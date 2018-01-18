@@ -1214,6 +1214,11 @@ public class ServiceApi {
         public static final String getStatisticsUserAgeByIdCardNo = "/tj/getStatisticsUserAgeByIdCardNo";
         public static final String getStatisticsDoctorByRoleType = "/tj/getStatisticsDoctorByRoleType";
         public static final String getStatisticsCityDoctorByRoleType = "/tj/getStatisticsCityDoctorByRoleType";
+
+        public static final String GetArchiveReportAll = "/stasticReport/getArchiveReportAll";
+        public static final String GetRecieveOrgCount = "/stasticReport/getRecieveOrgCount";
+        public static final String GetArchivesInc = "/stasticReport/getArchivesInc";
+
     }
 
     public static class Org {
