@@ -60,10 +60,10 @@ hadoop:
   user:
     name: root
 
-resolve:
+analyze:
   job:
-    init-size: 4 #解析入库初始任务数
-    max-size: 8 #解析入库最大任务数
+    init-size: 2 #档案分析入库初始任务数
+    max-size: 10 #档案分析入库最大任务数
     cron-exp: 0/4 * * * * ? #解析任务触发间隔表达式
 
 ---
@@ -87,7 +87,7 @@ spring:
         port: 8125
 fast-dfs:
   tracker-server: 172.19.103.13:22122
-  public-server: http://172.19.103.52:80
+  public-server: http://172.19.103.52
 hadoop:
   hbase-properties:
     - hbase.zookeeper.quorum: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com
