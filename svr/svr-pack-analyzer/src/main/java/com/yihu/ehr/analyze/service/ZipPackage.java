@@ -35,7 +35,6 @@ public class ZipPackage {
     //    private static final String ORIGIN = "origin";
     public static final String DATA = "d";
     private final static String TempPath = System.getProperty("java.io.tmpdir") + java.io.File.separator;
-
     private MPackage mPackage;
     private Zipper zipper = new Zipper();
     //数据集合
@@ -48,6 +47,10 @@ public class ZipPackage {
 
     public ZipPackage(MPackage mPackage) {
         this.mPackage = mPackage;
+    }
+
+    public MPackage getmPackage() {
+        return mPackage;
     }
 
     public Map<String, DataSetRecord> getDataSets() {
