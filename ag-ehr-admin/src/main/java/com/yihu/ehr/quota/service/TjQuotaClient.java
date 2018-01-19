@@ -69,7 +69,7 @@ public interface TjQuotaClient {
     @RequestMapping(value = ServiceApi.TJ.TjQuotaConfigInfo, method = RequestMethod.GET)
     @ApiOperation(value = "分页获取指标配置")
     ListResult quotaConfigInfo(
-            @RequestParam(value = "quotaName", required = false) String quotaName,
+            @RequestParam(value = "quotaNameOrCode", required = false) String quotaNameOrCode,
             @RequestParam(value = "page") Integer page,
             @RequestParam(value = "pageSize") Integer pageSize);
 
