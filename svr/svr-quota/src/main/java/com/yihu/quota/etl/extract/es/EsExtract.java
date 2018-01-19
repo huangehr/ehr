@@ -14,6 +14,7 @@ import com.yihu.quota.etl.save.es.ElasticFactory;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionMain;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionSlave;
 import com.yihu.quota.service.orgHealthCategory.OrgHealthCategoryStatisticsService;
+import com.yihu.quota.service.quota.BaseStatistsService;
 import com.yihu.quota.service.quota.QuotaService;
 import com.yihu.quota.vo.DictModel;
 import com.yihu.quota.vo.QuotaVo;
@@ -61,9 +62,12 @@ public class EsExtract {
     @Autowired
     private QuotaService quotaService;
     @Autowired
-    ExtractUtil extractUtil;
+    private ExtractUtil extractUtil;
     @Autowired
-    ElasticSearchPool elasticSearchPool;
+    private ElasticSearchPool elasticSearchPool;
+    @Autowired
+    private BaseStatistsService baseStatistsService;
+
     @Autowired
     private OrgHealthCategoryStatisticsService orgHealthCategoryStatisticsService;
 
@@ -185,15 +189,30 @@ public class EsExtract {
      */
     public List<List<Map<String, Object>>> stastisOrtType(List<Map<String, Object>> orgTypeList,List<TjQuotaDimensionMain> qdm,
                                                     List<TjQuotaDimensionSlave> qds){
+
+        Map<String,String>  dimensionDicMap = new HashMap<>();
         Map<String, Object> dimensionMap = new HashMap<>();
         for(TjQuotaDimensionMain main:qdm){
             if(!main.getMainCode().trim().equals("org")){
                 dimensionMap.put(main.getMainCode(),main.getMainCode());
+                if(org.apache.commons.lang.StringUtils.isNotEmpty(main.getDictSql())){
+                    Map<String,String> dicMap = baseStatistsService.getDimensionMap(main.getDictSql(),main.getMainCode());
+                    if(dicMap != null && dicMap.size() > 0){
+                        dimensionDicMap.putAll(dicMap);
+                    }
+                }
             }
         }
         for(TjQuotaDimensionSlave slave:qds){
             dimensionMap.put(slave.getSlaveCode(),slave.getSlaveCode());
+            if(org.apache.commons.lang.StringUtils.isNotEmpty(slave.getDictSql())){
+                Map<String,String> dicMap = baseStatistsService.getDimensionMap(slave.getDictSql(), slave.getSlaveCode());
+                if(dicMap != null && dicMap.size() > 0){
+                    dimensionDicMap.putAll(dicMap);
+                }
+            }
         }
+
 
         Map<String,String> dimenTypeMap = new HashMap<>();
         Map<String,String> orgDimenTypeMap = new HashMap<>();
@@ -230,6 +249,7 @@ public class EsExtract {
                                 if(dimensionMap != null && dimensionMap.size() > 0){
                                     for(String dimen:dimensionMap.keySet()){
                                         sumDimenMap.put(dimen,map.get(dimen));
+                                        sumDimenMap.put(dimen+"Name",dimensionDicMap.get(map.get(dimen)));
                                     }
                                 }
                             }

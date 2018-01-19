@@ -29,8 +29,11 @@ public class HealthCheckTask {
 
     private static String  SVR_PACK_MGR = "svr-pack-mgr";
 
+    private int jobSetSize;
     @Value("${resolve.job.init-size}")
     private int jobInitSize;
+    @Value("${resolve.job.max-size}")
+    private int jobMaxSize;
     @Value("${resolve.job.cron-exp}")
     private String jobCronExp;
     @Autowired
@@ -58,10 +61,11 @@ public class HealthCheckTask {
         }catch (Exception e) {
             e.printStackTrace();
         }
+        this.jobSetSize = jobInitSize;
     }
 
     @Scheduled(cron = "0 0/20 * * * ?")
-    public void startTask() {
+    private void startTask() {
         PackResolveLogger.info("Health Check:" + new Date());
         GroupMatcher groupMatcher = GroupMatcher.groupEquals("PackResolve");
         //检查集群信息
@@ -100,7 +104,7 @@ public class HealthCheckTask {
             Set<JobKey> jobKeySet = scheduler.getJobKeys(groupMatcher);
             if(jobKeySet != null) {
                 int activeCount = jobKeySet.size();
-                for (int i = 0; i < jobInitSize - activeCount; i++) {
+                for (int i = 0; i < jobSetSize - activeCount; i++) {
                     String suffix = UUID.randomUUID().toString().substring(0, 8);
                     JobDetail jobDetail = newJob(PackageResourceJob.class)
                             .withIdentity("PackResolveJob-" + suffix, "PackResolve")
@@ -130,4 +134,19 @@ public class HealthCheckTask {
             PackResolveLogger.error(e.getMessage());
         }
     }
+
+    public void addJobSize(int addSize) {
+        this.jobSetSize += addSize;
+        if(this.jobSetSize > jobMaxSize) {
+            jobSetSize = jobMaxSize;
+        }
+    }
+
+    public void minusJobSize(int minusSize) {
+        this.jobSetSize -= minusSize;
+        if(this.jobSetSize < 0) {
+            jobSetSize = 0;
+        }
+    }
+
 }

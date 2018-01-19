@@ -67,4 +67,7 @@ public interface OrganizationRepository extends PagingAndSortingRepository<Organ
 
     @Query("select org from Organization org where org.orgType='Hospital' and org.ing !='' and  org.ing is not null and org.lat!='' and org.lat is not null" )
     List<Organization> getHospital();
+
+    @Query(value = "SELECT org.* from Organizations org WHERE org.administrative_division in(SELECT id from address_dict where pid = :pid)", nativeQuery = true)
+    List<Organization> getOrgListByAddressPid(@Param("pid") Integer pid);
 }

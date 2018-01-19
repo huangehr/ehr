@@ -21,6 +21,7 @@ import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.log.LogService;
 import com.yihu.ehr.util.phonics.PinyinUtil;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -240,6 +241,10 @@ public class UserEndPoint extends EnvelopRestEndPoint {
     public Map<String, String> distributeKey(
             @ApiParam(name = "user_id", value = "登录帐号", defaultValue = "")
             @PathVariable(value = "user_id") String userId) throws Exception{
+        User user = userService.getUser(userId);
+        if(null == user) {
+            return null;
+        }
         UserSecurity userSecurity = userSecurityService.getKeyByUserId(userId, false);
         Map<String, String> keyMap = new HashMap<>();
         if (userSecurity != null) {
@@ -256,6 +261,34 @@ public class UserEndPoint extends EnvelopRestEndPoint {
         return keyMap;
     }
 
+    @RequestMapping(value = ServiceApi.Users.UserAdminKey, method = RequestMethod.GET)
+    @ApiOperation(value = "查询用户公钥", notes = "查询用户公钥")
+    public Envelop getKey(
+            @ApiParam(name = "user_id", value = "登录帐号", defaultValue = "")
+            @PathVariable(value = "user_id") String userId) throws Exception{
+        Envelop envelop = new Envelop();
+        User user = userService.getUser(userId);
+        if(null == user) {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("用户不存在");
+            return envelop;
+        }
+        UserSecurity userSecurity = userSecurityService.getKeyByUserId(userId, false);
+        if (null == userSecurity) {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("请先获取公钥");
+            return envelop;
+        }
+        Map<String, String> keyMap = new HashMap<>();
+        String validTime = DateFormatUtils.format(userSecurity.getFromDate(), "yyyy-MM-dd")
+                + "~" + DateFormatUtils.format(userSecurity.getExpiryDate(), "yyyy-MM-dd");
+        keyMap.put("publicKey", userSecurity.getPublicKey());
+        keyMap.put("validTime", validTime);
+        keyMap.put("startTime", DateFormatUtils.format(userSecurity.getFromDate(), "yyyy-MM-dd"));
+        envelop.setSuccessFlg(true);
+        envelop.setObj(keyMap);
+        return envelop;
+    }
 
     /**
      * 根据登陆用户名及密码验证用户.

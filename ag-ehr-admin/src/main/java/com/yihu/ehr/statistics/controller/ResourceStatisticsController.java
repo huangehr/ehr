@@ -112,5 +112,35 @@ public class ResourceStatisticsController extends BaseController {
         }
     }
 
+    @RequestMapping(value = ServiceApi.StasticReport.GetArchiveReportAll, method = RequestMethod.GET)
+    @ApiOperation(value = "获取一段时间内数据解析情况")
+    public Envelop getArchiveReportAll(
+            @ApiParam(name = "startDate", value = "开始日期")
+            @RequestParam(name = "startDate") String startDate,
+            @ApiParam(name = "endDate", value = "结束日期")
+            @RequestParam(name = "endDate") String endDate) {
+        Envelop envelop = resourceStatisticsClient.getArchiveReportAll(startDate,endDate);
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.StasticReport.GetRecieveOrgCount, method = RequestMethod.GET)
+    @ApiOperation(value = "根据接收日期统计各个医院的数据解析情况")
+    public Envelop getRecieveOrgCount(
+            @ApiParam(name = "date", value = "日期")
+            @RequestParam(name = "date") String date) {
+        Envelop envelop = resourceStatisticsClient.getRecieveOrgCount(date);
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.StasticReport.GetArchivesInc, method = RequestMethod.GET)
+    @ApiOperation(value = "获取某天数据新增情况")
+    public Envelop getArchivesInc(
+            @ApiParam(name = "date", value = "日期")
+            @RequestParam(name = "date") String date,
+            @ApiParam(name = "orgCode", value = "医院代码")
+            @RequestParam(name = "orgCode") String orgCode) {
+        Envelop envelop = resourceStatisticsClient.getArchivesInc(date,orgCode);
+        return envelop;
+    }
 
 }

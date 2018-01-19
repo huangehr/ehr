@@ -131,7 +131,7 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
         OrgDept dept=new OrgDept();
         dept.setOrgId(String.valueOf(orgId));
         dept.setCode(String.valueOf(orgId)+"1");
-        dept.setName("未分配部门人员");
+        dept.setName("未分配");
         orgDeptService.saveOrgDept(dept);
         return convertToModel(org, MOrganization.class);
     }
@@ -450,6 +450,24 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
             List<Organization> orgs = orgService.getHospital();
             envelop.setSuccessFlg(true);
             envelop.setDetailModelList(orgs);
+        }catch (Exception e) {
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return envelop;
+    }
+
+    @RequestMapping(value = "/organizations/getOrgListByAddressPid", method = RequestMethod.GET)
+    @ApiOperation(value = "根据区域查询机构列表")
+    public Envelop getOrgListByAddressPid(
+            @ApiParam(name = "pid", value = "区域id", defaultValue = "")
+            @RequestParam(value = "pid") Integer pid) {
+        Envelop envelop = new Envelop();
+        try {
+            List<Organization> orgList = orgService.getOrgListByAddressPid(pid);
+            envelop.setSuccessFlg(true);
+            envelop.setDetailModelList(orgList);
         }catch (Exception e) {
             e.printStackTrace();
             envelop.setSuccessFlg(false);

@@ -12,15 +12,19 @@ import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.entity.dict.SystemDictEntry;
 import com.yihu.ehr.model.tj.EchartReportModel;
 import com.yihu.ehr.model.tj.MapDataModel;
+import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import sun.util.calendar.BaseCalendar;
 
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -518,4 +522,52 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
+    @RequestMapping(value = ServiceApi.StasticReport.GetArchiveReportAll, method = RequestMethod.GET)
+    @ApiOperation(value = "获取一段时间内数据解析情况")
+    public Envelop getArchiveReportAll(
+            @ApiParam(name = "startDate", value = "开始日期")
+            @RequestParam(name = "startDate") String startDate,
+            @ApiParam(name = "endDate", value = "结束日期")
+            @RequestParam(name = "endDate") String endDate) {
+        Envelop envelop = new Envelop();
+        Date start = DateUtil.formatCharDateYMD(startDate);
+        Date end = DateUtil.formatCharDateYMD(endDate);
+        int day = (int) ((end.getTime() - start.getTime()) / (1000*3600*24))+1;
+        List<Map<String,List<Map<String,Object>>>> res = new ArrayList<Map<String,List<Map<String,Object>>>>();
+        for(int i =0;i<day;i++){
+            Date date = DateUtil.addDate(i,start);
+            Map<String,List<Map<String,Object>>> map = new HashMap<String,List<Map<String,Object>>>();
+            List<Map<String,Object>> list = statisticService.getArchivesCount(DateUtil.toString(date));
+            map.put(DateUtil.toString(date),list);
+            res.add(map);
+        }
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(res);
+        return envelop;
+    }
+    @RequestMapping(value = ServiceApi.StasticReport.GetRecieveOrgCount, method = RequestMethod.GET)
+    @ApiOperation(value = "根据接收日期统计各个医院的数据解析情况")
+    public Envelop getRecieveOrgCount(
+            @ApiParam(name = "date", value = "日期")
+            @RequestParam(name = "date") String date) {
+        Envelop envelop = new Envelop();
+        List<Map<String, Object>> list = statisticService.getRecieveOrgCount(date);
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(list);
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.StasticReport.GetArchivesInc, method = RequestMethod.GET)
+    @ApiOperation(value = "获取某天数据新增情况")
+    public Envelop getArchivesInc(
+            @ApiParam(name = "date", value = "日期")
+            @RequestParam(name = "date") String date,
+            @ApiParam(name = "orgCode", value = "医院代码")
+            @RequestParam(name = "orgCode") String orgCode) {
+        Envelop envelop = new Envelop();
+        List<Map<String, Object>> list = statisticService.getArchivesInc(date, orgCode);
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(list);
+        return envelop;
+    }
 }

@@ -59,15 +59,17 @@ public class TjQuotaService extends BaseJpaService<TjQuota, XTjQuotaRepository> 
         return tjQuota;
     }
 
-    public List<MQuotaConfigModel> getQuotaConfig(String quotaName, Integer page, Integer pageSize) {
+    public List<MQuotaConfigModel> getQuotaConfig(String quotaNameOrCode, Integer page, Integer pageSize) {
         Session session = entityManager.unwrap(Session.class);
         String sql = "SELECT h.name as quotaTypeName,tj.name as quotaName,tj.code as quotaCode,tj.id as quotaId from tj_quota tj left join tj_quota_category h on tj.quota_type = h.id where 1 = 1";
-        if (!StringUtils.isEmpty(quotaName)) {
+        if (!StringUtils.isEmpty(quotaNameOrCode)) {
             sql += " AND tj.name LIKE :quotaName";
+            sql += " OR tj.code = :quotaCode";
         }
         Query query = session.createSQLQuery(sql).setResultTransformer(Transformers.aliasToBean(MQuotaConfigModel.class));
-        if (!StringUtils.isEmpty(quotaName)) {
-            query.setParameter("quotaName", "%" + quotaName + "%");
+        if (!StringUtils.isEmpty(quotaNameOrCode)) {
+            query.setParameter("quotaName", "%" + quotaNameOrCode + "%");
+            query.setParameter("quotaCode", quotaNameOrCode);
         }
         query.setMaxResults(pageSize);
         query.setFirstResult((page - 1) * pageSize);
@@ -75,15 +77,17 @@ public class TjQuotaService extends BaseJpaService<TjQuota, XTjQuotaRepository> 
         return quotaConfigList;
     }
 
-    public int getCountInfo(String quotaName) {
+    public int getCountInfo(String quotaNameOrCode) {
         Session session = entityManager.unwrap(Session.class);
         String sql = "SELECT count(*) from tj_quota tj left join tj_quota_category h on tj.quota_type = h.id where 1 = 1";
-        if (!StringUtils.isEmpty(quotaName)) {
+        if (!StringUtils.isEmpty(quotaNameOrCode)) {
             sql += " AND tj.name LIKE :quotaName";
+            sql += " OR tj.code = :quotaCode";
         }
         Query query = session.createSQLQuery(sql);
-        if (!StringUtils.isEmpty(quotaName)) {
-            query.setParameter("quotaName", "%" + quotaName + "%");
+        if (!StringUtils.isEmpty(quotaNameOrCode)) {
+            query.setParameter("quotaName", "%" + quotaNameOrCode + "%");
+            query.setParameter("quotaCode", quotaNameOrCode);
         }
         Object ob  = (query.list().get(0));
         int count = Integer.parseInt(ob.toString());

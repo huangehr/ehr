@@ -14,6 +14,7 @@ import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionSlave;
 import com.yihu.quota.model.rest.QuotaTreeModel;
 import com.yihu.quota.service.dimension.TjDimensionMainService;
 import com.yihu.quota.service.dimension.TjDimensionSlaveService;
+import com.yihu.quota.service.quota.BaseStatistsService;
 import com.yihu.quota.service.quota.QuotaService;
 import com.yihu.quota.service.resource.ResourceQuotaService;
 import com.yihu.quota.util.BasesicUtil;
@@ -41,7 +42,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(description = "指标统计 -指标报表控制入口")
+@Api(description = "指标报表统计 -指标报表统计控制入口")
 public class QuotaReportController extends BaseController {
 
     @Autowired
@@ -56,6 +57,9 @@ public class QuotaReportController extends BaseController {
     private JdbcTemplate jdbcTemplate;
     @Autowired
     private ResourceQuotaService resourceQuotaService;
+    @Autowired
+    private BaseStatistsService baseStatistsService;
+
 
 
     /**
@@ -85,6 +89,33 @@ public class QuotaReportController extends BaseController {
         envelop.setSuccessFlg(false);
         return envelop;
     }
+    @ApiOperation(value = "获取指标统计报表 二维表")
+    @RequestMapping(value = ServiceApi.TJ.GetQuotaReportTwoDimensionalTable, method = RequestMethod.GET)
+    public List<Map<String, Object>> getQuotaReportTwoDimensionalTable(
+            @ApiParam(name = "quotaCodeStr", value = "指标Code,多个用,拼接", required = true)
+            @RequestParam(value = "quotaCodeStr" , required = true) String quotaCodeStr,
+            @ApiParam(name = "filter", value = "过滤", defaultValue = "")
+            @RequestParam(value = "filter", required = false) String filter,
+            @ApiParam(name = "dimension", value = "维度字段", defaultValue = "quotaDate")
+            @RequestParam(value = "dimension", required = false) String dimension,
+            @ApiParam(name = "dateType", value = "时间聚合类型 year,month,week,day", defaultValue = "dateType")
+            @RequestParam(value = "dateType", required = false) String dateType
+    ) {
+        List<Map<String, Object>> result = new ArrayList<>();
+        try {
+            List<String> quotaCodes = Arrays.asList(quotaCodeStr.split(","));
+            for(String code:quotaCodes){
+                List<Map<String, Object>> quotaResult = baseStatistsService.getSimpleQuotaReport(code, filter, dimension, dateType);
+                result.addAll(quotaResult);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return  result;
+
+    }
+
+
 
     @ApiOperation(value = "获取指标统计结果echart图表，支持多条组合")
     @RequestMapping(value = ServiceApi.TJ.GetMoreQuotaGraphicReportPreviews, method = RequestMethod.GET)

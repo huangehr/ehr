@@ -229,15 +229,15 @@ public class RsResourceController extends BaseController {
     @ApiOperation("指标资源配置")
     @RequestMapping(value = ServiceApi.Resources.GetQuotaList,method = RequestMethod.GET)
     public Envelop getQuotaList(
-            @ApiParam(name = "quotaName", value = "指标名称",defaultValue = "")
-            @RequestParam(value = "quotaName", required = false) String quotaName,
+            @ApiParam(name = "quotaNameOrCode", value = "指标名称或编码")
+            @RequestParam(value = "quotaNameOrCode", required = false) String quotaNameOrCode,
             @ApiParam(name = "filters", value = "过滤条件")
             @RequestParam(value = "filters") String filters,
             @ApiParam(name = "page", value = "页码",defaultValue = "1")
             @RequestParam(value = "page") Integer page,
             @ApiParam(name = "pageSize", value = "每页大小",defaultValue = "15")
             @RequestParam(value = "pageSize") Integer pageSize) {
-        ListResult listResult = tjQuotaClient.quotaConfigInfo(quotaName, page, pageSize);
+        ListResult listResult = tjQuotaClient.quotaConfigInfo(quotaNameOrCode, page, pageSize);
 
         List<MQuotaConfigModel> mainModelList  = new ArrayList<>();
         if(listResult.getTotalCount() != 0){
