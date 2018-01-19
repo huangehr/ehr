@@ -59,7 +59,9 @@ public class PortalLoginController extends BaseController {
         usersModel.setLoginCode(user.getLoginCode());
         usersModel.setUserType(user.getUserType());
         usersModel.setActivated(user.getActivated());
-        usersModel.setLastLoginTime(DateTimeUtil.simpleDateTimeFormat(user.getLastLoginTime()));
+        if(null != user.getLastLoginTime()){
+            usersModel.setLastLoginTime(DateTimeUtil.simpleDateTimeFormat(user.getLastLoginTime()));
+        }
         envelop.setSuccessFlg(true);
         envelop.setObj(usersModel);
         return envelop;
