@@ -447,7 +447,8 @@ public class SolrQuery {
         List<Map<String, Object>> resultCounts = new ArrayList<>();
 
         if (dimensionGroupList.size() > 0) {
-            // 收集将前 N-1 维度的统计，拼接成筛选条件
+            // 收集将前 N-1 维度的统计，拼接成筛选条件。
+            // 注意：其中指标维度code出现的顺序要与 dimensionGroupList 中的一致。
             List<SolrGroupEntity> groupList = new ArrayList<>();
             if (customGroups != null && customGroups.size() > 0) {
                 groupList = customGroups;
@@ -470,22 +471,21 @@ public class SolrQuery {
                         groupList.add(group);
                     }
                 } else {
+                    // 按分组字段值统计
                     groupFieldList.add(dimensionGroup.getGroupField());
+                    String[] groupFields = groupFieldList.toArray(new String[groupFieldList.size()]);
+                    List<FacetField> facets = solrUtil.groupCount(core, q, fq, groupFields);
+                    for (FacetField facet : facets) {
+                        String groupName = facet.getName();
+                        List<FacetField.Count> counts = facet.getValues();
+                        SolrGroupEntity group = new SolrGroupEntity(groupName);
+                        for (FacetField.Count count : counts) {
+                            String value = count.getName();
+                            group.putGroupCondition(value, groupName + ":" + value);
+                        }
+                        groupList.add(group);
+                    }
                 }
-            }
-
-            // 按分组字段值统计
-            String[] groupFields = groupFieldList.toArray(new String[groupFieldList.size()]);
-            List<FacetField> facets = solrUtil.groupCount(core, q, fq, groupFields);
-            for (FacetField facet : facets) {
-                String groupName = facet.getName();
-                List<FacetField.Count> counts = facet.getValues();
-                SolrGroupEntity group = new SolrGroupEntity(groupName);
-                for (FacetField.Count count : counts) {
-                    String value = count.getName();
-                    group.putGroupCondition(value, groupName + ":" + value);
-                }
-                groupList.add(group);
             }
 
             resultCounts = recGroupCount(core, groupList, 0, null, q, fq);
