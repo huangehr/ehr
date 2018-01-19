@@ -302,11 +302,19 @@ public class ExtractUtil {
                     //设置新key
                     String codeVal = getMainCode(mainOne, dimensionType, "code");
                     String nameVal = getMainCode(mainOne, dimensionType, "name");
-                    ;
+
                     StringBuffer newKey = new StringBuffer(one.getKey() + "-" + codeVal);
                     //设置新的value
                     SaveModel saveModelTemp = new SaveModel();
                     BeanUtils.copyProperties(one.getValue(), saveModelTemp);
+                    if (!StringUtils.isEmpty(mainOne.getTown())) {
+                        saveModelTemp.setTown(mainOne.getTown());
+                        saveModelTemp.setTownName(mainOne.getTownName());
+                    }
+                    if (!StringUtils.isEmpty(mainOne.getEconomic())) {
+                        saveModelTemp.setEconomic(mainOne.getEconomic());
+                        saveModelTemp.setEconomicName(mainOne.getEconomicName());
+                    }
                     code = code.substring(0, 1).toUpperCase() + code.substring(1);
                     StringBuffer keyMethodName = new StringBuffer("set" + code);
                     StringBuffer nameMethodName = new StringBuffer("set" + code + "Name");

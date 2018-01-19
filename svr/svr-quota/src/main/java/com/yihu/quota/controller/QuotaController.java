@@ -322,6 +322,9 @@ public class QuotaController extends BaseController {
             @RequestParam(value = "quotaCodes") String quotaCodes,
             @ApiParam(name = "town", value = "区域town", required = true)
             @RequestParam(value = "town") String town) {
+        if ("all".equalsIgnoreCase(town)) {
+            town = "";
+        }
         List<HospitalComposeModel> hospitalComposeModels = new ArrayList<>();
         List<HospitalComposeModel> hospitalComposeModelList = new ArrayList<>();
         HospitalComposeModel hospitalComposeModel = new HospitalComposeModel();
@@ -336,18 +339,23 @@ public class QuotaController extends BaseController {
 
                 List<Map<String, Object>> mapList = quotaService.queryResultPageByCode(code[i], "{\"town\":\""+ town + "\"}", 1, 10000);
                 if (null != mapList && mapList.size() > 0) {
+                    String title = exchangeCode(code[i]);
+                    hos.setName(title);
+                    Integer x1 = 0;
+                    Integer x2 = 0;
                     for (Map<String, Object> map : mapList) {
                         SaveModel saveModel =  objectMapper.convertValue(map, SaveModel.class);
                         if(saveModel != null){
-                            hos.setName(saveModel.getQuotaName());
                             if ("1".equals(saveModel.getSlaveKey1())) {
-                                hos.setX1(saveModel.getResult());
+                                x1 += Integer.parseInt(saveModel.getResult() == null ? "0" : saveModel.getResult());
                             } else if ("2".equals(saveModel.getSlaveKey1())) {
-                                hos.setX2(saveModel.getResult());
+                                x2 += Integer.parseInt(saveModel.getResult() == null ? "0" : saveModel.getResult());
                             }
 
                         }
                     }
+                    hos.setX1(x1 + "");
+                    hos.setX2(x2 + "");
                     hospitalComposeModels.add(hos);
                 } else {
                     String title = exchangeCode(code[i]);
