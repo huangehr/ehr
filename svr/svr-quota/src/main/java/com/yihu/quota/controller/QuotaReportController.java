@@ -91,7 +91,7 @@ public class QuotaReportController extends BaseController {
     }
     @ApiOperation(value = "获取指标统计报表 二维表")
     @RequestMapping(value = ServiceApi.TJ.GetQuotaReportTwoDimensionalTable, method = RequestMethod.GET)
-    public List<Map<String, Object>> getQuotaGraphicReports(
+    public List<Map<String, Object>> getQuotaReportTwoDimensionalTable(
             @ApiParam(name = "quotaCodeStr", value = "指标Code,多个用,拼接", required = true)
             @RequestParam(value = "quotaCodeStr" , required = true) String quotaCodeStr,
             @ApiParam(name = "filter", value = "过滤", defaultValue = "")

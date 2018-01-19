@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * Created by janseny on 2017/12/14.
  */
@@ -37,4 +40,17 @@ public interface RsResourceStatisticsClient {
             @RequestParam(value = "filters", required = false) String filters,
             @ApiParam(name = "dimension", value = "需要统计不同维度字段", defaultValue = "")
             @RequestParam(value = "dimension", required = false) String dimension );
+
+
+    @ApiOperation(value = "获取指标统计报表 二维表")
+    @RequestMapping(value = ServiceApi.TJ.GetQuotaReportTwoDimensionalTable, method = RequestMethod.GET)
+    public List<Map<String, Object>> getQuotaReportTwoDimensionalTable(
+            @ApiParam(name = "quotaCodeStr", value = "指标Code,多个用,拼接", required = true)
+            @RequestParam(value = "quotaCodeStr" , required = true) String quotaCodeStr,
+            @ApiParam(name = "filter", value = "过滤", defaultValue = "")
+            @RequestParam(value = "filter", required = false) String filter,
+            @ApiParam(name = "dimension", value = "维度字段", defaultValue = "quotaDate")
+            @RequestParam(value = "dimension", required = false) String dimension,
+            @ApiParam(name = "dateType", value = "时间聚合类型 year,month,week,day", defaultValue = "dateType")
+            @RequestParam(value = "dateType", required = false) String dateType);
 }
