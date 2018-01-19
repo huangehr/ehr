@@ -95,6 +95,6 @@ public interface TjQuotaJobClient {
     Envelop findByQuotaCodes(
             @ApiParam(name = "quotaCodes", value = "指标code", required = true)
             @RequestParam(value = "quotaCodes") String quotaCodes,
-            @ApiParam(name = "orgCode", value = "机构code", required = true)
-            @RequestParam(value = "orgCode") String orgCode);
+            @ApiParam(name = "town", value = "区域town", required = true)
+            @RequestParam(value = "town") String town);
 }
