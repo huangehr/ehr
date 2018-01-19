@@ -11,9 +11,33 @@ public class EsConfig {
     private String type;// 类型 es 相当于表
     private String clusterName;//es clusterName
     private String table;// 数据库表
-    private String molecular;  // 统计百分比时的分子  指标code
-    private String denominator;// 统计百分比时的分母  指标code
-    private String timekey;//根据sql去查询的key
+    private String molecular;  // 统计除法的分子  指标code
+    private String denominator;// 统计除法的分母  指标code
+    private String percentOperation;//运算方式  1 乘法  2 除法  默认乘法
+    private String percentOperationValue;//运算对应的值  默认 100
+
+    private String timekey;//根据sql去查询的key 时间控制字段
+    private String filter;  // where条件
+    private String aggregation;//聚合方式  默认count，另有sum
+    private String aggregationKey;//聚合字段
+
+    private String thousandFlag; //每千，每万 1000,10000
+    private String thousandDmolecular; //每千，每万 统计分子
+    private String thousandDenominator; //每千，每万 统计分母
+
+    private String especialType; //特殊类型  orgHealthCategory：卫生机构类型
+    private String superiorCode;//上级指标code
+
+    private String superiorBaseQuotaCode;  // 上级基础指标code
+
+
+    public String getSuperiorBaseQuotaCode() {
+        return superiorBaseQuotaCode;
+    }
+
+    public void setSuperiorBaseQuotaCode(String superiorBaseQuotaCode) {
+        this.superiorBaseQuotaCode = superiorBaseQuotaCode;
+    }
 
     public String getHost() {
         return host;
@@ -86,5 +110,85 @@ public class EsConfig {
 
     public void setDenominator(String denominator) {
         this.denominator = denominator;
+    }
+
+    public String getFilter() {
+        return filter;
+    }
+
+    public void setFilter(String filter) {
+        this.filter = filter;
+    }
+
+    public String getAggregation() {
+        return aggregation;
+    }
+
+    public void setAggregation(String aggregation) {
+        this.aggregation = aggregation;
+    }
+
+    public String getAggregationKey() {
+        return aggregationKey;
+    }
+
+    public void setAggregationKey(String aggregationKey) {
+        this.aggregationKey = aggregationKey;
+    }
+
+    public String getThousandFlag() {
+        return thousandFlag;
+    }
+
+    public void setThousandFlag(String thousandFlag) {
+        this.thousandFlag = thousandFlag;
+    }
+
+    public String getThousandDmolecular() {
+        return thousandDmolecular;
+    }
+
+    public void setThousandDmolecular(String thousandDmolecular) {
+        this.thousandDmolecular = thousandDmolecular;
+    }
+
+    public String getThousandDenominator() {
+        return thousandDenominator;
+    }
+
+    public void setThousandDenominator(String thousandDenominator) {
+        this.thousandDenominator = thousandDenominator;
+    }
+
+    public String getEspecialType() {
+        return especialType;
+    }
+
+    public void setEspecialType(String especialType) {
+        this.especialType = especialType;
+    }
+
+    public String getSuperiorCode() {
+        return superiorCode;
+    }
+
+    public void setSuperiorCode(String superiorCode) {
+        this.superiorCode = superiorCode;
+    }
+
+    public String getPercentOperation() {
+        return percentOperation;
+    }
+
+    public void setPercentOperation(String percentOperation) {
+        this.percentOperation = percentOperation;
+    }
+
+    public String getPercentOperationValue() {
+        return percentOperationValue;
+    }
+
+    public void setPercentOperationValue(String percentOperationValue) {
+        this.percentOperationValue = percentOperationValue;
     }
 }

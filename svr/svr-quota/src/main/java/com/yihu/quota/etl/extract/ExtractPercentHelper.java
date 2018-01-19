@@ -76,57 +76,103 @@ public class ExtractPercentHelper {
             }
             JSONObject obj = new JSONObject().fromObject(quotaDataSource.getConfigJson());
             EsConfig esConfig= (EsConfig) JSONObject.toBean(obj,EsConfig.class);
-            if(StringUtils.isNotEmpty(esConfig.getMolecular()) &&  StringUtils.isNotEmpty(esConfig.getDenominator())){
 
-                Map<String,DictModel> dimensionMap = getQuotaDimension(quotaDataSource.getQuotaCode());
-                Map<String,DictModel> moleDimensionMap = getQuotaDimension(esConfig.getMolecular());
-                Map<String,DictModel> denoDimensionMap = getQuotaDimension(esConfig.getMolecular());
+            if(StringUtils.isEmpty(esConfig.getThousandFlag())){
+                if(StringUtils.isNotEmpty(esConfig.getMolecular()) &&  StringUtils.isNotEmpty(esConfig.getDenominator())){
+                    Map<String,DictModel> dimensionMap = getQuotaDimension(quotaDataSource.getQuotaCode());
+                    Map<String,DictModel> moleDimensionMap = getQuotaDimension(esConfig.getMolecular());
+                    Map<String,DictModel> denoDimensionMap = getQuotaDimension(esConfig.getDenominator());
+                    List<String> quotaDimension = new ArrayList<>();
+                    String moleDimension = "";
+                    String denoDimension = "";
+                    int num = 0;
+                    int count = 0;
+                    for(String key : dimensionMap.keySet()){
+                        for(String molekey : moleDimensionMap.keySet()){
+                            if(key.equals(molekey) && dimensionMap.get(key).getCode().equals( moleDimensionMap.get(molekey).getCode() )){
+                                moleDimension = moleDimension + moleDimensionMap.get(molekey).getName() + ";";
+                                num ++;
+                            }
+                        }
+                        for(String denokey : denoDimensionMap.keySet()){
+                            if(key.equals(denokey) && dimensionMap.get(key).getCode().equals( denoDimensionMap.get(denokey).getCode() )){
+                                denoDimension = denoDimension + denoDimensionMap.get(denokey).getName() + ";";
+                                count ++;
+                            }
+                        }
+                        quotaDimension.add(dimensionMap.get(key).getName());
+                    }
+                    if(num != dimensionMap.size()){
+                        message = "指标维度无法与分子指标维度匹配";
+                        throw new Exception(message);
+                    }
 
-                List<String> quotaDimension = new ArrayList<>();
-                String moleDimension = "";
-                String denoDimension = "";
-                int num = 0;
-                int count = 0;
-                for(String key : dimensionMap.keySet()){
-                    for(String molekey : moleDimensionMap.keySet()){
-                        if(key.equals(molekey) && dimensionMap.get(key).getCode().equals( moleDimensionMap.get(molekey).getCode() )){
-                            moleDimension = moleDimension + moleDimensionMap.get(molekey).getName() + ";";
-                            num ++;
-                        }
+                    if(count != dimensionMap.size()){
+                        message = "指标维度无法与分母指标维度匹配";
+                        throw new Exception(message);
                     }
-                    for(String denokey : denoDimensionMap.keySet()){
-                        if(key.equals(denokey) && dimensionMap.get(key).getCode().equals( denoDimensionMap.get(denokey).getCode() )){
-                            denoDimension = denoDimension + denoDimensionMap.get(denokey).getName() + ";";
-                            count ++;
-                        }
-                    }
-                    quotaDimension.add(dimensionMap.get(key).getName());
-                }
-                if(num != dimensionMap.size()){
-                    message = "指标维度超出了分子指标维度范围";
+
+                    TjQuota moleTjQuota = quotaService.findByCode(esConfig.getMolecular());
+                    TjQuota denoTjQuota = quotaService.findByCode(esConfig.getDenominator());
+
+                    Map<String,String> param =  new HashMap<>();
+                    param.put("startTime",startTime);
+                    param.put("endTime",endTime);
+                    Map<String,Map<String, Object>>  moleResultMap = quotaService.getQuotaResult(moleTjQuota.getId(), objectMapper.writeValueAsString(param), moleDimension.substring(0, moleDimension.length() - 1));
+                    Map<String,Map<String, Object>>  denoResultMap = quotaService.getQuotaResult(denoTjQuota.getId(), objectMapper.writeValueAsString(param), denoDimension.substring(0, denoDimension.length() - 1));
+
+                    List<SaveModel>  resultModel = getPercentResult(moleResultMap, denoResultMap,quotaVo,esConfig);
+                    return resultModel;
+                }else{
+                    message = "配置错误，分子或分母指标没有配置";
                     throw new Exception(message);
                 }
+            }else {
+                // 每千每万人口 计算
+                if(StringUtils.isNotEmpty(esConfig.getThousandDmolecular()) &&  StringUtils.isNotEmpty(esConfig.getThousandDenominator())){
+                    Map<String,DictModel> dimensionMap = getQuotaDimension(quotaDataSource.getQuotaCode());
+                    Map<String,DictModel> moleDimensionMap = getQuotaDimension(esConfig.getThousandDmolecular());
+                    String moleDimension = "";
+                    int num = 0;
+                    for(String key : dimensionMap.keySet()){
+                        for(String molekey : moleDimensionMap.keySet()){
+                            if(key.equals(molekey)){
+                                moleDimension = moleDimension + moleDimensionMap.get(molekey).getName() + ";";
+                                num ++;
+                            }
+                        }
+                    }
+                    if(num != dimensionMap.size()){
+                        message = "指标维度无法与分子指标维度匹配";
+                        throw new Exception(message);
+                    }
 
-                if(count != dimensionMap.size()){
-                    message = "指标维度超出了分母指标维度范围";
+                    TjQuota moleTjQuota = quotaService.findByCode(esConfig.getThousandDmolecular());
+                    TjQuota denoTjQuota = quotaService.findByCode(esConfig.getThousandDenominator());
+
+                    Map<String,String> param =  new HashMap<>();
+                    param.put("startTime",startTime);
+                    param.put("endTime",endTime);
+                    Map<String,Map<String, Object>>  moleResultMap = quotaService.getQuotaResult(moleTjQuota.getId(), objectMapper.writeValueAsString(param), moleDimension.substring(0, moleDimension.length() - 1));
+                    int totalCount = 0;
+                    Calendar calendar = Calendar.getInstance();
+                    Map<String,Integer>  doneResultMap = quotaService.searcherSumByGroupBySql(denoTjQuota, "year", "year=" + calendar.get(Calendar.YEAR),"result","","");
+                    if(doneResultMap != null && doneResultMap.size()>0){
+                        for(String key :doneResultMap.keySet())
+                        totalCount = totalCount + doneResultMap.get(key);
+                    }
+                    List<SaveModel>  resultModel = new ArrayList<>();
+                    if(moleResultMap != null && moleResultMap.size() > 0 && totalCount > 0){
+                        resultModel = getThousandPercentResult(moleResultMap,totalCount, quotaVo,esConfig.getThousandFlag());
+                    }
+                    return resultModel;
+                }else{
+                    message = "配置错误，分子或分母指标没有配置";
                     throw new Exception(message);
                 }
-
-                TjQuota moleTjQuota = quotaService.findByCode(esConfig.getMolecular());
-                TjQuota denoTjQuota = quotaService.findByCode(esConfig.getDenominator());
-
-                Map<String,String> param =  new HashMap<>();
-                param.put("startTime",startTime);
-                param.put("endTime",endTime);
-                Map<String,Map<String, Object>>  moleResultMap = quotaService.getQuotaResult(moleTjQuota.getId(), objectMapper.writeValueAsString(param), moleDimension.substring(0, moleDimension.length() - 1));
-                Map<String,Map<String, Object>>  denoResultMap = quotaService.getQuotaResult(denoTjQuota.getId(), objectMapper.writeValueAsString(param), denoDimension.substring(0, denoDimension.length() - 1));
-
-                List<SaveModel>  resultModel = getPercentResult(moleResultMap, denoResultMap,quotaVo);
-                return resultModel;
-            }else{
-                message = "配置错误，分子或分母指标没有配置";
-                throw new Exception(message);
             }
+
+
         } catch (Exception e) {
             message = "数据抽取错误";
             throw new Exception(message);
@@ -136,7 +182,7 @@ public class ExtractPercentHelper {
     //获取指标维度
     public Map<String,DictModel> getQuotaDimension(String quotaCode){
         // 指标 主维度
-        List<TjQuotaDimensionMain> dimensionMains = dimensionMainService.findTjQuotaDimensionMainByQuotaIncudeAddress(quotaCode);
+        List<TjQuotaDimensionMain> dimensionMains = dimensionMainService.findTjQuotaDimensionMainByQuotaCode(quotaCode);
         // 指标 细维度
         List<TjQuotaDimensionSlave> dimensionSlaves = dimensionSlaveService.findTjQuotaDimensionSlaveByQuotaCode(quotaCode);
         Map<String,DictModel> map = new HashMap<>();
@@ -165,7 +211,7 @@ public class ExtractPercentHelper {
         return map;
     }
 
-    public List<SaveModel> getPercentResult(Map<String,Map<String, Object>> moleReultMap,Map<String,Map<String, Object>> denoReultMap,QuotaVo quotaVo){
+    public List<SaveModel> getPercentResult(Map<String,Map<String, Object>> moleReultMap,Map<String,Map<String, Object>> denoReultMap,QuotaVo quotaVo,EsConfig esConfig){
 
         List<SaveModel> saveModelList = new ArrayList<>();
         for(String dekey :denoReultMap.keySet()){
@@ -183,7 +229,15 @@ public class ExtractPercentHelper {
                            int point = 0;
                            float moleVal = Float.valueOf(moleMap.get("result").toString());
                            float denoVal = Float.valueOf(denoMap.get("result").toString());
-                           point = (int)(moleVal/denoVal)*100;
+                            int percentOperationValue = 100;
+                            if(StringUtils.isNotEmpty(esConfig.getPercentOperationValue())){
+                                percentOperationValue = Integer.valueOf(esConfig.getPercentOperationValue());
+                            }
+                            if(esConfig.getPercentOperation().equals(1)){
+                                point = (int)(moleVal/denoVal)*percentOperationValue;
+                            }else if(esConfig.getPercentOperation().equals(2)){
+                                point = (int)(moleVal/denoVal)/percentOperationValue;
+                            }
                            moleMap.remove("result");
                            moleMap.put("result",point);
                            map = moleMap;
@@ -200,7 +254,29 @@ public class ExtractPercentHelper {
         return saveModelList;
     }
 
-
+    public List<SaveModel> getThousandPercentResult(Map<String,Map<String, Object>> moleReultMap,int totalCount,QuotaVo quotaVo,String thousandFlag){
+        List<SaveModel> saveModelList = new ArrayList<>();
+        Map<String, Object> map = new HashMap<>();
+        for(String mokey :moleReultMap.keySet()){
+            Map<String, Object> moleMap = moleReultMap.get(mokey);
+            if(moleMap.get("result").toString().equals("0")){
+                map = moleMap;
+                moleMap.put("result","0");
+            }else{
+                String point = "0";
+                float moleVal = Float.valueOf(moleMap.get("result").toString());
+                DecimalFormat   df = new   DecimalFormat("#.##");
+                point = df.format( (moleVal / totalCount) * Integer.valueOf(thousandFlag));
+                moleMap.put("result",point);
+                map = moleMap;
+            }
+            SaveModel saveModel =  objectMapper.convertValue(map, SaveModel.class);
+            saveModel.setQuotaName(quotaVo.getName());
+            saveModel.setQuotaCode(quotaVo.getCode());
+            saveModelList.add(saveModel);
+        }
+        return  saveModelList;
+    }
 
 
 }

@@ -10,9 +10,10 @@ public enum ProfileType {
     Standard(1),
     File(2),
     Link(3),
-    Dataset(4);
+    DataSet(4);
 
     private int type;
+
     ProfileType(int type){
         this.type = type;
     }

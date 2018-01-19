@@ -2,6 +2,7 @@ package com.yihu.ehr.pack.task;
 
 import com.yihu.ehr.model.packs.MPackage;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -14,7 +15,8 @@ import java.util.Set;
  * @version 1.0
  * @created 2016.04.01 14:38
  */
-@Service
+//@Service
+@Deprecated
 public class MessageBuffer {
     Set<MPackage> messages = new HashSet<>();
 

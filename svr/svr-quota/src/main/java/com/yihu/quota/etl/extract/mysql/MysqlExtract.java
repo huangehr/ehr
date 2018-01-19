@@ -1,20 +1,17 @@
 package com.yihu.quota.etl.extract.mysql;
 
-import com.yihu.ehr.query.common.model.SolrGroupEntity;
+import com.yihu.ehr.entity.address.AddressDict;
+import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.query.services.SolrQuery;
 import com.yihu.ehr.solr.SolrUtil;
 import com.yihu.quota.etl.Contant;
+import com.yihu.quota.etl.extract.ExtractUtil;
 import com.yihu.quota.etl.model.EsConfig;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionMain;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionSlave;
 import com.yihu.quota.vo.DictModel;
 import com.yihu.quota.vo.QuotaVo;
 import com.yihu.quota.vo.SaveModel;
-import org.elasticsearch.search.aggregations.bucket.terms.DoubleTerms;
-import org.elasticsearch.search.aggregations.bucket.terms.LongTerms;
-import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
-import org.elasticsearch.search.aggregations.bucket.terms.Terms;
-import org.elasticsearch.search.aggregations.metrics.valuecount.InternalValueCount;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +39,8 @@ public class MysqlExtract {
     SolrUtil solrUtil;
     @Autowired
     SolrQuery solrQuery;
+    @Autowired
+    ExtractUtil extractUtil;
 
     private QuotaVo quotaVo;
     private String startTime;
@@ -65,15 +64,17 @@ public class MysqlExtract {
         this.esConfig = esConfig;
 
         List<SaveModel> returnList = new ArrayList<>();
-       //获取mysql
+        //获取mysql
         String mysql = getSql(qdm,qds);
         logger.debug(mysql);
+        System.out.println("统计mysql :" + mysql);
         if( !StringUtils.isEmpty(mysql)){
-            Map<String,Long> resultMap = new HashMap<>();
+            Map<String,Integer> resultMap = new HashMap<>();
+            Map<String, String> daySlaveDictMap = new HashMap<>();
             //执行MySQL
             List<Map<String, Object>> mapList = null;
             try {
-                 mapList =  jdbcTemplate.queryForList(mysql);
+                mapList =  jdbcTemplate.queryForList(mysql);
             }catch (Exception e){
                 throw new Exception("mysql查询数据出错" + e.getMessage());
             }
@@ -85,16 +86,20 @@ public class MysqlExtract {
                             keyVal = keyVal + map.get(key) +  "-";
                         }
                     }
-                    resultMap.put(keyVal.substring(0, keyVal.length() - 1), (long) map.get("result"));
+                    int result = Integer.parseInt(map.get("result").toString());
+                    String mapKey = keyVal.substring(0, keyVal.length() - 1);
+                    resultMap.put(mapKey, result);
+                    daySlaveDictMap.put(mapKey,map.get("quotaDate").toString());
                 }
-                compute(qdm, qds, returnList, resultMap);
+                TjQuotaDimensionSlave tjQuotaDimensionSlave = new TjQuotaDimensionSlave();
+                tjQuotaDimensionSlave.setQuotaCode(quotaVo.getCode());
+                qds.add(tjQuotaDimensionSlave);
+                extractUtil.compute(qdm, qds, returnList, resultMap,daySlaveDictMap,quotaVo);
             }
         }
         return returnList;
 
     }
-
-
 
     /**
      * @param tjQuotaDimensionMains
@@ -102,7 +107,6 @@ public class MysqlExtract {
      * @return
      */
     private String getSql(List<TjQuotaDimensionMain> tjQuotaDimensionMains, List<TjQuotaDimensionSlave> tjQuotaDimensionSlaves) {
-        Map<String, TjQuotaDimensionMain> sqlS = new HashMap<>();
         StringBuffer allField = new StringBuffer("");
         String tableName = esConfig.getTable();
         for (int j = 0; j < tjQuotaDimensionMains.size(); j++) {
@@ -114,192 +118,37 @@ public class MysqlExtract {
         for (int i = 0; i < tjQuotaDimensionSlaves.size(); i++) {
             allField.append(tjQuotaDimensionSlaves.get(i).getKeyVal()+ ",");
         }
-        //拼凑where语句
+        //拼接where语句 和 分组字段
         StringBuffer whereSql = new StringBuffer();
-        if ( !StringUtils.isEmpty(esConfig.getTimekey())) {
-            if (Contant.quota.dataLeval_oneDay.endsWith(quotaVo.getDataLevel())) {
-                whereSql.append(" where " + esConfig.getTimekey() + " >= '" + startTime + "'");//startTime 默认是 昨天
-                whereSql.append( " and " + esConfig.getTimekey() + " < '" + endTime + "'");//默认今天
-            }else{
-                whereSql.append( " where " + esConfig.getTimekey() + " < '" + endTime + "'");//默认今天
-            }
+        whereSql.append(" where 1=1");
+        if (!StringUtils.isEmpty(esConfig.getFilter())) {
+            whereSql.append(" and " + esConfig.getFilter());
         }
+        String selectGroupField = allField.toString();
+        String whereGroupField = allField.toString();
+        String timeKey = esConfig.getTimekey();
+        if ( !StringUtils.isEmpty(timeKey)) {
+            if ( !StringUtils.isEmpty(startTime) && !StringUtils.isEmpty(endTime)) {
+                whereSql.append(" and " + timeKey + " >= '" + startTime + "'");
+                whereSql.append( " and " + timeKey + " < '" + endTime + "'");
+            }
+            selectGroupField += " DATE_FORMAT(" + timeKey + ",'%Y-%m-%d') as quotaDate ,";
+            whereGroupField += "quotaDate";
+        }else{
+            whereGroupField = allField.substring(0,allField.length() - 1);
+        }
+        //拼接整个sql 语法
         StringBuffer sql = new StringBuffer();
-        if(StringUtils.isEmpty(allField)|| allField.length()==0){
-            sql.append("select count(*)  result  from " + tableName + whereSql);
-        }else {
-            String groupByField = allField.substring(0,allField.length() - 1);
-            sql.append("select " + allField + "  count(*) result from " + tableName + whereSql + " group by " + groupByField);
+        if(StringUtils.isEmpty(esConfig.getAggregation())){
+                sql.append("select " + selectGroupField + " count(*) result from " + tableName + whereSql + " group by " + whereGroupField);
+        }else if(esConfig.getAggregation().equals(Contant.quota.aggregation_sum)){
+            if(StringUtils.isEmpty(selectGroupField)|| selectGroupField.length()==0){
+                sql.append("select sum(" ).append(esConfig.getAggregationKey()).append(" ) result  from " + tableName + whereSql);
+            }else {
+                sql.append("select ").append(selectGroupField ).append(" sum(").append(esConfig.getAggregationKey()).append(" ) result from " + tableName + whereSql + " group by " + whereGroupField);
+            }
         }
         return sql.toString();
     }
-
-
-    private void compute(List<TjQuotaDimensionMain> qdm,List<TjQuotaDimensionSlave> qds,
-            List<SaveModel> returnList, Map<String, Long> map) throws Exception {
-        Map<String, SaveModel> allData = new HashMap<>();
-       if(qdm.size() + qds.size() == 0){
-           SaveModel saveModel = new SaveModel();
-           Long num = map.get("result");
-           saveModel = setSaveModel(saveModel);
-           saveModel.setResult(num.toString());
-           returnList.add(saveModel);
-       }else {
-           //初始化主细维度
-           if(qdm!=null && qdm.size()>0){
-               for(TjQuotaDimensionMain qmain:qdm){
-                   allData= initDimension(qds, qmain, allData);
-               }
-           }else{
-               allData= initDimension(qds, null, allData);
-           }
-           for(Map.Entry<String,SaveModel> oneMap:allData.entrySet()){
-               String key = oneMap.getKey();
-               SaveModel saveModel = oneMap.getValue();
-               Long num = map.get(key);
-               if(saveModel != null && num != null){
-                   saveModel.setResult(num.toString());
-               }else{
-                   saveModel.setResult("0");
-               }
-               returnList.add(saveModel);
-           }
-       }
-    }
-
-    /**
-     * 初始化主细维度
-     */
-    private  Map<String, SaveModel>  initDimension(List<TjQuotaDimensionSlave> tjQuotaDimensionSlaves, TjQuotaDimensionMain quotaDimensionMain, Map<String, SaveModel> allData) throws Exception {
-        try{
-            if(quotaDimensionMain !=null){
-                //查询字典数据
-                List<SaveModel> dictData = jdbcTemplate.query(quotaDimensionMain.getDictSql(), new BeanPropertyRowMapper(SaveModel.class));
-                if (dictData == null) {
-                    throw new Exception("主纬度配置有误");
-                }else {
-                    //设置到map里面
-                    setAllData(allData, dictData, quotaDimensionMain.getType());
-                }
-            }
-            for (int i = 0; i < tjQuotaDimensionSlaves.size(); i++) {
-                List<DictModel> dictDataSlave = jdbcTemplate.query(tjQuotaDimensionSlaves.get(i).getDictSql(), new BeanPropertyRowMapper(DictModel.class));
-                if (dictDataSlave == null) {
-                    throw new Exception("细纬度配置有误");
-                }else {
-                    allData = setAllSlaveData(allData, dictDataSlave,i);
-                }
-            }
-        }catch (Exception e){
-            throw new Exception("纬度配置有误");
-        }
-        return allData;
-    }
-
-    private Map<String, SaveModel> setAllSlaveData(Map<String, SaveModel> allData, List<DictModel> dictData,Integer key) {
-        try {
-            Map<String, SaveModel> returnAllData = new HashMap<>();
-            for (Map.Entry<String, SaveModel> one : allData.entrySet()) {
-                for (int i = 0; i < dictData.size(); i++) {
-                    DictModel dictOne = dictData.get(i);
-                    //设置新key
-                    StringBuffer newKey = new StringBuffer(one.getKey() + "-" + dictOne.getCode());
-                    //设置新的value
-                    SaveModel saveModelTemp = new SaveModel();
-                    BeanUtils.copyProperties(one.getValue(), saveModelTemp);
-
-                    StringBuffer keyMethodName = new StringBuffer("setSlaveKey" + (key + 1));
-                    StringBuffer nameMethodName = new StringBuffer("setSlaveKey" + (key + 1) + "Name");
-
-                    SaveModel.class.getMethod(keyMethodName.toString(), String.class).invoke(saveModelTemp, dictOne.getCode());
-                    SaveModel.class.getMethod(nameMethodName.toString(), String.class).invoke(saveModelTemp, dictOne.getName());
-                    returnAllData.put(newKey.toString(), saveModelTemp);
-                }
-            }
-            return returnAllData;
-        } catch (Exception e) {
-
-        }
-        return null;
-    }
-
-    /**
-     * @param allData
-     * @param dictData
-     * @param dictType
-     */
-    private void setAllData(Map<String, SaveModel> allData, List<SaveModel> dictData, String dictType) {
-        switch (dictType) {
-            case Contant.main_dimension.area_province: {
-                //设置省的全部的值
-                dictData.stream().forEach(one -> {
-                    //StringBuffer key = new StringBuffer(one.getProvince());
-                    setOneData(allData, one.getProvince(), one, Contant.main_dimension_areaLevel.area_province);
-                });
-                break;
-            }
-            case Contant.main_dimension.area_city: {
-                //设置市的全部的值
-                dictData.stream().forEach(one -> {
-                    //StringBuffer key = new StringBuffer(one.getProvince() + "-" + one.getCity());
-                    setOneData(allData, one.getCity(), one, Contant.main_dimension_areaLevel.area_city);
-                });
-                break;
-            }
-            case Contant.main_dimension.area_town: {
-                //设置区的全部的值
-                dictData.stream().forEach(one -> {
-                    //StringBuffer key = new StringBuffer(one.getProvince() + "-" + one.getCity() + "-" + one.getTown());
-                    setOneData(allData, one.getTown(), one, Contant.main_dimension_areaLevel.area_town);
-                });
-                break;
-            }
-            case Contant.main_dimension.area_org: {
-                //设置机构
-                dictData.stream().forEach(one -> {
-                    // StringBuffer key = new StringBuffer(one.getProvince() + "-" + one.getCity() + "-" + one.getTown() + "-" + one.getHospital());
-                    setOneData(allData, one.getOrg(), one, Contant.main_dimension_areaLevel.area_org);
-                });
-                break;
-            }
-            case Contant.main_dimension.area_team: {
-                //设置团队
-                dictData.stream().forEach(one -> {
-                    // StringBuffer key = new StringBuffer(one.getProvince() + "-" + one.getCity() + "-" + one.getTown() + "-" + one.getHospital() + "-" + one.getTeam());
-                    setOneData(allData, one.getTeam(), one, Contant.main_dimension_areaLevel.area_team);
-                });
-                break;
-            }
-        }
-    }
-
-    private void setOneData(Map<String, SaveModel> allData, String key, SaveModel one, String areaLevel) {
-        one.setAreaLevel(areaLevel);
-        one.setResult("0");
-        one.setCreateTime(new Date());
-        LocalDate today = LocalDate.now();
-        String yesterDay = (new DateTime().minusDays(1)).toString("yyyy-MM-dd");
-        one.setQuotaDate(yesterDay);
-        one.setQuotaCode(quotaVo.getCode());
-        one.setQuotaName(quotaVo.getName());
-        one.setTimeLevel(timeLevel);
-        one.setSaasId(null);
-        allData.put(key, one);
-    }
-
-    private SaveModel setSaveModel(SaveModel one ) {
-        one.setResult("0");
-        one.setCreateTime(new Date());
-        LocalDate today = LocalDate.now();
-        String yesterDay = (new DateTime().minusDays(1)).toString("yyyy-MM-dd");
-        one.setQuotaDate(yesterDay);
-        one.setQuotaCode(quotaVo.getCode());
-        one.setQuotaName(quotaVo.getName());
-        one.setTimeLevel(timeLevel);
-        one.setSaasId(null);
-        return one;
-    }
-
-
 
 }

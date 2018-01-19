@@ -29,7 +29,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0)
-@Api(value = "RsAdapterSchema", description = "适配方案服务")
+@Api(value = "RsAdapterSchemeEndPoint", description = "适配方案", tags = {"资源服务-适配方案"})
 public class RsAdapterSchemeEndPoint extends EnvelopRestEndPoint {
 
     @Autowired

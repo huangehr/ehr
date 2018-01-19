@@ -1,5 +1,7 @@
 package com.yihu.ehr.resource.client;
 
+import com.yihu.ehr.agModel.resource.RsReportCategoryInfoModel;
+import com.yihu.ehr.agModel.resource.RsReportCategoryModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.constants.ServiceApi;
@@ -43,13 +45,13 @@ public interface RsReportCategoryClient {
     @RequestMapping(value = ServiceApi.Resources.RsReportCategorySave, method = RequestMethod.POST)
     MRsReportCategory add(
             @ApiParam(name = "rsReportCategory", value = "资源报表分类JSON字符串", required = true)
-            @RequestParam(value = "rsReportCategory") String rsReportCategory);
+            @RequestBody String rsReportCategory);
 
     @ApiOperation("更新资源报表分类")
     @RequestMapping(value = ServiceApi.Resources.RsReportCategorySave, method = RequestMethod.PUT)
     MRsReportCategory update(
             @ApiParam(name = "rsReportCategory", value = "资源报表分类JSON字符串", required = true)
-            @RequestParam(value = "rsReportCategory") String rsReportCategory);
+            @RequestBody String rsReportCategory);
 
     @ApiOperation("删除资源报表分类")
     @RequestMapping(value = ServiceApi.Resources.RsReportCategoryDelete, method = RequestMethod.DELETE)
@@ -78,4 +80,20 @@ public interface RsReportCategoryClient {
     @ApiOperation("获取资源报表类别")
     List<MRsReportCategory> getAllCategories(
             @RequestParam(value="filters",required = false)String filters);
+
+    @RequestMapping(value = ServiceApi.Resources.RsReportCategoryByApp, method = RequestMethod.GET)
+    @ApiOperation("获取平台应用对应的报表分类")
+    List<RsReportCategoryModel> getCategoryByApp(@RequestParam(value = "appId") String appId);
+
+    @RequestMapping(value = ServiceApi.Resources.RsReportCategoryByIds, method = RequestMethod.GET)
+    @ApiOperation("根据Id获取平台应用对应的报表分类")
+    List<RsReportCategoryInfoModel> getCategoryByIds(
+            @ApiParam(name = "ids", value = "id")
+            @RequestParam(value = "ids") List<Integer> ids);
+
+    @RequestMapping(value = ServiceApi.Resources.RsReportCategoryIdsByCode, method = RequestMethod.GET)
+    @ApiOperation("根据code获取平台应用对应的报表分类子类")
+    List<Integer> getCategoryIdsByCode(
+            @ApiParam(name = "code", value = "分类编码")
+            @RequestParam(value = "code") String code);
 }

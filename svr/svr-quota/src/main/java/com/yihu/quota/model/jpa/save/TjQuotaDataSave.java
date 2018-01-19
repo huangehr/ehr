@@ -17,7 +17,7 @@ public class TjQuotaDataSave implements java.io.Serializable {
 	private String quotaCode;
 	private String saveCode;
 	private String configJson;
-	private String type;//1:mysql数据库 2:redis 3ES
+	private String type;
 
 	// Constructors
 

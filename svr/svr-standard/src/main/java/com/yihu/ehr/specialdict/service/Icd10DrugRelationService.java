@@ -1,6 +1,7 @@
 package com.yihu.ehr.specialdict.service;
 
 import com.yihu.ehr.query.BaseJpaService;
+import com.yihu.ehr.specialdict.dao.Icd10DrugRelationRepository;
 import com.yihu.ehr.specialdict.model.Icd10DrugRelation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,12 +24,12 @@ import java.util.List;
  */
 @Transactional
 @Service
-public class Icd10DrugRelationService extends BaseJpaService<Icd10DrugRelation, XIcd10DrugRelationRepository> {
+public class Icd10DrugRelationService extends BaseJpaService<Icd10DrugRelation, Icd10DrugRelationRepository> {
 
     @PersistenceContext
     protected EntityManager entityManager;
     @Autowired
-    private XIcd10DrugRelationRepository icd10DrugRelaRepo;
+    private Icd10DrugRelationRepository icd10DrugRelaRepo;
 
     public boolean isExist(long icd10Id,long drugId){
         Icd10DrugRelation icd10DrugRelation = icd10DrugRelaRepo.findByIcd10IdAndDrugId(icd10Id, drugId);

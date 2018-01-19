@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 /**
  * Created by AndyCai on 2016/1/19.
  */
-@FeignClient(name=MicroServices.Application)
+@FeignClient(name=MicroServices.Basic)
 public interface AppClient {
 
 

@@ -20,33 +20,25 @@ import java.net.InetSocketAddress;
  */
 @Configuration
 public class FastDFSConfig {
+
     @Value("${fast-dfs.pool.init-size}")
     private int initPoolSize;
-
     @Value("${fast-dfs.pool.max-size}")
     private int maxPoolSize;
-
     @Value("${fast-dfs.pool.wait-time}")
     private int waitTime;
-
     @Value("${fast-dfs.connect-timeout}")
     private int connectTimeout;
-
     @Value("${fast-dfs.network-timeout}")
     private int networkTimeout;
-
     @Value("${fast-dfs.charset}")
     private String charset;
-
     @Value("${fast-dfs.tracker-server}")
     private String trackerServers;
-
     @Value("${fast-dfs.http.tracker-http-port}")
     private int httpPort;
-
     @Value("${fast-dfs.http.anti-steal-token}")
     private boolean antiStealToken;
-
     @Value("${fast-dfs.http.secret-key}")
     private String secretKey;
 
@@ -103,7 +95,6 @@ public class FastDFSConfig {
     public FastDFSClientPool fastDFSClientPool(){
         FastDFSClientPool clientPool = new FastDFSClientPool();
         clientPool.setMaxPoolSize(maxPoolSize);
-
         return clientPool;
     }
 

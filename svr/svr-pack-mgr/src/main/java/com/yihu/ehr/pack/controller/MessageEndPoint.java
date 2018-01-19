@@ -2,6 +2,7 @@ package com.yihu.ehr.pack.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.constants.ArchiveStatus;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.Channel;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -31,16 +33,16 @@ import java.util.*;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "message_service", description = "消息服务")
+//@Api(value = "MessageEndPoint", description = "消息服务", tags = {"档案包服务-消息服务"})
+@ApiIgnore
 public class MessageEndPoint extends EnvelopRestEndPoint {
-    @Autowired
-    ObjectMapper objectMapper;
 
     @Autowired
-    PackageService packageService;
-
+    private ObjectMapper objectMapper;
     @Autowired
-    RedisTemplate redisTemplate;
+    private PackageService packageService;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @ApiOperation(value = "发送档案包解析消息", notes = "发送档案包解析消息")
     @RequestMapping(value = ServiceApi.Packages.ResolveMessage, method = RequestMethod.PUT)
@@ -53,7 +55,11 @@ public class MessageEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "count", required = false) int count,
             HttpServletRequest request,
             HttpServletResponse response) throws ParseException, JsonProcessingException {
-
+        try {
+            packageService.updateFailPackage(3); //更新时，不应该影响消息获取
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
         List<Package> packages = packageService.search(null, filters, sorts, 1, count);
         Collection<MPackage> mPackages = new HashSet<>(packages.size());
         mPackages = convertToModels(packages, mPackages, MPackage.class, "id,pwd,remotePath,clientId");

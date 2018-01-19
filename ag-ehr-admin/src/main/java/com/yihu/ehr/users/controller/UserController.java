@@ -145,12 +145,14 @@ public class UserController extends BaseController {
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page) {
+            @RequestParam(value = "page", required = false) int page,
+            @ApiParam(name = "orgCode", value = "机构编码", defaultValue = "")
+            @RequestParam(value = "orgCode", required = false) String orgCode) {
         if (null == sorts) {
             sorts = "-createDate,-lastLoginTime";
         }
         filters = resetFilter(filters);
-        ResponseEntity<List<MUser>> responseEntity = userClient.searchUsers(fields, filters, sorts, size, page);
+        ResponseEntity<List<MUser>> responseEntity = userClient.searchUsers(fields, filters, sorts, size, page, orgCode);
         List<MUser> mUsers = responseEntity.getBody();
         List<UsersModel> usersModels = new ArrayList<>();
         for (MUser mUser : mUsers) {
@@ -327,11 +329,11 @@ public class UserController extends BaseController {
             }
             //新增时先新增用户再保存所属角色组-人员关系表，用户新增失败（新增失败）、角色组关系表新增失败（删除新增用户-提示新增失败）
 
-                boolean bo = roleUserClient.batchCreateRolUsersRelation(mUser.getId(), roles);
-                if (!bo) {
-                    userClient.deleteUser(mUser.getId());
-                    return failed("保存失败!");
-                }
+            boolean bo = roleUserClient.batchCreateRolUsersRelation(mUser.getId(), roles);
+            if (!bo) {
+                userClient.deleteUser(mUser.getId());
+                return failed("保存失败!");
+            }
 
             detailModel = convertToUserDetailModel(mUser);
             return success(detailModel);
@@ -433,9 +435,9 @@ public class UserController extends BaseController {
                     roleUserClient.batchDeleteRoleUserRelation(mUser.getDemographicId(), oldRoleIds);
                 }
             } else {*/
-                if (buffer.length() > 0) {
-                    roleUserClient.batchDeleteRoleUserRelation(mUser.getId(), oldRoleIds);
-                }
+            if (buffer.length() > 0) {
+                roleUserClient.batchDeleteRoleUserRelation(mUser.getId(), oldRoleIds);
+            }
 //            }
             return failed("保存失败!");
         } catch (Exception ex) {
@@ -536,26 +538,34 @@ public class UserController extends BaseController {
     /**
      * 重新分配秘钥
      *
-     * @param userName 账号
+     * @param userId 账号
      * @return map  key{publicKey:公钥；validTime：有效时间; startTime：生效时间}
      */
-    @RequestMapping(value = "/users/key/{login_code}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/user/key", method = RequestMethod.PUT)
     @ApiOperation(value = "重新分配密钥", notes = "重新分配密钥")
     public Map<String, String> distributeKey(
-            @ApiParam(name = "login_code", value = "登录帐号", defaultValue = "")
-            @PathVariable(value = "login_code") String userName) {
+            @ApiParam(name = "userId", value = "用户ID", required = true)
+            @RequestParam(value = "userId") String userId) {
         try {
-            MUser mUser = userClient.getUserByUserName(userName);
-            if (mUser == null) {
-                return null;
-            }
-            return userClient.distributeKey(mUser.getId());
+            return userClient.distributeKey(userId);
         } catch (Exception ex) {
             ex.printStackTrace();
             return null;
         }
     }
 
+    /**
+     * 查询用户公钥
+     * @param userId
+     * @return
+     */
+    @RequestMapping(value = "/user/key", method = RequestMethod.GET)
+    @ApiOperation(value = "查询用户公钥", notes = "查询用户公钥")
+    public Envelop getKey(
+            @ApiParam(name = "userId", value = "用户ID", required = true)
+            @RequestParam(value = "userId") String userId) {
+        return userClient.getKey(userId);
+    }
 
     /**
      * 根据登陆用户名及密码验证用户.
@@ -840,8 +850,8 @@ public class UserController extends BaseController {
             @RequestParam(value = "id_card_no") String idCardNo) {
         PatientDetailModel detailModel =new PatientDetailModel();
         try{
-         MDemographicInfo demographicInfo = patientClient.getPatient(idCardNo);
-         detailModel = patientController.convertToPatientDetailModel(demographicInfo);
+            MDemographicInfo demographicInfo = patientClient.getPatient(idCardNo);
+            detailModel = patientController.convertToPatientDetailModel(demographicInfo);
 
         } catch (Exception ex) {
             ex.printStackTrace();

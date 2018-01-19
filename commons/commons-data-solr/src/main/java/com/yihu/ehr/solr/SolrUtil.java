@@ -12,10 +12,7 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Solr底层查询类
@@ -91,7 +88,6 @@ public class SolrUtil {
 
         QueryResponse rsp = conn.query(query);
         qtime = rsp.getQTime();
-        System.out.print("Solr Query Time:" + qtime);
         SolrDocumentList docs = rsp.getResults();
 
         pool.close(conn); //释放连接
@@ -119,7 +115,7 @@ public class SolrUtil {
         } else {
             query.setQuery("*:*");
         }
-        if (null != fq && fq.length>0) //设置过滤条件
+        if (null != fq && fq.length > 0) //设置过滤条件
         {
             query.setFilterQueries(fq);
         }
@@ -141,7 +137,6 @@ public class SolrUtil {
 
         QueryResponse rsp = conn.query(query);
         qtime = rsp.getQTime();
-        System.out.print("Solr Query Time:" + qtime);
         SolrDocumentList docs = rsp.getResults();
 
         pool.close(conn); //释放连接
@@ -177,11 +172,10 @@ public class SolrUtil {
         query.setRows(0);
 
         QueryResponse rsp = conn.query(query);
-        Integer start =  (int)rsp.getResults().getNumFound();
+        Integer start = (int) rsp.getResults().getNumFound();
         query.setStart(start);
         rsp = conn.query(query);
         qtime = rsp.getQTime();
-        System.out.print("Solr Count Time:" + qtime);
         SolrDocumentList docs = rsp.getResults();
 
         pool.close(conn);
@@ -191,7 +185,7 @@ public class SolrUtil {
     /**
      * 单组分组Count统计（start从0开始）
      */
-    public Map<String, Long> groupCount(String core, String q, String fq, String groupField, int start, int rows) throws Exception {
+    public Map<String, Long> groupCount(String core, String q, String fq, String groupField, int start, int limit) throws Exception {
         SolrClient conn = pool.getConnection(core);
         SolrQuery query = new SolrQuery();
         if (null != q && !q.equals("")) //设置查询条件
@@ -208,7 +202,7 @@ public class SolrUtil {
         query.setFacet(true);//设置facet=on
         query.setRows(0);
         query.addFacetField(groupField);
-        query.setFacetLimit(rows);//限制每次返回结果数
+        query.setFacetLimit(limit);//限制每次返回结果数
         query.set(FacetParams.FACET_OFFSET, start);
         query.setFacetMissing(false);//不统计null的值
         query.setFacetMinCount(0);// 设置返回的数据中每个分组的数据最小值，比如设置为0，则统计数量最小为0，不然不显示
@@ -216,8 +210,6 @@ public class SolrUtil {
         QueryResponse rsp = conn.query(query);
         List<FacetField.Count> countList = rsp.getFacetField(groupField).getValues();
         qtime = rsp.getQTime();
-        System.out.print("Solr Group Time:" + qtime);
-
         Map<String, Long> rmap = new HashMap<String, Long>();
         for (FacetField.Count count : countList) {
             if (count.getCount() > 0)
@@ -255,7 +247,6 @@ public class SolrUtil {
 
         QueryResponse rsp = conn.query(query);
         qtime = rsp.getQTime();
-        System.out.print("Solr Group Time:" + qtime);
         List<FacetField> facets = rsp.getFacetFields();
 
         pool.close(conn);
@@ -267,7 +258,7 @@ public class SolrUtil {
      *
      * @return
      */
-    public List<PivotField> groupCountMult(String core, String q, String fq, String groupFields, int start, int rows) throws Exception {
+    public List<PivotField> groupCountMult(String core, String q, String fq, String groupFields, int start, int limit) throws Exception {
         SolrClient conn = pool.getConnection(core);
         SolrQuery query = new SolrQuery();
         if (null != q && !q.equals("")) //设置查询条件
@@ -284,14 +275,12 @@ public class SolrUtil {
         query.setFacet(true);//设置facet=on
         query.setRows(0);
         query.addFacetPivotField(groupFields);
-        query.setFacetLimit(rows);//限制每次返回结果数
+        query.setFacetLimit(limit);//限制每次返回结果数
         query.setFacetMissing(false);//不统计null的值
         query.setFacetMinCount(0);// 设置返回的数据中每个分组的数据最小值，比如设置为0，则统计数量最小为0，不然不显示
 
         QueryResponse rsp = conn.query(query);
         qtime = rsp.getQTime();
-        System.out.print("Solr Group Time:" + qtime);
-
         NamedList<List<PivotField>> namedList = rsp.getFacetPivot();
 
         pool.close(conn);
@@ -332,7 +321,6 @@ public class SolrUtil {
 
         QueryResponse rsp = conn.query(query);
         qtime = rsp.getQTime();
-        System.out.print("Solr Stats Time:" + qtime);
 
         Map<String, FieldStatsInfo> stats = rsp.getFieldStatsInfo();
         pool.close(conn);
@@ -406,15 +394,6 @@ public class SolrUtil {
 
     /**
      * 日期范围分组统计
-     *
-     * @param core
-     * @param dateField
-     * @param startTime
-     * @param endTime
-     * @param grap
-     * @param fq
-     * @return
-     * @throws Exception
      */
     public List<RangeFacet> getFacetDateRange(String core, String dateField, Date startTime, Date endTime, String grap, String fq) throws Exception {
         SolrClient conn = pool.getConnection(core);
@@ -423,13 +402,45 @@ public class SolrUtil {
         query.setQuery("*:*");
 
         if (!StringUtils.isBlank(fq)) {
-
             query.setFilterQueries(fq);
         }
 
         query.setRows(0)
-               .setFacet(true)
-               .addDateRangeFacet(dateField, startTime, endTime, grap);
+                .setFacet(true)
+                .addDateRangeFacet(dateField, startTime, endTime, grap);
+        QueryResponse resp = conn.query(query);
+
+        return resp.getFacetRanges();
+    }
+
+    /**
+     * 日期范围分组统计
+     */
+    public List<RangeFacet> getFacetDateRange(String core,
+                                              String field,
+                                              String start,
+                                              String end,
+                                              String gap,
+                                              String fq,
+                                              String q) throws Exception {
+        SolrClient conn = pool.getConnection(core);
+        SolrQuery query = new SolrQuery();
+
+        if (StringUtils.isEmpty(q)) {
+            query.setQuery("*:*");
+        } else {
+            query.setQuery(q);
+        }
+        if (!StringUtils.isEmpty(fq)) {
+            query.setFilterQueries(fq);
+        }
+
+        query.setRows(0)
+                .setFacet(true)
+                .add("facet.range", new String[]{field})
+                .add(String.format(Locale.ROOT, "f.%s.%s", new Object[]{field, "facet.range.start"}), new String[]{start})
+                .add(String.format(Locale.ROOT, "f.%s.%s", new Object[]{field, "facet.range.end"}), new String[]{end})
+                .add(String.format(Locale.ROOT, "f.%s.%s", new Object[]{field, "facet.range.gap"}), new String[]{gap});
         QueryResponse resp = conn.query(query);
 
         return resp.getFacetRanges();

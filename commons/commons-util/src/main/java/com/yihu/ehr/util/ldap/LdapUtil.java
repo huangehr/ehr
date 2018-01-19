@@ -30,16 +30,16 @@ import java.util.*;
 @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class LdapUtil {
 
-    @Value("${spring.ldap.host}")
+    @Value("${spring.ldap.host:127.0.0.1}")
     String ldapHost;
 
     @Value("${spring.ldap.port:0}")
     Integer ldapPort;
 
-    @Value("${spring.ldap.bindDn}")
+    @Value("${spring.ldap.bindDn:''}")
     String ldapBindDN;
 
-    @Value("${spring.ldap.password}")
+    @Value("${spring.ldap.password:''}")
     String ldapPassword;
 
 

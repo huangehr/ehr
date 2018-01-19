@@ -68,11 +68,14 @@ public class EsClientUtil {
      */
     public List<InetSocketTransportAddress> getAllAddress(Map<String, Integer> ips) {
         List<InetSocketTransportAddress> addressList = new ArrayList<InetSocketTransportAddress>();
+        String ipStr = "";
         try {
             for (String ip : ips.keySet()) {
+                ipStr = ip;
                 addressList.add(new InetSocketTransportAddress(InetAddress.getByName(ip), ips.get(ip)));
             }
         } catch (UnknownHostException e) {
+            ips.remove(ipStr);
             e.printStackTrace();
             logger.info("elasticSearch 无法识别的IP");
         }

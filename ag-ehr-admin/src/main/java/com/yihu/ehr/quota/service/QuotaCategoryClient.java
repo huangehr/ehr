@@ -2,6 +2,7 @@ package com.yihu.ehr.quota.service;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.tj.MQuotaCategory;
 import io.swagger.annotations.ApiOperation;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by wxw on 2017/8/31.
@@ -85,4 +87,10 @@ public interface QuotaCategoryClient {
     @RequestMapping(value = "/quota/getQuotaCategoryChild", method = RequestMethod.GET)
     @ApiOperation(value = "获取指标分类子类列表")
     List<MQuotaCategory> getQuotaCategoryChild();
+
+    @RequestMapping(value = ServiceApi.TJ.getQuotaCategoryByName, method = RequestMethod.POST)
+    @ApiOperation("根据指标名称获取指标id和name")
+    Map<String,String> getQuotaCategoryByName(
+            @ApiParam(name = "name", value = "指标分类name", defaultValue = "")
+            @RequestBody String name);
 }

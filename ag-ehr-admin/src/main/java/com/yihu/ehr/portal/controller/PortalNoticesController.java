@@ -3,10 +3,13 @@ package com.yihu.ehr.portal.controller;
 import com.yihu.ehr.agModel.portal.PortalNoticeDetailModel;
 import com.yihu.ehr.agModel.portal.PortalNoticeModel;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseController;
+import com.yihu.ehr.model.common.ListResult;
+import com.yihu.ehr.model.common.Result;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.portal.MPortalNotice;
-import com.yihu.ehr.portal.service.PortalNoticesClient;
+import com.yihu.ehr.portal.client.PortalNoticesClient;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.rest.Envelop;
@@ -27,15 +30,61 @@ import java.util.List;
  * Created by yeshijie on 2017/2/17.
  */
 @EnableFeignClients
-@RequestMapping(ApiVersion.Version1_0 + "/admin")
+@RequestMapping(ApiVersion.Version1_0 + ServiceApi.GateWay.admin)
 @RestController
-@Api(value = "portalNotices", description = "通知公告接口", tags = {"云门户-通知公告接口"})
+@Api(value = "PortalNoticesController", description = "通知公告接口", tags = {"云门户-通知公告接口"})
 public class PortalNoticesController extends BaseController{
 
     @Autowired
     private PortalNoticesClient portalNoticesClient;
     @Autowired
     private ConventionalDictEntryClient conventionalDictClient;
+
+    @RequestMapping(value = ServiceApi.Portal.NoticesTop, method = RequestMethod.GET)
+    @ApiOperation(value = "获取通知公告前10数据", notes = "根据日期查询前10的数据在前端表格展示")
+    public Result getPortalNoticeTop10(){
+        try {
+            ResponseEntity<List<MPortalNotice>> responseEntity = portalNoticesClient.getPortalNoticeTop10();
+            List<MPortalNotice> mPortalNoticeList = responseEntity.getBody();
+            List<PortalNoticeModel> portalNoticeModels = new ArrayList<>();
+            for (MPortalNotice mPortalNotice : mPortalNoticeList) {
+                PortalNoticeModel portalNoticeModel = convertToModel(mPortalNotice, PortalNoticeModel.class);
+                portalNoticeModel.setReleaseDate(mPortalNotice.getReleaseDate() == null?"": DateTimeUtil.simpleDateTimeFormat(mPortalNotice.getReleaseDate()));
+                portalNoticeModels.add(portalNoticeModel);
+            }
+            ListResult re = new ListResult(1,10);
+            re.setTotalCount(portalNoticeModels.size());
+            re.setDetailModelList(portalNoticeModels);
+
+            return re;
+        }
+        catch (Exception ex)
+        {
+            return Result.error(ex.getMessage());
+        }
+    }
+
+    @RequestMapping(value = ServiceApi.Portal.NoticesAdmin, method = RequestMethod.GET)
+    @ApiOperation(value = "获取通知公告信息", notes = "通知公告信息")
+    public Envelop getPortalNotice(
+            @ApiParam(name = "portalNotice_id", value = "", defaultValue = "")
+            @PathVariable(value = "portalNotice_id") Long portalNoticeId) {
+        try {
+            MPortalNotice mPortalNotice = portalNoticesClient.getPortalNotice(portalNoticeId);
+            if (mPortalNotice == null) {
+                return failed("通知公告信息获取失败!");
+            }
+
+            PortalNoticeDetailModel detailModel = convertToModel(mPortalNotice, PortalNoticeDetailModel.class);
+            detailModel.setReleaseDate(mPortalNotice.getReleaseDate() == null?"": DateTimeUtil.simpleDateTimeFormat(mPortalNotice.getReleaseDate()));
+
+            return success(detailModel);
+        }
+        catch (Exception ex){
+            ex.printStackTrace();
+            return failedSystem();
+        }
+    }
 
 
     @RequestMapping(value = "/portalNotices", method = RequestMethod.GET)
@@ -75,27 +124,7 @@ public class PortalNoticesController extends BaseController{
     }
 
 
-    @RequestMapping(value = "portalNotices/admin/{portalNotice_id}", method = RequestMethod.GET)
-    @ApiOperation(value = "获取通知公告信息", notes = "通知公告信息")
-    public Envelop getPortalNotice(
-            @ApiParam(name = "portalNotice_id", value = "", defaultValue = "")
-            @PathVariable(value = "portalNotice_id") Long portalNoticeId) {
-        try {
-            MPortalNotice mPortalNotice = portalNoticesClient.getPortalNotice(portalNoticeId);
-            if (mPortalNotice == null) {
-                return failed("通知公告信息获取失败!");
-            }
 
-            PortalNoticeDetailModel detailModel = convertToModel(mPortalNotice, PortalNoticeDetailModel.class);
-            detailModel.setReleaseDate(mPortalNotice.getReleaseDate() == null?"": DateTimeUtil.simpleDateTimeFormat(mPortalNotice.getReleaseDate()));
-
-            return success(detailModel);
-        }
-        catch (Exception ex){
-            ex.printStackTrace();
-            return failedSystem();
-        }
-    }
 
     @RequestMapping(value = "/portalNotices/admin/{portalNotice_id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除通知公告", notes = "根据通知公告id")

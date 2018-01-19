@@ -16,8 +16,9 @@ import java.util.Map;
 /**
  * Created by AndyCai on 2016/3/3.
  */
-@FeignClient(name = MicroServices.Standard)
-@ApiIgnore
+//@FeignClient(name = MicroServices.Standard)
+//@ApiIgnore
+@Deprecated
 public interface StandardDispatchClient {
 
     @RequestMapping(value = ApiVersion.Version1_0+ ServiceApi.Standards.Dispatches, method = RequestMethod.POST)

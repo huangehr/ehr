@@ -1,5 +1,6 @@
 package com.yihu.ehr.resource.client;
 
+import com.yihu.ehr.agModel.resource.RsReportModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.constants.ServiceApi;
@@ -54,13 +55,13 @@ public interface RsReportClient {
     @RequestMapping(value = ServiceApi.Resources.RsReportSave, method = RequestMethod.POST)
     MRsReport add(
             @ApiParam(name = "rsReport", value = "资源报表JSON字符串", required = true)
-            @RequestParam(value = "rsReport") String rsReport);
+            @RequestBody String rsReport);
 
     @ApiOperation("更新资源报表")
     @RequestMapping(value = ServiceApi.Resources.RsReportSave, method = RequestMethod.PUT)
     MRsReport update(
             @ApiParam(name = "rsReport", value = "资源报表JSON字符串", required = true)
-            @RequestParam(value = "rsReport") String rsReport);
+            @RequestBody String rsReport);
 
     @ApiOperation("删除资源报表")
     @RequestMapping(value = ServiceApi.Resources.RsReportDelete, method = RequestMethod.DELETE)
@@ -101,4 +102,9 @@ public interface RsReportClient {
             @ApiParam(name = "reportCategoryId", value = "资源报表分类ID", required = true)
             @RequestParam(value = "reportCategoryId") Integer reportCategoryId);
 
+    @ApiOperation("根据资源分类编码获取资源报表分")
+    @RequestMapping(value = ServiceApi.Resources.RsReportByCategoryId, method = RequestMethod.GET)
+    List<RsReportModel> getByCategoryId(
+            @ApiParam(name = "reportCategoryId", value = "资源报表分类ID", required = true)
+            @RequestParam(value = "reportCategoryId") Integer reportCategoryId);
 }

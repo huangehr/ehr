@@ -9,6 +9,7 @@ import com.yihu.ehr.model.resource.MRsAppResource;
 import com.yihu.ehr.model.resource.MRsAppResourceMetadata;
 import com.yihu.ehr.model.resource.MRsRolesResource;
 import com.yihu.ehr.model.resource.MRsRolesResourceMetadata;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.MediaType;
@@ -168,8 +169,9 @@ public interface RsResourceGrantClient {
 
     @ApiOperation("单个角色组资源列表查询")
     @RequestMapping(value = ServiceApi.Resources.GetRolesGrantResources, method = RequestMethod.GET)
-    List<MRsRolesResource> getRolesGrantResources(
-            @RequestParam(value = "rolesId") String rolesId);
+    Envelop getRolesGrantResources(
+            @RequestParam(value = "rolesId") String rolesId,
+            @RequestParam(value = "userId") String userId);
 
 
     @ApiOperation("角色组资源数据元授权查询")

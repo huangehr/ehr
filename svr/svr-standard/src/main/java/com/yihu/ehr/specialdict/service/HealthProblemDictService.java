@@ -1,6 +1,8 @@
 package com.yihu.ehr.specialdict.service;
 
 import com.yihu.ehr.query.BaseJpaService;
+import com.yihu.ehr.specialdict.dao.HealthProblemDictRepository;
+import com.yihu.ehr.specialdict.dao.Icd10HpRelationRepository;
 import com.yihu.ehr.specialdict.model.DrugDict;
 import com.yihu.ehr.specialdict.model.HealthProblemDict;
 import com.yihu.ehr.specialdict.model.Icd10Dict;
@@ -15,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -27,12 +28,12 @@ import java.util.Map;
  */
 @Transactional
 @Service
-public class HealthProblemDictService extends BaseJpaService<HealthProblemDict, XHealthProblemDictRepository> {
+public class HealthProblemDictService extends BaseJpaService<HealthProblemDict, HealthProblemDictRepository> {
 
     @Autowired
-    private XHealthProblemDictRepository hpDictRepo;
+    private HealthProblemDictRepository hpDictRepo;
     @Autowired
-    private XIcd10HpRelationRepository hpIcd10ReRepo;
+    private Icd10HpRelationRepository hpIcd10ReRepo;
 
     public Page<HealthProblemDict> getDictList(String sorts, int page, int size) {
         Pageable pageable = new PageRequest(page, size, parseSorts(sorts));

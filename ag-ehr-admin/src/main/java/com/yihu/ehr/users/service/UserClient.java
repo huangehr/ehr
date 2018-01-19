@@ -4,6 +4,7 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.user.MUser;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -30,7 +31,8 @@ public interface UserClient {
             @RequestParam(value = "filters", required = false) String filters,
             @RequestParam(value = "sorts", required = false) String sorts,
             @RequestParam(value = "size", required = false) int size,
-            @RequestParam(value = "page", required = false) int page);
+            @RequestParam(value = "page", required = false) int page,
+            @RequestParam(value = "orgCode", required = false) String orgCode);
 
     @RequestMapping(value = ServiceApi.Users.Users, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建用户", notes = "重新绑定用户信息")
@@ -72,7 +74,13 @@ public interface UserClient {
 
     @RequestMapping(value = ServiceApi.Users.UserAdminKey, method = RequestMethod.PUT)
     @ApiOperation(value = "重新分配密钥", notes = "重新分配密钥")
-    Map<String, String> distributeKey(@PathVariable(value = "user_id") String userId);
+    Map<String, String> distributeKey(
+            @PathVariable(value = "user_id") String userId);
+
+    @RequestMapping(value = ServiceApi.Users.UserAdminKey, method = RequestMethod.GET)
+    @ApiOperation(value = "查询用户公钥", notes = "查询用户公钥")
+    Envelop getKey(
+            @PathVariable(value = "user_id") String userId);
 
     @RequestMapping(value = ServiceApi.Users.UserVerification, method = RequestMethod.GET)
     @ApiOperation(value = "根据用户名及密码获取用户", notes = "根据用户名及密码获取用户")

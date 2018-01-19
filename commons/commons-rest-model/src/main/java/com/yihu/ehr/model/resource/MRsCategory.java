@@ -12,6 +12,7 @@ public class MRsCategory  {
     private String id;
     private String name;
     private String pid;
+    private String code;
     private String description;
 
 
@@ -37,6 +38,14 @@ public class MRsCategory  {
 
     public void setPid(String pid) {
         this.pid = pid;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 
     public String getDescription() {

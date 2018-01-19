@@ -15,6 +15,8 @@ public interface RsResourceDefaultParamDao extends PagingAndSortingRepository<Rs
 
     List<RsResourceDefaultParam> findByResourcesCode(String resourcesCode);
 
+    void deleteByResourcesId(String resourcesId);
+
     @Query("from RsResourceDefaultParam where resourcesId = ?1 or resourcesCode = ?2 ")
     List<RsResourceDefaultParam> findByResourcesIdOrResourcesCode(String resourcesId, String resourceCode);
 

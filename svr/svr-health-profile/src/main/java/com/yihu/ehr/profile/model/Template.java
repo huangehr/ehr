@@ -140,8 +140,8 @@ public class Template {
      */
     public void setContent(boolean pc, InputStream fileStream) throws Exception {
         ObjectNode objectNode = fastDFSUtil().upload(fileStream, "html", "健康档案展示模板");
-        String group = objectNode.get(FastDFSUtil.GroupField).asText();
-        String remoteFile = objectNode.get(FastDFSUtil.RemoteFileField).asText();
+        String group = objectNode.get(FastDFSUtil.GROUP_NAME).asText();
+        String remoteFile = objectNode.get(FastDFSUtil.REMOTE_FILE_NAME).asText();
 
         String url = group + UrlSeparator + remoteFile;
         if (pc){

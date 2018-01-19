@@ -44,6 +44,16 @@ public class RsReportViewService extends BaseJpaService<RsReportView, RsReportVi
     }
 
     /**
+     * 根据视图ID，获取资源报表视图配置
+     *
+     * @param resourceId 视图ID
+     * @return RsReportView
+     */
+    public  List<RsReportView> findByResourceId(String resourceId) {
+        return rsReportViewDao.findByResourceId(resourceId);
+    }
+
+    /**
      * 保存资源报表视图配置
      *
      * @param reportId 资源报表ID

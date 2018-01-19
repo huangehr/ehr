@@ -22,7 +22,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 public interface XResourceClient {
 
 
-    @RequestMapping(value = ServiceApi.Resources.ResourcesQuery, method = POST)
+    @RequestMapping(value = ServiceApi.Resources.ResourceQuery, method = POST)
     Envelop getResources(
             @RequestParam(value = "resourcesCode", required = true) String resourcesCode,
             @RequestParam(value = "appId", required = true) String appId,

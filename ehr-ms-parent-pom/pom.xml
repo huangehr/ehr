@@ -17,32 +17,23 @@
     <modules>
         <module>../svr-configuration</module>
         <module>../svr-discovery</module>
-        <!--<module>../svr/svr-app</module>-->
-        <!--<module>../svr/svr-archive-security</module>
-        <module>../svr/svr-cipher</module>-->
-        <!--<module>../svr/svr-dict</module>-->
-        <!--<module>../svr/svr-esb</module>-->
-        <!--<module>../svr/svr-family</module>
-        <module>../svr/svr-file-resource</module>
-        <module>../svr/svr-geography</module>-->
+        <module>../svr/svr-dfs</module>
         <module>../svr/svr-health-profile</module>
-        <!--<module>../svr/svr-organization</module>-->
         <module>../svr/svr-pack-mgr</module>
         <module>../svr/svr-pack-resolve</module>
-        <!--<module>../svr/svr-patient</module>-->
+        <module>../svr/svr-pack-analyzer</module>
         <module>../svr/svr-resource</module>
-        <!--<module>../svr/svr-security</module>-->
         <module>../svr/svr-standard</module>
         <module>../svr/svr-ehr-basic</module>
-        <!--<module>../svr/svr-user</module>
-        <module>../svr/svr-portal</module>-->
         <module>../svr-authentication</module>
         <module>../ag-ehr-admin</module>
         <module>../ag-ehr-cloud</module>
-        <module>../ag-portal-cloud</module>
+        <!--<module>../ag-portal-cloud</module>-->
         <module>../svr/svr-redis</module>
+        <module>../svr/svr-redis-memory</module>
         <module>../svr/svr-quota</module>
         <module>../svr/svr-log-collection</module>
+        <!-- <module>../ag-zuul</module>-->
     </modules>
 
     <build>
@@ -282,8 +273,8 @@
                         <exclude>**/Abstract*.java</exclude>
                     </excludes>
                     <!--<systemPropertyVariables>-->
-                        <!--<java.security.egd>file:/dev/./urandom</java.security.egd>-->
-                        <!--<java.awt.headless>true</java.awt.headless>-->
+                    <!--<java.security.egd>file:/dev/./urandom</java.security.egd>-->
+                    <!--<java.awt.headless>true</java.awt.headless>-->
                     <!--</systemPropertyVariables>-->
                     <argLine>-Xmx1024m</argLine>
                 </configuration>
@@ -370,6 +361,11 @@
             </dependency>
             <dependency>
                 <groupId>com.yihu.ehr</groupId>
+                <artifactId>commons-data-elasticsearch</artifactId>
+                <version>${version.ehr}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.yihu.ehr</groupId>
                 <artifactId>commons-redis-keyschema</artifactId>
                 <version>${version.ehr}</version>
             </dependency>
@@ -424,9 +420,9 @@
                 <version>${version.ehr}</version>
             </dependency>
             <!--<dependency>-->
-                <!--<groupId>com.yihu.ehr</groupId>-->
-                <!--<artifactId>commons-metrics</artifactId>-->
-                <!--<version>${version.ehr}</version>-->
+            <!--<groupId>com.yihu.ehr</groupId>-->
+            <!--<artifactId>commons-metrics</artifactId>-->
+            <!--<version>${version.ehr}</version>-->
             <!--</dependency>-->
             <dependency>
                 <groupId>com.yihu.ehr</groupId>

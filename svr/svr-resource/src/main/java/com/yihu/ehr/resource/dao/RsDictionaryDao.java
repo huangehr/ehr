@@ -9,4 +9,6 @@ import org.springframework.data.repository.PagingAndSortingRepository;
  */
 public interface RsDictionaryDao extends PagingAndSortingRepository<RsDictionary,Integer> {
 
+    RsDictionary findByCode(String code);
+
 }

@@ -37,7 +37,7 @@ public interface RsResourceCategoryClient {
     @RequestMapping(value = ServiceApi.Resources.CategoryUpdate, method = RequestMethod.PUT,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("资源类别更新")
     MRsCategory updateRsCategory(
-                @RequestBody String resourceCategory);
+            @RequestBody String resourceCategory);
 
     @RequestMapping(value = ServiceApi.Resources.Category,method = RequestMethod.GET)
     @ApiOperation("根据ID获取资源类别")
@@ -49,11 +49,16 @@ public interface RsResourceCategoryClient {
     List<MRsCategory> getRsCategoryByPid(
             @RequestParam(value="pid",required = false) String pid);
 
+    @RequestMapping(value = ServiceApi.Resources.CategoriesByCodeAndPid, method = RequestMethod.GET)
+    @ApiOperation("根据pid获取资源类别列表")
+    List<MRsCategory> getRsCategoryByCodeAndPid(
+            @RequestParam(value="code") String code,
+            @RequestParam(value="pid", required = false) String pid);
 
     @RequestMapping(value = ServiceApi.Resources.CategoryExitSelfAndParent, method = RequestMethod.GET)
     @ApiOperation(value = "根据当前类别获取自己的父级以及同级以及同级所在父级类别列表")
-    List<MRsCategory> getCateTypeExcludeSelfAndParent(@ApiParam(name = "id", value = "id")
-                                                        @RequestParam(value = "id") String id);
+    List<MRsCategory> getCateTypeExcludeSelfAndParent(
+            @RequestParam(value = "id") String id);
 
 
     @RequestMapping(value = ServiceApi.Resources.CategoriesAll, method = RequestMethod.GET)
@@ -64,6 +69,7 @@ public interface RsResourceCategoryClient {
     @RequestMapping(value = ServiceApi.Resources.CategoriesSearch, method = RequestMethod.GET)
     @ApiOperation("获取资源类别")
     ResponseEntity<List<MRsCategory>> getRsCategories(
+            @RequestParam(value = "roleId") String roleId,
             @RequestParam(value = "fields", required = false) String fields,
             @RequestParam(value = "filters", required = false) String filters,
             @RequestParam(value = "sorts", required = false) String sorts,

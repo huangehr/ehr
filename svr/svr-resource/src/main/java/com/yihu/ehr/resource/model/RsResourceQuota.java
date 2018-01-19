@@ -1,6 +1,7 @@
 package com.yihu.ehr.resource.model;
 
 import javax.persistence.*;
+import java.util.List;
 
 /**
  * Created by Administrator on 2017/8/10.
@@ -14,6 +15,9 @@ public class RsResourceQuota {
     private String quotaCode;
     private int quotaChart;
     private int quotaId;
+    private Integer pid;
+
+    private List<RsResourceQuota> children;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -69,5 +73,23 @@ public class RsResourceQuota {
 
     public void setQuotaId(int quotaId) {
         this.quotaId = quotaId;
+    }
+
+    @Column(name = "pid")
+    public Integer getPid() {
+        return pid;
+    }
+
+    public void setPid(Integer pid) {
+        this.pid = pid;
+    }
+
+    @Transient
+    public List<RsResourceQuota> getChildren() {
+        return children;
+    }
+
+    public void setChildren(List<RsResourceQuota> children) {
+        this.children = children;
     }
 }

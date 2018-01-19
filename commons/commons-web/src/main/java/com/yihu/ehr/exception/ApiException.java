@@ -111,4 +111,10 @@ public class ApiException extends RuntimeException {
 
         return objectNode.toString();
     }
+
+    @Override
+    public String getMessage() {
+        return message;
+    }
+
 }

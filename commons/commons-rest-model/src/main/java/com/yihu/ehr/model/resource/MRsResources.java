@@ -13,6 +13,8 @@ public class MRsResources {
     private String grantType;
     private String description;
     private Integer dataSource;
+    private String echartType;
+
 
     public String getId() {
         return id;
@@ -73,5 +75,13 @@ public class MRsResources {
 
     public void setDataSource(Integer dataSource) {
         this.dataSource = dataSource;
+    }
+
+    public String getEchartType() {
+        return echartType;
+    }
+
+    public void setEchartType(String echartType) {
+        this.echartType = echartType;
     }
 }

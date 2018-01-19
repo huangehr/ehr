@@ -35,6 +35,13 @@ public interface TjQuotaLogClient {
             @RequestParam(value = "size", required = false) int size,
             @RequestParam(value = "page", required = false) int page);
 
+    @RequestMapping(value = ServiceApi.TJ.GetTjQuotaLogRecentRecord, method = RequestMethod.GET)
+    @ApiOperation(value = "获取最近日志列表")
+    MTjQuotaLog getRecentRecord(
+            @RequestParam(value = "quotaCode", required = false) String quotaCode,
+            @RequestParam(value = "endTime", required = false) String endTime
+    );
+
 
 
 

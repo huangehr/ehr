@@ -1,9 +1,12 @@
 package com.yihu.ehr.agModel.user;
 
+import java.io.Serializable;
+
 /**
  * Created by AndyCai on 2016/2/22.
  */
-public class UserDetailModel {
+public class UserDetailModel implements Serializable {
+
     private String id;
     private String createDate;
     private String lastLoginTime;

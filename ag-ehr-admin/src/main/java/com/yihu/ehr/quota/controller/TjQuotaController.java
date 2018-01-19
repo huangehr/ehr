@@ -6,23 +6,21 @@ import com.yihu.ehr.adapter.utils.ExtendController;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.entity.quota.TjQuota;
-import com.yihu.ehr.geography.service.AddressClient;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
 import com.yihu.ehr.model.dict.MConventionalDict;
-import com.yihu.ehr.model.geography.MGeographyDict;
-import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.resource.MRsMetadata;
 import com.yihu.ehr.model.tj.MQuotaCategory;
+import com.yihu.ehr.model.tj.MTjQuotaLog;
 import com.yihu.ehr.model.tj.MTjQuotaModel;
 import com.yihu.ehr.organization.service.OrganizationClient;
 import com.yihu.ehr.quota.service.QuotaCategoryClient;
 import com.yihu.ehr.quota.service.TjQuotaClient;
 import com.yihu.ehr.quota.service.TjQuotaJobClient;
+import com.yihu.ehr.quota.service.TjQuotaLogClient;
 import com.yihu.ehr.resource.client.RsMetadataClient;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
-import com.yihu.ehr.users.service.GetInfoClient;
 import com.yihu.ehr.util.FeignExceptionUtils;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
@@ -57,9 +55,7 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
-    private GetInfoClient getInfoClient;
-    @Autowired
-    private AddressClient addressClient;
+    TjQuotaLogClient tjQuotaLogClient;
     @Autowired
     OrganizationClient organizationClient;
 
@@ -213,14 +209,84 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
         return tjQuotaClient.hasExistsCode(code);
     }
 
-
-
-    @RequestMapping(value = ServiceApi.TJ.TjQuotaExecute, method = RequestMethod.GET)
-    @ApiOperation(value = "指标执行")
-    public boolean execuJob(
-            @ApiParam(name = "id")
+    @RequestMapping(value = ServiceApi.TJ.FirstExecuteQuota, method = RequestMethod.POST)
+    @ApiOperation(value = "初始指标执行")
+    public Envelop execuJob(
+            @ApiParam(name = "id", value = "指标ID", required = true)
             @RequestParam(value = "id") int id) throws Exception {
-        return tjQuotaJobClient.tjQuotaExecute(id);
+        Date date = new Date();
+        tjQuotaJobClient.firstExecuteQuota(id);
+        MTjQuotaModel quotaModel = tjQuotaClient.getById(Long.valueOf(String.valueOf(id)));
+        Envelop envelop = new Envelop();
+        MTjQuotaLog mTjQuotaLog = null;
+        boolean flag = true;
+        int count = 1;
+        while (flag) {
+            Thread.sleep(5 * 1000L);
+            mTjQuotaLog = tjQuotaLogClient.getRecentRecord(quotaModel.getCode(),DateUtil.toStringLong(date));
+            if(mTjQuotaLog != null ){
+                flag = false;
+            }else {
+                count ++;
+            }
+            if(count > 3){
+                flag = false;
+            }
+        }
+        if(mTjQuotaLog != null ){
+            if(mTjQuotaLog.getStatus() == 1){
+                envelop.setSuccessFlg(true);
+            }else {
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg(mTjQuotaLog.getContent());
+            }
+        }else {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("任务还在执行中，请稍后再进行查看日志！");
+        }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.TJ.TjQuotaExecute, method = RequestMethod.POST)
+    @ApiOperation(value = "指标执行")
+    public Envelop execuJob(
+            @ApiParam(name = "id", value = "指标ID", required = true)
+            @RequestParam(value = "id") int id,
+            @ApiParam(name = "startDate", value = "起始日期")
+            @RequestParam(value = "startDate", required = false) String startDate,
+            @ApiParam(name = "endDate", value = "截止日期")
+            @RequestParam(value = "endDate", required = false) String endDate) throws Exception {
+        Date date = new Date();
+        tjQuotaJobClient.tjQuotaExecute(id, startDate, endDate);
+        MTjQuotaModel quotaModel = tjQuotaClient.getById(Long.valueOf(String.valueOf(id)));
+        Envelop envelop = new Envelop();
+        MTjQuotaLog mTjQuotaLog = null;
+        boolean flag = true;
+        int count = 1;
+        while (flag) {
+            Thread.sleep(5 * 1000L);
+            mTjQuotaLog = tjQuotaLogClient.getRecentRecord(quotaModel.getCode(),DateUtil.toStringLong(date));
+            if(mTjQuotaLog != null ){
+                flag = false;
+            }else {
+                count ++;
+            }
+            if(count > 3){
+                flag = false;
+            }
+         }
+        if(mTjQuotaLog != null ){
+            if(mTjQuotaLog.getStatus() == 1){
+                envelop.setSuccessFlg(true);
+            }else {
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg(mTjQuotaLog.getContent());
+            }
+        }else {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("任务还在执行中，请稍后再进行查看日志！");
+        }
+        return envelop;
     }
 
     @RequestMapping(value = ServiceApi.TJ.TjGetQuotaResult, method = RequestMethod.GET)
@@ -240,7 +306,9 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
         //-----------------用户数据权限 start
         String org = "";
         if( userOrgList != null ){
-            org = StringUtils.strip(String.join(",", userOrgList), "[]");
+            if( !(userOrgList.size()==1 && userOrgList.get(0).equals("null")) ){
+                org = StringUtils.strip(String.join(",", userOrgList), "[]");
+            }
         }
         Map<String, Object> params  = new HashMap<>();
         if(org.length() > 0){
@@ -266,6 +334,35 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
             @ApiParam(name = "quotaCode", value = "指标编码")
             @RequestParam(value = "quotaCode") String quotaCode) {
         return tjQuotaClient.hasConfigDimension(quotaCode);
+    }
+
+    /**
+     *
+     * @param type   验证字段名称： code/name
+     * @param json
+     * @return
+     */
+    @RequestMapping(value = ServiceApi.TJ.TjQuotaTypeIsExist,method = RequestMethod.POST)
+    public List tjQuotaTypeIsExist(
+            @ApiParam(name = "type", value = "待验证字段名")
+            @RequestParam(value = "type")String type,
+            @ApiParam(name = "json", value = "待验证的值")
+            @RequestParam(value = "json")String json){
+        return tjQuotaClient.tjQuotaTypeIsExist(type,json);
+    }
+
+    @RequestMapping(value = ServiceApi.TJ.TjQuotaBatch, method = RequestMethod.POST)
+    @ApiOperation("批量导入指标、主维度、细维度")
+    public Object tjQuotaBatch(
+            @ApiParam(name = "lsMap", value = "指标、主维度、细维度")
+            @RequestParam(value = "lsMap")String lsMap) throws Exception {
+        try{
+
+            return tjQuotaClient.tjQuotaBatch(lsMap);
+        }catch (Exception e){
+            e.printStackTrace();
+            return "系统出错！";
+        }
     }
 
 }

@@ -1,6 +1,13 @@
 package com.yihu.ehr.analysis.model;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.yihu.ehr.util.datetime.DateUtil;
+import io.searchbox.annotations.JestId;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+
+import java.util.Date;
 
 /**
  * Created by Administrator on 2017/2/9.
@@ -14,33 +21,37 @@ import org.springframework.data.annotation.Id;
  * 5 label // 标签
  * 6 register  // 注册
  * 7 archive // 健康档案
- {
-      time:"" 时间
-     ,logType:2 日志类型
-     ,caller:"" 调用者
-     ,data:{
-         ,businessType:""  业务类型
-         ,patient:"" 居民
-         ,data:{} 业务数据
-     } 数据
- }
-
- // 接口调用日志
- {
-  time:"" 时间
- ,logType:1 日志类型
- ,caller:"" 调用者
- ,data:{
-      responseTime:"" 响应时间
-     ,url:"" 接口URL
-     ,params:{} 参数
-    } 数据
- }
+ * {
+ * time:"" 时间
+ * ,logType:2 日志类型
+ * ,caller:"" 调用者
+ * ,data:{
+ * ,businessType:""  业务类型
+ * ,patient:"" 居民
+ * ,data:{} 业务数据
+ * } 数据
+ * }
+ * <p>
+ * // 接口调用日志
+ * {
+ * time:"" 时间
+ * ,logType:1 日志类型
+ * ,caller:"" 调用者
+ * ,data:{
+ * responseTime:"" 响应时间
+ * ,url:"" 接口URL
+ * ,params:{} 参数
+ * } 数据
+ * }
  */
 public class DataModel {
-    @Id
+
+    @JestId
     protected String id;
-    protected String time;//时间
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXX")
+    @CreatedDate
+    @JSONField(format = "yyyy-MM-dd'T'HH:mm:ssXX")
+    protected Date time;//时间
     protected String caller; //调用者
     protected String logType;//日志类型 1接口 2业务
 
@@ -60,12 +71,11 @@ public class DataModel {
         this.logType = logType;
     }
 
-
-    public String getTime() {
+    public Date getTime() {
         return time;
     }
 
-    public void setTime(String time) {
+    public void setTime(Date time) {
         this.time = time;
     }
 
@@ -75,5 +85,9 @@ public class DataModel {
 
     public void setCaller(String caller) {
         this.caller = caller;
+    }
+
+    protected Date changeTime(String time) {
+        return DateUtil.strToDate(time);
     }
 }

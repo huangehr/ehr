@@ -86,7 +86,7 @@ public interface CDAClient {
             @ApiParam(name = "version", value = "versionCode")
             @RequestParam(value = "version") String versionCode,
             @ApiParam(name = "xml_info", value = "xml_info")
-            @RequestParam(value = "xml_info") String xmlInfo);
+            @RequestBody String xmlInfo);
 
     @ApiOperation(value = "根基id删除CDADataSetRelationship")
     @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Standards.DataSetRelationships, method = RequestMethod.DELETE)

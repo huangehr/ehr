@@ -4,6 +4,7 @@ import com.yihu.ehr.agModel.resource.ResourceQuotaModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.constants.ServiceApi;
+import com.yihu.ehr.entity.quota.TjQuota;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
@@ -80,4 +81,16 @@ public interface RsResourceQuotaClient {
     Result deleteByResourceId(
             @ApiParam(name = "resourceId", value = "资源Id", defaultValue = "")
             @RequestParam(value = "resourceId") String resourceId);
+
+    @RequestMapping(value = ServiceApi.Resources.SearchQuotaByResourceId, method = RequestMethod.GET)
+    @ApiOperation(value = "根据resourceId获取该资源下的指标列表")
+    List<TjQuota> getQuotaByResourceId(@RequestParam(value = "resourceId") String resourceId);
+
+    @RequestMapping(value = ServiceApi.Resources.SearchTreeByResourceId, method = RequestMethod.GET)
+    @ApiOperation(value = "根据resourceId获取该资源下的指标列表树")
+    Envelop searchTreeByResourceId(@RequestParam(value = "resourceId") String resourceId);
+
+    @RequestMapping(value = ServiceApi.Resources.UpdateResourceQuota, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "根据resourceId修改该资源下的指标关系")
+    Envelop updateResourceQuota(@RequestBody String jsonRelation);
 }

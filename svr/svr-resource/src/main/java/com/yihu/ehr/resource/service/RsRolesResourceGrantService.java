@@ -23,24 +23,21 @@ import java.util.List;
 public class RsRolesResourceGrantService extends BaseJpaService<RsRolesResource, RsRolesResourceDao> {
 
     @Autowired
-    private RsRolesResourceDao rolesRsDao;
+    private RsRolesResourceDao rsRolesResourceDao;
     @Autowired
     private RsRolesResourceMetadataDao rolesRsMetadataDao;
-    @Autowired
-    private RsAppResourceMetadataGrantService rsMetadataGrantService;
 
     @Value("${deploy.region}")
-    Short deployRegion = 3502;
+    private Short deployRegion = 3502;
+
     /**
      * 资源授权单个App
      *
      * @param rsRolesResource RsAppResource 资源授权实体
      * @return RsRolesResource 资源授权实体
      */
-    public RsRolesResource grantResource(RsRolesResource rsRolesResource)
-    {
-        rolesRsDao.save(rsRolesResource);
-
+    public RsRolesResource grantResource(RsRolesResource rsRolesResource) {
+        rsRolesResourceDao.save(rsRolesResource);
         return rsRolesResource;
     }
 
@@ -50,10 +47,8 @@ public class RsRolesResourceGrantService extends BaseJpaService<RsRolesResource,
      * @param rolesRsList List<RsRolesResource> 资源授权实体集合
      * @return List<RsRolesResource> 资源授权实体集合
      */
-    public List<RsRolesResource> grantResourceBatch(List<RsRolesResource> rolesRsList)
-    {
-        rolesRsDao.save(rolesRsList);
-
+    public List<RsRolesResource> grantResourceBatch(List<RsRolesResource> rolesRsList) {
+        rsRolesResourceDao.save(rolesRsList);
         return rolesRsList;
     }
 
@@ -62,14 +57,11 @@ public class RsRolesResourceGrantService extends BaseJpaService<RsRolesResource,
      *
      * @param id String 授权ID
      */
-    public void deleteResourceGrant(String id)
-    {
+    public void deleteResourceGrant(String id) {
         String[] idArray = id.split(",");
-
-        for(String _id:idArray)
-        {
+        for(String _id:idArray) {
             rolesRsMetadataDao.deleteByRolesResourceId(_id);
-            rolesRsDao.delete(_id);
+            rsRolesResourceDao.delete(_id);
         }
     }
 
@@ -81,11 +73,9 @@ public class RsRolesResourceGrantService extends BaseJpaService<RsRolesResource,
      * @param size int 分页大小
      * @return Page<RsResources> 资源
      */
-    public Page<RsRolesResource> getRolesResourceGrant(String sorts, int page, int size)
-    {
+    public Page<RsRolesResource> getRolesResourceGrant(String sorts, int page, int size) {
         Pageable pageable =  new PageRequest(page,size,parseSorts(sorts));
-
-        return rolesRsDao.findAll(pageable);
+        return rsRolesResourceDao.findAll(pageable);
     }
 
 
@@ -97,7 +87,7 @@ public class RsRolesResourceGrantService extends BaseJpaService<RsRolesResource,
      */
     public RsRolesResource getRsRolesGrantById(String id)
     {
-        return rolesRsDao.findOne(id);
+        return rsRolesResourceDao.findOne(id);
     }
 
 
@@ -105,13 +95,11 @@ public class RsRolesResourceGrantService extends BaseJpaService<RsRolesResource,
      * 删除资源授权
      *
      */
-    public void deleteGrantByIds(String[] rolesResIds)
-    {
+    public void deleteGrantByIds(String[] rolesResIds) {
         String hql = "delete from RsRolesResource res where id in(:rolesResIds)";
         Query query = currentSession().createQuery(hql);
         query.setParameterList("rolesResIds", rolesResIds);
         query.executeUpdate();
-
         hql = "delete from RsRolesResourceMetadata meta where rolesResourceId in(:rolesResIds)";
         query = currentSession().createQuery(hql);
         query.setParameterList("rolesResIds", rolesResIds);
@@ -122,20 +110,15 @@ public class RsRolesResourceGrantService extends BaseJpaService<RsRolesResource,
      * 新增资源授权
      *
      */
-    public List<RsRolesResource> addList(List<RsRolesResource> rolesRsList, String resourcesId)
-    {
+    public List<RsRolesResource> addList(List<RsRolesResource> rolesRsList, String resourcesId) {
         if(rolesRsList.size()==0)
             return rolesRsList;
-
 //        String sql = "SELECT sm.id, m.name FROM rs_resource_metadata sm LEFT JOIN rs_metadata m ON sm.METADATA_ID=m.ID WHERE " +
 //                "sm.resources_id=:resourcesId";
-
 //        SQLQuery query = currentSession().createSQLQuery(sql);
 //        query.setParameter("resourcesId", resourcesId);
 //        List<Object[]> rsResourceMetadatas = query.list();
-
-        rolesRsDao.save(rolesRsList);
-
+        rsRolesResourceDao.save(rolesRsList);
 //        List<RsAppResourceMetadata> appRsMetadataList = new ArrayList<>();
 //        RsAppResourceMetadata appRsMetadata;
 //        for(RsAppResource appResource: appRsList){
@@ -151,6 +134,16 @@ public class RsRolesResourceGrantService extends BaseJpaService<RsRolesResource,
 //        }
 //        rsMetadataGrantService.grantRsMetadataBatch(appRsMetadataList);
         return rolesRsList;
+    }
+
+    /**
+     * 根据资源id和角色id
+     * @param resourceId
+     * @param roleId
+     * @return
+     */
+    public RsRolesResource findByResourceIdAndRolesId(String resourceId, String roleId) {
+        return rsRolesResourceDao.findByResourceIdAndRolesId(resourceId, roleId);
     }
 
 }

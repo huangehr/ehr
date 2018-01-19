@@ -9,6 +9,7 @@ import com.yihu.ehr.agModel.org.OrgModel;
 import com.yihu.ehr.apps.service.AppClient;
 import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.fileresource.service.FileResourceClient;
 import com.yihu.ehr.geography.service.AddressClient;
@@ -117,9 +118,13 @@ public class OrganizationController extends BaseController {
         try {
             //根据登录人的机构获取saas化机构 --start
            String userOrgCode = "";
-            if( userOrgList != null ){
-                userOrgCode = StringUtils.strip(String.join(",", userOrgList), "[]");
-                filters += "orgCode=" + userOrgCode ;
+            if( userOrgList != null  ){
+                if( !(userOrgList.size()==1 && userOrgList.get(0).equals("null")) ){
+                    userOrgCode = StringUtils.strip(String.join(",", userOrgList), "[]");
+                    if(StringUtils.isNotEmpty(userOrgCode)){
+                        filters += "orgCode=" + userOrgCode ;
+                    }
+                }
             }
             //根据登录人的机构获取saas化机构 --end
             String address = "";
@@ -238,7 +243,7 @@ public class OrganizationController extends BaseController {
                 return failed("机构代码不能为空！");
             }
             //用户
-            ResponseEntity<List<MUser>> userEntity = userClient.searchUsers("", "organization="+orgCode, "", 1, 1);
+            ResponseEntity<List<MUser>> userEntity = userClient.searchUsers("", "organization="+orgCode, "", 1, 1, null);
             List<MUser> users = userEntity.getBody();
             if(users.size()>0){
                 return failed("删除失败!该组织机构下面存在用户，请先删除用户！");
@@ -355,6 +360,7 @@ public class OrganizationController extends BaseController {
                 }
             }
             mOrganization.setLocation(locationId);
+            mOrganization.setActivityFlag(1);
             String mOrganizationJson = objectMapper.writeValueAsString(mOrganization);
             MOrganization mOrgNew = orgClient.create(mOrganizationJson);
             if (mOrgNew == null) {
@@ -770,5 +776,36 @@ public class OrganizationController extends BaseController {
         return envelop;
     }
 
+    @RequestMapping(value = ServiceApi.Org.getseaOrgsByOrgCode, method = RequestMethod.POST)
+    @ApiOperation("根据机构code获取机构code和name")
+    public Envelop seaOrgsByOrgCode(
+            @ApiParam(name = "org_codes", value = "机构org_codes", defaultValue = "")
+            @RequestParam(value = "org_codes") String org_codes) throws Exception {
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(true);
+        try{
+            Map<String,String> orgMap= orgClient.seaOrgsByOrgCode(org_codes);
+            envelop.setObj(orgMap);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("系统出错！");
+        }
+        return envelop;
+    }
 
+    @RequestMapping(value = "/organizations/getHospital", method = RequestMethod.GET)
+    @ApiOperation(value = "查询所有经纬度医院列表")
+    public Envelop getHospital() throws Exception {
+        return orgClient.getHospital();
+    }
+
+    @RequestMapping(value = "/organizations/getOrgListByAddressPid", method = RequestMethod.GET)
+    @ApiOperation(value = "根据区域查询机构列表")
+    public Envelop getOrgListByAddressPid(
+            @ApiParam(name = "pid", value = "区域id", defaultValue = "")
+            @RequestParam(value = "pid") Integer pid) {
+        Envelop envelop = orgClient.getOrgListByAddressPid(pid);
+        return envelop;
+    }
 }

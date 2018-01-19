@@ -17,19 +17,6 @@ public class TjDimensionSlaveService {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    public List<TjDimensionSlave> getDimensionSlaveByQuotaCode(String code) {
-        String sql = "SELECT " +
-                "  dm.* " +
-                " FROM " +
-                "  tj_dimension_slave dm, " +
-                "  tj_quota_dimension_slave qdm " +
-                " WHERE " +
-                "  dm.`code` = qdm.slave_code " +
-                " AND qdm.quota_code = ? ";
-        List<TjDimensionSlave> quotaDataSources = jdbcTemplate.query(sql, new BeanPropertyRowMapper(TjDimensionSlave.class), code);
-        return quotaDataSources;
-    }
-
     public List<TjQuotaDimensionSlave> findTjQuotaDimensionSlaveByQuotaCode(String code) {
         String sql = "SELECT " +
                 "  qdm.*,dm.type " +

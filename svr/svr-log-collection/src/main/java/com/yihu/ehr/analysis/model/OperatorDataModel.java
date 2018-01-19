@@ -1,15 +1,19 @@
 package com.yihu.ehr.analysis.model;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.yihu.ehr.analysis.service.AppFeatureService;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Created by Administrator on 2017/2/9.
@@ -24,14 +28,16 @@ import java.util.Map;
  * } 数据
  * }
  */
-@Document
 @Component
 public class OperatorDataModel extends DataModel implements Serializable {
 
     @Autowired
     private AppFeatureService appFeatureService;
 
-    private String responseTime;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXX")
+    @CreatedDate
+    @JSONField(format = "yyyy-MM-dd'T'HH:mm:ssXX")
+    private Date responseTime;
     private String responseCode;
     private String response;
     private String api;
@@ -44,10 +50,10 @@ public class OperatorDataModel extends DataModel implements Serializable {
         try {
             operatorDataModel.setLogType(String.valueOf(jsonObject.get("logType")));
             operatorDataModel.setCaller(jsonObject.getString("caller"));
-            operatorDataModel.setTime(jsonObject.getString("time"));
+            operatorDataModel.setTime(changeTime(jsonObject.getString("time")));
 
             JSONObject chlidren = jsonObject.getJSONObject("data");
-            operatorDataModel.setResponseTime(chlidren.get("responseTime").toString());
+            operatorDataModel.setResponseTime(changeTime(chlidren.get("responseTime").toString()));
             operatorDataModel.setResponseCode(chlidren.getString("responseCode"));
             operatorDataModel.setResponse(chlidren.getString("response"));
             operatorDataModel.setUrl(chlidren.getString("url"));
@@ -63,12 +69,11 @@ public class OperatorDataModel extends DataModel implements Serializable {
         return operatorDataModel;
     }
 
-
-    public String getResponseTime() {
+    public Date getResponseTime() {
         return responseTime;
     }
 
-    public void setResponseTime(String responseTime) {
+    public void setResponseTime(Date responseTime) {
         this.responseTime = responseTime;
     }
 

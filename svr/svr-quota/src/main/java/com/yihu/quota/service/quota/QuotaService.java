@@ -3,8 +3,10 @@ package com.yihu.quota.service.quota;
 import com.yihu.quota.dao.jpa.TjQuotaDao;
 import com.yihu.quota.etl.extract.es.EsResultExtract;
 import com.yihu.quota.model.jpa.TjQuota;
+import com.yihu.quota.model.jpa.source.TjQuotaDataSource;
 import com.yihu.quota.model.rest.QuotaReport;
 import com.yihu.quota.model.rest.ResultModel;
+import com.yihu.quota.service.source.TjDataSourceService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,8 @@ public class QuotaService {
     private TjQuotaDao quotaDao;
     @Autowired
     private EsResultExtract esResultExtract;
+    @Autowired
+    private TjDataSourceService dataSourceService;
 
     public TjQuota findOne(int id){
         return quotaDao.findOne(id);
@@ -34,6 +38,10 @@ public class QuotaService {
         return  esResultExtract.queryResultPage(tjQuota, filters, pageNo, pageSize);
     }
 
+    public List<Map<String, Object>> queryResultPageByCode(String code,String filters ,int pageNo,int pageSize) throws Exception {
+        TjQuota tjQuota= quotaDao.findByCode(code);
+        return  esResultExtract.queryResultPage(tjQuota, filters, pageNo, pageSize);
+    }
 
     public long getQuotaTotalCount(Integer id,String filters) throws Exception {
         TjQuota tjQuota= quotaDao.findOne(id);
@@ -41,26 +49,24 @@ public class QuotaService {
         return count;
     }
 
-    public List<Map<String, Object>> searcherByGroup(Integer id,String filters,String aggsField ) throws Exception {
-        TjQuota tjQuota= quotaDao.findOne(id);
+    //指标分组统计数量 - 只支持一个字段
+    public List<Map<String, Object>> searcherByGroup(TjQuota tjQuota,String filters,String aggsField ) throws Exception {
         return  esResultExtract.searcherByGroup(tjQuota, filters,aggsField );
     }
 
-
-    public Map<String, Integer> searcherByGroupBySql(Integer id,String aggsField ,String filters ) throws Exception {
-        TjQuota tjQuota= quotaDao.findOne(id);
-        return  esResultExtract.searcherByGroupBySql(tjQuota,aggsField,filters);
+    //根据mysql 指标分组求和 支持一个和多个字段
+    public Map<String, Integer> searcherSumByGroupBySql(TjQuota tjQuota,String aggsField ,String filters,String sumField ,String orderFild,String order) throws Exception {
+        return  esResultExtract.searcherSumByGroupBySql(tjQuota, aggsField, filters,sumField,orderFild,order);
     }
 
     //多维度 数据的总和
-    public QuotaReport getQuotaReport(Integer id, String filters,String dimension,int size) throws Exception {
+    public QuotaReport getQuotaReport(TjQuota tjQuota, String filters,String dimension,int size) throws Exception {
         String[] dimensions = null;
         if(StringUtils.isNotEmpty(dimension)){
           dimensions = dimension.split(";");
         }else{
             dimensions = new String[]{"quotaDate"};
         }
-        TjQuota tjQuota= quotaDao.findOne(id);
         QuotaReport quotaReport = new QuotaReport();
         List<ResultModel> reultModelList = new ArrayList<>();
         List<Map<String, Object>> listMap = esResultExtract.getQuotaReport(tjQuota, filters,size);
@@ -74,7 +80,11 @@ public class QuotaService {
                     if(dimensions[k].equals("quotaDate")){
                         nameVal = listMap.get(i).get(dimensions[k]).toString();
                     }else{
-                        nameVal = listMap.get(i).get(dimensions[k]+"Name").toString();
+                        if(null != listMap.get(i).get(dimensions[k]+"Name")){
+                            nameVal = listMap.get(i).get(dimensions[k]+"Name").toString();
+                        }else {
+                            nameVal = listMap.get(i).get(dimensions[k]).toString();
+                        }
                     }
                     cloumns.add(nameVal);
                 }
@@ -95,7 +105,7 @@ public class QuotaService {
                     //如果有重复 先删除listl里面的数据，然后添加新数据
                     reultModelList.remove(oldresult);
                     reultModel.setCloumns(cloumns);
-                    Object totalResultVal = ( Integer.valueOf(resultVal.toString()) + Integer.valueOf(oldresult.getValue().toString()) );
+                    Object totalResultVal = ( Double.valueOf(resultVal.toString()) + Double.valueOf(oldresult.getValue().toString()) );
                     reultModel.setValue(totalResultVal);
                     reultModelList.add(reultModel);
                 }
@@ -161,14 +171,13 @@ public class QuotaService {
     }
 
     //多维度 数据的总和
-    public QuotaReport getQuotaReportGeneral(Integer id, String filters,String dimension,int size) throws Exception {
+    public QuotaReport getQuotaReportGeneral( TjQuota tjQuota,String filters,String dimension,int size) throws Exception {
         String[] dimensions = null;
         if(StringUtils.isNotEmpty(dimension)){
             dimensions = dimension.split(";");
         }else{
             dimensions = new String[]{"quotaDate"};
         }
-        TjQuota tjQuota= quotaDao.findOne(id);
         QuotaReport quotaReport = new QuotaReport();
         List<Map<String, Object>> listMap = esResultExtract.getQuotaReport(tjQuota, filters,size);
         List<ResultModel> reultModelList = new ArrayList<>();
@@ -209,8 +218,21 @@ public class QuotaService {
     }
 
 
+    public  List<Map<String, Object>> getQuotaResultList(TjQuota tjQuota,String filters) throws Exception {
+        List<Map<String, Object>> resultListMap = esResultExtract.getQuotaReport(tjQuota, filters,10000);
+        return  resultListMap;
+    }
 
 
+    /**
+     * 获取指标报表结果集
+     * @param code
+     * @param filters
+     * @param dimension
+     */
+    public void getQuotaReportResult(String code, String filters, String dimension) {
+        TjQuota tjQuota= quotaDao.findByCode(code);
+        TjQuotaDataSource quotaDataSource = dataSourceService.findSourceByQuotaCode(code);
 
-
+    }
 }

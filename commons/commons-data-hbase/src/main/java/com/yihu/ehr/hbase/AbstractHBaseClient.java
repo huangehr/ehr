@@ -6,14 +6,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.hadoop.hbase.HbaseTemplate;
 
 /**
+ * AbstractHBaseClient - 基类
  * @author hzp
  * @created 2017.05.03
  */
-public class AbstractHBaseClient {
+public abstract class AbstractHBaseClient {
 
     @Autowired
     protected HbaseTemplate hbaseTemplate;
-
 
     /**
      * 创建连接
@@ -21,7 +21,6 @@ public class AbstractHBaseClient {
     protected Connection getConnection() throws Exception {
         return getConnection(hbaseTemplate);
     }
-
 
     /**
      * 创建连接

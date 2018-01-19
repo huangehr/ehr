@@ -24,6 +24,8 @@ public interface RsResourceIntegratedClient {
     @ApiOperation("综合查询档案数据列表树")
     @RequestMapping(value = ServiceApi.Resources.IntMetadataList, method = RequestMethod.GET)
     Envelop getMetadataList(
+            @RequestParam(value = "userResource") String userResource,
+            @RequestParam(value = "roleId") String roleId,
             @RequestParam(value = "filters", required = false) String filters);
 
     @ApiOperation("综合查询档案数据检索")
@@ -31,8 +33,8 @@ public interface RsResourceIntegratedClient {
     Envelop searchMetadataData(
             @RequestParam(value = "resourcesCode") String resourcesCode,
             @RequestParam(value = "metaData", required = false) String metaData,
-            @RequestParam(value = "orgCode", required = false) String orgCode,
-            @RequestParam(value = "appId") String appId,
+            @RequestParam(value = "orgCode") String orgCode,
+            @RequestParam(value = "areaCode") String areaCode,
             @RequestParam(value = "queryCondition",required = false) String queryCondition,
             @RequestParam(value = "page",required = false) Integer page,
             @RequestParam(value = "size",required = false) Integer size);

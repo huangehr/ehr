@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.constants.ArchiveStatus;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
+import com.yihu.ehr.pack.dao.XDatasetPackageRepository;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.util.id.ObjectId;
 import com.yihu.ehr.util.log.LogService;
@@ -35,13 +36,11 @@ import java.util.Map;
 @Transactional
 public class DatasetPackageService extends BaseJpaService<DatasetPackage, XDatasetPackageRepository> {
     @Value("${deploy.region}")
-    Short adminRegion;
-
+    private Short adminRegion;
     @Autowired
-    FastDFSUtil fastDFSUtil;
-
+    private FastDFSUtil fastDFSUtil;
     @Autowired
-    XDatasetPackageRepository datasetPackageRepository;
+    private XDatasetPackageRepository datasetPackageRepository;
 
 
     public DatasetPackage receiveDatasets(InputStream is, String pwd, String md5, String orgCode, String clientId) {
@@ -87,8 +86,8 @@ public class DatasetPackageService extends BaseJpaService<DatasetPackage, XDatas
 
         try {
             ObjectNode msg = fastDFSUtil.upload(is, "zip", "健康档案JSON临时文件");
-            String group = msg.get(FastDFSUtil.GroupField).asText();
-            String remoteFile = msg.get(FastDFSUtil.RemoteFileField).asText();
+            String group = msg.get(FastDFSUtil.GROUP_NAME).asText();
+            String remoteFile = msg.get(FastDFSUtil.REMOTE_FILE_NAME).asText();
 
             // 将组与文件ID使用英文分号隔开, 提取的时候, 只需要将它们这个串拆开, 就可以得到组与文件ID
             String remoteFilePath = String.join(Package.pathSeparator, new String[]{group, remoteFile});

@@ -27,7 +27,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "Icd10IndicatorRelation", description = "ICD10与指标之间关联关系管理接口")
+@Api(value = "Icd10IndicatorRelationEndPoint", description = "ICD10与指标之间关联关系",tags = {"特殊字典-ICD10和指标关联关系"})
 public class Icd10IndicatorRelationEndPoint extends EnvelopRestEndPoint {
 
     @Autowired

@@ -35,6 +35,36 @@ public class HbaseQuery {
 	@Autowired
 	private HBaseDao hbaseDao;
 
+
+	/**
+	 * 查询solr 索引列表
+	 */
+	public Page<String> queryIndexBySolr(String table, String q, String sort, String fq, String basicFl, String dFl, int page, int rows) throws Exception{
+
+		long count = 0;
+		List<Map<String,Object>> data = new ArrayList<>();
+
+		if(rows < 0) rows = 50;
+		if(page <0) page = 1;
+		long start= (page-1) * rows;
+		Map<String, String> sortMap = getSortMap(sort);
+		//Solr查询
+		SolrDocumentList solrList = solr.query(table, q, fq, sortMap, start, rows);
+		//Hbase查询
+		List<String> list = new ArrayList<String>();
+		if(solrList!=null && solrList.getNumFound()>0) {
+			count = solrList.getNumFound();
+			for (SolrDocument doc : solrList){
+				String rowkey = String.valueOf(doc.getFieldValue("rowkey"));
+				list.add(rowkey);
+			}
+		}
+
+		return new PageImpl<String>(list,new PageRequest(page-1, rows), count);
+	}
+
+
+
 	/**
 	 * Keyrow条件查询
 	 * @param rowkey

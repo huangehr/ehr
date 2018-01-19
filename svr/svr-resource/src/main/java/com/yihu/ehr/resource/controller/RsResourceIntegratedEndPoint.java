@@ -21,6 +21,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -31,7 +32,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0)
-@Api(value = "RsResourceIntegrated", description = "资源综合查询数据服务接口")
+@Api(value = "RsResourceIntegratedEndPoint", description = "资源综合查询", tags = {"资源服务-资源综合查询"})
 public class RsResourceIntegratedEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
@@ -48,30 +49,41 @@ public class RsResourceIntegratedEndPoint extends EnvelopRestEndPoint {
     @ApiOperation("综合查询档案数据列表树")
     @RequestMapping(value = ServiceApi.Resources.IntMetadataList, method = RequestMethod.GET)
     public Envelop getMetadataList(
-            @ApiParam(name = "filters", value = "过滤条件(name)", defaultValue = "")
-            @RequestParam(value = "filters", required = false) String filters,
-            HttpServletRequest request) {
-        return resourcesIntegratedService.getMetadataList(filters);
+            @ApiParam(name = "userResource", value = "授权资源")
+            @RequestParam(value = "userResource") String userResource,
+            @ApiParam(name = "roleId", value = "角色id")
+            @RequestParam(value = "roleId") String roleId,
+            @ApiParam(name = "filters", value = "过滤条件(name)")
+            @RequestParam(value = "filters", required = false) String filters) {
+        Envelop envelop = new Envelop();
+        try {
+            envelop = resourcesIntegratedService.getMetadataList(userResource, roleId, filters);
+        }catch (Exception e) {
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return envelop;
     }
 
     @ApiOperation("综合查询档案数据检索")
     @RequestMapping(value = ServiceApi.Resources.IntMetadataData, method = RequestMethod.GET)
     public Envelop searchMetadataData(
-            @ApiParam(name = "resourcesCode", value = "资源代码([\"code\"])")
+            @ApiParam(name = "resourcesCode", value = "资源编码([\"code\"])")
             @RequestParam(value = "resourcesCode") String resourcesCode,
             @ApiParam(name = "metaData", value = "数据元([\"metadataId\"])")
             @RequestParam(value = "metaData", required = false) String metaData,
-            @ApiParam(name = "orgCode", value = "机构代码(orgCode)")
-            @RequestParam(value = "orgCode", required = false) String orgCode,
-            @ApiParam(name = "appId", value = "应用ID(appId)")
-            @RequestParam(value = "appId") String appId,
+            @ApiParam(name = "orgCode", value = "机构编码(orgCode)")
+            @RequestParam(value = "orgCode") String orgCode,
+            @ApiParam(name = "areaCode", value = "地区编码(areaCode)")
+            @RequestParam(value = "areaCode") String areaCode,
             @ApiParam(name = "queryCondition", value = "查询条件[{\"andOr\":\"(AND)(OR)\",\"condition\":\"(<)(=)(>)\",\"field\":\"fieldName\",\"value\":\"value\"}]")
             @RequestParam(value = "queryCondition", required = false) String queryCondition,
             @ApiParam(name = "page", value = "第几页(>0)")
             @RequestParam(value = "page", required = false) Integer page,
             @ApiParam(name = "size", value = "每页几行(>0)")
             @RequestParam(value = "size", required = false) Integer size) throws Exception{
-        return resourcesIntegratedService.searchMetadataData(resourcesCode, metaData, orgCode, appId, queryCondition, page, size);
+        return resourcesIntegratedService.searchMetadataData(resourcesCode, metaData, orgCode, areaCode, queryCondition, page, size);
     }
 
     @ApiOperation("综合查询指标统计列表树")
@@ -128,7 +140,15 @@ public class RsResourceIntegratedEndPoint extends EnvelopRestEndPoint {
                 }
                 String rsMetadatasStr = mapper.writeValueAsString(paraMap.get("metadatas"));
                 RsResourceMetadata[] rsMetadatas = toEntity(rsMetadatasStr, RsResourceMetadata[].class);
-                for (RsResourceMetadata rsMetadata : rsMetadatas) {
+                if(rsMetadatas == null || rsMetadatas.length <= 0) {
+                    /**
+                     * 档案数据元为空，删除资源
+                     */
+                    rsService.delete(newResources);
+                    envelop.setErrorMsg("档案数据元不能为空");
+                    return envelop;
+                }
+              	for (RsResourceMetadata rsMetadata : rsMetadatas) {
                     rsMetadata.setResourcesId(reId);
                     rsMetadata.setId(getObjectId(BizObject.ResourceMetadata));
                 }
@@ -167,7 +187,15 @@ public class RsResourceIntegratedEndPoint extends EnvelopRestEndPoint {
                 }
                 String rsQuotasStr = mapper.writeValueAsString(paraMap.get("quotas"));
                 RsResourceQuota[] rsQuotas = toEntity(rsQuotasStr, RsResourceQuota[].class);
-                for(RsResourceQuota resourceQuota : rsQuotas) {
+                if(rsQuotas == null || rsQuotas.length <= 0 ) {
+                    /**
+                     * 指标数据元关联失败，删除资源
+                     */
+                    rsService.delete(newResources);
+                    envelop.setErrorMsg("指标数据元不能为空");
+                    return envelop;
+                }
+              	for(RsResourceQuota resourceQuota : rsQuotas) {
                     resourceQuota.setResourceId(reId);
                     RsResourceQuota newResourceQuota = resourceQuotaService.save(resourceQuota);
                     if(newResourceQuota == null) {
@@ -200,6 +228,7 @@ public class RsResourceIntegratedEndPoint extends EnvelopRestEndPoint {
                 }
             }
             envelop.setSuccessFlg(true);
+            envelop.setObj(newResources.getId());
         }catch (Exception e) {
             e.printStackTrace();
             if(newResources != null) {
@@ -211,7 +240,7 @@ public class RsResourceIntegratedEndPoint extends EnvelopRestEndPoint {
                 resourceQuotaService.deleteByResourceId(newResources.getId());
                 rsService.delete(newResources);
             }
-            envelop.setErrorMsg(ErrorCode.SystemError.toString());
+            envelop.setErrorMsg(e.getMessage());
         }
         return envelop;
     }

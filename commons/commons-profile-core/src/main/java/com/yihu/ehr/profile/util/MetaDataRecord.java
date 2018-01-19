@@ -9,10 +9,11 @@ import java.util.TreeMap;
  * @created 2016.04.26 18:55
  */
 public class MetaDataRecord {
+
     Map<String, String> dataGroup = new TreeMap<>();
 
-    public Map<String, String> getDataGroup(){
-        return dataGroup;
+    public void putMetaData(String metaDataCode, String value){
+        dataGroup.put(metaDataCode, value);
     }
 
     public Set<String> getMetaDataCodes(){
@@ -23,7 +24,9 @@ public class MetaDataRecord {
         return dataGroup.get(metaDataCode);
     }
 
-    public void putMetaData(String metaDataCode, String value){
-        dataGroup.put(metaDataCode, value);
+    public Map<String, String> getDataGroup(){
+        return dataGroup;
     }
+
+
 }

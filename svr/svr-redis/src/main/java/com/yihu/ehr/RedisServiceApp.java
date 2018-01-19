@@ -1,5 +1,6 @@
 package com.yihu.ehr;
 
+import com.yihu.ehr.redis.listener.ApplicationReadyEventListener;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.actuate.autoconfigure.ManagementWebSecurityAutoConfiguration;
 import org.springframework.boot.actuate.autoconfigure.MetricExportAutoConfiguration;
@@ -22,9 +23,12 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableDiscoveryClient
 @EnableFeignClients
 @EnableScheduling
-public class RedisServiceApp extends SpringBootServletInitializer{
+public class RedisServiceApp extends SpringBootServletInitializer {
+
     public static void main(String[] args) {
-        SpringApplication.run(RedisServiceApp.class, args);
+        SpringApplication app = new SpringApplication();
+        app.addListeners(new ApplicationReadyEventListener());
+        app.run(RedisServiceApp.class, args);
     }
 
     @Override

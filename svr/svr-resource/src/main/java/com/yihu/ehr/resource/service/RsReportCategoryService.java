@@ -3,6 +3,8 @@ package com.yihu.ehr.resource.service;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.resource.dao.RsReportCategoryDao;
 import com.yihu.ehr.resource.model.RsReportCategory;
+import org.hibernate.Query;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,7 +44,7 @@ public class RsReportCategoryService extends BaseJpaService<RsReportCategory, Rs
      */
     public List<RsReportCategory> getChildrenByPid(Integer pid) {
         List<RsReportCategory> children = new ArrayList<>();
-        if (pid == -1) {
+        if (pid == 0) {
             children = rsReportCategoryDao.getTopParents();
         } else {
             children = rsReportCategoryDao.getChildrenByPid(pid);
@@ -184,4 +186,27 @@ public class RsReportCategoryService extends BaseJpaService<RsReportCategory, Rs
         return treeData;
     }
 
+    /**
+     * 获取政府服务平台应用对应的报表分类
+     * @return
+     */
+    public List<RsReportCategory> getCategoryByApp(String appId) {
+        Session session = currentSession();
+        String hql = "select category from RsReportCategory category where category.id in(" +
+                "select relation.reportCategoryId from ReportCategoryAppRelation relation where relation.appId = :appId)" +
+                " and category.pid is not null";
+        Query query = session.createQuery(hql);
+        query.setParameter("appId", appId);
+        List<RsReportCategory> list = query.list();
+        return list;
+    }
+
+    public List<RsReportCategory> getCategoryByIds(List<Integer> ids) {
+        List<RsReportCategory> categoryList = rsReportCategoryDao.findCategoryByIds(ids);
+        return categoryList;
+    }
+    public List<Integer> getCategoryIds(String code) {
+        List<Integer> categoryIds = rsReportCategoryDao.findCategoryIds(code);
+        return categoryIds;
+    }
 }

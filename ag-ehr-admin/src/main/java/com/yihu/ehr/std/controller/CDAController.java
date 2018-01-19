@@ -205,7 +205,7 @@ public class CDAController extends BaseController {
             @ApiParam(name = "versionCode", value = "标准版本代码")
             @RequestParam(value = "versionCode") String versionCode,
             @ApiParam(name = "xmlInfo", value = "XML文件信息")
-            @RequestParam(value = "xmlInfo") String xmlInfo) {
+            @RequestBody String xmlInfo) {
 
         Envelop envelop = new Envelop();
 

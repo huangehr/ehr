@@ -98,7 +98,7 @@ public class UserControllerTests {
         int page = 1;
         int rows = 15;
 
-        envelop = userController.searchUsers(fields,filter,"",rows,page);
+        envelop = userController.searchUsers(fields,filter,"",rows,page, null);
         assertTrue("列表获取失败", envelop.isSuccessFlg() && envelop.getDetailModelList()!=null);
 
         boolean status = true;
@@ -131,7 +131,7 @@ public class UserControllerTests {
         int page = 1;
         int rows = 15;
 
-        Envelop envelop = userController.searchUsers(fields,filter,"",rows,page);
+        Envelop envelop = userController.searchUsers(fields,filter,"",rows,page, null);
         assertTrue("列表获取失败", envelop.isSuccessFlg() && envelop.getDetailModelList()!=null);
 
     }

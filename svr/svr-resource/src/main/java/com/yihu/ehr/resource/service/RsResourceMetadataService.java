@@ -21,6 +21,7 @@ import java.util.List;
 @Service
 @Transactional
 public class RsResourceMetadataService extends BaseJpaService<RsResourceMetadata, RsResourceMetadataDao> {
+
     @Autowired
     private RsResourceMetadataDao rsMetadataDao;
 

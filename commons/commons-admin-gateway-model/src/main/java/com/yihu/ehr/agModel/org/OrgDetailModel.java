@@ -38,7 +38,7 @@ public class OrgDetailModel{
     private String tags;
     private String imgRemotePath;
     private String imgLocalPath;
-    private int administrativeDivision;
+    private Integer administrativeDivision;
 
     private Long id;
     //医院信息
@@ -310,11 +310,11 @@ public class OrgDetailModel{
         this.imgLocalPath = imgLocalPath;
     }
 
-    public int getAdministrativeDivision() {
+    public Integer getAdministrativeDivision() {
         return administrativeDivision;
     }
 
-    public void setAdministrativeDivision(int administrativeDivision) {
+    public void setAdministrativeDivision(Integer administrativeDivision) {
         this.administrativeDivision = administrativeDivision;
     }
 

@@ -2,7 +2,9 @@ package com.yihu.ehr.organization.service;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.model.org.MOrganization;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -35,7 +37,7 @@ public interface OrganizationClient {
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
-            @RequestBody(required = false) String filters,
+            @RequestParam(value = "filters", required = false) String filters,
             @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "")
             @RequestParam(value = "sorts", required = false) String sorts,
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
@@ -205,4 +207,18 @@ public interface OrganizationClient {
     @RequestMapping(value = "/organizations/batch", method = RequestMethod.POST)
     @ApiOperation("批量导入机构")
     boolean createOrgBatch(@RequestBody String orgs);
+
+    @RequestMapping(value = ServiceApi.Org.getseaOrgsByOrgCode, method = RequestMethod.POST)
+    @ApiOperation("根据机构code获取机构code和name")
+    Map<String,String> seaOrgsByOrgCode(
+            @ApiParam(name = "org_codes", value = "机构org_codes", defaultValue = "")
+            @RequestBody String org_codes);
+
+    @RequestMapping(value = "/organizations/getHospital", method = RequestMethod.GET)
+    @ApiOperation("查询所有经纬度医院列表")
+    Envelop getHospital();
+
+    @RequestMapping(value = "/organizations/getOrgListByAddressPid", method = RequestMethod.GET)
+    @ApiOperation(value = "根据区域查询机构列表")
+    Envelop getOrgListByAddressPid(@RequestParam(value = "pid") Integer pid);
 }

@@ -7,6 +7,7 @@ import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.model.resource.MRsReportView;
 import com.yihu.ehr.resource.model.RsReportView;
 import com.yihu.ehr.resource.service.RsReportViewService;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -27,7 +28,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0)
-@Api(value = "RsReportView", description = "资源报表视图配置服务接口")
+@Api(value = "RsReportViewEndPoint", description = "资源报表视图配置", tags = {"资源服务-资源报表视图配置"})
 public class RsReportViewEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
@@ -62,6 +63,34 @@ public class RsReportViewEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "resourceId") String resourceId) throws Exception {
         RsReportView rsReportView = rsReportViewService.findByReportIdAndResourceId(reportId, resourceId);
         if (rsReportView != null) {
+            return true;
+        }
+        return false;
+    }
+
+    @ApiOperation("判断资源报表是否关联相关资源")
+    @RequestMapping(value = ServiceApi.Resources.RsReportViewExistByResourceId, method = RequestMethod.GET)
+    public Envelop existByResourceId(
+            @ApiParam(name = "resourceId", value = "视图ID", required = true)
+            @RequestParam(value = "resourceId") String resourceId){
+        Envelop envelop = new Envelop();
+        List<RsReportView> rsReportViewList = rsReportViewService.findByResourceId(resourceId);
+        envelop.setSuccessFlg(true);
+        if (rsReportViewList == null || rsReportViewList.size() <= 0) {
+            envelop.setObj(false);
+        }else {
+            envelop.setObj(true);
+        }
+        return envelop;
+    }
+
+    @ApiOperation("判断资源视图是否存在于报表中")
+    @RequestMapping(value = ServiceApi.Resources.RsReportViewExistReport, method = RequestMethod.GET)
+    public boolean existReport(
+            @ApiParam(name = "resourceId", value = "视图ID", required = true)
+            @RequestParam(value = "resourceId") String resourceId) throws Exception {
+        List<RsReportView> list = rsReportViewService.findByResourceId(resourceId);
+        if (list != null && list.size() > 0) {
             return true;
         }
         return false;

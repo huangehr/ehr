@@ -14,20 +14,17 @@ import com.yihu.quota.service.dimension.TjDimensionSlaveService;
 import com.yihu.quota.service.save.TjDataSaveService;
 import com.yihu.quota.service.source.TjDataSourceService;
 import com.yihu.quota.util.SpringUtil;
-import com.yihu.quota.vo.DictModel;
 import com.yihu.quota.vo.QuotaVo;
 import com.yihu.quota.vo.SaveModel;
 import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by chenweida on 2017/6/1.
@@ -63,7 +60,7 @@ public class ExtractHelper {
     }
 
     /**
-     * 公共的抽取数据
+     * 抽取数据统计值
      *
      * @param quotaVo
      * @return
@@ -71,28 +68,29 @@ public class ExtractHelper {
      */
     public List<SaveModel> extractData(QuotaVo quotaVo, String startTime, String endTime,String timeLevel,String saasid) throws Exception {
         try {
-            //得到该指标的数据来源
             TjQuotaDataSource quotaDataSource = dataSourceService.findSourceByQuotaCode(quotaVo.getCode());
-            //如果为空说明数据错误
             if (quotaDataSource == null) {
                 throw new Exception("数据源配置错误");
             }
             JSONObject obj = new JSONObject().fromObject(quotaDataSource.getConfigJson());
             EsConfig esConfig= (EsConfig) JSONObject.toBean(obj,EsConfig.class);
             //得到主维度
-            List<TjQuotaDimensionMain> tjQuotaDimensionMains = dimensionMainService.findTjQuotaDimensionMainByQuotaIncudeAddress(quotaDataSource.getQuotaCode());
+            List<TjQuotaDimensionMain> tjQuotaDimensionMains = dimensionMainService.findTjQuotaDimensionMainByQuotaCode(quotaDataSource.getQuotaCode());
             //得到细维度
             List<TjQuotaDimensionSlave> tjQuotaDimensionSlaves = dimensionSlaveService.findTjQuotaDimensionSlaveByQuotaCode(quotaDataSource.getQuotaCode());
 
-            //判断数据源是什么类型,根据类型和数据库相关的配置信息抽取数据
             if ( TjDataSource.type_es.equals(quotaDataSource.getCode()) ) {
-                //查询ES数据
-                return esExtract.extract(tjQuotaDimensionMains,tjQuotaDimensionSlaves,startTime,endTime,timeLevel,saasid, quotaVo,esConfig);
+                // 抽取 ES 统计值
+                if( (!StringUtils.isEmpty(esConfig.getEspecialType())) && esConfig.getEspecialType().equals("orgHealthCategory")){
+                    return esExtract.extractOrgHealthCategory(tjQuotaDimensionMains,tjQuotaDimensionSlaves,startTime,endTime,timeLevel,saasid, quotaVo,esConfig);
+                }else{
+                    return esExtract.extract(tjQuotaDimensionMains,tjQuotaDimensionSlaves,startTime,endTime,timeLevel,saasid, quotaVo,esConfig);
+                }
             }else if( TjDataSource.type_solr.equals(quotaDataSource.getCode()) ){
-                //查询 solr 数据
+                // 抽取 solr 统计值
                 return  solrExtract.extract(tjQuotaDimensionMains,tjQuotaDimensionSlaves,startTime,endTime,timeLevel, quotaVo,esConfig);
             }else if( TjDataSource.type_mysql.equals(quotaDataSource.getCode()) ){
-                //查询 mysql 数据
+                // 抽取 mysql 统计值
                 return  SpringUtil.getBean(MysqlExtract.class).extract(tjQuotaDimensionMains,tjQuotaDimensionSlaves,startTime,endTime,timeLevel, quotaVo,esConfig);
             }
             return null;
@@ -101,7 +99,8 @@ public class ExtractHelper {
         }
     }
 
-    private Map<String, SaveModel> setAllSlaveData(Map<String, SaveModel> allData, List<DictModel> dictData) {
+    // 该方法没有被用到，在 ExtractUtil 中有相同方法，推测可替代。  -- 张进军 2018.1.10
+    /*private Map<String, SaveModel> setAllSlaveData(Map<String, SaveModel> allData, List<DictModel> dictData) {
         try {
             Map<String, SaveModel> returnAllData = new HashMap<>();
             for (Map.Entry<String, SaveModel> one : allData.entrySet()) {
@@ -126,6 +125,6 @@ public class ExtractHelper {
             e.getMessage();
         }
         return null;
-    }
+    }*/
 
 }

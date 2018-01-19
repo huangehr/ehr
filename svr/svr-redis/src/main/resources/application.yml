@@ -52,12 +52,24 @@ fast-dfs:
     anti-steal-token: no
     secret-key: FastDFS1234567890
 
+hystrix:
+  threadpool:
+    default:
+      coreSize: 60 #并发执行的最大线程数，默认10
+      maxQueueSize: 100 #LinkedBlockingQueue的最大队列数，默认-1，使用SynchronousQueue
+      #queueSizeRejectionThreshold: 50 #配置该值后，即使maxQueueSize没有达到，达到queueSizeRejectionThreshold该值后，请求也会被拒绝
+  command:
+      default:
+        execution:
+          isolation:
+            thread:
+              timeoutInMilliseconds: 30000 #缺省为1000
 ---
 spring:
   profiles: dev
 
   datasource:
-    url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
+    url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: chenweishan
     password: chenweishan
 
@@ -70,12 +82,19 @@ fast-dfs:
   tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52:80
 
+ehr-redis:
+  mq:
+    pubsub:
+      publisherAppId: svr-redis
+      responseTimeChannel: redis.cache.reponse-time
+
+
 ---
 spring:
   profiles: alpha
 
   datasource:
-    url: jdbc:mysql://192.168.1.220:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
+    url: jdbc:mysql://192.168.1.220:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: ha
     password: ha
 
@@ -86,6 +105,11 @@ fast-dfs:
   tracker-server: 172.19.103.54:22122
   public-server: http://172.19.103.54:22122
 
+ehr-redis:
+  mq:
+    pubsub:
+      publisherAppId: svr-redis
+      responseTimeChannel: redis.cache.reponse-time
 
 
 ---
@@ -93,7 +117,7 @@ spring:
   profiles: test
 
   datasource:
-    url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
+    url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: weifuwu
     password: weifuwu
 
@@ -104,6 +128,11 @@ fast-dfs:
   tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52:80
 
+ehr-redis:
+  mq:
+    pubsub:
+      publisherAppId: svr-redis
+      responseTimeChannel: redis.cache.reponse-time
 
 
 ---
@@ -113,30 +142,42 @@ spring:
   redis:
     host: 11.1.2.20 # Redis server host.
   datasource:
-    url: jdbc:mysql://11.1.2.5:3306/healtharchive?useUnicode=true&amp;characterEncoding=UTF-8
+    url: jdbc:mysql://11.1.2.5:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: ha
     password: jkzlxm
 
 fast-dfs:
   tracker-server: 11.1.2.9:22122
   public-server: http://ds.ehr.yihu.com:22122
+ehr-redis:
+  mq:
+    pubsub:
+      publisherAppId: svr-redis
+      responseTimeChannel: redis.cache.reponse-time
+
 
 ---
 spring:
   profiles: prod_fz
   datasource:
-    url: jdbc:mysql://192.168.135.39:3310/healtharchive?useUnicode=true&amp;characterEncoding=UTF-8
-    username: sr_healtharchive
-    password: data!@)1
+    url: jdbc:mysql://11.1.2.5:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: healthcloud
+    password: GP8Qz4qU
 
   redis:
-    host: 192.168.135.40 # Redis server host.
+    host: 11.1.2.22 # Redis server host.
     port: 6390
     # Login password of the redis server.
-    password: redis!@456
+    password: Kb6wKDQP1W4
 fast-dfs:
-  tracker-server: 192.168.135.42:22122
-  public-server: http://192.168.135.42:22122
+  tracker-server: 11.1.2.9:22122
+  public-server: http://11.1.2.9:80
+ehr-redis:
+  mq:
+    pubsub:
+      publisherAppId: svr-redis
+      responseTimeChannel: redis.cache.reponse-time
+
 
 ---
 spring:
@@ -146,11 +187,18 @@ spring:
     host: 10.176.97.5 # Redis server host.
     port: 6390
     password: q4YaQemf
+
   datasource:
-    url: jdbc:mysql://10.176.97.9:3310/healtharchive?useUnicode=true&amp;characterEncoding=UTF-8
+    url: jdbc:mysql://10.176.97.9:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: healthcloud
     password: GP8Qz4qU
 
 fast-dfs:
   tracker-server: 10.176.97.5:22122
-  public-server: http://10.176.97.5:22122
+  public-server: http://10.176.97.5:8888
+
+ehr-redis:
+  mq:
+    pubsub:
+      publisherAppId: svr-redis
+      responseTimeChannel: redis.cache.reponse-time

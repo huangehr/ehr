@@ -71,9 +71,11 @@ public class DoctorController extends BaseController {
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page) {
+            @RequestParam(value = "page", required = false) int page,
+            @ApiParam(name = "orgCode", value = "机构编码", defaultValue = "")
+            @RequestParam(value = "orgCode", required = false) String orgCode) {
 
-        ResponseEntity<List<MDoctor>> responseEntity = doctorClient.searchDoctors(fields, filters, sorts, size, page);
+        ResponseEntity<List<MDoctor>> responseEntity = doctorClient.searchDoctors(fields, filters, sorts, size, page, orgCode);
         List<MDoctor> mDoctors = responseEntity.getBody();
         List<DoctorDetailModel> doctorsModels = new ArrayList<>();
         for (MDoctor mDoctor : mDoctors) {

@@ -18,6 +18,8 @@ public interface RsReportViewDao extends PagingAndSortingRepository<RsReportView
 
     List<RsReportView> findByReportId(Integer reportId);
 
+    List<RsReportView> findByResourceId(String resourceId);
+
     RsReportView findByReportIdAndResourceId(Integer reportId, String resourceId);
 
     @Modifying

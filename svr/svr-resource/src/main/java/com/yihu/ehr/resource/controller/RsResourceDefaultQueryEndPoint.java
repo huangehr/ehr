@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(value= ApiVersion.Version1_0)
-@Api(value = "RsResourceDefaultQuery", description = "资源默认查询条件")
+@Api(value = "RsResourceDefaultQueryEndPoint", description = "资源默认查询条件", tags = {"资源服务-资源默认查询条件"})
 public class RsResourceDefaultQueryEndPoint {
 
     @Autowired

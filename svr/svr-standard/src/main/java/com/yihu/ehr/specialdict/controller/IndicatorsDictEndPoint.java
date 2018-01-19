@@ -21,7 +21,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "IndicatorsDict", description = "指标字典管理接口")
+@Api(value = "IndicatorsDictEndPoint", description = "指标字典", tags = {"特殊字典-指标字典"})
 public class IndicatorsDictEndPoint extends EnvelopRestEndPoint {
 
     @Autowired

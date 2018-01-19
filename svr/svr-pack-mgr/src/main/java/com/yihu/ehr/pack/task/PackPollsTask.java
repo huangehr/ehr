@@ -9,5 +9,6 @@ package com.yihu.ehr.pack.task;
  * @author Sand
  * @created 2016.05.12 15:10
  */
+@Deprecated
 public class PackPollsTask {
 }

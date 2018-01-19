@@ -29,7 +29,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0)
-@Api(value = "RsReport", description = "资源报表服务接口")
+@Api(value = "RsReportEndPoint", description = "资源报表", tags = {"资源服务-资源报表"})
 public class RsReportEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
@@ -74,20 +74,20 @@ public class RsReportEndPoint extends EnvelopRestEndPoint {
     }
 
     @ApiOperation("新增资源报表")
-    @RequestMapping(value = ServiceApi.Resources.RsReportSave, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Resources.RsReportSave, method = RequestMethod.POST,produces = "application/json")
     public MRsReport add(
             @ApiParam(name = "rsReport", value = "资源报表JSON", required = true)
-            @RequestParam(value = "rsReport") String rsReport) throws Exception {
+            @RequestBody String rsReport) throws Exception {
         RsReport newRsReport = toEntity(rsReport, RsReport.class);
         newRsReport = rsReportService.save(newRsReport);
         return convertToModel(newRsReport, MRsReport.class);
     }
 
     @ApiOperation("更新资源报表")
-    @RequestMapping(value = ServiceApi.Resources.RsReportSave, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Resources.RsReportSave, method = RequestMethod.PUT, produces = "application/json" )
     public MRsReport update(
             @ApiParam(name = "rsReport", value = "资源报表JSON", required = true)
-            @RequestParam(value = "rsReport") String rsReport) throws Exception {
+            @RequestBody String rsReport) throws Exception {
         RsReport newRsReport = toEntity(rsReport, RsReport.class);
         newRsReport = rsReportService.save(newRsReport);
         return convertToModel(newRsReport, MRsReport.class);
@@ -142,7 +142,7 @@ public class RsReportEndPoint extends EnvelopRestEndPoint {
         }
         String[] paths = rsReport.getTemplatePath().split(":");
         byte[] bytes = fastDFSUtil.download(paths[0], paths[1]);
-        String templateContent = new String(bytes);
+        String templateContent = new String(bytes, "UTF-8");
         return templateContent;
     }
 
@@ -155,4 +155,12 @@ public class RsReportEndPoint extends EnvelopRestEndPoint {
         return list.size() == 0 ? false : true;
     }
 
+    @ApiOperation("根据资源分类编码获取资源报表分")
+    @RequestMapping(value = ServiceApi.Resources.RsReportByCategoryId, method = RequestMethod.GET)
+    public List<RsReport> getByCategoryId(
+            @ApiParam(name = "reportCategoryId", value = "资源报表分类ID", required = true)
+            @RequestParam(value = "reportCategoryId") Integer reportCategoryId) throws Exception {
+        List<RsReport> list = rsReportService.getByReportCategoryId(reportCategoryId);
+        return list;
+    }
 }

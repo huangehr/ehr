@@ -25,7 +25,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0)
-@Api(value = "RsReportCategory", description = "资源报表分类服务接口")
+@Api(value = "RsReportCategoryEndPoint", description = "资源报表分类", tags = {"资源服务-资源报表分类"})
 public class RsReportCategoryEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
@@ -47,7 +47,7 @@ public class RsReportCategoryEndPoint extends EnvelopRestEndPoint {
         List<MRsReportCategory> resultList = new ArrayList<>();
 
         // 获取最顶层的资源报表分类集合
-        List<RsReportCategory> topNodeList = rsReportCategoryService.getChildrenByPid(-1);
+        List<RsReportCategory> topNodeList = rsReportCategoryService.getChildrenByPid(0);
         if (topNodeList.size() == 0) {
             return resultList;
         }
@@ -90,8 +90,11 @@ public class RsReportCategoryEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Resources.RsReportCategorySave, method = RequestMethod.POST)
     public MRsReportCategory add(
             @ApiParam(name = "rsReportCategory", value = "资源报表分类JSON", required = true)
-            @RequestParam(value = "rsReportCategory") String rsReportCategory) throws Exception {
+            @RequestBody String rsReportCategory) throws Exception {
         RsReportCategory newRsReportCategory = toEntity(rsReportCategory, RsReportCategory.class);
+        if (null == newRsReportCategory.getPid()) {
+            newRsReportCategory.setPid(0);
+        }
         newRsReportCategory = rsReportCategoryService.save(newRsReportCategory);
         return convertToModel(newRsReportCategory, MRsReportCategory.class);
     }
@@ -100,7 +103,7 @@ public class RsReportCategoryEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Resources.RsReportCategorySave, method = RequestMethod.PUT)
     public MRsReportCategory update(
             @ApiParam(name = "rsReportCategory", value = "资源报表分类JSON", required = true)
-            @RequestParam(value = "rsReportCategory") String rsReportCategory) throws Exception {
+            @RequestBody String rsReportCategory) throws Exception {
         RsReportCategory newRsReportCategory = toEntity(rsReportCategory, RsReportCategory.class);
         newRsReportCategory = rsReportCategoryService.save(newRsReportCategory);
         return convertToModel(newRsReportCategory, MRsReportCategory.class);
@@ -141,5 +144,32 @@ public class RsReportCategoryEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "filters", required = false) String filters) throws Exception {
         List<RsReportCategory> list = rsReportCategoryService.search(filters);
         return (List<MRsReportCategory>) convertToModels(list, new ArrayList<>(list.size()), MRsReportCategory.class, null);
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.RsReportCategoryByApp, method = RequestMethod.GET)
+    @ApiOperation("获取平台应用对应的报表分类")
+    public List<RsReportCategory> getCategoryByApp(
+            @ApiParam(name = "appId", value = "应用Id")
+            @RequestParam(value = "appId") String appId) {
+        List<RsReportCategory> reportCategoryList = rsReportCategoryService.getCategoryByApp(appId);
+        return reportCategoryList;
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.RsReportCategoryByIds, method = RequestMethod.GET)
+    @ApiOperation("根据Id获取平台应用对应的报表分类")
+    public List<RsReportCategory> getCategoryByIds(
+            @ApiParam(name = "ids", value = "id")
+            @RequestParam(value = "ids") List<Integer> ids) {
+        List<RsReportCategory> categoryList = rsReportCategoryService.getCategoryByIds(ids);
+        return categoryList;
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.RsReportCategoryIdsByCode, method = RequestMethod.GET)
+    @ApiOperation("根据code获取平台应用对应的报表分类子类")
+    public List<Integer> getCategoryIdsByCode(
+            @ApiParam(name = "code", value = "分类编码")
+            @RequestParam(value = "code") String code) {
+        List<Integer> categoryIds = rsReportCategoryService.getCategoryIds(code);
+        return categoryIds;
     }
 }

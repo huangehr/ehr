@@ -20,7 +20,8 @@ import java.util.Set;
  * @version 1.0
  * @created 2016.04.01 14:35
  */
-@Component
+//@Component
+@Deprecated
 public class MessageSendTask {
     @Autowired
     MessageBuffer messageBuffer;
