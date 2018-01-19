@@ -235,17 +235,17 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.TJ.TjQuotaConfigInfo, method = RequestMethod.GET)
     @ApiOperation(value = "分页获取指标配置")
     public ListResult quotaConfigInfo(
-            @ApiParam(name = "quotaName", value = "指标名称", defaultValue = "")
-            @RequestParam(value = "quotaName", required = false) String quotaName,
+            @ApiParam(name = "quotaNameOrCode", value = "指标名称或编码")
+            @RequestParam(value = "quotaNameOrCode", required = false) String quotaNameOrCode,
             @ApiParam(name = "page", value = "页码",defaultValue = "1")
             @RequestParam(value = "page") Integer page,
             @ApiParam(name = "pageSize", value = "每页大小",defaultValue = "15")
             @RequestParam(value = "pageSize") Integer pageSize) {
         ListResult listResult = new ListResult();
-        List<MQuotaConfigModel> quotaConfigList = tjQuotaService.getQuotaConfig(quotaName, page, pageSize);
+        List<MQuotaConfigModel> quotaConfigList = tjQuotaService.getQuotaConfig(quotaNameOrCode, page, pageSize);
         if(quotaConfigList != null){
             listResult.setDetailModelList(quotaConfigList);
-            listResult.setTotalCount((int)tjQuotaService.getCountInfo(quotaName));
+            listResult.setTotalCount((int)tjQuotaService.getCountInfo(quotaNameOrCode));
             listResult.setCode(200);
             listResult.setCurrPage(page);
             listResult.setPageSize(pageSize);
