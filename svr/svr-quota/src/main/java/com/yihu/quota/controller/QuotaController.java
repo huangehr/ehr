@@ -200,7 +200,7 @@ public class QuotaController extends BaseController {
      */
     @ApiOperation(value = "根据指标code获取指标统计结果")
     @RequestMapping(value = ServiceApi.TJ.TjGetReportQuotaResult, method = RequestMethod.GET)
-    public Envelop geQuotaReportResultByFilter(
+    public Envelop tjGetReportQuotaResult(
             @ApiParam(name = "code", value = "指标code", required = true)
             @RequestParam(value = "code" , required = true) String code,
             @ApiParam(name = "filters", value = "检索条件 多个条件用 and 拼接 如：town=361002 and org=10000001 ", defaultValue = "")
