@@ -131,7 +131,7 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
         OrgDept dept=new OrgDept();
         dept.setOrgId(String.valueOf(orgId));
         dept.setCode(String.valueOf(orgId)+"1");
-        dept.setName("未分配部门人员");
+        dept.setName("未分配");
         orgDeptService.saveOrgDept(dept);
         return convertToModel(org, MOrganization.class);
     }

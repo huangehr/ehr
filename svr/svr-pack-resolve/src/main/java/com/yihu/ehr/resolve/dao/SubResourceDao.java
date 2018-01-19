@@ -10,9 +10,9 @@ import com.yihu.ehr.resolve.model.stage2.SubRecords;
 import com.yihu.ehr.resolve.util.ResourceStorageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * 档案资源子库。
@@ -28,29 +28,35 @@ public class SubResourceDao {
     private HBaseDao hbaseDao;
 
     public void saveOrUpdate(ResourceBucket resBucket) throws Exception {
+        String rowKey = resBucket.getId();
         TableBundle bundle = new TableBundle();
         if (resBucket.isReUploadFlg()) { //补传处理
-            String legacyRowKeys[] = hbaseDao.findRowKeys(ResourceCore.SubTable, "^" + resBucket.getId());
-            if(legacyRowKeys != null && legacyRowKeys.length > 0) {
-                for (SubRecord record : resBucket.getSubRecords().getRecords()) {
-                    //重复补传的时候删除上次补传数据
-                    hbaseDao.delete(ResourceCore.SubTable, record.getRowkey());
+            List<SubRecord> subRecordList = resBucket.getSubRecords().getRecords();
+            if (subRecordList.size() > 0) {
+                //先删除
+                String legacyRowKeys[] = new String[subRecordList.size()];
+                for (int i = 0; i < subRecordList.size(); i++) {
+                    legacyRowKeys[i] = subRecordList.get(i).getRowkey();
+                }
+                bundle.addRows(legacyRowKeys);
+                hbaseDao.delete(ResourceCore.SubTable, bundle);
+                bundle.clear();
+                //保存
+                for (SubRecord record : subRecordList) {
                     bundle.addValues(
                             record.getRowkey(),
                             SubResourceFamily.Basic,
-                            ResourceStorageUtil.getSubResCells(SubResourceFamily.Basic, record));
+                            ResourceStorageUtil.getSubResCells(SubResourceFamily.Basic, record, resBucket));
                     bundle.addValues(
                             record.getRowkey(),
                             SubResourceFamily.Data,
-                            ResourceStorageUtil.getSubResCells(SubResourceFamily.Data, record));
+                            ResourceStorageUtil.getSubResCells(SubResourceFamily.Data, record, resBucket));
                 }
                 hbaseDao.save(ResourceCore.SubTable, bundle);
-            }else {
-                throw new RuntimeException("Please upload the complete package first !");
             }
         } else {
             // delete legacy data if they are exist
-            String legacyRowKeys[] = hbaseDao.findRowKeys(ResourceCore.SubTable, "^" + resBucket.getId());
+            String legacyRowKeys[] = hbaseDao.findRowKeys(ResourceCore.SubTable, "^" + rowKey);
             if (legacyRowKeys != null && legacyRowKeys.length > 0) {
                 bundle.addRows(legacyRowKeys);
                 hbaseDao.delete(ResourceCore.SubTable, bundle);
@@ -62,11 +68,11 @@ public class SubResourceDao {
                 bundle.addValues(
                         record.getRowkey(),
                         SubResourceFamily.Basic,
-                        ResourceStorageUtil.getSubResCells(SubResourceFamily.Basic, record));
+                        ResourceStorageUtil.getSubResCells(SubResourceFamily.Basic, record, resBucket));
                 bundle.addValues(
                         record.getRowkey(),
                         SubResourceFamily.Data,
-                        ResourceStorageUtil.getSubResCells(SubResourceFamily.Data, record));
+                        ResourceStorageUtil.getSubResCells(SubResourceFamily.Data, record, resBucket));
             }
             hbaseDao.save(ResourceCore.SubTable, bundle);
         }
