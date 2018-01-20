@@ -378,7 +378,6 @@ public class BaseStatistsService {
         groupDimension += ",org,quotaDate ";
         List<Map<String, Object>>  dimenListResult = esResultExtract.searcherSumGroup(tjQuota, groupDimension, filter, "result", "", "");
         List<Map<String, Object>> resultList = new ArrayList<>();
-        SimpleDateFormat format =  new SimpleDateFormat("yyyy-MM-dd");
         for(Map<String, Object> map : dimenListResult){
             Map<String,Object> dataMap = new HashMap<>();
             for(String key :map.keySet()){
@@ -390,9 +389,7 @@ public class BaseStatistsService {
                     dataMap.put("result", map.get(key).toString());
                 }
                 if(key.equals("quotaDate")){
-                    Long time= new Long(map.get(key).toString());
-                    String date = format.format(time);
-                    dataMap.put("quotaDate", date);
+                    dataMap.put("quotaDate", map.get(key).toString().substring(0,10));
                 }
                 dataMap.putAll(map);
             }
@@ -547,13 +544,12 @@ public class BaseStatistsService {
      * @throws Exception
      */
     public List<Map<String, Object>>  getSimpleQuotaReport(String code,String filters,String dimension,String dateType) throws Exception {
-        TjQuota quota = quotaDao.findByCode(code);
         List<Map<String, Object>> result = new ArrayList<>();
         TjQuotaDataSource quotaDataSource = dataSourceService.findSourceByQuotaCode(code);
         JSONObject obj = new JSONObject().fromObject(quotaDataSource.getConfigJson());
         EsConfig esConfig= (EsConfig) JSONObject.toBean(obj,EsConfig.class);
         String configFilter = esConfig.getFilter();
-        if(StringUtils.isNotEmpty(configFilter) && quota.getResultGetType().equals("2")){
+        if(StringUtils.isNotEmpty(configFilter)){
             if(StringUtils.isNotEmpty(filters)){
                 filters += "and " + configFilter;
             }else {
