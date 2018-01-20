@@ -12,9 +12,9 @@ public class EsConfig {
     private String clusterName;//es clusterName
     private String table;// 数据库表
     private String molecular;  // 统计除法的分子  指标code
-    private String molecularFilter;  // 除法的分子过滤条件  指标code
+    private String molecularFilter;  // 除法的分子过滤条件
     private String denominator;// 统计除法的分母  指标code
-    private String denominatorFilter;// 除法的分母过滤条件  指标code
+    private String denominatorFilter;// 除法的分母过滤条件
     private String percentOperation;//运算方式  1 乘法  2 除法  默认乘法
     private String percentOperationValue;//运算对应的值  默认 100
 
