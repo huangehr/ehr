@@ -115,37 +115,17 @@ public class SolrExtract {
             }
         }
 
-        // 维度字段及最后一个维度基于其他维度组合作为条件的统计结果的集合
+        // 最后一个维度基于其他维度组合作为条件的统计结果的集合
         List<Map<String, Object>> list = solrQuery.getGroupMultList(core, dimensionGroupList, null, q, fq);
         Map<String, Integer> countsMap = new LinkedHashMap<>(); // 统计结果集
         Map<String, String> daySlaveDictMap = new LinkedHashMap<>(); // 按天统计的所有日期项
         if (list != null && list.size() > 0) {
             for (Map<String, Object> objectMap : list) {
+                String countKey = objectMap.get("$countKey").toString();
+                Integer count = Integer.parseInt(objectMap.get("$count").toString());
                 String quotaDate = objectMap.get(timeKey).toString();
-                Integer count = 0;
-                String mainSlavesStr = "";
-                int num = 1;
-                for (String key : objectMap.keySet()) {
-                    if (mainMap.get(key) != null) {
-                        if (num == 1) {
-                            mainSlavesStr = mainSlavesStr + objectMap.get(key);
-                            num++;
-                        } else {
-                            mainSlavesStr = mainSlavesStr + "-" + objectMap.get(key);
-                        }
-                    } else if (key.equals("$count")) {
-                        if (objectMap.get(key) != null) {
-                            count = Integer.valueOf(objectMap.get(key).toString());
-                        }
-                    }
-                }
-                for (String key : objectMap.keySet()) {
-                    if (slaveMap.get(key) != null) {
-                        mainSlavesStr = mainSlavesStr + "-" + objectMap.get(key);
-                    }
-                }
-                countsMap.put(mainSlavesStr, count);
-                daySlaveDictMap.put(mainSlavesStr, quotaDate);
+                countsMap.put(countKey, count);
+                daySlaveDictMap.put(countKey, quotaDate);
             }
         }
 
