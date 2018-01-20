@@ -160,9 +160,8 @@ public class ResourceBrowseController extends BaseController {
             @RequestParam(value = "size", required = false) Integer size) throws Exception {
             Envelop envelop = new Envelop();
             envelop = resourcesClient.getResourceByCode(resourcesCode);
-//            RsResourcesModel rsResourcesModel =objectMapper.readValue(objectMapper.writeValueAsString(envelop.getObj()), RsResourcesModel.class);
             RsResourcesModel rsResourcesModel = objectMapper.convertValue(envelop.getObj(), RsResourcesModel.class);
-            if(rsResourcesModel.getDataSource().equals("1")){//1 Hbase 2 ElasticSearch
+            if( !rsResourcesModel.getRsInterface().equals("getQuotaData")){//1 Hbase 2 ElasticSearch
                 return resourceBrowseClient.getResourceData(resourcesCode, roleId, orgCode, areaCode, queryCondition, page, size);
             }else{
                 String quotaCodeStr = "";
@@ -173,7 +172,7 @@ public class ResourceBrowseController extends BaseController {
                     }
                 }
                 List<Map<String, Object>> resultList = rsResourceStatisticsClient.getQuotaReportTwoDimensionalTable(quotaCodeStr, null, "town", null);
-                envelop.setObj(resultList);
+                envelop.setDetailModelList(resultList);
                 envelop.setSuccessFlg(true);
                 return  envelop;
             }
