@@ -26,6 +26,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.net.URLDecoder;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -91,16 +92,17 @@ public class BaseStatistsService {
      * @param molecular
      * @param denominator
      * @param dimension
-     * @param filters
+     * @param molecularFilter
+     * @param denominatorFilters
      * @param operation
      * @param operationValue
      * @return
      * @throws Exception
      */
     public List<Map<String, Object>>  divisionQuota(String molecular, String denominator, String dimension,
-                                             String filters,String operation,String operationValue,String dateType) throws Exception {
-        List<Map<String, Object>> moleList = getQuotaResultList(molecular,dimension,filters,dateType);
-        List<Map<String, Object>> denoList =  getQuotaResultList(denominator,dimension,filters,dateType);
+                                                    String molecularFilter,String denominatorFilters,String operation,String operationValue,String dateType) throws Exception {
+        List<Map<String, Object>> moleList = getQuotaResultList(molecular,dimension,molecularFilter,dateType);
+        List<Map<String, Object>> denoList =  getQuotaResultList(denominator,dimension,denominatorFilters,dateType);
         dimension = StringUtils.isNotEmpty(dateType)?dimension+";"+dateType:dimension;
        return division(dimension,moleList,denoList,Integer.valueOf(operation),Integer.valueOf(operationValue));
     }
@@ -179,7 +181,7 @@ public class BaseStatistsService {
         List<Map<String, Object>> divisionResultList = new ArrayList<>();
         for(Map<String, Object> moleMap :moleList) {
             Map<String, Object> map = new HashMap<>();
-            double moleResultVal = Double.valueOf(moleMap.get("result").toString());
+            double moleResultVal = Double.valueOf(moleMap.get("result") == null ? "0" : moleMap.get("result").toString());
             String moleKeyVal = "";
             String [] moleDimensions = dimension.split(";");
             for(int i = 0 ;i < moleDimensions.length ; i++){
@@ -205,16 +207,17 @@ public class BaseStatistsService {
                         }
                     }
                     if(moleKeyVal.equals(dimenKeyVal)){
-                        int point = 0;
+                        double point = 0;
+                        DecimalFormat df = new DecimalFormat("#.0");
                         float dimeResultVal = Float.valueOf(denoMap.get("result").toString());
-                        if(dimeResultVal == 0){
+                        if(dimeResultVal != 0){
                             if(operation == 1){
-                                point = (int)(moleResultVal/dimeResultVal) * operationValue;
+                                point = (moleResultVal/dimeResultVal) * operationValue;
                             }else if(operation == 2){
-                                point = (int)(moleResultVal/dimeResultVal) / operationValue;
+                                point = (moleResultVal/dimeResultVal) / operationValue;
                             }
                         }
-                        map.put("result",point);
+                        map.put("result",df.format(point));
                         divisionResultList.add(map);
                         break;
                     }
@@ -559,15 +562,19 @@ public class BaseStatistsService {
                 filters = configFilter;
             }
         }
+        String molecularFilter = filters;
+        String denominatorFilter = filters;
         if( (StringUtils.isNotEmpty(esConfig.getEspecialType())) && esConfig.getEspecialType().equals(orgHealthCategory)){
             //特殊机构类型查询输出结果  只有查询条件没有维度 默认是 机构类型维度
              result = getOrgHealthCategory(code,filters,dateType);
         }else if( (StringUtils.isNotEmpty(esConfig.getMolecular())) && StringUtils.isNotEmpty(esConfig.getDenominator())){//除法
             //除法指标查询输出结果
-            result =  divisionQuota(esConfig.getMolecular(), esConfig.getDenominator(), dimension, filters, esConfig.getPercentOperation(), esConfig.getPercentOperationValue(),dateType);
+            molecularFilter = handleFilter(esConfig.getMolecularFilter(), molecularFilter);
+            denominatorFilter = handleFilter(esConfig.getDenominatorFilter(), denominatorFilter);
+            result =  divisionQuota(esConfig.getMolecular(), esConfig.getDenominator(), dimension, molecularFilter, denominatorFilter, esConfig.getPercentOperation(), esConfig.getPercentOperationValue(),dateType);
         }else if( (StringUtils.isNotEmpty(esConfig.getThousandDmolecular())) && StringUtils.isNotEmpty(esConfig.getThousandDenominator())){//除法
             //除法指标查询输出结果
-           result =  divisionQuota(esConfig.getThousandDmolecular(), esConfig.getThousandDenominator(), dimension, filters, "1", esConfig.getThousandFlag(),dateType);
+           result =  divisionQuota(esConfig.getThousandDmolecular(), esConfig.getThousandDenominator(), dimension, molecularFilter, denominatorFilter, "1", esConfig.getThousandFlag(),dateType);
         }else if(StringUtils.isNotEmpty(esConfig.getSuperiorBaseQuotaCode())) {
             //二次统计 指标查询
             result = getQuotaResultList(esConfig.getSuperiorBaseQuotaCode(), dimension,filters,dateType);
@@ -576,5 +583,16 @@ public class BaseStatistsService {
             result = getQuotaResultList(code, dimension,filters,dateType);
         }
         return result;
+    }
+
+    public String handleFilter(String secondFilter, String resultFilter) {
+        if (StringUtils.isNotEmpty(secondFilter)) {
+            if (StringUtils.isEmpty(resultFilter)) {
+                resultFilter = secondFilter;
+            } else {
+                resultFilter += " and " + secondFilter;
+            }
+        }
+        return resultFilter;
     }
 }
