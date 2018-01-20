@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * Created by yeshijie on 2017/2/14.
@@ -57,6 +58,8 @@ public class DoctorController extends BaseController {
     private OrgDeptMemberClient orgDeptMemberClient;
     @Autowired
     private OrgDeptClient orgDeptClient;
+    private String regex = "^[A-Za-z0-9\\-]+$";
+    private Pattern pattern = Pattern.compile(regex);
 
 
     @RequestMapping(value = "/doctors", method = RequestMethod.GET)
@@ -213,6 +216,9 @@ public class DoctorController extends BaseController {
             if (StringUtils.isEmpty(detailModel.getName())) {
                 errorMsg += "姓名不能为空!";
             }
+            if (StringUtils.isEmpty(detailModel.getIdCardNo()) && pattern.matcher(detailModel.getIdCardNo()).find()) {
+                errorMsg += "身份证号有误!";
+            }
             if (StringUtils.isEmpty(detailModel.getSkill())) {
                 errorMsg += "医生专长不能为空!";
             }
@@ -254,8 +260,14 @@ public class DoctorController extends BaseController {
         try {
             DoctorDetailModel detailModel = toEntity(doctorJsonData, DoctorDetailModel.class);
             String errorMsg = null;
+            if (StringUtils.isEmpty(detailModel.getCode())) {
+                errorMsg += "账户不能为空!";
+            }
             if (StringUtils.isEmpty(detailModel.getName())) {
                 errorMsg += "姓名不能为空!";
+            }
+            if (StringUtils.isEmpty(detailModel.getIdCardNo()) && pattern.matcher(detailModel.getIdCardNo()).find()) {
+                errorMsg += "身份证号有误!";
             }
             if (StringUtils.isEmpty(detailModel.getSkill())) {
                 errorMsg += "医生专长不能为空!";
@@ -269,6 +281,7 @@ public class DoctorController extends BaseController {
             if (StringUtils.isEmpty(detailModel.getOfficeTel())) {
                 errorMsg += "办公电话不能为空!";
             }
+
             if (StringUtils.isNotEmpty(errorMsg)) {
                 return failed(errorMsg);
             }
