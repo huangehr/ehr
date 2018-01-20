@@ -26,8 +26,6 @@ public class EsConfig {
     private String thousandDenominator; //每千，每万 统计分母
 
     private String especialType; //特殊类型  orgHealthCategory：卫生机构类型
-    private String superiorCode;//上级指标code
-
     private String superiorBaseQuotaCode;  // 上级基础指标code
 
 
@@ -166,14 +164,6 @@ public class EsConfig {
 
     public void setEspecialType(String especialType) {
         this.especialType = especialType;
-    }
-
-    public String getSuperiorCode() {
-        return superiorCode;
-    }
-
-    public void setSuperiorCode(String superiorCode) {
-        this.superiorCode = superiorCode;
     }
 
     public String getPercentOperation() {

@@ -3,6 +3,7 @@ package com.yihu.quota.service.quota;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.elasticsearch.ElasticSearchClient;
 import com.yihu.ehr.elasticsearch.ElasticSearchPool;
+import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.quota.dao.jpa.TjQuotaDao;
 import com.yihu.quota.etl.extract.es.EsResultExtract;
 import com.yihu.quota.etl.model.EsConfig;
@@ -25,6 +26,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.net.URLDecoder;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -66,10 +68,21 @@ public class BaseStatistsService {
             dimenListResult = getTimeAggregationResult(code, dimension, filter, dateType);
         }else {
             dimenListResult = getAggregationResult(code, dimension, filter);
-//            TjQuota tjQuota= quotaDao.findByCode(code);
-//            dimension = dimension.replaceAll(";",",");
-//            dimenListResult = esResultExtract.searcherSumGroup(tjQuota, dimension, filter, "result", "", "");
         }
+        return dimenListResult;
+    }
+
+
+    /**
+     *  特殊机构类型   根据 上级基础指标code 获取基础数据集
+     * @param code
+     * @param filter
+     * @param dimension
+     * @return
+     * @throws Exception
+     */
+    public List<Map<String, Object>> getOrgHealthCategoryQuotaResultList(String code,String dimension,String filter) throws Exception {
+        List<Map<String, Object>> dimenListResult = getOrgHealthCategoryAggregationResult(code, dimension, filter);
         return dimenListResult;
     }
 
@@ -350,6 +363,52 @@ public class BaseStatistsService {
      * @param filter
      * @throws Exception
      */
+    public  List<Map<String, Object>> getOrgHealthCategoryAggregationResult(String code,String dimension, String filter) throws Exception {
+        TjQuota tjQuota= quotaDao.findByCode(code);
+        String groupDimension = "";
+        if(dimension.contains(";")){
+            String[] dimens =  dimension.split(";");
+            for(int i =0 ;i<dimens.length ;i++){
+                groupDimension += dimens[i] + ",";
+            }
+            groupDimension = groupDimension.substring(0,groupDimension.length()-1);
+        }else {
+            groupDimension = dimension;
+        }
+        groupDimension += ",org,quotaDate ";
+        List<Map<String, Object>>  dimenListResult = esResultExtract.searcherSumGroup(tjQuota, groupDimension, filter, "result", "", "");
+        List<Map<String, Object>> resultList = new ArrayList<>();
+        SimpleDateFormat format =  new SimpleDateFormat("yyyy-MM-dd");
+        for(Map<String, Object> map : dimenListResult){
+            Map<String,Object> dataMap = new HashMap<>();
+            for(String key :map.keySet()){
+                //维度为特殊机构类型时
+                if(key.equals(orgHealthCategoryCode)){
+                    dataMap.put(map.get(orgHealthCategoryCode).toString(),map.get(orgHealthCategoryCode));
+                }
+                if(key.equals("SUM(result)")){
+                    dataMap.put("result", map.get(key).toString());
+                }
+                if(key.equals("quotaDate")){
+                    Long time= new Long(map.get(key).toString());
+                    String date = format.format(time);
+                    dataMap.put("quotaDate", date);
+                }
+                dataMap.putAll(map);
+            }
+            resultList.add(dataMap);
+        }
+        return resultList;
+    }
+
+
+    /**
+     * 获取  特殊机构类别  聚合查询指标结果
+     * @param code
+     * @param dimension 多维度 ; 分开
+     * @param filter
+     * @throws Exception
+     */
     public  List<Map<String, Object>> getAggregationResult(String code,String dimension, String filter) throws Exception {
         TjQuota tjQuota= quotaDao.findByCode(code);
         Map<String,String>  dimensionDicMap = new HashMap<>();
@@ -408,6 +467,8 @@ public class BaseStatistsService {
         return resultList;
     }
 
+
+
     /**
      * 获取维度的字典 sql
      * @param quotaCode
@@ -415,22 +476,27 @@ public class BaseStatistsService {
      * @return
      */
     private String getQuotaDimensionDictSql(String quotaCode, String dimension) {
+        boolean mainFlag = dimension.contains("province") || dimension.contains("city") ||dimension.contains("town") ||dimension.contains("org") ||dimension.contains("year") ||dimension.contains("month") ;
         String dictSql = "";
-        //查询维度
-        List<TjQuotaDimensionMain>  dimensionMains = tjDimensionMainService.findTjQuotaDimensionMainByQuotaCode(quotaCode);
-        if(dimensionMains != null && dimensionMains.size() > 0){
-            for(TjQuotaDimensionMain main:dimensionMains){
-                if(main.getMainCode().equals(dimension)){
-                    dictSql = main.getDictSql();
+        //查询维度 sql
+        if( mainFlag){
+            List<TjQuotaDimensionMain>  dimensionMains = tjDimensionMainService.findTjQuotaDimensionMainByQuotaCode(quotaCode);
+            if(dimensionMains != null && dimensionMains.size() > 0){
+                for(TjQuotaDimensionMain main:dimensionMains){
+                    if(main.getMainCode().equals(dimension)){
+                        dictSql = main.getDictSql();
+                    }
                 }
             }
-        }
-        if(StringUtils.isEmpty(dictSql)) {
-            List<TjQuotaDimensionSlave> dimensionSlaves = tjDimensionSlaveService.findTjQuotaDimensionSlaveByQuotaCode(quotaCode);
-            if (dimensionSlaves != null && dimensionSlaves.size() > 0) {
-                int slave = Integer.valueOf(dimension.substring(dimension.length()-1,dimension.length()));
-                if(dimensionSlaves.size() >= slave){
-                    dictSql = dimensionSlaves.get(slave-1).getDictSql();
+        }else {
+            if(StringUtils.isEmpty(dictSql)) {
+                List<TjQuotaDimensionSlave> dimensionSlaves = tjDimensionSlaveService.findTjQuotaDimensionSlaveByQuotaCode(quotaCode);
+                if (dimensionSlaves != null && dimensionSlaves.size() > 0) {
+                    for(TjQuotaDimensionSlave slave:dimensionSlaves){
+                        if(slave.getKeyVal().equals(dimension)){
+                            dictSql = slave.getDictSql();
+                        }
+                    }
                 }
             }
         }
@@ -447,15 +513,9 @@ public class BaseStatistsService {
         Map<String,String> dimensionDicMap = new HashMap<>();
         if(StringUtils.isNotEmpty(dictSql)) {
             BasesicUtil baseUtil = new BasesicUtil();
-            if(dimension.contains("slaveKey")){
-                //查询字典数据
-                List<DictModel> dictDatas = jdbcTemplate.query(dictSql, new BeanPropertyRowMapper(DictModel.class));
-                for (DictModel dictModel : dictDatas) {
-                    String name = baseUtil.getFieldValueByName("name", dictModel);
-                    String val = baseUtil.getFieldValueByName("code", dictModel).toLowerCase();
-                    dimensionDicMap.put(val,name);
-                }
-            } else{
+            boolean main = dimension.contains("province") || dimension.contains("city") ||dimension.contains("town") ||dimension.contains("org") ||dimension.contains("year") ||dimension.contains("month") ;
+            if( main){
+                //主纬度字典项
                 List<SaveModel> dictDatas = jdbcTemplate.query(dictSql, new BeanPropertyRowMapper(SaveModel.class));
                 if(dictDatas != null ) {
                     for (SaveModel saveModel : dictDatas) {
@@ -463,6 +523,14 @@ public class BaseStatistsService {
                         String val = baseUtil.getFieldValueByName(dimension,saveModel).toLowerCase();
                         dimensionDicMap.put(val,name);
                     }
+                }
+            } else{
+                //查询细维度字典数据
+                List<DictModel> dictDatas = jdbcTemplate.query(dictSql, new BeanPropertyRowMapper(DictModel.class));
+                for (DictModel dictModel : dictDatas) {
+                    String name = baseUtil.getFieldValueByName("name", dictModel);
+                    String val = baseUtil.getFieldValueByName("code", dictModel).toLowerCase();
+                    dimensionDicMap.put(val,name);
                 }
             }
         }
