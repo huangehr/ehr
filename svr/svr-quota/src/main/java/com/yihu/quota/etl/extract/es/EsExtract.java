@@ -146,7 +146,7 @@ public class EsExtract {
             List<Map<String, Object>> orgTypeList = new ArrayList<>();
 
             String quotaCode = esConfig.getSuperiorCode();
-            List<Map<String, Object>> mapList =  quotaService.queryResultPageByCode(quotaCode, "", 1, 500);
+            List<Map<String, Object>> mapList =  quotaService.queryResultPageByCode(quotaCode, "", 1, 10000);
             if(mapList != null && mapList.size() > 0){
                 for(Map<String,Object> map : mapList){
                     String dictSql = "SELECT org_code as orgCode,hos_type_id as hosTypeId from organizations where org_code=";

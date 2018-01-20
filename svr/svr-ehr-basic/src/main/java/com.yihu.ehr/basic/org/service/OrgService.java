@@ -248,7 +248,7 @@ public class OrgService extends BaseJpaService<Organization, OrganizationReposit
             OrgDept dept=new OrgDept();
             dept.setOrgId(String.valueOf(Id));
             dept.setCode(String.valueOf(Id)+"1");
-            dept.setName("未分配部门人员");
+            dept.setName("未分配");
             orgDeptService.saveOrgDept(dept);
             }
            } catch (Exception e) {

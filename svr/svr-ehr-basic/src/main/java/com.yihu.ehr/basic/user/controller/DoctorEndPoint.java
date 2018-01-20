@@ -122,7 +122,12 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
         user.setId(getObjectId(BizObject.User));
         user.setCreateDate(new Date());
         user.setPassword(DigestUtils.md5Hex(default_password));
-        user.setUserType("Doctor");
+        if(StringUtils.isEmpty(d.getRoleType())){
+            user.setUserType("5");
+        }else{
+          user.setUserType(d.getRoleType());
+        }
+
         user.setIdCardNo(d.getIdCardNo());
         user.setDoctorId(d.getId().toString());
         user.setEmail(d.getEmail());
@@ -298,8 +303,13 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
 
                   user.setCreateDate(DateUtil.strToDate(DateUtil.getNowDateTime()));
                   user.setActivated(true);
-                  user.setUserType("Doctor");
-                  user.setDType("Doctor");
+                  if(StringUtils.isEmpty(d.getRoleType())){
+                      user.setUserType("5");
+                      user.setDType("5");
+                  }else{
+                      user.setUserType(d.getRoleType());
+                      user.setDType(d.getRoleType());
+                  }
                   user.setDoctorId(d.getId() + "");
                   user.setProvinceId(0);
                   user.setCityId(0);

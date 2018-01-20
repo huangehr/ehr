@@ -1,7 +1,7 @@
 package com.yihu.ehr.analyze.service;
 
+import com.yihu.ehr.analyze.config.FastdfsConfig;
 import com.yihu.ehr.constants.ProfileType;
-import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.hbase.HBaseAdmin;
 import com.yihu.ehr.hbase.HBaseDao;
 import com.yihu.ehr.hbase.TableBundle;
@@ -14,12 +14,15 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.csource.common.MyException;
 import org.springframework.context.ApplicationContext;
+import org.springframework.http.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 
 /**
  * 档案包解析逻辑。
@@ -41,6 +44,7 @@ public class ZipPackage {
     private ProfileType profileType;
     private File zipFile;   //Zip档案包文件
     private File packFile;  //解压后文件目录
+    private Set<String> tableSet = new HashSet<>();
 
     public ZipPackage(MPackage mPackage) {
         this.mPackage = mPackage;
@@ -65,15 +69,32 @@ public class ZipPackage {
     }
 
     public void download() throws IOException, MyException {
+        FastdfsConfig config = SpringContext.getService(FastdfsConfig.class);
         String remotePath = mPackage.getRemotePath();
+        String url = config.getPublicServer() + "/" + remotePath.replace(":", "/");
 
-        FastDFSUtil fastDFSUtil = SpringContext.getService(FastDFSUtil.class);
-        String[] tokens = remotePath.split(":");
-        String download = fastDFSUtil.download(tokens[0], tokens[1], TempPath);
-        zipFile = new File(download);
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_OCTET_STREAM));
+
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+        ResponseEntity<byte[]> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET, entity, byte[].class);
+
+        if (response.getStatusCode() == HttpStatus.OK) {
+            Path path = Files.write(Paths.get(TempPath + mPackage.getId() + ".zip"), response.getBody());
+            zipFile = path.toFile();
+        } else {
+            zipFile = null;
+        }
+
     }
 
     public void unZip() throws Exception {
+        if (zipFile == null) {
+            return;
+        }
         String temp = TempPath + mPackage.getId();
         packFile = zipper.unzipFile(zipFile, temp, mPackage.getPwd());
         if (packFile == null || packFile.list() == null) {
@@ -124,12 +145,11 @@ public class ZipPackage {
     }
 
     private void saveDataSet(DataSetRecord dataSetRecord) throws Exception {
+        createTable(dataSetRecord.getCode());
+
         ApplicationContext context = SpringContext.getApplicationContext();
         HBaseDao hBaseDao = context.getBean(HBaseDao.class);
-        HBaseAdmin hBaseAdmin = context.getBean(HBaseAdmin.class);
-        if (!hBaseAdmin.isTableExists(dataSetRecord.getCode())) {
-            hBaseAdmin.createTable(dataSetRecord.getCode(), DATA);
-        }
+
         String table = dataSetRecord.getCode();
         String rowKeyPrefix = dataSetRecord.getRowKeyPrefix();
 
@@ -166,5 +186,19 @@ public class ZipPackage {
         });
     }
 
+
+    private synchronized void createTable(String table) throws Exception {
+        boolean created = tableSet.contains(table);
+        if (created) {
+            return;
+        }
+
+        ApplicationContext context = SpringContext.getApplicationContext();
+        HBaseAdmin hBaseAdmin = context.getBean(HBaseAdmin.class);
+        if (!hBaseAdmin.isTableExists(table)) {
+            hBaseAdmin.createTable(table, DATA);
+            tableSet.add(table);
+        }
+    }
 
 }
