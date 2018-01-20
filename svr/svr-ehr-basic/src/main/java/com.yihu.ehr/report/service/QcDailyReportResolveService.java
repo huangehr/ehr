@@ -380,7 +380,7 @@ public class QcDailyReportResolveService {
         }
 
         String beginDate = (String) envelop.getObj();
-        Date date = DateUtil.toDateFromTime(beginDate);
+        Date date = DateUtil.strToDate(beginDate);
         Date addDate = DateUtil.addDate(1, date);
         String endDate = DateUtil.toString(addDate);
         int page = 1;
@@ -395,20 +395,22 @@ public class QcDailyReportResolveService {
             page++;
             mPackages = packMgrClient.packageList("", "receiveDate>=" + beginDate + ";receiveDate<" + endDate, "+receiveDate", page, pageSize);
         }
-
+        //更改数量
+        qcDailyReportService.updateNum(beginDate);
+        qcDailyReportDatasetsService.updateNum(beginDate);
         this.setQcBeginDate(endDate);
 
         //TODO:需要发送1个消息，通知统计，不发消息直接统计也是可以。
     }
 
     private void loadQcDetailData(MPackage mPackage) {
-        ResponseEntity<String> entity = packResolveClient.fetch(mPackage.getId());
-        if (entity.getStatusCode() != HttpStatus.OK) {
-            return;
-        }
-
-        String body = entity.getBody();
         try {
+            ResponseEntity<String> entity = packResolveClient.fetch(mPackage.getId());
+            if (entity.getStatusCode() != HttpStatus.OK) {
+                return;
+            }
+
+            String body = entity.getBody();
             JsonNode jsonNode = objectMapper.readTree(body);
             String patientId = jsonNode.get("patientId").asText();
             String eventNo = jsonNode.get("eventNo").asText();
@@ -416,8 +418,24 @@ public class QcDailyReportResolveService {
             String eventType = jsonNode.get("eventType").asText();
             JsonNode dataSets = jsonNode.get("dataSets");
 
+            List<QcDailyReport> dailyList = qcDailyReportService.getData(orgCode, mPackage.getReceiveDate());
+            String dailyId = "";
+            if(dailyList!=null && dailyList.size()>0){
+                dailyId = dailyList.get(0).getId();
+            }else{
+                QcDailyReport qcDailyReport = new QcDailyReport();
+                qcDailyReport.setOrgCode(orgCode);
+                qcDailyReport.setCreateDate(mPackage.getReceiveDate());
+                qcDailyReport.setAddDate(new Date());
+                qcDailyReport.setRealHospitalNum(0);
+                qcDailyReport.setTotalHospitalNum(0);
+                qcDailyReport.setTotalOutpatientNum(0);
+                qcDailyReport.setRealOutpatientNum(0);
+                qcDailyReport = qcDailyReportService.save(qcDailyReport);
+                dailyId = qcDailyReport.getId();
+            }
             QcDailyReportDetail qcDailyReportDetail = new QcDailyReportDetail();
-            qcDailyReportDetail.setReportId(mPackage.getId());
+            qcDailyReportDetail.setReportId(dailyId);
             qcDailyReportDetail.setPatientId(patientId);
             qcDailyReportDetail.setEventNo(eventNo);
             qcDailyReportDetail.setArchiveType(eventType.equals("Resident") ? "inpatient" : "outpatient");
@@ -430,20 +448,33 @@ public class QcDailyReportResolveService {
 
             qcDailyReportDetailService.save(qcDailyReportDetail);   //TODO:需要过滤重复？
 
+            String dataSetsId="";
+            List<QcDailyReportDatasets> datasetsList = qcDailyReportDatasetsService.getTodayData(orgCode, mPackage.getReceiveDate());
+            if(datasetsList!=null && datasetsList.size()>0){
+                dataSetsId = datasetsList.get(0).getId();
+            }else{
+                QcDailyReportDatasets qcDailyReportDatasets = new QcDailyReportDatasets();
+                qcDailyReportDatasets.setCreateDate(mPackage.getReceiveDate());
+                qcDailyReportDatasets.setOrgCode(orgCode);
+                qcDailyReportDatasets.setEventTime(mPackage.getReceiveDate());
+                qcDailyReportDatasets.setTotalNum(0);
+                qcDailyReportDatasets.setRealNum(0);
+                qcDailyReportDatasets.setAddDate(new Date());
+                qcDailyReportDatasets = qcDailyReportDatasetsService.save(qcDailyReportDatasets);
+                dataSetsId = qcDailyReportDatasets.getId();
+            }
             Iterator<String> fieldNames = dataSets.fieldNames();
             while (fieldNames.hasNext()) {
                 String dateSet = fieldNames.next();
                 QcDailyReportDataset qcDailyReportDataset = new QcDailyReportDataset();
                 qcDailyReportDataset.setDataset(dateSet);
                 qcDailyReportDataset.setAcqFlag(1);
-                qcDailyReportDataset.setReportId(mPackage.getId());
+                qcDailyReportDataset.setReportId(dataSetsId);
                 qcDailyReportDataset.setAddDate(new Date());
 
                 qcDailyReportDatasetService.save(qcDailyReportDataset);   //TODO:需要过滤重复？
             }
-
-
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

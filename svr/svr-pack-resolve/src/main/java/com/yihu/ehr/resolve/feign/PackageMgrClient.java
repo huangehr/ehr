@@ -19,7 +19,6 @@ import java.util.Map;
  */
 @ApiIgnore
 @FeignClient(name = MicroServices.Package)
-//@FeignClient(name = "svr-pack-mgr-s")
 @RequestMapping(ApiVersion.Version1_0)
 public interface PackageMgrClient {
 

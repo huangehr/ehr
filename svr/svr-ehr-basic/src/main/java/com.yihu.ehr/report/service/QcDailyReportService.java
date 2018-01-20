@@ -3,15 +3,18 @@ package com.yihu.ehr.report.service;
 import com.yihu.ehr.entity.report.QcDailyReport;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.report.dao.XQcDailyReportRepository;
+import com.yihu.ehr.util.datetime.DateUtil;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author janseny
@@ -24,6 +27,10 @@ public class QcDailyReportService extends BaseJpaService<QcDailyReport, XQcDaily
 
     @Autowired
     XQcDailyReportRepository xQcDailyReportRepository;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private QcDailyReportDetailService qcDailyReportDetailService;
 
     public List<Object> getOrgData(String orgCode, Date quotaDate) {
         Session session = currentSession();
@@ -76,7 +83,6 @@ public class QcDailyReportService extends BaseJpaService<QcDailyReport, XQcDaily
 
     }
 
-
     public int getOrgDailyReportDetailCount(String reportId, String timelyFlag, String archiveType, String storageFlag) {
         Session session = currentSession();
         String hql = "select count(1) from QcDailyReportDetail qcd where  qcd.reportId=:reportId";
@@ -103,5 +109,40 @@ public class QcDailyReportService extends BaseJpaService<QcDailyReport, XQcDaily
         return ((Long) query.list().get(0)).intValue();
     }
 
+    public List<QcDailyReport> getData(String orgCode, Date quotaDate) {
+        Session session = currentSession();
+        String hql = "select qc " +
+                "from QcDailyReport qc where  qc.orgCode=:orgCode and  TO_DAYS(:quotaDate) - TO_DAYS(qc.createDate) = 0 ";
+        Query query = session.createQuery(hql);
+        query.setString("orgCode", orgCode);
+        query.setDate("quotaDate", quotaDate);
+        List<QcDailyReport> list = query.list();
+        if (list.size() == 0) {
+            return null;
+        } else {
+            return list;
+        }
+
+    }
+    /**
+     * 更新数量
+     * @param date
+     */
+    public void updateNum(String date){
+        Session session = currentSession();
+        String hql = "select qc from QcDailyReport qc where  TO_DAYS(:date) - TO_DAYS(qc.createDate) = 0 ";
+        Query query = session.createQuery(hql);
+        query.setDate("date", DateUtil.strToDate(date));
+        List<QcDailyReport> list = query.list();
+        for(QcDailyReport model : list){
+            int outpatient = qcDailyReportDetailService.getQcDailyReportDetailListCount(model.getId(),"outpatient",null,null);
+            int hospital = qcDailyReportDetailService.getQcDailyReportDetailListCount(model.getId(),"hospital",null,null);
+            model.setRealOutpatientNum(outpatient);
+            model.setTotalOutpatientNum(outpatient);
+            model.setRealHospitalNum(hospital);
+            model.setTotalHospitalNum(hospital);
+            save(model);
+        }
+    }
 
 }

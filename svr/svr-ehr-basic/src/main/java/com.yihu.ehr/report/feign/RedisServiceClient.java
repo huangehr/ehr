@@ -1,5 +1,6 @@
 package com.yihu.ehr.report.feign;
 
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.util.rest.Envelop;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @FeignClient(value = MicroServices.Redis)
+@RequestMapping(ApiVersion.Version1_0)
 public interface RedisServiceClient {
 
     @RequestMapping(value = ServiceApi.Redis.CacheOperation.Get, method = RequestMethod.GET)
