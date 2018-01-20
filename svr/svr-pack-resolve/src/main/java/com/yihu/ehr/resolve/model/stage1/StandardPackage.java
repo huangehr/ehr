@@ -313,11 +313,12 @@ public class StandardPackage {
         root.put("clientId", this.getClientId());
         root.put("eventTime", DateTimeUtil.utcDateTimeFormat(this.getEventDate()));
         root.put("createTime", DateTimeUtil.utcDateTimeFormat(this.getCreateDate()));
-        root.put("eventType", this.getEventType().toString());
+        root.put("eventType", this.getEventType() == null? "":this.getEventType().toString());
         root.put("profileType", this.getProfileType().toString());
         root.put("cardType", this.getCardType());
         root.put("patientName", this.getPatientName());
         root.put("diagnosis", StringUtils.join(this.getDiagnosisList(),";"));
+        root.put("reUploadFlg", this.isReUploadFlg());
         ObjectNode dataSetsNode = root.putObject("dataSets");
         for (String dataSetCode : dataSets.keySet()) {
             PackageDataSet dataSet = dataSets.get(dataSetCode);

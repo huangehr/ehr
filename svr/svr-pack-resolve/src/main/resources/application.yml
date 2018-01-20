@@ -3,6 +3,7 @@ server:
 
 management:
   port: ${server.port}
+
 logging:
   level:
     com:
@@ -21,23 +22,19 @@ spring:
     min-idle: 8
     validation-query: SELECT 1
     test-on-borrow: true
-
   # REDIS
   redis:
     database: 0 # Database index used by the connection factory.
     port: 6379 # Redis server port.
-    password: # Login password of the redis server.
     timeout: 0 # Connection timeout in milliseconds.
     #sentinel:
     #  master: # Name of Redis server.
     #  nodes: # Comma-separated list of host:port pairs.
-
     pool:
       max-active: 8 # Max number of connections that can be allocated by the pool at a given time. Use a negative value for no limit.
       max-idle: 8 # Max number of "idle" connections in the pool. Use a negative value to indicate an unlimited number of idle connections.
       max-wait: -1 # Maximum amount of time (in milliseconds) a connection allocation should block before throwing an exception when the pool is exhausted. Use a negative value to block indefinitely.
       min-idle: 1 # Target for the minimum number of idle connections to maintain in the pool. This setting only has an effect if it is positive.
-
   # SOLR (SolrProperties)
   data:
     solr:
@@ -48,11 +45,9 @@ fast-dfs:
     init-size: 5
     max-size: 20
     wait-time: 500
-
   connect-timeout: 2
   network-timeout: 30
   charset: ISO8859-1
-
   http:
     tracker-http-port: 80
     anti-steal-token: no
@@ -76,6 +71,7 @@ ehr:
         - HDSC01_02: Clinic #门诊-挂号 v1.0
         - HDSD00_85: Clinic #门诊-挂号 v1.3
         - HDSD00_72: Clinic #门诊-症状 v1.3
+        - HDSB03_10: Clinic #门诊-传染病报告卡信息 v1.3
         - HDSC02_09: Resident #住院-入院记录 v1.0
         - HDSC02_01: Resident #检验-报告单 v1.0
         - HDSC02_02: Resident #检验-图片报告单 v1.0
@@ -83,13 +79,12 @@ ehr:
         - HDSD00_77: Resident #检验-报告单 v1.3
         - HDSD00_76: Resident #检验-图片报告单 v1.3
         - HDSB05_03: MedicalExam #体检-登记信息 v1.3
-        - HDSB03_10: InfectCard #传染病报告卡信息 v1.3
       meta-data:
-        - HDSD00_01_457 #就诊日期时间 v.1.0 & v.13
-        - HDSD00_01_575 #入院日期时间 v1.0
-        - HDSD00_13_057 #入院日期时间 v1.3
-        - HDSB05_03_011 #体检日期 v1.3
-        - HDSB03_10_033 #传染病报告卡信息 - 填报日期 v1.3
+        - HDSD00_01_457 #门诊-就诊日期时间 v.1.0 & v.13
+        - HDSB03_10_033 #门诊-传染病报告卡信息填报日期 v1.3
+        - HDSD00_01_575 #住院-入院日期时间 v1.0
+        - HDSD00_13_057 #住院-入院日期时间 v1.3
+        - HDSB05_03_011 #体检-体检日期 v1.3
     #诊断信息
     diagnosis:
       data-sets:
@@ -127,7 +122,7 @@ ehr:
     eventNo:
       - HDSD00_02_040 #门（急）诊号 v1.3
       - HDSD00_02_066 #住院号 v1.3
-      - HDSD03_01_031 #门诊号（挂号号） v1.0
+      - HDSD03_01_031 #门诊号（挂号） v1.0
       - HDSD00_01_579 #住院号v1.0 会诊记录表编号v1.3
       - EVENT_NO
     eventTime:
@@ -151,16 +146,13 @@ spring:
     url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: chenweishan
     password: chenweishan
-
   redis:
     host: 172.19.103.47 # Redis server host.
     port: 6379
     password: redis!@456
-
   data:
     solr:
       zk-host: node1.hde.h3c.com,node2.hde.h3c.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
-
   metrics:
     export:
       statsd:
@@ -185,11 +177,9 @@ spring:
     password: ha
   redis:
     host: 192.168.1.220 # Redis server host.
-
   data:
     solr:
       zk-host: node1.hde.h3c.com,node2.hde.h3c.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
-
   metrics:
     export:
       statsd:
@@ -211,14 +201,11 @@ spring:
     url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: weifuwu
     password: weifuwu
-
   redis:
     host: 172.19.103.47 # Redis server host.
-
   data:
     solr:
       zk-host: node1.hde.h3c.com,node2.hde.h3c.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
-
   metrics:
     export:
       statsd:
@@ -240,16 +227,13 @@ spring:
     url: jdbc:mysql://11.1.2.5:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: ha
     password: jkzlxm
-
   redis:
     host: 11.1.2.20 # Redis server host.
-
   data:
     solr:
       host: http://172.19.103.10:8983/solr # Solr host. Ignored if "zk-host" is set.
       #zk-host: node1,node2,node3:2181/solr # ZooKeeper host address in the form HOST:PORT.
       zk-host: node1.hde.jkzlehr.com,node2.hde.jkzlehr.com,node3.hde.jkzlehr.com:2181/solr
-
   metrics:
     export:
       statsd:
@@ -265,8 +249,6 @@ hadoop:
     #- hbase.zookeeper.quorum: node2.jkzl.com,node3.jkzl.com,node1.jkzl.com
     - hbase.zookeeper.quorum: node1,node2,node3
 
-
-
 ---
 spring:
   profiles: prod_fz
@@ -278,11 +260,9 @@ spring:
     host: 11.1.2.22 # Redis server host.
     port: 6390
     password: Kb6wKDQP1W4
-
   data:
     solr:
       zk-host: node1.ehr.h3c.com,node2.ehr.h3c.com,node3.ehr.h3c.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
-
   metrics:
     export:
       statsd:
@@ -297,7 +277,6 @@ hadoop:
   hbase-properties:
     - hbase.zookeeper.quorum: node1.ehr.h3c.com,node2.ehr.h3c.com,node3.ehr.h3c.com
 
-
 ---
 spring:
   profiles: prod_sr
@@ -305,7 +284,6 @@ spring:
     url: jdbc:mysql://10.176.97.9:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: healthcloud
     password: GP8Qz4qU
-
   redis:
     host: 10.176.97.5 # Redis server host.
     port: 6390
@@ -315,7 +293,6 @@ spring:
       #host: http://172.19.103.10:8983/solr # Solr host. Ignored if "zk-host" is set.
       #zk-host: node1,node2,node3:2181/solr # ZooKeeper host address in the form HOST:PORT.
       zk-host: node1.hde.jkzlehr.com,node2.hde.jkzlehr.com,node3.hde.jkzlehr.com:2181/solr
-
   metrics:
     export:
       statsd:

@@ -2,6 +2,7 @@ package com.yihu.quota.etl.extract.es;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.elasticsearch.ElasticSearchPool;
 import com.yihu.quota.etl.model.EsConfig;
 import com.yihu.quota.etl.util.ElasticsearchUtil;
 import com.yihu.quota.etl.util.EsClientUtil;
@@ -11,6 +12,7 @@ import com.yihu.quota.model.jpa.save.TjDataSave;
 import com.yihu.quota.model.jpa.save.TjQuotaDataSave;
 import com.yihu.quota.service.save.TjDataSaveService;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringUtils;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.aggregations.bucket.terms.DoubleTerms;
@@ -24,7 +26,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 import java.util.*;
 
@@ -43,6 +44,7 @@ public class EsResultExtract {
     private String province;
     private String city;
     private String town;
+    private String year;
     private String slaveKey1;
     private String slaveKey2;
     private String result;
@@ -51,6 +53,8 @@ public class EsResultExtract {
     private EsConfig esConfig;
     @Autowired
     ElasticsearchUtil elasticsearchUtil;
+    @Autowired
+    ElasticSearchPool elasticSearchPool;
     @Autowired
     EsConfigUtil esConfigUtil;
     @Autowired
@@ -68,6 +72,7 @@ public class EsResultExtract {
         this.province = null;
         this.city = null;
         this.town = null;
+        this.year = null;
         this.quotaCode = null;
         this.result = null;
         this.slaveKey1 = null;
@@ -92,6 +97,8 @@ public class EsResultExtract {
                             this.city = params.get(key).toString();
                         else if(key.equals("town"))
                             this.town = params.get(key).toString();
+                        else if(key.equals("year"))
+                            this.year = params.get(key).toString();
                         else if(key.equals("slaveKey1"))
                             this.slaveKey1 = params.get(key).toString();
                         else if(key.equals("slaveKey2"))
@@ -132,7 +139,8 @@ public class EsResultExtract {
     }
 
     public Client getEsClient(){
-       return esClientUtil.getClient(esConfig.getHost(), esConfig.getPort(),esConfig.getIndex(),esConfig.getType(), esConfig.getClusterName());
+        esConfigUtil.getConfig(esConfig.getHost(), esConfig.getPort(),esConfig.getIndex(),esConfig.getType(), esConfig.getClusterName());
+        return elasticSearchPool.getClient();
     }
 
     public List<Map<String, Object>> queryResultPage(TjQuota tjQuota ,String filters,int pageNo,int pageSize) throws Exception {
@@ -188,6 +196,7 @@ public class EsResultExtract {
     public BoolQueryBuilder getBoolQueryBuilder(BoolQueryBuilder boolQueryBuilder){
 
         if( !StringUtils.isEmpty(result)){
+            result = "1";
             RangeQueryBuilder rangeQueryResult = QueryBuilders.rangeQuery("result").gte(result);
             boolQueryBuilder.must(rangeQueryResult);
         }
@@ -238,6 +247,10 @@ public class EsResultExtract {
         if( !StringUtils.isEmpty(town) ){
             QueryStringQueryBuilder termTown = QueryBuilders.queryStringQuery("town:" + town);
             boolQueryBuilder.must(termTown);
+        }
+        if( !StringUtils.isEmpty(year) ){
+            QueryStringQueryBuilder termYear = QueryBuilders.queryStringQuery("year:" + year);
+            boolQueryBuilder.must(termYear);
         }
         if( !StringUtils.isEmpty(startTime) ){
             RangeQueryBuilder rangeQueryStartTime = QueryBuilders.rangeQuery("quotaDate").gte(startTime);
@@ -332,6 +345,87 @@ public class EsResultExtract {
             client.close();
         }
         return map;
+    }
+
+
+
+
+    /**
+     * //根据mysql 指标分组 按时间聚合
+     * @param tjQuota
+     * @param aggsFields
+     * @param filter
+     * @param dateDime
+     * @return
+     * @throws Exception
+     */
+    public List<Map<String, Object>> searcherSumByGroupByTime(TjQuota tjQuota , String aggsFields ,String filter,String dateDime) throws Exception {
+        initialize(tjQuota,null);
+        if(StringUtils.isEmpty(filter)){
+            filter =  " quotaCode='" + tjQuota.getCode().replaceAll("_", "") + "' ";
+        }else {
+            filter = filter + " and quotaCode='" + tjQuota.getCode().replaceAll("_","") + "' ";
+        }
+        Client client = getEsClient();
+        try {
+            //SELECT sum(result) FROM medical_service_index group by town,date_histogram(field='quotaDate','interval'='year')
+            StringBuffer mysql = new StringBuffer("SELECT ")
+                    .append(aggsFields)
+                    .append(",sum(result) FROM ").append(esConfig.getIndex())
+                    .append(" where ").append(filter)
+                    .append(" group by ").append(aggsFields)
+                    .append(" ,date_histogram(field='quotaDate','interval'='")
+                    .append(dateDime).append("')");
+            System.out.println("查询分组 mysql= " + mysql.toString());
+            List<Map<String, Object>> listMap = elasticsearchUtil.excuteDataModel(mysql.toString());
+            return  listMap;
+        }catch (Exception e){
+            e.getMessage();
+        }finally {
+            client.close();
+        }
+        return null;
+    }
+
+
+    /**
+     * 根据sql  分组统计数据
+     * @param tjQuota
+     * @param aggsFields
+     * @param filter
+     * @param sumField
+     * @param orderFild
+     * @param order
+     * @return
+     * @throws Exception
+     */
+    public  List<Map<String, Object>>  searcherSumGroup(TjQuota tjQuota , String aggsFields ,String filter, String sumField,String orderFild,String order) throws Exception {
+        initialize(tjQuota,null);
+        if(StringUtils.isEmpty(filter)){
+            filter =  " quotaCode='" + tjQuota.getCode().replaceAll("_", "") + "' ";
+        }else {
+            filter = filter + " and quotaCode='" + tjQuota.getCode().replaceAll("_","") + "' ";
+        }
+        Client client = getEsClient();
+        try {
+            StringBuffer mysql = new StringBuffer("select ");
+            mysql.append(aggsFields)
+                    .append(" ,sum(").append(sumField).append(") ")
+                    .append(" from ").append(esConfig.getIndex())
+                    .append(" where ").append(filter)
+                    .append(" group by ").append(aggsFields);
+            if(StringUtils.isNotEmpty(orderFild) && StringUtils.isNotEmpty(order)){
+                mysql.append(" order by ").append(orderFild).append(" ").append(order);
+            }
+            System.out.println("查询分组 mysql= " + mysql.toString());
+            List<Map<String, Object>> listMap = elasticsearchUtil.excuteDataModel(mysql.toString());
+            return  listMap;
+        }catch (Exception e){
+            e.getMessage();
+        }finally {
+            client.close();
+        }
+        return null;
     }
 
 

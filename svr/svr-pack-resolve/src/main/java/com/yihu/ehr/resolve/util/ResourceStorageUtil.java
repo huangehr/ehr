@@ -56,10 +56,16 @@ public class ResourceStorageUtil {
         return map;
     }
 
-    public static Map<String, String> getSubResCells(String family, SubRecord subRecord){
+    public static Map<String, String> getSubResCells(String family, SubRecord subRecord, ResourceBucket resourceBucket){
         Map<String, String> map = new HashMap<String, String>();
         if (family.equals(SubResourceFamily.Basic)){
             map.put(SubResourceFamily.BasicColumns.ProfileId, subRecord.getProfileId());
+            //增加主表信息 start
+            map.put(MasterResourceFamily.BasicColumns.OrgCode, resourceBucket.getOrgCode());
+            map.put(MasterResourceFamily.BasicColumns.OrgArea, resourceBucket.getOrgArea());
+            map.put(MasterResourceFamily.BasicColumns.EventType, StringUtils.isEmpty(resourceBucket.getEventType())?"":Integer.toString(resourceBucket.getEventType().ordinal()));
+            map.put(MasterResourceFamily.BasicColumns.EventDate, DateTimeUtil.utcDateTimeFormat(resourceBucket.getEventDate()));
+            //增加主表信息 end
         } else if (family.equals(SubResourceFamily.Data)){
             map = subRecord.getDataGroup();
         }

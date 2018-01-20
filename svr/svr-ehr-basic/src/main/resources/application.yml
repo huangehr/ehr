@@ -75,6 +75,14 @@ fast-dfs:
   tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52:80
 
+es:
+  index: wlyy_quota_test
+  type: wlyy_quota_test
+  host:  http://172.19.103.68:9200
+  tHost: 172.19.103.68:9300
+  clusterName: jkzl
+
+
 ---
 spring:
   profiles: alpha
@@ -94,6 +102,14 @@ fast-dfs:
   tracker-server: 172.19.103.54:22122
   public-server: http://172.19.103.54
 
+es:
+  index: wlyy_quota_test
+  type: wlyy_quota_test
+  host:  http://172.19.103.68:9200
+  tHost: 172.19.103.68:9300
+  clusterName: jkzl
+
+
 ---
 spring:
   profiles: test
@@ -112,6 +128,14 @@ spring:
 fast-dfs:
   tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52:80
+
+es:
+  index: wlyy_quota_test
+  type: wlyy_quota_test
+  host:  http://172.19.103.68:9200
+  tHost: 172.19.103.68:9300
+  clusterName: jkzl
+
 
 ---
 spring:
@@ -137,6 +161,14 @@ spring:
 fast-dfs:
   tracker-server: 11.1.2.9:22122
   public-server: http://ds.ehr.yihu.com:22122
+
+es:
+  index: wlyy_quota_test
+  type: wlyy_quota_test
+  host:  http://172.19.103.68:9200
+  tHost: 172.19.103.68:9300
+  clusterName: jkzl
+
 
 ---
 spring:

@@ -5,22 +5,25 @@ import com.alibaba.druid.sql.ast.expr.SQLQueryExpr;
 import com.alibaba.druid.sql.parser.ParserException;
 import com.alibaba.druid.sql.parser.SQLExprParser;
 import com.alibaba.druid.sql.parser.Token;
+import com.yihu.ehr.elasticsearch.ElasticSearchPool;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.quota.etl.Contant;
+import com.yihu.quota.etl.extract.ExtractUtil;
 import com.yihu.quota.etl.model.EsConfig;
 import com.yihu.quota.etl.save.es.ElasticFactory;
-import com.yihu.quota.model.jpa.TjQuota;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionMain;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionSlave;
 import com.yihu.quota.service.orgHealthCategory.OrgHealthCategoryStatisticsService;
+import com.yihu.quota.service.quota.BaseStatistsService;
 import com.yihu.quota.service.quota.QuotaService;
 import com.yihu.quota.vo.DictModel;
 import com.yihu.quota.vo.QuotaVo;
 import com.yihu.quota.vo.SaveModel;
-import com.yihu.quota.vo.SaveModelOrgHealthCategory;
 import net.sf.json.JSONObject;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.search.aggregations.bucket.histogram.InternalDateHistogram;
+import org.elasticsearch.search.aggregations.bucket.histogram.InternalHistogram;
 import org.elasticsearch.search.aggregations.bucket.terms.DoubleTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.LongTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
@@ -43,7 +46,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import java.time.LocalDate;
 import java.util.*;
 
 /**
@@ -60,9 +62,14 @@ public class EsExtract {
     @Autowired
     private QuotaService quotaService;
     @Autowired
+    private ExtractUtil extractUtil;
+    @Autowired
+    private ElasticSearchPool elasticSearchPool;
+    @Autowired
+    private BaseStatistsService baseStatistsService;
+
+    @Autowired
     private OrgHealthCategoryStatisticsService orgHealthCategoryStatisticsService;
-
-
 
     private String startTime;
     private String endTime;
@@ -93,10 +100,10 @@ public class EsExtract {
             List<SaveModel> saveModels = null;
             //普通通用 拼接sql 方式
             //拼凑查询的sql
-            Map<String, TjQuotaDimensionMain> sqls = getSql(qdm, qds);
+            String sql = getSql(qdm, qds);
             //根据sql查询ES
             try {
-                saveModels = queryEsBySql(sqls, qds);
+                saveModels = queryEsBySql(sql,qdm, qds);
             }catch (Exception e){
                 throw new Exception("es 查询数据出错！" +e.getMessage() );
             }
@@ -104,6 +111,19 @@ public class EsExtract {
 
     }
 
+    /**
+     * 卫生机构类别 抽取
+     * @param qdm
+     * @param qds
+     * @param startTime
+     * @param endTime
+     * @param timeLevel
+     * @param saasid
+     * @param quotaVo
+     * @param esConfig
+     * @return
+     * @throws Exception
+     */
     public List<SaveModel> extractOrgHealthCategory(List<TjQuotaDimensionMain> qdm,//主维度
                                    List<TjQuotaDimensionSlave> qds,//细维度
                                    String startTime,//开始时间
@@ -126,7 +146,7 @@ public class EsExtract {
             List<Map<String, Object>> orgTypeList = new ArrayList<>();
 
             String quotaCode = esConfig.getSuperiorCode();
-            List<Map<String, Object>> mapList =  quotaService.queryResultPageByCode(quotaCode, "", 1, 500);
+            List<Map<String, Object>> mapList =  quotaService.queryResultPageByCode(quotaCode, "", 1, 10000);
             if(mapList != null && mapList.size() > 0){
                 for(Map<String,Object> map : mapList){
                     String dictSql = "SELECT org_code as orgCode,hos_type_id as hosTypeId from organizations where org_code=";
@@ -140,10 +160,12 @@ public class EsExtract {
                     }
                 }
             }
+            boolean resultFlag = false;
+            List<List<Map<String, Object>>> sumOrgTypeList =  stastisOrtType(orgTypeList,qdm, qds);
+            for(List<Map<String, Object>> list:sumOrgTypeList){
+                resultFlag = orgHealthCategoryStatisticsService.countResultsAndSaveToEs(list);
+            }
 
-            List<Map<String, Object>> sumOrgTypeList =  stastisOrtType(orgTypeList,qdm, qds);
-
-            boolean resultFlag = orgHealthCategoryStatisticsService.countResultsAndSaveToEs(sumOrgTypeList);
             SaveModel saveModel = new SaveModel();
             saveModel.setQuotaCode(orgHealthCategory);
             if(resultFlag){
@@ -158,64 +180,97 @@ public class EsExtract {
     }
 
 
-    public List<Map<String, Object>> stastisOrtType(List<Map<String, Object>> orgTypeList,List<TjQuotaDimensionMain> qdm,
+    /**
+     * 统计整理 不同维度的组合数据
+     * @param orgTypeList
+     * @param qdm
+     * @param qds
+     * @return
+     */
+    public List<List<Map<String, Object>>> stastisOrtType(List<Map<String, Object>> orgTypeList,List<TjQuotaDimensionMain> qdm,
                                                     List<TjQuotaDimensionSlave> qds){
+
+        Map<String,String>  dimensionDicMap = new HashMap<>();
         Map<String, Object> dimensionMap = new HashMap<>();
         for(TjQuotaDimensionMain main:qdm){
             if(!main.getMainCode().trim().equals("org")){
                 dimensionMap.put(main.getMainCode(),main.getMainCode());
+                if(org.apache.commons.lang.StringUtils.isNotEmpty(main.getDictSql())){
+                    Map<String,String> dicMap = baseStatistsService.getDimensionMap(main.getDictSql(),main.getMainCode());
+                    if(dicMap != null && dicMap.size() > 0){
+                        dimensionDicMap.putAll(dicMap);
+                    }
+                }
             }
         }
         for(TjQuotaDimensionSlave slave:qds){
             dimensionMap.put(slave.getSlaveCode(),slave.getSlaveCode());
+            if(org.apache.commons.lang.StringUtils.isNotEmpty(slave.getDictSql())){
+                Map<String,String> dicMap = baseStatistsService.getDimensionMap(slave.getDictSql(), slave.getSlaveCode());
+                if(dicMap != null && dicMap.size() > 0){
+                    dimensionDicMap.putAll(dicMap);
+                }
+            }
         }
 
-        List<Map<String, Object>> sumOrgTypeList = new ArrayList<>();
-        Map<String,String> typeMap = new HashMap<>();
+
+        Map<String,String> dimenTypeMap = new HashMap<>();
+        Map<String,String> orgDimenTypeMap = new HashMap<>();
         if(orgTypeList != null && orgTypeList.size() > 0){
             for(Map<String,Object> map : orgTypeList){
                 if( !StringUtils.isEmpty(map.get(orgHealthCategory))){
-                    String key = map.get(orgHealthCategory).toString();
+                    String key = "";
+                    String orgTypekey = map.get(orgHealthCategory).toString();
                     for(String dimen:dimensionMap.keySet()){
-                        key = key + "-" + map.get(dimen);
+                        key += "-" + map.get(dimen);
+                        orgTypekey += "-" + map.get(dimen);
                     }
-                    typeMap.put(key, key);
+                    dimenTypeMap.put(key, key);//map 不重复
+                    orgDimenTypeMap.put(orgTypekey, orgTypekey);//map 不重复
                 }
             }
         }
-
-        if(typeMap != null && typeMap.size() > 0){
-            for(String type : typeMap.keySet()){
-                Map<String, Object> sumOrgTypeMap = new HashMap<>();
+        List<List<Map<String, Object>>> dimenSumList = new ArrayList<>();
+        if(dimenTypeMap != null && dimenTypeMap.size() > 0){
+            for(String type : dimenTypeMap.keySet()){
+                List<Map<String, Object>> sumOrgTypeList = new ArrayList<>();
                 int count = 0;
-                int num = 0;
-                if(orgTypeList != null && orgTypeList.size() > 0){
-                    for(Map<String,Object> map : orgTypeList){
-                        num ++;
-                        String key = map.get(orgHealthCategory).toString();
-                        for(String dimen:dimensionMap.keySet()){
-                            key = key + "-" + map.get(dimen);
-                        }
-                        if(type.equals(key)){
-                            count = count + Integer.valueOf(map.get("result").toString());
-                            if(dimensionMap != null && dimensionMap.size() > 0){
-                                for(String dimen:dimensionMap.keySet()){
-                                    sumOrgTypeMap.put(dimen,map.get(dimen));
+                for(String orgDimenType : orgDimenTypeMap.keySet()){
+                    Map<String, Object> sumDimenMap = new HashMap<>();
+                    if(orgDimenType.contains(type) && orgTypeList != null && orgTypeList.size() > 0){
+                        for(Map<String,Object> map : orgTypeList){
+                            String key = map.get(orgHealthCategory).toString();
+                            for(String dimen:dimensionMap.keySet()){
+                                key += "-" + map.get(dimen);
+                            }
+                            if(orgDimenType.equals(key)){
+                                sumDimenMap.put("code",map.get(orgHealthCategory).toString());
+                                count = count + Integer.valueOf(map.get("result").toString());
+                                if(dimensionMap != null && dimensionMap.size() > 0){
+                                    for(String dimen:dimensionMap.keySet()){
+                                        sumDimenMap.put(dimen,map.get(dimen));
+                                        sumDimenMap.put(dimen+"Name",dimensionDicMap.get(map.get(dimen)));
+                                    }
                                 }
                             }
-                            sumOrgTypeMap.put("quotaCode",quotaVo.getCode());
-                            sumOrgTypeMap.put("quotaName",quotaVo.getName());
-                            sumOrgTypeMap.put("quotaDate",map.get("quotaDate"));
+                            sumDimenMap.put("quotaDate",map.get("quotaDate"));
                         }
+                        sumDimenMap.put("quotaCode",quotaVo.getCode());
+                        sumDimenMap.put("quotaName",quotaVo.getName());
+                        sumDimenMap.put("result",count);
+                        sumOrgTypeList.add(sumDimenMap);
                     }
                 }
-                sumOrgTypeMap.put("code",type);
-                sumOrgTypeMap.put("result",count);
-                sumOrgTypeList.add(sumOrgTypeMap);
+                dimenSumList.add(sumOrgTypeList);
             }
         }
-        return  sumOrgTypeList;
+        return  dimenSumList;
     }
+
+
+
+
+
 
     private Map<String, SaveModel> setAllSlaveData(Map<String, SaveModel> allData, List<DictModel> dictData,Integer key) {
         try {
@@ -307,6 +362,57 @@ public class EsExtract {
         allData.put(key, one);
     }
 
+    private  List<SaveModel> queryEsBySql(String sql,List<TjQuotaDimensionMain> qdm,  List<TjQuotaDimensionSlave> qds) {
+        List<SaveModel> returnList = new ArrayList<>();
+        //初始化es链接
+        esConfig = (EsConfig) JSONObject.toBean(JSONObject.fromObject(esConfig), EsConfig.class);
+        //初始化链接
+        Client client = elasticSearchPool.getClient();
+        logger.info("excute sql:" + sql);
+        System.out.println(sql);
+        try {
+            SQLExprParser parser = new ElasticSqlExprParser(sql);
+            SQLExpr expr = parser.expr();
+            if (parser.getLexer().token() != Token.EOF) {
+                throw new ParserException("illegal sql expr : " + sql);
+            }
+            SQLQueryExpr queryExpr = (SQLQueryExpr) expr;
+            //通过抽象语法树，封装成自定义的Select，包含了select、from、where group、limit等
+            Select select = null;
+            select = new SqlParser().parseSelect(queryExpr);
+
+            AggregationQueryAction action = null;
+            DefaultQueryAction queryAction = null;
+            SqlElasticSearchRequestBuilder requestBuilder = null;
+            if (select.isAgg) {
+                //包含计算的的排序分组的
+                action = new AggregationQueryAction(client, select);
+                requestBuilder = action.explain();
+            } else {
+                //封装成自己的Select对象
+                queryAction = new DefaultQueryAction(client, select);
+                requestBuilder = queryAction.explain();
+            }
+            //之后就是对ES的操作
+            SearchResponse response = (SearchResponse) requestBuilder.get();
+            StringTerms stringTerms = (StringTerms) response.getAggregations().asList().get(0);
+            Iterator<Terms.Bucket> gradeBucketIt = stringTerms.getBuckets().iterator();
+            client.close();
+            //里面存放的数据 例  350200-5-2-2    主维度  细维度1  细维度2  值
+            Map<String,Integer> map = new HashMap<>();
+            //递归解析json
+            expainJson(gradeBucketIt, map, null);
+
+            Map<String, String> daySlaveDictMap = new HashMap<>();
+            extractUtil.compute(qdm, qds, returnList, map,daySlaveDictMap,quotaVo);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return returnList;
+    }
+
+
     private  List<SaveModel> queryEsBySql(Map<String, TjQuotaDimensionMain> sqls, List<TjQuotaDimensionSlave> tjQuotaDimensionSlaves) {
         List<SaveModel> returnList = new ArrayList<>();
         //初始化es链接
@@ -347,10 +453,7 @@ public class EsExtract {
                 Map<String,Integer> map = new HashMap<>();
                 //递归解析json
                 expainJson(gradeBucketIt, map, null);
-                compute(tjQuotaDimensionSlaves,
-                        returnList,
-                        one,
-                        map);
+                compute(tjQuotaDimensionSlaves,returnList,one, map);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -363,17 +466,17 @@ public class EsExtract {
         //初始化主细维度
         allData= initDimension(tjQuotaDimensionSlaves, one, allData);
 
-        for(Map.Entry<String,SaveModel> oneMap:allData.entrySet()){
-            String key = oneMap.getKey().toLowerCase();//es 查询出结果默认是小写
-            SaveModel saveModel=oneMap.getValue();
-            Integer num = map.get(key);
-            if(saveModel!=null){
-                saveModel.setResult(num.toString());
-            }else{
-                saveModel.setResult("0");
+
+        for(String key :map.keySet()){
+            SaveModel saveModel = allData.get(key);
+            Integer count =  map.get(key);
+            if(saveModel != null ){
+                saveModel.setResult(count.toString());
+                returnList.add(saveModel);
             }
-            returnList.add(saveModel);
         }
+        //数据源中不存在的组合 保存数据为0  待实现
+        //ToDo
     }
 
     /**
@@ -437,55 +540,67 @@ public class EsExtract {
                     expainJson(gradeBucketItCh, map, sbTemp);
                 }
             }else {
-                InternalValueCount count = (InternalValueCount) b.getAggregations().asList().get(0);
-                map.put(new StringBuffer(sb.toString() + "-" + b.getKey()).toString() , (int)count.getValue());
+                    InternalValueCount count = (InternalValueCount) b.getAggregations().asList().get(0);
+                    map.put(new StringBuffer(sb.toString() + "-" + b.getKey()).toString() , (int)count.getValue());
             }
         }
     }
 
     /**
+     * 拼接sql
      * @param tjQuotaDimensionMains
      * @param tjQuotaDimensionSlaves
      * @return
      */
-    private Map<String, TjQuotaDimensionMain> getSql(List<TjQuotaDimensionMain> tjQuotaDimensionMains, List<TjQuotaDimensionSlave> tjQuotaDimensionSlaves) {
-        Map<String, TjQuotaDimensionMain> sqlS = new HashMap<>();
-        for (int j = 0; j < tjQuotaDimensionMains.size(); j++) {
-            TjQuotaDimensionMain one = tjQuotaDimensionMains.get(j);
-            String tableName = esConfig.getIndex();
-            if (StringUtils.isEmpty(one.getKeyVal())) {
-                continue;
+    private String getSql(List<TjQuotaDimensionMain> tjQuotaDimensionMains, List<TjQuotaDimensionSlave> tjQuotaDimensionSlaves) {
+
+        StringBuffer allField = new StringBuffer("");
+        String tableName = esConfig.getIndex();
+        String timeDimen = "";
+        for (TjQuotaDimensionMain one :tjQuotaDimensionMains) {
+            String code = one.getMainCode();
+            if(code.equals("year")){
+                timeDimen = "year";
+            }else if(code.equals("month")){
+                timeDimen = "month";
+            }else{
+                allField.append(code+ ",");
             }
-            StringBuffer allField = new StringBuffer(one.getKeyVal() + ",");// 例如区  town,sex,age
-            StringBuffer AllGroupBy = new StringBuffer(one.getKeyVal() + ",");// 例如区  town,sex,age
-            for (int i = 0; i < tjQuotaDimensionSlaves.size(); i++) {
-                allField.append(tjQuotaDimensionSlaves.get(i).getKeyVal());
-                AllGroupBy.append(tjQuotaDimensionSlaves.get(i).getKeyVal());
-//                AllGroupBy.append(tjQuotaDimensionSlaves.get(i).getGroupByKey());
-                if (i != (tjQuotaDimensionSlaves.size() - 1)) {
-                    allField.append(",");
-                    AllGroupBy.append(",");
-                }
-            }
-            //拼凑where语句
-            StringBuffer whereSql = new StringBuffer();
-            if ( !StringUtils.isEmpty(esConfig.getTimekey())) {
-                if (Contant.quota.dataLeval_oneDay.endsWith(quotaVo.getDataLevel())) {
-                    whereSql.append("" + esConfig.getTimekey() + " >= '" + startTime + "'");//startTime 默认是 昨天
-                    whereSql.append( " and " + esConfig.getTimekey() + " < '" + endTime + "'");//默认今天
-                }else{
-                    whereSql.append( "" + esConfig.getTimekey() + " < '" + endTime + "'");//默认今天
-                }
-            }
-            StringBuffer sql = new StringBuffer();
-            if(StringUtils.isEmpty(whereSql) || whereSql.length()==0){
-                 sql.append("select " + allField + " ,count(*) result from " + tableName + " group by " + AllGroupBy);
-            }else {
-                sql.append("select " + allField + " ,count(*) result from " + tableName + " where " + whereSql + " group by " + AllGroupBy);
-            }
-            sqlS.put(sql.toString(), one);
         }
-        return sqlS;
+        for (TjQuotaDimensionSlave slave :tjQuotaDimensionSlaves) {
+            allField.append(slave.getSlaveCode() + ",");
+        }
+        //拼接where语句 和 分组字段
+        StringBuffer whereSql = new StringBuffer();
+        if (!StringUtils.isEmpty(esConfig.getFilter())) {
+            whereSql.append(esConfig.getFilter());
+        }
+        String timeKey = esConfig.getTimekey();
+        if ( !StringUtils.isEmpty(timeKey)) {
+            if ( !StringUtils.isEmpty(startTime) && !StringUtils.isEmpty(endTime)) {
+                if(whereSql.length() > 1){
+                    whereSql.append(" and " + timeKey + " >= '" + startTime + "'");
+                    whereSql.append( " and " + timeKey + " < '" + endTime + "'");
+                }else{
+                    whereSql.append(timeKey + " >= '" + startTime + "'");
+                    whereSql.append( " and " + timeKey + " < '" + endTime + "'");
+                }
+            }
+        }
+        String selectGroupField = allField.toString();
+        String whereGroupField = allField.toString();
+        //拼接整个sql 语法
+        StringBuffer sql = new StringBuffer();
+        if(StringUtils.isEmpty(esConfig.getAggregation())){
+            sql.append("select " + selectGroupField + " count(*) from " + tableName + whereSql + " group by " + whereGroupField);
+        }else if(esConfig.getAggregation().equals(Contant.quota.aggregation_sum)){
+            if(StringUtils.isEmpty(selectGroupField)|| selectGroupField.length()==0){
+                sql.append("select sum(" ).append(esConfig.getAggregationKey()).append(" ) result  from " + tableName + whereSql);
+            }else {
+                sql.append("select ").append(selectGroupField ).append(" sum(").append(esConfig.getAggregationKey()).append(" ) result from " + tableName + whereSql + " group by " + whereGroupField);
+            }
+        }
+        return sql.toString();
     }
 
 }

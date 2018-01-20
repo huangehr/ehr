@@ -13,11 +13,10 @@ import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.resolve.model.stage2.ResourceBucket;
 import com.yihu.ehr.resolve.service.resource.stage1.PackageResolveService;
 import com.yihu.ehr.resolve.service.resource.stage2.PackMillService;
-import com.yihu.ehr.resolve.service.resource.stage2.PatientRegisterService;
+import com.yihu.ehr.resolve.service.resource.stage2.PatientService;
 import com.yihu.ehr.resolve.service.resource.stage2.ResourceService;
 import com.yihu.ehr.resolve.util.PackResolveLogger;
 import com.yihu.ehr.util.datetime.DateUtil;
-import com.yihu.ehr.util.log.LogService;
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.*;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -86,24 +85,25 @@ public class PackageResourceJob implements InterruptableJob {
 
     private void doResolve(MPackage pack, PackageMgrClient packageMgrClient) throws Exception {
         PackageResolveService resolveEngine = SpringContext.getService(PackageResolveService.class);
-        PatientRegisterService patientRegisterService = SpringContext.getService(PatientRegisterService.class);
+        PatientService patientService = SpringContext.getService(PatientService.class);
         PackMillService packMill = SpringContext.getService(PackMillService.class);
         ResourceService resourceService = SpringContext.getService(ResourceService.class);
         ObjectMapper objectMapper = new ObjectMapper();
         long start = System.currentTimeMillis();
         StandardPackage standardPackage = resolveEngine.doResolve(pack, downloadTo(pack.getRemotePath()));
         ResourceBucket resourceBucket = packMill.grindingPackModel(standardPackage);
-        resourceService.save(resourceBucket);
+        resourceService.save(resourceBucket, standardPackage);
         //居民信息注册
-        patientRegisterService.checkPatient(resourceBucket, pack.getId());
+        patientService.checkPatient(resourceBucket, pack.getId());
         //回填入库状态
         Map<String,String> map = new HashMap();
         map.put("profileId",standardPackage.getId());
         map.put("demographicId",standardPackage.getDemographicId());
-        map.put("eventType",String.valueOf(standardPackage.getEventType().getType()));
+        map.put("eventType", standardPackage.getEventType() == null? "":String.valueOf(standardPackage.getEventType().getType()));
         map.put("eventNo",standardPackage.getEventNo());
         map.put("eventDate", DateUtil.toStringLong(standardPackage.getEventDate()));
-        map.put("patientId",standardPackage.getPatientId());
+        map.put("patientId", standardPackage.getPatientId());
+        map.put("reUploadFlg", String.valueOf(standardPackage.isReUploadFlg()));
         packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Finished, objectMapper.writeValueAsString(map));
         getMetricRegistry().histogram(MetricNames.ResourceJob).update((System.currentTimeMillis() - start) / 1000);
     }

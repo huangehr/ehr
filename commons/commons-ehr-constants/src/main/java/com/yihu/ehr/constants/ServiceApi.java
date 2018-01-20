@@ -209,6 +209,7 @@ public class ServiceApi {
         public static final String RsReportCategoryNoPageCategories = "/resources/reportCategory/getAllCategories";
         public static final String RsReportCategoryByApp = "/resources/reportCategory/getAllCategoryByApp";
         public static final String RsReportCategoryByIds = "/resources/reportCategory/getAllCategoryByIds";
+        public static final String RsReportCategoryIdsByCode = "/resources/reportCategory/getCategoryIdsByCode";
 
         /**
          * 资源报表分类和应用
@@ -266,9 +267,26 @@ public class ServiceApi {
 
         public static final String StatisticsGetDoctorsGroupByTown = "/resources/statistics/getDoctorsGroupByTown";
 
-
-
-
+        //资源中心首页
+        public static final String GetPatientArchiveCount = "/resource/center/getPatientArchiveCount";
+        public static final String GetMedicalResourcesCount = "/resource/center/getMedicalResourcesCount";
+        public static final String GetHealthArchiveCount = "/resource/center/getHealthArchiveCount";
+        public static final String GetElectronicCasesCount = "/resource/center/getElectronicCasesCount";
+        public static final String GetHealthCardBindingAmount = "/resource/center/getHealthCardBindingAmount";
+        public static final String GetInfoDistribution = "/resource/center/getInfoDistribution";
+        public static final String GetNewSituation = "/resource/center/getNewSituation";
+        public static final String GetOrgArchives = "/resource/center/getOrgArchives";
+        public static final String GetMedicalStaffDistribution = "/resource/center/getMedicalStaffDistribution";
+        public static final String GetMedicalStaffRatio = "/resource/center/getMedicalStaffRatio";
+        public static final String GetCumulativeIntegration = "/resource/center/getCumulativeIntegration";
+        public static final String GteTotallyToBeIntegrated = "resource/center/gteTotallyToBeIntegrated";
+        public static final String GetArchiveSource = "/resource/center/getArchiveSource";
+        public static final String GetArchiveDistribution = "/resource/center/getArchiveDistribution";
+        public static final String GetStorageAnalysis = "/resource/center/getStorageAnalysis";
+        public static final String GetElectronicMedicalSource = "/resource/center/getElectronicMedicalSource";
+        public static final String GetElectronicMedicalOrgDistributed = "/resource/center/getElectronicMedicalOrgDistributed";
+        public static final String GetElectronicMedicalDeptDistributed = "/resource/center/getElectronicMedicalDeptDistributed";
+        public static final String GetElectronicMedicalAcquisitionSituation = "/resource/center/getElectronicMedicalAcquisitionSituation";
 
     }
 
@@ -289,19 +307,16 @@ public class ServiceApi {
         public static final String MedicationUsed = "/{demographic_id}/profile/medication_used"; //患者常用药（按次数）
         public static final String MedicalEvent = "/{event_no}/info"; //某次住院/门诊事件信息
 
-
         public static final String MedicationMaster = "/profile/medication/master"; //处方主表
         public static final String MedicationPrescription = "/profile/medication/prescription"; //处方笺
         public static final String MedicationDetail = "/profile/medication/detail/{prescription_no}"; //处方细表
         public static final String MedicationDetailChinese = "/profile/medication/detail/chinese"; //中药处方
         public static final String MedicationDetailWestern = "/profile/medication/detail/western"; //西药处方
 
-
         public static final String OutpatientDiagnosis = "/{demographic_id}/outpatient/diagnosis"; //门诊诊断
         public static final String OutpatientSymptom = "/{demographic_id}/outpatient/symptom"; //门诊症状
         public static final String OutpatientCostMaster = "/{demographic_id}/outpatient/cost/master"; //门诊费用汇总
         public static final String OutpatientCostDetail = "/{demographic_id}/outpatient/cost/detail"; //门诊费用明细
-
 
         public static final String HospitalizedDiagnosis = "/{demographic_id}/hospitalized/diagnosis"; //住院诊断
         public static final String HospitalizedSymptom = "/{demographic_id}/hospitalized/symptom"; //住院症状
@@ -393,8 +408,6 @@ public class ServiceApi {
         public static final String GetUserAppListById = "/userApp/getUserAppByAppId";
     }
 
-
-
     public static class Packages {
         public static final String Packages = "/packages";
         public static final String AcquirePackage = "/packages/acquire";
@@ -410,6 +423,7 @@ public class ServiceApi {
         public static final String ResolveQueue = "/packages/resolveQueue";
         public static final String QueueSize = "/packages/queueSize";
         public static final String PackageCrypto = "/PackageCrypto";
+        public static final String ImmediateResolve = "/immediate/resolve";
     }
 
     //非病人维度
@@ -430,10 +444,16 @@ public class ServiceApi {
         public static final String Scheduler = "/scheduler";
     }
 
+    public static class PackageAnalyzer {
+        public static final String Scheduler = "packAnalyzer/scheduler";
+        public static final String Queue = "packAnalyzer/queue";
+        public static final String Status = "packAnalyzer/status/{id}";
+    }
+
 
     public static class Patients {
         public static final String GetUserCards = "/getUserCards";// 就诊卡列表
-        public static final String CardApply = "/patientCards/apply";	 //卡认证申请
+        public static final String CardApply = "/patientCards/apply";     //卡认证申请
         public static final String CardList = "/patientCards/list";  //	个人账号列表
         public static final String CardApplyListManager = "/patientCards/manager/applyList";//	管理员--卡认证列表
         public static final String CardVerifyManager = "/patientCards/manager/verify";//	管理员--卡认证审核操作
@@ -451,7 +471,6 @@ public class ServiceApi {
         public static final String GetArchiveRelationList = "/patientArchive/getArRelationList";//根据查询条件查询个人档案申请列表
         public static final String GetArchiveRelation = "/patientArchive/{applyId}/getArRelation";//根据查询条件查询个人档案申请列表
 
-
         public static final String FindArchiveRelation = "/patient/findArchiveRelation";
         public static final String UpdateArchiveRelation = "/patient/updateArchiveRelation";
         public static final String DelArchiveRelation = "/patient/delArchiveRelation";
@@ -466,11 +485,6 @@ public class ServiceApi {
 
         public static final String Authentications = "/patient/authentications";
         public static final String Authentication = "/patient/Authentication/{id}";
-
-
-
-
-
 
         /******************************* 旧接口 **********************************************************/
         public static final String ArApplications = "/archive/applications";
@@ -488,24 +502,40 @@ public class ServiceApi {
         public static final String RefreshToken = "/oauth/refreshToken";
     }
 
+    public static class MessageRemind {
+        public static final String MessageRemind = "/messageRemind";
+        public static final String MessageRemindTop = "/messageRemindTop";
+        public static final String MessageRemindCount = "/messageRemindCount";
+        public static final String MessageRemindAdmin = "/messageRemind/admin/{messageRemind_id}";
+        public static final String MessageRemindReaded = "/messageRemind/readed/{remindId}";
+    }
+
+    public static class Portal {
+        public static final String Login = "/portal/login";
+        public static final String UserAppList = "/portal/userApp/list";
+        public static final String UserAppShow = "/portal/userApp/show";
+        public static final String MessageRemind = "/portal/messageRemind";
+        public static final String MessageRemindCount = "/portal/messageRemind/count";
+        public static final String MessageRemindRead = "/portal/messageRemind/read/{remindId}";
+        public static final String NoticesTop = "/portal/notices/top";
+        public static final String NoticesAdmin = "/portal/notices/admin/{portalNotice_id}";
+        public static final String Feedback = "/portal/feedback";
+        public static final String ResourceTop = "/portal/resource/top";
+        public static final String QuotaCategoryOfChild = "/portal/quotaCategoryOfChild";
+        public static final String TjQuotaWarn = "/portal/tj/tjQuotaWarn";
+        public static final String Setting = "/portal/setting";
+    }
+
     public static class PortalNotices {
         public static final String PortalNotices = "/portalNotices";
         public static final String PortalNoticesTop = "/portalNoticesTop";
         public static final String PortalNoticeAdmin = "/portalNotices/admin/{portalNotice_id}";
     }
 
-    public static class MessageRemind{
-        public static final String MessageRemind                            = "/messageRemind";
-        public static final String MessageRemindTop                            = "/messageRemindTop";
-        public static final String MessageRemindCount                         = "/messageRemindCount";
-        public static final String MessageRemindAdmin                        = "/messageRemind/admin/{messageRemind_id}";
-        public static final String MessageRemindReaded                         = "/messageRemind/readed/{remindId}";
-    }
-
-    public static class PortalResources{
-        public static final String PortalResources                            = "/portalResources";
-        public static final String PortalResourcesTop                         = "/portalResourcesTop";
-        public static final String PortalResourcesAdmin                       = "/portalResources/admin/{portalResources_id}";
+    public static class PortalResources {
+        public static final String PortalResources = "/portalResources";
+        public static final String PortalResourcesTop = "/portalResourcesTop";
+        public static final String PortalResourcesAdmin = "/portalResources/admin/{portalResources_id}";
     }
 
     public static class PortalFeedback {
@@ -517,11 +547,10 @@ public class ServiceApi {
         public static final String PortalLogin = "/login";
     }
 
-
     public static class PortalSetting {
         public static final String PortalSetting = "/portalSetting";
-        public static final String PortalSettingTop  = "/portalSettingTop";
-        public static final String PortalSettingAdmin  = "/portalSetting/admin/{portalSetting_id}";
+        public static final String PortalSettingTop = "/portalSettingTop";
+        public static final String PortalSettingAdmin = "/portalSetting/admin/{portalSetting_id}";
     }
 
     public static class PortalStandards {
@@ -611,6 +640,7 @@ public class ServiceApi {
         public static final String DataSetCodeIsExist = "/std/data_set/is_exist/code";
         public static final String DataSetsIds = "/std/{ids}data_sets";
         public static final String DataSetsBatch = "/std/data_set/bacth";
+        public static final String GetDataSetByCode = "/std/data_set/getDataSetByCode";
 
         public static final String MetaDatas = "/std/data_sets/meta_datas";
         public static final String MetaData = "/std/data_sets/meta_datas/{id}";
@@ -635,8 +665,6 @@ public class ServiceApi {
         public static final String DoctorEmailExistence = "/doctor/email/existence";
         public static final String DoctorsIdCardNoExistence = "/doctors/{doctor_idCardNo}/CardNoExist";
         public static final String DoctoridCardNoExistence = "/doctor/idCardNo/existence";
-
-
 
 
     }
@@ -924,6 +952,7 @@ public class ServiceApi {
             public static final String IsUniqueChannelName = "/redis/mq/channel/isUniqueChannelName";
             public static final String SendMessage = "/redis/mq/channel/sendMessage";
         }
+
         // Redis消息订阅者
         public static class MqSubscriber {
             public static final String Prefix = "/redis/mq/subscriber/";
@@ -934,6 +963,7 @@ public class ServiceApi {
             public static final String IsUniqueAppId = "/redis/mq/subscriber/isUniqueAppId";
             public static final String IsUniqueSubscribedUrl = "/redis/mq/subscriber/isUniqueSubscribedUrl";
         }
+
         // Redis消息发布者
         public static class MqPublisher {
             public static final String Prefix = "/redis/mq/publisher/";
@@ -943,6 +973,7 @@ public class ServiceApi {
             public static final String Delete = "/redis/mq/publisher/delete";
             public static final String IsUniqueAppId = "/redis/mq/publisher/isUniqueAppId";
         }
+
         // 缓存分类
         public static class CacheCategory {
             public static final String Prefix = "/redis/cache/category/";
@@ -954,6 +985,7 @@ public class ServiceApi {
             public static final String IsUniqueName = "/redis/cache/category/isUniqueName";
             public static final String IsUniqueCode = "/redis/cache/category/isUniqueCode";
         }
+
         // 缓存授权
         public static class CacheAuthorization {
             public static final String Prefix = "/redis/cache/authorization/";
@@ -963,6 +995,7 @@ public class ServiceApi {
             public static final String Delete = "/redis/cache/authorization/delete";
             public static final String IsUniqueAppId = "/redis/cache/authorization/isUniqueAppId";
         }
+
         // 缓存Key规则
         public static class CacheKeyRule {
             public static final String Prefix = "/redis/cache/keyRule/";
@@ -972,18 +1005,22 @@ public class ServiceApi {
             public static final String Delete = "/redis/cache/keyRule/delete";
             public static final String IsUniqueName = "/redis/cache/keyRule/isUniqueName";
             public static final String IsUniqueCode = "/redis/cache/keyRule/isUniqueCode";
+            public static final String IsUniqueExpression = "/redis/cache/keyRule/isUniqueExpression";
         }
+
         // 缓存操作
         public static class CacheOperation {
             public static final String Get = "/redis/cache/operation/get";
             public static final String Set = "/redis/cache/operation/set";
             public static final String Remove = "/redis/cache/operation/remove";
         }
+
         // 缓存操作
         public static class CacheStatistics {
             public static final String GetCategoryKeys = "/redis/cache/statistics/getCategoryKeys";
             public static final String GetCategoryMemory = "/redis/cache/statistics/getCategoryMemory";
         }
+
         // 接收订阅消息
         public static class SubscribeMessage {
             public static final String ReceiveResponseTime = "/redis/subscribeMessage/receiveResponseTime";
@@ -1066,18 +1103,17 @@ public class ServiceApi {
         public static final String GetTjDimensionMainList = "/tj/getTjDimensionMainList";
         public static final String TjDimensionMain = "/tj/tjDimensionMain";
         public static final String TjDimensionMainId = "/tj/tjDimensionMainId/{id}";
-        public static final String TjDimensionMainCode= "/tj/tjDimensionMainCode";
-        public static final String TjDimensionMainName= "/tj/tjDimensionMainName";
-        public static final String GetTjDimensionMainInfoList= "/tj/getTjDimensionMainInfoList";
+        public static final String TjDimensionMainCode = "/tj/tjDimensionMainCode";
+        public static final String TjDimensionMainName = "/tj/tjDimensionMainName";
+        public static final String GetTjDimensionMainInfoList = "/tj/getTjDimensionMainInfoList";
 
         public static final String GetTjDimensionSlaveList = "/tj/getTjDimensionSlaveList";
         public static final String TjDimensionSlaveId = "/tj/tjDimensionSlaveId/{id}";
         public static final String TjDimensionSlave = "/tj/tjDimensionSlave";
         public static final String TjDimensionSlaveCode = "/tj/tjDimensionSlaveCode";
-        public static final String TjDimensionSlaveName= "/tj/tjDimensionSlaveName";
-        public static final String GetTjDimensionSlaveInfoList= "/tj/getTjDimensionSlaveInfoList";
-        public static final String GetTjDimensionSlaveByCode= "/tj/getTjDimensionSlaveByCode";
-
+        public static final String TjDimensionSlaveName = "/tj/tjDimensionSlaveName";
+        public static final String GetTjDimensionSlaveInfoList = "/tj/getTjDimensionSlaveInfoList";
+        public static final String GetTjDimensionSlaveByCode = "/tj/getTjDimensionSlaveByCode";
 
 
         public static final String GetTjQuotaDimensionMainList = "/tj/getTjQuotaDimensionMainList";
@@ -1131,11 +1167,18 @@ public class ServiceApi {
         public static final String GetTjQuotaByCode = "/tj/getTjQuotaByCode";
         public static final String TjQuotaConfigInfo = "/tj/quotaConfigInfo";
         public static final String TjHasConfigDimension = "/tj/hasConfigDimension";
+        public static final String TjQuotaTypeIsExist = "/quota/type_isExist";
+        public static final String TjDimensionMainIsExist = "/quota/TjDimensionMainIsExist";
+        public static final String TjDimensionSlaveIsExist = "/quota/TjDimensionSlaveIsExist";
+        public static final String TjQuotaBatch = "/tjQuota/batch";
 
 
         public static final String TjGetQuotaResult = "/tj/tjGetQuotaResult";
         public static final String TjGetOrgHealthCategoryQuotaResult = "/tj/tjGetOrgHealthCategoryQuotaResult";
+        public static final String TjGetReportQuotaResult = "/tj/tjGetReportQuotaResult";
         public static final String TjQuotaExecute = "/job/execuJob";
+        public static final String FirstExecuteQuota = "/job/firstExecuteQuota";
+        public static final String FindByQuotaCodes = "/quota/findByQuotaCodes";
 
 
         public static final String GetTjQuotaWarn = "tj/getTjQuotaWarn";
@@ -1146,6 +1189,7 @@ public class ServiceApi {
         public static final String GetQuotaNestedPieReportPreviews = "tj/getQuotaNestedPieReportPreviews";
         public static final String GetQuotaTotalCount = "tj/getQuotaTotalCount";
         public static final String GetQuotaGroupBy = "tj/getQuotaGroupBy";
+        public static final String GetQuotaReportTwoDimensionalTable = "/tj/getQuotaReportTwoDimensionalTable";
 
 
 
@@ -1154,12 +1198,12 @@ public class ServiceApi {
         public static final String TjQuotaChartId = "/tj/tjQuotaChart/{id}";
         public static final String GetAllTjQuotaChart = "/tj/getAllTjQuotaChart";
 
-
+        public static final String getQuotaCategoryByName = "/quotaCategory/getQuotaCategoryByName";
 
     }
 
     public static class StasticReport {
-        public static final String GetStatisticsElectronicMedicalCount="/stasticReport/getStatisticsElectronicMedicalCount";
+        public static final String GetStatisticsElectronicMedicalCount = "/stasticReport/getStatisticsElectronicMedicalCount";
         public static final String GetStatisticsMedicalEventTypeCount = "/stasticReport/getStatisticsMedicalEventTypeCount";
         public static final String GetStatisticsDemographicsAgeCount = "/stasticReport/getStatisticsDemographicsAgeCount";
         public static final String GetArchiveReportInfo = "/stasticReport/getArchiveReportInfo";
@@ -1172,14 +1216,19 @@ public class ServiceApi {
         public static final String getStatisticsUserAgeByIdCardNo = "/tj/getStatisticsUserAgeByIdCardNo";
         public static final String getStatisticsDoctorByRoleType = "/tj/getStatisticsDoctorByRoleType";
         public static final String getStatisticsCityDoctorByRoleType = "/tj/getStatisticsCityDoctorByRoleType";
+
+        public static final String GetArchiveReportAll = "/stasticReport/getArchiveReportAll";
+        public static final String GetRecieveOrgCount = "/stasticReport/getRecieveOrgCount";
+        public static final String GetArchivesInc = "/stasticReport/getArchivesInc";
+
     }
 
     public static class Org {
-        public static final String getUserOrglistByUserId="/org/getUserOrglistByUserId/";
-        public static final String getUserOrgSaasByUserOrgCode="/org/getUserOrgSaasByUserOrgCode/";
-        public static final String GetOrgDeptsDate="/org/getOrgDeptsDate";
+        public static final String getUserOrglistByUserId = "/org/getUserOrglistByUserId/";
+        public static final String getUserOrgSaasByUserOrgCode = "/org/getUserOrgSaasByUserOrgCode/";
+        public static final String GetOrgDeptsDate = "/org/getOrgDeptsDate";
         public static final String GetOrgDeptInfoList = "/org/userId/getOrgDeptInfoList";
-        public static final String getseaOrgsByOrgCode="/organizations/seaOrgsByOrgCode";
+        public static final String getseaOrgsByOrgCode = "/organizations/seaOrgsByOrgCode";
 
         // 卫生机构类别
         public static class HealthCategory {
@@ -1215,7 +1264,7 @@ public class ServiceApi {
         public static final String GovernmentMenuReportMonitorTypeDelete = "/governmentMenuReportMonitorType/delete";
         public static final String MonitorTypeList = "/governmentMenuReportMonitorType/MonitorTypeList";
 
-        public static final String GetReportByMenuId = "/governmentMenuReportMonitorType/getReportByMenuId";
+        public static final String GetReportByMenuCode = "/governmentMenuReportMonitorType/getReportByMenuCode";
         //政府服务平台-门诊仪表盘-start
         public static final String OutpatientsBoardCount = "/government/outpatientsBoardCount";
         public static final String GetMonthDistribution = "/statistics/monthDistribution";
@@ -1250,14 +1299,15 @@ public class ServiceApi {
         public static final String AttendanceEdit = "/attendance/edit";
         public static final String AttendanceList = "/attendance/list";
         public static final String AttendanceDelete = "/attendance/delete";
-        public static final String AttendanceDetail= "/attendance/detail";
-        public static final String AttendanceAnalysis= "/attendance/analysis";
+        public static final String AttendanceDetail = "/attendance/detail";
+        public static final String AttendanceAnalysis = "/attendance/analysis";
         // 排班
         public static final String ScheduleList = "/schedule/list";
         public static final String ScheduleLevel = "/schedule/level";
         public static final String ScheduleSave = "/schedule/save";
         public static final String ScheduleUpdate = "/schedule/update";
         public static final String ScheduleBathUpdate = "/schedule/bathUpdate";
+        public static final String ScheduleCleanData = "/schedule/cleanData";
         public static final String ScheduleBatch = "/schedules/batch";
 
         // 待命地点
@@ -1291,6 +1341,7 @@ public class ServiceApi {
         public static final String Mapping = "/elasticSearch/mapping";
         public static final String Index = "/elasticSearch/index";
         public static final String Delete = "/elasticSearch/delete";
+        public static final String DeleteByField = "/elasticSearch/deleteByField";
         public static final String Update = "/elasticSearch/update";
         public static final String FindById = "/elasticSearch/{id}";
         public static final String FindByField = "/elasticSearch/findByField";

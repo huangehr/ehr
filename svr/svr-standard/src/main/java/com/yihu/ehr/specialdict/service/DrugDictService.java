@@ -1,6 +1,8 @@
 package com.yihu.ehr.specialdict.service;
 
 import com.yihu.ehr.query.BaseJpaService;
+import com.yihu.ehr.specialdict.dao.DrugDictRepository;
+import com.yihu.ehr.specialdict.dao.Icd10DrugRelationRepository;
 import com.yihu.ehr.specialdict.model.DrugDict;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -20,12 +22,12 @@ import java.util.List;
  */
 @Transactional
 @Service
-public class DrugDictService extends BaseJpaService<DrugDict, XDrugDictRepository> {
+public class DrugDictService extends BaseJpaService<DrugDict, DrugDictRepository> {
 
     @Autowired
-    private XDrugDictRepository drugDictRepo;
+    private DrugDictRepository drugDictRepo;
     @Autowired
-    private XIcd10DrugRelationRepository icd10DrugReRepo;
+    private Icd10DrugRelationRepository icd10DrugReRepo;
 
     public Page<DrugDict> getDictList(String sorts, int page, int size) {
         Pageable pageable = new PageRequest(page, size, parseSorts(sorts));

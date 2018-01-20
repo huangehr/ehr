@@ -6,11 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.hadoop.hbase.HbaseTemplate;
 
 /**
- * HBase - 基类
+ * AbstractHBaseClient - 基类
  * @author hzp
  * @created 2017.05.03
  */
-public class AbstractHBaseClient {
+public abstract class AbstractHBaseClient {
 
     @Autowired
     protected HbaseTemplate hbaseTemplate;

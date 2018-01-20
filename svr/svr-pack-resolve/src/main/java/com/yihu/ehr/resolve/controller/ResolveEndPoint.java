@@ -17,10 +17,9 @@ import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.resolve.model.stage2.ResourceBucket;
 import com.yihu.ehr.resolve.service.resource.stage1.PackageResolveService;
 import com.yihu.ehr.resolve.service.resource.stage2.PackMillService;
-import com.yihu.ehr.resolve.service.resource.stage2.PatientRegisterService;
+import com.yihu.ehr.resolve.service.resource.stage2.PatientService;
 import com.yihu.ehr.resolve.service.resource.stage2.ResourceService;
 import com.yihu.ehr.util.datetime.DateUtil;
-import com.yihu.ehr.util.log.LogService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -49,7 +48,7 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private ResourceService resourceService;
     @Autowired
-    private PatientRegisterService patientRegisterService;
+    private PatientService patientService;
     @Autowired
     private PackMillService packMillService;
     @Autowired
@@ -88,17 +87,18 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
             String zipFile = downloadTo(pack.getRemotePath());
             StandardPackage standardPackage = packageResolveService.doResolve(pack, zipFile);
             ResourceBucket resourceBucket = packMillService.grindingPackModel(standardPackage);
-            resourceService.save(resourceBucket);
+            resourceService.save(resourceBucket, standardPackage);
             //居民信息注册
-            patientRegisterService.checkPatient(resourceBucket, packId);
+            patientService.checkPatient(resourceBucket, packId);
             //回填入库状态
             Map<String, String> map = new HashMap();
             map.put("profileId", standardPackage.getId());
             map.put("demographicId", standardPackage.getDemographicId());
-            map.put("eventType", String.valueOf(standardPackage.getEventType().getType()));
+            map.put("eventType", standardPackage.getEventType() == null ? "":String.valueOf(standardPackage.getEventType().getType()));
             map.put("eventNo", standardPackage.getEventNo());
             map.put("eventDate", DateUtil.toStringLong(standardPackage.getEventDate()));
             map.put("patientId", standardPackage.getPatientId());
+            map.put("reUploadFlg", String.valueOf(standardPackage.isReUploadFlg()));
             packageMgrClient.reportStatus(packId, ArchiveStatus.Finished, objectMapper.writeValueAsString(map));
             getMetricRegistry().histogram(MetricNames.ResourceJob).update((System.currentTimeMillis() - start) / 1000);
             //是否返回数据
@@ -148,8 +148,8 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
             List<StandardPackage> standardPackages = packageResolveService.doResolveNonArchive(pack, zipFile);
             for (StandardPackage standardPackage : standardPackages) {
                 ResourceBucket resourceBucket = packMillService.grindingPackModel(standardPackage);
-                resourceService.save(resourceBucket);
-                patientRegisterService.checkPatient(resourceBucket, packId);
+                resourceService.save(resourceBucket, standardPackage);
+                patientService.checkPatient(resourceBucket, packId);
                 String json = standardPackage.toJson();
                 returnJson.add(json);
             }
@@ -162,6 +162,7 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
             map.put("eventNo", standardPackages.get(0).getEventNo());
             map.put("eventDate", DateUtil.toStringLong(standardPackages.get(0).getEventDate()));
             map.put("patientId", standardPackages.get(0).getPatientId());
+            map.put("reUploadFlg", String.valueOf(standardPackages.get(0).isReUploadFlg()));
             datasetPackageMgrClient.reportStatus(packId, ArchiveStatus.Finished, objectMapper.writeValueAsString(map));
             getMetricRegistry().histogram(MetricNames.ResourceJob).update((System.currentTimeMillis() - start) / 1000);
             if (echo) {
@@ -269,14 +270,14 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
             pack.setId(packageId);
             pack.setClientId(clientId);
             pack.setArchiveStatus(ArchiveStatus.Received);
-            StandardPackage packModel = packageResolveService.doResolve(pack, zipFile);
-            packModel.setClientId(clientId);
-            ResourceBucket resourceBucket = packMillService.grindingPackModel(packModel);
+            StandardPackage standardPackage = packageResolveService.doResolve(pack, zipFile);
+            standardPackage.setClientId(clientId);
+            ResourceBucket resourceBucket = packMillService.grindingPackModel(standardPackage);
             if (persist) {
-                resourceService.save(resourceBucket);
-                patientRegisterService.checkPatient(resourceBucket, packageId);
+                resourceService.save(resourceBucket, standardPackage);
+                patientService.checkPatient(resourceBucket, packageId);
             }
-            return new ResponseEntity<>(packModel.toJson(), HttpStatus.OK);
+            return new ResponseEntity<>(standardPackage.toJson(), HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -299,10 +300,60 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
             MPackage pack = entity.getBody();
             String zipFile = downloadTo(pack.getRemotePath());
             StandardPackage packModel = packageResolveService.doResolve(pack, zipFile);
-
             return new ResponseEntity<>(packModel.toJson(), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+
+    @ApiOperation(value = "即时交互档案解析入库", notes = "即时交互档案解析入库", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Packages.ImmediateResolve, method = RequestMethod.PUT)
+    public String immediateResolve(
+            @ApiParam(name = "idCardNo", value = "身份证号")
+            @RequestParam(value = "idCardNo", required = false) String idCardNo,
+            @ApiParam(name = "data", value = "档案数据")
+            @RequestParam(value = "data", required = false) String data,
+            @ApiParam(name = "clientId", value = "模拟应用ID")
+            @RequestParam(value = "clientId", required = false) String clientId,
+            @ApiParam(name = "echo", value = "返回档案数据")
+            @RequestParam(value = "echo",required = false,defaultValue = "true") boolean echo) throws Throwable {
+
+        try {
+            long start = System.currentTimeMillis();
+            StandardPackage standardPackage = packageResolveService.doResolveImmediateData(data,clientId);
+            ResourceBucket resourceBucket = packMillService.grindingPackModel(standardPackage);
+            resourceService.save(resourceBucket, standardPackage);
+            //居民信息注册
+            patientService.checkPatient(resourceBucket, null);
+            //回填入库状态
+            Map<String, String> map = new HashMap();
+            map.put("profileId", standardPackage.getId());
+            map.put("demographicId", standardPackage.getDemographicId());
+            map.put("eventType", String.valueOf(standardPackage.getEventType().getType()));
+            map.put("eventNo", standardPackage.getEventNo());
+            map.put("eventDate", DateUtil.toStringLong(standardPackage.getEventDate()));
+            map.put("patientId", standardPackage.getPatientId());
+
+            getMetricRegistry().histogram(MetricNames.ResourceJob).update((System.currentTimeMillis() - start) / 1000);
+            //是否返回数据
+            if (echo) {
+                return standardPackage.toJson();
+            } else {
+                Map<String, String> resultMap = new HashMap<String, String>();
+                resultMap.put("success", "入库成功！");
+                return objectMapper.writeValueAsString(resultMap);
+            }
+        } catch (Exception e) {
+            Map<String, String> resultMap = new HashMap<String, String>();
+            if (StringUtils.isBlank(e.getMessage())) {
+                resultMap.put("error", "Internal Server Error");
+                return objectMapper.writeValueAsString(resultMap);
+            } else {
+                resultMap.put("error", e.getMessage());
+                return objectMapper.writeValueAsString(resultMap);
+            }
         }
     }
 

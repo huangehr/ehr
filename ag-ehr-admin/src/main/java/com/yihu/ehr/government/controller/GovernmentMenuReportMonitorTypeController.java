@@ -6,6 +6,7 @@ import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.government.service.GovernmentMenuReportMonitorTypeClient;
+import com.yihu.ehr.quota.service.TjQuotaJobClient;
 import com.yihu.ehr.users.service.UserClient;
 import com.yihu.ehr.util.log.LogService;
 import com.yihu.ehr.util.rest.Envelop;
@@ -33,6 +34,8 @@ public class GovernmentMenuReportMonitorTypeController extends BaseController {
     private GovernmentMenuReportMonitorTypeClient governmentMenuReportMonitorTypeClient;
     @Autowired
     private UserClient userClient;
+    @Autowired
+    private TjQuotaJobClient tjQuotaJobClient;
 
     @ApiOperation("政府服务平台菜单报表监测类型")
     @RequestMapping(value = ServiceApi.Government.GovernmentMenuReportMonitorTypeSave, method = RequestMethod.POST)
@@ -69,5 +72,14 @@ public class GovernmentMenuReportMonitorTypeController extends BaseController {
         }
     }
 
-
+    @ApiOperation(value = "根据编码获取指标执行结果")
+    @RequestMapping(value = ServiceApi.TJ.FindByQuotaCodes, method = RequestMethod.GET)
+    public Envelop findByQuotaCodes(
+            @ApiParam(name = "quotaCodes", value = "指标code", required = true)
+            @RequestParam(value = "quotaCodes") String quotaCodes,
+            @ApiParam(name = "town", value = "区域town", required = true)
+            @RequestParam(value = "town") String town) {
+        Envelop envelop = tjQuotaJobClient.findByQuotaCodes(quotaCodes, town);
+        return envelop;
+    }
 }

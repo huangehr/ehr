@@ -47,6 +47,7 @@ public class DateUtil {
     public static final String DATE_MY_FORMAT = "MMyyyy";
     public static final String YYYYMMDDHHMMSS = "yyyyMMddHHmmss";
     public static final String utcDateTimePattern = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+    public static final String utcDateTimePatternTZ = " yyyy-MM-dd'T'HH:mm:ssZZZ";
 
 
 
@@ -1452,4 +1453,5 @@ public class DateUtil {
 
         return ts;
     }
+
 }

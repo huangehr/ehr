@@ -14,9 +14,10 @@ import springfox.documentation.annotations.ApiIgnore;
  * @author hzp
  * @created 2017.04.13
  */
-@ApiIgnore
-@FeignClient(name = MicroServices.Patient)
-@RequestMapping(ApiVersion.Version1_0)
+//@ApiIgnore
+//@FeignClient(name = MicroServices.Patient)
+//@RequestMapping(ApiVersion.Version1_0)
+@Deprecated
 public interface ArchiveClient {
 
     @RequestMapping(value = ServiceApi.Patients.ArchiveRelation, method = RequestMethod.POST)

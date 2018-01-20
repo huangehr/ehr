@@ -4,6 +4,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.model.redis.MRedisCacheKeyRule;
+import com.yihu.ehr.redis.cache.CacheCommonBiz;
 import com.yihu.ehr.redis.cache.entity.RedisCacheKeyRule;
 import com.yihu.ehr.redis.cache.service.RedisCacheKeyRuleService;
 import com.yihu.ehr.util.rest.Envelop;
@@ -87,6 +88,7 @@ public class RedisCacheKeyRuleEndPoint extends EnvelopRestEndPoint {
         envelop.setSuccessFlg(false);
         try {
             RedisCacheKeyRule newEntity = objectMapper.readValue(entityJson, RedisCacheKeyRule.class);
+            CacheCommonBiz.validateKeyRule(newEntity.getExpression());
             newEntity = redisCacheKeyRuleService.save(newEntity);
 
             MRedisCacheKeyRule mRedisCacheKeyRule = convertToModel(newEntity, MRedisCacheKeyRule.class);
@@ -109,6 +111,7 @@ public class RedisCacheKeyRuleEndPoint extends EnvelopRestEndPoint {
         envelop.setSuccessFlg(false);
         try {
             RedisCacheKeyRule updateEntity = objectMapper.readValue(entityJson, RedisCacheKeyRule.class);
+            CacheCommonBiz.validateKeyRule(updateEntity.getExpression());
             updateEntity = redisCacheKeyRuleService.save(updateEntity);
 
             MRedisCacheKeyRule mRedisCacheKeyRule = convertToModel(updateEntity, MRedisCacheKeyRule.class);
@@ -177,6 +180,31 @@ public class RedisCacheKeyRuleEndPoint extends EnvelopRestEndPoint {
             envelop.setSuccessFlg(result);
             if (!result) {
                 envelop.setErrorMsg("该缓存Key规则编码已被使用，请重新填写！");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            envelop.setErrorMsg("发生异常：" + e.getMessage());
+        }
+        return envelop;
+    }
+
+    @ApiOperation("验证类似的缓存Key规则表达式是否已经存在")
+    @RequestMapping(value = ServiceApi.Redis.CacheKeyRule.IsUniqueExpression, method = RequestMethod.GET)
+    public Envelop isUniqueExpression(
+            @ApiParam(name = "id", value = "缓存Key规则ID", required = true)
+            @RequestParam(value = "id") Integer id,
+            @ApiParam(name = "categoryCode", value = "缓存分类编码", required = true)
+            @RequestParam(value = "categoryCode") String categoryCode,
+            @ApiParam(name = "expression", value = "缓存Key规则表达式", required = true)
+            @RequestParam(value = "expression") String expression) {
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(false);
+        try {
+            CacheCommonBiz.validateKeyRule(expression);
+            boolean result = redisCacheKeyRuleService.isUniqueExpression(id, categoryCode, expression);
+            envelop.setSuccessFlg(result);
+            if (!result) {
+                envelop.setErrorMsg("当前分类下类似的缓存Key规则表达式已经定义过，请重新填写！");
             }
         } catch (Exception e) {
             e.printStackTrace();

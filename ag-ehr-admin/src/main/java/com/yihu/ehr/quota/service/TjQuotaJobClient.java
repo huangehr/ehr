@@ -19,9 +19,15 @@ import springfox.documentation.annotations.ApiIgnore;
 @ApiIgnore
 public interface TjQuotaJobClient {
 
-    @RequestMapping(value = ServiceApi.TJ.TjQuotaExecute, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.TJ.FirstExecuteQuota, method = RequestMethod.POST)
+    @ApiOperation(value = "初始执行指标任务")
+    boolean firstExecuteQuota(@RequestParam("id") Integer id);
+
+    @RequestMapping(value = ServiceApi.TJ.TjQuotaExecute, method = RequestMethod.POST)
     @ApiOperation(value = "执行指标任务")
-    boolean tjQuotaExecute(@RequestParam("id") Integer id);
+    boolean tjQuotaExecute(@RequestParam(value = "id") Integer id,
+                           @RequestParam(value = "startDate", required = false) String startDate,
+                           @RequestParam(value = "endDate", required = false) String endDate);
 
     @RequestMapping(value = ServiceApi.TJ.TjGetQuotaResult, method = RequestMethod.GET)
     @ApiOperation(value = "获取指标执行结果")
@@ -34,7 +40,7 @@ public interface TjQuotaJobClient {
             @RequestParam(value = "pageSize" , required = false) int pageSize
     );
 
-    @ApiOperation(value = "获取指标统计不同维度结果总量")
+    @ApiOperation(value = "获取指标统计不同维度结果数据")
     @RequestMapping(value = ServiceApi.TJ.GetQuotaTotalCount, method = RequestMethod.GET)
     Envelop getQuotaTotalCount(
             @ApiParam(name = "id", value = "指标任务ID", required = true)
@@ -83,4 +89,12 @@ public interface TjQuotaJobClient {
             @RequestParam(value = "dimension", required = false) String dimension,
             @ApiParam(name = "title", value = "名称", defaultValue = "")
             @RequestParam(value = "title", required = false) String title);
+
+    @ApiOperation(value = "根据编码获取指标执行结果")
+    @RequestMapping(value = ServiceApi.TJ.FindByQuotaCodes, method = RequestMethod.GET)
+    Envelop findByQuotaCodes(
+            @ApiParam(name = "quotaCodes", value = "指标code", required = true)
+            @RequestParam(value = "quotaCodes") String quotaCodes,
+            @ApiParam(name = "town", value = "区域town", required = true)
+            @RequestParam(value = "town") String town);
 }

@@ -4,6 +4,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.model.org.MOrganization;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -212,4 +213,12 @@ public interface OrganizationClient {
     Map<String,String> seaOrgsByOrgCode(
             @ApiParam(name = "org_codes", value = "机构org_codes", defaultValue = "")
             @RequestBody String org_codes);
+
+    @RequestMapping(value = "/organizations/getHospital", method = RequestMethod.GET)
+    @ApiOperation("查询所有经纬度医院列表")
+    Envelop getHospital();
+
+    @RequestMapping(value = "/organizations/getOrgListByAddressPid", method = RequestMethod.GET)
+    @ApiOperation(value = "根据区域查询机构列表")
+    Envelop getOrgListByAddressPid(@RequestParam(value = "pid") Integer pid);
 }

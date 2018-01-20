@@ -47,7 +47,7 @@ public class RsReportCategoryEndPoint extends EnvelopRestEndPoint {
         List<MRsReportCategory> resultList = new ArrayList<>();
 
         // 获取最顶层的资源报表分类集合
-        List<RsReportCategory> topNodeList = rsReportCategoryService.getChildrenByPid(-1);
+        List<RsReportCategory> topNodeList = rsReportCategoryService.getChildrenByPid(0);
         if (topNodeList.size() == 0) {
             return resultList;
         }
@@ -92,6 +92,9 @@ public class RsReportCategoryEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "rsReportCategory", value = "资源报表分类JSON", required = true)
             @RequestBody String rsReportCategory) throws Exception {
         RsReportCategory newRsReportCategory = toEntity(rsReportCategory, RsReportCategory.class);
+        if (null == newRsReportCategory.getPid()) {
+            newRsReportCategory.setPid(0);
+        }
         newRsReportCategory = rsReportCategoryService.save(newRsReportCategory);
         return convertToModel(newRsReportCategory, MRsReportCategory.class);
     }
@@ -159,5 +162,14 @@ public class RsReportCategoryEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "ids") List<Integer> ids) {
         List<RsReportCategory> categoryList = rsReportCategoryService.getCategoryByIds(ids);
         return categoryList;
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.RsReportCategoryIdsByCode, method = RequestMethod.GET)
+    @ApiOperation("根据code获取平台应用对应的报表分类子类")
+    public List<Integer> getCategoryIdsByCode(
+            @ApiParam(name = "code", value = "分类编码")
+            @RequestParam(value = "code") String code) {
+        List<Integer> categoryIds = rsReportCategoryService.getCategoryIds(code);
+        return categoryIds;
     }
 }

@@ -90,4 +90,10 @@ public interface RsReportCategoryClient {
     List<RsReportCategoryInfoModel> getCategoryByIds(
             @ApiParam(name = "ids", value = "id")
             @RequestParam(value = "ids") List<Integer> ids);
+
+    @RequestMapping(value = ServiceApi.Resources.RsReportCategoryIdsByCode, method = RequestMethod.GET)
+    @ApiOperation("根据code获取平台应用对应的报表分类子类")
+    List<Integer> getCategoryIdsByCode(
+            @ApiParam(name = "code", value = "分类编码")
+            @RequestParam(value = "code") String code);
 }

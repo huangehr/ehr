@@ -1,6 +1,10 @@
 package com.yihu.ehr.specialdict.service;
 
 import com.yihu.ehr.query.BaseJpaService;
+import com.yihu.ehr.specialdict.dao.Icd10DictRepository;
+import com.yihu.ehr.specialdict.dao.Icd10DrugRelationRepository;
+import com.yihu.ehr.specialdict.dao.Icd10HpRelationRepository;
+import com.yihu.ehr.specialdict.dao.Icd10IndicatorRelationRepository;
 import com.yihu.ehr.specialdict.model.Icd10Dict;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -21,16 +25,16 @@ import java.util.List;
  */
 @Transactional
 @Service
-public class Icd10DictService extends BaseJpaService<Icd10Dict, XIcd10DictRepository> {
+public class Icd10DictService extends BaseJpaService<Icd10Dict, Icd10DictRepository> {
 
     @Autowired
-    private XIcd10DictRepository icd10DictRepo;
+    private Icd10DictRepository icd10DictRepo;
     @Autowired
-    private XIcd10HpRelationRepository hpIcd10ReRepo;
+    private Icd10HpRelationRepository hpIcd10ReRepo;
     @Autowired
-    private XIcd10DrugRelationRepository icd10DrugReRepo;
+    private Icd10DrugRelationRepository icd10DrugReRepo;
     @Autowired
-    private XIcd10IndicatorRelationRepository icd10IndicatorReRepo;
+    private Icd10IndicatorRelationRepository icd10IndicatorReRepo;
 
     public boolean isCodeExist(String code){
         Icd10Dict icd10Dict = icd10DictRepo.findByCode(code);

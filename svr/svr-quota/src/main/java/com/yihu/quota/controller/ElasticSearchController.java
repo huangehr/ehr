@@ -49,9 +49,9 @@ public class ElasticSearchController extends BaseController {
 
     private static String host = "172.17.110.17";
     private static int port = 9300;
-    private static String index = "quota";
+    private static String index = "quota_index";
     private static String clusterName = "elasticsearch";
-    private static String type = "quota_test";
+    private static String type = "quota";
 
 
     public EsConfig config(){
@@ -202,8 +202,10 @@ public class ElasticSearchController extends BaseController {
     @RequestMapping(value = "/getElasticsearchDocument", method = RequestMethod.POST)
     @ApiOperation("查询elasticsearch文档")
     public List<Map<String, Object>> getElasticsearchDocument(
-            @ApiParam(value = "filter")
-            @RequestParam(value = "filter", required = true) String filter
+            @ApiParam(value = "term")
+            @RequestParam(value = "term", required = true) String term,
+            @ApiParam(value = "value")
+            @RequestParam(value = "value", required = true) String value
     ){
         List<Map<String, Object>> list = null;
         try {
@@ -215,7 +217,7 @@ public class ElasticSearchController extends BaseController {
             esConfig.setClusterName("elasticsearch");
             Client client = esClientUtil.getClient(esConfig.getHost(), esConfig.getPort(),esConfig.getIndex(),esConfig.getType(), esConfig.getClusterName());
             BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
-            TermQueryBuilder termQueryQuotaCode = QueryBuilders.termQuery("orgName", filter);
+            TermQueryBuilder termQueryQuotaCode = QueryBuilders.termQuery(term, value);
             boolQueryBuilder.must(termQueryQuotaCode);
 
             list = elasticsearchUtil.queryList(client, boolQueryBuilder, null, 200);

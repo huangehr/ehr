@@ -29,6 +29,8 @@ public class TjQuota implements Serializable {
     private String remark;
     private Integer quotaType;
     private String metadataCode;
+    private String isInitExec; // 是否初始执行过，0：否，1：是。
+    private String resultGetType; // 指标结果获取方式 1：直接库中获取，2：二次统计获取。
 
     private List<TjQuota> children;
 
@@ -194,6 +196,24 @@ public class TjQuota implements Serializable {
 
     public void setMetadataCode(String metadataCode) {
         this.metadataCode = metadataCode;
+    }
+
+    @Column(name = "is_init_exec", nullable = false)
+    public String getIsInitExec() {
+        return isInitExec;
+    }
+
+    public void setIsInitExec(String isInitExec) {
+        this.isInitExec = isInitExec;
+    }
+
+    @Column(name = "result_get_type")
+    public String getResultGetType() {
+        return resultGetType;
+    }
+
+    public void setResultGetType(String resultGetType) {
+        this.resultGetType = resultGetType;
     }
 
     @Transient

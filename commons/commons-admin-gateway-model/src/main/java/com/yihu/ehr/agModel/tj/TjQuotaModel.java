@@ -1,7 +1,5 @@
 package com.yihu.ehr.agModel.tj;
 
-import java.util.Date;
-
 /**
  * Created by Administrator on 2017/6/13.
  */
@@ -25,6 +23,8 @@ public class TjQuotaModel {
     private Integer quotaType;
     private String quotaTypeName;
     private String jobClazzName;
+    private String isInitExec; // 是否初始执行过，0：否，1：是。
+    private String resultGetType;
 
     private TjQuotaDataSourceModel tjQuotaDataSourceModel;
     private TjQuotaDataSaveModel tjQuotaDataSaveModel;
@@ -204,5 +204,21 @@ public class TjQuotaModel {
 
     public void setJobClazzName(String jobClazzName) {
         this.jobClazzName = jobClazzName;
+    }
+
+    public String getIsInitExec() {
+        return isInitExec;
+    }
+
+    public void setIsInitExec(String isInitExec) {
+        this.isInitExec = isInitExec;
+    }
+
+    public String getResultGetType() {
+        return resultGetType;
+    }
+
+    public void setResultGetType(String resultGetType) {
+        this.resultGetType = resultGetType;
     }
 }

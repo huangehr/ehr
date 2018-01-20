@@ -37,22 +37,16 @@ public class HBaseDao extends AbstractHBaseClient {
         hbaseTemplate.execute(tableName, new TableCallback<Void>() {
             @Override
             public Void doInTable(HTableInterface table) throws Throwable {
-                try {
-                    Put p = new Put(rowKey.getBytes());
-                    for (String familyName : family.keySet()) {
-                        Map<String, String> map = family.get(familyName);
-                        for (String qualifier : map.keySet()) {
-                            String value = map.get(qualifier);
-                            p.addColumn(familyName.getBytes(), qualifier.getBytes(), value.getBytes());
-                        }
-                    }
-                    table.put(p);
-                    return null;
-                }finally {
-                    if (table != null) {
-                        table.close();
+                Put p = new Put(rowKey.getBytes());
+                for (String familyName : family.keySet()) {
+                    Map<String, String> map = family.get(familyName);
+                    for (String qualifier : map.keySet()) {
+                        String value = map.get(qualifier);
+                        p.addColumn(familyName.getBytes(), qualifier.getBytes(), value.getBytes());
                     }
                 }
+                table.put(p);
+                return null;
             }
         });
     }
@@ -69,23 +63,17 @@ public class HBaseDao extends AbstractHBaseClient {
         hbaseTemplate.execute(tableName, new TableCallback<Void>() {
             @Override
             public Void doInTable(HTableInterface table) throws Throwable {
-                try {
-                    Put put = new Put(Bytes.toBytes(rowKey));
-                    for (int j = 0; j < columns.length; j++) {
-                        //为空字段不保存
-                        if (values[j] != null) {
-                            String column = String.valueOf(columns[j]);
-                            String value = String.valueOf(values[j]);
-                            put.addColumn(Bytes.toBytes(family), Bytes.toBytes(column), Bytes.toBytes(value));
-                        }
-                    }
-                    table.put(put);
-                    return null;
-                }finally {
-                    if (table != null) {
-                        table.close();
+                Put put = new Put(Bytes.toBytes(rowKey));
+                for (int j = 0; j < columns.length; j++) {
+                    //为空字段不保存
+                    if (values[j] != null) {
+                        String column = String.valueOf(columns[j]);
+                        String value = String.valueOf(values[j]);
+                        put.addColumn(Bytes.toBytes(family), Bytes.toBytes(column), Bytes.toBytes(value));
                     }
                 }
+                table.put(put);
+                return null;
             }
         });
     }
@@ -99,13 +87,9 @@ public class HBaseDao extends AbstractHBaseClient {
         hbaseTemplate.execute(tableName, new TableCallback<Void>() {
             @Override
             public Void doInTable(HTableInterface table) throws Throwable {
-                try {
-                    Delete d = new Delete(rowKey.getBytes());
-                    table.delete(d);
-                    return null;
-                }finally {
-                    table.close();
-                }
+                Delete d = new Delete(rowKey.getBytes());
+                table.delete(d);
+                return null;
             }
         });
     }
@@ -121,18 +105,14 @@ public class HBaseDao extends AbstractHBaseClient {
         return hbaseTemplate.execute(tableName, new TableCallback<Object[]>() {
             @Override
             public Object[] doInTable(HTableInterface table) throws Throwable {
-                try {
-                    List<Delete> deletes = new ArrayList<>(rowKeys.length);
-                    for (String rowKey : rowKeys) {
-                        Delete delete = new Delete(Bytes.toBytes(rowKey));
-                        deletes.add(delete);
-                    }
-                    Object[] results = new Object[deletes.size()];
-                    table.batch(deletes, results);
-                    return results;
-                }finally {
-                    table.close();
+                List<Delete> deletes = new ArrayList<>(rowKeys.length);
+                for (String rowKey : rowKeys) {
+                    Delete delete = new Delete(Bytes.toBytes(rowKey));
+                    deletes.add(delete);
                 }
+                Object[] results = new Object[deletes.size()];
+                table.batch(deletes, results);
+                return results;
             }
         });
     }
@@ -165,18 +145,6 @@ public class HBaseDao extends AbstractHBaseClient {
      */
     public void put(String tableName ,String rowKey, String familyName, String qualifier, String value) throws Exception {
         hbaseTemplate.put(tableName, rowKey, familyName, qualifier, value.getBytes());
-        /**
-         hbaseTemplate.execute(tableName, new TableCallback<String>() {
-        @Override
-        public String doInTable(HTableInterface table) throws Throwable {
-        Put p = new Put(rowKey.getBytes());
-        p.addColumn(familyName.getBytes(), qualifier.getBytes(), value.getBytes());
-        table.put(p);
-        table.close();
-        return null;
-        }
-        });
-         */
     }
 
     /**
@@ -308,16 +276,6 @@ public class HBaseDao extends AbstractHBaseClient {
         return hbaseTemplate.get(tableName, rowKey, familyName, new RowMapper<Map<String, String>>(){
             @Override
             public Map<String, String> mapRow(Result result, int rowNum) throws Exception {
-                /**
-                 List<Cell> ceList = result.listCells();
-                 String res = "";
-                 if(ceList != null && ceList.size() > 0){
-                 for(Cell cell:ceList){
-                 res = Bytes.toString(cell.getValueArray(), cell.getValueOffset(), cell.getValueLength());
-                 }
-                 }
-                 return res;
-                 */
                 Map<String, String> map = new HashMap<>();
                 NavigableMap<byte[], byte[]> navigableMaps = result.getFamilyMap(familyName.getBytes());
                 if(null != navigableMaps) {
@@ -344,16 +302,6 @@ public class HBaseDao extends AbstractHBaseClient {
         return hbaseTemplate.get(tableName, rowKey, familyName, qualifier, new RowMapper<String>(){
             @Override
             public String mapRow(Result result, int rowNum) throws Exception {
-                /**
-                 List<Cell> ceList = result.listCells();
-                 String res = "";
-                 if(ceList != null && ceList.size() > 0){
-                 for(Cell cell:ceList){
-                 res = Bytes.toString(cell.getValueArray(), cell.getValueOffset(), cell.getValueLength());
-                 }
-                 }
-                 return res;
-                 */
                 Cell cell = result.getColumnLatestCell(familyName.getBytes(), qualifier.getBytes());
                 return new String(CellUtil.cloneValue(cell));
             }
@@ -373,30 +321,24 @@ public class HBaseDao extends AbstractHBaseClient {
         return hbaseTemplate.execute(tableName, new TableCallback<Result[]>() {
             @Override
             public Result[] doInTable(HTableInterface table) throws Throwable {
-                try {
-                    List<Get> list = new ArrayList<Get>();
-                    for (String rowKey : rowKeys) {
-                        Get get = new Get(Bytes.toBytes(rowKey));
-                        if (!StringUtils.isEmpty(basicFl)) {
-                            String[] basicArr = basicFl.split(",");
-                            for (String basicStr : basicArr) {
-                                get.addColumn(Bytes.toBytes("basic"), Bytes.toBytes(basicStr));
-                            }
+                List<Get> list = new ArrayList<Get>();
+                for (String rowKey : rowKeys) {
+                    Get get = new Get(Bytes.toBytes(rowKey));
+                    if (!StringUtils.isEmpty(basicFl)) {
+                        String[] basicArr = basicFl.split(",");
+                        for (String basicStr : basicArr) {
+                            get.addColumn(Bytes.toBytes("basic"), Bytes.toBytes(basicStr));
                         }
-                        if (!StringUtils.isEmpty(dFl)) {
-                            String[] dArr = dFl.split(",");
-                            for (String dStr : dArr) {
-                                get.addColumn(Bytes.toBytes("d"), Bytes.toBytes(dStr));
-                            }
+                    }
+                    if (!StringUtils.isEmpty(dFl)) {
+                        String[] dArr = dFl.split(",");
+                        for (String dStr : dArr) {
+                            get.addColumn(Bytes.toBytes("d"), Bytes.toBytes(dStr));
                         }
-                        list.add(get);
                     }
-                    return table.get(list);
-                }finally {
-                    if (table != null) {
-                        table.close();
-                    }
+                    list.add(get);
                 }
+                return table.get(list);
             }
         });
     }
@@ -410,16 +352,10 @@ public class HBaseDao extends AbstractHBaseClient {
         hbaseTemplate.execute(tableName, new TableCallback<Void>() {
             @Override
             public Void doInTable(HTableInterface table) throws Throwable {
-                try {
-                    List<Put> puts = tableBundle.putOperations();
-                    Object[] results = new Object[puts.size()];
-                    table.batch(puts, results);
-                    return null;
-                }finally {
-                    if (table != null) {
-                        table.close();
-                    }
-                }
+                List<Put> puts = tableBundle.putOperations();
+                Object[] results = new Object[puts.size()];
+                table.batch(puts, results);
+                return null;
             }
         });
     }
@@ -431,16 +367,10 @@ public class HBaseDao extends AbstractHBaseClient {
         hbaseTemplate.execute(tableName, new TableCallback<Object[]>() {
             @Override
             public Object[] doInTable(HTableInterface table) throws Throwable {
-                try {
-                    List<Delete> deletes = tableBundle.deleteOperations();
-                    Object[] results = new Object[deletes.size()];
-                    table.batch(deletes, results);
-                    return null;
-                }finally {
-                    if (table != null) {
-                        table.close();
-                    }
-                }
+                List<Delete> deletes = tableBundle.deleteOperations();
+                Object[] results = new Object[deletes.size()];
+                table.batch(deletes, results);
+                return null;
             }
         });
     }
@@ -452,19 +382,13 @@ public class HBaseDao extends AbstractHBaseClient {
         return hbaseTemplate.execute(tableName, new TableCallback<Object[]>() {
             @Override
             public Object[] doInTable(HTableInterface table) throws Throwable {
-                try {
-                    List<Get> gets = tableBundle.getOperations();
-                    Object[] results = new Object[gets.size()];
-                    table.batch(gets, results);
-                    if (results.length > 0 && results[0].toString().equals("keyvalues=NONE")) {
-                        return null;
-                    }
-                    return results;
-                }finally {
-                    if(table != null) {
-                        table.close();
-                    }
+                List<Get> gets = tableBundle.getOperations();
+                Object[] results = new Object[gets.size()];
+                table.batch(gets, results);
+                if (results.length > 0 && results[0].toString().equals("keyvalues=NONE")) {
+                    return null;
                 }
+                return results;
             }
         });
     }

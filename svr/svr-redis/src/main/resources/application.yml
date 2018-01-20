@@ -81,22 +81,13 @@ spring:
 fast-dfs:
   tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52:80
+
 ehr-redis:
   mq:
     pubsub:
       publisherAppId: svr-redis
       responseTimeChannel: redis.cache.reponse-time
-  cache:
-    memory:
-      rdbFilePath: /usr/local/bin/dump.rdb
-      outFilePath: /usr/local/ehr/redisReport/memory.csv
-# 由于生产环境服务器维护通过堡垒机管理，不允许代码直接通过SSH访问远程服务器。
-# 暂时注释，寻求别的方法再去掉。
-#  server:
-#    host: 172.19.103.47
-#    username: root
-#    password: jkzl
-#    ssh-port: 22
+
 
 ---
 spring:
@@ -113,21 +104,12 @@ spring:
 fast-dfs:
   tracker-server: 172.19.103.54:22122
   public-server: http://172.19.103.54:22122
+
 ehr-redis:
   mq:
     pubsub:
       publisherAppId: svr-redis
       responseTimeChannel: redis.cache.reponse-time
-  cache:
-    memory:
-      rdbFilePath: /usr/local/bin/dump.rdb
-      outFilePath: /usr/local/ehr/redisReport/memory.csv
-#  server:
-#    host: 172.19.103.47
-#    username: root
-#    password: jkzl
-#    ssh-port: 22
-
 
 
 ---
@@ -145,21 +127,12 @@ spring:
 fast-dfs:
   tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52:80
+
 ehr-redis:
   mq:
     pubsub:
       publisherAppId: svr-redis
       responseTimeChannel: redis.cache.reponse-time
-  cache:
-    memory:
-      rdbFilePath: /usr/local/bin/dump.rdb
-      outFilePath: /usr/local/ehr/redisReport/memory.csv
-#  server:
-#    host: 172.19.103.47
-#    username: root
-#    password: jkzl
-#    ssh-port: 22
-
 
 
 ---
@@ -181,15 +154,7 @@ ehr-redis:
     pubsub:
       publisherAppId: svr-redis
       responseTimeChannel: redis.cache.reponse-time
-  cache:
-    memory:
-      rdbFilePath: /usr/local/bin/dump.rdb
-      outFilePath: /usr/local/ehr/redisReport/memory.csv
-#  server:
-#    host: 172.19.103.47
-#    username: root
-#    password: jkzl
-#    ssh-port: 22
+
 
 ---
 spring:
@@ -212,15 +177,7 @@ ehr-redis:
     pubsub:
       publisherAppId: svr-redis
       responseTimeChannel: redis.cache.reponse-time
-  cache:
-    memory:
-      rdbFilePath: /usr/local/bin/dump.rdb
-      outFilePath: /usr/local/ehr/redisReport/memory.csv
-#  server:
-#    host: 172.19.103.47
-#    username: root
-#    password: jkzl
-#    ssh-port: 22
+
 
 ---
 spring:
@@ -230,6 +187,7 @@ spring:
     host: 10.176.97.5 # Redis server host.
     port: 6390
     password: q4YaQemf
+
   datasource:
     url: jdbc:mysql://10.176.97.9:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: healthcloud
@@ -238,17 +196,9 @@ spring:
 fast-dfs:
   tracker-server: 10.176.97.5:22122
   public-server: http://10.176.97.5:8888
+
 ehr-redis:
   mq:
     pubsub:
       publisherAppId: svr-redis
       responseTimeChannel: redis.cache.reponse-time
-  cache:
-    memory:
-      rdbFilePath: /usr/local/bin/dump.rdb
-      outFilePath: /usr/local/ehr/redisReport/memory.csv
-#  server:
-#    host: 172.19.103.47
-#    username: root
-#    password: jkzl
-#    ssh-port: 22

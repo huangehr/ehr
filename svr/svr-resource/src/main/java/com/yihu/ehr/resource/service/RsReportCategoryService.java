@@ -44,7 +44,7 @@ public class RsReportCategoryService extends BaseJpaService<RsReportCategory, Rs
      */
     public List<RsReportCategory> getChildrenByPid(Integer pid) {
         List<RsReportCategory> children = new ArrayList<>();
-        if (pid == -1) {
+        if (pid == 0) {
             children = rsReportCategoryDao.getTopParents();
         } else {
             children = rsReportCategoryDao.getChildrenByPid(pid);
@@ -204,5 +204,9 @@ public class RsReportCategoryService extends BaseJpaService<RsReportCategory, Rs
     public List<RsReportCategory> getCategoryByIds(List<Integer> ids) {
         List<RsReportCategory> categoryList = rsReportCategoryDao.findCategoryByIds(ids);
         return categoryList;
+    }
+    public List<Integer> getCategoryIds(String code) {
+        List<Integer> categoryIds = rsReportCategoryDao.findCategoryIds(code);
+        return categoryIds;
     }
 }

@@ -6,7 +6,8 @@ import org.springframework.util.StringUtils;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by chenweida on 2017/6/1.
@@ -45,8 +46,8 @@ public class Contant {
      */
     public static class main_dimension {
         public static final String time_day = "1";//时间维度 日
-        public static final String time_month = "2";//时间维度 周
-        public static final String time_week = "3";//时间维度  月
+        public static final String time_week = "2";//时间维度 周
+        public static final String time_month = "3";//时间维度  月
         public static final String time_year = "4";//时间维度 年
         public static final String area_province = "5";//行政区划 省
         public static final String area_city = "6";//行政区划 市
@@ -56,8 +57,8 @@ public class Contant {
     }
 
     public static class quota {
-        public static final String dataLeval_all = "1";
-        public static final String dataLeval_oneDay = "2";
+        public static final String dataLevel_all = "1"; // 全量
+        public static final String dataLevel_increase = "2"; // 增量
 
         public static final String aggregation_count = "count";
         public static final String aggregation_sum = "sum";
@@ -111,7 +112,7 @@ public class Contant {
             if (StringUtils.isEmpty(key)) {
                 key = day;
             }
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'00:00:00'Z'");
             switch (key) {
                 case year: {
                     //去年度第一天
@@ -207,7 +208,7 @@ public class Contant {
          * @return
          */
         private static String getYesterday() {
-            return new org.joda.time.LocalDate(new DateTime().minusDays(1)).toString("yyyy-MM-dd");
+            return new org.joda.time.LocalDate(new DateTime().minusDays(1)).toString("yyyy-MM-dd'T'00:00:00'Z'");
         }
     }
 

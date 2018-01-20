@@ -60,6 +60,11 @@
             <artifactId>spring-cloud-starter-eureka</artifactId>
             <scope>${dependency.scope}</scope>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <scope>${dependency.scope}</scope>
+        </dependency>
 
         <!-- Swagger-ui -->
         <dependency>
@@ -73,22 +78,6 @@
             <scope>${dependency.scope}</scope>
         </dependency>
         <!-- Swagger-ui -->
-
-        <!-- FastDFS -->
-        <dependency>
-            <groupId>happy.fish</groupId>
-            <artifactId>fastDFS</artifactId>
-            <scope>${dependency.scope}</scope>
-        </dependency>
-        <!-- FastDFS -->
-
-        <!-- ElasticSearch -->
-        <dependency>
-            <groupId>org.elasticsearch</groupId>
-            <artifactId>elasticsearch</artifactId>
-            <version>2.4.5</version>
-        </dependency>
-        <!-- ElasticSearch -->
 
         <dependency>
             <groupId>com.yihu.ehr</groupId>
@@ -113,6 +102,18 @@
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-rest-model</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.yihu.ehr</groupId>
+            <artifactId>commons-data-elasticsearch</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.yihu.ehr</groupId>
+            <artifactId>commons-data-mysql</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.yihu.ehr</groupId>
+            <artifactId>commons-entity</artifactId>
         </dependency>
     </dependencies>
 </project>

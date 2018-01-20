@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -38,6 +39,7 @@ public class ElastricSearchSave {
 
             Bulk.Builder bulk = new Bulk.Builder().defaultIndex(esConfig.getIndex()).defaultType(esConfig.getType());
             for (SaveModel obj : smss) {
+                obj.setCreateTime( new Date());
                 Index index = new Index.Builder(obj).build();
                 bulk.addAction(index);
             }

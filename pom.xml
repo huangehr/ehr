@@ -122,7 +122,6 @@
         <version.zip4j>1.3.2</version.zip4j>
         <version.poi>3.12</version.poi>
         <version.scala>2.10.6</version.scala>
-        <version.jsch>0.1.54</version.jsch>
     </properties>
 
     <dependencyManagement>
@@ -666,12 +665,6 @@
                 <scope>import</scope>
             </dependency>
 
-            <dependency>
-                <groupId>com.jcraft</groupId>
-                <artifactId>jsch</artifactId>
-                <version>${version.jsch}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
