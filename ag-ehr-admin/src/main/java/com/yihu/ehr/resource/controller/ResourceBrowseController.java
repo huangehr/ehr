@@ -60,6 +60,8 @@ public class ResourceBrowseController extends BaseController {
     private TjQuotaSynthesizeQueryClient tjQuotaSynthesizeQueryClient;
     @Autowired
     private RsResourceDefaultQueryClient rsResourceDefaultQueryClient;
+    @Autowired
+    private RsResourceStatisticsClient rsResourceStatisticsClient;
 
     @ApiOperation("获取档案资源分类")
     @RequestMapping(value = ServiceApi.Resources.ResourceBrowseCategories, method = RequestMethod.GET)
@@ -156,7 +158,24 @@ public class ResourceBrowseController extends BaseController {
             @RequestParam(value = "page", required = false) Integer page,
             @ApiParam(name = "size", value = "每页几行")
             @RequestParam(value = "size", required = false) Integer size) throws Exception {
-        return resourceBrowseClient.getResourceData(resourcesCode, roleId, orgCode, areaCode, queryCondition, page, size);
+            Envelop envelop = new Envelop();
+            envelop = resourcesClient.getResourceByCode(resourcesCode);
+            RsResourcesModel rsResourcesModel = objectMapper.convertValue(envelop.getObj(), RsResourcesModel.class);
+            if( !rsResourcesModel.getRsInterface().equals("getQuotaData")){//1 Hbase 2 ElasticSearch
+                return resourceBrowseClient.getResourceData(resourcesCode, roleId, orgCode, areaCode, queryCondition, page, size);
+            }else{
+                String quotaCodeStr = "";
+                List<ResourceQuotaModel> list = resourceQuotaClient.getByResourceId(rsResourcesModel.getId());
+                if (list != null && list.size() > 0) {
+                    for (ResourceQuotaModel resourceQuotaModel : list) {
+                        quotaCodeStr = quotaCodeStr + resourceQuotaModel.getQuotaCode() + ",";
+                    }
+                }
+                List<Map<String, Object>> resultList = rsResourceStatisticsClient.getQuotaReportTwoDimensionalTable(quotaCodeStr, null, "town", null);
+                envelop.setDetailModelList(resultList);
+                envelop.setSuccessFlg(true);
+                return  envelop;
+            }
     }
 
     @ApiOperation("指标视图查询列表浏览")

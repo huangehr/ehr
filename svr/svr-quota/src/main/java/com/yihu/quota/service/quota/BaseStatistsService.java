@@ -550,12 +550,13 @@ public class BaseStatistsService {
      * @throws Exception
      */
     public List<Map<String, Object>>  getSimpleQuotaReport(String code,String filters,String dimension,String dateType) throws Exception {
+        TjQuota quota = quotaDao.findByCode(code);
         List<Map<String, Object>> result = new ArrayList<>();
         TjQuotaDataSource quotaDataSource = dataSourceService.findSourceByQuotaCode(code);
         JSONObject obj = new JSONObject().fromObject(quotaDataSource.getConfigJson());
         EsConfig esConfig= (EsConfig) JSONObject.toBean(obj,EsConfig.class);
         String configFilter = esConfig.getFilter();
-        if(StringUtils.isNotEmpty(configFilter)){
+        if(StringUtils.isNotEmpty(configFilter) && quota.getResultGetType().equals("2")){
             if(StringUtils.isNotEmpty(filters)){
                 filters += "and " + configFilter;
             }else {

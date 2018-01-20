@@ -55,11 +55,6 @@ public class QuotaController extends BaseController {
     private BaseStatistsService baseStatistsService;
     @Autowired
     private OrgHealthCategoryStatisticsService orgHealthCategoryStatisticsService;
-    private static String orgHealthCategory = "orgHealthCategory";
-
-
-
-
 
     /**
      * 查询结果
@@ -171,15 +166,19 @@ public class QuotaController extends BaseController {
 
             List<ResultModel> resultModelList = new ArrayList<>();
             String [] dimens = dimension.split(";");
-            for(Map<String, Object> map :resultList){
-                List<String> cloumns = new ArrayList<>();
-                ResultModel resultModel = new ResultModel();
-                resultModel.setValue(map.get("result"));
-                for(int i = 0;i < dimens.length;i++){
-                    cloumns.add(map.get(dimens[i]).toString());
+            if(resultList != null && resultList.size() > 0){
+                for(Map<String, Object> map :resultList){
+                    if(map.size() > 0){
+                        List<String> cloumns = new ArrayList<>();
+                        ResultModel resultModel = new ResultModel();
+                        resultModel.setValue(map.get("result"));
+                        for(int i = 0;i < dimens.length;i++){
+                            cloumns.add(map.get(dimens[i]).toString());
+                        }
+                        resultModel.setCloumns(cloumns);
+                        resultModelList.add(resultModel);
+                    }
                 }
-                resultModel.setCloumns(cloumns);
-                resultModelList.add(resultModel);
             }
 
             envelop.setDetailModelList(resultModelList);
