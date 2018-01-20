@@ -295,7 +295,9 @@ public class BaseStatistsService {
                 if(StringUtils.isNotEmpty(dictSql)){
                     Map<String,String> dicMap = getDimensionMap(dictSql, dimens[i]);
                     if(dicMap != null && dicMap.size() > 0){
-                        dimensionDicMap.putAll(dicMap);
+                        for(String key :dicMap.keySet()){
+                            dimensionDicMap.put(key.toLowerCase(),dicMap.get(key));
+                        }
                     }
                 }
                 groupDimension += dimens[i] + ",";
@@ -306,7 +308,9 @@ public class BaseStatistsService {
             if(StringUtils.isNotEmpty(dictSql)){
                 Map<String,String> dicMap = getDimensionMap(dictSql, dimension);
                 if(dicMap != null && dicMap.size() > 0){
-                    dimensionDicMap.putAll(dicMap);
+                    for(String key :dicMap.keySet()){
+                        dimensionDicMap.put(key.toLowerCase(),dicMap.get(key));
+                    }
                 }
             }
             groupDimension = dimension;
@@ -322,7 +326,7 @@ public class BaseStatistsService {
             for(String key :map.keySet()){
                 if(dimenList.contains(key)){
                     if(dimensionDicMap.get(map.get(key))  != null){
-                        String dictVal = dimensionDicMap.get(map.get(key).toString());
+                        String dictVal = dimensionDicMap.get(map.get(key).toString().toLowerCase());
                         dataMap.put(key,dictVal);
                     }else {
                         dataMap.put(key,map.get(key));
