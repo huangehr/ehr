@@ -302,11 +302,13 @@ public class ResourceBrowseController extends BaseController {
                                     //判断是否匹配
                                     boolean isMatch = false;
                                     Envelop envelop2 = envelopList.get(j);
-                                    for (Map<String, Object> tempMap2 : (List<Map<String, Object>>) envelop2.getDetailModelList()) {
-                                        if (Arrays.equals(((List<String>) tempMap1.get("cloumns")).toArray(), ((List<String>) tempMap2.get("cloumns")).toArray())) {
-                                            newMap.put(quotaCodeArr[i], tempMap1.get("value"));
-                                            newMap.put(quotaCodeArr[j], tempMap2.get("value"));
-                                            isMatch = true;
+                                    if (null != envelop2.getDetailModelList() && envelop2.getDetailModelList().size() > 0) {
+                                        for (Map<String, Object> tempMap2 : (List<Map<String, Object>>) envelop2.getDetailModelList()) {
+                                            if (Arrays.equals(((List<String>) tempMap1.get("cloumns")).toArray(), ((List<String>) tempMap2.get("cloumns")).toArray())) {
+                                                newMap.put(quotaCodeArr[i], tempMap1.get("value"));
+                                                newMap.put(quotaCodeArr[j], tempMap2.get("value"));
+                                                isMatch = true;
+                                            }
                                         }
                                     }
                                     //未匹配到数据
