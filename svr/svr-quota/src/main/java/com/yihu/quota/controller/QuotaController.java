@@ -55,11 +55,6 @@ public class QuotaController extends BaseController {
     private BaseStatistsService baseStatistsService;
     @Autowired
     private OrgHealthCategoryStatisticsService orgHealthCategoryStatisticsService;
-    private static String orgHealthCategory = "orgHealthCategory";
-
-
-
-
 
     /**
      * 查询结果
