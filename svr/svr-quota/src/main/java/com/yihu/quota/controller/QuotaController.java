@@ -140,6 +140,8 @@ public class QuotaController extends BaseController {
             JSONObject obj = new JSONObject().fromObject(quotaDataSource.getConfigJson());
             EsConfig esConfig= (EsConfig) JSONObject.toBean(obj,EsConfig.class);
             List<Map<String, Object>>  resultList = new ArrayList<>();
+            String molecularFilter = filters;
+            String denominatorFilter = filters;
             if(tjQuota.getResultGetType().equals("1")){
 //                if( (StringUtils.isNotEmpty(esConfig.getEspecialType())) && esConfig.getEspecialType().equals(orgHealthCategory)){
 //                    //特殊机构类型查询输出结果  只有查询条件没有维度 默认是 机构类型维度
@@ -151,11 +153,13 @@ public class QuotaController extends BaseController {
             }else {
                 if( (StringUtils.isNotEmpty(esConfig.getMolecular())) && StringUtils.isNotEmpty(esConfig.getDenominator())){//除法
                     //除法指标查询输出结果
-                    resultList =  baseStatistsService.divisionQuota(esConfig.getMolecular(), esConfig.getDenominator(), dimension, filters, esConfig.getPercentOperation(), esConfig.getPercentOperationValue(),dateType);
+                    molecularFilter = baseStatistsService.handleFilter(esConfig.getMolecularFilter(), molecularFilter);
+                    denominatorFilter = baseStatistsService.handleFilter(esConfig.getDenominatorFilter(), denominatorFilter);
+                    resultList =  baseStatistsService.divisionQuota(esConfig.getMolecular(), esConfig.getDenominator(), dimension, molecularFilter, denominatorFilter, esConfig.getPercentOperation(), esConfig.getPercentOperationValue(),dateType);
 
                 }else if( (StringUtils.isNotEmpty(esConfig.getThousandDmolecular())) && StringUtils.isNotEmpty(esConfig.getThousandDenominator())){//除法
                     //除法指标查询输出结果
-                    resultList =  baseStatistsService.divisionQuota(esConfig.getThousandDmolecular(), esConfig.getThousandDenominator(), dimension, filters, "1", esConfig.getThousandFlag(),dateType);
+                    resultList =  baseStatistsService.divisionQuota(esConfig.getThousandDmolecular(), esConfig.getThousandDenominator(), dimension, molecularFilter, denominatorFilter, "1", esConfig.getThousandFlag(),dateType);
 
                 }else {
                     if(StringUtils.isNotEmpty(esConfig.getSuperiorBaseQuotaCode())){
@@ -406,30 +410,31 @@ public class QuotaController extends BaseController {
         String value = "";
         switch (code) {
             case "HC_02_0101" :
-                value = "注册护士";
+                value = "nurse";
                 break;
             case "HC_02_0102" :
-                value = "药师";
+                value = "pharmacist";
                 break;
             case "HC_02_0103" :
-                value = "技师";
+                value = "technician";
                 break;
             case "HC_02_0104" :
-                value = "其他";
+                value = "other";
                 break;
             case "HC_02_0105" :
-                value = "执业医师";
+                value = "practitioner";
                 break;
             case "HC_02_0106" :
-                value = "执业（助理）医师";
+                value = "assistant";
                 break;
             case "HC_02_0107" :
-                value = "其他技术人员";
+                value = "othertechnician";
                 break;
             case "HC_02_0108" :
-                value = "管理人员";
+                value = "adminer";
                 break;
         }
         return value;
     }
+
 }
