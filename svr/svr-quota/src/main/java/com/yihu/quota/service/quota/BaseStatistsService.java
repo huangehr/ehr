@@ -333,7 +333,7 @@ public class BaseStatistsService {
             Map<String,Object> dataMap = new HashMap<>();
             for(String key :map.keySet()){
                 if(dimenList.contains(key)){
-                    if(dimensionDicMap.get(map.get(key))  != null){
+                    if(dimensionDicMap.get(map.get(key).toString().toLowerCase())  != null){
                         String dictVal = dimensionDicMap.get(map.get(key).toString().toLowerCase());
                         dataMap.put(key,dictVal);
                     }else {
@@ -430,9 +430,9 @@ public class BaseStatistsService {
             Map<String,Object> dataMap = new HashMap<>();
             for(String key :map.keySet()){
                 if(dimenList.contains(key)){
-                    if(dimensionDicMap.get(map.get(key))  != null){
-                        String dictVal = dimensionDicMap.get(map.get(key).toString());
-                        dataMap.put(key,dictVal);
+                    if(dimensionDicMap.get(map.get(key).toString().toLowerCase())  != null){
+//                        dataMap.put(key,dictVal);
+                        dataMap.put(key,dimensionDicMap.get(map.get(key).toString().toLowerCase()));
                         dataMap.put(key+"Name",dimensionDicMap.get(map.get(key).toString().toLowerCase()));
                     }else {
                         dataMap.put(key,map.get(key));
@@ -496,21 +496,11 @@ public class BaseStatistsService {
      */
     public Map<String,String>  getDimensionDicMap(String quotaCode ,String dimension){
         Map<String,String>  dimensionDicMap = new HashMap<>();
-        if(dimension.contains(";")){
-            String[] dimens =  dimension.split(";");
-            for(int i =0 ;i<dimens.length ;i++){
-                String dictSql = getQuotaDimensionDictSql(quotaCode, dimens[i]);
-                if(StringUtils.isNotEmpty(dictSql)){
-                    Map<String,String> dicMap = getDimensionMap(dictSql, dimens[i]);
-                    for(String key :dicMap.keySet()){
-                        dimensionDicMap.put(key.toLowerCase(),dicMap.get(key));
-                    }
-                }
-            }
-        }else {
-            String dictSql = getQuotaDimensionDictSql(quotaCode, dimension);
+        String[] dimens =  dimension.split(";");
+        for(int i =0 ;i<dimens.length ;i++){
+            String dictSql = getQuotaDimensionDictSql(quotaCode, dimens[i]);
             if(StringUtils.isNotEmpty(dictSql)){
-                Map<String,String> dicMap = getDimensionMap(dictSql, dimension);
+                Map<String,String> dicMap = getDimensionMap(dictSql, dimens[i]);
                 for(String key :dicMap.keySet()){
                     dimensionDicMap.put(key.toLowerCase(),dicMap.get(key));
                 }
@@ -543,9 +533,16 @@ public class BaseStatistsService {
             if(StringUtils.isEmpty(dictSql)) {
                 List<TjQuotaDimensionSlave> dimensionSlaves = tjDimensionSlaveService.findTjQuotaDimensionSlaveByQuotaCode(quotaCode);
                 if (dimensionSlaves != null && dimensionSlaves.size() > 0) {
-                    for(TjQuotaDimensionSlave slave:dimensionSlaves){
-                        if(slave.getKeyVal().equals(dimension)){
-                            dictSql = slave.getDictSql();
+//                    for(TjQuotaDimensionSlave slave:dimensionSlaves){
+//                        if(slave.getKeyVal().equals(dimension)){
+//                            dictSql = slave.getDictSql();
+//                        }
+//                    }
+                    String n = dimension.substring(dimension.length()-1,dimension.length());
+                    if(StringUtils.isNotEmpty(n)){
+                        int slave = Integer.valueOf(n);
+                        if(dimensionSlaves.size() >= slave){
+                            dictSql = dimensionSlaves.get(slave-1).getDictSql();
                         }
                     }
                 }
