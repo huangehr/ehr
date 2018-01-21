@@ -17,6 +17,7 @@ public class MRsReport implements Serializable {
     private String status; // 报表状态
     private String remark; // 备注
     private String templatePath; // 报表模版路径
+    private String showType;    // 报表展示类型  1、图表  2、二维表
 
     private String reportCategory; // 报表分类名称
     private String statusName; //
@@ -77,6 +78,14 @@ public class MRsReport implements Serializable {
 
     public void setTemplatePath(String templatePath) {
         this.templatePath = templatePath;
+    }
+
+    public String getShowType() {
+        return showType;
+    }
+
+    public void setShowType(String showType) {
+        this.showType = showType;
     }
 
     public String getReportCategory() {
