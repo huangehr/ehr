@@ -938,8 +938,12 @@ public class ServiceApi {
         public static final String StdDataSetNameByCode = "/redis/stdDataSetNameByCode";
         public static final String StdDataSetMultiRecord = "/redis/stdDataSetMultiRecord";
         public static final String StdMetadataType = "/redis/stdMetaDataType";
+        public static final String StdMetadataFormat = "/redis/stdMetaData/format";
+        public static final String StdMetadataNullable = "/redis/stdMetaData/nullable";
         public static final String StdMetadataDict = "/redis/stdMetaDataDict";
         public static final String StdDictEntryValue = "/redis/stdDictEntryValue";
+        public static final String StdDictEntryValueExist = "/redis/stdDictEntry/ValueExist";
+        public static final String StdDictEntryCodeExist = "/redis/stdDictEntry/CodeExist";
 
         // Redis消息队列
         public static class MqChannel {
@@ -1190,7 +1194,6 @@ public class ServiceApi {
         public static final String GetQuotaTotalCount = "tj/getQuotaTotalCount";
         public static final String GetQuotaGroupBy = "tj/getQuotaGroupBy";
         public static final String GetQuotaReportTwoDimensionalTable = "/tj/getQuotaReportTwoDimensionalTable";
-
 
 
         public static final String TjQuotaChart = "/tj/tjQuotaChart";
