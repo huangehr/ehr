@@ -110,6 +110,23 @@
         </dependency>
         <!-- Solr -->
 
+        <!-- elasticsearch -->
+        <dependency>
+            <groupId>com.yihu.ehr</groupId>
+            <artifactId>commons-data-elasticsearch</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.elasticsearch</groupId>
+            <artifactId>elasticsearch</artifactId>
+            <version>2.4.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.nlpcn</groupId>
+            <artifactId>elasticsearch-sql</artifactId>
+            <version>2.4.1.0</version>
+        </dependency>
+        <!-- elasticsearch -->
+
         <!-- Hbase -->
         <dependency>
             <groupId>com.yihu.ehr</groupId>
