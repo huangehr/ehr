@@ -67,8 +67,8 @@ hadoop:
 
 analyze:
   job:
-    init-size: 4 #解析入库初始任务数
-    max-size: 8 #解析入库最大任务数
+    init-size: 2 #解析入库初始任务数
+    max-size: 10 #解析入库最大任务数
     cron-exp: 0/4 * * * * ? #解析任务触发间隔表达式
 
 ---
@@ -92,7 +92,7 @@ spring:
         port: 8125
 fast-dfs:
   tracker-server: 172.19.103.13:22122
-  public-server: http://172.19.103.52:80
+  public-server: http://172.19.103.52
 elasticsearch:
   cluster-name: elasticsearch
   cluster-nodes: 172.17.110.17:9300
