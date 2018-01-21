@@ -1,4 +1,4 @@
-package com.yihu.ehr.analyze.service;
+package com.yihu.ehr.analyze.service.pack;
 
 import com.yihu.ehr.analyze.config.FastdfsConfig;
 import com.yihu.ehr.constants.ProfileType;
@@ -136,14 +136,6 @@ public class ZipPackage {
         for (String key : keySet) {
             DataSetRecord dataSetRecord = dataSets.get(key);
             saveDataSet(dataSetRecord);
-        }
-    }
-
-    public void sendQcMsg() {
-        Set<String> keySet = dataSets.keySet();
-        for (String key : keySet) {
-            DataSetRecord dataSetRecord = dataSets.get(key);
-//            saveDataSet(dataSetRecord);
         }
     }
 

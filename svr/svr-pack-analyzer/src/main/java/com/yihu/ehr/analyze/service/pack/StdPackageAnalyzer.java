@@ -1,4 +1,4 @@
-package com.yihu.ehr.analyze.service;
+package com.yihu.ehr.analyze.service.pack;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.yihu.ehr.profile.util.DataSetUtil;

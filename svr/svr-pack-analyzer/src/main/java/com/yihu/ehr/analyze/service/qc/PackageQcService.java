@@ -1,9 +1,13 @@
-package com.yihu.ehr.analyze.service;
+package com.yihu.ehr.analyze.service.qc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.analyze.feign.RedisServiceClient;
+import com.yihu.ehr.analyze.service.pack.DataElementRecord;
+import com.yihu.ehr.analyze.service.pack.DataSetRecord;
+import com.yihu.ehr.analyze.service.pack.ZipPackage;
 import com.yihu.ehr.model.packs.MPackage;
+import com.yihu.ehr.profile.util.DataSetUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -56,6 +60,35 @@ public class PackageQcService {
                     redisServiceClient.sendMessage("", channel, msgNode.toString());
                 });
             });
+        });
+    }
+
+    /**
+     * 统计包数据集
+     *
+     * @param zipPackage
+     */
+    @Async
+    public void qcReceive(ZipPackage zipPackage) {
+        MPackage mPackage = zipPackage.getmPackage();
+        Map<String, DataSetRecord> dataSets = zipPackage.getDataSets();
+        final int[] i = {0};
+        dataSets.forEach((key, dataSetRecord) -> {
+            if (key.contains(DataSetUtil.OriginDataSetFlag)) {
+                return;
+            }
+
+            if (i[0] == 0) {
+                i[0]++;
+                //TODO: save receive patient
+
+            }
+
+            Map<String, DataElementRecord> records = dataSetRecord.getRecords();
+            int size = records.size();
+            //TODO: save
+
+
         });
     }
 }

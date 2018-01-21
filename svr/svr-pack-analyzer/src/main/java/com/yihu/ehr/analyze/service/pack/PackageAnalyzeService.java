@@ -1,6 +1,7 @@
-package com.yihu.ehr.analyze.service;
+package com.yihu.ehr.analyze.service.pack;
 
 import com.yihu.ehr.analyze.feign.PackageMgrClient;
+import com.yihu.ehr.analyze.service.qc.PackageQcService;
 import com.yihu.ehr.model.packs.MPackage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,8 +54,8 @@ public class PackageAnalyzeService {
 
             mgrClient.analyzeStatus(mPackage.getId(), 3);
 
-            //发送Qc消息
-            packageQcService.sendQcMsg(zipPackage);
+            packageQcService.sendQcMsg(zipPackage);//发送Qc消息
+            packageQcService.qcReceive(zipPackage);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());

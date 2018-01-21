@@ -1,4 +1,4 @@
-package com.yihu.ehr.analyze.service;
+package com.yihu.ehr.analyze.service.pack;
 
 import java.util.Date;
 import java.util.Map;

@@ -198,7 +198,7 @@ public class RedisEndPoint extends EnvelopRestEndPoint {
             @RequestParam("dataSetCode") String dataSetCode,
             @ApiParam(value = "innerCode", defaultValue = "")
             @RequestParam("innerCode") String innerCode) {
-        return "";
+        return redisService.getMetaDataFormat(version, dataSetCode, innerCode);
     }
 
     @ApiOperation("通过StdDataSet版本、编码以及标准数据元的内部编码获取标准数据元的是否可为空")
@@ -210,7 +210,7 @@ public class RedisEndPoint extends EnvelopRestEndPoint {
             @RequestParam("dataSetCode") String dataSetCode,
             @ApiParam(value = "innerCode", defaultValue = "")
             @RequestParam("innerCode") String innerCode) {
-        return true;
+        return redisService.isMetaDataNullable(version, dataSetCode, innerCode);
     }
 
     @ApiOperation("通过StdDataSet版本、编码以及标准数据元的内部编码获取标准数据元字典ID")
@@ -247,7 +247,7 @@ public class RedisEndPoint extends EnvelopRestEndPoint {
             @RequestParam("dictId") String dictId,
             @ApiParam(value = "entryValue", defaultValue = "")
             @RequestParam("entryValue") String entryValue) {
-        return true;
+        return redisService.isDictValueExist(version, dictId, entryValue);
     }
 
     @ApiOperation("通过StdDataSet版本、标准数据元字典ID以及标准数据元字典项编码判断编码是否存在")
@@ -259,7 +259,7 @@ public class RedisEndPoint extends EnvelopRestEndPoint {
             @RequestParam("dictId") String dictId,
             @ApiParam(value = "entryCode", defaultValue = "")
             @RequestParam("entryCode") String entryCode) {
-        return true;
+        return redisService.isDictValueExist(version, dictId, entryCode);
     }
     //------------------------------------ 标准相关 END -------------------------------------------------------
 
