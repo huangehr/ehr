@@ -36,10 +36,8 @@ public class MasterResourceDao {
             if(!originResult.isEmpty()) {
                 MasterRecord masterRecord = resBucket.getMasterRecord();
                 Map<String, String> supplement = masterRecord.getDataGroup();
-                for(String key : supplement.keySet()) {
-                    originResult.put(key, supplement.get(key));
-                }
-                hbaseDao.deleteFamily(ResourceCore.MasterTable, rowKey, MasterResourceFamily.Data);
+                originResult.putAll(supplement);
+                //hbaseDao.deleteFamily(ResourceCore.MasterTable, rowKey, MasterResourceFamily.Data);
                 bundle.addValues(rowKey, MasterResourceFamily.Data, originResult);
                 hbaseDao.save(ResourceCore.MasterTable, bundle);
                 Map<String, String> basicResult = hbaseDao.get(ResourceCore.MasterTable, rowKey, MasterResourceFamily.Basic);

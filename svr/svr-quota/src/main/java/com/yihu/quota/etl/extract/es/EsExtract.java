@@ -14,6 +14,7 @@ import com.yihu.quota.etl.save.es.ElasticFactory;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionMain;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionSlave;
 import com.yihu.quota.service.orgHealthCategory.OrgHealthCategoryStatisticsService;
+import com.yihu.quota.service.quota.BaseStatistsService;
 import com.yihu.quota.service.quota.QuotaService;
 import com.yihu.quota.vo.DictModel;
 import com.yihu.quota.vo.QuotaVo;
@@ -61,9 +62,12 @@ public class EsExtract {
     @Autowired
     private QuotaService quotaService;
     @Autowired
-    ExtractUtil extractUtil;
+    private ExtractUtil extractUtil;
     @Autowired
-    ElasticSearchPool elasticSearchPool;
+    private ElasticSearchPool elasticSearchPool;
+    @Autowired
+    private BaseStatistsService baseStatistsService;
+
     @Autowired
     private OrgHealthCategoryStatisticsService orgHealthCategoryStatisticsService;
 
@@ -137,39 +141,85 @@ public class EsExtract {
         this.esConfig = esConfig;
 
         List<SaveModel> saveModels = new ArrayList<>();
-        if( (!StringUtils.isEmpty(esConfig.getEspecialType())) && esConfig.getEspecialType().equals(orgHealthCategory)){
-            //二次统计   特殊类型：卫生机构类型
-            List<Map<String, Object>> orgTypeList = new ArrayList<>();
+        try {
+            if( (!StringUtils.isEmpty(esConfig.getEspecialType())) && esConfig.getEspecialType().equals(orgHealthCategory)){
+                //二次统计   特殊类型：卫生机构类型
+                List<Map<String, Object>> orgTypeResultList = new ArrayList<>();
 
-            String quotaCode = esConfig.getSuperiorCode();
-            List<Map<String, Object>> mapList =  quotaService.queryResultPageByCode(quotaCode, "", 1, 500);
-            if(mapList != null && mapList.size() > 0){
-                for(Map<String,Object> map : mapList){
-                    String dictSql = "SELECT org_code as orgCode,hos_type_id as hosTypeId from organizations where org_code=";
-                    dictSql = dictSql + "'"+ map.get("org") + "'";
-                    List<MOrganization> organizations = jdbcTemplate.query(dictSql, new BeanPropertyRowMapper(MOrganization.class));
-                    if(organizations != null && organizations.size() > 0){
-                        if(!StringUtils.isEmpty(organizations.get(0).getHosTypeId())){
-                            map.put(orgHealthCategory,organizations.get(0).getHosTypeId());
-                            orgTypeList.add(map);
+
+                Map<String, Object> dimensionMap = new HashMap<>();
+                Map<String,String>  dimensionDicMap = new HashMap<>();
+                //查询除开机构维度  其他维度的字典项和 维度合并到map
+                //维度key 统一变小写
+                for(TjQuotaDimensionMain main:qdm){
+                    if(!main.getMainCode().trim().equals("org")){
+                        dimensionMap.put(main.getMainCode(),main.getMainCode());
+                        if(org.apache.commons.lang.StringUtils.isNotEmpty(main.getDictSql())){
+                            Map<String,String> dicMap = baseStatistsService.getDimensionMap(main.getDictSql(),main.getMainCode());
+                            if(dicMap != null && dicMap.size() > 0){
+                                for(String key :dicMap.keySet()){
+                                    dimensionDicMap.put(key.toLowerCase(),dicMap.get(key));
+                                }
+                            }
                         }
                     }
                 }
-            }
-            boolean resultFlag = false;
-            List<List<Map<String, Object>>> sumOrgTypeList =  stastisOrtType(orgTypeList,qdm, qds);
-            for(List<Map<String, Object>> list:sumOrgTypeList){
-                resultFlag = orgHealthCategoryStatisticsService.countResultsAndSaveToEs(list);
-            }
+                for(TjQuotaDimensionSlave slave:qds){
+                    dimensionMap.put(slave.getKeyVal(),slave.getKeyVal());
+                    if(org.apache.commons.lang.StringUtils.isNotEmpty(slave.getDictSql())){
+                        Map<String,String> dicMap = baseStatistsService.getDimensionMap(slave.getDictSql(), slave.getSlaveCode());
+                        if(dicMap != null && dicMap.size() > 0){
+                            for(String key :dicMap.keySet()){
+                                dimensionDicMap.put(key.toLowerCase(),dicMap.get(key));
+                            }
+                        }
+                    }
+                }
+                String dimension = "";
+                for(String key :dimensionMap.keySet()){
+                    dimension += dimensionMap.get(key) + ";";
+                }
+                if(dimension.length() < 1 ){
+                    throw new Exception("特殊机构类型转化时 维度维度不能为空！" );
+                }else {
+                    dimension = dimension.substring(0,dimension.length()-1);
+                }
+                String filter = "";
+                if ( !StringUtils.isEmpty(startTime) && !StringUtils.isEmpty(endTime)) {
+                    filter = " quotaDate >= '" + startTime.substring(0,10) + "' and quotaDate <= '" + endTime.substring(0,10) +"' ";
+                }
 
-            SaveModel saveModel = new SaveModel();
-            saveModel.setQuotaCode(orgHealthCategory);
-            if(resultFlag){
-                saveModel.setSaasId("success");
-            }else {
-                saveModel.setSaasId("fail");
+                List<Map<String, Object>> mapList = baseStatistsService.getOrgHealthCategoryQuotaResultList(esConfig.getSuperiorBaseQuotaCode(),dimension,filter);
+                if(mapList != null && mapList.size() > 0){
+                    for(Map<String,Object> map : mapList){
+                        String dictSql = "SELECT org_code as orgCode,hos_type_id as hosTypeId from organizations where org_code=";
+                        dictSql = dictSql + "'"+ map.get("org") + "'";
+                        List<MOrganization> organizations = jdbcTemplate.query(dictSql, new BeanPropertyRowMapper(MOrganization.class));
+                        if(organizations != null && organizations.size() > 0){
+                            if(!StringUtils.isEmpty(organizations.get(0).getHosTypeId())){
+                                map.put(orgHealthCategory,organizations.get(0).getHosTypeId());
+                                orgTypeResultList.add(map);
+                            }
+                        }
+                    }
+                }
+                boolean resultFlag = false;
+                List<List<Map<String, Object>>> sumOrgTypeList =  stastisOrtType(orgTypeResultList,dimensionMap, dimensionDicMap);
+                for(List<Map<String, Object>> list:sumOrgTypeList){
+                    resultFlag = orgHealthCategoryStatisticsService.countResultsAndSaveToEs(list);
+                }
+
+                SaveModel saveModel = new SaveModel();
+                saveModel.setQuotaCode(orgHealthCategory);
+                if(resultFlag){
+                    saveModel.setSaasId("success");
+                }else {
+                    saveModel.setSaasId("fail");
+                }
+                saveModels.add(saveModel);
             }
-            saveModels.add(saveModel);
+        }catch (Exception e){
+            throw new Exception("ES 特殊机构转化 查询数据出错！" +e.getMessage() );
         }
         return saveModels;
 
@@ -179,21 +229,12 @@ public class EsExtract {
     /**
      * 统计整理 不同维度的组合数据
      * @param orgTypeList
-     * @param qdm
-     * @param qds
+     * @param dimensionMap 维度集合
+     * @param dimensionDicMap 字典项key-value map
      * @return
      */
-    public List<List<Map<String, Object>>> stastisOrtType(List<Map<String, Object>> orgTypeList,List<TjQuotaDimensionMain> qdm,
-                                                    List<TjQuotaDimensionSlave> qds){
-        Map<String, Object> dimensionMap = new HashMap<>();
-        for(TjQuotaDimensionMain main:qdm){
-            if(!main.getMainCode().trim().equals("org")){
-                dimensionMap.put(main.getMainCode(),main.getMainCode());
-            }
-        }
-        for(TjQuotaDimensionSlave slave:qds){
-            dimensionMap.put(slave.getSlaveCode(),slave.getSlaveCode());
-        }
+    public List<List<Map<String, Object>>> stastisOrtType(List<Map<String, Object>> orgTypeList,Map<String, Object> dimensionMap,
+                                                          Map<String,String>  dimensionDicMap){
 
         Map<String,String> dimenTypeMap = new HashMap<>();
         Map<String,String> orgDimenTypeMap = new HashMap<>();
@@ -215,7 +256,7 @@ public class EsExtract {
         if(dimenTypeMap != null && dimenTypeMap.size() > 0){
             for(String type : dimenTypeMap.keySet()){
                 List<Map<String, Object>> sumOrgTypeList = new ArrayList<>();
-                int count = 0;
+                double count = 0.0;
                 for(String orgDimenType : orgDimenTypeMap.keySet()){
                     Map<String, Object> sumDimenMap = new HashMap<>();
                     if(orgDimenType.contains(type) && orgTypeList != null && orgTypeList.size() > 0){
@@ -226,10 +267,11 @@ public class EsExtract {
                             }
                             if(orgDimenType.equals(key)){
                                 sumDimenMap.put("code",map.get(orgHealthCategory).toString());
-                                count = count + Integer.valueOf(map.get("result").toString());
+                                count = count + Double.valueOf(map.get("result").toString());
                                 if(dimensionMap != null && dimensionMap.size() > 0){
                                     for(String dimen:dimensionMap.keySet()){
                                         sumDimenMap.put(dimen,map.get(dimen));
+                                        sumDimenMap.put(dimen+"Name",dimensionDicMap.get(map.get(dimen).toString().toLowerCase()));
                                     }
                                 }
                             }
@@ -237,7 +279,7 @@ public class EsExtract {
                         }
                         sumDimenMap.put("quotaCode",quotaVo.getCode());
                         sumDimenMap.put("quotaName",quotaVo.getName());
-                        sumDimenMap.put("result",count);
+                        sumDimenMap.put("result",(int)count);
                         sumOrgTypeList.add(sumDimenMap);
                     }
                 }

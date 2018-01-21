@@ -447,10 +447,7 @@ public class ServiceApi {
     public static class PackageAnalyzer {
         public static final String Scheduler = "packAnalyzer/scheduler";
         public static final String Queue = "packAnalyzer/queue";
-        public static final String Status = "packAnalyzer/status";
-        public static final String DailyReport = "packAnalyzer/dailyReport";
-        public static final String List = "packAnalyzer/list";
-        public static final String FindByField = "packAnalyzer/findByField";
+        public static final String Status = "packAnalyzer/status/{id}";
     }
 
 
@@ -1192,6 +1189,8 @@ public class ServiceApi {
         public static final String GetQuotaNestedPieReportPreviews = "tj/getQuotaNestedPieReportPreviews";
         public static final String GetQuotaTotalCount = "tj/getQuotaTotalCount";
         public static final String GetQuotaGroupBy = "tj/getQuotaGroupBy";
+        public static final String GetQuotaReportTwoDimensionalTable = "/tj/getQuotaReportTwoDimensionalTable";
+
 
 
         public static final String TjQuotaChart = "/tj/tjQuotaChart";

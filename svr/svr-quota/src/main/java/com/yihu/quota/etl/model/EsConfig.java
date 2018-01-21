@@ -11,8 +11,10 @@ public class EsConfig {
     private String type;// 类型 es 相当于表
     private String clusterName;//es clusterName
     private String table;// 数据库表
-    private String molecular;  // 统计百分比时的分子  指标code
-    private String denominator;// 统计百分比时的分母  指标code
+    private String molecular;  // 统计除法的分子  指标code
+    private String molecularFilter;  // 除法的分子过滤条件
+    private String denominator;// 统计除法的分母  指标code
+    private String denominatorFilter;// 除法的分母过滤条件
     private String percentOperation;//运算方式  1 乘法  2 除法  默认乘法
     private String percentOperationValue;//运算对应的值  默认 100
 
@@ -26,7 +28,16 @@ public class EsConfig {
     private String thousandDenominator; //每千，每万 统计分母
 
     private String especialType; //特殊类型  orgHealthCategory：卫生机构类型
-    private String superiorCode;//上级指标code
+    private String superiorBaseQuotaCode;  // 上级基础指标code
+
+
+    public String getSuperiorBaseQuotaCode() {
+        return superiorBaseQuotaCode;
+    }
+
+    public void setSuperiorBaseQuotaCode(String superiorBaseQuotaCode) {
+        this.superiorBaseQuotaCode = superiorBaseQuotaCode;
+    }
 
     public String getHost() {
         return host;
@@ -157,14 +168,6 @@ public class EsConfig {
         this.especialType = especialType;
     }
 
-    public String getSuperiorCode() {
-        return superiorCode;
-    }
-
-    public void setSuperiorCode(String superiorCode) {
-        this.superiorCode = superiorCode;
-    }
-
     public String getPercentOperation() {
         return percentOperation;
     }
@@ -179,5 +182,21 @@ public class EsConfig {
 
     public void setPercentOperationValue(String percentOperationValue) {
         this.percentOperationValue = percentOperationValue;
+    }
+
+    public String getMolecularFilter() {
+        return molecularFilter;
+    }
+
+    public void setMolecularFilter(String molecularFilter) {
+        this.molecularFilter = molecularFilter;
+    }
+
+    public String getDenominatorFilter() {
+        return denominatorFilter;
+    }
+
+    public void setDenominatorFilter(String denominatorFilter) {
+        this.denominatorFilter = denominatorFilter;
     }
 }

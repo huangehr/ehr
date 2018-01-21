@@ -138,10 +138,13 @@ public class OrgDeptService extends BaseJpaService<OrgDept, OrgDeptRepository> {
         boolean succ = false;
         if (!list.isEmpty()) {
             try {
+                int i=1;
                 for (Map<Object, Object> map : list) {
                     String mapJson = objectMapper.writeValueAsString(map);
                     OrgDept dept = objectMapper.readValue(mapJson, OrgDept.class);
+                    dept.setSortNo(i);
                     orgDeptRepository.save(dept);
+                    i++;
                 }
                 succ = true;
             } catch (Exception e) {
@@ -158,6 +161,7 @@ public class OrgDeptService extends BaseJpaService<OrgDept, OrgDeptRepository> {
         if (!list.isEmpty()) {
             try {
                 OrgDept dept = null;
+                int i=1;
                 for (Map<Object, Object> map : list) {
                     dept = new OrgDept();
                     Object parentName = map.get("parentName");
@@ -181,8 +185,9 @@ public class OrgDeptService extends BaseJpaService<OrgDept, OrgDeptRepository> {
                     dept.setCode(UUID.randomUUID().toString());
                     dept.setName(name);
                     dept.setDelFlag(0);
-
+                    dept.setSortNo(i);
                     orgDeptRepository.save(dept);
+                    i++;
                 }
                 succ = true;
             } catch (Exception e) {

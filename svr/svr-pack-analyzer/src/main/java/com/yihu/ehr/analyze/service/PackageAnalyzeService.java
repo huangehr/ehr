@@ -64,6 +64,12 @@ public class PackageAnalyzeService {
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
+
+            try {
+                mgrClient.analyzeStatus(mPackage.getId(), 2);
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
         } finally {
             if (zipPackage != null) {
                 zipPackage.houseKeep();
