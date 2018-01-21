@@ -9,10 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 卫生机构类别统计 Service
@@ -56,8 +53,8 @@ public class OrgHealthCategoryStatisticsService {
                 item.put("yearName", endpoint.get("yearName"));
                 item.put("slaveKey1", endpoint.get("slaveKey1"));
                 item.put("slaveKey1Name", endpoint.get("slaveKey1Name"));
-                item.put("slaveKey2Name", endpoint.get("slaveKey2"));
-                item.put("slaveKey1", endpoint.get("slaveKey2Name"));
+                item.put("slaveKey2", endpoint.get("slaveKey2"));
+                item.put("slaveKey2Name", endpoint.get("slaveKey2Name"));
                 item.put("slaveKey3", endpoint.get("slaveKey3"));
                 item.put("slaveKey3Name", endpoint.get("slaveKey3Name"));
             }
@@ -68,7 +65,9 @@ public class OrgHealthCategoryStatisticsService {
             Map<String, Object> item = allOrgHealthCategoryList.get(j);
             int id = (int) item.get("id");
             List<Map<String, Object>> itemEndpointList = findEndpointsForOneParent(allOrgHealthCategoryList, id);
-            item.put("result", countResult(itemEndpointList));
+            if (itemEndpointList.size() != 0) {
+                item.put("result", countResult(itemEndpointList));
+            }
         }
 
         // 添加【合计】到卫生机构类别集合
@@ -175,6 +174,7 @@ public class OrgHealthCategoryStatisticsService {
                 model.setSlaveKey1Name(slaveKey1Name);
                 model.setSlaveKey2Name(slaveKey2Name);
                 model.setSlaveKey3Name(slaveKey3Name);
+                model.setCreateTime(new Date());
                 model.setOrgHealthCategoryId(item.get("id").toString());
                 String pid = item.get("pid") == null ? null : item.get("pid").toString();
                 model.setOrgHealthCategoryPid(pid);
