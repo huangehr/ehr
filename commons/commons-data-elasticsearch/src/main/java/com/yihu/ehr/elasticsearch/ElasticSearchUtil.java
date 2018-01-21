@@ -79,6 +79,11 @@ public class ElasticSearchUtil {
         return elasticSearchClient.findByField(index, type, boolQueryBuilder);
     }
 
+    public List<Map<String, Object>> list(String index, String type, List<Map<String, Object>> filter) {
+        QueryBuilder boolQueryBuilder = getQueryBuilder(filter);
+        return elasticSearchClient.findByField(index, type, boolQueryBuilder);
+    }
+
     public List<Map<String, Object>> page(String index, String type, List<Map<String, Object>> filter, int page, int size) {
         QueryBuilder boolQueryBuilder = getQueryBuilder(filter);
         return elasticSearchClient.page(index, type, boolQueryBuilder, page, size);
