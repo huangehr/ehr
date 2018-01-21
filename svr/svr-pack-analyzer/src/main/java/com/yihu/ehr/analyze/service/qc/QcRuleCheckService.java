@@ -2,11 +2,17 @@ package com.yihu.ehr.analyze.service.qc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.analyze.feign.RedisServiceClient;
+import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Airhead
@@ -14,14 +20,14 @@ import java.io.IOException;
  */
 @Service
 public class QcRuleCheckService {
-    @Autowired
-    ObjectMapper objectMapper;
-    @Autowired
-    RedisServiceClient redisServiceClient;
+    private static final Logger logger = LoggerFactory.getLogger(QcRuleCheckService.class);
 
-    private void saveCheckResult(DataElementValue value, String checkInfo) {
-
-    }
+    @Autowired
+    private ObjectMapper objectMapper;
+    @Autowired
+    private RedisServiceClient redisServiceClient;
+    @Autowired
+    private ElasticSearchUtil elasticSearchUtil;
 
     /**
      * 检查值是否为空
@@ -31,12 +37,15 @@ public class QcRuleCheckService {
     public void emptyCheck(String data) {
         try {
             DataElementValue value = parse(data);
+            logger.info("code:" + value.getCode() + ",value:" + value.getValue());
+
             Boolean isNullable = redisServiceClient.isMetaDataNullable(value.getVersion(), value.getTable(), value.getCode());
             if (!isNullable && StringUtils.isEmpty(value.getValue())) {
                 saveCheckResult(value, "不能为空");
             }
         } catch (IOException e) {
             e.printStackTrace();
+            logger.error(e.getMessage());
         }
 
     }
@@ -68,6 +77,7 @@ public class QcRuleCheckService {
 
         } catch (IOException e) {
             e.printStackTrace();
+            logger.error(e.getMessage());
         }
     }
 
@@ -88,17 +98,41 @@ public class QcRuleCheckService {
     public void valueCheck(String data) {
         try {
             DataElementValue value = parse(data);
+            logger.info("code:" + value.getCode() + ",value:" + value.getValue());
             String dict = redisServiceClient.getMetaDataDict(value.getVersion(), value.getTable(), value.getCode());
             if (StringUtils.isEmpty(dict) || dict.equals("0")) {
                 return;
             }
 
+            logger.info("code:" + value.getCode() + ",value:" + value.getValue() + ",dict:" + dict);
             Boolean isExist = redisServiceClient.isDictCodeExist(value.getVersion(), dict, value.getCode());
             if (!isExist) {
                 saveCheckResult(value, "超出值域范围");
             }
         } catch (IOException e) {
             e.printStackTrace();
+            logger.error(e.getMessage());
+        }
+    }
+
+    private void saveCheckResult(DataElementValue value, String checkInfo) {
+        try {
+            Map<String, Object> map = new HashMap<>();
+            map.put("rowKey", value.getRowKey());
+            map.put("table", value.getTable());
+            map.put("version", value.getVersion());
+            map.put("code", value.getCode());
+            map.put("value", value.getValue());
+            map.put("orgCode", value.getOrgCode());
+            map.put("patientId", value.getPatientId());
+            map.put("eventNo", value.getEventNo());
+            map.put("eventTime", value.getEventTime());
+            map.put("receiveTime", value.getReceiveTime());
+            map.put("checkInfo", checkInfo);
+            elasticSearchUtil.index("qc", "receive_data_element", map);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
         }
     }
 

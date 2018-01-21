@@ -6,6 +6,7 @@ import com.yihu.ehr.analyze.feign.RedisServiceClient;
 import com.yihu.ehr.analyze.service.pack.DataElementRecord;
 import com.yihu.ehr.analyze.service.pack.DataSetRecord;
 import com.yihu.ehr.analyze.service.pack.ZipPackage;
+import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.profile.util.DataSetUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
@@ -13,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -25,6 +28,8 @@ public class PackageQcService {
     private RedisServiceClient redisServiceClient;
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private ElasticSearchUtil elasticSearchUtil;
 
     /**
      * 通过Redis的消息订阅发布来处理质控规则
@@ -64,7 +69,7 @@ public class PackageQcService {
     }
 
     /**
-     * 统计包数据集
+     * 实时统计接收包情况及数据集情况
      *
      * @param zipPackage
      */
@@ -80,15 +85,42 @@ public class PackageQcService {
 
             if (i[0] == 0) {
                 i[0]++;
-                //TODO: save receive patient
 
+                Map<String, Object> map = new HashMap<>();
+                map.put("patientId", dataSetRecord.getPatientId());
+                map.put("eventNo", dataSetRecord.getEventNo());
+                map.put("eventTime", dataSetRecord.getEventTime());
+                map.put("eventType", dataSetRecord.getEventType());
+                map.put("receiveTime", mPackage.getReceiveDate());
+                map.put("packId", mPackage.getId());
+                try {
+                    elasticSearchUtil.index("qc", "receive_data_pack", map);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
             }
 
             Map<String, DataElementRecord> records = dataSetRecord.getRecords();
             int size = records.size();
-            //TODO: save
-
-
+            Map<String, Object> map = new HashMap<>();
+            map.put("dataSet", dataSetRecord.getCode());
+            map.put("dataSetRow", size);
+            map.put("receiveTime", mPackage.getReceiveDate());
+            try {
+                elasticSearchUtil.index("qc", "receive_data_set", map);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
         });
+    }
+
+    /**
+     * 重新统计某段时间接收包情况及数据集情况
+     *
+     * @param beginDate
+     * @param endDate
+     */
+    public void qcReceive(String beginDate, String endDate) {
+        //TODO:
     }
 }
