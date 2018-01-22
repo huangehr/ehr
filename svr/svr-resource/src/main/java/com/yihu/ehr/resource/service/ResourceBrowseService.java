@@ -59,59 +59,44 @@ public class ResourceBrowseService {
      * @throws Exception
      */
     public String getResourceMetadata(String resourcesCode, String roleId) throws Exception{
-        Map<String, Object> mapParam = new HashMap<String, Object>();
-        List<DtoResourceMetadata> metadataList;
-        Set<String> rsMetadataIdSet = new HashSet<String>();
-        //获取资源信息
         RsResource rsResource = rsResourceDao.findByCode(resourcesCode);
-        String grantType = rsResource.getGrantType();
-        if(grantType.equals("1") && !roleId.equals("*")) {
-            List<String> roleIdList = objectMapper.readValue(roleId, List.class);
-            for(String id : roleIdList) {
-                RsRolesResource rsRolesResource = rsRolesResourceGrantService.findByResourceIdAndRolesId(rsResource.getId(), id);
-                if(rsRolesResource != null) {
-                    List<RsRolesResourceMetadata> rsRolesResourceMetadataList = rsRolesResourceMetadataGrantService.findByRolesResourceIdAndValid(rsRolesResource.getId(), "1");
-                    if(rsRolesResourceMetadataList != null) {
-                        for (RsRolesResourceMetadata rsRolesResourceMetadata : rsRolesResourceMetadataList) {
-                            rsMetadataIdSet.add(rsRolesResourceMetadata.getResourceMetadataId());
-                        }
-                    }
-                }
-            }
-            if(rsMetadataIdSet.size() > 0) {
-                String rsMetadataIds = "";
-                for (String id : rsMetadataIdSet) {
-                    rsMetadataIds += "'" + id + "'" + ",";
-                }
-                metadataList = resourceBrowseMetadataDao.getAuthResourceMetadata(rsMetadataIds.substring(0, rsMetadataIds.length() - 1));
-            }else {
-                metadataList = null;
-            }
-        } else{
-            metadataList = resourceBrowseMetadataDao.getAllResourceMetadata(rsResource.getCode());
+        if (rsResource == null) {
+            return null;
         }
+        Map<String, Object> mapParam = new HashMap<String, Object>();
+        boolean isOtherStdCode = false;
+        Map<String, String> correspondMap = new HashMap<>();
+        String otherStdMetadataStr = redisService.getOtherStdMetadata(rsResource.getCode());
+        if(otherStdMetadataStr != null) {
+            isOtherStdCode = true;
+        }
+        List<DtoResourceMetadata> metadataList = getAccessMetadata(rsResource, roleId, isOtherStdCode, correspondMap, otherStdMetadataStr);
         //资源结构
-        List<String> colunmName = new ArrayList<String>();
-        List<String> colunmCode = new ArrayList<String>();
-        List<String> colunmType = new ArrayList<String>();
-        List<String> colunmDict = new ArrayList<String>();
+        List<String> columnName = new ArrayList<String>();
+        List<String> columnCode = new ArrayList<String>();
+        List<String> columnType = new ArrayList<String>();
+        List<String> columnDict = new ArrayList<String>();
         if(metadataList != null) {
             for (DtoResourceMetadata r : metadataList) {
-                colunmName.add(r.getName());
-                if (!StringUtils.isEmpty(r.getDictCode())) {
-                    colunmCode.add(r.getId() + "_VALUE");
-                } else {
-                    colunmCode.add(r.getId());
+                if(isOtherStdCode) {
+                    columnName.add(redisService.transformMetadataName(correspondMap.get(r.getId())));
+                }else {
+                    columnName.add(r.getName());
                 }
-                colunmType.add(r.getColumnType());
-                colunmDict.add(r.getDictCode());
+                if (!StringUtils.isEmpty(r.getDictCode())) {
+                    columnCode.add(r.getId() + "_VALUE");
+                } else {
+                    columnCode.add(r.getId());
+                }
+                columnType.add(r.getColumnType());
+                columnDict.add(r.getDictCode());
             }
         }
         //设置动态datagrid值
-        mapParam.put("colunmName", colunmName);
-        mapParam.put("colunmCode", colunmCode);
-        mapParam.put("colunmDict", colunmDict);
-        mapParam.put("colunmType", colunmType);
+        mapParam.put("colunmName", columnName);
+        mapParam.put("colunmCode", columnCode);
+        mapParam.put("colunmType", columnType);
+        mapParam.put("colunmDict", columnDict);
         return objectMapper.writeValueAsString(mapParam);
     }
 
@@ -157,7 +142,7 @@ public class ResourceBrowseService {
     public Envelop resourcesBrowse(String resourcesCode, String methodName, String roleId, String orgCode, String areaCode, String queryParams, Integer page, Integer size) throws Exception {
         //获取结果集
         Envelop envelop = getResultData(resourcesCode, roleId, orgCode, areaCode, queryParams, page, size);
-        //如果资源查询为细表则增加主表信息
+        //细表的话追加主表的数据
         if(methodName.endsWith("Sub") && envelop.isSuccessFlg() && envelop.getDetailModelList() != null) {
             List<Map<String,Object>> oldList = envelop.getDetailModelList();
             for(Map<String, Object> temp : oldList) {
@@ -306,8 +291,14 @@ public class ResourceBrowseService {
         RsResource rsResources = rsResourceDao.findByCode(resourcesCode);
         if(rsResources != null) {
             String methodName = rsResources.getRsInterface(); //执行函数
-            //获取资源结构权限
-            List<DtoResourceMetadata> metadataList = getAccessMetadata(rsResources, roleId);
+            //获取资源结构权限，该部分新增其他标准数据集的判断
+            boolean isOtherStdCode = false;
+            Map<String, String> correspondMap = new HashMap<>();
+            String otherStdMetadataStr = redisService.getOtherStdMetadata(rsResources.getCode());
+            if(otherStdMetadataStr != null) {
+                isOtherStdCode = true;
+            }
+            List<DtoResourceMetadata> metadataList = getAccessMetadata(rsResources, roleId, isOtherStdCode, correspondMap, otherStdMetadataStr);
             //获取Saas权限
             StringBuilder saas = new StringBuilder();
             if (orgCode.equals("*") && areaCode.equals("*")) {
@@ -393,7 +384,7 @@ public class ResourceBrowseService {
                 for(DtoResourceMetadata metadata : metadataList) {
                     String id = metadata.getId();
                     metadataIdList.add(id);
-                    String dictCode = redisService.getRsMetaData(id);
+                    String dictCode = metadata.getDictCode();
                     if(!StringUtils.isEmpty(dictCode)) {
                         metadataIdList.add(id + "_VALUE");
                     }
@@ -485,16 +476,16 @@ public class ResourceBrowseService {
     private String addParams(String oldParams, String key,String value) {
         String newParam = "";
         if(value.startsWith("[") && value.endsWith("]")) {
-            newParam = "\""+key+"\":" + value;
+            newParam = "\"" + key + "\":" + value;
         }
         else{
-            newParam = "\""+key+"\":\""+value.replace("\"","\\\"") + "\"";
+            newParam = "\"" + key + "\":\""+ value.replace("\"","\\\"") + "\"";
         }
         if(oldParams!=null && oldParams.length()>3 && oldParams.startsWith("{") && oldParams.endsWith("}")) {
-            return oldParams.substring(0,oldParams.length()-1)+"," + newParam + "}";
+            return oldParams.substring(0, oldParams.length() - 1) + "," + newParam + "}";
         }
         else{
-            return "{"+newParam+"}";
+            return "{" + newParam + "}";
         }
     }
 
@@ -505,34 +496,84 @@ public class ResourceBrowseService {
      * @return
      * @throws Exception
      */
-    private List<DtoResourceMetadata> getAccessMetadata(RsResource rsResource, String roleId) throws Exception{
+    private List<DtoResourceMetadata> getAccessMetadata(RsResource rsResource, String roleId, boolean isOtherStdCode, Map<String, String> correspondMap, String otherStdMetadataStr) throws Exception{
         Set<String> rsMetadataIdSet = new HashSet<String>();
         String grantType = rsResource.getGrantType();
-        if(grantType.equals("1") && !roleId.equals("*")) {
-            List<String> roleIdList = objectMapper.readValue(roleId, List.class);
-            for(String id : roleIdList) {
-                RsRolesResource rsRolesResource = rsRolesResourceGrantService.findByResourceIdAndRolesId(rsResource.getId(), id);
-                if(rsRolesResource != null) {
-                    List<RsRolesResourceMetadata> rsRolesResourceMetadataList = rsRolesResourceMetadataGrantService.findByRolesResourceIdAndValid(rsRolesResource.getId(), "1");
-                    if(rsRolesResourceMetadataList != null) {
-                        for (RsRolesResourceMetadata rsRolesResourceMetadata : rsRolesResourceMetadataList) {
-                            rsMetadataIdSet.add(rsRolesResourceMetadata.getResourceMetadataId());
+        //其他标准
+        if(isOtherStdCode) {
+            String [] otherStdMetadataArr = otherStdMetadataStr.split(",");
+            List<String> transformStdMetadataList = new ArrayList<>(); // 此list存储其他标准数据集底下的数据元转换成的平台的数据元的id (EHR_XXXXX)
+            for(String otherStdMetadata : otherStdMetadataArr) {
+                String stdMetadata = redisService.transformMetadata(otherStdMetadata);
+                if(stdMetadata != null) {
+                    transformStdMetadataList.add(stdMetadata);
+                    correspondMap.put(stdMetadata, otherStdMetadata);
+                }
+            }
+            if (grantType.equals("1") && !roleId.equals("*")) {
+                List<String> roleIdList = objectMapper.readValue(roleId, List.class);
+                for (String id : roleIdList) {
+                    RsRolesResource rsRolesResource = rsRolesResourceGrantService.findByResourceIdAndRolesId(rsResource.getId(), id);
+                    if (rsRolesResource != null) {
+                        List<RsRolesResourceMetadata> rsRolesResourceMetadataList = rsRolesResourceMetadataGrantService.findByRolesResourceIdAndValid(rsRolesResource.getId(), "1");
+                        if (rsRolesResourceMetadataList != null) {
+                            for (RsRolesResourceMetadata rsRolesResourceMetadata : rsRolesResourceMetadataList) {
+                                if(transformStdMetadataList.contains(rsRolesResourceMetadata.getResourceMetadataId())) { // 如果其他标准数据集包含该数据元
+                                    rsMetadataIdSet.add(rsRolesResourceMetadata.getResourceMetadataId());
+                                }
+                            }
                         }
                     }
                 }
-            }
-            if(rsMetadataIdSet.size() > 0) {
-                String rsMetadataIds = "";
-                for (String id : rsMetadataIdSet) {
-                    rsMetadataIds += "'" + id + "'" + ",";
+                if (rsMetadataIdSet.size() > 0) {
+                    StringBuilder rsMetadataIds = new StringBuilder();
+                    for (String id : rsMetadataIdSet) {
+                        rsMetadataIds.append("'");
+                        rsMetadataIds.append(id);
+                        rsMetadataIds.append("',");
+                    }
+                    return resourceBrowseMetadataDao.getAuthResourceMetadata(rsMetadataIds.substring(0, rsMetadataIds.length() - 1));
+                } else {
+                    return null;
                 }
-                return resourceBrowseMetadataDao.getAuthResourceMetadata(rsMetadataIds.substring(0, rsMetadataIds.length() - 1));
-            }else {
-                return null;
+            } else {
+                StringBuilder rsMetadataIds = new StringBuilder();
+                for (String id : transformStdMetadataList) {
+                    rsMetadataIds.append("'");
+                    rsMetadataIds.append(id);
+                    rsMetadataIds.append("',");
+                }
+                return resourceBrowseMetadataDao.getRsMetadataByIds(rsMetadataIds.substring(0, rsMetadataIds.length() - 1));
             }
-        } else{
-            //返回所有数据元
-            return  resourceBrowseMetadataDao.getAllResourceMetadata(rsResource.getCode());
+        }else { //EHR所用标准
+            if (grantType.equals("1") && !roleId.equals("*")) {
+                List<String> roleIdList = objectMapper.readValue(roleId, List.class);
+                for (String id : roleIdList) {
+                    RsRolesResource rsRolesResource = rsRolesResourceGrantService.findByResourceIdAndRolesId(rsResource.getId(), id);
+                    if (rsRolesResource != null) {
+                        List<RsRolesResourceMetadata> rsRolesResourceMetadataList = rsRolesResourceMetadataGrantService.findByRolesResourceIdAndValid(rsRolesResource.getId(), "1");
+                        if (rsRolesResourceMetadataList != null) {
+                            for (RsRolesResourceMetadata rsRolesResourceMetadata : rsRolesResourceMetadataList) {
+                                rsMetadataIdSet.add(rsRolesResourceMetadata.getResourceMetadataId());
+                            }
+                        }
+                    }
+                }
+                if (rsMetadataIdSet.size() > 0) {
+                    StringBuilder rsMetadataIds = new StringBuilder();
+                    for (String id : rsMetadataIdSet) {
+                        rsMetadataIds.append("'");
+                        rsMetadataIds.append(id);
+                        rsMetadataIds.append("',");
+                    }
+                    return resourceBrowseMetadataDao.getAuthResourceMetadata(rsMetadataIds.substring(0, rsMetadataIds.length() - 1));
+                } else {
+                    return null;
+                }
+            } else {
+                //返回所有数据元
+                return resourceBrowseMetadataDao.getAllResourceMetadata(rsResource.getCode());
+            }
         }
     }
 
