@@ -298,7 +298,7 @@ public class SolrQuery {
                 Map<String, Long> countMap = new HashMap<>();
                 if (groupType.equals(SolrGroupEntity.GroupType.DATE_RANGE)) {
                     // 按每天范围统计
-                    List<RangeFacet> rangeFacets = solrUtil.getFacetDateRange(core, groupField, startTime, endTime, "+1DAY", fq, q);
+                    List<RangeFacet> rangeFacets = solrUtil.getFacetDateRange(core, groupField, startTime, endTime, "+1DAY", query, q);
                     for (RangeFacet rangeFacet : rangeFacets) {
                         List<RangeFacet.Count> countList = rangeFacet.getCounts();
                         for (RangeFacet.Count count : countList) {
