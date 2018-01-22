@@ -282,7 +282,7 @@ public class SolrQuery {
         String conditionName = "$condition"; // 拼接最后一个维度分组聚合统计的过滤条件
         String countKeyName = "$countKey"; // 拼接最后一个维度分组聚合统计值对应的唯一健
         if (num == grouplist.size() - 1) {
-            List<Map<String, Object>> list = new ArrayList<Map<String, Object>>(); // 维度组合Key及统计结果
+            List<Map<String, Object>> list = new ArrayList<Map<String, Object>>(); // 维度字段、维度组合Key及统计结果
             SolrGroupEntity group = grouplist.get(num);  // 最后一个维度
             String groupField = group.getGroupField();
             SolrGroupEntity.GroupType groupType = group.getType();
@@ -298,7 +298,7 @@ public class SolrQuery {
                 Map<String, Long> countMap = new HashMap<>();
                 if (groupType.equals(SolrGroupEntity.GroupType.DATE_RANGE)) {
                     // 按每天范围统计
-                    List<RangeFacet> rangeFacets = solrUtil.getFacetDateRange(core, groupField, startTime, endTime, "+1DAY", fq, q);
+                    List<RangeFacet> rangeFacets = solrUtil.getFacetDateRange(core, groupField, startTime, endTime, "+1DAY", query, q);
                     for (RangeFacet rangeFacet : rangeFacets) {
                         List<RangeFacet.Count> countList = rangeFacet.getCounts();
                         for (RangeFacet.Count count : countList) {
@@ -316,9 +316,12 @@ public class SolrQuery {
                 if (countMap.size() > 0) {
                     for (String key : countMap.keySet()) {
                         Map<String, Object> obj = new LinkedHashMap<>();
-                        obj.put("$count", countMap.get(key));
+                        obj.putAll(preObj); //深拷贝
+                        obj.put(groupField, key);
                         String countKey = preObj.get(countKeyName).toString() + "-" + key;
                         obj.put(countKeyName, countKey);
+                        obj.put("$count", countMap.get(key));
+                        obj.remove(conditionName);
                         list.add(obj);
                     }
                 }
@@ -336,6 +339,8 @@ public class SolrQuery {
                     //遍历当前分组数据
                     for (Map.Entry<String, String> item : groupMap.entrySet()) {
                         Map<String, Object> obj = new LinkedHashMap<>();
+                        obj.putAll(preObj); //深拷贝
+                        obj.put(groupName, item.getKey());
                         String condition = preObj.get(conditionName).toString() + " AND " + item.getValue();
                         obj.put(conditionName, condition);
                         String key = preObj.get(countKeyName).toString() + "-" + item.getKey();
@@ -346,6 +351,7 @@ public class SolrQuery {
             } else { //第一次遍历
                 for (Map.Entry<String, String> item : groupMap.entrySet()) {
                     Map<String, Object> obj = new HashMap<>();
+                    obj.put(groupName, item.getKey());
                     obj.put(conditionName, item.getValue());
                     obj.put(countKeyName, item.getKey());
                     list.add(obj);
