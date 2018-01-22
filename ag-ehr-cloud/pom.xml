@@ -189,6 +189,10 @@
             <artifactId>commons-admin-gateway-model</artifactId>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.yihu.hos</groupId>
+            <artifactId>common-rest-model</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

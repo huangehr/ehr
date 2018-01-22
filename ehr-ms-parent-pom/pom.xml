@@ -430,7 +430,7 @@
                 <version>${version.ehr}</version>
             </dependency>
 
-            <!-- eip 标准相关model的jar包 -->
+            <!-- eip 应用,标准等相关model的jar包 -->
             <dependency>
                 <groupId>com.yihu.hos</groupId>
                 <artifactId>common-rest-model</artifactId>

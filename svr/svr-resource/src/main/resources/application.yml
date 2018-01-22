@@ -69,6 +69,8 @@ hadoop:
 fast-dfs:
   tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52:80
+eip:
+  tenant: jkzl
 
 ---
 spring:
@@ -88,6 +90,8 @@ hadoop:
 fast-dfs:
   tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52:80
+eip:
+  tenant: jkzl
 
 ---
 spring:
@@ -107,6 +111,8 @@ hadoop:
 fast-dfs:
   tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52:80
+eip:
+  tenant: jkzl
 
 ---
 spring:
@@ -127,6 +133,8 @@ hadoop:
 fast-dfs:
   tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52:80
+eip:
+  tenant: ehr
 
 ---
 spring:
@@ -150,7 +158,8 @@ hadoop:
 fast-dfs:
   tracker-server: 11.1.2.9:22122
   public-server: http://11.1.2.9:80
-
+eip:
+  tenant: ehr
 ---
 spring:
   profiles: prod_sr
@@ -172,4 +181,6 @@ hadoop:
 fast-dfs:
   tracker-server: 10.176.97.5:22122
   public-server: http://10.176.97.5:8888
+eip:
+  tenant: ehr
 

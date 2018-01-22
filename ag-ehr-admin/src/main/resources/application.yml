@@ -27,23 +27,34 @@ ribbon:
 ---
 spring:
   profiles: dev
+eip:
+  tenant: jkzl
 
 ---
 spring:
   profiles: alpha
-
+eip:
+  tenant: jkzl
 ---
 spring:
   profiles: test
+eip:
+  tenant: ehr
 
 ---
 spring:
   profiles: prod
+eip:
+  tenant: jkzl
 
 ---
 spring:
   profiles: prod_fz
+eip:
+  tenant: jkzl
 
 ---
 spring:
   profiles: prod_sr
+eip:
+  tenant: jkzl

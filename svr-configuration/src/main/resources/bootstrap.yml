@@ -32,7 +32,7 @@ spring:
     config:
       server:
         git:
-          uri: http://192.168.1.220:10080/EHR/ehr.config.git
+          uri: http://192.168.1.220:10080/chenyongxing/ehr.config
           basedir: /usr/local/ehr-config
         default-label: dev
 
@@ -68,3 +68,16 @@ spring:
           uri: http://10.176.97.10:3000/jkzl/ehr.config.git
           basedir: /usr/local/ehr-config
         default-label: master
+
+---
+##不想用远程的git 可以在环境变量配置native 开启本地配置
+spring:
+  profiles:
+    active: native
+
+##git配置
+  cloud:
+    config:
+      server:
+        native:
+          search-locations: file:D:\code\ehr.config  ##本地的git配置路径
