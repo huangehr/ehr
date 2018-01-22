@@ -653,6 +653,10 @@ public class ServiceApi {
 
         public static final String Dispatch = "/std/dispatches/{id}";
         public static final String Dispatches = "/std/dispatches";
+
+
+        public static final String AdaptMeta = "/std/adapt/meta";
+        public static final String AdaptDict = "/std/adapt/dict";
     }
 
     public static class Doctors {

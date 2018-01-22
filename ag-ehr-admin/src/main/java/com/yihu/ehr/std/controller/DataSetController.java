@@ -4,7 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.standard.datasset.DataSetModel;
 import com.yihu.ehr.agModel.standard.datasset.MetaDataModel;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.model.standard.*;
+import com.yihu.hos.model.standard.MCdaDataSetRelationship;
+import com.yihu.hos.model.standard.MStdDataSet;
+import com.yihu.hos.model.standard.MStdDict;
+import com.yihu.hos.model.standard.MStdMetaData;
 import com.yihu.ehr.std.service.*;
 import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.ehr.controller.BaseController;
@@ -65,10 +68,6 @@ public class DataSetController extends BaseController {
         List<DataSetModel> dataSetModels = new ArrayList<>();
         for(DataSetModel dataSetModel:dataSetModelList){
             String reference = dataSetModel.getReference();
-            if (!StringUtils.isEmpty(reference)){
-                MStdSource mStdSource = stdSourcrClient.getStdSource(reference);
-                dataSetModel.setReferenceCode(mStdSource == null ? "" : mStdSource.getCode());
-            }
             dataSetModels.add(dataSetModel);
         }
         Envelop envelop = getResult(dataSetModels, getTotalCount(responseEntity), page, size);
@@ -239,8 +238,8 @@ public class DataSetController extends BaseController {
             List<MetaDataModel> metaDataModels = new ArrayList<>();
             for (MStdMetaData m : mStdMetaDatas){
                 MetaDataModel model = convertToModel(m,MetaDataModel.class);
-                long dictId = m.getDictId();
-                if(!(dictId == 0)){
+                Long dictId = m.getDictId();
+                if(!(dictId == null)){
                     MStdDict dict = dictClient.getCdaDictInfo(dictId, version);
                     model.setDictName(dict == null?"":dict.getName());
                     model.setDictCode(dict == null?"":dict.getCode());

@@ -124,5 +124,10 @@
             <version>2.1.0</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.yihu.hos</groupId>
+            <artifactId>common-rest-model</artifactId>
+        </dependency>
+
     </dependencies>
 </project>

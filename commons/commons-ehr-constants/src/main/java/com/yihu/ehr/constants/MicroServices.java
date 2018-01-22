@@ -27,6 +27,7 @@ public class MicroServices {
     //以下几个微服务聚合svr-standard
     public static final String Adaption = "svr-standard";
     public static final String Standard = "svr-standard";
+    public static final String StandardSource = "svr-standard";
     public static final String SpecialDict = "svr-standard";
 
     public static final String Resource = "svr-resource";
@@ -42,6 +43,8 @@ public class MicroServices {
     public static final String Authentication = "svr-authentication";
 
     public static final String Redis = "svr-redis";
+
+    public static final String StdRedis = "hos-admin";
 
     public static final String Quota = "svr-quota";
 

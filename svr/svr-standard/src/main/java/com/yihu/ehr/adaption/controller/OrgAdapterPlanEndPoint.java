@@ -1,7 +1,7 @@
 package com.yihu.ehr.adaption.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.adaption.common.ExtendEndPoint;
+import com.yihu.ehr.adaption.feignclient.DataSetClient;
 import com.yihu.ehr.adaption.model.AdapterCustomize;
 import com.yihu.ehr.adaption.model.AdapterDataSet;
 import com.yihu.ehr.adaption.model.OrgAdapterPlan;
@@ -10,8 +10,6 @@ import com.yihu.ehr.adaption.service.AdapterInfoSendService;
 import com.yihu.ehr.adaption.service.OrgAdapterPlanService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.adaption.MAdapterPlan;
-import com.yihu.ehr.standard.service.DataSetService;
-import com.yihu.ehr.standard.service.MetaDataService;
 import com.yihu.ehr.util.log.LogService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -42,9 +40,7 @@ public class OrgAdapterPlanEndPoint extends ExtendEndPoint<MAdapterPlan> {
     @Autowired
     AdapterInfoSendService adapterInfoSendService;
     @Autowired
-    DataSetService dataSetService;
-    @Autowired
-    private MetaDataService metaDataService;
+    private DataSetClient dataSetClient;
 
     @RequestMapping(value = "/plans", method = RequestMethod.GET)
     @ApiOperation(value = "适配方案搜索")
@@ -230,14 +226,20 @@ public class OrgAdapterPlanEndPoint extends ExtendEndPoint<MAdapterPlan> {
     /**************************************************************************************************/
 
     //获取所有标准数据集
-    private List<AdapterCustomize> findStdCustomize(String version, List<AdapterCustomize> adapterCustomizeList) {
+    private List<AdapterCustomize> findStdCustomize(String version, List<AdapterCustomize> adapterCustomizeList) throws IOException {
         boolean std = false;
         boolean check = false;
         long childCheckCount;
         List<AdapterCustomize> stdCustomizeList = new ArrayList<>();
 
-        Map<Long, String> map = dataSetService.getDataSetMapByIds(new Long[]{}, version);
-        Map<Long, Map> metaDatas = metaDataService.getMetaDataMapByIds(new Long[]{}, version);
+        Map<Long, String>  map = dataSetClient.getDataSetMapByIds(version, "");
+        //Map<Long, String> map = dataSetService.getDataSetMapByIds(new Long[]{}, version);
+        HashMap<String, Object> par = new HashMap<>();
+        par.put("metaIds",new Long[]{});
+        par.put("version",version);
+        String parStr = toJson(par);
+        Map<Long, Map> metaDatas = dataSetClient.getMetaDataMapByIds(parStr);
+        //Map<Long, Map> metaDatas = metaDataService.getMetaDataMapByIds(new Long[]{}, version);
         int rootCheckCount = 0;
         for (Long dataSetId : map.keySet()) {
             AdapterCustomize parent = new AdapterCustomize();
@@ -291,14 +293,23 @@ public class OrgAdapterPlanEndPoint extends ExtendEndPoint<MAdapterPlan> {
     }
 
     //获取所有定制数据集
-    private List<AdapterCustomize> findAdapterCustomize(Long planId, String version) {
+    private List<AdapterCustomize> findAdapterCustomize(Long planId, String version) throws IOException {
         boolean adapter = false;  //定制是否添加根节点
         List<AdapterCustomize> adapterCustomizeList = new ArrayList<>();
         //获取所有定制数据集
         List<Long> adapterDataSetList = adapterDataSetService.getAdapterDataSet(planId);
         List<AdapterDataSet> adapterMetaDataList = adapterDataSetService.getAdapterMetaData(planId);
         //数据集
-        Map<Long, String> map = dataSetService.getDataSetMapByIds(adapterDataSetList.toArray(new Long[adapterDataSetList.size()]), version);
+        String ids = "";
+        if(adapterDataSetList!=null && adapterDataSetList.size()>0){
+            for(Long id:adapterDataSetList){
+                ids+=","+id;
+            }
+            if(!StringUtils.isEmpty(ids)){
+                ids = ids.substring(1,ids.length());
+            }
+        }
+        Map<Long, String>  map = dataSetClient.getDataSetMapByIds(version, ids);
         String text = "";
         for (Long adapterDataSet : adapterDataSetList) {
             if(StringUtils.isEmpty(text = map.get(adapterDataSet)))
@@ -318,7 +329,13 @@ public class OrgAdapterPlanEndPoint extends ExtendEndPoint<MAdapterPlan> {
             metaDataIds[i] = adapterDataSet.getMetaDataId();
             i++;
         }
-        Map<Long, Map> metaDatas = metaDataService.getMetaDataMapByIds(metaDataIds, version);
+
+        HashMap<String, Object> par = new HashMap<>();
+        par.put("metaIds",metaDataIds);
+        par.put("version",version);
+        String parStr = toJson(par);
+        Map<Long, Map> metaDatas = dataSetClient.getMetaDataMapByIds(parStr);
+        //Map<Long, Map> metaDatas = metaDataService.getMetaDataMapByIds(metaDataIds, version);
         Map<Long, String> tmp;
         for (AdapterDataSet adapterDataSet : adapterMetaDataList) {
             if ((tmp = (Map) metaDatas.get(adapterDataSet.getDataSetId())) == null

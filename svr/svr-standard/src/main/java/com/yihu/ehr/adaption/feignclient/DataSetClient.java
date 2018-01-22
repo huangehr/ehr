@@ -1,15 +1,14 @@
 package com.yihu.ehr.adaption.feignclient;
 
-import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
+import com.yihu.ehr.constants.ServiceApi;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Map;
 
@@ -22,13 +21,14 @@ import java.util.Map;
 //@ApiIgnore
 //@FeignClient(name = MicroServices.Standard)
 @Deprecated
+@FeignClient(name = MicroServices.Standard)
 public interface DataSetClient {
 
     @RequestMapping(value = ApiVersion.Version1_0+ ServiceApi.Standards.DataSetsName, method = RequestMethod.GET)
     @ApiOperation(value = "获取数据集 id-name : map集")
     Map getDataSetMapByIds(
             @RequestParam(value = "version") String version,
-            @RequestParam(value = "ids") String ids);
+            @RequestParam(value = "ids",required = false) String ids);
 
 
     @RequestMapping(value =ApiVersion.Version1_0+ ServiceApi.Standards.MetaDatasName, method = RequestMethod.POST)

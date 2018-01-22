@@ -4,7 +4,7 @@ package com.yihu.ehr.adaption.feignclient;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
-import com.yihu.ehr.model.standard.MCDAVersion;
+import com.yihu.hos.model.standard.MSTDVersion;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,5 +25,5 @@ public interface StdVersionClient {
 
     @RequestMapping(value = ApiVersion.Version1_0+ ServiceApi.Standards.Version, method = RequestMethod.GET)
     @ApiOperation(value = "获取版本信息")
-    MCDAVersion getVersion(@PathVariable(value = "version") String version) throws Exception;
+    MSTDVersion getVersion(@PathVariable(value = "version") String version) throws Exception;
 }

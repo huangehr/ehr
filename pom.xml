@@ -81,6 +81,7 @@
         <version.commons-lang3>3.2.1</version.commons-lang3>
         <version.commons-pool2>2.4.2</version.commons-pool2>
         <version.ehr>1.1.0</version.ehr>
+
         <version.hadoop-client>2.7.1</version.hadoop-client>
         <version.hbase-client>1.1.1</version.hbase-client>
         <version.hibernate>4.3.11.Final</version.hibernate>

@@ -1,13 +1,11 @@
 package com.yihu.ehr.adaption.controller;
 
-import com.yihu.ehr.adaption.feignclient.StdVersionClient;
 import com.yihu.ehr.adaption.model.OrgAdapterPlan;
 import com.yihu.ehr.adaption.service.AdapterInfoSendService;
 import com.yihu.ehr.adaption.service.OrgAdapterPlanService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
-import com.yihu.ehr.model.standard.MCDAVersion;
 import com.yihu.ehr.standard.model.CDAVersion;
 import com.yihu.ehr.standard.service.CdaVersionService;
 import com.yihu.ehr.util.encrypt.RSA;
@@ -156,7 +154,7 @@ public class AdapterDispatchEndPoint {
 
             if (listPlan != null && listPlan.size() > 0) {
                 RestEcho restEcho = new RestEcho().success();
-                CDAVersion version = cdaVersionService.getVersion(listPlan.get(0).getVersion());
+                MSTDVersion version = cdaVersionService.getVersion(listPlan.get(0).getVersion());
                 restEcho.putResult("version", version.getVersion());
                 restEcho.putResult("timestamp", version.getCommitTime());
                 return restEcho;

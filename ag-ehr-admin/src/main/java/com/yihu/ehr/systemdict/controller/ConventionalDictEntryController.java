@@ -31,6 +31,9 @@ public class ConventionalDictEntryController extends BaseController{
     @Autowired
     private ConventionalDictEntryClient dictEntryClient;
 
+    @Autowired
+    private EsbDictEntryClient esbDictEntryClient;
+
     @RequestMapping(value = "/dictionaries/app_catalog", method = RequestMethod.GET)
     @ApiOperation(value = "获取应用类别字典项", response = MConventionalDict.class, produces = "application/json")
     public Envelop getAppCatalog(
@@ -817,6 +820,14 @@ public class ConventionalDictEntryController extends BaseController{
         MConventionalDict mConventionalDict = dictEntryClient.getMessageRemindTypeList(code);
         return convertDictToModel(mConventionalDict);
     }
+
+    @RequestMapping(value = "/dictionaries/cda_type_browser_list", method = RequestMethod.GET)
+    @ApiOperation(value = "浏览器用CDA类别清单", response = MConventionalDict.class)
+    public Envelop getCdaTypeForBrowserList(){
+        Collection<MConventionalDict> mConventionalDicts = esbDictEntryClient.getApiParameterDataRequiredList();
+        return convertDictToListModel(mConventionalDicts);
+    }
+
 
 
     private Envelop convertDictToModel(MConventionalDict mConventionalDict){

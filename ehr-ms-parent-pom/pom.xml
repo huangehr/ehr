@@ -429,6 +429,13 @@
                 <artifactId>commons-admin-gateway-model</artifactId>
                 <version>${version.ehr}</version>
             </dependency>
+
+            <!-- eip 标准相关model的jar包 -->
+            <dependency>
+                <groupId>com.yihu.hos</groupId>
+                <artifactId>common-rest-model</artifactId>
+                <version>${version.eip}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

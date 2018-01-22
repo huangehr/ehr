@@ -43,5 +43,10 @@
             <version>${version.ehr}</version>
             <scope>${dependency.scope}</scope>
         </dependency>
+        <dependency>
+            <groupId>com.yihu.hos</groupId>
+            <artifactId>common-rest-model</artifactId>
+            <version>${version.eip}</version>
+        </dependency>
     </dependencies>
 </project>
