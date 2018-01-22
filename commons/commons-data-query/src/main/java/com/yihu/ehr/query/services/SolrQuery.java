@@ -279,9 +279,10 @@ public class SolrQuery {
                                                     List<Map<String, Object>> preList,
                                                     String q,
                                                     String fq) throws Exception {
-        String conditionName = "$condition";
+        String conditionName = "$condition"; // 拼接最后一个维度分组聚合统计的过滤条件
+        String countKeyName = "$countKey"; // 拼接最后一个维度分组聚合统计值对应的唯一健
         if (num == grouplist.size() - 1) {
-            List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();// 维度字段及统计结果
+            List<Map<String, Object>> list = new ArrayList<Map<String, Object>>(); // 维度字段、维度组合Key及统计结果
             SolrGroupEntity group = grouplist.get(num);  // 最后一个维度
             String groupField = group.getGroupField();
             SolrGroupEntity.GroupType groupType = group.getType();
@@ -297,7 +298,7 @@ public class SolrQuery {
                 Map<String, Long> countMap = new HashMap<>();
                 if (groupType.equals(SolrGroupEntity.GroupType.DATE_RANGE)) {
                     // 按每天范围统计
-                    List<RangeFacet> rangeFacets = solrUtil.getFacetDateRange(core, groupField, startTime, endTime, "+1DAY", fq, q);
+                    List<RangeFacet> rangeFacets = solrUtil.getFacetDateRange(core, groupField, startTime, endTime, "+1DAY", query, q);
                     for (RangeFacet rangeFacet : rangeFacets) {
                         List<RangeFacet.Count> countList = rangeFacet.getCounts();
                         for (RangeFacet.Count count : countList) {
@@ -314,9 +315,11 @@ public class SolrQuery {
 
                 if (countMap.size() > 0) {
                     for (String key : countMap.keySet()) {
-                        Map<String, Object> obj = new LinkedHashMap<String, Object>();
+                        Map<String, Object> obj = new LinkedHashMap<>();
                         obj.putAll(preObj); //深拷贝
                         obj.put(groupField, key);
+                        String countKey = preObj.get(countKeyName).toString() + "-" + key;
+                        obj.put(countKeyName, countKey);
                         obj.put("$count", countMap.get(key));
                         obj.remove(conditionName);
                         list.add(obj);
@@ -335,21 +338,22 @@ public class SolrQuery {
                 for (Map<String, Object> preObj : preList) {
                     //遍历当前分组数据
                     for (Map.Entry<String, String> item : groupMap.entrySet()) {
-                        Map<String, Object> obj = new LinkedHashMap<String, Object>();
+                        Map<String, Object> obj = new LinkedHashMap<>();
                         obj.putAll(preObj); //深拷贝
                         obj.put(groupName, item.getKey());
-                        //拼接过滤条件
-                        String cond = obj.get(conditionName).toString();
-                        cond += " AND " + item.getValue();
-                        obj.put(conditionName, cond);
+                        String condition = preObj.get(conditionName).toString() + " AND " + item.getValue();
+                        obj.put(conditionName, condition);
+                        String key = preObj.get(countKeyName).toString() + "-" + item.getKey();
+                        obj.put(countKeyName, key);
                         list.add(obj);
                     }
                 }
             } else { //第一次遍历
                 for (Map.Entry<String, String> item : groupMap.entrySet()) {
-                    Map<String, Object> obj = new HashMap<String, Object>();
+                    Map<String, Object> obj = new HashMap<>();
                     obj.put(groupName, item.getKey());
                     obj.put(conditionName, item.getValue());
+                    obj.put(countKeyName, item.getKey());
                     list.add(obj);
                 }
             }
@@ -454,7 +458,6 @@ public class SolrQuery {
                 groupList = customGroups;
             }
 
-            List<String> groupFieldList = new ArrayList<>();
             for (SolrGroupEntity dimensionGroup : dimensionGroupList) {
                 if (dimensionGroup.getType().equals(SolrGroupEntity.GroupType.DATE_RANGE)) {
                     // 按每天范围统计
@@ -465,23 +468,26 @@ public class SolrQuery {
                         SolrGroupEntity group = new SolrGroupEntity(groupName);
                         group.setType(SolrGroupEntity.GroupType.DATE_RANGE);
                         for (RangeFacet.Count count : countList) {
-                            String day = count.getValue().substring(0, 10);
-                            group.putGroupCondition(day, String.format("%s:[%sT00:00:00Z TO %sT23:59:59Z]", groupName, day, day));
+                            if (count.getCount() > 0) {
+                                String day = count.getValue().substring(0, 10);
+                                group.putGroupCondition(day, String.format("%s:[%sT00:00:00Z TO %sT23:59:59Z]", groupName, day, day));
+                            }
                         }
                         groupList.add(group);
                     }
                 } else {
                     // 按分组字段值统计
-                    groupFieldList.add(dimensionGroup.getGroupField());
-                    String[] groupFields = groupFieldList.toArray(new String[groupFieldList.size()]);
-                    List<FacetField> facets = solrUtil.groupCount(core, q, fq, groupFields);
+                    String[] groupField = {dimensionGroup.getGroupField()};
+                    List<FacetField> facets = solrUtil.groupCount(core, q, fq, groupField);
                     for (FacetField facet : facets) {
                         String groupName = facet.getName();
                         List<FacetField.Count> counts = facet.getValues();
                         SolrGroupEntity group = new SolrGroupEntity(groupName);
                         for (FacetField.Count count : counts) {
-                            String value = count.getName();
-                            group.putGroupCondition(value, groupName + ":" + value);
+                            if (count.getCount() > 0) {
+                                String value = count.getName();
+                                group.putGroupCondition(value, groupName + ":" + value);
+                            }
                         }
                         groupList.add(group);
                     }

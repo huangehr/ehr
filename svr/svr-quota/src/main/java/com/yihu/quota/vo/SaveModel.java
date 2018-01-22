@@ -46,6 +46,8 @@ public class SaveModel {
     private String orgHealthCategoryPid;
     private String economic;    // 经济类型代码
     private String economicName;    // 经济类型名称
+    private String level;   // 医院等级
+    private String levelName;   // 医院等级名称
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssZ")// 2017-06-24T11:51:30+080
     @CreatedDate
@@ -329,5 +331,21 @@ public class SaveModel {
 
     public void setEconomicName(String economicName) {
         this.economicName = economicName;
+    }
+
+    public String getLevel() {
+        return level;
+    }
+
+    public void setLevel(String level) {
+        this.level = level;
+    }
+
+    public String getLevelName() {
+        return levelName;
+    }
+
+    public void setLevelName(String levelName) {
+        this.levelName = levelName;
     }
 }

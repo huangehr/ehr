@@ -1,9 +1,7 @@
-package com.yihu.ehr.analyze.service;
+package com.yihu.ehr.analyze.service.pack;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.analyze.feign.PackageMgrClient;
-import com.yihu.ehr.analyze.feign.RedisServiceClient;
+import com.yihu.ehr.analyze.service.qc.PackageQcService;
 import com.yihu.ehr.model.packs.MPackage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.util.Map;
 
 /**
  * 档案解析引擎.
@@ -29,9 +26,7 @@ public class PackageAnalyzeService {
     @Autowired
     private PackageMgrClient mgrClient;
     @Autowired
-    private RedisServiceClient redisServiceClient;
-    @Autowired
-    private ObjectMapper objectMapper;
+    private PackageQcService packageQcService;
 
     @PostConstruct
     private void init() {
@@ -59,8 +54,8 @@ public class PackageAnalyzeService {
 
             mgrClient.analyzeStatus(mPackage.getId(), 3);
 
-            //发送Qc消息
-            sendMsg(zipPackage);
+            packageQcService.sendQcMsg(zipPackage);//发送Qc消息
+            packageQcService.qcReceive(zipPackage);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
@@ -75,33 +70,6 @@ public class PackageAnalyzeService {
                 zipPackage.houseKeep();
             }
         }
-    }
-
-    /**
-     * 通过Redis的消息订阅发布来处理质控规则
-     *
-     * @param zipPackage 档案包
-     */
-    private void sendMsg(ZipPackage zipPackage) {
-        Map<String, DataSetRecord> dataSets = zipPackage.getDataSets();
-        dataSets.forEach((key, dataSetRecord) -> {
-            Map<String, DataElementRecord> records = dataSetRecord.getRecords();
-            records.forEach((elementCode, dataElement) -> {
-                String rowKey = dataSetRecord.genRowKey(elementCode);
-                Map<String, String> dataGroup = dataElement.getDataGroup();
-                dataGroup.forEach((code, value) -> {
-                    String channel = "dataElement_" + code;
-                    ObjectNode msgNode = objectMapper.createObjectNode();
-                    msgNode.put("rowKey", rowKey);
-                    msgNode.put("table", dataSetRecord.getCode());
-                    msgNode.put("columnFamily", ZipPackage.DATA);
-                    msgNode.put("code", code);
-                    msgNode.put("value", value);
-
-                    redisServiceClient.sendMessage("", channel, msgNode.toString());
-                });
-            });
-        });
     }
 
 }

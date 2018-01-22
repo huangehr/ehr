@@ -53,8 +53,8 @@ public class OrgHealthCategoryStatisticsService {
                 item.put("yearName", endpoint.get("yearName"));
                 item.put("slaveKey1", endpoint.get("slaveKey1"));
                 item.put("slaveKey1Name", endpoint.get("slaveKey1Name"));
-                item.put("slaveKey2Name", endpoint.get("slaveKey2"));
-                item.put("slaveKey1", endpoint.get("slaveKey2Name"));
+                item.put("slaveKey2", endpoint.get("slaveKey2"));
+                item.put("slaveKey2Name", endpoint.get("slaveKey2Name"));
                 item.put("slaveKey3", endpoint.get("slaveKey3"));
                 item.put("slaveKey3Name", endpoint.get("slaveKey3Name"));
             }
