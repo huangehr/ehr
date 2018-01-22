@@ -671,25 +671,6 @@
 
     <repositories>
         <repository>
-            <id>nexus</id>
-            <name>local private nexus</name>
-            <url>http://maven.oschina.net/content/groups/public/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>spring-milestones</id>
-            <name>Spring Milestones</name>
-            <url>https://repo.spring.io/milestone</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
             <id>repositoryCentral</id>
             <name>repositoryCentral</name>
             <url>http://172.19.103.43:8081/nexus/content/repositories/central/</url>
@@ -698,6 +679,14 @@
             <id>repositoryReleases</id>
             <name>repositoryReleases</name>
             <url>http://172.19.103.43:8081/nexus/content/repositories/releases/</url>
+        </repository>
+        <repository>
+            <id>spring-milestones</id>
+            <name>Spring Milestones</name>
+            <url>https://repo.spring.io/milestone</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </repository>
     </repositories>
 
