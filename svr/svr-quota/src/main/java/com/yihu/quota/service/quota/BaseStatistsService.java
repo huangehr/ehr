@@ -387,12 +387,12 @@ public class BaseStatistsService {
         }else {
             groupDimension = dimension;
         }
-        groupDimension += ",org,quotaDate ";
         List<Map<String, Object>>  dimenListResult = esResultExtract.searcherSumGroup(tjQuota, groupDimension, filter, "result", "", "");
         List<Map<String, Object>> resultList = new ArrayList<>();
         for(Map<String, Object> map : dimenListResult){
             Map<String,Object> dataMap = new HashMap<>();
             for(String key :map.keySet()){
+                dataMap.putAll(map);
                 //维度为特殊机构类型时
                 if(key.equals(orgHealthCategoryCode)){
                     dataMap.put(map.get(orgHealthCategoryCode).toString(),map.get(orgHealthCategoryCode));
@@ -401,9 +401,11 @@ public class BaseStatistsService {
                     dataMap.put("result", map.get(key).toString());
                 }
                 if(key.equals("quotaDate")){
-                    dataMap.put("quotaDate", map.get(key).toString().substring(0,10));
+                    SimpleDateFormat format =  new SimpleDateFormat("yyyy-MM-dd");
+                    Long time = new Long(Long.valueOf(map.get(key).toString()));
+                    String quotaDate = format.format(time);
+                    dataMap.put("quotaDate", quotaDate);
                 }
-                dataMap.putAll(map);
             }
             resultList.add(dataMap);
         }
