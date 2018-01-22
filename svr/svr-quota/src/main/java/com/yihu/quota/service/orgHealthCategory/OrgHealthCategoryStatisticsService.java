@@ -9,10 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 卫生机构类别统计 Service
@@ -51,10 +48,15 @@ public class OrgHealthCategoryStatisticsService {
                     item.put("isEndpoint", "true");
                 }
                 item.put("town", endpoint.get("town"));
+                item.put("townName", endpoint.get("townName"));
                 item.put("year", endpoint.get("year"));
+                item.put("yearName", endpoint.get("yearName"));
                 item.put("slaveKey1", endpoint.get("slaveKey1"));
-                item.put("slaveKey2", endpoint.get("slaveKey2"));
+                item.put("slaveKey1Name", endpoint.get("slaveKey1Name"));
+                item.put("slaveKey2Name", endpoint.get("slaveKey2"));
+                item.put("slaveKey1", endpoint.get("slaveKey2Name"));
                 item.put("slaveKey3", endpoint.get("slaveKey3"));
+                item.put("slaveKey3Name", endpoint.get("slaveKey3Name"));
             }
         }
 
@@ -63,7 +65,9 @@ public class OrgHealthCategoryStatisticsService {
             Map<String, Object> item = allOrgHealthCategoryList.get(j);
             int id = (int) item.get("id");
             List<Map<String, Object>> itemEndpointList = findEndpointsForOneParent(allOrgHealthCategoryList, id);
-            item.put("result", countResult(itemEndpointList));
+            if (itemEndpointList.size() != 0) {
+                item.put("result", countResult(itemEndpointList));
+            }
         }
 
         // 添加【合计】到卫生机构类别集合
@@ -130,6 +134,11 @@ public class OrgHealthCategoryStatisticsService {
             String slaveKey1 = null;
             String slaveKey2 = null;
             String slaveKey3 = null;
+            String townName = null;
+            String yearName = null;
+            String slaveKey1Name = null;
+            String slaveKey2Name = null;
+            String slaveKey3Name = null;
             if (endpointsStatisticList.size() > 0) {
                 Map<String, Object> endpoint = endpointsStatisticList.get(0);
                 quotaCode = endpoint.get("quotaCode").toString().replaceAll("_", "");
@@ -145,16 +154,27 @@ public class OrgHealthCategoryStatisticsService {
                 slaveKey1 = item.get("slaveKey1") == null ? null : item.get("slaveKey1").toString();
                 slaveKey2 = item.get("slaveKey2") == null ? null : item.get("slaveKey2").toString();
                 slaveKey3 = item.get("slaveKey3") == null ? null : item.get("slaveKey3").toString();
+
+                townName = item.get("townName") == null ? null : item.get("townName").toString();
+                yearName = item.get("yearName") == null ? null : item.get("yearName").toString();
+                slaveKey1Name = item.get("slaveKey1Name") == null ? null : item.get("slaveKey1Name").toString();
+                slaveKey2Name = item.get("slaveKey2Name") == null ? null : item.get("slaveKey2Name").toString();
+                slaveKey3Name = item.get("slaveKey3Name") == null ? null : item.get("slaveKey3Name").toString();
+
                 model.setQuotaCode(quotaCode);
                 model.setQuotaName(quotaName);
                 model.setQuotaDate(quotaDate);
                 model.setTown(town);
-                model.setTownName(town);
+                model.setTownName(townName);
                 model.setYear(year);
-                model.setYearName(year);
+                model.setYearName(yearName);
                 model.setSlaveKey1(slaveKey1);
                 model.setSlaveKey2(slaveKey2);
                 model.setSlaveKey3(slaveKey3);
+                model.setSlaveKey1Name(slaveKey1Name);
+                model.setSlaveKey2Name(slaveKey2Name);
+                model.setSlaveKey3Name(slaveKey3Name);
+                model.setCreateTime(new Date());
                 model.setOrgHealthCategoryId(item.get("id").toString());
                 String pid = item.get("pid") == null ? null : item.get("pid").toString();
                 model.setOrgHealthCategoryPid(pid);

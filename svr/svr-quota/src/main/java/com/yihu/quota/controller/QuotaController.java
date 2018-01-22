@@ -84,12 +84,14 @@ public class QuotaController extends BaseController {
                 filters = URLDecoder.decode(filters, "UTF-8");
             }
             System.out.println(filters);
-            List<Map<String, Object>> resultList = quotaService.queryResultPage(id, filters, pageNo, pageSize);
             List<SaveModel> saveModelList = new ArrayList<SaveModel>();
-            for(Map<String, Object> map : resultList){
-                SaveModel saveModel =  objectMapper.convertValue(map, SaveModel.class);
-                if(saveModel != null){
-                    saveModelList.add(saveModel);
+            List<Map<String, Object>> resultList = quotaService.queryResultPage(id, filters, pageNo, pageSize);
+            if(resultList != null && resultList.size() > 0){
+                for(Map<String, Object> map : resultList){
+                    SaveModel saveModel =  objectMapper.convertValue(map, SaveModel.class);
+                    if(saveModel != null){
+                        saveModelList.add(saveModel);
+                    }
                 }
             }
             long totalCount = quotaService.getQuotaTotalCount(id,filters);
@@ -130,19 +132,22 @@ public class QuotaController extends BaseController {
         try {
             if(filters!=null){
                 filters = URLDecoder.decode(filters, "UTF-8");
+                if(filters.equals("{}")){
+                    filters = null;
+                }
             }
             TjQuotaDataSource quotaDataSource = dataSourceService.findSourceByQuotaCode(code);
             JSONObject obj = new JSONObject().fromObject(quotaDataSource.getConfigJson());
             EsConfig esConfig= (EsConfig) JSONObject.toBean(obj,EsConfig.class);
             List<Map<String, Object>>  resultList = new ArrayList<>();
             if(tjQuota.getResultGetType().equals("1")){
-                if( (StringUtils.isNotEmpty(esConfig.getEspecialType())) && esConfig.getEspecialType().equals(orgHealthCategory)){
-                    //特殊机构类型查询输出结果  只有查询条件没有维度 默认是 机构类型维度
-                    resultList = baseStatistsService.getOrgHealthCategory(code,filters,dateType);
-                }else {
+//                if( (StringUtils.isNotEmpty(esConfig.getEspecialType())) && esConfig.getEspecialType().equals(orgHealthCategory)){
+//                    //特殊机构类型查询输出结果  只有查询条件没有维度 默认是 机构类型维度
+//                    resultList = baseStatistsService.getOrgHealthCategory(code,filters,dateType);
+//                }else {
                     //普通指标直接查询
                     resultList = baseStatistsService.getQuotaResultList(code, dimension,filters,dateType);
-                }
+//                }
             }else {
                 if( (StringUtils.isNotEmpty(esConfig.getMolecular())) && StringUtils.isNotEmpty(esConfig.getDenominator())){//除法
                     //除法指标查询输出结果
@@ -195,10 +200,10 @@ public class QuotaController extends BaseController {
      */
     @ApiOperation(value = "根据指标code获取指标统计结果")
     @RequestMapping(value = ServiceApi.TJ.TjGetReportQuotaResult, method = RequestMethod.GET)
-    public Envelop geQuotaReportResultByFilter(
+    public Envelop tjGetReportQuotaResult(
             @ApiParam(name = "code", value = "指标code", required = true)
             @RequestParam(value = "code" , required = true) String code,
-            @ApiParam(name = "filters", value = "检索条件", defaultValue = "")
+            @ApiParam(name = "filters", value = "检索条件 多个条件用 and 拼接 如：town=361002 and org=10000001 ", defaultValue = "")
             @RequestParam(value = "filters", required = false) String filters,
             @ApiParam(name = "dimension", value = "需要统计不同维度字段", defaultValue = "")
             @RequestParam(value = "dimension", required = true) String dimension,
@@ -210,27 +215,8 @@ public class QuotaController extends BaseController {
             if(filters!=null){
                 filters = URLDecoder.decode(filters, "UTF-8");
             }
-            TjQuotaDataSource quotaDataSource = dataSourceService.findSourceByQuotaCode(code);
-            JSONObject obj = new JSONObject().fromObject(quotaDataSource.getConfigJson());
-            EsConfig esConfig= (EsConfig) JSONObject.toBean(obj,EsConfig.class);
-
-            if( (StringUtils.isNotEmpty(esConfig.getEspecialType())) && esConfig.getEspecialType().equals(orgHealthCategory)){
-                //特殊机构类型查询输出结果  只有查询条件没有维度 默认是 机构类型维度
-                List<Map<String, Object>> result = baseStatistsService.getOrgHealthCategory(code,filters,dateType);
-                envelop.setObj(result);
-            }else if( (StringUtils.isNotEmpty(esConfig.getMolecular())) && StringUtils.isNotEmpty(esConfig.getDenominator())){//除法
-                //除法指标查询输出结果
-                List<Map<String, Object>> result =  baseStatistsService.divisionQuota(esConfig.getMolecular(), esConfig.getDenominator(), dimension, filters, esConfig.getPercentOperation(), esConfig.getPercentOperationValue(),dateType);
-                envelop.setObj(result);
-            }else if( (StringUtils.isNotEmpty(esConfig.getThousandDmolecular())) && StringUtils.isNotEmpty(esConfig.getThousandDenominator())){//除法
-                //除法指标查询输出结果
-                List<Map<String, Object>> result =  baseStatistsService.divisionQuota(esConfig.getThousandDmolecular(), esConfig.getThousandDenominator(), dimension, filters, "1", esConfig.getThousandFlag(),dateType);
-                envelop.setObj(result);
-            }else {
-                //普通指标查询
-                List<Map<String, Object>>  resultMap = baseStatistsService.getQuotaResultList(code, dimension,filters,dateType);
-                envelop.setObj(resultMap);
-            }
+            List<Map<String, Object>> result =  baseStatistsService.getSimpleQuotaReport(code,filters,dimension,dateType);
+            envelop.setObj(result);
             envelop.setSuccessFlg(true);
             return envelop;
         } catch (Exception e) {
@@ -296,74 +282,86 @@ public class QuotaController extends BaseController {
 //    }
 
 
-    /**
-     * 从维度结果集中抽取机构类型的数据 返回机构类型树状结构数据
-     * @param orgHealthCategoryList
-     * @param dimensionValList
-     * @param filters
-     * @param dimension
-     * @param tjQuota
-     * @return
-     * @throws Exception
-     */
-    public List<Map<String,Object>> setResult(List<Map<String,Object>> orgHealthCategoryList ,
-                                              List<String> dimensionValList ,String filters,
-                                              String dimension,TjQuota tjQuota, Map<String, List<Map<String, Object>>>  resultMap ) throws Exception {
-        List<Map<String,Object>> result = new ArrayList<>();
-        for(int i=0 ; i < orgHealthCategoryList.size() ; i++ ){
-            Map<String,Object> mapCategory = orgHealthCategoryList.get(i);
-            String code = mapCategory.get("code").toString();
-            for(String val : dimensionValList){
-                if(resultMap.get(val) != null ){
-                    for(Map<String,Object> map : resultMap.get(val)){
-                        mapCategory.put(val, map.get(code) != null ? map.get(code).toString() : "0");
-                    }
-                }
-            }
-            result.add(mapCategory);
-            if(mapCategory.get("children") != null){
-                List<Map<String,Object>> childrenOrgHealthCategoryList = (List<Map<String, Object>>) mapCategory.get("children");
-                mapCategory.put("children",setResult(childrenOrgHealthCategoryList,dimensionValList,filters,dimension,tjQuota,resultMap));
-            }
-        }
-        return  result;
-    }
+//    /**
+//     * 从维度结果集中抽取机构类型的数据 返回机构类型树状结构数据
+//     * @param orgHealthCategoryList
+//     * @param dimensionValList
+//     * @param filters
+//     * @param dimension
+//     * @param tjQuota
+//     * @return
+//     * @throws Exception
+//     */
+//    public List<Map<String,Object>> setResult(List<Map<String,Object>> orgHealthCategoryList ,
+//                                              List<String> dimensionValList ,String filters,
+//                                              String dimension,TjQuota tjQuota, Map<String, List<Map<String, Object>>>  resultMap ) throws Exception {
+//        List<Map<String,Object>> result = new ArrayList<>();
+//        for(int i=0 ; i < orgHealthCategoryList.size() ; i++ ){
+//            Map<String,Object> mapCategory = orgHealthCategoryList.get(i);
+//            String code = mapCategory.get("code").toString();
+//            for(String val : dimensionValList){
+//                if(resultMap.get(val) != null ){
+//                    for(Map<String,Object> map : resultMap.get(val)){
+//                        mapCategory.put(val, map.get(code) != null ? map.get(code).toString() : "0");
+//                    }
+//                }
+//            }
+//            result.add(mapCategory);
+//            if(mapCategory.get("children") != null){
+//                List<Map<String,Object>> childrenOrgHealthCategoryList = (List<Map<String, Object>>) mapCategory.get("children");
+//                mapCategory.put("children",setResult(childrenOrgHealthCategoryList,dimensionValList,filters,dimension,tjQuota,resultMap));
+//            }
+//        }
+//        return  result;
+//    }
 
     @ApiOperation(value = "根据编码获取指标执行结果")
     @RequestMapping(value = ServiceApi.TJ.FindByQuotaCodes, method = RequestMethod.GET)
     public Envelop findByQuotaCodes(
             @ApiParam(name = "quotaCodes", value = "指标code", required = true)
             @RequestParam(value = "quotaCodes") String quotaCodes,
-            @ApiParam(name = "orgCode", value = "机构code", required = true)
-            @RequestParam(value = "orgCode") String orgCode) {
+            @ApiParam(name = "town", value = "区域town", required = true)
+            @RequestParam(value = "town") String town) {
+        if ("all".equalsIgnoreCase(town)) {
+            town = "";
+        }
         List<HospitalComposeModel> hospitalComposeModels = new ArrayList<>();
+        List<HospitalComposeModel> hospitalComposeModelList = new ArrayList<>();
         HospitalComposeModel hospitalComposeModel = new HospitalComposeModel();
-        hospitalComposeModel.setTitle("按性别分");
+        hospitalComposeModel.setName("按性别分");
         Envelop envelop = new Envelop();
         String[] code = quotaCodes.split(",");
 
         List<Map<String, Object>> myListMap = new ArrayList<>();
         try {
-            for (String quotaCode : code) {
-                List<Map<String, Object>> mapList = quotaService.queryResultPageByCode(quotaCode, "{\"org\":\""+ orgCode+ "\"}", 1, 10000);
+            for (int i = 0; i < code.length; i++) {
+                HospitalComposeModel hos = new HospitalComposeModel();
+
+                List<Map<String, Object>> mapList = quotaService.queryResultPageByCode(code[i], "{\"town\":\""+ town + "\"}", 1, 10000);
                 if (null != mapList && mapList.size() > 0) {
-                    Map<String, Object> title = new HashMap<>();
-                    Map<String, Object> myMap = new HashMap<>();
+                    String title = exchangeCode(code[i]);
+                    hos.setName(title);
+                    Integer x1 = 0;
+                    Integer x2 = 0;
                     for (Map<String, Object> map : mapList) {
                         SaveModel saveModel =  objectMapper.convertValue(map, SaveModel.class);
                         if(saveModel != null){
-                            title.put("title", saveModel.getQuotaName());
                             if ("1".equals(saveModel.getSlaveKey1())) {
-                                myMap.put("男", saveModel.getResult());
+                                x1 += Integer.parseInt(saveModel.getResult() == null ? "0" : saveModel.getResult());
                             } else if ("2".equals(saveModel.getSlaveKey1())) {
-                                myMap.put("女", saveModel.getResult());
+                                x2 += Integer.parseInt(saveModel.getResult() == null ? "0" : saveModel.getResult());
                             }
+
                         }
                     }
-                    myMap.putAll(title);
-                    myListMap.add(myMap);
+                    hos.setX1(x1 + "");
+                    hos.setX2(x2 + "");
+                    hospitalComposeModels.add(hos);
                 } else {
-                    String title = exchangeCode(quotaCode);
+                    String title = exchangeCode(code[i]);
+                    hos.setName(title);
+                    hos.setX1("0");
+                    hos.setX2("0");
                     Map<String, Object> map = new HashMap<>();
                     Map<String, Object> titleMap = new HashMap<>();
                     map.put("男", 0);
@@ -371,14 +369,31 @@ public class QuotaController extends BaseController {
                     titleMap.put("title", title);
                     map.putAll(titleMap);
                     myListMap.add(map);
+                    hospitalComposeModels.add(hos);
                 }
             }
-            HospitalComposeModel hos = new HospitalComposeModel();
-            hos.setListMap(myListMap);
-            hospitalComposeModel.setChildren(hos);
-            hospitalComposeModels.add(hospitalComposeModel);
-            envelop.setDetailModelList(hospitalComposeModels);
             envelop.setSuccessFlg(true);
+
+            List<Map<String, Object>> list = new ArrayList<>();
+            Map<String, Object> map1 = new HashMap<>();
+            Map<String, Object> map2 = new HashMap<>();
+            int sum1 = 0;
+            int sum2 = 0;
+            for (int i = 0; i < hospitalComposeModels.size(); i++) {
+                map1.put(hospitalComposeModels.get(i).getName(), hospitalComposeModels.get(i).getX1() == null ? "0" : hospitalComposeModels.get(i).getX1());
+                map2.put(hospitalComposeModels.get(i).getName(), hospitalComposeModels.get(i).getX2() == null ? "0" : hospitalComposeModels.get(i).getX2());
+                sum1 += Integer.parseInt(hospitalComposeModels.get(i).getX1() == null ? "0" : hospitalComposeModels.get(i).getX1());
+                sum2 += Integer.parseInt(hospitalComposeModels.get(i).getX2() == null ? "0" : hospitalComposeModels.get(i).getX2());
+            }
+            map1.put("name", "男");
+            map1.put("sum", sum1);
+            map2.put("name", "女");
+            map2.put("sum", sum2);
+            list.add(map1);
+            list.add(map2);
+            hospitalComposeModel.setChildren(list);
+            hospitalComposeModelList.add(hospitalComposeModel);
+            envelop.setObj(hospitalComposeModelList);
         } catch (Exception e) {
             e.printStackTrace();
             envelop.setSuccessFlg(false);

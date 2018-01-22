@@ -8,31 +8,40 @@ import java.util.Map;
  * Created by Administrator on 2018/1/16.
  */
 public class HospitalComposeModel implements Serializable {
-    private String title;
-    private List<Map<String, Object>> listMap;
-    private HospitalComposeModel children;
+    private String x1;
+    private String x2;
+    private String name;
+    private List<Map<String, Object>> children;
 
-    public String getTitle() {
-        return title;
+    public String getX1() {
+        return x1;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setX1(String x1) {
+        this.x1 = x1;
     }
 
-    public List<Map<String, Object>> getListMap() {
-        return listMap;
+    public String getX2() {
+        return x2;
     }
 
-    public void setListMap(List<Map<String, Object>> listMap) {
-        this.listMap = listMap;
+    public void setX2(String x2) {
+        this.x2 = x2;
     }
 
-    public HospitalComposeModel getChildren() {
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public List<Map<String, Object>> getChildren() {
         return children;
     }
 
-    public void setChildren(HospitalComposeModel children) {
+    public void setChildren(List<Map<String, Object>> children) {
         this.children = children;
     }
 }

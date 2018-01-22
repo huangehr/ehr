@@ -106,7 +106,7 @@ public class StdPackageAnalyzer extends PackageAnalyzer {
             dataSet.setPatientId(patientId);
             dataSet.setEventNo(eventNo);
             dataSet.setVersion(version);
-            String dataSetCode = isOrigin ? DataSetUtil.originDataSetCode(dataSet.getCode()) : dataSet.getCode();
+            String dataSetCode = isOrigin ? DataSetUtil.originDataSetCode(code) : code;
             dataSet.setCode(dataSetCode);
             dataSet.setOrgCode(orgCode);
             dataSet.setEventTime(DateUtil.strToDate(eventTime));
@@ -126,10 +126,12 @@ public class StdPackageAnalyzer extends PackageAnalyzer {
                     Map.Entry<String, JsonNode> item = iterator.next();
                     String metaData = item.getKey();
                     JsonNode node = item.getValue();
-                    String value = node.asText().equals("null") ? "" : node.asText();
+                    String value = node.asText();
+                    value = value.equals("null") ? "" : value;
 
                     record.putMetaData(metaData, value);
                 }
+
                 dataSet.addRecord(Integer.toString(i), record);
             }
         } catch (NullPointerException e) {

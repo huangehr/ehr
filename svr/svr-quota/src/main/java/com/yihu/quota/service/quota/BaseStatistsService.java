@@ -5,9 +5,11 @@ import com.yihu.ehr.elasticsearch.ElasticSearchClient;
 import com.yihu.ehr.elasticsearch.ElasticSearchPool;
 import com.yihu.quota.dao.jpa.TjQuotaDao;
 import com.yihu.quota.etl.extract.es.EsResultExtract;
+import com.yihu.quota.etl.model.EsConfig;
 import com.yihu.quota.model.jpa.TjQuota;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionMain;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionSlave;
+import com.yihu.quota.model.jpa.source.TjQuotaDataSource;
 import com.yihu.quota.service.dimension.TjDimensionMainService;
 import com.yihu.quota.service.dimension.TjDimensionSlaveService;
 import com.yihu.quota.service.orgHealthCategory.OrgHealthCategoryStatisticsService;
@@ -15,12 +17,14 @@ import com.yihu.quota.service.source.TjDataSourceService;
 import com.yihu.quota.util.BasesicUtil;
 import com.yihu.quota.vo.DictModel;
 import com.yihu.quota.vo.SaveModel;
+import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import java.net.URLDecoder;
 import java.util.*;
 
 /**
@@ -42,11 +46,10 @@ public class BaseStatistsService {
     @Autowired
     private OrgHealthCategoryStatisticsService orgHealthCategoryStatisticsService;
     @Autowired
-    private ElasticSearchPool elasticSearchPool;
+    private TjDataSourceService dataSourceService;
     @Autowired
     ObjectMapper objectMapper;
-
-
+    private static String orgHealthCategory = "orgHealthCategory";
     public static String orgHealthCategoryCode = "orgHealthCategoryCode";
 
     /**
@@ -224,7 +227,7 @@ public class BaseStatistsService {
             dimenListResult = esResultExtract.searcherByGroup(tjQuota, filters, orgHealthCategoryCode);
         }
         List<Map<String, Object>> orgHealthCategoryList = orgHealthCategoryStatisticsService.getOrgHealthCategoryTreeByPid(-1);
-        List<Map<String, Object>> resultList = setResult(orgHealthCategoryList,dimenListResult);
+        List<Map<String, Object>> resultList = setResult(orgHealthCategoryList,dimenListResult,dateType);
         return resultList;
     }
 
@@ -235,26 +238,24 @@ public class BaseStatistsService {
      * @param
      * @return
      */
-    public List<Map<String,Object>> setResult(List<Map<String,Object>> orgHealthCategoryList,List<Map<String, Object>> dimenListResult){
+    public List<Map<String,Object>> setResult(List<Map<String,Object>> orgHealthCategoryList,List<Map<String, Object>> dimenListResult,String dateType){
         List<Map<String,Object>> result = new ArrayList<>();
         for(int i=0 ; i < orgHealthCategoryList.size() ; i++ ){
             Map<String,Object> mapCategory = orgHealthCategoryList.get(i);
             String code = mapCategory.get("code").toString();
             for(Map<String, Object> dimenMap : dimenListResult){
                 if(dimenMap.get(code) != null){
-                    mapCategory.put("result", dimenMap.get(code) != null ? dimenMap.get(code).toString() : "0");
-                    for(String key : dimenMap.keySet()){
-                        mapCategory.put(key,dimenMap.get(key));
+                    mapCategory.putAll(dimenMap);
+                    if(StringUtils.isNotEmpty(dateType)){
+                        mapCategory.put(dimenMap.get(dateType).toString(),dimenMap.get("result"));
                     }
                     break;
-                }else {
-                    mapCategory.put("result",0);
                 }
             }
             result.add(mapCategory);
             if(mapCategory.get("children") != null){
                 List<Map<String,Object>> childrenOrgHealthCategoryList = (List<Map<String, Object>>) mapCategory.get("children");
-                mapCategory.put("children",setResult(childrenOrgHealthCategoryList,dimenListResult));
+                mapCategory.put("children",setResult(childrenOrgHealthCategoryList,dimenListResult,dateType));
             }
         }
         return  result;
@@ -442,7 +443,7 @@ public class BaseStatistsService {
      * @param dimension
      * @return
      */
-    private Map<String,String> getDimensionMap(String dictSql, String dimension) {
+    public Map<String,String> getDimensionMap(String dictSql, String dimension) {
         Map<String,String> dimensionDicMap = new HashMap<>();
         if(StringUtils.isNotEmpty(dictSql)) {
             BasesicUtil baseUtil = new BasesicUtil();
@@ -468,4 +469,44 @@ public class BaseStatistsService {
         return dimensionDicMap;
     }
 
+    /**
+     * 获取单个指标结果
+     * @param code
+     * @param filters
+     * @param dimension
+     * @param dateType
+     * @return
+     * @throws Exception
+     */
+    public List<Map<String, Object>>  getSimpleQuotaReport(String code,String filters,String dimension,String dateType) throws Exception {
+        List<Map<String, Object>> result = new ArrayList<>();
+        TjQuotaDataSource quotaDataSource = dataSourceService.findSourceByQuotaCode(code);
+        JSONObject obj = new JSONObject().fromObject(quotaDataSource.getConfigJson());
+        EsConfig esConfig= (EsConfig) JSONObject.toBean(obj,EsConfig.class);
+        String configFilter = esConfig.getFilter();
+        if(StringUtils.isNotEmpty(configFilter)){
+            if(StringUtils.isNotEmpty(filters)){
+                filters += "and " + configFilter;
+            }else {
+                filters = configFilter;
+            }
+        }
+        if( (StringUtils.isNotEmpty(esConfig.getEspecialType())) && esConfig.getEspecialType().equals(orgHealthCategory)){
+            //特殊机构类型查询输出结果  只有查询条件没有维度 默认是 机构类型维度
+             result = getOrgHealthCategory(code,filters,dateType);
+        }else if( (StringUtils.isNotEmpty(esConfig.getMolecular())) && StringUtils.isNotEmpty(esConfig.getDenominator())){//除法
+            //除法指标查询输出结果
+            result =  divisionQuota(esConfig.getMolecular(), esConfig.getDenominator(), dimension, filters, esConfig.getPercentOperation(), esConfig.getPercentOperationValue(),dateType);
+        }else if( (StringUtils.isNotEmpty(esConfig.getThousandDmolecular())) && StringUtils.isNotEmpty(esConfig.getThousandDenominator())){//除法
+            //除法指标查询输出结果
+           result =  divisionQuota(esConfig.getThousandDmolecular(), esConfig.getThousandDenominator(), dimension, filters, "1", esConfig.getThousandFlag(),dateType);
+        }else if(StringUtils.isNotEmpty(esConfig.getSuperiorBaseQuotaCode())) {
+            //二次统计 指标查询
+            result = getQuotaResultList(esConfig.getSuperiorBaseQuotaCode(), dimension,filters,dateType);
+        }else {
+            //普通基础指标查询
+            result = getQuotaResultList(code, dimension,filters,dateType);
+        }
+        return result;
+    }
 }
