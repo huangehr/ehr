@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
 
 import com.yihu.ehr.constants.BizObject;
-import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.resource.model.RsResource;
@@ -20,8 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -33,10 +30,10 @@ import java.util.Map;
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0)
 @Api(value = "RsResourceIntegratedEndPoint", description = "资源综合查询", tags = {"资源服务-资源综合查询"})
-public class RsResourceIntegratedEndPoint extends EnvelopRestEndPoint {
+public class ResourceIntegratedEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
-    private RsResourceIntegratedService resourcesIntegratedService;
+    private ResourceIntegratedService resourcesIntegratedService;
     @Autowired
     private RsResourceService rsService;
     @Autowired

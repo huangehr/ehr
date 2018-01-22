@@ -49,8 +49,7 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
             result =  resourceBrowseService.getResourceMetadata(resourcesCode, roleId);
         }catch (Exception e){
             e.printStackTrace();
-            result = e.getMessage();
-            return result;
+            return e.getMessage();
         }
         return result;
     }
