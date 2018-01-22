@@ -150,13 +150,16 @@ public class EsExtract {
                 Map<String, Object> dimensionMap = new HashMap<>();
                 Map<String,String>  dimensionDicMap = new HashMap<>();
                 //查询除开机构维度  其他维度的字典项和 维度合并到map
+                //维度key 统一变小写
                 for(TjQuotaDimensionMain main:qdm){
                     if(!main.getMainCode().trim().equals("org")){
                         dimensionMap.put(main.getMainCode(),main.getMainCode());
                         if(org.apache.commons.lang.StringUtils.isNotEmpty(main.getDictSql())){
                             Map<String,String> dicMap = baseStatistsService.getDimensionMap(main.getDictSql(),main.getMainCode());
                             if(dicMap != null && dicMap.size() > 0){
-                                dimensionDicMap.putAll(dicMap);
+                                for(String key :dicMap.keySet()){
+                                    dimensionDicMap.put(key.toLowerCase(),dicMap.get(key));
+                                }
                             }
                         }
                     }
@@ -166,7 +169,9 @@ public class EsExtract {
                     if(org.apache.commons.lang.StringUtils.isNotEmpty(slave.getDictSql())){
                         Map<String,String> dicMap = baseStatistsService.getDimensionMap(slave.getDictSql(), slave.getSlaveCode());
                         if(dicMap != null && dicMap.size() > 0){
-                            dimensionDicMap.putAll(dicMap);
+                            for(String key :dicMap.keySet()){
+                                dimensionDicMap.put(key.toLowerCase(),dicMap.get(key));
+                            }
                         }
                     }
                 }
@@ -185,7 +190,6 @@ public class EsExtract {
                 }
 
                 List<Map<String, Object>> mapList = baseStatistsService.getOrgHealthCategoryQuotaResultList(esConfig.getSuperiorBaseQuotaCode(),dimension,filter);
-//            List<Map<String, Object>> mapList =  quotaService.queryResultPageByCode(quotaCode, "", 1, 10000);
                 if(mapList != null && mapList.size() > 0){
                     for(Map<String,Object> map : mapList){
                         String dictSql = "SELECT org_code as orgCode,hos_type_id as hosTypeId from organizations where org_code=";
@@ -232,30 +236,6 @@ public class EsExtract {
     public List<List<Map<String, Object>>> stastisOrtType(List<Map<String, Object>> orgTypeList,Map<String, Object> dimensionMap,
                                                           Map<String,String>  dimensionDicMap){
 
-//        Map<String,String>  dimensionDicMap = new HashMap<>();
-//        Map<String, Object> dimensionMap = new HashMap<>();
-//        for(TjQuotaDimensionMain main:qdm){
-//            if(!main.getMainCode().trim().equals("org")){
-//                dimensionMap.put(main.getMainCode(),main.getMainCode());
-//                if(org.apache.commons.lang.StringUtils.isNotEmpty(main.getDictSql())){
-//                    Map<String,String> dicMap = baseStatistsService.getDimensionMap(main.getDictSql(),main.getMainCode());
-//                    if(dicMap != null && dicMap.size() > 0){
-//                        dimensionDicMap.putAll(dicMap);
-//                    }
-//                }
-//            }
-//        }
-//        for(TjQuotaDimensionSlave slave:qds){
-//            dimensionMap.put(slave.getSlaveCode(),slave.getSlaveCode());
-//            if(org.apache.commons.lang.StringUtils.isNotEmpty(slave.getDictSql())){
-//                Map<String,String> dicMap = baseStatistsService.getDimensionMap(slave.getDictSql(), slave.getSlaveCode());
-//                if(dicMap != null && dicMap.size() > 0){
-//                    dimensionDicMap.putAll(dicMap);
-//                }
-//            }
-//        }
-
-
         Map<String,String> dimenTypeMap = new HashMap<>();
         Map<String,String> orgDimenTypeMap = new HashMap<>();
         if(orgTypeList != null && orgTypeList.size() > 0){
@@ -291,7 +271,7 @@ public class EsExtract {
                                 if(dimensionMap != null && dimensionMap.size() > 0){
                                     for(String dimen:dimensionMap.keySet()){
                                         sumDimenMap.put(dimen,map.get(dimen));
-                                        sumDimenMap.put(dimen+"Name",dimensionDicMap.get(map.get(dimen)));
+                                        sumDimenMap.put(dimen+"Name",dimensionDicMap.get(map.get(dimen).toString().toLowerCase()));
                                     }
                                 }
                             }

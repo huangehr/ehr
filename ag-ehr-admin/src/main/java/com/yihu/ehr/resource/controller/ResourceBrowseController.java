@@ -60,6 +60,8 @@ public class ResourceBrowseController extends BaseController {
     private TjQuotaSynthesizeQueryClient tjQuotaSynthesizeQueryClient;
     @Autowired
     private RsResourceDefaultQueryClient rsResourceDefaultQueryClient;
+    @Autowired
+    private RsResourceStatisticsClient rsResourceStatisticsClient;
 
     @ApiOperation("获取档案资源分类")
     @RequestMapping(value = ServiceApi.Resources.ResourceBrowseCategories, method = RequestMethod.GET)
@@ -156,7 +158,24 @@ public class ResourceBrowseController extends BaseController {
             @RequestParam(value = "page", required = false) Integer page,
             @ApiParam(name = "size", value = "每页几行")
             @RequestParam(value = "size", required = false) Integer size) throws Exception {
-        return resourceBrowseClient.getResourceData(resourcesCode, roleId, orgCode, areaCode, queryCondition, page, size);
+            Envelop envelop = new Envelop();
+            envelop = resourcesClient.getResourceByCode(resourcesCode);
+            RsResourcesModel rsResourcesModel = objectMapper.convertValue(envelop.getObj(), RsResourcesModel.class);
+            if( !rsResourcesModel.getRsInterface().equals("getQuotaData")){//1 Hbase 2 ElasticSearch
+                return resourceBrowseClient.getResourceData(resourcesCode, roleId, orgCode, areaCode, queryCondition, page, size);
+            }else{
+                String quotaCodeStr = "";
+                List<ResourceQuotaModel> list = resourceQuotaClient.getByResourceId(rsResourcesModel.getId());
+                if (list != null && list.size() > 0) {
+                    for (ResourceQuotaModel resourceQuotaModel : list) {
+                        quotaCodeStr = quotaCodeStr + resourceQuotaModel.getQuotaCode() + ",";
+                    }
+                }
+                List<Map<String, Object>> resultList = rsResourceStatisticsClient.getQuotaReportTwoDimensionalTable(quotaCodeStr, null, "town", null);
+                envelop.setDetailModelList(resultList);
+                envelop.setSuccessFlg(true);
+                return  envelop;
+            }
     }
 
     @ApiOperation("指标视图查询列表浏览")
@@ -302,11 +321,13 @@ public class ResourceBrowseController extends BaseController {
                                     //判断是否匹配
                                     boolean isMatch = false;
                                     Envelop envelop2 = envelopList.get(j);
-                                    for (Map<String, Object> tempMap2 : (List<Map<String, Object>>) envelop2.getDetailModelList()) {
-                                        if (Arrays.equals(((List<String>) tempMap1.get("cloumns")).toArray(), ((List<String>) tempMap2.get("cloumns")).toArray())) {
-                                            newMap.put(quotaCodeArr[i], tempMap1.get("value"));
-                                            newMap.put(quotaCodeArr[j], tempMap2.get("value"));
-                                            isMatch = true;
+                                    if (null != envelop2.getDetailModelList() && envelop2.getDetailModelList().size() > 0) {
+                                        for (Map<String, Object> tempMap2 : (List<Map<String, Object>>) envelop2.getDetailModelList()) {
+                                            if (Arrays.equals(((List<String>) tempMap1.get("cloumns")).toArray(), ((List<String>) tempMap2.get("cloumns")).toArray())) {
+                                                newMap.put(quotaCodeArr[i], tempMap1.get("value"));
+                                                newMap.put(quotaCodeArr[j], tempMap2.get("value"));
+                                                isMatch = true;
+                                            }
                                         }
                                     }
                                     //未匹配到数据
