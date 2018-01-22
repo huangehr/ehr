@@ -48,7 +48,7 @@ public class MasterResourceDao {
                 standardPackage.setDemographicId(basicResult.get("demographic_id"));
                 resBucket.setDemographicId(basicResult.get("demographic_id"));
             }else {
-                throw new RuntimeException("Please upload the complete package first !");
+                throw new RuntimeException("Please upload the complete package(" + rowKey + ") first !");
             }
         }else {
             // delete legacy data if they are exist
