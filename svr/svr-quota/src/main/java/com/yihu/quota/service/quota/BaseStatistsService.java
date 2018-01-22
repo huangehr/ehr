@@ -208,7 +208,7 @@ public class BaseStatistsService {
                     }
                     if(moleKeyVal.equals(dimenKeyVal)){
                         double point = 0;
-                        DecimalFormat df = new DecimalFormat("#.0");
+                        DecimalFormat df = new DecimalFormat("0.0");
                         float dimeResultVal = Float.valueOf(denoMap.get("result").toString());
                         if(dimeResultVal != 0){
                             if(operation == 1){
