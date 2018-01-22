@@ -142,14 +142,11 @@ public class EsExtract {
 
         List<SaveModel> saveModels = new ArrayList<>();
         try {
+            //二次统计   特殊类型：卫生机构类型
             if( (!StringUtils.isEmpty(esConfig.getEspecialType())) && esConfig.getEspecialType().equals(orgHealthCategory)){
-                //二次统计   特殊类型：卫生机构类型
-                List<Map<String, Object>> orgTypeResultList = new ArrayList<>();
-
-
                 Map<String, Object> dimensionMap = new HashMap<>();
                 Map<String,String>  dimensionDicMap = new HashMap<>();
-                //查询除开机构维度  其他维度的字典项和 维度合并到map
+                //查询除开 机构维度  其他维度的字典项和 维度合并到map
                 //维度key 统一变小写
                 for(TjQuotaDimensionMain main:qdm){
                     if(!main.getMainCode().trim().equals("org")){
@@ -188,7 +185,12 @@ public class EsExtract {
                 if ( !StringUtils.isEmpty(startTime) && !StringUtils.isEmpty(endTime)) {
                     filter = " quotaDate >= '" + startTime.substring(0,10) + "' and quotaDate <= '" + endTime.substring(0,10) +"' ";
                 }
+                //查询分组的时候要增加 org 时间 ，每天的不同机构的数据
+                dimension += ";org;quotaDate";
+                dimensionMap.put("org", "org");
+                dimensionMap.put("quotaDate","quotaDate");
 
+                List<Map<String, Object>> orgTypeResultList = new ArrayList<>();
                 List<Map<String, Object>> mapList = baseStatistsService.getOrgHealthCategoryQuotaResultList(esConfig.getSuperiorBaseQuotaCode(),dimension,filter);
                 if(mapList != null && mapList.size() > 0){
                     for(Map<String,Object> map : mapList){
