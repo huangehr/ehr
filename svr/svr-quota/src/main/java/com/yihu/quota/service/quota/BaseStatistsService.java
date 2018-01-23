@@ -261,7 +261,10 @@ public class BaseStatistsService {
             String code = mapCategory.get("code").toString();
             for(Map<String, Object> dimenMap : dimenListResult){
                 if(dimenMap.get(code) != null){
-                    mapCategory.putAll(dimenMap);
+//                    mapCategory.putAll(dimenMap);
+                    if(dimenMap.containsKey(code)){
+                        mapCategory.put(code,dimenMap.get(code));
+                    }
                     if(StringUtils.isNotEmpty(dateType)){
                         mapCategory.put(dimenMap.get(dateType).toString(),dimenMap.get("result"));
                     }
