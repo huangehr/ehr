@@ -439,4 +439,141 @@ public class ResourceStatisticService extends BaseJpaService<JsonArchives, XJson
             return resMap;
         }
     }
+
+
+    /**
+     * 及时性分析
+     * @param startDate
+     * @param endDate
+     * @param orgCode
+     * @return
+     */
+    public Envelop getArchivesTime(String startDate, String endDate, String orgCode) {
+        Envelop envelop = new Envelop();
+        Date start = DateUtil.formatCharDateYMD(startDate);
+        Date end = DateUtil.formatCharDateYMD(endDate);
+        int day = (int) ((end.getTime() - start.getTime()) / (1000*3600*24))+1;
+        Map<String,Object> resMap = new HashMap<String,Object>();
+        List<Map<String,Map<String,Object>>> res = new ArrayList<Map<String,Map<String,Object>>>();
+        int total=0;
+        int inpatient_total=0;
+        int oupatient_total=0;
+        int total_es=0;
+        int inpatient_total_es=0;
+        int oupatient_total_es=0;
+        for(int i =0;i<day;i++){
+            Date date = DateUtil.addDate(i,start);
+            Map<String,Map<String,Object>> map = new HashMap<String,Map<String,Object>>();
+            Map<String,Object> rate = new HashMap<String,Object>();
+            //平台数据
+            List<Map<String,Object>> list = getPatientCountTime(DateUtil.toString(date), orgCode);
+            total+=(Integer.parseInt(list.get(0).get("total").toString())+Integer.parseInt(list.get(1).get("total").toString()));
+            inpatient_total+=Integer.parseInt(list.get(1).get("total").toString());
+            oupatient_total+=Integer.parseInt(list.get(0).get("total").toString());
+            //医院数据
+            Map<String,Object> map2 = getPatientCountEs(DateUtil.toString(date), orgCode);
+            total_es+=Integer.parseInt(map2.get("total").toString());
+            inpatient_total_es+=Integer.parseInt(map2.get("inpatient_total").toString());
+            oupatient_total_es+=Integer.parseInt(map2.get("oupatient_total").toString());
+            //平台与医院
+            if(Integer.parseInt(map2.get("total").toString())!=0){
+                rate.put("total_rate", ((double)(Integer.parseInt(list.get(0).get("total").toString())+Integer.parseInt(list.get(1).get("total").toString())) / Double.parseDouble(map2.get("total").toString()))*100);
+            }else{
+                rate.put("total_rate", "0");
+            }
+            if(Integer.parseInt(map2.get("inpatient_total").toString())!=0){
+                rate.put("inpatient_rate", (Double.parseDouble(list.get(1).get("total").toString()) / Double.parseDouble(map2.get("inpatient_total").toString()))*100);
+            }else{
+                rate.put("inpatient_rate", "0");
+            }
+            if(Integer.parseInt(map2.get("oupatient_total").toString())!=0){
+                rate.put("oupatient_rate", (Double.parseDouble(list.get(0).get("total").toString()) / Double.parseDouble(map2.get("oupatient_total").toString()))*100);
+            }else{
+                rate.put("oupatient_rate", "0");
+            }
+            map.put(DateUtil.toString(date),rate);
+            res.add(map);
+        }
+        //平台总数
+        resMap.put("total",total);
+        resMap.put("inpatient_total",inpatient_total);
+        resMap.put("oupatient_total",oupatient_total);
+        //医院总数
+        resMap.put("total_es",total_es);
+        resMap.put("inpatient_total_es",inpatient_total_es);
+        resMap.put("oupatient_total_es",oupatient_total_es);
+        //平台与医院比例
+        if(total_es!=0){
+            resMap.put("total_rate", ((double)total / (double)total_es)*100);
+        }else{
+            resMap.put("total_rate", "0");
+        }
+        if(inpatient_total_es!=0){
+            resMap.put("inpatient_rate", ((double)inpatient_total / (double)inpatient_total_es)*100);
+        }else{
+            resMap.put("inpatient_rate", "0");
+        }
+        if(oupatient_total_es!=0){
+            resMap.put("oupatient_rate", ((double)oupatient_total / (double)oupatient_total_es)*100);
+        }else{
+            resMap.put("oupatient_rate", "0");
+        }
+        envelop.setObj(resMap);
+        envelop.setDetailModelList(res);
+        envelop.setSuccessFlg(true);
+        return envelop;
+    }
+
+    /**
+     * 获取一段时间内数据解析情况
+     * @param date
+     * @param orgCode
+     * @return
+     */
+    public List<Map<String,Object>> getPatientCountTime(String date, String orgCode) {
+        Date begin = DateUtil.parseDate(date, DateUtil.DEFAULT_DATE_YMD_FORMAT);
+        Date end = DateUtil.addDate(2, begin);
+        Date end1 = DateUtil.addDate(2, begin);
+        Date end2 = DateUtil.addDate(7, begin);
+        StringBuffer sql = new StringBuffer();
+        sql.append(" SELECT");
+        sql.append("     IFNULL( SUM(CASE WHEN event_type =0 THEN 1 ELSE 0 END),0) total");
+        sql.append(" FROM(");
+        sql.append("     SELECT");
+        sql.append("         event_type,");
+        sql.append("         patient_id,");
+        sql.append("         event_no");
+        sql.append("     FROM");
+        sql.append("         json_archives t");
+        sql.append("     WHERE event_date >= '"+DateUtil.toString(begin)+"' ");
+        sql.append("         AND event_date < '"+DateUtil.toString(end)+"'");
+        sql.append("         AND receive_date >= '"+DateUtil.toString(begin)+"'");
+        sql.append("         AND receive_date < '"+DateUtil.toString(end1)+"'");
+        if(StringUtils.isNotEmpty(orgCode)){
+            sql.append("         AND org_code = '"+orgCode+"'");
+        }
+        sql.append("     GROUP BY patient_id,event_no");
+        sql.append(" )t");
+        sql.append(" UNION ALL");
+        sql.append(" SELECT");
+        sql.append("     IFNULL( SUM(CASE WHEN event_type =1 THEN 1 ELSE 0 END),0) total");
+        sql.append(" FROM(");
+        sql.append("     SELECT");
+        sql.append("         event_type,");
+        sql.append("         patient_id,");
+        sql.append("         event_no");
+        sql.append("     FROM");
+        sql.append("         json_archives t");
+        sql.append("     WHERE event_date >= '"+DateUtil.toString(begin)+"' ");
+        sql.append("         AND event_date < '"+DateUtil.toString(end)+"'");
+        sql.append("         AND receive_date >= '"+DateUtil.toString(begin)+"'");
+        sql.append("         AND receive_date < '"+DateUtil.toString(end2)+"'");
+        if(StringUtils.isNotEmpty(orgCode)){
+            sql.append("         AND org_code = '"+orgCode+"'");
+        }
+        sql.append("     GROUP BY patient_id,event_no");
+        sql.append(" )t");
+        List<Map<String, Object>> list = jdbcTemplate.queryForList(sql.toString());
+        return  list;
+    }
 }
