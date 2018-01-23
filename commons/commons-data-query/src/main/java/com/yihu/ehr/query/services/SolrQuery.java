@@ -281,98 +281,6 @@ public class SolrQuery {
     }
 
     /**
-     * 递归获取分组数据(混合)
-     */
-    private List<Map<String, Object>> recGroupCount(String core,
-                                                    List<SolrGroupEntity> grouplist,
-                                                    int num,
-                                                    List<Map<String, Object>> preList,
-                                                    String q,
-                                                    String fq) throws Exception {
-        String conditionName = "$condition"; // 拼接最后一个维度分组聚合统计的过滤条件
-        String countKeyName = "$countKey"; // 拼接最后一个维度分组聚合统计值对应的唯一健
-        if (num == grouplist.size() - 1) {
-            List<Map<String, Object>> list = new ArrayList<Map<String, Object>>(); // 维度字段、维度组合Key及统计结果
-            SolrGroupEntity group = grouplist.get(num);  // 最后一个维度
-            String groupField = group.getGroupField();
-            SolrGroupEntity.GroupType groupType = group.getType();
-
-            for (Map<String, Object> preObj : preList) {
-                // 遍历前 N-1 维度组合作为筛选条件
-                String query = preObj.get(conditionName).toString();
-                if (fq != null && !fq.equals("") && !fq.equals("*:*")) {
-                    query += " AND " + fq;
-                }
-
-                // 统计最后一个维度
-                Map<String, Long> countMap = new HashMap<>();
-                if (groupType.equals(SolrGroupEntity.GroupType.DATE_RANGE)) {
-                    // 按每天范围统计
-                    List<RangeFacet> rangeFacets = solrUtil.getFacetDateRange(core, groupField, startTime, endTime, "+1DAY", query, q);
-                    for (RangeFacet rangeFacet : rangeFacets) {
-                        List<RangeFacet.Count> countList = rangeFacet.getCounts();
-                        for (RangeFacet.Count count : countList) {
-                            if (count.getCount() > 0) {
-                                String key = count.getValue().substring(0, 10);
-                                countMap.put(key, (long) count.getCount());
-                            }
-                        }
-                    }
-                } else {
-                    // 按字段值统计
-                    countMap = solrUtil.groupCount(core, q, query, groupField, 0, 1000);
-                }
-
-                if (countMap.size() > 0) {
-                    for (String key : countMap.keySet()) {
-                        Map<String, Object> obj = new LinkedHashMap<>();
-                        obj.putAll(preObj); //深拷贝
-                        obj.put(groupField, key);
-                        String countKey = preObj.get(countKeyName).toString() + "-" + key;
-                        obj.put(countKeyName, countKey);
-                        obj.put("$count", countMap.get(key));
-                        obj.remove(conditionName);
-                        list.add(obj);
-                    }
-                }
-            }
-
-            return list;
-        } else {
-            List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();//返回集合
-            SolrGroupEntity group = grouplist.get(num); //当前分组
-            Map<String, String> groupMap = group.getGroupCondition(); //当前分组项
-            String groupName = group.getGroupField();
-            if (preList != null) {
-                //遍历上级递归数据
-                for (Map<String, Object> preObj : preList) {
-                    //遍历当前分组数据
-                    for (Map.Entry<String, String> item : groupMap.entrySet()) {
-                        Map<String, Object> obj = new LinkedHashMap<>();
-                        obj.putAll(preObj); //深拷贝
-                        obj.put(groupName, item.getKey());
-                        String condition = preObj.get(conditionName).toString() + " AND " + item.getValue();
-                        obj.put(conditionName, condition);
-                        String key = preObj.get(countKeyName).toString() + "-" + item.getKey();
-                        obj.put(countKeyName, key);
-                        list.add(obj);
-                    }
-                }
-            } else { //第一次遍历
-                for (Map.Entry<String, String> item : groupMap.entrySet()) {
-                    Map<String, Object> obj = new HashMap<>();
-                    obj.put(groupName, item.getKey());
-                    obj.put(conditionName, item.getValue());
-                    obj.put(countKeyName, item.getKey());
-                    list.add(obj);
-                }
-            }
-            return recGroupCount(core, grouplist, num + 1, list, q, fq);
-        }
-
-    }
-
-    /**
      * 纯自定义分组递归
      */
     private List<Map<String, Object>> recGroupCount(String table,
@@ -526,95 +434,58 @@ public class SolrQuery {
         return resultCounts;
     }
 
-    /************************* 数值统计 **********************************************/
     /**
-     * 递归数值统计
+     * 递归获取分组数据(混合)
      */
-    private List<Map<String, Object>> recStats(String table,
-                                               String[] stats,
-                                               List<SolrGroupEntity> grouplist,
-                                               String q,
-                                               String fq,
-                                               int num,
-                                               List<Map<String, Object>> preList) throws Exception {
-        String conditionName = "$condition";
+    private List<Map<String, Object>> recGroupCount(String core,
+                                                    List<SolrGroupEntity> grouplist,
+                                                    int num,
+                                                    List<Map<String, Object>> preList,
+                                                    String q,
+                                                    String fq) throws Exception {
+        String conditionName = "$condition"; // 拼接最后一个维度分组聚合统计的过滤条件
+        String countKeyName = "$countKey"; // 拼接最后一个维度分组聚合统计值对应的唯一健
         if (num == grouplist.size() - 1) {
-            List<Map<String, Object>> list = new ArrayList<>();//返回集合
-            SolrGroupEntity group = grouplist.get(num);
-            Map<String, String> groupMap = group.getGroupCondition(); //当前分组项
-            String groupName = group.getGroupField();
-            DecimalFormat df = new DecimalFormat("#.00");
+            List<Map<String, Object>> list = new ArrayList<Map<String, Object>>(); // 维度字段、维度组合Key及统计结果
+            SolrGroupEntity group = grouplist.get(num);  // 最后一个维度
+            String groupField = group.getGroupField();
+            SolrGroupEntity.GroupType groupType = group.getType();
 
-            if (preList != null && preList.size() > 0) {
-                for (Map<String, Object> preObj : preList) {
-                    String query = preObj.get(conditionName).toString();
+            for (Map<String, Object> preObj : preList) {
+                // 遍历前 N-1 维度组合作为筛选条件
+                String query = preObj.get(conditionName).toString();
+                if (fq != null && !fq.equals("") && !fq.equals("*:*")) {
+                    query += " AND " + fq;
+                }
 
-                    if ((fq != null && !fq.equals("")) && (query != null && !query.equals(""))) {
-                        query = fq + " AND " + query;
-                    } else {
-                        query = fq + query;
-                    }
-
-                    //根据条件最后一级数值统计
-                    Map<String, List<FieldStatsInfo>> statsMap = new HashMap<>();
-                    //所有统计字段
-                    for (String stat : stats) {
-                        List<FieldStatsInfo> statsList = solrUtil.getStats(table, q, query, stat, groupName);
-                        statsMap.put(stat, statsList);
-                    }
-
-                    if (statsMap != null && statsMap.size() > 0) {
-                        List<FieldStatsInfo> statsFirst = statsMap.get(stats[0]);
-                        if (statsFirst != null) {
-                            for (int i = 0; i < statsFirst.size(); i++) {
-                                String groupItem = statsFirst.get(i).getName();
-                                Map<String, Object> obj = new HashMap<>();
-                                obj.putAll(preObj); //深拷贝
-                                obj.put(groupName, groupItem == null ? "" : groupItem);
-                                obj.remove(conditionName);
-
-                                for (String stat : stats) {
-                                    List<FieldStatsInfo> statsList = statsMap.get(stat);
-                                    FieldStatsInfo item = statsList.get(i);
-                                    obj.put("$count_" + stat, item.getCount());
-                                    obj.put("$sum_" + stat, df.format(item.getSum()));
-                                    obj.put("$avg_" + stat, df.format(item.getMean()));
-                                    obj.put("$max_" + stat, df.format(item.getMax()));
-                                    obj.put("$min_" + stat, df.format(item.getMin()));
-                                }
-
-                                list.add(obj);
+                // 统计最后一个维度
+                Map<String, Long> countMap = new HashMap<>();
+                if (groupType.equals(SolrGroupEntity.GroupType.DATE_RANGE)) {
+                    // 按每天范围统计
+                    List<RangeFacet> rangeFacets = solrUtil.getFacetDateRange(core, groupField, startTime, endTime, "+1DAY", query, q);
+                    for (RangeFacet rangeFacet : rangeFacets) {
+                        List<RangeFacet.Count> countList = rangeFacet.getCounts();
+                        for (RangeFacet.Count count : countList) {
+                            if (count.getCount() > 0) {
+                                String key = count.getValue().substring(0, 10);
+                                countMap.put(key, (long) count.getCount());
                             }
                         }
                     }
-                }
-            } else {
-                //最后一级数值统计
-                Map<String, List<FieldStatsInfo>> statsMap = new HashMap<>();
-                //所有统计字段
-                for (String stat : stats) {
-                    List<FieldStatsInfo> statsList = solrUtil.getStats(table, q, fq, stat, groupName);
-                    statsMap.put(stat, statsList);
+                } else {
+                    // 按字段值统计
+                    countMap = solrUtil.groupCount(core, q, query, groupField, 0, 1000);
                 }
 
-                if (statsMap != null && statsMap.size() > 0) {
-                    List<FieldStatsInfo> statsFirst = statsMap.get(stats[0]);
-                    for (int i = 0; i < statsFirst.size(); i++) {
-                        String groupItem = statsFirst.get(i).getName();
-                        Map<String, Object> obj = new HashMap<>();
-                        obj.put(groupName, groupItem == null ? "" : groupItem);
+                if (countMap.size() > 0) {
+                    for (String key : countMap.keySet()) {
+                        Map<String, Object> obj = new LinkedHashMap<>();
+                        obj.putAll(preObj); //深拷贝
+                        obj.put(groupField, key);
+                        String countKey = preObj.get(countKeyName).toString() + "-" + key;
+                        obj.put(countKeyName, countKey);
+                        obj.put("$count", countMap.get(key));
                         obj.remove(conditionName);
-
-                        for (String stat : stats) {
-                            List<FieldStatsInfo> statsList = statsMap.get(stat);
-                            FieldStatsInfo item = statsList.get(i);
-                            obj.put("$count_" + stat, item.getCount());
-                            obj.put("$sum_" + stat, df.format(item.getSum()));
-                            obj.put("$avg_" + stat, df.format(item.getMean()));
-                            obj.put("$max_" + stat, df.format(item.getMax()));
-                            obj.put("$min_" + stat, df.format(item.getMin()));
-                        }
-
                         list.add(obj);
                     }
                 }
@@ -622,24 +493,22 @@ public class SolrQuery {
 
             return list;
         } else {
-            List<Map<String, Object>> list = new ArrayList<>();//返回集合
-
+            List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();//返回集合
             SolrGroupEntity group = grouplist.get(num); //当前分组
             Map<String, String> groupMap = group.getGroupCondition(); //当前分组项
             String groupName = group.getGroupField();
-
             if (preList != null) {
                 //遍历上级递归数据
                 for (Map<String, Object> preObj : preList) {
                     //遍历当前分组数据
                     for (Map.Entry<String, String> item : groupMap.entrySet()) {
-                        Map<String, Object> obj = new HashMap<>();
+                        Map<String, Object> obj = new LinkedHashMap<>();
                         obj.putAll(preObj); //深拷贝
                         obj.put(groupName, item.getKey());
-                        //拼接过滤条件
-                        String cond = obj.get(conditionName).toString();
-                        cond += " AND " + item.getValue();
-                        obj.put(conditionName, cond);
+                        String condition = preObj.get(conditionName).toString() + " AND " + item.getValue();
+                        obj.put(conditionName, condition);
+                        String key = preObj.get(countKeyName).toString() + "-" + item.getKey();
+                        obj.put(countKeyName, key);
                         list.add(obj);
                     }
                 }
@@ -648,14 +517,16 @@ public class SolrQuery {
                     Map<String, Object> obj = new HashMap<>();
                     obj.put(groupName, item.getKey());
                     obj.put(conditionName, item.getValue());
+                    obj.put(countKeyName, item.getKey());
                     list.add(obj);
                 }
             }
-
-            return recStats(table, stats, grouplist, q, fq, num + 1, list);
+            return recGroupCount(core, grouplist, num + 1, list, q, fq);
         }
 
     }
+
+    /************************* 数值统计 **********************************************/
 
     /**
      * 多级数值统计
@@ -725,6 +596,132 @@ public class SolrQuery {
         }
 
         return new PageImpl<Map<String, Object>>(data);
+    }
+
+    /**
+     * 递归数值统计
+     */
+    private List<Map<String, Object>> recStats(String core,
+                                               String[] statsFields,
+                                               List<SolrGroupEntity> grouplist,
+                                               String q,
+                                               String fq,
+                                               int num,
+                                               List<Map<String, Object>> preList) throws Exception {
+        String conditionName = "$condition";
+        if (num == grouplist.size() - 1) {
+            List<Map<String, Object>> list = new ArrayList<>();//返回集合
+            SolrGroupEntity group = grouplist.get(num);
+            Map<String, String> groupMap = group.getGroupCondition(); //当前分组项
+            String groupName = group.getGroupField();
+            DecimalFormat df = new DecimalFormat("#.00");
+
+            if (preList != null && preList.size() > 0) {
+                for (Map<String, Object> preObj : preList) {
+                    String query = preObj.get(conditionName).toString();
+
+                    if ((fq != null && !fq.equals("")) && (query != null && !query.equals(""))) {
+                        query = fq + " AND " + query;
+                    } else {
+                        query = fq + query;
+                    }
+
+                    //根据条件最后一级数值统计
+                    Map<String, List<FieldStatsInfo>> statsMap = new HashMap<>();
+                    //所有统计字段
+                    for (String field : statsFields) {
+                        List<FieldStatsInfo> statsList = solrUtil.getStats(core, q, query, field, groupName);
+                        statsMap.put(field, statsList);
+                    }
+
+                    if (statsMap != null && statsMap.size() > 0) {
+                        List<FieldStatsInfo> statsFirst = statsMap.get(statsFields[0]);
+                        if (statsFirst != null) {
+                            for (int i = 0; i < statsFirst.size(); i++) {
+                                String groupItem = statsFirst.get(i).getName();
+                                Map<String, Object> obj = new HashMap<>();
+                                obj.putAll(preObj); //深拷贝
+                                obj.put(groupName, groupItem == null ? "" : groupItem);
+                                obj.remove(conditionName);
+
+                                for (String field : statsFields) {
+                                    List<FieldStatsInfo> statsList = statsMap.get(field);
+                                    FieldStatsInfo item = statsList.get(i);
+                                    obj.put("$count_" + field, item.getCount());
+                                    obj.put("$sum_" + field, df.format(item.getSum()));
+                                    obj.put("$avg_" + field, df.format(item.getMean()));
+                                    obj.put("$max_" + field, df.format(item.getMax()));
+                                    obj.put("$min_" + field, df.format(item.getMin()));
+                                }
+
+                                list.add(obj);
+                            }
+                        }
+                    }
+                }
+            } else {
+                //最后一级数值统计
+                Map<String, List<FieldStatsInfo>> statsMap = new HashMap<>();
+                //所有统计字段
+                for (String field : statsFields) {
+                    List<FieldStatsInfo> statsList = solrUtil.getStats(core, q, fq, field, groupName);
+                    statsMap.put(field, statsList);
+                }
+
+                if (statsMap != null && statsMap.size() > 0) {
+                    List<FieldStatsInfo> statsFirst = statsMap.get(statsFields[0]);
+                    for (int i = 0; i < statsFirst.size(); i++) {
+                        String groupItem = statsFirst.get(i).getName();
+                        Map<String, Object> obj = new HashMap<>();
+                        obj.put(groupName, groupItem == null ? "" : groupItem);
+                        obj.remove(conditionName);
+
+                        for (String field : statsFields) {
+                            List<FieldStatsInfo> statsList = statsMap.get(field);
+                            FieldStatsInfo item = statsList.get(i);
+                            obj.put("$count_" + field, item.getCount());
+                            obj.put("$sum_" + field, df.format(item.getSum()));
+                            obj.put("$avg_" + field, df.format(item.getMean()));
+                            obj.put("$max_" + field, df.format(item.getMax()));
+                            obj.put("$min_" + field, df.format(item.getMin()));
+                        }
+
+                        list.add(obj);
+                    }
+                }
+            }
+
+            return list;
+        } else {
+            List<Map<String, Object>> list = new ArrayList<>();//返回集合
+            SolrGroupEntity group = grouplist.get(num); //当前分组
+            Map<String, String> groupMap = group.getGroupCondition(); //当前分组项
+            String groupName = group.getGroupField();
+
+            if (preList != null) {
+                //遍历上级递归数据
+                for (Map<String, Object> preObj : preList) {
+                    //遍历当前分组数据
+                    for (Map.Entry<String, String> item : groupMap.entrySet()) {
+                        Map<String, Object> obj = new HashMap<>();
+                        obj.putAll(preObj); //深拷贝
+                        obj.put(groupName, item.getKey());
+                        String condition = obj.get(conditionName).toString() + " AND " + item.getValue();
+                        obj.put(conditionName, condition);
+                        list.add(obj);
+                    }
+                }
+            } else { //第一次遍历
+                for (Map.Entry<String, String> item : groupMap.entrySet()) {
+                    Map<String, Object> obj = new HashMap<>();
+                    obj.put(groupName, item.getKey());
+                    obj.put(conditionName, item.getValue());
+                    list.add(obj);
+                }
+            }
+
+            return recStats(core, statsFields, grouplist, q, fq, num + 1, list);
+        }
     }
 
 }
