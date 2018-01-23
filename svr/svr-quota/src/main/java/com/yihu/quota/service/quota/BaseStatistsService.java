@@ -559,11 +559,22 @@ public class BaseStatistsService {
      * @param code
      * @param filters
      * @param dimension
-     * @param dateType
      * @return
      * @throws Exception
      */
-    public List<Map<String, Object>>  getSimpleQuotaReport(String code,String filters,String dimension,String dateType) throws Exception {
+    public List<Map<String, Object>>  getSimpleQuotaReport(String code,String filters,String dimension) throws Exception {
+        String dateType = "";
+        //指标的展示维度，由视图中决定
+        if(dimension.trim().equals("year")){
+            dateType = "year";
+            dimension = "";
+        }else if(dimension.trim().equals("month")){
+            dateType = "month";
+            dimension = "";
+        }else if(dimension.trim().equals("day")){
+            dateType = "day";
+            dimension = "";
+        }
         List<Map<String, Object>> result = new ArrayList<>();
         TjQuotaDataSource quotaDataSource = dataSourceService.findSourceByQuotaCode(code);
         JSONObject obj = new JSONObject().fromObject(quotaDataSource.getConfigJson());
