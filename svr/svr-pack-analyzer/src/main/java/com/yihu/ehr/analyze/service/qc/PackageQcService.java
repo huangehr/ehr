@@ -90,7 +90,7 @@ public class PackageQcService {
                 map.put("patientId", dataSetRecord.getPatientId());
                 map.put("eventNo", dataSetRecord.getEventNo());
                 map.put("eventTime", dataSetRecord.getEventTime());
-                map.put("eventType", dataSetRecord.getEventType());
+                map.put("eventType", dataSetRecord.getEventType()); //注意，此处的EventType可能不准确，包中未提供
                 map.put("receiveTime", mPackage.getReceiveDate());
                 map.put("packId", mPackage.getId());
                 try {
@@ -106,6 +106,7 @@ public class PackageQcService {
             map.put("dataSet", dataSetRecord.getCode());
             map.put("dataSetRow", size);
             map.put("receiveTime", mPackage.getReceiveDate());
+            map.put("packId", mPackage.getId());
             try {
                 elasticSearchUtil.index("qc", "receive_data_set", map);
             } catch (ParseException e) {
@@ -115,7 +116,8 @@ public class PackageQcService {
     }
 
     /**
-     * 重新统计某段时间接收包情况及数据集情况
+     * 重新统计某段时间接收包情况及数据集情况，需要提供端点
+     * 根据Hbase进行重新计算，还需要修改Hbase的接收时间
      *
      * @param beginDate
      * @param endDate
