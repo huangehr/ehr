@@ -22,8 +22,6 @@ import com.yihu.quota.vo.SaveModel;
 import net.sf.json.JSONObject;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.search.aggregations.bucket.histogram.InternalDateHistogram;
-import org.elasticsearch.search.aggregations.bucket.histogram.InternalHistogram;
 import org.elasticsearch.search.aggregations.bucket.terms.DoubleTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.LongTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
@@ -269,6 +267,7 @@ public class EsExtract {
                             }
                             if(orgDimenType.equals(key)){
                                 sumDimenMap.put("code",map.get(orgHealthCategory).toString());
+                                sumDimenMap.put("quotaDate",map.get("quotaDate"));
                                 count = count + Double.valueOf(map.get("result").toString());
                                 if(dimensionMap != null && dimensionMap.size() > 0){
                                     for(String dimen:dimensionMap.keySet()){
@@ -277,7 +276,6 @@ public class EsExtract {
                                     }
                                 }
                             }
-                            sumDimenMap.put("quotaDate",map.get("quotaDate"));
                         }
                         sumDimenMap.put("quotaCode",quotaVo.getCode());
                         sumDimenMap.put("quotaName",quotaVo.getName());
