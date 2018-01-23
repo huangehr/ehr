@@ -161,7 +161,7 @@ public class ResourceBrowseController extends BaseController {
             Envelop envelop = new Envelop();
             envelop = resourcesClient.getResourceByCode(resourcesCode);
             RsResourcesModel rsResourcesModel = objectMapper.convertValue(envelop.getObj(), RsResourcesModel.class);
-            if( !rsResourcesModel.getRsInterface().equals("getQuotaData")){//1 Hbase 2 ElasticSearch
+            if( !rsResourcesModel.getRsInterface().equals("getQuotaData")){//接口 来自接口统计
                 return resourceBrowseClient.getResourceData(resourcesCode, roleId, orgCode, areaCode, queryCondition, page, size);
             }else{
                 String quotaCodeStr = "";
@@ -171,7 +171,7 @@ public class ResourceBrowseController extends BaseController {
                         quotaCodeStr = quotaCodeStr + resourceQuotaModel.getQuotaCode() + ",";
                     }
                 }
-                List<Map<String, Object>> resultList = rsResourceStatisticsClient.getQuotaReportTwoDimensionalTable(quotaCodeStr, null, "town", null);
+                List<Map<String, Object>> resultList = rsResourceStatisticsClient.getQuotaReportTwoDimensionalTable(quotaCodeStr, null, rsResourcesModel.getDimension());
                 envelop.setDetailModelList(resultList);
                 envelop.setSuccessFlg(true);
                 return  envelop;

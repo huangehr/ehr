@@ -287,39 +287,6 @@ public class BaseStatistsService {
      */
     public  List<Map<String, Object>> getTimeAggregationResult(String code,String dimension, String filter,String dateDime) throws Exception {
         TjQuota tjQuota= quotaDao.findByCode(code);
-//        Map<String,String>  dimensionDicMap = new HashMap<>();
-//        List<String> dimenList = new ArrayList<>();
-//        String groupDimension = "";
-//        if(dimension.contains(";")){
-//            String[] dimens =  dimension.split(";");
-//            for(int i =0 ;i<dimens.length ;i++){
-//                dimenList.add(dimens[i]);
-//                String dictSql = getQuotaDimensionDictSql(tjQuota.getCode(), dimens[i]);
-//                if(StringUtils.isNotEmpty(dictSql)){
-//                    Map<String,String> dicMap = getDimensionMap(dictSql, dimens[i]);
-//                    if(dicMap != null && dicMap.size() > 0){
-//                        for(String key :dicMap.keySet()){
-//                            dimensionDicMap.put(key.toLowerCase(),dicMap.get(key));
-//                        }
-//                    }
-//                }
-//                groupDimension += dimens[i] + ",";
-//            }
-//            groupDimension = groupDimension.substring(0,groupDimension.length()-1);
-//        }else {
-//            String dictSql = getQuotaDimensionDictSql(tjQuota.getCode(), dimension);
-//            if(StringUtils.isNotEmpty(dictSql)){
-//                Map<String,String> dicMap = getDimensionMap(dictSql, dimension);
-//                if(dicMap != null && dicMap.size() > 0){
-//                    for(String key :dicMap.keySet()){
-//                        dimensionDicMap.put(key.toLowerCase(),dicMap.get(key));
-//                    }
-//                }
-//            }
-//            groupDimension = dimension;
-//            dimenList.add(dimension);
-//        }
-
         Map<String,String>  dimensionDicMap = getDimensionDicMap(code,dimension);
         List<String> dimenList = getDimenList(dimension);
         String groupDimension = joinDimen(dimension);
@@ -592,17 +559,28 @@ public class BaseStatistsService {
      * @param code
      * @param filters
      * @param dimension
-     * @param dateType
      * @return
      * @throws Exception
      */
-    public List<Map<String, Object>>  getSimpleQuotaReport(String code,String filters,String dimension,String dateType) throws Exception {
+    public List<Map<String, Object>>  getSimpleQuotaReport(String code,String filters,String dimension) throws Exception {
+        String dateType = "";
+        //指标的展示维度，由视图中决定
+        if(dimension.trim().equals("year")){
+            dateType = "year";
+            dimension = "";
+        }else if(dimension.trim().equals("month")){
+            dateType = "month";
+            dimension = "";
+        }else if(dimension.trim().equals("day")){
+            dateType = "day";
+            dimension = "";
+        }
         List<Map<String, Object>> result = new ArrayList<>();
         TjQuotaDataSource quotaDataSource = dataSourceService.findSourceByQuotaCode(code);
         JSONObject obj = new JSONObject().fromObject(quotaDataSource.getConfigJson());
         EsConfig esConfig= (EsConfig) JSONObject.toBean(obj,EsConfig.class);
         String configFilter = esConfig.getFilter();
-        if(StringUtils.isNotEmpty(configFilter) && quotaDataSource.getSourceCode().equals("1")){
+        if(StringUtils.isNotEmpty(configFilter) && quotaDataSource.getSourceCode().equals("1")){//数据源为ES库
             if(StringUtils.isNotEmpty(filters)){
                 filters += " and " + configFilter;
             }else {

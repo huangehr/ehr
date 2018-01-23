@@ -2,6 +2,7 @@ package com.yihu.ehr.resource.controller;
 
 import com.yihu.ehr.adapter.utils.ExtendController;
 import com.yihu.ehr.agModel.resource.ResourceQuotaModel;
+import com.yihu.ehr.agModel.resource.RsResourcesModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.model.common.ObjectResult;
@@ -76,11 +77,7 @@ public class RsResourceStatisticsController extends ExtendController {
             @ApiParam(name = "resourceId", value = "资源ID", defaultValue = "")
             @RequestParam(value = "resourceId") String resourceId,
             @ApiParam(name = "filters", value = "检索条件 多个条件用 and 拼接 如：town=361002 and org=10000001 ", defaultValue = "")
-            @RequestParam(value = "filters", required = false) String filters,
-            @ApiParam(name = "dimension", value = "需要统计不同维度字段", defaultValue = "")
-            @RequestParam(value = "dimension", required = true) String dimension,
-            @ApiParam(name = "dateType", value = "时间聚合类型 year,month,week,day", defaultValue = "")
-            @RequestParam(value = "dateType", required = false) String dateType){
+            @RequestParam(value = "filters", required = false) String filters){
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
         Envelop resourceResult =  resourcesClient.getResourceById(resourceId);
@@ -96,7 +93,8 @@ public class RsResourceStatisticsController extends ExtendController {
                 }
             }
         }
-        List<Map<String, Object>> resultList = rsResourceStatisticsClient.getQuotaReportTwoDimensionalTable(quotaCodeStr, filters, dimension, dateType);
+        RsResourcesModel rsResourcesModel = objectMapper.convertValue(resourceResult.getObj(), RsResourcesModel.class);
+        List<Map<String, Object>> resultList = rsResourceStatisticsClient.getQuotaReportTwoDimensionalTable(quotaCodeStr, filters, rsResourcesModel.getDimension());
         envelop.setObj(resultList);
         envelop.setSuccessFlg(true);
         return  envelop;
