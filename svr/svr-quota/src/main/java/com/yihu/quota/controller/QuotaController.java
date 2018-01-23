@@ -209,16 +209,14 @@ public class QuotaController extends BaseController {
             @ApiParam(name = "filters", value = "检索条件 多个条件用 and 拼接 如：town=361002 and org=10000001 ", defaultValue = "")
             @RequestParam(value = "filters", required = false) String filters,
             @ApiParam(name = "dimension", value = "需要统计不同维度字段", defaultValue = "")
-            @RequestParam(value = "dimension", required = true) String dimension,
-            @ApiParam(name = "dateType", value = "时间聚合类型 year,month,week,day", defaultValue = "")
-            @RequestParam(value = "dateType", required = false) String dateType
+            @RequestParam(value = "dimension", required = true) String dimension
     ) {
         Envelop envelop = new Envelop();
         try {
             if(filters!=null){
                 filters = URLDecoder.decode(filters, "UTF-8");
             }
-            List<Map<String, Object>> result =  baseStatistsService.getSimpleQuotaReport(code,filters,dimension,dateType);
+            List<Map<String, Object>> result =  baseStatistsService.getSimpleQuotaReport(code,filters,dimension);
             envelop.setObj(result);
             envelop.setSuccessFlg(true);
             return envelop;
