@@ -570,4 +570,16 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
         envelop.setDetailModelList(list);
         return envelop;
     }
+
+    @RequestMapping(value = ServiceApi.StasticReport.GetArchivesFull, method = RequestMethod.GET)
+    @ApiOperation(value = "完整性分析")
+    public Envelop getArchivesFull(
+            @ApiParam(name = "startDate", value = "开始日期")
+            @RequestParam(name = "startDate") String startDate,
+            @ApiParam(name = "endDate", value = "结束日期")
+            @RequestParam(name = "endDate") String endDate,
+            @ApiParam(name = "orgCode", value = "医院代码")
+            @RequestParam(name = "orgCode",required = false) String orgCode) {
+        return statisticService.getArchivesFull(startDate, endDate, orgCode);
+    }
 }

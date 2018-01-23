@@ -1227,6 +1227,7 @@ public class ServiceApi {
         public static final String GetArchiveReportAll = "/stasticReport/getArchiveReportAll";
         public static final String GetRecieveOrgCount = "/stasticReport/getRecieveOrgCount";
         public static final String GetArchivesInc = "/stasticReport/getArchivesInc";
+        public static final String GetArchivesFull = "/stasticReport/getArchivesFull";
 
     }
 
