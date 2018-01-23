@@ -486,7 +486,8 @@ public class BaseStatistsService {
      * @return
      */
     private String getQuotaDimensionDictSql(String quotaCode, String dimension) {
-        boolean mainFlag = dimension.contains("province") || dimension.contains("city") ||dimension.contains("town") ||dimension.contains("org") ||dimension.contains("year") ||dimension.contains("month") ;
+        boolean mainFlag = dimension.contains("province") || dimension.contains("city") ||dimension.contains("town")
+                ||dimension.contains("org") ||dimension.contains("year") ||dimension.contains("month") ||dimension.contains("day") || dimension.contains("quotaDate") ;
         String dictSql = "";
         //查询维度 sql
         if( mainFlag){
@@ -502,16 +503,13 @@ public class BaseStatistsService {
             if(StringUtils.isEmpty(dictSql)) {
                 List<TjQuotaDimensionSlave> dimensionSlaves = tjDimensionSlaveService.findTjQuotaDimensionSlaveByQuotaCode(quotaCode);
                 if (dimensionSlaves != null && dimensionSlaves.size() > 0) {
-//                    for(TjQuotaDimensionSlave slave:dimensionSlaves){
-//                        if(slave.getKeyVal().equals(dimension)){
-//                            dictSql = slave.getDictSql();
-//                        }
-//                    }
-                    String n = dimension.substring(dimension.length()-1,dimension.length());
-                    if(StringUtils.isNotEmpty(n)){
-                        int slave = Integer.valueOf(n);
-                        if(dimensionSlaves.size() >= slave){
-                            dictSql = dimensionSlaves.get(slave-1).getDictSql();
+                    if(StringUtils.isNotEmpty(dimension)){
+                        String n = dimension.substring(dimension.length() - 1, dimension.length());
+                        if(StringUtils.isNotEmpty(n)){
+                            int slave = Integer.valueOf(n);
+                            if(dimensionSlaves.size() >= slave){
+                                dictSql = dimensionSlaves.get(slave-1).getDictSql();
+                            }
                         }
                     }
                 }
@@ -567,13 +565,13 @@ public class BaseStatistsService {
         //指标的展示维度，由视图中决定
         if(dimension.trim().equals("year")){
             dateType = "year";
-            dimension = "";
+            dimension = "quotaDate";
         }else if(dimension.trim().equals("month")){
             dateType = "month";
-            dimension = "";
+            dimension = "quotaDate";
         }else if(dimension.trim().equals("day")){
             dateType = "day";
-            dimension = "";
+            dimension = "quotaDate";
         }
         List<Map<String, Object>> result = new ArrayList<>();
         TjQuotaDataSource quotaDataSource = dataSourceService.findSourceByQuotaCode(code);

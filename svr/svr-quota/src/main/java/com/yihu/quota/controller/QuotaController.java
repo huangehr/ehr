@@ -53,8 +53,6 @@ public class QuotaController extends BaseController {
     private TjDataSourceService dataSourceService;
     @Autowired
     private BaseStatistsService baseStatistsService;
-    @Autowired
-    private OrgHealthCategoryStatisticsService orgHealthCategoryStatisticsService;
 
     /**
      * 查询结果
@@ -138,13 +136,8 @@ public class QuotaController extends BaseController {
             String molecularFilter = filters;
             String denominatorFilter = filters;
             if(tjQuota.getResultGetType().equals("1")){
-//                if( (StringUtils.isNotEmpty(esConfig.getEspecialType())) && esConfig.getEspecialType().equals(orgHealthCategory)){
-//                    //特殊机构类型查询输出结果  只有查询条件没有维度 默认是 机构类型维度
-//                    resultList = baseStatistsService.getOrgHealthCategory(code,filters,dateType);
-//                }else {
-                    //普通指标直接查询
-                    resultList = baseStatistsService.getQuotaResultList(code, dimension,filters,dateType);
-//                }
+                //普通指标直接查询
+                resultList = baseStatistsService.getQuotaResultList(code, dimension,filters,dateType);
             }else {
                 if( (StringUtils.isNotEmpty(esConfig.getMolecular())) && StringUtils.isNotEmpty(esConfig.getDenominator())){//除法
                     //除法指标查询输出结果
@@ -182,9 +175,6 @@ public class QuotaController extends BaseController {
             }
 
             envelop.setDetailModelList(resultModelList);
-
-//            QuotaReport  quotaReport = quotaService.getQuotaReport(tjQuota, filters, dimension,1000);
-//            envelop.setDetailModelList(quotaReport.getReultModelList());
             envelop.setSuccessFlg(true);
             return envelop;
         } catch (Exception e) {
@@ -197,7 +187,7 @@ public class QuotaController extends BaseController {
 
 
     /**
-     * 根据指标code获取指标统计结果
+     * 根据指标code获取指标统计结果 swagger- 测试接口
      * @param
      * @return
      */
