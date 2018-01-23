@@ -92,7 +92,7 @@ public class RolesController extends BaseController {
                 return failed("角色组描述不能大于250字");
             }
         }catch (Exception e){
-
+            e.printStackTrace();
         }
         MRoles mRoles = rolesClient.createRoles(dataJson);
         if(null == mRoles){
@@ -100,6 +100,7 @@ public class RolesController extends BaseController {
         }
         return success(convertToModel(mRoles, RolesModel.class));
     }
+
     @RequestMapping(value = ServiceApi.Roles.Role,method = RequestMethod.PUT)
     @ApiOperation(value = "修改角色组")
     public Envelop updateRoles(
@@ -120,6 +121,7 @@ public class RolesController extends BaseController {
         }
         return success(convertToModel(mRoles, RolesModel.class));
     }
+
     @RequestMapping(value = ServiceApi.Roles.RoleId,method = RequestMethod.DELETE)
     @ApiOperation(value = "根据角色组id删除")
     public Envelop deleteRoles(
@@ -152,6 +154,7 @@ public class RolesController extends BaseController {
         }
         return failed("角色组删除失败！");
     }
+
     @RequestMapping(value = ServiceApi.Roles.RoleId,method = RequestMethod.GET)
     @ApiOperation(value = "根据角色组id查询")
     public Envelop getRolesById(
@@ -170,6 +173,7 @@ public class RolesController extends BaseController {
         }
         return success(rolesModel);
     }
+
     @RequestMapping(value = ServiceApi.Roles.Roles,method = RequestMethod.GET)
     @ApiOperation(value = "查询用户角色列表---分页")
     public Envelop searchRoles(
@@ -232,6 +236,7 @@ public class RolesController extends BaseController {
         }
         return failed("");
     }
+
     @RequestMapping(value = ServiceApi.Roles.RoleCodeExistence,method = RequestMethod.GET)
     @ApiOperation(value = "角色组代码是否已存在" )
     public Envelop isCodeExistence(
@@ -243,13 +248,28 @@ public class RolesController extends BaseController {
             @RequestParam(value = "orgCode") String orgCode,
             @ApiParam(name = "type",value = "角色组类别")
             @RequestParam(value = "type",required = false) String type){
-        boolean  bo = rolesClient.isCodeExistence(appId,code,orgCode,type);
+        boolean  bo = rolesClient.isCodeExistence(appId, code, orgCode, type);
         if(bo){
             MOrganization organization = organizationClient.getOrg(orgCode);
             return success(code + "在" + organization.getFullName()+"中已存在！"  );
         }
         return failed("");
     }
+
+    @RequestMapping(value = ServiceApi.Roles.RoleFindByField, method = RequestMethod.POST)
+    @ApiOperation(value = "通过字段获取角色" )
+    public Envelop findByFields(
+            @ApiParam(name = "appId",value = "应用id")
+            @RequestParam(value = "appId") String appId,
+            @ApiParam(name = "code",value = "角色组代码")
+            @RequestParam(value = "code") String code,
+            @ApiParam(name = "orgCode",value = "机构Code")
+            @RequestParam(value = "orgCode") String orgCode,
+            @ApiParam(name = "type",value = "角色组类别")
+            @RequestParam(value = "type", required = false) String type){
+        return rolesClient.findByFields(appId, code, orgCode, type);
+    }
+
 //    private RolesModel changeToModel(MRoles m) {
 //        RolesModel rolesModel = convertToModel(m, RolesModel.class);
 //        //获取角色组类别字典

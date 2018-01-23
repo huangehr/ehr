@@ -701,6 +701,7 @@ public class ServiceApi {
         public static final String RoleNameExistence = "/roles/name/existence";
         public static final String RoleCodeExistence = "/roles/code/existence";
         public static final String RoleBatchAdd = "/roles/roleBatchAdd";
+        public static final String RoleFindByField = "/roles/findByField";
 
 
         public static final String RoleUser = "/roles/role_user";
