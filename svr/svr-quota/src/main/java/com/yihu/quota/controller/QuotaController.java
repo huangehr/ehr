@@ -53,8 +53,6 @@ public class QuotaController extends BaseController {
     private TjDataSourceService dataSourceService;
     @Autowired
     private BaseStatistsService baseStatistsService;
-    @Autowired
-    private OrgHealthCategoryStatisticsService orgHealthCategoryStatisticsService;
 
     /**
      * 查询结果
@@ -197,7 +195,7 @@ public class QuotaController extends BaseController {
 
 
     /**
-     * 根据指标code获取指标统计结果
+     * 根据指标code获取指标统计结果 swagger- 测试接口
      * @param
      * @return
      */
