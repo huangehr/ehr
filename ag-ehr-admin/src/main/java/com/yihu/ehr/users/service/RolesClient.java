@@ -107,8 +107,6 @@ public interface RolesClient {
             @RequestParam(value = "appId") String appId,
             @ApiParam(name = "code",value = "角色组代码")
             @RequestParam(value = "code") String code,
-            @ApiParam(name = "orgCode",value = "机构Code")
-            @RequestParam(value = "orgCode") String orgCode,
             @ApiParam(name = "type",value = "角色组类别")
-            @RequestParam(value = "type", required = false) String type);
+            @RequestParam(value = "type") String type);
 }

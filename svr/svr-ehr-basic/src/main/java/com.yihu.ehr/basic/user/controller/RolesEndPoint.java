@@ -176,17 +176,15 @@ public class RolesEndPoint extends EnvelopRestEndPoint{
     @RequestMapping(value = ServiceApi.Roles.RoleFindByField, method = RequestMethod.POST)
     @ApiOperation(value = "通过字段获取角色" )
     public Envelop findByFields(
-            @ApiParam(name = "appId",value = "应用id")
+            @ApiParam(name = "appId", value = "应用id", required = true)
             @RequestParam(value = "appId") String appId,
-            @ApiParam(name = "code",value = "角色组代码")
+            @ApiParam(name = "code", value = "角色组代码", required = true)
             @RequestParam(value = "code") String code,
-            @ApiParam(name = "orgCode",value = "机构Code")
-            @RequestParam(value = "orgCode") String orgCode,
-            @ApiParam(name = "type",value = "角色组类别")
-            @RequestParam(value = "type", required = false) String type){
+            @ApiParam(name = "type", value = "角色组类别", required = true)
+            @RequestParam(value = "type") String type){
         Envelop envelop = new Envelop();
-        String[] fields = {"appId", "code", "orgCode", "type"};
-        String[] values = {appId, code, orgCode, type};
+        String[] fields = {"appId", "code", "type"};
+        String[] values = {appId, code, type};
         List<Roles> roles = rolesService.findByFields(fields, values);
         if(roles != null && roles.size() >0){
             envelop.setSuccessFlg(true);

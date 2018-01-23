@@ -16,7 +16,7 @@ public class RedisService {
         return rsMetadataKeySchema.get(key);
     }
 
-    //获取他们标准的数据元
+    //获取其他标准的数据元
     public String getOtherStdMetadata(String code) {
         if(null == code) {
             return null;

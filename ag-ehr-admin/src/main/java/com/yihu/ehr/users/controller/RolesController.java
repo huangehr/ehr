@@ -259,15 +259,13 @@ public class RolesController extends BaseController {
     @RequestMapping(value = ServiceApi.Roles.RoleFindByField, method = RequestMethod.POST)
     @ApiOperation(value = "通过字段获取角色" )
     public Envelop findByFields(
-            @ApiParam(name = "appId",value = "应用id")
+            @ApiParam(name = "appId",value = "应用id", required = true)
             @RequestParam(value = "appId") String appId,
-            @ApiParam(name = "code",value = "角色组代码")
+            @ApiParam(name = "code",value = "角色组代码", required = true)
             @RequestParam(value = "code") String code,
-            @ApiParam(name = "orgCode",value = "机构Code")
-            @RequestParam(value = "orgCode") String orgCode,
-            @ApiParam(name = "type",value = "角色组类别")
+            @ApiParam(name = "type",value = "角色组类别", required = true)
             @RequestParam(value = "type", required = false) String type){
-        return rolesClient.findByFields(appId, code, orgCode, type);
+        return rolesClient.findByFields(appId, code, type);
     }
 
 //    private RolesModel changeToModel(MRoles m) {
