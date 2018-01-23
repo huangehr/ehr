@@ -88,4 +88,14 @@ public interface ResourceStatisticsClient {
             @RequestParam(name = "endDate") String endDate,
             @ApiParam(name = "orgCode", value = "医院代码")
             @RequestParam(name = "orgCode",required = false) String orgCode);
+
+    @RequestMapping(value = ServiceApi.StasticReport.GetArchivesTime, method = RequestMethod.GET)
+    @ApiOperation(value = "及时性分析")
+    Envelop getArchivesTime(
+            @ApiParam(name = "startDate", value = "开始日期")
+            @RequestParam(name = "startDate") String startDate,
+            @ApiParam(name = "endDate", value = "结束日期")
+            @RequestParam(name = "endDate") String endDate,
+            @ApiParam(name = "orgCode", value = "医院代码")
+            @RequestParam(name = "orgCode",required = false) String orgCode);
 }
