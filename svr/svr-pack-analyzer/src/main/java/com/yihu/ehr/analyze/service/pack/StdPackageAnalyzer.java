@@ -1,4 +1,4 @@
-package com.yihu.ehr.analyze.service;
+package com.yihu.ehr.analyze.service.pack;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.yihu.ehr.profile.util.DataSetUtil;
@@ -82,6 +82,7 @@ public class StdPackageAnalyzer extends PackageAnalyzer {
         String version = jsonNode.path("inner_version").asText();
         String createTime = jsonNode.path("create_date").asText();
         String eventTime = jsonNode.path("event_time").asText();
+        String eventType = jsonNode.path("event_type").asText();
         boolean reUploadFlg = jsonNode.path("reUploadFlg").asBoolean();
 
         //验证档案基础数据的完整性，当其中某字段为空的情况下直接提示档案包信息缺失。
@@ -109,6 +110,7 @@ public class StdPackageAnalyzer extends PackageAnalyzer {
             String dataSetCode = isOrigin ? DataSetUtil.originDataSetCode(code) : code;
             dataSet.setCode(dataSetCode);
             dataSet.setOrgCode(orgCode);
+            dataSet.setEventType(eventType);    //TODO:暂时无数据？
             dataSet.setEventTime(DateUtil.strToDate(eventTime));
             dataSet.setCreateTime(DateTimeUtil.simpleDateParse(createTime));
             dataSet.setReUploadFlg(reUploadFlg);

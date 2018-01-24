@@ -4,6 +4,11 @@ server:
 management:
   port: ${server.port}
 
+elasticsearch:
+  pool:
+    init-size: 5
+    max-size: 10
+
 logging:
   level:
     com:
@@ -62,9 +67,9 @@ hadoop:
 
 analyze:
   job:
-    init-size: 2 #档案分析入库初始任务数
-    max-size: 10 #档案分析入库最大任务数
-    cron-exp: 0/4 * * * * ? #解析任务触发间隔表达式
+    minSize: 2 #解析入库初始任务数
+    maxSize: 10 #解析入库最大任务数
+    cronExp: 0/4 * * * * ? #解析任务触发间隔表达式
 
 ---
 spring:
@@ -88,6 +93,9 @@ spring:
 fast-dfs:
   tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52
+elasticsearch:
+  cluster-name: elasticsearch
+  cluster-nodes: 172.17.110.17:9300
 hadoop:
   hbase-properties:
     - hbase.zookeeper.quorum: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com
@@ -113,6 +121,9 @@ spring:
 fast-dfs:
   tracker-server: 172.19.103.54:22122
   public-server: http://172.19.103.54:22122
+elasticsearch:
+  cluster-name: elasticsearch
+  cluster-nodes: 172.17.110.17:9300
 hadoop:
   hbase-properties:
     - hbase.zookeeper.quorum: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com
@@ -137,6 +148,9 @@ spring:
 fast-dfs:
   tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52:80
+elasticsearch:
+  cluster-name: elasticsearch
+  cluster-nodes: 172.17.110.17:9300
 hadoop:
   hbase-properties:
     - hbase.zookeeper.quorum: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com
@@ -163,6 +177,9 @@ spring:
 fast-dfs:
   tracker-server: 11.1.2.9:22122
   public-server: http://ds.ehr.yihu.com:22122
+elasticsearch:
+  cluster-name: elasticsearch
+  cluster-nodes: 172.17.110.17:9300
 hadoop:
   hbase-properties:
     #- hbase.zookeeper.quorum: node2.jkzl.com,node3.jkzl.com,node1.jkzl.com
@@ -190,7 +207,9 @@ spring:
 fast-dfs:
   tracker-server: 11.1.2.9:22122
   public-server: http://11.1.2.9:80
-
+elasticsearch:
+  cluster-name: elasticsearch
+  cluster-nodes: 172.17.110.17:9300
 hadoop:
   hbase-properties:
     - hbase.zookeeper.quorum: node1.ehr.h3c.com,node2.ehr.h3c.com,node3.ehr.h3c.com
@@ -219,6 +238,9 @@ spring:
 fast-dfs:
   tracker-server: 10.176.97.5:22122
   public-server: http://10.176.97.5:8888
+elasticsearch:
+  cluster-name: elasticsearch
+  cluster-nodes: localhost:9300
 hadoop:
   hbase-properties:
     #- hbase.zookeeper.quorum: node2.jkzl.com,node3.jkzl.com,node1.jkzl.com

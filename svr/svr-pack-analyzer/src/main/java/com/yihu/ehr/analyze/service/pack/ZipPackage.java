@@ -1,4 +1,4 @@
-package com.yihu.ehr.analyze.service;
+package com.yihu.ehr.analyze.service.pack;
 
 import com.yihu.ehr.analyze.config.FastdfsConfig;
 import com.yihu.ehr.constants.ProfileType;
@@ -9,6 +9,7 @@ import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.profile.core.ResourceCore;
 import com.yihu.ehr.util.compress.Zipper;
+import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.log.LogService;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -35,7 +36,6 @@ public class ZipPackage {
     //    private static final String ORIGIN = "origin";
     public static final String DATA = "d";
     private final static String TempPath = System.getProperty("java.io.tmpdir") + java.io.File.separator;
-
     private MPackage mPackage;
     private Zipper zipper = new Zipper();
     //数据集合
@@ -48,6 +48,10 @@ public class ZipPackage {
 
     public ZipPackage(MPackage mPackage) {
         this.mPackage = mPackage;
+    }
+
+    public MPackage getmPackage() {
+        return mPackage;
     }
 
     public Map<String, DataSetRecord> getDataSets() {
@@ -136,14 +140,6 @@ public class ZipPackage {
         }
     }
 
-    public void sendQcMsg() {
-        Set<String> keySet = dataSets.keySet();
-        for (String key : keySet) {
-            DataSetRecord dataSetRecord = dataSets.get(key);
-//            saveDataSet(dataSetRecord);
-        }
-    }
-
     private void saveDataSet(DataSetRecord dataSetRecord) throws Exception {
         createTable(dataSetRecord.getCode());
 
@@ -170,18 +166,16 @@ public class ZipPackage {
                 hBaseDao.delete(ResourceCore.MasterTable, rowKey);
             }
 
+            Map<String, String> dataGroup = metaDataRecord.getDataGroup();
+            String receiveTime = DateUtil.toString(mPackage.getReceiveDate(), DateUtil.DEFAULT_YMDHMSDATE_FORMAT);
+            dataGroup.put("receiveTime", receiveTime);  //增加接收时间
             bundle.clear();
             bundle.addValues(
                     rowKey,
                     DATA,
-                    metaDataRecord.getDataGroup()
+                    dataGroup
             );
 
-//            bundle.addValues(
-//                    rowKey,
-//                    ORIGIN,
-//                    metaDataRecord.getDataGroup()
-//            );
             hBaseDao.save(table, bundle);
         });
     }

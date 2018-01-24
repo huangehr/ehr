@@ -1,6 +1,6 @@
 package com.yihu.ehr.analyze.job;
 
-import com.yihu.ehr.analyze.service.PackageAnalyzeService;
+import com.yihu.ehr.analyze.service.pack.PackageAnalyzeService;
 import com.yihu.ehr.lang.SpringContext;
 import org.quartz.InterruptableJob;
 import org.quartz.JobExecutionContext;

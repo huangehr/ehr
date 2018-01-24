@@ -1,10 +1,9 @@
 package com.yihu.ehr.analyze.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
-
-import static org.quartz.JobBuilder.newJob;
 
 /**
  * @author Airhead
@@ -13,9 +12,27 @@ import static org.quartz.JobBuilder.newJob;
  */
 @Configuration
 public class SchedulerConfig {
+    @Value("${analyze.job.maxSize}")
+    private int jobMaxSize;
+    @Value("${analyze.job.minSize}")
+    private int jobMinSize;
+    @Value("${analyze.job.cronExp}")
+    private String cronExp;
+
+    public int getJobMaxSize() {
+        return jobMaxSize;
+    }
+
+    public int getJobMinSize() {
+        return jobMinSize;
+    }
+
+    public String getCronExp() {
+        return cronExp;
+    }
 
     @Bean
-    SchedulerFactoryBean schedulerFactoryBean(){
+    SchedulerFactoryBean schedulerFactoryBean() {
         SchedulerFactoryBean bean = new SchedulerFactoryBean();
         bean.setAutoStartup(true);
         bean.setSchedulerName("PackageAnalyzerScheduler");

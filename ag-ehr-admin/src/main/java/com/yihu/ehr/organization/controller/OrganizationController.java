@@ -338,8 +338,17 @@ public class OrganizationController extends BaseController {
             if (StringUtils.isEmpty(mOrganization.getShortName())) {
                 errorMsg+="机构简称不能为空！";
             }
+            if (StringUtils.isEmpty(mOrganization.getOrgType())) {
+                errorMsg+="机构类型不能为空！";
+            }
+            if (null != mOrganization.getBerth()) {
+                errorMsg+="核定床位不能为空！";
+            }
             if (StringUtils.isEmpty(mOrganization.getTel())) {
                 errorMsg+="联系方式不能为空！";
+            }
+            if (StringUtils.isEmpty(mOrganization.getTel())) {
+                errorMsg+="入驻方式不能为空！";
             }
             if(StringUtils.isNotEmpty(errorMsg)) {
                 return failed(errorMsg);
@@ -434,8 +443,17 @@ public class OrganizationController extends BaseController {
             if (StringUtils.isEmpty(mOrganization.getShortName())) {
                 errorMsg+="机构简称不能为空！";
             }
+            if (StringUtils.isEmpty(mOrganization.getOrgType())) {
+                errorMsg+="机构类型不能为空！";
+            }
+            if (null != mOrganization.getBerth()) {
+                errorMsg+="核定床位不能为空！";
+            }
             if (StringUtils.isEmpty(mOrganization.getTel())) {
                 errorMsg+="联系方式不能为空！";
+            }
+            if (StringUtils.isEmpty(mOrganization.getTel())) {
+                errorMsg+="入驻方式不能为空！";
             }
             if(StringUtils.isNotEmpty(errorMsg)) {
                 return failed(errorMsg);

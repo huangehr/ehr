@@ -46,6 +46,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URLDecoder;
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * Created by AndyCai on 2016/1/21.
@@ -79,6 +80,9 @@ public class PatientController extends BaseController {
     private UserClient userClient;
     @Autowired
     private RoleUserClient roleUserClient;
+
+    private String regex = "^[A-Za-z0-9\\-]+$";
+    private Pattern pattern = Pattern.compile(regex);
 
     @RequestMapping(value = "/populations", method = RequestMethod.GET)
     @ApiOperation(value = "根据条件查询人")
@@ -229,18 +233,22 @@ public class PatientController extends BaseController {
         if (StringUtils.isEmpty(detailModel.getName())) {
             errorMsg += "姓名不能为空!";
         }
-        if (StringUtils.isEmpty(detailModel.getIdCardNo())) {
+        if (StringUtils.isEmpty(detailModel.getIdCardNo()) && pattern.matcher(detailModel.getIdCardNo()).find()) {
             errorMsg += "身份证号不能为空!";
         }
-        if (StringUtils.isEmpty(detailModel.getTelephoneNo())) {
-            errorMsg += "联系方式不能为空!";
+        if (StringUtils.isEmpty(detailModel.getGender())) {
+            errorMsg += "性别不能为空!";
+        }
+        if (StringUtils.isEmpty(detailModel.getNation())) {
+            errorMsg += "民族不能为空!";
         }
         if (StringUtils.isEmpty(detailModel.getNativePlace())) {
             errorMsg += "籍贯不能为空!";
         }
-        if (StringUtils.isEmpty(detailModel.getNation())) {
-            errorMsg += "籍贯不能为空!";
+        if (StringUtils.isEmpty(detailModel.getTelephoneNo())) {
+            errorMsg += "联系方式不能为空!";
         }
+
         if (StringUtils.isNotEmpty(errorMsg)) {
             return failed(errorMsg);
         }
@@ -361,18 +369,22 @@ public class PatientController extends BaseController {
         if (StringUtils.isEmpty(detailModel.getName())) {
             errorMsg += "姓名不能为空!";
         }
-        if (StringUtils.isEmpty(detailModel.getIdCardNo())) {
+        if (StringUtils.isEmpty(detailModel.getIdCardNo()) && pattern.matcher(detailModel.getIdCardNo()).find()) {
             errorMsg += "身份证号不能为空!";
         }
-        if (StringUtils.isEmpty(detailModel.getTelephoneNo())) {
-            errorMsg += "联系方式不能为空!";
+        if (StringUtils.isEmpty(detailModel.getGender())) {
+            errorMsg += "性别不能为空!";
+        }
+        if (StringUtils.isEmpty(detailModel.getNation())) {
+            errorMsg += "民族不能为空!";
         }
         if (StringUtils.isEmpty(detailModel.getNativePlace())) {
             errorMsg += "籍贯不能为空!";
         }
-        if (StringUtils.isEmpty(detailModel.getNation())) {
-            errorMsg += "籍贯不能为空!";
+        if (StringUtils.isEmpty(detailModel.getTelephoneNo())) {
+            errorMsg += "联系方式不能为空!";
         }
+
         if (StringUtils.isNotEmpty(errorMsg)) {
             return failed(errorMsg);
         }
@@ -444,18 +456,22 @@ public class PatientController extends BaseController {
         if (StringUtils.isEmpty(detailModel.getName())) {
             errorMsg += "姓名不能为空!";
         }
-        if (StringUtils.isEmpty(detailModel.getIdCardNo())) {
+        if (StringUtils.isEmpty(detailModel.getIdCardNo()) && pattern.matcher(detailModel.getIdCardNo()).find()) {
             errorMsg += "身份证号不能为空!";
         }
-        if (StringUtils.isEmpty(detailModel.getTelephoneNo())) {
-            errorMsg += "联系方式不能为空!";
+        if (StringUtils.isEmpty(detailModel.getGender())) {
+            errorMsg += "性别不能为空!";
+        }
+        if (StringUtils.isEmpty(detailModel.getNation())) {
+            errorMsg += "民族不能为空!";
         }
         if (StringUtils.isEmpty(detailModel.getNativePlace())) {
             errorMsg += "籍贯不能为空!";
         }
-        if (StringUtils.isEmpty(detailModel.getNation())) {
-            errorMsg += "籍贯不能为空!";
+        if (StringUtils.isEmpty(detailModel.getTelephoneNo())) {
+            errorMsg += "联系方式不能为空!";
         }
+
         if (StringUtils.isNotEmpty(errorMsg)) {
             return failed(errorMsg);
         }

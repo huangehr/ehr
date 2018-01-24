@@ -52,7 +52,7 @@ public class TjQuotaSynthesizeQueryEndPoint extends EnvelopRestEndPoint {
 
 
     @RequestMapping(value = ServiceApi.TJ.GetTjQuotaSynthesiseDimension, method = RequestMethod.GET)
-    @ApiOperation(value = "查询多个指标交集维度")
+    @ApiOperation(value = "查询多个指标交集维度---针对于查询ES库数据维度 主纬度是具体字段，细维度为slaveKey*")
     public  List<Map<String,String>>  getTjQuotaSynthesiseDimension(
             @ApiParam(name = "quotaCodes", value = "指标code，多个指标用英文,分开")
             @RequestParam(value = "quotaCodes") String quotaCodes) {
@@ -65,13 +65,13 @@ public class TjQuotaSynthesizeQueryEndPoint extends EnvelopRestEndPoint {
         for(int i=0 ; i < quotaCode.length ;i++){
             Map<String,String> map = new LinkedHashMap<>();
             tjQuotaDimensionMains = tjQuotaDimensionMainService.getTjQuotaDimensionMainByCode(quotaCode[i]);
-            int main = 1;
+//            int main = 1;
             for(TjQuotaDimensionMain tjQuotaDimensionMain : tjQuotaDimensionMains){
                 TjDimensionMain tjDimensionMain = tjDimensionMainService.getTjDimensionMainByCode(tjQuotaDimensionMain.getMainCode());
                if(tjDimensionMain !=null){
-                   map.put(tjDimensionMain.getCode(),tjDimensionMain.getName()+"-mainKey" + main);
+                   map.put(tjDimensionMain.getCode(),tjDimensionMain.getName() + "-" + tjDimensionMain.getCode());
                }
-                main ++;
+//                main ++;
             }
             tjQuotaDimensionSlaves = tjQuotaDimensionSlaveService.getTjQuotaDimensionSlaveByCode(quotaCode[i]);
 
@@ -122,7 +122,7 @@ public class TjQuotaSynthesizeQueryEndPoint extends EnvelopRestEndPoint {
                 for(String keyCode:dimensionMap.keySet() ){
                     if(saveModelMap.containsKey(keyCode+"-"+ tempDimenCode)) {
                         String str = keyCode+"-"+ tempDimenCode;
-                        if(saveModelMap.get(str).contains("mainKey")){
+                        if(saveModelMap.get(str).contains(tempDimenCode)){
                             modelCloumnMap.put(keyCode,tempDimenCode);
                         }
                         if(saveModelMap.get(str).contains("slaveKey")){
