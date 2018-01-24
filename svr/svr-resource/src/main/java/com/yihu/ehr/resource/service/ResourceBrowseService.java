@@ -3,6 +3,8 @@ package com.yihu.ehr.resource.service;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
+import com.yihu.ehr.hbase.HBaseDao;
 import com.yihu.ehr.profile.core.ResourceCore;
 import com.yihu.ehr.query.common.model.QueryCondition;
 import com.yihu.ehr.query.services.HbaseQuery;
@@ -17,6 +19,8 @@ import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Method;
 import java.util.*;
+
+import static sun.tools.jstat.Alignment.keySet;
 
 
 /**
@@ -47,6 +51,8 @@ public class ResourceBrowseService {
     private RsRolesResourceGrantService rsRolesResourceGrantService;
     @Autowired
     private RsRolesResourceMetadataGrantService rsRolesResourceMetadataGrantService;
+    @Autowired
+    private HBaseDao hbaseDao;
 
     //忽略字段
     private List<String> ignoreField = new ArrayList<String>(Arrays.asList("rowkey", "event_type", "event_no", "event_date", "demographic_id", "patient_id", "org_code", "org_name", "profile_id", "cda_version", "client_id", "profile_type", "patient_name", "org_area", "diagnosis", "health_problem"));
@@ -615,7 +621,36 @@ public class ResourceBrowseService {
      */
     public Page<String> getSolrIndexs(String queryParams, Integer page, Integer size) throws Exception {
         return resourceBrowseDao.getSolrIndexs(queryParams,page,size);
-}
+    }
+
+    public List<Map<String,Object>> getSubDateByRowkey(String rowKey)throws Exception{
+        //查询出所有细表的rowKey
+        String legacyRowKeys[] = hbaseDao.findRowKeys(ResourceCore.SubTable, "^" + rowKey);
+        List<Map<String,Object>> resultList = Lists.newArrayList();
+        if (legacyRowKeys!=null){
+            for (String subRowKey : legacyRowKeys){
+                if (!StringUtils.isEmpty(subRowKey)){
+                    //获取细表的数据
+                    Map<String, Object> re = hbaseDao.getResultMap(ResourceCore.SubTable,subRowKey);
+                    List<String> idsList = Lists.newArrayList();
+                    //匹配细表中每个key的字典名称
+                    for(Map.Entry<String,Object> vo : re.entrySet()){
+                        if (vo.getKey().contains("EHR")){
+                            idsList.add(vo.getKey());
+                        }
+                    }
+                    List<Map<String,Object>> metaList = resourceBrowseDao.getMetaData(idsList);
+                    metaList.stream().forEach(one->{
+                        Object obj = re.get(String.valueOf(one.get("ID")));
+                        re.remove(String.valueOf(one.get("ID")));
+                        re.put(String.valueOf(one.get("NAME")),obj);
+                    });
+                    resultList.add(re);
+                }
+            }
+        }
+        return  resultList;
+    }
 
 
 }

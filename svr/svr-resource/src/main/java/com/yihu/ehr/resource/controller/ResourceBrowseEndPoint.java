@@ -1,5 +1,6 @@
 package com.yihu.ehr.resource.controller;
 
+import com.google.common.collect.Lists;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
@@ -354,5 +355,18 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
         return re;
     }
 
+    @ApiOperation("根据主表rowKey查询所有细表数据")
+    @RequestMapping(value = ServiceApi.Resources.FindSubDate,method = RequestMethod.GET)
+    public Map<String,Object> findSubDateByRowKey(@ApiParam(name = "rowKey")@RequestParam(value = "rowKey")String rowKey){
+        Map<String,Object> map = new HashMap<>();
+        try {
+            List<Map<String,Object>> list = resourceBrowseService.getSubDateByRowkey(rowKey);
+            map.put("data",list);
+        }catch (Exception e){
+            e.printStackTrace();
+            map.put("error",e.getMessage());
+        }
+        return map;
+    }
 
 }

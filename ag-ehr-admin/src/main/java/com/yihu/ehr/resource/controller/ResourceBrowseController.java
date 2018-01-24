@@ -1,6 +1,7 @@
 package com.yihu.ehr.resource.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.common.collect.Lists;
 import com.yihu.ehr.agModel.resource.ResourceQuotaModel;
 import com.yihu.ehr.agModel.resource.RsBrowseModel;
 import com.yihu.ehr.agModel.resource.RsCategoryTypeTreeModel;
@@ -420,6 +421,12 @@ public class ResourceBrowseController extends BaseController {
             envelop.setObj(dataMap);
         }
         return envelop;
+    }
+
+    @ApiOperation("根据主表rowKey查询所有细表数据")
+    @RequestMapping(value = ServiceApi.Resources.FindSubDate,method = RequestMethod.GET)
+    public Map<String,Object> findSubDateByRowKey(@ApiParam(name = "rowKey")@RequestParam(value = "rowKey")String rowKey){
+        return  resourceBrowseClient.findSubDateByRowKey(rowKey);
     }
 
     @RequestMapping(value = ServiceApi.Resources.ResourceBrowseTree, method = RequestMethod.GET)
