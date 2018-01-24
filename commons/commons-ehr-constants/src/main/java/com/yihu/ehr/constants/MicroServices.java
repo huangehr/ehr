@@ -52,5 +52,7 @@ public class MicroServices {
     public static final String Statistics = "svr-protal-statistics";
     public static final String Discovery = "svr-discovery";
     public static final String LogCollection = "svr-logCollection";
+
     public static final String Analyzer = "svr-pack-analyze";
+
 }

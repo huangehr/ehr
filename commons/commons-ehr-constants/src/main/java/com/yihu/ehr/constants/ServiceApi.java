@@ -372,6 +372,8 @@ public class ServiceApi {
         public static final String FilterList = "/apps/filterList";
         public static final String getAppTypeAndApps = "/getAppTypeAndApps";
         public static final String getApps = "/getApps";
+        public static final String AppFieldExistence = "/app/field/existence";
+        public static final String AppAuthClient = "/app/authClient";
     }
 
     public static class AppApi {
@@ -380,6 +382,7 @@ public class ServiceApi {
         public static final String AppApisNoPage = "/appApiNoPage";
         public static final String AppApiSearch = "/appApi/search";
         public static final String AppApiAuth = "/appApiAuth";
+        public static final String AppApiAuthList = "/appApi/auth/list";
 
     }
 
@@ -1231,6 +1234,7 @@ public class ServiceApi {
         public static final String GetRecieveOrgCount = "/stasticReport/getRecieveOrgCount";
         public static final String GetArchivesInc = "/stasticReport/getArchivesInc";
         public static final String GetArchivesFull = "/stasticReport/getArchivesFull";
+        public static final String GetArchivesTime = "/stasticReport/getArchivesTime";
 
     }
 
