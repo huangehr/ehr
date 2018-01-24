@@ -958,6 +958,7 @@ public class ServiceApi {
             public static final String Delete = "/redis/mq/channel/delete";
             public static final String IsUniqueChannel = "/redis/mq/channel/isUniqueChannel";
             public static final String IsUniqueChannelName = "/redis/mq/channel/isUniqueChannelName";
+            public static final String IsExist = "/redis/mq/channel/isExist";
             public static final String SendMessage = "/redis/mq/channel/sendMessage";
         }
 
@@ -970,6 +971,8 @@ public class ServiceApi {
             public static final String Delete = "/redis/mq/subscriber/delete";
             public static final String IsUniqueAppId = "/redis/mq/subscriber/isUniqueAppId";
             public static final String IsUniqueSubscribedUrl = "/redis/mq/subscriber/isUniqueSubscribedUrl";
+            public static final String IsExist = "/redis/mq/subscriber/isExist";
+            public static final String Unsubscribe = "/redis/mq/subscriber/unsubscribe";
         }
 
         // Redis消息发布者
