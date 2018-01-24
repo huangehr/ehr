@@ -22,8 +22,6 @@ import com.yihu.quota.vo.SaveModel;
 import net.sf.json.JSONObject;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.search.aggregations.bucket.histogram.InternalDateHistogram;
-import org.elasticsearch.search.aggregations.bucket.histogram.InternalHistogram;
 import org.elasticsearch.search.aggregations.bucket.terms.DoubleTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.LongTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
@@ -221,6 +219,7 @@ public class EsExtract {
                 saveModels.add(saveModel);
             }
         }catch (Exception e){
+            e.printStackTrace();
             throw new Exception("ES 特殊机构转化 查询数据出错！" +e.getMessage() );
         }
         return saveModels;
