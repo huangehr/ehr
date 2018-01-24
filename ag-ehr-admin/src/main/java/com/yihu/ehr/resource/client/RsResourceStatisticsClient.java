@@ -50,7 +50,5 @@ public interface RsResourceStatisticsClient {
             @ApiParam(name = "filter", value = "过滤", defaultValue = "")
             @RequestParam(value = "filter", required = false) String filter,
             @ApiParam(name = "dimension", value = "维度字段", defaultValue = "quotaDate")
-            @RequestParam(value = "dimension", required = false) String dimension,
-            @ApiParam(name = "dateType", value = "时间聚合类型 year,month,week,day", defaultValue = "dateType")
-            @RequestParam(value = "dateType", required = false) String dateType);
+            @RequestParam(value = "dimension", required = false) String dimension);
 }
