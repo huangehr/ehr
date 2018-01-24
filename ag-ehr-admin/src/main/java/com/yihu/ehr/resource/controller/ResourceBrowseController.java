@@ -1,7 +1,6 @@
 package com.yihu.ehr.resource.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.google.common.collect.Lists;
 import com.yihu.ehr.agModel.resource.ResourceQuotaModel;
 import com.yihu.ehr.agModel.resource.RsBrowseModel;
 import com.yihu.ehr.agModel.resource.RsCategoryTypeTreeModel;
