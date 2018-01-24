@@ -7,6 +7,7 @@ import com.yihu.ehr.profile.core.ResourceCore;
 import com.yihu.ehr.query.common.model.QueryCondition;
 import com.yihu.ehr.query.services.HbaseQuery;
 import com.yihu.ehr.query.services.SolrQuery;
+import com.yihu.ehr.resource.client.StdTransformClient;
 import com.yihu.ehr.resource.dao.*;
 import com.yihu.ehr.resource.model.*;
 import com.yihu.ehr.util.rest.Envelop;
@@ -47,7 +48,8 @@ public class ResourceBrowseService {
     private RsRolesResourceGrantService rsRolesResourceGrantService;
     @Autowired
     private RsRolesResourceMetadataGrantService rsRolesResourceMetadataGrantService;
-
+    @Autowired
+    private StdTransformClient stdTransformClient;
     //忽略字段
     private List<String> ignoreField = new ArrayList<String>(Arrays.asList("rowkey", "event_type", "event_no", "event_date", "demographic_id", "patient_id", "org_code", "org_name", "profile_id", "cda_version", "client_id", "profile_type", "patient_name", "org_area", "diagnosis", "health_problem"));
 
@@ -66,7 +68,8 @@ public class ResourceBrowseService {
         Map<String, Object> mapParam = new HashMap<String, Object>();
         boolean isOtherStdCode = false;
         Map<String, String> correspondMap = new HashMap<>();
-        String otherStdMetadataStr = redisService.getOtherStdMetadata(rsResource.getCode());
+        //String otherStdMetadataStr = redisService.getOtherStdMetadata(rsResource.getCode());
+        String otherStdMetadataStr = stdTransformClient.stdMetadataCodes("5a278924cd67", rsResource.getCode()); //省平台临时数据处理
         if(otherStdMetadataStr != null) {
             isOtherStdCode = true;
         }
@@ -502,12 +505,12 @@ public class ResourceBrowseService {
         //其他标准
         if(isOtherStdCode) {
             String [] otherStdMetadataArr = otherStdMetadataStr.split(",");
-            List<String> transformStdMetadataList = new ArrayList<>(); // 此list存储其他标准数据集底下的数据元转换成的平台的数据元的id (EHR_XXXXX)
+            List<String> transformEhrMetadataList = new ArrayList<>(); // 此list存储其他标准数据集底下的数据元转换成的平台的数据元的id (EHR_XXXXX)
             for(String otherStdMetadata : otherStdMetadataArr) {
-                String stdMetadata = redisService.transformMetadata(otherStdMetadata);
-                if(stdMetadata != null) {
-                    transformStdMetadataList.add(stdMetadata);
-                    correspondMap.put(stdMetadata, otherStdMetadata);
+                String ehrMetadata = redisService.transformMetadata(otherStdMetadata);
+                if(ehrMetadata != null) {
+                    transformEhrMetadataList.add(ehrMetadata);
+                    correspondMap.put(ehrMetadata, otherStdMetadata);
                 }
             }
             if (grantType.equals("1") && !roleId.equals("*")) {
@@ -518,7 +521,7 @@ public class ResourceBrowseService {
                         List<RsRolesResourceMetadata> rsRolesResourceMetadataList = rsRolesResourceMetadataGrantService.findByRolesResourceIdAndValid(rsRolesResource.getId(), "1");
                         if (rsRolesResourceMetadataList != null) {
                             for (RsRolesResourceMetadata rsRolesResourceMetadata : rsRolesResourceMetadataList) {
-                                if(transformStdMetadataList.contains(rsRolesResourceMetadata.getResourceMetadataId())) { // 如果其他标准数据集包含该数据元
+                                if(transformEhrMetadataList.contains(rsRolesResourceMetadata.getResourceMetadataId())) { // 如果其他标准数据集包含该数据元
                                     rsMetadataIdSet.add(rsRolesResourceMetadata.getResourceMetadataId());
                                 }
                             }
@@ -538,7 +541,7 @@ public class ResourceBrowseService {
                 }
             } else {
                 StringBuilder rsMetadataIds = new StringBuilder();
-                for (String id : transformStdMetadataList) {
+                for (String id : transformEhrMetadataList) {
                     rsMetadataIds.append("'");
                     rsMetadataIds.append(id);
                     rsMetadataIds.append("',");
