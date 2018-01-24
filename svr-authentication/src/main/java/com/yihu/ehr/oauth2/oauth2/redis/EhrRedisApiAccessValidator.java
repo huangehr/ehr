@@ -25,8 +25,8 @@ public class EhrRedisApiAccessValidator {
     //private static final String DEFAULT_USER_ID_BY_USER_NAME_STATEMENT = "SELECT id FROM users WHERE login_code = ?";
     private static final String DEFAULT_APP_API_STATEMENT = "SELECT CONCAT(aa.micro_service_url, aa.ms_method_name) FROM apps_api aa \n" +
             "\tLEFT JOIN role_api_relation rar ON rar.app_api_id = aa.id \n" +
-            "\tWHERE (rar.role_id IN (SELECT role_id FROM role_app_relation WHERE app_id = ?)) \n" +
-            "\tAND LENGTH(aa.micro_service_url) > 0 AND LENGTH(aa.ms_method_name) > 0;";
+            "\tWHERE rar.role_id IN (SELECT role_id FROM role_app_relation WHERE app_id = ?) \n" +
+            "\tAND LENGTH(aa.micro_service_url) > 0 AND LENGTH(aa.ms_method_name) > 0";
 
     @Autowired
     private RedisTemplate<String, Serializable> redisTemplate;

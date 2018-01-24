@@ -382,6 +382,7 @@ public class ServiceApi {
         public static final String AppApisNoPage = "/appApiNoPage";
         public static final String AppApiSearch = "/appApi/search";
         public static final String AppApiAuth = "/appApiAuth";
+        public static final String AppApiAuthList = "/appApi/auth/list";
 
     }
 

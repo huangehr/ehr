@@ -5,12 +5,14 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.app.MAppApi;
 import com.yihu.ehr.model.app.MAppApiDetail;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Collection;
 import java.util.List;
@@ -18,6 +20,7 @@ import java.util.List;
 /**
  * Created by linz on 2016年7月8日11:30:03.
  */
+@ApiIgnore
 @FeignClient(name=MicroServices.Application)
 public interface AppApiClient {
 
@@ -78,4 +81,11 @@ public interface AppApiClient {
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page);
+
+    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.AppApi.AppApiAuthList, method = RequestMethod.GET)
+    @ApiOperation(value = "获取AppApi列表")
+    Envelop authApiList(
+            @ApiParam(name = "clientId", value = "应用ID", required = true)
+            @RequestParam(value = "clientId") String clientId);
+
 }
