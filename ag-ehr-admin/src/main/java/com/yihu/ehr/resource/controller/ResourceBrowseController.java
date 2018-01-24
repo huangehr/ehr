@@ -161,7 +161,7 @@ public class ResourceBrowseController extends BaseController {
             Envelop envelop = new Envelop();
             envelop = resourcesClient.getResourceByCode(resourcesCode);
             RsResourcesModel rsResourcesModel = objectMapper.convertValue(envelop.getObj(), RsResourcesModel.class);
-            if( !rsResourcesModel.getRsInterface().equals("getQuotaData")){//1 Hbase 2 ElasticSearch
+            if( !rsResourcesModel.getRsInterface().equals("getQuotaData")){//接口 来自接口统计
                 return resourceBrowseClient.getResourceData(resourcesCode, roleId, orgCode, areaCode, queryCondition, page, size);
             }else{
                 String quotaCodeStr = "";
@@ -171,7 +171,7 @@ public class ResourceBrowseController extends BaseController {
                         quotaCodeStr = quotaCodeStr + resourceQuotaModel.getQuotaCode() + ",";
                     }
                 }
-                List<Map<String, Object>> resultList = rsResourceStatisticsClient.getQuotaReportTwoDimensionalTable(quotaCodeStr, null, "town", null);
+                List<Map<String, Object>> resultList = rsResourceStatisticsClient.getQuotaReportTwoDimensionalTable(quotaCodeStr, null, rsResourcesModel.getDimension());
                 envelop.setDetailModelList(resultList);
                 envelop.setSuccessFlg(true);
                 return  envelop;
@@ -420,6 +420,12 @@ public class ResourceBrowseController extends BaseController {
             envelop.setObj(dataMap);
         }
         return envelop;
+    }
+
+    @ApiOperation("根据主表rowKey查询所有细表数据")
+    @RequestMapping(value = ServiceApi.Resources.FindSubDate,method = RequestMethod.GET)
+    public Map<String,Object> findSubDateByRowKey(@ApiParam(name = "rowKey")@RequestParam(value = "rowKey")String rowKey){
+        return  resourceBrowseClient.findSubDateByRowKey(rowKey);
     }
 
     @RequestMapping(value = ServiceApi.Resources.ResourceBrowseTree, method = RequestMethod.GET)

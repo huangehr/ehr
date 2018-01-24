@@ -47,6 +47,7 @@ public class ServiceApi {
         public static final String ResourceSubStat = "/resources/query/sub_stat"; //细表资源查询接口
         public static final String ResourceMysql = "/resources/query/mysql"; //mysql资源查询接口
         public static final String SolrIndexData = "/resources/query/solrIndex"; //solr索引列表查询接口
+        public static final String FindSubDate = "/resources/query/subDataByRowKey";//根据主表查询词表数据接口
 
         //资源浏览
         public static final String ResourceBrowseCategories = "/resources/ResourceBrowses/categories";

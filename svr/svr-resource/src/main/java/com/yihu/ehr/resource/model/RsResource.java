@@ -30,6 +30,8 @@ public class RsResource extends BaseAssignedEntity {
     private Integer dataSource;
     //指标视图展示类型
     private String echartType;
+    //视图展示维度
+    private String dimension;
 
     @Column(name="code",nullable = false)
     public String getCode() {
@@ -99,5 +101,14 @@ public class RsResource extends BaseAssignedEntity {
 
     public void setEchartType(String echartType) {
         this.echartType = echartType;
+    }
+
+    @Column(name="dimension")
+    public String getDimension() {
+        return dimension;
+    }
+
+    public void setDimension(String dimension) {
+        this.dimension = dimension;
     }
 }

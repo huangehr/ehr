@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * Created by wq on 2016/6/3.
  */
@@ -50,4 +53,8 @@ public interface ResourceBrowseClient {
             @RequestParam(value = "resourcesCode") String resourcesCode,
             @RequestParam(value = "rowKey") String rowKey);
     */
+
+    @ApiOperation("根据主表rowKey查询所有细表数据")
+    @RequestMapping(value = ServiceApi.Resources.FindSubDate,method = RequestMethod.GET)
+    public Map<String,Object> findSubDateByRowKey(@RequestParam(value = "rowKey")String rowKey);
 }
