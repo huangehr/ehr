@@ -83,6 +83,20 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
+    @ApiOperation("根据主表rowKey查询所有细表数据")
+    @RequestMapping(value = ServiceApi.Resources.FindSubDate, method = RequestMethod.GET)
+    public Envelop findSubDateByRowKey(
+            @ApiParam(name = "rowKey", value = "主表rowKey", required = true)
+            @RequestParam(value = "rowKey") String rowKey,
+            @ApiParam(name = "version", value = "版本", required = true)
+            @RequestParam(value = "version") String version) throws Exception {
+        Envelop envelop = new Envelop();
+        List<Object> resultList = resourceBrowseService.getSubDateByRowkey(rowKey, version);
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(resultList);
+        return envelop;
+    }
+
     // ---------------------------------------------- 基础信息管理 End---------------------------------
 
 
@@ -352,20 +366,6 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
         re.setTotalCount(new Long(result.getTotalElements()).intValue());
         re.setDetailModelList(result.getContent());
         return re;
-    }
-
-    @ApiOperation("根据主表rowKey查询所有细表数据")
-    @RequestMapping(value = ServiceApi.Resources.FindSubDate,method = RequestMethod.GET)
-    public Map<String,Object> findSubDateByRowKey(@ApiParam(name = "rowKey")@RequestParam(value = "rowKey")String rowKey){
-        Map<String,Object> map = new HashMap<>();
-        try {
-            List<Map<String,Object>> list = resourceBrowseService.getSubDateByRowkey(rowKey);
-            map.put("data",list);
-        }catch (Exception e){
-            e.printStackTrace();
-            map.put("error",e.getMessage());
-        }
-        return map;
     }
 
 }

@@ -655,7 +655,6 @@ public class ResourceBrowseService {
         return areaList;
     }
 
-
     /**
      *
      * @param queryParams
@@ -668,36 +667,57 @@ public class ResourceBrowseService {
         return resourceBrowseDao.getSolrIndexs(queryParams,page,size);
     }
 
-    public List<Map<String,Object>> getSubDateByRowkey(String rowKey)throws Exception{
+    public List<Object> getSubDateByRowkey(String rowKey, String version)throws Exception{
         //查询出所有细表的rowKey
+        List<Object> resultList = new ArrayList<>();
         String legacyRowKeys[] = hbaseDao.findRowKeys(ResourceCore.SubTable, "^" + rowKey);
-        List<Map<String,Object>> resultList = Lists.newArrayList();
-        if (legacyRowKeys!=null){
-            for (String subRowKey : legacyRowKeys){
-                if (!StringUtils.isEmpty(subRowKey)){
-                    //获取细表的数据
-                    Map<String, Object> re = hbaseDao.getResultMap(ResourceCore.SubTable,subRowKey);
-                    List<String> idsList = Lists.newArrayList();
-                    //匹配细表中每个key的字典名称
-                    for(Map.Entry<String,Object> vo : re.entrySet()){
-                        if (vo.getKey().contains("EHR")){
-                            idsList.add(vo.getKey());
-                        }
+        Map<String, Object> resultMap = new HashMap<>();
+        for(String subRowKey : legacyRowKeys) {
+            String dataSetCode = subRowKey.split("\\$")[1];
+            if(!resultMap.containsKey(dataSetCode)) {
+                Map<String, Object> dataMap = new HashMap<>();
+                dataMap.put("name", redisService.getDataSetName(version, dataSetCode));
+                List<Map<String, Object>> dataList = new ArrayList<>();
+                Map<String, Object> detailedMap = hbaseDao.getResultMap(ResourceCore.SubTable, subRowKey);
+                Map<String, Object> tempMap = new HashMap<>(detailedMap.size());
+                List<String> idsList = new ArrayList<>(detailedMap.size());
+                for(String id : detailedMap.keySet()) {
+                    if (id.startsWith("EHR")) {
+                        idsList.add(id);
                     }
-                    List<Map<String,Object>> metaList = resourceBrowseDao.getMetaData(idsList);
-                    metaList.stream().forEach(one->{
-                        Object obj = re.get(String.valueOf(one.get("ID")));
-                        re.remove(String.valueOf(one.get("ID")));
-                        re.put(String.valueOf(one.get("NAME")),obj);
-                    });
-                    resultList.add(re);
                 }
+                List<Map<String, Object>> metaList = resourceBrowseDao.getMetaData(idsList);
+                metaList.stream().forEach(one->{
+                    Object obj = detailedMap.get(String.valueOf(one.get("ID")));
+                    tempMap.put(String.valueOf(one.get("NAME")), obj);
+                });
+                dataList.add(tempMap);
+                dataMap.put("data", dataList);
+                resultMap.put(dataSetCode, dataMap);
+            }else {
+                Map<String, Object> dataMap = (Map<String, Object>) resultMap.get(dataSetCode);
+                List<Map<String, Object>> dataList = (List<Map<String,Object>>) dataMap.get("data");
+                Map<String, Object> detailedMap = hbaseDao.getResultMap(ResourceCore.SubTable, subRowKey);
+                Map<String, Object> tempMap = new HashMap<>(detailedMap.size());
+                List<String> idsList = new ArrayList<>(detailedMap.size());
+                for(String id : detailedMap.keySet()) {
+                    if (id.startsWith("EHR")) {
+                        idsList.add(id);
+                    }
+                }
+                List<Map<String, Object>> metaList = resourceBrowseDao.getMetaData(idsList);
+                metaList.stream().forEach(one->{
+                    Object obj = detailedMap.get(String.valueOf(one.get("ID")));
+                    tempMap.put(String.valueOf(one.get("NAME")), obj);
+                });
+                dataList.add(tempMap);
+                dataMap.put("data", dataList);
+                resultMap.put(dataSetCode, dataMap);
             }
         }
-        return  resultList;
+        resultList.addAll(resultMap.entrySet());
+        return resultList;
     }
-
-
 }
 
 

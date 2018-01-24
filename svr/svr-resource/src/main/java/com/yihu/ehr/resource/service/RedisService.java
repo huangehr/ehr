@@ -11,6 +11,8 @@ public class RedisService {
 
     @Autowired
     private RsMetadataKeySchema rsMetadataKeySchema;
+    @Autowired
+    private StdDataSetKeySchema stdDataSetKeySchema;
 
     public String getRsMetaData(String key) {
         return rsMetadataKeySchema.get(key);
@@ -39,4 +41,9 @@ public class RedisService {
         }
         return null;
     }
+
+    public String getDataSetName(String version, String id) {
+        return stdDataSetKeySchema.dataSetName(version, id);
+    }
+
 }

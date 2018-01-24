@@ -5,6 +5,7 @@ import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -55,6 +56,8 @@ public interface ResourceBrowseClient {
     */
 
     @ApiOperation("根据主表rowKey查询所有细表数据")
-    @RequestMapping(value = ServiceApi.Resources.FindSubDate,method = RequestMethod.GET)
-    public Map<String,Object> findSubDateByRowKey(@RequestParam(value = "rowKey")String rowKey);
+    @RequestMapping(value = ServiceApi.Resources.FindSubDate, method = RequestMethod.GET)
+    Envelop findSubDateByRowKey(
+            @RequestParam(value = "rowKey") String rowKey,
+            @RequestParam(value = "version") String version);
 }

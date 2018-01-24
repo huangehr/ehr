@@ -178,6 +178,16 @@ public class ResourceBrowseController extends BaseController {
             }
     }
 
+    @ApiOperation("根据主表rowKey查询所有细表数据")
+    @RequestMapping(value = ServiceApi.Resources.FindSubDate, method = RequestMethod.GET)
+    public Envelop findSubDateByRowKey(
+            @ApiParam(name = "rowKey", value = "主表rowKey", required = true)
+            @RequestParam(value = "rowKey") String rowKey,
+            @ApiParam(name = "version", value = "版本", required = true)
+            @RequestParam(value = "version") String version){
+        return  resourceBrowseClient.findSubDateByRowKey(rowKey, version);
+    }
+
     @ApiOperation("指标视图查询列表浏览")
     @RequestMapping(value = ServiceApi.Resources.ResourceBrowseQuotaResourceData, method = RequestMethod.GET)
     public Envelop getQuotaResourceData(
@@ -420,12 +430,6 @@ public class ResourceBrowseController extends BaseController {
             envelop.setObj(dataMap);
         }
         return envelop;
-    }
-
-    @ApiOperation("根据主表rowKey查询所有细表数据")
-    @RequestMapping(value = ServiceApi.Resources.FindSubDate,method = RequestMethod.GET)
-    public Map<String,Object> findSubDateByRowKey(@ApiParam(name = "rowKey")@RequestParam(value = "rowKey")String rowKey){
-        return  resourceBrowseClient.findSubDateByRowKey(rowKey);
     }
 
     @RequestMapping(value = ServiceApi.Resources.ResourceBrowseTree, method = RequestMethod.GET)
