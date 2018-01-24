@@ -133,8 +133,18 @@ public class QuotaController extends BaseController {
             JSONObject obj = new JSONObject().fromObject(quotaDataSource.getConfigJson());
             EsConfig esConfig= (EsConfig) JSONObject.toBean(obj,EsConfig.class);
             List<Map<String, Object>>  resultList = new ArrayList<>();
+            String configFilter = esConfig.getFilter();
+            if(StringUtils.isNotEmpty(configFilter) && quotaDataSource.getSourceCode().equals("1")){//数据源为ES库
+                if(StringUtils.isNotEmpty(filters)){
+                    filters += " and " + configFilter;
+                }else {
+                    filters = configFilter;
+                }
+            }
             String molecularFilter = filters;
             String denominatorFilter = filters;
+
+
             if(tjQuota.getResultGetType().equals("1")){
                 //普通指标直接查询
                 resultList = baseStatistsService.getQuotaResultList(code, dimension,filters,dateType);
