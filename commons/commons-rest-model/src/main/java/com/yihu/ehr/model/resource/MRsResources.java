@@ -14,6 +14,7 @@ public class MRsResources {
     private String description;
     private Integer dataSource;
     private String echartType;
+    private String dimension;
 
 
     public String getId() {
@@ -83,5 +84,13 @@ public class MRsResources {
 
     public void setEchartType(String echartType) {
         this.echartType = echartType;
+    }
+
+    public String getDimension() {
+        return dimension;
+    }
+
+    public void setDimension(String dimension) {
+        this.dimension = dimension;
     }
 }

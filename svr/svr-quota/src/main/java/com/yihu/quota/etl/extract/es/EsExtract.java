@@ -269,6 +269,7 @@ public class EsExtract {
                             }
                             if(orgDimenType.equals(key)){
                                 sumDimenMap.put("code",map.get(orgHealthCategory).toString());
+                                sumDimenMap.put("quotaDate",map.get("quotaDate"));
                                 count = count + Double.valueOf(map.get("result").toString());
                                 if(dimensionMap != null && dimensionMap.size() > 0){
                                     for(String dimen:dimensionMap.keySet()){
@@ -277,7 +278,6 @@ public class EsExtract {
                                     }
                                 }
                             }
-                            sumDimenMap.put("quotaDate",map.get("quotaDate"));
                         }
                         sumDimenMap.put("quotaCode",quotaVo.getCode());
                         sumDimenMap.put("quotaName",quotaVo.getName());
