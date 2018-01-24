@@ -422,6 +422,12 @@ public class ResourceBrowseController extends BaseController {
         return envelop;
     }
 
+    @ApiOperation("根据主表rowKey查询所有细表数据")
+    @RequestMapping(value = ServiceApi.Resources.FindSubDate,method = RequestMethod.GET)
+    public Map<String,Object> findSubDateByRowKey(@ApiParam(name = "rowKey")@RequestParam(value = "rowKey")String rowKey){
+        return  resourceBrowseClient.findSubDateByRowKey(rowKey);
+    }
+
     @RequestMapping(value = ServiceApi.Resources.ResourceBrowseTree, method = RequestMethod.GET)
     @ApiOperation(value = "获取视图类别-数据集列表树")
     public Envelop getResourceBrowseTree() {
