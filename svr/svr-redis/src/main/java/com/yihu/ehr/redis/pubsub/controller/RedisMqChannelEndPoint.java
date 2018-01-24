@@ -225,4 +225,12 @@ public class RedisMqChannelEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
+    @ApiOperation("验证消息队列是否已存在")
+    @RequestMapping(value = ServiceApi.Redis.MqChannel.IsExist, method = RequestMethod.GET)
+    public Boolean isExist(
+            @ApiParam(name = "channel", value = "消息队列", required = true)
+            @RequestParam(value = "channel") String channel) {
+        return redisMqChannelService.isExist(channel);
+    }
+
 }
