@@ -88,7 +88,7 @@ public class QuotaReportController extends BaseController {
         envelop.setSuccessFlg(false);
         return envelop;
     }
-    @ApiOperation(value = "获取统计报表视图下多个指标组合  二维表数据")
+    @ApiOperation(value = "获取统计报表一个视图下多个指标组合  二维表数据")
     @RequestMapping(value = ServiceApi.TJ.GetQuotaReportTwoDimensionalTable, method = RequestMethod.GET)
     public List<Map<String, Object>> getQuotaReportTwoDimensionalTable(
             @ApiParam(name = "quotaCodeStr", value = "指标Code,多个用,拼接", required = true)
@@ -98,17 +98,34 @@ public class QuotaReportController extends BaseController {
             @ApiParam(name = "dimension", value = "维度字段", defaultValue = "quotaDate")
             @RequestParam(value = "dimension", required = false) String dimension
     ) {
-        List<Map<String, Object>> result = new ArrayList<>();
+        List<Map<String, Object>> viewResult = new ArrayList<>();
         try {
             List<String> quotaCodes = Arrays.asList(quotaCodeStr.split(","));
+            int i = 1;
             for(String code:quotaCodes){
                 List<Map<String, Object>> quotaResult = baseStatistsService.getSimpleQuotaReport(code, filter, dimension);
-                result.addAll(quotaResult);
+                if( i == 1){
+                    for(Map<String, Object> qMap : quotaResult){
+                        qMap.put(code,qMap.get("result"));
+                    }
+                    viewResult.addAll(quotaResult);
+                    i++;
+                }else {
+                    for(Map<String, Object> vMap : viewResult){
+                        for(Map<String, Object> qMap : quotaResult){
+                            if(vMap.get(dimension).toString().trim().equals(qMap.get(dimension).toString().trim())){
+                                vMap.put(code,qMap.get("result"));
+                                break;
+                            }
+                        }
+                    }
+                }
+
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return  result;
+        return  viewResult;
 
     }
 
