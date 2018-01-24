@@ -2,9 +2,7 @@ package com.yihu.quota.service.orgHealthCategory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.elasticsearch.ElasticSearchClient;
-import com.yihu.quota.client.EsClient;
 import com.yihu.quota.vo.SaveModel;
-import com.yihu.quota.vo.SaveModelOrgHealthCategory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -36,7 +34,7 @@ public class OrgHealthCategoryStatisticsService {
      */
     public boolean countResultsAndSaveToEs(List<Map<String, Object>> endpointsStatisticList) {
         // 获取所有卫生机构类别的集合
-        String sql = "SELECT id, pid, code, name, 0 AS result, 'false' AS isEndpoint FROM org_health_category ORDER BY code ";
+        String sql = "SELECT id, pid, top_pid AS topPid, code, name, 0 AS result, 'false' AS isEndpoint FROM org_health_category ORDER BY code ";
         List<Map<String, Object>> allOrgHealthCategoryList = jdbcTemplate.queryForList(sql);
 
         for (Map<String, Object> endpoint : endpointsStatisticList) {
@@ -93,7 +91,17 @@ public class OrgHealthCategoryStatisticsService {
             int id = (int) item.get("id");
             Object itemPid = item.get("pid");
             boolean isEndpoint = Boolean.parseBoolean(item.get("isEndpoint").toString());
-            if (itemPid != null && (int) itemPid == pid) {
+            if (itemPid == null && id == pid) { // 顶节点
+                for (Map<String, Object> topSubItem : allOrgHealthCategoryList) {
+                    Object topPid = topSubItem.get("topPid");
+                    Object topSubItemPid = topSubItem.get("pid");
+                    boolean isEndpointSubItem = Boolean.parseBoolean(topSubItem.get("isEndpoint").toString());
+                    if (topSubItemPid != null && Integer.parseInt(topPid.toString()) == pid && isEndpointSubItem) {
+                        endpointList.add(topSubItem);
+                    }
+                }
+                return endpointList;
+            } else if (itemPid != null && (int) itemPid == pid) {
                 if (isEndpoint) {
                     endpointList.add(item);
                 } else {

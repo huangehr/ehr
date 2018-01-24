@@ -219,6 +219,7 @@ public class EsExtract {
                 saveModels.add(saveModel);
             }
         }catch (Exception e){
+            e.printStackTrace();
             throw new Exception("ES 特殊机构转化 查询数据出错！" +e.getMessage() );
         }
         return saveModels;
