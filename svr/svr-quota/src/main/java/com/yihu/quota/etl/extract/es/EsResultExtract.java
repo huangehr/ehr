@@ -418,6 +418,7 @@ public class EsResultExtract {
                 mysql.append(" order by ").append(orderFild).append(" ").append(order);
             }
             mysql.append(" limit 10000 ");
+            System.out.println("查询分组 mysql= " + mysql.toString());
             List<Map<String, Object>> listMap = elasticsearchUtil.excuteDataModel(mysql.toString());
             return  listMap;
         }catch (Exception e){

@@ -99,34 +99,51 @@ public class QuotaReportController extends BaseController {
             @RequestParam(value = "dimension", required = false) String dimension
     ) {
         List<Map<String, Object>> viewResult = new ArrayList<>();
+
+        Map<String,List<Map<String, Object>>> quotaViewResult = new HashMap<>();
+        String maxQuota = "";
+        int num = 0;
         try {
             List<String> quotaCodes = Arrays.asList(quotaCodeStr.split(","));
             int i = 1;
             for(String code:quotaCodes){
                 List<Map<String, Object>> quotaResult = baseStatistsService.getSimpleQuotaReport(code, filter, dimension);
-                if( i == 1){
-                    for(Map<String, Object> qMap : quotaResult){
-                        qMap.put(code,qMap.get("result"));
-                    }
-                    viewResult.addAll(quotaResult);
-                    i++;
-                }else {
-                    for(Map<String, Object> vMap : viewResult){
-                        for(Map<String, Object> qMap : quotaResult){
-                            if(vMap.get(dimension).toString().trim().equals(qMap.get(dimension).toString().trim())){
-                                vMap.put(code,qMap.get("result"));
+                if(quotaResult.size() >= num){
+                    num = quotaResult.size();
+                    maxQuota = code;
+                }
+                quotaViewResult.put(code,quotaResult);
+            }
+            Map<String,List<Map<String, Object>>> otherQuotaViewResult = new HashMap<>();
+            for(String key :quotaViewResult.keySet()){
+                if(key != maxQuota){
+                    otherQuotaViewResult.put(key,quotaViewResult.get(key));
+                }
+            }
+            //以查询结果数据最多的指标为主，其他指标对应维度没有数据的补充0
+            for(Map<String, Object> vMap : quotaViewResult.get(maxQuota)){
+                vMap.put(maxQuota, vMap.get("result"));
+                for (String viewQuotaCode : otherQuotaViewResult.keySet()) {
+                    for (Map<String, Object> quotaResultMap : otherQuotaViewResult.get(viewQuotaCode)) {
+                        if( quotaResultMap.get(dimension) != null){
+                            if (vMap.get(dimension).toString().trim().equals(quotaResultMap.get(dimension).toString().trim())) {
+                                vMap.put(viewQuotaCode, quotaResultMap.get("result").toString());
                                 break;
+                            } else {
+                                vMap.put(viewQuotaCode, 0);
                             }
+                        } else {
+                            vMap.put(viewQuotaCode, 0);
                         }
                     }
                 }
-
             }
+
+
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return  viewResult;
-
+        return  quotaViewResult.get(maxQuota);
     }
 
 
