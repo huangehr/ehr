@@ -210,9 +210,19 @@ public class QuotaReportController extends BaseController {
                         List<Map<String, Object>> listMap = baseStatistsService.getSimpleQuotaReport(tjQuota.getCode(), filter, dimension);
                         if(listMap != null && listMap.size() > 0){
                             for(Map<String, Object> map : listMap){
-                                groupDataMap.putAll(map);
+                                String keyName = "";
+                                String val = "";
+                                for (String key : map.keySet()) {
+                                    if ("result".equals(key)) {
+                                        val = map.get(key).toString();
+                                    } else {
+                                        keyName = map.get(key).toString();
+                                    }
+                                }
+                                groupDataMap.put(keyName, val);
                             }
                         }
+
                     }
 
                     for(String key : groupDataMap.keySet()){
