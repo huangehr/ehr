@@ -422,7 +422,7 @@ public class EsExtract {
             Iterator<Terms.Bucket> gradeBucketIt = stringTerms.getBuckets().iterator();
             client.close();
             //里面存放的数据 例  350200-5-2-2    主维度  细维度1  细维度2  值
-            Map<String,Integer> map = new HashMap<>();
+            Map<String,String> map = new HashMap<>();
             //递归解析json
             expainJson(gradeBucketIt, map, null);
 
@@ -473,7 +473,7 @@ public class EsExtract {
                 Iterator<Terms.Bucket> gradeBucketIt = stringTerms.getBuckets().iterator();
                 client.close();
                 //里面存放的数据 例  350200-5-2-2    主维度  细维度1  细维度2  值
-                Map<String,Integer> map = new HashMap<>();
+                Map<String,String> map = new HashMap<>();
                 //递归解析json
                 expainJson(gradeBucketIt, map, null);
                 compute(tjQuotaDimensionSlaves,returnList,one, map);
@@ -484,7 +484,7 @@ public class EsExtract {
         return returnList;
     }
 
-    private void compute(List<TjQuotaDimensionSlave> tjQuotaDimensionSlaves, List<SaveModel> returnList, Map.Entry<String, TjQuotaDimensionMain> one, Map<String, Integer> map) throws Exception {
+    private void compute(List<TjQuotaDimensionSlave> tjQuotaDimensionSlaves, List<SaveModel> returnList, Map.Entry<String, TjQuotaDimensionMain> one, Map<String, String> map) throws Exception {
         Map<String, SaveModel> allData = new HashMap<>();
         //初始化主细维度
         allData= initDimension(tjQuotaDimensionSlaves, one, allData);
@@ -492,7 +492,7 @@ public class EsExtract {
 
         for(String key :map.keySet()){
             SaveModel saveModel = allData.get(key);
-            Integer count =  map.get(key);
+            String count =  map.get(key);
             if(saveModel != null ){
                 saveModel.setResult(count.toString());
                 returnList.add(saveModel);
@@ -538,7 +538,7 @@ public class EsExtract {
      * @param map
      * @param sb
      */
-    private void expainJson(Iterator<Terms.Bucket> gradeBucketIt,Map<String,Integer>map, StringBuffer sb) {
+    private void expainJson(Iterator<Terms.Bucket> gradeBucketIt,Map<String,String>map, StringBuffer sb) {
         while (gradeBucketIt.hasNext()) {
             Terms.Bucket b =  gradeBucketIt.next();
             if (b.getAggregations().asList().get(0) instanceof StringTerms) {
@@ -564,7 +564,7 @@ public class EsExtract {
                 }
             }else {
                     InternalValueCount count = (InternalValueCount) b.getAggregations().asList().get(0);
-                    map.put(new StringBuffer(sb.toString() + "-" + b.getKey()).toString() , (int)count.getValue());
+                    map.put(new StringBuffer(sb.toString() + "-" + b.getKey()).toString() , Long.valueOf(count.getValue()).toString());
             }
         }
     }

@@ -250,9 +250,9 @@ public class SolrUtil {
      * @param groupFields 分组字段名
      */
     public List<FacetField> groupCount(String core,
-                                           String q,
-                                           String fq,
-                                           String[] groupFields) throws Exception {
+                                       String q,
+                                       String fq,
+                                       String[] groupFields) throws Exception {
         SolrClient conn = pool.getConnection(core);
         SolrQuery query = new SolrQuery();
         if (null != q && !q.equals("")) {
@@ -327,7 +327,46 @@ public class SolrUtil {
     }
 
 
-    /**************************** 数值统计 ******************************************/
+    /**************************** 数值统计
+     /**
+     * 分组数值统计
+     *
+     * @param core       表名
+     * @param q          查询条件
+     * @param statsField 统计字段
+     * @return
+     */
+    public FieldStatsInfo getStats(String core,
+                                   String q,
+                                   String fq,
+                                   String statsField) throws Exception {
+        SolrClient conn = pool.getConnection(core);
+        SolrQuery query = new SolrQuery();
+        if (null != q && !q.equals("")) {
+            query.setQuery(q);
+        } else {
+            query.setQuery("*:*");
+        }
+        if (null != fq && !fq.equals("")) {
+            query.setFilterQueries(fq);
+        }
+
+        query.addGetFieldStatistics(statsField);
+        query.setRows(0);
+
+        QueryResponse rsp = conn.query(query);
+        qtime = rsp.getQTime();
+
+        Map<String, FieldStatsInfo> stats = rsp.getFieldStatsInfo();
+        pool.close(conn);
+
+        if (stats != null && stats.size() > 0) {
+            return stats.get(statsField);
+        }
+
+        return null;
+    }
+
     /**
      * 分组数值统计
      *

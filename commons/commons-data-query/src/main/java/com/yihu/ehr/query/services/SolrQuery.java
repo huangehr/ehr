@@ -5,6 +5,7 @@ import com.yihu.ehr.query.common.enums.Operation;
 import com.yihu.ehr.query.common.model.QueryCondition;
 import com.yihu.ehr.query.common.model.SolrGroupEntity;
 import com.yihu.ehr.solr.SolrUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.FieldStatsInfo;
 import org.apache.solr.client.solrj.response.PivotField;
@@ -25,8 +26,9 @@ import java.util.*;
 @Service
 public class SolrQuery {
 
-    private String startTime;
-    private String endTime;
+    // 基础指标抽取时用
+    private String startTime; // 查找的开始日期
+    private String endTime; // 查找的截止日期
 
     @Autowired
     SolrUtil solrUtil;
@@ -36,6 +38,8 @@ public class SolrQuery {
         this.startTime = startTime == null ? "NOW/YEAR-50YEAR" : startTime;
         this.endTime = endTime == null ? "NOW" : endTime;
     }
+
+    //region solr语法转换
 
     /**
      * solr语法转换
@@ -181,7 +185,10 @@ public class SolrQuery {
             return re + NOT + ")";
     }
 
-    /******************************** Count方法 ******************************************************/
+    //endregion solr语法转换
+
+    //region Count 统计
+
     /**
      * 获取总条数
      *
@@ -336,7 +343,7 @@ public class SolrQuery {
         List<Map<String, Object>> data = null;
         if (groupFields != null && groupFields.length() > 0) {
             String[] groups = groupFields.split(",");
-            List<SolrGroupEntity> grouplist = new ArrayList<SolrGroupEntity>();
+            List<SolrGroupEntity> grouplist = new ArrayList<>();
             if (customGroup != null && customGroup.size() > 0) {
                 grouplist = customGroup;
             }
@@ -357,9 +364,7 @@ public class SolrQuery {
             }
 
             data = recGroupCount(table, grouplist, 0, null, q, fq);
-        }
-        //纯自定义分组
-        else {
+        } else { // 纯自定义分组
             if (customGroup != null && customGroup.size() > 0) {
                 data = recGroupCount(table, customGroup, 0, null, null, null);
             }
@@ -368,9 +373,9 @@ public class SolrQuery {
     }
 
     /**
-     * 多级分组统计Count（包含自定义分组）
+     * 多级分组 Count 统计（包含自定义分组）
      */
-    public List<Map<String, Object>> getGroupMultList(String core,
+    public List<Map<String, Object>> getCountMultList(String core,
                                                       List<SolrGroupEntity> dimensionGroupList,
                                                       List<SolrGroupEntity> customGroups,
                                                       String q,
@@ -379,53 +384,16 @@ public class SolrQuery {
         List<Map<String, Object>> resultCounts = new ArrayList<>();
 
         if (dimensionGroupList.size() > 0) {
-            // 收集将前 N-1 维度的统计，拼接成筛选条件。
-            // 注意：其中指标维度code出现的顺序要与 dimensionGroupList 中的一致。
             List<SolrGroupEntity> groupList = new ArrayList<>();
             if (customGroups != null && customGroups.size() > 0) {
                 groupList = customGroups;
             }
 
-            for (SolrGroupEntity dimensionGroup : dimensionGroupList) {
-                if (dimensionGroup.getType().equals(SolrGroupEntity.GroupType.DATE_RANGE)) {
-                    // 按每天范围统计
-                    List<RangeFacet> rangeFacets = solrUtil.getFacetDateRange(core, dimensionGroup.getGroupField(), startTime, endTime, "+1DAY", fq, q);
-                    for (RangeFacet rangeFacet : rangeFacets) {
-                        String groupName = rangeFacet.getName();
-                        List<RangeFacet.Count> countList = rangeFacet.getCounts();
-                        SolrGroupEntity group = new SolrGroupEntity(groupName);
-                        group.setType(SolrGroupEntity.GroupType.DATE_RANGE);
-                        for (RangeFacet.Count count : countList) {
-                            if (count.getCount() > 0) {
-                                String day = count.getValue().substring(0, 10);
-                                group.putGroupCondition(day, String.format("%s:[%sT00:00:00Z TO %sT23:59:59Z]", groupName, day, day));
-                            }
-                        }
-                        groupList.add(group);
-                    }
-                } else {
-                    // 按分组字段值统计
-                    String[] groupField = {dimensionGroup.getGroupField()};
-                    List<FacetField> facets = solrUtil.groupCount(core, q, fq, groupField);
-                    for (FacetField facet : facets) {
-                        String groupName = facet.getName();
-                        List<FacetField.Count> counts = facet.getValues();
-                        SolrGroupEntity group = new SolrGroupEntity(groupName);
-                        for (FacetField.Count count : counts) {
-                            if (count.getCount() > 0) {
-                                String value = count.getName();
-                                group.putGroupCondition(value, groupName + ":" + value);
-                            }
-                        }
-                        groupList.add(group);
-                    }
-                }
-            }
+            // 收集根据指标维度分组聚合的条件
+            groupList.addAll(joinAggregationCondition(core, q, fq, dimensionGroupList));
 
             resultCounts = recGroupCount(core, groupList, 0, null, q, fq);
-        }
-        //纯自定义分组
-        else {
+        } else { // 纯自定义分组
             if (customGroups != null && customGroups.size() > 0) {
                 resultCounts = recGroupCount(core, customGroups, 0, null, null, null);
             }
@@ -435,7 +403,7 @@ public class SolrQuery {
     }
 
     /**
-     * 递归获取分组数据(混合)
+     * 递归 Count 统计(混合)
      */
     private List<Map<String, Object>> recGroupCount(String core,
                                                     List<SolrGroupEntity> grouplist,
@@ -443,81 +411,121 @@ public class SolrQuery {
                                                     List<Map<String, Object>> preList,
                                                     String q,
                                                     String fq) throws Exception {
+        // 时间维度字段、维度组合Key及统计结果
+        List<Map<String, Object>> resultList = new ArrayList<>();
+
         String conditionName = "$condition"; // 拼接最后一个维度分组聚合统计的过滤条件
-        String countKeyName = "$countKey"; // 拼接最后一个维度分组聚合统计值对应的唯一健
+        String statisticsKeyName = "$statisticsKey"; // 拼接最后一个维度分组聚合统计值对应的唯一健
         if (num == grouplist.size() - 1) {
-            List<Map<String, Object>> list = new ArrayList<Map<String, Object>>(); // 维度字段、维度组合Key及统计结果
             SolrGroupEntity group = grouplist.get(num);  // 最后一个维度
             String groupField = group.getGroupField();
             SolrGroupEntity.GroupType groupType = group.getType();
+            Map<String, String> groupConditionMap = group.getGroupCondition();
 
-            for (Map<String, Object> preObj : preList) {
+            if (preList != null && preList.size() > 0) {
                 // 遍历前 N-1 维度组合作为筛选条件
-                String query = preObj.get(conditionName).toString();
-                if (fq != null && !fq.equals("") && !fq.equals("*:*")) {
-                    query += " AND " + fq;
-                }
+                for (Map<String, Object> preObj : preList) {
+                    String query = preObj.get(conditionName).toString();
+                    if (StringUtils.isNotEmpty(fq) && !fq.equals("*:*")) {
+                        query += " AND " + fq;
+                    }
 
-                // 统计最后一个维度
-                Map<String, Long> countMap = new HashMap<>();
-                if (groupType.equals(SolrGroupEntity.GroupType.DATE_RANGE)) {
-                    // 按每天范围统计
-                    List<RangeFacet> rangeFacets = solrUtil.getFacetDateRange(core, groupField, startTime, endTime, "+1DAY", query, q);
-                    for (RangeFacet rangeFacet : rangeFacets) {
-                        List<RangeFacet.Count> countList = rangeFacet.getCounts();
-                        for (RangeFacet.Count count : countList) {
-                            if (count.getCount() > 0) {
-                                String key = count.getValue().substring(0, 10);
-                                countMap.put(key, (long) count.getCount());
+                    // 收集最后一个维度的统计结果
+                    Map<String, Long> countMap = new HashMap<>();
+                    if (groupType.equals(SolrGroupEntity.GroupType.DATE_RANGE)) {
+                        // 针对基础指标，按每天范围统计
+                        List<RangeFacet> rangeFacets = solrUtil.getFacetDateRange(core, groupField, startTime, endTime, "+1DAY", query, q);
+                        for (RangeFacet rangeFacet : rangeFacets) {
+                            List<RangeFacet.Count> countList = rangeFacet.getCounts();
+                            for (RangeFacet.Count count : countList) {
+                                if (count.getCount() > 0) {
+                                    String key = count.getValue().substring(0, 10);
+                                    countMap.put(key, (long) count.getCount());
+                                }
                             }
                         }
+                    } else {
+                        // 按字段值统计
+                        countMap = solrUtil.groupCount(core, q, query, groupField, 0, -1);
                     }
-                } else {
-                    // 按字段值统计
-                    countMap = solrUtil.groupCount(core, q, query, groupField, 0, 1000);
-                }
 
-                if (countMap.size() > 0) {
-                    for (String key : countMap.keySet()) {
-                        Map<String, Object> obj = new LinkedHashMap<>();
-                        obj.putAll(preObj); //深拷贝
-                        obj.put(groupField, key);
-                        String countKey = preObj.get(countKeyName).toString() + "-" + key;
-                        obj.put(countKeyName, countKey);
-                        obj.put("$count", countMap.get(key));
-                        obj.remove(conditionName);
-                        list.add(obj);
+                    if (countMap.size() > 0) {
+                        for (String key : countMap.keySet()) {
+                            Map<String, Object> obj = new LinkedHashMap<>();
+                            obj.putAll(preObj); // 深拷贝
+                            obj.put(groupField, key);
+                            String statisticsKey = preObj.get(statisticsKeyName).toString() + "-" + key;
+                            obj.put(statisticsKeyName, statisticsKey);
+                            obj.put("$result", countMap.get(key));
+                            obj.remove(conditionName);
+                            resultList.add(obj);
+                        }
+                    }
+                }
+            } else {  // 只有一个维度分组统计场合
+                for (Map.Entry<String, String> item : groupConditionMap.entrySet()) {
+                    String currFq = item.getValue();
+                    if (StringUtils.isNotEmpty(fq) && !fq.equals("*:*")) {
+                        currFq += " AND " + fq;
+                    }
+
+                    Map<String, Long> countMap = new HashMap<>();
+                    if (groupType.equals(SolrGroupEntity.GroupType.DATE_RANGE)) {
+                        // 针对基础指标，按每天范围统计
+                        List<RangeFacet> rangeFacets = solrUtil.getFacetDateRange(core, groupField, startTime, endTime, "+1DAY", currFq, q);
+                        for (RangeFacet rangeFacet : rangeFacets) {
+                            List<RangeFacet.Count> countList = rangeFacet.getCounts();
+                            for (RangeFacet.Count count : countList) {
+                                if (count.getCount() > 0) {
+                                    String key = count.getValue().substring(0, 10);
+                                    countMap.put(key, (long) count.getCount());
+                                }
+                            }
+                        }
+                    } else {
+                        // 按字段值统计
+                        countMap = solrUtil.groupCount(core, q, currFq, groupField, 0, -1);
+                    }
+
+                    if (countMap.size() > 0) {
+                        for (String key : countMap.keySet()) {
+                            Map<String, Object> obj = new LinkedHashMap<>();
+                            obj.put(groupField, key);
+                            obj.put(statisticsKeyName, key);
+                            obj.put("$result", countMap.get(key));
+                            resultList.add(obj);
+                        }
                     }
                 }
             }
 
-            return list;
+            return resultList;
         } else {
-            List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();//返回集合
+            List<Map<String, Object>> list = new ArrayList<>();//返回集合
             SolrGroupEntity group = grouplist.get(num); //当前分组
             Map<String, String> groupMap = group.getGroupCondition(); //当前分组项
-            String groupName = group.getGroupField();
+            String groupField = group.getGroupField();
             if (preList != null) {
                 //遍历上级递归数据
                 for (Map<String, Object> preObj : preList) {
                     //遍历当前分组数据
                     for (Map.Entry<String, String> item : groupMap.entrySet()) {
                         Map<String, Object> obj = new LinkedHashMap<>();
-                        obj.putAll(preObj); //深拷贝
-                        obj.put(groupName, item.getKey());
+                        obj.putAll(preObj); // 深拷贝
+                        obj.put(groupField, item.getKey());
                         String condition = preObj.get(conditionName).toString() + " AND " + item.getValue();
                         obj.put(conditionName, condition);
-                        String key = preObj.get(countKeyName).toString() + "-" + item.getKey();
-                        obj.put(countKeyName, key);
+                        String statisticsKey = preObj.get(statisticsKeyName).toString() + "-" + item.getKey();
+                        obj.put(statisticsKeyName, statisticsKey);
                         list.add(obj);
                     }
                 }
             } else { //第一次遍历
                 for (Map.Entry<String, String> item : groupMap.entrySet()) {
                     Map<String, Object> obj = new HashMap<>();
-                    obj.put(groupName, item.getKey());
+                    obj.put(groupField, item.getKey());
                     obj.put(conditionName, item.getValue());
-                    obj.put(countKeyName, item.getKey());
+                    obj.put(statisticsKeyName, item.getKey());
                     list.add(obj);
                 }
             }
@@ -526,34 +534,46 @@ public class SolrQuery {
 
     }
 
-    /************************* 数值统计 **********************************************/
+    //endregion Count 统计
+
+    //region 多级数值统计
 
     /**
      * 多级数值统计
+     *
+     * @param core        core名
+     * @param groupFields 分组字段
+     * @param statsFields 统计字段，多个则逗号分隔
      */
-    public Page<Map<String, Object>> getStats(String table,
+    public Page<Map<String, Object>> getStats(String core,
                                               String groupFields,
                                               String statsFields) throws Exception {
-        return getStats(table, groupFields, statsFields, "", "", null);
-    }
-
-    /**
-     * 多级数值统计
-     */
-    public Page<Map<String, Object>> getStats(String table,
-                                              String groupFields,
-                                              String statsFields,
-                                              String q,
-                                              String fq) throws Exception {
-        return getStats(table, groupFields, statsFields, q, fq, null);
+        return getStats(core, groupFields, statsFields, "", "", null);
     }
 
     /**
      * 多级数值统计
      *
      * @param core        core名
-     * @param groupFields 统计字段
-     * @param statsFields 分组字段
+     * @param groupFields 分组字段
+     * @param statsFields 统计字段，多个则逗号分隔
+     * @param q           查询条件
+     * @param fq          筛选条件
+     */
+    public Page<Map<String, Object>> getStats(String core,
+                                              String groupFields,
+                                              String statsFields,
+                                              String q,
+                                              String fq) throws Exception {
+        return getStats(core, groupFields, statsFields, q, fq, null);
+    }
+
+    /**
+     * 多级数值统计
+     *
+     * @param core        core名
+     * @param groupFields 分组字段
+     * @param statsFields 统计字段，多个则逗号分隔
      * @param q           查询条件
      * @param fq          筛选条件
      * @param customGroup 额外自定义分组
@@ -723,5 +743,213 @@ public class SolrQuery {
             return recStats(core, statsFields, grouplist, q, fq, num + 1, list);
         }
     }
+
+    //endregion 多级数值统计
+
+    //region 指标多维度求和统计
+
+    /**
+     * 指标多维度求和统计（包含自定义分组）
+     *
+     * @param core               core名
+     * @param q                  查询条件
+     * @param fq                 筛选条件
+     * @param statsField         统计字段
+     * @param dimensionGroupList 分组字段
+     * @param customGroups       额外自定义分组
+     */
+    public List<Map<String, Object>> getSumMultList(String core,
+                                                    String q,
+                                                    String fq,
+                                                    String statsField,
+                                                    List<SolrGroupEntity> dimensionGroupList,
+                                                    List<SolrGroupEntity> customGroups) throws Exception {
+        // 维度字段及最后一个维度基于其他维度组合作为条件的统计结果的集合
+        List<Map<String, Object>> resultList = new ArrayList<>();
+
+        if (dimensionGroupList != null && dimensionGroupList.size() > 0) {
+            List<SolrGroupEntity> groupList = new ArrayList<>();
+            if (customGroups != null && customGroups.size() > 0) {
+                groupList = customGroups;
+            }
+
+            // 收集根据指标维度分组聚合的条件
+            groupList.addAll(joinAggregationCondition(core, q, fq, dimensionGroupList));
+
+            resultList = recGroupSum(core, statsField, groupList, q, fq, 0, null);
+        } else { // 纯自定义分组
+            if (customGroups != null && customGroups.size() > 0) {
+                resultList = recGroupSum(core, statsField, customGroups, q, fq, 0, null);
+            }
+        }
+
+        return resultList;
+    }
+
+    /**
+     * 指标多维度递归求和统计
+     */
+    private List<Map<String, Object>> recGroupSum(String core,
+                                                  String statsField,
+                                                  List<SolrGroupEntity> groupList,
+                                                  String q,
+                                                  String fq,
+                                                  int num,
+                                                  List<Map<String, Object>> preList) throws Exception {
+        // 时间维度字段、维度组合Key及统计结果
+        List<Map<String, Object>> resultList = new ArrayList<>();
+
+        String conditionName = "$condition"; // 拼接最后一个维度分组聚合统计的过滤条件
+        String statisticsKeyName = "$statisticsKey"; // 拼接最后一个维度分组聚合统计值对应的唯一健
+        if (num == groupList.size() - 1) {
+            SolrGroupEntity group = groupList.get(num); // 最后一个分组维度
+            String groupField = group.getGroupField();
+            Map<String, String> groupConditionMap = group.getGroupCondition();
+            DecimalFormat df = new DecimalFormat("#.00");
+
+            if (preList != null && preList.size() > 0) {
+                for (Map<String, Object> preObj : preList) {
+                    // 遍历前 N-1 维度组合作为筛选条件
+                    String query = preObj.get(conditionName).toString();
+                    if (StringUtils.isNotEmpty(fq) && !fq.equals("*:*")) {
+                        query += " AND " + fq;
+                    }
+
+                    // 收集最后一个维度的统计结果
+                    for (Map.Entry<String, String> item : groupConditionMap.entrySet()) {
+                        String currFq = query + " AND " + item.getValue();
+
+                        Map<String, FieldStatsInfo> statsMap = new HashMap<>();
+                        FieldStatsInfo statsInfo = solrUtil.getStats(core, q, currFq, statsField);
+                        if (statsInfo.getSum() != null && !statsInfo.getSum().equals(0d)) {
+                            Map<String, Object> obj = new HashMap<>();
+                            obj.putAll(preObj); // 深拷贝
+                            obj.put(groupField, item.getKey());
+                            String statisticsKey = preObj.get(statisticsKeyName).toString() + "-" + item.getKey();
+                            obj.put(statisticsKeyName, statisticsKey);
+                            obj.put("$result", df.format(statsInfo.getSum()));
+                            obj.remove(conditionName);
+                            resultList.add(obj);
+                        }
+                    }
+                }
+            } else { // 只有一个维度分组统计场合
+                for (Map.Entry<String, String> item : groupConditionMap.entrySet()) {
+                    String currFq = item.getValue();
+                    if (StringUtils.isNotEmpty(fq) && !fq.equals("*:*")) {
+                        currFq += " AND " + fq;
+                    }
+
+                    Map<String, FieldStatsInfo> statsMap = new HashMap<>();
+                    FieldStatsInfo statsInfo = solrUtil.getStats(core, q, currFq, statsField);
+                    if (statsInfo.getSum() != null && !statsInfo.getSum().equals(0d)) {
+                        Map<String, Object> obj = new HashMap<>();
+                        obj.put(groupField, item.getKey());
+                        obj.put(statisticsKeyName, item.getKey());
+                        obj.put("$result", df.format(statsInfo.getSum()));
+                        resultList.add(obj);
+                    }
+                }
+            }
+
+            return resultList;
+        } else {
+            List<Map<String, Object>> list = new ArrayList<>(); // 返回集合
+            SolrGroupEntity group = groupList.get(num); // 当前分组项
+            Map<String, String> groupConditionMap = group.getGroupCondition();
+            String groupField = group.getGroupField();
+
+            if (preList != null) {
+                //遍历上级递归数据
+                for (Map<String, Object> preObj : preList) {
+                    //遍历当前分组数据
+                    for (Map.Entry<String, String> item : groupConditionMap.entrySet()) {
+                        Map<String, Object> obj = new HashMap<>();
+                        obj.putAll(preObj); // 深拷贝
+                        obj.put(groupField, item.getKey());
+                        String condition = preObj.get(conditionName).toString() + " AND " + item.getValue();
+                        obj.put(conditionName, condition);
+                        String statisticsKey = preObj.get(statisticsKeyName).toString() + "-" + item.getKey();
+                        obj.put(statisticsKeyName, statisticsKey);
+                        list.add(obj);
+                    }
+                }
+            } else { //第一次遍历
+                for (Map.Entry<String, String> item : groupConditionMap.entrySet()) {
+                    Map<String, Object> obj = new HashMap<>();
+                    obj.put(groupField, item.getKey());
+                    obj.put(conditionName, item.getValue());
+                    obj.put(statisticsKeyName, item.getKey());
+                    list.add(obj);
+                }
+            }
+
+            return recGroupSum(core, statsField, groupList, q, fq, num + 1, list);
+        }
+    }
+
+    //endregion 指标多维度求和统计
+
+    //region 公共私有方法
+
+    /**
+     * 收集根据指标维度分组聚合的条件
+     * 注意：其中指标维度code出现的顺序要与 dimensionGroupList 中的一致。
+     *
+     * @param core               core名
+     * @param q                  查询条件
+     * @param fq                 筛选条件
+     * @param dimensionGroupList 分组字段
+     */
+    private List<SolrGroupEntity> joinAggregationCondition(String core,
+                                                           String q,
+                                                           String fq,
+                                                           List<SolrGroupEntity> dimensionGroupList) throws Exception {
+        List<SolrGroupEntity> groupList = new ArrayList<>();
+
+        for (SolrGroupEntity dimensionGroup : dimensionGroupList) {
+            if (dimensionGroup.getType().equals(SolrGroupEntity.GroupType.DATE_RANGE)) {
+                // 按每天范围统计
+                List<RangeFacet> rangeFacets = solrUtil.getFacetDateRange(core, dimensionGroup.getGroupField(), startTime, endTime, "+1DAY", fq, q);
+                for (RangeFacet rangeFacet : rangeFacets) {
+                    String groupName = rangeFacet.getName();
+                    List<RangeFacet.Count> countList = rangeFacet.getCounts();
+                    SolrGroupEntity group = new SolrGroupEntity(groupName);
+                    group.setType(SolrGroupEntity.GroupType.DATE_RANGE);
+                    for (RangeFacet.Count count : countList) {
+                        if (count.getCount() > 0) {
+                            String day = count.getValue().substring(0, 10);
+                            group.putGroupCondition(day, String.format("%s:[%sT00:00:00Z TO %sT23:59:59Z]", groupName, day, day));
+                        }
+                    }
+                    if (group.getGroupCondition().size() > 0) {
+                        groupList.add(group);
+                    }
+                }
+            } else {
+                // 按分组字段值统计
+                String[] groupField = {dimensionGroup.getGroupField()};
+                List<FacetField> facets = solrUtil.groupCount(core, q, fq, groupField);
+                for (FacetField facet : facets) {
+                    String groupName = facet.getName();
+                    List<FacetField.Count> counts = facet.getValues();
+                    SolrGroupEntity group = new SolrGroupEntity(groupName);
+                    for (FacetField.Count count : counts) {
+                        if (count.getCount() > 0) {
+                            String value = count.getName();
+                            group.putGroupCondition(value, groupName + ":" + value);
+                        }
+                    }
+                    if (group.getGroupCondition().size() > 0) {
+                        groupList.add(group);
+                    }
+                }
+            }
+        }
+
+        return groupList;
+    }
+
+    //endregion 公共私有方法
 
 }
