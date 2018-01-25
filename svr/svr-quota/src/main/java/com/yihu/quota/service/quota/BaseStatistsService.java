@@ -609,9 +609,6 @@ public class BaseStatistsService {
             molecularFilter = handleFilter(esConfig.getMolecularFilter(), molecularFilter);
             denominatorFilter = handleFilter(esConfig.getDenominatorFilter(), denominatorFilter);
             result =  divisionQuota(esConfig.getMolecular(), esConfig.getDenominator(), dimension, molecularFilter, denominatorFilter, esConfig.getPercentOperation(), esConfig.getPercentOperationValue(),dateType);
-        }else if( (StringUtils.isNotEmpty(esConfig.getThousandDmolecular())) && StringUtils.isNotEmpty(esConfig.getThousandDenominator())){//除法
-            //除法指标查询输出结果
-           result =  divisionQuota(esConfig.getThousandDmolecular(), esConfig.getThousandDenominator(), dimension, molecularFilter, denominatorFilter, "1", esConfig.getThousandFlag(),dateType);
         }else if(StringUtils.isNotEmpty(esConfig.getSuperiorBaseQuotaCode())) {
             //二次统计 指标查询
             result = getQuotaResultList(esConfig.getSuperiorBaseQuotaCode(), dimension,filters,dateType);

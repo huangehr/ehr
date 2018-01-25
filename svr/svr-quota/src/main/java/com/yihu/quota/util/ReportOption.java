@@ -148,11 +148,6 @@ public class ReportOption {
 //        legendDataList.add(legend);
 //        option.legend().data(legendDataList);
 
-        //grid
-        option.grid().x("50px");  // left
-        option.grid().x2("10ox"); // right
-        option.grid().y2("30px"); // bottom
-//        option.grid().containLabel(true);
         //series
         Pie pie = new Pie();
         pie.name(pieName);
@@ -163,6 +158,9 @@ public class ReportOption {
         } else {
             pie.center(new String[]{"50%", "50%"});
         }
+        pie.itemStyle().normal().labelLine().show(false);
+        pie.itemStyle().normal().label().show(false);
+
 //        pie.itemStyle().emphasis().shadowBlur(10);
 //        pie.itemStyle().emphasis().shadowOffsetX(0);
 //        pie.itemStyle().emphasis().shadowColor("rgba(0, 0, 0, 0.5)");

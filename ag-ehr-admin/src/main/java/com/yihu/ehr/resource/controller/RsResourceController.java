@@ -409,7 +409,28 @@ public class RsResourceController extends BaseController {
                     }else if(StringUtils.isNotEmpty(mRsResources.getEchartType()) && mRsResources.getEchartType().equals("nestedPie")){
                         chartInfoModel = tjQuotaJobClient.getQuotaNestedPieGraphicReports(resourceId, quotaIdstr, filter, dimension, mRsResources.getName());
                     }else {
-                        chartInfoModel = tjQuotaJobClient.getMoreQuotaGraphicReportPreviews(quotaIdstr, charstr, filter, dimension, mRsResources.getName());
+                        //修改前
+//                        chartInfoModel = tjQuotaJobClient.getMoreQuotaGraphicReportPreviews(quotaIdstr, charstr, filter, dimension, mRsResources.getName());
+                        //修改后
+                        String chart = "";
+                        if(StringUtils.isNotEmpty(rsResourcesModel.getEchartType())){
+                            chart = rsResourcesModel.getEchartType();
+                            if(chart.equals("bar")){
+                                chart ="1";
+                            }else if(chart.equals("line")){
+                                chart ="2";
+                            }else if(chart.equals("pie")){
+                                chart ="3";
+                            }
+                        }else{
+                            chart = charstr;
+                        }
+                        if(StringUtils.isNotEmpty(rsResourcesModel.getDimension())){
+                            dimension = rsResourcesModel.getDimension();
+                        }else {
+                            dimension =  firstDimension;
+                        }
+                        chartInfoModel = tjQuotaJobClient.getMoreQuotaGraphicReportPreviews(quotaIdstr, chart, filter, dimension , mRsResources.getName());
                     }
                     chartInfoModel.setResourceId(resourceId);
                     chartInfoModel.setDimensionMap(dimensionMap);
