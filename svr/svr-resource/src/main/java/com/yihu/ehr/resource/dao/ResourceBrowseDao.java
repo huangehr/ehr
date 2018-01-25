@@ -453,18 +453,4 @@ public class ResourceBrowseDao {
         return hbase.queryBySolr(core, q, sort, fq, page, size);
     }
 
-    public List<Map<String,Object>> getMetaData(List<String> idsList){
-        String ids = "";
-        for (String id : idsList){
-            id = "'" + id + "'";
-            ids += id + ",";
-        }
-        if (ids.length()>1){
-            ids = ids.substring(0,ids.length()-1);
-        }
-        String sql ="SELECT ID,NAME FROM rs_metadata WHERE ID in(" + ids + ")";
-        List<Map<String,Object>> list = jdbcTemplate.queryForList(sql);
-        return list;
-    }
-
 }
