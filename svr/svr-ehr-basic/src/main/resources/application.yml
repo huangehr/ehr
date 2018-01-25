@@ -195,7 +195,12 @@ spring:
 fast-dfs:
   tracker-server: 11.1.2.9:22122
   public-server: http://11.1.2.9:80
-
+es:
+  index: wlyy_quota_test
+  type: wlyy_quota_test
+  host:  http://172.19.103.68:9200
+  tHost: 172.19.103.68:9300
+  clusterName: jkzl
 
 
 ---
@@ -222,7 +227,12 @@ spring:
 fast-dfs:
   tracker-server: 10.176.97.5:22122
   public-server: http://10.176.97.5:8888
-
+es:
+  index: wlyy_quota_test
+  type: wlyy_quota_test
+  host:  http://10.176.97.7:9200
+  tHost: 10.176.97.7:9300
+  clusterName: jkzl
 
 ---
 spring:
@@ -248,3 +258,9 @@ spring:
 fast-dfs:
   tracker-server: 100.100.1.157:22122
   public-server: http://100.100.1.157:8888
+es:
+  index: wlyy_quota_test
+  type: wlyy_quota_test
+  host:  http://100.100.1.158:9200
+  tHost: 100.100.1.158:9300
+  clusterName: jkzl
