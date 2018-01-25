@@ -10,6 +10,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -41,7 +42,7 @@ public class ResourceBrowseMetadataDao {
         String sql = "SELECT m.id, m.domain, m.name, m.std_code, m.display_code, m.column_type, m.null_able, m.dict_code, m.description, m.valid, a.group_type, a.group_data " +
                 "FROM rs_resource_metadata a, rs_metadata m " +
                 "WHERE a.id IN (" + rsMetadataIds + ") " +
-                "AND a.METADATA_ID = m.id ";
+                "AND a.metadata_id = m.id ";
         RowMapper rowMapper = BeanPropertyRowMapper.newInstance(DtoResourceMetadata.class);
         return jdbcTemplate.query(sql, rowMapper);
     }
@@ -59,4 +60,21 @@ public class ResourceBrowseMetadataDao {
         RowMapper rowMapper = BeanPropertyRowMapper.newInstance(RsMetadata.class);
         return jdbcTemplate.query(sql, rowMapper);
     }
+
+    public List<Map<String, Object>> getMetaData(List<String> idsList){
+        StringBuilder builder = new StringBuilder();
+        for (String id : idsList){
+            builder.append("'");
+            builder.append(id);
+            builder.append("',");
+        }
+        String ids = "";
+        if (builder.length() > 1){
+            ids = builder.substring(0, builder.length()-1);
+        }
+        String sql ="SELECT ID, NAME FROM rs_metadata WHERE ID in(" + ids + ")";
+        List<Map<String,Object>> list = jdbcTemplate.queryForList(sql);
+        return list;
+    }
+
 }

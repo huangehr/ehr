@@ -3,7 +3,6 @@ package com.yihu.ehr.resource.service;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Lists;
 import com.yihu.ehr.hbase.HBaseDao;
 import com.yihu.ehr.profile.core.ResourceCore;
 import com.yihu.ehr.query.common.model.QueryCondition;
@@ -21,7 +20,6 @@ import org.springframework.util.StringUtils;
 import java.lang.reflect.Method;
 import java.util.*;
 
-import static sun.tools.jstat.Alignment.keySet;
 
 
 /**
@@ -304,7 +302,7 @@ public class ResourceBrowseService {
             //获取资源结构权限，该部分新增其他标准数据集的判断
             boolean isOtherStdCode = false;
             Map<String, String> correspondMap = new HashMap<>();
-            String otherStdMetadataStr = redisService.getOtherStdMetadata(rsResources.getCode());
+            String otherStdMetadataStr = stdTransformClient.stdMetadataCodes("5a278924cd67", rsResources.getCode()); //省平台临时数据处理
             if(otherStdMetadataStr != null) {
                 isOtherStdCode = true;
             }
@@ -692,7 +690,7 @@ public class ResourceBrowseService {
                         idsList.add(id);
                     }
                 }
-                List<Map<String, Object>> metaList = resourceBrowseDao.getMetaData(idsList);
+                List<Map<String, Object>> metaList = resourceBrowseMetadataDao.getMetaData(idsList);
                 metaList.stream().forEach(one->{
                     Object obj = detailedMap.get(String.valueOf(one.get("ID")));
                     tempMap.put(String.valueOf(one.get("NAME")), obj);
@@ -711,7 +709,7 @@ public class ResourceBrowseService {
                         idsList.add(id);
                     }
                 }
-                List<Map<String, Object>> metaList = resourceBrowseDao.getMetaData(idsList);
+                List<Map<String, Object>> metaList = resourceBrowseMetadataDao.getMetaData(idsList);
                 metaList.stream().forEach(one->{
                     Object obj = detailedMap.get(String.valueOf(one.get("ID")));
                     tempMap.put(String.valueOf(one.get("NAME")), obj);
