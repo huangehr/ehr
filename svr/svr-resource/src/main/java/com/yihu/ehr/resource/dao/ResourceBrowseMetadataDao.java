@@ -57,7 +57,7 @@ public class ResourceBrowseMetadataDao {
         String sql = "SELECT m.id, m.std_code, m.column_type, m.dict_code " +
                 "FROM rs_metadata m " +
                 "WHERE m.id IN (" + rsMetadataIds + ")";
-        RowMapper rowMapper = BeanPropertyRowMapper.newInstance(RsMetadata.class);
+        RowMapper rowMapper = BeanPropertyRowMapper.newInstance(DtoResourceMetadata.class);
         return jdbcTemplate.query(sql, rowMapper);
     }
 
