@@ -171,12 +171,15 @@ public class QuotaReportController extends BaseController {
             List<String> lineNames = new ArrayList<>();
             Map<String,Map<String, Object>> lineData = new LinkedHashMap<>();
             Map<String, String> xAxisMap = new LinkedHashMap<>();
+            Map<String, Object> dataMap = new LinkedHashMap<>();
+            Map<String, Object> groupDataMap = new HashMap<>();
+            List<Map<String, Object>> listMap = new ArrayList<>();
+            Map<String,String> dimensionDicMap = new HashMap<>();
+
             for(String quotaId:quotaIds){
-                Map<String, Object> dataMap = new LinkedHashMap<>();
                 TjQuota tjQuota = quotaService.findOne(Integer.valueOf(quotaId));
                 if(tjQuota != null){
                     String dictSql = getQuotaDimensionDictSql(tjQuota.getCode(),dimension);
-                    Map<String,String> dimensionDicMap = new HashMap<>();
                     if(StringUtils.isNotEmpty(dictSql)){
                         BasesicUtil baseUtil = new BasesicUtil();
                         if(dimension.contains("slaveKey")){
@@ -199,41 +202,76 @@ public class QuotaReportController extends BaseController {
                         }
                     }
 
-                    Map<String, Object> groupDataMap = new HashMap<>();
-                    if(tjQuota.getResultGetType().trim().equals("1")){
-                        //使用分组计算 返回结果实例： groupDataMap -> "4205000000-儿-1": 200 =>group by 三个字段
-                        Map<String, Integer> resultDataMap =  quotaService.searcherSumByGroupBySql(tjQuota, dimension, filter,"result","","");
-                        for(String key: resultDataMap.keySet()){
-                            groupDataMap.put(key,resultDataMap.get(key));
-                        }
-                    }else{//二次统计指标获取 结果接口
-                        List<Map<String, Object>> listMap = baseStatistsService.getSimpleQuotaReport(tjQuota.getCode(), filter, dimension);
-                        if(listMap != null && listMap.size() > 0){
-                            for(Map<String, Object> map : listMap){
-                                String keyName = "";
-                                String val = "";
-                                for (String key : map.keySet()) {
-                                    if ("result".equals(key)) {
-                                        val = map.get(key).toString();
-                                    } else {
-                                        keyName = map.get(key).toString();
-                                    }
-                                }
-                                groupDataMap.put(keyName, val);
+//                    Map<String, Object> groupDataMap = new HashMap<>();
+                    List<Map<String, Object>>  resultListMap = baseStatistsService.getSimpleQuotaReport(tjQuota.getCode(), filter, dimension);
+                    if(resultListMap != null && resultListMap.size() > 0){
+                        for(Map<String, Object> map:resultListMap){
+                            if(map !=null && map.size() > 0){
+                                listMap.add(map);
                             }
                         }
-
+                        for(Map<String, Object> map : resultListMap){
+                            String keyName = "";
+                            String val = "";
+                            for (String key : map.keySet()) {
+                                if ("result".equals(key)) {
+                                    val = map.get(key).toString();
+                                } else {
+                                    keyName = map.get(key).toString();
+                                }
+                            }
+                            groupDataMap.put(keyName, val);
+                        }
                     }
 
-                    for(String key : groupDataMap.keySet()){
-                        key = key.toLowerCase();
-                        dataMap.put(dimensionDicMap.containsKey(key)?dimensionDicMap.get(key):key,groupDataMap.get(key));
-                        xAxisMap.put(dimensionDicMap.containsKey(key)?dimensionDicMap.get(key): key,key);
-                    }
-                    lineNames.add(tjQuota.getName());
-                    lineData.put(tjQuota.getCode(), dataMap);
+
+
+
+//                    if(tjQuota.getResultGetType().trim().equals("1")){
+//                        //使用分组计算 返回结果实例： groupDataMap -> "4205000000-儿-1": 200 =>group by 三个字段
+//                        Map<String, Integer> resultDataMap =  quotaService.searcherSumByGroupBySql(tjQuota, dimension, filter,"result","","");
+//                        for(String key: resultDataMap.keySet()){
+//                            groupDataMap.put(key,resultDataMap.get(key));
+//                        }
+//                    }else{//二次统计指标获取 结果接口
+//                        List<Map<String, Object>> listMap = baseStatistsService.getSimpleQuotaReport(tjQuota.getCode(), filter, dimension);
+//                        if(listMap != null && listMap.size() > 0){
+//                            for(Map<String, Object> map : listMap){
+//                                String keyName = "";
+//                                String val = "";
+//                                for (String key : map.keySet()) {
+//                                    if ("result".equals(key)) {
+//                                        val = map.get(key).toString();
+//                                    } else {
+//                                        keyName = map.get(key).toString();
+//                                    }
+//                                }
+//                                groupDataMap.put(keyName, val);
+//                            }
+//                        }
+
+//                    }
+//                    for(String key : groupDataMap.keySet()){
+//                        key = key.toLowerCase();
+//                        dataMap.put(dimensionDicMap.containsKey(key)?dimensionDicMap.get(key):key,groupDataMap.get(key));
+//                        xAxisMap.put(dimensionDicMap.containsKey(key)?dimensionDicMap.get(key): key,key);
+//                    }
+
                 }
             }
+
+            for(String key : groupDataMap.keySet()){
+                key = key.toLowerCase();
+                dataMap.put(dimensionDicMap.containsKey(key)?dimensionDicMap.get(key):key,groupDataMap.get(key));
+                xAxisMap.put(dimensionDicMap.containsKey(key)?dimensionDicMap.get(key): key,key);
+            }
+
+
+
+            lineNames.add(title);
+            lineData.put("", dataMap);
+
+
             Map<String, Object> quotaMap = new LinkedHashMap<>();
             ReportOption reportOption = new ReportOption();
 
@@ -268,7 +306,27 @@ public class QuotaReportController extends BaseController {
                 }
             }
             Object[] xData = (Object[])quotaMap.keySet().toArray(new Object[quotaMap.size()]);
-            option = reportOption.getLineEchartOptionMoreChart(title, "", "", xData, optionData, lineNames,charTypes);
+
+
+            for(String typeStr :charTypes){
+                int type = Integer.valueOf(typeStr);
+                if (type == ReportOption.bar) {
+                    option = reportOption.getLineEchartOptionMoreChart(title, "", "", xData, optionData, lineNames, charTypes);
+                } else if (type == ReportOption.line) {
+                    option = reportOption.getLineEchartOptionMoreChart(title, "", "", xData, optionData, lineNames, charTypes);
+                } else if (type == ReportOption.pie) {
+                    List<Map<String, Object>> datalist = new ArrayList<>();
+                    for(Map<String, Object> resultMap :listMap){
+                        Map<String, Object> map = new HashMap<>();
+                        map.put("NAME",resultMap.get(dimension));
+                        map.put("TOTAL",resultMap.get("result"));
+                        datalist.add(map);
+                    }
+                    option = reportOption.getPieEchartOption(title, "", "", datalist, lineNames.get(0), null);
+                }
+            }
+
+
             chartInfoModel.setOption(option.toString());
             chartInfoModel.setTitle(title);
             chartInfoModel.setxAxisMap(xAxisMap);
@@ -279,6 +337,139 @@ public class QuotaReportController extends BaseController {
             return null;
         }
     }
+
+
+//    @ApiOperation(value = "获取指标统计结果echart图表，支持多条组合")
+//    @RequestMapping(value = ServiceApi.TJ.GetMoreQuotaGraphicReportPreviews, method = RequestMethod.GET)
+//    public MChartInfoModel getQuotaGraphicReports(
+//            @ApiParam(name = "quotaIdStr", value = "指标ID,多个用,拼接", required = true)
+//            @RequestParam(value = "quotaIdStr" , required = true) String quotaIdStr,
+//            @ApiParam(name = "charstr", value = "多图表类型用,拼接,混合类型只支持柱状和线性", defaultValue = "1")
+//            @RequestParam(value = "charstr" , required = true) String charstr,
+//            @ApiParam(name = "filter", value = "过滤", defaultValue = "")
+//            @RequestParam(value = "filter", required = false) String filter,
+//            @ApiParam(name = "dimension", value = "维度字段", defaultValue = "quotaDate")
+//            @RequestParam(value = "dimension", required = false) String dimension,
+//            @ApiParam(name = "title", value = "视图名称", defaultValue = "")
+//            @RequestParam(value = "title", required = false) String title
+//    ) {
+//        List<String> quotaIds = Arrays.asList(quotaIdStr.split(","));
+//        List<String> charTypes = Arrays.asList(charstr.split(","));
+//        MChartInfoModel chartInfoModel = new MChartInfoModel();
+//        try {
+//            Option option = null;
+//            List<List<Object>> optionData = new ArrayList<>();
+//            List<String> lineNames = new ArrayList<>();
+//            Map<String,Map<String, Object>> lineData = new LinkedHashMap<>();
+//            Map<String, String> xAxisMap = new LinkedHashMap<>();
+//            for(String quotaId:quotaIds){
+//                Map<String, Object> dataMap = new LinkedHashMap<>();
+//                TjQuota tjQuota = quotaService.findOne(Integer.valueOf(quotaId));
+//                if(tjQuota != null){
+//                    String dictSql = getQuotaDimensionDictSql(tjQuota.getCode(),dimension);
+//                    Map<String,String> dimensionDicMap = new HashMap<>();
+//                    if(StringUtils.isNotEmpty(dictSql)){
+//                        BasesicUtil baseUtil = new BasesicUtil();
+//                        if(dimension.contains("slaveKey")){
+//                            //查询字典数据
+//                            List<DictModel> dictDatas = jdbcTemplate.query(dictSql, new BeanPropertyRowMapper(DictModel.class));
+//                            for (DictModel dictModel : dictDatas) {
+//                                String name = baseUtil.getFieldValueByName("name", dictModel);
+//                                String val = baseUtil.getFieldValueByName("code", dictModel).toLowerCase();
+//                                dimensionDicMap.put(val,name);
+//                            }
+//                        } else{
+//                            List<SaveModel> dictDatas = jdbcTemplate.query(dictSql, new BeanPropertyRowMapper(SaveModel.class));
+//                            if(dictDatas != null ) {
+//                                for (SaveModel saveModel : dictDatas) {
+//                                    String name = baseUtil.getFieldValueByName(dimension + "Name", saveModel);
+//                                    String val = baseUtil.getFieldValueByName(dimension,saveModel).toLowerCase();
+//                                    dimensionDicMap.put(val,name);
+//                                }
+//                            }
+//                        }
+//                    }
+//
+//                    Map<String, Object> groupDataMap = new HashMap<>();
+//                    if(tjQuota.getResultGetType().trim().equals("1")){
+//                        //使用分组计算 返回结果实例： groupDataMap -> "4205000000-儿-1": 200 =>group by 三个字段
+//                        Map<String, Integer> resultDataMap =  quotaService.searcherSumByGroupBySql(tjQuota, dimension, filter,"result","","");
+//                        for(String key: resultDataMap.keySet()){
+//                            groupDataMap.put(key,resultDataMap.get(key));
+//                        }
+//                    }else{//二次统计指标获取 结果接口
+//                        List<Map<String, Object>> listMap = baseStatistsService.getSimpleQuotaReport(tjQuota.getCode(), filter, dimension);
+//                        if(listMap != null && listMap.size() > 0){
+//                            for(Map<String, Object> map : listMap){
+//                                String keyName = "";
+//                                String val = "";
+//                                for (String key : map.keySet()) {
+//                                    if ("result".equals(key)) {
+//                                        val = map.get(key).toString();
+//                                    } else {
+//                                        keyName = map.get(key).toString();
+//                                    }
+//                                }
+//                                groupDataMap.put(keyName, val);
+//                            }
+//                        }
+//
+//                    }
+//
+//                    for(String key : groupDataMap.keySet()){
+//                        key = key.toLowerCase();
+//                        dataMap.put(dimensionDicMap.containsKey(key)?dimensionDicMap.get(key):key,groupDataMap.get(key));
+//                        xAxisMap.put(dimensionDicMap.containsKey(key)?dimensionDicMap.get(key): key,key);
+//                    }
+//                    lineNames.add(tjQuota.getName());
+//                    lineData.put(tjQuota.getCode(), dataMap);
+//                }
+//            }
+//            Map<String, Object> quotaMap = new LinkedHashMap<>();
+//            ReportOption reportOption = new ReportOption();
+//
+//            int size = 0;
+//            String quota = "";
+//            if(lineData != null && lineData.size() > 0){
+//                for(String key : lineData.keySet()){
+//                    int tempSize = lineData.get(key).size();
+//                    if (tempSize > size){
+//                        size = tempSize;
+//                        quota = key;
+//                        quotaMap = lineData.get(key);
+//                    }
+//                }
+//                for(String key : lineData.keySet()){
+//                    List<Object> dataList = new ArrayList<>();
+//                    Map<String,Object> valMap = lineData.get(key);
+//                    if(key != quota){
+//                        for(String name :quotaMap .keySet()){
+//                            if(valMap.containsKey(name)){
+//                                dataList.add(valMap.get(name));
+//                            }else {
+//                                dataList.add(0);
+//                            }
+//                        }
+//                    }else{
+//                        for(String name :valMap .keySet()){
+//                            dataList.add(valMap.get(name));
+//                        }
+//                    }
+//                    optionData.add(dataList);
+//                }
+//            }
+//            Object[] xData = (Object[])quotaMap.keySet().toArray(new Object[quotaMap.size()]);
+//            option = reportOption.getLineEchartOptionMoreChart(title, "", "", xData, optionData, lineNames,charTypes);
+//            chartInfoModel.setOption(option.toString());
+//            chartInfoModel.setTitle(title);
+//            chartInfoModel.setxAxisMap(xAxisMap);
+//            return chartInfoModel;
+//        } catch (Exception e) {
+//            error(e);
+//            invalidUserException(e, -1, "查询失败:" + e.getMessage());
+//            return null;
+//        }
+//    }
 
 
     @ApiOperation(value = "指标统计分组查询")
