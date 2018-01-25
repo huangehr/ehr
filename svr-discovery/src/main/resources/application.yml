@@ -42,3 +42,7 @@ spring:
 ---
 spring:
   profiles: prod_sr
+
+---
+spring:
+  profiles: prod_fzzy

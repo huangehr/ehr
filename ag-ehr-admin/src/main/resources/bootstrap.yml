@@ -61,3 +61,13 @@ spring:
       password: configuration
       uri: http://10.176.97.10:1221
       label: master
+
+---
+spring:
+  profiles: prod_fzzy
+  cloud:
+    config:
+      username: user
+      password: configuration
+      uri: http://100.100.1.153:1221
+      label: master
