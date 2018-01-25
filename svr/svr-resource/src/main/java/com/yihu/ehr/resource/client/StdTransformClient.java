@@ -21,6 +21,12 @@ public interface StdTransformClient {
             @RequestParam(value = "version") String version,
             @RequestParam(value = "datasetCode") String datasetCode);
 
+    @RequestMapping(value = "/redis/adapterMetadataCode", method = RequestMethod.GET)
+    String adapterMetadataCode(
+            @RequestParam(value = "version") String version,
+            @RequestParam(value = "stdDatasetCode") String datasetCode,
+            @RequestParam(value = "stdMetadataCode") String stdMetadataCode);
+
     @RequestMapping(value = "/redis/stdMetadataName", method = RequestMethod.GET)
     String stdMetadataName(
             @RequestParam(value = "version") String version,

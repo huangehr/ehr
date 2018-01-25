@@ -11,7 +11,8 @@ import java.io.PrintWriter;
 /**
  * Created by hzp on 20170317.
  */
-@Component
+@Deprecated
+//@Component
 public class GlobalHandlerExceptionResolver implements HandlerExceptionResolver {
 
     /**
