@@ -28,12 +28,15 @@ import java.util.Random;
 @Service
 @Transactional
 public class AppService extends BaseJpaService<App, AppRepository> {
+
     private static final int AppIdLength = 10;
     private static final int AppSecretLength = 16;
+
     @Autowired
     private UserAppRepository userAppRepository;
     @Autowired
     private AppRepository appRepo;
+
     @Value("${fast-dfs.public-server}")
     private String fastDfsPublicServers;
 
@@ -66,13 +69,11 @@ public class AppService extends BaseJpaService<App, AppRepository> {
      */
     public boolean verifyApp(String id, String secret) {
         App app = appRepo.findOne(id);
-
         return app != null && app.getSecret().equals(secret);
     }
 
     public boolean isAppNameExists(String name){
         App app = appRepo.findByName(name);
-
         return app != null;
     }
 
@@ -104,7 +105,7 @@ public class AppService extends BaseJpaService<App, AppRepository> {
         if(userAppList != null) {
             for (UserApp userApp : userAppList) {
                 userApp.setShowFlag(Integer.parseInt(showFlag));
-               userAppRepository.save(userApp);
+                userAppRepository.save(userApp);
             }
         }
     }
@@ -114,7 +115,7 @@ public class AppService extends BaseJpaService<App, AppRepository> {
     }
 
     public boolean findByIdAndSecret(String appId, String secret) {
-        return appRepo.findByIdAndSecret(appId,secret).size()>0;
+        return appRepo.findByIdAndSecret(appId, secret).size()>0;
     }
 
     /**

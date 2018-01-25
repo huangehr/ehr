@@ -88,7 +88,7 @@ public class QuotaReportController extends BaseController {
         envelop.setSuccessFlg(false);
         return envelop;
     }
-    @ApiOperation(value = "获取统计报表视图下多个指标组合  二维表数据")
+    @ApiOperation(value = "获取统计报表一个视图下多个指标组合  二维表数据")
     @RequestMapping(value = ServiceApi.TJ.GetQuotaReportTwoDimensionalTable, method = RequestMethod.GET)
     public List<Map<String, Object>> getQuotaReportTwoDimensionalTable(
             @ApiParam(name = "quotaCodeStr", value = "指标Code,多个用,拼接", required = true)
@@ -98,18 +98,52 @@ public class QuotaReportController extends BaseController {
             @ApiParam(name = "dimension", value = "维度字段", defaultValue = "quotaDate")
             @RequestParam(value = "dimension", required = false) String dimension
     ) {
-        List<Map<String, Object>> result = new ArrayList<>();
+        List<Map<String, Object>> viewResult = new ArrayList<>();
+
+        Map<String,List<Map<String, Object>>> quotaViewResult = new HashMap<>();
+        String maxQuota = "";
+        int num = 0;
         try {
             List<String> quotaCodes = Arrays.asList(quotaCodeStr.split(","));
+            int i = 1;
             for(String code:quotaCodes){
                 List<Map<String, Object>> quotaResult = baseStatistsService.getSimpleQuotaReport(code, filter, dimension);
-                result.addAll(quotaResult);
+                if(quotaResult.size() >= num){
+                    num = quotaResult.size();
+                    maxQuota = code;
+                }
+                quotaViewResult.put(code,quotaResult);
             }
+            Map<String,List<Map<String, Object>>> otherQuotaViewResult = new HashMap<>();
+            for(String key :quotaViewResult.keySet()){
+                if(key != maxQuota){
+                    otherQuotaViewResult.put(key,quotaViewResult.get(key));
+                }
+            }
+            //以查询结果数据最多的指标为主，其他指标对应维度没有数据的补充0
+            for(Map<String, Object> vMap : quotaViewResult.get(maxQuota)){
+                vMap.put(maxQuota, vMap.get("result"));
+                for (String viewQuotaCode : otherQuotaViewResult.keySet()) {
+                    for (Map<String, Object> quotaResultMap : otherQuotaViewResult.get(viewQuotaCode)) {
+                        if( quotaResultMap.get(dimension) != null){
+                            if (vMap.get(dimension).toString().trim().equals(quotaResultMap.get(dimension).toString().trim())) {
+                                vMap.put(viewQuotaCode, quotaResultMap.get("result").toString());
+                                break;
+                            } else {
+                                vMap.put(viewQuotaCode, 0);
+                            }
+                        } else {
+                            vMap.put(viewQuotaCode, 0);
+                        }
+                    }
+                }
+            }
+
+
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return  result;
-
+        return  quotaViewResult.get(maxQuota);
     }
 
 
@@ -176,9 +210,19 @@ public class QuotaReportController extends BaseController {
                         List<Map<String, Object>> listMap = baseStatistsService.getSimpleQuotaReport(tjQuota.getCode(), filter, dimension);
                         if(listMap != null && listMap.size() > 0){
                             for(Map<String, Object> map : listMap){
-                                groupDataMap.putAll(map);
+                                String keyName = "";
+                                String val = "";
+                                for (String key : map.keySet()) {
+                                    if ("result".equals(key)) {
+                                        val = map.get(key).toString();
+                                    } else {
+                                        keyName = map.get(key).toString();
+                                    }
+                                }
+                                groupDataMap.put(keyName, val);
                             }
                         }
+
                     }
 
                     for(String key : groupDataMap.keySet()){

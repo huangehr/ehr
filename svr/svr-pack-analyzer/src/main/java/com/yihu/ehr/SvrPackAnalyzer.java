@@ -1,5 +1,9 @@
 package com.yihu.ehr;
 
+import com.yihu.ehr.analyze.config.SchedulerConfig;
+import com.yihu.ehr.analyze.service.scheduler.SchedulerService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.actuate.autoconfigure.ManagementWebSecurityAutoConfiguration;
 import org.springframework.boot.actuate.autoconfigure.MetricExportAutoConfiguration;
@@ -30,15 +34,20 @@ import java.util.concurrent.Executor;
 @EnableFeignClients
 @EnableScheduling
 @EnableAsync
-public class SvrPackAnalyzer extends SpringBootServletInitializer {
+public class SvrPackAnalyzer extends SpringBootServletInitializer implements CommandLineRunner {
+
+    @Autowired
+    private SchedulerService schedulerService;
+    @Autowired
+    private SchedulerConfig schedulerConfig;
 
     public static void main(String[] args) throws NoSuchFieldException, IllegalAccessException {
         SpringApplication.run(SvrPackAnalyzer.class, args);
     }
 
     @Override
-    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        return application.sources(SvrPackAnalyzer.class);
+    public void run(String... strings) throws Exception {
+        schedulerService.addJob(schedulerConfig.getJobMinSize(), schedulerConfig.getCronExp());
     }
 
     @Bean
@@ -50,5 +59,10 @@ public class SvrPackAnalyzer extends SpringBootServletInitializer {
         executor.setThreadNamePrefix("qc-");
         executor.initialize();
         return executor;
+    }
+
+    @Override
+    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+        return application.sources(SvrPackAnalyzer.class);
     }
 }

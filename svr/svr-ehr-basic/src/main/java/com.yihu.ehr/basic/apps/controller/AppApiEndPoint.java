@@ -2,6 +2,7 @@ package com.yihu.ehr.basic.apps.controller;
 
 import com.yihu.ehr.basic.apps.model.AppApi;
 import com.yihu.ehr.basic.apps.service.AppApiParameterService;
+import com.yihu.ehr.basic.apps.service.AppApiResponseService;
 import com.yihu.ehr.basic.apps.service.AppApiService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ErrorCode;
@@ -11,9 +12,12 @@ import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.app.MAppApi;
 import com.yihu.ehr.model.app.MAppApiDetail;
 import com.yihu.ehr.model.app.MAppApiParameter;
+import com.yihu.ehr.model.app.OpenAppApi;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.springframework.aop.aspectj.annotation.LazySingletonAspectInstanceFactoryDecorator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -38,6 +42,8 @@ public class AppApiEndPoint extends EnvelopRestEndPoint {
     private AppApiService appApiService;
     @Autowired
     private AppApiParameterService appApiParameterService;
+    @Autowired
+    private AppApiResponseService appApiResponseService;
 
     @RequestMapping(value = ServiceApi.AppApi.AppApis, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建AppApi")
@@ -141,5 +147,24 @@ public class AppApiEndPoint extends EnvelopRestEndPoint {
         return mAppApiDetails;
     }
 
+    //------------------------ 开放平台 -------------------------
+
+    @RequestMapping(value = ServiceApi.AppApi.AppApiAuthList, method = RequestMethod.GET)
+    @ApiOperation(value = "获取AppApi列表")
+    public Envelop authApiList(
+            @ApiParam(name = "clientId", value = "应用ID", required = true)
+            @RequestParam(value = "clientId") String clientId) throws Exception{
+        Envelop envelop = new Envelop();
+        List<OpenAppApi> appApiList = appApiService.authApiList(clientId);
+        List<OpenAppApi> resultList = new ArrayList<>(appApiList.size());
+        for(OpenAppApi openAppApi : appApiList) {
+            openAppApi.setParameter(appApiParameterService.search("appApiId=" + openAppApi.getId()));
+            openAppApi.setResponse(appApiResponseService.search("appApiId=" + openAppApi.getId()));
+            resultList.add(openAppApi);
+        }
+        envelop.setDetailModelList(resultList);
+        envelop.setSuccessFlg(true);
+        return envelop;
+    }
 
 }

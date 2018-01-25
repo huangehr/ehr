@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
  */
 @Service
 @Transactional
-public class RsResourceIntegratedService extends BaseJpaService<RsResource, RsResourceDao> {
+public class ResourceIntegratedService extends BaseJpaService<RsResource, RsResourceDao> {
 
     @Autowired
     private ObjectMapper objectMapper;

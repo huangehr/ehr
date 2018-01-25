@@ -62,8 +62,7 @@ public class ResourceBrowseDao {
                     if (obj.containsKey("saas") && !obj.get("saas").equals("*")) {
                         q += " AND (" + obj.get("saas") + ")";
                     }
-                }
-                else{
+                } else{
                     if (obj.containsKey("saas") && !obj.get("saas").equals("*")) {
                         q = obj.get("saas");
                     }
@@ -83,8 +82,7 @@ public class ResourceBrowseDao {
                     fq = q;
                     q = "{!join fromIndex=" + subJoinCore + " from=profile_id to=rowkey}" +join;
                 }
-            }
-            else {
+            } else {
                 q = queryParams;
             }
         }
@@ -122,8 +120,7 @@ public class ResourceBrowseDao {
                     if (obj.containsKey("saas") && !obj.get("saas").equals("*")) {
                         q += " AND (" + obj.get("saas") + ")";
                     }
-                }
-                else{
+                } else{
                     if (obj.containsKey("saas") && !obj.get("saas").equals("*")) {
                         q = obj.get("saas");
                     }
@@ -143,8 +140,7 @@ public class ResourceBrowseDao {
                     fq = q;
                     q = "{!join fromIndex=" + subJoinCore + " from=profile_id to=rowkey}" +join;
                 }
-            }
-            else {
+            } else {
                 q = queryParams;
             }
         }
@@ -249,8 +245,7 @@ public class ResourceBrowseDao {
             if (params.containsKey("saas") && !params.get("saas").equals("*")) {
                 fq += " AND ("+params.get("saas")+")";
             }
-        }
-        else{
+        } else{
             if (params.containsKey("saas") && !params.get("saas").equals("*")) {
                 fq = params.get("saas").toString();
             }
@@ -407,12 +402,10 @@ public class ResourceBrowseDao {
 
         //分页查询
         List<Map<String,Object>> list = new ArrayList<>();
-        if(count>size)
-        {
+        if(count>size) {
             String sqlList = parser.getPageSql(sql, page, size);
             list = jdbcTemplate.queryForList(sqlList);
-        }
-        else{
+        } else{
             list = jdbcTemplate.queryForList(sql);
         }
         return new PageImpl<Map<String, Object>>(list,new PageRequest(page-1, size),count);

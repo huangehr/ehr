@@ -10,6 +10,7 @@ import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.users.service.UserClient;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.rest.Envelop;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.time.DateUtils;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0 + ServiceApi.GateWay.admin)
+@Api(value = "PortalLoginController", description = "登陆接口", tags = {"云门户 - 登陆接口"})
 public class PortalLoginController extends BaseController {
 
     @Autowired

@@ -13,12 +13,14 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Collection;
 import java.util.Map;
 
+@ApiIgnore
 @FeignClient(value = MicroServices.Standard)
 @RequestMapping(ApiVersion.Version1_0)
 public interface StandardClient {
