@@ -346,6 +346,7 @@ public class RsResourceController extends BaseController {
             envelop.setErrorMsg("视图不存在，请确认！");
             return envelop;
         }else {
+            RsResourcesModel rsResourcesModel = toEntity(toJson(resourceResult.getObj()), RsResourcesModel.class);
             List<ResourceQuotaModel> list = resourceQuotaClient.getByResourceId(resourceId);
             if(list != null && list.size() > 0){
                 String quotaCodestr  = "";
@@ -388,7 +389,7 @@ public class RsResourceController extends BaseController {
                     }
                 }
                 if(StringUtils.isEmpty(dimension) || dimension.equals(" ")){
-                    dimension = firstDimension;
+                    dimension = rsResourcesModel.getDimension();
                 }
 
                 if(org.length() > 0 && dimensionMap.containsKey("org")){
