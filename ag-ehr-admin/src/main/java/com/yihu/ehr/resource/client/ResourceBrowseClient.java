@@ -55,8 +55,8 @@ public interface ResourceBrowseClient {
             @RequestParam(value = "rowKey") String rowKey);
     */
 
-    @ApiOperation("根据主表rowKey查询所有细表数据")
-    @RequestMapping(value = ServiceApi.Resources.FindSubDate, method = RequestMethod.GET)
+    @ApiOperation("档案资源浏览细表数据")
+    @RequestMapping(value = ServiceApi.Resources.ResourceBrowseResourceSubData, method = RequestMethod.GET)
     Envelop findSubDateByRowKey(
             @RequestParam(value = "rowKey") String rowKey,
             @RequestParam(value = "version") String version);

@@ -542,6 +542,9 @@ public class ResourceBrowseService {
                         rsMetadataIds.append(id);
                         rsMetadataIds.append("',");
                     }
+                    if(rsMetadataIds.length() <= 0 ) {
+                        return null;
+                    }
                     return resourceBrowseMetadataDao.getAuthResourceMetadata(rsMetadataIds.substring(0, rsMetadataIds.length() - 1));
                 } else {
                     return null;
@@ -552,6 +555,9 @@ public class ResourceBrowseService {
                     rsMetadataIds.append("'");
                     rsMetadataIds.append(id);
                     rsMetadataIds.append("',");
+                }
+                if(rsMetadataIds.length() <= 0 ) {
+                    return null;
                 }
                 return resourceBrowseMetadataDao.getRsMetadataByIds(rsMetadataIds.substring(0, rsMetadataIds.length() - 1));
             }
