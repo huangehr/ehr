@@ -178,8 +178,8 @@ public class ResourceBrowseController extends BaseController {
             }
     }
 
-    @ApiOperation("根据主表rowKey查询所有细表数据")
-    @RequestMapping(value = ServiceApi.Resources.FindSubDate, method = RequestMethod.GET)
+    @ApiOperation("档案资源浏览细表数据")
+    @RequestMapping(value = ServiceApi.Resources.ResourceBrowseResourceSubData, method = RequestMethod.GET)
     public Envelop findSubDateByRowKey(
             @ApiParam(name = "rowKey", value = "主表rowKey", required = true)
             @RequestParam(value = "rowKey") String rowKey,
