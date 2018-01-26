@@ -163,6 +163,7 @@ public class QuotaReportController extends BaseController {
         List<String> quotaIds = Arrays.asList(quotaIdStr.split(","));
         List<String> charTypes = Arrays.asList(charstr.split(","));
         MChartInfoModel chartInfoModel = new MChartInfoModel();
+        String dimensionName = dimension+"Name";
         try {
             Option option = null;
             List<List<Object>> optionData = new ArrayList<>();
@@ -170,77 +171,35 @@ public class QuotaReportController extends BaseController {
             Map<String,Map<String, Object>> lineData = new LinkedHashMap<>();
             Map<String, String> xAxisMap = new LinkedHashMap<>();
             Map<String, Object> dataMap = new LinkedHashMap<>();
-            Map<String, Object> groupDataMap = new HashMap<>();
             List<Map<String, Object>> listMap = new ArrayList<>();
-            Map<String,String> dimensionDicMap = new HashMap<>();
 
             for(String quotaId:quotaIds){
                 TjQuota tjQuota = quotaService.findOne(Integer.valueOf(quotaId));
                 if(tjQuota != null){
-                    String dictSql = getQuotaDimensionDictSql(tjQuota.getCode(),dimension);
-                    if(StringUtils.isNotEmpty(dictSql)){
-                        BasesicUtil baseUtil = new BasesicUtil();
-                        if(dimension.contains("slaveKey")){
-                            //查询字典数据
-                            List<DictModel> dictDatas = jdbcTemplate.query(dictSql, new BeanPropertyRowMapper(DictModel.class));
-                            for (DictModel dictModel : dictDatas) {
-                                String name = baseUtil.getFieldValueByName("name", dictModel);
-                                String val = baseUtil.getFieldValueByName("code", dictModel).toLowerCase();
-                                dimensionDicMap.put(val,name);
-                            }
-                        } else{
-                            List<SaveModel> dictDatas = jdbcTemplate.query(dictSql, new BeanPropertyRowMapper(SaveModel.class));
-                            if(dictDatas != null ) {
-                                for (SaveModel saveModel : dictDatas) {
-                                    String name = baseUtil.getFieldValueByName(dimension + "Name", saveModel);
-                                    String val = baseUtil.getFieldValueByName(dimension,saveModel).toLowerCase();
-                                    dimensionDicMap.put(val,name);
-                                }
-                            }
-                        }
-                    }
-
-//                    Map<String, Object> groupDataMap = new HashMap<>();
                     List<Map<String, Object>>  resultListMap = baseStatistsService.getSimpleQuotaReport(tjQuota.getCode(), filter, dimension);
                     if(resultListMap != null && resultListMap.size() > 0){
                         for(Map<String, Object> map:resultListMap){
                             if(map !=null && map.size() > 0){
                                 listMap.add(map);
-                            }
-                        }
-                        for(Map<String, Object> map : resultListMap){
-                            String keyName = "";
-                            String val = "";
-                            for (String key : map.keySet()) {
-                                if ("result".equals(key)) {
-                                    val = map.get(key).toString();
-                                } else {
-                                    if(map.get(key) != null ){
-                                        keyName = map.get(key).toString();
-                                    }
+                                //第一种 ES库中有定义的维度 如org,slaveKey1
+                                //第二种 ES库中未定义的维度 如level，economic
+                                if(map.containsKey(dimensionName)){
+                                    dataMap.put(map.get(dimensionName).toString(), map.get("result"));
+                                    xAxisMap.put(map.get(dimensionName).toString(), map.get(dimension).toString());
+                                }else{
+                                    dataMap.put(map.get(dimension).toString(), map.get("result"));
+                                    xAxisMap.put(map.get(dimension).toString(), map.get(dimension).toString());
                                 }
                             }
-                            groupDataMap.put(keyName, val);
+
                         }
                     }
                 }
             }
-
-            for(String key : groupDataMap.keySet()){
-                key = key.toLowerCase();
-                dataMap.put(dimensionDicMap.containsKey(key)?dimensionDicMap.get(key):key,groupDataMap.get(key));
-                xAxisMap.put(dimensionDicMap.containsKey(key)?dimensionDicMap.get(key): key,key);
-            }
-
-
-
             lineNames.add(title);
             lineData.put("", dataMap);
-
-
             Map<String, Object> quotaMap = new LinkedHashMap<>();
             ReportOption reportOption = new ReportOption();
-
             int size = 0;
             String quota = "";
             if(lineData != null && lineData.size() > 0){
@@ -272,8 +231,6 @@ public class QuotaReportController extends BaseController {
                 }
             }
             Object[] xData = (Object[])quotaMap.keySet().toArray(new Object[quotaMap.size()]);
-
-
             for(String typeStr :charTypes){
                 if(typeStr.equals("common")){
                     typeStr = "1";
@@ -287,15 +244,13 @@ public class QuotaReportController extends BaseController {
                     List<Map<String, Object>> datalist = new ArrayList<>();
                     for(Map<String, Object> resultMap :listMap){
                         Map<String, Object> map = new HashMap<>();
-                        map.put("NAME",resultMap.get(dimension));
+                        map.put("NAME",resultMap.get(dimensionName));
                         map.put("TOTAL",resultMap.get("result"));
                         datalist.add(map);
                     }
                     option = reportOption.getPieEchartOption(title, "", "", datalist, lineNames.get(0), null);
                 }
             }
-
-
             chartInfoModel.setOption(option.toString());
             chartInfoModel.setTitle(title);
             chartInfoModel.setxAxisMap(xAxisMap);
