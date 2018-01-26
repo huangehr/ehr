@@ -5,7 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * 自定义分组条件
+ * solr分组聚合条件
  * Created by hzp on 2015/11/17.
  */
 public class SolrGroupEntity {
@@ -19,24 +19,33 @@ public class SolrGroupEntity {
 
     private String groupField; // 分组字段名
     private GroupType type; // 分组统计类型
+    private Object gap; // 分组间隔，用于范围统计
     private Map<String, String> groupCondition = new LinkedHashMap<>(); // 分组条件
 
     public SolrGroupEntity(String groupField) {
         this.groupField = groupField;
         this.type = GroupType.FIELD_VALUE;
+        this.gap = null;
         this.groupCondition = new HashMap<String, String>();
     }
 
     public SolrGroupEntity(String groupField, Map<String, String> groupCondition) {
         this.groupField = groupField;
         this.type = GroupType.FIELD_VALUE;
+        this.gap = null;
         this.groupCondition = groupCondition;
     }
 
-    public SolrGroupEntity(String groupField, GroupType type, Map<String, String> groupCondition) {
+    public SolrGroupEntity(String groupField, GroupType type) {
+        this.groupField = groupField;
+        this.type = GroupType.FIELD_VALUE;
+        this.gap = null;
+    }
+
+    public SolrGroupEntity(String groupField, GroupType type, Object gap) {
         this.groupField = groupField;
         this.type = type;
-        this.groupCondition = groupCondition;
+        this.gap = gap;
     }
 
     public String getGroupField() {
@@ -53,6 +62,14 @@ public class SolrGroupEntity {
 
     public void setType(GroupType type) {
         this.type = type;
+    }
+
+    public Object getGap() {
+        return gap;
+    }
+
+    public void setGap(Object gap) {
+        this.gap = gap;
     }
 
     public Map<String, String> getGroupCondition() {

@@ -319,8 +319,9 @@ public class BaseStatistsService {
                 if(dimenList.contains(key)){
                     if(dimensionDicMap.get(map.get(key).toString().toLowerCase())  != null){
                         String dictVal = dimensionDicMap.get(map.get(key).toString().toLowerCase());
-                        dataMap.put(key,dictVal);
-                        dataMap.put("cloumnName", dictVal);
+                        dataMap.put(key+"Name",dictVal);
+                        dataMap.put(key,map.get(key).toString());
+                        dataMap.put("firstColumn", dictVal);
                     }else {
                         if(key.equals("quotaDate")){
                             String dateFormat = "yyyy-MM-dd";
@@ -341,7 +342,7 @@ public class BaseStatistsService {
                 //维度为特殊机构类型时
                 if(key.equals(orgHealthCategoryCode)){
                     dataMap.put(map.get(orgHealthCategoryCode).toString(),map.get(orgHealthCategoryCode));
-                    dataMap.put("cloumnName",map.get("text"));
+                    dataMap.put("firstColumn",map.get("text"));
                 }
                 if(key.equals("SUM(result)")){
                     dataMap.put("result", map.get(key).toString());
@@ -417,10 +418,10 @@ public class BaseStatistsService {
             for(String key :map.keySet()){
                 if(dimenList.contains(key)){
                     if(dimensionDicMap.get(map.get(key).toString().toLowerCase())  != null){
-//                        dataMap.put(key,dictVal);
-                        dataMap.put(key,dimensionDicMap.get(map.get(key).toString().toLowerCase()));
+//                        dataMap.put(key,dimensionDicMap.get(map.get(key).toString().toLowerCase()));
+                        dataMap.put(key,map.get(key).toString());
                         dataMap.put(key+"Name",dimensionDicMap.get(map.get(key).toString().toLowerCase()));
-                        dataMap.put("cloumnName",dimensionDicMap.get(map.get(key).toString().toLowerCase()));
+                        dataMap.put("firstColumn",dimensionDicMap.get(map.get(key).toString().toLowerCase()));
                     }else {
                         dataMap.put(key,map.get(key));
                     }
@@ -428,7 +429,7 @@ public class BaseStatistsService {
                 //维度为特殊机构类型时
                 if(key.equals(orgHealthCategoryCode)){
                     dataMap.put(map.get(orgHealthCategoryCode).toString(),map.get(orgHealthCategoryCode));
-                    dataMap.put("cloumnName",map.get("text"));
+                    dataMap.put("firstColumn",map.get("text"));
                 }
                 if(key.equals("SUM(result)")){
                     dataMap.put("result", map.get(key).toString());
@@ -584,13 +585,13 @@ public class BaseStatistsService {
         //指标的展示维度，由视图中决定
         if(dimension.trim().equals("year")){
             dateType = "year";
-            dimension = "quotaDate";
+            dimension = "";
         }else if(dimension.trim().equals("month")){
             dateType = "month";
-            dimension = "quotaDate";
+            dimension = "";
         }else if(dimension.trim().equals("day")){
             dateType = "day";
-            dimension = "quotaDate";
+            dimension = "";
         }
         List<Map<String, Object>> result = new ArrayList<>();
         TjQuotaDataSource quotaDataSource = dataSourceService.findSourceByQuotaCode(code);
