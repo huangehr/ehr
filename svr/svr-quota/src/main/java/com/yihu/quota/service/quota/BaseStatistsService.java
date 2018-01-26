@@ -302,20 +302,20 @@ public class BaseStatistsService {
         for(Map<String, Object> map : dimenListResult){
             Map<String,Object> dataMap = new HashMap<>();
             for(String key :map.keySet()){
-                if(dimenList.contains(key)){
-                    if(key.equals(dateHist)) {
-                        String value = "";
-                        if (dateDime.equals("year")) {
-                            value = map.get(key).toString().substring(0, 4);
-                        } else if (dateDime.contains("month")) {
-                            value = map.get(key).toString().substring(0, 7);
-                        } else if (dateDime.contains("week")) {
-                            value = map.get(key).toString().substring(0, 7);
-                        } else if (dateDime.contains("day")) {
-                            value = map.get(key).toString().substring(0, 10);
-                        }
-                        dataMap.put(dateDime, value);
+                if(key.equals(dateHist)) {
+                    String value = "";
+                    if (dateDime.equals("year")) {
+                        value = map.get(key).toString().substring(0, 4);
+                    } else if (dateDime.contains("month")) {
+                        value = map.get(key).toString().substring(0, 7);
+                    } else if (dateDime.contains("week")) {
+                        value = map.get(key).toString().substring(0, 7);
+                    } else if (dateDime.contains("day")) {
+                        value = map.get(key).toString().substring(0, 10);
                     }
+                    dataMap.put(dateDime, value);
+                }
+                if(dimenList.contains(key)){
                     if(dimensionDicMap.get(map.get(key).toString().toLowerCase())  != null){
                         String dictVal = dimensionDicMap.get(map.get(key).toString().toLowerCase());
                         dataMap.put(key,dictVal);
