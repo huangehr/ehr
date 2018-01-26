@@ -300,7 +300,7 @@ public class RsResourceController extends BaseController {
     public Envelop getRsQuotaPreview(
             @ApiParam(name = "resourceId", value = "资源ID", defaultValue = "")
             @RequestParam(value = "resourceId") String resourceId,
-            @ApiParam(name = "quotaFilter" ,value = "指标过滤条件" , defaultValue = "" )
+            @ApiParam(name = "quotaFilter" ,value = "指标过滤条件 如：town=361002;quotaDate >= '2018-01-01';quotaDate <= '2018-12-31'" , defaultValue = "" )
             @RequestParam(value = "quotaFilter" , required = false) String quotaFilter,
             @ApiParam(name = "userOrgList" ,value = "用户拥有机构权限", defaultValue = "null" )
             @RequestParam(value = "userOrgList" , required = false) List<String> userOrgList,
@@ -322,20 +322,7 @@ public class RsResourceController extends BaseController {
                 }
             }
         }
-        String filter = "";
-        if(StringUtils.isNotEmpty(quotaFilter)){
-            String [] quotaFilters = quotaFilter.split(";");
-            for(int i = 0;i < quotaFilters.length; i++){
-                String [] keyVal = quotaFilters[i].split("=");
-                if(keyVal[i].length()>1){
-                    if(i==0){
-                        filter = keyVal[0] + "='" + keyVal[1] +"' ";
-                    }else {
-                        filter = filter + " and "  + keyVal[0] + "='" + keyVal[1] +"' ";
-                    }
-                }
-            }
-        }
+        String filter = quotaFilter;
         //-----------------用户数据权限 end
         Envelop envelop = new Envelop();
         MChartInfoModel chartInfoModel = new MChartInfoModel();;
