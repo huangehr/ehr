@@ -946,9 +946,7 @@ public class SolrQuery {
                             groupEntity.putGroupCondition(day, String.format("%s:[%sT00:00:00Z TO %sT23:59:59Z]", groupName, day, day));
                         }
                     }
-                    if (groupEntity.getGroupCondition().size() > 0) {
-                        groupList.add(groupEntity);
-                    }
+                    groupList.add(groupEntity);
                 }
             } else {
                 // 按分组字段值统计
@@ -964,9 +962,7 @@ public class SolrQuery {
                             groupEntity.putGroupCondition(value, groupName + ":" + value);
                         }
                     }
-                    if (groupEntity.getGroupCondition().size() > 0) {
-                        groupList.add(groupEntity);
-                    }
+                    groupList.add(groupEntity);
                 }
             }
         }
