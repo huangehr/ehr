@@ -264,6 +264,7 @@ public class BaseStatistsService {
 //                    mapCategory.putAll(dimenMap);
                     if(dimenMap.containsKey(code)){
                         mapCategory.put(code,dimenMap.get(code));
+                        mapCategory.put("result",dimenMap.get("result"));
                     }
                     if(StringUtils.isNotEmpty(dateType)){
                         mapCategory.put(dimenMap.get(dateType).toString(),dimenMap.get("result"));
@@ -319,6 +320,7 @@ public class BaseStatistsService {
                     if(dimensionDicMap.get(map.get(key).toString().toLowerCase())  != null){
                         String dictVal = dimensionDicMap.get(map.get(key).toString().toLowerCase());
                         dataMap.put(key,dictVal);
+                        dataMap.put("cloumnName", dictVal);
                     }else {
                         if(key.equals("quotaDate")){
                             String dateFormat = "yyyy-MM-dd";
@@ -339,6 +341,7 @@ public class BaseStatistsService {
                 //维度为特殊机构类型时
                 if(key.equals(orgHealthCategoryCode)){
                     dataMap.put(map.get(orgHealthCategoryCode).toString(),map.get(orgHealthCategoryCode));
+                    dataMap.put("cloumnName",map.get("text"));
                 }
                 if(key.equals("SUM(result)")){
                     dataMap.put("result", map.get(key).toString());
@@ -417,6 +420,7 @@ public class BaseStatistsService {
 //                        dataMap.put(key,dictVal);
                         dataMap.put(key,dimensionDicMap.get(map.get(key).toString().toLowerCase()));
                         dataMap.put(key+"Name",dimensionDicMap.get(map.get(key).toString().toLowerCase()));
+                        dataMap.put("cloumnName",dimensionDicMap.get(map.get(key).toString().toLowerCase()));
                     }else {
                         dataMap.put(key,map.get(key));
                     }
@@ -424,6 +428,7 @@ public class BaseStatistsService {
                 //维度为特殊机构类型时
                 if(key.equals(orgHealthCategoryCode)){
                     dataMap.put(map.get(orgHealthCategoryCode).toString(),map.get(orgHealthCategoryCode));
+                    dataMap.put("cloumnName",map.get("text"));
                 }
                 if(key.equals("SUM(result)")){
                     dataMap.put("result", map.get(key).toString());

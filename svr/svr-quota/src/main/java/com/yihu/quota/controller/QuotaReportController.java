@@ -98,8 +98,6 @@ public class QuotaReportController extends BaseController {
             @ApiParam(name = "dimension", value = "维度字段", defaultValue = "quotaDate")
             @RequestParam(value = "dimension", required = false) String dimension
     ) {
-        List<Map<String, Object>> viewResult = new ArrayList<>();
-
         Map<String,List<Map<String, Object>>> quotaViewResult = new HashMap<>();
         String maxQuota = "";
         int num = 0;
@@ -217,46 +215,14 @@ public class QuotaReportController extends BaseController {
                                 if ("result".equals(key)) {
                                     val = map.get(key).toString();
                                 } else {
-                                    keyName = map.get(key).toString();
+                                    if(map.get(key) != null ){
+                                        keyName = map.get(key).toString();
+                                    }
                                 }
                             }
                             groupDataMap.put(keyName, val);
                         }
                     }
-
-
-
-
-//                    if(tjQuota.getResultGetType().trim().equals("1")){
-//                        //使用分组计算 返回结果实例： groupDataMap -> "4205000000-儿-1": 200 =>group by 三个字段
-//                        Map<String, Integer> resultDataMap =  quotaService.searcherSumByGroupBySql(tjQuota, dimension, filter,"result","","");
-//                        for(String key: resultDataMap.keySet()){
-//                            groupDataMap.put(key,resultDataMap.get(key));
-//                        }
-//                    }else{//二次统计指标获取 结果接口
-//                        List<Map<String, Object>> listMap = baseStatistsService.getSimpleQuotaReport(tjQuota.getCode(), filter, dimension);
-//                        if(listMap != null && listMap.size() > 0){
-//                            for(Map<String, Object> map : listMap){
-//                                String keyName = "";
-//                                String val = "";
-//                                for (String key : map.keySet()) {
-//                                    if ("result".equals(key)) {
-//                                        val = map.get(key).toString();
-//                                    } else {
-//                                        keyName = map.get(key).toString();
-//                                    }
-//                                }
-//                                groupDataMap.put(keyName, val);
-//                            }
-//                        }
-
-//                    }
-//                    for(String key : groupDataMap.keySet()){
-//                        key = key.toLowerCase();
-//                        dataMap.put(dimensionDicMap.containsKey(key)?dimensionDicMap.get(key):key,groupDataMap.get(key));
-//                        xAxisMap.put(dimensionDicMap.containsKey(key)?dimensionDicMap.get(key): key,key);
-//                    }
-
                 }
             }
 
@@ -309,6 +275,9 @@ public class QuotaReportController extends BaseController {
 
 
             for(String typeStr :charTypes){
+                if(typeStr.equals("common")){
+                    typeStr = "1";
+                }
                 int type = Integer.valueOf(typeStr);
                 if (type == ReportOption.bar) {
                     option = reportOption.getLineEchartOptionMoreChart(title, "", "", xData, optionData, lineNames, charTypes);
