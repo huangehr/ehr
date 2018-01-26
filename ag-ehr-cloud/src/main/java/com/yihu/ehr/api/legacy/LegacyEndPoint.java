@@ -36,8 +36,8 @@ import java.util.regex.Pattern;
 @RestController
 @RequestMapping("/rest/v1.0")
 public class LegacyEndPoint {
-    @Value("${svr-package.ip-address}")
-    String packageIpAddress;
+//    @Value("${svr-package.ip-address}")
+//    String packageIpAddress;
 
     @Autowired
     AdaptionsEndPoint adaptions;

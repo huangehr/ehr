@@ -825,27 +825,21 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.Resources.GetElectronicMedicalDeptDistributed, method = RequestMethod.GET)
     @ApiOperation(value = "电子病例 - 电子病历采集科室分布")
-    public Envelop getElectronicMedicalDeptDistributed() {
+    public Envelop getElectronicMedicalDeptDistributed() throws Exception{
         Envelop envelop = new Envelop();
-        try {
-            FacetField facetField = solrUtil.getFacetField("HealthProfile", "EHR_000081", null, 0, 0, 1000000, false);
-            List<FacetField.Count> countList = facetField.getValues();
-            Map<String, Long> dataMap = new HashMap<>(countList.size());
-            for (FacetField.Count count : countList) {
-                String orgCode = count.getName();
-                String orgName = statisticService.getOrgNameByCode(orgCode);
-                if (!StringUtils.isEmpty(orgName)) {
-                    long count1 = count.getCount();
-                    dataMap.put(orgName, count1);
-                }
+        FacetField facetField = solrUtil.getFacetField("HealthProfile", "EHR_000081", null, 0, 0, 1000000, false);
+        List<FacetField.Count> countList = facetField.getValues();
+        Map<String, Long> dataMap = new HashMap<>(countList.size());
+        for (FacetField.Count count : countList) {
+            String orgCode = count.getName();
+            String deptName = statisticService.getDeptNameByCode(orgCode);
+            if (!StringUtils.isEmpty(deptName)) {
+                long count1 = count.getCount();
+                dataMap.put(deptName, count1);
             }
-            envelop.setSuccessFlg(true);
-            envelop.setObj(dataMap);
-        }catch (Exception e) {
-            e.printStackTrace();
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg(e.getMessage());
         }
+        envelop.setSuccessFlg(true);
+        envelop.setObj(dataMap);
         return envelop;
     }
 
