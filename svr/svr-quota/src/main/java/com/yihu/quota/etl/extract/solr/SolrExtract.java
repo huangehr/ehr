@@ -84,19 +84,19 @@ public class SolrExtract {
             String key = qdm.get(i).getKeyVal();
             String mainCode = qdm.get(i).getMainCode();
             mainMap.put(key, key);
-            dimensionGroupList.add(new SolrGroupEntity(key, SolrGroupEntity.GroupType.FIELD_VALUE, null));
+            dimensionGroupList.add(new SolrGroupEntity(key, SolrGroupEntity.GroupType.FIELD_VALUE));
         }
         for (int i = 0; i < qds.size(); i++) {
             String key = qds.get(i).getKeyVal();
             slaveMap.put(key, key);
-            dimensionGroupList.add(new SolrGroupEntity(key, SolrGroupEntity.GroupType.FIELD_VALUE, null));
+            dimensionGroupList.add(new SolrGroupEntity(key, SolrGroupEntity.GroupType.FIELD_VALUE));
         }
         // 默认追加一个日期字段作为细维度，方便按天统计作为最小单位统计值。
         slaveMap.put(timeKey, timeKey);
         TjQuotaDimensionSlave daySlave = new TjQuotaDimensionSlave();
         daySlave.setSlaveCode(timeKey);
         qds.add(daySlave);
-        dimensionGroupList.add(new SolrGroupEntity(timeKey, SolrGroupEntity.GroupType.DATE_RANGE, null));
+        dimensionGroupList.add(new SolrGroupEntity(timeKey, SolrGroupEntity.GroupType.DATE_RANGE, "+1DAY"));
 
         // 拼接增量或全量的筛选条件
         if (!StringUtils.isEmpty(timeKey)) {
@@ -121,7 +121,7 @@ public class SolrExtract {
         if (StringUtils.isEmpty(esConfig.getAggregation())
                 || Contant.quota.aggregation_count.equals(esConfig.getAggregation())) {
             // count 聚合
-            list = solrQuery.getCountMultList(core, dimensionGroupList, null, q, fq);
+            list = solrQuery.getCountMultList(core, q, fq, dimensionGroupList, null);
         } else {
             // sum 聚合
             list = solrQuery.getSumMultList(core, q, fq, esConfig.getAggregationKey(), dimensionGroupList, null);
