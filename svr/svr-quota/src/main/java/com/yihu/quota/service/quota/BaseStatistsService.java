@@ -585,13 +585,13 @@ public class BaseStatistsService {
         //指标的展示维度，由视图中决定
         if(dimension.trim().equals("year")){
             dateType = "year";
-            dimension = "quotaDate";
+            dimension = "";
         }else if(dimension.trim().equals("month")){
             dateType = "month";
-            dimension = "quotaDate";
+            dimension = "";
         }else if(dimension.trim().equals("day")){
             dateType = "day";
-            dimension = "quotaDate";
+            dimension = "";
         }
         List<Map<String, Object>> result = new ArrayList<>();
         TjQuotaDataSource quotaDataSource = dataSourceService.findSourceByQuotaCode(code);
