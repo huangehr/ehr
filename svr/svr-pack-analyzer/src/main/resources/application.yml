@@ -67,9 +67,9 @@ hadoop:
 
 analyze:
   job:
-    init-size: 2 #解析入库初始任务数
-    max-size: 10 #解析入库最大任务数
-    cron-exp: 0/4 * * * * ? #解析任务触发间隔表达式
+    minSize: 2 #解析入库初始任务数
+    maxSize: 10 #解析入库最大任务数
+    cronExp: 0/4 * * * * ? #解析任务触发间隔表达式
 
 ---
 spring:

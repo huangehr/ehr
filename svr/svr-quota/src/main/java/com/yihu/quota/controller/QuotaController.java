@@ -133,8 +133,18 @@ public class QuotaController extends BaseController {
             JSONObject obj = new JSONObject().fromObject(quotaDataSource.getConfigJson());
             EsConfig esConfig= (EsConfig) JSONObject.toBean(obj,EsConfig.class);
             List<Map<String, Object>>  resultList = new ArrayList<>();
+            String configFilter = esConfig.getFilter();
+            if(StringUtils.isNotEmpty(configFilter) && quotaDataSource.getSourceCode().equals("1")){//数据源为ES库
+                if(StringUtils.isNotEmpty(filters)){
+                    filters += " and " + configFilter;
+                }else {
+                    filters = configFilter;
+                }
+            }
             String molecularFilter = filters;
             String denominatorFilter = filters;
+
+
             if(tjQuota.getResultGetType().equals("1")){
                 //普通指标直接查询
                 resultList = baseStatistsService.getQuotaResultList(code, dimension,filters,dateType);
@@ -144,11 +154,6 @@ public class QuotaController extends BaseController {
                     molecularFilter = baseStatistsService.handleFilter(esConfig.getMolecularFilter(), molecularFilter);
                     denominatorFilter = baseStatistsService.handleFilter(esConfig.getDenominatorFilter(), denominatorFilter);
                     resultList =  baseStatistsService.divisionQuota(esConfig.getMolecular(), esConfig.getDenominator(), dimension, molecularFilter, denominatorFilter, esConfig.getPercentOperation(), esConfig.getPercentOperationValue(),dateType);
-
-                }else if( (StringUtils.isNotEmpty(esConfig.getThousandDmolecular())) && StringUtils.isNotEmpty(esConfig.getThousandDenominator())){//除法
-                    //除法指标查询输出结果
-                    resultList =  baseStatistsService.divisionQuota(esConfig.getThousandDmolecular(), esConfig.getThousandDenominator(), dimension, molecularFilter, denominatorFilter, "1", esConfig.getThousandFlag(),dateType);
-
                 }else {
                     if(StringUtils.isNotEmpty(esConfig.getSuperiorBaseQuotaCode())){
                         //通过基础指标 抽取查询

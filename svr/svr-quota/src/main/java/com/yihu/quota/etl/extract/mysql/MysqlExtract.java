@@ -1,7 +1,5 @@
 package com.yihu.quota.etl.extract.mysql;
 
-import com.yihu.ehr.entity.address.AddressDict;
-import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.query.services.SolrQuery;
 import com.yihu.ehr.solr.SolrUtil;
 import com.yihu.quota.etl.Contant;
@@ -9,22 +7,20 @@ import com.yihu.quota.etl.extract.ExtractUtil;
 import com.yihu.quota.etl.model.EsConfig;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionMain;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionSlave;
-import com.yihu.quota.vo.DictModel;
 import com.yihu.quota.vo.QuotaVo;
 import com.yihu.quota.vo.SaveModel;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by janseny on 2017/7/10.
@@ -69,7 +65,7 @@ public class MysqlExtract {
         logger.debug(mysql);
         System.out.println("统计mysql :" + mysql);
         if( !StringUtils.isEmpty(mysql)){
-            Map<String,Integer> resultMap = new HashMap<>();
+            Map<String,String> resultMap = new HashMap<>();
             Map<String, String> daySlaveDictMap = new HashMap<>();
             //执行MySQL
             List<Map<String, Object>> mapList = null;
@@ -86,7 +82,7 @@ public class MysqlExtract {
                             keyVal = keyVal + map.get(key) +  "-";
                         }
                     }
-                    int result = Integer.parseInt(map.get("result").toString());
+                    String result = map.get("result").toString();
                     String mapKey = keyVal.substring(0, keyVal.length() - 1);
                     resultMap.put(mapKey, result);
                     daySlaveDictMap.put(mapKey,map.get("quotaDate").toString());

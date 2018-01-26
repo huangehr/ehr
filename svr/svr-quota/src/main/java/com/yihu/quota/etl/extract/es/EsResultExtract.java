@@ -375,7 +375,7 @@ public class EsResultExtract {
                     .append(" where ").append(filter)
                     .append(" group by ").append(aggsFields)
                     .append(" ,date_histogram(field='quotaDate','interval'='")
-                    .append(dateDime).append("')");
+                    .append(dateDime).append("')").append(" limit 10000 ");
             System.out.println("查询分组 mysql= " + mysql.toString());
             List<Map<String, Object>> listMap = elasticsearchUtil.excuteDataModel(mysql.toString());
             return  listMap;
@@ -417,6 +417,7 @@ public class EsResultExtract {
             if(StringUtils.isNotEmpty(orderFild) && StringUtils.isNotEmpty(order)){
                 mysql.append(" order by ").append(orderFild).append(" ").append(order);
             }
+            mysql.append(" limit 10000 ");
             System.out.println("查询分组 mysql= " + mysql.toString());
             List<Map<String, Object>> listMap = elasticsearchUtil.excuteDataModel(mysql.toString());
             return  listMap;

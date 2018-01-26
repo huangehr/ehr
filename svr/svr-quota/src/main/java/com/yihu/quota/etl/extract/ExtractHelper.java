@@ -95,6 +95,7 @@ public class ExtractHelper {
             }
             return null;
         } catch (Exception e) {
+            e.printStackTrace();
             throw new Exception("数据抽取错误," + e.getMessage() );
         }
     }

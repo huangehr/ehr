@@ -302,32 +302,43 @@ public class BaseStatistsService {
         for(Map<String, Object> map : dimenListResult){
             Map<String,Object> dataMap = new HashMap<>();
             for(String key :map.keySet()){
+                if(key.equals(dateHist)) {
+                    String value = "";
+                    if (dateDime.equals("year")) {
+                        value = map.get(key).toString().substring(0, 4);
+                    } else if (dateDime.contains("month")) {
+                        value = map.get(key).toString().substring(0, 7);
+                    } else if (dateDime.contains("week")) {
+                        value = map.get(key).toString().substring(0, 7);
+                    } else if (dateDime.contains("day")) {
+                        value = map.get(key).toString().substring(0, 10);
+                    }
+                    dataMap.put(dateDime, value);
+                }
                 if(dimenList.contains(key)){
                     if(dimensionDicMap.get(map.get(key).toString().toLowerCase())  != null){
                         String dictVal = dimensionDicMap.get(map.get(key).toString().toLowerCase());
                         dataMap.put(key,dictVal);
                     }else {
-                        dataMap.put(key,map.get(key));
+                        if(key.equals("quotaDate")){
+                            String dateFormat = "yyyy-MM-dd";
+                            if (dateDime.equals("year")) {
+                                dateFormat = "yyyy";
+                            }else if(dateDime.equals("month")){
+                                dateFormat = "yyyy-MM";
+                            }
+                            SimpleDateFormat format =  new SimpleDateFormat(dateFormat);
+                            Long time = new Long(Long.valueOf(map.get(key).toString()));
+                            String quotaDate = format.format(time);
+                            dataMap.put(key, quotaDate);
+                        }else {
+                            dataMap.put(key,map.get(key));
+                        }
                     }
                 }
                 //维度为特殊机构类型时
                 if(key.equals(orgHealthCategoryCode)){
                     dataMap.put(map.get(orgHealthCategoryCode).toString(),map.get(orgHealthCategoryCode));
-                }
-                if(key.equals(dateHist)) {
-                    if (dateDime.equals("year")) {
-                        String value = map.get(key).toString().substring(0, 4);
-                        dataMap.put(dateDime, value);
-                    } else if (dateDime.contains("month")) {
-                        String value = map.get(key).toString().substring(0, 7);
-                        dataMap.put(dateDime, value);
-                    } else if (dateDime.contains("week")) {
-                        String value = map.get(key).toString().substring(0, 7);
-                        dataMap.put(dateDime, value);
-                    } else if (dateDime.contains("day")) {
-                        String value = map.get(key).toString().substring(0, 10);
-                        dataMap.put(dateDime, value);
-                    }
                 }
                 if(key.equals("SUM(result)")){
                     dataMap.put("result", map.get(key).toString());
@@ -508,7 +519,7 @@ public class BaseStatistsService {
                 if (dimensionSlaves != null && dimensionSlaves.size() > 0) {
                     if(StringUtils.isNotEmpty(dimension)){
                         String n = dimension.substring(dimension.length() - 1, dimension.length());
-                        if(StringUtils.isNotEmpty(n)){
+                        if(StringUtils.isNotEmpty(n) && (n.equals("1") || n.equals("2") || n.equals("3")) ){
                             int slave = Integer.valueOf(n);
                             if(dimensionSlaves.size() >= slave){
                                 dictSql = dimensionSlaves.get(slave-1).getDictSql();
@@ -598,9 +609,6 @@ public class BaseStatistsService {
             molecularFilter = handleFilter(esConfig.getMolecularFilter(), molecularFilter);
             denominatorFilter = handleFilter(esConfig.getDenominatorFilter(), denominatorFilter);
             result =  divisionQuota(esConfig.getMolecular(), esConfig.getDenominator(), dimension, molecularFilter, denominatorFilter, esConfig.getPercentOperation(), esConfig.getPercentOperationValue(),dateType);
-        }else if( (StringUtils.isNotEmpty(esConfig.getThousandDmolecular())) && StringUtils.isNotEmpty(esConfig.getThousandDenominator())){//除法
-            //除法指标查询输出结果
-           result =  divisionQuota(esConfig.getThousandDmolecular(), esConfig.getThousandDenominator(), dimension, molecularFilter, denominatorFilter, "1", esConfig.getThousandFlag(),dateType);
         }else if(StringUtils.isNotEmpty(esConfig.getSuperiorBaseQuotaCode())) {
             //二次统计 指标查询
             result = getQuotaResultList(esConfig.getSuperiorBaseQuotaCode(), dimension,filters,dateType);

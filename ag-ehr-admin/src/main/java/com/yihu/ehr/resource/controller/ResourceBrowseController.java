@@ -178,6 +178,16 @@ public class ResourceBrowseController extends BaseController {
             }
     }
 
+    @ApiOperation("档案资源浏览细表数据")
+    @RequestMapping(value = ServiceApi.Resources.ResourceBrowseResourceSubData, method = RequestMethod.GET)
+    public Envelop findSubDateByRowKey(
+            @ApiParam(name = "rowKey", value = "主表rowKey", required = true)
+            @RequestParam(value = "rowKey") String rowKey,
+            @ApiParam(name = "version", value = "版本", required = true)
+            @RequestParam(value = "version") String version){
+        return  resourceBrowseClient.findSubDateByRowKey(rowKey, version);
+    }
+
     @ApiOperation("指标视图查询列表浏览")
     @RequestMapping(value = ServiceApi.Resources.ResourceBrowseQuotaResourceData, method = RequestMethod.GET)
     public Envelop getQuotaResourceData(

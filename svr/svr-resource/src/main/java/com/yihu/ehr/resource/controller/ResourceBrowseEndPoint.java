@@ -1,5 +1,6 @@
 package com.yihu.ehr.resource.controller;
 
+import com.google.common.collect.Lists;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
@@ -49,8 +50,7 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
             result =  resourceBrowseService.getResourceMetadata(resourcesCode, roleId);
         }catch (Exception e){
             e.printStackTrace();
-            result = e.getMessage();
-            return result;
+            return e.getMessage();
         }
         return result;
     }
@@ -80,6 +80,20 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg(e.getMessage());
         }
+        return envelop;
+    }
+
+    @ApiOperation("档案资源浏览细表数据")
+    @RequestMapping(value = ServiceApi.Resources.ResourceBrowseResourceSubData, method = RequestMethod.GET)
+    public Envelop findSubDateByRowKey(
+            @ApiParam(name = "rowKey", value = "主表rowKey", required = true)
+            @RequestParam(value = "rowKey") String rowKey,
+            @ApiParam(name = "version", value = "版本", required = true)
+            @RequestParam(value = "version") String version) throws Exception {
+        Envelop envelop = new Envelop();
+        List<Object> resultList = resourceBrowseService.getSubDateByRowkey(rowKey, version);
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(resultList);
         return envelop;
     }
 
@@ -353,6 +367,5 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
         re.setDetailModelList(result.getContent());
         return re;
     }
-
 
 }

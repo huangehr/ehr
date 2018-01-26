@@ -34,9 +34,9 @@ import java.util.stream.Collectors;
 /**
  * Created by linz on 2016年7月8日11:30:18.
  */
-@RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
-@Api(value = "AppApi", description = "应用开放接口维护", tags = {"应用管理-应用开放接口维护"})
+@RequestMapping(ApiVersion.Version1_0 + "/admin")
+@Api(value = "AppApiController", description = "应用开放接口维护", tags = {"应用管理-应用开放接口维护"})
 public class AppApiController extends BaseController {
 
     private static final String DELETE = "delete";
@@ -45,16 +45,15 @@ public class AppApiController extends BaseController {
     private static final String NEW_DATA = "0";
     private static final String DATA_STATUS = "__status";
     @Autowired
-    AppApiClient appApiClient;
+    private AppApiClient appApiClient;
     @Autowired
-    RoleApiRelationClient roleApiRelationClient;
+    private RoleApiRelationClient roleApiRelationClient;
     @Autowired
-    AppApiParameterClient appApiParameterClient;
+    private AppApiParameterClient appApiParameterClient;
     @Autowired
-    AppApiResponseClient appApiResponseClient;
+    private AppApiResponseClient appApiResponseClient;
     @Autowired
     private ConventionalDictEntryClient conDictEntryClient;
-
     @Autowired
     private RoleAppRelationClient roleAppRelationClient;
 
@@ -341,6 +340,16 @@ public class AppApiController extends BaseController {
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
+    }
+
+    //-------------------开放平台--------------------------
+
+    @RequestMapping(value = ServiceApi.AppApi.AppApiAuthList, method = RequestMethod.GET)
+    @ApiOperation(value = "获取AppApi列表")
+    public Envelop authApiList(
+            @ApiParam(name = "clientId", value = "应用ID", required = true)
+            @RequestParam(value = "clientId") String clientId) {
+        return appApiClient.authApiList(clientId);
     }
 
 }
