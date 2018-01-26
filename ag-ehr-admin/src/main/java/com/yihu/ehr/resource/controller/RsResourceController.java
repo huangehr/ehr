@@ -389,7 +389,12 @@ public class RsResourceController extends BaseController {
                     }
                 }
                 if(StringUtils.isEmpty(dimension) || dimension.equals(" ")){
-                    dimension = rsResourcesModel.getDimension();
+                    String defaultDimension = rsResourcesModel.getDimension();
+                    if (!StringUtils.isEmpty(defaultDimension)) {
+                        dimension = rsResourcesModel.getDimension();
+                    } else {
+                        dimension = firstDimension;
+                    }
                 }
 
                 if(org.length() > 0 && dimensionMap.containsKey("org")){
