@@ -769,7 +769,7 @@ public class SolrQuery {
      * <p>
      * TODO
      * 涉及时间维度聚合统计，目前是按天间隔统计的写法，需要扩展按年、月等间隔统计时，需要定制分支。
-     * 具体需要扩展的地方查看 joinAggregationCondition()、finalCount() 方法中备注。
+     * 具体需要扩展的地方查看 joinAggregationCondition() 方法中备注。
      * -- 张进军 2018.1.26
      *
      * @param core               core名
@@ -946,9 +946,7 @@ public class SolrQuery {
                             groupEntity.putGroupCondition(day, String.format("%s:[%sT00:00:00Z TO %sT23:59:59Z]", groupName, day, day));
                         }
                     }
-                    if (groupEntity.getGroupCondition().size() > 0) {
-                        groupList.add(groupEntity);
-                    }
+                    groupList.add(groupEntity);
                 }
             } else {
                 // 按分组字段值统计
@@ -964,9 +962,7 @@ public class SolrQuery {
                             groupEntity.putGroupCondition(value, groupName + ":" + value);
                         }
                     }
-                    if (groupEntity.getGroupCondition().size() > 0) {
-                        groupList.add(groupEntity);
-                    }
+                    groupList.add(groupEntity);
                 }
             }
         }
