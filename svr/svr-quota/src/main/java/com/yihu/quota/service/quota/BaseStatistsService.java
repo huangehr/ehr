@@ -103,7 +103,7 @@ public class BaseStatistsService {
                                                     String molecularFilter,String denominatorFilters,String operation,String operationValue,String dateType) throws Exception {
         List<Map<String, Object>> moleList = getQuotaResultList(molecular,dimension,molecularFilter,dateType);
         List<Map<String, Object>> denoList =  getQuotaResultList(denominator,dimension,denominatorFilters,dateType);
-        dimension = StringUtils.isNotEmpty(dateType)?dimension+";"+dateType:dimension;
+        dimension = StringUtils.isNotEmpty(dateType)? (StringUtils.isNotEmpty(dimension)? dimension +";"+dateType : dateType):dimension;
        return division(dimension,moleList,denoList,Integer.valueOf(operation),Integer.valueOf(operationValue));
     }
 
