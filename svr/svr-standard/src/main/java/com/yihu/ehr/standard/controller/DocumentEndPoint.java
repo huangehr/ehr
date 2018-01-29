@@ -1,7 +1,6 @@
 package com.yihu.ehr.standard.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.standard.MCDADocument;
@@ -12,6 +11,7 @@ import com.yihu.ehr.standard.model.BaseCDADocument;
 import com.yihu.ehr.standard.model.CDADocument;
 import com.yihu.ehr.standard.service.CDADataSetRelationshipService;
 import com.yihu.ehr.standard.service.CDADocumentService;
+import com.yihu.ehr.util.id.BizObject;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

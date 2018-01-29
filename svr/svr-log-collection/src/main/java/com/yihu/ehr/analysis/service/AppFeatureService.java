@@ -2,10 +2,8 @@ package com.yihu.ehr.analysis.service;
 
 import com.google.gson.Gson;
 import com.yihu.ehr.analysis.util.HttpClientUtil;
-import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.util.rest.Envelop;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.http.client.methods.HttpRequestBase;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -52,7 +50,7 @@ public class AppFeatureService {
             return resultStr;
         } catch (Exception e) {
             envelop.setSuccessFlg(false);
-            envelop.setErrorMsg(ErrorCode.SystemError.toString());
+            envelop.setErrorMsg(e.getMessage());
             return envelop;
         }
 
@@ -73,7 +71,7 @@ public class AppFeatureService {
             return resultStr;
         } catch (Exception e) {
             envelop.setSuccessFlg(false);
-            envelop.setErrorMsg(ErrorCode.SystemError.toString());
+            envelop.setErrorMsg(e.getMessage());
             return envelop;
         }
     }

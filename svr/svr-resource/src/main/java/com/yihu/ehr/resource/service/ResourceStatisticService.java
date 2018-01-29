@@ -134,7 +134,7 @@ public class ResourceStatisticService extends BaseJpaService {
         if("Doctor".equals(roleType)) {
             sql = "SELECT COUNT(*) FROM doctors WHERE LENGTH(orgCode) > 0 AND role_type IN ('10', '11')";
         }else {
-            sql = "SELECT COUNT(*) FROM doctors WHERE role_type = '8'";
+            sql = "SELECT COUNT(*) FROM doctors WHERE LENGTH(orgCode) > 0 AND role_type = '8'";
         }
         Query query = session.createSQLQuery(sql);
         query.setFlushMode(FlushMode.COMMIT);
@@ -160,7 +160,7 @@ public class ResourceStatisticService extends BaseJpaService {
     }
 
     public List<Object> getStatisticsDemographicsAgeCount() {
-        Session session = currentSession();;
+        Session session = currentSession();
         String sql = "SELECT count(1), tt.age  from(  " +
                 " SELECT t1.id ,  " +
                 "  ELT(   CEIL(  FLOOR( TIMESTAMPDIFF(MONTH, STR_TO_DATE(t1.id ,'%Y%m%d'), CURDATE())/12) /10+1 ), " +
@@ -215,6 +215,17 @@ public class ResourceStatisticService extends BaseJpaService {
         Query query = session.createSQLQuery(sql);
         query.setFlushMode(FlushMode.COMMIT);
         query.setString("orgCode", orgCode);
+        return (String) query.uniqueResult();
+    }
+
+    public String getDeptNameByCode(String deptCode) {
+        Session session = currentSession();
+        String sql = "SELECT entry.value FROM std_dictionary_entry_59083976eebd entry \n" +
+                "\tINNER JOIN std_dictionary_59083976eebd dict ON entry.dict_id = dict.id \n" +
+                "\tWHERE dict.code = 'STD_DEPARTMENT' AND entry.code = :deptCode";
+        Query query = session.createSQLQuery(sql);
+        query.setFlushMode(FlushMode.COMMIT);
+        query.setString("deptCode", deptCode);
         return (String) query.uniqueResult();
     }
 
