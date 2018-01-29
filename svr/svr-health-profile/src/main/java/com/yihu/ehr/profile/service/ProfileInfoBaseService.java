@@ -2,7 +2,6 @@ package com.yihu.ehr.profile.service;
 
 
 import com.yihu.ehr.profile.feign.*;
-import com.yihu.ehr.util.httpClient.HttpClientUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

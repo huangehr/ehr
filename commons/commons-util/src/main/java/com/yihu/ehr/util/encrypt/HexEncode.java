@@ -1,4 +1,4 @@
-package com.yihu.ehr.util.encode;
+package com.yihu.ehr.util.encrypt;
 
 public class HexEncode {
     static public String toHexString(byte[] bytes) {
