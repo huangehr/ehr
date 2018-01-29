@@ -1,7 +1,5 @@
 package com.yihu.ehr.util.encrypt;
 
-import com.yihu.ehr.util.encode.HexEncode;
-
 import java.security.MessageDigest;
 
 /**
