@@ -51,8 +51,8 @@ public class ResourceStatisticService extends BaseJpaService {
 
     public BigInteger getUseCardCount() {
         Session session = currentSession();
-        String hql = "SELECT COUNT(*) FROM user_cards";
-        Query query = session.createSQLQuery(hql);
+        String sql = "SELECT COUNT(DISTINCT(owner_idcard)) FROM user_cards";
+        Query query = session.createSQLQuery(sql);
         query.setFlushMode(FlushMode.COMMIT);
         return (BigInteger)query.uniqueResult();
     }
@@ -92,13 +92,13 @@ public class ResourceStatisticService extends BaseJpaService {
         if(StringUtils.isEmpty(clazz)) {
             sql = "SELECT a.name, COUNT(*) " +
                     "FROM organizations o " +
-                    "LEFT JOIN address_dict a ON o.administrative_division = a.id " +
+                    "LEFT JOIN address_dict a ON o.administrative_division = a.id WHERE org_type = 'Hospital' " +
                     "GROUP BY o.administrative_division, a.name";
         }else {
             sql = "SELECT a.name, COUNT(*) " +
                     "FROM organizations o " +
                     "LEFT JOIN address_dict a ON o.administrative_division = a.id " +
-                    "WHERE o.big_classification = :clazz " +
+                    "WHERE o.big_classification = :clazz  AND o.org_type = 'Hospital' " +
                     "GROUP BY o.administrative_division, a.name";
         }
         Query query = session.createSQLQuery(sql);
