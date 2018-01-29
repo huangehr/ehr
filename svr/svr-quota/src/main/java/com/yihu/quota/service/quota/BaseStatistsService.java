@@ -243,7 +243,7 @@ public class BaseStatistsService {
             dimenListResult = esResultExtract.searcherByGroup(tjQuota, filters, orgHealthCategoryCode);
         }
         List<Map<String, Object>> orgHealthCategoryList = orgHealthCategoryStatisticsService.getOrgHealthCategoryTreeByPid(-1);
-        List<Map<String, Object>> resultList = setResult(orgHealthCategoryList,dimenListResult,dateType);
+        List<Map<String, Object>> resultList = setResult(code,orgHealthCategoryList,dimenListResult,dateType);
         return resultList;
     }
 
@@ -254,11 +254,12 @@ public class BaseStatistsService {
      * @param
      * @return
      */
-    public List<Map<String,Object>> setResult(List<Map<String,Object>> orgHealthCategoryList,List<Map<String, Object>> dimenListResult,String dateType){
+    public List<Map<String,Object>> setResult(String quotaCode,List<Map<String,Object>> orgHealthCategoryList,List<Map<String, Object>> dimenListResult,String dateType){
         List<Map<String,Object>> result = new ArrayList<>();
         for(int i=0 ; i < orgHealthCategoryList.size() ; i++ ){
             Map<String,Object> mapCategory = orgHealthCategoryList.get(i);
             String code = mapCategory.get("code").toString();
+            mapCategory.put("firstColumn",mapCategory.get("text"));
             for(Map<String, Object> dimenMap : dimenListResult){
                 if(dimenMap.get(code) != null){
 //                    mapCategory.putAll(dimenMap);
@@ -269,13 +270,18 @@ public class BaseStatistsService {
                     if(StringUtils.isNotEmpty(dateType)){
                         mapCategory.put(dimenMap.get(dateType).toString(),dimenMap.get("result"));
                     }
+                    mapCategory.put(quotaCode,dimenMap.get("result"));
                     break;
+                }else {
+                    mapCategory.put("result",0);
+                    mapCategory.put(quotaCode,0);
                 }
             }
+
             result.add(mapCategory);
             if(mapCategory.get("children") != null){
                 List<Map<String,Object>> childrenOrgHealthCategoryList = (List<Map<String, Object>>) mapCategory.get("children");
-                mapCategory.put("children",setResult(childrenOrgHealthCategoryList,dimenListResult,dateType));
+                mapCategory.put("children",setResult(quotaCode,childrenOrgHealthCategoryList,dimenListResult,dateType));
             }
         }
         return  result;
