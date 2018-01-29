@@ -1,3 +1,4 @@
+
 svr-authentication:
   server:
     port: 10260
@@ -100,5 +101,18 @@ spring:
     password: GP8Qz4qU
   redis:
     host: 10.176.97.5
+    port: 6390
+    password: q4YaQemf
+
+
+---
+spring:
+  profiles: prod_fzzy
+  datasource:
+    url: jdbc:mysql://100.100.1.159:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: healthcloud
+    password: GP8Qz4qU
+  redis:
+    host: 100.100.1.161
     port: 6390
     password: q4YaQemf

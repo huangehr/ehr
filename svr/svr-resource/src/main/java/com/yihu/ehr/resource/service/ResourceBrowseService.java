@@ -70,15 +70,16 @@ public class ResourceBrowseService {
         if (rsResource == null) {
             return null;
         }
-        Map<String, Object> mapParam = new HashMap<String, Object>();
-        boolean isOtherStdCode = false;
         Map<String, String> correspondMap = new HashMap<>();
-        //String otherStdMetadataStr = redisService.getOtherStdMetadata(rsResource.getCode());
-        String otherStdMetadataStr = stdTransformClient.stdMetadataCodes("5a278924cd67", rsResource.getCode()); //省平台临时数据处理
-        if(otherStdMetadataStr != null) {
-            isOtherStdCode = true;
+        boolean isOtherVersion = false;
+        String version = "";
+        String code = "";
+        if(resourcesCode.split("\\$").length > 1) {
+            isOtherVersion = true;
+            version = resourcesCode.split("\\$")[1];
+            code = resourcesCode.split("\\$")[0];
         }
-        List<DtoResourceMetadata> metadataList = getAccessMetadata(rsResource, roleId, isOtherStdCode, correspondMap, otherStdMetadataStr);
+        List<DtoResourceMetadata> metadataList = getAccessMetadata(rsResource, roleId, correspondMap);
         //资源结构
         List<String> columnName = new ArrayList<String>();
         List<String> columnCode = new ArrayList<String>();
@@ -86,21 +87,32 @@ public class ResourceBrowseService {
         List<String> columnDict = new ArrayList<String>();
         if(metadataList != null) {
             for (DtoResourceMetadata r : metadataList) {
-                if(isOtherStdCode) {
-                    columnName.add(redisService.transformMetadataName(correspondMap.get(r.getId())));
-                }else {
+                if(!isOtherVersion) {
                     columnName.add(r.getName());
+                    if (!StringUtils.isEmpty(r.getDictCode())) {
+                        columnCode.add(r.getId() + "_VALUE");
+                    } else {
+                        columnCode.add(r.getId());
+                    }
+                    columnType.add(r.getColumnType());
+                    columnDict.add(r.getDictCode());
+                }else {
+                    String name = stdTransformClient.stdMetadataName(version, code, correspondMap.get(r.getId()));
+                    if(!StringUtils.isEmpty(name)) {
+                        columnName.add(name);
+                        if (!StringUtils.isEmpty(r.getDictCode())) {
+                            columnCode.add(r.getId() + "_VALUE");
+                        } else {
+                            columnCode.add(r.getId());
+                        }
+                        columnType.add(r.getColumnType());
+                        columnDict.add(r.getDictCode());
+                    }
                 }
-                if (!StringUtils.isEmpty(r.getDictCode())) {
-                    columnCode.add(r.getId() + "_VALUE");
-                } else {
-                    columnCode.add(r.getId());
-                }
-                columnType.add(r.getColumnType());
-                columnDict.add(r.getDictCode());
             }
         }
         //设置动态datagrid值
+        Map<String, Object> mapParam = new HashMap<String, Object>();
         mapParam.put("colunmName", columnName);
         mapParam.put("colunmCode", columnCode);
         mapParam.put("colunmType", columnType);
@@ -300,13 +312,7 @@ public class ResourceBrowseService {
         if(rsResources != null) {
             String methodName = rsResources.getRsInterface(); //执行函数
             //获取资源结构权限，该部分新增其他标准数据集的判断
-            boolean isOtherStdCode = false;
-            Map<String, String> correspondMap = new HashMap<>();
-            String otherStdMetadataStr = stdTransformClient.stdMetadataCodes("5a278924cd67", rsResources.getCode()); //省平台临时数据处理
-            if(otherStdMetadataStr != null) {
-                isOtherStdCode = true;
-            }
-            List<DtoResourceMetadata> metadataList = getAccessMetadata(rsResources, roleId, isOtherStdCode, correspondMap, otherStdMetadataStr);
+            List<DtoResourceMetadata> metadataList = getAccessMetadata(rsResources, roleId, new HashMap<>());
             //获取Saas权限
             StringBuilder saas = new StringBuilder();
             if (orgCode.equals("*") && areaCode.equals("*")) {
@@ -382,7 +388,6 @@ public class ResourceBrowseService {
                     queryParams = addParams(queryParams,"customGroup", customGroup);
                 }
                 */
-
                 //基础信息字段
                 String basicStr = ignoreField.toString();
                 String dealBasicStr = basicStr.substring(1, basicStr.length() - 1).replaceAll(" ", "");
@@ -504,18 +509,28 @@ public class ResourceBrowseService {
      * @return
      * @throws Exception
      */
-    private List<DtoResourceMetadata> getAccessMetadata(RsResource rsResource, String roleId, boolean isOtherStdCode, Map<String, String> correspondMap, String otherStdMetadataStr) throws Exception{
+    private List<DtoResourceMetadata> getAccessMetadata(RsResource rsResource, String roleId, Map<String, String> correspondMap) throws Exception{
         Set<String> rsMetadataIdSet = new HashSet<String>();
         String grantType = rsResource.getGrantType();
-        //其他标准
-        if(isOtherStdCode) {
+        boolean isOtherVersion = false;
+        if(rsResource.getCode().split("\\$").length > 1) {
+            isOtherVersion = true;
+        }
+        if(isOtherVersion) {
+            String version = rsResource.getCode().split("\\$")[1];
+            String code = rsResource.getCode().split("\\$")[0];
+            String otherStdMetadataStr = stdTransformClient.stdMetadataCodes(version, code); //省平台临时数据处理
             String [] otherStdMetadataArr = otherStdMetadataStr.split(",");
             List<String> transformEhrMetadataList = new ArrayList<>(); // 此list存储其他标准数据集底下的数据元转换成的平台的数据元的id (EHR_XXXXX)
             for(String otherStdMetadata : otherStdMetadataArr) {
-                String ehrMetadata = redisService.transformMetadata(otherStdMetadata);
-                if(ehrMetadata != null) {
-                    transformEhrMetadataList.add(ehrMetadata);
-                    correspondMap.put(ehrMetadata, otherStdMetadata);
+                String dataSetAndMetadata = stdTransformClient.adapterMetadataCode("5a6951bff0bb", code, otherStdMetadata); //适配版本号
+                if(!StringUtils.isEmpty(dataSetAndMetadata) && dataSetAndMetadata.split("\\.").length > 1 ) {
+                    String [] dataSetAndMetadataArr = dataSetAndMetadata.split("\\.");
+                    String ehrMetadata = redisService.getRsAdapterMetaData("59083976eebd", dataSetAndMetadataArr[0], dataSetAndMetadataArr[1]);
+                    if (!StringUtils.isEmpty(ehrMetadata)) {
+                        transformEhrMetadataList.add(ehrMetadata);
+                        correspondMap.put(ehrMetadata, otherStdMetadata);
+                    }
                 }
             }
             if (grantType.equals("1") && !roleId.equals("*")) {
@@ -559,7 +574,7 @@ public class ResourceBrowseService {
                 }
                 return resourceBrowseMetadataDao.getRsMetadataByIds(rsMetadataIds.substring(0, rsMetadataIds.length() - 1));
             }
-        }else { //EHR所用标准
+        } else { //EHR所用标准
             if (grantType.equals("1") && !roleId.equals("*")) {
                 List<String> roleIdList = objectMapper.readValue(roleId, List.class);
                 for (String id : roleIdList) {
