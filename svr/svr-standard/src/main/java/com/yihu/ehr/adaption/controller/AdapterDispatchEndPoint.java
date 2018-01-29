@@ -1,16 +1,14 @@
 package com.yihu.ehr.adaption.controller;
 
-import com.yihu.ehr.adaption.feignclient.StdVersionClient;
 import com.yihu.ehr.adaption.model.OrgAdapterPlan;
 import com.yihu.ehr.adaption.service.AdapterInfoSendService;
 import com.yihu.ehr.adaption.service.OrgAdapterPlanService;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
-import com.yihu.ehr.model.standard.MCDAVersion;
 import com.yihu.ehr.standard.model.CDAVersion;
 import com.yihu.ehr.standard.service.CdaVersionService;
 import com.yihu.ehr.util.encrypt.RSA;
+import com.yihu.ehr.util.rest.ErrorCode;
 import com.yihu.ehr.util.rest.RestEcho;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

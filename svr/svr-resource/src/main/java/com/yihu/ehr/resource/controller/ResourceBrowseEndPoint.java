@@ -44,15 +44,8 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "resourcesCode", value = "资源编码")
             @RequestParam(value = "resourcesCode") String resourcesCode,
             @ApiParam(name = "roleId", value = "角色id")
-            @RequestParam(value = "roleId") String roleId) {
-        String result;
-        try {
-            result =  resourceBrowseService.getResourceMetadata(resourcesCode, roleId);
-        }catch (Exception e){
-            e.printStackTrace();
-            return e.getMessage();
-        }
-        return result;
+            @RequestParam(value = "roleId") String roleId)throws Exception {
+        return resourceBrowseService.getResourceMetadata(resourcesCode, roleId);
     }
 
     @ApiOperation("资源浏览")
@@ -71,20 +64,12 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "page", value = "第几页")
             @RequestParam(value = "page", required = false) Integer page,
             @ApiParam(name = "size", value = "每页几条")
-            @RequestParam(value = "size", required = false) Integer size) {
-        Envelop envelop = new Envelop();
-        try {
-            envelop = resourceBrowseService.getResourceData(resourcesCode, roleId, orgCode, areaCode, queryCondition, page, size);
-        }catch (Exception e) {
-            e.printStackTrace();
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg(e.getMessage());
-        }
-        return envelop;
+            @RequestParam(value = "size", required = false) Integer size) throws Exception{
+        return resourceBrowseService.getResourceData(resourcesCode, roleId, orgCode, areaCode, queryCondition, page, size);
     }
 
     @ApiOperation("档案资源浏览细表数据")
-    @RequestMapping(value = ServiceApi.Resources.ResourceBrowseResourceSubData, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.ResourceViewSubData, method = RequestMethod.GET)
     public Envelop findSubDateByRowKey(
             @ApiParam(name = "rowKey", value = "主表rowKey", required = true)
             @RequestParam(value = "rowKey") String rowKey,

@@ -2,13 +2,13 @@ package com.yihu.ehr.resource.controller;
 
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.model.resource.MRsSystemDictionary;
 import com.yihu.ehr.resource.model.RsSystemDictionary;
 import com.yihu.ehr.resource.model.RsSystemDictionaryEntry;
 import com.yihu.ehr.resource.service.RsSystemDictionaryEntryService;
 import com.yihu.ehr.resource.service.RsSystemDictionaryService;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.util.id.BizObject;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

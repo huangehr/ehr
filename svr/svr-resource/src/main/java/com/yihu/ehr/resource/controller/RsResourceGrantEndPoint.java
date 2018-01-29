@@ -2,7 +2,6 @@ package com.yihu.ehr.resource.controller;
 
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.model.org.MRsOrgResource;
 import com.yihu.ehr.model.org.MRsOrgResourceMetadata;
 import com.yihu.ehr.model.resource.MRsAppResource;
@@ -12,6 +11,7 @@ import com.yihu.ehr.model.resource.MRsRolesResourceMetadata;
 import com.yihu.ehr.resource.model.*;
 import com.yihu.ehr.resource.service.*;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.util.id.BizObject;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

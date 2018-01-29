@@ -3,7 +3,6 @@ package com.yihu.ehr.resource.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
 
-import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.resource.model.RsResource;
@@ -11,6 +10,7 @@ import com.yihu.ehr.resource.model.RsResourceQuota;
 import com.yihu.ehr.resource.model.RsResourceMetadata;
 import com.yihu.ehr.resource.model.RsResourceDefaultQuery;
 import com.yihu.ehr.resource.service.*;
+import com.yihu.ehr.util.id.BizObject;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

@@ -70,5 +70,9 @@
             <version>${version.ehr}</version>
             <scope>${dependency.scope}</scope>
         </dependency>
+        <dependency>
+            <groupId>com.netflix.hystrix</groupId>
+            <artifactId>hystrix-core</artifactId>
+        </dependency>
     </dependencies>
 </project>

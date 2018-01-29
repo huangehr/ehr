@@ -1,6 +1,6 @@
 package com.yihu.ehr.standard.model;
 
-import com.yihu.ehr.constants.BizObject;
+import com.yihu.ehr.util.id.BizObject;
 import com.yihu.ehr.util.id.ObjectId;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.beans.factory.annotation.Value;
