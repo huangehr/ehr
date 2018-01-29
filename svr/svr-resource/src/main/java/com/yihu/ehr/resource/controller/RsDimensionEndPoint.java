@@ -1,11 +1,11 @@
 package com.yihu.ehr.resource.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.model.resource.MRsDimension;
 import com.yihu.ehr.resource.model.RsDimension;
 import com.yihu.ehr.resource.service.RsDimensionService;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.util.id.BizObject;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

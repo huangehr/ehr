@@ -3,7 +3,6 @@ package com.yihu.ehr.util.rest;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.yihu.ehr.constants.ErrorCode;
 
 import java.io.IOException;
 import java.io.Serializable;
