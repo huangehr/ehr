@@ -576,4 +576,34 @@ public class ResourceStatisticService extends BaseJpaService<JsonArchives, XJson
         List<Map<String, Object>> list = jdbcTemplate.queryForList(sql.toString());
         return  list;
     }
+
+    /**
+     * 获取数据集数量
+     * @param date
+     * @param orgCode
+     * @return
+     */
+    public Envelop getDataSetCount(String date, String orgCode) {
+        Envelop envelop = new Envelop();
+        try{
+            List<String> fields = new ArrayList<String>();
+            fields.add("dataSet");
+            fields.add("count");
+            fields.add("row");
+            String sql ="";
+            if(StringUtils.isNotEmpty(orgCode)){
+                sql = "select dataSet,count(dataSet) as count,sum(dataSetRow) as row from qc where receiveTime='"+date+"' and orgCode='"+orgCode+"' group by dataSet";
+            }else{
+                sql = "select dataSet,count(dataSet) as count,sum(dataSetRow) as row from qc where receiveTime='"+date+"' group by dataSet";
+            }
+            List<Map<String, Object>> list = dailyReportClient.findBySql(objectMapper.writeValueAsString(fields),sql);
+            envelop.setDetailModelList(list);
+            envelop.setSuccessFlg(true);
+        }catch(Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return envelop;
+    }
 }

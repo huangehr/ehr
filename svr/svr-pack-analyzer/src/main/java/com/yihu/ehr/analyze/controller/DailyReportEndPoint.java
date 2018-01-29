@@ -53,4 +53,14 @@ public class DailyReportEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "value") String value) {
         return dailyReportService.findByField(field, value);
     }
+
+    @ApiOperation(value = "根据sql查询")
+    @RequestMapping(value = ServiceApi.PackageAnalyzer.FindBySql, method = RequestMethod.POST)
+    public List<Map<String,Object>> findBySql(
+            @ApiParam(name = "field", value = "字段列表", required = true)
+            @RequestParam(value = "field") String field,
+            @ApiParam(name = "sql", value = "sql", required = true)
+            @RequestParam(value = "sql") String sql) {
+        return dailyReportService.findBySql(field,sql);
+    }
 }

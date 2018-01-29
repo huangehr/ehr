@@ -594,4 +594,14 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
             @RequestParam(name = "orgCode",required = false) String orgCode) {
         return statisticService.getArchivesTime(startDate, endDate, orgCode);
     }
+
+    @RequestMapping(value = ServiceApi.StasticReport.GetDataSetCount, method = RequestMethod.GET)
+    @ApiOperation(value = "获取数据集数量")
+    public Envelop getDataSetCount(
+            @ApiParam(name = "date", value = "日期")
+            @RequestParam(name = "date") String date,
+            @ApiParam(name = "orgCode", value = "医院代码")
+            @RequestParam(name = "orgCode",required = false) String orgCode) {
+        return statisticService.getDataSetCount(date, orgCode);
+    }
 }
