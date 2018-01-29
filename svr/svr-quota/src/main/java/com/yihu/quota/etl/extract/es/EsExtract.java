@@ -203,27 +203,18 @@ public class EsExtract {
                         }
                     }
                 }
-                boolean resultFlag = false;
+
                 List<List<Map<String, Object>>> sumOrgTypeList =  stastisOrtType(orgTypeResultList,dimensionMap, dimensionDicMap);
                 for(List<Map<String, Object>> list:sumOrgTypeList){
-                    resultFlag = orgHealthCategoryStatisticsService.countResultsAndSaveToEs(list);
+                    saveModels.addAll(orgHealthCategoryStatisticsService.getAllNodesStatistic(list));
                 }
-
-                SaveModel saveModel = new SaveModel();
-                saveModel.setQuotaCode(orgHealthCategory);
-                if(resultFlag){
-                    saveModel.setSaasId("success");
-                }else {
-                    saveModel.setSaasId("fail");
-                }
-                saveModels.add(saveModel);
             }
         }catch (Exception e){
             e.printStackTrace();
             throw new Exception("ES 特殊机构转化 查询数据出错！" +e.getMessage() );
         }
-        return saveModels;
 
+        return saveModels;
     }
 
 

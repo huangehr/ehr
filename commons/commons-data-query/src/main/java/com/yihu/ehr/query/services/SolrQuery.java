@@ -915,7 +915,7 @@ public class SolrQuery {
 
     /**
      * 收集多分组聚合的条件
-     * 注意：其中指标维度code出现的顺序要与 dimensionGroupList 中的一致。
+     * 注意：groupList 中指标维度code出现的顺序要与 dimensionGroupList 中的一致。
      *
      * @param core               core名
      * @param q                  查询条件
