@@ -170,10 +170,11 @@ public class QuotaReportController extends BaseController {
             List<String> lineNames = new ArrayList<>();
             Map<String,Map<String, Object>> lineData = new LinkedHashMap<>();
             Map<String, String> xAxisMap = new LinkedHashMap<>();
-            Map<String, Object> dataMap = new LinkedHashMap<>();
+            Integer i = 0;
             List<Map<String, Object>> listMap = new ArrayList<>();
 
             for(String quotaId:quotaIds){
+                Map<String, Object> dataMap = new LinkedHashMap<>();
                 TjQuota tjQuota = quotaService.findOne(Integer.valueOf(quotaId));
                 if(tjQuota != null){
                     List<Map<String, Object>>  resultListMap = baseStatistsService.getSimpleQuotaReport(tjQuota.getCode(), filter, dimension);
@@ -195,13 +196,16 @@ public class QuotaReportController extends BaseController {
                         }
                     }
                 }
+                lineData.put("" + i, dataMap);
+                lineNames.add(tjQuota.getName());
+                i++;
             }
-            lineNames.add(title);
-            lineData.put("", dataMap);
+//            lineNames.add(title);
+//            lineData.put("", dataMap);
             Map<String, Object> quotaMap = new LinkedHashMap<>();
             ReportOption reportOption = new ReportOption();
             int size = 0;
-            String quota = "";
+            String quota = "0";
             if(lineData != null && lineData.size() > 0){
                 for(String key : lineData.keySet()){
                     int tempSize = lineData.get(key).size();
