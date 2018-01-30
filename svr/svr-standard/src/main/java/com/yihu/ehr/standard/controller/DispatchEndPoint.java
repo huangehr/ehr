@@ -1,12 +1,12 @@
 package com.yihu.ehr.standard.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.standard.common.ExtendEndPoint;
 import com.yihu.ehr.standard.service.DispatchService;
 import com.yihu.ehr.util.encrypt.RSA;
+import com.yihu.ehr.util.rest.ErrorCode;
 import com.yihu.ehr.util.rest.RestEcho;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

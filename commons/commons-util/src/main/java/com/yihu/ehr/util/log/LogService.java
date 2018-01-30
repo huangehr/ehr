@@ -15,9 +15,16 @@ public class LogService{
 
     public static Logger getLogger(){
         StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
-        if(stackTraceElements == null && stackTraceElements.length > 3){
+        if(stackTraceElements == null || stackTraceElements.length < 3 ){
             return LoggerFactory.getLogger(LogService.class);
         } else{
+            for(int i = 3; i < stackTraceElements.length; i ++) {
+                String caller = stackTraceElements[2].getClassName();
+                String caller1 = stackTraceElements[i].getClassName();
+                if(!caller.equals(caller1)) {
+                    return LoggerFactory.getLogger(caller1);
+                }
+            }
             return LoggerFactory.getLogger(stackTraceElements[2].getClassName());
         }
     }

@@ -3,6 +3,7 @@ package com.yihu.quota.etl.extract.solr;
 import com.yihu.ehr.query.common.model.SolrGroupEntity;
 import com.yihu.ehr.query.services.SolrQuery;
 import com.yihu.ehr.solr.SolrUtil;
+import com.yihu.quota.etl.Contant;
 import com.yihu.quota.etl.extract.ExtractUtil;
 import com.yihu.quota.etl.model.EsConfig;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionMain;
@@ -52,7 +53,7 @@ public class SolrExtract {
                                    String startTime,//开始时间
                                    String endTime, //结束时间
                                    String timeLevel, // 时间维度，默认且只按天统计
-                                   QuotaVo quotaVo,//指标code
+                                   QuotaVo quotaVo,//指标配置
                                    EsConfig esConfig //es配置
     ) throws Exception {
         this.startTime = startTime;
@@ -83,19 +84,19 @@ public class SolrExtract {
             String key = qdm.get(i).getKeyVal();
             String mainCode = qdm.get(i).getMainCode();
             mainMap.put(key, key);
-            dimensionGroupList.add(new SolrGroupEntity(key, SolrGroupEntity.GroupType.FIELD_VALUE, null));
+            dimensionGroupList.add(new SolrGroupEntity(key, SolrGroupEntity.GroupType.FIELD_VALUE));
         }
         for (int i = 0; i < qds.size(); i++) {
             String key = qds.get(i).getKeyVal();
             slaveMap.put(key, key);
-            dimensionGroupList.add(new SolrGroupEntity(key, SolrGroupEntity.GroupType.FIELD_VALUE, null));
+            dimensionGroupList.add(new SolrGroupEntity(key, SolrGroupEntity.GroupType.FIELD_VALUE));
         }
-        // 默认追加一个日期字段作为细维度，方便按天统计数据作为最小单位统计值。
-        dimensionGroupList.add(new SolrGroupEntity(timeKey, SolrGroupEntity.GroupType.DATE_RANGE, null));
+        // 默认追加一个日期字段作为细维度，方便按天统计作为最小单位统计值。
         slaveMap.put(timeKey, timeKey);
         TjQuotaDimensionSlave daySlave = new TjQuotaDimensionSlave();
         daySlave.setSlaveCode(timeKey);
         qds.add(daySlave);
+        dimensionGroupList.add(new SolrGroupEntity(timeKey, SolrGroupEntity.GroupType.DATE_RANGE, "+1DAY"));
 
         // 拼接增量或全量的筛选条件
         if (!StringUtils.isEmpty(timeKey)) {
@@ -116,21 +117,30 @@ public class SolrExtract {
         }
 
         // 最后一个维度基于其他维度组合作为条件的统计结果的集合
-        List<Map<String, Object>> list = solrQuery.getGroupMultList(core, dimensionGroupList, null, q, fq);
-        Map<String, Integer> countsMap = new LinkedHashMap<>(); // 统计结果集
+        List<Map<String, Object>> list = new ArrayList<>();
+        if (StringUtils.isEmpty(esConfig.getAggregation())
+                || Contant.quota.aggregation_count.equals(esConfig.getAggregation())) {
+            // count 聚合
+            list = solrQuery.getCountMultList(core, q, fq, dimensionGroupList, null);
+        } else {
+            // sum 聚合
+            list = solrQuery.getSumMultList(core, q, fq, esConfig.getAggregationKey(), dimensionGroupList, null);
+        }
+
+        Map<String, String> statisticsResultMap = new LinkedHashMap<>(); // 统计结果集
         Map<String, String> daySlaveDictMap = new LinkedHashMap<>(); // 按天统计的所有日期项
         if (list != null && list.size() > 0) {
             for (Map<String, Object> objectMap : list) {
-                String countKey = objectMap.get("$countKey").toString();
-                Integer count = Integer.parseInt(objectMap.get("$count").toString());
+                String statisticsKey = objectMap.get("$statisticsKey").toString();
+                String result = objectMap.get("$result").toString();
                 String quotaDate = objectMap.get(timeKey).toString();
-                countsMap.put(countKey, count);
-                daySlaveDictMap.put(countKey, quotaDate);
+                statisticsResultMap.put(statisticsKey, result);
+                daySlaveDictMap.put(statisticsKey, quotaDate);
             }
         }
 
         // 融合主细维度、其组合统计值为SaveModel
-        extractUtil.compute(qdm, qds, returnList, countsMap, daySlaveDictMap, quotaVo);
+        extractUtil.compute(qdm, qds, returnList, statisticsResultMap, daySlaveDictMap, quotaVo);
 
         return returnList;
     }

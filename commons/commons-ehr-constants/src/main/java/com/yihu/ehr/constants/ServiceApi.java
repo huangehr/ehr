@@ -35,6 +35,7 @@ public class ServiceApi {
         //资源查询接口(命名先按原有路径，不规范)
         public static final String ResourceViewMetadata = "/resources/query/getResourceMetadata"; //资源浏览获取结构
         public static final String ResourceViewData = "/resources/query/getResourceData"; //资源浏览获取数据
+        public static final String ResourceViewSubData = "/resources/query/getResourceSubData";
         public static final String ResourceQuery = "/resources/query"; //资源查询接口
         //public static final String ResourceSubQuery = "/resources/sub_query"; //详细资源查询接口
         public static final String ResourceQueryTransform = "/resources/query/transform"; //资源查询接口+转译

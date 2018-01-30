@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ *
  * Created by wq on 2016/6/3.
  */
 
@@ -56,7 +57,7 @@ public interface ResourceBrowseClient {
     */
 
     @ApiOperation("档案资源浏览细表数据")
-    @RequestMapping(value = ServiceApi.Resources.ResourceBrowseResourceSubData, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.ResourceViewSubData, method = RequestMethod.GET)
     Envelop findSubDateByRowKey(
             @RequestParam(value = "rowKey") String rowKey,
             @RequestParam(value = "version") String version);
