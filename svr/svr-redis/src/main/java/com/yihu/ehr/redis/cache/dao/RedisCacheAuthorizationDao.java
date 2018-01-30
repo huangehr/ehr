@@ -1,6 +1,7 @@
 package com.yihu.ehr.redis.cache.dao;
 
 import com.yihu.ehr.redis.cache.entity.RedisCacheAuthorization;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
@@ -17,5 +18,9 @@ public interface RedisCacheAuthorizationDao extends PagingAndSortingRepository<R
 
     @Query(" FROM RedisCacheAuthorization a WHERE a.id <> :id AND a.categoryCode = :categoryCode AND a.appId = :appId ")
     RedisCacheAuthorization isUniqueAppId(@Param("id") Integer id, @Param("categoryCode") String categoryCode, @Param("appId") String appId);
+
+    @Modifying
+    @Query(" DELETE RedisCacheAuthorization WHERE categoryCode = :categoryCode")
+    void deleteByCategoryCode(@Param("categoryCode") String categoryCode);
 
 }
