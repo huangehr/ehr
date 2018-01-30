@@ -29,7 +29,7 @@ public class MicroServices {
     public static final String Standard = "svr-standard";
     public static final String SpecialDict = "svr-standard";
 
-    public static final String Resource = "svr-resource-zhoujie";
+    public static final String Resource = "svr-resource";
 
     public static final String ESB = "svr-esb";
 
@@ -43,7 +43,7 @@ public class MicroServices {
 
     public static final String Redis = "svr-redis";
 
-    public static final String Quota = "svr-quota-zhoujie";
+    public static final String Quota = "svr-quota";
 
     public static final String Dfs = "svr-dfs";
 
