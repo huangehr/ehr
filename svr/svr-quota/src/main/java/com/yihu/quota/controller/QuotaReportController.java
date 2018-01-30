@@ -147,7 +147,7 @@ public class QuotaReportController extends BaseController {
     @RequestMapping(value = ServiceApi.TJ.GetMoreQuotaGraphicReportPreviews, method = RequestMethod.GET)
     public MChartInfoModel getQuotaGraphicReports(
             @ApiParam(name = "quotaIdStr", value = "指标ID,多个用,拼接", required = true)
-            @RequestParam(value = "quotaIdStr", required = true) String quotaIdStr,
+            @RequestParam(value = "quotaIdStr" , required = true) String quotaIdStr,
             @ApiParam(name = "charstr", value = "多图表类型用,拼接,混合类型只支持柱状和线性", defaultValue = "1")
             @RequestParam(value = "charstr", required = true) String charstr,
             @ApiParam(name = "filter", value = "过滤", defaultValue = "")
@@ -247,6 +247,21 @@ public class QuotaReportController extends BaseController {
                         Map<String, Object> map = new HashMap<>();
                         map.put("NAME", resultMap.get(dimensionName));
                         map.put("TOTAL", resultMap.get("result"));
+                        if(resultMap.get(dimensionName) != null){
+                            map.put("NAME",resultMap.get(dimensionName));
+                        }else {
+                            //非 指标中配置的维度 关联出来的字段
+                            if(dimensionName.equals("levelName")){
+                                if(resultMap.get(dimension).equals("1")){
+                                    map.put("NAME","一级医院");
+                                }else  if(resultMap.get(dimension).equals("2")){
+                                    map.put("NAME","二级医院");
+                                }else  if(resultMap.get(dimension).equals("3")){
+                                    map.put("NAME","三级医院");
+                                }
+                            }
+                        }
+                        map.put("TOTAL",resultMap.get("result"));
                         datalist.add(map);
                     }
                     option = reportOption.getPieEchartOption(title, "", "", datalist, lineNames.get(0), null);
@@ -410,7 +425,7 @@ public class QuotaReportController extends BaseController {
         Envelop envelop = new Envelop();
         try {
             TjQuota tjQuota = quotaService.findOne(id);
-            Map<String, Integer> resultMap = quotaService.searcherSumByGroupBySql(tjQuota, dimension, filters, "result", "", "");
+            Map<String, Integer>  resultMap = quotaService.searcherSumByGroupBySql(tjQuota,dimension, filters,"result","","");
             envelop.setSuccessFlg(true);
             envelop.setObj(resultMap);
             return envelop;
