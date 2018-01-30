@@ -17,7 +17,6 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.elasticsearch.index.query.RangeQueryBuilder;
-import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.quartz.*;
 import org.slf4j.Logger;
@@ -46,7 +45,7 @@ public class EsQuotaJob implements Job {
     private Logger logger = LoggerFactory.getLogger(EsQuotaJob.class);
 
     private String saasid; // saasid
-    private QuotaVo quotaVo=new QuotaVo(); // 指标对象
+    private QuotaVo quotaVo = new QuotaVo(); // 指标对象
     private String endTime; // 结束时间
     private String startTime; //开始时间
     private String timeLevel; //时间
@@ -94,40 +93,28 @@ public class EsQuotaJob implements Job {
         try {
             //抽取数据 如果是累加就是 List<DataModel>  如果是相除 Map<String,List<DataModel>>
             List<SaveModel> dataModels = extract();
-            if(dataModels != null && dataModels.size() > 0){
-                if(dataModels!=null && dataModels.size()==1 && dataModels.get(0).getQuotaCode().equals("orgHealthCategory")){
-                    //特殊卫生机构类型数据返回结果
-                    if(dataModels.get(0).getSaasId().equals("success")){
-                        tjQuotaLog.setStatus(Contant.save_status.success);
-                        tjQuotaLog.setContent("特殊卫生机构类型 统计保存成功");
-                        System.out.println("特殊卫生机构类型 统计保存成功");
-                    }else {
-                        tjQuotaLog.setStatus(Contant.save_status.fail);
-                        tjQuotaLog.setContent("特殊卫生机构类型 统计数据ElasticSearch保存失败");
-                        System.out.println("特殊卫生机构类型 统计数据ElasticSearch保存失败");
-                    }
-                }else{
-                    //查询是否已经统计过,如果已统计 先删除后保存
-                    deleteRecord();
 
-                    List<SaveModel> dataSaveModels = new ArrayList<>();
-                    for(SaveModel saveModel :dataModels){
-                        if(saveModel.getResult() != null ){//&& Double.valueOf(saveModel.getResult())>0
-                            dataSaveModels.add(saveModel);
-                        }
-                    }
-                    if(dataSaveModels != null && dataSaveModels.size() > 0){
-                        //保存数据
-                        Boolean success = saveDate(dataSaveModels);
-                        tjQuotaLog.setStatus(success ? Contant.save_status.success : Contant.save_status.fail);
-                        tjQuotaLog.setContent(success ? "统计保存成功" : "统计数据ElasticSearch保存失败");
-                        System.out.println(success?"统计保存成功":"统计数据ElasticSearch保存失败");
-                    }else {
-                        tjQuotaLog.setStatus(Contant.save_status.success);
-                        tjQuotaLog.setContent("统计成功,统计结果大于0的数据为0条");
+            if (dataModels != null && dataModels.size() > 0) {
+                //查询是否已经统计过,如果已统计 先删除后保存
+                deleteRecord();
+
+                List<SaveModel> dataSaveModels = new ArrayList<>();
+                for (SaveModel saveModel : dataModels) {
+                    if (saveModel.getResult() != null) {//&& Double.valueOf(saveModel.getResult())>0
+                        dataSaveModels.add(saveModel);
                     }
                 }
-            }else {
+                if (dataSaveModels != null && dataSaveModels.size() > 0) {
+                    //保存数据
+                    Boolean success = saveDate(dataSaveModels);
+                    tjQuotaLog.setStatus(success ? Contant.save_status.success : Contant.save_status.fail);
+                    tjQuotaLog.setContent(success ? "统计保存成功" : "统计数据 ElasticSearch 保存失败");
+                    System.out.println(success ? "统计保存成功" : "统计数据 ElasticSearch 保存失败");
+                } else {
+                    tjQuotaLog.setStatus(Contant.save_status.success);
+                    tjQuotaLog.setContent("统计成功，统计结果大于0的数据为0条");
+                }
+            } else {
                 tjQuotaLog.setStatus(Contant.save_status.fail);
                 tjQuotaLog.setContent("没有抽取到数据");
             }
@@ -138,11 +125,9 @@ public class EsQuotaJob implements Job {
                 jdbcTemplate.update(sql);
             }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
-            logger.error(e.getMessage());
-            message = e.getMessage();
+            e.printStackTrace();
             tjQuotaLog.setStatus(Contant.save_status.fail);
-            tjQuotaLog.setContent(message);
+            tjQuotaLog.setContent(e.getMessage());
         }
         tjQuotaLog.setEndTime(new Date());
         saveLog(tjQuotaLog);
@@ -150,23 +135,23 @@ public class EsQuotaJob implements Job {
 
     private void deleteRecord() throws Exception {
         EsConfig esConfig = extractHelper.getEsConfig(quotaVo.getCode());
-        BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         QueryStringQueryBuilder termQueryQuotaCode = QueryBuilders.queryStringQuery("quotaCode:" + quotaVo.getCode().replaceAll("_", ""));
         boolQueryBuilder.must(termQueryQuotaCode);
-        if( !StringUtils.isEmpty(startTime) ){
+        if (!StringUtils.isEmpty(startTime)) {
             RangeQueryBuilder rangeQueryStartTime = QueryBuilders.rangeQuery("quotaDate").gte(startTime);
-                    boolQueryBuilder.must(rangeQueryStartTime);
+            boolQueryBuilder.must(rangeQueryStartTime);
         }
-        if( !StringUtils.isEmpty(endTime)){
+        if (!StringUtils.isEmpty(endTime)) {
             RangeQueryBuilder rangeQueryEndTime = QueryBuilders.rangeQuery("quotaDate").lte(endTime);
-                    boolQueryBuilder.must(rangeQueryEndTime);
+            boolQueryBuilder.must(rangeQueryEndTime);
         }
-        Client client = esClientUtil.getClient(esConfig.getHost(), esConfig.getPort(),esConfig.getIndex(),esConfig.getType(), esConfig.getClusterName());
+        Client client = esClientUtil.getClient(esConfig.getHost(), esConfig.getPort(), esConfig.getIndex(), esConfig.getType(), esConfig.getClusterName());
         try {
-            elasticsearchUtil.queryDelete(client,boolQueryBuilder);
-        }catch (Exception e){
+            elasticsearchUtil.queryDelete(client, boolQueryBuilder);
+        } catch (Exception e) {
             e.getMessage();
-        }finally {
+        } finally {
             client.close();
         }
     }
@@ -177,7 +162,7 @@ public class EsQuotaJob implements Job {
      * @return
      */
     private List<SaveModel> extract() throws Exception {
-        return SpringUtil.getBean(ExtractHelper.class).extractData(quotaVo, startTime, endTime,timeLevel,saasid);
+        return SpringUtil.getBean(ExtractHelper.class).extractData(quotaVo, startTime, endTime, timeLevel, saasid);
     }
 
     /**
@@ -188,15 +173,15 @@ public class EsQuotaJob implements Job {
     private void initParams(JobExecutionContext context) {
         JobDataMap map = context.getJobDetail().getJobDataMap();
         Map<String, Object> params = context.getJobDetail().getJobDataMap();
-        Object object =  map.get("quota");
-        if(object!=null){
-            BeanUtils.copyProperties(object,this.quotaVo);
+        Object object = map.get("quota");
+        if (object != null) {
+            BeanUtils.copyProperties(object, this.quotaVo);
         }
         this.saasid = map.getString("saasid");
         // 默认按天，如果指标有配置时间维度，ES抽取过程中维度字典项转换为 SaveModel 时再覆盖。
         this.timeLevel = Contant.main_dimension_timeLevel.day;
-        this.executeFlag =  map.getString("executeFlag");
-        if("2".equals(executeFlag)){
+        this.executeFlag = map.getString("executeFlag");
+        if ("2".equals(executeFlag)) {
             if (StringUtils.isEmpty(map.getString("startTime"))) {
                 startTime = Contant.main_dimension_timeLevel.getStartTime(timeLevel);
             } else {
