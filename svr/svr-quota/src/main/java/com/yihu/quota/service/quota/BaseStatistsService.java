@@ -191,6 +191,7 @@ public class BaseStatistsService {
                     }else {
                         moleKeyVal = moleKeyVal + "-" + moleMap.get(moleDimensions[i]).toString() ;
                     }
+                    map.put("firstColumn", moleMap.get("firstColumn"));
                     map.put(moleDimensions[i], moleMap.get(moleDimensions[i]).toString());
                 }
                 if (moleResultVal == 0) {
