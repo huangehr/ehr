@@ -104,7 +104,7 @@ public class ElasticSearchController extends BaseController {
             EsConfig esConfig = config();
             esConfig.setIndex(index);
             esConfig.setType(type);
-            esConfig.setHost("172.17.110.17");
+            esConfig.setHost("172.19.103.9");
             esConfig.setPort(9300);
             esConfig.setClusterName("elasticsearch");
             Client client = esClientUtil.getClient(esConfig.getHost(), esConfig.getPort(),esConfig.getIndex(),esConfig.getType(), esConfig.getClusterName());
