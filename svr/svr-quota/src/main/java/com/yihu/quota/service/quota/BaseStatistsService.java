@@ -427,7 +427,8 @@ public class BaseStatistsService {
                 if(dimenList.contains(key)){
                     if(dimensionDicMap.get(map.get(key).toString().toLowerCase())  != null){
 //                        dataMap.put(key,dimensionDicMap.get(map.get(key).toString().toLowerCase()));
-                        dataMap.put(key,map.get(key).toString());
+//                        dataMap.put(key,map.get(key).toString());
+                        dataMap.put(key,dimensionDicMap.get(map.get(key).toString().toLowerCase()));
                         dataMap.put(key+"Name",dimensionDicMap.get(map.get(key).toString().toLowerCase()));
                         dataMap.put("firstColumn",dimensionDicMap.get(map.get(key).toString().toLowerCase()));
                     }else {
