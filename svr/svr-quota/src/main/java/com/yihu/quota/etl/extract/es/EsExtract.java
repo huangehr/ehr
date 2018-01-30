@@ -22,8 +22,6 @@ import com.yihu.quota.vo.SaveModel;
 import net.sf.json.JSONObject;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.search.aggregations.bucket.histogram.InternalDateHistogram;
-import org.elasticsearch.search.aggregations.bucket.histogram.InternalHistogram;
 import org.elasticsearch.search.aggregations.bucket.terms.DoubleTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.LongTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
@@ -205,26 +203,18 @@ public class EsExtract {
                         }
                     }
                 }
-                boolean resultFlag = false;
+
                 List<List<Map<String, Object>>> sumOrgTypeList =  stastisOrtType(orgTypeResultList,dimensionMap, dimensionDicMap);
                 for(List<Map<String, Object>> list:sumOrgTypeList){
-                    resultFlag = orgHealthCategoryStatisticsService.countResultsAndSaveToEs(list);
+                    saveModels.addAll(orgHealthCategoryStatisticsService.getAllNodesStatistic(list));
                 }
-
-                SaveModel saveModel = new SaveModel();
-                saveModel.setQuotaCode(orgHealthCategory);
-                if(resultFlag){
-                    saveModel.setSaasId("success");
-                }else {
-                    saveModel.setSaasId("fail");
-                }
-                saveModels.add(saveModel);
             }
         }catch (Exception e){
+            e.printStackTrace();
             throw new Exception("ES 特殊机构转化 查询数据出错！" +e.getMessage() );
         }
-        return saveModels;
 
+        return saveModels;
     }
 
 
@@ -269,6 +259,7 @@ public class EsExtract {
                             }
                             if(orgDimenType.equals(key)){
                                 sumDimenMap.put("code",map.get(orgHealthCategory).toString());
+                                sumDimenMap.put("quotaDate",map.get("quotaDate"));
                                 count = count + Double.valueOf(map.get("result").toString());
                                 if(dimensionMap != null && dimensionMap.size() > 0){
                                     for(String dimen:dimensionMap.keySet()){
@@ -277,7 +268,6 @@ public class EsExtract {
                                     }
                                 }
                             }
-                            sumDimenMap.put("quotaDate",map.get("quotaDate"));
                         }
                         sumDimenMap.put("quotaCode",quotaVo.getCode());
                         sumDimenMap.put("quotaName",quotaVo.getName());
@@ -423,7 +413,7 @@ public class EsExtract {
             Iterator<Terms.Bucket> gradeBucketIt = stringTerms.getBuckets().iterator();
             client.close();
             //里面存放的数据 例  350200-5-2-2    主维度  细维度1  细维度2  值
-            Map<String,Integer> map = new HashMap<>();
+            Map<String,String> map = new HashMap<>();
             //递归解析json
             expainJson(gradeBucketIt, map, null);
 
@@ -474,7 +464,7 @@ public class EsExtract {
                 Iterator<Terms.Bucket> gradeBucketIt = stringTerms.getBuckets().iterator();
                 client.close();
                 //里面存放的数据 例  350200-5-2-2    主维度  细维度1  细维度2  值
-                Map<String,Integer> map = new HashMap<>();
+                Map<String,String> map = new HashMap<>();
                 //递归解析json
                 expainJson(gradeBucketIt, map, null);
                 compute(tjQuotaDimensionSlaves,returnList,one, map);
@@ -485,7 +475,7 @@ public class EsExtract {
         return returnList;
     }
 
-    private void compute(List<TjQuotaDimensionSlave> tjQuotaDimensionSlaves, List<SaveModel> returnList, Map.Entry<String, TjQuotaDimensionMain> one, Map<String, Integer> map) throws Exception {
+    private void compute(List<TjQuotaDimensionSlave> tjQuotaDimensionSlaves, List<SaveModel> returnList, Map.Entry<String, TjQuotaDimensionMain> one, Map<String, String> map) throws Exception {
         Map<String, SaveModel> allData = new HashMap<>();
         //初始化主细维度
         allData= initDimension(tjQuotaDimensionSlaves, one, allData);
@@ -493,7 +483,7 @@ public class EsExtract {
 
         for(String key :map.keySet()){
             SaveModel saveModel = allData.get(key);
-            Integer count =  map.get(key);
+            String count =  map.get(key);
             if(saveModel != null ){
                 saveModel.setResult(count.toString());
                 returnList.add(saveModel);
@@ -539,7 +529,7 @@ public class EsExtract {
      * @param map
      * @param sb
      */
-    private void expainJson(Iterator<Terms.Bucket> gradeBucketIt,Map<String,Integer>map, StringBuffer sb) {
+    private void expainJson(Iterator<Terms.Bucket> gradeBucketIt,Map<String,String>map, StringBuffer sb) {
         while (gradeBucketIt.hasNext()) {
             Terms.Bucket b =  gradeBucketIt.next();
             if (b.getAggregations().asList().get(0) instanceof StringTerms) {
@@ -565,7 +555,7 @@ public class EsExtract {
                 }
             }else {
                     InternalValueCount count = (InternalValueCount) b.getAggregations().asList().get(0);
-                    map.put(new StringBuffer(sb.toString() + "-" + b.getKey()).toString() , (int)count.getValue());
+                    map.put(new StringBuffer(sb.toString() + "-" + b.getKey()).toString() , Long.valueOf(count.getValue()).toString());
             }
         }
     }

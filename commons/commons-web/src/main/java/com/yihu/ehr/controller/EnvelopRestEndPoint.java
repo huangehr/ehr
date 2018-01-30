@@ -1,6 +1,6 @@
 package com.yihu.ehr.controller;
 
-import com.yihu.ehr.constants.BizObject;
+import com.yihu.ehr.util.id.BizObject;
 import com.yihu.ehr.util.id.ObjectId;
 import com.yihu.ehr.util.rest.Envelop;
 import org.springframework.beans.factory.annotation.Value;

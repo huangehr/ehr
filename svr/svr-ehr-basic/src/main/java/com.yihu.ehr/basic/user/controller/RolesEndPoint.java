@@ -7,6 +7,7 @@ import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.user.MRoles;
 import com.yihu.ehr.basic.user.service.RolesService;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -72,6 +73,7 @@ public class RolesEndPoint extends EnvelopRestEndPoint{
         Roles rolesNew = rolesService.save(roles);
         return convertToModel(rolesNew,MRoles.class,null);
     }
+
     @RequestMapping(value = ServiceApi.Roles.Role,method = RequestMethod.PUT,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改角色组")
     public MRoles updateRoles(
@@ -82,6 +84,7 @@ public class RolesEndPoint extends EnvelopRestEndPoint{
         Roles rolesNew = rolesService.save(roles);
         return convertToModel(rolesNew,MRoles.class,null);
     }
+
     @RequestMapping(value = ServiceApi.Roles.RoleId,method = RequestMethod.DELETE)
     @ApiOperation(value = "根据角色组id删除")
     public boolean deleteRoles(
@@ -90,6 +93,7 @@ public class RolesEndPoint extends EnvelopRestEndPoint{
         rolesService.delete(id);
         return true;
     }
+
     @RequestMapping(value = ServiceApi.Roles.RoleId,method = RequestMethod.GET)
     @ApiOperation(value = "根据角色组id查询")
     public MRoles getRolesById(
@@ -99,6 +103,7 @@ public class RolesEndPoint extends EnvelopRestEndPoint{
         if(roles == null) throw new ApiException(HttpStatus.NOT_FOUND,"角色组未找到！");
         return convertToModel(roles,MRoles.class);
     }
+
     @RequestMapping(value = ServiceApi.Roles.Roles,method = RequestMethod.GET)
     @ApiOperation(value = "查询角色组列表---分页")
     public Collection<MRoles> searchRoles(
@@ -118,6 +123,7 @@ public class RolesEndPoint extends EnvelopRestEndPoint{
         pagedResponse(request, response, rolesService.getCount(filters), page, size);
         return convertToModels(rolesList, new ArrayList<>(rolesList.size()), MRoles.class, fields);
     }
+
     @RequestMapping(value = ServiceApi.Roles.RolesNoPage,method = RequestMethod.GET)
     @ApiOperation(value = "查询角色组列表---不分页")
     public Collection<MRoles> searchRolesNoPaging(
@@ -146,7 +152,8 @@ public class RolesEndPoint extends EnvelopRestEndPoint{
         }
         return false;
     }
-    @RequestMapping(value = ServiceApi.Roles.RoleCodeExistence,method = RequestMethod.GET)
+
+    @RequestMapping(value = ServiceApi.Roles.RoleCodeExistence, method = RequestMethod.GET)
     @ApiOperation(value = "角色组代码是否已存在" )
     public boolean isCodeExistence(
             @ApiParam(name = "app_id",value = "应用id")
@@ -164,5 +171,27 @@ public class RolesEndPoint extends EnvelopRestEndPoint{
             return true;
         }
         return false;
+    }
+
+    @RequestMapping(value = ServiceApi.Roles.RoleFindByField, method = RequestMethod.POST)
+    @ApiOperation(value = "通过字段获取角色" )
+    public Envelop findByFields(
+            @ApiParam(name = "appId", value = "应用id", required = true)
+            @RequestParam(value = "appId") String appId,
+            @ApiParam(name = "code", value = "角色组代码", required = true)
+            @RequestParam(value = "code") String code,
+            @ApiParam(name = "type", value = "角色组类别", required = true)
+            @RequestParam(value = "type") String type){
+        Envelop envelop = new Envelop();
+        String[] fields = {"appId", "code", "type"};
+        String[] values = {appId, code, type};
+        List<Roles> roles = rolesService.findByFields(fields, values);
+        if(roles != null && roles.size() >0){
+            envelop.setSuccessFlg(true);
+            envelop.setDetailModelList(roles);
+            envelop.setObj(roles.get(0).getId());
+            return envelop;
+        }
+        return envelop;
     }
 }

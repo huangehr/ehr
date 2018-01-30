@@ -1,14 +1,19 @@
 package com.yihu.ehr.analyze.service.pack;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.analyze.feign.PackageMgrClient;
 import com.yihu.ehr.analyze.service.qc.PackageQcService;
+import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.model.packs.MPackage;
+import com.yihu.ehr.util.rest.Envelop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 档案解析引擎.
@@ -27,7 +32,10 @@ public class PackageAnalyzeService {
     private PackageMgrClient mgrClient;
     @Autowired
     private PackageQcService packageQcService;
-
+    @Autowired
+    private ElasticSearchUtil elasticSearchUtil;
+    @Autowired
+    protected ObjectMapper objectMapper;
     @PostConstruct
     private void init() {
     }
@@ -72,4 +80,16 @@ public class PackageAnalyzeService {
         }
     }
 
+    public Envelop esSaveData(String index, String type, String dataList){
+        Envelop envelop = new Envelop();
+        try {
+            List<Map<String, Object>> list = objectMapper.readValue(dataList,List.class);
+            for (Map<String, Object> map : list) {
+                elasticSearchUtil.index(index, type, map);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return envelop;
+    }
 }

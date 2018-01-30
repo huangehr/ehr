@@ -16,6 +16,7 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -82,6 +83,15 @@ public class RedisMqSubscriberEndPoint extends EnvelopRestEndPoint {
             envelop.setErrorMsg("获取消息订阅者发生异常：" + e.getMessage());
         }
         return envelop;
+    }
+
+    @ApiOperation(value = "获取消息订阅者列表，不分页")
+    @RequestMapping(value = ServiceApi.Redis.MqSubscriber.Prefix, method = RequestMethod.GET)
+    public Collection<MRedisMqSubscriber> getSubscriberList(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filters") String filters) throws Exception {
+        List<RedisMqSubscriber> subscriberList = redisMqSubscriberService.search(filters);
+        return convertToModels(subscriberList, new ArrayList<>(subscriberList.size()), MRedisMqSubscriber.class, "");
     }
 
     @ApiOperation("新增消息订阅者")
@@ -193,6 +203,26 @@ public class RedisMqSubscriberEndPoint extends EnvelopRestEndPoint {
             envelop.setErrorMsg("发生异常：" + e.getMessage());
         }
         return envelop;
+    }
+
+    @ApiOperation("验证消息队列的订阅者服务地址是否存在")
+    @RequestMapping(value = ServiceApi.Redis.MqSubscriber.IsExist, method = RequestMethod.GET)
+    public Boolean isExist(
+            @ApiParam(name = "channel", value = "消息队列编码", required = true)
+            @RequestParam(value = "channel") String channel,
+            @ApiParam(name = "subscriber", value = "消息订阅者服务地址", required = true)
+            @RequestParam(value = "subscriber") String subscriber) {
+        return redisMqSubscriberService.isExist(channel, subscriber);
+    }
+
+    @ApiOperation("取消队列的订阅者")
+    @RequestMapping(value = ServiceApi.Redis.MqSubscriber.Unsubscribe, method = RequestMethod.POST)
+    public void unsubscribe(
+            @ApiParam(name = "channel", value = "消息队列编码", required = true)
+            @RequestParam(value = "channel") String channel,
+            @ApiParam(name = "subscriber", value = "消息订阅者服务地址", required = false)
+            @RequestParam(value = "subscriber", required = false) String subscriber) {
+        redisMqSubscriberService.unsubscribe(channel, subscriber);
     }
 
 }

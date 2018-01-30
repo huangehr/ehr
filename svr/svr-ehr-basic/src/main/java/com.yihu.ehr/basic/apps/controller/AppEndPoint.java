@@ -2,13 +2,18 @@ package com.yihu.ehr.basic.apps.controller;
 
 import com.yihu.ehr.basic.apps.model.App;
 import com.yihu.ehr.basic.apps.service.AppService;
+import com.yihu.ehr.basic.apps.service.OauthClientDetailsService;
+import com.yihu.ehr.basic.user.entity.RoleAppRelation;
+import com.yihu.ehr.basic.user.service.RoleAppRelationService;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.entity.oauth2.OauthClientDetails;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.app.MApp;
+import com.yihu.ehr.util.id.BizObject;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -16,12 +21,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -33,10 +41,16 @@ import java.util.List;
 @RequestMapping(ApiVersion.Version1_0)
 @Api(value = "Application", description = "EHR应用管理", tags = {"应用管理-EHR应用管理"})
 public class AppEndPoint extends EnvelopRestEndPoint {
-    @Autowired
-    private AppService appService;
+
     @Value("${fast-dfs.public-server}")
     private String fastDfsPublicServers;
+
+    @Autowired
+    private AppService appService;
+    @Autowired
+    private OauthClientDetailsService oauthClientDetailsService;
+    @Autowired
+    private RoleAppRelationService roleAppRelationService;
 
     @RequestMapping(value = ServiceApi.Apps.Apps, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建App")
@@ -108,6 +122,15 @@ public class AppEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "app_id", value = "id")
             @PathVariable(value = "app_id") String appId) throws Exception {
         appService.delete(appId);
+        //删除Oauth
+        oauthClientDetailsService.delete(appId);
+        //删除应用角色
+        List<RoleAppRelation> relationList = roleAppRelationService.search("appId=" + appId);
+        if(relationList != null && relationList.size() > 0) {
+            for(RoleAppRelation roleAppRelation : relationList) {
+                roleAppRelationService.delete(roleAppRelation.getId());
+            }
+        }
         return true;
     }
 
@@ -134,7 +157,7 @@ public class AppEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.Apps.AppNameExistence, method = RequestMethod.GET)
     @ApiOperation(value = "判断应用名称是否已经存在")
-    boolean isAppNameExists(
+    public boolean isAppNameExists(
             @ApiParam(value = "app_name")
             @PathVariable(value = "app_name") String appName) {
         return appService.isAppNameExists(appName);
@@ -162,4 +185,72 @@ public class AppEndPoint extends EnvelopRestEndPoint {
         List<App> appList = appService.getApps(userId, catalog, manageType);
         return convertToModels(appList,new ArrayList<MApp>(appList.size()),MApp.class,"");
     }
+
+    // -------------------------- 开放平台 ---------------------------------
+
+    @RequestMapping(value =  ServiceApi.Apps.AppFieldExistence, method = RequestMethod.POST)
+    @ApiOperation(value = "根据条件判断应用ID或者名称是否存在")
+    public Envelop isFieldExist(
+            @ApiParam(name = "field", value = "字段", required = true)
+            @RequestParam(value = "field") String field,
+            @ApiParam(name = "value", value = "值", required = true)
+            @RequestParam(value = "value") String value) throws Exception{
+        Envelop envelop = new Envelop();
+        List<App> appList = appService.search(field + "=" + value);
+        if (appList != null && appList.size() > 0) {
+            envelop.setSuccessFlg(true);
+            return envelop;
+        }
+        envelop.setSuccessFlg(false);
+        return envelop;
+    }
+
+    @RequestMapping(value =  ServiceApi.Apps.AppAuthClient, method = RequestMethod.POST)
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    @ApiOperation(value = "开放平台审核结果处理接口，包含App初始化和应用角色分配")
+    public Envelop authClient(
+            @ApiParam(name = "appJson", value = "App", required = true)
+            @RequestParam(value = "appJson") String appJson,
+            @ApiParam(name = "roleId", value = "角色ID", required = true)
+            @RequestParam(value = "roleId") Integer roleId) throws Exception{
+        Envelop envelop = new Envelop();
+        //app 表
+        App app = objectMapper.readValue(appJson, App.class);
+        app.setCreateTime(new Date());
+        app.setAuditor("system");
+        app.setAuditTime(new Date());
+        app.setCatalog("ApplicationService");
+        app.setStatus("Approved");
+        app.setSourceType(0);
+        app.setCode("DEFAULT");
+        app.setManageType("client");
+        app.setReleaseFlag(1);
+        appService.save(app);
+        //oauth 表
+        OauthClientDetails oauthClientDetails = new OauthClientDetails();
+        oauthClientDetails.setClientId(app.getId());
+        oauthClientDetails.setResourceIds("user");
+        oauthClientDetails.setClientSecret(app.getSecret());
+        oauthClientDetails.setScope("read");
+        oauthClientDetails.setAuthorizedGrantTypes("authorization_code,refresh_token,password,implicit");
+        oauthClientDetails.setWebServerRedirectUri(app.getUrl());
+        oauthClientDetails.setAccessTokenValidity(null);
+        oauthClientDetails.setAccessTokenValidity(null);
+        oauthClientDetails.setAutoApprove("true");
+        oauthClientDetailsService.save(oauthClientDetails);
+        //应用角色表
+        RoleAppRelation roleAppRelation = new RoleAppRelation();
+        roleAppRelation.setAppId(app.getId());
+        roleAppRelation.setRoleId(roleId);
+        String[] fields = {"appId", "roleId"};
+        String[] values = {roleAppRelation.getAppId(), roleAppRelation.getRoleId() + ""};
+        List<RoleAppRelation> roleAppRelations = roleAppRelationService.findByFields(fields, values);
+        if(roleAppRelations == null || roleAppRelations.size() <= 0){
+            roleAppRelationService.save(roleAppRelation);
+        }
+        envelop.setSuccessFlg(true);
+        envelop.setObj(app);
+        return envelop;
+    }
+
 }

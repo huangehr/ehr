@@ -124,3 +124,30 @@ service-gateway:
 kafka:
   broker:
     address: 10.176.97.7:6667
+
+
+---
+spring:
+  profiles: prod_fzzy
+  datasource:
+    url: jdbc:mysql://100.100.1.159:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: healthcloud
+    password: GP8Qz4qU
+
+  data:
+    mongodb:
+      host: 100.100.1.157
+      port: 29000
+      username: jkzlehr
+      password: GMLBq1LG
+      authenticationDatabase: admin
+      database: ehr
+
+service-gateway:
+  username: user
+  password: eureka
+  url: http://100.100.1.162:10000/api/v1.0/admin
+
+kafka:
+  broker:
+    address: 100.100.1.155:6667

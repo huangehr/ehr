@@ -41,7 +41,7 @@ public class QcRuleCheckService {
 
             Boolean isNullable = redisServiceClient.isMetaDataNullable(value.getVersion(), value.getTable(), value.getCode());
             if (!isNullable && StringUtils.isEmpty(value.getValue())) {
-                saveCheckResult(value, "不能为空");
+                saveCheckResult(value, "E00001", "不能为空");
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -107,7 +107,7 @@ public class QcRuleCheckService {
             logger.info("code:" + value.getCode() + ",value:" + value.getValue() + ",dict:" + dict);
             Boolean isExist = redisServiceClient.isDictCodeExist(value.getVersion(), dict, value.getCode());
             if (!isExist) {
-                saveCheckResult(value, "超出值域范围");
+                saveCheckResult(value, "E00002", "超出值域范围");
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -115,7 +115,7 @@ public class QcRuleCheckService {
         }
     }
 
-    private void saveCheckResult(DataElementValue value, String checkInfo) {
+    private void saveCheckResult(DataElementValue value, String errorCode, String errorMsg) {
         try {
             Map<String, Object> map = new HashMap<>();
             map.put("rowKey", value.getRowKey());
@@ -128,7 +128,9 @@ public class QcRuleCheckService {
             map.put("eventNo", value.getEventNo());
             map.put("eventTime", value.getEventTime());
             map.put("receiveTime", value.getReceiveTime());
-            map.put("checkInfo", checkInfo);
+            map.put("errorCode", errorCode);
+            map.put("errorMsg", errorMsg);
+
             elasticSearchUtil.index("qc", "receive_data_element", map);
         } catch (ParseException e) {
             e.printStackTrace();

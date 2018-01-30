@@ -5,13 +5,18 @@ import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.util.List;
+import java.util.Map;
+
 /**
+ *
  * Created by wq on 2016/6/3.
  */
 
@@ -50,4 +55,10 @@ public interface ResourceBrowseClient {
             @RequestParam(value = "resourcesCode") String resourcesCode,
             @RequestParam(value = "rowKey") String rowKey);
     */
+
+    @ApiOperation("档案资源浏览细表数据")
+    @RequestMapping(value = ServiceApi.Resources.ResourceViewSubData, method = RequestMethod.GET)
+    Envelop findSubDateByRowKey(
+            @RequestParam(value = "rowKey") String rowKey,
+            @RequestParam(value = "version") String version);
 }

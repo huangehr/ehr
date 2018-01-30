@@ -26,16 +26,17 @@ import java.util.List;
 @RequestMapping(ApiVersion.Version1_0)
 @Api(value = "roleApp",description = "角色组-应用关系管理", tags = {"安全管理-角色组-应用关系管理"})
 public class RoleAppRelationEndPoint extends EnvelopRestEndPoint {
+
     @Autowired
     private RoleAppRelationService roleAppRelationService;
 
-    @RequestMapping(value = ServiceApi.Roles.RoleApp,method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-     @ApiOperation(value = "为角色组配置应用，单个")
-     public MRoleAppRelation createRoleAppRelation(
+    @RequestMapping(value = ServiceApi.Roles.RoleApp, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "为角色组配置应用，单个")
+    public MRoleAppRelation createRoleAppRelation(
             @ApiParam(name = "data_json",value = "角色组-应用关系对象Json字符串")
             @RequestBody String dataJson){
         RoleAppRelation roleAppRelation = toEntity(dataJson,RoleAppRelation.class);
-        String[] fields = {"appId","roleId"};
+        String[] fields = {"appId", "roleId"};
         String[] values = {roleAppRelation.getAppId(),roleAppRelation.getRoleId()+""};
         List<RoleAppRelation> roleAppRelations = roleAppRelationService.findByFields(fields, values);
         if(roleAppRelations != null && roleAppRelations.size() > 0){

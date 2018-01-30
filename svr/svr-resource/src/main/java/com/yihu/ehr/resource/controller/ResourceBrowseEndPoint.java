@@ -1,5 +1,6 @@
 package com.yihu.ehr.resource.controller;
 
+import com.google.common.collect.Lists;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
@@ -43,16 +44,8 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "resourcesCode", value = "资源编码")
             @RequestParam(value = "resourcesCode") String resourcesCode,
             @ApiParam(name = "roleId", value = "角色id")
-            @RequestParam(value = "roleId") String roleId) {
-        String result;
-        try {
-            result =  resourceBrowseService.getResourceMetadata(resourcesCode, roleId);
-        }catch (Exception e){
-            e.printStackTrace();
-            result = e.getMessage();
-            return result;
-        }
-        return result;
+            @RequestParam(value = "roleId") String roleId)throws Exception {
+        return resourceBrowseService.getResourceMetadata(resourcesCode, roleId);
     }
 
     @ApiOperation("资源浏览")
@@ -71,15 +64,21 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "page", value = "第几页")
             @RequestParam(value = "page", required = false) Integer page,
             @ApiParam(name = "size", value = "每页几条")
-            @RequestParam(value = "size", required = false) Integer size) {
+            @RequestParam(value = "size", required = false) Integer size) throws Exception{
+        return resourceBrowseService.getResourceData(resourcesCode, roleId, orgCode, areaCode, queryCondition, page, size);
+    }
+
+    @ApiOperation("档案资源浏览细表数据")
+    @RequestMapping(value = ServiceApi.Resources.ResourceViewSubData, method = RequestMethod.GET)
+    public Envelop findSubDateByRowKey(
+            @ApiParam(name = "rowKey", value = "主表rowKey", required = true)
+            @RequestParam(value = "rowKey") String rowKey,
+            @ApiParam(name = "version", value = "版本", required = true)
+            @RequestParam(value = "version") String version) throws Exception {
         Envelop envelop = new Envelop();
-        try {
-            envelop = resourceBrowseService.getResourceData(resourcesCode, roleId, orgCode, areaCode, queryCondition, page, size);
-        }catch (Exception e) {
-            e.printStackTrace();
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg(e.getMessage());
-        }
+        List<Object> resultList = resourceBrowseService.getSubDateByRowkey(rowKey, version);
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(resultList);
         return envelop;
     }
 
@@ -353,6 +352,5 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
         re.setDetailModelList(result.getContent());
         return re;
     }
-
 
 }

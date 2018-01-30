@@ -2,7 +2,6 @@ package com.yihu.ehr.basic.user.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.yihu.ehr.basic.patient.service.DemographicService;
-import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
@@ -20,6 +19,7 @@ import com.yihu.ehr.basic.user.entity.User;
 import com.yihu.ehr.basic.user.service.DoctorService;
 import com.yihu.ehr.basic.user.service.UserService;
 import com.yihu.ehr.util.datetime.DateUtil;
+import com.yihu.ehr.util.id.BizObject;
 import com.yihu.ehr.util.phonics.PinyinUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

@@ -9,6 +9,7 @@ import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.profile.core.ResourceCore;
 import com.yihu.ehr.util.compress.Zipper;
+import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.log.LogService;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -165,18 +166,16 @@ public class ZipPackage {
                 hBaseDao.delete(ResourceCore.MasterTable, rowKey);
             }
 
+            Map<String, String> dataGroup = metaDataRecord.getDataGroup();
+            String receiveTime = DateUtil.toString(mPackage.getReceiveDate(), DateUtil.DEFAULT_YMDHMSDATE_FORMAT);
+            dataGroup.put("receiveTime", receiveTime);  //增加接收时间
             bundle.clear();
             bundle.addValues(
                     rowKey,
                     DATA,
-                    metaDataRecord.getDataGroup()
+                    dataGroup
             );
 
-//            bundle.addValues(
-//                    rowKey,
-//                    ORIGIN,
-//                    metaDataRecord.getDataGroup()
-//            );
             hBaseDao.save(table, bundle);
         });
     }

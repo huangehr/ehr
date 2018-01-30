@@ -1,12 +1,12 @@
 package com.yihu.ehr.standard.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.model.standard.MCDAType;
 import com.yihu.ehr.standard.model.CDAType;
 import com.yihu.ehr.standard.service.CdaTypeService;
+import com.yihu.ehr.util.id.BizObject;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

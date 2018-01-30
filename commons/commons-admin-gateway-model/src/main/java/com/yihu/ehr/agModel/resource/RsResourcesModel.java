@@ -16,6 +16,7 @@ public class RsResourcesModel {
     private String description;
     private Integer dataSource;
     private String echartType;
+    private String dimension;
 
     public String getId() {
         return id;
@@ -98,5 +99,13 @@ public class RsResourcesModel {
 
     public void setEchartType(String echartType) {
         this.echartType = echartType;
+    }
+
+    public String getDimension() {
+        return dimension;
+    }
+
+    public void setDimension(String dimension) {
+        this.dimension = dimension;
     }
 }

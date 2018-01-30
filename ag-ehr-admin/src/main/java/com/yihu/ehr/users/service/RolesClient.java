@@ -4,6 +4,7 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.user.MRoles;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by yww on 2016/7/8.
@@ -98,4 +100,13 @@ public interface RolesClient {
             @ApiParam(name = "type",value = "角色组类别")
             @RequestParam(value = "type",required = false) String type);
 
+    @RequestMapping(value = ServiceApi.Roles.RoleFindByField, method = RequestMethod.POST)
+    @ApiOperation(value = "通过字段获取角色" )
+    Envelop findByFields(
+            @ApiParam(name = "appId",value = "应用id")
+            @RequestParam(value = "appId") String appId,
+            @ApiParam(name = "code",value = "角色组代码")
+            @RequestParam(value = "code") String code,
+            @ApiParam(name = "type",value = "角色组类别")
+            @RequestParam(value = "type") String type);
 }

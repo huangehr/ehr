@@ -2,9 +2,7 @@ package com.yihu.quota.service.orgHealthCategory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.elasticsearch.ElasticSearchClient;
-import com.yihu.quota.client.EsClient;
 import com.yihu.quota.vo.SaveModel;
-import com.yihu.quota.vo.SaveModelOrgHealthCategory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -29,14 +27,14 @@ public class OrgHealthCategoryStatisticsService {
 
     /**
      * 将卫生机构类别末节点统计结果，填充到卫生机构类别集合中，
-     * 然后合计父节点统计结果，再将卫生机构类别集合统计结果保存到ES库中。
+     * 然后合计父节点的统计结果。
      *
      * @param endpointsStatisticList 卫生机构类别末节点统计结果
-     * @return 保存成功的状态
+     * @return 所有卫生机构类别的统计结果
      */
-    public boolean countResultsAndSaveToEs(List<Map<String, Object>> endpointsStatisticList) {
+    public List<SaveModel> getAllNodesStatistic(List<Map<String, Object>> endpointsStatisticList) {
         // 获取所有卫生机构类别的集合
-        String sql = "SELECT id, pid, code, name, 0 AS result, 'false' AS isEndpoint FROM org_health_category ORDER BY code ";
+        String sql = "SELECT id, pid, top_pid AS topPid, code, name, 0 AS result, 'false' AS isEndpoint FROM org_health_category ORDER BY code ";
         List<Map<String, Object>> allOrgHealthCategoryList = jdbcTemplate.queryForList(sql);
 
         for (Map<String, Object> endpoint : endpointsStatisticList) {
@@ -77,7 +75,8 @@ public class OrgHealthCategoryStatisticsService {
         totalMap.put("name", "合计");
         totalMap.put("result", totalResult);
         allOrgHealthCategoryList.add(totalMap);
-        return saveToEs(endpointsStatisticList, allOrgHealthCategoryList);
+
+        return translateModel(endpointsStatisticList, allOrgHealthCategoryList);
     }
 
     /**
@@ -93,7 +92,17 @@ public class OrgHealthCategoryStatisticsService {
             int id = (int) item.get("id");
             Object itemPid = item.get("pid");
             boolean isEndpoint = Boolean.parseBoolean(item.get("isEndpoint").toString());
-            if (itemPid != null && (int) itemPid == pid) {
+            if (itemPid == null && id == pid) { // 顶节点
+                for (Map<String, Object> topSubItem : allOrgHealthCategoryList) {
+                    Object topPid = topSubItem.get("topPid");
+                    Object topSubItemPid = topSubItem.get("pid");
+                    boolean isEndpointSubItem = Boolean.parseBoolean(topSubItem.get("isEndpoint").toString());
+                    if (topSubItemPid != null && Integer.parseInt(topPid.toString()) == pid && isEndpointSubItem) {
+                        endpointList.add(topSubItem);
+                    }
+                }
+                return endpointList;
+            } else if (itemPid != null && (int) itemPid == pid) {
                 if (isEndpoint) {
                     endpointList.add(item);
                 } else {
@@ -117,14 +126,15 @@ public class OrgHealthCategoryStatisticsService {
     }
 
     /**
-     * 将卫生机构类别统计结果保存到ES库中
+     * 将卫生机构类别统计结果转换成 SaveModel
      *
      * @param endpointsStatisticList   卫生机构类别末节点统计结果
      * @param allOrgHealthCategoryList 所有卫生机构类集合
      * @return
      */
-    private boolean saveToEs(List<Map<String, Object>> endpointsStatisticList, List<Map<String, Object>> allOrgHealthCategoryList) {
-        boolean result = false;
+    private List<SaveModel> translateModel(List<Map<String, Object>> endpointsStatisticList,
+                                           List<Map<String, Object>> allOrgHealthCategoryList) {
+        List<SaveModel> resultList = new ArrayList<>();
         try {
             String quotaCode = null;
             String quotaName = null;
@@ -182,15 +192,14 @@ public class OrgHealthCategoryStatisticsService {
                 model.setOrgHealthCategoryCode(code);
                 model.setOrgHealthCategoryName(item.get("name").toString());
                 model.setResult(item.get("result").toString());
-                Map<String, Object> sourceMap = objectMapper.readValue(objectMapper.writeValueAsString(model), Map.class);
-                esClient.index("medical_service_index", "medical_service", sourceMap);
+
+                resultList.add(model);
             }
-            result = true;
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return result;
+        return resultList;
     }
 
     /**

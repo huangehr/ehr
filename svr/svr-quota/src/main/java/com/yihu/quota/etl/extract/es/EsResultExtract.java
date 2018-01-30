@@ -366,16 +366,19 @@ public class EsResultExtract {
         }else {
             filter = filter + " and quotaCode='" + tjQuota.getCode().replaceAll("_","") + "' ";
         }
+        if(StringUtils.isNotEmpty(aggsFields)){
+            aggsFields += ",";
+        }
         Client client = getEsClient();
         try {
             //SELECT sum(result) FROM medical_service_index group by town,date_histogram(field='quotaDate','interval'='year')
             StringBuffer mysql = new StringBuffer("SELECT ")
                     .append(aggsFields)
-                    .append(",sum(result) FROM ").append(esConfig.getIndex())
+                    .append(" sum(result) FROM ").append(esConfig.getIndex())
                     .append(" where ").append(filter)
                     .append(" group by ").append(aggsFields)
-                    .append(" ,date_histogram(field='quotaDate','interval'='")
-                    .append(dateDime).append("')");
+                    .append(" date_histogram(field='quotaDate','interval'='")
+                    .append(dateDime).append("')").append(" limit 10000 ");
             System.out.println("查询分组 mysql= " + mysql.toString());
             List<Map<String, Object>> listMap = elasticsearchUtil.excuteDataModel(mysql.toString());
             return  listMap;
@@ -417,6 +420,7 @@ public class EsResultExtract {
             if(StringUtils.isNotEmpty(orderFild) && StringUtils.isNotEmpty(order)){
                 mysql.append(" order by ").append(orderFild).append(" ").append(order);
             }
+            mysql.append(" limit 10000 ");
             System.out.println("查询分组 mysql= " + mysql.toString());
             List<Map<String, Object>> listMap = elasticsearchUtil.excuteDataModel(mysql.toString());
             return  listMap;

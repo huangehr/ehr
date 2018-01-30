@@ -30,13 +30,13 @@ public interface RedisServiceClient {
             @RequestParam("dataSetCode") String dataSetCode,
             @RequestParam("innerCode") String innerCode);
 
-    @RequestMapping(value = ServiceApi.Redis.StdMetadataType, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Redis.StdMetadataFormat, method = RequestMethod.GET)
     String getMetaDataFormat(
             @RequestParam("version") String version,
             @RequestParam("dataSetCode") String dataSetCode,
             @RequestParam("innerCode") String innerCode);
 
-    @RequestMapping(value = ServiceApi.Redis.StdMetadataType, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Redis.StdMetadataNullable, method = RequestMethod.GET)
     Boolean isMetaDataNullable(
             @RequestParam("version") String version,
             @RequestParam("dataSetCode") String dataSetCode,

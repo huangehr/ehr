@@ -522,6 +522,7 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
     public Envelop getArchiveDistribution() {
         Envelop envelop = new Envelop();
         //获取年龄字典
+        /**
         List<SystemDictEntry> ageDictEntryList = statisticService.getSystemDictEntry((long)89);
         if (ageDictEntryList != null) {
             Map<String, Integer> ageMap = new LinkedHashMap<>();
@@ -624,22 +625,64 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
             envelop.setSuccessFlg(true);
             envelop.setDetailModelList(resultList);
             return envelop;
+        }*/
+        Map<String, Integer> ageMap = getDefaultAgeMap();
+        List<Object []> allGroup = statisticService.newStatisticsDemographicsAgeCount();
+        Map<String, BigInteger> maleGroup = new HashMap<>();
+        Map<String, BigInteger> femaleGroup = new HashMap<>();
+        for(Object [] dataArr : allGroup) {
+            String gender = (String) dataArr[2];
+            String age = (String) dataArr[1];
+            BigInteger count = (BigInteger) dataArr[0];
+            if(gender.equals("1")) {
+                maleGroup.put(age, count);
+            }else {
+                femaleGroup.put(age, count);
+            }
         }
+        List<String> xData = new ArrayList<>();
+        List<BigInteger> yData = new ArrayList<>();
+        List<String> xData1 = new ArrayList<>();
+        List<BigInteger> yData1 = new ArrayList<>();
+        for(String key : ageMap.keySet()) {
+            xData.add(key);
+            xData1.add(key);
+            if(maleGroup.containsKey(key)) {
+                yData.add(maleGroup.get(key));
+            }else {
+                yData.add(new BigInteger("0"));
+            }
+            if(femaleGroup.containsKey(key)) {
+                yData1.add(femaleGroup.get(key));
+            }else {
+                yData1.add(new BigInteger("0"));
+            }
+        }
+        List<Map> resultList = new ArrayList<>(2);
+        Map<String, Object> resultMap = new HashMap<>(4);
+        resultMap.put("name", "男");
+        resultMap.put("dataModels", null);
+        resultMap.put("xData", xData);
+        resultMap.put("yData", yData);
+        resultList.add(resultMap);
+        Map<String, Object> resultMap1 = new HashMap<>(4);
+        resultMap1.put("name", "女");
+        resultMap1.put("dataModels", null);
+        resultMap1.put("xData", xData1);
+        resultMap1.put("yData", yData1);
+        resultList.add(resultMap1);
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(resultList);
+        return envelop;
     }
 
     private  Map<String, Integer> getDefaultAgeMap() {
-        Map<String, Integer> map = new LinkedHashMap<>(11);
-        map.put("0-1", 0);
-        map.put("1-10", 0);
-        map.put("11-20", 0);
-        map.put("21-30", 0);
-        map.put("31-40", 0);
-        map.put("41-50", 0);
-        map.put("51-60", 0);
-        map.put("61-70", 0);
-        map.put("71-80", 0);
-        map.put("81-90", 0);
-        map.put("> 90", 0);
+        Map<String, Integer> map = new LinkedHashMap<>(5);
+        map.put("0-6", 0);
+        map.put("7-17", 0);
+        map.put("18-40", 0);
+        map.put("41-65", 0);
+        map.put("> 65", 0);
         return map;
     }
 
@@ -782,27 +825,21 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.Resources.GetElectronicMedicalDeptDistributed, method = RequestMethod.GET)
     @ApiOperation(value = "电子病例 - 电子病历采集科室分布")
-    public Envelop getElectronicMedicalDeptDistributed() {
+    public Envelop getElectronicMedicalDeptDistributed() throws Exception{
         Envelop envelop = new Envelop();
-        try {
-            FacetField facetField = solrUtil.getFacetField("HealthProfile", "EHR_000081", null, 0, 0, 1000000, false);
-            List<FacetField.Count> countList = facetField.getValues();
-            Map<String, Long> dataMap = new HashMap<>(countList.size());
-            for (FacetField.Count count : countList) {
-                String orgCode = count.getName();
-                String orgName = statisticService.getOrgNameByCode(orgCode);
-                if (!StringUtils.isEmpty(orgName)) {
-                    long count1 = count.getCount();
-                    dataMap.put(orgName, count1);
-                }
+        FacetField facetField = solrUtil.getFacetField("HealthProfile", "EHR_000081", null, 0, 0, 1000000, false);
+        List<FacetField.Count> countList = facetField.getValues();
+        Map<String, Long> dataMap = new HashMap<>(countList.size());
+        for (FacetField.Count count : countList) {
+            String orgCode = count.getName();
+            String deptName = statisticService.getDeptNameByCode(orgCode);
+            if (!StringUtils.isEmpty(deptName)) {
+                long count1 = count.getCount();
+                dataMap.put(deptName, count1);
             }
-            envelop.setSuccessFlg(true);
-            envelop.setObj(dataMap);
-        }catch (Exception e) {
-            e.printStackTrace();
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg(e.getMessage());
         }
+        envelop.setSuccessFlg(true);
+        envelop.setObj(dataMap);
         return envelop;
     }
 
