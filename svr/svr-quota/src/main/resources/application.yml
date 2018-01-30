@@ -115,4 +115,4 @@ spring:
 
 elasticsearch:
   cluster-name: elasticsearch
-  cluster-nodes: 172.19.103.9:9300
+  cluster-nodes: 10.176.97.7:9300
