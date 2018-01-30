@@ -180,46 +180,48 @@ public class BaseStatistsService {
     public List<Map<String, Object>> division(String dimension, List<Map<String, Object>> moleList, List<Map<String, Object>> denoList,int operation,int operationValue){
         List<Map<String, Object>> divisionResultList = new ArrayList<>();
         for(Map<String, Object> moleMap :moleList) {
-            Map<String, Object> map = new HashMap<>();
-            double moleResultVal = Double.valueOf(moleMap.get("result") == null ? "0" : moleMap.get("result").toString());
-            String moleKeyVal = "";
-            String [] moleDimensions = dimension.split(";");
-            for(int i = 0 ;i < moleDimensions.length ; i++){
-                if(i == 0){
-                    moleKeyVal = moleMap.get(moleDimensions[i]).toString();
-                }else {
-                    moleKeyVal = moleKeyVal + "-" + moleMap.get(moleDimensions[i]).toString() ;
-                }
-                map.put(moleDimensions[i], moleMap.get(moleDimensions[i]).toString());
-            }
-            if (moleResultVal == 0) {
-                map.put("result",0);
-                divisionResultList.add(map);
-            } else {
-                for(Map<String, Object> denoMap :denoList) {
-                    String dimenKeyVal = "";
-                    String [] dimeDimensions = dimension.split(";");
-                    for(int i = 0 ;i < dimeDimensions.length ; i++){
-                        if(i == 0){
-                            dimenKeyVal = denoMap.get(dimeDimensions[i]).toString();
-                        }else {
-                            dimenKeyVal = dimenKeyVal + "-" + denoMap.get(dimeDimensions[i]).toString() ;
-                        }
+            if (null != moleMap && moleMap.size() > 0 ) {
+                Map<String, Object> map = new HashMap<>();
+                double moleResultVal = Double.valueOf(moleMap.get("result") == null ? "0" : moleMap.get("result").toString());
+                String moleKeyVal = "";
+                String [] moleDimensions = dimension.split(";");
+                for(int i = 0 ;i < moleDimensions.length ; i++){
+                    if(i == 0){
+                        moleKeyVal = moleMap.get(moleDimensions[i]).toString();
+                    }else {
+                        moleKeyVal = moleKeyVal + "-" + moleMap.get(moleDimensions[i]).toString() ;
                     }
-                    if(moleKeyVal.equals(dimenKeyVal)){
-                        double point = 0;
-                        DecimalFormat df = new DecimalFormat("0.0");
-                        float dimeResultVal = Float.valueOf(denoMap.get("result").toString());
-                        if(dimeResultVal != 0){
-                            if(operation == 1){
-                                point = (moleResultVal/dimeResultVal) * operationValue;
-                            }else if(operation == 2){
-                                point = (moleResultVal/dimeResultVal) / operationValue;
+                    map.put(moleDimensions[i], moleMap.get(moleDimensions[i]).toString());
+                }
+                if (moleResultVal == 0) {
+                    map.put("result",0);
+                    divisionResultList.add(map);
+                } else {
+                    for(Map<String, Object> denoMap :denoList) {
+                        String dimenKeyVal = "";
+                        String [] dimeDimensions = dimension.split(";");
+                        for(int i = 0 ;i < dimeDimensions.length ; i++){
+                            if(i == 0){
+                                dimenKeyVal = denoMap.get(dimeDimensions[i]).toString();
+                            }else {
+                                dimenKeyVal = dimenKeyVal + "-" + denoMap.get(dimeDimensions[i]).toString() ;
                             }
                         }
-                        map.put("result",df.format(point));
-                        divisionResultList.add(map);
-                        break;
+                        if(moleKeyVal.equals(dimenKeyVal)){
+                            double point = 0;
+                            DecimalFormat df = new DecimalFormat("0.0");
+                            float dimeResultVal = Float.valueOf(denoMap.get("result").toString());
+                            if(dimeResultVal != 0){
+                                if(operation == 1){
+                                    point = (moleResultVal/dimeResultVal) * operationValue;
+                                }else if(operation == 2){
+                                    point = (moleResultVal/dimeResultVal) / operationValue;
+                                }
+                            }
+                            map.put("result",df.format(point));
+                            divisionResultList.add(map);
+                            break;
+                        }
                     }
                 }
             }
@@ -425,7 +427,8 @@ public class BaseStatistsService {
                 if(dimenList.contains(key)){
                     if(dimensionDicMap.get(map.get(key).toString().toLowerCase())  != null){
 //                        dataMap.put(key,dimensionDicMap.get(map.get(key).toString().toLowerCase()));
-                        dataMap.put(key,map.get(key).toString());
+//                        dataMap.put(key,map.get(key).toString());
+                        dataMap.put(key,dimensionDicMap.get(map.get(key).toString().toLowerCase()));
                         dataMap.put(key+"Name",dimensionDicMap.get(map.get(key).toString().toLowerCase()));
                         dataMap.put("firstColumn",dimensionDicMap.get(map.get(key).toString().toLowerCase()));
                     }else {
