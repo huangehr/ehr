@@ -20,6 +20,11 @@
             <artifactId>elasticsearch</artifactId>
             <version>2.4.5</version>
         </dependency>
+        <dependency>
+            <groupId>org.nlpcn</groupId>
+            <artifactId>elasticsearch-sql</artifactId>
+            <version>2.4.1.0</version>
+        </dependency>
         <!-- ElasticSearch -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
