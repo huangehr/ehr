@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 
 import java.net.URLDecoder;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -353,7 +354,8 @@ public class BaseStatistsService {
                     dataMap.put("firstColumn",map.get("text"));
                 }
                 if(key.equals("SUM(result)")){
-                    dataMap.put("result", map.get(key).toString());
+                    NumberFormat nf = NumberFormat.getInstance();
+                    dataMap.put("result",  nf.format(map.get(key)));
                 }
             }
              resultList.add(dataMap);
@@ -391,7 +393,8 @@ public class BaseStatistsService {
                     dataMap.put(map.get(orgHealthCategoryCode).toString(),map.get(orgHealthCategoryCode));
                 }
                 if(key.equals("SUM(result)")){
-                    dataMap.put("result", map.get(key).toString());
+                    NumberFormat nf = NumberFormat.getInstance();
+                    dataMap.put("result",  nf.format(map.get(key)));
                 }
                 if(key.equals("quotaDate")){
                     SimpleDateFormat format =  new SimpleDateFormat("yyyy-MM-dd");
@@ -441,7 +444,8 @@ public class BaseStatistsService {
                     dataMap.put("firstColumn",map.get("text"));
                 }
                 if(key.equals("SUM(result)")){
-                    dataMap.put("result", map.get(key).toString());
+                    NumberFormat nf = NumberFormat.getInstance();
+                    dataMap.put("result",  nf.format(map.get(key)));
                 }
             }
             resultList.add(dataMap);
