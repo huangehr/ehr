@@ -50,7 +50,7 @@ spring:
 
 elasticsearch:
   cluster-name: elasticsearch
-  cluster-nodes: 172.17.110.17:9300
+  cluster-nodes: 172.19.103.9:9300
 ---
 spring:
   profiles: test
@@ -66,7 +66,7 @@ spring:
 
 elasticsearch:
   cluster-name: elasticsearch
-  cluster-nodes: 172.17.110.17:9300
+  cluster-nodes: 172.19.103.9:9300
 
 ---
 spring:
@@ -83,7 +83,7 @@ spring:
 
 elasticsearch:
   cluster-name: elasticsearch
-  cluster-nodes: 172.17.110.17:9300
+  cluster-nodes: 172.19.103.9:9300
 ---
 spring:
   profiles: prod_fz
@@ -98,7 +98,7 @@ spring:
 
 elasticsearch:
   cluster-name: elasticsearch
-  cluster-nodes: 172.17.110.17:9300
+  cluster-nodes: 172.19.103.9:9300
 
 ---
 spring:
@@ -115,4 +115,4 @@ spring:
 
 elasticsearch:
   cluster-name: elasticsearch
-  cluster-nodes: 172.17.110.17:9300
+  cluster-nodes: 172.19.103.9:9300
