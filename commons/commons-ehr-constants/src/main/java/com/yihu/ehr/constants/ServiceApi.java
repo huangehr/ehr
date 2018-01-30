@@ -526,7 +526,6 @@ public class ServiceApi {
         public static final String MessageRemindCount = "/portal/messageRemind/count";
         public static final String MessageRemindRead = "/portal/messageRemind/read/{remindId}";
         public static final String NoticesTop = "/portal/notices/top";
-        public static final String NoticesAdmin = "/portal/notices/admin/{portalNotice_id}";
         public static final String Feedback = "/portal/feedback";
         public static final String ResourceTop = "/portal/resource/top";
         public static final String QuotaCategoryOfChild = "/portal/quotaCategoryOfChild";
