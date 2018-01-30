@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * 缓存Key规则 Service
  *
@@ -26,6 +28,10 @@ public class RedisCacheKeyRuleService extends BaseJpaService<RedisCacheKeyRule, 
 
     public RedisCacheKeyRule findByCode(String code) {
         return redisCacheKeyRuleDao.findByCode(code);
+    }
+
+    public List<RedisCacheKeyRule> findByCategoryCode(String categoryCode) {
+        return redisCacheKeyRuleDao.findByCategoryCode(categoryCode);
     }
 
     @Transactional(readOnly = false)

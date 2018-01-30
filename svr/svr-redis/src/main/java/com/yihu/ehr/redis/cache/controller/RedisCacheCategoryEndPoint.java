@@ -5,7 +5,9 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.model.redis.MRedisCacheCategory;
 import com.yihu.ehr.redis.cache.entity.RedisCacheCategory;
+import com.yihu.ehr.redis.cache.entity.RedisCacheKeyRule;
 import com.yihu.ehr.redis.cache.service.RedisCacheCategoryService;
+import com.yihu.ehr.redis.cache.service.RedisCacheKeyRuleService;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -29,6 +31,8 @@ public class RedisCacheCategoryEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     private RedisCacheCategoryService redisCacheCategoryService;
+    @Autowired
+    private RedisCacheKeyRuleService redisCacheKeyRuleService;
 
     @ApiOperation("根据ID获取缓存分类")
     @RequestMapping(value = ServiceApi.Redis.CacheCategory.GetById, method = RequestMethod.GET)
@@ -151,10 +155,16 @@ public class RedisCacheCategoryEndPoint extends EnvelopRestEndPoint {
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
         try {
-            redisCacheCategoryService.delete(id);
-
-            envelop.setSuccessFlg(true);
-            envelop.setErrorMsg("成功删除缓存分类。");
+            RedisCacheCategory category = redisCacheCategoryService.getById(id);
+            List<RedisCacheKeyRule> redisCacheKeyRuleList = redisCacheKeyRuleService.findByCategoryCode(category.getCode());
+            if (redisCacheKeyRuleList.size() > 0) {
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg("该缓存分类已有 Key 规则在使用，请确认清理对应 Key 规则之后，再来删除该缓存分类。");
+            } else {
+                redisCacheCategoryService.delete(id, category.getCode());
+                envelop.setSuccessFlg(true);
+                envelop.setErrorMsg("成功删除缓存分类。");
+            }
         } catch (Exception e) {
             e.printStackTrace();
             envelop.setErrorMsg("删除缓存分类发生异常：" + e.getMessage());

@@ -202,3 +202,25 @@ ehr-redis:
     pubsub:
       publisherAppId: svr-redis
       responseTimeChannel: redis.cache.reponse-time
+
+---
+spring:
+  profiles: prod_fzzy
+
+  redis:
+    host: 100.100.1.161 # Redis server host.
+    port: 6390
+    password: q4YaQemf
+  datasource:
+    url: jdbc:mysql://100.100.1.159:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: healthcloud
+    password: GP8Qz4qU
+
+fast-dfs:
+  tracker-server: 100.100.1.157:22122
+  public-server: http://100.100.1.157:8888
+ehr-redis:
+  mq:
+    pubsub:
+      publisherAppId: svr-redis
+      responseTimeChannel: redis.cache.reponse-time

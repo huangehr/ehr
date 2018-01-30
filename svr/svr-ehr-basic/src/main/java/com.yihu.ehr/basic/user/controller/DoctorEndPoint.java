@@ -121,7 +121,13 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
         User user =new User();
         user.setId(getObjectId(BizObject.User));
         user.setCreateDate(new Date());
-        user.setPassword(DigestUtils.md5Hex(default_password));
+        String defaultPassword="";
+        if(!StringUtils.isEmpty(doctor.getIdCardNo())&&doctor.getIdCardNo().length()>7){
+            defaultPassword=doctor.getIdCardNo().substring(doctor.getIdCardNo().length()-6,doctor.getIdCardNo().length());
+            user.setPassword(DigestUtils.md5Hex(defaultPassword));
+        }else{
+            user.setPassword(DigestUtils.md5Hex(default_password));
+        }
         if(StringUtils.isEmpty(d.getRoleType())){
             user.setUserType("5");
         }else{
@@ -144,7 +150,12 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
 
         //创建居民
         DemographicInfo demographicInfo =new DemographicInfo();
-        demographicInfo.setPassword(DigestUtils.md5Hex(default_password));
+        if(!StringUtils.isEmpty(doctor.getIdCardNo())&&doctor.getIdCardNo().length()>7){
+            defaultPassword=doctor.getIdCardNo().substring(doctor.getIdCardNo().length()-6,doctor.getIdCardNo().length());
+            demographicInfo.setPassword(DigestUtils.md5Hex(defaultPassword));
+        }else{
+            demographicInfo.setPassword(DigestUtils.md5Hex(default_password));
+        }
         demographicInfo.setRegisterTime(new Date());
         demographicInfo.setIdCardNo(d.getIdCardNo());
         demographicInfo.setName(d.getName());
