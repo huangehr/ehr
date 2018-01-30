@@ -84,14 +84,16 @@ public class RsResourceGrantController extends BaseController {
     public Object resourceGrantTree(
             @ApiParam(name = "resourceId", value = "返回字段", defaultValue = "")
             @RequestParam(value = "resourceId", required = true) String resourceId) throws Exception {
-        try
-        {
+        try {
             List<MRsAppResource> rsAppResources = searchGrantApp("", "resourceId="+resourceId, "" ,1 ,500);
             String ids = "";
             Map<String, String> mapping = new HashMap<>();
             for(MRsAppResource appResource: rsAppResources){
                 ids += "," + appResource.getAppId();
                 mapping.put(appResource.getAppId(), appResource.getId());
+            }
+            if(StringUtils.isEmpty(ids)) {
+                return new ArrayList<>(0);
             }
             List<MApp> apps = searchApp("", "id=" + ids.substring(1), "+org", 1, 500);
             ids = "";
@@ -133,7 +135,7 @@ public class RsResourceGrantController extends BaseController {
         }
         catch (Exception e) {
             e.printStackTrace();
-            return failed("获取数据错误！");
+            return failed(e.getMessage());
         }
     }
 
