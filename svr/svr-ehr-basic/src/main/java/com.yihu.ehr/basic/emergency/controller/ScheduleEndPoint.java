@@ -93,7 +93,7 @@ public class ScheduleEndPoint extends EnvelopRestEndPoint {
             List<Object> resultList = new ArrayList<Object>();
             List<java.sql.Date> dateGroup = scheduleService.getDateGroup(date, page, size);
             for(int i = 0; i < dateGroup.size(); i ++) {
-                for(int j = 0; j <= 1; j ++) {
+                for(int j = 1; j >= 0 ; j --) {
                     Map<String, Object> middleMap1 = new HashMap<String, Object>();
                     java.sql.Date date1 = dateGroup.get(i);
                     //时间节点
