@@ -107,9 +107,9 @@ public class AppEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "获取App")
     public MApp getApp(
             @ApiParam(name = "app_id", value = "id")
-            @PathVariable(value = "app_id") String appId) throws Exception {
+            @RequestParam(value = "app_id") String appId) throws Exception {
         App app = appService.retrieve(appId);
-        if (StringUtils.isNotEmpty(app.getIcon())) {
+        if (app != null && StringUtils.isNotEmpty(app.getIcon())) {
             String iconUrl = fastDfsPublicServers + "/" + app.getIcon().replace(":", "/");
             app.setIcon(iconUrl);
         }
