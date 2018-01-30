@@ -248,7 +248,20 @@ public class QuotaReportController extends BaseController {
                     List<Map<String, Object>> datalist = new ArrayList<>();
                     for(Map<String, Object> resultMap :listMap){
                         Map<String, Object> map = new HashMap<>();
-                        map.put("NAME",resultMap.get(dimensionName));
+                        if(resultMap.get(dimensionName) != null){
+                            map.put("NAME",resultMap.get(dimensionName));
+                        }else {
+                            //非 指标中配置的维度 关联出来的字段
+                            if(dimensionName.equals("levelName")){
+                                if(resultMap.get(dimension).equals("1")){
+                                    map.put("NAME","一级医院");
+                                }else  if(resultMap.get(dimension).equals("2")){
+                                    map.put("NAME","二级医院");
+                                }else  if(resultMap.get(dimension).equals("3")){
+                                    map.put("NAME","三级医院");
+                                }
+                            }
+                        }
                         map.put("TOTAL",resultMap.get("result"));
                         datalist.add(map);
                     }
