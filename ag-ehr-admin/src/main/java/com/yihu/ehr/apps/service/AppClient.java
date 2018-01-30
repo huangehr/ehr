@@ -51,7 +51,7 @@ public interface AppClient {
     @ApiOperation(value = "获取App")
     MApp getApp(
             @ApiParam(name = "app_id", value = "id", defaultValue = "")
-            @PathVariable(value = "app_id") String appId);
+            @RequestParam(value = "app_id") String appId);
 
     @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Apps.Apps, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "更新App")
