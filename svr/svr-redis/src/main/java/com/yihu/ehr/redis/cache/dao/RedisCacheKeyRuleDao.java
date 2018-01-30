@@ -5,6 +5,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 /**
  * 缓存Key生成规则 DAO
  *
@@ -14,6 +16,8 @@ import org.springframework.data.repository.query.Param;
 public interface RedisCacheKeyRuleDao extends PagingAndSortingRepository<RedisCacheKeyRule, Integer> {
 
     RedisCacheKeyRule findByCode(@Param("code") String code);
+
+    List<RedisCacheKeyRule> findByCategoryCode(@Param("categoryCode") String categoryCode);
 
     @Query(" FROM RedisCacheKeyRule a WHERE a.id <> :id AND a.name = :name ")
     RedisCacheKeyRule isUniqueName(@Param("id") Integer id, @Param("name") String name);
