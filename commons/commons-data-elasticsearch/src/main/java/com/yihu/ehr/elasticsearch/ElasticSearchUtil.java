@@ -1,18 +1,23 @@
 package com.yihu.ehr.elasticsearch;
 
+import com.alibaba.druid.pool.DruidDataSource;
+import com.alibaba.druid.pool.ElasticSearchDruidDataSourceFactory;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.index.engine.DocumentMissingException;
 import org.elasticsearch.index.query.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.text.ParseException;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Util - Es搜索服务
@@ -24,6 +29,8 @@ public class ElasticSearchUtil {
 
     @Autowired
     private ElasticSearchClient elasticSearchClient;
+    @Value("${elasticsearch.cluster-nodes}")
+    protected String clusterNodes;
 
     public void mapping(String index, String type, Map<String, Map<String, String>> source) throws IOException{
         XContentBuilder xContentBuilder = XContentFactory.jsonBuilder().startObject().startObject("properties");
@@ -139,4 +146,30 @@ public class ElasticSearchUtil {
         return boolQueryBuilder;
     }
 
+    public List<Map<String, Object>> findBySql(List<String> field, String sql){
+        List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
+        try {
+            Properties properties = new Properties();
+            properties.put("url", "jdbc:elasticsearch://"+clusterNodes+"/");
+            DruidDataSource dds= (DruidDataSource) ElasticSearchDruidDataSourceFactory
+                    .createDataSource(properties);
+            dds.setInitialSize(1);
+            Connection connection = dds.getConnection();
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Map<String,Object> rowData = new HashMap<String,Object>();
+                for (int i = 0; i < field.size(); i++) {
+                    rowData.put(field.get(i), rs.getObject(i));
+                }
+                list.add(rowData);
+            }
+            ps.close();
+            connection.close();
+            dds.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return list;
+    }
 }
