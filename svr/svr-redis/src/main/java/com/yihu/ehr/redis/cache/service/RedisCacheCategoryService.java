@@ -1,6 +1,7 @@
 package com.yihu.ehr.redis.cache.service;
 
 import com.yihu.ehr.query.BaseJpaService;
+import com.yihu.ehr.redis.cache.dao.RedisCacheAuthorizationDao;
 import com.yihu.ehr.redis.cache.dao.RedisCacheCategoryDao;
 import com.yihu.ehr.redis.cache.entity.RedisCacheCategory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,9 @@ public class RedisCacheCategoryService extends BaseJpaService<RedisCacheCategory
 
     @Autowired
     RedisCacheCategoryDao redisCacheCategoryDao;
-    
+    @Autowired
+    RedisCacheAuthorizationDao redisCacheAuthorizationDao;
+
     public RedisCacheCategory getById(Integer id) {
         return redisCacheCategoryDao.findOne(id);
     }
@@ -30,7 +33,8 @@ public class RedisCacheCategoryService extends BaseJpaService<RedisCacheCategory
     }
 
     @Transactional(readOnly = false)
-    public void delete(Integer id) {
+    public void delete(Integer id, String code) {
+        redisCacheAuthorizationDao.deleteByCategoryCode(code);
         redisCacheCategoryDao.delete(id);
     }
 
