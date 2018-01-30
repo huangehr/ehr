@@ -456,6 +456,8 @@ public class ServiceApi {
         public static final String DailyReport = "packAnalyzer/dailyReport";
         public static final String List = "packAnalyzer/list";
         public static final String FindByField = "packAnalyzer/findByField";
+        public static final String FindBySql = "packAnalyzer/findBySql";
+        public static final String EsSaveData = "packAnalyzer/esSaveData";
     }
 
 
@@ -1237,6 +1239,7 @@ public class ServiceApi {
         public static final String GetArchivesInc = "/stasticReport/getArchivesInc";
         public static final String GetArchivesFull = "/stasticReport/getArchivesFull";
         public static final String GetArchivesTime = "/stasticReport/getArchivesTime";
+        public static final String GetDataSetCount = "/stasticReport/getDataSetCount";
 
     }
 
