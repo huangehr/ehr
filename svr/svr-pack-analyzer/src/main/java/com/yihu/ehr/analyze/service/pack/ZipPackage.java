@@ -2,12 +2,10 @@ package com.yihu.ehr.analyze.service.pack;
 
 import com.yihu.ehr.analyze.config.FastdfsConfig;
 import com.yihu.ehr.constants.ProfileType;
-import com.yihu.ehr.hbase.HBaseAdmin;
 import com.yihu.ehr.hbase.HBaseDao;
 import com.yihu.ehr.hbase.TableBundle;
 import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.model.packs.MPackage;
-import com.yihu.ehr.profile.core.ResourceCore;
 import com.yihu.ehr.util.compress.Zipper;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.log.LogService;
@@ -141,8 +139,6 @@ public class ZipPackage {
     }
 
     private void saveDataSet(DataSetRecord dataSetRecord) throws Exception {
-        createTable(dataSetRecord.getCode());
-
         ApplicationContext context = SpringContext.getApplicationContext();
         HBaseDao hBaseDao = context.getBean(HBaseDao.class);
 
@@ -151,10 +147,10 @@ public class ZipPackage {
 
         TableBundle bundle = new TableBundle();
         if (dataSetRecord.isReUploadFlg()) {
-            String legacyRowKeys[] = hBaseDao.findRowKeys(ResourceCore.MasterTable, "^" + rowKeyPrefix);
+            String legacyRowKeys[] = hBaseDao.findRowKeys(table, "^" + rowKeyPrefix);
             if (legacyRowKeys != null && legacyRowKeys.length > 0) {
                 bundle.addRows(legacyRowKeys);
-                hBaseDao.delete(ResourceCore.MasterTable, bundle);
+                hBaseDao.delete(table, bundle);
             }
         }
 
@@ -163,7 +159,7 @@ public class ZipPackage {
             String rowKey = dataSetRecord.genRowKey(key);
             String legacy = hBaseDao.get(table, rowKey);
             if (StringUtils.isNotEmpty(legacy)) {
-                hBaseDao.delete(ResourceCore.MasterTable, rowKey);
+                hBaseDao.delete(table, rowKey);
             }
 
             Map<String, String> dataGroup = metaDataRecord.getDataGroup();
@@ -178,21 +174,6 @@ public class ZipPackage {
 
             hBaseDao.save(table, bundle);
         });
-    }
-
-
-    private synchronized void createTable(String table) throws Exception {
-        boolean created = tableSet.contains(table);
-        if (created) {
-            return;
-        }
-
-        ApplicationContext context = SpringContext.getApplicationContext();
-        HBaseAdmin hBaseAdmin = context.getBean(HBaseAdmin.class);
-        if (!hBaseAdmin.isTableExists(table)) {
-            hBaseAdmin.createTable(table, DATA);
-            tableSet.add(table);
-        }
     }
 
 }

@@ -240,7 +240,7 @@ fast-dfs:
   public-server: http://10.176.97.5:8888
 elasticsearch:
   cluster-name: elasticsearch
-  cluster-nodes: localhost:9300
+  cluster-nodes: 10.176.97.7:9300
 hadoop:
   hbase-properties:
     #- hbase.zookeeper.quorum: node2.jkzl.com,node3.jkzl.com,node1.jkzl.com

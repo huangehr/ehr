@@ -54,12 +54,12 @@ public class PortalResourcesController extends BaseController {
             @RequestParam(value = "page", required = false) int page) throws Exception{
         String filters = "";
         if(!StringUtils.isEmpty(startTime)){
-            filters += "releaseDate>"+changeToUtc(startTime)+";";
+            filters += "uploadTime>"+changeToUtc(startTime)+";";
         }
         if(!StringUtils.isEmpty(endTime)){
-            filters += "releaseDate<"+changeToUtc(endTime)+";";
+            filters += "uploadTime<"+changeToUtc(endTime)+";";
         }
-        String sorts = "+releaseDate";
+        String sorts = "+uploadTime";
         ResponseEntity<List<MPortalResources>> responseEntity = portalResourcesClient.searchPortalResources(null, filters, sorts, size, page);
         List<MPortalResources> mPortalResourcesList = responseEntity.getBody();
         List<PortalResourcesModel> portalResourcesModels = new ArrayList<>();
