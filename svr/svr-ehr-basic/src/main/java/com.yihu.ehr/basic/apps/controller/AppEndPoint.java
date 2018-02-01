@@ -103,7 +103,7 @@ public class AppEndPoint extends EnvelopRestEndPoint {
         return convertToModel(app, MApp.class);
     }
 
-    @RequestMapping(value = ServiceApi.Apps.App, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Apps.getApp, method = RequestMethod.GET)
     @ApiOperation(value = "获取App")
     public MApp getApp(
             @ApiParam(name = "app_id", value = "id")
@@ -120,12 +120,14 @@ public class AppEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "删除App")
     public boolean deleteApp(
             @ApiParam(name = "app_id", value = "id")
-            @PathVariable(value = "app_id") String appId) throws Exception {
-        appService.delete(appId);
+            @PathVariable(value = "app_id") String app_id) throws Exception {
+        appService.delete(app_id);
         //删除Oauth
-        oauthClientDetailsService.delete(appId);
+        if (oauthClientDetailsService.findByField("clientId", app_id).size() > 0) {
+            oauthClientDetailsService.delete(app_id);
+        }
         //删除应用角色
-        List<RoleAppRelation> relationList = roleAppRelationService.search("appId=" + appId);
+        List<RoleAppRelation> relationList = roleAppRelationService.search("appId=" + app_id);
         if(relationList != null && relationList.size() > 0) {
             for(RoleAppRelation roleAppRelation : relationList) {
                 roleAppRelationService.delete(roleAppRelation.getId());
