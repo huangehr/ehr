@@ -44,12 +44,16 @@ public interface DoctorClient {
     @ApiOperation(value = "创建医生", notes = "重新绑定医生信息")
     MDoctor createDoctor(
             @ApiParam(name = "doctor_json_data", value = "", defaultValue = "")
-            @RequestBody String doctoJsonData);
+            @RequestBody String doctoJsonData,
+            @ApiParam(name = "model", value = "医生所属机构、部门", defaultValue = "")
+            @RequestParam("model") String model);
 
     @RequestMapping(value = ServiceApi.Doctors.Doctors, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改医生", notes = "重新绑定医生信息")
     MDoctor updateDoctor(@ApiParam(name = "doctor_json_data", value = "", defaultValue = "")
-                         @RequestBody String doctoJsonData);
+                         @RequestBody String doctoJsonData,
+                         @ApiParam(name = "model", value = "医生所属机构、部门", defaultValue = "")
+                         @RequestParam("model") String model);
 
     @RequestMapping(value = ServiceApi.Doctors.DoctorAdmin, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除医生", notes = "根据医生id删除医生")
