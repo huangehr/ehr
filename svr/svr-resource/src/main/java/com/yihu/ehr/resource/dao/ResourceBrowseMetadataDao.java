@@ -70,9 +70,9 @@ public class ResourceBrowseMetadataDao {
         }
         String ids = "";
         if (builder.length() > 1){
-            ids = builder.substring(0, builder.length()-1);
+            ids = builder.substring(0, builder.length() - 1);
         }
-        String sql ="SELECT ID, NAME FROM rs_metadata WHERE ID in(" + ids + ")";
+        String sql ="SELECT id, name FROM rs_metadata WHERE id in(" + ids + ")";
         List<Map<String,Object>> list = jdbcTemplate.queryForList(sql);
         return list;
     }
