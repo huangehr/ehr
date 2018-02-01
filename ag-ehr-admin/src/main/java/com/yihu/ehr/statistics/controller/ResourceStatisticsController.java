@@ -177,4 +177,16 @@ public class ResourceStatisticsController extends BaseController {
             @RequestParam(name = "orgCode",required = false) String orgCode) {
         return resourceStatisticsClient.getDataSetCount(date, orgCode);
     }
+
+    @RequestMapping(value = ServiceApi.StasticReport.GetArchivesRight, method = RequestMethod.GET)
+    @ApiOperation(value = "准确性分析")
+    public Envelop getArchivesRight(
+            @ApiParam(name = "startDate", value = "开始日期")
+            @RequestParam(name = "startDate") String startDate,
+            @ApiParam(name = "endDate", value = "结束日期")
+            @RequestParam(name = "endDate") String endDate,
+            @ApiParam(name = "orgCode", value = "医院代码")
+            @RequestParam(name = "orgCode",required = false) String orgCode) {
+        return resourceStatisticsClient.getArchivesRight(startDate, endDate, orgCode);
+    }
 }

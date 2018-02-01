@@ -585,6 +585,8 @@ public class ResourceStatisticService extends BaseJpaService<JsonArchives, XJson
      */
     public Envelop getDataSetCount(String date, String orgCode) {
         Envelop envelop = new Envelop();
+        Date today = DateUtil.parseDate(date, DateUtil.DEFAULT_DATE_YMD_FORMAT);
+        Date end = DateUtil.addDate(1, today);
         try{
             List<String> fields = new ArrayList<String>();
             fields.add("dataSet");
@@ -592,9 +594,11 @@ public class ResourceStatisticService extends BaseJpaService<JsonArchives, XJson
             fields.add("row");
             String sql ="";
             if(StringUtils.isNotEmpty(orgCode)){
-                sql = "select dataSet,count(dataSet) as count,sum(dataSetRow) as row from qc where receiveTime='"+date+"' and orgCode='"+orgCode+"' group by dataSet";
+                sql = "select dataSet,count(dataSet) as count,sum(dataSetRow) as row from qc/receive_data_set " +
+                        " where receiveTime >= '"+date+"' and receiveTime < '"+DateUtil.toString(end)+"'and orgCode='"+orgCode+"' group by dataSet";
             }else{
-                sql = "select dataSet,count(dataSet) as count,sum(dataSetRow) as row from qc where receiveTime='"+date+"' group by dataSet";
+                sql = "select dataSet,count(dataSet) as count,sum(dataSetRow) as row from qc/receive_data_set " +
+                        " where receiveTime >= '"+date+"' and receiveTime < '"+DateUtil.toString(end)+"' group by dataSet";
             }
             List<Map<String, Object>> list = dailyReportClient.findBySql(objectMapper.writeValueAsString(fields),sql);
             envelop.setDetailModelList(list);
@@ -605,5 +609,149 @@ public class ResourceStatisticService extends BaseJpaService<JsonArchives, XJson
             envelop.setErrorMsg(e.getMessage());
         }
         return envelop;
+    }
+
+    public Envelop getArchivesRight(String startDate, String endDate, String orgCode) {
+        Envelop envelop = new Envelop();
+        try{
+            Date start = DateUtil.formatCharDateYMD(startDate);
+            Date end = DateUtil.formatCharDateYMD(endDate);
+            int day = (int) ((end.getTime() - start.getTime()) / (1000*3600*24))+1;
+            List<Map<String, Object>> dataSetCountList = new ArrayList<Map<String, Object>>();
+            Map<String,Object> resMap = new HashMap<String,Object>();
+            for(int i =0;i<day;i++){
+                Map<String,Object> map = new HashMap<String,Object>();
+                Date date = DateUtil.addDate(i,start);
+                Map<String,Object> dataSetCount = getErrorDataSetCount(DateUtil.toString(date), orgCode);
+                map.put(DateUtil.toString(date),dataSetCount);
+                dataSetCountList.add(map);
+            }
+            List<Map<String, Object>> errorCodeList = getErrorCode(startDate, endDate, orgCode);
+            List<Map<String, Object>> codeList = getCode(startDate, endDate, orgCode);
+            resMap.put("dataSet",dataSetCountList);
+            resMap.put("errorCode",errorCodeList);
+            resMap.put("code",codeList);
+            envelop.setObj(resMap);
+            envelop.setSuccessFlg(true);
+        }catch(Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return envelop;
+    }
+
+    /**
+     * 获取数据集数量和环比
+     * @param date
+     * @param orgCode
+     * @return
+     */
+    public Map<String,Object> getErrorDataSetCount(String date, String orgCode) {
+        Map<String,Object> map = new HashMap<String,Object>();
+        try{
+            Date today = DateUtil.parseDate(date, DateUtil.DEFAULT_DATE_YMD_FORMAT);
+            Date yesterday = DateUtil.addDate(-1, today);
+            Date end = DateUtil.addDate(1, today);
+            List<String> fields = new ArrayList<String>();
+            fields.add("count");
+            String sql1 ="";
+            String sql2 ="";
+            if(StringUtils.isNotEmpty(orgCode)){
+                sql1 = "select count(code) as count from qc/receive_data_element where " +
+                        " receiveTime>='"+date+"' and receiveTime<'"+DateUtil.toString(end)+"' and orgCode='"+orgCode+"'";
+                sql2 = "select count(code) as count from qc/receive_data_element where " +
+                        "   receiveTime='"+DateUtil.toString(yesterday)+"' and receiveTime<'"+date+"' and orgCode='"+orgCode+"'";
+            }else{
+                sql1 = "select count(code) as count from qc/receive_data_element where " +
+                        " receiveTime>='"+date+"' and receiveTime<'"+DateUtil.toString(end)+"'";
+                sql2 = "select count(code) as count from qc/receive_data_element where " +
+                        " receiveTime>='"+DateUtil.toString(yesterday)+"' and receiveTime<'"+date+"'";
+            }
+            double num1=0;
+            double num2=0;
+            List<Map<String, Object>> list1 = dailyReportClient.findBySql(objectMapper.writeValueAsString(fields),sql1);
+            if(list1!=null&&list1.size()>0){
+                num1= (double)(list1.get(0).get("count"));
+            }
+            List<Map<String, Object>> list2 = dailyReportClient.findBySql(objectMapper.writeValueAsString(fields),sql2);
+            if(list2!=null&&list2.size()>0){
+                num2= (double)(list2.get(0).get("count"));
+            }
+            map.put("count",num1);
+            if(num2!=0){
+                map.put("rate",(num1-num2)/num2*100);
+            }else{
+                map.put("rate",0);
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+            map.put("count",0);
+            map.put("rate",0);
+        }
+        return map;
+    }
+
+    /**
+     * 错误数据按规则分类占比
+     * @param startDate
+     * @param endDate
+     * @param orgCode
+     * @return
+     */
+    public List<Map<String,Object>> getErrorCode(String startDate, String endDate, String orgCode){
+        List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+        Date today = DateUtil.parseDate(endDate, DateUtil.DEFAULT_DATE_YMD_FORMAT);
+        Date end = DateUtil.addDate(1, today);
+        try {
+            List<String> fields = new ArrayList<String>();
+            fields.add("errorCode");
+            fields.add("count");
+            String sql = "";
+            if (StringUtils.isNotEmpty(orgCode)) {
+                sql = "select errorCode,count(errorCode) as count  from qc/receive_data_element " +
+                        " where receiveTime>='"+startDate+"' and receiveTime<='"+DateUtil.toString(end)+"'and orgCode='"+orgCode+"' group by errorCode";
+            } else {
+                sql = "select errorCode,count(errorCode) as count  from qc/receive_data_element " +
+                        " where receiveTime>='"+startDate+"' and receiveTime<='"+DateUtil.toString(end)+"' group by errorCode";
+            }
+            list = dailyReportClient.findBySql(objectMapper.writeValueAsString(fields), sql);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    /**
+     * 错误数据按数据元分类占比
+     * @param startDate
+     * @param endDate
+     * @param orgCode
+     * @return
+     */
+    public List<Map<String,Object>> getCode(String startDate, String endDate, String orgCode){
+        List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+        Date today = DateUtil.parseDate(endDate, DateUtil.DEFAULT_DATE_YMD_FORMAT);
+        Date end = DateUtil.addDate(1, today);
+        try {
+            List<String> fields = new ArrayList<String>();
+            fields.add("code");
+            fields.add("count");
+            String sql = "";
+            if (StringUtils.isNotEmpty(orgCode)) {
+                sql = "select code , count(code) as count from qc/receive_data_element " +
+                        " where receiveTime>='"+startDate+"' and receiveTime<='"+DateUtil.toString(end)+"'and orgCode='"+orgCode+"' group by code order by count desc ";
+            } else {
+                sql = "select code , count(code) as count from qc/receive_data_element " +
+                        " where receiveTime>='"+startDate+"' and receiveTime<='"+DateUtil.toString(end)+"' group by code order by count desc ";
+            }
+            list = dailyReportClient.findBySql(objectMapper.writeValueAsString(fields), sql);
+            if(list.size()>10){
+                list = list.subList(0,10);
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return list;
     }
 }

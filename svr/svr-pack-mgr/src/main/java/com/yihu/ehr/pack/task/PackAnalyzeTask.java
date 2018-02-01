@@ -8,6 +8,7 @@ import com.yihu.ehr.pack.service.PackageService;
 import com.yihu.ehr.util.datetime.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +30,7 @@ public class PackAnalyzeTask {
      * 每一分钟增加1000条分析数据到队列中.
      * 限流，避免过多占用内存，这部分非主业务流程。
      */
-    @Scheduled(cron = "0 0/1 * * * ?")
+    @Scheduled(cron = "0 0/10 * * * ?")
     public void delayPushTask() {
         try {
             if (size() > MaxSize) {
@@ -37,12 +38,21 @@ public class PackAnalyzeTask {
             }
 
             addToQueue("analyzeStatus=0");  //添加未分析的
-            Date date = DateUtil.addDate(-1, new Date());
-            addToQueue("analyzeStatus=1;parseDate<" + DateUtil.toString(date));  //添加分析异常的
+            Date date = DateUtil.addDate(-3, new Date());
+            addToQueue("analyzeStatus=1;analyzeDate<" + DateUtil.toString(date));  //添加分析异常的
             addToQueue("analyzeStatus=2;analyzeFailCount<3");   //添加分析错误的
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Async
+    public void savePack(Package pack) {
+        pack = packageService.getPackage(pack.getId());
+
+        pack.setAnalyzeStatus(1);
+        pack.setAnalyzeDate(new Date());
+        packageService.save(pack);
     }
 
     private void addToQueue(String filter) throws Exception {
@@ -53,9 +63,7 @@ public class PackAnalyzeTask {
             String packString = objectMapper.writeValueAsString(mPackage);
             push(packString);
 
-            pack.setAnalyzeStatus(1);
-            pack.setAnalyzeDate(new Date());
-            packageService.save(pack);
+            savePack(pack);
         }
     }
 
