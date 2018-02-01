@@ -1,5 +1,7 @@
 package com.yihu.ehr.basic.portal.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -104,7 +106,8 @@ public class ItResourceDownload {
     public void setUploadUser(String uploadUser) {this.uploadUser = uploadUser;}
 
     @Basic
-    @Column(name = "upload_time", nullable = true, insertable = true, updatable = true)
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @Column(name = "upload_time")
     public Date getUploadTime() { return uploadTime;}
 
     public void setUploadTime(Date uploadTime) {this.uploadTime = uploadTime;}

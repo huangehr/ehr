@@ -10,6 +10,7 @@ import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -73,6 +74,24 @@ public class PortalResourcesController extends BaseController {
         int totalCount = getTotalCount(responseEntity);
         Envelop envelop = getResult(portalResourcesModels, totalCount, page, size);
         return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.PortalResources.PortalResources, method = RequestMethod.POST)
+    @ApiOperation(value = "获取资源信息列表", notes = "根据查询条件获取资源信息列表在前端表格展示")
+    public Envelop createPortalResources(
+            @ApiParam(name = "portalResources_json_data", value = "", defaultValue = "")
+            @RequestParam(value = "portalResources_json_data") String portalResourcesJsonData) throws Exception{
+        MPortalResources mPortalResources =  portalResourcesClient.createPortalResources(portalResourcesJsonData);
+        return success(mPortalResources);
+    }
+
+    @RequestMapping(value = ServiceApi.PortalResources.PortalResources, method = RequestMethod.PUT)
+    @ApiOperation(value = "获取资源信息列表", notes = "根据查询条件获取资源信息列表在前端表格展示")
+    public Envelop updatePortalResources(
+            @ApiParam(name = "portalResources_json_data", value = "", defaultValue = "")
+            @RequestParam(value = "portalResources_json_data") String portalResourcesJsonData) throws Exception {
+        MPortalResources mPortalResources = portalResourcesClient.updatePortalResources(portalResourcesJsonData);
+        return success(mPortalResources);
     }
 
     @RequestMapping(value = ServiceApi.PortalResources.PortalResourcesAdmin, method = RequestMethod.GET)
