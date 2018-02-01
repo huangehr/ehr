@@ -233,8 +233,10 @@ public class PatientController extends BaseController {
         if (StringUtils.isEmpty(detailModel.getName())) {
             errorMsg += "姓名不能为空!";
         }
-        if (StringUtils.isEmpty(detailModel.getIdCardNo()) && pattern.matcher(detailModel.getIdCardNo()).find()) {
+        if (StringUtils.isEmpty(detailModel.getIdCardNo())) {
             errorMsg += "身份证号不能为空!";
+        }else if( ! pattern.matcher(detailModel.getIdCardNo()).find()){
+            errorMsg += "身份证号格式不正!";
         }
         if (StringUtils.isEmpty(detailModel.getGender())) {
             errorMsg += "性别不能为空!";
@@ -369,8 +371,10 @@ public class PatientController extends BaseController {
         if (StringUtils.isEmpty(detailModel.getName())) {
             errorMsg += "姓名不能为空!";
         }
-        if (StringUtils.isEmpty(detailModel.getIdCardNo()) && pattern.matcher(detailModel.getIdCardNo()).find()) {
+        if (StringUtils.isEmpty(detailModel.getIdCardNo())) {
             errorMsg += "身份证号不能为空!";
+        }else if( ! pattern.matcher(detailModel.getIdCardNo()).find()){
+            errorMsg += "身份证号格式不正!";
         }
         if (StringUtils.isEmpty(detailModel.getGender())) {
             errorMsg += "性别不能为空!";
@@ -456,8 +460,10 @@ public class PatientController extends BaseController {
         if (StringUtils.isEmpty(detailModel.getName())) {
             errorMsg += "姓名不能为空!";
         }
-        if (StringUtils.isEmpty(detailModel.getIdCardNo()) && pattern.matcher(detailModel.getIdCardNo()).find()) {
+        if (StringUtils.isEmpty(detailModel.getIdCardNo())) {
             errorMsg += "身份证号不能为空!";
+        }else if( ! pattern.matcher(detailModel.getIdCardNo()).find()){
+            errorMsg += "身份证号格式不正!";
         }
         if (StringUtils.isEmpty(detailModel.getGender())) {
             errorMsg += "性别不能为空!";

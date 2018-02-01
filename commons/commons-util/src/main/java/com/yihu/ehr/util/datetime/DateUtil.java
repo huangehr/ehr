@@ -48,6 +48,7 @@ public class DateUtil {
     public static final String YYYYMMDDHHMMSS = "yyyyMMddHHmmss";
     public static final String utcDateTimePattern = "yyyy-MM-dd'T'HH:mm:ss'Z'";
     public static final String utcDateTimePatternTZ = " yyyy-MM-dd'T'HH:mm:ssZZZ";
+    public static final String DATE_WORLD_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 
 
 
@@ -1452,6 +1453,20 @@ public class DateUtil {
         }
 
         return ts;
+    }
+
+    //utc时间转换
+    public static String utcToDate(String utcTime,String format){
+        SimpleDateFormat utcSdf = new SimpleDateFormat(DATE_WORLD_FORMAT);
+        SimpleDateFormat newSdf = new SimpleDateFormat(format);
+        String date= null;
+        try {
+            if (!StringUtils.isEmpty(utcTime))
+                date = newSdf.format(utcSdf.parse(utcTime));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return date;
     }
 
 }
