@@ -4,17 +4,20 @@ import com.yihu.ehr.util.log.LogService;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.*;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -35,11 +38,14 @@ public class HttpUtils {
     }
 
     public static HttpResponse doGet(String url, Map<String, Object> params, Map<String, String> headers) throws Exception {
+        return doGet(url, params, headers, null, null);
+    }
+
+    public static HttpResponse doGet(String url, Map<String, Object> params, Map<String, String> headers, String username, String password) throws Exception {
         String response;
         int status;
         CloseableHttpClient httpClient = null;
         CloseableHttpResponse closeableHttpResponse = null;
-
         List<NameValuePair> nameValuePairList = new ArrayList<NameValuePair>();
         if(params != null) {
             for(String key : params.keySet()) {
@@ -57,7 +63,14 @@ public class HttpUtils {
             }
         }
         try {
-            httpClient = HttpClients.createDefault();
+            if(!StringUtils.isEmpty(username) && !StringUtils.isEmpty(password)) {
+                UsernamePasswordCredentials usernamePasswordCredentials = new UsernamePasswordCredentials(username, password);
+                CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+                credentialsProvider.setCredentials(AuthScope.ANY, usernamePasswordCredentials);
+                httpClient = HttpClients.custom().setDefaultCredentialsProvider(credentialsProvider).build();
+            }else {
+                httpClient = HttpClients.createDefault();
+            }
             closeableHttpResponse = httpClient.execute(httpGet);
             HttpEntity resEntity = closeableHttpResponse.getEntity();
             status = closeableHttpResponse.getStatusLine().getStatusCode();
@@ -79,6 +92,7 @@ public class HttpUtils {
         }
         HttpResponse httpResponse = new HttpResponse(status, response);
         return httpResponse;
+
     }
 
     public static HttpResponse doPost(String url, Map<String, Object> params) throws Exception {
@@ -86,6 +100,10 @@ public class HttpUtils {
     }
 
     public static HttpResponse doPost(String url, Map<String, Object> params, Map<String, String> headers) throws Exception{
+        return doPost(url, params, headers, null, null);
+    }
+
+    public static HttpResponse doPost(String url, Map<String, Object> params, Map<String, String> headers, String username, String password) throws Exception{
         String response;
         int status;
         CloseableHttpClient httpClient = null;
@@ -107,7 +125,14 @@ public class HttpUtils {
             }
         }
         try {
-            httpClient = HttpClients.createDefault();
+            if (!StringUtils.isEmpty(username) && !StringUtils.isEmpty(password)) {
+                UsernamePasswordCredentials usernamePasswordCredentials = new UsernamePasswordCredentials(username, password);
+                CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+                credentialsProvider.setCredentials(AuthScope.ANY, usernamePasswordCredentials);
+                httpClient = HttpClients.custom().setDefaultCredentialsProvider(credentialsProvider).build();
+            }else {
+                httpClient = HttpClients.createDefault();
+            }
             closeableHttpResponse = httpClient.execute(httpPost);
             HttpEntity resEntity = closeableHttpResponse.getEntity();
             status = closeableHttpResponse.getStatusLine().getStatusCode();
@@ -136,6 +161,10 @@ public class HttpUtils {
     }
 
     public static HttpResponse doPut(String url, Map<String, Object> params, Map<String, String> headers) throws Exception {
+        return doPut(url, params, headers, null, null);
+    }
+
+    public static HttpResponse doPut(String url, Map<String, Object> params, Map<String, String> headers, String username, String password) throws Exception {
         String response;
         int status;
         CloseableHttpClient httpClient = null;
@@ -157,7 +186,14 @@ public class HttpUtils {
             }
         }
         try {
-            httpClient = HttpClients.createDefault();
+            if (!StringUtils.isEmpty(username) && !StringUtils.isEmpty(password)) {
+                UsernamePasswordCredentials usernamePasswordCredentials = new UsernamePasswordCredentials(username, password);
+                CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+                credentialsProvider.setCredentials(AuthScope.ANY, usernamePasswordCredentials);
+                httpClient = HttpClients.custom().setDefaultCredentialsProvider(credentialsProvider).build();
+            }else {
+                httpClient = HttpClients.createDefault();
+            }
             closeableHttpResponse = httpClient.execute(httpPut);
             HttpEntity resEntity = closeableHttpResponse.getEntity();
             status = closeableHttpResponse.getStatusLine().getStatusCode();
@@ -186,6 +222,10 @@ public class HttpUtils {
     }
 
     public static HttpResponse doDelete(String url, Map<String, Object> params, Map<String, String> headers) throws Exception {
+        return doDelete(url, params, headers, null, null);
+    }
+
+    public static HttpResponse doDelete(String url, Map<String, Object> params, Map<String, String> headers, String username, String password) throws Exception {
         String response;
         int status;
         CloseableHttpClient httpClient = null;
@@ -207,7 +247,14 @@ public class HttpUtils {
             }
         }
         try {
-            httpClient = HttpClients.createDefault();
+            if (!StringUtils.isEmpty(username) && !StringUtils.isEmpty(password)) {
+                UsernamePasswordCredentials usernamePasswordCredentials = new UsernamePasswordCredentials(username, password);
+                CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+                credentialsProvider.setCredentials(AuthScope.ANY, usernamePasswordCredentials);
+                httpClient = HttpClients.custom().setDefaultCredentialsProvider(credentialsProvider).build();
+            }else {
+                httpClient = HttpClients.createDefault();
+            }
             closeableHttpResponse = httpClient.execute(httpDelete);
             HttpEntity resEntity = closeableHttpResponse.getEntity();
             status = closeableHttpResponse.getStatusLine().getStatusCode();
@@ -232,8 +279,16 @@ public class HttpUtils {
     }
 
     public static HttpResponse doUpload(String url, Map<String, Object> params, File file) throws Exception {
-        String response = "";
-        int status = -1;
+        return doUpload(url, params, null, file, null, null);
+    }
+
+    public static HttpResponse doUpload(String url, Map<String, Object> params, Map<String, String> headers, File file) throws Exception {
+        return doUpload(url, params, headers, file, null, null);
+    }
+
+    public static HttpResponse doUpload(String url, Map<String, Object> params, Map<String, String> headers, File file, String username, String password) throws Exception {
+        String response;
+        int status;
         CloseableHttpClient httpClient = null;
         CloseableHttpResponse closeableHttpResponse = null;
         HttpPost httpPost = new HttpPost(url);
@@ -248,10 +303,22 @@ public class HttpUtils {
                 }
             }
         }
+        if (headers != null) {
+            for(String key : headers.keySet()) {
+                httpPost.addHeader(key, headers.get(key));
+            }
+        }
         HttpEntity reqEntity = multipartEntityBuilder.build();
         httpPost.setEntity(reqEntity);
         try {
-            httpClient = HttpClients.createDefault();
+            if (!StringUtils.isEmpty(username) && !StringUtils.isEmpty(password)) {
+                UsernamePasswordCredentials usernamePasswordCredentials = new UsernamePasswordCredentials(username, password);
+                CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+                credentialsProvider.setCredentials(AuthScope.ANY, usernamePasswordCredentials);
+                httpClient = HttpClients.custom().setDefaultCredentialsProvider(credentialsProvider).build();
+            }else {
+                httpClient = HttpClients.createDefault();
+            }
             closeableHttpResponse = httpClient.execute(httpPost);
             HttpEntity resEntity = closeableHttpResponse.getEntity();
             status = closeableHttpResponse.getStatusLine().getStatusCode();

@@ -63,10 +63,10 @@ spring:
 
 ---
 spring:
-  profiles: prod_sr
+  profiles: prod_fzzy
   cloud:
     config:
       username: user
       password: configuration
-      uri: http://100.100.1.153:1221
+      uri: http://100.100.1.162:1221
       label: master
