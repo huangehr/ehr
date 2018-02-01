@@ -283,7 +283,7 @@ public class DoctorController extends BaseController {
             }
             MDoctor mDoctor = convertToMDoctor(detailModel);
             mDoctor = doctorClient.updateDoctor(objectMapper.writeValueAsString(mDoctor), model);
-            if(mDoctor==null){
+            if(mDoctor == null){
                 return failed("保存失败!");
             }
 
