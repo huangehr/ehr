@@ -112,7 +112,7 @@
         <version.spring-data-release-train>Hopper-SR1</version.spring-data-release-train>
         <version.spring-data-hadoop>2.3.0.RELEASE</version.spring-data-hadoop>
         <version.spring-framework>4.2.5.RELEASE</version.spring-framework>
-        <version.spring-session>1.2.0.RELEASE</version.spring-session>
+        <version.spring-session>1.2.1.RELEASE</version.spring-session>
         <version.statsd-client>3.1.0</version.statsd-client>
         <version.swagger>2.7.0</version.swagger>
         <version.swagger-ui>2.7.0</version.swagger-ui>
