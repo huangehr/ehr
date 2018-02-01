@@ -356,6 +356,7 @@ public class BaseStatistsService {
                 }
                 if(key.equals("SUM(result)")){
                     NumberFormat nf = NumberFormat.getInstance();
+                    nf.setGroupingUsed(false);
                     dataMap.put("result",  nf.format(map.get(key)));
                 }
             }
@@ -395,6 +396,7 @@ public class BaseStatistsService {
                 }
                 if(key.equals("SUM(result)")){
                     NumberFormat nf = NumberFormat.getInstance();
+                    nf.setGroupingUsed(false);
                     dataMap.put("result",  nf.format(map.get(key)));
                 }
                 if(key.equals("quotaDate")){
@@ -446,6 +448,7 @@ public class BaseStatistsService {
                 }
                 if(key.equals("SUM(result)")){
                     NumberFormat nf = NumberFormat.getInstance();
+                    nf.setGroupingUsed(false);
                     dataMap.put("result",  nf.format(map.get(key)));
                 }
             }
