@@ -689,26 +689,28 @@ public class ResourceBrowseService {
     public List<Object> getSubDateByRowkey(String rowKey, String version)throws Exception{
         //查询出所有细表的rowKey
         List<Object> resultList = new ArrayList<>();
-        String legacyRowKeys[] = hbaseDao.findRowKeys(ResourceCore.SubTable, "^" + rowKey);
+        String q = "{\"q\":\"profile_id:" + rowKey + "\"}";
+        Page<Map<String, Object>> page = resourceBrowseDao.getEhrCenterSub(q, 1, 500);
+        List<Map<String, Object>> pageContent = page.getContent();
         Map<String, Object> resultMap = new HashMap<>();
-        for(String subRowKey : legacyRowKeys) {
+        for(Map<String, Object> temp : pageContent) {
+            String subRowKey = temp.get("rowkey").toString();
             String dataSetCode = subRowKey.split("\\$")[1];
             if(!resultMap.containsKey(dataSetCode)) {
                 Map<String, Object> dataMap = new HashMap<>();
                 dataMap.put("name", redisService.getDataSetName(version, dataSetCode));
                 List<Map<String, Object>> dataList = new ArrayList<>();
-                Map<String, Object> detailedMap = hbaseDao.getResultMap(ResourceCore.SubTable, subRowKey);
-                Map<String, Object> tempMap = new HashMap<>(detailedMap.size());
-                List<String> idsList = new ArrayList<>(detailedMap.size());
-                for(String id : detailedMap.keySet()) {
+                Map<String, Object> tempMap = new HashMap<>(temp.size());
+                List<String> idsList = new ArrayList<>(temp.size());
+                for(String id : temp.keySet()) {
                     if (id.startsWith("EHR")) {
                         idsList.add(id);
                     }
                 }
                 List<Map<String, Object>> metaList = resourceBrowseMetadataDao.getMetaData(idsList);
                 metaList.stream().forEach(one->{
-                    Object obj = detailedMap.get(String.valueOf(one.get("ID")));
-                    tempMap.put(String.valueOf(one.get("NAME")), obj);
+                    Object obj = temp.get(String.valueOf(one.get("id")));
+                    tempMap.put(String.valueOf(one.get("name")), obj);
                 });
                 dataList.add(tempMap);
                 dataMap.put("data", dataList);
@@ -716,18 +718,17 @@ public class ResourceBrowseService {
             }else {
                 Map<String, Object> dataMap = (Map<String, Object>) resultMap.get(dataSetCode);
                 List<Map<String, Object>> dataList = (List<Map<String,Object>>) dataMap.get("data");
-                Map<String, Object> detailedMap = hbaseDao.getResultMap(ResourceCore.SubTable, subRowKey);
-                Map<String, Object> tempMap = new HashMap<>(detailedMap.size());
-                List<String> idsList = new ArrayList<>(detailedMap.size());
-                for(String id : detailedMap.keySet()) {
+                Map<String, Object> tempMap = new HashMap<>(temp.size());
+                List<String> idsList = new ArrayList<>(temp.size());
+                for(String id : temp.keySet()) {
                     if (id.startsWith("EHR")) {
                         idsList.add(id);
                     }
                 }
                 List<Map<String, Object>> metaList = resourceBrowseMetadataDao.getMetaData(idsList);
                 metaList.stream().forEach(one->{
-                    Object obj = detailedMap.get(String.valueOf(one.get("ID")));
-                    tempMap.put(String.valueOf(one.get("NAME")), obj);
+                    Object obj = temp.get(String.valueOf(one.get("id")));
+                    tempMap.put(String.valueOf(one.get("name")), obj);
                 });
                 dataList.add(tempMap);
                 dataMap.put("data", dataList);

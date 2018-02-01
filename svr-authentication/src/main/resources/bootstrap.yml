@@ -63,7 +63,7 @@ spring:
 
 ---
 spring:
-  profiles: prod_sr
+  profiles: prod_fzzy
   cloud:
     config:
       username: user
