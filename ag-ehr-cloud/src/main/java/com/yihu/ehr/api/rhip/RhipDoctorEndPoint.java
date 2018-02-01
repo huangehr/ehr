@@ -9,6 +9,7 @@ import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.feign.DoctorClient;
 import com.yihu.ehr.feign.FileResourceClient;
 import com.yihu.ehr.feign.OrganizationClient;
+import com.yihu.ehr.feign.UserClient;
 import com.yihu.ehr.model.org.MOrgDept;
 import com.yihu.ehr.model.org.MOrgDeptJson;
 import com.yihu.ehr.model.org.MOrganization;
@@ -48,6 +49,8 @@ public class RhipDoctorEndPoint extends BaseController {
     private FileResourceClient fileResourceClient;
     @Autowired
     private OrganizationClient orgClient;
+    @Autowired
+    private UserClient userClient;
 
     private String regex = "^[A-Za-z0-9\\-]+$";
     private Pattern pattern = Pattern.compile(regex);
@@ -120,15 +123,26 @@ public class RhipDoctorEndPoint extends BaseController {
                 errorMsg += "身份证号不能为空!";
             }else if(!pattern.matcher(detailModel.getIdCardNo()).find()){
                 errorMsg += "身份证号格式有误!";
+            }else  if (null != doctorClient.idCardNoExistence( "["+objectMapper.writeValueAsString(detailModel.getIdCardNo()) +"]")&& userClient.isIdCardExists( detailModel.getIdCardNo())) {
+                return failed("身份证号已存在!");
             }
+
             if (StringUtils.isEmpty(detailModel.getSkill())) {
                 errorMsg += "医生专长不能为空!";
             }
+
             if (StringUtils.isEmpty(detailModel.getEmail())) {
                 errorMsg += "邮箱不能为空!";
+            }else if (null != doctorClient.emailsExistence( "["+objectMapper.writeValueAsString(detailModel.getEmail())+"]")
+                    && userClient.isEmailExists( detailModel.getEmail())) {
+                return failed("邮箱已存在!");
             }
+
             if (StringUtils.isEmpty(detailModel.getPhone())) {
                 errorMsg += "手机-主号码不能为空!";
+            }else if (null != doctorClient.idExistence( "["+objectMapper.writeValueAsString(detailModel.getPhone())+"]")
+                    && userClient.isTelephoneExists( detailModel.getPhone())) {
+                return failed("电话号码已存在!");
             }
             String mOrgDeptStr = "";
             String orgCode = "";
@@ -212,15 +226,26 @@ public class RhipDoctorEndPoint extends BaseController {
                 errorMsg += "身份证号不能为空!";
             }else if(!pattern.matcher(detailModel.getIdCardNo()).find()){
                 errorMsg += "身份证号格式有误!";
+            }else  if (null != doctorClient.idCardNoExistence( "["+objectMapper.writeValueAsString(detailModel.getIdCardNo()) +"]")&& userClient.isIdCardExists( detailModel.getIdCardNo())) {
+                return failed("身份证号已存在!");
             }
+
             if (StringUtils.isEmpty(detailModel.getSkill())) {
                 errorMsg += "医生专长不能为空!";
             }
+
             if (StringUtils.isEmpty(detailModel.getEmail())) {
                 errorMsg += "邮箱不能为空!";
+            }else if (null != doctorClient.emailsExistence( "["+objectMapper.writeValueAsString(detailModel.getEmail())+"]")
+                    && userClient.isEmailExists( detailModel.getEmail())) {
+                return failed("邮箱已存在!");
             }
+
             if (StringUtils.isEmpty(detailModel.getPhone())) {
                 errorMsg += "手机-主号码不能为空!";
+            }else if (null != doctorClient.idExistence( "["+objectMapper.writeValueAsString(detailModel.getPhone())+"]")
+                    && userClient.isTelephoneExists( detailModel.getPhone())) {
+                return failed("电话号码已存在!");
             }
             String mOrgDeptStr = "";
             String orgCode = "";
