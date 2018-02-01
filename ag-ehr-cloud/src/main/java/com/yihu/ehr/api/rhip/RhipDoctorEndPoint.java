@@ -226,8 +226,8 @@ public class RhipDoctorEndPoint extends BaseController {
                 errorMsg += "身份证号不能为空!";
             }else if(!pattern.matcher(detailModel.getIdCardNo()).find()){
                 errorMsg += "身份证号格式有误!";
-            }else  if (null != doctorClient.idCardNoExistence( "["+objectMapper.writeValueAsString(detailModel.getIdCardNo()) +"]")&& userClient.isIdCardExists( detailModel.getIdCardNo())) {
-                return failed("身份证号已存在!");
+            }else  if (null == doctorClient.idCardNoExistence( "["+objectMapper.writeValueAsString(detailModel.getIdCardNo()) +"]")&& !userClient.isIdCardExists( detailModel.getIdCardNo())) {
+                return failed("身份证号不存在!");
             }
 
             if (StringUtils.isEmpty(detailModel.getSkill())) {
@@ -236,16 +236,16 @@ public class RhipDoctorEndPoint extends BaseController {
 
             if (StringUtils.isEmpty(detailModel.getEmail())) {
                 errorMsg += "邮箱不能为空!";
-            }else if (null != doctorClient.emailsExistence( "["+objectMapper.writeValueAsString(detailModel.getEmail())+"]")
-                    && userClient.isEmailExists( detailModel.getEmail())) {
-                return failed("邮箱已存在!");
+            }else if (null == doctorClient.emailsExistence( "["+objectMapper.writeValueAsString(detailModel.getEmail())+"]")
+                    && !userClient.isEmailExists( detailModel.getEmail())) {
+                return failed("邮箱不存在!");
             }
 
             if (StringUtils.isEmpty(detailModel.getPhone())) {
                 errorMsg += "手机-主号码不能为空!";
-            }else if (null != doctorClient.idExistence( "["+objectMapper.writeValueAsString(detailModel.getPhone())+"]")
-                    && userClient.isTelephoneExists( detailModel.getPhone())) {
-                return failed("电话号码已存在!");
+            }else if (null == doctorClient.idExistence( "["+objectMapper.writeValueAsString(detailModel.getPhone())+"]")
+                    && !userClient.isTelephoneExists( detailModel.getPhone())) {
+                return failed("电话号码不存在!");
             }
             String mOrgDeptStr = "";
             String orgCode = "";
