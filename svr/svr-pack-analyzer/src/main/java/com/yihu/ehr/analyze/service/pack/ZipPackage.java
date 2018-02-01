@@ -2,6 +2,7 @@ package com.yihu.ehr.analyze.service.pack;
 
 import com.yihu.ehr.analyze.config.FastdfsConfig;
 import com.yihu.ehr.constants.ProfileType;
+import com.yihu.ehr.hbase.HBaseAdmin;
 import com.yihu.ehr.hbase.HBaseDao;
 import com.yihu.ehr.hbase.TableBundle;
 import com.yihu.ehr.lang.SpringContext;
@@ -139,10 +140,13 @@ public class ZipPackage {
     }
 
     private void saveDataSet(DataSetRecord dataSetRecord) throws Exception {
+        String table = dataSetRecord.getCode();
+        createTable(table);
+
         ApplicationContext context = SpringContext.getApplicationContext();
         HBaseDao hBaseDao = context.getBean(HBaseDao.class);
 
-        String table = dataSetRecord.getCode();
+
         String rowKeyPrefix = dataSetRecord.getRowKeyPrefix();
 
         TableBundle bundle = new TableBundle();
@@ -174,6 +178,20 @@ public class ZipPackage {
 
             hBaseDao.save(table, bundle);
         });
+    }
+
+    private synchronized void createTable(String table) throws Exception {
+        boolean created = tableSet.contains(table);
+        if (created) {
+            return;
+        }
+
+        ApplicationContext context = SpringContext.getApplicationContext();
+        HBaseAdmin hBaseAdmin = context.getBean(HBaseAdmin.class);
+        if (!hBaseAdmin.isTableExists(table)) {
+            hBaseAdmin.createTable(table, DATA);
+            tableSet.add(table);
+        }
     }
 
 }
