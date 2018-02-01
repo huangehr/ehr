@@ -242,4 +242,17 @@ public class OrgDeptEndPoint extends EnvelopRestEndPoint {
         mOrgDeptData.setChildren(orgDeptData);
         return mOrgDeptData;
     }
+
+    @RequestMapping(value = "/orgDept/getOrgDeptByDeptName", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "根据机构id及部门名称获取部门id")
+    public MOrgDept getOrgDeptByDeptName(
+            @ApiParam(name = "orgId", value = "机构ID")
+            @RequestParam(value = "orgId", required = true) Integer orgId,
+            @ApiParam(name = "name", value = "部门名称")
+            @RequestParam(value = "name", required = true) String name
+    ) throws Exception {
+        OrgDept dept = orgDeptService.getOrgDeptByDeptName(orgId.toString(), name);
+        return convertToModel(dept, MOrgDept.class);
+
+    }
 }
