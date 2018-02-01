@@ -105,6 +105,7 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value = ServiceApi.Doctors.Doctors, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     @ApiOperation(value = "创建医生", notes = "创建医生信息")
     public MDoctor createDoctor(
             @ApiParam(name = "doctor_json_data", value = "", defaultValue = "")
@@ -139,7 +140,7 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
         user.setEmail(d.getEmail());
         user.setGender(d.getSex());
         user.setTelephone(d.getPhone());
-        user.setLoginCode(d.getPhone());
+        user.setLoginCode(d.getIdCardNo());
         user.setRealName(d.getName());
         user.setProvinceId(0);
         user.setCityId(0);
@@ -169,6 +170,7 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value = ServiceApi.Doctors.Doctors, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     @ApiOperation(value = "修改医生", notes = "重新绑定医生信息")
     public MDoctor updateDoctor(
             @ApiParam(name = "doctor_json_data", value = "", defaultValue = "")
