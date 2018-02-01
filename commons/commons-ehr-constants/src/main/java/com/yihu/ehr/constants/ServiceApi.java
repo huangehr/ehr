@@ -367,7 +367,8 @@ public class ServiceApi {
     public static class Apps {
         public static final String Apps = "/apps";
         public static final String AppsNoPage = "/apps/no_paging";
-        public static final String App = "/app";
+        public static final String getApp = "/app";
+        public static final String App = "/apps/{app_id}";
         public static final String AppExistence = "/apps/{app_id}/existence";
         public static final String AppStatus = "/apps/{app_id}/status";
         public static final String AppNameExistence = "/app/{app_name}/existence";
