@@ -201,7 +201,7 @@ public class RhipDoctorEndPoint extends BaseController {
             return success(detailModel);
         } catch (Exception ex) {
             ex.printStackTrace();
-            return failedSystem();
+            return failed(ex.getMessage());
         }
     }
 
@@ -304,7 +304,7 @@ public class RhipDoctorEndPoint extends BaseController {
         }
         catch (Exception ex){
             ex.printStackTrace();
-            return failedSystem();
+            return failed(ex.getMessage());
         }
     }
 
