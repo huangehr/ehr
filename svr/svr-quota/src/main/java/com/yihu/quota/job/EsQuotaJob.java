@@ -91,7 +91,7 @@ public class EsQuotaJob implements Job {
         tjQuotaLog.setSaasId(saasid);
         tjQuotaLog.setStartTime(new Date());
         try {
-            //抽取数据 如果是累加就是 List<DataModel>  如果是相除 Map<String,List<DataModel>>
+            //抽取数据
             List<SaveModel> dataModels = extract();
 
             if (dataModels != null && dataModels.size() > 0) {
