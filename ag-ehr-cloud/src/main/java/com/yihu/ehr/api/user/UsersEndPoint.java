@@ -11,6 +11,7 @@ import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.controller.BaseController;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -46,11 +47,11 @@ public class UsersEndPoint extends BaseController {
     @ApiOperation("获取用户列表")
     @RequestMapping(value = "/users", method = RequestMethod.GET)
     public List<UserModel> getUsers(
-            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,realName,idCardNo,gender,createDate")
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
             @RequestParam(value = "filters", required = false) String filters,
-            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+realName,+createDate")
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+name,+createTime")
             @RequestParam(value = "sorts", required = false) String sorts,
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
@@ -96,5 +97,36 @@ public class UsersEndPoint extends BaseController {
         key.setPrivateKey("");
 
         return key;
+    }
+
+    @ApiOperation("获取用户列表")
+    @RequestMapping(value = "/getUserList", method = RequestMethod.GET)
+    public Envelop getUserList(
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,realName,idCardNo,gender,createDate")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+realName,+createDate")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page) {
+        Envelop envelop = new Envelop();
+        List<UserModel> UserModels = new ArrayList<>();
+        List<com.yihu.ehr.model.user.MUser> mUsers = userClient.getUsers(fields, filters, sorts, size, page);
+        for (com.yihu.ehr.model.user.MUser mUser : mUsers) {
+            UserModel UserModel = convertToModel(mUser, UserModel.class);
+            if (mUser.getOrganization() != null) {
+                MOrganization mOrganization = organizationClient.getOrg(mUser.getOrganization());
+                UserModel.setOrganization(convertToModel(mOrganization, OrgModel.class));
+            }
+            UserModels.add(UserModel);
+        }
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(UserModels);
+        envelop.setCurrPage(page);
+        envelop.setPageSize(size);
+        return envelop;
     }
 }
