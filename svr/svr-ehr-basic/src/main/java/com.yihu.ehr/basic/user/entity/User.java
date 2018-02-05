@@ -1,5 +1,7 @@
 package com.yihu.ehr.basic.user.entity;
 
+import com.yihu.ehr.entity.BaseAssignedEntity;
+import com.yihu.ehr.entity.BaseIdentityEntity;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -13,9 +15,8 @@ import java.util.Date;
 @Entity
 @Table(name = "users")
 @Access(value = AccessType.PROPERTY)
-public class User {
-    private String id;
-    private Date createDate;
+public class User  extends BaseAssignedEntity {
+    private Date invalidDate;//失效时间
     private Date lastLoginTime;
     private String email;
     private String loginCode;
@@ -64,26 +65,16 @@ public class User {
     private String doctorId;
     private String realnameFlag;
 
+
     public User() {
     }
 
-    @Id
-    @GeneratedValue(generator = "Generator")
-    @GenericGenerator(name = "Generator", strategy = "assigned")
-    @Column(name = "id", unique = true, nullable = false)
-    public String getId() {
-        return id;
+    @Column(name = "invalid_date",  nullable = true)
+    public Date getInvalidDate() {
+        return invalidDate;
     }
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    @Column(name = "create_date",  nullable = true)
-    public Date getCreateDate() {
-        return createDate;
-    }
-    public void setCreateDate(Date createDate) {
-        this.createDate = createDate;
+    public void setInvalidDate(Date invalidDate) {
+        this.invalidDate = invalidDate;
     }
 
     @Column(name = "last_login_time",  nullable = true)

@@ -54,6 +54,14 @@ public class MUser implements Serializable{
     private String realnameFlag;
     private String demographicId;
     private String doctorId;
+    /** 创建日期 */
+    private Date invalidDate;
+    /** 创建者 */
+    private String creator;
+    /** 修改日期 */
+    private Date modifyDate;
+    /** 修改者 */
+    private String modifier;
 
 
     public int getProvinceId() {
@@ -382,5 +390,37 @@ public class MUser implements Serializable{
 
     public void setDoctorId(String doctorId) {
         this.doctorId = doctorId;
+    }
+
+    public Date getInvalidDate() {
+        return invalidDate;
+    }
+
+    public void setInvalidDate(Date invalidDate) {
+        this.invalidDate = invalidDate;
+    }
+
+    public String getCreator() {
+        return creator;
+    }
+
+    public void setCreator(String creator) {
+        this.creator = creator;
+    }
+
+    public Date getModifyDate() {
+        return modifyDate;
+    }
+
+    public void setModifyDate(Date modifyDate) {
+        this.modifyDate = modifyDate;
+    }
+
+    public String getModifier() {
+        return modifier;
+    }
+
+    public void setModifier(String modifier) {
+        this.modifier = modifier;
     }
 }
