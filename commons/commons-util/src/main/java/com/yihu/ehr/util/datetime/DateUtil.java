@@ -1469,4 +1469,10 @@ public class DateUtil {
         return date;
     }
 
+    public static String utcToDate(java.util.Date date){
+        SimpleDateFormat sdf1 = new SimpleDateFormat(DATE_WORLD_FORMAT);
+        String utcDate = sdf1.format(date);
+        return utcDate;
+    }
+
 }

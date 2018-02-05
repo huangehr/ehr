@@ -1,6 +1,11 @@
 package com.yihu.ehr.util.file;
 
+import eu.medsea.mimeutil.MimeUtil;
 import java.io.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * @author Air
@@ -62,7 +67,6 @@ public class FileUtil {
 
         return true;
     }
-
 
     /**
      * 删除整个目录
@@ -149,7 +153,6 @@ public class FileUtil {
         return sb.toString();
     }
 
-
     /**
      * 清空文件内容
      * @param filePath 文件路径
@@ -169,9 +172,6 @@ public class FileUtil {
             e.printStackTrace();
         }
     }
-
-
-
 
     /**
      * 记录文件最后读取的位置
@@ -241,8 +241,6 @@ public class FileUtil {
         return stringBuilder.toString();
     }
 
-
-
     public static  byte[] getBytesByStream(InputStream inputStream){
         byte[] buffer = null;
         try {
@@ -302,6 +300,43 @@ public class FileUtil {
     public static String getSuffix(File file){
         String suffix = file.getName().substring(file.getName().lastIndexOf(".") + 1);
         return suffix;
+    }
+
+    /**
+     * 获取文件Mine-Type
+     * @param file
+     * @return
+     */
+    public static String getMimeType(File file) {
+        MimeUtil.registerMimeDetector("eu.medsea.mimeutil.detector.MagicMimeMimeDetector");
+        Collection<?> collection = MimeUtil.getMimeTypes(file);
+        return collection.toString();
+    }
+
+    public static String getMimeType(byte[] bytes) {
+        MimeUtil.registerMimeDetector("eu.medsea.mimeutil.detector.MagicMimeMimeDetector");
+        Collection<?> collection = MimeUtil.getMimeTypes(bytes);
+        return collection.toString();
+    }
+
+    /**
+     * 非结构化档案--文件类型map生成
+     * @param map
+     * @return
+     */
+    public static Map<String, StringBuffer> groupDataMap(Map<String, String> map) {
+        Map<String, StringBuffer> result = new HashMap<String, StringBuffer>();
+        Iterator<String> rs = map.keySet().iterator();
+        while (rs.hasNext()) {
+            String key = rs.next();
+            String value = map.get(key);
+            if (result.containsKey(value)) {
+                result.get(value).append(",").append(key);
+            } else {
+                result.put(value, new StringBuffer(key));
+            }
+        }
+        return result;
     }
 
 }
