@@ -47,7 +47,7 @@ public interface AppClient {
             @ApiParam(name = "app", value = "对象JSON结构体", allowMultiple = true, defaultValue = "{\"name\": \"\", \"url\": \"\", \"catalog\": \"\", \"description\": \"\", \"creator\":\"\",\"icon\": \"\",\"releaseFlag\": \"\"}")
             @RequestBody String appJson);
 
-    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Apps.App, method = RequestMethod.GET)
+    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Apps.getApp, method = RequestMethod.GET)
     @ApiOperation(value = "获取App")
     MApp getApp(
             @ApiParam(name = "app_id", value = "id", defaultValue = "")
@@ -63,7 +63,7 @@ public interface AppClient {
     @ApiOperation(value = "删除app")
     boolean deleteApp(
             @ApiParam(name = "app_id", value = "id", defaultValue = "")
-            @PathVariable(value = "app_id") String appId);
+            @PathVariable(value = "app_id") String app_id);
 
     @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Apps.AppStatus, method = RequestMethod.PUT)
     @ApiOperation(value = "修改状态")
