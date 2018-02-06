@@ -196,9 +196,11 @@ public class EsResultExtract {
     public BoolQueryBuilder getBoolQueryBuilder(BoolQueryBuilder boolQueryBuilder){
 
         if( !StringUtils.isEmpty(result)){
-            result = "1";
-            RangeQueryBuilder rangeQueryResult = QueryBuilders.rangeQuery("result").gte(result);
-            boolQueryBuilder.must(rangeQueryResult);
+            if( !result.equals("qb")){//查全部
+                result = "1";
+                RangeQueryBuilder rangeQueryResult = QueryBuilders.rangeQuery("result").gte(result);
+                boolQueryBuilder.must(rangeQueryResult);
+            }
         }
         if( !StringUtils.isEmpty(quotaCode)){
 //            TermQueryBuilder termQueryQuotaCode = QueryBuilders.termQuery("quotaCode", quotaCode);
