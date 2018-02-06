@@ -77,7 +77,7 @@ public class PortalResourcesController extends BaseController {
     }
 
     @RequestMapping(value = ServiceApi.PortalResources.PortalResources, method = RequestMethod.POST)
-    @ApiOperation(value = "获取资源信息列表", notes = "根据查询条件获取资源信息列表在前端表格展示")
+    @ApiOperation(value = "创建资源", notes = "根据json字符串创建资源")
     public Envelop createPortalResources(
             @ApiParam(name = "portalResources_json_data", value = "", defaultValue = "")
             @RequestParam(value = "portalResources_json_data") String portalResourcesJsonData) throws Exception{
@@ -86,7 +86,7 @@ public class PortalResourcesController extends BaseController {
     }
 
     @RequestMapping(value = ServiceApi.PortalResources.PortalResources, method = RequestMethod.PUT)
-    @ApiOperation(value = "获取资源信息列表", notes = "根据查询条件获取资源信息列表在前端表格展示")
+    @ApiOperation(value = "更新资源", notes = "更新资源")
     public Envelop updatePortalResources(
             @ApiParam(name = "portalResources_json_data", value = "", defaultValue = "")
             @RequestParam(value = "portalResources_json_data") String portalResourcesJsonData) throws Exception {
