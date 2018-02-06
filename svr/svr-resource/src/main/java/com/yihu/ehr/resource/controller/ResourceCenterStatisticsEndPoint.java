@@ -134,7 +134,9 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
     public Envelop getInfoDistribution() {
         Envelop envelop = new Envelop();
         List<Map> resultList = new ArrayList(1);
-        List areaIdGroupList = statisticService.getOrgAreaIdGroup();
+        int currentCityId = statisticService.getCurrentCityId();
+        List districtList = statisticService.getDistrict(currentCityId);
+        List areaIdGroupList = statisticService.getOrgAreaIdGroup(currentCityId);
         Map<Integer, BigInteger> distinctMap = new HashMap();
         for(int i = 0; i < areaIdGroupList.size(); i ++) {
             Object [] dataArr = (Object[]) areaIdGroupList.get(i);
@@ -148,13 +150,25 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
                 }
             }
         }
-        List<String> xData = new ArrayList<>(areaIdGroupList.size());
-        List<BigInteger> yData = new ArrayList<>(areaIdGroupList.size());
+        List<String> xData = new ArrayList<>(districtList.size());
+        List<BigInteger> yData = new ArrayList<>(districtList.size());
+        for(int i = 0; i < districtList.size(); i ++) {
+            Object [] dataArr = (Object[]) districtList.get(i);
+            Integer areaId = (Integer) dataArr[0];
+            String name = (String) dataArr[1];
+            xData.add(name);
+            if(distinctMap.containsKey(areaId)) {
+                yData.add(distinctMap.get(areaId));
+            }else {
+                yData.add(new BigInteger("0"));
+            }
+        }
+        /*
         for(Integer areaId : distinctMap.keySet()) {
             String areaName = statisticService.getAreaNameById(areaId);
             xData.add(areaName);
             yData.add(distinctMap.get(areaId));
-        }
+        }*/
         Map<String, Object> resultMap = new HashMap<>(4);
         resultMap.put("name", "人口个案信息分布");
         resultMap.put("dataModels", null);
@@ -215,10 +229,36 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "医疗资源库 - 医疗机构建档分布")
     public Envelop getOrgArchives() {
         Envelop envelop = new Envelop();
-        List allGroup = statisticService.getOrgAreaNameGroupByClazz(null);
-        List<String> xData = new ArrayList<>(allGroup.size());
-        List<BigInteger> yData = new ArrayList<>(allGroup.size());
+        int currentCityId = statisticService.getCurrentCityId();
+        List districtList = statisticService.getDistrict(currentCityId);
+        List allGroup = statisticService.getOrgAreaNameGroupByClazz(null, currentCityId);
+        Map<String, BigInteger> distinctMap = new HashMap();
         for(int i = 0; i < allGroup.size(); i ++) {
+            Object [] dataArr = (Object[]) allGroup.get(i);
+            String name = (String) dataArr[0];
+            BigInteger count = (BigInteger) dataArr[1];
+            if(name != null) {
+                if (distinctMap.containsKey(name)) {
+                    distinctMap.put(name, count.add(distinctMap.get(name)));
+                } else {
+                    distinctMap.put(name, count);
+                }
+            }
+        }
+        List<String> xData = new ArrayList<>(districtList.size());
+        List<BigInteger> yData = new ArrayList<>(districtList.size());
+        for(int i = 0; i < districtList.size(); i ++) {
+            Object [] dataArr = (Object[]) districtList.get(i);
+            //Integer areaId = (Integer) dataArr[0];
+            String name = (String) dataArr[1];
+            xData.add(name);
+            if(distinctMap.containsKey(name)) {
+                yData.add(distinctMap.get(name));
+            }else {
+                yData.add(new BigInteger("0"));
+            }
+        }
+        /*for(int i = 0; i < allGroup.size(); i ++) {
             Object [] dataArr = (Object [])allGroup.get(i);
             String name = (String)dataArr[0];
             BigInteger count = (BigInteger) dataArr[1];
@@ -226,8 +266,8 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
                 xData.add(name);
                 yData.add(count);
             }
-        }
-        List group1 = statisticService.getOrgAreaNameGroupByClazz("1");
+        }*/
+        List group1 = statisticService.getOrgAreaNameGroupByClazz("1", currentCityId);
         List<String> xData1 = new ArrayList<>(xData.size());
         List<BigInteger> yData1 = new ArrayList<>(xData.size());
         for(int i = 0; i < xData.size(); i ++) {
@@ -250,7 +290,7 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
                 yData1.add(new BigInteger("0"));
             }
         }
-        List group2 = statisticService.getOrgAreaNameGroupByClazz("2");
+        List group2 = statisticService.getOrgAreaNameGroupByClazz("2", currentCityId);
         List<String> xData2 = new ArrayList<>(xData.size());
         List<BigInteger> yData2 = new ArrayList<>(xData.size());
         for(int i = 0; i < xData.size(); i ++) {
@@ -273,7 +313,7 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
                 yData2.add(new BigInteger("0"));
             }
         }
-        List group3 = statisticService.getOrgAreaNameGroupByClazz("3");
+        List group3 = statisticService.getOrgAreaNameGroupByClazz("3", currentCityId);
         List<String> xData3 = new ArrayList<>(xData.size());
         List<BigInteger> yData3 = new ArrayList<>(xData.size());
         for(int i = 0; i < xData.size(); i ++) {
@@ -296,7 +336,7 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
                 yData3.add(new BigInteger("0"));
             }
         }
-        List group4 = statisticService.getOrgAreaNameGroupByClazz("4");
+        List group4 = statisticService.getOrgAreaNameGroupByClazz("4", currentCityId);
         List<String> xData4 = new ArrayList<>(xData.size());
         List<BigInteger> yData4 = new ArrayList<>(xData.size());
         for(int i = 0; i < xData.size(); i ++) {
@@ -359,65 +399,70 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "医疗资源库 - 医疗人员分布")
     public Envelop getMedicalStaffDistribution() {
         Envelop envelop = new Envelop();
+        int currentCityId = statisticService.getCurrentCityId();
+        List districtList = statisticService.getDistrict(currentCityId);
         List<Map> eChartReportModels = new ArrayList<>(2);
-        List doctorGroup = statisticService.getMedicalAreaCountGroupByRole("Doctor");
-        List<String> xData = new ArrayList<>(doctorGroup.size());
-        List<BigInteger> yData = new ArrayList<>(doctorGroup.size());
+        Map<Integer, BigInteger> distinctMap = new HashMap();
+        //医生信息
+        List doctorGroup = statisticService.getMedicalAreaCountGroupByRole("Doctor", currentCityId);
         for(int i = 0; i < doctorGroup.size(); i ++) {
-            Object [] dataArr = (Object [])doctorGroup.get(i);
+            Object [] dataArr = (Object[]) doctorGroup.get(i);
             if(dataArr[0] != null) {
                 Integer areaId = (Integer) dataArr[0];
                 BigInteger count = (BigInteger) dataArr[1];
-                String areaName = statisticService.getAreaNameById(areaId);
-                if(xData.contains(areaName)) {
-                    int position = xData.indexOf(areaName);
-                    BigInteger total = yData.get(position).add(count);
-                    yData.set(position, total);
-                }else {
-                    xData.add(areaName);
-                    yData.add(count);
-                }
-            }
-        }
-        List nurseGroup = statisticService.getMedicalAreaCountGroupByRole("Nurse");
-        List<String> xData1 = new ArrayList<>(doctorGroup.size());
-        List<BigInteger> yData1 = new ArrayList<>(doctorGroup.size());
-        for(int i = 0; i < xData.size(); i ++) {
-            boolean isInit = false;
-            String areaName = xData.get(i);
-            for(int j = 0; j < nurseGroup.size(); j ++) {
-                Object [] dataArr = (Object [])nurseGroup.get(j);
-                if(dataArr[0] != null) {
-                    Integer areaId = (Integer) dataArr[0];
-                    BigInteger count = (BigInteger) dataArr[1];
-                    String areaName1 = statisticService.getAreaNameById(areaId);
-                    if(areaName1.equals(areaName)) {
-                        xData1.add(areaName1);
-                        yData1.add(count);
-                        isInit = true;
-                        break;
+                if (areaId != null) {
+                    if (distinctMap.containsKey(areaId)) {
+                        distinctMap.put(areaId, count.add(distinctMap.get(areaId)));
+                    } else {
+                        distinctMap.put(areaId, count);
                     }
                 }
             }
-            if(!isInit) {
-                xData1.add(xData.get(i));
-                yData1.add(new BigInteger("0"));
+        }
+        List<String> xData = new ArrayList<>(districtList.size());
+        List<BigInteger> yData = new ArrayList<>(districtList.size());
+        for(int i = 0; i < districtList.size(); i ++) {
+            Object [] dataArr = (Object[]) districtList.get(i);
+            Integer areaId = (Integer) dataArr[0];
+            String name = (String) dataArr[1];
+            xData.add(name);
+            if(distinctMap.containsKey(areaId)) {
+                yData.add(distinctMap.get(areaId));
+            }else {
+                yData.add(new BigInteger("0"));
             }
         }
+        //护士信息
+        distinctMap.clear();
+        List nurseGroup = statisticService.getMedicalAreaCountGroupByRole("Nurse", currentCityId);
         for(int i = 0; i < nurseGroup.size(); i ++) {
-            Object [] dataArr = (Object [])nurseGroup.get(i);
+            Object [] dataArr = (Object[]) nurseGroup.get(i);
             if(dataArr[0] != null) {
                 Integer areaId = (Integer) dataArr[0];
                 BigInteger count = (BigInteger) dataArr[1];
-                String areaName1 = statisticService.getAreaNameById(areaId);
-                if(!xData.contains(areaName1)) {
-                    xData.add(areaName1);
-                    yData.add(new BigInteger("0"));
-                    xData1.add(areaName1);
-                    yData1.add(count);
+                if (areaId != null) {
+                    if (distinctMap.containsKey(areaId)) {
+                        distinctMap.put(areaId, count.add(distinctMap.get(areaId)));
+                    } else {
+                        distinctMap.put(areaId, count);
+                    }
                 }
             }
         }
+        List<String> xData1 = new ArrayList<>(districtList.size());
+        List<BigInteger> yData1 = new ArrayList<>(districtList.size());
+        for(int i = 0; i < districtList.size(); i ++) {
+            Object [] dataArr = (Object[]) districtList.get(i);
+            Integer areaId = (Integer) dataArr[0];
+            String name = (String) dataArr[1];
+            xData1.add(name);
+            if(distinctMap.containsKey(areaId)) {
+                yData1.add(distinctMap.get(areaId));
+            }else {
+                yData1.add(new BigInteger("0"));
+            }
+        }
+
         Map<String, Object> doctorMap = new HashMap<>(4);
         doctorMap.put("name", "医生");
         doctorMap.put("xData", xData);
@@ -441,14 +486,15 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
         Envelop envelop = new Envelop();
         EchartReportModel echartReportModel = new EchartReportModel();
         //根据角色/医院获取Doctor总数
-        BigInteger doctorCount = statisticService.getMedicalCountByRoleType("Doctor");
+        int currentCityId = statisticService.getCurrentCityId();
+        BigInteger doctorCount = statisticService.getMedicalCountByRoleType("Doctor", currentCityId);
         List<MapDataModel> MapDataModelList = new ArrayList<>();
         MapDataModel mapDataModel = new MapDataModel();
         mapDataModel.setName("医生");
         mapDataModel.setValue(String.valueOf(doctorCount));
         MapDataModelList.add(mapDataModel);
 
-        BigInteger nurseCount = statisticService.getMedicalCountByRoleType("Nurse");
+        BigInteger nurseCount = statisticService.getMedicalCountByRoleType("Nurse", currentCityId);
         mapDataModel = new MapDataModel();
         mapDataModel.setName("护士");
         mapDataModel.setValue(String.valueOf(nurseCount));
@@ -799,27 +845,25 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.Resources.GetElectronicMedicalOrgDistributed, method = RequestMethod.GET)
     @ApiOperation(value = "电子病例 - 电子病历采集医院分布")
-    public Envelop getElectronicMedicalOrgDistributed() {
+    public Envelop getElectronicMedicalOrgDistributed() throws Exception {
         Envelop envelop = new Envelop();
-        try {
-            FacetField facetField = solrUtil.getFacetField("HealthProfile", "org_code", null, 0, 0, 1000000, false);
-            List<FacetField.Count> countList = facetField.getValues();
-            Map<String, Long> dataMap = new HashMap<>(countList.size());
-            for (FacetField.Count count : countList) {
-                String orgCode = count.getName();
+        int currentCityId = statisticService.getCurrentCityId();
+        FacetField facetField = solrUtil.getFacetField("HealthProfile", "org_code", null, 0, 0, 1000000, false);
+        List<FacetField.Count> countList = facetField.getValues();
+        Map<String, Long> dataMap = new HashMap<>(countList.size());
+        for (FacetField.Count count : countList) {
+            String orgCode = count.getName();
+            Integer areaId = statisticService.getOrgAreaByCode(orgCode, currentCityId);
+            if(areaId != null && areaId != 0) {
                 String orgName = statisticService.getOrgNameByCode(orgCode);
                 if (!StringUtils.isEmpty(orgName)) {
                     long count1 = count.getCount();
                     dataMap.put(orgName, count1);
                 }
             }
-            envelop.setSuccessFlg(true);
-            envelop.setObj(dataMap);
-        }catch (Exception e) {
-            e.printStackTrace();
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg(e.getMessage());
         }
+        envelop.setSuccessFlg(true);
+        envelop.setObj(dataMap);
         return envelop;
     }
 
@@ -827,12 +871,27 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "电子病例 - 电子病历采集科室分布")
     public Envelop getElectronicMedicalDeptDistributed() throws Exception{
         Envelop envelop = new Envelop();
+        Envelop orgEnvelop = getElectronicMedicalOrgDistributed();
+        if(orgEnvelop.isSuccessFlg() ) {
+            Map result1 = (Map)orgEnvelop.getObj();
+            if(result1.size() <= 0) {
+                envelop.setSuccessFlg(true);
+                envelop.setObj(new HashMap<>());
+                return envelop;
+            }
+        }else {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorCode(orgEnvelop.getErrorCode());
+            envelop.setErrorMsg(orgEnvelop.getErrorMsg());
+            envelop.setObj(new HashMap<>());
+            return envelop;
+        }
         FacetField facetField = solrUtil.getFacetField("HealthProfile", "EHR_000081", null, 0, 0, 1000000, false);
         List<FacetField.Count> countList = facetField.getValues();
         Map<String, Long> dataMap = new HashMap<>(countList.size());
         for (FacetField.Count count : countList) {
-            String orgCode = count.getName();
-            String deptName = statisticService.getDeptNameByCode(orgCode);
+            String deptCode = count.getName();
+            String deptName = statisticService.getDeptNameByCode(deptCode);
             if (!StringUtils.isEmpty(deptName)) {
                 long count1 = count.getCount();
                 dataMap.put(deptName, count1);
