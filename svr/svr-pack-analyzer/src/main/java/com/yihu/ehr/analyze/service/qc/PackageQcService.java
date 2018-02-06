@@ -87,6 +87,7 @@ public class PackageQcService {
                 i[0]++;
 
                 Map<String, Object> map = new HashMap<>();
+                map.put("orgCode", dataSetRecord.getOrgCode());
                 map.put("patientId", dataSetRecord.getPatientId());
                 map.put("eventNo", dataSetRecord.getEventNo());
                 map.put("eventTime", dataSetRecord.getEventTime());
@@ -103,6 +104,7 @@ public class PackageQcService {
             Map<String, DataElementRecord> records = dataSetRecord.getRecords();
             int size = records.size();
             Map<String, Object> map = new HashMap<>();
+            map.put("orgCode", dataSetRecord.getOrgCode());
             map.put("dataSet", dataSetRecord.getCode());
             map.put("dataSetRow", size);
             map.put("receiveTime", mPackage.getReceiveDate());

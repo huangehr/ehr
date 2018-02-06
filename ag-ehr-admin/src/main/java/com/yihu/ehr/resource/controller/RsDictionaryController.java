@@ -96,16 +96,7 @@ public class RsDictionaryController extends BaseController {
     public Envelop deleteRsDictionary(
             @ApiParam(name = "id", value = "id", defaultValue = "")
             @PathVariable(value = "id") int id) throws Exception {
-        Envelop envelop = new Envelop();
-        try{
-            rsDictionaryClient.deleteRsDictionary(id);
-            envelop.setSuccessFlg(true);
-        } catch (Exception e){
-            e.printStackTrace();
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg(FeignExceptionUtils.getErrorMsg(e));
-        }
-        return envelop;
+        return rsDictionaryClient.deleteRsDictionary(id);
     }
 
     @RequestMapping(value =  ServiceApi.Resources.Dict, method = RequestMethod.GET)

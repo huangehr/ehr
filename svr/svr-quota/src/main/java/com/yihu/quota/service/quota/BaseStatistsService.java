@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 
 import java.net.URLDecoder;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -191,6 +192,7 @@ public class BaseStatistsService {
                     }else {
                         moleKeyVal = moleKeyVal + "-" + moleMap.get(moleDimensions[i]).toString() ;
                     }
+                    map.put("firstColumn", moleMap.get("firstColumn"));
                     map.put(moleDimensions[i], moleMap.get(moleDimensions[i]).toString());
                 }
                 if (moleResultVal == 0) {
@@ -353,7 +355,9 @@ public class BaseStatistsService {
                     dataMap.put("firstColumn",map.get("text"));
                 }
                 if(key.equals("SUM(result)")){
-                    dataMap.put("result", map.get(key).toString());
+                    NumberFormat nf = NumberFormat.getInstance();
+                    nf.setGroupingUsed(false);
+                    dataMap.put("result",  nf.format(map.get(key)));
                 }
             }
              resultList.add(dataMap);
@@ -391,7 +395,9 @@ public class BaseStatistsService {
                     dataMap.put(map.get(orgHealthCategoryCode).toString(),map.get(orgHealthCategoryCode));
                 }
                 if(key.equals("SUM(result)")){
-                    dataMap.put("result", map.get(key).toString());
+                    NumberFormat nf = NumberFormat.getInstance();
+                    nf.setGroupingUsed(false);
+                    dataMap.put("result",  nf.format(map.get(key)));
                 }
                 if(key.equals("quotaDate")){
                     SimpleDateFormat format =  new SimpleDateFormat("yyyy-MM-dd");
@@ -427,7 +433,8 @@ public class BaseStatistsService {
                 if(dimenList.contains(key)){
                     if(dimensionDicMap.get(map.get(key).toString().toLowerCase())  != null){
 //                        dataMap.put(key,dimensionDicMap.get(map.get(key).toString().toLowerCase()));
-                        dataMap.put(key,map.get(key).toString());
+//                        dataMap.put(key,map.get(key).toString());
+                        dataMap.put(key,dimensionDicMap.get(map.get(key).toString().toLowerCase()));
                         dataMap.put(key+"Name",dimensionDicMap.get(map.get(key).toString().toLowerCase()));
                         dataMap.put("firstColumn",dimensionDicMap.get(map.get(key).toString().toLowerCase()));
                     }else {
@@ -440,7 +447,9 @@ public class BaseStatistsService {
                     dataMap.put("firstColumn",map.get("text"));
                 }
                 if(key.equals("SUM(result)")){
-                    dataMap.put("result", map.get(key).toString());
+                    NumberFormat nf = NumberFormat.getInstance();
+                    nf.setGroupingUsed(false);
+                    dataMap.put("result",  nf.format(map.get(key)));
                 }
             }
             resultList.add(dataMap);

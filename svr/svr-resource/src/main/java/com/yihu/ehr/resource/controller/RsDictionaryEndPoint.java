@@ -1,13 +1,14 @@
 package com.yihu.ehr.resource.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.model.resource.MRsDictionary;
 import com.yihu.ehr.resource.model.RsDictionary;
 import com.yihu.ehr.resource.service.RsDictionaryEntryService;
 import com.yihu.ehr.resource.service.RsDictionaryService;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -58,7 +59,6 @@ public class RsDictionaryEndPoint extends EnvelopRestEndPoint {
     }
 
 
-
     @RequestMapping(value = ServiceApi.Resources.DictList, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建标准字典", notes = "创建标准字典")
     public MRsDictionary createRsDictionary(
@@ -66,7 +66,7 @@ public class RsDictionaryEndPoint extends EnvelopRestEndPoint {
             @RequestBody String jsonData) throws Exception {
         RsDictionary rsDictionary = toEntity(jsonData, RsDictionary.class);
         String code = rsDictionary.getCode();
-        if(isExistence(code)){
+        if (isExistence(code)) {
             throw new Exception("字典代码不能重复");
         }
         dictionaryService.insert(rsDictionary);
@@ -87,14 +87,26 @@ public class RsDictionaryEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.Resources.Dict, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除标准字典", notes = "删除标准字典")
-    public boolean deleteRsDictionary(
+    public Envelop deleteRsDictionary(
             @ApiParam(name = "id", value = "id", defaultValue = "")
             @PathVariable(value = "id") int id) throws Exception {
-
-        RsDictionary dictionary = dictionaryService.findById(id);
-        hasChild(dictionary);
-        dictionaryService.delete(id);
-        return true;
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(false);
+        try {
+            RsDictionary dictionary = dictionaryService.findById(id);
+            int count = dictionaryEntryService.countByDictId(dictionary.getId());
+            if (count != 0) {
+                envelop.setErrorMsg("该字典存在字典项，不可删除。");
+            } else {
+                dictionaryService.delete(id);
+                envelop.setSuccessFlg(true);
+                envelop.setErrorMsg("删除成功。");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            envelop.setErrorMsg("删除发生异常。");
+        }
+        return envelop;
     }
 
     @RequestMapping(value = ServiceApi.Resources.Dict, method = RequestMethod.GET)
@@ -112,19 +124,19 @@ public class RsDictionaryEndPoint extends EnvelopRestEndPoint {
     public boolean createRsDictionaries(
             @ApiParam(name = "json_data", value = "", defaultValue = "")
             @RequestBody String jsonData) throws Exception {
-        List<RsDictionary> dictionaries = toEntity(jsonData,List.class);
+        List<RsDictionary> dictionaries = toEntity(jsonData, List.class);
         dictionaryService.batchInsert(dictionaries);
         return true;
     }
 
-    @RequestMapping(value = ServiceApi.Resources.DictExistence,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.DictExistence, method = RequestMethod.GET)
     @ApiOperation("根据过滤条件判断是否存在")
     public boolean isExistenceFilters(
-            @ApiParam(name="filters",value="filters",defaultValue = "")
-            @RequestParam(value="filters") String filters) throws Exception {
+            @ApiParam(name = "filters", value = "filters", defaultValue = "")
+            @RequestParam(value = "filters") String filters) throws Exception {
 
-        List ls = dictionaryService.search("",filters,"", 1, 1);
-        return ls!=null && ls.size()>0;
+        List ls = dictionaryService.search("", filters, "", 1, 1);
+        return ls != null && ls.size() > 0;
     }
 
     @RequestMapping(value = ServiceApi.Resources.DictEntryBatch, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -132,12 +144,13 @@ public class RsDictionaryEndPoint extends EnvelopRestEndPoint {
     public boolean createDictAndEntries(
             @RequestBody String jsonData) throws Exception {
 
-        List models = objectMapper.readValue(jsonData, new TypeReference<List>() {});
+        List models = objectMapper.readValue(jsonData, new TypeReference<List>() {
+        });
         dictionaryService.batchInsertDictsAndEntry(models);
         return true;
     }
 
-    @RequestMapping(value = ServiceApi.Resources.DictCodesExistence,method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Resources.DictCodesExistence, method = RequestMethod.POST)
     @ApiOperation("获取已存在字典编码")
     public List codeExistence(
             @RequestBody String codes) throws Exception {
@@ -153,18 +166,12 @@ public class RsDictionaryEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "code") String code) throws Exception {
 
         List<RsDictionary> ls = dictionaryService.findByField("code", code);
-        return ls.size()>0? convertToModel(ls.get(0), MRsDictionary.class) : null;
+        return ls.size() > 0 ? convertToModel(ls.get(0), MRsDictionary.class) : null;
     }
 
 
     private boolean isExistence(String code) {
-        return dictionaryService.findByField("code",code).size() != 0;
-    }
-
-    private void hasChild(RsDictionary dictionary) throws Exception {
-        if(dictionaryEntryService.countByDictId(dictionary.getId())!=0){
-            throw new Exception("该字典包含字典项，不可删除");
-        }
+        return dictionaryService.findByField("code", code).size() != 0;
     }
 
 }

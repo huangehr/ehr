@@ -216,8 +216,10 @@ public class DoctorController extends BaseController {
             if (StringUtils.isEmpty(detailModel.getName())) {
                 errorMsg += "姓名不能为空!";
             }
-            if (StringUtils.isEmpty(detailModel.getIdCardNo()) && pattern.matcher(detailModel.getIdCardNo()).find()) {
-                errorMsg += "身份证号有误!";
+            if (StringUtils.isEmpty(detailModel.getIdCardNo()) ) {
+                errorMsg += "身份证号不能为空!";
+            }else if(!pattern.matcher(detailModel.getIdCardNo()).find()){
+                errorMsg += "身份证号格式有误!";
             }
             if (StringUtils.isEmpty(detailModel.getSkill())) {
                 errorMsg += "医生专长不能为空!";
@@ -228,10 +230,6 @@ public class DoctorController extends BaseController {
             if (StringUtils.isEmpty(detailModel.getPhone())) {
                 errorMsg += "手机-主号码不能为空!";
             }
-            if (StringUtils.isEmpty(detailModel.getOfficeTel())) {
-                errorMsg += "办公电话不能为空!";
-            }
-
             if (StringUtils.isNotEmpty(errorMsg)) {
                 return failed(errorMsg);
             }
@@ -266,8 +264,10 @@ public class DoctorController extends BaseController {
             if (StringUtils.isEmpty(detailModel.getName())) {
                 errorMsg += "姓名不能为空!";
             }
-            if (StringUtils.isEmpty(detailModel.getIdCardNo()) && pattern.matcher(detailModel.getIdCardNo()).find()) {
-                errorMsg += "身份证号有误!";
+            if (StringUtils.isEmpty(detailModel.getIdCardNo()) ) {
+                errorMsg += "身份证号不能为空!";
+            }else if(!pattern.matcher(detailModel.getIdCardNo()).find()){
+                errorMsg += "身份证号格式有误!";
             }
             if (StringUtils.isEmpty(detailModel.getSkill())) {
                 errorMsg += "医生专长不能为空!";
@@ -278,16 +278,12 @@ public class DoctorController extends BaseController {
             if (StringUtils.isEmpty(detailModel.getPhone())) {
                 errorMsg += "手机-主号码不能为空!";
             }
-            if (StringUtils.isEmpty(detailModel.getOfficeTel())) {
-                errorMsg += "办公电话不能为空!";
-            }
-
             if (StringUtils.isNotEmpty(errorMsg)) {
                 return failed(errorMsg);
             }
             MDoctor mDoctor = convertToMDoctor(detailModel);
             mDoctor = doctorClient.updateDoctor(objectMapper.writeValueAsString(mDoctor), model);
-            if(mDoctor==null){
+            if(mDoctor == null){
                 return failed("保存失败!");
             }
 
