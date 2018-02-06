@@ -36,6 +36,7 @@ import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
@@ -288,7 +289,13 @@ public class UserController extends BaseController {
                 return failed("电话号码已存在!");
             }
 
-            detailModel.setPassword(AgAdminConstants.DefaultPassword);
+            //设置默认密码为身份证后六位
+            if(!org.springframework.util.StringUtils.isEmpty(detailModel.getIdCardNo())&&detailModel.getIdCardNo().length()>7){
+                String  defaultPassword=detailModel.getIdCardNo().substring(detailModel.getIdCardNo().length()-6,detailModel.getIdCardNo().length());
+                detailModel.setPassword(defaultPassword);
+            }else{
+                detailModel.setPassword(AgAdminConstants.DefaultPassword);
+            }
             detailModel.setRole(null);
             MUser mUser = convertToMUser(detailModel);
 //            增加居民注册账号时身份证号的校验，demographics表中已存在，users表增加demographic_id身份证号关联
