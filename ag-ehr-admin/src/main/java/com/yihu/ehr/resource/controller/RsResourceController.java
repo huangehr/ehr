@@ -413,6 +413,8 @@ public class RsResourceController extends BaseController {
                                 chart ="2";
                             }else if(chart.equals("pie")){
                                 chart ="3";
+                            } else if ("mixed".equals(chart)) {
+                                chart = charstr;
                             }
                         }else{
                             chart = charstr;
