@@ -878,15 +878,10 @@ public class UserController extends BaseController {
         return existPhones;
     }
 
-    /**
-     * 账户体系-密码重置
-     * @param userId
-     * @return
-     */
-    @RequestMapping(value = "systemUsers/password/{user_id}", method = RequestMethod.PUT)
-    @ApiOperation(value = "重设密码", notes = "用户忘记密码管理员帮助重新还原密码，初始密码123456")
+    @RequestMapping(value = "systemUsersResetPass/password/{user_id}", method = RequestMethod.PUT)
+    @ApiOperation(value = "重设密码", notes = "账户体系-密码重置。用户忘记密码管理员帮助重新还原密码，初始密码123456")
     public Envelop systemUsersResetPass(
-            @ApiParam(name = "user_id", value = "id", defaultValue = "")
+            @ApiParam(name = "user_id", value = "用户id", defaultValue = "")
             @PathVariable(value = "user_id") String userId) {
         Envelop envelop = new Envelop();
         try {
@@ -903,93 +898,61 @@ public class UserController extends BaseController {
         }
     }
 
-    /**
-     * 账户体系-新增用户
-     * @param userJsonData
-     * @param registrationType
-     * @return
-     */
-    @RequestMapping(value = "/systemUser", method = RequestMethod.POST)
-    @ApiOperation(value = "创建用户", notes = "重新绑定用户信息")
+
+    @RequestMapping(value = "/createSystemUser", method = RequestMethod.POST)
+    @ApiOperation(value = "创建用户", notes = "账户体系-新增用户")
     public Envelop createSystemUser(
             @ApiParam(name = "user_json_data", value = "用户信息json", defaultValue = "")
             @RequestParam(value = "user_json_data") String userJsonData,
             @ApiParam(name = "registration_type", value = "用户注册方式：默认0为账户注册、1为身份证号注册，2为电话号码注册", defaultValue = "")
             @RequestParam(value = "registration_type") String registrationType) {
-
         try {
-
             UserDetailModel detailModel = objectMapper.readValue(userJsonData, UserDetailModel.class);
             String idCard = detailModel.getIdCardNo();
-           String telephone = detailModel.getTelephone();
+            String telephone = detailModel.getTelephone();
             String errorMsg = null;
             if(StringUtils.isNotEmpty(registrationType)&&registrationType.equals("2")){
                 //2为电话号码注册
                 if (StringUtils.isEmpty(telephone)) {
-                    failed("电话号码不能为空!");
+                    return failed("电话号码不能为空!");
                 }else{
                     detailModel.setLoginCode(telephone);
                 }
             }else if(StringUtils.isNotEmpty(registrationType)&&registrationType.equals("1")){
                 //1为身份证号注册
                 if (StringUtils.isEmpty(idCard)) {
-                    failed("身份证号不能为空!");
+                    return  failed("身份证号不能为空!");
                 }else{
                     detailModel.setLoginCode(idCard);
                 }
-
             }else{
                 //默认0为账户注册
                 if (StringUtils.isEmpty(detailModel.getLoginCode())) {
-                    errorMsg += "账户不能为空";
+                    return  failed ("账户不能为空") ;
                 }
             }
-
             if (StringUtils.isEmpty(detailModel.getRealName())) {
                 errorMsg += "姓名不能为空!";
             }
-            if (StringUtils.isEmpty(detailModel.getEmail())) {
-                errorMsg += "邮箱不能为空!";
+            if (StringUtils.isNotEmpty(idCard) && userClient.isIdCardExists(idCard)) {
+                return failed("身份证号已存在!");
             }
-            if (StringUtils.isEmpty(detailModel.getTelephone())) {
-                errorMsg += "电话号码不能为空!";
-            }
-            String roles = detailModel.getRole();
-            if (StringUtils.isEmpty(roles)) {
-                errorMsg += "用户角色不能为空!";
-            }
-            if (StringUtils.isNotEmpty(errorMsg)) {
-                return failed(errorMsg);
+            if (StringUtils.isNotEmpty(telephone) && userClient.isTelephoneExists(telephone)) {
+                return failed("电话号码已存在!");
             }
             if (userClient.isUserNameExists(detailModel.getLoginCode())) {
                 return failed("账户已存在!");
             }
-            if (userClient.isIdCardExists(idCard)) {
-                return failed("身份证号已存在!");
+            if (StringUtils.isNotEmpty(errorMsg)) {
+                return failed(errorMsg);
             }
-            if (userClient.isEmailExists(detailModel.getEmail())) {
-                return failed("邮箱已存在!");
-            }
-            if (userClient.isTelephoneExists(detailModel.getTelephone())) {
-                return failed("电话号码已存在!");
-            }
-
-            //设置默认密码为身份证后六位
-            if(!org.springframework.util.StringUtils.isEmpty(detailModel.getIdCardNo())&&detailModel.getIdCardNo().length()>7){
-                String  defaultPassword=detailModel.getIdCardNo().substring(detailModel.getIdCardNo().length()-6,detailModel.getIdCardNo().length());
-                detailModel.setPassword(defaultPassword);
-            }else{
-                detailModel.setPassword(AgAdminConstants.DefaultPassword);
-            }
-            detailModel.setRole(null);
             MUser mUser = convertToMUser(detailModel);
-//            增加居民注册账号时身份证号的校验，demographics表中已存在，users表增加demographic_id身份证号关联
+            //增加居民注册账号时身份证号的校验，demographics表中已存在，users表增加demographic_id身份证号关联
             mUser.setDemographicId(idCard);
             mUser = userClient.createUser(objectMapper.writeValueAsString(mUser));
             if (mUser == null) {
                 return failed("保存失败!");
             }
-            //新增时先新增用户再保存所属角色组-人员关系表，用户新增失败（新增失败）、角色组关系表新增失败（删除新增用户-提示新增失败）
             detailModel = convertToUserDetailModel(mUser);
             return success(detailModel);
         } catch (Exception ex) {
