@@ -166,4 +166,8 @@ public interface UserClient {
     @ApiOperation("根据身份证号码获取用户id")
     String getUserIdByIdCardNo(
             @RequestParam(value="idCardNo") String idCardNo);
+
+    @RequestMapping(value = ServiceApi.Users.UpdateSystemUser, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "修改用户", notes = "账户体系-修改用户信息")
+    MUser UpdateSystemUser(@RequestBody String userJsonData);
 }

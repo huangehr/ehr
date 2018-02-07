@@ -879,7 +879,7 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping(value = "systemUsersResetPass/password/{user_id}", method = RequestMethod.PUT)
-    @ApiOperation(value = "重设密码", notes = "账户体系-密码重置。用户忘记密码管理员帮助重新还原密码，初始密码123456")
+    @ApiOperation(value = "账户体系-重设密码", notes = "账户体系-密码重置。用户忘记密码管理员帮助重新还原密码，初始密码123456")
     public Envelop systemUsersResetPass(
             @ApiParam(name = "user_id", value = "用户id", defaultValue = "")
             @PathVariable(value = "user_id") String userId) {
@@ -900,7 +900,7 @@ public class UserController extends BaseController {
 
 
     @RequestMapping(value = "/createSystemUser", method = RequestMethod.POST)
-    @ApiOperation(value = "创建用户", notes = "账户体系-新增用户")
+    @ApiOperation(value = "账户体系-创建用户", notes = "账户体系-新增用户")
     public Envelop createSystemUser(
             @ApiParam(name = "user_json_data", value = "用户信息json", defaultValue = "")
             @RequestParam(value = "user_json_data") String userJsonData,
@@ -957,7 +957,57 @@ public class UserController extends BaseController {
             return success(detailModel);
         } catch (Exception ex) {
             ex.printStackTrace();
-            return failedSystem();
+            return failed(ex.getMessage());
+        }
+    }
+
+
+    @RequestMapping(value = "/updateSystemUser", method = RequestMethod.PUT)
+    @ApiOperation(value = "账户体系-修改用户", notes = "账户体系-修改用户信息")
+    public Envelop updateSystemUser(
+            @ApiParam(name = "user_json_data", value = "", defaultValue = "")
+            @RequestParam(value = "user_json_data") String userJsonData) {
+        try {
+            UserDetailModel detailModel = toEntity(userJsonData, UserDetailModel.class);
+            String errorMsg = "";
+            if (StringUtils.isEmpty(detailModel.getLoginCode())) {
+                errorMsg += "账户不能为空";
+            }
+            if (StringUtils.isEmpty(detailModel.getRealName())) {
+                errorMsg += "姓名不能为空!";
+            }
+            if (StringUtils.isEmpty(detailModel.getId())) {
+                errorMsg += "id不能为空!";
+            }
+            if (StringUtils.isNotEmpty(errorMsg)) {
+                return failed(errorMsg);
+            }
+            MUser mUser = userClient.getUser(detailModel.getId());
+            if (!mUser.getLoginCode().equals(detailModel.getLoginCode())
+                    && userClient.isUserNameExists(detailModel.getLoginCode())) {
+                return failed("账户已存在!");
+            }
+            if (null!= detailModel.getIdCardNo() && !detailModel.getIdCardNo().equals(mUser.getIdCardNo())
+                    && userClient.isIdCardExists(detailModel.getIdCardNo())) {
+                return failed("身份证号已存在!");
+            }
+            if (null !=detailModel.getTelephone() && !detailModel.getTelephone().equals(mUser.getTelephone())
+                    && userClient.isTelephoneExists(detailModel.getTelephone())) {
+                return failed("电话号码已存在!");
+            }
+            String pass = mUser.getPassword();
+            mUser = convertToMUser(detailModel);
+            mUser.setPassword(pass);
+            mUser.setRole(null);
+            mUser = userClient.updateUser(objectMapper.writeValueAsString(mUser));
+            if (mUser != null) {
+                detailModel = convertToUserDetailModel(mUser);
+                return success(detailModel);
+            }
+            return failed("保存失败！");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return failed(ex.getMessage());
         }
     }
 
