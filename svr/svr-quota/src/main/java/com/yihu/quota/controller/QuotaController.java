@@ -211,7 +211,7 @@ public class QuotaController extends BaseController {
             if(filters!=null){
                 filters = URLDecoder.decode(filters, "UTF-8");
             }
-            List<Map<String, Object>> result =  baseStatistsService.getSimpleQuotaReport(code,filters,dimension);
+            List<Map<String, Object>> result =  baseStatistsService.getSimpleQuotaReport(code,filters,dimension,true);
             envelop.setObj(result);
             envelop.setSuccessFlg(true);
             return envelop;
