@@ -22,6 +22,11 @@ import java.util.Map;
 @RequestMapping(ApiVersion.Version1_0)
 public interface DailyReportClient {
 
+    @RequestMapping(value = ServiceApi.PackageAnalyzer.DailyReport, method = RequestMethod.POST)
+    Envelop dailyReport(
+            @ApiParam(name = "report", value = "日报json对象")
+            @RequestParam(value = "report", required = true) String report);
+
     @RequestMapping(value = ServiceApi.PackageAnalyzer.List, method = RequestMethod.POST)
     Envelop list(
             @ApiParam(name = "filter", value = "过滤条件")

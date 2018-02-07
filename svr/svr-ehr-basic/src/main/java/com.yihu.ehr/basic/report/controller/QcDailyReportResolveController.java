@@ -1,8 +1,11 @@
 package com.yihu.ehr.basic.report.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.basic.report.service.JsonReportService;
 import com.yihu.ehr.basic.report.service.QcDailyReportResolveService;
 import com.yihu.ehr.basic.security.service.UserSecurityService;
+import com.yihu.ehr.basic.statistics.feign.DailyReportClient;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.entity.report.JsonReport;
@@ -17,14 +20,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -42,14 +50,16 @@ public class QcDailyReportResolveController extends EnvelopRestEndPoint {
     private JsonReportService reportService;
     @Autowired
     private QcDailyReportResolveService qcDailyReportResolveService;
+    @Autowired
+    private DailyReportClient dailyReportClient;
     @Value("${fast-dfs.public-server}")
     private String fastDfsPublicServers;
 
     @RequestMapping(value = "/report/receiveReportFile", method = RequestMethod.POST)
     @ApiOperation(value = "接收质控包")
     Envelop receiveReportFile(
-            @ApiParam(name = "reportFile", value = "质控包", allowMultiple = true)
-            @RequestParam(value = "reportFile") File reportFile,
+            @ApiParam(name = "reportFile", value = "质控包")
+            @RequestParam(value = "reportFile") MultipartFile reportFile,
             @ApiParam(name = "org_code", value = "机构代码")
             @RequestParam(value = "org_code") String orgCode,
             @ApiParam(name = "encrypt_pwd", value = "解压密码,二次加密")
@@ -67,8 +77,11 @@ public class QcDailyReportResolveController extends EnvelopRestEndPoint {
                 throw new ApiException(HttpStatus.FORBIDDEN, "Invalid private key, maybe you miss the organization code?");
             }
             password = RSA.decrypt(encryptPwd, RSA.genPrivateKey(key.getPrivateKey()));
-            InputStream in = new FileInputStream(reportFile);
+            InputStream in =  reportFile.getInputStream();
+            InputStream stream =  reportFile.getInputStream();
             JsonReport jsonReport = reportService.receive(in, password, encryptPwd, md5, orgCode, type);
+            JsonNode jsonNode = objectMapper.readTree(stream);
+            saveQcPackage(jsonNode,jsonReport);
             if (jsonReport != null) {
                 envelop.setSuccessFlg(true);
             } else {
@@ -87,5 +100,29 @@ public class QcDailyReportResolveController extends EnvelopRestEndPoint {
         return qcDailyReportResolveService.setQcBeginDate(date);
     }
 
-
+    /**
+     * 把数据存到es并更新json_report表
+     * @param jsonNode
+     * @param jsonReport
+     */
+    @Async
+    public void saveQcPackage(JsonNode jsonNode,JsonReport jsonReport) {
+        try{
+            String org_code = jsonNode.get("org_code").asText();
+            String create_date = jsonNode.get("create_date").asText();
+            JsonNode data = jsonNode.get("data");
+            List<Map<String,Object>> list = objectMapper.readValue(objectMapper.writeValueAsString(data),List.class);
+            for(Map<String,Object> map:list){
+                map.put("org_code",org_code);
+                map.put("create_date",create_date);
+            }
+            dailyReportClient.dailyReport(objectMapper.writeValueAsString(list));
+            jsonReport.setParseDate(new Date());
+            jsonReport.setFinishDate(new Date());
+            jsonReport.setStatus(1);
+            reportService.updateJsonReport(jsonReport);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 }
