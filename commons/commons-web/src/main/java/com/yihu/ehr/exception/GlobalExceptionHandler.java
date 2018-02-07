@@ -2,6 +2,7 @@ package com.yihu.ehr.exception;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.hystrix.exception.HystrixRuntimeException;
+import com.yihu.ehr.util.log.LogService;
 import com.yihu.ehr.util.rest.Envelop;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -57,6 +58,7 @@ public class GlobalExceptionHandler {
             envelop.setErrorCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
             envelop.setErrorMsg(e.getMessage());
         }
+        LogService.getLogger().error(e.getMessage());
         e.printStackTrace();
         return envelop;
     }

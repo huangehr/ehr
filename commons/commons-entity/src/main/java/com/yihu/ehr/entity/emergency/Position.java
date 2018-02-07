@@ -9,21 +9,32 @@ import java.util.Date;
 /**
  * Entity - 定位数据表
  * Created by progr1mmer on 2017/11/7.
+ * 暂时不用
  */
 @Entity
 @Table(name = "eme_position")
 @Access(value = AccessType.PROPERTY)
 public class Position extends BaseIdentityEntity {
 
-    // 经度
+    /**
+     * 经度
+     */
     private double longitude;
-    // 纬度
+    /**
+     * 纬度
+     */
     private double latitude;
-    // 车牌号码
+    /**
+     * 车牌号码
+     */
     private String carId;
-    // 时间
+    /**
+     * 时间
+     */
     private Date date;
-    // 出勤ID
+    /**
+     * 出勤ID
+     */
     private int attendanceId;
 
     @Column(name = "longitude", nullable = false)
