@@ -58,7 +58,7 @@ public class QcDailyReportResolveController extends EnvelopRestEndPoint {
     @RequestMapping(value = "/report/receiveReportFile", method = RequestMethod.POST)
     @ApiOperation(value = "接收质控包")
     Envelop receiveReportFile(
-            @ApiParam(name = "reportFile", value = "质控包")
+            @ApiParam(name = "reportFile", value = "质控包", allowMultiple = true)
             @RequestParam(value = "reportFile") MultipartFile reportFile,
             @ApiParam(name = "org_code", value = "机构代码")
             @RequestParam(value = "org_code") String orgCode,
