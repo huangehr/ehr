@@ -1,7 +1,6 @@
 package com.yihu.ehr.adaption.controller;
 
 import com.yihu.ehr.adaption.common.ExtendEndPoint;
-import com.yihu.ehr.adaption.feignclient.DataSetClient;
 import com.yihu.ehr.adaption.model.AdapterCustomize;
 import com.yihu.ehr.adaption.model.AdapterDataSet;
 import com.yihu.ehr.adaption.model.OrgAdapterPlan;
@@ -10,6 +9,7 @@ import com.yihu.ehr.adaption.service.AdapterInfoSendService;
 import com.yihu.ehr.adaption.service.OrgAdapterPlanService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.adaption.MAdapterPlan;
+import com.yihu.ehr.standard.feignclient.DataSetClient;
 import com.yihu.ehr.util.log.LogService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

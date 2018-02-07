@@ -1,8 +1,8 @@
-package com.yihu.ehr.adaption.feignclient;
+package com.yihu.ehr.standard.feignclient;
 
-import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
+import com.yihu.ehr.constants.ServiceApi;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,9 +19,8 @@ import java.util.Map;
  * @version 1.0
  * @created 2016.2.1
  */
-//@ApiIgnore
-//@FeignClient(name = MicroServices.Standard)
-@Deprecated
+@ApiIgnore
+@FeignClient(name = MicroServices.Standard)
 public interface DictClient {
 
     @RequestMapping(value = ApiVersion.Version1_0+ ServiceApi.Standards.MetaDataWithDict, method = RequestMethod.GET)

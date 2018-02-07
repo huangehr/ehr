@@ -2,14 +2,8 @@ package com.yihu.ehr.adaption.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.yihu.ehr.adaption.feignclient.DispatchLogClient;
-import com.yihu.ehr.adaption.feignclient.StandardDispatchClient;
 import com.yihu.ehr.adaption.model.*;
-import com.yihu.ehr.adaption.model.OrgDict;
-import com.yihu.ehr.adaption.model.OrgDictItem;
-import com.yihu.ehr.adaption.model.OrgMetaData;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
-import com.yihu.ehr.model.standard.MDispatchLog;
 import com.yihu.ehr.standard.model.DispatchLog;
 import com.yihu.ehr.standard.service.DispatchLogService;
 import com.yihu.ehr.standard.service.DispatchService;
@@ -60,6 +54,7 @@ public class AdapterInfoSendService {
     private AdapterDictService adapterDictService;
     @Autowired
     private DispatchLogService dispatchLogService;
+
     @Autowired
     private DispatchService dispatchService;
 

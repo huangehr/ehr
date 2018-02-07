@@ -1,4 +1,4 @@
-package com.yihu.ehr.adaption.feignclient;
+package com.yihu.ehr.standard.feignclient;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
@@ -18,9 +18,6 @@ import java.util.Map;
  * @version 1.0
  * @created 2016.2.1
  */
-//@ApiIgnore
-//@FeignClient(name = MicroServices.Standard)
-@Deprecated
 @FeignClient(name = MicroServices.Standard)
 public interface DataSetClient {
 
@@ -28,7 +25,7 @@ public interface DataSetClient {
     @ApiOperation(value = "获取数据集 id-name : map集")
     Map getDataSetMapByIds(
             @RequestParam(value = "version") String version,
-            @RequestParam(value = "ids",required = false) String ids);
+            @RequestParam(value = "ids", required = false) String ids);
 
 
     @RequestMapping(value =ApiVersion.Version1_0+ ServiceApi.Standards.MetaDatasName, method = RequestMethod.POST)

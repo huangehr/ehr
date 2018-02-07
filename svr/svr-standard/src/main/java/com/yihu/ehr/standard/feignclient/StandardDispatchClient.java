@@ -1,8 +1,8 @@
-package com.yihu.ehr.adaption.feignclient;
+package com.yihu.ehr.standard.feignclient;
 
-import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
+import com.yihu.ehr.constants.ServiceApi;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -16,9 +16,8 @@ import java.util.Map;
 /**
  * Created by AndyCai on 2016/3/3.
  */
-//@FeignClient(name = MicroServices.Standard)
-//@ApiIgnore
-@Deprecated
+@FeignClient(name = MicroServices.Adaption)
+@ApiIgnore
 public interface StandardDispatchClient {
 
     @RequestMapping(value = ApiVersion.Version1_0+ ServiceApi.Standards.Dispatches, method = RequestMethod.POST)
