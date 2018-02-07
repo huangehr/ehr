@@ -235,20 +235,25 @@ public class BaseStatistsService {
      * 特殊机构类别 根据条件查询结果
      * @param code
      * @param filters
+     * @param  dateType 日期类型
+     * @param isTrunTree 是否转为机构类型树状机构
      * @throws Exception
      */
-    public List<Map<String, Object>>  getOrgHealthCategory(String code,String filters,String dateType) throws Exception {
+    public List<Map<String, Object>>  getOrgHealthCategory(String code,String filters,String dateType,boolean isTrunTree) throws Exception {
 
         List<Map<String, Object>> dimenListResult = new ArrayList<>();
         if(dateType != null && (dateType.contains("year") || dateType.contains("month") || dateType.contains("day"))){
             dimenListResult = getTimeAggregationResult(code,orgHealthCategoryCode,filters,dateType);//dimension 维度为 year,month,day
         }else {
-            TjQuota tjQuota= quotaDao.findByCode(code);
-            dimenListResult = esResultExtract.searcherByGroup(tjQuota, filters, orgHealthCategoryCode);
+            dimenListResult = getAggregationResult(code, orgHealthCategoryCode, filters);
         }
-        List<Map<String, Object>> orgHealthCategoryList = orgHealthCategoryStatisticsService.getOrgHealthCategoryTreeByPid(-1);
-        List<Map<String, Object>> resultList = setResult(code,orgHealthCategoryList,dimenListResult,dateType);
-        return resultList;
+        if(isTrunTree){
+            List<Map<String, Object>> orgHealthCategoryList = orgHealthCategoryStatisticsService.getOrgHealthCategoryTreeByPid(-1);
+            List<Map<String, Object>> resultList = setResult(code,orgHealthCategoryList,dimenListResult,dateType);
+            return resultList;
+        }else {
+            return dimenListResult;
+        }
     }
 
     /**
@@ -269,7 +274,7 @@ public class BaseStatistsService {
 //                    mapCategory.putAll(dimenMap);
                     if(dimenMap.containsKey(code)){
                         mapCategory.put(code,dimenMap.get(code));
-                        mapCategory.put("result",dimenMap.get("result"));
+                        mapCategory.put("result",dimenMap.get("result")!=null ? dimenMap.get("result"):dimenMap.get(code));
                     }
                     if(StringUtils.isNotEmpty(dateType)){
                         mapCategory.put(dimenMap.get(dateType).toString(),dimenMap.get("result"));
@@ -432,8 +437,6 @@ public class BaseStatistsService {
             for(String key :map.keySet()){
                 if(dimenList.contains(key)){
                     if(dimensionDicMap.get(map.get(key).toString().toLowerCase())  != null){
-//                        dataMap.put(key,dimensionDicMap.get(map.get(key).toString().toLowerCase()));
-//                        dataMap.put(key,map.get(key).toString());
                         dataMap.put(key,dimensionDicMap.get(map.get(key).toString().toLowerCase()));
                         dataMap.put(key+"Name",dimensionDicMap.get(map.get(key).toString().toLowerCase()));
                         dataMap.put("firstColumn",dimensionDicMap.get(map.get(key).toString().toLowerCase()));
@@ -454,8 +457,63 @@ public class BaseStatistsService {
             }
             resultList.add(dataMap);
         }
-        return resultList;
+        return noDataDimenDictionary(resultList,dimension,filter);
     }
+
+    /**
+     * 查询结果 对无数据的字典项补0
+     * @param  dataList 数据集合
+     * @param dimen 维度
+     * @return
+     */
+    public List<Map<String, Object>> noDataDimenDictionary(List<Map<String, Object>> dataList,String dimen,String filter){
+        Map<String, Object> dictMap = new HashMap<>();
+        if(dimen.equals("town") || dimen.equals("org") ){
+            String sql = "";
+            if(dimen.equals("town") ){
+                sql = "SELECT id as code,name as name  from address_dict where pid = '361100'";
+            }
+            if(dimen.equals("org") ){
+                String areasql = "SELECT id from address_dict where pid = '361100'";
+                String [] filters = filter.split("and");
+                List<String> filterList = Arrays.asList(filter.split("and"));
+                for(String fil : filterList){
+                   if(fil.contains("town")){
+                       areasql = fil.split("=")[1];
+                   }
+                }
+                sql = "SELECT org_code as code,full_name as name from organizations WHERE administrative_division in(" + areasql + ")";
+            }
+            List<Map<String, Object>> dictDataList = jdbcTemplate.queryForList(sql);
+            if(null != dictDataList) {
+                for(int i = 0 ; i < dictDataList.size();i++){
+                    if(null != dictDataList.get(i).get("code") && null != dictDataList.get(i).get("name")){
+                        dictMap.put(dictDataList.get(i).get("code").toString(),dictDataList.get(i).get("name").toString());
+                    }
+                }
+            }
+
+            List<Map<String, Object>> resultList = new ArrayList<>();
+            for(String code : dictMap.keySet()){
+                Map<String,Object> oneMap = new HashMap<>();
+                String result = "0";
+                for(Map<String,Object> map : dataList){
+                    if(map.get(dimen) !=null && map.get(dimen).equals(dictMap.get(code))){
+                        result = map.get("result").toString();
+                        break;
+                    }
+                }
+                oneMap.put("firstColumn",dictMap.get(code));
+                oneMap.put(dimen+"Name",dictMap.get(code));
+                oneMap.put(dimen,dictMap.get(code));
+                oneMap.put("result",result);
+                resultList.add(oneMap);
+            }
+            return  resultList;
+        }
+        return  dataList;
+    }
+
 
     /**
      * 拼接维度分组
@@ -597,7 +655,7 @@ public class BaseStatistsService {
      * @return
      * @throws Exception
      */
-    public List<Map<String, Object>>  getSimpleQuotaReport(String code,String filters,String dimension) throws Exception {
+    public List<Map<String, Object>>  getSimpleQuotaReport(String code,String filters,String dimension,boolean isTrunTree) throws Exception {
         String dateType = "";
         //指标的展示维度，由视图中决定
         if(dimension.trim().equals("year")){
@@ -626,7 +684,7 @@ public class BaseStatistsService {
         String denominatorFilter = filters;
         if( (StringUtils.isNotEmpty(esConfig.getEspecialType())) && esConfig.getEspecialType().equals(orgHealthCategory)){
             //特殊机构类型查询输出结果  只有查询条件没有维度 默认是 机构类型维度
-             result = getOrgHealthCategory(code,filters,dateType);
+             result = getOrgHealthCategory(code,filters,dateType,isTrunTree);
         }else if( (StringUtils.isNotEmpty(esConfig.getMolecular())) && StringUtils.isNotEmpty(esConfig.getDenominator())){//除法
             //除法指标查询输出结果
             molecularFilter = handleFilter(esConfig.getMolecularFilter(), molecularFilter);
