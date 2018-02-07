@@ -1,6 +1,5 @@
 package com.yihu.quota.etl.extract;
 
-import com.sun.net.httpserver.Headers;
 import com.yihu.ehr.entity.address.AddressDict;
 import com.yihu.ehr.entity.dict.SystemDictEntry;
 import com.yihu.ehr.model.org.MOrganization;
@@ -51,14 +50,21 @@ public class ExtractUtil {
 
     /**
      * 融合主细维度、其组合统计值为SaveModel
+     *
+     * @param qdm                 主维度集合
+     * @param qds                 细维度集合
+     * @param returnList          转换后的 SaveModel 集合
+     * @param statisticsResultMap 统计结果集
+     * @param daySlaveDictMap     按天统计的所有日期项
+     * @param quotaVo             指标配置
      */
     public void compute(List<TjQuotaDimensionMain> qdm,
                         List<TjQuotaDimensionSlave> qds,
                         List<SaveModel> returnList,
-                        Map<String, Integer> countsMap,
+                        Map<String, String> statisticsResultMap,
                         Map<String, String> daySlaveDictMap,
                         QuotaVo quotaVo) throws Exception {
-        if (countsMap == null || countsMap.size() == 0) {
+        if (statisticsResultMap == null || statisticsResultMap.size() == 0) {
             return;
         }
         this.quotaVo = quotaVo;
@@ -72,41 +78,41 @@ public class ExtractUtil {
         }
 
         // 设置维度组合的统计值
-        for (Map.Entry<String, Integer> entry : countsMap.entrySet()) {
+        for (Map.Entry<String, String> entry : statisticsResultMap.entrySet()) {
             String key = entry.getKey();
             SaveModel saveModel = allData.get(key);
             if (saveModel != null) {
-                saveModel.setResult(countsMap.get(key).toString());
+                saveModel.setResult(statisticsResultMap.get(key));
                 saveModel.setQuotaDate(daySlaveDictMap.get(key));
                 returnList.add(saveModel);
             }
         }
 
-       boolean orgFlag = false;
+        boolean orgFlag = false;
         List<String> dimins = new ArrayList<>();
-        for(TjQuotaDimensionSlave slave : qds){
-            if( slave.getId() !=null){
+        for (TjQuotaDimensionSlave slave : qds) {
+            if (slave.getId() != null) {
                 dimins.add(slave.getSlaveCode());
             }
         }
-        for(TjQuotaDimensionMain main : qdm){
-            if( !main.getMainCode().equals("org")){
+        for (TjQuotaDimensionMain main : qdm) {
+            if (!main.getMainCode().equals("org")) {
                 dimins.add(main.getMainCode());
-            }else{
+            } else {
                 orgFlag = true;
             }
         }
-        if(orgFlag){
+        if (orgFlag) {
 
             dimins.add("quotaDate");
             BasesicUtil baseUtil = new BasesicUtil();
-            Map<String,String> diminMap = new HashMap<>();
-            for(SaveModel saveModel :returnList){
+            Map<String, String> diminMap = new HashMap<>();
+            for (SaveModel saveModel : returnList) {
                 String diminStr = "";
-                for(String key :dimins){
+                for (String key : dimins) {
                     diminStr += baseUtil.getFieldValueByName(key, saveModel);
                 }
-                diminMap.put(diminStr,diminStr);
+                diminMap.put(diminStr, diminStr);
             }
 
 //            for(String dimin : diminMap.keySet()){
@@ -158,34 +164,8 @@ public class ExtractUtil {
                 if (dictData == null) {
                     throw new Exception("主纬度配置有误");
                 } else {
-                    if(dimensionMain.getMainCode().equals("org")){//机构关联出区县
-                        for(SaveModel model: dictData){
-                            String dictSql = "SELECT org_code as orgCode,hos_type_id as hosTypeId,administrative_division as administrativeDivision, hos_economic as hosEconomic from organizations where org_code=";
-                            dictSql += "'"+ model.getOrg() + "'";
-                            List<MOrganization> organizations = jdbcTemplate.query(dictSql, new BeanPropertyRowMapper(MOrganization.class));
-                            if(organizations != null && organizations.size() > 0){
-                                if(!StringUtils.isEmpty(organizations.get(0).getAdministrativeDivision())){
-                                    model.setCity("shangrao");
-                                    model.setCityName("上饶市");
-                                    String townSql = "SELECT id ,name from address_dict where id = " + organizations.get(0).getAdministrativeDivision();
-                                    List<AddressDict> addressDicts = jdbcTemplate.query(townSql, new BeanPropertyRowMapper(AddressDict.class));
-                                    model.setTown(String.valueOf(addressDicts.get(0).getId()));
-                                    model.setTownName(addressDicts.get(0).getName());
-                                }
-                                if (!StringUtils.isEmpty(organizations.get(0).getHosEconomic())) {
-                                    String economicSql = "SELECT DISTINCT catalog from system_dict_entries WHERE dict_id = 102 and code =" + organizations.get(0).getHosEconomic();
-                                    List<SystemDictEntry> systemDictEntries = jdbcTemplate.query(economicSql, new BeanPropertyRowMapper(SystemDictEntry.class));
-                                    String name = systemDictEntries.get(0).getCatalog();
-                                    if ("公立".equals(name)) {
-                                        model.setEconomic("1021");
-                                        model.setEconomicName("公立");
-                                    } else {
-                                        model.setEconomic("1022");
-                                        model.setEconomicName("非公立");
-                                    }
-                                }
-                            }
-                        }
+                    if (dimensionMain.getMainCode().equals("org")) {//机构关联出区县
+                        setSaveModelProperties(dictData);
                     }
                     //设置到map里面
                     setAllData(allData, dictData, dimensionMain.getType());
@@ -235,34 +215,8 @@ public class ExtractUtil {
             for (int i = 0; i < dimensionMains.size(); i++) {
                 if (i != 0) {
                     List<SaveModel> saveDataMain = jdbcTemplate.query(dimensionMains.get(i).getDictSql(), new BeanPropertyRowMapper(SaveModel.class));
-                    if(dimensionMains.get(i).getMainCode().equals("org")){//机构关联出区县
-                        for(SaveModel model: saveDataMain){
-                            String dictSql = "SELECT org_code as orgCode,hos_type_id as hosTypeId,administrative_division as administrativeDivision, hos_economic as hosEconomic from organizations where org_code=";
-                            dictSql += "'"+ model.getOrg() + "'";
-                            List<MOrganization> organizations = jdbcTemplate.query(dictSql, new BeanPropertyRowMapper(MOrganization.class));
-                            if(organizations != null && organizations.size() > 0){
-                                if(!StringUtils.isEmpty(organizations.get(0).getAdministrativeDivision())){
-                                    model.setCity("shangrao");
-                                    model.setCityName("上饶市");
-                                    String townSql = "SELECT id ,name from address_dict where id = " + organizations.get(0).getAdministrativeDivision();
-                                    List<AddressDict> addressDicts = jdbcTemplate.query(townSql, new BeanPropertyRowMapper(AddressDict.class));
-                                    model.setTown(String.valueOf(addressDicts.get(0).getId()));
-                                    model.setTownName(addressDicts.get(0).getName());
-                                }
-                            }
-                            if (!StringUtils.isEmpty(organizations.get(0).getHosEconomic())) {
-                                String economicSql = "SELECT DISTINCT catalog from system_dict_entries WHERE dict_id = 102 and code =" + organizations.get(0).getHosEconomic();
-                                List<SystemDictEntry> systemDictEntries = jdbcTemplate.query(economicSql, new BeanPropertyRowMapper(SystemDictEntry.class));
-                                String name = systemDictEntries.get(0).getCatalog();
-                                if ("公立".equals(name)) {
-                                    model.setEconomic("1021");
-                                    model.setEconomicName("公立");
-                                } else {
-                                    model.setEconomic("1022");
-                                    model.setEconomicName("非公立");
-                                }
-                            }
-                        }
+                    if (dimensionMains.get(i).getMainCode().equals("org")) {//机构关联出区县
+                        setSaveModelProperties(saveDataMain);
                     }
                     allData = setOtherMainData(allData, saveDataMain, dimensionMains.get(i).getMainCode(), dimensionMains.get(i).getType());
                 }
@@ -314,6 +268,10 @@ public class ExtractUtil {
                     if (!StringUtils.isEmpty(mainOne.getEconomic())) {
                         saveModelTemp.setEconomic(mainOne.getEconomic());
                         saveModelTemp.setEconomicName(mainOne.getEconomicName());
+                    }
+                    if (!StringUtils.isEmpty(mainOne.getLevel())) {
+                        saveModelTemp.setLevel(mainOne.getLevel());
+                        saveModelTemp.setLevelName(mainOne.getLevelName());
                     }
                     code = code.substring(0, 1).toUpperCase() + code.substring(1);
                     StringBuffer keyMethodName = new StringBuffer("set" + code);
@@ -478,4 +436,53 @@ public class ExtractUtil {
         return one;
     }
 
+    private void setSaveModelProperties(List<SaveModel> saveDataMain) {
+        for (SaveModel model : saveDataMain) {
+            String dictSql = "SELECT org_code as orgCode,hos_type_id as hosTypeId,administrative_division as administrativeDivision, hos_economic as hosEconomic, level_id as levelId  from organizations where org_code=";
+            dictSql += "'" + model.getOrg() + "'";
+            List<MOrganization> organizations = jdbcTemplate.query(dictSql, new BeanPropertyRowMapper(MOrganization.class));
+
+            if (organizations != null && organizations.size() > 0) {
+                if (!StringUtils.isEmpty(organizations.get(0).getAdministrativeDivision())) {
+                    model.setCity("shangrao");
+                    model.setCityName("上饶市");
+                    String townSql = "SELECT id ,name from address_dict where id = " + organizations.get(0).getAdministrativeDivision();
+                    List<AddressDict> addressDicts = jdbcTemplate.query(townSql, new BeanPropertyRowMapper(AddressDict.class));
+                    model.setTown(String.valueOf(addressDicts.get(0).getId()));
+                    model.setTownName(addressDicts.get(0).getName());
+                }
+                if (!StringUtils.isEmpty(organizations.get(0).getHosEconomic())) {
+                    String economicSql = "SELECT DISTINCT catalog from system_dict_entries WHERE dict_id = 102 and code =" + organizations.get(0).getHosEconomic();
+                    List<SystemDictEntry> systemDictEntries = jdbcTemplate.query(economicSql, new BeanPropertyRowMapper(SystemDictEntry.class));
+                    String name = systemDictEntries.get(0).getCatalog();
+                    if ("公立".equals(name)) {
+                        model.setEconomic("1021");
+                        model.setEconomicName("公立");
+                    } else {
+                        model.setEconomic("1022");
+                        model.setEconomicName("非公立");
+                    }
+                }
+                if (!StringUtils.isEmpty(organizations.get(0).getLevelId())) {
+                    String levelId = organizations.get(0).getLevelId();
+                    if ("1".equals(levelId)) {
+                        model.setLevel(levelId);
+                        model.setLevelName("一级");
+                    } else if ("2".equals(levelId)) {
+                        model.setLevel(levelId);
+                        model.setLevelName("二级");
+                    } else if ("3".equals(levelId)) {
+                        model.setLevel(levelId);
+                        model.setLevelName("三级");
+                    } else {
+                        model.setLevel(levelId);
+                        model.setLevelName("未定级");
+                    }
+                } else {
+                    model.setLevel("9");
+                    model.setLevelName("未定级");
+                }
+            }
+        }
+    }
 }

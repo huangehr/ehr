@@ -67,9 +67,9 @@ hadoop:
 
 analyze:
   job:
-    init-size: 2 #解析入库初始任务数
-    max-size: 10 #解析入库最大任务数
-    cron-exp: 0/4 * * * * ? #解析任务触发间隔表达式
+    minSize: 2 #解析入库初始任务数
+    maxSize: 10 #解析入库最大任务数
+    cronExp: 0/4 * * * * ? #解析任务触发间隔表达式
 
 ---
 spring:
@@ -240,7 +240,7 @@ fast-dfs:
   public-server: http://10.176.97.5:8888
 elasticsearch:
   cluster-name: elasticsearch
-  cluster-nodes: localhost:9300
+  cluster-nodes: 10.176.97.7:9300
 hadoop:
   hbase-properties:
     #- hbase.zookeeper.quorum: node2.jkzl.com,node3.jkzl.com,node1.jkzl.com

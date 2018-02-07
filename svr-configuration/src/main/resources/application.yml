@@ -69,3 +69,13 @@ eureka:
   instance:
     ip-address: 10.176.97.10:8761
     prefer-ip-address: true
+
+
+---
+spring:
+  profiles: prod_fzzy
+
+eureka:
+  instance:
+    ip-address: 100.100.1.162:8761
+    prefer-ip-address: true

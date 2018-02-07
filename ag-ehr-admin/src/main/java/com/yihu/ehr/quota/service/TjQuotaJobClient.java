@@ -90,11 +90,4 @@ public interface TjQuotaJobClient {
             @ApiParam(name = "title", value = "名称", defaultValue = "")
             @RequestParam(value = "title", required = false) String title);
 
-    @ApiOperation(value = "根据编码获取指标执行结果")
-    @RequestMapping(value = ServiceApi.TJ.FindByQuotaCodes, method = RequestMethod.GET)
-    Envelop findByQuotaCodes(
-            @ApiParam(name = "quotaCodes", value = "指标code", required = true)
-            @RequestParam(value = "quotaCodes") String quotaCodes,
-            @ApiParam(name = "town", value = "区域town", required = true)
-            @RequestParam(value = "town") String town);
 }

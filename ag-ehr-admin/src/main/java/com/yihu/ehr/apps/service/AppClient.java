@@ -4,6 +4,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.model.app.MApp;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -46,11 +47,11 @@ public interface AppClient {
             @ApiParam(name = "app", value = "对象JSON结构体", allowMultiple = true, defaultValue = "{\"name\": \"\", \"url\": \"\", \"catalog\": \"\", \"description\": \"\", \"creator\":\"\",\"icon\": \"\",\"releaseFlag\": \"\"}")
             @RequestBody String appJson);
 
-    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Apps.App, method = RequestMethod.GET)
+    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Apps.getApp, method = RequestMethod.GET)
     @ApiOperation(value = "获取App")
     MApp getApp(
             @ApiParam(name = "app_id", value = "id", defaultValue = "")
-            @PathVariable(value = "app_id") String appId);
+            @RequestParam(value = "app_id") String appId);
 
     @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Apps.Apps, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "更新App")
@@ -62,7 +63,7 @@ public interface AppClient {
     @ApiOperation(value = "删除app")
     boolean deleteApp(
             @ApiParam(name = "app_id", value = "id", defaultValue = "")
-            @PathVariable(value = "app_id") String appId);
+            @PathVariable(value = "app_id") String app_id);
 
     @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Apps.AppStatus, method = RequestMethod.PUT)
     @ApiOperation(value = "修改状态")
@@ -100,4 +101,19 @@ public interface AppClient {
             @ApiParam(name = "manageType", value = "APP管理类型，backStage：后台管理，client：客户端。")
             @RequestParam(value = "manageType", required = false) String manageType);
 
+    @RequestMapping(value =  ApiVersion.Version1_0 + ServiceApi.Apps.AppFieldExistence, method = RequestMethod.POST)
+    @ApiOperation(value = "根据条件判断应用ID或者名称是否存在")
+    Envelop isFieldExist(
+            @ApiParam(name = "field", value = "字段", required = true)
+            @RequestParam(value = "field") String field,
+            @ApiParam(name = "value", value = "值", required = true)
+            @RequestParam(value = "value") String value);
+
+    @RequestMapping(value =  ApiVersion.Version1_0 + ServiceApi.Apps.AppAuthClient, method = RequestMethod.POST)
+    @ApiOperation(value = "开放平台审核结果处理接口，包含App初始化和应用角色分配")
+    Envelop authClient(
+            @ApiParam(name = "appJson", value = "App")
+            @RequestParam(value = "appJson") String appJson,
+            @ApiParam(name = "roleId", value = "角色ID")
+            @RequestParam(value = "roleId") Integer roleId);
 }

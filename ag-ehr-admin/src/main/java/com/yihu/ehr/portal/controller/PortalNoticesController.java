@@ -64,7 +64,7 @@ public class PortalNoticesController extends BaseController{
         }
     }
 
-    @RequestMapping(value = ServiceApi.Portal.NoticesAdmin, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.PortalNotices.PortalNoticeAdmin, method = RequestMethod.GET)
     @ApiOperation(value = "获取通知公告信息", notes = "通知公告信息")
     public Envelop getPortalNotice(
             @ApiParam(name = "portalNotice_id", value = "", defaultValue = "")

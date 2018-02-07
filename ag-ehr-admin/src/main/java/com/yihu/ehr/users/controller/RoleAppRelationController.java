@@ -29,7 +29,7 @@ import java.util.List;
  * Created by yww on 2016/7/7.
  */
 @EnableFeignClients
-@RequestMapping(ApiVersion.Version1_0+"/admin")
+@RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
 @Api(value = "roleApp",description = "角色组-应用关系管理", tags = {"安全管理-角色组-应用关系管理"})
 public class RoleAppRelationController extends BaseController{
@@ -42,14 +42,14 @@ public class RoleAppRelationController extends BaseController{
     @Autowired
     private RolesClient rolesClient;
 
-    @RequestMapping(value = ServiceApi.Roles.RoleApp,method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Roles.RoleApp, method = RequestMethod.POST)
     @ApiOperation(value = "为角色组配置应用，单个--单个")
     public Envelop createRoleAppRelation(
             @ApiParam(name = "data_json",value = "角色组-应用关系对象Json字符串")
             @RequestParam(value = "data_json") String dataJson){
         MRoleAppRelation mRoleAppRelation = roleAppRelationClient.createRoleAppRelation(dataJson);
         if(mRoleAppRelation != null){
-            return success(convertToModel(mRoleAppRelation,RoleAppRelationModel.class,null));
+            return success(convertToModel(mRoleAppRelation, RoleAppRelationModel.class,null));
         }
         return failed("新增失败");
     }
@@ -137,6 +137,7 @@ public class RoleAppRelationController extends BaseController{
         Integer totalCount = getTotalCount(responseEntity);
         return getResult(roleAppRelationModels,totalCount,page,size);
     }
+
     @RequestMapping(value = ServiceApi.Roles.RoleAppsNoPage,method = RequestMethod.GET)
     @ApiOperation(value = "查询角色组-应用关系列表---不分页")
     public Envelop searchRoleAppNoPaging(

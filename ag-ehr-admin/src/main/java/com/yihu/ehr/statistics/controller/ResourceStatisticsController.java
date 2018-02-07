@@ -138,9 +138,55 @@ public class ResourceStatisticsController extends BaseController {
             @ApiParam(name = "date", value = "日期")
             @RequestParam(name = "date") String date,
             @ApiParam(name = "orgCode", value = "医院代码")
-            @RequestParam(name = "orgCode") String orgCode) {
+            @RequestParam(name = "orgCode",required = false) String orgCode) {
         Envelop envelop = resourceStatisticsClient.getArchivesInc(date,orgCode);
         return envelop;
     }
 
+    @RequestMapping(value = ServiceApi.StasticReport.GetArchivesFull, method = RequestMethod.GET)
+    @ApiOperation(value = "完整性分析")
+    public Envelop getArchivesFull(
+            @ApiParam(name = "startDate", value = "开始日期")
+            @RequestParam(name = "startDate") String startDate,
+            @ApiParam(name = "endDate", value = "结束日期")
+            @RequestParam(name = "endDate") String endDate,
+            @ApiParam(name = "orgCode", value = "医院代码")
+            @RequestParam(name = "orgCode",required = false) String orgCode) {
+        Envelop envelop = resourceStatisticsClient.getArchivesFull(startDate,endDate,orgCode);
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.StasticReport.GetArchivesTime, method = RequestMethod.GET)
+    @ApiOperation(value = "及时性分析")
+    public Envelop getArchivesTime(
+            @ApiParam(name = "startDate", value = "开始日期")
+            @RequestParam(name = "startDate") String startDate,
+            @ApiParam(name = "endDate", value = "结束日期")
+            @RequestParam(name = "endDate") String endDate,
+            @ApiParam(name = "orgCode", value = "医院代码")
+            @RequestParam(name = "orgCode",required = false) String orgCode) {
+        return resourceStatisticsClient.getArchivesTime(startDate, endDate, orgCode);
+    }
+
+    @RequestMapping(value = ServiceApi.StasticReport.GetDataSetCount, method = RequestMethod.GET)
+    @ApiOperation(value = "获取数据集数量")
+    public Envelop getDataSetCount(
+            @ApiParam(name = "date", value = "日期")
+            @RequestParam(name = "date") String date,
+            @ApiParam(name = "orgCode", value = "医院代码")
+            @RequestParam(name = "orgCode",required = false) String orgCode) {
+        return resourceStatisticsClient.getDataSetCount(date, orgCode);
+    }
+
+    @RequestMapping(value = ServiceApi.StasticReport.GetArchivesRight, method = RequestMethod.GET)
+    @ApiOperation(value = "准确性分析")
+    public Envelop getArchivesRight(
+            @ApiParam(name = "startDate", value = "开始日期")
+            @RequestParam(name = "startDate") String startDate,
+            @ApiParam(name = "endDate", value = "结束日期")
+            @RequestParam(name = "endDate") String endDate,
+            @ApiParam(name = "orgCode", value = "医院代码")
+            @RequestParam(name = "orgCode",required = false) String orgCode) {
+        return resourceStatisticsClient.getArchivesRight(startDate, endDate, orgCode);
+    }
 }

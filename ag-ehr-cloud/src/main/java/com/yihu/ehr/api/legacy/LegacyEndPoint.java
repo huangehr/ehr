@@ -2,7 +2,6 @@ package com.yihu.ehr.api.legacy;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.api.adaption.AdaptionsEndPoint;
-import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.feign.*;
 import com.yihu.ehr.model.geography.MGeography;
@@ -10,6 +9,7 @@ import com.yihu.ehr.model.patient.MDemographicInfo;
 import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.id.IdValidator;
+import com.yihu.ehr.util.rest.ErrorCode;
 import com.yihu.ehr.util.rest.RestEcho;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -36,8 +36,8 @@ import java.util.regex.Pattern;
 @RestController
 @RequestMapping("/rest/v1.0")
 public class LegacyEndPoint {
-    @Value("${svr-package.ip-address:''}")
-    String packageIpAddress;
+//    @Value("${svr-package.ip-address}")
+//    String packageIpAddress;
 
     @Autowired
     AdaptionsEndPoint adaptions;
@@ -181,7 +181,7 @@ public class LegacyEndPoint {
     @RequestMapping(value = "/patient/registration", method = RequestMethod.POST)
     public Object patientRegister(
             @ApiParam(name = "user_info", value = "病人实体json字符串")
-            @RequestParam(value = "user_info", required = true) String userInfo) throws IOException, ParseException {
+            @RequestParam(value = "user_info", required = true) String userInfo) throws Exception {
         Map<String, String> telMap = new HashMap<>();
 
         Map<String, Object> fields = new ObjectMapper().readValue(userInfo, Map.class);
@@ -274,11 +274,11 @@ public class LegacyEndPoint {
         //缺少身份证号
         idCardNo = "352225199102146010";
         if (StringUtils.isEmpty(idCardNo)) {
-            throw new ApiException(ErrorCode.MissParameter);
+            throw new Exception("ehr.common.miss.parameter");
         }
         String errorInfo = IdValidator.validateIdCardNo(idCardNo);
         if (!StringUtils.isEmpty(errorInfo)) {
-            throw new ApiException(ErrorCode.InvalidIdentityNo, errorInfo);
+            throw new Exception(errorInfo);
         }
 
         if (patientClient.isRegistered(idCardNo)) {
@@ -287,7 +287,7 @@ public class LegacyEndPoint {
             Pattern pattern = Pattern.compile("([0-9]{17}([0-9]|X))|([0-9]{15})");
             Matcher matcher = pattern.matcher(idCardNo);
             if (!matcher.matches()) {
-                throw new ApiException(ErrorCode.InvalidParameter);
+                throw new Exception("ehr.common.invalid.parameter");
             }
 
             MDemographicInfo demoInfo = new MDemographicInfo();

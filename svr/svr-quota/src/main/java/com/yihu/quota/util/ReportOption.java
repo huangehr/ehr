@@ -18,6 +18,7 @@ import com.github.abel533.echarts.series.Radar;
 import com.github.abel533.echarts.style.ItemStyle;
 import com.github.abel533.echarts.style.itemstyle.Normal;
 import com.yihu.ehr.model.echarts.ChartDataModel;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.*;
 
@@ -79,7 +80,12 @@ public class ReportOption {
         if(lineNames.size() > 0 && lineDatas.size() >0 && lineNames.size() == lineDatas.size()) {
             for (int i = 0; i < lineDatas.size(); i++) {
                 String lineName = lineNames.get(i);
-                String type = types.get(i);
+                String type = "";
+                if (types.size() > i) {
+                    type = types.get(i);
+                } else {
+                    type = types.get(types.size() > 0 ? types.size() -1 : 0);
+                }
                 //series
                 Line line = new Line();
                 line.name(lineName);
@@ -89,7 +95,7 @@ public class ReportOption {
                     line.type(SeriesType.line);
                 }
                 line.smooth(true);
-                line.stack("stack");
+//                line.stack("stack");
                 line.itemStyle().normal().lineStyle().shadowColor("rgba(0,0,0,0.4)");
 
                 List<Object> lineValList = lineDatas.get(i);
@@ -148,11 +154,6 @@ public class ReportOption {
 //        legendDataList.add(legend);
 //        option.legend().data(legendDataList);
 
-        //grid
-        option.grid().x("50px");  // left
-        option.grid().x2("10ox"); // right
-        option.grid().y2("30px"); // bottom
-//        option.grid().containLabel(true);
         //series
         Pie pie = new Pie();
         pie.name(pieName);
@@ -163,6 +164,9 @@ public class ReportOption {
         } else {
             pie.center(new String[]{"50%", "50%"});
         }
+        pie.itemStyle().normal().labelLine().show(false);
+        pie.itemStyle().normal().label().show(false);
+
 //        pie.itemStyle().emphasis().shadowBlur(10);
 //        pie.itemStyle().emphasis().shadowOffsetX(0);
 //        pie.itemStyle().emphasis().shadowColor("rgba(0, 0, 0, 0.5)");

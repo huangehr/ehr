@@ -22,7 +22,7 @@ public class ResourceStatisticService extends BaseJpaService {
 
     public BigInteger getPatientArchiveCount() {
         Session session = currentSession();
-        String sql = "SELECT COUNT(*) FROM archive_relation";
+        String sql = "SELECT COUNT(1) FROM archive_relation";
         Query query = session.createSQLQuery(sql);
         query.setFlushMode(FlushMode.COMMIT);
         return (BigInteger)query.uniqueResult();
@@ -30,11 +30,11 @@ public class ResourceStatisticService extends BaseJpaService {
 
     public BigInteger getMedicalResourcesCount() {
         Session session = currentSession();
-        String sql = "SELECT COUNT(*) FROM organizations";
+        String sql = "SELECT COUNT(1) FROM organizations";
         Query query = session.createSQLQuery(sql);
         query.setFlushMode(FlushMode.COMMIT);
         BigInteger count = (BigInteger) query.uniqueResult();
-        String sql1 = "SELECT COUNT(*) FROM doctors";
+        String sql1 = "SELECT COUNT(1) FROM doctors";
         Query query1 = session.createSQLQuery(sql1);
         query1.setFlushMode(FlushMode.COMMIT);
         BigInteger count1 = (BigInteger) query1.uniqueResult();
@@ -43,7 +43,7 @@ public class ResourceStatisticService extends BaseJpaService {
 
     public BigInteger getDemographicCount() {
         Session session = currentSession();
-        String hql = "SELECT COUNT(*) FROM demographics";
+        String hql = "SELECT COUNT(1) FROM demographics";
         Query query = session.createSQLQuery(hql);
         query.setFlushMode(FlushMode.COMMIT);
         return (BigInteger) query.uniqueResult();
@@ -51,20 +51,22 @@ public class ResourceStatisticService extends BaseJpaService {
 
     public BigInteger getUseCardCount() {
         Session session = currentSession();
-        String hql = "SELECT COUNT(*) FROM user_cards";
-        Query query = session.createSQLQuery(hql);
+        String sql = "SELECT COUNT(DISTINCT(owner_idcard)) FROM user_cards";
+        Query query = session.createSQLQuery(sql);
         query.setFlushMode(FlushMode.COMMIT);
         return (BigInteger)query.uniqueResult();
     }
 
-    public List getOrgAreaIdGroup() {
+    public List getOrgAreaIdGroup(int currentCityId) {
         Session session = currentSession();
         String sql = "SELECT o.administrative_division, COUNT(1) " +
                 "FROM archive_relation a " +
                 "LEFT JOIN organizations o ON a.org_code = o.org_code " +
+                "WHERE o.administrative_division IN (SELECT id FROM address_dict WHERE pid = :pid) " +
                 "GROUP BY a.org_code, o.administrative_division";
         Query query = session.createSQLQuery(sql);
         query.setFlushMode(FlushMode.COMMIT);
+        query.setInteger("pid", currentCityId);
         return query.list();
     }
 
@@ -79,71 +81,86 @@ public class ResourceStatisticService extends BaseJpaService {
 
     public List getArchiveRelationDateGroup(Date before) {
         Session session = currentSession();
-        String hql = "SELECT DATE_FORMAT(createDate, '%Y-%m-%d'), COUNT(*) FROM ArchiveRelation archiveRelation WHERE archiveRelation.createDate > :before GROUP BY DATE_FORMAT(createDate, '%Y-%m-%d')";
+        String hql = "SELECT DATE_FORMAT(createDate, '%Y-%m-%d'), COUNT(1) FROM ArchiveRelation archiveRelation WHERE archiveRelation.createDate > :before GROUP BY DATE_FORMAT(createDate, '%Y-%m-%d')";
         Query query = session.createQuery(hql);
         query.setFlushMode(FlushMode.COMMIT);
         query.setDate("before", before);
         return query.list();
     }
 
-    public List getOrgAreaNameGroupByClazz(String clazz) {
+    public List getOrgAreaNameGroupByClazz(String clazz, int currentCityId) {
         Session session = currentSession();
         String sql;
         if(StringUtils.isEmpty(clazz)) {
-            sql = "SELECT a.name, COUNT(*) " +
+            sql = "SELECT a.name, COUNT(1) " +
                     "FROM organizations o " +
-                    "LEFT JOIN address_dict a ON o.administrative_division = a.id " +
+                    "LEFT JOIN address_dict a ON o.administrative_division = a.id WHERE org_type = 'Hospital' " +
+                    "AND o.administrative_division IN (SELECT id FROM address_dict WHERE pid = :pid) " +
                     "GROUP BY o.administrative_division, a.name";
         }else {
-            sql = "SELECT a.name, COUNT(*) " +
+            sql = "SELECT a.name, COUNT(1) " +
                     "FROM organizations o " +
                     "LEFT JOIN address_dict a ON o.administrative_division = a.id " +
-                    "WHERE o.big_classification = :clazz " +
+                    "WHERE o.big_classification = :clazz  AND o.org_type = 'Hospital' " +
+                    "AND o.administrative_division IN (SELECT id FROM address_dict WHERE pid = :pid) " +
                     "GROUP BY o.administrative_division, a.name";
         }
         Query query = session.createSQLQuery(sql);
         query.setFlushMode(FlushMode.COMMIT);
+        query.setInteger("pid", currentCityId);
         if(!StringUtils.isEmpty(clazz)) {
             query.setString("clazz", clazz);
         }
         return query.list();
     }
 
-    public List getMedicalAreaCountGroupByRole(String roleType) {
+    public List getMedicalAreaCountGroupByRole(String roleType, int currentCityId) {
         Session session = currentSession();
         String sql;
         if("Doctor".equals(roleType)) {
-            sql = "SELECT o.administrative_division, COUNT(*) " +
+            sql = "SELECT o.administrative_division, COUNT(1) " +
                     "FROM doctors d " +
                     "LEFT JOIN organizations o ON o.org_code = d.orgCode " +
-                    "WHERE d.role_type IN ('10', '11') OR d.role_type IS NULL GROUP BY d.orgCode, o.administrative_division";
+                    "WHERE d.role_type IN ('10', '11') " +
+                    "AND o.administrative_division IN (SELECT id FROM address_dict WHERE pid = :pid) " +
+                    "GROUP BY d.orgCode, o.administrative_division";
         }else {
-            sql = "SELECT o.administrative_division, COUNT(*) " +
+            sql = "SELECT o.administrative_division, COUNT(1) " +
                     "FROM doctors d " +
                     "LEFT JOIN organizations o ON o.org_code = d.orgCode " +
-                    "WHERE d.role_type = '8' GROUP BY d.orgCode, o.administrative_division";
+                    "WHERE d.role_type = '8' " +
+                    "AND o.administrative_division IN (SELECT id FROM address_dict WHERE pid = :pid) " +
+                    "GROUP BY d.orgCode, o.administrative_division";
         }
         Query query = session.createSQLQuery(sql);
         query.setFlushMode(FlushMode.COMMIT);
+        query.setInteger("pid", currentCityId);
         return query.list();
     }
 
-    public BigInteger getMedicalCountByRoleType(String roleType) {
+    public BigInteger getMedicalCountByRoleType(String roleType, int currentCityId) {
         Session session = currentSession();
         String sql;
         if("Doctor".equals(roleType)) {
-            sql = "SELECT COUNT(*) FROM doctors WHERE LENGTH(orgCode) > 0 AND (role_type IN ('10', '11') OR role_type IS NULL)";
+            sql = "SELECT COUNT(1) FROM doctors d " +
+                    "LEFT JOIN organizations o ON o.org_code = d.orgCode " +
+                    "WHERE d.role_type IN ('10', '11') " +
+                    "AND o.administrative_division IN (SELECT id FROM address_dict WHERE pid = :pid)";
         }else {
-            sql = "SELECT COUNT(*) FROM doctors WHERE role_type = '8'";
+            sql = "SELECT COUNT(1) FROM doctors d " +
+                    "LEFT JOIN organizations o ON o.org_code = d.orgCode " +
+                    "WHERE role_type = '8' " +
+                    "AND o.administrative_division IN (SELECT id FROM address_dict WHERE pid = :pid)";
         }
         Query query = session.createSQLQuery(sql);
         query.setFlushMode(FlushMode.COMMIT);
+        query.setInteger("pid", currentCityId);
         return  (BigInteger) query.uniqueResult();
     }
 
     public BigInteger getJsonArchiveCount(String status) {
         Session session = currentSession();
-        String sql = "SELECT COUNT(*) FROM json_archives WHERE archive_status = :status";
+        String sql = "SELECT COUNT(1) FROM json_archives WHERE archive_status = :status";
         Query query = session.createSQLQuery(sql);
         query.setFlushMode(FlushMode.COMMIT);
         query.setString("status", status);
@@ -160,7 +177,7 @@ public class ResourceStatisticService extends BaseJpaService {
     }
 
     public List<Object> getStatisticsDemographicsAgeCount() {
-        Session session = currentSession();;
+        Session session = currentSession();
         String sql = "SELECT count(1), tt.age  from(  " +
                 " SELECT t1.id ,  " +
                 "  ELT(   CEIL(  FLOOR( TIMESTAMPDIFF(MONTH, STR_TO_DATE(t1.id ,'%Y%m%d'), CURDATE())/12) /10+1 ), " +
@@ -175,7 +192,7 @@ public class ResourceStatisticService extends BaseJpaService {
         Session session = currentSession();;
         String sql = "SELECT count(1), tt.age ,tt.gender from( SELECT t1.id , gender, " +
                 "ELT( CEIL( FLOOR( TIMESTAMPDIFF(MONTH, STR_TO_DATE(t1.id ,'%Y%m%d'), CURDATE())/12) /10+1 ), \n" +
-                "'0-1','1-10','11-20','21-30','31-40','41-50','51-60','61-70','71-80','81-90','> 90') as age from ( " +
+                "'0-6','7-17','18-40','41-65','> 65') as age from ( " +
                 " SELECT CASE when length(id)=15  then CONCAT('19',substr(id ,7,6)) ELSE substr(id ,7,8) end  id ,gender from demographics t )t1 " +
                 " )tt WHERE tt.age is not null AND  gender IN ('1', '2') GROUP BY tt.age, tt.gender";
         SQLQuery query = session.createSQLQuery(sql);
@@ -184,7 +201,7 @@ public class ResourceStatisticService extends BaseJpaService {
 
     public List getJsonArchiveReceiveDateGroup(Date before) {
         Session session = currentSession();
-        String hql = "SELECT DATE_FORMAT(receiveDate, '%Y-%m-%d'), COUNT(*) FROM JsonArchives jsonArchives WHERE jsonArchives.receiveDate > :before GROUP BY DATE_FORMAT(receiveDate, '%Y-%m-%d')";
+        String hql = "SELECT DATE_FORMAT(receiveDate, '%Y-%m-%d'), COUNT(1) FROM JsonArchives jsonArchives WHERE jsonArchives.receiveDate > :before GROUP BY DATE_FORMAT(receiveDate, '%Y-%m-%d')";
         Query query = session.createQuery(hql);
         query.setFlushMode(FlushMode.COMMIT);
         query.setDate("before", before);
@@ -193,7 +210,7 @@ public class ResourceStatisticService extends BaseJpaService {
 
     public List getJsonArchiveFinishDateGroup(Date before) {
         Session session = currentSession();
-        String hql = "SELECT DATE_FORMAT(finishDate, '%Y-%m-%d'), COUNT(*) FROM JsonArchives jsonArchives WHERE jsonArchives.finishDate > :before GROUP BY DATE_FORMAT(finishDate, '%Y-%m-%d')";
+        String hql = "SELECT DATE_FORMAT(finishDate, '%Y-%m-%d'), COUNT(1) FROM JsonArchives jsonArchives WHERE jsonArchives.finishDate > :before GROUP BY DATE_FORMAT(finishDate, '%Y-%m-%d')";
         Query query = session.createQuery(hql);
         query.setFlushMode(FlushMode.COMMIT);
         query.setDate("before", before);
@@ -202,11 +219,23 @@ public class ResourceStatisticService extends BaseJpaService {
 
     public BigInteger getArchiveRelationCountByEventType(String eventType) {
         Session session = currentSession();
-        String sql = "SELECT COUNT(*) FROM archive_relation WHERE event_type = :eventType";
+        String sql = "SELECT COUNT(1) FROM archive_relation WHERE event_type = :eventType";
         Query query = session.createSQLQuery(sql);
         query.setFlushMode(FlushMode.COMMIT);
         query.setString("eventType", eventType);
         return (BigInteger)query.uniqueResult();
+    }
+
+    public Integer getOrgAreaByCode(String orgCode, int currentCityId) {
+        Session session = currentSession();
+        String sql = "SELECT o.administrative_division FROM organizations o " +
+                "WHERE o.org_code = :orgCode " +
+                "AND O.administrative_division IN (SELECT id FROM address_dict WHERE pid = :pid)";
+        Query query = session.createSQLQuery(sql);
+        query.setFlushMode(FlushMode.COMMIT);
+        query.setString("orgCode", orgCode);
+        query.setInteger("pid", currentCityId);
+        return (Integer) query.uniqueResult();
     }
 
     public String getOrgNameByCode(String orgCode) {
@@ -216,6 +245,36 @@ public class ResourceStatisticService extends BaseJpaService {
         query.setFlushMode(FlushMode.COMMIT);
         query.setString("orgCode", orgCode);
         return (String) query.uniqueResult();
+    }
+
+    public String getDeptNameByCode(String deptCode) {
+        Session session = currentSession();
+        String sql = "SELECT entry.value FROM std_dictionary_entry_59083976eebd entry " +
+                "INNER JOIN std_dictionary_59083976eebd dict ON entry.dict_id = dict.id " +
+                "WHERE dict.code = 'STD_DEPARTMENT' AND entry.code = :deptCode";
+        Query query = session.createSQLQuery(sql);
+        query.setFlushMode(FlushMode.COMMIT);
+        query.setString("deptCode", deptCode);
+        return (String) query.uniqueResult();
+    }
+
+    public int getCurrentCityId() {
+        Session session = currentSession();
+        String sql = "SELECT entry.value FROM system_dict_entries entry " +
+                "INNER JOIN system_dicts dict ON dict.id = entry.dict_id " +
+                "WHERE entry.code = 'CITY'";
+        Query query = session.createSQLQuery(sql);
+        query.setFlushMode(FlushMode.COMMIT);
+        return Integer.parseInt((String)query.uniqueResult());
+    }
+
+    public List getDistrict(int currentCityId) {
+        Session session = currentSession();
+        String sql = "SELECT id, name FROM address_dict WHERE pid = :pid";
+        Query query = session.createSQLQuery(sql);
+        query.setInteger("pid", currentCityId);
+        query.setFlushMode(FlushMode.COMMIT);
+        return query.list();
     }
 
 }

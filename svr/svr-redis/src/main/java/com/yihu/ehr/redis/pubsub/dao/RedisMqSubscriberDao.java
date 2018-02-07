@@ -16,11 +16,13 @@ import java.util.List;
 public interface RedisMqSubscriberDao extends PagingAndSortingRepository<RedisMqSubscriber, Integer> {
 
     List<RedisMqSubscriber> findByChannel(@Param("channel") String channel);
+    RedisMqSubscriber findByChannelAndAndSubscribedUrl(String channel, String subscribedUrl);
 
     @Query(" FROM RedisMqSubscriber rms WHERE rms.id <> :id AND rms.channel = :channel AND rms.appId = :appId ")
     RedisMqSubscriber isUniqueAppId(@Param("id") Integer id, @Param("channel") String channel, @Param("appId") String appId);
 
     @Query(" FROM RedisMqSubscriber rms WHERE rms.id <> :id AND rms.channel = :channel AND rms.subscribedUrl = :subscribedUrl ")
     RedisMqSubscriber isUniqueSubscribedUrl(@Param("id") Integer id, @Param("channel") String channel, @Param("subscribedUrl") String subscribedUrl);
+
 
 }

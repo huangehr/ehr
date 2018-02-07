@@ -122,4 +122,9 @@ public class RedisMqChannelService extends BaseJpaService<RedisMqChannel, RedisM
         return envelop;
     }
 
+    public Boolean isExist(String channel) {
+        RedisMqChannel channels = redisMqChannelDao.findByChannel(channel);
+        return channels != null;
+    }
+
 }

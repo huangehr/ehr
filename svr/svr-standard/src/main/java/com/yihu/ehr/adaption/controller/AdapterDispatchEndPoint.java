@@ -4,12 +4,12 @@ import com.yihu.ehr.adaption.model.OrgAdapterPlan;
 import com.yihu.ehr.adaption.service.AdapterInfoSendService;
 import com.yihu.ehr.adaption.service.OrgAdapterPlanService;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
-import com.yihu.ehr.standard.feignclient.StdVersionClient;
+import com.yihu.ehr.standard.model.CDAVersion;
+import com.yihu.ehr.standard.service.CdaVersionService;
 import com.yihu.ehr.util.encrypt.RSA;
+import com.yihu.ehr.util.rest.ErrorCode;
 import com.yihu.ehr.util.rest.RestEcho;
-import com.yihu.hos.model.standard.MSTDVersion;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -39,7 +39,7 @@ public class AdapterDispatchEndPoint {
     @Autowired
     private OrgAdapterPlanService orgAdapterPlanService;
     @Autowired
-    private StdVersionClient stdVersionClient;
+    private CdaVersionService cdaVersionService;
     @Autowired
     private FastDFSUtil fastDFSUtil;
 
@@ -154,7 +154,7 @@ public class AdapterDispatchEndPoint {
 
             if (listPlan != null && listPlan.size() > 0) {
                 RestEcho restEcho = new RestEcho().success();
-                MSTDVersion version = stdVersionClient.getVersion(listPlan.get(0).getVersion());
+                CDAVersion version = cdaVersionService.getVersion(listPlan.get(0).getVersion());
                 restEcho.putResult("version", version.getVersion());
                 restEcho.putResult("timestamp", version.getCommitTime());
                 return restEcho;

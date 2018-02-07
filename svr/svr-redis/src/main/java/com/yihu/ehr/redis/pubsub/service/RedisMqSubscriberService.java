@@ -3,6 +3,7 @@ package com.yihu.ehr.redis.pubsub.service;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.redis.pubsub.dao.RedisMqSubscriberDao;
 import com.yihu.ehr.redis.pubsub.entity.RedisMqSubscriber;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,6 +57,22 @@ public class RedisMqSubscriberService extends BaseJpaService<RedisMqSubscriber, 
         } else {
             return false;
         }
+    }
+
+    public Boolean isExist(String channel, String subscriber) {
+        RedisMqSubscriber redisMqSubscriber = redisMqSubscriberDao.findByChannelAndAndSubscribedUrl(channel, subscriber);
+        return redisMqSubscriber != null;
+    }
+
+    public void unsubscribe(String channel, String subscriber) {
+        List<RedisMqSubscriber> subscriberList = redisMqSubscriberDao.findByChannel(channel);
+        subscriberList.forEach(redisMqSubscriber -> {
+            if (StringUtils.isEmpty(subscriber)) {//取消所有订阅者
+                redisMqSubscriberDao.delete(redisMqSubscriber);
+            } else if (subscriber.equals(redisMqSubscriber.getSubscribedUrl())) {
+                redisMqSubscriberDao.delete(redisMqSubscriber);//取消指定订阅者
+            }
+        });
     }
 
 }

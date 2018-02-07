@@ -214,7 +214,7 @@ public class UserController extends BaseController {
             //删除用户-用户角色组关系
             //Todo 根据用户id删除的接口
             Collection<MRoleUser> mRoleUsers = roleUserClient.searchRoleUserNoPaging("userId=" + userId);
-            if (mRoleUsers != null) {
+            if (mRoleUsers != null && mRoleUsers.size()>0) {
                 StringBuffer buffer = new StringBuffer();
                 for (MRoleUser m : mRoleUsers) {
                     buffer.append(m.getRoleId());

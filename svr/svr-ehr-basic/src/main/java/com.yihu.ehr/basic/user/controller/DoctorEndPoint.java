@@ -2,7 +2,6 @@ package com.yihu.ehr.basic.user.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.yihu.ehr.basic.patient.service.DemographicService;
-import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
@@ -20,6 +19,7 @@ import com.yihu.ehr.basic.user.entity.User;
 import com.yihu.ehr.basic.user.service.DoctorService;
 import com.yihu.ehr.basic.user.service.UserService;
 import com.yihu.ehr.util.datetime.DateUtil;
+import com.yihu.ehr.util.id.BizObject;
 import com.yihu.ehr.util.phonics.PinyinUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -105,6 +105,7 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value = ServiceApi.Doctors.Doctors, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     @ApiOperation(value = "创建医生", notes = "创建医生信息")
     public MDoctor createDoctor(
             @ApiParam(name = "doctor_json_data", value = "", defaultValue = "")
@@ -121,7 +122,13 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
         User user =new User();
         user.setId(getObjectId(BizObject.User));
         user.setCreateDate(new Date());
-        user.setPassword(DigestUtils.md5Hex(default_password));
+        String defaultPassword="";
+        if(!StringUtils.isEmpty(doctor.getIdCardNo())&&doctor.getIdCardNo().length()>7){
+            defaultPassword=doctor.getIdCardNo().substring(doctor.getIdCardNo().length()-6,doctor.getIdCardNo().length());
+            user.setPassword(DigestUtils.md5Hex(defaultPassword));
+        }else{
+            user.setPassword(DigestUtils.md5Hex(default_password));
+        }
         if(StringUtils.isEmpty(d.getRoleType())){
             user.setUserType("5");
         }else{
@@ -133,7 +140,7 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
         user.setEmail(d.getEmail());
         user.setGender(d.getSex());
         user.setTelephone(d.getPhone());
-        user.setLoginCode(d.getPhone());
+        user.setLoginCode(d.getIdCardNo());
         user.setRealName(d.getName());
         user.setProvinceId(0);
         user.setCityId(0);
@@ -144,7 +151,12 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
 
         //创建居民
         DemographicInfo demographicInfo =new DemographicInfo();
-        demographicInfo.setPassword(DigestUtils.md5Hex(default_password));
+        if(!StringUtils.isEmpty(doctor.getIdCardNo())&&doctor.getIdCardNo().length()>7){
+            defaultPassword=doctor.getIdCardNo().substring(doctor.getIdCardNo().length()-6,doctor.getIdCardNo().length());
+            demographicInfo.setPassword(DigestUtils.md5Hex(defaultPassword));
+        }else{
+            demographicInfo.setPassword(DigestUtils.md5Hex(default_password));
+        }
         demographicInfo.setRegisterTime(new Date());
         demographicInfo.setIdCardNo(d.getIdCardNo());
         demographicInfo.setName(d.getName());
@@ -158,6 +170,7 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value = ServiceApi.Doctors.Doctors, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     @ApiOperation(value = "修改医生", notes = "重新绑定医生信息")
     public MDoctor updateDoctor(
             @ApiParam(name = "doctor_json_data", value = "", defaultValue = "")

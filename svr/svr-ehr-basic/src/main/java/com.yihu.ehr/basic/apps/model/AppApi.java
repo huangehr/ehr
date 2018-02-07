@@ -29,7 +29,6 @@ public class AppApi {
     private String openLevel;
     private String auditLevel;
     private String methodName;
-
     private String microServiceUri;
     private String msMethodName;
     private String microServiceName;

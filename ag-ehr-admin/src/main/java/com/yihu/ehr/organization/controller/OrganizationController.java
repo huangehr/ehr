@@ -308,9 +308,9 @@ public class OrganizationController extends BaseController {
             @ApiParam(name = "geography_model_json_data",value = "地址信息Json",defaultValue = "")
             @RequestParam(value = "geography_model_json_data", required = false) String geographyModelJsonData,
             @ApiParam(name = "inputStream", value = "转换后的输入流", defaultValue = "")
-            @RequestParam(value = "inputStream") String inputStream,
+            @RequestParam(value = "inputStream" , required = false) String inputStream,
             @ApiParam(name = "imageName", value = "图片全名", defaultValue = "")
-            @RequestParam(value = "imageName") String imageName){
+            @RequestParam(value = "imageName", required = false) String imageName){
         try {
             String errorMsg = "";
 
@@ -329,6 +329,9 @@ public class OrganizationController extends BaseController {
             }
 
             MOrganization mOrganization = convertToMOrganization(orgDetailModel);
+            if (null == mOrganization.getBerth() ) {
+                mOrganization.setBerth(0);
+            }
             if (StringUtils.isEmpty(mOrganization.getOrgCode())) {
                 errorMsg+="机构代码不能为空！";
             }
@@ -340,9 +343,6 @@ public class OrganizationController extends BaseController {
             }
             if (StringUtils.isEmpty(mOrganization.getOrgType())) {
                 errorMsg+="机构类型不能为空！";
-            }
-            if (null != mOrganization.getBerth()) {
-                errorMsg+="核定床位不能为空！";
             }
             if (StringUtils.isEmpty(mOrganization.getTel())) {
                 errorMsg+="联系方式不能为空！";
@@ -434,6 +434,9 @@ public class OrganizationController extends BaseController {
                 orgDetailModel.setImgLocalPath("");
             }
             MOrganization mOrganization = convertToMOrganization(orgDetailModel);
+            if (null == mOrganization.getBerth()) {
+                mOrganization.setBerth(0);
+            }
             if (StringUtils.isEmpty(mOrganization.getOrgCode())) {
                 errorMsg+="机构代码不能为空！";
             }
@@ -445,9 +448,6 @@ public class OrganizationController extends BaseController {
             }
             if (StringUtils.isEmpty(mOrganization.getOrgType())) {
                 errorMsg+="机构类型不能为空！";
-            }
-            if (null != mOrganization.getBerth()) {
-                errorMsg+="核定床位不能为空！";
             }
             if (StringUtils.isEmpty(mOrganization.getTel())) {
                 errorMsg+="联系方式不能为空！";

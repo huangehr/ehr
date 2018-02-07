@@ -11,12 +11,21 @@ public class RedisService {
 
     @Autowired
     private RsMetadataKeySchema rsMetadataKeySchema;
+    @Autowired
+    private StdDataSetKeySchema stdDataSetKeySchema;
+    @Autowired
+    private RsAdapterMetaKeySchema rsAdapterMetaKeySchema;
 
-    /**
-     *获取资源化数据元映射 redis
-     * @return
-     */
     public String getRsMetaData(String key) {
         return rsMetadataKeySchema.get(key);
     }
+
+    public String getDataSetName(String version, String id) {
+        return stdDataSetKeySchema.dataSetName(version, id);
+    }
+
+    public String getRsAdapterMetaData(String cdaVersion, String dictCode, String srcDictEntryCode) {
+        return rsAdapterMetaKeySchema.getMetaData(cdaVersion, dictCode, srcDictEntryCode);
+    }
+
 }

@@ -28,33 +28,34 @@ spring:
   profiles: dev
 eip:
   tenant: jkzl
-
 ---
 spring:
   profiles: alpha
 eip:
   tenant: jkzl
-
 ---
 spring:
   profiles: test
 eip:
   tenant: jkzl
-
 ---
 spring:
   profiles: prod
 eip:
-  tenant: ehr
-
+  tenant: jkzl
 ---
 spring:
   profiles: prod_fz
 eip:
-  tenant: ehr
-
+  tenant: jkzl
 ---
 spring:
   profiles: prod_sr
 eip:
-  tenant: ehr
+  tenant: jkzl
+---
+spring:
+  profiles: prod_fzzy
+eip:
+  tenant: jkzl
+

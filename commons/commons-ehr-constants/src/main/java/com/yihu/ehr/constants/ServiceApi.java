@@ -35,6 +35,7 @@ public class ServiceApi {
         //资源查询接口(命名先按原有路径，不规范)
         public static final String ResourceViewMetadata = "/resources/query/getResourceMetadata"; //资源浏览获取结构
         public static final String ResourceViewData = "/resources/query/getResourceData"; //资源浏览获取数据
+        public static final String ResourceViewSubData = "/resources/query/getResourceSubData";
         public static final String ResourceQuery = "/resources/query"; //资源查询接口
         //public static final String ResourceSubQuery = "/resources/sub_query"; //详细资源查询接口
         public static final String ResourceQueryTransform = "/resources/query/transform"; //资源查询接口+转译
@@ -51,6 +52,7 @@ public class ServiceApi {
         //资源浏览
         public static final String ResourceBrowseCategories = "/resources/ResourceBrowses/categories";
         public static final String ResourceBrowseResourceData = "/resources/ResourceBrowses/getResourceData";
+        public static final String ResourceBrowseResourceSubData = "/resources/ResourceBrowses/getResourceSubData";//根据主表查询词表数据接口
         public static final String ResourceBrowseQuotaResourceData = "/resources/ResourceBrowses/getQuotaResourceData";
         public static final String ResourceBrowseQuotaResourceParam = "/resources/ResourceBrowses/getQuotaResourceParam";
         public static final String ResourceBrowseResourceMetadata = "/resources/ResourceBrowses/getResourceMetadata";
@@ -365,6 +367,7 @@ public class ServiceApi {
     public static class Apps {
         public static final String Apps = "/apps";
         public static final String AppsNoPage = "/apps/no_paging";
+        public static final String getApp = "/app";
         public static final String App = "/apps/{app_id}";
         public static final String AppExistence = "/apps/{app_id}/existence";
         public static final String AppStatus = "/apps/{app_id}/status";
@@ -372,6 +375,8 @@ public class ServiceApi {
         public static final String FilterList = "/apps/filterList";
         public static final String getAppTypeAndApps = "/getAppTypeAndApps";
         public static final String getApps = "/getApps";
+        public static final String AppFieldExistence = "/app/field/existence";
+        public static final String AppAuthClient = "/app/authClient";
     }
 
     public static class AppApi {
@@ -380,6 +385,7 @@ public class ServiceApi {
         public static final String AppApisNoPage = "/appApiNoPage";
         public static final String AppApiSearch = "/appApi/search";
         public static final String AppApiAuth = "/appApiAuth";
+        public static final String AppApiAuthList = "/appApi/auth/list";
 
     }
 
@@ -447,10 +453,12 @@ public class ServiceApi {
     public static class PackageAnalyzer {
         public static final String Scheduler = "packAnalyzer/scheduler";
         public static final String Queue = "packAnalyzer/queue";
-        public static final String Status = "packAnalyzer/status";
+        public static final String Status = "packAnalyzer/status/{id}";
         public static final String DailyReport = "packAnalyzer/dailyReport";
         public static final String List = "packAnalyzer/list";
         public static final String FindByField = "packAnalyzer/findByField";
+        public static final String FindBySql = "packAnalyzer/findBySql";
+        public static final String EsSaveData = "packAnalyzer/esSaveData";
     }
 
 
@@ -521,7 +529,6 @@ public class ServiceApi {
         public static final String MessageRemindCount = "/portal/messageRemind/count";
         public static final String MessageRemindRead = "/portal/messageRemind/read/{remindId}";
         public static final String NoticesTop = "/portal/notices/top";
-        public static final String NoticesAdmin = "/portal/notices/admin/{portalNotice_id}";
         public static final String Feedback = "/portal/feedback";
         public static final String ResourceTop = "/portal/resource/top";
         public static final String QuotaCategoryOfChild = "/portal/quotaCategoryOfChild";
@@ -705,6 +712,7 @@ public class ServiceApi {
         public static final String RoleNameExistence = "/roles/name/existence";
         public static final String RoleCodeExistence = "/roles/code/existence";
         public static final String RoleBatchAdd = "/roles/roleBatchAdd";
+        public static final String RoleFindByField = "/roles/findByField";
 
 
         public static final String RoleUser = "/roles/role_user";
@@ -961,6 +969,7 @@ public class ServiceApi {
             public static final String Delete = "/redis/mq/channel/delete";
             public static final String IsUniqueChannel = "/redis/mq/channel/isUniqueChannel";
             public static final String IsUniqueChannelName = "/redis/mq/channel/isUniqueChannelName";
+            public static final String IsExist = "/redis/mq/channel/isExist";
             public static final String SendMessage = "/redis/mq/channel/sendMessage";
         }
 
@@ -973,6 +982,8 @@ public class ServiceApi {
             public static final String Delete = "/redis/mq/subscriber/delete";
             public static final String IsUniqueAppId = "/redis/mq/subscriber/isUniqueAppId";
             public static final String IsUniqueSubscribedUrl = "/redis/mq/subscriber/isUniqueSubscribedUrl";
+            public static final String IsExist = "/redis/mq/subscriber/isExist";
+            public static final String Unsubscribe = "/redis/mq/subscriber/unsubscribe";
         }
 
         // Redis消息发布者
@@ -1230,6 +1241,10 @@ public class ServiceApi {
         public static final String GetArchiveReportAll = "/stasticReport/getArchiveReportAll";
         public static final String GetRecieveOrgCount = "/stasticReport/getRecieveOrgCount";
         public static final String GetArchivesInc = "/stasticReport/getArchivesInc";
+        public static final String GetArchivesFull = "/stasticReport/getArchivesFull";
+        public static final String GetArchivesTime = "/stasticReport/getArchivesTime";
+        public static final String GetDataSetCount = "/stasticReport/getDataSetCount";
+        public static final String GetArchivesRight = "/stasticReport/getArchivesRight";
 
     }
 

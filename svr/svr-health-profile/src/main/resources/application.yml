@@ -108,7 +108,7 @@ fast-dfs:
   tracker-server: 11.1.2.9:22122
   public-server: http://ds.ehr.yihu.com:22122
 eip:
-  tenant: ehr
+  tenant: jkzl
 
 ---
 spring:
@@ -123,7 +123,8 @@ fast-dfs:
   tracker-server: 11.1.2.9:22122
   public-server: http://11.1.2.9:80
 eip:
-  tenant: ehr
+  tenant: jkzl
+
 ---
 spring:
   profiles: prod_sr
@@ -137,4 +138,19 @@ fast-dfs:
   tracker-server: 10.176.97.5:22122
   public-server: http://10.176.97.5:8888
 eip:
-  tenant: ehr
+  tenant: jkzl
+
+---
+spring:
+  profiles: prod_fzzy
+  datasource:
+    url: jdbc:mysql://100.100.1.159:3310/healtharchive?useUnicode=true&amp;characterEncoding=UTF-8&useSSL=false
+    username: healthcloud
+    password: GP8Qz4qU
+  application:
+    id: JKZL
+fast-dfs:
+  tracker-server: 100.100.1.157:22122
+  public-server: http://100.100.1.157:8888
+eip:
+  tenant: jkzl

@@ -22,12 +22,11 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class EhrRedisApiAccessValidator {
 
-    private static final String DEFAULT_USER_ID_BY_USER_NAME_STATEMENT = "SELECT id FROM users WHERE login_code = ?";
+    //private static final String DEFAULT_USER_ID_BY_USER_NAME_STATEMENT = "SELECT id FROM users WHERE login_code = ?";
     private static final String DEFAULT_APP_API_STATEMENT = "SELECT CONCAT(aa.micro_service_url, aa.ms_method_name) FROM apps_api aa \n" +
             "\tLEFT JOIN role_api_relation rar ON rar.app_api_id = aa.id \n" +
-            "\tWHERE (rar.role_id IN (SELECT role_id FROM role_user WHERE user_id = ?)) \n" +
-            "\tAND aa.app_id = ? \n" +
-            "\tAND LENGTH(aa.micro_service_url) > 0 AND LENGTH(aa.ms_method_name);";
+            "\tWHERE rar.role_id IN (SELECT role_id FROM role_app_relation WHERE app_id = ?) \n" +
+            "\tAND LENGTH(aa.micro_service_url) > 0 AND LENGTH(aa.ms_method_name) > 0";
 
     @Autowired
     private RedisTemplate<String, Serializable> redisTemplate;
@@ -35,11 +34,13 @@ public class EhrRedisApiAccessValidator {
     private JdbcTemplate jdbcTemplate;
 
     public void putVerificationApi (String clientId, String userName) {
+        /**
         List<String> userId = jdbcTemplate.queryForList(DEFAULT_USER_ID_BY_USER_NAME_STATEMENT, new String []{userName}, String.class);
         if(userId.size() <= 0) {
             throw new InsufficientAuthenticationException("Illegal authorized user.");
         }
-        List<String> appApiList = jdbcTemplate.queryForList(DEFAULT_APP_API_STATEMENT, new String[]{userId.get(0), clientId}, String.class);
+         */
+        List<String> appApiList = jdbcTemplate.queryForList(DEFAULT_APP_API_STATEMENT, new String[]{clientId}, String.class);
         if(appApiList.size() > 0) {
             Date today = new Date();
             Date tomorrow = DateUtils.addDays(today, 1);

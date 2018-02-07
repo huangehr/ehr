@@ -70,7 +70,6 @@ fast-dfs:
   public-server: http://172.19.103.52:80
 eip:
   tenant: jkzl
-
 ---
 spring:
   profiles: alpha
@@ -90,7 +89,6 @@ fast-dfs:
   public-server: http://172.19.103.54:22122
 eip:
   tenant: jkzl
-
 ---
 spring:
   profiles: test
@@ -110,7 +108,6 @@ fast-dfs:
   public-server: http://172.19.103.52:80
 eip:
   tenant: jkzl
-
 ---
 spring:
   profiles: prod
@@ -141,7 +138,7 @@ fast-dfs:
   tracker-server: 11.1.2.9:22122
   public-server: http://11.1.2.9:80
 eip:
-  tenant: ehr
+  tenant: jkzl
 ---
 spring:
   profiles: prod_sr
@@ -157,4 +154,20 @@ fast-dfs:
   tracker-server: 10.176.97.5:22122
   public-server: http://10.176.97.5:8888
 eip:
-  tenant: ehr
+  tenant: jkzl
+---
+spring:
+  profiles: prod_fzzy
+  datasource:
+    url: jdbc:mysql://100.100.1.159:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: healthcloud
+    password: GP8Qz4qU
+  redis:
+    host: 100.100.1.161 # Redis server host.
+    port: 6390
+    password: q4YaQemf
+fast-dfs:
+  tracker-server: 100.100.1.157:22122
+  public-server: http://100.100.1.157:8888
+eip:
+  tenant: jkzl
