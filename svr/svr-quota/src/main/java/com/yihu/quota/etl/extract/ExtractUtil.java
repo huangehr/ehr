@@ -88,7 +88,6 @@ public class ExtractUtil {
             }
         }
 
-        boolean orgFlag = false;
         List<String> dimins = new ArrayList<>();
         for (TjQuotaDimensionSlave slave : qds) {
             if (slave.getId() != null) {
@@ -96,57 +95,51 @@ public class ExtractUtil {
             }
         }
         for (TjQuotaDimensionMain main : qdm) {
-            if (!main.getMainCode().equals("org")) {
-                dimins.add(main.getMainCode());
-            } else {
-                orgFlag = true;
-            }
+            dimins.add(main.getMainCode());
         }
-        if (orgFlag) {
-
-            dimins.add("quotaDate");
-            BasesicUtil baseUtil = new BasesicUtil();
-            Map<String, String> diminMap = new HashMap<>();
-            for (SaveModel saveModel : returnList) {
-                String diminStr = "";
-                for (String key : dimins) {
-                    diminStr += baseUtil.getFieldValueByName(key, saveModel);
-                }
-                diminMap.put(diminStr, diminStr);
+        dimins.add("quotaDate");
+        BasesicUtil baseUtil = new BasesicUtil();
+        Map<String, String> diminMap = new HashMap<>();
+        for (SaveModel saveModel : returnList) {
+            String diminStr = "";
+            for (String key : dimins) {
+                diminStr += baseUtil.getFieldValueByName(key, saveModel);
             }
+            diminMap.put(diminStr, diminStr);
+        }
 
-//            for(String dimin : diminMap.keySet()){
-//                SaveModel saveAllModel = new SaveModel();
-//                double count = 0;
-//                for(int i=0;i < returnList.size();i++){
-//                    String diminStr = "";
-//                    SaveModel saveModel = returnList.get(i);
-//                    for(String key :dimins){
-//                        diminStr += baseUtil.getFieldValueByName(key, saveModel);
-//                    }
-//                    if(dimin.equals(diminStr)){
-//                        saveAllModel.setSlaveKey1(saveModel.getSlaveKey1());
-//                        saveAllModel.setSlaveKey1Name(saveModel.getSlaveKey1Name());
-//                        saveAllModel.setSlaveKey2(saveModel.getSlaveKey2());
-//                        saveAllModel.setSlaveKey2Name(saveModel.getSlaveKey2Name());
-//                        saveAllModel.setSlaveKey3(saveModel.getSlaveKey3());
-//                        saveAllModel.setSlaveKey3Name(saveModel.getSlaveKey3Name());
-//                        saveAllModel.setQuotaDate(saveModel.getQuotaDate());
-//                        saveAllModel.setQuotaCode(saveModel.getQuotaCode());
-//                        saveAllModel.setQuotaName(saveModel.getQuotaName());
-//                        count = count + Double.valueOf(saveModel.getResult());
-//                    }
+
+//        for(String dimin : diminMap.keySet()){
+//            SaveModel saveAllModel = new SaveModel();
+//            double count = 0;
+//            for(int i=0;i < returnList.size();i++){
+//                String diminStr = "";
+//                SaveModel saveModel = returnList.get(i);
+//                for(String key :dimins){
+//                    diminStr += baseUtil.getFieldValueByName(key, saveModel);
 //                }
-//                saveAllModel.setOrg("ALL");
-//                saveAllModel.setOrgName("");
-//                saveAllModel.setTown("ALL");
-//                saveAllModel.setTownName("上饶市");
-//                saveAllModel.setCity("shangrao");
-//                saveAllModel.setCityName("上饶市");
-//                saveAllModel.setResult(String.valueOf(count));
-//                returnList.add(saveAllModel);
+//                if(dimin.equals(diminStr)){
+//                    saveAllModel.setSlaveKey1(saveModel.getSlaveKey1());
+//                    saveAllModel.setSlaveKey1Name(saveModel.getSlaveKey1Name());
+//                    saveAllModel.setSlaveKey2(saveModel.getSlaveKey2());
+//                    saveAllModel.setSlaveKey2Name(saveModel.getSlaveKey2Name());
+//                    saveAllModel.setSlaveKey3(saveModel.getSlaveKey3());
+//                    saveAllModel.setSlaveKey3Name(saveModel.getSlaveKey3Name());
+//                    saveAllModel.setQuotaDate(saveModel.getQuotaDate());
+//                    saveAllModel.setQuotaCode(saveModel.getQuotaCode());
+//                    saveAllModel.setQuotaName(saveModel.getQuotaName());
+//                    count = count + Double.valueOf(saveModel.getResult());
+//                }
 //            }
-        }
+//            saveAllModel.setOrg("ALL");
+//            saveAllModel.setOrgName("");
+//            saveAllModel.setTown("ALL");
+//            saveAllModel.setTownName("上饶市");
+//            saveAllModel.setCity("shangrao");
+//            saveAllModel.setCityName("上饶市");
+//            saveAllModel.setResult(String.valueOf(count));
+//            returnList.add(saveAllModel);
+//        }
 
     }
 
