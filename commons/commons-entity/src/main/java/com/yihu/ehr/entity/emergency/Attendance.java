@@ -3,7 +3,6 @@ package com.yihu.ehr.entity.emergency;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.yihu.ehr.entity.BaseIdentityEntity;
-import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -31,37 +30,69 @@ public class Attendance extends BaseIdentityEntity{
         /** 意外中止 */
         discontinue
     }
-    //车牌号码
+    /**
+     * 车牌号码
+     */
     private String carId;
-    //到达时间
+    /**
+     * 到达时间
+     */
     private Date arrivalTime;
-    //结束时间
+    /**
+     * 结束时间
+     */
     private Date completeTime;
-    //状态
+    /**
+     * 状态
+     */
     private Status status;
-    //接警电话
+    /**
+     * 报警电话
+     */
     private String alarmTel;
-    //呼救地点
+    /**
+     * 呼救地点
+     */
     private String callAddress;
-    //主诉
+    /**
+     * 主诉
+     */
     private String chiefComplaint;
-    //调派医院
+    /**
+     * 调派医院
+     */
     private String dispatchHospital;
-    //患者人数
+    /**
+     * 患者人数
+     */
     private int patientNum;
-    //病人性别
+    /**
+     * 病人性别
+     */
     private String patientGender;
-    //初步诊断
+    /**
+     * 初步诊断
+     */
     private String disease;
-    //送达地点
+    /**
+     * 送达地点
+     */
     private String deliverAddress;
-    //呼救地点经度
+    /**
+     * 呼救地点经度
+     */
     private double longitude;
-    //呼救地点纬度
+    /**
+     * 呼救地点纬度
+     */
     private double latitude;
-    //备注
+    /**
+     * 备注
+     */
     private String remark;
-    //值班id列表
+    /**
+     * 值班ID列表
+     */
     private String schedules;
 
     @Column(name = "car_id", nullable = false)
