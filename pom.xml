@@ -111,8 +111,10 @@
         <version.spring-cloud-config-server>1.1.0.RELEASE</version.spring-cloud-config-server>
         <version.spring-data-release-train>Hopper-SR1</version.spring-data-release-train>
         <version.spring-data-hadoop>2.3.0.RELEASE</version.spring-data-hadoop>
+        <version.spring-data-redis>1.7.1.RELEASE</version.spring-data-redis>
         <version.spring-framework>4.2.5.RELEASE</version.spring-framework>
         <version.spring-session>1.2.1.RELEASE</version.spring-session>
+        <version.spring-security>4.0.4.RELEASE</version.spring-security>
         <version.statsd-client>3.1.0</version.statsd-client>
         <version.swagger>2.7.0</version.swagger>
         <version.swagger-ui>2.7.0</version.swagger-ui>
@@ -534,6 +536,32 @@
                 <version>${version.spring-session}</version>
                 <scope>${dependency.scope}</scope>
             </dependency>
+            <dependency>
+                <groupId>org.springframework.session</groupId>
+                <artifactId>spring-session-data-redis</artifactId>
+                <version>${version.spring-session}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+
+            <!--Spring security family-->
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-core</artifactId>
+                <version>${version.spring-security}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-web</artifactId>
+                <version>${version.spring-security}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-config</artifactId>
+                <version>${version.spring-security}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
 
             <!--Spring data family, hadoop not in BOM. see http://projects.spring.io/spring-data/-->
             <dependency>
@@ -547,6 +575,14 @@
                 <groupId>org.springframework.data</groupId>
                 <artifactId>spring-data-hadoop-hbase</artifactId>
                 <version>${version.spring-data-hadoop}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+
+            <!--Spring data redis-->
+            <dependency>
+                <groupId>org.springframework.data</groupId>
+                <artifactId>spring-data-redis</artifactId>
+                <version>${version.spring-data-redis}</version>
                 <scope>${dependency.scope}</scope>
             </dependency>
 
