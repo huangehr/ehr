@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.text.NumberFormat;
 import java.util.*;
 
 
@@ -103,10 +104,10 @@ public class QuotaReportController extends BaseController {
     ) {
         List<Map<String, Object>> dataList = new ArrayList<>();
         Map<String, List<Map<String, Object>>> quotaViewResult = new HashMap<>();
+        List<String> quotaCodes = Arrays.asList(quotaCodeStr.split(","));
         String maxQuotaCode = "";
         int num = 0;
         try {
-            List<String> quotaCodes = Arrays.asList(quotaCodeStr.split(","));
             for (String code : quotaCodes) {
                 List<Map<String, Object>> quotaResult = baseStatistsService.getSimpleQuotaReport(code, filter, dimension,false);
                 if (quotaResult.size() >= num) {
@@ -139,17 +140,46 @@ public class QuotaReportController extends BaseController {
                     }
                 }
             }
-            dataList = quotaViewResult.get(maxQuotaCode);
+            List<Map<String, Object>> resultList = quotaViewResult.get(maxQuotaCode);
 
             if(dimension.equals(orgHealthCategoryCode)){//如果是特殊机构类型树状机构需要转成树状结构
                 List<Map<String, Object>> orgHealthCategoryList = orgHealthCategoryStatisticsService.getOrgHealthCategoryTreeByPid(-1);
-                List<Map<String, Object>> resultList = baseStatistsService.setResult(maxQuotaCode, orgHealthCategoryList, dataList, null);
-                return resultList;
+                dataList = baseStatistsService.setResult(maxQuotaCode, orgHealthCategoryList, resultList, null);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+        //计算合计
+        if(dataList != null && dataList.size() > 0){
+            Map<String, Object> sumMap = new HashMap<>();
+            sumMap.put("firstColumn","合计");
+            for (String code : quotaCodes) {
+                double sum = 0;
+                sum = calculateSum(sum,code,dataList);
+                NumberFormat nf = NumberFormat.getInstance();
+                nf.setGroupingUsed(false);
+                sumMap.put(code, nf.format(sum));
+            }
+            dataList.add(0,sumMap);
+        }
         return dataList;
+    }
+
+    /**
+     * 统计每列合计
+     * @param sum
+     * @param code
+     * @param dataList
+     * @return
+     */
+    private double calculateSum( double sum,String code,List<Map<String, Object>> dataList){
+        for(Map<String, Object> map : dataList){
+            sum += Double.valueOf(map.get(code).toString());
+            if(map.containsKey("children")){
+                calculateSum(sum,code,(List<Map<String, Object>>) map.get("children"));
+            }
+        }
+        return sum;
     }
 
     @ApiOperation(value = "获取指标统计结果echart图表，支持多条组合")
