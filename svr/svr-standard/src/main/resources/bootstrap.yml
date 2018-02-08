@@ -9,8 +9,8 @@ spring:
     config:
       username: user
       password: configuration
-      uri: http://172.19.103.73:1221
-#      uri: http://172.19.103.58:1221
+#      uri: http://172.19.103.73:1221
+      uri: http://172.19.103.58:1221
       label: dev
 
 ---

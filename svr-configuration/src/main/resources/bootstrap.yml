@@ -32,7 +32,7 @@ spring:
     config:
       server:
         git:
-          uri: http://192.168.1.220:10080/chenyongxing/ehr.config
+          uri: http://192.168.1.220:10080/CYX_JKZL/ehr.config
           basedir: /usr/local/ehr-config
         default-label: dev
 
