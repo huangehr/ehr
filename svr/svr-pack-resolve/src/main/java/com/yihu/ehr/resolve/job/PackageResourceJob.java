@@ -64,20 +64,16 @@ public class PackageResourceJob implements InterruptableJob {
             if (pack != null) {
                 packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Acquired, "正在入库中");
                 PackResolveLogger.info("开始入库:" + pack.getId() + ", Timestamp:" + new Date());
-                //LogService.getLogger().info("开始入库:" + pack.getId() + ", Timestamp:" + new Date());
                 doResolve(pack, packageMgrClient);
             }
-        }catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception e) {
             if(pack != null) {
                 if (StringUtils.isBlank(e.getMessage())) {
-                    packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Failed, "Internal Server Error");
-                    PackResolveLogger.error("Internal Server Error, Please See Tomcat Log!");
-                    //LogService.getLogger().error("Internal Server Error, Please See Tomcat Log!");
+                    packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Failed, "Internal server error, please see task log for detail message.");
+                    PackResolveLogger.error("Internal server error, please see task log for detail message.", e);
                 } else {
                     packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Failed, e.getMessage());
-                    PackResolveLogger.error(e.getMessage());
-                    //LogService.getLogger().error(e.getMessage());
+                    PackResolveLogger.error(e.getMessage(), e);
                 }
             }
         }

@@ -1,21 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration scan="true">
 
-	<property name="log_home" value="/ehr-logs/svr-pack-mgr/" />
+    <springProperty scope="context" name="dir" source="spring.application.name"/>
 
-	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
-		<encoder>
-			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) --- [ %thread] - %magenta(%logger{36}): %msg%n</pattern>
-			<charset class="java.nio.charset.Charset">UTF-8</charset>
-		</encoder>
-	</appender>
+    <property name="log_home" value="/ehr-logs/${dir}/" />
 
-	<appender name="infoFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <!-- Standard output -->
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) --- [ %thread] - %magenta(%logger{36}): %msg%n</pattern>
+            <charset class="java.nio.charset.Charset">UTF-8</charset>
+        </encoder>
+    </appender>
+
+	<!-- Api Log Start -->
+	<appender name="ApiInfoFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${log_home}/info/pack-mgr-%d{yyyy-MM-dd}.log</fileNamePattern>
+			<fileNamePattern>${log_home}/api/info/%d{yyyy-MM-dd}.log</fileNamePattern>
 		</rollingPolicy>
 		<encoder>
-			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level --- [ %thread]: %msg%n</pattern>
+			<pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level --- [ %thread] - %logger{36}: %msg%n</pattern>
 			<charset class="java.nio.charset.Charset">UTF-8</charset>
 		</encoder>
 		<filter class="ch.qos.logback.classic.filter.LevelFilter">
@@ -25,12 +29,12 @@
 		</filter>
 	</appender>
 
-	<appender name="warnFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+	<appender name="ApiWarnFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${log_home}/warn/pack-mgr-%d{yyyy-MM-dd}.log</fileNamePattern>
+			<fileNamePattern>${log_home}/api/warn/%d{yyyy-MM-dd}.log</fileNamePattern>
 		</rollingPolicy>
 		<encoder>
-			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level --- [ %thread]: %msg%n</pattern>
+			<pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level --- [ %thread] - %logger{36}: %msg%n</pattern>
 			<charset class="java.nio.charset.Charset">UTF-8</charset>
 		</encoder>
 		<filter class="ch.qos.logback.classic.filter.LevelFilter">
@@ -40,12 +44,70 @@
 		</filter>
 	</appender>
 
-	<appender name="errorFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+	<appender name="ApiErrorFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${log_home}/error/pack-mgr-%d{yyyy-MM-dd}.log</fileNamePattern>
+			<fileNamePattern>${log_home}/api/error/%d{yyyy-MM-dd}.log</fileNamePattern>
 		</rollingPolicy>
 		<encoder>
-			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level --- [ %thread]: %msg%n</pattern>
+			<pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level --- [ %thread] - %logger{36}: %msg%n</pattern>
+			<charset class="java.nio.charset.Charset">UTF-8</charset>
+		</encoder>
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>ERROR</level>
+			<onMatch>ACCEPT</onMatch>
+			<onMismatch>DENY</onMismatch>
+		</filter>
+	</appender>
+
+	<logger name="com.yihu.ehr.exception.GlobalExceptionHandler" level="WARN" additivity="false">
+		<springProfile name="dev">
+			<appender-ref ref="console" />
+		</springProfile>
+		<appender-ref ref="ApiInfoFile" />
+		<appender-ref ref="ApiWarnFile" />
+		<appender-ref ref="ApiErrorFile" />
+	</logger>
+	<!-- Api Log End -->
+
+    <!-- 如果微服务纳入全局异常处理，请勿修改以上代码，有新的日志处理请在以下追加！！！ -->
+
+	<!-- FastDfs Start -->
+	<appender name="fastDfsInfoFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${log_home}/fastDfs/info/%d{yyyy-MM-dd}.log</fileNamePattern>
+		</rollingPolicy>
+		<encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level --- [ %thread] - %logger{36}: %msg%n</pattern>
+			<charset class="java.nio.charset.Charset">UTF-8</charset>
+		</encoder>
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>INFO</level>
+			<onMatch>ACCEPT</onMatch>
+			<onMismatch>DENY</onMismatch>
+		</filter>
+	</appender>
+
+	<appender name="fastDfsWarnFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${log_home}/fastDfs/warn/%d{yyyy-MM-dd}.log</fileNamePattern>
+		</rollingPolicy>
+		<encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level --- [ %thread] - %logger{36}: %msg%n</pattern>
+			<charset class="java.nio.charset.Charset">UTF-8</charset>
+		</encoder>
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>WARN</level>
+			<onMatch>ACCEPT</onMatch>
+			<onMismatch>DENY</onMismatch>
+		</filter>
+	</appender>
+
+	<appender name="fastDfsErrorFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${log_home}/fastDfs/error/%d{yyyy-MM-dd}.log</fileNamePattern>
+		</rollingPolicy>
+		<encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level --- [ %thread] - %logger{36}: %msg%n</pattern>
 			<charset class="java.nio.charset.Charset">UTF-8</charset>
 		</encoder>
 		<filter class="ch.qos.logback.classic.filter.LevelFilter">
@@ -56,10 +118,14 @@
 	</appender>
 
 	<logger name="com.yihu.ehr.fastdfs.FastDFSUtil" level="WARN" additivity="false">
-		<appender-ref ref="infoFile" />
-		<appender-ref ref="warnFile" />
-		<appender-ref ref="errorFile" />
+        <springProfile name="dev">
+            <appender-ref ref="console" />
+        </springProfile>
+		<appender-ref ref="fastDfsInfoFile" />
+		<appender-ref ref="fastDfsWarnFile" />
+		<appender-ref ref="fastDfsErrorFile" />
 	</logger>
+    <!-- FastDfs End -->
 
 	<root level="INFO">
 		<appender-ref ref="console" />
