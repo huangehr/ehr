@@ -38,18 +38,11 @@ public class ElasticSearchEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "type", value = "索引类型", required = true)
             @RequestParam(value = "type") String type,
             @ApiParam(name = "source", value = "Json串值", required = true)
-            @RequestParam(value = "source") String source) {
+            @RequestParam(value = "source") String source) throws Exception {
         Envelop envelop = new Envelop();
-        try {
-            String mapper = source.replaceAll("\\[","{").replaceAll("\\]","}");
-            Map<String, Map<String, String>> Mapping = objectMapper.readValue(mapper, Map.class);
-            elasticSearchService.mapping(index, type, Mapping);
-        }catch (IOException e) {
-            e.printStackTrace();
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg(e.getMessage());
-            return envelop;
-        }
+        String mapper = source.replaceAll("\\[","{").replaceAll("\\]","}");
+        Map<String, Map<String, String>> Mapping = objectMapper.readValue(mapper, Map.class);
+        elasticSearchService.mapping(index, type, Mapping);
         envelop.setSuccessFlg(true);
         return envelop;
     }

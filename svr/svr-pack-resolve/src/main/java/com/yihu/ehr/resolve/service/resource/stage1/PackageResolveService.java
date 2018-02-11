@@ -61,7 +61,7 @@ public class PackageResolveService {
         try {
             root = new Zipper().unzipFile(new File(zipFile), TempPath + pack.getId(), pack.getPwd());
             if (root == null || !root.isDirectory() || root.list().length == 0) {
-                throw new RuntimeException("Invalid package file, package id: " + pack.getId());
+                throw new RuntimeException("Invalid package file " + pack.getId() + ", do not deal with fail-tolerant.");
             }
             //根据压缩包获取标准档案包
             StandardPackage standardPackage = PackModelFactory.createPackModel(root);
@@ -109,7 +109,7 @@ public class PackageResolveService {
         try {
             root = new Zipper().unzipFile(new File(zipFile), TempPath + pack.getId(), pack.getPwd());
             if (root == null || !root.isDirectory() || root.list().length == 0) {
-                throw new RuntimeException("Invalid package file, package id: " + pack.getId());
+                throw new RuntimeException("Invalid package file " + pack.getId() + ", do not deal with fail-tolerant.");
             }
             PackageResolver packageResolver = packageResolvers.get(ProfileType.DataSet);
             List<StandardPackage> standardPackages = packageResolver.resolveDataSets(root, pack.getClientId());
@@ -133,7 +133,7 @@ public class PackageResolveService {
         try {
             root = new Zipper().unzipFile(new File(zipFile), TempPath + pack.getId(), pack.getPwd());
             if (root == null || !root.isDirectory() || root.list().length == 0) {
-                throw new RuntimeException("Invalid package file, package id: " + pack.getId());
+                throw new RuntimeException("Invalid package file " + pack.getId() + ", do not deal with fail-tolerant.");
             }
 
             DataSetPackage profile = (DataSetPackage) PackModelFactory.createPackModel(root);

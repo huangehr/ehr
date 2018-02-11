@@ -336,7 +336,7 @@ public class DataSetPackageResolver extends PackageResolver {
             } catch (NullPointerException e) {
                 throw new RuntimeException("Null pointer occurs while generate data set, package cda version: " + version);
             } catch (ParseException e) {
-                throw new RuntimeException("Invalid date time format.");
+                throw new RuntimeException("Invalid date time format, do not deal with fail-tolerant.");
             }
         }
         return packageDataSetList;

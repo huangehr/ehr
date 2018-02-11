@@ -202,11 +202,15 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             aPackage.setParseDate(new Date()); //入库执行时间
         } else {
             aPackage.setFinishDate(null);
-            Package oldPackage = packService.getPackage(aPackage.getId());
-            if (oldPackage.getFailCount() < 3) {
-                int failCount = oldPackage.getFailCount();
-                failCount++;
-                aPackage.setFailCount(failCount);
+            if(aPackage.getMessage().endsWith("do not deal with fail-tolerant.")) {
+                aPackage.setFailCount(3);
+            }else{
+                Package oldPackage = packService.getPackage(aPackage.getId());
+                if (oldPackage.getFailCount() < 3) {
+                    int failCount = oldPackage.getFailCount();
+                    failCount++;
+                    aPackage.setFailCount(failCount);
+                }
             }
         }
         packService.save(aPackage);
