@@ -13,6 +13,7 @@ import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionMain;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionSlave;
 import com.yihu.quota.service.dimension.TjDimensionMainService;
 import com.yihu.quota.service.dimension.TjDimensionSlaveService;
+import com.yihu.quota.service.orgHealthCategory.OrgHealthCategoryStatisticsService;
 import com.yihu.quota.service.quota.BaseStatistsService;
 import com.yihu.quota.service.quota.QuotaService;
 import com.yihu.quota.service.resource.ResourceQuotaService;
@@ -32,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.text.NumberFormat;
 import java.util.*;
 
 
@@ -56,7 +58,10 @@ public class QuotaReportController extends BaseController {
     @Autowired
     private ResourceQuotaService resourceQuotaService;
     @Autowired
+    private OrgHealthCategoryStatisticsService orgHealthCategoryStatisticsService;
+    @Autowired
     private BaseStatistsService baseStatistsService;
+    public static String orgHealthCategoryCode = "orgHealthCategoryCode";
 
     /**
      * 获取指标统计结果
@@ -97,34 +102,36 @@ public class QuotaReportController extends BaseController {
             @ApiParam(name = "dimension", value = "维度字段", defaultValue = "quotaDate")
             @RequestParam(value = "dimension", required = false) String dimension
     ) {
+        NumberFormat nf = NumberFormat.getInstance();
+        nf.setGroupingUsed(false);
+        List<Map<String, Object>> dataList = new ArrayList<>();
         Map<String, List<Map<String, Object>>> quotaViewResult = new HashMap<>();
-        String maxQuota = "";
+        List<String> quotaCodes = Arrays.asList(quotaCodeStr.split(","));
+        String maxQuotaCode = "";
         int num = 0;
         try {
-            List<String> quotaCodes = Arrays.asList(quotaCodeStr.split(","));
-            int i = 1;
             for (String code : quotaCodes) {
-                List<Map<String, Object>> quotaResult = baseStatistsService.getSimpleQuotaReport(code, filter, dimension);
+                List<Map<String, Object>> quotaResult = baseStatistsService.getSimpleQuotaReport(code, filter, dimension,false);
                 if (quotaResult.size() >= num) {
                     num = quotaResult.size();
-                    maxQuota = code;
+                    maxQuotaCode = code;
                 }
                 quotaViewResult.put(code, quotaResult);
             }
             Map<String, List<Map<String, Object>>> otherQuotaViewResult = new HashMap<>();
             for (String key : quotaViewResult.keySet()) {
-                if (key != maxQuota) {
+                if (key != maxQuotaCode) {
                     otherQuotaViewResult.put(key, quotaViewResult.get(key));
                 }
             }
             //以查询结果数据最多的指标为主，其他指标对应维度没有数据的补充0
-            for (Map<String, Object> vMap : quotaViewResult.get(maxQuota)) {
-                vMap.put(maxQuota, vMap.get("result"));
+            for (Map<String, Object> vMap : quotaViewResult.get(maxQuotaCode)) {
+                vMap.put(maxQuotaCode, vMap.get("result")==null ? 0 : nf.format(Double.valueOf(vMap.get("result").toString())));
                 for (String viewQuotaCode : otherQuotaViewResult.keySet()) {
                     for (Map<String, Object> quotaResultMap : otherQuotaViewResult.get(viewQuotaCode)) {
                         if (quotaResultMap.get(dimension) != null) {
                             if (vMap.get(dimension).toString().trim().equals(quotaResultMap.get(dimension).toString().trim())) {
-                                vMap.put(viewQuotaCode, quotaResultMap.get("result").toString());
+                                vMap.put(viewQuotaCode, quotaResultMap.get("result")==null ? 0 : nf.format(Double.valueOf(quotaResultMap.get("result").toString())));
                                 break;
                             } else {
                                 vMap.put(viewQuotaCode, 0);
@@ -135,12 +142,48 @@ public class QuotaReportController extends BaseController {
                     }
                 }
             }
+            List<Map<String, Object>> resultList = quotaViewResult.get(maxQuotaCode);
 
-
+            if(dimension.equals(orgHealthCategoryCode)){//如果是特殊机构类型树状机构需要转成树状结构
+                List<Map<String, Object>> orgHealthCategoryList = orgHealthCategoryStatisticsService.getOrgHealthCategoryTreeByPid(-1);
+                dataList = baseStatistsService.setResult(maxQuotaCode, orgHealthCategoryList, resultList, null);
+            }else {
+                dataList = resultList;
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return quotaViewResult.get(maxQuota);
+        //计算合计
+        if(dataList != null && dataList.size() > 0){
+            Map<String, Object> sumMap = new HashMap<>();
+            sumMap.put("firstColumn","合计");
+            for (String code : quotaCodes) {
+                double sum = 0;
+                sum = calculateSum(sum,code,dataList);
+                sumMap.put(code, nf.format(sum));
+            }
+            dataList.add(0,sumMap);
+        }
+        //二次指标为除法运算的  合计需要重新计算
+        //TODO
+        return dataList;
+    }
+
+    /**
+     * 统计每列合计
+     * @param sum
+     * @param code
+     * @param dataList
+     * @return
+     */
+    private double calculateSum( double sum,String code,List<Map<String, Object>> dataList){
+        for(Map<String, Object> map : dataList){
+            sum += Double.valueOf(map.get(code).toString());
+            if(map.containsKey("children")){
+                calculateSum(sum,code,(List<Map<String, Object>>) map.get("children"));
+            }
+        }
+        return sum;
     }
 
     @ApiOperation(value = "获取指标统计结果echart图表，支持多条组合")
@@ -174,7 +217,7 @@ public class QuotaReportController extends BaseController {
                 Map<String, Object> dataMap = new LinkedHashMap<>();
                 TjQuota tjQuota = quotaService.findOne(Integer.valueOf(quotaId));
                 if (tjQuota != null) {
-                    List<Map<String, Object>> resultListMap = baseStatistsService.getSimpleQuotaReport(tjQuota.getCode(), filter, dimension);
+                    List<Map<String, Object>> resultListMap = baseStatistsService.getSimpleQuotaReport(tjQuota.getCode(), filter, dimension,true);
                     if (resultListMap != null && resultListMap.size() > 0) {
                         for (Map<String, Object> map : resultListMap) {
                             if (map != null && map.size() > 0) {
