@@ -24,26 +24,50 @@ public class Schedule extends BaseIdentityEntity {
         /** 未启用 */
         off
     }
+
+    /**
+     * 开始时间 天
+     */
     private java.sql.Date date;
-    // 开始时间
+    /**
+     * 开始时间
+     */
     private java.sql.Time start;
-    // 结束时间
+    /**
+     * 结束时间
+     */
     private java.sql.Time end;
-    // 车牌号码
+    /**
+     * 车牌号码
+     */
     private String carId;
-    // 执勤人员
+    /**
+     * 执勤人员
+     */
     private String dutyName;
-    // 工号
+    /**
+     * 工号
+     */
     private String dutyNum;
-    // 执勤手机号码
+    /**
+     * 执勤手机号码
+     */
     private String dutyPhone;
-    // 执勤角色
+    /**
+     * 执勤角色
+     */
     private String dutyRole;
-    // 状态（只能有一份数据为启用状态）
+    /**
+     * 状态（只能有一份数据为启用状态）
+     */
     private Status status;
-    // 主副班
+    /**
+     * 主副班
+     */
     private Boolean main;
-    //性别：0代表未知、1代表男性，2代表女性
+    /**
+     * 性别：0代表未知、1代表男性，2代表女性
+     */
     private String gender;
 
     @JsonFormat(pattern="yyyy-MM-dd", timezone = "GMT+8")

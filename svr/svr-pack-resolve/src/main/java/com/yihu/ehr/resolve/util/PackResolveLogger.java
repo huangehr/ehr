@@ -10,13 +10,13 @@ import org.slf4j.LoggerFactory;
  */
 public class PackResolveLogger {
 
-    private static Logger logger = LoggerFactory.getLogger(PackResolveLogger.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PackResolveLogger.class);
 
     /**
      * @param info
      */
     public static void info(String info) {
-        logger.info(info);
+        LOGGER.info(info);
     }
 
     /**
@@ -24,7 +24,7 @@ public class PackResolveLogger {
      * @param warn
      */
     public static void warn(String warn) {
-        logger.warn(warn);
+        LOGGER.warn(warn);
     }
 
     /**
@@ -32,7 +32,16 @@ public class PackResolveLogger {
      * @param error
      */
     public static void error(String error) {
-        logger.error(error);
+        LOGGER.error(error);
+    }
+
+    /**
+     *
+     * @param error
+     * @param e
+     */
+    public static void error(String error, Exception e) {
+        LOGGER.error(error, e);
     }
 
     /**

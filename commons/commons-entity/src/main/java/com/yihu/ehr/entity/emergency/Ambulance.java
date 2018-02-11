@@ -32,16 +32,29 @@ public class Ambulance extends BaseAssignedEntity {
         down
     }
 
+    /**
+     * 待命地点
+     */
     private Integer location;
-    // 所属医院名称
+    /**
+     * 所属医院名称
+     */
     private String orgName;
-    // 随车手机号码
+    /**
+     * 随车手机号码
+     */
     private String phone;
-    // 状态
+    /**
+     * 状态
+     */
     private Status status;
-    // 图片
+    /**
+     * 图片
+     */
     private String img;
-    // 百度鹰眼设备号
+    /**
+     * 百度鹰眼设备号
+     */
     private String entityName;
 
     @Column(name = "location", nullable = false)

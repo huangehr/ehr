@@ -74,7 +74,7 @@ public class MysqlExtract {
             }catch (Exception e){
                 throw new Exception("mysql查询数据出错" + e.getMessage());
             }
-            if(mapList != null){
+            if(mapList != null && mapList.size() > 0){
                 for(Map<String, Object> map :mapList){
                     String keyVal  = "";
                     for(String key :map.keySet()){

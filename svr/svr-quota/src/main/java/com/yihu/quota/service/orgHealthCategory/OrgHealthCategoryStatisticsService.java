@@ -68,13 +68,14 @@ public class OrgHealthCategoryStatisticsService {
             }
         }
 
-        // 添加【合计】到卫生机构类别集合
-        int totalResult = countResult(endpointsStatisticList);
-        Map<String, Object> totalMap = new HashMap<>();
-        totalMap.put("id", "-1");
-        totalMap.put("name", "合计");
-        totalMap.put("result", totalResult);
-        allOrgHealthCategoryList.add(totalMap);
+//        // 添加【合计】到卫生机构类别集合
+//        int totalResult = countResult(endpointsStatisticList);
+//        Map<String, Object> totalMap = new HashMap<>();
+//        totalMap.put("id", "-1");
+//        totalMap.put("code", "SUM");
+//        totalMap.put("name", "合计");
+//        totalMap.put("result", totalResult);
+//        allOrgHealthCategoryList.add(totalMap);
 
         return translateModel(endpointsStatisticList, allOrgHealthCategoryList);
     }

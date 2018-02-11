@@ -27,7 +27,15 @@
             <artifactId>commons-util</artifactId>
             <version>${version.ehr}</version>
         </dependency>
-        <!-- 验证报错问题 -->
+
+        <!-- Spring Session -->
+        <dependency>
+            <groupId>org.springframework.session</groupId>
+            <artifactId>spring-session</artifactId>
+        </dependency>
+        <!-- Spring Session -->
+
+        <!-- Spring Security -->
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-core</artifactId>
@@ -38,10 +46,11 @@
             <artifactId>spring-security-web</artifactId>
             <version>4.0.4.RELEASE</version>
         </dependency>
-        <!-- 验证报错问题 -->
         <dependency>
-            <groupId>org.springframework.session</groupId>
-            <artifactId>spring-session</artifactId>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-config</artifactId>
+            <version>4.0.4.RELEASE</version>
         </dependency>
+        <!-- Spring Security -->
     </dependencies>
 </project>

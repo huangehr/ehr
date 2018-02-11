@@ -35,6 +35,14 @@ public class UserModel implements Serializable{
 
     private String imgRemotePath;
     private String imgLocalPath;
+    /** 创建日期 */
+    private Date invalidDate;
+    /** 创建者 */
+    private String creator;
+    /** 修改日期 */
+    private Date modifyDate;
+    /** 修改者 */
+    private String modifier;
 
     public String getId() {
         return id;
@@ -226,5 +234,37 @@ public class UserModel implements Serializable{
 
     public void setImgLocalPath(String imgLocalPath) {
         this.imgLocalPath = imgLocalPath;
+    }
+
+    public Date getInvalidDate() {
+        return invalidDate;
+    }
+
+    public void setInvalidDate(Date invalidDate) {
+        this.invalidDate = invalidDate;
+    }
+
+    public String getCreator() {
+        return creator;
+    }
+
+    public void setCreator(String creator) {
+        this.creator = creator;
+    }
+
+    public Date getModifyDate() {
+        return modifyDate;
+    }
+
+    public void setModifyDate(Date modifyDate) {
+        this.modifyDate = modifyDate;
+    }
+
+    public String getModifier() {
+        return modifier;
+    }
+
+    public void setModifier(String modifier) {
+        this.modifier = modifier;
     }
 }

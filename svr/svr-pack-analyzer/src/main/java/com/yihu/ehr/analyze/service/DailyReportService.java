@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,7 @@ public class DailyReportService {
     protected ObjectMapper objectMapper;
     @Autowired
     private JdbcTemplate jdbcTemplate;
+    private static final Logger log = LoggerFactory.getLogger(DailyReportService.class);
     /**
      * 日报上传
      * @param report
@@ -55,14 +58,12 @@ public class DailyReportService {
                 if(map.get("HSI07_01_012")==null||"".equals(map.get("HSI07_01_012"))){
                     msg = msg + "出院人数不能为空、";
                 }
-                if(map.get("created_time")==null||"".equals(map.get("created_time"))){
-                    msg = msg + "上报时间不能为空、";
-                }
             }
 
             if(StringUtils.isNotEmpty(msg)){
-                envelop.setSuccessFlg(false);
+                log.error(msg);
                 envelop.setErrorMsg("参数校验失败");
+                envelop.setSuccessFlg(false);
             }else{
                 for(Map<String, Object> map : list) {
                     elasticSearchUtil.index(index, type, map);

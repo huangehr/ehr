@@ -4,15 +4,6 @@ server:
 management:
   port: ${server.port}
 
-logging:
-  level:
-    com:
-      netflix: INFO
-    org:
-      springframework:
-        web: INFO
-      hibernate: ERROR
-
 spring:
   # REDIS
   redis:
@@ -23,7 +14,6 @@ spring:
     #sentinel:
     #  master: # Name of Redis server.
     #  nodes: # Comma-separated list of host:port pairs.
-
     pool:
       max-active: 8 # Max number of connections that can be allocated by the pool at a given time. Use a negative value for no limit.
       max-idle: 8 # Max number of "idle" connections in the pool. Use a negative value to indicate an unlimited number of idle connections.
@@ -59,11 +49,12 @@ hystrix:
       maxQueueSize: 100 #LinkedBlockingQueue的最大队列数，默认-1，使用SynchronousQueue
       #queueSizeRejectionThreshold: 50 #配置该值后，即使maxQueueSize没有达到，达到queueSizeRejectionThreshold该值后，请求也会被拒绝
   command:
-      default:
-        execution:
-          isolation:
-            thread:
-              timeoutInMilliseconds: 30000 #缺省为1000
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 30000 #缺省为1000
+
 ---
 spring:
   profiles: dev
