@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.hystrix.exception.HystrixRuntimeException;
 import com.yihu.ehr.util.log.LogService;
 import com.yihu.ehr.util.rest.Envelop;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
@@ -22,6 +24,8 @@ import java.io.IOException;
  */
 @ControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final Logger logger = LogService.getLogger(GlobalExceptionHandler.class);
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -58,8 +62,7 @@ public class GlobalExceptionHandler {
             envelop.setErrorCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
             envelop.setErrorMsg(e.getMessage());
         }
-        LogService.getLogger().error(e.getMessage());
-        e.printStackTrace();
+        logger.error(e.getMessage(), e);
         return envelop;
     }
 
