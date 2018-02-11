@@ -25,10 +25,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.net.URLDecoder;
+import java.util.*;
 
 /**
  * Created by lyr on 2016/7/26.
@@ -228,4 +226,29 @@ public class ElasticSearchController extends BaseController {
         return  list;
     }
 
+    @RequestMapping(value = "/elasticSearch/addElasticSearch", method = RequestMethod.POST)
+    @ApiOperation("elasticsearch文档数据")
+    public Boolean addElasticSearch(
+            @ApiParam(name = "index", value = "索引名称")
+            @RequestParam(value = "index") String index,
+            @ApiParam(name = "type", value = "索引类型")
+            @RequestParam(value = "type") String type,
+            @ApiParam(name = "sourceList", value = "值")
+            @RequestParam(value = "sourceList") String sourceList) throws Exception {
+        boolean flag = false;
+        sourceList = URLDecoder.decode(sourceList, "UTF-8");
+        EsConfig esConfig = config();
+        esConfig.setIndex(index);
+        esConfig.setType(type);
+        esConfig.setHost("172.19.103.9");
+        esConfig.setPort(9300);
+        esConfig.setClusterName("elasticsearch");
+        Client client = esClientUtil.getClient(esConfig.getHost(), esConfig.getPort(),esConfig.getIndex(),esConfig.getType(), esConfig.getClusterName());
+        String[] array = sourceList.split(";");
+        List<String> list = Arrays.asList(array);
+        for (String source : list) {
+            flag = elasticsearchUtil.save(client, source);
+        }
+        return flag;
+    }
 }
