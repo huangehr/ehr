@@ -312,6 +312,40 @@ public class SystemDictController extends BaseController {
         return systemDictClient.isDictEntryCodeExists(dictId, code);
     }
 
+    @ApiOperation(value = "获取字典列表")
+    @RequestMapping(value = "/dictionariesWithEntry", method = RequestMethod.GET)
+    public Envelop getDictionariesWithEntry(
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段")
+            @RequestParam(value = "fields", required = false, defaultValue = "") String fields,
+            @ApiParam(name = "filters", value = "过滤器")
+            @RequestParam(value = "filters", required = false, defaultValue = "") String filters,
+            @ApiParam(name = "sorts", value = "排序")
+            @RequestParam(value = "sorts", required = false, defaultValue = "") String sorts,
+            @ApiParam(name = "size", value = "分页大小")
+            @RequestParam(value = "size", required = false, defaultValue = "999") Integer size,
+            @ApiParam(name = "page", value = "页码")
+            @RequestParam(value = "page", required = false, defaultValue = "1") Integer page) {
+
+        try {
+            ResponseEntity<Collection<MSystemDict>> responseEntity = systemDictClient.getDictionaries(fields, filters, sorts, size, page);
+            List<MSystemDict> systemDicts = (List<MSystemDict>) responseEntity.getBody();
+            List<SystemDictModel> systemDictModelList = new ArrayList<>();
+            for (MSystemDict mSystemDict : systemDicts) {
+                SystemDictModel dictModel = convertToSysDictModel(mSystemDict);
+                ResponseEntity<List<MDictionaryEntry>> responseEntity2 = systemDictClient.getDictEntries(fields, "dictId="+dictModel.getId(), sorts, 999, 1);
+                dictModel.setChild(responseEntity2.getBody());
+                systemDictModelList.add(dictModel);
+            }
+
+            Envelop envelop = getResult(systemDictModelList, getTotalCount(responseEntity), page, size);
+
+            return envelop;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return failedSystem();
+        }
+    }
+
     public SystemDictModel convertToSysDictModel(MSystemDict mSystemDict) {
         if (mSystemDict == null) {
             return null;
