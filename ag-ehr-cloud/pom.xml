@@ -19,16 +19,7 @@
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-aop</artifactId>
-            <scope>${dependency.scope}</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-            <scope>compile</scope>
-        </dependency>
+        <!-- true -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -37,16 +28,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
-            <scope>${dependency.scope}</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter</artifactId>
-            <scope>${dependency.scope}</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-oauth2</artifactId>
             <scope>${dependency.scope}</scope>
         </dependency>
         <dependency>
@@ -65,13 +46,12 @@
             <scope>${dependency.scope}</scope>
         </dependency>
         <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-ribbon</artifactId>
-            <scope>${dependency.scope}</scope>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter</artifactId>
+            <artifactId>spring-cloud-starter-ribbon</artifactId>
             <scope>${dependency.scope}</scope>
         </dependency>
         <dependency>
@@ -80,64 +60,11 @@
             <scope>${dependency.scope}</scope>
         </dependency>
         <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-commons</artifactId>
-            <scope>${dependency.scope}</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-jdbc</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <scope>${dependency.scope}</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-pool2</artifactId>
-            <scope>${dependency.scope}</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-dbcp2</artifactId>
-            <scope>${dependency.scope}</scope>
-        </dependency>
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <scope>${dependency.scope}</scope>
-        </dependency>
-
-        <!--<dependency>-->
-        <!--<groupId>org.springframework.boot</groupId>-->
-        <!--<artifactId>spring-boot-starter-security</artifactId>-->
-        <!--</dependency>-->
-        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <scope>${dependency.scope}</scope>
         </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
-            <scope>${dependency.scope}</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
-            <scope>${dependency.scope}</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.yihu.ehr</groupId>
-            <artifactId>commons-ehr-constants</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-compress</artifactId>
-            <scope>${dependency.scope}</scope>
-        </dependency>
+
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-ehr-constants</artifactId>
@@ -162,34 +89,19 @@
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-profile-core</artifactId>
             <scope>compile</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.yihu.ehr</groupId>
-                    <artifactId>commons-data-redis</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.yihu.ehr</groupId>
-                    <artifactId>commons-redis-keyschema</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
-        <!--<dependency>-->
-        <!--<groupId>com.yihu.ehr</groupId>-->
-        <!--<artifactId>commons-metrics</artifactId>-->
-        <!--<scope>compile</scope>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-web</artifactId>
             <scope>compile</scope>
         </dependency>
-
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-admin-gateway-model</artifactId>
             <scope>compile</scope>
         </dependency>
     </dependencies>
+
     <build>
         <plugins>
             <plugin>

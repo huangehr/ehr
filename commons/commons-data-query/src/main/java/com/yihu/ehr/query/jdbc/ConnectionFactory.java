@@ -34,11 +34,9 @@ public class ConnectionFactory {
     /**
      * 使用连接池中连接
      */
-    public Connection getConnection(String name) throws Exception
-    {
+    public Connection getConnection(String name) throws Exception {
         ConnectionPool source = pools.get(name);
-        if(source!=null)
-        {
+        if(source!=null) {
             return source.getConnection();
         }
         else{
@@ -49,11 +47,9 @@ public class ConnectionFactory {
     /**
      * 使用默认连接
      */
-    public Connection getConnection() throws Exception
-    {
+    public Connection getConnection() throws Exception {
         ConnectionPool source = pools.get(defaultName);
-        if(source!=null)
-        {
+        if(source != null) {
             return source.getConnection();
         }
         else{
@@ -66,14 +62,11 @@ public class ConnectionFactory {
     /**
      * 使用默认连接
      */
-    public Connection getConnection(String name,String uri) throws Exception
-    {
+    public Connection getConnection(String name,String uri) throws Exception {
         ConnectionPool source = pools.get(name);
-        if(source!=null)
-        {
+        if (source != null) {
             return source.getConnection();
-        }
-        else{
+        } else{
             source = new ConnectionPool(uri);
             pools.put(name, source);
             return source.getConnection();
@@ -82,14 +75,11 @@ public class ConnectionFactory {
     /**
      * 使用配置连接
      */
-    public Connection getConnection(String name,String uri,String user,String password) throws Exception
-    {
+    public Connection getConnection(String name,String uri,String user,String password) throws Exception {
         ConnectionPool source = pools.get(name);
-        if(source!=null)
-        {
+        if(source != null) {
             return source.getConnection();
-        }
-        else{
+        } else{
             source = new ConnectionPool(uri, user, password);
             pools.put(name, source);
             return source.getConnection();

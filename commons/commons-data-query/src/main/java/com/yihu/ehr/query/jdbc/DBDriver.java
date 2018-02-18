@@ -27,28 +27,17 @@ public class DBDriver {
      */
     public static String getDriver(String uri) {
 
-        if (uri.startsWith("jdbc:mysql"))
-        {
+        if (uri.startsWith("jdbc:mysql")) {
             return "com.mysql.jdbc.Driver";
-        }
-        else if (uri.startsWith("jdbc:oracle")) {
-
+        } else if (uri.startsWith("jdbc:oracle")) {
             return "oracle.jdbc.driver.OracleDriver";
-        }
-        else if (uri.startsWith("jdbc:hive2")) {
-
+        } else if (uri.startsWith("jdbc:hive2")) {
             return "org.apache.hive.jdbc.HiveDriver";
-        }
-        else if (uri.startsWith("jdbc:microsoft:sqlserver")) {
-
+        } else if (uri.startsWith("jdbc:microsoft:sqlserver")) {
             return "com.microsoft.jdbc.sqlserver.SQLServerDriver";
-        }
-        else if (uri.startsWith("jdbc:sqlite")) {
-
+        } else if (uri.startsWith("jdbc:sqlite")) {
             return "org.sqlite.JDBC";
-        }
-        else
-        {
+        } else {
             return "";
         }
     }
@@ -60,26 +49,16 @@ public class DBDriver {
     public static DBType getDbType(String uri){
 
         if (uri.startsWith("jdbc:mysql")) {
-
             return DBType.Mysql;
-        }
-        else if (uri.startsWith("jdbc:oracle")) {
-
+        } else if (uri.startsWith("jdbc:oracle")) {
             return DBType.Oracle;
-        }
-        else if (uri.startsWith("jdbc:hive2")) {
-
+        } else if (uri.startsWith("jdbc:hive2")) {
             return DBType.Hive;
-        }
-        else if (uri.startsWith("jdbc:microsoft:sqlserver")) {
-
+        } else if (uri.startsWith("jdbc:microsoft:sqlserver")) {
             return DBType.Sqlserver;
-        }
-        else if (uri.startsWith("jdbc:sqlite")) {
-
+        } else if (uri.startsWith("jdbc:sqlite")) {
             return DBType.Sqlite;
-        }
-        else{
+        } else{
             return null;
         }
 

@@ -14,11 +14,19 @@
     <packaging>jar</packaging>
 
     <dependencies>
+        <!-- true -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot</artifactId>
+        </dependency>
         <!-- ElasticSearch -->
         <dependency>
             <groupId>org.elasticsearch</groupId>
             <artifactId>elasticsearch</artifactId>
-            <version>2.4.5</version>
         </dependency>
         <dependency>
             <groupId>org.nlpcn</groupId>
@@ -26,11 +34,6 @@
             <version>2.4.1.0</version>
         </dependency>
         <!-- ElasticSearch -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-            <scope>${dependency.scope}</scope>
-        </dependency>
     </dependencies>
 
 

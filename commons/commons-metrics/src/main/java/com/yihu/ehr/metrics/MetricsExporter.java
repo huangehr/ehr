@@ -20,7 +20,7 @@ import java.util.SortedMap;
  * @author Sand
  * @created 2016.05.18 10:04
  */
-@Service
+//@Service
 public class MetricsExporter {
     @Value("${spring.application.name:application}")
     private String applicationName = "";

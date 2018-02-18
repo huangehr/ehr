@@ -1,7 +1,8 @@
 package com.yihu.ehr.analysis.service;
 
 import com.google.gson.Gson;
-import com.yihu.ehr.analysis.util.HttpClientUtil;
+import com.yihu.ehr.util.http.HttpResponse;
+import com.yihu.ehr.util.http.HttpUtils;
 import com.yihu.ehr.util.rest.Envelop;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,7 +32,7 @@ public class AppFeatureService {
      * @param url
      * @return
      */
-    public Object appFeatureFindUrl(String url) {
+    public Object appFeatureFindUrl(String url) throws Exception {
         String rqUrl = "/AppFeatureFindUrl";
         String resultStr = "";
         Envelop envelop = new Envelop();
@@ -45,15 +46,8 @@ public class AppFeatureService {
         if (!StringUtils.isEmpty(filters)) {
             params.put("filters", filters);
         }
-        try {
-            resultStr = HttpClientUtil.doGet(comUrl + rqUrl, params, username, password);
-            return resultStr;
-        } catch (Exception e) {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg(e.getMessage());
-            return envelop;
-        }
-
+        HttpResponse  httpResponse = HttpUtils.doGet(comUrl + rqUrl, params, null,  username, password);
+        return httpResponse.getContent();
     }
 
     /**
@@ -62,21 +56,13 @@ public class AppFeatureService {
      * @param parentId
      * @return
      */
-    public Object appFeatureFindParentId(String parentId) {
+    public Object appFeatureFindParentId(String parentId) throws Exception {
         String url = "/appFeature/" + parentId;
-        String resultStr = "";
-        Envelop envelop = new Envelop();
-        try {
-            resultStr = HttpClientUtil.doGet(comUrl + url, username, password);
-            return resultStr;
-        } catch (Exception e) {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg(e.getMessage());
-            return envelop;
-        }
+        HttpResponse httpResponse = HttpUtils.doGet(comUrl + url, null, null, username, password);
+        return httpResponse.getContent();
     }
 
-    public Map<String,String> getOperatPageName(Object obj){
+    public Map<String,String> getOperatPageName(Object obj) throws Exception {
         String function = ""; // 操作页面名称
         String operation = "";// 操作内容（增、删、改、查、导入）
         Map<String,String> map = new HashMap<>();

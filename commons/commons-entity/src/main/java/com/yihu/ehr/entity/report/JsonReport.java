@@ -1,6 +1,5 @@
 package com.yihu.ehr.entity.report;
 
-import com.yihu.ehr.constants.ArchiveStatus;
 
 import javax.persistence.*;
 import java.util.Date;

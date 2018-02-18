@@ -32,6 +32,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         private EhrUserDetailsService userDetailsService;
         @Autowired
         private PasswordEncoder passwordEncoder;
+
         @Override
         protected void configure(AuthenticationManagerBuilder authBuilder) throws Exception {
             authBuilder.userDetailsService(userDetailsService).passwordEncoder(new Md5PasswordEncoder());
@@ -69,10 +70,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .httpBasic();
         }
 
-        @Autowired
-        public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-            auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
-        }
     }
 
     //==========密码加密方式====================

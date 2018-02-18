@@ -36,7 +36,7 @@ import java.util.List;
 //@Api(description = "定时任务", tags = {"缓存服务管理--定时任务"})
 public class RedisScheduledTask {
 
-    Logger logger = LoggerFactory.getLogger(RedisScheduledTask.class);
+    private static final Logger logger = LoggerFactory.getLogger(RedisScheduledTask.class);
 
     @Value("${ehr-redis.cache.memory.rdbFilePath}")
     private String rdbFilePath;

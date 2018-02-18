@@ -1,18 +1,15 @@
 package com.yihu.ehr.profile.service;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.model.resource.MCdaTransformDto;
 import com.yihu.ehr.model.standard.MCDADocument;
 import com.yihu.ehr.model.standard.MCdaDataSet;
-import com.yihu.ehr.profile.config.CdaDocumentTypeOptions;
-import com.yihu.ehr.profile.dao.TemplateDao;
-import com.yihu.ehr.profile.feign.XCDADocumentClient;
-import com.yihu.ehr.profile.feign.XResourceClient;
-import com.yihu.ehr.profile.feign.XTransformClient;
-import com.yihu.ehr.profile.model.Template;
+import com.yihu.ehr.profile.dao.ArchiveTemplateDao;
+import com.yihu.ehr.profile.feign.CDADocumentClient;
+import com.yihu.ehr.profile.feign.ResourceClient;
+import com.yihu.ehr.profile.model.ArchiveTemplate;
 import com.yihu.ehr.util.rest.Envelop;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,13 +29,13 @@ public class ProfileCDAService {
     private String appId;
 
     @Autowired
-    private XResourceClient resource;
+    private ResourceClient resource;
     //模板服务
     @Autowired
-    private TemplateDao templateRepository;
+    private ArchiveTemplateDao templateDao;
     //CDA服务
     @Autowired
-    private XCDADocumentClient cdaService;
+    private CDADocumentClient cdaService;
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -85,7 +82,7 @@ public class ProfileCDAService {
             } else {
                 String orgCode = obj.get("org_code").toString();
                 //根据机构获取定制模板
-                List<Template> list = templateRepository.findByOrganizationCodeAndCdaVersion(orgCode, cdaVersion);
+                List<ArchiveTemplate> list = templateDao.findByOrganizationCodeAndCdaVersion(orgCode, cdaVersion);
                 //遍历模板
                 if (list != null && list.size() > 0) {
                     //获取档案相关数据集编码列表
@@ -100,7 +97,7 @@ public class ProfileCDAService {
                             }
                         }
                     }
-                    for (Template template : list) {
+                    for (ArchiveTemplate template : list) {
                         String cdaDocumentId = template.getCdaDocumentId();
                         String cdaCode = template.getCdaCode();
                         //是否显示
@@ -181,7 +178,7 @@ public class ProfileCDAService {
             Map<String, Object> obj = (Map<String, Object>) result.getDetailModelList().get(0);
             String cdaVersion = obj.get("cda_version").toString();
             //获取模板ID
-            Template template = templateRepository.findByOrganizationCodeAndCdaVersionAndCdaCode(orgCode, cdaVersion, cdaCode);
+            ArchiveTemplate template = templateDao.findByOrganizationCodeAndCdaVersionAndCdaCode(orgCode, cdaVersion, cdaCode);
             if (template != null) {
                 re.put("template_id",template.getId());
                 re.put("profile_id",obj.get("rowkey"));

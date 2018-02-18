@@ -6,7 +6,7 @@
         <groupId>com.yihu.ehr</groupId>
         <artifactId>ehr-ms-parent-pom</artifactId>
         <version>1.1.0</version>
-        <relativePath>../../ehr-ms-parent-pom</relativePath>
+        <relativePath>../../ehr-ms-parent-pom/pom.xml</relativePath>
     </parent>
 
     <artifactId>svr-pack-mgr</artifactId>
@@ -19,30 +19,11 @@
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-jpa</artifactId>
-            <scope>${dependency.scope}</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-redis</artifactId>
-            <scope>${dependency.scope}</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-commons</artifactId>
-            <scope>${dependency.scope}</scope>
-        </dependency>
+        <!-- true -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-            <scope>${dependency.scope}</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
@@ -59,35 +40,20 @@
             <artifactId>spring-cloud-starter-eureka</artifactId>
             <scope>${dependency.scope}</scope>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter</artifactId>
-            <scope>${dependency.scope}</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>ch.qos.logback</groupId>
-                    <artifactId>logback-classic</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+        <!-- actuator -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-actuator</artifactId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.timgroup</groupId>
+            <artifactId>java-statsd-client</artifactId>
             <scope>${dependency.scope}</scope>
         </dependency>
+        <!-- actuator -->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
-            <scope>${dependency.scope}</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
-            <scope>${dependency.scope}</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
             <scope>${dependency.scope}</scope>
         </dependency>
         <dependency>
@@ -95,6 +61,7 @@
             <artifactId>commons-io</artifactId>
             <scope>${dependency.scope}</scope>
         </dependency>
+
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-ehr-constants</artifactId>
@@ -126,18 +93,13 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>happy.fish</groupId>
-            <artifactId>fastDFS</artifactId>
-            <scope>${dependency.scope}</scope>
-        </dependency>
-        <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-web</artifactId>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
-            <artifactId>commons-data-mysql</artifactId>
+            <artifactId>commons-ui-swagger</artifactId>
         </dependency>
     </dependencies>
 </project>

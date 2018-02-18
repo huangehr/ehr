@@ -1,7 +1,7 @@
 package com.yihu.ehr.profile.service;
 
-import com.yihu.ehr.profile.feign.XRedisServiceClient;
-import com.yihu.ehr.profile.feign.XResourceClient;
+import com.yihu.ehr.profile.feign.RedisServiceClient;
+import com.yihu.ehr.profile.feign.ResourceClient;
 import com.yihu.ehr.util.rest.Envelop;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
@@ -19,9 +19,9 @@ import java.util.*;
 public class ProfileDiseaseService {
 
     @Autowired
-    private XResourceClient resource; //资源服务
+    private ResourceClient resource; //资源服务
     @Autowired
-    private XRedisServiceClient redisServiceClient;
+    private RedisServiceClient redisServiceClient;
 
     /**
      * 根据时间获取病龄

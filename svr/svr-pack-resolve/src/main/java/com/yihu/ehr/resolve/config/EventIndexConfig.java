@@ -13,7 +13,7 @@ import java.util.List;
  * @created 2017.07.03 17:03
  */
 @Component
-@ConfigurationProperties(prefix = "ehr.eventIndex",locations = "application.yml")
+@ConfigurationProperties(prefix = "ehr.eventIndex")
 public class EventIndexConfig {
     private List<String> eventNo = new ArrayList<>();
     private List<String> patientId = new ArrayList<>();

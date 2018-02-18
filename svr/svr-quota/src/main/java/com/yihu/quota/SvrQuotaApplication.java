@@ -17,16 +17,15 @@ import org.springframework.data.web.config.EnableSpringDataWebSupport;
  * Created by janseny on 2017/06/16.
  */
 @Configuration
-@SpringBootApplication
 @EnableAutoConfiguration(exclude = {
-        SecurityAutoConfiguration.class,
-        ManagementWebSecurityAutoConfiguration.class})
+        SecurityAutoConfiguration.class})
 @ComponentScan(basePackages = { "com.yihu" })
 @EnableFeignClients
 @EnableDiscoveryClient //服务注册到发现服务
 @EnableEurekaClient
 @EnableSpringDataWebSupport
 @EnableJpaRepositories(basePackages="com.yihu.quota.dao.jpa")
+@SpringBootApplication
 public class SvrQuotaApplication {
 
     public static void main(String[] args) {

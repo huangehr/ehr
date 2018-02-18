@@ -12,45 +12,50 @@
     <packaging>jar</packaging>
 
     <dependencies>
+        <!-- true-->
         <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-redis</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
             <scope>${dependency.scope}</scope>
         </dependency>
         <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
-            <scope>${dependency.scope}</scope>
         </dependency>
+
+        <!-- Spring Session -->
+        <!--<dependency>-->
+            <!--<groupId>org.springframework.session</groupId>-->
+            <!--<artifactId>spring-session</artifactId>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.springframework.session</groupId>-->
+            <!--<artifactId>spring-session-hazelcast</artifactId>-->
+        <!--</dependency>-->
+        <!-- Spring Session -->
+
+        <!-- Spring Security -->
+        <!--<dependency>-->
+            <!--<groupId>org.springframework.security</groupId>-->
+            <!--<artifactId>spring-security-core</artifactId>-->
+            <!--<version>4.2.3.RELEASE</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.springframework.security</groupId>-->
+            <!--<artifactId>spring-security-web</artifactId>-->
+            <!--<version>4.2.3.RELEASE</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.springframework.security</groupId>-->
+            <!--<artifactId>spring-security-config</artifactId>-->
+            <!--<version>4.2.3.RELEASE</version>-->
+        <!--</dependency>-->
+        <!-- Spring Security -->
+
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-util</artifactId>
             <version>${version.ehr}</version>
         </dependency>
-
-        <!-- Spring Session -->
-        <dependency>
-            <groupId>org.springframework.session</groupId>
-            <artifactId>spring-session</artifactId>
-        </dependency>
-        <!-- Spring Session -->
-
-        <!-- Spring Security -->
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-core</artifactId>
-            <version>4.0.4.RELEASE</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-web</artifactId>
-            <version>4.0.4.RELEASE</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-config</artifactId>
-            <version>4.0.4.RELEASE</version>
-        </dependency>
-        <!-- Spring Security -->
     </dependencies>
 </project>

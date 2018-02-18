@@ -331,32 +331,7 @@
         <dependencies>
             <dependency>
                 <groupId>com.yihu.ehr</groupId>
-                <artifactId>commons-ehr-constants</artifactId>
-                <version>${version.ehr}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.yihu.ehr</groupId>
-                <artifactId>commons-util</artifactId>
-                <version>${version.ehr}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.yihu.ehr</groupId>
-                <artifactId>commons-data-hbase</artifactId>
-                <version>${version.ehr}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.yihu.ehr</groupId>
-                <artifactId>commons-data-fastdfs</artifactId>
-                <version>${version.ehr}</version>
-            </dependency>
-            <dependency>
-                <groupId>happy.fish</groupId>
-                <artifactId>fastDFS</artifactId>
-                <version>${version.ehr}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.yihu.ehr</groupId>
-                <artifactId>commons-data-solr</artifactId>
+                <artifactId>commons-admin-gateway-model</artifactId>
                 <version>${version.ehr}</version>
             </dependency>
             <dependency>
@@ -366,12 +341,12 @@
             </dependency>
             <dependency>
                 <groupId>com.yihu.ehr</groupId>
-                <artifactId>commons-redis-keyschema</artifactId>
+                <artifactId>commons-data-fastdfs</artifactId>
                 <version>${version.ehr}</version>
             </dependency>
             <dependency>
                 <groupId>com.yihu.ehr</groupId>
-                <artifactId>commons-ui-swagger</artifactId>
+                <artifactId>commons-data-hbase</artifactId>
                 <version>${version.ehr}</version>
             </dependency>
             <dependency>
@@ -381,42 +356,27 @@
             </dependency>
             <dependency>
                 <groupId>com.yihu.ehr</groupId>
-                <artifactId>commons-data-redis</artifactId>
-                <version>${version.ehr}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.yihu.ehr</groupId>
                 <artifactId>commons-data-query</artifactId>
                 <version>${version.ehr}</version>
             </dependency>
             <dependency>
                 <groupId>com.yihu.ehr</groupId>
-                <artifactId>commons-rest-model</artifactId>
+                <artifactId>commons-data-redis</artifactId>
+                <version>${version.ehr}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.yihu.ehr</groupId>
+                <artifactId>commons-data-solr</artifactId>
+                <version>${version.ehr}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.yihu.ehr</groupId>
+                <artifactId>commons-ehr-constants</artifactId>
                 <version>${version.ehr}</version>
             </dependency>
             <dependency>
                 <groupId>com.yihu.ehr</groupId>
                 <artifactId>commons-entity</artifactId>
-                <version>${version.ehr}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.yihu.ehr</groupId>
-                <artifactId>commons-web</artifactId>
-                <version>${version.ehr}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.yihu.ehr</groupId>
-                <artifactId>commons-profile-core</artifactId>
-                <version>${version.ehr}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.yihu.ehr</groupId>
-                <artifactId>commons-profile-persist</artifactId>
-                <version>${version.ehr}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.yihu.ehr</groupId>
-                <artifactId>commons-redis-mq</artifactId>
                 <version>${version.ehr}</version>
             </dependency>
             <!--<dependency>-->
@@ -426,9 +386,39 @@
             <!--</dependency>-->
             <dependency>
                 <groupId>com.yihu.ehr</groupId>
-                <artifactId>commons-admin-gateway-model</artifactId>
+                <artifactId>commons-profile-core</artifactId>
                 <version>${version.ehr}</version>
             </dependency>
+            <dependency>
+                <groupId>com.yihu.ehr</groupId>
+                <artifactId>commons-redis-mq</artifactId>
+                <version>${version.ehr}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.yihu.ehr</groupId>
+                <artifactId>commons-rest-model</artifactId>
+                <version>${version.ehr}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.yihu.ehr</groupId>
+                <artifactId>commons-ui-swagger</artifactId>
+                <version>${version.ehr}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.yihu.ehr</groupId>
+                <artifactId>commons-util</artifactId>
+                <version>${version.ehr}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.yihu.ehr</groupId>
+                <artifactId>commons-web</artifactId>
+                <version>${version.ehr}</version>
+            </dependency>
+            <!--<dependency>
+                <groupId>com.yihu.ehr</groupId>
+                <artifactId>commons-metrics</artifactId>
+                <version>${version.ehr}</version>
+            </dependency>-->
         </dependencies>
     </dependencyManagement>
 
@@ -459,13 +449,12 @@
                 <dependency>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-starter-tomcat</artifactId>
-                    <scope>compile</scope>
                 </dependency>
-                <dependency>
+                <!--<dependency>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-devtools</artifactId>
                     <scope>${dependency.scope}</scope>
-                </dependency>
+                </dependency>-->
             </dependencies>
         </profile>
         <profile>
