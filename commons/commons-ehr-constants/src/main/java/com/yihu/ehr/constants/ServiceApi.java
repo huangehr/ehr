@@ -698,6 +698,8 @@ public class ServiceApi {
         public static final String UseridCardNoExistence = "/user/idCardNo/existence";
         public static final String UserByIdCardNo = "/user/idCardNo/userByIdCardNo";
         public static final String UpdateSystemUser = "/updateSystemUser";
+        public static final String GetOrgAndDeptRelation = "/users/getOrgAndDeptRelation";
+
 
     }
 
