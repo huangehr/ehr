@@ -98,11 +98,11 @@ public class UserController extends BaseController {
             for (int i = 0; i < filterArr.length; i++) {
                 String filter = filterArr[i];
                 if (filter.startsWith("organization")) {
-                    if (filter.contains("<>") || filter.contains(">=") || filter.contains("<="))
+                    if (filter.contains("<>") || filter.contains(">=") || filter.contains("<=")) {
                         values = filter.substring(14).split(" ");
-                    else
+                    }else{
                         values = filter.substring(13).split(" ");
-
+                    }
                     orgName = values[0];
                     ResponseEntity<List<MOrganization>> rs = orgClient.searchOrgs("", "fullName?" + orgName, "", 1000, 1);
                     if (rs.getStatusCode().value() <= 200) {
@@ -112,15 +112,17 @@ public class UserController extends BaseController {
                                 orgCodes += "," + org.getOrgCode();
                             }
                             filterArr[i] = "organization=" + orgCodes.substring(1);
-                        } else
+                        } else {
                             filterArr[i] = "organization=-1";
-
-                        if (values.length > 1)
+                        }
+                        if (values.length > 1) {
                             filterArr[i] = filterArr[i] + " " + values[1];
+                        }
                         searchOrg = true;
                         break;
-                    } else
+                    } else {
                         throw new IllegalAccessError("解析错误");
+                    }
                 }
             }
 
@@ -1009,6 +1011,28 @@ public class UserController extends BaseController {
             ex.printStackTrace();
             return failed(ex.getMessage());
         }
+    }
+
+    @RequestMapping(value = "/user/picture", method = RequestMethod.POST)
+    @ApiOperation(value = "头像上传")
+    public Envelop uploadPicture(
+            @ApiParam(name = "jsonData", value = "转换后的输入流")
+            @RequestParam(value = "jsonData", required = false) String jsonData) throws Exception {
+        Envelop envelop = new Envelop();
+        //头像上传,接收头像保存的远程路径  path
+        String path = null;
+        try {
+            if (!org.apache.commons.lang.StringUtils.isEmpty(jsonData)) {
+                path = userClient.uploadPicture(jsonData);
+            }
+            envelop.setSuccessFlg(true);
+            envelop.setObj("path :"+path);
+        }  catch (Exception ex) {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(ex.getMessage());
+            ex.printStackTrace();
+        }
+        return  envelop;
     }
 
 }
