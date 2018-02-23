@@ -888,8 +888,8 @@ public class UserController extends BaseController {
     @RequestMapping(value = "systemUsersResetPass/password/{user_id}", method = RequestMethod.PUT)
     @ApiOperation(value = "账户体系-重设密码", notes = "账户体系-密码重置。用户忘记密码管理员帮助重新还原密码，初始密码123456")
     public Envelop systemUsersResetPass(
-            @ApiParam(name = "user_id", value = "用户id", defaultValue = "")
-            @PathVariable(value = "user_id") String userId) {
+            @ApiParam(name = "userId", value = "用户id", defaultValue = "")
+            @PathVariable(value = "userId") String userId) {
         Envelop envelop = new Envelop();
         try {
             boolean sussFlag =  userClient.resetPass(userId);
@@ -909,10 +909,10 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/createSystemUser", method = RequestMethod.POST)
     @ApiOperation(value = "账户体系-创建用户", notes = "账户体系-新增用户")
     public Envelop createSystemUser(
-            @ApiParam(name = "user_json_data", value = "用户信息json", defaultValue = "")
-            @RequestParam(value = "user_json_data") String userJsonData,
-            @ApiParam(name = "registration_type", value = "用户注册方式：默认0为账户注册、1为身份证号注册，2为电话号码注册", defaultValue = "")
-            @RequestParam(value = "registration_type") String registrationType) {
+            @ApiParam(name = "userJsonData", value = "用户信息json", defaultValue = "")
+            @RequestParam(value = "userJsonData") String userJsonData,
+            @ApiParam(name = "registrationType", value = "用户注册方式：默认0为账户注册、1为身份证号注册，2为电话号码注册", defaultValue = "")
+            @RequestParam(value = "registrationType") String registrationType) {
         try {
             UserDetailModel detailModel = objectMapper.readValue(userJsonData, UserDetailModel.class);
             String idCard = detailModel.getIdCardNo();
@@ -972,8 +972,8 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/updateSystemUser", method = RequestMethod.PUT)
     @ApiOperation(value = "账户体系-修改用户", notes = "账户体系-修改用户信息")
     public Envelop updateSystemUser(
-            @ApiParam(name = "user_json_data", value = "", defaultValue = "")
-            @RequestParam(value = "user_json_data") String userJsonData) {
+            @ApiParam(name = "userJsonData", value = "", defaultValue = "")
+            @RequestParam(value = "userJsonData") String userJsonData) {
         try {
             UserDetailModel detailModel = toEntity(userJsonData, UserDetailModel.class);
             String errorMsg = "";
