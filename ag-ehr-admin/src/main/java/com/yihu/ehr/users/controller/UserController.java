@@ -6,6 +6,7 @@ import com.yihu.ehr.agModel.geogrephy.GeographyModel;
 import com.yihu.ehr.agModel.patient.PatientDetailModel;
 import com.yihu.ehr.agModel.user.UserDetailModel;
 import com.yihu.ehr.agModel.user.UsersModel;
+import com.yihu.ehr.apps.service.AppClient;
 import com.yihu.ehr.apps.service.AppFeatureClient;
 import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
@@ -13,7 +14,9 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.fileresource.service.FileResourceClient;
 import com.yihu.ehr.geography.service.AddressClient;
+import com.yihu.ehr.model.app.MApp;
 import com.yihu.ehr.model.app.MAppFeature;
+import com.yihu.ehr.model.app.MUserApp;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.geography.MGeography;
 import com.yihu.ehr.model.org.MOrganization;
@@ -86,6 +89,8 @@ public class UserController extends BaseController {
     private PatientClient patientClient;
     @Autowired
     private PatientController patientController;
+    @Autowired
+    private  AppClient appClient;
 
 
     private String resetFilter(String filters) {
@@ -1033,6 +1038,70 @@ public class UserController extends BaseController {
             ex.printStackTrace();
         }
         return  envelop;
+    }
+
+
+    @RequestMapping(value = ServiceApi.Users.InitializeSystemUser, method = RequestMethod.POST)
+    @ApiOperation(value = "账户体系-用户注册", notes = "账户体系-用户注册")
+    public Envelop initializeSystemUser(
+            @ApiParam(name = "userJsonData", value = "用户信息json，默认只有手机号码和身份证号码", defaultValue = "")
+            @RequestParam(value = "userJsonData") String userJsonData,
+            @ApiParam(name = "registrationType", value = "用户注册方式：默认0为账户注册、1为身份证号注册，2为电话号码注册", defaultValue = "2")
+            @RequestParam(value = "registrationType") String registrationType,
+            @ApiParam(name = "appId", value = "应用Id,用于关联用户和应用，初始化应用权限", defaultValue = "")
+            @RequestParam(value = "appId") String appId,
+            @ApiParam(name = "sendMsg", value = "是否发送短信验证码标识（True / false）", defaultValue = "True")
+            @RequestParam(value = "sendMsg") String sendMsg) {
+        try {
+            UserDetailModel detailModel = objectMapper.readValue(userJsonData, UserDetailModel.class);
+            String idCard = detailModel.getIdCardNo();
+            String telephone = detailModel.getTelephone();
+            if(StringUtils.isNotEmpty(registrationType)&&registrationType.equals("2")){
+                //2为电话号码注册
+                if (StringUtils.isEmpty(telephone)) {
+                    return failed("电话号码不能为空!");
+                }else{
+                    detailModel.setLoginCode(telephone);
+                }
+            }else{
+                return failed("验证方式不正确!");
+            }
+            detailModel.setRealName(telephone);
+            if (StringUtils.isEmpty(detailModel.getRealName())) {
+                return failed("姓名不能为空!");
+            }
+            if (StringUtils.isNotEmpty(telephone) && userClient.isTelephoneExists(telephone)) {
+                return failed("电话号码已存在!");
+            }
+            if (StringUtils.isNotEmpty(idCard) && userClient.isIdCardExists(idCard)) {
+                return failed("身份证号已存在!");
+            }
+            if (userClient.isUserNameExists(detailModel.getLoginCode())) {
+                //使用手机号码作为登陆账户
+                return failed("电话号码已存在!");
+            }
+            MUser mUser = convertToMUser(detailModel);
+            mUser.setDemographicId(idCard);
+            mUser = userClient.createUser(objectMapper.writeValueAsString(mUser));
+            //查找应用名称
+            MApp mApp = appClient.getApp(appId);
+            //保存用户与应用的关联关系
+            MUserApp mUserApp = new MUserApp();
+            mUserApp.setAppId(appId);
+            mUserApp.setUserId(mUser.getId());
+            mUserApp.setStatus(0);
+            mUserApp.setAppName(mApp.getName());
+            mUserApp.setUserName(mUser.getRealName());
+            appClient.createUserApp(objectMapper.writeValueAsString(mUserApp));
+            if (mUser == null) {
+                return failed("保存失败!");
+            }
+            detailModel = convertToUserDetailModel(mUser);
+            return success(detailModel);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return failed(ex.getMessage());
+        }
     }
 
 }
