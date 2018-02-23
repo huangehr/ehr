@@ -209,9 +209,9 @@ public class AppController extends BaseController {
     @ApiOperation(value = "删除app")
     public Envelop deleteApp(
             @ApiParam(name = "app_id", value = "id", defaultValue = "")
-            @PathVariable(value = "app_id") String appId){
+            @PathVariable(value = "app_id") String app_id){
         try {
-            boolean result = appClient.deleteApp(appId);
+            boolean result = appClient.deleteApp(app_id);
             if(!result)
             {
                 return failed("删除失败!");
@@ -260,9 +260,9 @@ public class AppController extends BaseController {
      * @return AppModel
      */
     private AppModel convertToAppModel(MApp mApp) {
-        if(mApp==null)
+        if(mApp==null) {
             return null;
-
+        }
         AppModel appModel = convertToModel(mApp, AppModel.class);
         //获取app类别字典值
         if(!StringUtils.isEmpty(mApp.getCatalog())){

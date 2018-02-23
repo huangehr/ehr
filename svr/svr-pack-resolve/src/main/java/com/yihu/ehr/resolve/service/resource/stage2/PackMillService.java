@@ -75,9 +75,9 @@ public class PackMillService {
             if(DataSetUtil.isOriginDataSet(srcDataSet.getCode())){
                 continue;
             }
-            Boolean isMultiRecord = Boolean.valueOf(redisService.getDataSetMultiRecord(srcDataSet.getCdaVersion(), srcDataSet.getCode()));
+            Boolean isMultiRecord = redisService.getDataSetMultiRecord(srcDataSet.getCdaVersion(), srcDataSet.getCode());
             if(null == isMultiRecord) {
-                throw new RuntimeException("IsMultiRecord Can not be null");
+                throw new RuntimeException("IsMultiRecord can not be null.");
             }
             Set<String> keys = srcDataSet.getRecordKeys();
             if (!isMultiRecord){
@@ -170,6 +170,20 @@ public class PackMillService {
         String dictCode = getMetadataDict(metadataId);
         //内部EHR数据元字典不为空情况
         if(StringUtils.isNotBlank(dictCode) && StringUtils.isNotBlank(value)) {
+            //判断是否为时间格式
+            if(dictCode.equals("DATECONDITION")) {
+                if(!value.contains("T") && !value.contains("Z")) {
+                    StringBuilder error = new StringBuilder();
+                    error.append("Invalid date time format ")
+                            .append(metadataId)
+                            .append(" ")
+                            .append(value)
+                            .append(" for std version ")
+                            .append(cdaVersion)
+                            .append(", do not deal with fail-tolerant.");
+                    throw new RuntimeException(error.toString());
+                }
+            }
             //查找对应的字典数据
             String[] dict = getDict(cdaVersion, dictCode, value);
             //对应字典不为空情况下，转换EHR内部字典，并保存字典对应值，为空则不处理
@@ -181,7 +195,7 @@ public class PackMillService {
             } else {
                 dataRecord.addResource(metadataId, value);
             }
-        } else {   //内部EHR数据元为空不处理
+        } else {   //内部EHR数据元字典为空不处理
             dataRecord.addResource(metadataId, value);
         }
     }
@@ -205,10 +219,9 @@ public class PackMillService {
      */
     public String[] getDict(String version, String dictCode, String srcDictEntryCode) {
         String dict = redisService.getRsAdapterDict(version, dictCode, srcDictEntryCode);
-        if(dict != null) {
+        if (dict != null) {
             return dict.split("&");
-        }
-        else {
+        } else {
             return null;
         }
     }

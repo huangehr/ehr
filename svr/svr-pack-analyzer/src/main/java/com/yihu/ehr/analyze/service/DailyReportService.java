@@ -1,12 +1,7 @@
 package com.yihu.ehr.analyze.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.yihu.ehr.analyze.feign.PackageMgrClient;
-import com.yihu.ehr.analyze.feign.RedisServiceClient;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
-import com.yihu.ehr.model.packs.MPackage;
-import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -15,11 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 档案分析服务
@@ -34,6 +25,7 @@ public class DailyReportService {
     protected ObjectMapper objectMapper;
     @Autowired
     private JdbcTemplate jdbcTemplate;
+    private static final Logger log = LoggerFactory.getLogger(DailyReportService.class);
     /**
      * 日报上传
      * @param report
@@ -66,14 +58,12 @@ public class DailyReportService {
                 if(map.get("HSI07_01_012")==null||"".equals(map.get("HSI07_01_012"))){
                     msg = msg + "出院人数不能为空、";
                 }
-                if(map.get("created_time")==null||"".equals(map.get("created_time"))){
-                    msg = msg + "上报时间不能为空、";
-                }
             }
 
             if(StringUtils.isNotEmpty(msg)){
-                envelop.setSuccessFlg(false);
+                log.error(msg);
                 envelop.setErrorMsg("参数校验失败");
+                envelop.setSuccessFlg(false);
             }else{
                 for(Map<String, Object> map : list) {
                     elasticSearchUtil.index(index, type, map);
@@ -138,5 +128,21 @@ public class DailyReportService {
             envelop.setErrorMsg(e.getMessage());
         }
         return envelop;
+    }
+
+    /**
+     * 根据某个字段查询
+     * @param sql
+     * @return
+     */
+    public List<Map<String, Object>> findBySql(String field ,String sql){
+        List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
+        try {
+            List<String> fields = objectMapper.readValue(field, List.class);
+            list = elasticSearchUtil.findBySql(fields,sql);
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 }

@@ -27,12 +27,12 @@ public class OrgHealthCategoryStatisticsService {
 
     /**
      * 将卫生机构类别末节点统计结果，填充到卫生机构类别集合中，
-     * 然后合计父节点统计结果，再将卫生机构类别集合统计结果保存到ES库中。
+     * 然后合计父节点的统计结果。
      *
      * @param endpointsStatisticList 卫生机构类别末节点统计结果
-     * @return 保存成功的状态
+     * @return 所有卫生机构类别的统计结果
      */
-    public boolean countResultsAndSaveToEs(List<Map<String, Object>> endpointsStatisticList) {
+    public List<SaveModel> getAllNodesStatistic(List<Map<String, Object>> endpointsStatisticList) {
         // 获取所有卫生机构类别的集合
         String sql = "SELECT id, pid, top_pid AS topPid, code, name, 0 AS result, 'false' AS isEndpoint FROM org_health_category ORDER BY code ";
         List<Map<String, Object>> allOrgHealthCategoryList = jdbcTemplate.queryForList(sql);
@@ -68,14 +68,16 @@ public class OrgHealthCategoryStatisticsService {
             }
         }
 
-        // 添加【合计】到卫生机构类别集合
-        int totalResult = countResult(endpointsStatisticList);
-        Map<String, Object> totalMap = new HashMap<>();
-        totalMap.put("id", "-1");
-        totalMap.put("name", "合计");
-        totalMap.put("result", totalResult);
-        allOrgHealthCategoryList.add(totalMap);
-        return saveToEs(endpointsStatisticList, allOrgHealthCategoryList);
+//        // 添加【合计】到卫生机构类别集合
+//        int totalResult = countResult(endpointsStatisticList);
+//        Map<String, Object> totalMap = new HashMap<>();
+//        totalMap.put("id", "-1");
+//        totalMap.put("code", "SUM");
+//        totalMap.put("name", "合计");
+//        totalMap.put("result", totalResult);
+//        allOrgHealthCategoryList.add(totalMap);
+
+        return translateModel(endpointsStatisticList, allOrgHealthCategoryList);
     }
 
     /**
@@ -125,14 +127,15 @@ public class OrgHealthCategoryStatisticsService {
     }
 
     /**
-     * 将卫生机构类别统计结果保存到ES库中
+     * 将卫生机构类别统计结果转换成 SaveModel
      *
      * @param endpointsStatisticList   卫生机构类别末节点统计结果
      * @param allOrgHealthCategoryList 所有卫生机构类集合
      * @return
      */
-    private boolean saveToEs(List<Map<String, Object>> endpointsStatisticList, List<Map<String, Object>> allOrgHealthCategoryList) {
-        boolean result = false;
+    private List<SaveModel> translateModel(List<Map<String, Object>> endpointsStatisticList,
+                                           List<Map<String, Object>> allOrgHealthCategoryList) {
+        List<SaveModel> resultList = new ArrayList<>();
         try {
             String quotaCode = null;
             String quotaName = null;
@@ -190,15 +193,14 @@ public class OrgHealthCategoryStatisticsService {
                 model.setOrgHealthCategoryCode(code);
                 model.setOrgHealthCategoryName(item.get("name").toString());
                 model.setResult(item.get("result").toString());
-                Map<String, Object> sourceMap = objectMapper.readValue(objectMapper.writeValueAsString(model), Map.class);
-                esClient.index("medical_service_index", "medical_service", sourceMap);
+
+                resultList.add(model);
             }
-            result = true;
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return result;
+        return resultList;
     }
 
     /**

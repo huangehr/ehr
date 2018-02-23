@@ -46,10 +46,9 @@ import java.util.*;
 /**
  * Created by AndyCai on 2016/1/21.
  */
-@EnableFeignClients
-@RequestMapping(ApiVersion.Version1_0+"/admin")
+@RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
-@Api(value = "organization", description = "机构信息管理", tags = {"机构管理"})
+@Api(value = "OrganizationController", description = "机构信息管理", tags = {"机构管理 - 机构信息管理"})
 public class OrganizationController extends BaseController {
 
     @Autowired
@@ -57,9 +56,9 @@ public class OrganizationController extends BaseController {
     @Autowired
     private ConventionalDictEntryClient conDictEntryClient;
     @Autowired
-    AddressClient addressClient;
+    private AddressClient addressClient;
     @Autowired
-    SecurityClient securityClient;
+    private SecurityClient securityClient;
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
@@ -80,77 +79,64 @@ public class OrganizationController extends BaseController {
     @ApiOperation(value = "获取所有部门列表")
     @RequestMapping(value = "/organizations/getAllOrgs", method = RequestMethod.GET)
     public Envelop getAllOrgDepts() {
-        try {
-            Envelop envelop = new Envelop();
-            envelop.setDetailModelList(orgClient.getAllOrgs() );
-            envelop.setSuccessFlg(true);
-            return envelop;
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-            return failedSystem();
-        }
+        Envelop envelop = new Envelop();
+        envelop.setDetailModelList(orgClient.getAllOrgs() );
+        envelop.setSuccessFlg(true);
+        return envelop;
     }
 
 
     @RequestMapping(value = "/organizations", method = RequestMethod.GET)
     @ApiOperation(value = "根据条件查询机构列表")
     public Envelop searchOrgs(
-            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
-            @RequestParam(value = "fields", required = false) String fields,
-            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
-            @RequestParam(value = "filters", required = false) String filters,
-            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "-createDate")
-            @RequestParam(value = "sorts", required = false) String sorts,
-            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
-            @RequestParam(value = "size", required = false) int size,
-            @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page,
-            @ApiParam(name = "userOrgList", value = "登录者授权机构", defaultValue = "1")
-            @RequestParam(value = "userOrgList", required = false) List<String> userOrgList,
-            @ApiParam(name = "province", value = "省", defaultValue = "")
-            @RequestParam(value = "province",required=false) String province,
-            @ApiParam(name = "city", value = "市", defaultValue = "")
-            @RequestParam(value = "city",required=false) String city,
-            @ApiParam(name = "district", value = "县", defaultValue = "")
-            @RequestParam(value = "district",required=false) String district) {
-        try {
-            //根据登录人的机构获取saas化机构 --start
-           String userOrgCode = "";
-            if( userOrgList != null  ){
-                if( !(userOrgList.size()==1 && userOrgList.get(0).equals("null")) ){
-                    userOrgCode = StringUtils.strip(String.join(",", userOrgList), "[]");
-                    if(StringUtils.isNotEmpty(userOrgCode)){
-                        filters += "orgCode=" + userOrgCode ;
-                    }
+        @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
+        @RequestParam(value = "fields", required = false) String fields,
+        @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+        @RequestParam(value = "filters", required = false) String filters,
+        @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "-createDate")
+        @RequestParam(value = "sorts", required = false) String sorts,
+        @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+        @RequestParam(value = "size", required = false) int size,
+        @ApiParam(name = "page", value = "页码", defaultValue = "1")
+        @RequestParam(value = "page", required = false) int page,
+        @ApiParam(name = "userOrgList", value = "登录者授权机构", defaultValue = "1")
+        @RequestParam(value = "userOrgList", required = false) List<String> userOrgList,
+        @ApiParam(name = "province", value = "省", defaultValue = "")
+        @RequestParam(value = "province",required = false) String province,
+        @ApiParam(name = "city", value = "市", defaultValue = "")
+        @RequestParam(value = "city", required = false) String city,
+        @ApiParam(name = "district", value = "县", defaultValue = "")
+        @RequestParam(value = "district", required = false) String district) {
+        //根据登录人的机构获取saas化机构 --start
+       String userOrgCode = "";
+        if( userOrgList != null  ){
+            if( !(userOrgList.size()==1 && userOrgList.get(0).equals("null")) ){
+                userOrgCode = StringUtils.strip(String.join(",", userOrgList), "[]");
+                if(StringUtils.isNotEmpty(userOrgCode)){
+                    filters += "orgCode=" + userOrgCode ;
                 }
             }
-            //根据登录人的机构获取saas化机构 --end
-            String address = "";
-            if(StringUtils.isNotBlank(province)){
-                List<String> addressList = addressClient.search(province, city, district);
-                String[] addrIdsArrays = addressList.toArray(new String[addressList.size()]);
-                address = String.join(",", addrIdsArrays);
-            }
-            if(StringUtils.isNotBlank(address)){
-                filters = StringUtils.isNotBlank(filters)?(filters+"location="+address):"location="+address;
-            }
-            List<OrgModel> orgModelList = new ArrayList<>();
-            ResponseEntity<List<MOrganization>> responseEntity = orgClient.searchOrgs(fields, filters, sorts, size, page);
-            List<MOrganization> organizations = responseEntity.getBody();
-            for (MOrganization mOrg : organizations) {
-                OrgModel orgModel = convertToOrgModel(mOrg);
-                orgModelList.add(orgModel);
-            }
-            int totalCount = getTotalCount(responseEntity);
-            return getResult(orgModelList, totalCount, page, size);
         }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-            return failedSystem();
+        //根据登录人的机构获取saas化机构 --end
+        String address = "";
+        if(StringUtils.isNotBlank(province)){
+            List<String> addressList = addressClient.search(province, city, district);
+            String[] addrIdsArrays = addressList.toArray(new String[addressList.size()]);
+            address = String.join(",", addrIdsArrays);
         }
+        if(StringUtils.isNotBlank(address)){
+            filters = StringUtils.isNotBlank(filters)?(filters + "location=" + address) : "location=" + address;
+        }
+        List<OrgModel> orgModelList = new ArrayList<>();
+        ResponseEntity<List<MOrganization>> responseEntity = orgClient.searchOrgs(fields, filters, sorts, size, page);
+        List<MOrganization> organizations = responseEntity.getBody();
+        for (MOrganization mOrg : organizations) {
+            OrgModel orgModel = convertToOrgModel(mOrg);
+            orgModelList.add(orgModel);
+        }
+        int totalCount = getTotalCount(responseEntity);
+        return getResult(orgModelList, totalCount, page, size);
+
     }
 
     @RequestMapping(value = "/organizations/combo", method = RequestMethod.GET)
@@ -166,17 +152,10 @@ public class OrganizationController extends BaseController {
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page) {
+        ResponseEntity<List<MOrganization>> responseEntity = orgClient.searchOrgs(fields, filters, sorts, size, page);
+        int totalCount = getTotalCount(responseEntity);
+        return getResult(responseEntity.getBody(), totalCount, page, size);
 
-        try {
-            ResponseEntity<List<MOrganization>> responseEntity = orgClient.searchOrgs(fields, filters, sorts, size, page);
-            int totalCount = getTotalCount(responseEntity);
-            return getResult(responseEntity.getBody(), totalCount, page, size);
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-            return failedSystem();
-        }
     }
 
     /**
@@ -187,8 +166,7 @@ public class OrganizationController extends BaseController {
      */
     public OrgModel convertToOrgModel(MOrganization mOrg) {
 
-        if(mOrg==null)
-        {
+        if(mOrg==null) {
             return null;
         }
 
@@ -201,7 +179,7 @@ public class OrganizationController extends BaseController {
         else{
             orgModel.setOrgTypeName("");
         }
-        if(StringUtils.isNotEmpty(mOrg.getLocation())){
+        if (StringUtils.isNotEmpty(mOrg.getLocation())) {
             // 获取机构地址信息
             String locationStrName = addressClient.getCanonicalAddress(mOrg.getLocation());
             if(StringUtils.isNotEmpty(locationStrName)){
@@ -209,11 +187,10 @@ public class OrganizationController extends BaseController {
             }
         }
         //获取机构接入方式
-        if(!StringUtils.isEmpty(mOrg.getSettledWay())){
+        if (!StringUtils.isEmpty(mOrg.getSettledWay())) {
             MConventionalDict settledWayDict = conDictEntryClient.getSettledWay(mOrg.getSettledWay());
             orgModel.setSettledWayName(settledWayDict == null ? "" : settledWayDict.getValue());
-        }
-        else{
+        } else{
             orgModel.setSettledWayName("");
         }
 
@@ -303,92 +280,86 @@ public class OrganizationController extends BaseController {
     @RequestMapping(value = "/organizations" , method = RequestMethod.POST)
     @ApiOperation(value = "创建机构")
     public Envelop create(
-            @ApiParam(name = "mOrganizationJsonData", value = "机构信息Json", defaultValue = "")
+            @ApiParam(name = "mOrganizationJsonData", value = "机构信息Json")
             @RequestParam(value = "mOrganizationJsonData", required = false) String mOrganizationJsonData,
-            @ApiParam(name = "geography_model_json_data",value = "地址信息Json",defaultValue = "")
+            @ApiParam(name = "geography_model_json_data", value = "地址信息Json")
             @RequestParam(value = "geography_model_json_data", required = false) String geographyModelJsonData,
-            @ApiParam(name = "inputStream", value = "转换后的输入流", defaultValue = "")
-            @RequestParam(value = "inputStream") String inputStream,
-            @ApiParam(name = "imageName", value = "图片全名", defaultValue = "")
-            @RequestParam(value = "imageName") String imageName){
-        try {
-            String errorMsg = "";
+            @ApiParam(name = "inputStream", value = "转换后的输入流")
+            @RequestParam(value = "inputStream" , required = false) String inputStream,
+            @ApiParam(name = "imageName", value = "图片全名")
+            @RequestParam(value = "imageName", required = false) String imageName) throws Exception{
+        String errorMsg = "";
 
-            //头像上传,接收头像保存的远程路径  path
-            String path = null;
-            if (!StringUtils.isEmpty(inputStream)) {
-                String jsonData = inputStream + "," + imageName;
-                path = orgClient.uploadPicture(jsonData);
-            }
+        //头像上传,接收头像保存的远程路径  path
+        String path = null;
+        if (!StringUtils.isEmpty(inputStream)) {
+            String jsonData = inputStream + "," + imageName;
+            path = orgClient.uploadPicture(jsonData);
+        }
 
-            OrgDetailModel orgDetailModel = objectMapper.readValue(mOrganizationJsonData, OrgDetailModel.class);
+        OrgDetailModel orgDetailModel = objectMapper.readValue(mOrganizationJsonData, OrgDetailModel.class);
 
-            if (!StringUtils.isEmpty(path)) {
-                orgDetailModel.setImgRemotePath(path);
-                orgDetailModel.setImgLocalPath("");
-            }
+        if (!StringUtils.isEmpty(path)) {
+            orgDetailModel.setImgRemotePath(path);
+            orgDetailModel.setImgLocalPath("");
+        }
 
-            MOrganization mOrganization = convertToMOrganization(orgDetailModel);
-            if (StringUtils.isEmpty(mOrganization.getOrgCode())) {
-                errorMsg+="机构代码不能为空！";
+        MOrganization mOrganization = convertToMOrganization(orgDetailModel);
+        if (null == mOrganization.getBerth() ) {
+            mOrganization.setBerth(0);
+        }
+        if (StringUtils.isEmpty(mOrganization.getOrgCode())) {
+            errorMsg+="机构代码不能为空！";
+        }
+        if (StringUtils.isEmpty(mOrganization.getFullName())) {
+            errorMsg+="机构全名不能为空！";
+        }
+        if (StringUtils.isEmpty(mOrganization.getShortName())) {
+            errorMsg+="机构简称不能为空！";
+        }
+        if (StringUtils.isEmpty(mOrganization.getOrgType())) {
+            errorMsg+="机构类型不能为空！";
+        }
+        if (StringUtils.isEmpty(mOrganization.getTel())) {
+            errorMsg+="联系方式不能为空！";
+        }
+        if (StringUtils.isEmpty(mOrganization.getTel())) {
+            errorMsg+="入驻方式不能为空！";
+        }
+        if(StringUtils.isNotEmpty(errorMsg)) {
+            return failed(errorMsg);
+        }
+        String locationId = null;
+        if (!StringUtils.isEmpty(geographyModelJsonData)) {
+            GeographyModel geographyModel = objectMapper.readValue(geographyModelJsonData, GeographyModel.class);
+            if (geographyModel.nullAddress()) {
+                errorMsg+="机构地址不能为空！";
             }
-            if (StringUtils.isEmpty(mOrganization.getFullName())) {
-                errorMsg+="机构全名不能为空！";
+            locationId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
+            if (StringUtils.isEmpty(locationId)) {
+                return failed("保存地址失败！");
             }
-            if (StringUtils.isEmpty(mOrganization.getShortName())) {
-                errorMsg+="机构简称不能为空！";
-            }
-            if (StringUtils.isEmpty(mOrganization.getOrgType())) {
-                errorMsg+="机构类型不能为空！";
-            }
-            if (null != mOrganization.getBerth()) {
-                errorMsg+="核定床位不能为空！";
-            }
-            if (StringUtils.isEmpty(mOrganization.getTel())) {
-                errorMsg+="联系方式不能为空！";
-            }
-            if (StringUtils.isEmpty(mOrganization.getTel())) {
-                errorMsg+="入驻方式不能为空！";
-            }
-            if(StringUtils.isNotEmpty(errorMsg)) {
+            if(StringUtils.isNotEmpty(errorMsg))
+            {
                 return failed(errorMsg);
             }
-            String locationId = null;
-            if (!StringUtils.isEmpty(geographyModelJsonData)) {
-                GeographyModel geographyModel = objectMapper.readValue(geographyModelJsonData, GeographyModel.class);
-                if (geographyModel.nullAddress()) {
-                    errorMsg+="机构地址不能为空！";
-                }
-                locationId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
-                if (StringUtils.isEmpty(locationId)) {
-                    return failed("保存地址失败！");
-                }
-                if(StringUtils.isNotEmpty(errorMsg))
-                {
-                    return failed(errorMsg);
-                }
-            }
-            mOrganization.setLocation(locationId);
-            mOrganization.setActivityFlag(1);
-            String mOrganizationJson = objectMapper.writeValueAsString(mOrganization);
-            MOrganization mOrgNew = orgClient.create(mOrganizationJson);
-            if (mOrgNew == null) {
-                return failed("保存失败!");
-            }
-            //新增机构名称缓存（原则上如果缓存新增失败不能影响实际新增结果）
-            try {
-                redisUpdateClient.updateOrgName(mOrgNew.getOrgCode());
-                redisUpdateClient.updateOrgArea(mOrgNew.getOrgCode());
-            }catch (Exception e) {
-                e.printStackTrace();
-            }
-            return success(convertToOrgDetailModel(mOrgNew));
         }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-            return failedSystem();
+        mOrganization.setLocation(locationId);
+        mOrganization.setActivityFlag(1);
+        String mOrganizationJson = objectMapper.writeValueAsString(mOrganization);
+        MOrganization mOrgNew = orgClient.create(mOrganizationJson);
+        if (mOrgNew == null) {
+            return failed("保存失败!");
         }
+        //新增机构名称缓存（原则上如果缓存新增失败不能影响实际新增结果）
+        try {
+            redisUpdateClient.updateOrgName(mOrgNew.getOrgCode());
+            redisUpdateClient.updateOrgArea(mOrgNew.getOrgCode());
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        return success(convertToOrgDetailModel(mOrgNew));
+
     }
 
     @RequestMapping(value = "/organizations/update" , method = RequestMethod.POST)
@@ -434,6 +405,9 @@ public class OrganizationController extends BaseController {
                 orgDetailModel.setImgLocalPath("");
             }
             MOrganization mOrganization = convertToMOrganization(orgDetailModel);
+            if (null == mOrganization.getBerth()) {
+                mOrganization.setBerth(0);
+            }
             if (StringUtils.isEmpty(mOrganization.getOrgCode())) {
                 errorMsg+="机构代码不能为空！";
             }
@@ -445,9 +419,6 @@ public class OrganizationController extends BaseController {
             }
             if (StringUtils.isEmpty(mOrganization.getOrgType())) {
                 errorMsg+="机构类型不能为空！";
-            }
-            if (null != mOrganization.getBerth()) {
-                errorMsg+="核定床位不能为空！";
             }
             if (StringUtils.isEmpty(mOrganization.getTel())) {
                 errorMsg+="联系方式不能为空！";

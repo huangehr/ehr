@@ -22,13 +22,15 @@ public class EsConfig {
     private String filter;  // where条件
     private String aggregation;//聚合方式  默认count，另有sum
     private String aggregationKey;//聚合字段
+    private String especialType; //特殊类型  orgHealthCategory：卫生机构类型
+    private String superiorBaseQuotaCode;  // 上级基础指标code
 
+
+
+    //已停止使用
     private String thousandFlag; //每千，每万 1000,10000
     private String thousandDmolecular; //每千，每万 统计分子
     private String thousandDenominator; //每千，每万 统计分母
-
-    private String especialType; //特殊类型  orgHealthCategory：卫生机构类型
-    private String superiorBaseQuotaCode;  // 上级基础指标code
 
 
     public String getSuperiorBaseQuotaCode() {

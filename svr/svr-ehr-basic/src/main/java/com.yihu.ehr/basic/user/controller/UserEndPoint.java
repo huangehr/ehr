@@ -308,7 +308,7 @@ public class UserEndPoint extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value = ServiceApi.Users.UserExistence, method = RequestMethod.GET)
-    @ApiOperation(value = "判断用户名是否存在")
+    @ApiOperation(value = "判断登陆账户（用户名）是否存在")
     public boolean isUserNameExists(
             @ApiParam(name = "user_name", value = "user_name", defaultValue = "")
             @PathVariable(value = "user_name") String userName) {
@@ -476,5 +476,22 @@ public class UserEndPoint extends EnvelopRestEndPoint {
     public String getUserIdByIdCardNo(String idCardNo) {
         User user = userService.getUserByIdCardNo(idCardNo);
         return StringUtils.isEmpty(user) ? "" : user.getId();
+    }
+
+    @RequestMapping(value = ServiceApi.Users.UpdateSystemUser, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "修改用户", notes = "账户体系-修改用户信息")
+    public MUser UpdateSystemUser(
+            @ApiParam(name = "user_json_data", value = "用户信息json", defaultValue = "")
+            @RequestBody String userJsonData) throws Exception {
+        User user = toEntity(userJsonData, User.class);
+        String userType = user.getUserType();
+        if(!StringUtils.isEmpty(userType)){
+            SystemDictEntry dict = dictEntryService.getDictEntry(15, userType);
+            if (dict != null) {
+                user.setDType(userType);
+            }
+        }
+        userService.saveUser(user);
+        return convertToModel(user, MUser.class);
     }
 }

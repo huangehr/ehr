@@ -13,13 +13,21 @@ import javax.persistence.*;
 @Access(value = AccessType.PROPERTY)
 public class Location extends BaseIdentityEntity {
 
-    // 待命经度
+    /**
+     * 经度
+     */
     private double initLongitude;
-    // 待命纬度
+    /**
+     * 纬度
+     */
     private double initLatitude;
-    // 待命地点
+    /**
+     * 地点
+     */
     private String initAddress;
-    // 归属片区
+    /**
+     * 归属片区
+     */
     private String district;
 
     @Column(name = "init_longitude", nullable = false)

@@ -1,9 +1,10 @@
 package com.yihu.ehr.resource.client;
 
-import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.model.resource.MRsDictionary;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -44,7 +45,7 @@ public interface RsDictionaryClient {
 
     @RequestMapping(value = ServiceApi.Resources.Dict, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除标准字典", notes = "删除标准字典")
-    boolean deleteRsDictionary(
+    Envelop deleteRsDictionary(
             @PathVariable(value = "id") int id);
 
     @RequestMapping(value = ServiceApi.Resources.Dict, method = RequestMethod.GET)

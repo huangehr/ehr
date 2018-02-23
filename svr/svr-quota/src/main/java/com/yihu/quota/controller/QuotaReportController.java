@@ -13,6 +13,7 @@ import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionMain;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionSlave;
 import com.yihu.quota.service.dimension.TjDimensionMainService;
 import com.yihu.quota.service.dimension.TjDimensionSlaveService;
+import com.yihu.quota.service.orgHealthCategory.OrgHealthCategoryStatisticsService;
 import com.yihu.quota.service.quota.BaseStatistsService;
 import com.yihu.quota.service.quota.QuotaService;
 import com.yihu.quota.service.resource.ResourceQuotaService;
@@ -32,11 +33,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.text.NumberFormat;
 import java.util.*;
 
 
 /**
- *
  * @author janseny
  */
 @RestController
@@ -57,12 +58,14 @@ public class QuotaReportController extends BaseController {
     @Autowired
     private ResourceQuotaService resourceQuotaService;
     @Autowired
+    private OrgHealthCategoryStatisticsService orgHealthCategoryStatisticsService;
+    @Autowired
     private BaseStatistsService baseStatistsService;
-
-
+    public static String orgHealthCategoryCode = "orgHealthCategoryCode";
 
     /**
      * 获取指标统计结果
+     *
      * @param id
      * @return
      */
@@ -70,7 +73,7 @@ public class QuotaReportController extends BaseController {
     @RequestMapping(value = ServiceApi.TJ.GetQuotaReport, method = RequestMethod.GET)
     public Envelop getQuotaReport(
             @ApiParam(name = "id", value = "指标任务ID", required = true)
-            @RequestParam(value = "id" , required = true) int id,
+            @RequestParam(value = "id", required = true) int id,
             @ApiParam(name = "filters", value = "检索条件", defaultValue = "")
             @RequestParam(value = "filters", required = false) String filters,
             @ApiParam(name = "dimension", value = "维度字段", defaultValue = "quotaDate")
@@ -88,44 +91,47 @@ public class QuotaReportController extends BaseController {
         envelop.setSuccessFlg(false);
         return envelop;
     }
+
     @ApiOperation(value = "获取统计报表一个视图下多个指标组合  二维表数据")
     @RequestMapping(value = ServiceApi.TJ.GetQuotaReportTwoDimensionalTable, method = RequestMethod.GET)
     public List<Map<String, Object>> getQuotaReportTwoDimensionalTable(
             @ApiParam(name = "quotaCodeStr", value = "指标Code,多个用,拼接", required = true)
-            @RequestParam(value = "quotaCodeStr" , required = true) String quotaCodeStr,
+            @RequestParam(value = "quotaCodeStr", required = true) String quotaCodeStr,
             @ApiParam(name = "filter", value = "过滤", defaultValue = "")
             @RequestParam(value = "filter", required = false) String filter,
             @ApiParam(name = "dimension", value = "维度字段", defaultValue = "quotaDate")
             @RequestParam(value = "dimension", required = false) String dimension
     ) {
-        Map<String,List<Map<String, Object>>> quotaViewResult = new HashMap<>();
-        String maxQuota = "";
+        NumberFormat nf = NumberFormat.getInstance();
+        nf.setGroupingUsed(false);
+        List<Map<String, Object>> dataList = new ArrayList<>();
+        Map<String, List<Map<String, Object>>> quotaViewResult = new HashMap<>();
+        List<String> quotaCodes = Arrays.asList(quotaCodeStr.split(","));
+        String maxQuotaCode = "";
         int num = 0;
         try {
-            List<String> quotaCodes = Arrays.asList(quotaCodeStr.split(","));
-            int i = 1;
-            for(String code:quotaCodes){
-                List<Map<String, Object>> quotaResult = baseStatistsService.getSimpleQuotaReport(code, filter, dimension);
-                if(quotaResult.size() >= num){
+            for (String code : quotaCodes) {
+                List<Map<String, Object>> quotaResult = baseStatistsService.getSimpleQuotaReport(code, filter, dimension,false);
+                if (quotaResult.size() >= num) {
                     num = quotaResult.size();
-                    maxQuota = code;
+                    maxQuotaCode = code;
                 }
-                quotaViewResult.put(code,quotaResult);
+                quotaViewResult.put(code, quotaResult);
             }
-            Map<String,List<Map<String, Object>>> otherQuotaViewResult = new HashMap<>();
-            for(String key :quotaViewResult.keySet()){
-                if(key != maxQuota){
-                    otherQuotaViewResult.put(key,quotaViewResult.get(key));
+            Map<String, List<Map<String, Object>>> otherQuotaViewResult = new HashMap<>();
+            for (String key : quotaViewResult.keySet()) {
+                if (key != maxQuotaCode) {
+                    otherQuotaViewResult.put(key, quotaViewResult.get(key));
                 }
             }
             //以查询结果数据最多的指标为主，其他指标对应维度没有数据的补充0
-            for(Map<String, Object> vMap : quotaViewResult.get(maxQuota)){
-                vMap.put(maxQuota, vMap.get("result"));
+            for (Map<String, Object> vMap : quotaViewResult.get(maxQuotaCode)) {
+                vMap.put(maxQuotaCode, vMap.get("result")==null ? 0 : nf.format(Double.valueOf(vMap.get("result").toString())));
                 for (String viewQuotaCode : otherQuotaViewResult.keySet()) {
                     for (Map<String, Object> quotaResultMap : otherQuotaViewResult.get(viewQuotaCode)) {
-                        if( quotaResultMap.get(dimension) != null){
+                        if (quotaResultMap.get(dimension) != null) {
                             if (vMap.get(dimension).toString().trim().equals(quotaResultMap.get(dimension).toString().trim())) {
-                                vMap.put(viewQuotaCode, quotaResultMap.get("result").toString());
+                                vMap.put(viewQuotaCode, quotaResultMap.get("result")==null ? 0 : nf.format(Double.valueOf(quotaResultMap.get("result").toString())));
                                 break;
                             } else {
                                 vMap.put(viewQuotaCode, 0);
@@ -136,15 +142,49 @@ public class QuotaReportController extends BaseController {
                     }
                 }
             }
+            List<Map<String, Object>> resultList = quotaViewResult.get(maxQuotaCode);
 
-
+            if(dimension.equals(orgHealthCategoryCode)){//如果是特殊机构类型树状机构需要转成树状结构
+                List<Map<String, Object>> orgHealthCategoryList = orgHealthCategoryStatisticsService.getOrgHealthCategoryTreeByPid(-1);
+                dataList = baseStatistsService.setResult(maxQuotaCode, orgHealthCategoryList, resultList, null);
+            }else {
+                dataList = resultList;
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return  quotaViewResult.get(maxQuota);
+        //计算合计
+        if(dataList != null && dataList.size() > 0){
+            Map<String, Object> sumMap = new HashMap<>();
+            sumMap.put("firstColumn","合计");
+            for (String code : quotaCodes) {
+                double sum = 0;
+                sum = calculateSum(sum,code,dataList);
+                sumMap.put(code, nf.format(sum));
+            }
+            dataList.add(0,sumMap);
+        }
+        //二次指标为除法运算的  合计需要重新计算
+        //TODO
+        return dataList;
     }
 
-
+    /**
+     * 统计每列合计
+     * @param sum
+     * @param code
+     * @param dataList
+     * @return
+     */
+    private double calculateSum( double sum,String code,List<Map<String, Object>> dataList){
+        for(Map<String, Object> map : dataList){
+            sum += Double.valueOf(map.get(code).toString());
+            if(map.containsKey("children")){
+                calculateSum(sum,code,(List<Map<String, Object>>) map.get("children"));
+            }
+        }
+        return sum;
+    }
 
     @ApiOperation(value = "获取指标统计结果echart图表，支持多条组合")
     @RequestMapping(value = ServiceApi.TJ.GetMoreQuotaGraphicReportPreviews, method = RequestMethod.GET)
@@ -152,7 +192,7 @@ public class QuotaReportController extends BaseController {
             @ApiParam(name = "quotaIdStr", value = "指标ID,多个用,拼接", required = true)
             @RequestParam(value = "quotaIdStr" , required = true) String quotaIdStr,
             @ApiParam(name = "charstr", value = "多图表类型用,拼接,混合类型只支持柱状和线性", defaultValue = "1")
-            @RequestParam(value = "charstr" , required = true) String charstr,
+            @RequestParam(value = "charstr", required = true) String charstr,
             @ApiParam(name = "filter", value = "过滤", defaultValue = "")
             @RequestParam(value = "filter", required = false) String filter,
             @ApiParam(name = "dimension", value = "维度字段", defaultValue = "quotaDate")
@@ -163,31 +203,31 @@ public class QuotaReportController extends BaseController {
         List<String> quotaIds = Arrays.asList(quotaIdStr.split(","));
         List<String> charTypes = Arrays.asList(charstr.split(","));
         MChartInfoModel chartInfoModel = new MChartInfoModel();
-        String dimensionName = dimension+"Name";
+        String dimensionName = dimension + "Name";
         try {
             Option option = null;
             List<List<Object>> optionData = new ArrayList<>();
             List<String> lineNames = new ArrayList<>();
-            Map<String,Map<String, Object>> lineData = new LinkedHashMap<>();
+            Map<String, Map<String, Object>> lineData = new LinkedHashMap<>();
             Map<String, String> xAxisMap = new LinkedHashMap<>();
             Integer i = 0;
             List<Map<String, Object>> listMap = new ArrayList<>();
 
-            for(String quotaId:quotaIds){
+            for (String quotaId : quotaIds) {
                 Map<String, Object> dataMap = new LinkedHashMap<>();
                 TjQuota tjQuota = quotaService.findOne(Integer.valueOf(quotaId));
-                if(tjQuota != null){
-                    List<Map<String, Object>>  resultListMap = baseStatistsService.getSimpleQuotaReport(tjQuota.getCode(), filter, dimension);
-                    if(resultListMap != null && resultListMap.size() > 0){
-                        for(Map<String, Object> map:resultListMap){
-                            if(map !=null && map.size() > 0){
+                if (tjQuota != null) {
+                    List<Map<String, Object>> resultListMap = baseStatistsService.getSimpleQuotaReport(tjQuota.getCode(), filter, dimension,true);
+                    if (resultListMap != null && resultListMap.size() > 0) {
+                        for (Map<String, Object> map : resultListMap) {
+                            if (map != null && map.size() > 0) {
                                 listMap.add(map);
                                 //第一种 ES库中有定义的维度 如org,slaveKey1
                                 //第二种 ES库中未定义的维度 如level，economic
-                                if(map.containsKey(dimensionName)){
+                                if (map.containsKey(dimensionName)) {
                                     dataMap.put(map.get(dimensionName).toString(), map.get("result"));
                                     xAxisMap.put(map.get(dimensionName).toString(), map.get(dimension).toString());
-                                }else{
+                                } else {
                                     dataMap.put(map.get(dimension).toString(), map.get("result"));
                                     xAxisMap.put(map.get(dimension).toString(), map.get(dimension).toString());
                                 }
@@ -206,37 +246,37 @@ public class QuotaReportController extends BaseController {
             ReportOption reportOption = new ReportOption();
             int size = 0;
             String quota = "0";
-            if(lineData != null && lineData.size() > 0){
-                for(String key : lineData.keySet()){
+            if (lineData != null && lineData.size() > 0) {
+                for (String key : lineData.keySet()) {
                     int tempSize = lineData.get(key).size();
-                    if (tempSize > size){
+                    if (tempSize > size) {
                         size = tempSize;
                         quota = key;
                         quotaMap = lineData.get(key);
                     }
                 }
-                for(String key : lineData.keySet()){
+                for (String key : lineData.keySet()) {
                     List<Object> dataList = new ArrayList<>();
-                    Map<String,Object> valMap = lineData.get(key);
-                    if(key != quota){
-                        for(String name :quotaMap .keySet()){
-                            if(valMap.containsKey(name)){
+                    Map<String, Object> valMap = lineData.get(key);
+                    if (key != quota) {
+                        for (String name : quotaMap.keySet()) {
+                            if (valMap.containsKey(name)) {
                                 dataList.add(valMap.get(name));
-                            }else {
+                            } else {
                                 dataList.add(0);
                             }
                         }
-                    }else{
-                        for(String name :valMap .keySet()){
+                    } else {
+                        for (String name : valMap.keySet()) {
                             dataList.add(valMap.get(name));
                         }
                     }
                     optionData.add(dataList);
                 }
             }
-            Object[] xData = (Object[])quotaMap.keySet().toArray(new Object[quotaMap.size()]);
-            for(String typeStr :charTypes){
-                if(typeStr.equals("common")){
+            Object[] xData = (Object[]) quotaMap.keySet().toArray(new Object[quotaMap.size()]);
+            for (String typeStr : charTypes) {
+                if (typeStr.equals("common")) {
                     typeStr = "1";
                 }
                 int type = Integer.valueOf(typeStr);
@@ -246,9 +286,24 @@ public class QuotaReportController extends BaseController {
                     option = reportOption.getLineEchartOptionMoreChart(title, "", "", xData, optionData, lineNames, charTypes);
                 } else if (type == ReportOption.pie) {
                     List<Map<String, Object>> datalist = new ArrayList<>();
-                    for(Map<String, Object> resultMap :listMap){
+                    for (Map<String, Object> resultMap : listMap) {
                         Map<String, Object> map = new HashMap<>();
-                        map.put("NAME",resultMap.get(dimensionName));
+                        map.put("NAME", resultMap.get(dimensionName));
+                        map.put("TOTAL", resultMap.get("result"));
+                        if(resultMap.get(dimensionName) != null){
+                            map.put("NAME",resultMap.get(dimensionName));
+                        }else {
+                            //非 指标中配置的维度 关联出来的字段
+                            if(dimensionName.equals("levelName")){
+                                if(resultMap.get(dimension).equals("1")){
+                                    map.put("NAME","一级医院");
+                                }else  if(resultMap.get(dimension).equals("2")){
+                                    map.put("NAME","二级医院");
+                                }else  if(resultMap.get(dimension).equals("3")){
+                                    map.put("NAME","三级医院");
+                                }
+                            }
+                        }
                         map.put("TOTAL",resultMap.get("result"));
                         datalist.add(map);
                     }
@@ -404,7 +459,7 @@ public class QuotaReportController extends BaseController {
     @RequestMapping(value = ServiceApi.TJ.GetQuotaGroupBy, method = RequestMethod.GET)
     public Envelop getQuotaGroupBy(
             @ApiParam(name = "id", value = "指标任务ID", required = true)
-            @RequestParam(value = "id" , required = true) int id,
+            @RequestParam(value = "id", required = true) int id,
             @ApiParam(name = "filters", value = "检索条件", defaultValue = "")
             @RequestParam(value = "filters", required = false) String filters,
             @ApiParam(name = "dimension", value = "维度字段", defaultValue = "quotaDate")
@@ -429,20 +484,20 @@ public class QuotaReportController extends BaseController {
     private String getQuotaDimensionDictSql(String quotaCode, String dimension) {
         String dictSql = "";
         //查询维度
-        List<TjQuotaDimensionMain>  dimensionMains = tjDimensionMainService.findTjQuotaDimensionMainByQuotaCode(quotaCode);
-        if(dimensionMains != null && dimensionMains.size() > 0){
-            for(TjQuotaDimensionMain main:dimensionMains){
-                if(main.getMainCode().equals(dimension)){
+        List<TjQuotaDimensionMain> dimensionMains = tjDimensionMainService.findTjQuotaDimensionMainByQuotaCode(quotaCode);
+        if (dimensionMains != null && dimensionMains.size() > 0) {
+            for (TjQuotaDimensionMain main : dimensionMains) {
+                if (main.getMainCode().equals(dimension)) {
                     dictSql = main.getDictSql();
                 }
             }
         }
-        if(StringUtils.isEmpty(dictSql)) {
+        if (StringUtils.isEmpty(dictSql)) {
             List<TjQuotaDimensionSlave> dimensionSlaves = tjDimensionSlaveService.findTjQuotaDimensionSlaveByQuotaCode(quotaCode);
             if (dimensionSlaves != null && dimensionSlaves.size() > 0) {
-               int slave = Integer.valueOf(dimension.substring(dimension.length()-1,dimension.length()));
-                if(dimensionSlaves.size() >= slave){
-                    dictSql = dimensionSlaves.get(slave-1).getDictSql();
+                int slave = Integer.valueOf(dimension.substring(dimension.length() - 1, dimension.length()));
+                if (dimensionSlaves.size() >= slave) {
+                    dictSql = dimensionSlaves.get(slave - 1).getDictSql();
                 }
             }
         }
@@ -453,7 +508,7 @@ public class QuotaReportController extends BaseController {
     @RequestMapping(value = ServiceApi.TJ.GetQuotaRadarGraphicReportPreviews, method = RequestMethod.GET)
     public MChartInfoModel getQuotaRadarGraphicReports(
             @ApiParam(name = "quotaIdStr", value = "指标ID,多个用,拼接", required = true)
-            @RequestParam(value = "quotaIdStr" , required = true) String quotaIdStr,
+            @RequestParam(value = "quotaIdStr", required = true) String quotaIdStr,
             @ApiParam(name = "filter", value = "过滤", defaultValue = "")
             @RequestParam(value = "filter", required = false) String filter,
             @ApiParam(name = "dimension", value = "维度字段", defaultValue = "")
@@ -471,19 +526,19 @@ public class QuotaReportController extends BaseController {
             List<Map<String, Object>> listData = new ArrayList<>();
 
             Map<String, String> xAxisMap = new HashMap<>();
-            for(String quotaId : quotaIds) {
+            for (String quotaId : quotaIds) {
                 Map<String, Object> dataMap = new HashMap<>();
                 TjQuota tjQuota = quotaService.findOne(Integer.valueOf(quotaId));
-                if(null != tjQuota){
+                if (null != tjQuota) {
                     String dictSql = getQuotaDimensionDictSql(tjQuota.getCode(), dimension);
-                    Map<String,String> dimensionDicMap = new HashMap<>();
+                    Map<String, String> dimensionDicMap = new HashMap<>();
                     dimensionDicMap = setDimensionMap(dictSql, dimension, dimensionDicMap);
                     //使用分组计算 返回结果实例： groupDataMap -> "4205000000-儿-1": 200 =>group by 三个字段
-                    Map<String, Integer> groupDataMap =  quotaService.searcherSumByGroupBySql(tjQuota, dimension, filter,"result","","");
-                    for(String key : groupDataMap.keySet()){
+                    Map<String, Integer> groupDataMap = quotaService.searcherSumByGroupBySql(tjQuota, dimension, filter, "result", "", "");
+                    for (String key : groupDataMap.keySet()) {
                         key = key.toLowerCase();
                         dataMap.put(dimensionDicMap.containsKey(key) ? dimensionDicMap.get(key) : key, groupDataMap.get(key));
-                        xAxisMap.put(dimensionDicMap.containsKey(key) ? dimensionDicMap.get(key): key, key);
+                        xAxisMap.put(dimensionDicMap.containsKey(key) ? dimensionDicMap.get(key) : key, key);
                     }
                     radarNames.add(tjQuota.getName());
                     radarData.put(tjQuota.getCode(), dataMap);
@@ -516,7 +571,7 @@ public class QuotaReportController extends BaseController {
             @ApiParam(name = "resourceId", value = "资源ID", defaultValue = "")
             @RequestParam(value = "resourceId") String resourceId,
             @ApiParam(name = "quotaIdStr", value = "指标ID,多个用,拼接", required = true)
-            @RequestParam(value = "quotaIdStr" , required = true) String quotaIdStr,
+            @RequestParam(value = "quotaIdStr", required = true) String quotaIdStr,
             @ApiParam(name = "filter", value = "过滤", defaultValue = "")
             @RequestParam(value = "filter", required = false) String filter,
             @ApiParam(name = "dimension", value = "维度字段", defaultValue = "")
@@ -546,7 +601,7 @@ public class QuotaReportController extends BaseController {
         }
     }
 
-    public ChartDataModel getChartDataModel(List<Integer> quotaId, Integer count, String resourceId, String dimension, String filter, Map<String, String> xAxisMap) throws Exception {
+    private ChartDataModel getChartDataModel(List<Integer> quotaId, Integer count, String resourceId, String dimension, String filter, Map<String, String> xAxisMap) throws Exception {
         ChartDataModel chartDataModel = new ChartDataModel();
         List<RsResourceQuota> resultList = resourceQuotaService.getChildrenByPidList(quotaId, resourceId);
         quotaId.clear();
@@ -560,16 +615,16 @@ public class QuotaReportController extends BaseController {
                 RsResourceQuota parent = rq;
                 TjQuota tjQuota = quotaService.findOne(Integer.valueOf(rq.getQuotaId()));
                 Map<String, Object> dataMap = new HashMap<>();
-                if(null != tjQuota) {
+                if (null != tjQuota) {
                     String dictSql = getQuotaDimensionDictSql(tjQuota.getCode(), dimension);
-                    Map<String,String> dimensionDicMap = new HashMap<>();
+                    Map<String, String> dimensionDicMap = new HashMap<>();
                     dimensionDicMap = setDimensionMap(dictSql, dimension, dimensionDicMap);
                     //使用分组计算 返回结果实例： groupDataMap -> "4205000000-儿-1": 200 =>group by 三个字段
-                    Map<String, Integer> groupDataMap =  quotaService.searcherSumByGroupBySql(tjQuota, dimension, filter,"result","","");
-                    for(String key : groupDataMap.keySet()){
+                    Map<String, Integer> groupDataMap = quotaService.searcherSumByGroupBySql(tjQuota, dimension, filter, "result", "", "");
+                    for (String key : groupDataMap.keySet()) {
                         key = key.toLowerCase();
                         dataMap.put(dimensionDicMap.containsKey(key) ? dimensionDicMap.get(key) : key, groupDataMap.get(key));
-                        xAxisMap.put(dimensionDicMap.containsKey(key) ? dimensionDicMap.get(key): key, key);
+                        xAxisMap.put(dimensionDicMap.containsKey(key) ? dimensionDicMap.get(key) : key, key);
                     }
                 }
                 Integer num = getNum(dataMap);
@@ -592,24 +647,24 @@ public class QuotaReportController extends BaseController {
         return chartDataModel;
     }
 
-    private Map<String,String> setDimensionMap(String dictSql, String dimension, Map<String,String> dimensionDicMap) {
-        if(StringUtils.isNotEmpty(dictSql)) {
+    private Map<String, String> setDimensionMap(String dictSql, String dimension, Map<String, String> dimensionDicMap) {
+        if (StringUtils.isNotEmpty(dictSql)) {
             BasesicUtil baseUtil = new BasesicUtil();
-            if(dimension.contains("slaveKey")){
+            if (dimension.contains("slaveKey")) {
                 //查询字典数据
                 List<DictModel> dictDatas = jdbcTemplate.query(dictSql, new BeanPropertyRowMapper(DictModel.class));
                 for (DictModel dictModel : dictDatas) {
                     String name = baseUtil.getFieldValueByName("name", dictModel);
                     String val = baseUtil.getFieldValueByName("code", dictModel).toLowerCase();
-                    dimensionDicMap.put(val,name);
+                    dimensionDicMap.put(val, name);
                 }
-            } else{
+            } else {
                 List<SaveModel> dictDatas = jdbcTemplate.query(dictSql, new BeanPropertyRowMapper(SaveModel.class));
-                if(dictDatas != null ) {
+                if (dictDatas != null) {
                     for (SaveModel saveModel : dictDatas) {
                         String name = baseUtil.getFieldValueByName(dimension + "Name", saveModel);
-                        String val = baseUtil.getFieldValueByName(dimension,saveModel).toLowerCase();
-                        dimensionDicMap.put(val,name);
+                        String val = baseUtil.getFieldValueByName(dimension, saveModel).toLowerCase();
+                        dimensionDicMap.put(val, name);
                     }
                 }
             }
@@ -617,10 +672,10 @@ public class QuotaReportController extends BaseController {
         return dimensionDicMap;
     }
 
-    public Integer getNum(Map<String, Object> dataMap) {
+    private Integer getNum(Map<String, Object> dataMap) {
         Integer num = 0;
         for (String key : dataMap.keySet()) {
-            Integer result = null !=  dataMap.get(key) ? Integer.parseInt(dataMap.get(key).toString()) : 0;
+            Integer result = null != dataMap.get(key) ? Integer.parseInt(dataMap.get(key).toString()) : 0;
             num += result;
         }
         return num;

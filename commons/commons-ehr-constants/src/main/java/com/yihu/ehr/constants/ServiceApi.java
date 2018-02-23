@@ -367,6 +367,7 @@ public class ServiceApi {
     public static class Apps {
         public static final String Apps = "/apps";
         public static final String AppsNoPage = "/apps/no_paging";
+        public static final String getApp = "/app";
         public static final String App = "/apps/{app_id}";
         public static final String AppExistence = "/apps/{app_id}/existence";
         public static final String AppStatus = "/apps/{app_id}/status";
@@ -411,6 +412,7 @@ public class ServiceApi {
         public static final String UserAppList = "/userAppList";
         public static final String UserAppShow = "/userApp/show";
         public static final String GetUserAppListById = "/userApp/getUserAppByAppId";
+        public static final String CreateUserApp = "/userApp/createUserApp";
     }
 
     public static class Packages {
@@ -456,6 +458,8 @@ public class ServiceApi {
         public static final String DailyReport = "packAnalyzer/dailyReport";
         public static final String List = "packAnalyzer/list";
         public static final String FindByField = "packAnalyzer/findByField";
+        public static final String FindBySql = "packAnalyzer/findBySql";
+        public static final String EsSaveData = "packAnalyzer/esSaveData";
     }
 
 
@@ -526,7 +530,6 @@ public class ServiceApi {
         public static final String MessageRemindCount = "/portal/messageRemind/count";
         public static final String MessageRemindRead = "/portal/messageRemind/read/{remindId}";
         public static final String NoticesTop = "/portal/notices/top";
-        public static final String NoticesAdmin = "/portal/notices/admin/{portalNotice_id}";
         public static final String Feedback = "/portal/feedback";
         public static final String ResourceTop = "/portal/resource/top";
         public static final String QuotaCategoryOfChild = "/portal/quotaCategoryOfChild";
@@ -695,6 +698,10 @@ public class ServiceApi {
         public static final String UserEmailExistence = "/user/email/existence";
         public static final String UseridCardNoExistence = "/user/idCardNo/existence";
         public static final String UserByIdCardNo = "/user/idCardNo/userByIdCardNo";
+        public static final String UpdateSystemUser = "/updateSystemUser";
+        public static final String GetOrgAndDeptRelation = "/users/getOrgAndDeptRelation";
+        public static final String InitializeSystemUser = "/users/initialize";
+
 
     }
 
@@ -1237,6 +1244,8 @@ public class ServiceApi {
         public static final String GetArchivesInc = "/stasticReport/getArchivesInc";
         public static final String GetArchivesFull = "/stasticReport/getArchivesFull";
         public static final String GetArchivesTime = "/stasticReport/getArchivesTime";
+        public static final String GetDataSetCount = "/stasticReport/getDataSetCount";
+        public static final String GetArchivesRight = "/stasticReport/getArchivesRight";
 
     }
 

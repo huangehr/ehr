@@ -8,14 +8,14 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class IPInfoUtils {
 
-    private static final long a1 = getIpNum("10.0.0.0");
-    private static final long a2 = getIpNum("10.255.255.255");
-    private static final long b1 = getIpNum("172.16.0.0");
-    private static final long b2 = getIpNum("172.31.255.255");
-    private static final long c1 = getIpNum("192.168.0.0");
-    private static final long c2 = getIpNum("192.168.255.255");
-    private static final long d1 = getIpNum("10.44.0.0");
-    private static final long d2 = getIpNum("10.69.0.255");
+    private static final long A1 = getIpNum("10.0.0.0");
+    private static final long A2 = getIpNum("10.255.255.255");
+    private static final long B1 = getIpNum("172.16.0.0");
+    private static final long B2 = getIpNum("172.31.255.255");
+    private static final long C1 = getIpNum("192.168.0.0");
+    private static final long C2 = getIpNum("192.168.255.255");
+    private static final long D1 = getIpNum("10.44.0.0");
+    private static final long D2 = getIpNum("10.69.0.255");
 
     private static long getIpNum(String ipAddress) {
         String [] ip = ipAddress.split("\\.");
@@ -28,7 +28,7 @@ public class IPInfoUtils {
 
     public static boolean isInnerIP(String ip){
         long n = getIpNum(ip);
-        return (n >= a1 && n <= a2) || (n >= b1 && n <= b2) || (n >= c1 && n <= c2) || (n >= d1 && n <= d2);
+        return (n >= A1 && n <= A2) || (n >= B1 && n <= B2) || (n >= C1 && n <= C2) || (n >= D1 && n <= D2);
     }
 
     public static String getIPAddress(HttpServletRequest request) {

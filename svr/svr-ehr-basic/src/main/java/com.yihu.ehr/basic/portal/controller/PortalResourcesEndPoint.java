@@ -72,7 +72,7 @@ public class PortalResourcesEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.PortalResources.PortalResources, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改资源", notes = "重新绑定资源信息")
-    public MPortalResources updateDoctor(
+    public MPortalResources updatePortalResources(
             @ApiParam(name = "portalResources_json_data", value = "", defaultValue = "")
             @RequestBody String portalResourcesJsonData) throws Exception {
         ItResourceDownload portalResources = toEntity(portalResourcesJsonData, ItResourceDownload.class);

@@ -110,16 +110,12 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
                 return objectMapper.writeValueAsString(resultMap);
             }
         } catch (Exception e) {
-            Map<String, String> resultMap = new HashMap<String, String>();
             if (StringUtils.isBlank(e.getMessage())) {
                 packageMgrClient.reportStatus(packId, ArchiveStatus.Failed, "Internal Server Error");
-                resultMap.put("error", "Internal Server Error");
-                return objectMapper.writeValueAsString(resultMap);
             } else {
                 packageMgrClient.reportStatus(packId, ArchiveStatus.Failed, e.getMessage());
-                resultMap.put("error", e.getMessage());
-                return objectMapper.writeValueAsString(resultMap);
             }
+            throw e;
         }
     }
 

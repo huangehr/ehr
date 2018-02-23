@@ -211,7 +211,7 @@ public class QuotaController extends BaseController {
             if(filters!=null){
                 filters = URLDecoder.decode(filters, "UTF-8");
             }
-            List<Map<String, Object>> result =  baseStatistsService.getSimpleQuotaReport(code,filters,dimension);
+            List<Map<String, Object>> result =  baseStatistsService.getSimpleQuotaReport(code,filters,dimension,true);
             envelop.setObj(result);
             envelop.setSuccessFlg(true);
             return envelop;
@@ -221,124 +221,6 @@ public class QuotaController extends BaseController {
         }
         envelop.setSuccessFlg(false);
         return envelop;
-    }
-
-    @ApiOperation(value = "根据编码获取指标执行结果")
-    @RequestMapping(value = ServiceApi.TJ.FindByQuotaCodes, method = RequestMethod.GET)
-    public Envelop findByQuotaCodes(
-            @ApiParam(name = "quotaCodes", value = "指标code", required = true)
-            @RequestParam(value = "quotaCodes") String quotaCodes,
-            @ApiParam(name = "town", value = "区域town", required = true)
-            @RequestParam(value = "town") String town) {
-        if ("all".equalsIgnoreCase(town)) {
-            town = "";
-        }
-        List<HospitalComposeModel> hospitalComposeModels = new ArrayList<>();
-        List<HospitalComposeModel> hospitalComposeModelList = new ArrayList<>();
-        HospitalComposeModel hospitalComposeModel = new HospitalComposeModel();
-        hospitalComposeModel.setName("按性别分");
-        Envelop envelop = new Envelop();
-        String[] code = quotaCodes.split(",");
-
-        List<Map<String, Object>> myListMap = new ArrayList<>();
-        try {
-            for (int i = 0; i < code.length; i++) {
-                HospitalComposeModel hos = new HospitalComposeModel();
-
-                List<Map<String, Object>> mapList = quotaService.queryResultPageByCode(code[i], "{\"town\":\""+ town + "\"}", 1, 10000);
-                if (null != mapList && mapList.size() > 0) {
-                    String title = exchangeCode(code[i]);
-                    hos.setName(title);
-                    Integer x1 = 0;
-                    Integer x2 = 0;
-                    for (Map<String, Object> map : mapList) {
-                        SaveModel saveModel =  objectMapper.convertValue(map, SaveModel.class);
-                        if(saveModel != null){
-                            if ("1".equals(saveModel.getSlaveKey1())) {
-                                x1 += Integer.parseInt(saveModel.getResult() == null ? "0" : saveModel.getResult());
-                            } else if ("2".equals(saveModel.getSlaveKey1())) {
-                                x2 += Integer.parseInt(saveModel.getResult() == null ? "0" : saveModel.getResult());
-                            }
-
-                        }
-                    }
-                    hos.setX1(x1 + "");
-                    hos.setX2(x2 + "");
-                    hospitalComposeModels.add(hos);
-                } else {
-                    String title = exchangeCode(code[i]);
-                    hos.setName(title);
-                    hos.setX1("0");
-                    hos.setX2("0");
-                    Map<String, Object> map = new HashMap<>();
-                    Map<String, Object> titleMap = new HashMap<>();
-                    map.put("男", 0);
-                    map.put("女", 0);
-                    titleMap.put("title", title);
-                    map.putAll(titleMap);
-                    myListMap.add(map);
-                    hospitalComposeModels.add(hos);
-                }
-            }
-            envelop.setSuccessFlg(true);
-
-            List<Map<String, Object>> list = new ArrayList<>();
-            Map<String, Object> map1 = new HashMap<>();
-            Map<String, Object> map2 = new HashMap<>();
-            int sum1 = 0;
-            int sum2 = 0;
-            for (int i = 0; i < hospitalComposeModels.size(); i++) {
-                map1.put(hospitalComposeModels.get(i).getName(), hospitalComposeModels.get(i).getX1() == null ? "0" : hospitalComposeModels.get(i).getX1());
-                map2.put(hospitalComposeModels.get(i).getName(), hospitalComposeModels.get(i).getX2() == null ? "0" : hospitalComposeModels.get(i).getX2());
-                sum1 += Integer.parseInt(hospitalComposeModels.get(i).getX1() == null ? "0" : hospitalComposeModels.get(i).getX1());
-                sum2 += Integer.parseInt(hospitalComposeModels.get(i).getX2() == null ? "0" : hospitalComposeModels.get(i).getX2());
-            }
-            map1.put("name", "男");
-            map1.put("sum", sum1);
-            map2.put("name", "女");
-            map2.put("sum", sum2);
-            list.add(map1);
-            list.add(map2);
-            hospitalComposeModel.setChildren(list);
-            hospitalComposeModelList.add(hospitalComposeModel);
-            envelop.setObj(hospitalComposeModelList);
-        } catch (Exception e) {
-            e.printStackTrace();
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg(e.getMessage());
-        }
-        return envelop;
-    }
-
-    public String exchangeCode(String code) {
-        String value = "";
-        switch (code) {
-            case "HC_02_0101" :
-                value = "nurse";
-                break;
-            case "HC_02_0102" :
-                value = "pharmacist";
-                break;
-            case "HC_02_0103" :
-                value = "technician";
-                break;
-            case "HC_02_0104" :
-                value = "other";
-                break;
-            case "HC_02_0105" :
-                value = "practitioner";
-                break;
-            case "HC_02_0106" :
-                value = "assistant";
-                break;
-            case "HC_02_0107" :
-                value = "othertechnician";
-                break;
-            case "HC_02_0108" :
-                value = "adminer";
-                break;
-        }
-        return value;
     }
 
 }
