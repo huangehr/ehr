@@ -4,6 +4,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.model.app.MApp;
+import com.yihu.ehr.model.app.MUserApp;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -116,4 +117,10 @@ public interface AppClient {
             @RequestParam(value = "appJson") String appJson,
             @ApiParam(name = "roleId", value = "角色ID")
             @RequestParam(value = "roleId") Integer roleId);
+
+    @RequestMapping(value = ApiVersion.Version1_0 +  ServiceApi.UserApp.CreateUserApp, method = RequestMethod.GET)
+    @ApiOperation(value = "创建用户与app关联")
+    MUserApp createUserApp(
+            @ApiParam(name = "userAppJson", value = "用户APP对象json")
+            @RequestParam(value = "userAppJson", required = true) String userAppJson);
 }

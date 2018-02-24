@@ -1,7 +1,11 @@
 package com.yihu.ehr.basic.org.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.model.org.MOrgDeptData;
 import com.yihu.ehr.model.org.MOrgDeptJson;
 import com.yihu.ehr.model.org.MOrgMemberRelation;
 import com.yihu.ehr.basic.org.model.OrgMemberRelation;
@@ -15,8 +19,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author HZY
@@ -194,6 +198,48 @@ public class OrgMemberRelationEndPoint extends EnvelopRestEndPoint {
             orgDeptJson.setDeptIds(r.getDeptId() + "");
             list.add(orgDeptJson);
         }
+        return list;
+    }
+    @RequestMapping(value = ServiceApi.Users.GetOrgAndDeptRelation, method = RequestMethod.GET)
+    @ApiOperation(value = "根据userId获取机构及部门列表")
+    public List<MOrgDeptData> getOrgAndDeptRelation(
+            @ApiParam(name = "userId", value = "用户id")
+            @RequestParam(value = "userId") String userId) {
+        List<OrgMemberRelation> memberRelationList = relationService.getByUserId(userId);
+        List<MOrgDeptData> list = new ArrayList<>();
+        Map<String,MOrgDeptData> mOrgDeptDataMap = new HashMap<>();
+        //将机构与部门实装到 MOrgDeptData 对象中
+        for (OrgMemberRelation r : memberRelationList) {
+            //机构
+            MOrgDeptData mOrg =new MOrgDeptData();
+            mOrg.setId(Integer.valueOf(r.getOrgId()));
+            mOrg.setName(r.getOrgName());
+            //若存在该机构，则判断是否存在部门，若部门存在则不做处理，否则添加部门。
+            if(null != mOrgDeptDataMap.get(r.getOrgId())){
+                //部门
+                MOrgDeptData mOrgDept =new MOrgDeptData();
+                mOrgDept.setId(r.getDeptId());
+                mOrgDept.setName(r.getDeptName());
+                List<MOrgDeptData> childrenList = mOrgDeptDataMap.get(r.getOrgId()).getChildren();
+                //JAVA 8直接用流的方法将list转换成map
+                Map<Integer, MOrgDeptData> mapOrgDeptData = childrenList.stream().collect(Collectors.toMap(MOrgDeptData::getId, (p) -> p));
+                if(null == mapOrgDeptData.get(mOrgDept.getId())){
+                    childrenList.add(mOrgDept);
+                }
+            }else{
+                //部门
+                MOrgDeptData mOrgDept = new MOrgDeptData();
+                mOrgDept.setId(r.getDeptId());
+                mOrgDept.setName(r.getDeptName());
+                List<MOrgDeptData> childrenList = new ArrayList<>();
+                childrenList.add(mOrgDept);
+                mOrg.setChildren(childrenList);
+                //该机构不存在，则添加该机构
+                mOrgDeptDataMap.put(r.getOrgId(),mOrg);
+            }
+        }
+        Collection<MOrgDeptData> mOrgDeptDataCollection = mOrgDeptDataMap.values();
+        list = new ArrayList<MOrgDeptData>(mOrgDeptDataCollection);
         return list;
     }
 }
