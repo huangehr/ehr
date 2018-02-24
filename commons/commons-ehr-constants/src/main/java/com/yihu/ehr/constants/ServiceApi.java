@@ -701,8 +701,11 @@ public class ServiceApi {
         public static final String UpdateSystemUser = "/updateSystemUser";
         public static final String GetOrgAndDeptRelation = "/users/getOrgAndDeptRelation";
         public static final String InitializeSystemUser = "/users/initialize";
+        public static final String UsersByTel = "/users/tel";
+    }
 
-
+    public static class TelVerification {
+        public static final String TelVerification = "/verification";
     }
 
     public static class Roles {
