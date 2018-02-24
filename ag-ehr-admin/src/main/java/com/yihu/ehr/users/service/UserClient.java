@@ -170,4 +170,10 @@ public interface UserClient {
     @RequestMapping(value = ServiceApi.Users.UpdateSystemUser, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改用户", notes = "账户体系-修改用户信息")
     MUser UpdateSystemUser(@RequestBody String userJsonData);
+
+    @RequestMapping(value = ServiceApi.Users.UsersByTel, method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "根据手机号码查询用户信息", notes = "根据手机号码查询用户信息")
+    MUser getUserByTel(
+            @ApiParam(name = "tel", value = "手机号码", defaultValue = "")
+            @RequestParam(value = "tel") String tel);
 }
