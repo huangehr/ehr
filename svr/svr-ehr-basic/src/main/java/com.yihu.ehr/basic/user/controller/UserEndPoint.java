@@ -308,7 +308,7 @@ public class UserEndPoint extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value = ServiceApi.Users.UserExistence, method = RequestMethod.GET)
-    @ApiOperation(value = "判断用户名是否存在")
+    @ApiOperation(value = "判断登陆账户（用户名）是否存在")
     public boolean isUserNameExists(
             @ApiParam(name = "user_name", value = "user_name", defaultValue = "")
             @PathVariable(value = "user_name") String userName) {

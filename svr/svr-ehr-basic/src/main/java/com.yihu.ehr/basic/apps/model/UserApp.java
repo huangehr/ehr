@@ -1,9 +1,8 @@
 package com.yihu.ehr.basic.apps.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import org.hibernate.annotations.GenericGenerator;
+
+import javax.persistence.*;
 
 /**
  * Created by Dell on 2017/2/13.
@@ -24,6 +23,8 @@ public class UserApp {
 
 
     @Id
+    @GeneratedValue(generator = "Generator")
+    @GenericGenerator(name = "Generator", strategy = "identity")
     @Column(name = "id", nullable = false, insertable = true, updatable = true)
     public int getId() {
         return id;
