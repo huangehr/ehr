@@ -96,7 +96,6 @@ public class TelVerificationController extends BaseController {
             apiParamMap.put("content",content);
             //渠道号
             apiParamMap.put("clientId",clientId);
-            String apiParam = objectMapper.writeValueAsString(apiParamMap);
             //健康之路医疗基础信息接入参数AuthInfo
             Map<String,Object> params  = jkzlGateway( api, apiParamMap);
             String url= gatewayUrl;
