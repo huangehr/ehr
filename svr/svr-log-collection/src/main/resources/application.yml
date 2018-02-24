@@ -13,6 +13,14 @@ zookeeper:
   broker:
     address: node1.hde.h3c.com:2181,node2.hde.h3c.com:2181
 
+spring:
+  session:
+    store-type: none
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL5Dialect
+    hibernate.dialect: org.hibernate.dialect.MySQL5Dialect
+    show-sql: false
+
 ---
 spring:
   profiles: test
@@ -44,8 +52,8 @@ spring:
   profiles: dev
   datasource:
     url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: weifuwu
-    password: weifuwu
+    username: chenweishan
+    password: chenweishan
 
 service-gateway:
   username: user

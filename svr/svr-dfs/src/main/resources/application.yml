@@ -1,24 +1,25 @@
-logging:
-  level:
-    org:
-      springframework:
-        web: INFO
-      hibernate: ERROR
-    com:
-      yihu:
-        ehr: WARN
-
 server:
   port: ${svr-dfs.server.port}
 
 management:
   port: ${server.port}
+  security:
+    enabled: false
 
 info:
   app:
     name: svr-dfs
     description: Ehr Platform Distributed File System Service.
     version: 1.0.0
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    max-active: 5
+    max-idle: 2
+    min-idle: 2
+    validation-query: SELECT 1
+    test-on-borrow: true
 
 fast-dfs:
   connect-timeout: 2
@@ -37,15 +38,6 @@ fast-dfs:
   index:
     name: dfs #ES索引名称
     type: info #ES索引类型
-
-spring:
-  datasource:
-    driver-class-name: com.mysql.jdbc.Driver
-    max-active: 5
-    max-idle: 2
-    min-idle: 2
-    validation-query: SELECT 1
-    test-on-borrow: true
 
 elasticsearch:
   pool:

@@ -34,14 +34,10 @@ public class DBHelper {
     /**
      * 获取当前连接
      */
-    private Connection getConn() throws Exception
-    {
-        if (name.length() > 0)
-        {
+    private Connection getConn() throws Exception {
+        if (name.length() > 0) {
             return factory.getConnection(name);
-        }
-        else
-        {
+        } else {
             return factory.getConnection();
         }
     }
@@ -50,8 +46,7 @@ public class DBHelper {
      * 关闭连接
      */
     private void close(Connection conn) throws Exception{
-        if(conn!=null)
-        {
+        if(conn != null) {
             conn.close();
         }
     }
@@ -70,20 +65,17 @@ public class DBHelper {
      * 驼峰表达式转下划线
      */
     private String camelToUnderline(String val){
-        if (val==null||"".equals(val.trim())){
+        if (val == null || "".equals(val.trim())){
             return "";
         }
         int len=val.length();
         StringBuilder sb=new StringBuilder(len);
-        for (int i = 0; i < len; i++)
-        {
+        for (int i = 0; i < len; i++) {
             char c=val.charAt(i);
-            if (Character.isUpperCase(c))
-            {
+            if (Character.isUpperCase(c)) {
                 sb.append(UNDERLINE);
                 sb.append(Character.toLowerCase(c));
-            }
-            else{
+            } else{
                 sb.append(c);
             }
         }

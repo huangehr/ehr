@@ -70,7 +70,19 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.version>${version.spring-framework}</spring.version>
+        <version.spring-framework>4.3.13.RELEASE</version.spring-framework>
+        <version.spring-boot>1.5.9.RELEASE</version.spring-boot>
+        <version.spring-cloud-starter>1.3.2.RELEASE</version.spring-cloud-starter>
+        <version.spring-cloud>1.4.2.RELEASE</version.spring-cloud>
+        <version.spring-security>4.2.3.RELEASE</version.spring-security>
+        <version.spring-oauth2>2.0.14.RELEASE</version.spring-oauth2>
+        <version.spring-session>1.3.1.RELEASE</version.spring-session>
+        <version.spring-session-hazelcast>2.0.1.RELEASE</version.spring-session-hazelcast>
+        <version.spring-data-commons>1.13.9.RELEASE</version.spring-data-commons>
+        <version.spring-data-hadoop>2.2.0.RELEASE</version.spring-data-hadoop>
+        <version.spring-data-solr>2.1.3.RELEASE</version.spring-data-solr>
+        <version.spring-data-redis>1.7.1.RELEASE</version.spring-data-redis>
+        <version.spring-data-jpa>1.11.10.RELEASE</version.spring-data-jpa>
         <version.commons-bean-utils>1.9.2</version.commons-bean-utils>
         <version.commons-codec>1.9</version.commons-codec>
         <version.commons-collections>3.2.1</version.commons-collections>
@@ -80,54 +92,450 @@
         <version.commons-io>2.4</version.commons-io>
         <version.commons-lang3>3.2.1</version.commons-lang3>
         <version.commons-pool2>2.4.2</version.commons-pool2>
-        <version.ehr>1.1.0</version.ehr>
-        <version.hadoop-client>2.7.1</version.hadoop-client>
+        <version.zookeeper>3.4.6</version.zookeeper>
+        <version.hadoop-client>2.6.5</version.hadoop-client>
         <version.hbase-client>1.1.1</version.hbase-client>
+        <version.solr>5.5.4</version.solr>
         <version.hibernate>4.3.11.Final</version.hibernate>
-        <version.hibernate-annotations>4.0.5.Final</version.hibernate-annotations>
         <version.hibernate-jpa-api>1.0.0.Final</version.hibernate-jpa-api>
-        <version.http-client>4.5.1</version.http-client>
         <version.http-core>4.4.3</version.http-core>
+        <version.http-client>4.5.1</version.http-client>
+        <version.http-mime>4.5.1</version.http-mime>
         <version.io-dropwizard-metrics>3.1.2</version.io-dropwizard-metrics>
         <version.java>1.8</version.java>
         <version.jackson>2.6.6</version.jackson>
-        <version.jedis>2.7.3</version.jedis>
+        <version.jedis>2.9.0</version.jedis>
         <version.jcl-over-slf4j>1.7.19</version.jcl-over-slf4j>
         <version.jul-over-slf4j>1.7.21</version.jul-over-slf4j>
         <version.joda-time>2.8.2</version.joda-time>
         <version.junit>4.12</version.junit>
+        <version.logging>1.2</version.logging>
         <version.log4j>1.2.17</version.log4j>
-        <version.log4j-over-slf4j>1.7.21</version.log4j-over-slf4j>
         <version.log4j2>2.4.1</version.log4j2>
         <version.logback>1.1.7</version.logback>
-        <version.mysql>5.1.38</version.mysql>
+        <version.mysql>5.1.45</version.mysql>
         <version.pinyin4j>2.5.0</version.pinyin4j>
-        <version.quartz>2.0.1</version.quartz>
+        <version.quartz>2.2.3</version.quartz>
         <version.servlet-api>3.1.0</version.servlet-api>
         <version.slf4j>1.7.21</version.slf4j>
-        <version.solr>5.5.1</version.solr>
-        <version.spring-boot>1.3.5.RELEASE</version.spring-boot>
-        <version.spring-cloud-release-train>Brixton.RELEASE</version.spring-cloud-release-train>
-        <version.spring-cloud-config-server>1.1.0.RELEASE</version.spring-cloud-config-server>
-        <version.spring-data-release-train>Hopper-SR1</version.spring-data-release-train>
-        <version.spring-data-hadoop>2.3.0.RELEASE</version.spring-data-hadoop>
-        <version.spring-data-redis>1.7.1.RELEASE</version.spring-data-redis>
-        <version.spring-framework>4.2.5.RELEASE</version.spring-framework>
-        <version.spring-session>1.2.1.RELEASE</version.spring-session>
         <version.statsd-client>3.1.0</version.statsd-client>
         <version.swagger>2.7.0</version.swagger>
         <version.swagger-ui>2.7.0</version.swagger-ui>
         <version.thrift>0.9.1</version.thrift>
-        <version.tomcat-embed>8.0.28</version.tomcat-embed>
+        <version.tomcat-embed>8.5.27</version.tomcat-embed>
         <version.websocket-api>1.1</version.websocket-api>
         <version.zip4j>1.3.2</version.zip4j>
         <version.poi>3.12</version.poi>
         <version.scala>2.10.6</version.scala>
+        <version.elasticsearch>2.4.5</version.elasticsearch>
+        <version.elasticsearch-sql>2.4.1.0</version.elasticsearch-sql>
+        <version.jest>2.4.0</version.jest>
+        <version.ehr>1.1.0</version.ehr>
     </properties>
 
     <dependencyManagement>
         <dependencies>
-            <!--Jackson library-->
+            <!--<dependency>-->
+                <!--<groupId>org.springframework.boot</groupId>-->
+                <!--<artifactId>spring-boot-dependencies</artifactId>-->
+                <!--<version>1.5.9.RELEASE</version>-->
+                <!--<type>pom</type>-->
+                <!--<scope>import</scope>-->
+            <!--</dependency>-->
+            <!--<dependency>-->
+                <!--<groupId>org.springframework.cloud</groupId>-->
+                <!--<artifactId>spring-cloud-dependencies</artifactId>-->
+                <!--<version>Finchley.M5</version>-->
+                <!--<type>pom</type>-->
+                <!--<scope>import</scope>-->
+            <!--</dependency>-->
+            <!-- Base library-->
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>javax.servlet-api</artifactId>
+                <version>${version.servlet-api}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${version.junit}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <!-- Spring framework family -->
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-aop</artifactId>
+                <version>${version.spring-framework}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-aspects</artifactId>
+                <version>${version.spring-framework}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-beans</artifactId>
+                <version>${version.spring-framework}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-context</artifactId>
+                <version>${version.spring-framework}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-context-support</artifactId>
+                <version>${version.spring-framework}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-core</artifactId>
+                <version>${version.spring-framework}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-expression</artifactId>
+                <version>${version.spring-framework}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-jdbc</artifactId>
+                <version>${version.spring-framework}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-messaging</artifactId>
+                <version>${version.spring-framework}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-orm</artifactId>
+                <version>${version.spring-framework}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-oxm</artifactId>
+                <version>${version.spring-framework}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-test</artifactId>
+                <version>${version.spring-framework}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-tx</artifactId>
+                <version>${version.spring-framework}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-web</artifactId>
+                <version>${version.spring-framework}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-webmvc</artifactId>
+                <version>${version.spring-framework}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-orm</artifactId>
+                <version>${version.spring-framework}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+
+            <!-- Spring boot family -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot</artifactId>
+                <version>${version.spring-boot}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-actuator</artifactId>
+                <version>${version.spring-boot}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-autoconfigure</artifactId>
+                <version>${version.spring-boot}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-devtools</artifactId>
+                <version>${version.spring-boot}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter</artifactId>
+                <version>${version.spring-boot}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-actuator</artifactId>
+                <version>${version.spring-boot}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-aop</artifactId>
+                <version>${version.spring-boot}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-data-jpa</artifactId>
+                <version>${version.spring-boot}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-data-redis</artifactId>
+                <version>${version.spring-boot}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-batch</artifactId>
+                <version>${version.spring-boot}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-jdbc</artifactId>
+                <version>${version.spring-boot}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-security</artifactId>
+                <version>${version.spring-boot}</version>
+                <scope>${dependency.scope}</scope>
+                <optional>true</optional>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-thymeleaf</artifactId>
+                <version>${version.spring-boot}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-test</artifactId>
+                <version>${version.spring-boot}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-web</artifactId>
+                <version>${version.spring-boot}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-tomcat</artifactId>
+                <version>${version.spring-boot}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-data-mongodb</artifactId>
+                <version>${version.spring-boot}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+
+            <!-- Spring cloud family -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter</artifactId>
+                <version>${version.spring-cloud-starter}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-config-server</artifactId>
+                <version>${version.spring-cloud}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-archaius</artifactId>
+                <version>${version.spring-cloud}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-config</artifactId>
+                <version>${version.spring-cloud}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-eureka</artifactId>
+                <version>${version.spring-cloud}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-eureka-server</artifactId>
+                <version>${version.spring-cloud}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-netflix-eureka</artifactId>
+                <version>${version.spring-cloud}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-feign</artifactId>
+                <version>${version.spring-cloud}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-ribbon</artifactId>
+                <version>${version.spring-cloud}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-zuul</artifactId>
+                <version>${version.spring-cloud}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-hystrix</artifactId>
+                <version>${version.spring-cloud}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-hystrix-dashboard</artifactId>
+                <version>${version.spring-cloud}</version>
+            </dependency>
+
+            <!-- Hystrix family -->
+            <dependency>
+                <groupId>com.netflix.archaius</groupId>
+                <artifactId>archaius-core</artifactId>
+                <version>0.7.4</version>
+            </dependency>
+            <dependency>
+                <groupId>com.netflix.hystrix</groupId>
+                <artifactId>hystrix-core</artifactId>
+                <version>1.5.10</version>
+            </dependency>
+            <dependency>
+                <groupId>com.netflix.feign</groupId>
+                <artifactId>feign-core</artifactId>
+                <version>8.18.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.netflix.feign</groupId>
+                <artifactId>feign-jackson</artifactId>
+                <version>8.18.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.netflix.feign</groupId>
+                <artifactId>feign-ribbon</artifactId>
+                <version>8.18.0</version>
+            </dependency>
+
+            <!-- Spring data family -->
+            <dependency>
+                <groupId>org.springframework.data</groupId>
+                <artifactId>spring-data-commons</artifactId>
+                <version>${version.spring-data-commons}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.data</groupId>
+                <artifactId>spring-data-hadoop-hbase</artifactId>
+                <version>${version.spring-data-hadoop}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.data</groupId>
+                <artifactId>spring-data-solr</artifactId>
+                <version>${version.spring-data-solr}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+
+            <!-- Spring session family-->
+            <dependency>
+                <groupId>org.springframework.session</groupId>
+                <artifactId>spring-session-hazelcast</artifactId>
+                <version>${version.spring-session-hazelcast}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.session</groupId>
+                <artifactId>spring-session</artifactId>
+                <version>${version.spring-session}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.session</groupId>
+                <artifactId>spring-session-data-redis</artifactId>
+                <version>${version.spring-session}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+
+            <!-- Spring Security -->
+            <!--<dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-config</artifactId>
+                <version>${version.spring-security}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-core</artifactId>
+                <version>${version.spring-security}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-crypto</artifactId>
+                <version>${version.spring-security}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-web</artifactId>
+                <version>${version.spring-security}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>-->
+
+            <!-- Oauth2 -->
+            <dependency>
+                <groupId>org.springframework.security.oauth</groupId>
+                <artifactId>spring-security-oauth2</artifactId>
+                <version>${version.spring-oauth2}</version>
+                <scope>${dependency.scope}</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.springframework.security</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <!--Jackson library -->
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-annotations</artifactId>
@@ -147,19 +555,27 @@
                 <scope>${dependency.scope}</scope>
             </dependency>
 
-            <!--Apache commons library-->
+            <!-- Http library -->
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpcore</artifactId>
+                <version>${version.http-core}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>${version.http-client}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpmime</artifactId>
-                <version>4.4.1</version>
+                <version>${version.http-mime}</version>
                 <scope>${dependency.scope}</scope>
             </dependency>
-            <dependency>
-                <groupId>org.apache.zookeeper</groupId>
-                <artifactId>zookeeper</artifactId>
-                <version>3.4.6</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
+
+            <!--Apache commons library -->
             <dependency>
                 <groupId>org.codehaus.woodstox</groupId>
                 <artifactId>stax2-api</artifactId>
@@ -182,18 +598,6 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
                 <version>${version.commons-lang3}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.httpcomponents</groupId>
-                <artifactId>httpcore</artifactId>
-                <version>${version.http-core}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.httpcomponents</groupId>
-                <artifactId>httpclient</artifactId>
-                <version>${version.http-client}</version>
                 <scope>${dependency.scope}</scope>
             </dependency>
             <dependency>
@@ -239,123 +643,128 @@
                 <scope>${dependency.scope}</scope>
             </dependency>
             <dependency>
+                <groupId>commons-codec</groupId>
+                <artifactId>commons-codec</artifactId>
+                <version>${version.commons-codec}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-compress</artifactId>
                 <version>${version.commons-compress}</version>
                 <scope>${dependency.scope}</scope>
             </dependency>
 
-            <!--Hibernate framework-->
-            <dependency>
-                <groupId>org.hibernate.javax.persistence</groupId>
-                <artifactId>hibernate-jpa-2.1-api</artifactId>
-                <version>${version.hibernate-jpa-api}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-core</artifactId>
-                <version>${version.hibernate}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
-
-            <!--Hadoop library-->
-            <dependency>
-                <groupId>org.apache.hadoop</groupId>
-                <artifactId>hadoop-common</artifactId>
-                <version>${version.hadoop-client}</version>
-                <scope>${dependency.scope}</scope>
-                <exclusions>
-                    <exclusion>
-                        <groupId>tomcat</groupId>
-                        <artifactId>jasper-compiler</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>tomcat</groupId>
-                        <artifactId>jasper-runtime</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.hadoop</groupId>
-                <artifactId>hadoop-client</artifactId>
-                <version>${version.hadoop-client}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.hbase</groupId>
-                <artifactId>hbase-common</artifactId>
-                <version>${version.hbase-client}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.hbase</groupId>
-                <artifactId>hbase-protocol</artifactId>
-                <version>${version.hbase-client}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.hbase</groupId>
-                <artifactId>hbase-client</artifactId>
-                <version>${version.hbase-client}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
-
-            <!--Miscellaneous-->
-            <dependency>
-                <groupId>org.quartz-scheduler</groupId>
-                <artifactId>quartz</artifactId>
-                <version>${version.quartz}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
-            <dependency>
-                <groupId>net.lingala.zip4j</groupId>
-                <artifactId>zip4j</artifactId>
-                <version>${version.zip4j}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
-            <dependency>
-                <groupId>javax.servlet</groupId>
-                <artifactId>javax.servlet-api</artifactId>
-                <version>${version.servlet-api}</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.belerweb</groupId>
-                <artifactId>pinyin4j</artifactId>
-                <version>${version.pinyin4j}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>${version.junit}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>io.springfox</groupId>
-                <artifactId>springfox-swagger2</artifactId>
-                <version>${version.swagger}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
-            <dependency>
-                <groupId>io.springfox</groupId>
-                <artifactId>springfox-swagger-ui</artifactId>
-                <version>${version.swagger-ui}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
+            <!-- Mysql library -->
             <dependency>
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
                 <version>${version.mysql}</version>
                 <scope>${dependency.scope}</scope>
             </dependency>
+
+            <!-- Hibernate framework library -->
             <dependency>
-                <groupId>joda-time</groupId>
-                <artifactId>joda-time</artifactId>
-                <version>${version.joda-time}</version>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-core</artifactId>
+                <version>${version.hibernate}</version>
                 <scope>${dependency.scope}</scope>
             </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-entitymanager</artifactId>
+                <version>${version.hibernate}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.javax.persistence</groupId>
+                <artifactId>hibernate-jpa-2.1-api</artifactId>
+                <version>${version.hibernate-jpa-api}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+
+            <!-- Zookeeper library -->
+            <dependency>
+                <groupId>org.apache.zookeeper</groupId>
+                <artifactId>zookeeper</artifactId>
+                <version>${version.zookeeper}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+
+            <!-- Hadoop library -->
+            <!--<dependency>-->
+                <!--<groupId>org.apache.hadoop</groupId>-->
+                <!--<artifactId>hadoop-client</artifactId>-->
+                <!--<version>${version.hadoop-client}</version>-->
+                <!--<scope>${dependency.scope}</scope>-->
+            <!--</dependency>-->
+            <dependency>
+                <groupId>org.apache.hbase</groupId>
+                <artifactId>hbase-client</artifactId>
+                <version>${version.hbase-client}</version>
+                <scope>${dependency.scope}</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.hadoop</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-log4j12</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hbase</groupId>
+                <artifactId>hbase-common</artifactId>
+                <version>${version.hbase-client}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-log4j12</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hbase</groupId>
+                <artifactId>hbase-protocol</artifactId>
+                <version>${version.hbase-client}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-log4j12</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <!-- Google library -->
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>18.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.code.findbugs</groupId>
+                <artifactId>jsr305</artifactId>
+                <version>3.0.1</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.code.gson</groupId>
+                <artifactId>gson</artifactId>
+                <version>2.6.2</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.protobuf</groupId>
+                <artifactId>protobuf-java</artifactId>
+                <version>2.5.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.inject</groupId>
+                <artifactId>guice</artifactId>
+                <version>4.1.0</version>
+            </dependency>
+
+            <!-- Solr library -->
             <dependency>
                 <groupId>org.apache.solr</groupId>
                 <artifactId>solr-core</artifactId>
@@ -379,6 +788,73 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+
+            <!-- Elasticsearch -->
+            <dependency>
+                <groupId>org.elasticsearch</groupId>
+                <artifactId>elasticsearch</artifactId>
+                <version>${version.elasticsearch}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.nlpcn</groupId>
+                <artifactId>elasticsearch-sql</artifactId>
+                <version>${version.elasticsearch-sql}</version>
+            </dependency>
+
+            <!-- Redis library -->
+            <dependency>
+                <groupId>redis.clients</groupId>
+                <artifactId>jedis</artifactId>
+                <version>${version.jedis}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+
+            <!-- Quartz library -->
+            <dependency>
+                <groupId>org.quartz-scheduler</groupId>
+                <artifactId>quartz</artifactId>
+                <version>${version.quartz}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+
+            <!-- Zip library -->
+            <dependency>
+                <groupId>net.lingala.zip4j</groupId>
+                <artifactId>zip4j</artifactId>
+                <version>${version.zip4j}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+
+            <!-- Pinyin library -->
+            <dependency>
+                <groupId>com.belerweb</groupId>
+                <artifactId>pinyin4j</artifactId>
+                <version>${version.pinyin4j}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+
+            <!-- Swagger-ui library -->
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-swagger2</artifactId>
+                <version>${version.swagger}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-swagger-ui</artifactId>
+                <version>${version.swagger-ui}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+
+            <!-- date Time util library -->
+            <dependency>
+                <groupId>joda-time</groupId>
+                <artifactId>joda-time</artifactId>
+                <version>${version.joda-time}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+
             <dependency>
                 <groupId>org.apache.thrift</groupId>
                 <artifactId>libthrift</artifactId>
@@ -397,20 +873,14 @@
                 <version>${version.io-dropwizard-metrics}</version>
                 <scope>${dependency.scope}</scope>
             </dependency>
-            <dependency>
-                <groupId>redis.clients</groupId>
-                <artifactId>jedis</artifactId>
-                <version>${version.jedis}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
-            <dependency>
-                <groupId>commons-codec</groupId>
-                <artifactId>commons-codec</artifactId>
-                <version>${version.commons-codec}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
 
-            <!--Log framework-->
+            <!-- Log framework library -->
+            <dependency>
+                <groupId>commons-logging</groupId>
+                <artifactId>commons-logging</artifactId>
+                <version>${version.logging}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
             <dependency>
                 <groupId>log4j</groupId>
                 <artifactId>log4j</artifactId>
@@ -418,59 +888,11 @@
                 <scope>${dependency.scope}</scope>
             </dependency>
             <dependency>
-                <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j-api</artifactId>
-                <version>${version.log4j2}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j-core</artifactId>
-                <version>${version.log4j2}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
-
-            <!--Log framework to SLF4J bridge: x-over-slf4j-->
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>jcl-over-slf4j</artifactId>
-                <version>${version.jcl-over-slf4j}</version>
-                <scope>${dependency.scope}</scope>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-jdk14</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>jul-to-slf4j</artifactId>
-                <version>${version.jul-over-slf4j}</version>
-                <scope>${dependency.scope}</scope>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-log4j12</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>log4j-over-slf4j</artifactId>
-                <version>${version.log4j-over-slf4j}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
-
-            <!--SLF4J api-->
-            <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
                 <version>${version.slf4j}</version>
                 <scope>${dependency.scope}</scope>
             </dependency>
-
-            <!--The single log BACKEND-->
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
@@ -478,204 +900,10 @@
                 <scope>${dependency.scope}</scope>
             </dependency>
 
-            <!--Spring framework family-->
             <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-core</artifactId>
-                <version>${version.spring-framework}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-context</artifactId>
-                <version>${version.spring-framework}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-aop</artifactId>
-                <version>${version.spring-framework}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-beans</artifactId>
-                <version>${version.spring-framework}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-web</artifactId>
-                <version>${version.spring-framework}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-webmvc</artifactId>
-                <version>${version.spring-framework}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-orm</artifactId>
-                <version>${version.spring-framework}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-jdbc</artifactId>
-                <version>${version.spring-framework}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
-
-            <!--Spring session family-->
-            <dependency>
-                <groupId>org.springframework.session</groupId>
-                <artifactId>spring-session</artifactId>
-                <version>${version.spring-session}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.session</groupId>
-                <artifactId>spring-session-data-redis</artifactId>
-                <version>${version.spring-session}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
-
-            <!--Spring data family, hadoop not in BOM. see http://projects.spring.io/spring-data/-->
-            <dependency>
-                <groupId>org.springframework.data</groupId>
-                <artifactId>spring-data-releasetrain</artifactId>
-                <version>${version.spring-data-release-train}</version>
-                <scope>import</scope>
-                <type>pom</type>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.data</groupId>
-                <artifactId>spring-data-hadoop-hbase</artifactId>
-                <version>${version.spring-data-hadoop}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.data</groupId>
-                <artifactId>spring-data-redis</artifactId>
-                <version>${version.spring-data-redis}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
-
-            <!--Spring integration family-->
-            <dependency>
-                <groupId>org.springframework.integration</groupId>
-                <artifactId>spring-integration-jmx</artifactId>
-                <version>${version.spring-framework}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
-
-            <!--Spring boot family-->
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot</artifactId>
-                <version>${version.spring-boot}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-actuator-docs</artifactId>
-                <version>${version.spring-boot}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-devtools</artifactId>
-                <version>${version.spring-boot}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-actuator</artifactId>
-                <version>${version.spring-boot}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-actuator</artifactId>
-                <version>${version.spring-boot}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-aop</artifactId>
-                <version>${version.spring-boot}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-data-jpa</artifactId>
-                <version>${version.spring-boot}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-batch</artifactId>
-                <version>${version.spring-boot}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-jdbc</artifactId>
-                <version>${version.spring-boot}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-security</artifactId>
-                <version>${version.spring-boot}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-thymeleaf</artifactId>
-                <version>${version.spring-boot}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-test</artifactId>
-                <version>${version.spring-boot}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-web</artifactId>
-                <version>${version.spring-boot}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-tomcat</artifactId>
-                <version>${version.spring-boot}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-data-mongodb</artifactId>
-                <version>${version.spring-boot}</version>
-            </dependency>
-
-            <!--Spring cloud family-->
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-config-server</artifactId>
-                <version>${version.spring-cloud-config-server}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-dependencies</artifactId>
-                <version>${version.spring-cloud-release-train}</version>
-                <type>pom</type>
-                <scope>import</scope>
+                <groupId>org.codehaus.jettison</groupId>
+                <artifactId>jettison</artifactId>
+                <version>1.3.7</version>
             </dependency>
 
         </dependencies>

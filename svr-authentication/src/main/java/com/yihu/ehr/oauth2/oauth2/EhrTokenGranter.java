@@ -173,7 +173,8 @@ public class EhrTokenGranter implements TokenGranter {
             String userName = ehrJDBCUserSecurityService.getDefaultUserNameByUserId(userId);
             UserDetails userDetails = ehrUserDetailsService.loadUserByUsername(userName);
             if(StringUtils.isEmpty(keyId) || StringUtils.isEmpty(userId) || StringUtils.isEmpty(userName)) {
-                throw new InsufficientAuthenticationException("Illegal pk");}
+                throw new InsufficientAuthenticationException("Illegal pk");
+            }
             UsernamePasswordAuthenticationToken userToken = new UsernamePasswordAuthenticationToken(userDetails.getUsername(), userDetails.getPassword(), userDetails.getAuthorities());
             return new OAuth2Authentication(finalStoredOAuth2Request, userToken);
         }

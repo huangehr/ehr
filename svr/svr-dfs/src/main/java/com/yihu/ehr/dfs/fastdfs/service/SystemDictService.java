@@ -1,17 +1,11 @@
 package com.yihu.ehr.dfs.fastdfs.service;
 
-import com.yihu.ehr.dfs.fastdfs.dao.SystemDictEntryRepository;
-import com.yihu.ehr.dfs.fastdfs.dao.SystemDictRepository;
+import com.yihu.ehr.dfs.fastdfs.dao.SystemDictDao;
 import com.yihu.ehr.entity.dict.SystemDict;
 import com.yihu.ehr.query.BaseJpaService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Date;
 
 /**
  * 系统字典管理器.
@@ -22,13 +16,13 @@ import java.util.Date;
  */
 @Service
 @Transactional
-public class SystemDictService extends BaseJpaService<SystemDict, SystemDictRepository> {
+public class SystemDictService extends BaseJpaService<SystemDict, SystemDictDao> {
 
     @Autowired
-    private SystemDictRepository dictRepo;
+    private SystemDictDao systemDictDao;
 
     public SystemDict findByPhoneticCode(String code) {
-        return dictRepo.findByPhoneticCode(code);
+        return systemDictDao.findByPhoneticCode(code);
     }
 
 }

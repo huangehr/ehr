@@ -1,8 +1,8 @@
 package com.yihu.ehr.profile.service;
 
 import com.yihu.ehr.model.specialdict.MIndicatorsDict;
-import com.yihu.ehr.profile.feign.XDictClient;
-import com.yihu.ehr.profile.feign.XResourceClient;
+import com.yihu.ehr.profile.feign.DictClient;
+import com.yihu.ehr.profile.feign.ResourceClient;
 import com.yihu.ehr.util.rest.Envelop;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,10 +22,10 @@ import java.util.Map;
 public class IndicatorsService {
 
     @Autowired
-    XDictClient dictService;
+    DictClient dictService;
 
     @Autowired
-    XResourceClient resource; //资源服务
+    ResourceClient resource; //资源服务
 
     @Value("${spring.application.id}")
     String appId;

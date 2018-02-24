@@ -9,8 +9,8 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.LisEntry;
 import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.model.resource.MStdTransformDto;
-import com.yihu.ehr.profile.feign.XResourceClient;
-import com.yihu.ehr.profile.feign.XTransformClient;
+import com.yihu.ehr.profile.feign.ResourceClient;
+import com.yihu.ehr.profile.feign.TransformClient;
 import com.yihu.ehr.profile.service.BasisConstant;
 import com.yihu.ehr.profile.service.SanofiService;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
@@ -50,13 +50,13 @@ public class SanofiEndPoint {
     SanofiService sanofiService;
 
     @Autowired
-    XTransformClient transformClient;
+    TransformClient transformClient;
 
     @Autowired
     ObjectMapper objectMapper;
 
     @Autowired
-    XResourceClient resourceClient;
+    ResourceClient resourceClient;
 
     @ApiOperation(value = "获取体征数据", notes = "获取体征数据")
     @RequestMapping(value = ServiceApi.SanofiSupport.PhysicSigns, method = RequestMethod.POST)

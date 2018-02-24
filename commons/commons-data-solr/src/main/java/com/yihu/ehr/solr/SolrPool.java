@@ -29,10 +29,8 @@ public class SolrPool {
             CloudSolrClient client = new CloudSolrClient(zkHost);
             factory = new MulticoreSolrClientFactory(client);
         }
-
         return factory;
     }
-
 
     /**
      * 获取连接

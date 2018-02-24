@@ -11,7 +11,7 @@ security:
 info:
   app:
     name: ConfigurationService
-    description: EHR平台全局配置服务
+    description: EHR platform global configuration service
     version: 1.0.0
 
 ---
@@ -21,7 +21,6 @@ spring:
 eureka:
   instance:
     ip-address: 127.0.0.1:8761
-    #ip-address: 192.168.1.221:8761
     prefer-ip-address: true
 
 ---

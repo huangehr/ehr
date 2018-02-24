@@ -358,13 +358,13 @@ public class QcDailyReportResolveService {
 
     public int returnArchiveStatus(JsonArchives jsonArchives) {
         if (jsonArchives != null) {
-            if (jsonArchives.getArchiveStatus() == ArchiveStatus.Received) {
+            if (jsonArchives.getArchiveStatus() == JsonArchives.ArchiveStatus.Received) {
                 return 0;
-            } else if (jsonArchives.getArchiveStatus() == ArchiveStatus.Acquired) {
+            } else if (jsonArchives.getArchiveStatus() == JsonArchives.ArchiveStatus.Acquired) {
                 return 1;
-            } else if (jsonArchives.getArchiveStatus() == ArchiveStatus.Failed) {
+            } else if (jsonArchives.getArchiveStatus() == JsonArchives.ArchiveStatus.Failed) {
                 return 2;
-            } else if (jsonArchives.getArchiveStatus() == ArchiveStatus.Finished) {
+            } else if (jsonArchives.getArchiveStatus() == JsonArchives.ArchiveStatus.Finished) {
                 return 3;
             } else {
                 return 0;

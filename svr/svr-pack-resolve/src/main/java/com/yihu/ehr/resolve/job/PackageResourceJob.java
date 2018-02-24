@@ -1,13 +1,11 @@
 package com.yihu.ehr.resolve.job;
 
-import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ArchiveStatus;
 import com.yihu.ehr.constants.RedisCollection;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.model.packs.MPackage;
-import com.yihu.ehr.resolve.config.MetricNames;
 import com.yihu.ehr.resolve.feign.PackageMgrClient;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.resolve.model.stage2.ResourceBucket;
@@ -85,7 +83,7 @@ public class PackageResourceJob implements InterruptableJob {
         PackMillService packMill = SpringContext.getService(PackMillService.class);
         ResourceService resourceService = SpringContext.getService(ResourceService.class);
         ObjectMapper objectMapper = new ObjectMapper();
-        long start = System.currentTimeMillis();
+        //long start = System.currentTimeMillis();
         StandardPackage standardPackage = resolveEngine.doResolve(pack, downloadTo(pack.getRemotePath()));
         ResourceBucket resourceBucket = packMill.grindingPackModel(standardPackage);
         resourceService.save(resourceBucket, standardPackage);
@@ -101,7 +99,6 @@ public class PackageResourceJob implements InterruptableJob {
         map.put("patientId", standardPackage.getPatientId());
         map.put("reUploadFlg", String.valueOf(standardPackage.isReUploadFlg()));
         packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Finished, objectMapper.writeValueAsString(map));
-        getMetricRegistry().histogram(MetricNames.ResourceJob).update((System.currentTimeMillis() - start) / 1000);
     }
 
     private String downloadTo(String filePath) throws Exception {
@@ -110,7 +107,4 @@ public class PackageResourceJob implements InterruptableJob {
         return fastDFSUtil.download(tokens[0], tokens[1], LocalTempPath);
     }
 
-    private MetricRegistry getMetricRegistry(){
-        return SpringContext.getService(MetricRegistry.class);
-    }
 }

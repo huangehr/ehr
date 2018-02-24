@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.config.FastDFSConfig;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
-import com.yihu.ehr.profile.dao.TemplateDao;
-import com.yihu.ehr.profile.model.Template;
+import com.yihu.ehr.profile.dao.ArchiveTemplateDao;
+import com.yihu.ehr.profile.model.ArchiveTemplate;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.log.LogService;
@@ -25,7 +25,7 @@ import java.util.List;
  * Created by Administrator on 2016/6/14.
  */
 @Service
-public class ThridPrescriptionService extends BaseJpaService<Template, TemplateDao> {
+public class ThridPrescriptionService extends BaseJpaService<ArchiveTemplate, ArchiveTemplateDao> {
     @Autowired
     private FastDFSConfig FastDFSConfig;
 
@@ -33,7 +33,7 @@ public class ThridPrescriptionService extends BaseJpaService<Template, TemplateD
     ProfileCDAService cdaService;
 
     @Autowired
-    TemplateService tempService;
+    ArchiveTemplateService tempService;
 
     @Autowired
     ProfileCDAService profileCDAService;
@@ -109,7 +109,7 @@ public class ThridPrescriptionService extends BaseJpaService<Template, TemplateD
      */
     public String transformImage(String profileId, String orgCode, String cdaVersion, String cdaCode, String type, int width, int height) throws Exception {
         //获取CDA模板信息
-        Template temp = tempService.getPresriptionTemplate(orgCode, cdaVersion, cdaCode);
+        ArchiveTemplate temp = tempService.getPresriptionTemplate(orgCode, cdaVersion, cdaCode);
 
         if (temp == null) {
             LogService.getLogger("prescription").error("CDA template not existed");
