@@ -1,11 +1,9 @@
 package com.yihu.ehr.entity.user;
 
 import com.yihu.ehr.entity.BaseIdentityEntity;
+import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -18,12 +16,29 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "user_tel_verification")
-public class UserTelVerification extends BaseIdentityEntity{
-
+public class UserTelVerification  implements Serializable{
+    /** ID */
+    private Integer id;
+    /** 用于登录的手机号码 */
     private String telNo;
+    /** 手机短信验证码 */
     private String verificationCode;
+    /** 有效时间，当前时间+10分钟 */
     private Date effectivePeriod;
+    /** 用于验证码的应用 */
     private String appId;
+
+    @Id
+    @GeneratedValue(generator = "Generator")
+    @GenericGenerator(name = "Generator", strategy = "identity")
+    @Column(name = "id", unique = true, nullable = false)
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     @Column(name = "tel_no",  nullable = true)
     public String getTelNo() {
