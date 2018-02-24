@@ -85,9 +85,8 @@ public class TelVerificationController extends BaseController {
                 code = ((LinkedHashMap) result.getObj()).get("verificationCode").toString();
             }
             String api= "MsgGW.Sms.send";
-            String content = "你好，短信验证码为:【" + code + "】，请在10分钟内验证！" ;
+            String content = "您好，短信验证码为:【" + code + "】，请在10分钟内验证！" ;
             String resultStr;
-
             Map<String,String> apiParamMap = new HashMap<>();
             //手机号码
             apiParamMap.put("mobile",tel);
@@ -98,21 +97,8 @@ public class TelVerificationController extends BaseController {
             //渠道号
             apiParamMap.put("clientId",clientId);
             String apiParam = objectMapper.writeValueAsString(apiParamMap);
-
             //健康之路医疗基础信息接入参数AuthInfo
-            Map<String,Object> params = new HashMap<>();
-            Map<String,String> authInfoParamMap = new HashMap<>();
-            //渠道号
-            authInfoParamMap.put("ClientId",clientId);
-            //接入方系统版本号
-            authInfoParamMap.put("ClientVersion",clientVersion);
-            authInfoParamMap.put("Sign","");
-            authInfoParamMap.put("SessionKey","");
-            String authInfoParam = objectMapper.writeValueAsString(authInfoParamMap);
-            params.put("Api",api);
-            params.put("Param",apiParam);
-            params.put("AuthInfo",authInfoParam);
-            params.put("SequenceNoString",DateUtil.getNowDate().toString());
+            Map<String,Object> params  = jkzlGateway( api, apiParamMap);
             String url= gatewayUrl;
             resultStr = HttpClientUtil.doPost(url, params);
             if(resultStr != null){
@@ -251,20 +237,20 @@ public class TelVerificationController extends BaseController {
 
     //拼接总部统一网关的参数。
     public Map<String,Object> jkzlGateway(String api,Map apiParam) throws Exception{
-        String clientVersion = "1.0";
-
         //统一接口授权信息
         Map<String,String> authInfo = new HashMap<>();
-        authInfo.put("ClientId", clientId);
-        authInfo.put("ClientVersion", clientVersion);
-
+        authInfo.put("ClientId",clientId);
+        //接入方系统版本号
+        authInfo.put("ClientVersion",clientVersion);
+        authInfo.put("Sign","");
+        authInfo.put("SessionKey","");
         ObjectMapper objectMapper = new ObjectMapper();
         String authInfoS = objectMapper.writeValueAsString(authInfo);
         String apiParamS = objectMapper.writeValueAsString(apiParam);
 
         Map<String, Object> params = new HashMap<>();
         params.put("AuthInfo",authInfoS);
-        params.put("SequenceNo", DateUtil.getSysDateTime().toString());
+        params.put("SequenceNo", DateUtil.getNowDate().toString());
         params.put("Api", api);
         params.put("Param", apiParamS);
         params.put("ParamType", 0);
