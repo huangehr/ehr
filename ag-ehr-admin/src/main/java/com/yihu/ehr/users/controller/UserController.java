@@ -672,8 +672,8 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/users/changePassWord", method = RequestMethod.PUT)
     @ApiOperation(value = "修改用户密码", notes = "修改用户密码")
     public Envelop changePassWord(
-            @ApiParam(name = "user_id", value = "password", defaultValue = "")
-            @RequestParam(value = "user_id") String userId,
+            @ApiParam(name = "userId", value = "password", defaultValue = "")
+            @RequestParam(value = "userId") String userId,
             @ApiParam(name = "password", value = "密码", defaultValue = "")
             @RequestParam(value = "password") String password) {
 
