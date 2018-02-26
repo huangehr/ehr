@@ -48,94 +48,42 @@ hystrix:
 ---
 spring:
   profiles: dev
-
   datasource:
     url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: chenweishan
     password: chenweishan
-
   redis:
     host: 172.19.103.47 # Redis server host.
     port: 6379
     password: redis!@456
-
 fast-dfs:
   tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52:80
-
 ehr-redis:
   mq:
     pubsub:
       publisherAppId: svr-redis
       responseTimeChannel: redis.cache.reponse-time
-
-
----
-spring:
-  profiles: alpha
-
-  datasource:
-    url: jdbc:mysql://192.168.1.220:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: ha
-    password: ha
-
-  redis:
-    host: 192.168.1.220 # Redis server host.
-
-fast-dfs:
-  tracker-server: 172.19.103.54:22122
-  public-server: http://172.19.103.54:22122
-
-ehr-redis:
-  mq:
-    pubsub:
-      publisherAppId: svr-redis
-      responseTimeChannel: redis.cache.reponse-time
-
 
 ---
 spring:
   profiles: test
-
   datasource:
     url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: weifuwu
-    password: weifuwu
-
+    username: chenweishan
+    password: chenweishan
   redis:
     host: 172.19.103.47 # Redis server host.
-
+    port: 6379
+    password: redis!@456
 fast-dfs:
   tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52:80
-
 ehr-redis:
   mq:
     pubsub:
       publisherAppId: svr-redis
       responseTimeChannel: redis.cache.reponse-time
-
-
----
-spring:
-  profiles: prod
-
-  redis:
-    host: 11.1.2.20 # Redis server host.
-  datasource:
-    url: jdbc:mysql://11.1.2.5:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: ha
-    password: jkzlxm
-
-fast-dfs:
-  tracker-server: 11.1.2.9:22122
-  public-server: http://ds.ehr.yihu.com:22122
-ehr-redis:
-  mq:
-    pubsub:
-      publisherAppId: svr-redis
-      responseTimeChannel: redis.cache.reponse-time
-
 
 ---
 spring:
@@ -144,7 +92,6 @@ spring:
     url: jdbc:mysql://11.1.2.5:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: healthcloud
     password: GP8Qz4qU
-
   redis:
     host: 11.1.2.22 # Redis server host.
     port: 6390
@@ -159,25 +106,20 @@ ehr-redis:
       publisherAppId: svr-redis
       responseTimeChannel: redis.cache.reponse-time
 
-
 ---
 spring:
   profiles: prod_sr
-
   redis:
     host: 10.176.97.5 # Redis server host.
     port: 6390
     password: q4YaQemf
-
   datasource:
     url: jdbc:mysql://10.176.97.9:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: healthcloud
     password: GP8Qz4qU
-
 fast-dfs:
   tracker-server: 10.176.97.5:22122
   public-server: http://10.176.97.5:8888
-
 ehr-redis:
   mq:
     pubsub:
@@ -187,7 +129,6 @@ ehr-redis:
 ---
 spring:
   profiles: prod_fzzy
-
   redis:
     host: 100.100.1.161 # Redis server host.
     port: 6390
@@ -196,7 +137,6 @@ spring:
     url: jdbc:mysql://100.100.1.159:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: healthcloud
     password: GP8Qz4qU
-
 fast-dfs:
   tracker-server: 100.100.1.157:22122
   public-server: http://100.100.1.157:8888
