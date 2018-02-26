@@ -1,4 +1,4 @@
-package com.yihu.ehr.organization.controller;
+package com.yihu.ehr.saas.controller;
 
 import com.yihu.ehr.agModel.orgSaas.AreaSaasModel;
 import com.yihu.ehr.agModel.orgSaas.OrgSaasModel;

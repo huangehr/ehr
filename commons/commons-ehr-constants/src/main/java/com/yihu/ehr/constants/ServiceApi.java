@@ -412,6 +412,7 @@ public class ServiceApi {
         public static final String UserAppList = "/userAppList";
         public static final String UserAppShow = "/userApp/show";
         public static final String GetUserAppListById = "/userApp/getUserAppByAppId";
+        public static final String CreateUserApp = "/userApp/createUserApp";
     }
 
     public static class Packages {
@@ -698,7 +699,13 @@ public class ServiceApi {
         public static final String UseridCardNoExistence = "/user/idCardNo/existence";
         public static final String UserByIdCardNo = "/user/idCardNo/userByIdCardNo";
         public static final String UpdateSystemUser = "/updateSystemUser";
+        public static final String GetOrgAndDeptRelation = "/users/getOrgAndDeptRelation";
+        public static final String InitializeSystemUser = "/users/initialize";
+        public static final String UsersByTel = "/users/tel";
+    }
 
+    public static class TelVerification {
+        public static final String TelVerification = "/verification";
     }
 
     public static class Roles {

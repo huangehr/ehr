@@ -260,9 +260,9 @@ public class AppController extends BaseController {
      * @return AppModel
      */
     private AppModel convertToAppModel(MApp mApp) {
-        if(mApp==null)
+        if(mApp==null) {
             return null;
-
+        }
         AppModel appModel = convertToModel(mApp, AppModel.class);
         //获取app类别字典值
         if(!StringUtils.isEmpty(mApp.getCatalog())){

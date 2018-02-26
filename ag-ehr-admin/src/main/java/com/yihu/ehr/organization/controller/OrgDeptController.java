@@ -7,10 +7,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.dict.MConventionalDict;
-import com.yihu.ehr.model.org.MOrgDept;
-import com.yihu.ehr.model.org.MOrgDeptData;
-import com.yihu.ehr.model.org.MOrgDeptDetail;
-import com.yihu.ehr.model.org.MOrgMemberRelation;
+import com.yihu.ehr.model.org.*;
 import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.organization.service.OrgDeptClient;
 import com.yihu.ehr.organization.service.OrgDeptMemberClient;
@@ -700,6 +697,25 @@ public class OrgDeptController  extends BaseController {
         catch (Exception ex) {
             ex.printStackTrace();
             return failedSystem();
+        }
+    }
+
+    @ApiOperation(value = "根据用户ＩＤ获取机构及部门列表")
+    @RequestMapping(value = ServiceApi.Users.GetOrgAndDeptRelation, method = RequestMethod.GET)
+    public Envelop getOrgAndDeptRelation(
+            @ApiParam(name = "userId", value = "用户ID", defaultValue = "")
+            @RequestParam(value = "userId") String userId) {
+        Envelop envelop = new Envelop();
+        try {
+            List<MOrgDeptData> orgDeptJsonList = orgDeptMemberClient.getOrgAndDeptRelation(userId);
+            envelop.setDetailModelList(orgDeptJsonList);
+            envelop.setSuccessFlg(true);
+            return envelop;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            envelop.setErrorMsg(ex.getMessage());
+            envelop.setSuccessFlg(false);
+            return envelop;
         }
     }
 

@@ -25,10 +25,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.net.URLDecoder;
+import java.util.*;
 
 /**
  * Created by lyr on 2016/7/26.
@@ -228,4 +226,60 @@ public class ElasticSearchController extends BaseController {
         return  list;
     }
 
+    @RequestMapping(value = "/elasticSearch/addElasticSearch", method = RequestMethod.POST)
+    @ApiOperation("elasticsearch文档数据")
+    public Boolean addElasticSearch(
+            @ApiParam(name = "index", value = "索引名称")
+            @RequestParam(value = "index") String index,
+            @ApiParam(name = "type", value = "索引类型")
+            @RequestParam(value = "type") String type,
+            @ApiParam(name = "sourceList", value = "值")
+            @RequestParam(value = "sourceList") String sourceList) throws Exception {
+        boolean f = false;
+        try {
+            /***** elasticsearch 保存 ********/
+            EsConfig esConfig = config();
+            esConfig.setIndex(index);
+            esConfig.setType(type);
+            esConfig.setHost("172.19.103.9");
+            esConfig.setPort(9300);
+            esConfig.setClusterName("elasticsearch");
+            Client client = esClientUtil.getClient(esConfig.getHost(), esConfig.getPort(),esConfig.getIndex(),esConfig.getType(), esConfig.getClusterName());
+            InputStream fis = null;
+            InputStreamReader isr = null;
+            BufferedReader br = null; //用于包装InputStreamReader,提高处理性能。因为BufferedReader有缓冲的，而InputStreamReader没有。
+            try {
+                String str = "";
+                String jsonString = "";
+                sourceList = URLDecoder.decode(sourceList, "UTF-8");
+                fis = new ByteArrayInputStream(sourceList.getBytes("UTF-8"));
+                // 从文件系统中的某个文件中获取字节
+                isr = new InputStreamReader(fis);// InputStreamReader 是字节流通向字符流的桥梁,
+                br = new BufferedReader(isr);// 从字符输入流中读取文件中的内容,封装了一个new InputStreamReader的对象
+                while ((str = br.readLine()) != null) {
+                    jsonString = str;
+                    System.out.println(jsonString);// 打印
+                    //添加到es库
+                    f = elasticsearchUtil.save(client,jsonString);
+                }
+            } catch (FileNotFoundException e) {
+                System.out.println("找不到指定文件");
+            } catch (IOException e) {
+                System.out.println("读取文件失败");
+            } finally {
+                try {
+                    br.close();
+                    isr.close();
+                    fis.close();
+                    client.close();
+                    // 关闭的时候最好按照先后顺序关闭最后开的先关闭所以先关s,再关n,最后关m
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return  f;
+    }
 }
