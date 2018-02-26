@@ -3,8 +3,6 @@ server:
 
 management:
   port: ${server.port}
-  security:
-    enabled: false
 
 info:
   app:
@@ -65,34 +63,14 @@ spring:
 fast-dfs:
   tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52:80
-eip:
-  tenant: jkzl
----
-spring:
-  profiles: alpha
-  datasource:
-    url: jdbc:mysql://192.168.1.220:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: ha
-    password: ha
-  redis:
-    host: 192.168.1.220 # Redis server host.
-  metrics:
-    export:
-      statsd:
-        host: 192.168.1.221
-        port: 8125
-fast-dfs:
-  tracker-server: 172.19.103.54:22122
-  public-server: http://172.19.103.54:22122
-eip:
-  tenant: jkzl
+
 ---
 spring:
   profiles: test
   datasource:
     url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: weifuwu
-    password: weifuwu
+    username: chenweishan
+    password: chenweishan
   redis:
     host: 172.19.103.47 # Redis server host.
     port: 6379
@@ -107,21 +85,6 @@ fast-dfs:
   public-server: http://172.19.103.52:80
 eip:
   tenant: jkzl
----
-spring:
-  profiles: prod
-  datasource:
-    url: jdbc:mysql://11.1.2.5:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: ha
-    password: jkzlxm
-  redis:
-    host: 11.1.2.20 # Redis server host.
-fast-dfs:
-  tracker-server: 11.1.2.9:22122
-  public-server: http://ds.ehr.yihu.com:22122
-eip:
-  tenant: jkzl
-
 ---
 spring:
   profiles: prod_fz

@@ -4,6 +4,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.dfs.client.ElasticSearchClient;
+import com.yihu.ehr.quota.service.TjQuotaJobClient;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -23,6 +24,8 @@ public class ElasticSearchController extends EnvelopRestEndPoint {
 
     @Autowired
     private ElasticSearchClient elasticSearchClient;
+    @Autowired
+    private TjQuotaJobClient tjQuotaJobClient;
 
     @RequestMapping(value = ServiceApi.ElasticSearch.Mapping, method = RequestMethod.POST)
     @ApiOperation(value = "建立索引")
@@ -83,7 +86,7 @@ public class ElasticSearchController extends EnvelopRestEndPoint {
             @RequestParam(value = "type") String type,
             @ApiParam(name = "id", value = "id", required = true)
             @PathVariable(value = "id") String id) {
-        return elasticSearchClient.index(index, type, id);
+        return elasticSearchClient.findById(index, type, id);
     }
 
     @RequestMapping(value = ServiceApi.ElasticSearch.FindByField, method = RequestMethod.GET)
@@ -116,4 +119,18 @@ public class ElasticSearchController extends EnvelopRestEndPoint {
         return elasticSearchClient.page(index, type, filter, page, size);
     }
 
+    @RequestMapping(value = "/elasticSearch/addElasticSearch", method = RequestMethod.POST)
+    @ApiOperation("elasticsearch文档数据")
+    public Envelop addElasticSearch(
+            @ApiParam(name = "index", value = "索引名称")
+            @RequestParam(value = "index") String index,
+            @ApiParam(name = "type", value = "索引类型")
+            @RequestParam(value = "type") String type,
+            @ApiParam(name = "sourceList", value = "值")
+            @RequestParam(value = "sourceList") String sourceList) throws Exception {
+        Envelop envelop = new Envelop();
+        boolean flag = tjQuotaJobClient.addElasticSearch(index, type, sourceList);
+        envelop.setSuccessFlg(flag);
+        return envelop;
+    }
 }

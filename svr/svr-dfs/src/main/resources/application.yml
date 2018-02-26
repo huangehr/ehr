@@ -3,8 +3,6 @@ server:
 
 management:
   port: ${server.port}
-  security:
-    enabled: false
 
 info:
   app:

@@ -1,5 +1,5 @@
 server:
-  port: 10001
+  port: ${ag-admin.server.port}
 
 management:
   port: ${server.port}
@@ -11,22 +11,15 @@ info:
     version: 1.0.0
   component: Zuul Server
 
-hystrix:
-  command:
-    default:
-      execution:
-#        timeout:
-#          enabled: false
-        isolation:
-          thread:
-            timeoutInMilliseconds: 30000
-ribbon:
-  ReadTimeout: 30000
-  ConnectTimeout: 6000
-
 ---
 spring:
   profiles: dev
+#总部统一网关接口参数配置
+service-gateway:
+  url: http://service.yihu.com:8085/WSGW/rest
+  handlerId: 50871
+  clientId: 9000401
+  clientVersion: 1.0
 eip:
   tenant: jkzl
 ---
@@ -52,6 +45,11 @@ eip:
 ---
 spring:
   profiles: prod_sr
+#总部统一网关接口参数配置
+service-gateway:
+  url: http://service.yihu.com:8080/WSGW/rest
+  handlerId: 50641
+  clientId: 9000401
 eip:
   tenant: jkzl
 ---

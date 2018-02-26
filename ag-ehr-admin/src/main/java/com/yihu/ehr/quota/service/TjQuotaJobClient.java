@@ -90,4 +90,13 @@ public interface TjQuotaJobClient {
             @ApiParam(name = "title", value = "名称", defaultValue = "")
             @RequestParam(value = "title", required = false) String title);
 
+    @RequestMapping(value = "/elasticSearch/addElasticSearch", method = RequestMethod.POST)
+    @ApiOperation("elasticsearch文档数据")
+    Boolean addElasticSearch(
+            @ApiParam(name = "index", value = "索引名称")
+            @RequestParam(value = "index") String index,
+            @ApiParam(name = "type", value = "索引类型")
+            @RequestParam(value = "type") String type,
+            @ApiParam(name = "sourceList", value = "值")
+            @RequestParam(value = "sourceList" ) String sourceList);
 }

@@ -494,4 +494,18 @@ public class UserEndPoint extends EnvelopRestEndPoint {
         userService.saveUser(user);
         return convertToModel(user, MUser.class);
     }
+
+    @RequestMapping(value = ServiceApi.Users.UsersByTel, method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "根据手机号码查询用户信息", notes = "根据手机号码查询用户信息")
+    public MUser getUserByTel(
+            @ApiParam(name = "tel", value = "手机号码", defaultValue = "")
+            @RequestParam(value = "tel") String tel) throws Exception {
+
+        User user = userService.getUserByTelephone(tel);
+        if(user == null){
+            return null;
+        }
+        MUser mUser = convertToModel(user, MUser.class);
+        return mUser;
+    }
 }
