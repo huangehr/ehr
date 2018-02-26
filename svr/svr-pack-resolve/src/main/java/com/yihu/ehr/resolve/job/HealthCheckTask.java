@@ -66,7 +66,7 @@ public class HealthCheckTask {
 
     @Scheduled(cron = "0 0/20 * * * ?")
     private void startTask() {
-        PackResolveLogger.info("Health Check:" + new Date());
+        PackResolveLogger.info("Health Check: " + new Date());
         GroupMatcher groupMatcher = GroupMatcher.groupEquals("PackResolve");
         //检查集群信息
         try {

@@ -17,7 +17,6 @@ import java.util.List;
  * @version 1.0
  * @created 2015.12.16 15:10
  */
-@Repository
 public interface XPackageRepository extends PagingAndSortingRepository<Package, String> {
 
     @Query("select pack from Package pack where archiveStatus in (:archiveStatus) and receiveDate between :from and :to")

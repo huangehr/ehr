@@ -16,19 +16,17 @@ import java.util.Map;
  */
 @Service
 public class DBQuery {
+
     @Autowired
     private DBHelper db;
     private ParserSql ps;
 
-    public DBHelper getDB() throws Exception
-    {
+    public DBHelper getDB() throws Exception {
         return db;
     }
 
-    public ParserSql getParserSql() throws Exception
-    {
-        switch (getDB().dbType)
-        {
+    public ParserSql getParserSql() throws Exception {
+        switch (getDB().dbType) {
             case Oracle:
                 ps = new ParserOracle();
                 break;
@@ -50,8 +48,7 @@ public class DBQuery {
     /**
      * 初始化连接
      */
-    public void connect() throws Exception
-    {
+    public void connect() throws Exception {
         db.connect();
     }
 
@@ -59,16 +56,14 @@ public class DBQuery {
      * 自定义连接
      * uri包含用户名/密码
      */
-    public void connect(String name,String uri) throws Exception
-    {
+    public void connect(String name,String uri) throws Exception {
         db.connect(name,uri);
     }
 
     /**
      * 自定义连接
      */
-    public void connect(String name,String uri,String user,String password) throws Exception
-    {
+    public void connect(String name,String uri,String user,String password) throws Exception {
         db.connect(name,uri,user,password);
     }
 
@@ -77,8 +72,7 @@ public class DBQuery {
     /**
      * 查询单条记录
      */
-    public Map<String,Object> load(QueryEntity qe) throws Exception
-    {
+    public Map<String,Object> load(QueryEntity qe) throws Exception {
         String sql = getParserSql().getSql(qe);
         return getDB().load(sql);
     }
@@ -86,8 +80,7 @@ public class DBQuery {
     /**
      * 查询单实体
      */
-    public <T> T load(Class<T> cls,QueryEntity qe) throws Exception
-    {
+    public <T> T load(Class<T> cls,QueryEntity qe) throws Exception {
         String sql = getParserSql().getSql(qe);
         return getDB().load(cls, sql);
     }
@@ -95,28 +88,24 @@ public class DBQuery {
     /**
      * 查询实体列表
      */
-    public DataList query(QueryEntity qe) throws Exception
-    {
+    public DataList query(QueryEntity qe) throws Exception {
         DataList list = new DataList(qe.getPage(),qe.getRows());
         list.setName(qe.getTableName());
 
         int count = count(qe);
         list.setCount(count);
 
-        if(count!=0)
-        {
+        if(count !=0 ) {
             String sql = getParserSql().getSql(qe);
             list.setList(getDB().query(sql));
         }
-
         return list;
     }
 
     /**
      * 查询实体列表
      */
-    public <T> List<T> query(Class<T> cls,QueryEntity qe) throws Exception
-    {
+    public <T> List<T> query(Class<T> cls,QueryEntity qe) throws Exception {
         String sql = getParserSql().getSql(qe);
         return getDB().query(cls, sql);
     }
@@ -125,8 +114,7 @@ public class DBQuery {
      * 获取总条数
      * @return
      */
-    public int count(QueryEntity qe) throws Exception
-    {
+    public int count(QueryEntity qe) throws Exception {
         String sqlCount = getParserSql().getCountSql(qe);
         return Integer.parseInt(String.valueOf(getDB().scalar(sqlCount)));
     }

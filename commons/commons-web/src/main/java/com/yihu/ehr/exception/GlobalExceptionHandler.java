@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
@@ -34,30 +33,30 @@ public class GlobalExceptionHandler {
     @ResponseBody
     public Envelop handle(HttpServletResponse response, Exception e) throws IOException {
         Envelop envelop = new Envelop();
-        if(e instanceof NoHandlerFoundException) {
+        if (e instanceof NoHandlerFoundException) {
             response.setStatus(HttpStatus.NOT_FOUND.value());
             envelop.setErrorCode(HttpStatus.NOT_FOUND.value());
             envelop.setErrorMsg(e.getMessage());
-        }else if(e instanceof HttpRequestMethodNotSupportedException){
+        } else if (e instanceof HttpRequestMethodNotSupportedException){
             response.setStatus(HttpStatus.METHOD_NOT_ALLOWED.value());
             envelop.setErrorCode(HttpStatus.METHOD_NOT_ALLOWED.value());
             envelop.setErrorMsg(e.getMessage());
-        }else if(e instanceof MissingServletRequestParameterException) {
+        } else if (e instanceof MissingServletRequestParameterException) {
             response.setStatus(HttpStatus.BAD_REQUEST.value());
             envelop.setErrorCode(HttpStatus.BAD_REQUEST.value());
             envelop.setErrorMsg(e.getMessage());
-        }else if(e instanceof HystrixRuntimeException) {
+        } else if (e instanceof HystrixRuntimeException) {
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
             envelop.setErrorCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
             String message = e.getCause().getMessage();
-            if(message.indexOf("{") != -1) {
+            if (message.indexOf("{") != -1) {
                 String content = message.substring(message.indexOf("{"));
                 envelop = objectMapper.readValue(content, Envelop.class);
                 envelop.setErrorMsg(message.substring(0, message.indexOf(";") + 1) + " Caused by: " + envelop.getErrorMsg());
-            }else {
+            } else {
                 envelop.setErrorMsg(message);
             }
-        }else {
+        } else {
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
             envelop.setErrorCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
             envelop.setErrorMsg(e.getMessage());

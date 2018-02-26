@@ -3,11 +3,10 @@ package com.yihu.ehr.analyze.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.util.rest.Envelop;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -23,8 +22,7 @@ public class DailyReportService {
     private ElasticSearchUtil elasticSearchUtil;
     @Autowired
     protected ObjectMapper objectMapper;
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+
     private static final Logger log = LoggerFactory.getLogger(DailyReportService.class);
     /**
      * 日报上传

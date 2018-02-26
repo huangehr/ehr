@@ -18,7 +18,7 @@ public class ProfileInfoBaseService {
     @Value("${spring.application.id}")
     private String appId;
     @Autowired
-    private XResourceClient resource; //资源服务
+    private ResourceClient resource; //资源服务
     @Autowired
     private ProfileDiseaseService profileDiseaseService;
 

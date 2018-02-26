@@ -14,22 +14,7 @@
     <packaging>jar</packaging>
 
     <dependencies>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-            <scope>${dependency.scope}</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-redis</artifactId>
-            <scope>${dependency.scope}</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.yihu.ehr</groupId>
-            <artifactId>commons-util</artifactId>
-            <version>${version.ehr}</version>
-            <scope>${dependency.scope}</scope>
-        </dependency>
+        <!-- true -->
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-data-redis</artifactId>

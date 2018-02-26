@@ -9,16 +9,6 @@ elasticsearch:
     init-size: 5
     max-size: 10
 
-logging:
-  level:
-    com:
-      netflix: INFO
-    org:
-      springframework:
-        web: INFO
-      hibernate: ERROR
-      apache: ERROR
-
 spring:
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
@@ -30,7 +20,6 @@ spring:
   # REDIS
   redis:
     database: 0 # Database index used by the connection factory.
-    port: 6379 # Redis server port.
     timeout: 0 # Connection timeout in milliseconds.
     #sentinel:
     #  master: # Name of Redis server.
@@ -60,8 +49,8 @@ fast-dfs:
 
 hadoop:
   hbase-properties:
-    - hbase.zookeeper.property.clientPort: 2181
-    - zookeeper.znode.parent: /hbase-unsecure
+    hbase.zookeeper.property.clientPort: 2181
+    zookeeper.znode.parent: /hbase-unsecure
   user:
     name: root
 
@@ -98,7 +87,7 @@ elasticsearch:
   cluster-nodes: 172.17.110.17:9300
 hadoop:
   hbase-properties:
-    - hbase.zookeeper.quorum: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com
+    hbase.zookeeper.quorum: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com
 
 ---
 spring:

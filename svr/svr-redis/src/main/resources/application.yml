@@ -8,8 +8,6 @@ spring:
   # REDIS
   redis:
     database: 0 # Database index used by the connection factory.
-    port: 6379 # Redis server port.
-    password: # Login password of the redis server.
     timeout: 0 # Connection timeout in milliseconds.
     #sentinel:
     #  master: # Name of Redis server.
@@ -19,7 +17,6 @@ spring:
       max-idle: 8 # Max number of "idle" connections in the pool. Use a negative value to indicate an unlimited number of idle connections.
       max-wait: -1 # Maximum amount of time (in milliseconds) a connection allocation should block before throwing an exception when the pool is exhausted. Use a negative value to block indefinitely.
       min-idle: 1 # Target for the minimum number of idle connections to maintain in the pool. This setting only has an effect if it is positive.
-
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
     max-active: 20
@@ -28,15 +25,14 @@ spring:
     validation-query: SELECT 1
     test-on-borrow: true
 
-
 fast-dfs:
+  connect-timeout: 2
+  network-timeout: 30
+  charset: ISO8859-1
   pool:
     init-size: 5
     max-size: 20
     wait-time: 500
-  connect-timeout: 2
-  network-timeout: 30
-  charset: ISO8859-1
   http:
     tracker-http-port: 80
     anti-steal-token: no
@@ -48,12 +44,6 @@ hystrix:
       coreSize: 60 #并发执行的最大线程数，默认10
       maxQueueSize: 100 #LinkedBlockingQueue的最大队列数，默认-1，使用SynchronousQueue
       #queueSizeRejectionThreshold: 50 #配置该值后，即使maxQueueSize没有达到，达到queueSizeRejectionThreshold该值后，请求也会被拒绝
-  command:
-    default:
-      execution:
-        isolation:
-          thread:
-            timeoutInMilliseconds: 30000 #缺省为1000
 
 ---
 spring:

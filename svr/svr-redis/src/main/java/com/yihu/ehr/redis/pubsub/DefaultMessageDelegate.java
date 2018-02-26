@@ -23,7 +23,7 @@ import java.util.Map;
  */
 public class DefaultMessageDelegate implements MessageDelegate {
 
-    Logger logger = Logger.getLogger(DefaultMessageDelegate.class);
+    private static final Logger logger = Logger.getLogger(DefaultMessageDelegate.class);
 
     @Autowired
     private RestTemplate restTemplate;

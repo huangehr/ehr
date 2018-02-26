@@ -2,10 +2,11 @@ package com.yihu.ehr.fastdfs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.yihu.ehr.util.log.LogService;
 import org.csource.common.MyException;
 import org.csource.common.NameValuePair;
 import org.csource.fastdfs.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
@@ -26,6 +27,8 @@ import java.util.Map;
  * @author Sand
  */
 public class FastDFSUtil {
+
+    private static final Logger logger = LoggerFactory.getLogger(FastDFSUtil.class);
 
     public final static String GROUP_NAME = "groupName";
     public final static String REMOTE_FILE_NAME = "remoteFileName";
@@ -109,7 +112,7 @@ public class FastDFSUtil {
                     fileURl += "?token=" + token + "&ts=" + ts;
                 }
                 message.put(FILE_URL, fileURl);
-                LogService.getLogger(FastDFSUtil.class).info(client.get_file_info(groupName, remoteFile).toString());
+                logger.info(client.get_file_info(groupName, remoteFile).toString());
             }
         } finally {
             clientPool.releaseStorageClient(client);
@@ -222,7 +225,7 @@ public class FastDFSUtil {
                     fileUrl += "?token=" + token + "&ts=" + ts;
                 }
                 message.put(FILE_URL, fileUrl);
-                LogService.getLogger(FastDFSUtil.class).info(client.get_file_info(groupName, remoteFileName).toString());
+                logger.info(client.get_file_info(groupName, remoteFileName).toString());
                 return message;
             } else {
                 return null;

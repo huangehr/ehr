@@ -1,12 +1,3 @@
-logging:
-  level:
-    com:
-      netflix: INFO
-    org:
-      springframework:
-        web: INFO
-      hibernate: ERROR
-
 server:
   port: ${svr-standard.server.port}
 
@@ -25,13 +16,13 @@ common.notfound.entity: 没有找到{0}实体：{}
 std.version.invalid.stage: 该版本不处于编辑状态！
 
 fast-dfs:
+  connect-timeout: 2
+  network-timeout: 30
+  charset: ISO8859-1
   pool:
     init-size: 5
     max-size: 20
     wait-time: 500
-  connect-timeout: 2
-  network-timeout: 30
-  charset: ISO8859-1
   http:
     tracker-http-port: 80
     anti-steal-token: no
@@ -47,10 +38,6 @@ spring:
       max-idle: 8
       max-wait: -1
       min-idle: 1
-  # SOLR (SolrProperties)
-  data:
-    solr:
-      repositories.enabled: true # Enable Solr repositories.
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
     max-active: 20
@@ -58,6 +45,10 @@ spring:
     min-idle: 8
     validation-query: SELECT 1
     test-on-borrow: true
+  # SOLR (SolrProperties)
+  data:
+    solr:
+      repositories.enabled: true # Enable Solr repositories.
 
 ---
 spring:

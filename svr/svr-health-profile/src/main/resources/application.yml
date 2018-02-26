@@ -4,15 +4,6 @@ server:
 management:
   port: ${server.port}
 
-logging:
-  level:
-    com:
-      netflix: INFO
-    org:
-      springframework:
-        web: INFO
-      hibernate: ERROR
-
 spring:
   # REDIS
   redis:
@@ -33,15 +24,17 @@ spring:
     min-idle: 8
     validation-query: SELECT 1
     test-on-borrow: true
+  application:
+    id: JKZL
 
 fast-dfs:
+  connect-timeout: 2
+  network-timeout: 30
+  charset: ISO8859-1
   pool:
     init-size: 5
     max-size: 20
     wait-time: 500
-  connect-timeout: 2
-  network-timeout: 30
-  charset: ISO8859-1
   http:
     tracker-http-port: 80
     anti-steal-token: no
@@ -58,8 +51,6 @@ spring:
     host: 172.19.103.47 # Redis server host.
     port: 6379
     password: redis!@456
-  application:
-    id: JKZL
 fast-dfs:
   tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52:80

@@ -26,6 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @created 2016.03.05 15:38
  */
 public class EhrTokenStoreService implements TokenStore {
+
     private static final int DEFAULT_FLUSH_INTERVAL = 1000;
 
     private final ConcurrentHashMap<String, OAuth2AccessToken> accessTokenStore = new ConcurrentHashMap<String, OAuth2AccessToken>();

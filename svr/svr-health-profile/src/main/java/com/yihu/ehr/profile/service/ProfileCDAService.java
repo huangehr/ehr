@@ -1,18 +1,15 @@
 package com.yihu.ehr.profile.service;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.model.resource.MCdaTransformDto;
 import com.yihu.hos.model.standard.MCDADocument;
 import com.yihu.hos.model.standard.MCdaDataSet;
-import com.yihu.ehr.profile.config.CdaDocumentTypeOptions;
-import com.yihu.ehr.profile.dao.TemplateDao;
-import com.yihu.ehr.profile.feign.XCDADocumentClient;
-import com.yihu.ehr.profile.feign.XResourceClient;
-import com.yihu.ehr.profile.feign.XTransformClient;
-import com.yihu.ehr.profile.model.Template;
+import com.yihu.ehr.profile.dao.ArchiveTemplateDao;
+import com.yihu.ehr.profile.feign.CDADocumentClient;
+import com.yihu.ehr.profile.feign.ResourceClient;
+import com.yihu.ehr.profile.model.ArchiveTemplate;
 import com.yihu.ehr.util.rest.Envelop;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,13 +29,13 @@ public class ProfileCDAService {
     private String appId;
 
     @Autowired
-    private XResourceClient resource;
+    private ResourceClient resource;
     //模板服务
     @Autowired
-    private TemplateDao templateRepository;
+    private ArchiveTemplateDao templateDao;
     //CDA服务
     @Autowired
-    private XCDADocumentClient cdaService;
+    private CDADocumentClient cdaService;
     @Autowired
     private ObjectMapper objectMapper;
 
