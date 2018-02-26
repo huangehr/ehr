@@ -1,5 +1,5 @@
 server:
-  port: 10001
+  port: ${ag-admin.server.port}
 
 management:
   port: ${server.port}
@@ -10,19 +10,6 @@ info:
     description: EHR platform json app service.
     version: 1.0.0
   component: Zuul Server
-
-hystrix:
-  command:
-    default:
-      execution:
-#        timeout:
-#          enabled: false
-        isolation:
-          thread:
-            timeoutInMilliseconds: 30000
-ribbon:
-  ReadTimeout: 30000
-  ConnectTimeout: 6000
 
 ---
 spring:

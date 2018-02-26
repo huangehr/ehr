@@ -156,38 +156,15 @@ hadoop:
 
 ---
 spring:
-  profiles: alpha
-  # Mysql
-  datasource:
-    url: jdbc:mysql://192.168.1.220:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: ha
-    password: ha
-  redis:
-    host: 192.168.1.220 # Redis server host.
-  data:
-    solr:
-      zk-host: node1.hde.h3c.com,node2.hde.h3c.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
-  metrics:
-    export:
-      statsd:
-        host: 192.168.1.221
-        port: 8125
-fast-dfs:
-  tracker-server: 172.19.103.54:22122
-  public-server: http://172.19.103.54:22122
-hadoop:
-  hbase-properties:
-    - hbase.zookeeper.quorum: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com
-
----
-spring:
-  profiles: test
+  profiles: dev
   datasource:
     url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: weifuwu
-    password: weifuwu
+    username: chenweishan
+    password: chenweishan
   redis:
     host: 172.19.103.47 # Redis server host.
+    port: 6379
+    password: redis!@456
   data:
     solr:
       zk-host: node1.hde.h3c.com,node2.hde.h3c.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
@@ -201,34 +178,7 @@ fast-dfs:
   public-server: http://172.19.103.52:80
 hadoop:
   hbase-properties:
-    - hbase.zookeeper.quorum: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com
-
----
-spring:
-  profiles: prod
-  datasource:
-    url: jdbc:mysql://11.1.2.5:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: ha
-    password: jkzlxm
-  redis:
-    host: 11.1.2.20 # Redis server host.
-  data:
-    solr:
-      host: http://172.19.103.10:8983/solr # Solr host. Ignored if "zk-host" is set.
-      #zk-host: node1,node2,node3:2181/solr # ZooKeeper host address in the form HOST:PORT.
-      zk-host: node1.hde.jkzlehr.com,node2.hde.jkzlehr.com,node3.hde.jkzlehr.com:2181/solr
-  metrics:
-    export:
-      statsd:
-        host: localhost
-        port: 8125
-fast-dfs:
-  tracker-server: 11.1.2.9:22122
-  public-server: http://ds.ehr.yihu.com:22122
-hadoop:
-  hbase-properties:
-    #- hbase.zookeeper.quorum: node2.jkzl.com,node3.jkzl.com,node1.jkzl.com
-    - hbase.zookeeper.quorum: node1,node2,node3
+    hbase.zookeeper.quorum: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com
 
 ---
 spring:
@@ -255,7 +205,7 @@ fast-dfs:
 
 hadoop:
   hbase-properties:
-    - hbase.zookeeper.quorum: node1.ehr.h3c.com,node2.ehr.h3c.com,node3.ehr.h3c.com
+    hbase.zookeeper.quorum: node1.ehr.h3c.com,node2.ehr.h3c.com,node3.ehr.h3c.com
 
 ---
 spring:
@@ -284,8 +234,7 @@ fast-dfs:
 hadoop:
   hbase-properties:
     #- hbase.zookeeper.quorum: node2.jkzl.com,node3.jkzl.com,node1.jkzl.com
-    - hbase.zookeeper.quorum: node1,node2,node3
-
+    hbase.zookeeper.quorum: node1,node2,node3
 
 ---
 spring:
@@ -314,4 +263,4 @@ fast-dfs:
 hadoop:
   hbase-properties:
     #- hbase.zookeeper.quorum: node2.jkzl.com,node3.jkzl.com,node1.jkzl.com
-    - hbase.zookeeper.quorum: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com,node4.hde.h3c.com
+    hbase.zookeeper.quorum: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com,node4.hde.h3c.com

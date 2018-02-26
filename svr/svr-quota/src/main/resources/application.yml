@@ -5,11 +5,6 @@ server:
 management:
   port: ${server.port}
 
-elasticsearch:
-  pool:
-    init-size: 5
-    max-size: 10
-
 spring:
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
@@ -19,11 +14,16 @@ spring:
     validation-query: SELECT 1
     test-on-borrow: true
 
+elasticsearch:
+  pool:
+    init-size: 5
+    max-size: 10
+
 hadoop:
   hbase-properties:
-    - hbase.zookeeper.property.clientPort: 2181
-    - zookeeper.znode.parent: /hbase-unsecure
-    - hbase.zookeeper.quorum: node1,node2,node3
+    hbase.zookeeper.property.clientPort: 2181
+    zookeeper.znode.parent: /hbase-unsecure
+    hbase.zookeeper.quorum: node1,node2,node3
   user:
     name: root
 
@@ -34,47 +34,27 @@ spring:
     url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: chenweishan
     password: chenweishan
-
   data:
     solr:
       zk-host: node1.hde.h3c.com,node2.hde.h3c.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
-
 elasticsearch:
   cluster-name: elasticsearch
   cluster-nodes: 172.19.103.9:9300
+
 ---
 spring:
   profiles: test
-
   datasource:
     url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: weifuwu
     password: weifuwu
-
   data:
     solr:
       zk-host: node1.hde.h3c.com,node2.hde.h3c.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
-
 elasticsearch:
   cluster-name: elasticsearch
   cluster-nodes: 172.19.103.9:9300
 
----
-spring:
-  profiles: prod
-
-  datasource:
-    url: jdbc:mysql://11.1.2.5:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: ha
-    password: jkzlxm
-
-  data:
-    solr:
-      zk-host: node1.hde.h3c.com,node2.hde.h3c.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
-
-elasticsearch:
-  cluster-name: elasticsearch
-  cluster-nodes: 172.19.103.9:9300
 ---
 spring:
   profiles: prod_fz
@@ -82,11 +62,9 @@ spring:
     url: jdbc:mysql://11.1.2.5:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: healthcloud
     password: GP8Qz4qU
-
   data:
     solr:
       zk-host: node1.ehr.h3c.com,node2.ehr.h3c.com,node3.ehr.h3c.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
-
 elasticsearch:
   cluster-name: elasticsearch
   cluster-nodes: 172.19.103.9:9300
@@ -94,30 +72,24 @@ elasticsearch:
 ---
 spring:
   profiles: prod_sr
-
   datasource:
     url: jdbc:mysql://10.176.97.9:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: healthcloud
     password: GP8Qz4qU
-
   data:
     solr:
       zk-host: node1.hde.h3c.com,node2.hde.h3c.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
-
 elasticsearch:
   cluster-name: elasticsearch
   cluster-nodes: 10.176.97.7:9300
 
-
 ---
 spring:
   profiles: prod_fzzy
-
   datasource:
     url: jdbc:mysql://100.100.1.159:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: healthcloud
     password: GP8Qz4qU
-
   data:
     solr:
       zk-host: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com,node4.hde.h3c.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
