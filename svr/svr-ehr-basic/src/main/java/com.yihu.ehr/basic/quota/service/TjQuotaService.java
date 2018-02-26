@@ -161,6 +161,7 @@ public class TjQuotaService extends BaseJpaService<TjQuota, XTjQuotaRepository> 
            data.setStatus(Integer.valueOf(String.valueOf(quotaSet.get("status"))));
            data.setDataLevel(Integer.valueOf(String.valueOf(quotaSet.get("dataLevel"))));
            data.setRemark(String.valueOf(quotaSet.get("remark")));
+           data.setIsInitExec("0");
            int maxId = getMaxIdNumber();
            maxId = maxId + 1;
            String newId = "" + maxId;
