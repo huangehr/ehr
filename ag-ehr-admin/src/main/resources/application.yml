@@ -24,12 +24,13 @@ eip:
   tenant: jkzl
 ---
 spring:
-  profiles: alpha
-eip:
-  tenant: jkzl
----
-spring:
   profiles: test
+#总部统一网关接口参数配置
+service-gateway:
+  url: http://service.yihu.com:8085/WSGW/rest
+  handlerId: 50871
+  clientId: 9000401
+  clientVersion: 1.0
 eip:
   tenant: jkzl
 ---
@@ -50,6 +51,7 @@ service-gateway:
   url: http://service.yihu.com:8080/WSGW/rest
   handlerId: 50641
   clientId: 9000401
+  clientVersion: 1.0
 eip:
   tenant: jkzl
 ---

@@ -47,6 +47,9 @@ spring:
       password: admin
       authenticationDatabase: admin
       database: ehr
+  elasticsearch:
+    jest:
+      uris: http://172.19.103.68:9200
 fast-dfs:
   tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52:80
@@ -54,7 +57,7 @@ fast-dfs:
 es:
   index: wlyy_quota_test
   type: wlyy_quota_test
-  host:  http://172.19.103.68:9200
+  host: http://172.19.103.68:9200
   tHost: 172.19.103.68:9300
   clusterName: jkzl
 eip:
@@ -75,6 +78,9 @@ spring:
       password: admin
       authenticationDatabase: admin
       database: ehr
+  elasticsearch:
+    jest:
+      uris: http://172.19.103.68:9200
 fast-dfs:
   tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52:80
@@ -82,7 +88,7 @@ fast-dfs:
 es:
   index: wlyy_quota_test
   type: wlyy_quota_test
-  host:  http://172.19.103.68:9200
+  host: http://172.19.103.68:9200
   tHost: 172.19.103.68:9300
   clusterName: jkzl
 eip:
@@ -103,20 +109,17 @@ spring:
       password: GMLBq1LG
       authenticationDatabase: admin
       database: ehr
-  ldap:
-    host: 172.19.103.87
-    port: 389
-    bindDn: cn=admin,dc=ehr,dc=jkzl
-    password: jkzl
-    root: dc=ehr,dc=jkzl
-
+  elasticsearch:
+    jest:
+      uris: http://172.19.103.68:9200
 fast-dfs:
   tracker-server: 11.1.2.9:22122
   public-server: http://11.1.2.9:80
+
 es:
   index: wlyy_quota_test
   type: wlyy_quota_test
-  host:  http://172.19.103.68:9200
+  host: http://172.19.103.68:9200
   tHost: 172.19.103.68:9300
   clusterName: jkzl
 eip:
@@ -129,12 +132,6 @@ spring:
     url: jdbc:mysql://10.176.97.9:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: healthcloud
     password: GP8Qz4qU
-  ldap:
-    host: 172.19.103.87
-    port: 389
-    bindDn: cn=admin,dc=ehr,dc=jkzl
-    password: jkzl
-    root: dc=ehr,dc=jkzl
   data:
     mongodb:
       host: 10.176.97.9
@@ -143,13 +140,17 @@ spring:
       password: GMLBq1LG
       authenticationDatabase: admin
       database: ehr
+  elasticsearch:
+    jest:
+      uris: http://10.176.97.7:9200
 fast-dfs:
   tracker-server: 10.176.97.5:22122
   public-server: http://10.176.97.5:8888
+
 es:
   index: wlyy_quota_test
   type: wlyy_quota_test
-  host:  http://10.176.97.7:9200
+  host: http://10.176.97.7:9200
   tHost: 10.176.97.7:9300
   clusterName: jkzl
 eip:
@@ -162,12 +163,6 @@ spring:
     url: jdbc:mysql://100.100.1.159:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: healthcloud
     password: GP8Qz4qU
-  ldap:
-    host: 100.100.1.157
-    port: 389
-    bindDn: cn=admin,dc=ehr,dc=jkzl
-    password: jkzl
-    root: dc=ehr,dc=jkzl
   data:
     mongodb:
       host: 100.100.1.157
@@ -176,13 +171,17 @@ spring:
       password: GMLBq1LG
       authenticationDatabase: admin
       database: ehr
+  elasticsearch:
+    jest:
+      uris: http://100.100.1.158:9200
 fast-dfs:
   tracker-server: 100.100.1.157:22122
   public-server: http://100.100.1.157:8888
+
 es:
   index: wlyy_quota_test
   type: wlyy_quota_test
-  host:  http://100.100.1.158:9200
+  host: http://100.100.1.158:9200
   tHost: 100.100.1.158:9300
   clusterName: jkzl
 eip:
