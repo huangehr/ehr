@@ -82,7 +82,7 @@ public class ProfileCDAService {
             } else {
                 String orgCode = obj.get("org_code").toString();
                 //根据机构获取定制模板
-                List<Template> list = templateRepository.findByOrganizationCodeAndCdaVersion(orgCode, cdaVersion);
+                List<ArchiveTemplate> list = templateDao.findByOrganizationCodeAndCdaVersion(orgCode, cdaVersion);
                 //遍历模板
                 if (list != null && list.size() > 0) {
                     //获取档案相关数据集编码列表
@@ -97,7 +97,7 @@ public class ProfileCDAService {
                             }
                         }
                     }
-                    for (Template template : list) {
+                    for (ArchiveTemplate template : list) {
                         String cdaDocumentId = template.getCdaDocumentId();
                         String cdaCode = template.getCdaCode();
                         //是否显示
@@ -178,7 +178,7 @@ public class ProfileCDAService {
             Map<String, Object> obj = (Map<String, Object>) result.getDetailModelList().get(0);
             String cdaVersion = obj.get("cda_version").toString();
             //获取模板ID
-            Template template = templateRepository.findByOrganizationCodeAndCdaVersionAndCdaCode(orgCode, cdaVersion, cdaCode);
+            ArchiveTemplate template = templateDao.findByOrganizationCodeAndCdaVersionAndCdaCode(orgCode, cdaVersion, cdaCode);
             if (template != null) {
                 re.put("template_id",template.getId());
                 re.put("profile_id",obj.get("rowkey"));
