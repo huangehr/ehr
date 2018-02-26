@@ -37,6 +37,9 @@ spring:
   data:
     solr:
       zk-host: node1.hde.h3c.com,node2.hde.h3c.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
+  elasticsearch:
+    jest:
+      uris: http://172.19.103.9:9200
 elasticsearch:
   cluster-name: elasticsearch
   cluster-nodes: 172.19.103.9:9300
@@ -46,11 +49,14 @@ spring:
   profiles: test
   datasource:
     url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: weifuwu
-    password: weifuwu
+    username: chenweishan
+    password: chenweishan
   data:
     solr:
       zk-host: node1.hde.h3c.com,node2.hde.h3c.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
+  elasticsearch:
+    jest:
+      uris: http://172.19.103.9:9200
 elasticsearch:
   cluster-name: elasticsearch
   cluster-nodes: 172.19.103.9:9300
@@ -65,6 +71,9 @@ spring:
   data:
     solr:
       zk-host: node1.ehr.h3c.com,node2.ehr.h3c.com,node3.ehr.h3c.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
+  elasticsearch:
+    jest:
+      uris: http://172.19.103.9:9200
 elasticsearch:
   cluster-name: elasticsearch
   cluster-nodes: 172.19.103.9:9300
@@ -78,7 +87,10 @@ spring:
     password: GP8Qz4qU
   data:
     solr:
-      zk-host: node1.hde.h3c.com,node2.hde.h3c.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
+      zk-host: node1.jkzl.com,node2.jkzl.com,node3.jkzl.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
+  elasticsearch:
+    jest:
+      uris: http://10.176.97.7:9200
 elasticsearch:
   cluster-name: elasticsearch
   cluster-nodes: 10.176.97.7:9300
@@ -93,6 +105,9 @@ spring:
   data:
     solr:
       zk-host: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com,node4.hde.h3c.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
+  elasticsearch:
+    jest:
+      uris: http://100.100.1.158:9200
 elasticsearch:
   cluster-name: elasticsearch
   cluster-nodes: 100.100.1.158:9300
