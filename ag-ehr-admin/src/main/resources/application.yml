@@ -45,6 +45,7 @@ service-gateway:
   url: http://service.yihu.com:8080/WSGW/rest
   handlerId: 50641
   clientId: 9000401
+  clientVersion: 1.0
 
 ---
 spring:
