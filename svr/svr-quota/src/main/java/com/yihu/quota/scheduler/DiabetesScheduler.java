@@ -60,9 +60,11 @@ public class DiabetesScheduler {
 		String fq = null; // 过滤条件
 		String dictSql = "";
 
+
 		//第一步 找出糖尿病的就诊档案  患病数量
 		long count = solrUtil.count(coreSub, q,fq);
 		List<Map<String,Object>> dataList = selectData(coreSub, q, fq, count);
+		//新增患病数-各区县  HC_05_0001
 
 		//第一步 统计糖尿病的具体数据
 		//EHR_001225  地址
