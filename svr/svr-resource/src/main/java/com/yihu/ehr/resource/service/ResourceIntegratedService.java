@@ -42,6 +42,8 @@ public class ResourceIntegratedService extends BaseJpaService<RsResource, RsReso
     private RsRolesResourceMetadataGrantService rsRolesResourceMetadataGrantService;
     @Autowired
     private RsDictionaryService rsDictionaryService;
+    @Autowired
+    private RsResourceCategoryService resourceCategoryService;
 
 
     /**
@@ -52,22 +54,22 @@ public class ResourceIntegratedService extends BaseJpaService<RsResource, RsReso
         String sql = "";
         if (filters != null) {
             if(ids != null) {
-                sql = "SELECT rr.id, rr.code, rr.name, rr.rs_interface, rr.grant_type FROM rs_resource rr WHERE ((rr.category_id IN (SELECT id FROM rs_resource_category WHERE code = 'standard') " +
+                sql = "SELECT rr.id, rr.code, rr.name, rr.category_id, rr.rs_interface, rr.grant_type FROM rs_resource rr WHERE ((rr.category_id IN (SELECT id FROM rs_resource_category WHERE code = 'standard') " +
                         "AND (rr.rs_interface = 'getEhrCenter' AND rr.id IN (" + ids + "))) " +
                         "OR ((rr.category_id IN (SELECT id FROM rs_resource_category WHERE code = 'standard') AND rr.rs_interface = 'getEhrCenter' AND rr.grant_type = '0'))) " +
                         "AND rr.name like " + "'%" + filters + "%'";
             }else {
-                sql = "SELECT rr.id, rr.code, rr.name, rr.rs_interface, rr.grant_type FROM rs_resource rr WHERE rr.category_id IN (SELECT id FROM rs_resource_category WHERE code = 'standard') " +
+                sql = "SELECT rr.id, rr.code, rr.name, rr.category_id, rr.rs_interface, rr.grant_type FROM rs_resource rr WHERE rr.category_id IN (SELECT id FROM rs_resource_category WHERE code = 'standard') " +
                         "AND rr.rs_interface = 'getEhrCenter' " +
                         "AND rr.name like " + "'%" + filters + "%'";
             }
         } else {
             if(ids != null) {
-                sql = "SELECT rr.id, rr.code, rr.name, rr.rs_interface, rr.grant_type FROM rs_resource rr WHERE ((rr.category_id IN (SELECT id FROM rs_resource_category WHERE code = 'standard') " +
+                sql = "SELECT rr.id, rr.code, rr.name, rr.category_id, rr.rs_interface, rr.grant_type FROM rs_resource rr WHERE ((rr.category_id IN (SELECT id FROM rs_resource_category WHERE code = 'standard') " +
                         "AND (rr.rs_interface = 'getEhrCenter' AND rr.id IN (" + ids + "))) " +
                         "OR ((rr.category_id IN (SELECT id FROM rs_resource_category WHERE code = 'standard') AND rr.rs_interface = 'getEhrCenter' AND rr.grant_type = '0')))";
             }else {
-                sql = "SELECT rr.id, rr.code, rr.name, rr.rs_interface, rr.grant_type FROM rs_resource rr WHERE rr.category_id IN (SELECT id FROM rs_resource_category WHERE code = 'standard') " +
+                sql = "SELECT rr.id, rr.code, rr.name, rr.category_id, rr.rs_interface, rr.grant_type FROM rs_resource rr WHERE rr.category_id IN (SELECT id FROM rs_resource_category WHERE code = 'standard') " +
                         "AND rr.rs_interface = 'getEhrCenter'";
             }
         }
@@ -218,7 +220,7 @@ public class ResourceIntegratedService extends BaseJpaService<RsResource, RsReso
      */
     public Envelop getMetadataList(String userResource, String roleId, String filters) throws Exception{
         Envelop envelop = new Envelop();
-        List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
+        List<Object> resultList = new ArrayList<>();
         Map<String, Object> baseMap = new HashMap<String, Object>();
         List<Map<String, String>> baseList = new ArrayList<Map<String, String>>();
         //处理基本数据
@@ -268,18 +270,21 @@ public class ResourceIntegratedService extends BaseJpaService<RsResource, RsReso
                 rrList = findFileMasterList(ids.substring(0, ids.length() -1), filters);
             }
         }
-        if(rrList != null) {
+        Map<String, Object> finalMap = new HashMap<>();
+        Map<String, String> categoryMap = new HashMap<>();
+        if (rrList != null) {
             for(RsResource rsResources : rrList) {
+                String categoryId = rsResources.getCategoryId();
                 Map<String, Object> masterMap = new HashMap<String, Object>();
+                masterMap.put("level", "2");
                 masterMap.put("code", rsResources.getCode());
                 masterMap.put("name", rsResources.getName());
-                masterMap.put("level", "1");
                 List<RsMetadata> rmList = findFileMetadataList(rsResources, roleId);
-                if(rmList != null) {
+                if (rmList != null) {
                     List<Map<String, Object>> metadataList = new ArrayList<Map<String, Object>>();
                     for(RsMetadata rsMetadata : rmList) {
                         Map<String, Object> metadataMap = new HashMap<String, Object>();
-                        metadataMap.put("level", "2");
+                        metadataMap.put("level", "3");
                         metadataMap.put("code", rsMetadata.getId());
                         metadataMap.put("name", rsMetadata.getName());
                         metadataMap.put("stdCode", rsMetadata.getStdCode());
@@ -300,10 +305,33 @@ public class ResourceIntegratedService extends BaseJpaService<RsResource, RsReso
                         metadataMap.put("groupType", "");
                         metadataList.add(metadataMap);
                     }
-                    masterMap.put("metaDataList", metadataList);
-                    resultList.add(masterMap);
+                    masterMap.put("children", metadataList);
+                    if (categoryMap.containsKey(categoryId)) {
+                        List<Map> dataList = (List)((Map)finalMap.get(categoryId)).get("children");
+                        if (dataList != null) {
+                            dataList.add(masterMap);
+                        }
+                    } else {
+                        RsResourceCategory resourceCategory = resourceCategoryService.getRsCategoryById(categoryId);
+                        if (resourceCategory != null) {
+                            String categoryName = resourceCategory.getName();
+                            categoryMap.put(categoryId, categoryName);
+                            List<Map> dataList = new ArrayList<>();
+                            dataList.add(masterMap);
+                            Map<String, Object> dataMap = new HashMap<>();
+                            dataMap.put("level", "1");
+                            dataMap.put("name", categoryName);
+                            dataMap.put("children", dataList);
+                            finalMap.put(categoryId, dataMap);
+                        }
+                    }
                 }
             }
+            List<Object> finalList = new ArrayList<>();
+            for(String key : finalMap.keySet()) {
+                finalList.add(finalMap.get(key));
+            }
+            resultList.add(finalList);
         }
         envelop.setSuccessFlg(true);
         envelop.setDetailModelList(resultList);

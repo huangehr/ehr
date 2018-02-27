@@ -125,9 +125,6 @@
 	</appender>
 
 	<logger name="com.yihu.ehr.resolve.util.PackResolveLogger" level="INFO" additivity="false">
-        <springProfile name="dev">
-            <appender-ref ref="console" />
-        </springProfile>
 		<appender-ref ref="TaskInfoFile" />
 		<appender-ref ref="TaskWarnFile" />
 		<appender-ref ref="TaskErrorFile" />
