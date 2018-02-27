@@ -15,6 +15,7 @@ import com.yihu.ehr.model.tj.MTjQuotaDataSaveModel;
 import com.yihu.ehr.model.tj.MTjQuotaDataSourceModel;
 import com.yihu.ehr.model.tj.MTjQuotaModel;
 import com.yihu.ehr.util.datetime.DateUtil;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -272,31 +273,39 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.TJ.TjQuotaBatch, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     @ApiOperation(value = "批量导入指标、主维度、细维度", notes = "批量导入指标、主维度、细维度")
-    public boolean tjQuotaBatch(
+    public Envelop tjQuotaBatch(
             @RequestBody String lsMap) throws Exception {
-        Map<String,Object> values = objectMapper.readValue(lsMap , new TypeReference<Map<String,Object>>() {});
-        List saveLs=new ArrayList();
-        List quotaMainLs=new ArrayList();
-        List quotaSlaveLs=new ArrayList();
-        if(null != values && values.size()>0){
-            for(String key:values.keySet()){
+        List saveLs = new ArrayList();
+        List quotaMainLs = new ArrayList();
+        List quotaSlaveLs = new ArrayList();
+        Envelop envelop = new Envelop();
+        try{
+        Map<String, Object> values = objectMapper.readValue(lsMap, new TypeReference<Map<String, Object>>() {});
+        if (null != values && values.size() > 0) {
+            for (String key : values.keySet()) {
 
-                if("saveLs".equals(key)){
+                if ("saveLs".equals(key)) {
                     //指标、数据源、数据存储
-                    saveLs = (List)values.get(key);
+                    saveLs = (List) values.get(key);
                     tjQuotaService.tjQuotaBatch(saveLs);
 
-                }else if("quotaMainLs".equals(key)){
+                } else if ("quotaMainLs".equals(key)) {
                     //主维度
-                    quotaMainLs = (List)values.get(key);
+                    quotaMainLs = (List) values.get(key);
                     tjQuotaDimensionMainService.addTjQuotaDimensionMainBatch(quotaMainLs);
-                }else{
+                } else {
                     //细维度
-                    quotaSlaveLs = (List)values.get(key);
+                    quotaSlaveLs = (List) values.get(key);
                     tjQuotaDimensionSlaveService.addTjQuotaDimensionSlaveBatch(quotaSlaveLs);
                 }
             }
         }
-        return true;
+        envelop.setSuccessFlg(true);
+    }catch (Exception e) {
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return envelop;
     }
 }
