@@ -31,8 +31,6 @@ public class SolrAdmin {
     @Autowired
     private SolrPool pool;
 
-
-    /************************* 基础操作 **************************************************/
     /**
      * 新建单条索引
      */
@@ -45,7 +43,6 @@ public class SolrAdmin {
         }
         UpdateResponse re = client.add(doc);
         client.commit();
-        pool.close(client); //释放连接
         if (re.getStatus() != 0) {
             logger.info("create index cost " + re.getQTime());
             return true;
@@ -61,7 +58,7 @@ public class SolrAdmin {
     public Boolean update(String core,String uniqueKey,String uniqueKeyValue,String key,Object value) throws Exception {
         Map<String,Object> map = new HashMap();
         map.put(key, value);
-        return update(core,uniqueKey+":"+uniqueKeyValue,map);
+        return update(core,uniqueKey + ":" + uniqueKeyValue, map);
     }
 
     /**
@@ -85,7 +82,6 @@ public class SolrAdmin {
             }
             UpdateResponse re = client.add(solrList);
             client.commit();
-            pool.close(client); //释放连接
             if(re.getStatus() != 0) {
                 logger.info("update index cost " + re.getQTime());
                 return true;
@@ -108,7 +104,6 @@ public class SolrAdmin {
         SolrClient client = pool.getConnection(core);
         UpdateResponse de = client.deleteByQuery(keyQuery);
         client.commit();
-        pool.close(client); //释放连接
         if (de.getStatus() != 0) {
             logger.info("delete index cost " + de.getQTime());
             return true;
