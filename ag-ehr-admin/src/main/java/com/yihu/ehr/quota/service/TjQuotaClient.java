@@ -7,6 +7,7 @@ import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
 import com.yihu.ehr.model.tj.MTjQuotaModel;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -80,6 +81,6 @@ public interface TjQuotaClient {
 
     @RequestMapping(value = ServiceApi.TJ.TjQuotaBatch, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "批量导入指标、主维度、细维度", notes = "批量导入指标、主维度、细维度")
-    boolean tjQuotaBatch(
+    Envelop tjQuotaBatch(
             @RequestBody String lsMap) ;
 }
