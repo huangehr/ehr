@@ -29,7 +29,7 @@ spring:
 
 eureka:
   instance:
-    ip-address: 172.19.103.58:8761
+    ip-address: 172.19.103.73:8761
     prefer-ip-address: true
 
 ---
