@@ -1225,6 +1225,9 @@ public class ServiceApi {
 
         public static final String getQuotaCategoryByName = "/quotaCategory/getQuotaCategoryByName";
 
+        public static final String GetHeatMapByQuotaCode = "/tj/getHeatMapByQuotaCode";
+        public static final String GetNumberOfDiabetes = "/tj/getNumberOfDiabetes";
+
     }
 
     public static class StasticReport {
