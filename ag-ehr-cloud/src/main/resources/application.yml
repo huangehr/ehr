@@ -6,29 +6,21 @@ server:
 
 management:
   port: ${server.port}
-
+eip:
+  tenant: jkzl
 ---
 spring:
   profiles: dev
-eip:
-  tenant: jkzl
+
 ---
 spring:
   profiles: test
-eip:
-  tenant: jkzl
 ---
 spring:
   profiles: prod_fz
-eip:
-  tenant: jkzl
 ---
 spring:
   profiles: prod_sr
-eip:
-  tenant: jkzl
 ---
 spring:
   profiles: prod_fzzy
-eip:
-  tenant: jkzl

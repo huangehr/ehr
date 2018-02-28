@@ -25,6 +25,8 @@ fast-dfs:
     tracker-http-port: 80
     anti-steal-token: no
     secret-key: FastDFS1234567890
+eip:
+  tenant: jkzl
 
 ---
 spring:
@@ -60,8 +62,6 @@ es:
   host: http://172.19.103.68:9200
   tHost: 172.19.103.68:9300
   clusterName: jkzl
-eip:
-  tenant: jkzl
 
 ---
 spring:
@@ -97,8 +97,6 @@ es:
   host: http://172.19.103.68:9200
   tHost: 172.19.103.68:9300
   clusterName: jkzl
-eip:
-  tenant: jkzl
 
 ---
 spring:
@@ -128,8 +126,6 @@ es:
   host: http://172.19.103.68:9200
   tHost: 172.19.103.68:9300
   clusterName: jkzl
-eip:
-  tenant: jkzl
 
 ---
 spring:
@@ -159,8 +155,6 @@ es:
   host: http://10.176.97.7:9200
   tHost: 10.176.97.7:9300
   clusterName: jkzl
-eip:
-  tenant: jkzl
 
 ---
 spring:
@@ -190,5 +184,3 @@ es:
   host: http://100.100.1.158:9200
   tHost: 100.100.1.158:9300
   clusterName: jkzl
-eip:
-  tenant: jkzl
