@@ -49,6 +49,8 @@ spring:
   data:
     solr:
       repositories.enabled: true # Enable Solr repositories.
+eip:
+  tenant: jkzl
 
 ---
 spring:
@@ -128,5 +130,4 @@ spring:
 fast-dfs:
   tracker-server: 100.100.1.157:22122
   public-server: http://100.100.1.157:8888
-
 

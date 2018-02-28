@@ -22,6 +22,11 @@
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-ehr-constants</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.yihu.hos</groupId>
+            <artifactId>common-rest-model</artifactId>
+            <version>${version.eip}</version>
+        </dependency>
     </dependencies>
 
 </project>

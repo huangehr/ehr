@@ -7,8 +7,8 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.adaption.MAdapterOrg;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.resource.MRsAdapterSchema;
-import com.yihu.ehr.model.standard.MCDAVersion;
 import com.yihu.ehr.resource.client.RsAdapterSchemaClient;
+import com.yihu.hos.model.standard.MSTDVersion;
 import com.yihu.ehr.std.service.CDAVersionClient;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.util.rest.Envelop;
@@ -204,7 +204,7 @@ public class RsAdapterSchemaController extends BaseController {
                 }
                 if(StringUtils.isNotBlank(mRsAdapterSchema.getAdapterVersion())){
                     if(PLAT_FORM.equals(mRsAdapterSchema.getType())){//格式化平台标准
-                        MCDAVersion mcdaVersion =  cdaVersionClient.getVersion(mRsAdapterSchema.getAdapterVersion());
+                        MSTDVersion mcdaVersion =  cdaVersionClient.getVersion(mRsAdapterSchema.getAdapterVersion());
                         if(mcdaVersion!=null){
                             rsAdapterSchemaModel.setAdapterVersionName(mcdaVersion.getVersionName());
                         }

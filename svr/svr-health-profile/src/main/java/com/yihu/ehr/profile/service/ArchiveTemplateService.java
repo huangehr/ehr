@@ -1,6 +1,6 @@
 package com.yihu.ehr.profile.service;
 
-import com.yihu.ehr.model.standard.MCDADocument;
+import com.yihu.hos.model.standard.MCDADocument;
 import com.yihu.ehr.profile.dao.ArchiveTemplateDao;
 import com.yihu.ehr.profile.feign.CDADocumentClient;
 import com.yihu.ehr.profile.model.ArchiveTemplate;

@@ -99,17 +99,6 @@ public class RedisInitEndPoint extends EnvelopRestEndPoint {
         return "Redis缓存机构Saas机构完成！";
     }
 
-    @ApiOperation("Redis缓存标准版本")
-    @RequestMapping(value = ServiceApi.Redis.InitVersions, method = RequestMethod.POST)
-    public String cacheVersions(
-            @ApiParam(name = "versions", value = "版本列表，使用逗号分隔", defaultValue = "59083976eebd")
-            @RequestParam("versions") String versions,
-            @ApiParam(name = "force", value = "强制清除再缓存", defaultValue = "true")
-            @RequestParam("force") boolean force) throws Exception {
-        redisInitService.cacheVersions(versions, force);
-        return "Redis缓存标准版本完成！";
-    }
-
     @RequestMapping(value= ServiceApi.Redis.InitRsAdapterDict, method = RequestMethod.POST)
     @ApiOperation("Redis缓存适配数据字典数据")
     public String cacheAdapterDict(

@@ -1,7 +1,5 @@
 package com.yihu.ehr.resource.model;
 
-import org.hibernate.annotations.GenericGenerator;
-
 import javax.persistence.*;
 
 /**
@@ -22,8 +20,7 @@ public class RsAdapterDictionary {
     private String srcDictEntryName;
 
     @Id
-    @GeneratedValue(generator="Generator")
-    @GenericGenerator(name="Generator",strategy = "assigned")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="id",nullable = false,unique = true)
     public String getId() {
         return id;

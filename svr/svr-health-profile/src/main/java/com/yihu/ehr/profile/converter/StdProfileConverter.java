@@ -1,7 +1,7 @@
 package com.yihu.ehr.profile.converter;
 
 import com.yihu.ehr.constants.EventType;
-import com.yihu.ehr.model.standard.MCDADocument;
+import com.yihu.hos.model.standard.MCDADocument;
 import com.yihu.ehr.profile.config.CdaDocumentTypeOptions;
 import com.yihu.ehr.profile.feign.CDADocumentClient;
 import com.yihu.ehr.profile.model.ArchiveTemplate;

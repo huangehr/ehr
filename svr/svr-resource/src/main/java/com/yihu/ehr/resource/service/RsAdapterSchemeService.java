@@ -1,9 +1,12 @@
 package com.yihu.ehr.resource.service;
 
 import com.yihu.ehr.query.BaseJpaService;
+import com.yihu.ehr.resource.dao.RsAdapterDictionaryDao;
 import com.yihu.ehr.resource.dao.RsAdapterMetadataDao;
 import com.yihu.ehr.resource.dao.RsAdapterSchemeDao;
-import com.yihu.ehr.resource.dao.RsAdapterDictionaryDao;
+import com.yihu.ehr.resource.feign.StandClient;
+import com.yihu.ehr.resource.model.RsAdapterDictionary;
+import com.yihu.ehr.resource.model.RsAdapterMetadata;
 import com.yihu.ehr.resource.model.RsAdapterScheme;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +16,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 适配方案服务
@@ -37,6 +44,9 @@ public class RsAdapterSchemeService extends BaseJpaService<RsAdapterScheme, RsAd
 
     @Value("${deploy.region}")
     Short deployRegion = 3502;
+
+    @Autowired
+    private StandClient standClient;
 
     /**
      * 保存适配方案
@@ -112,47 +122,40 @@ public class RsAdapterSchemeService extends BaseJpaService<RsAdapterScheme, RsAd
 
     //平台标准字典适配
     public void batchAdapterDictionary(RsAdapterScheme adapterscheme) throws Exception {
-        String sql ="INSERT INTO rs_adapter_dictionary ( " +
-                " scheme_id, " +
-                " src_dict_code, " +
-                " src_dict_entry_code, " +
-                " src_dict_entry_name " +
-                ") SELECT " +
-                " '"+adapterscheme.getId()+"', " +
-                " sd. CODE, " +
-                " sde. CODE, " +
-                " sde. " +
-                "VALUE " +
-                " " +
-                "FROM " +
-                " std_dictionary_entry_"+adapterscheme.getAdapterVersion()+" sde " +
-                "LEFT JOIN" +
-                " std_dictionary_"+adapterscheme.getAdapterVersion()+" sd " +
-                "ON " +
-                " sde.dict_id = sd.id where sd.code is not null ";
-        jdbcTemplate.execute(sql);
+        List<Map<String, Object>> ehrAdapterDict = standClient.getEhrAdapterDict(adapterscheme.getAdapterVersion());
+        if(ehrAdapterDict!=null && ehrAdapterDict.size()>0){
+            List<RsAdapterDictionary> rsAdapterDitcs = new ArrayList<>();
+            String schemeId = adapterscheme.getId();
+            for (Map<String,Object> map :ehrAdapterDict){
+                RsAdapterDictionary rsAdapterDictionary = new RsAdapterDictionary();
+                rsAdapterDictionary.setSchemeId(schemeId);
+                rsAdapterDictionary.setSrcDictCode(map.get("dictCode")==null ? "": map.get("dictCode").toString());
+                rsAdapterDictionary.setSrcDictEntryCode(map.get("dictEntryCode")==null ? "": map.get("dictEntryCode").toString());
+                rsAdapterDictionary.setSrcDictEntryName(map.get("dictEntryName")==null ? "": map.get("dictEntryName").toString());
+                rsAdapterDitcs.add(rsAdapterDictionary);
+            }
+            adapterDictionaryDao.save(rsAdapterDitcs);
+        }
     }
 
     //平台标准数据元适配
     public void batchAdapterMetadata(RsAdapterScheme adapterscheme) throws Exception {
-        String sql = "INSERT INTO rs_adapter_metadata ( " +
-                " scheme_id,  " +
-                " src_dataset_code,  " +
-                " src_metadata_code,  " +
-                " src_metadata_name  " +
-                ") SELECT  " +
-                " '"+adapterscheme.getId()+"',  " +
-                " sds. CODE,  " +
-                " smd.column_name,  " +
-                " smd. NAME  " +
-                "FROM  " +
-                " std_meta_data_"+adapterscheme.getAdapterVersion()+" smd  " +
-                "LEFT JOIN" +
-                " std_data_set_"+adapterscheme.getAdapterVersion()+" sds  " +
-                "ON  " +
-                " smd.dataset_id = sds.id";
-        jdbcTemplate.execute(sql);
+        List<Map<String, Object>> ehrAdapterMetadata = standClient.getEhrAdapterMetadata(adapterscheme.getAdapterVersion());
+        if(ehrAdapterMetadata!=null && ehrAdapterMetadata.size()>0){
+            List<RsAdapterMetadata> rsAdapterMetadatas = new ArrayList<>();
+            String schemeId = adapterscheme.getId();
+            for (Map<String,Object> map :ehrAdapterMetadata){
+                RsAdapterMetadata rsAdapterMetadata = new RsAdapterMetadata();
+                rsAdapterMetadata.setSchemeId(schemeId);
+                rsAdapterMetadata.setSrcDatasetCode(map.get("dataSetCode")==null ? "": map.get("dataSetCode").toString());
+                rsAdapterMetadata.setSrcMetadataCode(map.get("metadaCode")==null ? "": map.get("metadaCode").toString());
+                rsAdapterMetadata.setSrcMetadataName(map.get("metadaName")==null ? "": map.get("metadaName").toString());
+                rsAdapterMetadatas.add(rsAdapterMetadata);
+            }
+            metadataDao.save(rsAdapterMetadatas);
+        }
     }
+
 
 
     /**
