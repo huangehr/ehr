@@ -788,7 +788,7 @@ public class ConventionalDictEntryController extends BaseController{
     @RequestMapping(value = "/dictionaries/portal_notice_protal_type_list", method = RequestMethod.GET)
     @ApiOperation(value = "通知公告云类别清单", response = MConventionalDict.class)
     public Envelop getPortalNoticeProtalTypeList(@ApiParam(name = "code", value = "字典代码", defaultValue = "")
-                                                     @RequestParam(value = "code") String code){
+                                                 @RequestParam(value = "code") String code){
         MConventionalDict mConventionalDict  = dictEntryClient.getPortalNoticeProtalTypeList(code);
         return convertDictToModel(mConventionalDict);
     }
@@ -797,7 +797,7 @@ public class ConventionalDictEntryController extends BaseController{
     @RequestMapping(value = "/dictionaries/portal_resources_platform_type_list", method = RequestMethod.GET)
     @ApiOperation(value = "资源平台类别类别清单", response = MConventionalDict.class)
     public Envelop getPortalResourcesPlatformTypeList(@ApiParam(name = "code", value = "字典代码", defaultValue = "")
-                                           @RequestParam(value = "code") String code){
+                                                      @RequestParam(value = "code") String code){
         MConventionalDict mConventionalDict = dictEntryClient.getPortalResourcesPlatformTypeList(code);
         return convertDictToModel(mConventionalDict);
     }
@@ -805,7 +805,7 @@ public class ConventionalDictEntryController extends BaseController{
     @RequestMapping(value = "/dictionaries/portal_resources_develop_lan_type_list", method = RequestMethod.GET)
     @ApiOperation(value = "资源应用开发环境类别清单", response = MConventionalDict.class)
     public Envelop getPortalResourcesDevelopLanTypeList(@ApiParam(name = "code", value = "字典代码", defaultValue = "")
-                                                      @RequestParam(value = "code") String code){
+                                                        @RequestParam(value = "code") String code){
         MConventionalDict mConventionalDict = dictEntryClient.getPortalResourcesDevelopLanTypeList(code);
         return convertDictToModel(mConventionalDict);
     }
@@ -813,7 +813,7 @@ public class ConventionalDictEntryController extends BaseController{
     @RequestMapping(value = "/dictionaries/portal_messageRemind_type_list", method = RequestMethod.GET)
     @ApiOperation(value = "消息提醒类别清单", response = MConventionalDict.class)
     public Envelop getMessageRemindTypeList(@ApiParam(name = "code", value = "字典代码", defaultValue = "")
-                                                        @RequestParam(value = "code") String code){
+                                            @RequestParam(value = "code") String code){
         MConventionalDict mConventionalDict = dictEntryClient.getMessageRemindTypeList(code);
         return convertDictToModel(mConventionalDict);
     }

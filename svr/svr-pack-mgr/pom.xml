@@ -45,12 +45,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
+
         <dependency>
             <groupId>com.timgroup</groupId>
             <artifactId>java-statsd-client</artifactId>
             <scope>${dependency.scope}</scope>
         </dependency>
-        <!-- actuator -->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>

@@ -3,9 +3,8 @@ package com.yihu.ehr.basic.report.feign;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.constants.ServiceApi;
-import com.yihu.ehr.model.packs.MPackage;
-import com.yihu.ehr.model.standard.MStdDataSet;
-import com.yihu.ehr.model.standard.MStdMetaData;
+import com.yihu.hos.model.standard.MStdDataSet;
+import com.yihu.hos.model.standard.MStdMetaData;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -15,8 +14,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import springfox.documentation.annotations.ApiIgnore;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.Collection;
 import java.util.Map;
 

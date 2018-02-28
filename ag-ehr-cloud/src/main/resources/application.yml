@@ -10,27 +10,25 @@ management:
 ---
 spring:
   profiles: dev
-
----
-spring:
-  profiles: alpha
-
+eip:
+  tenant: jkzl
 ---
 spring:
   profiles: test
-
----
-spring:
-  profiles: prod
-
+eip:
+  tenant: jkzl
 ---
 spring:
   profiles: prod_fz
-
+eip:
+  tenant: jkzl
 ---
 spring:
   profiles: prod_sr
-
+eip:
+  tenant: jkzl
 ---
 spring:
   profiles: prod_fzzy
+eip:
+  tenant: jkzl

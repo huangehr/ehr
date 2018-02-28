@@ -3,8 +3,6 @@ server:
 
 management:
   port: ${server.port}
-  security:
-    enabled: false
 
 info:
   app:
@@ -60,20 +58,6 @@ fast-dfs:
 
 ---
 spring:
-  profiles: alpha
-  datasource:
-    url: jdbc:mysql://192.168.1.220:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: ha
-    password: ha
-elasticsearch:
-  cluster-name: elasticsearch
-  cluster-nodes: 172.17.110.17:9300
-fast-dfs:
-  tracker-server: 172.19.103.54:22122
-  public-server: http://172.19.103.54:80
-
----
-spring:
   profiles: test
   datasource:
     url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
@@ -85,20 +69,6 @@ elasticsearch:
 fast-dfs:
   tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52:80
-
----
-spring:
-  profiles: prod
-  datasource:
-    url: jdbc:mysql://11.1.2.5:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: ha
-    password: jkzlxm
-elasticsearch:
-  cluster-name: elasticsearch
-  cluster-nodes: 172.17.110.17:9300
-fast-dfs:
-  tracker-server: 11.1.2.9:22122
-  public-server: http://ds.ehr.yihu.com:22122
 
 ---
 spring:

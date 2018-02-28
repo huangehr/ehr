@@ -130,24 +130,26 @@
         <version.elasticsearch>2.4.5</version.elasticsearch>
         <version.elasticsearch-sql>2.4.1.0</version.elasticsearch-sql>
         <version.jest>2.4.0</version.jest>
+        <version.alibaba-druid>1.0.15</version.alibaba-druid>
         <version.ehr>1.1.0</version.ehr>
+        <version.eip>1.3.0</version.eip>
     </properties>
 
     <dependencyManagement>
         <dependencies>
             <!--<dependency>-->
-                <!--<groupId>org.springframework.boot</groupId>-->
-                <!--<artifactId>spring-boot-dependencies</artifactId>-->
-                <!--<version>1.5.9.RELEASE</version>-->
-                <!--<type>pom</type>-->
-                <!--<scope>import</scope>-->
+            <!--<groupId>org.springframework.boot</groupId>-->
+            <!--<artifactId>spring-boot-dependencies</artifactId>-->
+            <!--<version>1.5.9.RELEASE</version>-->
+            <!--<type>pom</type>-->
+            <!--<scope>import</scope>-->
             <!--</dependency>-->
             <!--<dependency>-->
-                <!--<groupId>org.springframework.cloud</groupId>-->
-                <!--<artifactId>spring-cloud-dependencies</artifactId>-->
-                <!--<version>Finchley.M5</version>-->
-                <!--<type>pom</type>-->
-                <!--<scope>import</scope>-->
+            <!--<groupId>org.springframework.cloud</groupId>-->
+            <!--<artifactId>spring-cloud-dependencies</artifactId>-->
+            <!--<version>Finchley.M5</version>-->
+            <!--<type>pom</type>-->
+            <!--<scope>import</scope>-->
             <!--</dependency>-->
             <!-- Base library-->
             <dependency>
@@ -692,12 +694,96 @@
             </dependency>
 
             <!-- Hadoop library -->
-            <!--<dependency>-->
-                <!--<groupId>org.apache.hadoop</groupId>-->
-                <!--<artifactId>hadoop-client</artifactId>-->
-                <!--<version>${version.hadoop-client}</version>-->
-                <!--<scope>${dependency.scope}</scope>-->
-            <!--</dependency>-->
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-annotations</artifactId>
+                <version>${version.hadoop-client}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-auth</artifactId>
+                <version>${version.hadoop-client}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-common</artifactId>
+                <version>${version.hadoop-client}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-distcp</artifactId>
+                <version>${version.hadoop-client}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-hdfs</artifactId>
+                <version>${version.hadoop-client}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-mapreduce-client-common</artifactId>
+                <version>${version.hadoop-client}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-mapreduce-client-core</artifactId>
+                <version>${version.hadoop-client}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
+                <version>${version.hadoop-client}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-mapreduce-client-shuffle</artifactId>
+                <version>${version.hadoop-client}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-streaming</artifactId>
+                <version>${version.hadoop-client}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-yarn-api</artifactId>
+                <version>${version.hadoop-client}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-yarn-client</artifactId>
+                <version>${version.hadoop-client}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-yarn-common</artifactId>
+                <version>${version.hadoop-client}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-yarn-server-common</artifactId>
+                <version>${version.hadoop-client}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-yarn-server-nodemanager</artifactId>
+                <version>${version.hadoop-client}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
             <dependency>
                 <groupId>org.apache.hbase</groupId>
                 <artifactId>hbase-client</artifactId>
@@ -800,6 +886,12 @@
                 <artifactId>elasticsearch-sql</artifactId>
                 <version>${version.elasticsearch-sql}</version>
             </dependency>
+            <!-- Jest -->
+            <dependency>
+                <groupId>io.searchbox</groupId>
+                <artifactId>jest</artifactId>
+                <version>${version.jest}</version>
+            </dependency>
 
             <!-- Redis library -->
             <dependency>
@@ -815,6 +907,11 @@
                 <artifactId>quartz</artifactId>
                 <version>${version.quartz}</version>
                 <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.quartz-scheduler</groupId>
+                <artifactId>quartz-jobs</artifactId>
+                <version>${version.quartz}</version>
             </dependency>
 
             <!-- Zip library -->
@@ -898,6 +995,13 @@
                 <artifactId>logback-classic</artifactId>
                 <version>${version.logback}</version>
                 <scope>${dependency.scope}</scope>
+            </dependency>
+
+            <!-- Alibaba -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid</artifactId>
+                <version>${version.alibaba-druid}</version>
             </dependency>
 
             <dependency>

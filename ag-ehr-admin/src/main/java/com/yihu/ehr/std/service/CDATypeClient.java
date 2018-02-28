@@ -3,7 +3,7 @@ package com.yihu.ehr.std.service;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
-import com.yihu.ehr.model.standard.MCDAType;
+import com.yihu.hos.model.standard.MCDAType;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;

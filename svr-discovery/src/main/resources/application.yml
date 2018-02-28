@@ -7,6 +7,8 @@ spring:
       enabled: false
 
 eureka:
+  server:
+    enable-self-preservation: false
   client:
     register-with-eureka: false
     fetch-registry: false
@@ -25,15 +27,7 @@ spring:
 
 ---
 spring:
-  profiles: alpha
-
----
-spring:
   profiles: test
-
----
-spring:
-  profiles: prod
 
 ---
 spring:

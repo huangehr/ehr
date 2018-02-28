@@ -65,20 +65,8 @@ spring:
 fast-dfs:
   tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52:80
-
----
-spring:
-  profiles: alpha
-  datasource:
-    url: jdbc:mysql://192.168.1.220:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: ha
-    password: ha
-  redis:
-    host: 192.168.1.220 # Redis server host.
-fast-dfs:
-  tracker-server: 172.19.103.54:22122
-  public-server: http://172.19.103.54:22122
-
+eip:
+  tenant: jkzl
 ---
 spring:
   profiles: test
@@ -94,20 +82,8 @@ spring:
 fast-dfs:
   tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52:80
-
----
-spring:
-  profiles: prod
-  datasource:
-    url: jdbc:mysql://11.1.2.5:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: ha
-    password: jkzlxm
-  redis:
-    host: 11.1.2.20 # Redis server host.
-fast-dfs:
-  tracker-server: 11.1.2.9:22122
-  public-server: http://ds.ehr.yihu.com:22122
-
+eip:
+  tenant: jkzl
 ---
 spring:
   profiles: prod_fz
@@ -122,7 +98,8 @@ spring:
 fast-dfs:
   tracker-server: 11.1.2.9:22122
   public-server: http://11.1.2.9:80
-
+eip:
+  tenant: jkzl
 ---
 spring:
   profiles: prod_sr
@@ -137,7 +114,8 @@ spring:
 fast-dfs:
   tracker-server: 10.176.97.5:22122
   public-server: http://10.176.97.5:8888
-
+eip:
+  tenant: jkzl
 ---
 spring:
   profiles: prod_fzzy
@@ -154,5 +132,6 @@ spring:
 fast-dfs:
   tracker-server: 100.100.1.157:22122
   public-server: http://100.100.1.157:8888
-
+eip:
+  tenant: jkzl
 

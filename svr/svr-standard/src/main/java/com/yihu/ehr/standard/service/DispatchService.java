@@ -2,9 +2,14 @@ package com.yihu.ehr.standard.service;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
-import com.yihu.ehr.standard.model.*;
+import com.yihu.ehr.standard.feignclient.CdaDocumentClient;
+import com.yihu.ehr.standard.feignclient.DataSetClient;
+import com.yihu.ehr.standard.feignclient.DictClient;
+import com.yihu.ehr.standard.feignclient.StdVersionClient;
+import com.yihu.ehr.standard.model.VersionFileInfo;
 import com.yihu.ehr.util.compress.Zipper;
 import com.yihu.ehr.util.log.LogService;
+import com.yihu.hos.model.standard.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -38,23 +43,13 @@ public class DispatchService {
     @Autowired
     VersionFileService versionFileService;
     @Autowired
-    DataSetService dataSetService;
+    private DataSetClient dataSetClient;
     @Autowired
-    MetaDataService metaDataService;
+    private StdVersionClient stdVersionClient;
     @Autowired
-    CdaVersionService cdaVersionService;
+    private CdaDocumentClient cdaDocumentClient;
     @Autowired
-    DictService dictService;
-    @Autowired
-    DictEntryService dictEntryService;
-    @Autowired
-    CDADocumentService cdaDocumentService;
-    @Autowired
-    CDADataSetRelationshipService cdaDataSetRelationshipManager;
-
-    private Class getServiceEntity(String version){
-        return cdaDocumentService.getServiceEntity(version);
-    }
+    private DictClient dictClient;
 
     @Autowired
     FastDFSUtil fastDFSUtil;
@@ -189,7 +184,7 @@ public class DispatchService {
      * 创建标准版本XML
      */
     @Transactional(propagation = Propagation.SUPPORTS)
-    public void createStandardVersionFile(String strFilePath, String strFileName, List<CDAVersion> cdaVersion)
+    public void createStandardVersionFile(String strFilePath, String strFileName, List<MSTDVersion> cdaVersion)
             throws Exception {
         Document doc = createDocument();
         Element root = doc.createElement("table");
@@ -200,7 +195,7 @@ public class DispatchService {
         root.appendChild(getVersionColumnElementRoot(doc));
 
         //创建版本详细信息
-        for (CDAVersion version : cdaVersion) {
+        for (MSTDVersion version : cdaVersion) {
             Element rowRoot = doc.createElement("row");
             rowRoot.setAttribute("type", "add");
 
@@ -223,10 +218,10 @@ public class DispatchService {
      * 创建数据集文件
      */
     @Transactional(propagation = Propagation.SUPPORTS)
-    public List<BaseMetaData> createDataSetFile(String strFilePath, String strFileName, List<BaseDataSet> dataSet, String version)
+    public List<MStdMetaData> createDataSetFile(String strFilePath, String strFileName, List<MStdDataSet> dataSet, String version)
             throws Exception {
         //创建数据集XML 返回数据集IDList
-        List<BaseMetaData> listMetaDta = new ArrayList<>();
+        List<MStdMetaData> listMetaDta = new ArrayList<>();
         Document doc = createDocument();
         Element root = doc.createElement("table");
         root.setAttribute("name", "std_dataset");
@@ -239,7 +234,7 @@ public class DispatchService {
         root.appendChild(getColumnElement(doc, colRoot, strColumn));
 
         //创建数据集详细信息
-        for (BaseDataSet xDataSet : dataSet) {
+        for (MStdDataSet xDataSet : dataSet) {
             Element rowRoot = doc.createElement("row");
             appendChild(rowRoot, doc.createElement("summary"), "");
             appendChild(rowRoot, doc.createElement("valid"), "1");
@@ -266,7 +261,7 @@ public class DispatchService {
      * 创建数据元文件
      */
     @Transactional(propagation = Propagation.SUPPORTS)
-    public void createMetaDataFile(String strFilePath, String strFileName, String version, List<BaseMetaData> metaDataList)
+    public void createMetaDataFile(String strFilePath, String strFileName, String version, List<MStdMetaData> metaDataList)
             throws Exception{
         //创建数据元XML
         Document doc = createDocument();
@@ -281,7 +276,7 @@ public class DispatchService {
         root.appendChild(getColumnElement(doc, colRoot, strColumn));
 
         //创建数据元明细信息
-        for (BaseMetaData metaData : metaDataList) {
+        for (MStdMetaData metaData : metaDataList) {
             Element rowRoot = doc.createElement("row");
 
             appendChild(rowRoot, doc.createElement("inner_version"), version);
@@ -316,10 +311,10 @@ public class DispatchService {
      * 创建字典文件
      */
     @Transactional(propagation = Propagation.SUPPORTS)
-    public List<BaseDictEntry> createDictFile(String strFilePath, String strFileName, List<BaseDict> dicts, String sourceVersionId)
+    public List<MStdDictEntry> createDictFile(String strFilePath, String strFileName, List<MStdDict> dicts, String sourceVersionId)
         throws Exception{
         //创建字典XML，返回字典值 List
-        List<BaseDictEntry> listEntry = new ArrayList<>();
+        List<MStdDictEntry> listEntry = new ArrayList<>();
         Document doc = createDocument();
         Element root = doc.createElement("table");
         root.setAttribute("name", "std_dict");
@@ -330,7 +325,7 @@ public class DispatchService {
         //创建数据元文件列信息
         root.appendChild(getColumnElement(doc, colRoot, strColumn));
 
-        for (BaseDict xDict : dicts) {
+        for (MStdDict xDict : dicts) {
             Element rowRoot = doc.createElement("row");
 
             appendChild(rowRoot, doc.createElement("valid"), "1");
@@ -360,7 +355,7 @@ public class DispatchService {
      * 创建字典值XML文件
      */
     @Transactional(propagation = Propagation.SUPPORTS)
-    public void createDictEntryFile(String strFilePath, String strFileName, String version, List<BaseDictEntry> dictEntry)
+    public void createDictEntryFile(String strFilePath, String strFileName, String version, List<MStdDictEntry> dictEntry)
         throws Exception{
         //创建字典值XML
         Document doc = createDocument();
@@ -373,7 +368,7 @@ public class DispatchService {
 
         //创建数据元文件列信息
         root.appendChild(getColumnElement(doc, colRoot, strColumn));
-        for (BaseDictEntry xDictEntry : dictEntry) {
+        for (MStdDictEntry xDictEntry : dictEntry) {
             Element rowRoot = doc.createElement("row");
             String type = typeMapping.get(xDictEntry.getOperationType());
             rowRoot.setAttribute("type", type==null ? "add" : type);
@@ -449,8 +444,9 @@ public class DispatchService {
         }
 
         //获取标准版本信息
-        List<CDAVersion> listVersion = new ArrayList<CDAVersion>();
-        CDAVersion sourceVersion = cdaVersionService.retrieve(sourceVersionId);
+        List<MSTDVersion> listVersion = new ArrayList<MSTDVersion>();
+
+        MSTDVersion sourceVersion = stdVersionClient.getVersion(sourceVersionId);
         listVersion.add(sourceVersion);
 
         //创建文档
@@ -544,7 +540,7 @@ public class DispatchService {
      * @return
      */
     @Transactional(propagation = Propagation.SUPPORTS)
-    public void createCDAFile(String strFilePath, String strFileName, List<CDADocument> listCDA) throws Exception{
+    public void createCDAFile(String strFilePath, String strFileName, List<MCDADocument> listCDA) throws Exception{
         Document doc = createDocument();
         Element root = doc.createElement("table");
         root.setAttribute("name", "std_cda");
@@ -563,7 +559,7 @@ public class DispatchService {
         //创建数据元文件列信息
         root.appendChild(getColumnElement(doc, colRoot, strColumn));
         for (int i = 0; i < listCDA.size(); i++) {
-            CDADocument info = listCDA.get(i);
+            MCDADocument info = listCDA.get(i);
             Element rowRoot = doc.createElement("row");
             String type = typeMapping.get(info.getType());
             if(type==null)
@@ -600,35 +596,54 @@ public class DispatchService {
         outputXml(doc, strFilePath + strFileName);
     }
 
-    private void createFiles(String strXMLFilePath, List<CDAVersion> listVersion, String sourceVersionId)
+    private void createFiles(String strXMLFilePath, List<MSTDVersion> listVersion, String sourceVersionId)
         throws Exception{
         //创建版本文件
         createStandardVersionFile(strXMLFilePath, "std_inner_version.xml", listVersion);
 
         //创建数据集文件，并获取数据元信息
-        List<BaseMetaData> listMateData =
-                createDataSetFile(strXMLFilePath, "std_dataset.xml",
-                    dataSetService.findAll(dataSetService.getServiceEntity(sourceVersionId)), sourceVersionId);
+        Collection<MStdDataSet> mStdDataSets = dataSetClient.searchSourcesWithoutPaging("", sourceVersionId);
+        ArrayList<MStdDataSet> stdDataSets = new ArrayList<>();
+        for(MStdDataSet mStdDataSet:mStdDataSets){
+            stdDataSets.add(mStdDataSet);
+        }
+
+        List<MStdMetaData> listMateData =
+                createDataSetFile(strXMLFilePath, "std_dataset.xml", stdDataSets, sourceVersionId);
 
         //创建数据元文件
         createMetaDataFile(strXMLFilePath, "std_metadata.xml", sourceVersionId, listMateData);
 
         //创建CDA文档
         String strCDAFileName = "std_cda.xml";
-
-        Class entityClass = getServiceEntity(sourceVersionId);
-        List<CDADocument> listCDA = cdaDocumentService.search(entityClass, "id="+ sourceVersionId);
+        Collection<MCDADocument> cdaDocumentNoPage = cdaDocumentClient.getCDADocumentNoPage("", "id=" + sourceVersionId, null, sourceVersionId);
+        List<MCDADocument> listCDA = new ArrayList<>();
+        for(MCDADocument documentt:cdaDocumentNoPage){
+            listCDA.add(documentt);
+        }
         createCDAFile(strXMLFilePath, strCDAFileName, listCDA);
 
         //创建关系文档
         String strRelationFileName = "std_cda_dataset_relationship.xml";
-        List<CDADataSetRelationship> listRelation = cdaDataSetRelationshipManager.getCDADataSetRelationship(sourceVersionId);
+
+        Collection<MCdaDataSetRelationship> cdaDataSetRelationshipsNoPage = cdaDocumentClient.getCDADataSetRelationshipsNoPage("", "", null, sourceVersionId);
+        List<MCdaDataSetRelationship> listRelation = new ArrayList<>();
+        for(MCdaDataSetRelationship relationShip:cdaDataSetRelationshipsNoPage){
+            listRelation.add(relationShip);
+        }
+
         createCDADatasetRelationshipFile(strXMLFilePath, strRelationFileName, listRelation);
 
         //创建字典文档，并获取字典值信息
-        List<BaseDictEntry> listEntry =
-                createDictFile(strXMLFilePath, "std_dict.xml",
-                        dictService.findAll(dictService.getServiceEntity(sourceVersionId)), sourceVersionId);
+
+        Collection<MStdDict> mStdDicts = dictClient.searchSourcesWithoutPaging("", sourceVersionId);
+        List<MStdDict> stdDicts = new ArrayList<>();
+        for(MStdDict mSd:mStdDicts){
+            stdDicts.add(mSd);
+        }
+
+
+        List<MStdDictEntry> listEntry = createDictFile(strXMLFilePath, "std_dict.xml",stdDicts,sourceVersionId);
 
         //创建字典值文档
         createDictEntryFile(strXMLFilePath, "std_dict_item.xml", sourceVersionId, listEntry);
@@ -644,7 +659,7 @@ public class DispatchService {
      * @return
      */
     @Transactional(propagation = Propagation.SUPPORTS)
-    public void createCDADatasetRelationshipFile(String strFilePath, String strFileName, List<CDADataSetRelationship> listRelastion) throws Exception{
+    public void createCDADatasetRelationshipFile(String strFilePath, String strFileName, List<MCdaDataSetRelationship> listRelastion) throws Exception{
         //创建字典值XML
         Document doc = createDocument();
         Element root = doc.createElement("table");
@@ -656,7 +671,7 @@ public class DispatchService {
 
         root.appendChild(getColumnElement(doc, colRoot, strColumn));
         for (int i = 0; i < listRelastion.size(); i++) {
-            CDADataSetRelationship info = listRelastion.get(i);
+            MCdaDataSetRelationship info = listRelastion.get(i);
             Element rowRoot = doc.createElement("row");
 
             appendChild(rowRoot, doc.createElement("id"), info.getId());
