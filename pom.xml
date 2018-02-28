@@ -130,24 +130,26 @@
         <version.elasticsearch>2.4.5</version.elasticsearch>
         <version.elasticsearch-sql>2.4.1.0</version.elasticsearch-sql>
         <version.jest>2.4.0</version.jest>
+        <version.alibaba-druid>1.0.15</version.alibaba-druid>
         <version.ehr>1.1.0</version.ehr>
+        <version.eip>1.3.0</version.eip>
     </properties>
 
     <dependencyManagement>
         <dependencies>
             <!--<dependency>-->
-                <!--<groupId>org.springframework.boot</groupId>-->
-                <!--<artifactId>spring-boot-dependencies</artifactId>-->
-                <!--<version>1.5.9.RELEASE</version>-->
-                <!--<type>pom</type>-->
-                <!--<scope>import</scope>-->
+            <!--<groupId>org.springframework.boot</groupId>-->
+            <!--<artifactId>spring-boot-dependencies</artifactId>-->
+            <!--<version>1.5.9.RELEASE</version>-->
+            <!--<type>pom</type>-->
+            <!--<scope>import</scope>-->
             <!--</dependency>-->
             <!--<dependency>-->
-                <!--<groupId>org.springframework.cloud</groupId>-->
-                <!--<artifactId>spring-cloud-dependencies</artifactId>-->
-                <!--<version>Finchley.M5</version>-->
-                <!--<type>pom</type>-->
-                <!--<scope>import</scope>-->
+            <!--<groupId>org.springframework.cloud</groupId>-->
+            <!--<artifactId>spring-cloud-dependencies</artifactId>-->
+            <!--<version>Finchley.M5</version>-->
+            <!--<type>pom</type>-->
+            <!--<scope>import</scope>-->
             <!--</dependency>-->
             <!-- Base library-->
             <dependency>
@@ -884,6 +886,12 @@
                 <artifactId>elasticsearch-sql</artifactId>
                 <version>${version.elasticsearch-sql}</version>
             </dependency>
+            <!-- Jest -->
+            <dependency>
+                <groupId>io.searchbox</groupId>
+                <artifactId>jest</artifactId>
+                <version>${version.jest}</version>
+            </dependency>
 
             <!-- Redis library -->
             <dependency>
@@ -899,6 +907,11 @@
                 <artifactId>quartz</artifactId>
                 <version>${version.quartz}</version>
                 <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.quartz-scheduler</groupId>
+                <artifactId>quartz-jobs</artifactId>
+                <version>${version.quartz}</version>
             </dependency>
 
             <!-- Zip library -->
@@ -982,6 +995,13 @@
                 <artifactId>logback-classic</artifactId>
                 <version>${version.logback}</version>
                 <scope>${dependency.scope}</scope>
+            </dependency>
+
+            <!-- Alibaba -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid</artifactId>
+                <version>${version.alibaba-druid}</version>
             </dependency>
 
             <dependency>

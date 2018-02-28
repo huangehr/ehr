@@ -91,6 +91,11 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
+            <groupId>com.yihu.hos</groupId>
+            <artifactId>common-rest-model</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-data-redis</artifactId>
             <scope>compile</scope>

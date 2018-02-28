@@ -6,7 +6,8 @@ import com.yihu.ehr.agModel.standard.standardsource.StdSourceDetailModel;
 import com.yihu.ehr.agModel.standard.standardsource.StdSourceModel;
 import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.model.standard.*;
+import com.yihu.hos.model.standard.*;
+import com.yihu.ehr.model.standard.MStdSource;
 import com.yihu.ehr.std.service.*;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.util.rest.Envelop;
@@ -240,10 +241,10 @@ public class StandardSourceController extends BaseController {
 
         try {
             //查询所有版本
-            ResponseEntity<Collection<MCDAVersion>> responseEntity = cdaVersionClient.searchCDAVersions("", "", "", 1000, 1);
-            Collection<MCDAVersion> mCdaVersions = responseEntity.getBody();
+            ResponseEntity<Collection<MSTDVersion>> responseEntity = cdaVersionClient.searchCDAVersions("", "", "", 1000, 1);
+            Collection<MSTDVersion> mCdaVersions = responseEntity.getBody();
 
-            for (MCDAVersion mcdaVersion : mCdaVersions) {
+            for (MSTDVersion mcdaVersion : mCdaVersions) {
                 ResponseEntity<Collection<MStdDict>> dict = dictClient.searchDict("", "sourceId=" + id, "", id.split(",").length, 1, mcdaVersion.getVersion());
                 if (dict.getBody().size() > 0) {
                     envelop.setErrorMsg("该标准来源正在被标准字典使用，不可删除");

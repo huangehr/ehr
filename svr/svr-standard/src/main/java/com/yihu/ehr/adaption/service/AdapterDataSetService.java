@@ -9,7 +9,7 @@ import com.yihu.ehr.adaption.model.OrgAdapterPlan;
 import com.yihu.ehr.model.adaption.MAdapterDataVo;
 import com.yihu.ehr.model.adaption.MAdapterRelationship;
 import com.yihu.ehr.query.BaseJpaService;
-import com.yihu.ehr.standard.service.DictService;
+import com.yihu.ehr.standard.feignclient.DictClient;
 import com.yihu.ehr.util.CDAVersionUtil;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
@@ -39,7 +39,7 @@ public class AdapterDataSetService extends BaseJpaService<AdapterDataSet, Adapte
     @Autowired
     private AdapterDictService adapterDictService;
     @Autowired
-    private DictService dictService;
+    DictClient dictClient;
 
     /**
      * 根据方案ID及查询条件查询数据集适配关系
@@ -249,7 +249,7 @@ public class AdapterDataSetService extends BaseJpaService<AdapterDataSet, Adapte
         Long planId = adapterDataSet.getAdapterPlanId();
         String cdaVersion = orgAdapterPlan.getVersion();
 
-        Map map = dictService.getDictMapByIds(cdaVersion, adapterDataSet.getDataSetId(), adapterDataSet.getMetaDataId());
+        Map map = dictClient.getDictMapByIds(cdaVersion, adapterDataSet.getDataSetId(), adapterDataSet.getMetaDataId());
         if (map != null) {
             Long dictId = Long.parseLong(String.valueOf(map.get("dictId")));
             adapterDataSet.setStdDict(dictId);
@@ -539,14 +539,14 @@ public class AdapterDataSetService extends BaseJpaService<AdapterDataSet, Adapte
         Session session = currentSession();
         String sql =
                 "SELECT meta.id, meta.code, meta.name " +
-                "FROM" +
-                "   "+ metaTable +" meta " +
-                "LEFT JOIN" +
-                "   (SELECT * FROM adapter_dataset ad where ad.plan_id = :planId) adapterDataSet " +
-                "ON" +
-                "   meta.id = adapterDataSet.std_metadata " +
-                "WHERE" +
-                "   meta.dataset_id = :dataSetId ";
+                        "FROM" +
+                        "   "+ metaTable +" meta " +
+                        "LEFT JOIN" +
+                        "   (SELECT * FROM adapter_dataset ad where ad.plan_id = :planId) adapterDataSet " +
+                        "ON" +
+                        "   meta.id = adapterDataSet.std_metadata " +
+                        "WHERE" +
+                        "   meta.dataset_id = :dataSetId ";
         if("new".equals(mode))
             sql += " AND adapterDataSet.id is null ";
         if(!StringUtils.isEmpty(seachName))
@@ -583,14 +583,14 @@ public class AdapterDataSetService extends BaseJpaService<AdapterDataSet, Adapte
         Session session = currentSession();
         String sql =
                 "SELECT count(*) " +
-                "FROM" +
-                "   "+ metaTable +" meta " +
-                "LEFT JOIN" +
-                "   (SELECT * FROM adapter_dataset ad where ad.plan_id = :planId) adapterDataSet " +
-                "ON" +
-                "   meta.id = adapterDataSet.std_metadata " +
-                "WHERE" +
-                "   meta.dataset_id = :dataSetId ";
+                        "FROM" +
+                        "   "+ metaTable +" meta " +
+                        "LEFT JOIN" +
+                        "   (SELECT * FROM adapter_dataset ad where ad.plan_id = :planId) adapterDataSet " +
+                        "ON" +
+                        "   meta.id = adapterDataSet.std_metadata " +
+                        "WHERE" +
+                        "   meta.dataset_id = :dataSetId ";
         if("new".equals(mode))
             sql += " AND adapterDataSet.id is null ";
         if(!StringUtils.isEmpty(seachName))
@@ -608,11 +608,11 @@ public class AdapterDataSetService extends BaseJpaService<AdapterDataSet, Adapte
     public boolean isLeftMeta(Long planId, Long dataSetId, Long[] metaIds){
         String hql =
                 "SELECT " +
-                "   COUNT(*) " +
-                "FROM " +
-                "   AdapterDataSet " +
-                "where " +
-                "   dataSetId = :dataSetId AND adapterPlanId = :planId and id NOT IN(:ids)";
+                        "   COUNT(*) " +
+                        "FROM " +
+                        "   AdapterDataSet " +
+                        "where " +
+                        "   dataSetId = :dataSetId AND adapterPlanId = :planId and id NOT IN(:ids)";
 
         Session session = currentSession();
         Query query = session.createQuery(hql);

@@ -1,7 +1,6 @@
 package com.yihu.ehr.standard.config;
 
 
-import com.yihu.ehr.standard.model.BaseDataSet;
 import com.yihu.ehr.standard.service.ClassPoolUtils;
 import com.yihu.ehr.standard.service.ExtJdbcTemplate;
 import org.hibernate.SessionFactory;
@@ -11,10 +10,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.orm.hibernate4.HibernateTransactionManager;
 
 import javax.sql.DataSource;
-import java.io.File;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -37,23 +32,6 @@ public class StdHibernateConfig {
     DataSource dataSource;
 
     public static Map<String, String> vesionedEntitys = new HashMap<>();
-    static{
-        vesionedEntitys.put("com.yihu.ehr.standard.model.DataSet", "std_data_set_");
-        vesionedEntitys.put("com.yihu.ehr.standard.model.MetaData", "std_meta_data_");
-        vesionedEntitys.put("com.yihu.ehr.standard.model.Dict", "std_dictionary_");
-        vesionedEntitys.put("com.yihu.ehr.standard.model.DictEntry", "std_dictionary_entry_");
-        vesionedEntitys.put("com.yihu.ehr.standard.model.CDADocument", "std_cda_document_");
-        vesionedEntitys.put("com.yihu.ehr.standard.model.CDADataSetRelationship", "std_cda_data_set_relationship_");
-    }
-
-    private static void addPath(File f) throws Exception {
-        URL u = f.toURI().toURL();
-        URLClassLoader urlClassLoader = (URLClassLoader) BaseDataSet.class.getClassLoader();
-        Class urlClass = URLClassLoader.class;
-        Method method = urlClass.getDeclaredMethod("addURL", new Class[]{URL.class});
-        method.setAccessible(true);
-        method.invoke(urlClassLoader, new Object[]{u});
-    }
 
     @Bean
     public StdSessionFactoryBean sessionFactory() throws Exception {
@@ -63,12 +41,8 @@ public class StdHibernateConfig {
         //bind entity to session
         sessionFactory.setAnnotatedClasses(tableClass.toArray(new Class[tableClass.size()]));
         sessionFactory.setDataSource(dataSource);
-        sessionFactory.getHibernateProperties().setProperty("hibernate.show_sql", "false");
+        sessionFactory.getHibernateProperties().setProperty("hibernate.show_sql", "true");
         sessionFactory.getHibernateProperties().setProperty("hibernate.format_sql", "true");
-
-        String splitMark = System.getProperty("file.separator");
-        String path = System.getProperty("user.home") +splitMark+ "ehr" + splitMark + "std" + splitMark;
-        addPath(new File(path));
         return sessionFactory;
     }
 

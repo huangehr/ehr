@@ -5,11 +5,11 @@ import com.yihu.ehr.adaption.service.AdapterInfoSendService;
 import com.yihu.ehr.adaption.service.OrgAdapterPlanService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
-import com.yihu.ehr.standard.model.CDAVersion;
-import com.yihu.ehr.standard.service.CdaVersionService;
+import com.yihu.ehr.standard.feignclient.StdVersionClient;
 import com.yihu.ehr.util.encrypt.RSA;
 import com.yihu.ehr.util.rest.ErrorCode;
 import com.yihu.ehr.util.rest.RestEcho;
+import com.yihu.hos.model.standard.MSTDVersion;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -39,7 +39,7 @@ public class AdapterDispatchEndPoint {
     @Autowired
     private OrgAdapterPlanService orgAdapterPlanService;
     @Autowired
-    private CdaVersionService cdaVersionService;
+    private StdVersionClient stdVersionClient;
     @Autowired
     private FastDFSUtil fastDFSUtil;
 
@@ -82,9 +82,9 @@ public class AdapterDispatchEndPoint {
 
             RestEcho restEcho =
                     new RestEcho()
-                    .success()
-                    .putResult("cryptograph", encryptPwd)
-                    .putResult("zipfile", fileBytes);
+                            .success()
+                            .putResult("cryptograph", encryptPwd)
+                            .putResult("zipfile", fileBytes);
             return restEcho;
         } catch (IOException ex) {
             return new RestEcho().failed(ErrorCode.GenerateArchiveFileStreamFailed, "生成适配版本文件流失败");
@@ -144,8 +144,8 @@ public class AdapterDispatchEndPoint {
     @RequestMapping(value = "/org_plan/version", method = RequestMethod.GET)
     @ApiOperation(value = "根据机构编码获取最新映射版本号 ", response = RestEcho.class, produces = "application/json", notes = "指定版本的信息")
     public Object getCDAVersionInfoByOrgCode(
-             @ApiParam(name = "org_code", value = "机构编码")
-             @RequestParam(value = "org_code") String orgCode) throws Exception {
+            @ApiParam(name = "org_code", value = "机构编码")
+            @RequestParam(value = "org_code") String orgCode) throws Exception {
         try {
             Map<String, Object> args = new HashMap<>();
             args.put("orgcode", orgCode);
@@ -154,7 +154,7 @@ public class AdapterDispatchEndPoint {
 
             if (listPlan != null && listPlan.size() > 0) {
                 RestEcho restEcho = new RestEcho().success();
-                CDAVersion version = cdaVersionService.getVersion(listPlan.get(0).getVersion());
+                MSTDVersion version = stdVersionClient.getVersion(listPlan.get(0).getVersion());
                 restEcho.putResult("version", version.getVersion());
                 restEcho.putResult("timestamp", version.getCommitTime());
                 return restEcho;

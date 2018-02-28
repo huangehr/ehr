@@ -9,7 +9,8 @@ spring:
     config:
       username: user
       password: configuration
-      uri: http://172.19.103.73:1221
+#      uri: http://172.19.103.73:1221
+      uri: http://172.19.103.58:1221
       label: dev
 
 ---
@@ -29,7 +30,8 @@ spring:
     config:
       username: user
       password: configuration
-      uri: http://172.19.103.73:1221
+#      uri: http://172.19.103.73:1221
+      uri: http://172.19.103.58:1221
       label: dev
 
 ---
@@ -50,7 +52,7 @@ spring:
     config:
       username: user
       password: configuration
-      uri: http://﻿11.1.2.1:1221
+      uri: http://192.168.135.29:1221
       label: master
 
 

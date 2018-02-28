@@ -3,7 +3,7 @@
 
 	<springProperty scope="context" name="dir" source="spring.application.name"/>
 
-	<property name="log_home" value="/ehr-logs/${dir}/" />
+	<property name="log_home" value="/ehr-logs/${dir}" />
 
 	<conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter" />
 	<conversionRule conversionWord="wex" converterClass="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter" />
