@@ -500,7 +500,7 @@ public class RhipPatientsEndPoint extends BaseController {
 
 
     @ApiOperation(value = "通过json对象更新患者", notes = "根据患者的身份证号在健康档案平台中更新患者-弘扬对接接口")
-    @RequestMapping(value = "/updatePatientByPJson", method = RequestMethod.POST)
+    @RequestMapping(value = "/updatePatientByPJson", method = RequestMethod.PUT)
     public Envelop updatePatientByPJson(
             @ApiParam(name = "json", value = "患者人口学数据集")
             @RequestParam(value = "json", required = true) String patientInfo) throws Exception{
