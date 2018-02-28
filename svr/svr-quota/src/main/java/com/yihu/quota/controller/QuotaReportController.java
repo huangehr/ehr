@@ -17,6 +17,7 @@ import com.yihu.quota.service.orgHealthCategory.OrgHealthCategoryStatisticsServi
 import com.yihu.quota.service.quota.BaseStatistsService;
 import com.yihu.quota.service.quota.QuotaService;
 import com.yihu.quota.service.resource.ResourceQuotaService;
+import com.yihu.quota.service.singledisease.SingleDiseaseService;
 import com.yihu.quota.util.BasesicUtil;
 import com.yihu.quota.util.ReportOption;
 import com.yihu.quota.vo.DictModel;
@@ -61,6 +62,9 @@ public class QuotaReportController extends BaseController {
     private OrgHealthCategoryStatisticsService orgHealthCategoryStatisticsService;
     @Autowired
     private BaseStatistsService baseStatistsService;
+    @Autowired
+    private SingleDiseaseService singleDiseaseService;
+
     public static String orgHealthCategoryCode = "orgHealthCategoryCode";
 
     /**
@@ -670,6 +674,77 @@ public class QuotaReportController extends BaseController {
             }
         }
         return dimensionDicMap;
+    }
+
+    @RequestMapping(value = ServiceApi.TJ.GetHeatMapByQuotaCode, method = RequestMethod.GET)
+    @ApiOperation(value = "热力图")
+    public Envelop getHeatMap(
+            @ApiParam(name = "quotaCode", value = "指标编码")
+            @RequestParam(value = "quotaCode") String quotaCode) throws Exception {
+        Envelop envelop = new Envelop();
+        String heatMapPoint = singleDiseaseService.getHeatMap(quotaCode);
+        envelop.setSuccessFlg(true);
+        envelop.setObj(heatMapPoint);
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.TJ.GetNumberOfDiabetes, method = RequestMethod.GET)
+    @ApiOperation(value = "糖尿病患者数")
+    public Envelop getNumberOfDiabetes(
+            @ApiParam(name = "quotaCode", value = "指标编码")
+            @RequestParam(value = "quotaCode") String quotaCode) throws Exception {
+        Envelop envelop = new Envelop();
+        List<Map<String, Object>> numberOfDiabetes = singleDiseaseService.getNumberOfDiabetes(quotaCode);
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(numberOfDiabetes);
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.TJ.GetPieData, method = RequestMethod.GET)
+    @ApiOperation(value = "获取饼图数据")
+    public Envelop getPieData(
+            @ApiParam(name = "quotaCode", value = "指标编码")
+            @RequestParam(value = "quotaCode") String quotaCode) throws Exception {
+        Envelop envelop = new Envelop();
+        Map<String, Object> pieDataInfo = singleDiseaseService.getPieDataInfo(quotaCode);
+        envelop.setSuccessFlg(true);
+        envelop.setObj(pieDataInfo.get("legendData"));
+        ArrayList<Map<String, Object>> seriesData = (ArrayList<Map<String, Object>>) pieDataInfo.get("seriesData");
+        envelop.setDetailModelList(seriesData);
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.TJ.GetLineData, method = RequestMethod.GET)
+    @ApiOperation(value = "获取折线图数据")
+    public Envelop getLineData(
+            @ApiParam(name = "quotaCode", value = "指标编码")
+            @RequestParam(value = "quotaCode") String quotaCode) throws Exception {
+        Envelop envelop = new Envelop();
+        Map<String, List<String>> map = singleDiseaseService.getLineDataInfo(quotaCode);
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(map.get("xData"));
+        envelop.setObj(map.get("valueData"));
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.TJ.GetBarData, method = RequestMethod.GET)
+    @ApiOperation(value = "获取柱状图数据")
+    public Envelop getBarData(
+            @ApiParam(name = "quotaCode", value = "指标编码")
+            @RequestParam(value = "quotaCode") String quotaCode,
+            @ApiParam(name = "type", value = "类型")
+            @RequestParam(value = "type") String type) throws Exception {
+        Envelop envelop = new Envelop();
+        Map<String, List<String>> map = null;
+        if ("1".equals(type)) {
+            map = singleDiseaseService.getSingleBarDataInfo(quotaCode);
+        } else {
+
+        }
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(map.get("xData"));
+        envelop.setObj(map.get("valueData"));
+        return envelop;
     }
 
     private Integer getNum(Map<String, Object> dataMap) {
