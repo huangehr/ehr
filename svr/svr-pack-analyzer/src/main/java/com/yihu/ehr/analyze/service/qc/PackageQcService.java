@@ -62,7 +62,7 @@ public class PackageQcService {
                     String receiveTime = DateUtil.toString(mPackage.getReceiveDate(), DateUtil.DEFAULT_YMDHMSDATE_FORMAT);
                     msgNode.put("receiveTime", receiveTime);
 
-                    redisServiceClient.sendMessage("", channel, msgNode.toString());
+                    redisServiceClient.sendMessage("svr-pack-analyzer", channel, msgNode.toString());
                 });
             });
         });
