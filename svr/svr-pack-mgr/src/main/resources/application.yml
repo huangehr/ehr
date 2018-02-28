@@ -43,6 +43,8 @@ fast-dfs:
     tracker-http-port: 80
     anti-steal-token: no
     secret-key: FastDFS1234567890
+eip:
+  tenant: jkzl
 
 ---
 spring:
@@ -83,8 +85,7 @@ spring:
 fast-dfs:
   tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52:80
-eip:
-  tenant: jkzl
+
 ---
 spring:
   profiles: prod_fz
@@ -99,8 +100,7 @@ spring:
 fast-dfs:
   tracker-server: 11.1.2.9:22122
   public-server: http://11.1.2.9:80
-eip:
-  tenant: jkzl
+
 ---
 spring:
   profiles: prod_sr
@@ -115,8 +115,7 @@ spring:
 fast-dfs:
   tracker-server: 10.176.97.5:22122
   public-server: http://10.176.97.5:8888
-eip:
-  tenant: jkzl
+
 ---
 spring:
   profiles: prod_fzzy
@@ -131,5 +130,3 @@ spring:
 fast-dfs:
   tracker-server: 100.100.1.157:22122
   public-server: http://100.100.1.157:8888
-eip:
-  tenant: jkzl
