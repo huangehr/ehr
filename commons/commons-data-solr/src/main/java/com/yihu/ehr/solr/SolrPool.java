@@ -8,6 +8,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.solr.server.support.MulticoreSolrClientFactory;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PreDestroy;
+
 
 /**
  * Solr连接池
@@ -24,27 +26,34 @@ public class SolrPool {
 
     private MulticoreSolrClientFactory factory;
 
-    protected MulticoreSolrClientFactory getFactory(){
-        if(factory == null) {
+    protected synchronized MulticoreSolrClientFactory getFactory(){
+        if (null == factory) {
             CloudSolrClient client = new CloudSolrClient(zkHost);
             factory = new MulticoreSolrClientFactory(client);
         }
         return factory;
     }
 
-    /**
-     * 获取连接
-     */
     public SolrClient getConnection(String core) throws Exception{
+        if (factory != null) {
+            return factory.getSolrClient(core);
+        }
         return getFactory().getSolrClient(core);
+    }
+
+    @PreDestroy
+    private void destroy() {
+        if (factory != null) {
+            factory.destroy();
+        }
     }
 
     /**
      * 关闭连接
-     */
     public void close(SolrClient solrClient) throws Exception{
         solrClient.close();
     }
+     */
 
 
 }
