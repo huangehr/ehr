@@ -79,7 +79,6 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
         MPackage pack = objectMapper.readValue(packString, MPackage.class);  //已修改包状态为1 正在入库库
         String packId = pack.getId();
         try {
-            long start = System.currentTimeMillis();
             if (StringUtils.isEmpty(pack.getClientId())) {
                 pack.setClientId(clientId);
             }
