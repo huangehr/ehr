@@ -111,8 +111,9 @@ public class EsResultExtract {
             }
         }
         this.tjQuota = tjQuota;
-        if(tjQuota.getCode() != null)
+        if(null != tjQuota && StringUtils.isNotEmpty(tjQuota.getCode())){
             this.quotaCode = tjQuota.getCode();
+        }
         EsConfig esConfig = null;
         esConfig = getEsConfig(tjQuota);
         this.esConfig = esConfig;

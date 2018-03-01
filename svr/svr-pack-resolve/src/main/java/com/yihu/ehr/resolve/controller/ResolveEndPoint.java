@@ -311,40 +311,30 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "echo", value = "返回档案数据")
             @RequestParam(value = "echo",required = false,defaultValue = "true") boolean echo) throws Throwable {
 
-        try {
-            long start = System.currentTimeMillis();
-            StandardPackage standardPackage = packageResolveService.doResolveImmediateData(data,clientId);
-            ResourceBucket resourceBucket = packMillService.grindingPackModel(standardPackage);
-            resourceService.save(resourceBucket, standardPackage);
-            //居民信息注册
-            patientService.checkPatient(resourceBucket, null);
-            //回填入库状态
-            Map<String, String> map = new HashMap();
-            map.put("profileId", standardPackage.getId());
-            map.put("demographicId", standardPackage.getDemographicId());
-            map.put("eventType", String.valueOf(standardPackage.getEventType().getType()));
-            map.put("eventNo", standardPackage.getEventNo());
-            map.put("eventDate", DateUtil.toStringLong(standardPackage.getEventDate()));
-            map.put("patientId", standardPackage.getPatientId());
+        long start = System.currentTimeMillis();
+        StandardPackage standardPackage = packageResolveService.doResolveImmediateData(data,clientId);
+        ResourceBucket resourceBucket = packMillService.grindingPackModel(standardPackage);
+        resourceService.save(resourceBucket, standardPackage);
+        //居民信息注册
+        patientService.checkPatient(resourceBucket, null);
+        //回填入库状态
+        Map<String, String> map = new HashMap();
+        map.put("profileId", standardPackage.getId());
+        map.put("demographicId", standardPackage.getDemographicId());
+        map.put("eventType", String.valueOf(standardPackage.getEventType().getType()));
+        map.put("eventNo", standardPackage.getEventNo());
+        map.put("eventDate", DateUtil.toStringLong(standardPackage.getEventDate()));
+        map.put("patientId", standardPackage.getPatientId());
 
-            //是否返回数据
-            if (echo) {
-                return standardPackage.toJson();
-            } else {
-                Map<String, String> resultMap = new HashMap<String, String>();
-                resultMap.put("success", "入库成功！");
-                return objectMapper.writeValueAsString(resultMap);
-            }
-        } catch (Exception e) {
+        //是否返回数据
+        if (echo) {
+            return standardPackage.toJson();
+        } else {
             Map<String, String> resultMap = new HashMap<String, String>();
-            if (StringUtils.isBlank(e.getMessage())) {
-                resultMap.put("error", "Internal Server Error");
-                return objectMapper.writeValueAsString(resultMap);
-            } else {
-                resultMap.put("error", e.getMessage());
-                return objectMapper.writeValueAsString(resultMap);
-            }
+            resultMap.put("success", "入库成功！");
+            return objectMapper.writeValueAsString(resultMap);
         }
+
     }
 
     private String downloadTo(String filePath) throws Exception {
