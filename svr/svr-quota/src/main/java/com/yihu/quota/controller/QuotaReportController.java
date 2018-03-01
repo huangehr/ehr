@@ -742,9 +742,11 @@ public class QuotaReportController extends BaseController {
             envelop.setObj(map.get("xData"));
         } else {
             map = singleDiseaseService.getMultipleBarDataInfo(quotaCode);
-            List<List<String>> list = new ArrayList<>();
-            list.add(map.get("valueData1"));
-            list.add(map.get("valueData2"));
+            List<Map<String, Object>> list = new ArrayList<>();
+            Map<String, Object> myMap = new HashMap<>();
+            myMap.put("男", map.get("valueData1"));
+            myMap.put("女", map.get("valueData2"));
+            list.add(myMap);
             envelop.setDetailModelList(list);
             envelop.setObj(map.get("xData"));
         }
