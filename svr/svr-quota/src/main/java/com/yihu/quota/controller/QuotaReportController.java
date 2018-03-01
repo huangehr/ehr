@@ -708,9 +708,11 @@ public class QuotaReportController extends BaseController {
         Envelop envelop = new Envelop();
         Map<String, Object> pieDataInfo = singleDiseaseService.getPieDataInfo(quotaCode);
         envelop.setSuccessFlg(true);
-        envelop.setObj(pieDataInfo.get("legendData"));
-        ArrayList<Map<String, Object>> seriesData = (ArrayList<Map<String, Object>>) pieDataInfo.get("seriesData");
-        envelop.setDetailModelList(seriesData);
+        if (null != pieDataInfo && pieDataInfo.size() > 0) {
+            envelop.setObj(pieDataInfo.get("legendData"));
+            ArrayList<Map<String, Object>> seriesData = (ArrayList<Map<String, Object>>) pieDataInfo.get("seriesData");
+            envelop.setDetailModelList(seriesData);
+        }
         return envelop;
     }
 
@@ -722,8 +724,10 @@ public class QuotaReportController extends BaseController {
         Envelop envelop = new Envelop();
         Map<String, List<String>> map = singleDiseaseService.getLineDataInfo(quotaCode);
         envelop.setSuccessFlg(true);
-        envelop.setDetailModelList(map.get("xData"));
-        envelop.setObj(map.get("valueData"));
+        if (null != map && map.size() > 0) {
+            envelop.setDetailModelList(map.get("xData"));
+            envelop.setObj(map.get("valueData"));
+        }
         return envelop;
     }
 
@@ -738,17 +742,21 @@ public class QuotaReportController extends BaseController {
         Map<String, List<String>> map = null;
         if ("1".equals(type)) {
             map = singleDiseaseService.getSingleBarDataInfo(quotaCode);
-            envelop.setDetailModelList(map.get("valueData"));
-            envelop.setObj(map.get("xData"));
+            if (null != map && map.size() > 0) {
+                envelop.setDetailModelList(map.get("valueData"));
+                envelop.setObj(map.get("xData"));
+            }
         } else {
             map = singleDiseaseService.getMultipleBarDataInfo(quotaCode);
-            List<Map<String, Object>> list = new ArrayList<>();
-            Map<String, Object> myMap = new HashMap<>();
-            myMap.put("男", map.get("valueData1"));
-            myMap.put("女", map.get("valueData2"));
-            list.add(myMap);
-            envelop.setDetailModelList(list);
-            envelop.setObj(map.get("xData"));
+            if (null != map && map.size() > 0) {
+                List<Map<String, Object>> list = new ArrayList<>();
+                Map<String, Object> myMap = new HashMap<>();
+                myMap.put("男", map.get("valueData1"));
+                myMap.put("女", map.get("valueData2"));
+                list.add(myMap);
+                envelop.setDetailModelList(list);
+                envelop.setObj(map.get("xData"));
+            }
         }
         envelop.setSuccessFlg(true);
 
