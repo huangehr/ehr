@@ -460,6 +460,10 @@ public class ServiceApi {
         public static final String FindByField = "packAnalyzer/findByField";
         public static final String FindBySql = "packAnalyzer/findBySql";
         public static final String EsSaveData = "packAnalyzer/esSaveData";
+        public static final String QcEmpty = "packAnalyzer/qc/check/empty";
+        public static final String QcType = "packAnalyzer/qc/check/type";
+        public static final String QcFormat = "packAnalyzer/qc/check/format";
+        public static final String QcValue = "packAnalyzer/qc/check/value";
     }
 
 
