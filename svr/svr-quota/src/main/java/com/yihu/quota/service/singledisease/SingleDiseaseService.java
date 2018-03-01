@@ -161,17 +161,28 @@ public class SingleDiseaseService {
      * @return
      */
     public Map<String, List<String>> getMultipleBarDataInfo(String quotaCode) {
-        String sql = "select slaveKey1, sum(slaveKey1Name) from medical_service_index where quotaCode = '" + quotaCode + "' group by slaveKey1";
-        List<Map<String, Object>> listData = elasticsearchUtil.excuteDataModel(sql);
+        String firstSql = "select slaveKey2Name, sum(result) from medical_service_index where quotaCode = '" + quotaCode + "' and slaveKey2=1 group by slaveKey1Name,slaveKey2Name";
+        String secondSql = "select slaveKey2Name, sum(result) from medical_service_index where quotaCode = '" + quotaCode + "' and slaveKey2=2 group by slaveKey1Name,slaveKey2Name";
+        List<Map<String, Object>> firstListData = elasticsearchUtil.excuteDataModel(firstSql);
+        List<Map<String, Object>> secondListData = elasticsearchUtil.excuteDataModel(secondSql);
         Map<String, List<String>> map = new HashMap<>();
-        List<String> xData = new ArrayList<>();
-        List<String> valueData = new ArrayList<>();
-        listData.forEach(one -> {
-            xData.add(one.get("slaveKey1") + "");
-            valueData.add(one.get("SUM(result)") + "");
+        List<String> xData = new LinkedList<>();
+        List<String> valueData1 = new LinkedList<>();    // 存放第一个数据源
+        List<String> valueData2 = new LinkedList<>();    // 存放第二个数据源
+        firstListData.forEach(one -> {
+            xData.add(one.get("slaveKey1Name") + "");   // 获取横坐标
+            valueData1.add(one.get("SUM(result)") + "");
         });
+        secondListData.forEach(one -> {
+            xData.add(one.get("slaveKey1Name") + "");
+            valueData2.add(one.get("SUM(result)") + "");
+        });
+        Set<String> hash = new LinkedHashSet<>(xData);
+        xData.clear();
+        xData.addAll(hash);
         map.put("xData", xData);
-        map.put("valueData", valueData);
+        map.put("valueData1", valueData1);
+        map.put("valueData2", valueData2);
         return map;
     }
 }

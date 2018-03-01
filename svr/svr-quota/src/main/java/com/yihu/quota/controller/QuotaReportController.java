@@ -738,12 +738,18 @@ public class QuotaReportController extends BaseController {
         Map<String, List<String>> map = null;
         if ("1".equals(type)) {
             map = singleDiseaseService.getSingleBarDataInfo(quotaCode);
+            envelop.setDetailModelList(map.get("valueData"));
+            envelop.setObj(map.get("xData"));
         } else {
-
+            map = singleDiseaseService.getMultipleBarDataInfo(quotaCode);
+            List<List<String>> list = new ArrayList<>();
+            list.add(map.get("valueData1"));
+            list.add(map.get("valueData2"));
+            envelop.setDetailModelList(list);
+            envelop.setObj(map.get("xData"));
         }
         envelop.setSuccessFlg(true);
-        envelop.setDetailModelList(map.get("xData"));
-        envelop.setObj(map.get("valueData"));
+
         return envelop;
     }
 
