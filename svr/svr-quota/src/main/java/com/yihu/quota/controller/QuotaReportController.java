@@ -682,9 +682,9 @@ public class QuotaReportController extends BaseController {
             @ApiParam(name = "quotaCode", value = "指标编码")
             @RequestParam(value = "quotaCode") String quotaCode) throws Exception {
         Envelop envelop = new Envelop();
-        String heatMapPoint = singleDiseaseService.getHeatMap(quotaCode);
+        List<Map<String,String>>  heatMapPoint = singleDiseaseService.getHeatMap(quotaCode);
         envelop.setSuccessFlg(true);
-        envelop.setObj(heatMapPoint);
+        envelop.setDetailModelList(heatMapPoint);
         return envelop;
     }
 

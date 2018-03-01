@@ -27,7 +27,7 @@ public class SingleDiseaseService {
      * @return
      * @throws Exception
      */
-    public String getHeatMap(String quotaCode) throws Exception {
+    public List<Map<String,String>>  getHeatMap(String quotaCode) throws Exception {
         List<Map<String,String>> list = new ArrayList<>();
         String sql = "select town, sum(result) from medical_service_index where quotaCode ='" + quotaCode +"' group by town";
         List<Map<String, Object>> listData = elasticsearchUtil.excuteDataModel(sql);
@@ -44,8 +44,7 @@ public class SingleDiseaseService {
             temp.put("count", v + "");
             list.add(temp);
         });
-        String points = JSONArray.fromObject(list).toString();
-        return points;
+        return list;
     }
 
     /**
