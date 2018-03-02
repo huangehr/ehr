@@ -71,7 +71,7 @@ public class DiabetesScheduler {
 	 * 每天2点 执行一次
 	 * @throws Exception
 	 */
-	@Scheduled(cron = "0 0 2 * * ?")
+	@Scheduled(cron = "0 53 11 * * ?")
 	public void validatorIdentityScheduler() throws Exception{
 
 		String q =  "health_problem:HP0047"; // 查询条件  HP0047 为糖尿病
@@ -91,13 +91,15 @@ public class DiabetesScheduler {
 		String keyDiseaseType = "EHR_003810";//疾病类型
 		String keyDiseaseSymptom = "EHR_000112";//并发症
 		String keyFastingBloodGlucose = "EHR_002724";//空腹血糖
+		String keysugarToleranceName = "EHR_000392";//糖耐量检测名称
+		String keysugarToleranceVal = "EHR_000387";//糖耐量值
 		String keyWestMedicine= "EHR_000100";  //西药
 		String keyChineseMedicine= "EHR_000131 ";//中药
 		List<PersonalInfoModel> personalInfoList = new ArrayList<>();
 		List<CheckInfoModel> checkInfoList = new ArrayList<>();
 
 		BasesicUtil basesicUtil = new BasesicUtil();
-		String initializeDate = "2018-03-01";
+		String initializeDate = "2018-03-03";
 		Date now = new Date();
 		String nowDate = DateUtil.formatDate(now,DateUtil.DEFAULT_DATE_YMD_FORMAT);
 		if(basesicUtil.compareDate(initializeDate,nowDate) == -1){//  -1 后面时间大 当前时间小于初始化时间，就所有数据初始化，后面每天抽取
@@ -111,10 +113,6 @@ public class DiabetesScheduler {
 //		//找出糖尿病的就诊档案
 		long count = solrUtil.count(ResourceCore.MasterTable, q,fq);
 		List<String> rowKeyList = selectSubRowKey(ResourceCore.MasterTable, q, fq, count);
-
-		//查询糖尿病的患者
-		SolrDocumentList solrList = solrUtil.query(ResourceCore.MasterTable, q , fq, null, 1,10000000);
-		if(solrList!=null && solrList.getNumFound()>0){}
 		if(rowKeyList != null && rowKeyList.size() > 0){
 			List<Map<String,Object>> hbaseDataList = selectHbaseData(rowKeyList);
 			if( hbaseDataList != null && hbaseDataList.size() > 0 ){
@@ -210,14 +208,38 @@ public class DiabetesScheduler {
 						checkInfo.setMedicineName(map.get(keyChineseMedicine).toString());
 						checkInfoList.add(checkInfo);
 					}
+					//葡萄糖（口服75 g葡萄糖后2 h)
+					if(map.get(keysugarToleranceName) != null && map.get(keysugarToleranceName).equals("14995-5")){
+						//7.8mmol/l 以下 2：7.8-11.1mmol/l  3:11.1 以上
+						String sugarTolename = "";
+						String sugarToleCode = "";
+						double val = Double.valueOf(map.get(keysugarToleranceVal).toString());
+						if(val >= 4.4 && val < 6.1){
+							sugarTolename = "4.4-6.1mmol/l";
+							sugarToleCode = "1";
+						}
+						if(val >= 6.1 && val < 7.0){
+							sugarTolename = "6.1-7.0mmol/l";
+							sugarToleCode = "2";
+						}
+						if( val > 7.0){
+							sugarTolename = "大于7.0mmol/l 上";
+							sugarToleCode = "3";
+						}
+						checkInfo.setSugarToleranceName(sugarTolename);
+						checkInfo.setSugarToleranceCode(sugarToleCode);
+						checkInfo.setCheckCode("CH004");
+						checkInfoList.add(checkInfo);
+					}
 
 
 				}
 				//保存到ES库
 				//个人信息保存 去重处理，已保存的不在保存  身份证和就诊卡ID
-				String index = "single_disease_index";
+				String index = "single_disease_check_index";
 				String type = "";
 				for(PersonalInfoModel personalInfo : personalInfoList){
+					index = "single_disease_personal_index";
 					type = "personal_info";
 					Map<String, Object> source = new HashMap<>();
 					String jsonPer = objectMapper.writeValueAsString(personalInfo);
@@ -237,6 +259,7 @@ public class DiabetesScheduler {
 				}
 				//检查信息保存  并发症 去重处理，已保存的不在保存  身份证和就诊卡ID
 				for(CheckInfoModel checkInfo : checkInfoList){
+					index = "single_disease_check_index";
 					type = "check_info";
 					Map<String, Object> source = new HashMap<>();
 					String jsonCheck = objectMapper.writeValueAsString(checkInfo);
