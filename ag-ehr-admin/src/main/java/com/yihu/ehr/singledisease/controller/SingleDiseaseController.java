@@ -26,45 +26,37 @@ public class SingleDiseaseController extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.TJ.GetHeatMapByQuotaCode, method = RequestMethod.GET)
     @ApiOperation(value = "热力图")
-    public Envelop getHeatMap(
-            @ApiParam(name = "quotaCode", value = "指标编码")
-            @RequestParam(value = "quotaCode") String quotaCode) {
-        Envelop envelop = singleDiseaseClient.getHeatMap(quotaCode);
+    public Envelop getHeatMap() {
+        Envelop envelop = singleDiseaseClient.getHeatMap();
         return envelop;
     }
 
     @RequestMapping(value = ServiceApi.TJ.GetNumberOfDiabetes, method = RequestMethod.GET)
     @ApiOperation(value = "糖尿病患者数")
-    public Envelop getNumberOfDiabetes(
-            @ApiParam(name = "quotaCode", value = "指标编码")
-            @RequestParam(value = "quotaCode") String quotaCode) {
-        Envelop envelop = singleDiseaseClient.getNumberOfDiabetes(quotaCode);
+    public Envelop getNumberOfDiabetes() {
+        Envelop envelop = singleDiseaseClient.getNumberOfDiabetes();
         return envelop;
     }
 
     @RequestMapping(value = ServiceApi.TJ.GetPieData, method = RequestMethod.GET)
     @ApiOperation(value = "获取饼图数据")
     public Envelop getPieData(
-            @ApiParam(name = "quotaCode", value = "指标编码")
-            @RequestParam(value = "quotaCode") String quotaCode) {
-        return singleDiseaseClient.getPieData(quotaCode);
+            @ApiParam(name = "type", value = "类型")
+            @RequestParam(value = "type") String type) {
+        return singleDiseaseClient.getPieData(type);
     }
 
     @RequestMapping(value = ServiceApi.TJ.GetLineData, method = RequestMethod.GET)
     @ApiOperation(value = "获取折线图数据")
-    public Envelop getLineData(
-            @ApiParam(name = "quotaCode", value = "指标编码")
-            @RequestParam(value = "quotaCode") String quotaCode) {
-        return singleDiseaseClient.getLineData(quotaCode);
+    public Envelop getLineData() {
+        return singleDiseaseClient.getLineData();
     }
 
     @RequestMapping(value = ServiceApi.TJ.GetBarData, method = RequestMethod.GET)
     @ApiOperation(value = "获取柱状图数据")
     public Envelop getBarData(
-            @ApiParam(name = "quotaCode", value = "指标编码")
-            @RequestParam(value = "quotaCode") String quotaCode,
             @ApiParam(name = "type", value = "类型")
             @RequestParam(value = "type") String type) {
-        return singleDiseaseClient.getBarData(quotaCode, type);
+        return singleDiseaseClient.getBarData(type);
     }
 }

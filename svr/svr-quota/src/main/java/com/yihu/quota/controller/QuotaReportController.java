@@ -678,23 +678,21 @@ public class QuotaReportController extends BaseController {
 
     @RequestMapping(value = ServiceApi.TJ.GetHeatMapByQuotaCode, method = RequestMethod.GET)
     @ApiOperation(value = "热力图")
-    public Envelop getHeatMap(
-            @ApiParam(name = "quotaCode", value = "指标编码")
-            @RequestParam(value = "quotaCode") String quotaCode) throws Exception {
+    public Envelop getHeatMap() throws Exception {
         Envelop envelop = new Envelop();
-        List<Map<String,String>>  heatMapPoint = singleDiseaseService.getHeatMap(quotaCode);
+        List<Map<String,String>>  heatMapPoint = singleDiseaseService.getHeatMap();
         envelop.setSuccessFlg(true);
-        envelop.setDetailModelList(heatMapPoint);
+        if (null != heatMapPoint && heatMapPoint.size() > 0) {
+            envelop.setDetailModelList(heatMapPoint);
+        }
         return envelop;
     }
 
     @RequestMapping(value = ServiceApi.TJ.GetNumberOfDiabetes, method = RequestMethod.GET)
     @ApiOperation(value = "糖尿病患者数")
-    public Envelop getNumberOfDiabetes(
-            @ApiParam(name = "quotaCode", value = "指标编码")
-            @RequestParam(value = "quotaCode") String quotaCode) throws Exception {
+    public Envelop getNumberOfDiabetes() throws Exception {
         Envelop envelop = new Envelop();
-        List<Map<String, Object>> numberOfDiabetes = singleDiseaseService.getNumberOfDiabetes(quotaCode);
+        List<Map<String, Object>> numberOfDiabetes = singleDiseaseService.getNumberOfDiabetes();
         envelop.setSuccessFlg(true);
         envelop.setDetailModelList(numberOfDiabetes);
         return envelop;
@@ -703,10 +701,10 @@ public class QuotaReportController extends BaseController {
     @RequestMapping(value = ServiceApi.TJ.GetPieData, method = RequestMethod.GET)
     @ApiOperation(value = "获取饼图数据")
     public Envelop getPieData(
-            @ApiParam(name = "quotaCode", value = "指标编码")
-            @RequestParam(value = "quotaCode") String quotaCode) throws Exception {
+            @ApiParam(name = "type", value = "类型")
+            @RequestParam(value = "type") String type) throws Exception {
         Envelop envelop = new Envelop();
-        Map<String, Object> pieDataInfo = singleDiseaseService.getPieDataInfo(quotaCode);
+        Map<String, Object> pieDataInfo = singleDiseaseService.getPieDataInfo(type);
         envelop.setSuccessFlg(true);
         if (null != pieDataInfo && pieDataInfo.size() > 0) {
             envelop.setObj(pieDataInfo.get("legendData"));
@@ -718,11 +716,9 @@ public class QuotaReportController extends BaseController {
 
     @RequestMapping(value = ServiceApi.TJ.GetLineData, method = RequestMethod.GET)
     @ApiOperation(value = "获取折线图数据")
-    public Envelop getLineData(
-            @ApiParam(name = "quotaCode", value = "指标编码")
-            @RequestParam(value = "quotaCode") String quotaCode) throws Exception {
+    public Envelop getLineData() throws Exception {
         Envelop envelop = new Envelop();
-        Map<String, List<String>> map = singleDiseaseService.getLineDataInfo(quotaCode);
+        Map<String, List<String>> map = singleDiseaseService.getLineDataInfo();
         envelop.setSuccessFlg(true);
         if (null != map && map.size() > 0) {
             envelop.setDetailModelList(map.get("xData"));
@@ -734,20 +730,26 @@ public class QuotaReportController extends BaseController {
     @RequestMapping(value = ServiceApi.TJ.GetBarData, method = RequestMethod.GET)
     @ApiOperation(value = "获取柱状图数据")
     public Envelop getBarData(
-            @ApiParam(name = "quotaCode", value = "指标编码")
-            @RequestParam(value = "quotaCode") String quotaCode,
-            @ApiParam(name = "type", value = "类型")
+            @ApiParam(name = "type", value = "类型 1并发症 2用药患者数 3空腹血糖统计 4糖耐量")
             @RequestParam(value = "type") String type) throws Exception {
         Envelop envelop = new Envelop();
         Map<String, List<String>> map = null;
-        if ("1".equals(type)) {
-            map = singleDiseaseService.getSingleBarDataInfo(quotaCode);
+        if ("1".equals(type) || "2".equals(type)) {
+            if ("1".equals(type)) {
+                map = singleDiseaseService.getSymptomDataInfo();
+            } else {
+                map = singleDiseaseService.getMedicineDataInfo();
+            }
             if (null != map && map.size() > 0) {
                 envelop.setDetailModelList(map.get("valueData"));
                 envelop.setObj(map.get("xData"));
             }
-        } else {
-            map = singleDiseaseService.getMultipleBarDataInfo(quotaCode);
+        } else if ("3".equals(type) || "4".equals(type)){
+            if ("3".equals(type)) {
+                map = singleDiseaseService.getFastingBloodGlucoseDataInfo();
+            } else {
+                map = singleDiseaseService.getSugarToleranceDataInfo();
+            }
             if (null != map && map.size() > 0) {
                 List<Map<String, Object>> list = new ArrayList<>();
                 Map<String, Object> myMap = new HashMap<>();

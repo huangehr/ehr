@@ -2,7 +2,6 @@ package com.yihu.quota.service.singledisease;
 
 import com.yihu.quota.etl.extract.es.EsExtract;
 import com.yihu.quota.etl.util.ElasticsearchUtil;
-import net.sf.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -21,40 +20,43 @@ public class SingleDiseaseService {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    public static final String HEALTHPROBLEM = "1"; // 健康问题
+    public static final String AGE = "2"; // 年龄段分布
+    public static final String SEX = "3"; // 性别
     /**
      * 热力图数据
-     * @param quotaCode
      * @return
      * @throws Exception
      */
-    public List<Map<String,String>>  getHeatMap(String quotaCode) throws Exception {
+    public List<Map<String,String>>  getHeatMap() throws Exception {
         List<Map<String,String>> list = new ArrayList<>();
-        String sql = "select town, sum(result) from medical_service_index where quotaCode ='" + quotaCode +"' group by town";
+        String sql = "select addressLngLat, count(cardId) from single_disease_personal_index group by addressLngLat";
         List<Map<String, Object>> listData = elasticsearchUtil.excuteDataModel(sql);
         Map<String, Object> map = new HashMap<>();
-        listData.forEach(item -> {
-            map.put(item.get("town") + "", item.get("SUM(result)"));
-        });
-        map.forEach((k,v)->{
-            Map<String, String> temp = new HashMap<>();
-            String lng = k.split(";")[0];
-            String lat = k.split(";")[1];
-            temp.put("lng", lng);
-            temp.put("lat", lat);
-            temp.put("count", v + "");
-            list.add(temp);
-        });
+        if (null != listData && listData.get(0).size() > 0) {
+            listData.forEach(item -> {
+                map.put(item.get("town") + "", item.get("SUM(result)"));
+            });
+            map.forEach((k,v)->{
+                Map<String, String> temp = new HashMap<>();
+                String lng = k.split(";")[0];
+                String lat = k.split(";")[1];
+                temp.put("lng", lng);
+                temp.put("lat", lat);
+                temp.put("count", v + "");
+                list.add(temp);
+            });
+        }
         return list;
     }
 
     /**
      * 获取糖尿病患者数
-     * @param quotaCode
      * @return
      * @throws Exception
      */
-    public List<Map<String, Object>> getNumberOfDiabetes(String quotaCode) throws Exception {
-        String sql = "select town, sum(result) from medical_service_index where quotaCode = '" + quotaCode + "' group by town";
+    public List<Map<String, Object>> getNumberOfDiabetes() throws Exception {
+        String sql = "select town, count(*) from single_disease_personal_index group by town";
         List<Map<String, Object>> list = elasticsearchUtil.excuteDataModel(sql);
         List<Map<String, Object>> dataList = fillNoDataColumn(list);
         return dataList;
@@ -78,7 +80,7 @@ public class SingleDiseaseService {
             String result = "0";
             for(Map<String,Object> map : dataList){
                 if(map.get("town") != null && code.equals(map.get("town"))){
-                    result = map.get("SUM(result)").toString();
+                    result = map.get("COUNT(*)").toString();
                     break;
                 }
             }
@@ -92,96 +94,225 @@ public class SingleDiseaseService {
 
     /**
      * 新增患者年趋势
-     * @param quotaCode
      * @return
      */
-    public Map<String, List<String>> getLineDataInfo(String quotaCode) {
-        String sql = "select year, sum(result) from medical_service_index where quotaCode = '" + quotaCode + "' group by year";
+    public Map<String, List<String>> getLineDataInfo() {
+        String sql = "select eventDate, count(*) from single_disease_personal_index group by date_histogram(field='eventDate','interval'='year')";
         List<Map<String, Object>> listData = elasticsearchUtil.excuteDataModel(sql);
-        Collections.reverse(listData);
         Map<String, List<String>> map = new HashMap<>();
         List<String> xData = new ArrayList<>();
         List<String> valueData = new ArrayList<>();
-        listData.forEach(one -> {
-            xData.add(one.get("year") + "");
-            valueData.add(one.get("SUM(result)") + "");
-        });
-        map.put("xData", xData);
-        map.put("valueData", valueData);
+        if (null != listData && listData.get(0).size() > 0) {
+            listData.forEach(one -> {
+                xData.add((one.get("date_histogram(field=eventDate,interval=year)") + "").substring(0,4));
+                valueData.add(one.get("COUNT(*)") + "");
+            });
+            map.put("xData", xData);
+            map.put("valueData", valueData);
+        }
         return map;
     }
 
     /**
      * 获取饼状图数据
-     * @param quotaCode
+     * @param type 健康状况、年龄段、性别
      * @return
      */
-    public Map<String, Object> getPieDataInfo(String quotaCode) {
-        String sql = "select slaveKey1Name, sum(result) from medical_service_index where quotaCode = '" + quotaCode + "' group by slaveKey1Name";
+    public Map<String, Object> getPieDataInfo(String type) {
+        Map<String, Object> map = new HashMap<>();
+        if (HEALTHPROBLEM.equals(type)) {
+            map = getHealthProInfo();
+        } else if (AGE.equals(type)) {
+            map = getAgeInfo();
+        } else if (SEX.equals(type)) {
+            map = getGenderInfo();
+        }
+        return map;
+    }
+
+    /**
+     * 获取健康状况
+     * @return
+     */
+    public Map<String, Object> getHealthProInfo() {
+        String sql = "select diseaseName, count(cardId) from single_disease_personal_index group by diseaseName";
         List<Map<String, Object>> listData = elasticsearchUtil.excuteDataModel(sql);
         Map<String, Object> map = new HashMap<>();
         List<String> legendData = new ArrayList<>();
         List<Map<String, Object>> seriesData = new ArrayList<>();
-        listData.forEach(one -> {
-            Map<String, Object> myMap = new HashMap<>();
-            legendData.add(one.get("slaveKey1Name") + "");
-            myMap.put("name", one.get("slaveKey1Name") + "");
-            myMap.put("value", one.get("SUM(result)") + "");
-            seriesData.add(myMap);
-        });
-        map.put("legendData", legendData);
-        map.put("seriesData", seriesData);
+        if (null != listData && listData.get(0).size() > 0) {
+            listData.forEach(one -> {
+                Map<String, Object> myMap = new HashMap<>();
+                legendData.add(one.get("diseaseName") + "");
+                myMap.put("name", one.get("diseaseName") + "");
+                myMap.put("value", one.get("COUNT(cardId)") + "");
+                seriesData.add(myMap);
+            });
+            map.put("legendData", legendData);
+            map.put("seriesData", seriesData);
+        }
         return map;
     }
 
     /**
-     * 获取柱状图数据（多数据源）
-     * @param quotaCode
+     * 获取年龄段数据
      * @return
      */
-    public Map<String, List<String>> getSingleBarDataInfo(String quotaCode) {
-        String sql = "select slaveKey1Name, sum(result) from medical_service_index where quotaCode = '" + quotaCode + "' group by slaveKey1Name";
+    public Map<String, Object> getAgeInfo() {
+        String sql = "select slaveKey1Name, count(result) from medical_service_index group by slaveKey1Name";
+        List<Map<String, Object>> listData = elasticsearchUtil.excuteDataModel(sql);
+        Map<String, Object> map = new HashMap<>();
+        List<String> legendData = new ArrayList<>();
+        List<Map<String, Object>> seriesData = new ArrayList<>();
+        if (null != listData && listData.get(0).size() > 0) {
+            listData.forEach(one -> {
+                Map<String, Object> myMap = new HashMap<>();
+                legendData.add(one.get("slaveKey1Name") + "");
+                myMap.put("name", one.get("slaveKey1Name") + "");
+                myMap.put("value", one.get("SUM(result)") + "");
+                seriesData.add(myMap);
+            });
+            map.put("legendData", legendData);
+            map.put("seriesData", seriesData);
+        }
+        return map;
+    }
+
+    /**
+     * 获取性别数据
+     * @return
+     */
+    public Map<String, Object> getGenderInfo() {
+        String sql = "select sexName, count(*) from single_disease_personal_index group by sexName";
+        List<Map<String, Object>> listData = elasticsearchUtil.excuteDataModel(sql);
+        Map<String, Object> map = new HashMap<>();
+        List<String> legendData = new ArrayList<>();
+        List<Map<String, Object>> seriesData = new ArrayList<>();
+        if (null != listData && listData.get(0).size() > 0) {
+            listData.forEach(one -> {
+                Map<String, Object> myMap = new HashMap<>();
+                legendData.add(one.get("sexName") + "");
+                myMap.put("name", one.get("sexName") + "");
+                myMap.put("value", one.get("COUNT(*)") + "");
+                seriesData.add(myMap);
+            });
+            map.put("legendData", legendData);
+            map.put("seriesData", seriesData);
+        }
+        return map;
+    }
+
+    /**
+     * 获取并发症数据
+     * @return
+     */
+    public Map<String, List<String>> getSymptomDataInfo() {
+        String sql = "select symptomName, count(*) from single_disease_check_index where checkCode = 'CH001' group by symptomName";
         List<Map<String, Object>> listData = elasticsearchUtil.excuteDataModel(sql);
         Map<String, List<String>> map = new HashMap<>();
         List<String> xData = new ArrayList<>();
         List<String> valueData = new ArrayList<>();
-        listData.forEach(one -> {
-            xData.add(one.get("slaveKey1Name") + "");
-            valueData.add(one.get("SUM(result)") + "");
-        });
-        map.put("xData", xData);
-        map.put("valueData", valueData);
+        if (null != listData && listData.get(0).size() > 0) {
+            listData.forEach(one -> {
+                xData.add(one.get("symptomName") + "");
+                valueData.add(one.get("COUNT(*)") + "");
+            });
+            map.put("xData", xData);
+            map.put("valueData", valueData);
+        }
         return map;
     }
 
     /**
-     * 获取柱状图数据（多数据源）
-     * @param quotaCode
+     * 用药患者数分布
      * @return
      */
-    public Map<String, List<String>> getMultipleBarDataInfo(String quotaCode) {
-        String firstSql = "select slaveKey2Name, sum(result) from medical_service_index where quotaCode = '" + quotaCode + "' and slaveKey2=1 group by slaveKey1Name,slaveKey2Name";
-        String secondSql = "select slaveKey2Name, sum(result) from medical_service_index where quotaCode = '" + quotaCode + "' and slaveKey2=2 group by slaveKey1Name,slaveKey2Name";
+    public Map<String, List<String>> getMedicineDataInfo() {
+        String sql = "select medicineName, count(*) from single_disease_check_index where checkCode = 'CH004' group by medicineName";
+        List<Map<String, Object>> listData = elasticsearchUtil.excuteDataModel(sql);
+        Map<String, List<String>> map = new HashMap<>();
+        List<String> xData = new ArrayList<>();
+        List<String> valueData = new ArrayList<>();
+        if (null != listData && listData.get(0).size() > 0) {
+            listData.forEach(one -> {
+                xData.add(one.get("medicineName") + "");
+                valueData.add(one.get("COUNT(*)") + "");
+            });
+            map.put("xData", xData);
+            map.put("valueData", valueData);
+        }
+        return map;
+    }
+
+    /**
+     *  空腹血糖统计
+     * @return
+     */
+    public Map<String, List<String>> getFastingBloodGlucoseDataInfo() {
+        String firstSql = "select fastingBloodGlucoseName, count(*) from single_disease_check_index where checkCode = 'CH002' and sex=1 group by fastingBloodGlucoseName";
+        String secondSql = "select fastingBloodGlucoseName, count(*) from single_disease_check_index where checkCode = 'CH002' and sex=2 group by fastingBloodGlucoseName";
         List<Map<String, Object>> firstListData = elasticsearchUtil.excuteDataModel(firstSql);
         List<Map<String, Object>> secondListData = elasticsearchUtil.excuteDataModel(secondSql);
         Map<String, List<String>> map = new HashMap<>();
         List<String> xData = new LinkedList<>();
         List<String> valueData1 = new LinkedList<>();    // 存放第一个数据源
         List<String> valueData2 = new LinkedList<>();    // 存放第二个数据源
-        firstListData.forEach(one -> {
-            xData.add(one.get("slaveKey1Name") + "");   // 获取横坐标
-            valueData1.add(one.get("SUM(result)") + "");
-        });
-        secondListData.forEach(one -> {
-            xData.add(one.get("slaveKey1Name") + "");
-            valueData2.add(one.get("SUM(result)") + "");
-        });
-        Set<String> hash = new LinkedHashSet<>(xData);
-        xData.clear();
-        xData.addAll(hash);
-        map.put("xData", xData);
-        map.put("valueData1", valueData1);
-        map.put("valueData2", valueData2);
+        if (null != firstListData && firstListData.get(0).size() > 0) {
+            firstListData.forEach(one -> {
+                xData.add(one.get("fastingBloodGlucoseName") + "");   // 获取横坐标
+                valueData1.add(one.get("COUNT(*)") + "");
+            });
+            map.put("valueData1", valueData1);
+        }
+        if (null != secondListData && secondListData.get(0).size() > 0) {
+            secondListData.forEach(one -> {
+                xData.add(one.get("fastingBloodGlucoseName") + "");
+                valueData2.add(one.get("COUNT(*)") + "");
+            });
+            map.put("valueData2", valueData2);
+        }
+        if (xData.size() > 0) {
+            Set<String> hash = new LinkedHashSet<>(xData);
+            xData.clear();
+            xData.addAll(hash);
+            map.put("xData", xData);
+        }
+        return map;
+    }
+
+    /**
+     * 糖耐量统计
+     * @return
+     */
+    public Map<String, List<String>> getSugarToleranceDataInfo() {
+        String firstSql = "select sugarToleranceName, count(*) from single_disease_check_index where checkCode = 'CH003' and sex=1 group by sugarToleranceName";
+        String secondSql = "select sugarToleranceName, count(*) from single_disease_check_index where checkCode = 'CH003' and sex=2 group by sugarToleranceName";
+        List<Map<String, Object>> firstListData = elasticsearchUtil.excuteDataModel(firstSql);
+        List<Map<String, Object>> secondListData = elasticsearchUtil.excuteDataModel(secondSql);
+        Map<String, List<String>> map = new HashMap<>();
+        List<String> xData = new LinkedList<>();
+        List<String> valueData1 = new LinkedList<>();    // 存放第一个数据源
+        List<String> valueData2 = new LinkedList<>();    // 存放第二个数据源
+        if (null != firstListData && firstListData.get(0).size() > 0) {
+            firstListData.forEach(one -> {
+                xData.add(one.get("sugarToleranceName") + "");   // 获取横坐标
+                valueData1.add(one.get("COUNT(*)") + "");
+            });
+            map.put("valueData1", valueData1);
+        }
+        if (null != secondListData && secondListData.get(0).size() > 0) {
+            secondListData.forEach(one -> {
+                xData.add(one.get("sugarToleranceName") + "");
+                valueData2.add(one.get("COUNT(*)") + "");
+            });
+            map.put("valueData2", valueData2);
+        }
+        if (xData.size() > 0) {
+            Set<String> hash = new LinkedHashSet<>(xData);
+            xData.clear();
+            xData.addAll(hash);
+            map.put("xData", xData);
+        }
         return map;
     }
 }

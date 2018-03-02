@@ -21,24 +21,23 @@ public interface SingleDiseaseClient {
 
     @RequestMapping(value = ServiceApi.TJ.GetHeatMapByQuotaCode, method = RequestMethod.GET)
     @ApiOperation(value = "热力图")
-    Envelop getHeatMap(@RequestParam(value = "quotaCode") String quotaCode);
+    Envelop getHeatMap();
 
     @RequestMapping(value = ServiceApi.TJ.GetNumberOfDiabetes, method = RequestMethod.GET)
     @ApiOperation(value = "糖尿病患者数")
-    Envelop getNumberOfDiabetes(@RequestParam(value = "quotaCode") String quotaCode);
+    Envelop getNumberOfDiabetes();
 
     @RequestMapping(value = ServiceApi.TJ.GetPieData, method = RequestMethod.GET)
     @ApiOperation(value = "获取饼图数据")
     Envelop getPieData(
-            @RequestParam(value = "quotaCode") String quotaCode);
+            @RequestParam(value = "type") String type);
 
     @RequestMapping(value = ServiceApi.TJ.GetLineData, method = RequestMethod.GET)
     @ApiOperation(value = "获取折线图数据")
-    Envelop getLineData(
-            @RequestParam(value = "quotaCode") String quotaCode);
+    Envelop getLineData();
+
     @RequestMapping(value = ServiceApi.TJ.GetBarData, method = RequestMethod.GET)
     @ApiOperation(value = "获取柱状图数据")
     Envelop getBarData(
-            @RequestParam(value = "quotaCode") String quotaCode,
             @RequestParam(value = "type") String type);
 }
