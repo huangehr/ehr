@@ -20,12 +20,12 @@ public class CheckInfoModel {
     private String demographicId;//身份证号
     private String carId;     //就诊卡号
     private String checkCode;//检查code （CH001 并发症,CH002 空腹血糖,CH003 葡萄糖耐量,CH004 用药名称）
-    private String symptom;    //并发症名称
     private String symptomCode;//并发症code
+    private String symptomName;    //并发症名称
     private String fastingBloodGlucoseCode;//空腹血糖编码 1：7.8mmol/l 以下 2：7.8-11.1mmol/l  3:11.1mmol/l 以上
     private String fastingBloodGlucoseName;//空腹血糖值
     private String sugarToleranceCode;//葡萄糖耐量Code  1：4.6-6.1mmol/l  2：6.1-7.0mmol/l 3:7.0mmol/l 以上
-    private String sugarTolerance;//葡萄糖耐量值
+    private String sugarToleranceName;//葡萄糖耐量值
     private String medicineCode;//用药编码
     private String medicineName;//用药名称
 
@@ -98,12 +98,12 @@ public class CheckInfoModel {
         this.checkCode = checkCode;
     }
 
-    public String getSymptom() {
-        return symptom;
+    public String getSymptomName() {
+        return symptomName;
     }
 
-    public void setSymptom(String symptom) {
-        this.symptom = symptom;
+    public void setSymptomName(String symptomName) {
+        this.symptomName = symptomName;
     }
 
     public String getSymptomCode() {
@@ -138,12 +138,12 @@ public class CheckInfoModel {
         this.sugarToleranceCode = sugarToleranceCode;
     }
 
-    public String getSugarTolerance() {
-        return sugarTolerance;
+    public String getSugarToleranceName() {
+        return sugarToleranceName;
     }
 
-    public void setSugarTolerance(String sugarTolerance) {
-        this.sugarTolerance = sugarTolerance;
+    public void setSugarToleranceName(String sugarToleranceName) {
+        this.sugarToleranceName = sugarToleranceName;
     }
 
     public String getMedicineCode() {

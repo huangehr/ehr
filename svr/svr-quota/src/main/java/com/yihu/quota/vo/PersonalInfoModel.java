@@ -27,6 +27,7 @@ public class PersonalInfoModel {
     private String addressLngLat;//常住地址经纬度
     private String disease;//疾病
     private String diseaseName;
+    private Date eventDate;
 
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
@@ -151,5 +152,13 @@ public class PersonalInfoModel {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public Date getEventDate() {
+        return eventDate;
+    }
+
+    public void setEventDate(Date eventDate) {
+        this.eventDate = eventDate;
     }
 }

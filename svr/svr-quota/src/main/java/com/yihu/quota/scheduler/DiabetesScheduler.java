@@ -15,10 +15,12 @@ import com.yihu.quota.vo.CheckInfoModel;
 import com.yihu.quota.vo.DictModel;
 import com.yihu.quota.vo.PersonalInfoModel;
 import com.yihu.quota.vo.SaveModel;
+import org.apache.commons.lang.time.DateUtils;
 import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.CellUtil;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.apache.solr.client.solrj.response.RangeFacet;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.slf4j.Logger;
@@ -35,6 +37,7 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -56,8 +59,6 @@ public class DiabetesScheduler {
 	@Autowired
 	private ElasticSearchClient elasticSearchClient;
 	@Autowired
-	private SolrQuery solrQuery;
-	@Autowired
 	private HBaseDao hbaseDao;
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
@@ -72,10 +73,11 @@ public class DiabetesScheduler {
 	 */
 	@Scheduled(cron = "0 0 2 * * ?")
 	public void validatorIdentityScheduler() throws Exception{
-		List<Map<String, Object>> list = new ArrayList<>();
-		String q = "health_problem:HP0047"; // 查询条件
-		String fq = null; // 过滤条件
+
+		String q =  "health_problem:HP0047"; // 查询条件  HP0047 为糖尿病
+		String fq = ""; // 过滤条件
 		String dictSql = "";
+		String keyEventDate = "event_date";
 		String keyOrgArea = "org_area";
 		String keyOrgName = "org_name";
 		String keyPatientName = "patient_name";
@@ -91,11 +93,20 @@ public class DiabetesScheduler {
 		String keyFastingBloodGlucose = "EHR_002724";//空腹血糖
 		String keyWestMedicine= "EHR_000100";  //西药
 		String keyChineseMedicine= "EHR_000131 ";//中药
-
-
 		List<PersonalInfoModel> personalInfoList = new ArrayList<>();
 		List<CheckInfoModel> checkInfoList = new ArrayList<>();
 
+		BasesicUtil basesicUtil = new BasesicUtil();
+		String initializeDate = "2018-03-01";
+		Date now = new Date();
+		String nowDate = DateUtil.formatDate(now,DateUtil.DEFAULT_DATE_YMD_FORMAT);
+		if(basesicUtil.compareDate(initializeDate,nowDate) == -1){//  -1 后面时间大 当前时间小于初始化时间，就所有数据初始化，后面每天抽取
+			Date yesterdayDate = DateUtils.addDays(now,-1);
+			String yesterday = DateUtil.formatDate(yesterdayDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
+			fq = "create_date:[" + yesterday + "T00:00:00Z TO  " + yesterday + "T23:59:59Z]";
+		}else{
+			fq = "create_date:[* TO  2017-07-27T23:59:59Z]";
+		}
 
 //		//找出糖尿病的就诊档案
 		long count = solrUtil.count(ResourceCore.MasterTable, q,fq);
@@ -113,6 +124,8 @@ public class DiabetesScheduler {
 					CheckInfoModel checkInfo = new CheckInfoModel();
 					personalInfo.setCreateTime(new Date());
 					checkInfo.setCreateTime(new Date());
+					if(map.get(keyEventDate) != null){
+						personalInfo.setEventDate(DateUtil.formatCharDateYMD(map.get(keyEventDate).toString()));					}
 					if(map.get(keyOrgArea) != null){
 						personalInfo.setTown(map.get(keyOrgArea).toString());
 						personalInfo.setTownName(map.get(keyOrgName).toString());
@@ -161,7 +174,7 @@ public class DiabetesScheduler {
 					//检查信息 姓名,身份证，就诊卡号,并发症，空腹血糖值，葡萄糖耐量值，用药名称，检查信息code （CH001 并发症,CH002 空腹血糖,CH003 葡萄糖耐量,CH004 用药名称）
 					if(map.get(keyDiseaseSymptom) != null){
 						checkInfo.setCheckCode("CH001");
-						checkInfo.setSymptom(map.get(keyDiseaseSymptom).toString());
+						checkInfo.setSymptomName(map.get(keyDiseaseSymptom).toString());
 						checkInfoList.add(checkInfo);
 					}
 					if(map.get(keyFastingBloodGlucose) != null){
@@ -202,9 +215,10 @@ public class DiabetesScheduler {
 				}
 				//保存到ES库
 				//个人信息保存 去重处理，已保存的不在保存  身份证和就诊卡ID
-				String index = "";
+				String index = "single_disease_index";
 				String type = "";
 				for(PersonalInfoModel personalInfo : personalInfoList){
+					type = "personal_info";
 					Map<String, Object> source = new HashMap<>();
 					String jsonPer = objectMapper.writeValueAsString(personalInfo);
 					source = objectMapper.readValue(jsonPer, Map.class);
@@ -223,6 +237,7 @@ public class DiabetesScheduler {
 				}
 				//检查信息保存  并发症 去重处理，已保存的不在保存  身份证和就诊卡ID
 				for(CheckInfoModel checkInfo : checkInfoList){
+					type = "check_info";
 					Map<String, Object> source = new HashMap<>();
 					String jsonCheck = objectMapper.writeValueAsString(checkInfo);
 					source = objectMapper.readValue(jsonCheck,Map.class);
@@ -245,52 +260,8 @@ public class DiabetesScheduler {
 			}
 		}
 
-
-
-
-
-
-
 	}
 
-	/**
-	 * 将一个 Map 对象转化为一个 JavaBean
-	 * @param type 要转化的类型
-	 * @param map 包含属性值的 map
-	 * @return 转化出来的 JavaBean 对象
-	 * @throws IntrospectionException
-	 *             如果分析类属性失败
-	 * @throws IllegalAccessException
-	 *             如果实例化 JavaBean 失败
-	 * @throws InstantiationException
-	 *             如果实例化 JavaBean 失败
-	 * @throws InvocationTargetException
-	 *             如果调用属性的 setter 方法失败
-	 */
-	public static Object convertMap(Class type, Map map)
-			throws IntrospectionException, IllegalAccessException,
-			InstantiationException, InvocationTargetException {
-		BeanInfo beanInfo = Introspector.getBeanInfo(type); // 获取类属性
-		Object obj = type.newInstance(); // 创建 JavaBean 对象
-
-		// 给 JavaBean 对象的属性赋值
-		PropertyDescriptor[] propertyDescriptors =  beanInfo.getPropertyDescriptors();
-		for (int i = 0; i< propertyDescriptors.length; i++) {
-			PropertyDescriptor descriptor = propertyDescriptors[i];
-			String propertyName = descriptor.getName();
-
-			if (map.containsKey(propertyName)) {
-				// 下面一句可以 try 起来，这样当一个属性赋值失败的时候就不会影响其他属性赋值。
-				Object value = map.get(propertyName);
-
-				Object[] args = new Object[1];
-				args[0] = value;
-
-				descriptor.getWriteMethod().invoke(obj, args);
-			}
-		}
-		return obj;
-	}
 
 	//获取维度的字典项
 	private Map<String, String> getdimensionDicMap(String dictSql){
@@ -317,26 +288,6 @@ public class DiabetesScheduler {
 			}
 		}
 		return  data;
-	}
-
-	//统计不同维度的数量
-	private Map<String,Integer> keyCountList(List<String> dataList){
-		Map<String, Integer> map = new HashMap<String, Integer>();
-		Set<String> set = new HashSet<String>(dataList);
-		for (String str : set) {
-			for (String lstr : dataList) {
-				if (str.equals(lstr)) {
-					if (map.containsKey(str)) {
-						Integer count = map.get(str);
-						count++;
-						map.put(str, count);
-					} else {
-						map.put(str, 1);
-					}
-				}
-			}
-		}
-		return  map;
 	}
 
 	//查询habase里面数据
@@ -383,40 +334,6 @@ public class DiabetesScheduler {
 		}else{
 			return null;
 		}
-	}
-
-	//出生日期字符串转化成Date对象
-	public  Date parse(String strDate) throws ParseException {
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-		return sdf.parse(strDate);
-	}
-
-	//由出生日期获得年龄
-	public  int getAge(Date birthDay) throws Exception {
-		Calendar cal = Calendar.getInstance();
-		if (cal.before(birthDay)) {
-			throw new IllegalArgumentException(
-					"The birthDay is before Now.It's unbelievable!");
-		}
-		int yearNow = cal.get(Calendar.YEAR);
-		int monthNow = cal.get(Calendar.MONTH);
-		int dayOfMonthNow = cal.get(Calendar.DAY_OF_MONTH);
-		cal.setTime(birthDay);
-
-		int yearBirth = cal.get(Calendar.YEAR);
-		int monthBirth = cal.get(Calendar.MONTH);
-		int dayOfMonthBirth = cal.get(Calendar.DAY_OF_MONTH);
-
-		int age = yearNow - yearBirth;
-
-		if (monthNow <= monthBirth) {
-			if (monthNow == monthBirth) {
-				if (dayOfMonthNow < dayOfMonthBirth) age--;
-			}else{
-				age--;
-			}
-		}
-		return age;
 	}
 
 
