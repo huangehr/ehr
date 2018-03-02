@@ -1,31 +1,8 @@
-logging:
-  level:
-    com:
-      netflix: INFO
-    org:
-      springframework:
-        web: INFO
-      hibernate: ERROR
-
 server:
   port: ${svr-ehr-basic.server.port}
 
 management:
   port: ${server.port}
-
-
-fast-dfs:
-  pool:
-    init-size: 5
-    max-size: 20
-    wait-time: 500
-  connect-timeout: 2
-  network-timeout: 30
-  charset: ISO8859-1
-  http:
-    tracker-http-port: 80
-    anti-steal-token: no
-    secret-key: FastDFS1234567890
 
 spring:
   datasource:
@@ -35,28 +12,29 @@ spring:
     min-idle: 8
     validation-query: SELECT 1
     test-on-borrow: true
-  # REDIS
-  redis:
-    database: 0 # Database index used by the connection factory.
-    port: 6379 # Redis server port.
-    password: # Login password of the redis server.
-    timeout: 0 # Connection timeout in milliseconds.
-    #sentinel:
-    #  master: # Name of Redis server.
-    #  nodes: # Comma-separated list of host:port pairs.
-    pool:
-      max-active: 8 # Max number of connections that can be allocated by the pool at a given time. Use a negative value for no limit.
-      max-idle: 8 # Max number of "idle" connections in the pool. Use a negative value to indicate an unlimited number of idle connections.
-      max-wait: -1 # Maximum amount of time (in milliseconds) a connection allocation should block before throwing an exception when the pool is exhausted. Use a negative value to block indefinitely.
-      min-idle: 1 # Target for the minimum number of idle connections to maintain in the pool. This setting only has an effect if it is positive.
+
+fast-dfs:
+  connect-timeout: 2
+  network-timeout: 30
+  charset: ISO8859-1
+  pool:
+    init-size: 5
+    max-size: 20
+    wait-time: 500
+  http:
+    tracker-http-port: 80
+    anti-steal-token: no
+    secret-key: FastDFS1234567890
+eip:
+  tenant: jkzl
 
 ---
 spring:
   profiles: dev
   datasource:
     url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: weifuwu
-    password: weifuwu
+    username: chenweishan
+    password: chenweishan
   ldap:
     host: 172.19.103.87
     port: 389
@@ -71,6 +49,9 @@ spring:
       password: admin
       authenticationDatabase: admin
       database: ehr
+  elasticsearch:
+    jest:
+      uris: http://172.19.103.68:9200
 fast-dfs:
   tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52:80
@@ -78,37 +59,9 @@ fast-dfs:
 es:
   index: wlyy_quota_test
   type: wlyy_quota_test
-  host:  http://172.19.103.68:9200
+  host: http://172.19.103.68:9200
   tHost: 172.19.103.68:9300
   clusterName: jkzl
-
-
----
-spring:
-  profiles: alpha
-  datasource:
-    url: jdbc:mysql://192.168.1.220:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: ha
-    password: ha
-  data:
-    mongodb:
-      host: 192.168.1.220
-      port: 27017
-      username: admin
-      password: admin
-      authenticationDatabase: admin
-      database: ehr
-fast-dfs:
-  tracker-server: 172.19.103.54:22122
-  public-server: http://172.19.103.54
-
-es:
-  index: wlyy_quota_test
-  type: wlyy_quota_test
-  host:  http://172.19.103.68:9200
-  tHost: 172.19.103.68:9300
-  clusterName: jkzl
-
 
 ---
 spring:
@@ -117,33 +70,6 @@ spring:
     url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: weifuwu
     password: weifuwu
-  data:
-    mongodb:
-      host: 192.168.1.220
-      port: 27017
-      username: admin
-      password: admin
-      authenticationDatabase: admin
-      database: ehr
-fast-dfs:
-  tracker-server: 172.19.103.13:22122
-  public-server: http://172.19.103.52:80
-
-es:
-  index: wlyy_quota_test
-  type: wlyy_quota_test
-  host:  http://172.19.103.68:9200
-  tHost: 172.19.103.68:9300
-  clusterName: jkzl
-
-
----
-spring:
-  profiles: prod
-  datasource:
-    url: jdbc:mysql://11.1.2.5:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: ha
-    password: jkzlxm
   ldap:
     host: 172.19.103.87
     port: 389
@@ -158,17 +84,19 @@ spring:
       password: admin
       authenticationDatabase: admin
       database: ehr
+  elasticsearch:
+    jest:
+      uris: http://172.19.103.68:9200
 fast-dfs:
-  tracker-server: 11.1.2.9:22122
-  public-server: http://ds.ehr.yihu.com:22122
+  tracker-server: 172.19.103.13:22122
+  public-server: http://172.19.103.52:80
 
 es:
   index: wlyy_quota_test
   type: wlyy_quota_test
-  host:  http://172.19.103.68:9200
+  host: http://172.19.103.68:9200
   tHost: 172.19.103.68:9300
   clusterName: jkzl
-
 
 ---
 spring:
@@ -185,23 +113,19 @@ spring:
       password: GMLBq1LG
       authenticationDatabase: admin
       database: ehr
-  ldap:
-    host: 172.19.103.87
-    port: 389
-    bindDn: cn=admin,dc=ehr,dc=jkzl
-    password: jkzl
-    root: dc=ehr,dc=jkzl
-
+  elasticsearch:
+    jest:
+      uris: http://172.19.103.68:9200
 fast-dfs:
   tracker-server: 11.1.2.9:22122
   public-server: http://11.1.2.9:80
+
 es:
   index: wlyy_quota_test
   type: wlyy_quota_test
-  host:  http://172.19.103.68:9200
+  host: http://172.19.103.68:9200
   tHost: 172.19.103.68:9300
   clusterName: jkzl
-
 
 ---
 spring:
@@ -210,12 +134,6 @@ spring:
     url: jdbc:mysql://10.176.97.9:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: healthcloud
     password: GP8Qz4qU
-  ldap:
-    host: 172.19.103.87
-    port: 389
-    bindDn: cn=admin,dc=ehr,dc=jkzl
-    password: jkzl
-    root: dc=ehr,dc=jkzl
   data:
     mongodb:
       host: 10.176.97.9
@@ -224,13 +142,17 @@ spring:
       password: GMLBq1LG
       authenticationDatabase: admin
       database: ehr
+  elasticsearch:
+    jest:
+      uris: http://10.176.97.7:9200
 fast-dfs:
   tracker-server: 10.176.97.5:22122
   public-server: http://10.176.97.5:8888
+
 es:
   index: wlyy_quota_test
   type: wlyy_quota_test
-  host:  http://10.176.97.7:9200
+  host: http://10.176.97.7:9200
   tHost: 10.176.97.7:9300
   clusterName: jkzl
 
@@ -241,12 +163,6 @@ spring:
     url: jdbc:mysql://100.100.1.159:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: healthcloud
     password: GP8Qz4qU
-  ldap:
-    host: 100.100.1.157
-    port: 389
-    bindDn: cn=admin,dc=ehr,dc=jkzl
-    password: jkzl
-    root: dc=ehr,dc=jkzl
   data:
     mongodb:
       host: 100.100.1.157
@@ -255,12 +171,16 @@ spring:
       password: GMLBq1LG
       authenticationDatabase: admin
       database: ehr
+  elasticsearch:
+    jest:
+      uris: http://100.100.1.158:9200
 fast-dfs:
   tracker-server: 100.100.1.157:22122
   public-server: http://100.100.1.157:8888
+
 es:
   index: wlyy_quota_test
   type: wlyy_quota_test
-  host:  http://100.100.1.158:9200
+  host: http://100.100.1.158:9200
   tHost: 100.100.1.158:9300
   clusterName: jkzl

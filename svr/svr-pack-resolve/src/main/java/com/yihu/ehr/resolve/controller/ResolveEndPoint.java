@@ -1,6 +1,5 @@
 package com.yihu.ehr.resolve.controller;
 
-import com.codahale.metrics.MetricRegistry;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ArchiveStatus;
 import com.yihu.ehr.constants.ServiceApi;
@@ -100,7 +99,6 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
             map.put("patientId", standardPackage.getPatientId());
             map.put("reUploadFlg", String.valueOf(standardPackage.isReUploadFlg()));
             packageMgrClient.reportStatus(packId, ArchiveStatus.Finished, objectMapper.writeValueAsString(map));
-            getMetricRegistry().histogram(MetricNames.ResourceJob).update((System.currentTimeMillis() - start) / 1000);
             //是否返回数据
             if (echo) {
                 return standardPackage.toJson();
@@ -160,7 +158,6 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
             map.put("patientId", standardPackages.get(0).getPatientId());
             map.put("reUploadFlg", String.valueOf(standardPackages.get(0).isReUploadFlg()));
             datasetPackageMgrClient.reportStatus(packId, ArchiveStatus.Finished, objectMapper.writeValueAsString(map));
-            getMetricRegistry().histogram(MetricNames.ResourceJob).update((System.currentTimeMillis() - start) / 1000);
             if (echo) {
                 return returnJson;
             } else {
@@ -214,7 +211,6 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
             map.put("eventDate", null);
             map.put("patientId", null);
             datasetPackageMgrClient.reportStatus(packId, ArchiveStatus.Finished, objectMapper.writeValueAsString(map));
-            getMetricRegistry().histogram(MetricNames.ResourceJob).update((System.currentTimeMillis() - start) / 1000);
             if (echo) {
                 return datasetPackage.toJson();
             } else {
@@ -332,7 +328,6 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
             map.put("eventDate", DateUtil.toStringLong(standardPackage.getEventDate()));
             map.put("patientId", standardPackage.getPatientId());
 
-            getMetricRegistry().histogram(MetricNames.ResourceJob).update((System.currentTimeMillis() - start) / 1000);
             //是否返回数据
             if (echo) {
                 return standardPackage.toJson();
@@ -356,10 +351,6 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
     private String downloadTo(String filePath) throws Exception {
         String[] tokens = filePath.split(":");
         return fastDFSUtil.download(tokens[0], tokens[1], System.getProperty("java.io.tmpdir") + java.io.File.separator);
-    }
-
-    private MetricRegistry getMetricRegistry() {
-        return SpringContext.getService(MetricRegistry.class);
     }
 
 }

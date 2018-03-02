@@ -22,12 +22,14 @@ public class MicroServices {
     public static final String Family = "svr-ehr-basic";
     public static final String FileResource = "svr-ehr-basic";
     public static final String Dictionary = "svr-ehr-basic";
+    public static final String EsbDictionary = "hos-admin";
     public static final String Organization = "svr-ehr-basic";
 
     //以下几个微服务聚合svr-standard
     public static final String Adaption = "svr-standard";
-    public static final String Standard = "svr-standard";
-    public static final String SpecialDict = "svr-standard";
+    public static final String Standard = "hos-admin";
+    public static final String StandardSource = "svr-standard";
+    public static final String SpecialDict = "hos-admin";
 
     public static final String Resource = "svr-resource";
 
@@ -43,6 +45,8 @@ public class MicroServices {
 
     public static final String Redis = "svr-redis";
 
+    public static final String StdRedis = "hos-admin";
+
     public static final String Quota = "svr-quota";
 
     public static final String Dfs = "svr-dfs";
@@ -53,6 +57,6 @@ public class MicroServices {
     public static final String Discovery = "svr-discovery";
     public static final String LogCollection = "svr-logCollection";
 
-    public static final String Analyzer = "svr-pack-analyze";
+    public static final String Analyzer = "svr-pack-analyzer";
 
 }

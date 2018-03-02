@@ -1,6 +1,7 @@
 package com.yihu.ehr.entity.dict;
 
 
+
 import com.yihu.ehr.util.phonics.PinyinUtil;
 
 import javax.persistence.*;

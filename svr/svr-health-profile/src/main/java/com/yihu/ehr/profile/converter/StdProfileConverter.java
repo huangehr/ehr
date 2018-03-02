@@ -1,11 +1,11 @@
 package com.yihu.ehr.profile.converter;
 
 import com.yihu.ehr.constants.EventType;
-import com.yihu.ehr.model.standard.MCDADocument;
+import com.yihu.hos.model.standard.MCDADocument;
 import com.yihu.ehr.profile.config.CdaDocumentTypeOptions;
-import com.yihu.ehr.profile.feign.XCDADocumentClient;
-import com.yihu.ehr.profile.model.Template;
-import com.yihu.ehr.profile.service.TemplateService;
+import com.yihu.ehr.profile.feign.CDADocumentClient;
+import com.yihu.ehr.profile.model.ArchiveTemplate;
+import com.yihu.ehr.profile.service.ArchiveTemplateService;
 import com.yihu.ehr.util.log.LogService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -24,10 +24,10 @@ import java.util.Map;
 @Service
 public class StdProfileConverter {
     @Autowired
-    private TemplateService templateService;
+    private ArchiveTemplateService templateService;
 
     @Autowired
-    private XCDADocumentClient cdaDocumentClient;
+    private CDADocumentClient cdaDocumentClient;
 
     @Autowired
     private CdaDocumentTypeOptions cdaDocumentTypeOptions;
@@ -39,7 +39,7 @@ public class StdProfileConverter {
      * <p>
      * 定制的CDA文档列表根据档案类别，从而获取这份档案的CDA类别。此CDA类别包含与文档相关的模板，CDA文档。
      */
-    protected Map<Template, MCDADocument> getCustomizedCDADocuments(String cdaVersion, String orgCode, EventType eventType) throws Exception {
+    protected Map<ArchiveTemplate, MCDADocument> getCustomizedCDADocuments(String cdaVersion, String orgCode, EventType eventType) throws Exception {
         // 使用事件-CDA类别映射，取得与此档案相关联的CDA类别ID
         String cdaType = cdaDocumentTypeOptions.getCdaDocumentTypeId(Integer.toString(eventType.getType()));
 
@@ -50,7 +50,7 @@ public class StdProfileConverter {
         }
 
         // 此类别下卫生机构定制的CDA文档列表
-        Map<Template, MCDADocument> cdaDocuments = templateService.getOrganizationTemplates(orgCode, cdaVersion, cdaType);
+        Map<ArchiveTemplate, MCDADocument> cdaDocuments = templateService.getOrganizationTemplates(orgCode, cdaVersion, cdaType);
         if (CollectionUtils.isEmpty(cdaDocuments)) {
             LogService.getLogger().error(
                     String.format("Unable to get cda document of version %s for organization %s, template not prepared?",
@@ -62,7 +62,7 @@ public class StdProfileConverter {
         return cdaDocuments;
     }
 
-    protected Pair<Template, MCDADocument> getCustomizedCDADocument(String cdaVersion, String orgCode, EventType eventType, String cdaDocumentId) throws Exception{
+    protected Pair<ArchiveTemplate, MCDADocument> getCustomizedCDADocument(String cdaVersion, String orgCode, EventType eventType, String cdaDocumentId) throws Exception{
         String cdaType = cdaDocumentTypeOptions.getCdaDocumentTypeId(Integer.toString(eventType.getType()));
 
         if (StringUtils.isEmpty(cdaType)) {
@@ -71,7 +71,7 @@ public class StdProfileConverter {
             return null;
         }
 
-        Pair<Template, MCDADocument> cdaDocuments = templateService.getOrganizationTemplate(orgCode, cdaVersion, cdaType, cdaDocumentId);
+        Pair<ArchiveTemplate, MCDADocument> cdaDocuments = templateService.getOrganizationTemplate(orgCode, cdaVersion, cdaType, cdaDocumentId);
         if (cdaDocuments == null) {
             LogService.getLogger().error(
                     String.format("Unable to get cda document of version %s for organization %s, template not prepared?",

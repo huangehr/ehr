@@ -1,8 +1,6 @@
 package com.yihu.ehr.redis.cache.service;
 
 import com.yihu.ehr.redis.schema.*;
-import com.yihu.ehr.util.id.ObjectVersion;
-import com.yihu.ehr.util.log.LogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -236,73 +234,6 @@ public class RedisInitService {
         }
         if(!StringUtils.isEmpty(orgCode)) {
             orgKeySchema.setOrgSaasOrg(orgCode,val);
-        }
-        return true;
-    }
-
-    /**
-     * 缓存版本
-     * @param versions
-     * @param force
-     * @return
-     */
-    public boolean cacheVersions(String versions, boolean force) {
-        String versionQuery = "SELECT version_name FROM std_cda_versions WHERE version = 'std.version.column'" ;
-        String dataSetQuery = "SELECT id, code, name, multi_record FROM data.set.table";
-        String metaDataQuery = "SELECT a.code AS data_set_code, b.inner_code, b.type, b.dict_id FROM data.set.table a, " +
-                "meta.data.table b WHERE a.id = b.dataset_id";
-        String dictEntryQuery = "SELECT t.dict_id, t.code, t.value FROM dict.entry.table t";
-        for (String version : versions.split(",")) {
-            if (!ObjectVersion.isValid(version)) {
-                throw new IllegalArgumentException("无效版本号");
-            }
-            if(force) {
-                stdCdaVersionKeySchema.delete(version);
-                stdMetaDataKeySchema.deleteMetaDataDict(version, "*", "*");
-                stdMetaDataKeySchema.deleteMetaDataType(version, "*", "*");
-                stdMetaDataKeySchema.deleteDictEntryValue(version, "*", "*");
-            }
-            String dataSetTable = "std_data_set_" + version;
-            String metaDataTable = "std_meta_data_" + version;
-            String dictEntryTable = "std_dictionary_entry_" + version;
-            //数据集
-            List<Map<String,Object>> dataSetList = jdbc.queryForList(dataSetQuery.replace("data.set.table", dataSetTable));
-            for (Map<String, Object> tempMap: dataSetList) {
-                String id = tempMap.get("id").toString();
-                String code = (String) tempMap.get("code");
-                String name = (String) tempMap.get("name");
-                boolean multiRecord = (boolean) tempMap.get("multi_record");
-                stdDataSetKeySchema.setDataSetCode(version, id, code);
-                stdDataSetKeySchema.setDataSetName(version, id, name);
-                stdDataSetKeySchema.setDataSetNameByCode(version, code, name);
-                stdDataSetKeySchema.setDataSetMultiRecord(version, code, multiRecord);
-            }
-            //数据元
-            List<Map<String,Object>> metaDataList = jdbc.queryForList(metaDataQuery.replace("data.set.table", dataSetTable).replace("meta.data.table", metaDataTable));
-            for(Map<String, Object> tempMap : metaDataList) {
-                String dataSetCode = (String) tempMap.get("data_set_code");
-                String innerCode = (String) tempMap.get("inner_code");
-                String type = (String) tempMap.get("type");
-                long dictId = (Integer) tempMap.get("dict_id");
-                String metaDataTypeKey = stdMetaDataKeySchema.makeKey(version, dataSetCode, innerCode);
-                if (!force && stdMetaDataKeySchema.hasKey(metaDataTypeKey)) {
-                    LogService.getLogger().warn("Meta data duplicated: " + metaDataTypeKey);
-                }
-                stdMetaDataKeySchema.setMetaDataType(version, dataSetCode, innerCode, type);
-                stdMetaDataKeySchema.setMetaDataDict(version, dataSetCode, innerCode, String.valueOf(dictId));
-            }
-            //字典项
-            List<Map<String,Object>> dictEntryList = jdbc.queryForList(dictEntryQuery.replace("dict.entry.table", dictEntryTable));
-            for (Map<String, Object> tempMap: dictEntryList) {
-                String dictId = tempMap.get("dict_id").toString();
-                String code = (String) tempMap.get("code");
-                String value = (String) tempMap.get("value");
-                stdMetaDataKeySchema.setDictEntryValue(version, dictId, code, value);
-            }
-            //版本名
-            Map<String, Object> versionMap = jdbc.queryForMap(versionQuery.replace("std.version.column", version));
-            String versionName = (String) versionMap.get("version_name");
-            stdCdaVersionKeySchema.set(version, versionName);
         }
         return true;
     }

@@ -6,26 +6,26 @@ package com.yihu.ehr.agModel.standard.dict;
 
 public class DictEntryModel {
 
-    long id;
-    long dictId;//字典ID
+    Long id;
+    Long dictId;//字典ID
     String code;
     String value;
     String desc;
-    int hashCode;
+    Integer hashCode;
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public long getDictId() {
+    public Long getDictId() {
         return dictId;
     }
 
-    public void setDictId(long dictId) {
+    public void setDictId(Long dictId) {
         this.dictId = dictId;
     }
 
@@ -53,11 +53,11 @@ public class DictEntryModel {
         this.desc = desc;
     }
 
-    public int getHashCode() {
+    public Integer getHashCode() {
         return hashCode;
     }
 
-    public void setHashCode(int hashCode) {
+    public void setHashCode(Integer hashCode) {
         this.hashCode = hashCode;
     }
 }

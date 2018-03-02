@@ -19,8 +19,10 @@ public class PackQueueService {
 
     public MPackage pop() throws IOException {
         Serializable serializable = redisTemplate.opsForList().rightPop(RedisCollection.AnalyzeQueue);
-        String packStr = serializable.toString();
-        return objectMapper.readValue(packStr, MPackage.class);
+        if(serializable != null) {
+            String packStr = serializable.toString();
+            return objectMapper.readValue(packStr, MPackage.class);
+        }
+        return null;
     }
-
 }

@@ -4,32 +4,19 @@ server:
 management:
   port: ${server.port}
 
-logging:
-  level:
-    com:
-      netflix: INFO
-    org:
-      springframework:
-        web: INFO
-      hibernate: ERROR
-
 spring:
   # REDIS
   redis:
     database: 0 # Database index used by the connection factory.
-    port: 6379 # Redis server port.
-    password: # Login password of the redis server.
     timeout: 0 # Connection timeout in milliseconds.
     #sentinel:
     #  master: # Name of Redis server.
     #  nodes: # Comma-separated list of host:port pairs.
-
     pool:
       max-active: 8 # Max number of connections that can be allocated by the pool at a given time. Use a negative value for no limit.
       max-idle: 8 # Max number of "idle" connections in the pool. Use a negative value to indicate an unlimited number of idle connections.
       max-wait: -1 # Maximum amount of time (in milliseconds) a connection allocation should block before throwing an exception when the pool is exhausted. Use a negative value to block indefinitely.
       min-idle: 1 # Target for the minimum number of idle connections to maintain in the pool. This setting only has an effect if it is positive.
-
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
     max-active: 20
@@ -37,7 +24,6 @@ spring:
     min-idle: 8
     validation-query: SELECT 1
     test-on-borrow: true
-
 
 ---
 spring:
@@ -61,25 +47,6 @@ ehr-redis:
 
 ---
 spring:
-  profiles: alpha
-
-  datasource:
-    url: jdbc:mysql://192.168.1.220:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: ha
-    password: ha
-
-  redis:
-    host: 192.168.1.220 # Redis server host.
-
-ehr-redis:
-  cache:
-    memory:
-      rdbFilePath: /usr/local/bin/dump.rdb
-      outFilePath: /home/ehr/redisReport/memory.csv
-
-
----
-spring:
   profiles: test
 
   datasource:
@@ -95,26 +62,6 @@ ehr-redis:
     memory:
       rdbFilePath: /usr/local/bin/dump.rdb
       outFilePath: /home/ehr/redisReport/memory.csv
-
-
----
-spring:
-  profiles: prod
-
-  redis:
-    host: 11.1.2.20
-
-  datasource:
-    url: jdbc:mysql://11.1.2.5:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: ha
-    password: jkzlxm
-
-ehr-redis:
-  cache:
-    memory:
-      rdbFilePath: /usr/local/bin/dump.rdb
-      outFilePath: /home/ehr/redisReport/memory.csv
-
 
 ---
 spring:
@@ -135,7 +82,6 @@ ehr-redis:
       rdbFilePath: /usr/local/bin/dump.rdb
       outFilePath: /home/ehr/redisReport/memory.csv
 
-
 ---
 spring:
   profiles: prod_sr
@@ -147,6 +93,26 @@ spring:
 
   datasource:
     url: jdbc:mysql://10.176.97.9:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: healthcloud
+    password: GP8Qz4qU
+
+ehr-redis:
+  cache:
+    memory:
+      rdbFilePath: /usr/local/bin/dump.rdb
+      outFilePath: /home/ehr/redisReport/memory.csv
+
+---
+spring:
+  profiles: prod_fzzy
+
+  redis:
+    host: 100.100.1.161
+    port: 6390
+    password: q4YaQemf
+
+  datasource:
+    url: jdbc:mysql://100.100.1.159:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: healthcloud
     password: GP8Qz4qU
 

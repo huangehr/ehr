@@ -3,6 +3,7 @@ package com.yihu.ehr.ui;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.web.context.request.async.DeferredResult;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.spi.DocumentationType;
@@ -15,6 +16,7 @@ import static springfox.documentation.builders.PathSelectors.regex;
 @Configuration
 @EnableSwagger2
 @ComponentScan("com.yihu.ehr.*.controller")
+@Profile({"dev", "test"})
 public class SwaggerConfig {
     public static final String LEGACY_API = "Legacy";
     public static final String PRIVATE_API = "Private";

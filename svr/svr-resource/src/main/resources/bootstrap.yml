@@ -53,8 +53,6 @@ spring:
       uri: http://﻿11.1.2.1:1221
       label: master
 
-
-
 ---
 spring:
   profiles: prod_sr
@@ -64,7 +62,6 @@ spring:
       password: configuration
       uri: http://10.176.97.10:1221
       label: master
-
 
 ---
 spring:

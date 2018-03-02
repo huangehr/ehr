@@ -2,7 +2,7 @@ package com.yihu.ehr.api.dict;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.feign.StdDictEntryClient;
-import com.yihu.ehr.model.standard.MStdDictEntry;
+import com.yihu.hos.model.standard.MStdDictEntry;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

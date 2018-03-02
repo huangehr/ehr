@@ -1,11 +1,13 @@
 package com.yihu.ehr.basic.apps.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.basic.apps.model.UserApp;
 import com.yihu.ehr.basic.apps.service.UserAppService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.model.app.MUserApp;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -60,5 +62,18 @@ public class UserAppEndPoint extends EnvelopRestEndPoint {
             }else{
                 return null;
         }
+    }
+
+    @RequestMapping(value = ServiceApi.UserApp.CreateUserApp, method = RequestMethod.GET)
+    @ApiOperation(value = "创建用户与app关联")
+    public MUserApp createUserApp(
+            @ApiParam(name = "userAppJson", value = "用户APP对象json")
+            @RequestParam(value = "userAppJson", required = true) String userAppJson) throws Exception {
+            UserApp userApp =objectMapper.readValue(userAppJson, UserApp.class);
+            userApp.setShowFlag(1);
+            userApp.setOrgId("");
+            userApp.setOrgName("");
+            MUserApp mUserApp = convertToModel(userAppService.save(userApp),MUserApp.class);
+            return mUserApp;
     }
 }

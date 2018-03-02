@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -20,7 +19,7 @@ public class ProfileEventService {
     @Value("${spring.application.id}")
     private String appId;
     @Autowired
-    private XResourceClient resource; //资源服务
+    private ResourceClient resource; //资源服务
 
     //event_type对应数据集
     Map<String,String[]> eventTypeDataset = new HashMap() {

@@ -5,8 +5,8 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.profile.MTemplate;
-import com.yihu.ehr.profile.model.Template;
-import com.yihu.ehr.profile.service.TemplateService;
+import com.yihu.ehr.profile.model.ArchiveTemplate;
+import com.yihu.ehr.profile.service.ArchiveTemplateService;
 import com.yihu.ehr.util.compress.Zipper;
 import com.yihu.ehr.controller.BaseRestEndPoint;
 import com.yihu.ehr.util.log.LogService;
@@ -44,13 +44,13 @@ import java.util.List;
 @Api(value = "健康档案模板服务", description = "维护/获取健康档案模板")
 public class TemplateEndPoint extends BaseRestEndPoint {
     @Autowired
-    TemplateService templateService;
+    ArchiveTemplateService templateService;
 
     @ApiOperation(value = "创建模板")
     @RequestMapping(value = ServiceApi.ProfileTemplate.Templates, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, method = RequestMethod.POST)
     public void saveTemplate(@ApiParam(value = "健康档案模板")
                              @RequestBody String model) {
-        Template template = toEntity(model, Template.class);
+        ArchiveTemplate template = toEntity(model, ArchiveTemplate.class);
         template.setCreateTime(new Date());
         templateService.save(template);
     }
@@ -71,7 +71,7 @@ public class TemplateEndPoint extends BaseRestEndPoint {
             HttpServletRequest request,
             HttpServletResponse response
     ) throws ParseException {
-        List<Template> templateList = templateService.search(fields, filters, sorts, page, size);
+        List<ArchiveTemplate> templateList = templateService.search(fields, filters, sorts, page, size);
 
         pagedResponse(request, response, templateService.getCount(filters), page, size);
 
@@ -82,7 +82,7 @@ public class TemplateEndPoint extends BaseRestEndPoint {
     @RequestMapping(value = ServiceApi.ProfileTemplate.Template, method = RequestMethod.GET)
     public MTemplate getTemplate(@ApiParam(value = "模板ID")
                                  @PathVariable(value = "id") int id) {
-        Template template = templateService.getTemplate(id);
+        ArchiveTemplate template = templateService.getTemplate(id);
         if (null == template) throw new ApiException(HttpStatus.NOT_FOUND, "Template not found");
 
         return convertToModel(template, MTemplate.class, null);
@@ -107,10 +107,10 @@ public class TemplateEndPoint extends BaseRestEndPoint {
                             @PathVariable(value = "id") int id,
                             @ApiParam(value = "模板JSON")
                             @RequestBody String model) {
-        Template tpl = templateService.getTemplate(id);
+        ArchiveTemplate tpl = templateService.getTemplate(id);
         if (null == tpl) throw new ApiException(HttpStatus.NOT_FOUND, "Template not found");
 
-        Template template = toEntity(model, Template.class);
+        ArchiveTemplate template = toEntity(model, ArchiveTemplate.class);
         template.setId(id);
 
         templateService.save(template);
@@ -123,7 +123,7 @@ public class TemplateEndPoint extends BaseRestEndPoint {
                                    @ApiParam(value = "true表示PC端，false表示移动端")
                                    @RequestParam(value = "pc", defaultValue = "true") boolean pc,
                                    HttpServletResponse response) throws Exception {
-        Template template = templateService.getTemplate(id);
+        ArchiveTemplate template = templateService.getTemplate(id);
         if (template == null) throw new ApiException(HttpStatus.NOT_FOUND, "Template not found");
         if (StringUtils.isEmpty(template.getPcTplURL()))
             throw new ApiException(HttpStatus.NOT_FOUND, "Template content is empty.");
@@ -143,7 +143,7 @@ public class TemplateEndPoint extends BaseRestEndPoint {
                                    @RequestParam(value = "pc", defaultValue = "true") boolean pc,
                                    @ApiParam(value = "展示文件")
                                    @RequestPart() MultipartFile file) throws Exception {
-        Template template = templateService.getTemplate(id);
+        ArchiveTemplate template = templateService.getTemplate(id);
         if (template == null) throw new ApiException(HttpStatus.NOT_FOUND, "Template not found");
 
         InputStream stream = file.getInputStream();
@@ -178,8 +178,8 @@ public class TemplateEndPoint extends BaseRestEndPoint {
 
         try {
             // download and zip templates
-            List<Template> templateList = templateService.search("", filters, sorts, reducePage(page), size);
-            for (Template template : templateList) {
+            List<ArchiveTemplate> templateList = templateService.search("", filters, sorts, reducePage(page), size);
+            for (ArchiveTemplate template : templateList) {
                 byte pc[] = template.getContent(true);
                 byte mobile[] = template.getContent(false);
 
@@ -206,7 +206,7 @@ public class TemplateEndPoint extends BaseRestEndPoint {
         }
     }
 
-    private void writeTplContent(File location, Template template, String suffix, byte content[]) throws IOException {
+    private void writeTplContent(File location, ArchiveTemplate template, String suffix, byte content[]) throws IOException {
         if (content != null) {
             String fileName = location.getAbsolutePath() + File.separator + template.getId() + suffix;
             FileUtils.writeByteArrayToFile(new File(fileName), content);

@@ -17,16 +17,18 @@ public class StdSessionFactoryBean extends LocalSessionFactoryBean {
     public synchronized SessionFactory addClassToBuildSessionFactory(Class ... annotatedClasses){
         Configuration cfg = getConfiguration();
         for (Class c : annotatedClasses){
-            if(cfg.getClassMapping(c.getName())==null)
+            if(cfg.getClassMapping(c.getName()) == null) {
                 cfg.addAnnotatedClass(c);
+            }
         }
         return sessionFactory = super.buildSessionFactory((LocalSessionFactoryBuilder) cfg);
     }
 
     @Override
     public SessionFactory getObject() {
-        if(sessionFactory==null)
+        if(sessionFactory == null) {
             sessionFactory = super.getObject();
+        }
         return sessionFactory;
     }
 }

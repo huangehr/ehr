@@ -18,7 +18,7 @@ public class ProfileInfoBaseService {
     @Value("${spring.application.id}")
     private String appId;
     @Autowired
-    private XResourceClient resource; //资源服务
+    private ResourceClient resource; //资源服务
     @Autowired
     private ProfileDiseaseService profileDiseaseService;
 
@@ -83,7 +83,7 @@ public class ProfileInfoBaseService {
         }
         Envelop envelop;
         //传染病史
-        String q2 = "{\"q\":\"demographic_id:" + demographic_id + "%20AND%20EHR_002393:*\"}";
+        String q2 = "{\"q\":\"demographic_id:" + demographic_id + " AND EHR_002393:*\"}";
         envelop = resource.getMasterData(q2, null, null, null);
         List<Map<String, Object>> list2 = envelop.getDetailModelList();
         if(list2 != null && list2.size() > 0) {
@@ -110,7 +110,7 @@ public class ProfileInfoBaseService {
             resultList.add(infectiousDisease);
         }
         //预防接种史
-        String q3 = "{\"q\":\"demographic_id:" + demographic_id + "%20AND%20EHR_002443:*\"}";
+        String q3 = "{\"q\":\"demographic_id:" + demographic_id + " AND EHR_002443:*\"}";
         envelop = resource.getMasterData(q3, null, null, null);
         List<Map<String, Object>> list3 = envelop.getDetailModelList();
         if(list3 != null && list3.size() > 0) {
@@ -170,7 +170,7 @@ public class ProfileInfoBaseService {
             }
         }
         //孕产史
-        String q5 = "{\"q\":\"demographic_id:" + demographic_id + "%20AND%20EHR_002443:*\"}";
+        String q5 = "{\"q\":\"demographic_id:" + demographic_id + " AND EHR_002443:*\"}";
         envelop = resource.getMasterData(q5, null, null, null);
         List<Map<String, Object>> list5 = envelop.getDetailModelList();
         if(list5 != null && list5.size() > 0) {

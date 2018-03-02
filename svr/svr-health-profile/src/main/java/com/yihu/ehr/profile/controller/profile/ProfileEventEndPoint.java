@@ -4,7 +4,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseRestEndPoint;
 import com.yihu.ehr.model.resource.MStdTransformDto;
-import com.yihu.ehr.profile.feign.XTransformClient;
+import com.yihu.ehr.profile.feign.TransformClient;
 import com.yihu.ehr.profile.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -33,7 +33,7 @@ public class ProfileEventEndPoint extends BaseRestEndPoint {
     @Autowired
     private ProfileEventService patientEvent;
     @Autowired
-    private XTransformClient transform;
+    private TransformClient transform;
 
     @ApiOperation("门诊/住院事件(时间轴)")
     @RequestMapping(value = ServiceApi.Profiles.MedicalEvents, method = RequestMethod.GET)

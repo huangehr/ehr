@@ -24,7 +24,7 @@ import java.util.Map;
  */
 @Service
 public class PackageAnalyzeService {
-    private final static Logger logger = LoggerFactory.getLogger(PackQueueService.class);
+    private final static Logger logger = LoggerFactory.getLogger(PackageAnalyzeService.class);
 
     @Autowired
     private PackQueueService packQueueService;
@@ -54,16 +54,18 @@ public class PackageAnalyzeService {
         ZipPackage zipPackage = null;
         try {
             mPackage = packQueueService.pop();
-            zipPackage = new ZipPackage(mPackage);
-            zipPackage.download();
-            zipPackage.unZip();
-            zipPackage.resolve();
-            zipPackage.save();
+            if (mPackage != null) {
+                zipPackage = new ZipPackage(mPackage);
+                zipPackage.download();
+                zipPackage.unZip();
+                zipPackage.resolve();
+                zipPackage.save();
 
-            mgrClient.analyzeStatus(mPackage.getId(), 3);
+                mgrClient.analyzeStatus(mPackage.getId(), 3);
 
-            packageQcService.sendQcMsg(zipPackage);//发送Qc消息
-            packageQcService.qcReceive(zipPackage);
+                packageQcService.sendQcMsg(zipPackage);//发送Qc消息
+                packageQcService.qcReceive(zipPackage);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());

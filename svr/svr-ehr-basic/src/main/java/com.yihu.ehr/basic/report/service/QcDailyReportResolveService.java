@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.basic.report.feign.PackMgrClient;
 import com.yihu.ehr.basic.report.feign.PackResolveClient;
 import com.yihu.ehr.basic.report.feign.RedisServiceClient;
+import com.yihu.ehr.basic.report.feign.StandardClient;
 import com.yihu.ehr.basic.util.QcDatasetsParser;
 import com.yihu.ehr.basic.util.QcEventDataParser;
 import com.yihu.ehr.basic.util.QcMetadataParser;
@@ -16,11 +17,10 @@ import com.yihu.ehr.entity.report.*;
 import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.model.report.MQcDailyReportDetail;
 import com.yihu.ehr.model.report.json.*;
-import com.yihu.ehr.model.standard.MStdDataSet;
-import com.yihu.ehr.model.standard.MStdMetaData;
-import com.yihu.ehr.basic.report.feign.StandardClient;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.rest.Envelop;
+import com.yihu.hos.model.standard.MStdDataSet;
+import com.yihu.hos.model.standard.MStdMetaData;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -358,13 +358,13 @@ public class QcDailyReportResolveService {
 
     public int returnArchiveStatus(JsonArchives jsonArchives) {
         if (jsonArchives != null) {
-            if (jsonArchives.getArchiveStatus() == ArchiveStatus.Received) {
+            if (jsonArchives.getArchiveStatus() == JsonArchives.ArchiveStatus.Received) {
                 return 0;
-            } else if (jsonArchives.getArchiveStatus() == ArchiveStatus.Acquired) {
+            } else if (jsonArchives.getArchiveStatus() == JsonArchives.ArchiveStatus.Acquired) {
                 return 1;
-            } else if (jsonArchives.getArchiveStatus() == ArchiveStatus.Failed) {
+            } else if (jsonArchives.getArchiveStatus() == JsonArchives.ArchiveStatus.Failed) {
                 return 2;
-            } else if (jsonArchives.getArchiveStatus() == ArchiveStatus.Finished) {
+            } else if (jsonArchives.getArchiveStatus() == JsonArchives.ArchiveStatus.Finished) {
                 return 3;
             } else {
                 return 0;

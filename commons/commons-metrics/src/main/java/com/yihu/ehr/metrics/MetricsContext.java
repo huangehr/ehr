@@ -19,7 +19,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Sand
  * @created 2016.05.26 16:31
  */
-@Configuration
+//@Configuration
 public class MetricsContext {
     @Value("${spring.metrics.export.statsd.host}")
     private String statsdHost;

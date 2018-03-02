@@ -16,5 +16,6 @@ public interface RsAdapterDictionaryDao extends PagingAndSortingRepository<RsAda
     @Modifying
     @Query("delete from RsAdapterDictionary where schemeId = ?1")
     void deleteBySchemeId(String schemeId);
+
     List<RsAdapterDictionary> findBySchemeId(String schemeId);
 }

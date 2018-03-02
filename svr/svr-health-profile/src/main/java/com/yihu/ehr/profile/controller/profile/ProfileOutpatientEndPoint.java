@@ -5,7 +5,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseRestEndPoint;
 import com.yihu.ehr.model.resource.MStdTransformDto;
-import com.yihu.ehr.profile.feign.XTransformClient;
+import com.yihu.ehr.profile.feign.TransformClient;
 import com.yihu.ehr.profile.service.*;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
@@ -45,7 +45,7 @@ public class ProfileOutpatientEndPoint extends BaseRestEndPoint {
     ProfileCDAService profileCDAService;
 
     @Autowired
-    XTransformClient transform;
+    TransformClient transform;
 
     @Autowired
     IndicatorsService indicatorsService;

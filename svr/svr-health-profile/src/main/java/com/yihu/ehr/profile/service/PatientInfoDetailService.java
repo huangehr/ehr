@@ -20,34 +20,34 @@ import java.util.*;
 @Service
 public class PatientInfoDetailService {
     @Autowired
-    XResourceClient resource;
+    ResourceClient resource;
 
     //字典信息服务
     @Autowired
-    XDictClient dictService;
+    DictClient dictService;
 
     @Autowired
     MedicationStatService medicationStatService;
 
     @Autowired
-    TemplateService templateService;
+    ArchiveTemplateService templateService;
 
     //CDA服务
     @Autowired
-    XCDADocumentClient cdaService;
+    CDADocumentClient cdaService;
 
     @Autowired
     ObjectMapper objectMapper;
 
     @Autowired
-    XTransformClient transform;
+    TransformClient transform;
 
 
     @Autowired
     ThridPrescriptionService thridPrescriptionService;
 
     @Autowired
-    XProflieClient proflieClient;
+    ProflieClient proflieClient;
 
     /**
      * fastDfs服务器地址

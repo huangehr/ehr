@@ -11,7 +11,7 @@ import java.util.List;
  *
  * Created by lyr on 2016/5/16.
  */
-public interface RsMetadataDao extends PagingAndSortingRepository<RsMetadata,String> {
+public interface RsMetadataDao extends PagingAndSortingRepository<RsMetadata, String> {
 
     @Query("select a from RsMetadata a where a.dictCode <> null and a.dictCode <> '' ")
     List<RsMetadata> findMetadataExistDictCode();

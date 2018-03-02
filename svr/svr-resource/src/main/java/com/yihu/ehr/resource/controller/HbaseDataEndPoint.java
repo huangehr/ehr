@@ -112,21 +112,11 @@ public class HbaseDataEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = "isTableExists",method = RequestMethod.GET)
     public String isTableExists(
             @ApiParam(value="表名",defaultValue = "HealthProfile")
-            @RequestParam String tableName)
-    {
-        try {
-
-            if (hbaseAdmin.isTableExists(tableName)) {
-                return "true";
-            } else {
-                return "false";
-            }
+            @RequestParam String tableName) throws Exception {
+        if (hbaseAdmin.isTableExists(tableName)) {
+            return "true";
         }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-            return "Fail!"+ex.getMessage();
-        }
+        return "false";
     }
 
     @ApiOperation("创建表")

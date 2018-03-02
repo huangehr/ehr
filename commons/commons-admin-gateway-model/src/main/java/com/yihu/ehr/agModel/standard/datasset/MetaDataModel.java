@@ -5,9 +5,9 @@ package com.yihu.ehr.agModel.standard.datasset;
  */
 public class MetaDataModel {
 
-    long id;                    // 数据元ID
+    Long id;                    // 数据元ID
 
-    long dataSetId;             //数据集ID
+    Long dataSetId;             //数据集ID
 
     String innerCode;           // 内部标识码
 
@@ -17,7 +17,7 @@ public class MetaDataModel {
 
     String type;                // 数据类型
 
-    long dictId;                //字典ID
+    Long dictId;                //字典ID
 
     String dictName;
 
@@ -37,19 +37,19 @@ public class MetaDataModel {
 
     boolean primaryKey;         // 是否为主键
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public long getDataSetId() {
+    public Long getDataSetId() {
         return dataSetId;
     }
 
-    public void setDataSetId(long dataSetId) {
+    public void setDataSetId(Long dataSetId) {
         this.dataSetId = dataSetId;
     }
 
@@ -85,11 +85,11 @@ public class MetaDataModel {
         this.type = type;
     }
 
-    public long getDictId() {
+    public Long getDictId() {
         return dictId;
     }
 
-    public void setDictId(long dictId) {
+    public void setDictId(Long dictId) {
         this.dictId = dictId;
     }
 

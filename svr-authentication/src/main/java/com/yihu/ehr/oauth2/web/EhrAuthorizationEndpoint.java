@@ -234,8 +234,7 @@ public class EhrAuthorizationEndpoint extends AbstractEndpoint {
                     securityContext.setAuthentication(userToken);
                     SecurityContextHolder.setContext(securityContext);
                     principal = userToken;
-                }
-                else {
+                } else {
                     throw new InsufficientAuthenticationException(
                             "User must be authenticated with Spring Security before authorization can be completed.");
                 }

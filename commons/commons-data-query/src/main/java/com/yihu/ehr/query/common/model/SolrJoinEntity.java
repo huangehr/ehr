@@ -14,15 +14,13 @@ public class SolrJoinEntity {
     private String toCol;
     private List<QueryCondition> conditions; //过滤条件
 
-    public SolrJoinEntity()
-    {}
+    public SolrJoinEntity() {}
 
 
     /**
      * 构造函数
      */
-    public SolrJoinEntity(String fromIndex, String fromCol, String toCol, List<QueryCondition> conditions)
-    {
+    public SolrJoinEntity(String fromIndex, String fromCol, String toCol, List<QueryCondition> conditions) {
         this.fromIndex = fromIndex;
         this.fromCol = fromCol;
         this.toCol = toCol;
@@ -32,8 +30,7 @@ public class SolrJoinEntity {
     /**
      * 构造函数
      */
-    public SolrJoinEntity(String fromCol, String toCol, List<QueryCondition> conditions)
-    {
+    public SolrJoinEntity(String fromCol, String toCol, List<QueryCondition> conditions) {
         this.fromCol = fromCol;
         this.toCol = toCol;
         this.conditions = conditions;
@@ -42,25 +39,18 @@ public class SolrJoinEntity {
     /**
      *join条件转字符串
      */
-    public String toString()
-    {
-        if(!fromCol.equals("") && !toCol.equals(""))
-        {
+    public String toString() {
+        if(!fromCol.equals("") && !toCol.equals("")) {
             String re = "{!join ";
-            if(fromIndex!=null && !fromIndex.equals(""))
-            {
+            if(fromIndex!=null && !fromIndex.equals("")) {
                 re += " fromIndex="+fromIndex;
             }
             re +=" from="+fromCol+" to="+toCol+"}";
-            if(conditions!=null && conditions.size()>0)
-            {
+            if(conditions!=null && conditions.size() > 0) {
                 String conditionString ="";
-                for(QueryCondition condition :conditions)
-                {
-                    if(!conditionString.equals(""))
-                    {
-                        switch (condition.getLogical())
-                        {
+                for(QueryCondition condition :conditions) {
+                    if(!conditionString.equals("")) {
+                        switch (condition.getLogical()) {
                             case Logical.AND:
                                 conditionString+=" AND ";
                                 break;
@@ -72,18 +62,14 @@ public class SolrJoinEntity {
                                 break;
                         }
                     }
-
                     conditionString+=condition.toString() +" ";
                 }
-            }
-            else {
+            } else {
                 re +="*:* ";
             }
             return re;
-        }
-        else{
+        } else{
             return "";
         }
     }
-
 }

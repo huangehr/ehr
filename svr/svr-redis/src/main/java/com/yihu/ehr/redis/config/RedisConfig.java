@@ -17,35 +17,11 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Configuration
 public class RedisConfig {
 
-    @Value("${spring.redis.host}")
-    public String redisHost;
-    @Value("${spring.redis.port}")
-    public Integer redisPort;
-    @Value("${spring.redis.password}")
-    public String redisPassword;
-
     @Bean
-    JedisConnectionFactory jedisConnectionFactory() {
-        JedisConnectionFactory jedisConnectionFactory = new JedisConnectionFactory();
-        jedisConnectionFactory.setHostName(redisHost);
-        jedisConnectionFactory.setPort(redisPort);
-        jedisConnectionFactory.setPassword(redisPassword);
-        return jedisConnectionFactory;
-    }
-
-    @Bean
-    RedisMessageListenerContainer redisMessageListenerContainer() {
+    RedisMessageListenerContainer redisMessageListenerContainer(JedisConnectionFactory jedisConnectionFactory) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-        container.setConnectionFactory(jedisConnectionFactory());
+        container.setConnectionFactory(jedisConnectionFactory);
         return container;
-    }
-
-    @Bean
-    RedisTemplate<String, Object> redisTemplate() {
-        RedisTemplate<String, Object> template = new RedisTemplate<>();
-        template.setConnectionFactory(jedisConnectionFactory());
-        template.setDefaultSerializer(new StringRedisSerializer());
-        return template;
     }
 
 }

@@ -1,6 +1,5 @@
 package com.yihu.ehr.entity.report;
 
-import com.yihu.ehr.constants.ArchiveStatus;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -12,6 +11,19 @@ import java.util.Date;
 @Entity
 @Table(name = "json_archives")
 public class JsonArchives {
+
+    public enum ArchiveStatus {
+        // 0 已缓存
+        Received,
+        // 1 正在入库
+        Acquired,
+        // 2 入库失败
+        Failed,
+        // 3 已入库
+        Finished
+        // 4 未能入库的档案
+        //LegacyIgnored;
+    }
 
     private String id;
     private String pwd;

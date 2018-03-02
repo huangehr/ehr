@@ -31,7 +31,7 @@ public class SolrQuery {
     private String endTime; // 查找的截止日期
 
     @Autowired
-    SolrUtil solrUtil;
+    private SolrUtil solrUtil;
 
     public void initParams(String startTime, String endTime) {
         // 初始执行指标，起止日期没有值，默认分组聚合前50年的。
