@@ -15,10 +15,10 @@ public class PersonalInfoModel {
     @JestId
     private String id;
     private String name;//姓名
-    private String sex;//性别
+    private int sex;//性别
     private String sexName;//性别
     private String birthday;//出生年月
-    private String birthYear;//出生年份
+    private int birthYear;//出生年份
     private String demographicId;//身份证号
     private String carId;     //就诊卡号
     private String town;    //区代码
@@ -50,11 +50,11 @@ public class PersonalInfoModel {
         this.name = name;
     }
 
-    public String getSex() {
+    public int getSex() {
         return sex;
     }
 
-    public void setSex(String sex) {
+    public void setSex(int sex) {
         this.sex = sex;
     }
 
@@ -74,11 +74,11 @@ public class PersonalInfoModel {
         this.birthday = birthday;
     }
 
-    public String getBirthYear() {
+    public int getBirthYear() {
         return birthYear;
     }
 
-    public void setBirthYear(String birthYear) {
+    public void setBirthYear(int birthYear) {
         this.birthYear = birthYear;
     }
 

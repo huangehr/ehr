@@ -15,7 +15,7 @@ public class CheckInfoModel {
     @JestId
     private String id;
     private String name;//姓名
-    private String sex;//性别
+    private int sex;//性别
     private String sexName;//性别
     private String demographicId;//身份证号
     private String carId;     //就诊卡号
@@ -50,11 +50,11 @@ public class CheckInfoModel {
         this.name = name;
     }
 
-    public String getSex() {
+    public int getSex() {
         return sex;
     }
 
-    public void setSex(String sex) {
+    public void setSex(int sex) {
         this.sex = sex;
     }
 
