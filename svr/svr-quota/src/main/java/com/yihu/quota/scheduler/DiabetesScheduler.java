@@ -141,14 +141,14 @@ public class DiabetesScheduler {
 						checkInfo.setCarId(map.get(keyCardId).toString());
 					}
 					if(map.get(keySex) != null){
-						personalInfo.setSex(map.get(keySex).toString());
+						personalInfo.setSex(Integer.valueOf(map.get(keySex).toString()));
 						personalInfo.setSexName(map.get(keySexValue).toString());
-						checkInfo.setSex(map.get(keySex).toString());
+						checkInfo.setSex(Integer.valueOf(map.get(keySex).toString()));
 						checkInfo.setSexName(map.get(keySexValue).toString());
 					}
 					if(map.get(keyAge) != null){
 						personalInfo.setBirthday( map.get(keyAge).toString().substring(0, 10));
-						personalInfo.setBirthYear(map.get(keyAge).toString().substring(0, 4));
+						personalInfo.setBirthYear(Integer.valueOf(map.get(keyAge).toString().substring(0, 4)));
 					}
 					if(map.get(keyAddress) != null){
 						String address = map.get(keyAddress).toString();
