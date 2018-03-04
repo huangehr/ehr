@@ -159,23 +159,55 @@ public class SingleDiseaseService {
      * @return
      */
     public Map<String, Object> getAgeInfo() {
-        String sql = "select slaveKey1Name, count(result) from medical_service_index group by slaveKey1Name";
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR) + 1;
+        String range = "range(birthYear," + (year - 151) + "," + (year - 66) + "," + (year - 41) + "," + (year - 18) + "," + (year - 7) + "," + year + ")";
+        String sql = "select count(birthYear) from single_disease_personal_index group by " + range;
         List<Map<String, Object>> listData = elasticsearchUtil.excuteDataModel(sql);
         Map<String, Object> map = new HashMap<>();
         List<String> legendData = new ArrayList<>();
         List<Map<String, Object>> seriesData = new ArrayList<>();
         if (null != listData && listData.get(0).size() > 0) {
             listData.forEach(one -> {
+                String rangeName = one.get(range) + "";
+                int first = Integer.parseInt(rangeName.split("-")[0]);
+                int last = Integer.parseInt(rangeName.split("-")[1]);
+                Integer result = last - first;
+                String keyName = exchangeInfo(result);
                 Map<String, Object> myMap = new HashMap<>();
-                legendData.add(one.get("slaveKey1Name") + "");
-                myMap.put("name", one.get("slaveKey1Name") + "");
-                myMap.put("value", one.get("SUM(result)") + "");
+                legendData.add(keyName);
+                myMap.put("name", keyName);
+                myMap.put("value", one.get("COUNT(birthYear)") + "");
                 seriesData.add(myMap);
             });
             map.put("legendData", legendData);
             map.put("seriesData", seriesData);
         }
         return map;
+    }
+
+    private String exchangeInfo(Integer result) {
+        String keyName = "";
+        switch (result) {
+            case 85:
+                keyName = "66岁以上";
+                break;
+            case 25:
+                keyName = "41-65岁";
+                break;
+            case 23:
+                keyName = "18-40岁";
+                break;
+            case 11:
+                keyName = "7-17岁";
+                break;
+            case 7:
+                keyName = "0-6岁";
+                break;
+            default:
+                break;
+        }
+        return keyName;
     }
 
     /**
