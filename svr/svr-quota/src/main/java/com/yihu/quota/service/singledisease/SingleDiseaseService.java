@@ -170,8 +170,8 @@ public class SingleDiseaseService {
         if (null != listData && listData.get(0).size() > 0) {
             listData.forEach(one -> {
                 String rangeName = one.get(range) + "";
-                int first = Integer.parseInt(rangeName.split("-")[0]);
-                int last = Integer.parseInt(rangeName.split("-")[1]);
+                int first = (int) Double.parseDouble(rangeName.split("-")[0]);
+                int last = (int) Double.parseDouble(rangeName.split("-")[1]);
                 Integer result = last - first;
                 String keyName = exchangeInfo(result);
                 Map<String, Object> myMap = new HashMap<>();

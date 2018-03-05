@@ -721,8 +721,8 @@ public class QuotaReportController extends BaseController {
         Map<String, List<String>> map = singleDiseaseService.getLineDataInfo();
         envelop.setSuccessFlg(true);
         if (null != map && map.size() > 0) {
-            envelop.setDetailModelList(map.get("xData"));
-            envelop.setObj(map.get("valueData"));
+            envelop.setDetailModelList(map.get("valueData"));
+            envelop.setObj(map.get("xData"));
         }
         return envelop;
     }
