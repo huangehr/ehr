@@ -73,10 +73,10 @@ spring:
       zk-host: node1.ehr.h3c.com,node2.ehr.h3c.com,node3.ehr.h3c.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
   elasticsearch:
     jest:
-      uris: http://172.19.103.9:9200
+      uris: http://11.1.2.8:9200
 elasticsearch:
   cluster-name: elasticsearch
-  cluster-nodes: 172.19.103.9:9300
+  cluster-nodes: 11.1.2.8:9300
 
 ---
 spring:
