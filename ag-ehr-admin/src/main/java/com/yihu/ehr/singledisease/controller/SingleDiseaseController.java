@@ -42,8 +42,10 @@ public class SingleDiseaseController extends EnvelopRestEndPoint {
     @ApiOperation(value = "获取饼图数据")
     public Envelop getPieData(
             @ApiParam(name = "type", value = "类型")
-            @RequestParam(value = "type") String type) {
-        return singleDiseaseClient.getPieData(type);
+            @RequestParam(value = "type") String type,
+            @ApiParam(name = "code", value = "字典编码")
+            @RequestParam(value = "code") String code) {
+        return singleDiseaseClient.getPieData(type, code);
     }
 
     @RequestMapping(value = ServiceApi.TJ.GetLineData, method = RequestMethod.GET)

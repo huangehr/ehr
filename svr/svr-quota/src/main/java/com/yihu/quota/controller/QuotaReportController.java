@@ -702,9 +702,11 @@ public class QuotaReportController extends BaseController {
     @ApiOperation(value = "获取饼图数据")
     public Envelop getPieData(
             @ApiParam(name = "type", value = "类型")
-            @RequestParam(value = "type") String type) throws Exception {
+            @RequestParam(value = "type") String type,
+            @ApiParam(name = "code", value = "字典编码")
+            @RequestParam(value = "code") String code) throws Exception {
         Envelop envelop = new Envelop();
-        Map<String, Object> pieDataInfo = singleDiseaseService.getPieDataInfo(type);
+        Map<String, Object> pieDataInfo = singleDiseaseService.getPieDataInfo(type, code);
         envelop.setSuccessFlg(true);
         if (null != pieDataInfo && pieDataInfo.size() > 0) {
             envelop.setObj(pieDataInfo.get("legendData"));
