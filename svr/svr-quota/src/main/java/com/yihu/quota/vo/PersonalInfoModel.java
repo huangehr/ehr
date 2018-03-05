@@ -20,17 +20,16 @@ public class PersonalInfoModel {
     private String birthday;//出生年月
     private int birthYear;//出生年份
     private String demographicId;//身份证号
-    private String carId;     //就诊卡号
+    private String cardId;     //就诊卡号
     private String town;    //区代码
     private String townName;//
     private String address;//常住地址
     private String addressLngLat;//常住地址经纬度
     private String disease;//疾病
     private String diseaseName;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssZ")// 2017-06-24T11:51:30+080
     private Date eventDate;
-
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssZ")// 2017-06-24T11:51:30+080
     @CreatedDate
     private Date createTime;//创建时间
 
@@ -90,12 +89,12 @@ public class PersonalInfoModel {
         this.demographicId = demographicId;
     }
 
-    public String getCarId() {
-        return carId;
+    public String getCardId() {
+        return cardId;
     }
 
-    public void setCarId(String carId) {
-        this.carId = carId;
+    public void setCardId(String cardId) {
+        this.cardId = cardId;
     }
 
     public String getTown() {

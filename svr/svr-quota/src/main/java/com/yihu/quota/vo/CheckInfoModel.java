@@ -18,7 +18,7 @@ public class CheckInfoModel {
     private int sex;//性别
     private String sexName;//性别
     private String demographicId;//身份证号
-    private String carId;     //就诊卡号
+    private String cardId;     //就诊卡号
     private String checkCode;//检查code （CH001 并发症,CH002 空腹血糖,CH003 葡萄糖耐量,CH004 用药名称）
     private String symptomCode;//并发症code
     private String symptomName;    //并发症名称
@@ -29,8 +29,8 @@ public class CheckInfoModel {
     private String medicineCode;//用药编码
     private String medicineName;//用药名称
 
-    
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssZ")// 2017-06-24T11:51:30+080
     @CreatedDate
     private Date createTime;//创建时间
 
@@ -82,12 +82,12 @@ public class CheckInfoModel {
         this.demographicId = demographicId;
     }
 
-    public String getCarId() {
-        return carId;
+    public String getCardId() {
+        return cardId;
     }
 
-    public void setCarId(String carId) {
-        this.carId = carId;
+    public void setCardId(String cardId) {
+        this.cardId = cardId;
     }
 
     public String getCheckCode() {
