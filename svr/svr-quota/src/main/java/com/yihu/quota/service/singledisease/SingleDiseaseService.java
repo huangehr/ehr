@@ -1,8 +1,11 @@
 package com.yihu.quota.service.singledisease;
 
+import com.yihu.quota.dao.jpa.dict.SystemDictListDao;
 import com.yihu.quota.etl.extract.es.EsExtract;
 import com.yihu.quota.etl.util.ElasticsearchUtil;
+import com.yihu.quota.vo.DictModel;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -118,10 +121,10 @@ public class SingleDiseaseService {
      * @param type 健康状况、年龄段、性别
      * @return
      */
-    public Map<String, Object> getPieDataInfo(String type) {
+    public Map<String, Object> getPieDataInfo(String type, String code) {
         Map<String, Object> map = new HashMap<>();
         if (HEALTHPROBLEM.equals(type)) {
-            map = getHealthProInfo();
+            map = getHealthProInfo(code);
         } else if (AGE.equals(type)) {
             map = getAgeInfo();
         } else if (SEX.equals(type)) {
@@ -134,24 +137,38 @@ public class SingleDiseaseService {
      * 获取健康状况
      * @return
      */
-    public Map<String, Object> getHealthProInfo() {
-        String sql = "select diseaseName, count(cardId) from single_disease_personal_index group by diseaseName";
+    public Map<String, Object> getHealthProInfo(String code) {
+        String sql = "select disease, count(cardId) from single_disease_personal_index group by disease";
         List<Map<String, Object>> listData = elasticsearchUtil.excuteDataModel(sql);
         Map<String, Object> map = new HashMap<>();
         List<String> legendData = new ArrayList<>();
+        legendData.add("患病人群");
+        legendData.add("健康人群");
         List<Map<String, Object>> seriesData = new ArrayList<>();
         if (null != listData && listData.get(0).size() > 0) {
             listData.forEach(one -> {
                 Map<String, Object> myMap = new HashMap<>();
-                legendData.add(one.get("diseaseName") + "");
-                myMap.put("name", one.get("diseaseName") + "");
+                myMap.put("name", "患病人群");
                 myMap.put("value", one.get("COUNT(cardId)") + "");
                 seriesData.add(myMap);
             });
-            map.put("legendData", legendData);
-            map.put("seriesData", seriesData);
         }
+        // 获取健康人群人数
+        Map<String, Object> healthMap = new HashMap<>();
+        healthMap = getHealthCountInfo(healthMap, code);
+        seriesData.add(healthMap);
+        map.put("legendData", legendData);
+        map.put("seriesData", seriesData);
         return map;
+    }
+
+    public Map<String, Object> getHealthCountInfo(Map<String, Object> healthMap, String code) {
+        String sql = "select code, value as name from system_dict_entries where dict_id = 158 and code = ?";
+        List<DictModel> dictDatas = jdbcTemplate.query(sql, new BeanPropertyRowMapper(DictModel.class), code);
+
+        healthMap.put("name", "健康人群");
+        healthMap.put("value", null != dictDatas && dictDatas.size() > 0 ? dictDatas.get(0).getName() : "0");
+        return healthMap;
     }
 
     /**

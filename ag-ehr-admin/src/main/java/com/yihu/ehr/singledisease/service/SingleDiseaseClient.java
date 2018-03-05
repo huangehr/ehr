@@ -30,7 +30,8 @@ public interface SingleDiseaseClient {
     @RequestMapping(value = ServiceApi.TJ.GetPieData, method = RequestMethod.GET)
     @ApiOperation(value = "获取饼图数据")
     Envelop getPieData(
-            @RequestParam(value = "type") String type);
+            @RequestParam(value = "type") String type,
+            @RequestParam(value = "code") String code);
 
     @RequestMapping(value = ServiceApi.TJ.GetLineData, method = RequestMethod.GET)
     @ApiOperation(value = "获取折线图数据")
