@@ -353,16 +353,10 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
 
     @RequestMapping(value = ServiceApi.TJ.TjQuotaBatch, method = RequestMethod.POST)
     @ApiOperation("批量导入指标、主维度、细维度")
-    public Object tjQuotaBatch(
+    public Envelop tjQuotaBatch(
             @ApiParam(name = "lsMap", value = "指标、主维度、细维度")
             @RequestParam(value = "lsMap")String lsMap) throws Exception {
-        try{
-
-            return tjQuotaClient.tjQuotaBatch(lsMap);
-        }catch (Exception e){
-            e.printStackTrace();
-            return "系统出错！";
-        }
+        return tjQuotaClient.tjQuotaBatch(lsMap);
     }
 
 }

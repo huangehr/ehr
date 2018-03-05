@@ -14,7 +14,8 @@ import org.springframework.data.solr.core.SolrTemplate;
  * @version 1.0
  * @created 2016.04.18 18:47
  */
-@Configuration
+//@Configuration
+@Deprecated
 public class SolrContext {
 
     @Value("${spring.data.solr.zk-host}")

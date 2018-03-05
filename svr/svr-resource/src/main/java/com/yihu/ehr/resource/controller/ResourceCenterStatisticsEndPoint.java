@@ -74,17 +74,11 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.Resources.GetElectronicCasesCount, method = RequestMethod.GET)
     @ApiOperation(value = "顶部栏 - 电子病例建档数")
-    public Envelop getElectronicCasesCount(){
+    public Envelop getElectronicCasesCount() throws Exception{
         Envelop envelop = new Envelop();
-        try {
-            long count = solrUtil.count("HealthProfile", "*:*");
-            envelop.setSuccessFlg(true);
-            envelop.setObj(count);
-        }catch (Exception e) {
-            e.printStackTrace();
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg(e.getMessage());
-        }
+        long count = solrUtil.count("HealthProfile", "*:*");
+        envelop.setSuccessFlg(true);
+        envelop.setObj(count);
         return envelop;
     }
 
@@ -806,40 +800,33 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.Resources.GetElectronicMedicalSource, method = RequestMethod.GET)
     @ApiOperation(value = "电子病例 - 电子病例来源分布情况")
-    public Envelop getElectronicMedicalSource() {
+    public Envelop getElectronicMedicalSource() throws Exception {
         Envelop envelop = new Envelop();
-        try {
-            long clinic = solrUtil.count("HealthProfile", "event_type:0");
-            Map<String, Object> clinicMap = new HashedMap(2);
-            clinicMap.put("name", "门诊");
-            clinicMap.put("value", clinic);
-            long resident = solrUtil.count("HealthProfile", "event_type:1");
-            Map<String, Object> residentMap = new HashedMap(2);
-            residentMap.put("name", "住院");
-            residentMap.put("value", resident);
-            List<Map> dataModels = new ArrayList<>(2);
-            dataModels.add(clinicMap);
-            dataModels.add(residentMap);
-            List<Map> resultList = new ArrayList<>(1);
-            Map<String, Object> dataMap = new HashMap<>(4);
-            dataMap.put("name", null);
-            dataMap.put("xData", null);
-            dataMap.put("yData", null);
-            dataMap.put("dataModels", dataModels);
-            resultList.add(dataMap);
-            Map<String, Object> resultMap = new HashMap<>(3);
-            resultMap.put("门诊/住院", clinic + resident);
-            resultMap.put("门诊", clinic);
-            resultMap.put("住院", resident);
-            envelop.setSuccessFlg(true);
-            envelop.setDetailModelList(resultList);
-            envelop.setObj(resultMap);
-        }catch (Exception e) {
-            e.printStackTrace();
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg(e.getMessage());
-            return envelop;
-        }
+        long clinic = solrUtil.count("HealthProfile", "event_type:0");
+        Map<String, Object> clinicMap = new HashedMap(2);
+        clinicMap.put("name", "门诊");
+        clinicMap.put("value", clinic);
+        long resident = solrUtil.count("HealthProfile", "event_type:1");
+        Map<String, Object> residentMap = new HashedMap(2);
+        residentMap.put("name", "住院");
+        residentMap.put("value", resident);
+        List<Map> dataModels = new ArrayList<>(2);
+        dataModels.add(clinicMap);
+        dataModels.add(residentMap);
+        List<Map> resultList = new ArrayList<>(1);
+        Map<String, Object> dataMap = new HashMap<>(4);
+        dataMap.put("name", null);
+        dataMap.put("xData", null);
+        dataMap.put("yData", null);
+        dataMap.put("dataModels", dataModels);
+        resultList.add(dataMap);
+        Map<String, Object> resultMap = new HashMap<>(3);
+        resultMap.put("门诊/住院", clinic + resident);
+        resultMap.put("门诊", clinic);
+        resultMap.put("住院", resident);
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(resultList);
+        envelop.setObj(resultMap);
         return envelop;
     }
 
@@ -904,40 +891,34 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.Resources.GetElectronicMedicalAcquisitionSituation, method = RequestMethod.GET)
     @ApiOperation(value = "电子病例 - 电子病历采集采集情况")
-    public Envelop getElectronicMedicalAcquisitionSituation() {
+    public Envelop getElectronicMedicalAcquisitionSituation() throws Exception {
         Envelop envelop = new Envelop();
-        try {
-            Calendar calendar = Calendar.getInstance();
-            calendar.set(Calendar.HOUR_OF_DAY, 0);
-            calendar.set(Calendar.MINUTE, 0);
-            calendar.set(Calendar.SECOND, 0);
-            calendar.set(Calendar.MILLISECOND, 0);
-            Date now = DateUtils.addDays(calendar.getTime(), 1);
-            Date before = DateUtils.addDays(now, -30);
-            List<RangeFacet> clinicList = solrUtil.getFacetDateRange("HealthProfile", "create_date", DateUtils.addHours(before, 8), DateUtils.addHours(now, 8), "+1DAY", "event_type:0");
-            RangeFacet clinicRangeFacet = clinicList.get(0);
-            List<RangeFacet.Count> clinicCount = clinicRangeFacet.getCounts();
-            Map<String, Integer> dataMap1 = new LinkedHashMap<>(clinicCount.size());
-            for (RangeFacet.Count count : clinicCount) {
-                dataMap1.put(count.getValue().substring(0, 10), count.getCount());
-            }
-            List<RangeFacet> residentList = solrUtil.getFacetDateRange("HealthProfile", "create_date", DateUtils.addHours(before, 8), DateUtils.addHours(now, 8), "+1DAY", "event_type:1");
-            RangeFacet residentRangeFacet = residentList.get(0);
-            List<RangeFacet.Count> residentCount = residentRangeFacet.getCounts();
-            Map<String, Integer> dataMap2 = new LinkedHashMap<>(residentCount.size());
-            for (RangeFacet.Count count : residentCount) {
-                dataMap2.put(count.getValue().substring(0, 10), count.getCount());
-            }
-            List<Map> resultList = new ArrayList<>(2);
-            resultList.add(dataMap1);
-            resultList.add(dataMap2);
-            envelop.setSuccessFlg(true);
-            envelop.setDetailModelList(resultList);
-        }catch (Exception e) {
-            e.printStackTrace();
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg(e.getMessage());
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        Date now = DateUtils.addDays(calendar.getTime(), 1);
+        Date before = DateUtils.addDays(now, -30);
+        List<RangeFacet> clinicList = solrUtil.getFacetDateRange("HealthProfile", "create_date", DateUtils.addHours(before, 8), DateUtils.addHours(now, 8), "+1DAY", "event_type:0");
+        RangeFacet clinicRangeFacet = clinicList.get(0);
+        List<RangeFacet.Count> clinicCount = clinicRangeFacet.getCounts();
+        Map<String, Integer> dataMap1 = new LinkedHashMap<>(clinicCount.size());
+        for (RangeFacet.Count count : clinicCount) {
+            dataMap1.put(count.getValue().substring(0, 10), count.getCount());
         }
+        List<RangeFacet> residentList = solrUtil.getFacetDateRange("HealthProfile", "create_date", DateUtils.addHours(before, 8), DateUtils.addHours(now, 8), "+1DAY", "event_type:1");
+        RangeFacet residentRangeFacet = residentList.get(0);
+        List<RangeFacet.Count> residentCount = residentRangeFacet.getCounts();
+        Map<String, Integer> dataMap2 = new LinkedHashMap<>(residentCount.size());
+        for (RangeFacet.Count count : residentCount) {
+            dataMap2.put(count.getValue().substring(0, 10), count.getCount());
+        }
+        List<Map> resultList = new ArrayList<>(2);
+        resultList.add(dataMap1);
+        resultList.add(dataMap2);
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(resultList);
         return envelop;
     }
 
