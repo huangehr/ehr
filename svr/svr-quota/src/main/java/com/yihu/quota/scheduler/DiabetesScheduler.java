@@ -1,5 +1,6 @@
 package com.yihu.quota.scheduler;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.elasticsearch.ElasticSearchClient;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
@@ -71,7 +72,7 @@ public class DiabetesScheduler {
 	 * 每天2点 执行一次
 	 * @throws Exception
 	 */
-	@Scheduled(cron = "0 53 11 * * ?")
+	@Scheduled(cron = "0 36 14 * * ?")
 	public void validatorIdentityScheduler() throws Exception{
 
 		String q =  "health_problem:HP0047"; // 查询条件  HP0047 为糖尿病
@@ -99,15 +100,17 @@ public class DiabetesScheduler {
 		List<CheckInfoModel> checkInfoList = new ArrayList<>();
 
 		BasesicUtil basesicUtil = new BasesicUtil();
-		String initializeDate = "2018-03-03";
+		String initializeDate = "2018-03-09";
 		Date now = new Date();
 		String nowDate = DateUtil.formatDate(now,DateUtil.DEFAULT_DATE_YMD_FORMAT);
-		if(basesicUtil.compareDate(initializeDate,nowDate) == -1){//  -1 后面时间大 当前时间小于初始化时间，就所有数据初始化，后面每天抽取
+		if(basesicUtil.compareDate(initializeDate,nowDate) == -1){//  当前时间大于初始化时间，就所有数据初始化，当前时间小于于初始时间每天抽取
 			Date yesterdayDate = DateUtils.addDays(now,-1);
 			String yesterday = DateUtil.formatDate(yesterdayDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
 			fq = "create_date:[" + yesterday + "T00:00:00Z TO  " + yesterday + "T23:59:59Z]";
 		}else{
-			fq = "create_date:[* TO  2017-07-27T23:59:59Z]";
+			fq = "create_date:[* TO *]";
+			fq = "create_date:[2018-01-30T00:00:00Z TO 2018-01-30T23:59:59Z]";
+
 		}
 
 //		//找出糖尿病的就诊档案
@@ -115,36 +118,58 @@ public class DiabetesScheduler {
 		List<String> rowKeyList = selectSubRowKey(ResourceCore.MasterTable, q, fq, count);
 		if(rowKeyList != null && rowKeyList.size() > 0){
 			List<Map<String,Object>> hbaseDataList = selectHbaseData(rowKeyList);
+
+//			Map<String,Object> testMap = new HashMap<>();
+//			testMap.put(keyEventDate,"2017-11-20 12:12:10");
+//			testMap.put(keyOrgArea,"10001");
+//			testMap.put(keyOrgName,"婺源县");
+//			testMap.put(keyPatientName,"花灯节");
+//			testMap.put(keyDemographicId,"456048111111");
+//			testMap.put(keyCardId,"5641245");
+//			testMap.put(keySex,"1");
+//			testMap.put(keySexValue,"男");
+//			testMap.put(keyAge,"1990-02-21");
+//			testMap.put(keyAddress,"厦门市湖里区海天路");
+//			testMap.put(keyHealthProblem,"HP0047");
+//
+//			testMap.put(keyDiseaseSymptom,"心脏");
+//			testMap.put(keyFastingBloodGlucose,"7.9");
+//			testMap.put(keysugarToleranceVal,"5.2");
+//			testMap.put(keysugarToleranceName,"糖耐量");
+//			testMap.put(keyWestMedicine,"阿司匹林");
+//			testMap.put(keyChineseMedicine,"车前草");
+//			hbaseDataList.add(testMap);
+
+
 			if( hbaseDataList != null && hbaseDataList.size() > 0 ){
 				for(Map<String,Object> map : hbaseDataList){
 					//个人信息 > 姓名，身份证，就诊卡号，性别，出生日期，出生年份，区县，常住地址，常住地址经纬度，疾病名称，疾病code
 					PersonalInfoModel personalInfo = new PersonalInfoModel();
-					CheckInfoModel checkInfo = new CheckInfoModel();
+					CheckInfoModel baseCheckInfo = new CheckInfoModel();
 					personalInfo.setCreateTime(new Date());
-					checkInfo.setCreateTime(new Date());
 					if(map.get(keyEventDate) != null){
-						personalInfo.setEventDate(DateUtil.formatCharDateYMD(map.get(keyEventDate).toString()));					}
+						personalInfo.setEventDate(DateUtil.formatCharDateYMDHMS(map.get(keyEventDate).toString()));					}
 					if(map.get(keyOrgArea) != null){
 						personalInfo.setTown(map.get(keyOrgArea).toString());
 						personalInfo.setTownName(map.get(keyOrgName).toString());
 					}
 					if(map.get(keyPatientName) != null){
 						personalInfo.setName(map.get(keyPatientName).toString());
-						checkInfo.setName(map.get(keyPatientName).toString());
+						baseCheckInfo.setName(map.get(keyPatientName).toString());
 					}
 					if(map.get(keyDemographicId) != null){
 						personalInfo.setDemographicId(map.get(keyDemographicId).toString());
-						checkInfo.setDemographicId(map.get(keyDemographicId).toString());
+						baseCheckInfo.setDemographicId(map.get(keyDemographicId).toString());
 					}
 					if(map.get(keyCardId) != null){
-						personalInfo.setCarId(map.get(keyCardId).toString());
-						checkInfo.setCarId(map.get(keyCardId).toString());
+						personalInfo.setCardId(map.get(keyCardId).toString());
+						baseCheckInfo.setCardId(map.get(keyCardId).toString());
 					}
 					if(map.get(keySex) != null){
 						personalInfo.setSex(Integer.valueOf(map.get(keySex).toString()));
 						personalInfo.setSexName(map.get(keySexValue).toString());
-						checkInfo.setSex(Integer.valueOf(map.get(keySex).toString()));
-						checkInfo.setSexName(map.get(keySexValue).toString());
+						baseCheckInfo.setSex(Integer.valueOf(map.get(keySex).toString()));
+						baseCheckInfo.setSexName(map.get(keySexValue).toString());
 					}
 					if(map.get(keyAge) != null){
 						personalInfo.setBirthday( map.get(keyAge).toString().substring(0, 10));
@@ -162,15 +187,20 @@ public class DiabetesScheduler {
 						//去查询疾病编码的疾病名称
 						dictSql = "select code,name from health_problem_dict where code='" + val +"'";
 						Map<String, String> dictMap = getdimensionDicMap(dictSql);
-						personalInfo.setDiseaseName(dictMap.get(keyHealthProblem));
-						personalInfo.setDisease(map.get(keyHealthProblem).toString());
+						if(dictMap != null && dictMap.size() >0){
+							for(String key:dictMap.keySet()){
+								personalInfo.setDiseaseName(key);
+								personalInfo.setDisease(dictMap.get(key).toString());
+								break;
+							}
+						}
 					}
-
 					personalInfoList.add(personalInfo);
 
 
 					//检查信息 姓名,身份证，就诊卡号,并发症，空腹血糖值，葡萄糖耐量值，用药名称，检查信息code （CH001 并发症,CH002 空腹血糖,CH003 葡萄糖耐量,CH004 用药名称）
 					if(map.get(keyDiseaseSymptom) != null){
+						CheckInfoModel checkInfo = setCheckInfoModel(baseCheckInfo);
 						checkInfo.setCheckCode("CH001");
 						checkInfo.setSymptomName(map.get(keyDiseaseSymptom).toString());
 						checkInfoList.add(checkInfo);
@@ -192,6 +222,7 @@ public class DiabetesScheduler {
 							fastname = "11.1mmol/l 上";
 							fastcode = "3";
 						}
+						CheckInfoModel checkInfo = setCheckInfoModel(baseCheckInfo);
 						checkInfo.setFastingBloodGlucoseName(fastname);
 						checkInfo.setFastingBloodGlucoseCode(fastcode);
 						checkInfo.setCheckCode("CH002");
@@ -199,11 +230,13 @@ public class DiabetesScheduler {
 					}
 
 					if(map.get(keyWestMedicine) != null){
+						CheckInfoModel checkInfo = setCheckInfoModel(baseCheckInfo);
 						checkInfo.setCheckCode("CH003");
 						checkInfo.setMedicineName(map.get(keyWestMedicine).toString());
 						checkInfoList.add(checkInfo);
 					}
 					if(map.get(keyChineseMedicine) != null) {
+						CheckInfoModel checkInfo = setCheckInfoModel(baseCheckInfo);
 						checkInfo.setCheckCode("CH003");
 						checkInfo.setMedicineName(map.get(keyChineseMedicine).toString());
 						checkInfoList.add(checkInfo);
@@ -226,6 +259,7 @@ public class DiabetesScheduler {
 							sugarTolename = "大于7.0mmol/l 上";
 							sugarToleCode = "3";
 						}
+						CheckInfoModel checkInfo = setCheckInfoModel(baseCheckInfo);
 						checkInfo.setSugarToleranceName(sugarTolename);
 						checkInfo.setSugarToleranceCode(sugarToleCode);
 						checkInfo.setCheckCode("CH004");
@@ -234,12 +268,13 @@ public class DiabetesScheduler {
 
 
 				}
+				objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 				//保存到ES库
 				//个人信息保存 去重处理，已保存的不在保存  身份证和就诊卡ID
-				String index = "single_disease_check_index";
+				String index = "";
 				String type = "";
 				for(PersonalInfoModel personalInfo : personalInfoList){
-					index = "single_disease_personal_index";
+					index = "singleDiseasePersonal";
 					type = "personal_info";
 					Map<String, Object> source = new HashMap<>();
 					String jsonPer = objectMapper.writeValueAsString(personalInfo);
@@ -249,17 +284,18 @@ public class DiabetesScheduler {
 						if(relist== null || relist.size() ==0){
 							elasticSearchClient.index(index,type, source);
 						}
-					}
-					if(personalInfo.getCarId() != null){
-						List<Map<String, Object>> relist = elasticSearchUtil.findByField(index,type, "cardId",personalInfo.getCarId());
+					}else if(personalInfo.getCardId() != null){
+						List<Map<String, Object>> relist = elasticSearchUtil.findByField(index,type, "cardId",personalInfo.getCardId());
 						if(relist== null || relist.size() ==0){
 							elasticSearchClient.index(index,type, source);
 						}
+					}else {
+						elasticSearchClient.index(index,type, source);
 					}
 				}
 				//检查信息保存  并发症 去重处理，已保存的不在保存  身份证和就诊卡ID
 				for(CheckInfoModel checkInfo : checkInfoList){
-					index = "single_disease_check_index";
+					index = "singleDiseaseCheck";
 					type = "check_info";
 					Map<String, Object> source = new HashMap<>();
 					String jsonCheck = objectMapper.writeValueAsString(checkInfo);
@@ -270,8 +306,8 @@ public class DiabetesScheduler {
 						if(relist== null || relist.size() ==0){
 							elasticSearchClient.index(index,type, source);
 						}
-					}else if(checkInfo.getCheckCode().equals("CH001") && checkInfo.getCarId() != null){
-						List<Map<String, Object>> relist = elasticSearchUtil.findByField(index,type, "cardId",checkInfo.getCarId());
+					}else if(checkInfo.getCheckCode().equals("CH001") && checkInfo.getCardId() != null){
+						List<Map<String, Object>> relist = elasticSearchUtil.findByField(index,type, "cardId",checkInfo.getCardId());
 						if(relist== null || relist.size() ==0){
 							elasticSearchClient.index(index,type, source);
 						}
@@ -285,7 +321,16 @@ public class DiabetesScheduler {
 
 	}
 
-
+	public  CheckInfoModel setCheckInfoModel(CheckInfoModel baseCheckInfo ){
+		CheckInfoModel checkInfo = new CheckInfoModel();
+		checkInfo.setSexName(baseCheckInfo.getSexName());
+		checkInfo.setSex(baseCheckInfo.getSex());
+		checkInfo.setDemographicId(baseCheckInfo.getDemographicId());
+		checkInfo.setCardId(baseCheckInfo.getCardId());
+		checkInfo.setName(baseCheckInfo.getName());
+		checkInfo.setCreateTime(new Date());
+		return  checkInfo;
+	}
 	//获取维度的字典项
 	private Map<String, String> getdimensionDicMap(String dictSql){
 		BasesicUtil baseUtil = new BasesicUtil();
