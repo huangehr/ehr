@@ -72,7 +72,7 @@ public class DiabetesScheduler {
 	 * 每天2点 执行一次
 	 * @throws Exception
 	 */
-	@Scheduled(cron = "0 36 14 * * ?")
+	@Scheduled(cron = "0 16 15 * * ?")
 	public void validatorIdentityScheduler() throws Exception{
 
 		String q =  "health_problem:HP0047"; // 查询条件  HP0047 为糖尿病
@@ -84,20 +84,21 @@ public class DiabetesScheduler {
 		String keyPatientName = "patient_name";
 		String keyDemographicId = "demographic_id";//身份证
 		String keyCardId = "card_id	";
-		String keyHealthProblem = "health_problem	";
+		String keyHealthProblem = "health_problem";
 		String keySex = "EHR_000019";
 		String keySexValue = "EHR_000019_VALUE";
 		String keyAge = "EHR_000007";
 		String keyAddress = "EHR_001211"; //地址
 		String keyDiseaseType = "EHR_003810";//疾病类型
 		String keyDiseaseSymptom = "EHR_000112";//并发症
-		String keyFastingBloodGlucose = "EHR_002724";//空腹血糖
-		String keysugarToleranceName = "EHR_000392";//糖耐量检测名称
-		String keysugarToleranceVal = "EHR_000387";//糖耐量值
+//		String keyFastingBloodGlucose = "EHR_002724";//空腹血糖
+		String keysugarToleranceName = "EHR_000392";//  检验-项目结果 - 报告子项的LOINC编码  14995-5 糖耐量值  14771-0 空腹血糖
+		String keysugarToleranceVal = "EHR_000387";//检验-项目结果 -  结果值  糖耐量值
 		String keyWestMedicine= "EHR_000100";  //西药
-		String keyChineseMedicine= "EHR_000131 ";//中药
+		String keyChineseMedicine= "EHR_000131";//中药
 		List<PersonalInfoModel> personalInfoList = new ArrayList<>();
 		List<CheckInfoModel> checkInfoList = new ArrayList<>();
+		Map<String, String> dictDiseaseMap = new HashMap<>();
 
 		BasesicUtil basesicUtil = new BasesicUtil();
 		String initializeDate = "2018-03-09";
@@ -109,8 +110,6 @@ public class DiabetesScheduler {
 			fq = "create_date:[" + yesterday + "T00:00:00Z TO  " + yesterday + "T23:59:59Z]";
 		}else{
 			fq = "create_date:[* TO *]";
-			fq = "create_date:[2018-01-30T00:00:00Z TO 2018-01-30T23:59:59Z]";
-
 		}
 
 //		//找出糖尿病的就诊档案
@@ -118,29 +117,6 @@ public class DiabetesScheduler {
 		List<String> rowKeyList = selectSubRowKey(ResourceCore.MasterTable, q, fq, count);
 		if(rowKeyList != null && rowKeyList.size() > 0){
 			List<Map<String,Object>> hbaseDataList = selectHbaseData(rowKeyList);
-
-//			Map<String,Object> testMap = new HashMap<>();
-//			testMap.put(keyEventDate,"2017-11-20 12:12:10");
-//			testMap.put(keyOrgArea,"10001");
-//			testMap.put(keyOrgName,"婺源县");
-//			testMap.put(keyPatientName,"花灯节");
-//			testMap.put(keyDemographicId,"456048111111");
-//			testMap.put(keyCardId,"5641245");
-//			testMap.put(keySex,"1");
-//			testMap.put(keySexValue,"男");
-//			testMap.put(keyAge,"1990-02-21");
-//			testMap.put(keyAddress,"厦门市湖里区海天路");
-//			testMap.put(keyHealthProblem,"HP0047");
-//
-//			testMap.put(keyDiseaseSymptom,"心脏");
-//			testMap.put(keyFastingBloodGlucose,"7.9");
-//			testMap.put(keysugarToleranceVal,"5.2");
-//			testMap.put(keysugarToleranceName,"糖耐量");
-//			testMap.put(keyWestMedicine,"阿司匹林");
-//			testMap.put(keyChineseMedicine,"车前草");
-//			hbaseDataList.add(testMap);
-
-
 			if( hbaseDataList != null && hbaseDataList.size() > 0 ){
 				for(Map<String,Object> map : hbaseDataList){
 					//个人信息 > 姓名，身份证，就诊卡号，性别，出生日期，出生年份，区县，常住地址，常住地址经纬度，疾病名称，疾病code
@@ -148,7 +124,7 @@ public class DiabetesScheduler {
 					CheckInfoModel baseCheckInfo = new CheckInfoModel();
 					personalInfo.setCreateTime(new Date());
 					if(map.get(keyEventDate) != null){
-						personalInfo.setEventDate(DateUtil.formatCharDateYMDHMS(map.get(keyEventDate).toString()));					}
+						personalInfo.setEventDate(DateUtil.formatCharDate(map.get(keyEventDate).toString(), DateUtil.DATE_WORLD_FORMAT));					}
 					if(map.get(keyOrgArea) != null){
 						personalInfo.setTown(map.get(keyOrgArea).toString());
 						personalInfo.setTownName(map.get(keyOrgName).toString());
@@ -184,13 +160,15 @@ public class DiabetesScheduler {
 					if(map.get(keyHealthProblem) != null){
 						String val = map.get(keyHealthProblem).toString();
 						personalInfo.setDisease(val);
-						//去查询疾病编码的疾病名称
-						dictSql = "select code,name from health_problem_dict where code='" + val +"'";
-						Map<String, String> dictMap = getdimensionDicMap(dictSql);
-						if(dictMap != null && dictMap.size() >0){
-							for(String key:dictMap.keySet()){
-								personalInfo.setDiseaseName(key);
-								personalInfo.setDisease(dictMap.get(key).toString());
+						if(dictDiseaseMap == null || dictDiseaseMap.size() == 0){
+							//去查询疾病编码的疾病名称
+							dictSql = "select code,name from health_problem_dict where code='" + val +"'";
+							dictDiseaseMap = getdimensionDicMap(dictSql);
+						}
+						if(dictDiseaseMap != null && dictDiseaseMap.size() >0){
+							for(String key:dictDiseaseMap.keySet()){
+								personalInfo.setDisease(key);
+								personalInfo.setDiseaseName(dictDiseaseMap.get(key).toString());
 								break;
 							}
 						}
@@ -205,11 +183,11 @@ public class DiabetesScheduler {
 						checkInfo.setSymptomName(map.get(keyDiseaseSymptom).toString());
 						checkInfoList.add(checkInfo);
 					}
-					if(map.get(keyFastingBloodGlucose) != null){
+					if(map.get(keysugarToleranceName) != null && map.get(keysugarToleranceName).equals("14771-0")){
 						//7.8mmol/l 以下 2：7.8-11.1mmol/l  3:11.1 以上
 						String fastname = "";
 						String fastcode = "";
-						double val = Double.valueOf(map.get(keyFastingBloodGlucose).toString());
+						double val = Double.valueOf(map.get(keysugarToleranceVal).toString());
 						if(val < 7.8){
 							fastname = "7.8mmol/l 以下";
 							fastcode = "1";
