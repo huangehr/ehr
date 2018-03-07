@@ -460,6 +460,10 @@ public class ServiceApi {
         public static final String FindByField = "packAnalyzer/findByField";
         public static final String FindBySql = "packAnalyzer/findBySql";
         public static final String EsSaveData = "packAnalyzer/esSaveData";
+        public static final String QcEmpty = "packAnalyzer/qc/check/empty";
+        public static final String QcType = "packAnalyzer/qc/check/type";
+        public static final String QcFormat = "packAnalyzer/qc/check/format";
+        public static final String QcValue = "packAnalyzer/qc/check/value";
     }
 
 
@@ -617,6 +621,7 @@ public class ServiceApi {
         public static final String VersionLatestExistence = "/std/versions/{version}/latest/existence";
 
         public static final String Documents = "/std/documents";
+        public static final String DocumentNoPage="/std/document/noPage";
         public static final String Document = "/std/documents/{id}";
         public static final String DocumentList = "/std/documentsList";
         public static final String DocumentFileExistence = "/std/documents/{id}/file/existence";
@@ -626,6 +631,7 @@ public class ServiceApi {
         public static final String DocumentDataSet = "/std/documents/data_set";
         public static final String DocumentDataSetList = "/std/documents/data_set_list";
         public static final String DataSetRelationships = "/std/documents/data_set_relationships";
+        public static final String DataSetRelationshipsNoPage = "/std/documents/data_set_relationships/noPage";
         public static final String DataSetRelationship = "/std/documents/data_set_relationships/{id}";
 
         public static final String Dictionaries = "/std/dictionaries";
@@ -664,6 +670,10 @@ public class ServiceApi {
 
         public static final String Dispatch = "/std/dispatches/{id}";
         public static final String Dispatches = "/std/dispatches";
+
+
+        public static final String AdaptMeta = "/std/adapt/meta";
+        public static final String AdaptDict = "/std/adapt/dict";
     }
 
     public static class Doctors {
@@ -1227,6 +1237,9 @@ public class ServiceApi {
 
         public static final String GetHeatMapByQuotaCode = "/tj/getHeatMapByQuotaCode";
         public static final String GetNumberOfDiabetes = "/tj/getNumberOfDiabetes";
+        public static final String GetPieData = "/tj/getPieData";
+        public static final String GetLineData = "/tj/getLineData";
+        public static final String GetBarData = "/tj/getBarData";
 
     }
 
