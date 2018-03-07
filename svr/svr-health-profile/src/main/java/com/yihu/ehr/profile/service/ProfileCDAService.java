@@ -8,12 +8,14 @@ import com.yihu.ehr.model.standard.MCDADocument;
 import com.yihu.ehr.model.standard.MCdaDataSet;
 import com.yihu.ehr.profile.dao.ArchiveTemplateDao;
 import com.yihu.ehr.profile.feign.CDADocumentClient;
+import com.yihu.ehr.profile.feign.RedisServiceClient;
 import com.yihu.ehr.profile.feign.ResourceClient;
 import com.yihu.ehr.profile.model.ArchiveTemplate;
 import com.yihu.ehr.util.rest.Envelop;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.util.*;
@@ -30,10 +32,10 @@ public class ProfileCDAService {
 
     @Autowired
     private ResourceClient resource;
-    //模板服务
+    @Autowired
+    private RedisServiceClient redisServiceClient;
     @Autowired
     private ArchiveTemplateDao templateDao;
-    //CDA服务
     @Autowired
     private CDADocumentClient cdaService;
     @Autowired
@@ -308,11 +310,29 @@ public class ProfileCDAService {
             cdaTransformDto.setMasterDatasetCodeList(singleDataSetMap);
             cdaTransformDto.setMultiDatasetCodeList(multiDataSetMap);
             dataSetMap = resource.getCDAData(objectMapper.writeValueAsString(cdaTransformDto));
-            for(String key :dataSetMap.keySet()) {
+            for (String key :dataSetMap.keySet()) {
                 Map<String, Object> middleMap = (Map<String, Object>)dataSetMap.get(key);
-                for(String key2 : middleMap.keySet()) {
+                for (String key2 : middleMap.keySet()) {
                     List<Map<String, Object>> middleList = (List<Map<String, Object>>)middleMap.get(key2);
-                    for(Map<String, Object> temp : middleList) {
+                    for (Map<String, Object> temp : middleList) {
+                        //诊断代码
+                        if (temp.containsKey("JDSD00_79_021")) {
+                            String icd10Code = (String) temp.get("JDSD00_79_021");
+                            String icd10Name = redisServiceClient.getIcd10Name(icd10Code);
+                            if (!StringUtils.isEmpty(icd10Name)) {
+                                temp.put("JDSD00_79_021", icd10Name);
+                            }
+                        }
+                        for (String key3 : temp.keySet()) {
+                            String dataSetCode = key2;
+                            String dictId = redisServiceClient.getMetaDataDict(cdaVersion, dataSetCode, key3);
+                            if (!StringUtils.isEmpty(dictId) && !dictId.equals("0")) {
+                                String dictValue = redisServiceClient.getDictEntryValue(cdaVersion, dictId, (String) temp.get(key3));
+                                if (!StringUtils.isEmpty(dictValue)) {
+                                    temp.put(key3, dictValue);
+                                }
+                            }
+                        }
                         temp.put("org_area", event.get("org_area"));
                         temp.put("org_name", event.get("org_name"));
                         temp.put("event_date", event.get("event_date"));
