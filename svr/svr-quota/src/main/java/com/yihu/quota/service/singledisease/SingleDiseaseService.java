@@ -329,7 +329,7 @@ public class SingleDiseaseService {
         Map<String,String> resultDataMap = new HashMap<>();
         if (null != list && list.get(0).size() > 0) {
             list.forEach(one -> {
-                String code =  one.get("sugarToleranceCode") + "";
+                String code =  one.get("fastingBloodGlucoseCode") + "";
                 String gender = one.get("sexName") + "";
                 String count = one.get("COUNT(*)") + "";
                 if(!code.equals("null") && StringUtils.isNotEmpty(code)){
