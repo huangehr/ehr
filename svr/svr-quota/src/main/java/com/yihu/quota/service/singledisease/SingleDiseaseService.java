@@ -35,7 +35,7 @@ public class SingleDiseaseService {
      */
     public List<Map<String,String>>  getHeatMap() throws Exception {
         List<Map<String,String>> list = new ArrayList<>();
-        String sql = "select addressLngLat from single_disease_personal_index";
+        String sql = "select addressLngLat from single_disease_personal_index where addressLngLat is not null ";
         List<Map<String, Object>> listData = parseIntegerValue(sql);
         Map<String, Object> map = new HashMap<>();
         if (null != listData && listData.get(0).size() > 0) {
@@ -338,11 +338,11 @@ public class SingleDiseaseService {
             });
 
             for(int i =1;i<4 ;i++){
-                if( !resultDataMap.containsKey(i + "-" + "男")) {
-                    resultDataMap.put(i + "-" + "男","0");
+                if( !resultDataMap.containsKey(i + "-" + "男性")) {
+                    resultDataMap.put(i + "-" + "男性","0");
                 }
-                if( !resultDataMap.containsKey(i + "-" + "女")) {
-                    resultDataMap.put(i + "-" + "女","0");
+                if( !resultDataMap.containsKey(i + "-" + "女性")) {
+                    resultDataMap.put(i + "-" + "女性","0");
                 }
             }
 
@@ -350,10 +350,10 @@ public class SingleDiseaseService {
             List<String> valueData2 = new LinkedList<>();    // 存放第二个数据源 女生
             map.put("xData", xData);
             for(String key : resultDataMap.keySet()){
-                if(key.contains("男")){
+                if(key.contains("男性")){
                     valueData1.add(resultDataMap.get(key)+"");
                 }
-                if(key.contains("女")){
+                if(key.contains("女性")){
                     valueData2.add(resultDataMap.get(key)+"");
                 }
             }
@@ -388,11 +388,11 @@ public class SingleDiseaseService {
             });
 
             for(int i =1;i<4 ;i++){
-                if( !resultDataMap.containsKey(i + "-" + "男")) {
-                    resultDataMap.put(i + "-" + "男","0");
+                if( !resultDataMap.containsKey(i + "-" + "男性")) {
+                    resultDataMap.put(i + "-" + "男性","0");
                 }
-                if( !resultDataMap.containsKey(i + "-" + "女")) {
-                    resultDataMap.put(i + "-" + "女","0");
+                if( !resultDataMap.containsKey(i + "-" + "女性")) {
+                    resultDataMap.put(i + "-" + "女性","0");
                 }
             }
 
@@ -400,10 +400,10 @@ public class SingleDiseaseService {
             List<String> valueData2 = new LinkedList<>();    // 存放第二个数据源 女生
             map.put("xData", xData);
             for(String key : resultDataMap.keySet()){
-                if(key.contains("男")){
+                if(key.contains("男性")){
                     valueData1.add(resultDataMap.get(key)+"");
                 }
-                if(key.contains("女")){
+                if(key.contains("女性")){
                     valueData2.add(resultDataMap.get(key)+"");
                 }
             }
