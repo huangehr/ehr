@@ -317,33 +317,27 @@ public class SingleDiseaseService {
      * @return
      */
     public Map<String, List<String>> getFastingBloodGlucoseDataInfo() {
-        String firstSql = "select fastingBloodGlucoseName, count(*) from single_disease_check_index where checkCode = 'CH002' and sex=1 group by fastingBloodGlucoseName";
-        String secondSql = "select fastingBloodGlucoseName, count(*) from single_disease_check_index where checkCode = 'CH002' and sex=2 group by fastingBloodGlucoseName";
-        List<Map<String, Object>> firstListData = parseIntegerValue(firstSql);
-        List<Map<String, Object>> secondListData = parseIntegerValue(secondSql);
+        String sql = "select fastingBloodGlucoseName, count(*) from single_disease_check_index where checkCode = 'CH002' group by fastingBloodGlucoseName,sexName";
+        List<Map<String, Object>> list = parseIntegerValue(sql);
         Map<String, List<String>> map = new HashMap<>();
         List<String> xData = new LinkedList<>();
-        List<String> valueData1 = new LinkedList<>();    // 存放第一个数据源
-        List<String> valueData2 = new LinkedList<>();    // 存放第二个数据源
-        if (null != firstListData && firstListData.get(0).size() > 0) {
-            firstListData.forEach(one -> {
+        List<String> valueData1 = new LinkedList<>();    // 存放第一个数据源 男生
+        List<String> valueData2 = new LinkedList<>();    // 存放第二个数据源 女生
+        if (null != list && list.get(0).size() > 0) {
+            list.forEach(one -> {
                 xData.add(one.get("fastingBloodGlucoseName") + "");   // 获取横坐标
-                valueData1.add(one.get("COUNT(*)") + "");
+                String gender = one.get("sexName") + "";
+                if ("男".equals(gender)) {
+                    valueData1.add(one.get("COUNT(*)") + "");
+                    valueData2.add("0");
+                } else if ("女".equals(gender)) {
+                    valueData1.add("0");
+                    valueData2.add(one.get("COUNT(*)") + "");
+                }
             });
-            map.put("valueData1", valueData1);
-        }
-        if (null != secondListData && secondListData.get(0).size() > 0) {
-            secondListData.forEach(one -> {
-                xData.add(one.get("fastingBloodGlucoseName") + "");
-                valueData2.add(one.get("COUNT(*)") + "");
-            });
-            map.put("valueData2", valueData2);
-        }
-        if (xData.size() > 0) {
-            Set<String> hash = new LinkedHashSet<>(xData);
-            xData.clear();
-            xData.addAll(hash);
             map.put("xData", xData);
+            map.put("valueData1", valueData1);
+            map.put("valueData2", valueData2);
         }
         return map;
     }
@@ -353,33 +347,27 @@ public class SingleDiseaseService {
      * @return
      */
     public Map<String, List<String>> getSugarToleranceDataInfo() {
-        String firstSql = "select sugarToleranceName, count(*) from single_disease_check_index where checkCode = 'CH003' and sex=1 group by sugarToleranceName";
-        String secondSql = "select sugarToleranceName, count(*) from single_disease_check_index where checkCode = 'CH003' and sex=2 group by sugarToleranceName";
-        List<Map<String, Object>> firstListData = parseIntegerValue(firstSql);
-        List<Map<String, Object>> secondListData = parseIntegerValue(secondSql);
+        String sql = "select sugarToleranceName, count(*) from single_disease_check_index where checkCode = 'CH003' group by sugarToleranceName,sexName";
+        List<Map<String, Object>> list = parseIntegerValue(sql);
         Map<String, List<String>> map = new HashMap<>();
         List<String> xData = new LinkedList<>();
-        List<String> valueData1 = new LinkedList<>();    // 存放第一个数据源
-        List<String> valueData2 = new LinkedList<>();    // 存放第二个数据源
-        if (null != firstListData && firstListData.get(0).size() > 0) {
-            firstListData.forEach(one -> {
+        List<String> valueData1 = new LinkedList<>();    // 存放第一个数据源 男生
+        List<String> valueData2 = new LinkedList<>();    // 存放第二个数据源 女生
+        if (null != list && list.get(0).size() > 0) {
+            list.forEach(one -> {
                 xData.add(one.get("sugarToleranceName") + "");   // 获取横坐标
-                valueData1.add(one.get("COUNT(*)") + "");
+                String gender = one.get("sexName") + "";
+                if ("男".equals(gender)) {
+                    valueData1.add(one.get("COUNT(*)") + "");
+                    valueData2.add("0");
+                } else if ("女".equals(gender)) {
+                    valueData1.add("0");
+                    valueData2.add(one.get("COUNT(*)") + "");
+                }
             });
-            map.put("valueData1", valueData1);
-        }
-        if (null != secondListData && secondListData.get(0).size() > 0) {
-            secondListData.forEach(one -> {
-                xData.add(one.get("sugarToleranceName") + "");
-                valueData2.add(one.get("COUNT(*)") + "");
-            });
-            map.put("valueData2", valueData2);
-        }
-        if (xData.size() > 0) {
-            Set<String> hash = new LinkedHashSet<>(xData);
-            xData.clear();
-            xData.addAll(hash);
             map.put("xData", xData);
+            map.put("valueData1", valueData1);
+            map.put("valueData2", valueData2);
         }
         return map;
     }
