@@ -5,6 +5,7 @@ import com.yihu.ehr.elasticsearch.ElasticSearchClient;
 import com.yihu.ehr.elasticsearch.ElasticSearchPool;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.quota.dao.jpa.TjQuotaDao;
+import com.yihu.quota.dao.jpa.TjQuotaGovProvisionDao;
 import com.yihu.quota.etl.extract.es.EsResultExtract;
 import com.yihu.quota.etl.model.EsConfig;
 import com.yihu.quota.model.jpa.TjQuota;
@@ -53,6 +54,9 @@ public class BaseStatistsService {
     private TjDataSourceService dataSourceService;
     @Autowired
     ObjectMapper objectMapper;
+    @Autowired
+    private TjQuotaGovProvisionDao tjQuotaGovProvisionDao;
+
     private static String orgHealthCategory = "orgHealthCategory";
     public static String orgHealthCategoryCode = "orgHealthCategoryCode";
 
@@ -111,17 +115,24 @@ public class BaseStatistsService {
     /**
      * 指标除法运算 分母为常量
      * @param molecular
-     * @param denominatorVal
      * @param dimension
      * @param filters
      * @param operation
      * @param operationValue
+     * @param constValue
+     * @param district
      * @return
      * @throws Exception
      */
     public List<Map<String, Object>>  divisionQuotaDenoConstant(String molecular, String dimension,String filters,
-                                                                String operation,String operationValue,String dateType,Double denominatorVal) throws Exception {
+                                                                String operation,String operationValue,String dateType,String constValue, String district) throws Exception {
+        Double denominatorVal = 0.0;
         List<Map<String, Object>> moleList = getQuotaResultList(molecular,dimension,filters,dateType);
+        // 获取分母的数值
+        if ("1".equals(constValue)) {
+            Long sumValue = tjQuotaGovProvisionDao.getSumByDistrict(district);
+            denominatorVal = sumValue.doubleValue();
+        }
         return divisionDenoConstant(dimension, moleList, denominatorVal, Integer.valueOf(operation), Integer.valueOf(operationValue));
     }
 
