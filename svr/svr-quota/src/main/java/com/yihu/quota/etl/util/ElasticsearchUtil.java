@@ -368,4 +368,38 @@ public class ElasticsearchUtil {
         return returnModels;
     }
 
+    public long getCountBySql(String sql) {
+        try {
+            SQLExprParser parser = new ElasticSqlExprParser(sql);
+            SQLExpr expr = parser.expr();
+            SQLQueryExpr queryExpr = (SQLQueryExpr) expr;
+            Select select = null;
+            select = new SqlParser().parseSelect(queryExpr);
+
+            //通过抽象语法树，封装成自定义的Select，包含了select、from、where group、limit等
+            AggregationQueryAction action = null;
+            DefaultQueryAction queryAction = null;
+            SqlElasticSearchRequestBuilder requestBuilder = null;
+            if (select.isAgg) {
+                //包含计算的的排序分组的
+                action = new AggregationQueryAction(elasticSearchPool.getClient(), select);
+                requestBuilder = action.explain();
+            } else {
+                //封装成自己的Select对象
+                Client client = elasticSearchPool.getClient();
+                queryAction = new DefaultQueryAction(client, select);
+                requestBuilder = queryAction.explain();
+            }
+            SearchResponse response = (SearchResponse) requestBuilder.get();
+            SearchHits hits = response.getHits();
+            if(hits != null){
+                return hits.totalHits();
+            }
+            return 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
 }

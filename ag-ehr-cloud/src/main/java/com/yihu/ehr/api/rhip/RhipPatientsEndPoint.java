@@ -400,12 +400,7 @@ public class RhipPatientsEndPoint extends BaseController {
             }
             //民族 nation
             if (null != detailModelJson.get("nation") && !StringUtils.isEmpty(detailModelJson.get("nation").toString())) {
-                String nation = getDictKeyByValueAndDictList(dictEntryClient.getDictEntryByDictId("5"),detailModelJson.get("nation").toString());
-                if(!StringUtils.isEmpty(nation)){
-                    detailModel.setNation(nation);
-                }else{
-                    errorMsg += "该民族不存在!";
-                }
+                    detailModel.setNation(detailModelJson.get("nation").toString());
             }
             //出生日期 birthday
             if (null != detailModelJson.get("birthday") && !StringUtils.isEmpty(detailModelJson.get("birthday").toString())) {
@@ -418,32 +413,15 @@ public class RhipPatientsEndPoint extends BaseController {
             }
             //性别 gender
             if (null != detailModelJson.get("gender") && !StringUtils.isEmpty(detailModelJson.get("gender").toString())) {
-                String gender = getDictKeyByValueAndDictList(dictEntryClient.getDictEntryByDictId("3"),detailModelJson.get("gender").toString());
-                if(!StringUtils.isEmpty(gender)){
-                    detailModel.setGender(gender);
-                }else{
-                    errorMsg += "性别不存在!";
-                }
+                    detailModel.setGender(detailModelJson.get("gender").toString());
             }
             //婚姻状况 martialStatus
             if (null != detailModelJson.get("martialStatus") && !StringUtils.isEmpty(detailModelJson.get("martialStatus").toString())) {
-                String martialStatus = getDictKeyByValueAndDictList(dictEntryClient.getDictEntryByDictId("4"),detailModelJson.get("martialStatus").toString());
-                if(!StringUtils.isEmpty(martialStatus)){
-                    detailModel.setMartialStatus(martialStatus);
-                }else{
-                    errorMsg += "婚姻状况不存在!";
-                }
+                    detailModel.setMartialStatus(detailModelJson.get("martialStatus").toString());
             }
             //户口性质 residenceType temp 农村，usual 非农村
             if (null != detailModelJson.get("residenceType") && !StringUtils.isEmpty(detailModelJson.get("residenceType").toString())) {
-                if("农村".equals(detailModelJson.get("residenceType").toString())){
-                    detailModel.setResidenceType("temp");
-                }else if("非农村".equals(detailModelJson.get("residenceType").toString())){
-                    detailModel.setResidenceType("usual");
-                }else{
-                    errorMsg += "户籍性质（residenceType）应该为农村或者非农村!";
-                }
-
+                detailModel.setResidenceType(detailModelJson.get("residenceType").toString());
             }
             //头像路径 picPath
             if (null != detailModelJson.get("picPath") && !StringUtils.isEmpty(detailModelJson.get("picPath").toString())) {
@@ -541,12 +519,7 @@ public class RhipPatientsEndPoint extends BaseController {
             }
             //民族 nation
             if (null != detailModelJson.get("nation") && !StringUtils.isEmpty(detailModelJson.get("nation").toString())) {
-                String nation = getDictKeyByValueAndDictList(dictEntryClient.getDictEntryByDictId("5"),detailModelJson.get("nation").toString());
-                if(!StringUtils.isEmpty(nation)){
-                    detailModel.setNation(nation);
-                }else{
-                    errorMsg += "该民族不存在!";
-                }
+                    detailModel.setNation(detailModelJson.get("nation").toString());
             }
             //出生日期 birthday
             if (null != detailModelJson.get("birthday") && !StringUtils.isEmpty(detailModelJson.get("birthday").toString())) {
@@ -559,32 +532,15 @@ public class RhipPatientsEndPoint extends BaseController {
             }
             //性别 gender
             if (null != detailModelJson.get("gender") && !StringUtils.isEmpty(detailModelJson.get("gender").toString())) {
-                String gender = getDictKeyByValueAndDictList(dictEntryClient.getDictEntryByDictId("3"),detailModelJson.get("gender").toString());
-                if(!StringUtils.isEmpty(gender)){
-                    detailModel.setGender(gender);
-                }else{
-                    errorMsg += "性别不存在!";
-                }
+                    detailModel.setGender(detailModelJson.get("gender").toString());
             }
             //婚姻状况 martialStatus
             if (null != detailModelJson.get("martialStatus") && !StringUtils.isEmpty(detailModelJson.get("martialStatus").toString())) {
-                String martialStatus = getDictKeyByValueAndDictList(dictEntryClient.getDictEntryByDictId("4"),detailModelJson.get("martialStatus").toString());
-                if(!StringUtils.isEmpty(martialStatus)){
-                    detailModel.setMartialStatus(martialStatus);
-                }else{
-                    errorMsg += "婚姻状况不存在!";
-                }
+                detailModel.setMartialStatus(detailModelJson.get("martialStatus").toString());
             }
             //户口性质 residenceType temp 农村，usual 非农村
             if (null != detailModelJson.get("residenceType") && !StringUtils.isEmpty(detailModelJson.get("residenceType").toString())) {
-                if("农村".equals(detailModelJson.get("residenceType").toString())){
-                    detailModel.setResidenceType("temp");
-                }else if("非农村".equals(detailModelJson.get("residenceType").toString())){
-                    detailModel.setResidenceType("usual");
-                }else{
-                    errorMsg += "户籍性质（residenceType）应该为农村或者非农村!";
-                }
-
+                    detailModel.setResidenceType(detailModelJson.get("residenceType").toString());
             }
             //头像路径 picPath
             if (null != detailModelJson.get("picPath") && !StringUtils.isEmpty(detailModelJson.get("picPath").toString())) {
@@ -639,24 +595,6 @@ public class RhipPatientsEndPoint extends BaseController {
         }
     }
 
-    /**
-     * 根据传过来的字典项list和参照做对比，若list中存在参照则获取字典的key值
-     * @param mDictionaryEntryList
-     * @param value
-     * @return
-     */
-    private String  getDictKeyByValueAndDictList(List<MDictionaryEntry> mDictionaryEntryList,String value){
-        String key ="";
-        Map<String,String> map = new HashMap<>();
-        if(null != mDictionaryEntryList && mDictionaryEntryList.size()>0){
-            for(MDictionaryEntry mDictionaryEntry : mDictionaryEntryList){
-               if(value.equals(mDictionaryEntry.getValue())){
-                   key = mDictionaryEntry.getCode();
-               }
-            }
-        }
-        return key;
-    }
 
     /**
      * 根据传过来的地址转换成地址对象

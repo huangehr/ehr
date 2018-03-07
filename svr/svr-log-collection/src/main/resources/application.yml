@@ -113,6 +113,12 @@ service-gateway:
 kafka:
   broker:
     address: 11.1.2.21:6667
+es:
+  index: wlyy_quota
+  type: wlyy_quota
+  host:  http://11.1.2.3:9200
+  tHost: 11.1.2.3:9300
+  clusterName: jkzl
 
 
 ---
@@ -123,7 +129,6 @@ spring:
     username: healthcloud
     password: GP8Qz4qU
 
-
 service-gateway:
   username: user
   password: eureka
@@ -132,6 +137,12 @@ service-gateway:
 kafka:
   broker:
     address: 10.176.97.7:6667
+es:
+  index: wlyy_quota
+  type: wlyy_quota
+  host:  http://10.176.97.7:9200
+  tHost: 10.176.97.7:9300
+  clusterName: jkzl
 
 
 ---
@@ -159,3 +170,9 @@ service-gateway:
 kafka:
   broker:
     address: 100.100.1.155:6667
+es:
+  index: wlyy_quota
+  type: wlyy_quota
+  host:  http://100.100.1.158:9300
+  tHost: 100.100.1.158:9300
+  clusterName: jkzl
