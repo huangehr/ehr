@@ -80,7 +80,6 @@ public class DiabetesScheduler {
 		String dictSql = "";
 		String keyEventDate = "event_date";
 		String keyOrgArea = "org_area";
-		String keyOrgName = "org_name";
 		String keyPatientName = "patient_name";
 		String keyDemographicId = "demographic_id";//身份证
 		String keyCardId = "card_id	";
@@ -127,7 +126,7 @@ public class DiabetesScheduler {
 						personalInfo.setEventDate(DateUtil.formatCharDate(map.get(keyEventDate).toString(), DateUtil.DATE_WORLD_FORMAT));					}
 					if(map.get(keyOrgArea) != null){
 						personalInfo.setTown(map.get(keyOrgArea).toString());
-						personalInfo.setTownName(map.get(keyOrgName).toString());
+//						personalInfo.setTownName(map.get(keyOrgName).toString());
 					}
 					if(map.get(keyPatientName) != null){
 						personalInfo.setName(map.get(keyPatientName).toString());
