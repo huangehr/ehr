@@ -7,11 +7,11 @@ import com.yihu.ehr.agModel.standard.cdatype.CdaTypeTreeModel;
 import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.dict.MConventionalDict;
-import com.yihu.ehr.model.standard.MCDADocument;
-import com.yihu.ehr.model.standard.MCDAVersion;
+import com.yihu.hos.model.standard.MCDADocument;
+import com.yihu.hos.model.standard.MCDAType;
+import com.yihu.hos.model.standard.MSTDVersion;
 import com.yihu.ehr.std.service.CDAClient;
 import com.yihu.ehr.std.service.CDATypeClient;
-import com.yihu.ehr.model.standard.MCDAType;
 import com.yihu.ehr.std.service.CDAVersionClient;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.util.rest.Envelop;
@@ -438,10 +438,10 @@ public class CDATypeController extends BaseController {
         cdaTypeIds = cdaTypeIds.substring(0, cdaTypeIds.length() - 1);
         String filters = "type="+cdaTypeIds;
         //获取当前所有版本
-        ResponseEntity<Collection<MCDAVersion>> entity = cdaVersionClient.searchCDAVersions("", "", "", 1000, 1);
-        Collection<MCDAVersion> mCdaVersions = entity.getBody();
+        ResponseEntity<Collection<MSTDVersion>> entity = cdaVersionClient.searchCDAVersions("", "", "", 1000, 1);
+        Collection<MSTDVersion> mCdaVersions = entity.getBody();
         envelop.setSuccessFlg(false);
-        for (MCDAVersion mcdaVersion : mCdaVersions){
+        for (MSTDVersion mcdaVersion : mCdaVersions){
             //对应每个版本的cda文档是否有关联指定的cda类别
             ResponseEntity<List<MCDADocument>> responseEntity  = cdaClient.GetCDADocuments("", filters,"", 1000, 1, mcdaVersion.getVersion());
             List<MCDADocument> mcdaDocuments = responseEntity.getBody();

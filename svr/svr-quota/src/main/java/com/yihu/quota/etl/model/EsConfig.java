@@ -25,6 +25,8 @@ public class EsConfig {
     private String especialType; //特殊类型  orgHealthCategory：卫生机构类型
     private String superiorBaseQuotaCode;  // 上级基础指标code
 
+    private String constValue;  // 分母为常量的类型 1总人口数 2……
+    private String district;    // 所属区域  根据区域获取该区域下的总人口数
 
 
     //已停止使用
@@ -200,5 +202,21 @@ public class EsConfig {
 
     public void setDenominatorFilter(String denominatorFilter) {
         this.denominatorFilter = denominatorFilter;
+    }
+
+    public String getConstValue() {
+        return constValue;
+    }
+
+    public void setConstValue(String constValue) {
+        this.constValue = constValue;
+    }
+
+    public String getDistrict() {
+        return district;
+    }
+
+    public void setDistrict(String district) {
+        this.district = district;
     }
 }

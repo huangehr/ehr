@@ -80,6 +80,7 @@ public class DiabetesScheduler {
 		String dictSql = "";
 		String keyEventDate = "event_date";
 		String keyOrgArea = "org_area";
+		String keyOrgName = "org_name";
 		String keyPatientName = "patient_name";
 		String keyDemographicId = "demographic_id";//身份证
 		String keyCardId = "card_id	";
@@ -126,7 +127,7 @@ public class DiabetesScheduler {
 						personalInfo.setEventDate(DateUtil.formatCharDate(map.get(keyEventDate).toString(), DateUtil.DATE_WORLD_FORMAT));					}
 					if(map.get(keyOrgArea) != null){
 						personalInfo.setTown(map.get(keyOrgArea).toString());
-//						personalInfo.setTownName(map.get(keyOrgName).toString());
+						personalInfo.setTownName(map.get(keyOrgName).toString());
 					}
 					if(map.get(keyPatientName) != null){
 						personalInfo.setName(map.get(keyPatientName).toString());
@@ -187,19 +188,18 @@ public class DiabetesScheduler {
 						String fastname = "";
 						String fastcode = "";
 						double val = Double.valueOf(map.get(keysugarToleranceVal).toString());
-						if(val >= 4.4 && val < 6.1){
-							fastname = "4.4~6.1mmol/L";
+						if(val < 7.8){
+							fastname = "7.8mmol/l 以下";
 							fastcode = "1";
 						}
-						if(val >= 6.1 && val < 7.0){
-							fastname = "6.1~7mmol/L";
+						if(val >= 7.8 && val < 11.1){
+							fastname = "7.8-11.1mmol/l";
 							fastcode = "2";
 						}
-						if( val > 7.0){
-							fastname = "7.0mmol/L以上";
+						if( val > 11.1){
+							fastname = "11.1mmol/l 上";
 							fastcode = "3";
 						}
-
 						CheckInfoModel checkInfo = setCheckInfoModel(baseCheckInfo);
 						checkInfo.setFastingBloodGlucoseName(fastname);
 						checkInfo.setFastingBloodGlucoseCode(fastcode);
@@ -225,16 +225,16 @@ public class DiabetesScheduler {
 						String sugarTolename = "";
 						String sugarToleCode = "";
 						double val = Double.valueOf(map.get(keysugarToleranceVal).toString());
-						if(val < 7.8){
-							sugarTolename = "7.8 mmol/L以下";
+						if(val >= 4.4 && val < 6.1){
+							sugarTolename = "4.4-6.1mmol/l";
 							sugarToleCode = "1";
 						}
-						if(val >= 7.8 && val < 11.1){
-							sugarTolename = "7.8~11.1 mmol/L";
+						if(val >= 6.1 && val < 7.0){
+							sugarTolename = "6.1-7.0mmol/l";
 							sugarToleCode = "2";
 						}
-						if( val > 11.1){
-							sugarTolename = "11.1 mmol/L以上";
+						if( val > 7.0){
+							sugarTolename = "大于7.0mmol/l 上";
 							sugarToleCode = "3";
 						}
 						CheckInfoModel checkInfo = setCheckInfoModel(baseCheckInfo);

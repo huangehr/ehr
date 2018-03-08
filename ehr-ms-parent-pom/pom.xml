@@ -400,6 +400,11 @@
                 <version>${version.ehr}</version>
             </dependency>
             <dependency>
+                <groupId>com.yihu.hos</groupId>
+                <artifactId>common-rest-model</artifactId>
+                <version>${version.eip}</version>
+            </dependency>
+            <dependency>
                 <groupId>com.yihu.ehr</groupId>
                 <artifactId>commons-ui-swagger</artifactId>
                 <version>${version.ehr}</version>

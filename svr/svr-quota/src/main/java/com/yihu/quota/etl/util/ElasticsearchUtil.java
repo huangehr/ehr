@@ -401,5 +401,4 @@ public class ElasticsearchUtil {
             return 0;
         }
     }
-
 }

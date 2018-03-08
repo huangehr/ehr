@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.yihu.ehr</groupId>
     <artifactId>ehr-cloud</artifactId>
-    <version>1.2.0</version>
+    <version>1.1.0</version>
     <packaging>pom</packaging>
     <name>ehr-cloud</name>
     <description>EHR parent pom for all</description>
@@ -131,24 +131,25 @@
         <version.elasticsearch-sql>2.4.1.0</version.elasticsearch-sql>
         <version.jest>2.4.0</version.jest>
         <version.alibaba-druid>1.0.15</version.alibaba-druid>
-        <version.ehr>1.2.0</version.ehr>
+        <version.ehr>1.1.0</version.ehr>
+        <version.eip>1.3.0</version.eip>
     </properties>
 
     <dependencyManagement>
         <dependencies>
             <!--<dependency>-->
-                <!--<groupId>org.springframework.boot</groupId>-->
-                <!--<artifactId>spring-boot-dependencies</artifactId>-->
-                <!--<version>1.5.9.RELEASE</version>-->
-                <!--<type>pom</type>-->
-                <!--<scope>import</scope>-->
+            <!--<groupId>org.springframework.boot</groupId>-->
+            <!--<artifactId>spring-boot-dependencies</artifactId>-->
+            <!--<version>1.5.9.RELEASE</version>-->
+            <!--<type>pom</type>-->
+            <!--<scope>import</scope>-->
             <!--</dependency>-->
             <!--<dependency>-->
-                <!--<groupId>org.springframework.cloud</groupId>-->
-                <!--<artifactId>spring-cloud-dependencies</artifactId>-->
-                <!--<version>Finchley.M5</version>-->
-                <!--<type>pom</type>-->
-                <!--<scope>import</scope>-->
+            <!--<groupId>org.springframework.cloud</groupId>-->
+            <!--<artifactId>spring-cloud-dependencies</artifactId>-->
+            <!--<version>Finchley.M5</version>-->
+            <!--<type>pom</type>-->
+            <!--<scope>import</scope>-->
             <!--</dependency>-->
             <!-- Base library-->
             <dependency>

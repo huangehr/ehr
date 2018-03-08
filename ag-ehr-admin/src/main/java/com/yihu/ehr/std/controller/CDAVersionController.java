@@ -4,7 +4,7 @@ import com.yihu.ehr.agModel.standard.standardversion.StdVersionDetailModel;
 import com.yihu.ehr.agModel.standard.standardversion.StdVersionModel;
 import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.model.standard.MCDAVersion;
+import com.yihu.hos.model.standard.MSTDVersion;
 import com.yihu.ehr.std.service.CDAVersionClient;
 import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.ehr.controller.BaseController;
@@ -43,17 +43,17 @@ public class CDAVersionController extends BaseController {
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page) throws Exception {
-        ResponseEntity<Collection<MCDAVersion>> responseEntity = cdaVersionClient.searchCDAVersions(fields, filters, sorts, size, page);
-        Collection<MCDAVersion> mCdaVersions = responseEntity.getBody();
+        ResponseEntity<Collection<MSTDVersion>> responseEntity = cdaVersionClient.searchCDAVersions(fields, filters, sorts, size, page);
+        Collection<MSTDVersion> mCdaVersions = responseEntity.getBody();
         List<StdVersionModel> versionModelList = new ArrayList<>();
-        for (MCDAVersion mCdaVersion : mCdaVersions) {
+        for (MSTDVersion mCdaVersion : mCdaVersions) {
             StdVersionModel versionModel = convertToModel(mCdaVersion, StdVersionModel.class);
             if(mCdaVersion.getCommitTime()!=null)
                 versionModel.setCommitTime(DateUtil.formatDate(mCdaVersion.getCommitTime(), DateUtil.DEFAULT_YMDHMSDATE_FORMAT));
 
             //基础版本名字
             //versionModel.setBaseVersionName();
-            //MCDAVersion mcdaVersionBase = cdaVersionClient.getVersion(versionModel.getBaseVersion());
+            //MSTDVersion mcdaVersionBase = cdaVersionClient.getVersion(versionModel.getBaseVersion());
             versionModelList.add(versionModel);
         }
         int totalCount = getTotalCount(responseEntity);
@@ -80,7 +80,7 @@ public class CDAVersionController extends BaseController {
             envelop.setErrorMsg("已经存在处于编辑状态的标准版，不能新增！");
             return envelop;
         }
-        MCDAVersion mcdaVersion = cdaVersionClient.addVersion(userLoginCode);
+        MSTDVersion mcdaVersion = cdaVersionClient.addVersion(userLoginCode);
         if (mcdaVersion == null) {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("新增标准版本失败");
@@ -157,7 +157,7 @@ public class CDAVersionController extends BaseController {
             @RequestParam(value = "baseVersion") String baseVersion) throws Exception {
 
         Envelop envelop = new Envelop();
-        MCDAVersion mcdaVersion = cdaVersionClient.updateVersion(version, versionName, userCode, inStage, baseVersion);
+        MSTDVersion mcdaVersion = cdaVersionClient.updateVersion(version, versionName, userCode, inStage, baseVersion);
         if (mcdaVersion == null) {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("标准版本更新失败！");
@@ -194,7 +194,7 @@ public class CDAVersionController extends BaseController {
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
             @PathVariable(value = "version") String version) throws Exception {
         Envelop envelop = new Envelop();
-        MCDAVersion mCdaVersion = cdaVersionClient.getVersion(version);
+        MSTDVersion mCdaVersion = cdaVersionClient.getVersion(version);
         if (mCdaVersion == null) {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("版本信息获取失败！");
@@ -210,7 +210,7 @@ public class CDAVersionController extends BaseController {
     @ApiOperation(value = "获取最新版本")
     public Envelop getLatestVersion()throws Exception {
         Envelop envelop = new Envelop();
-        MCDAVersion cdaVersion = cdaVersionClient.getLatestVersion();
+        MSTDVersion cdaVersion = cdaVersionClient.getLatestVersion();
         if (cdaVersion == null) {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("没有版本信息！");

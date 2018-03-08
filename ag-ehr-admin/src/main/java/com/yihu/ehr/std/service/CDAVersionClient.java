@@ -3,7 +3,7 @@ package com.yihu.ehr.std.service;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
-import com.yihu.ehr.model.standard.MCDAVersion;
+import com.yihu.hos.model.standard.MSTDVersion;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -26,7 +26,7 @@ public interface CDAVersionClient {
 
     @RequestMapping(value = ServiceApi.Standards.Versions, method = RequestMethod.GET)
     @ApiOperation(value = "适配采集标准")
-    ResponseEntity<Collection<MCDAVersion>> searchCDAVersions(
+    ResponseEntity<Collection<MSTDVersion>> searchCDAVersions(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
@@ -48,7 +48,7 @@ public interface CDAVersionClient {
 
     @RequestMapping(value = ServiceApi.Standards.Versions, method = RequestMethod.POST)
     @ApiOperation(value = "新增cda版本")
-    MCDAVersion addVersion(
+    MSTDVersion addVersion(
             @ApiParam(name = "userLoginCode", value = "用户登录名")
             @RequestParam(value = "userLoginCode") String userLoginCode);
 
@@ -81,7 +81,7 @@ public interface CDAVersionClient {
 
     @RequestMapping(value = ServiceApi.Standards.Version, method = RequestMethod.PUT)
     @ApiOperation(value = "修改版本信息")
-    MCDAVersion updateVersion(
+    MSTDVersion updateVersion(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
             @PathVariable(value = "version") String version,
             @ApiParam(name = "versionName", value = "版本名称", defaultValue = "")
@@ -107,13 +107,13 @@ public interface CDAVersionClient {
 
     @RequestMapping(value = ServiceApi.Standards.Version, method = RequestMethod.GET)
     @ApiOperation(value = "获取版本信息")
-    MCDAVersion getVersion(
+    MSTDVersion getVersion(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
             @PathVariable(value = "version") String version);
 
     @RequestMapping(value = ServiceApi.Standards.VersionLatest, method = RequestMethod.GET)
     @ApiOperation(value = "获取最新版本")
-    MCDAVersion getLatestVersion();
+    MSTDVersion getLatestVersion();
 
     @RequestMapping(value = ServiceApi.Standards.VersionCache, method = RequestMethod.PUT)
     @ApiOperation(value = "向Redis中缓存标准数据")

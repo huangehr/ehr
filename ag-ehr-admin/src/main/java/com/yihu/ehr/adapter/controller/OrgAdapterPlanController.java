@@ -11,7 +11,7 @@ import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.adaption.MAdapterOrg;
 import com.yihu.ehr.model.adaption.MAdapterPlan;
 import com.yihu.ehr.model.dict.MConventionalDict;
-import com.yihu.ehr.model.standard.MCDAVersion;
+import com.yihu.hos.model.standard.MSTDVersion;
 import com.yihu.ehr.std.service.CDAVersionClient;
 import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.ehr.util.validate.ValidateResult;
@@ -260,7 +260,7 @@ public class OrgAdapterPlanController extends ExtendController<AdapterPlanModel>
         String versionId = adapterPlanModel.getVersion();
         if(StringUtils.isNotEmpty(versionId))
         {
-            MCDAVersion version = cdaVersionClient.getVersion(versionId);
+            MSTDVersion version = cdaVersionClient.getVersion(versionId);
             if(version!=null)
             {
                 adapterPlanModel.setVersionName(version.getVersionName());

@@ -7,7 +7,7 @@ import com.yihu.ehr.geography.service.AddressClient;
 import com.yihu.ehr.model.geography.MGeography;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.profile.MTemplate;
-import com.yihu.ehr.model.standard.MCDADocument;
+import com.yihu.hos.model.standard.MCDADocument;
 import com.yihu.ehr.organization.service.OrganizationClient;
 import com.yihu.ehr.std.service.CDAClient;
 import com.yihu.ehr.template.service.TemplateClient;

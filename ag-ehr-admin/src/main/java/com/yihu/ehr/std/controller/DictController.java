@@ -6,7 +6,7 @@ import com.yihu.ehr.agModel.standard.dict.DictModel;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.model.standard.*;
+import com.yihu.hos.model.standard.*;
 import com.yihu.ehr.std.service.CDAVersionClient;
 import com.yihu.ehr.std.service.DataSetClient;
 import com.yihu.ehr.std.service.DictClient;
@@ -66,7 +66,7 @@ public class DictController extends BaseController {
         ResponseEntity<Collection<MStdDict>> responseEntity = dictClient.searchDict(fields, filters, sorts, size, page, version);
 
         List<DictModel> dictModelList = (List<DictModel>) convertToModels(responseEntity.getBody(), new ArrayList<DictModel>(responseEntity.getBody().size()), DictModel.class, null);
-        MCDAVersion mcdaVersion = versionClient.getVersion(version);
+        MSTDVersion mcdaVersion = versionClient.getVersion(version);
         if(dictModelList!=null)
         {
             for(int i=0;i<dictModelList.size();i++)
@@ -112,7 +112,7 @@ public class DictController extends BaseController {
         if (dictModel == null) {
             return failed("数据获取失败!");
         }
-        MCDAVersion mcdaVersion = versionClient.getVersion(versionCode);
+        MSTDVersion mcdaVersion = versionClient.getVersion(versionCode);
         dictModel.setInStage(mcdaVersion.isInStage()?0:1);
 
         return success(dictModel);
@@ -133,7 +133,7 @@ public class DictController extends BaseController {
         if (dictModel == null) {
             return failed("数据获取失败!");
         }
-        //MCDAVersion mcdaVersion = versionClient.getVersion(version);
+        //MSTDVersion mcdaVersion = versionClient.getVersion(version);
         //dictModel.setInStage(mcdaVersion.isInStage()?0:1);
         return success(dictModel);
     }
@@ -165,7 +165,7 @@ public class DictController extends BaseController {
             boolean isExist = dictClient.isExistDictCode(dictModel.getCode(),versionCode);
 
             MStdDict mStdDict = convertToModel(dictModel, MStdDict.class);
-            if (dictModel.getId() == 0) {
+            if (dictModel.getId() == null) {
                 if(isExist)
                 {
                     return failed("代码已存在!");
@@ -282,8 +282,8 @@ public class DictController extends BaseController {
         try {
 
             //查询所有版本
-//            ResponseEntity<Collection<MCDAVersion>> responseEntity = versionClient.searchCDAVersions("", "", "", 1000, 1);
-//            Collection<MCDAVersion> mCdaVersions = responseEntity.getBody();
+//            ResponseEntity<Collection<MSTDVersion>> responseEntity = versionClient.searchCDAVersions("", "", "", 1000, 1);
+//            Collection<MSTDVersion> mCdaVersions = responseEntity.getBody();
 
             ResponseEntity<Collection<MStdDict>> dict = dictClient.searchDict("", "baseDict=" + id, "", id.length(), 1, versionCode);
             List<DictModel> dictModelList = (List<DictModel>) convertToModels(dict.getBody(), new ArrayList<DictModel>(dict.getBody().size()), DictModel.class, null);
@@ -294,7 +294,7 @@ public class DictController extends BaseController {
                 return envelop;
             }
 
-//            for (MCDAVersion mcdaVersion : mCdaVersions){
+//            for (MSTDVersion mcdaVersion : mCdaVersions){
                 List<MStdDataSet> mStdDataSetList = dataSetClient.search("",versionCode);
 
                 for (MStdDataSet mStdDataSet:mStdDataSetList){
@@ -379,7 +379,7 @@ public class DictController extends BaseController {
             //代码唯一性校验
             boolean isExist = dictClient.isExistEntryCode(dictEntryModel.getDictId(),dictEntryModel.getCode(),versionCode);
             MStdDictEntry mStdDictEntry = convertToModel(dictEntryModel, MStdDictEntry.class);
-            if (dictEntryModel.getId() == 0) {
+            if (dictEntryModel.getId() == null) {
                 if(isExist)
                 {
                     return failed("代码已存在!");
@@ -489,7 +489,7 @@ public class DictController extends BaseController {
         if (dictEntryModel == null) {
             return failed("数据获取失败!");
         }
-//        MCDAVersion mcdaVersion = versionClient.getVersion(versionCode);
+//        MSTDVersion mcdaVersion = versionClient.getVersion(versionCode);
 //        dictEntryModel.setStaged(mcdaVersion.isInStage()?0:1);
 
         return success(dictEntryModel);

@@ -5,7 +5,7 @@ package com.yihu.ehr.agModel.standard.dict;
  */
 public class DictModel {
 
-    long id;
+    Long id;
     String code;//字典代码
     String name;//字典名称
     String author;// 作者
@@ -14,16 +14,16 @@ public class DictModel {
     String description;//字典描述
     String sourceId;
     String stdVersion;// 标准化版本
-    int hashCode;
+    Integer hashCode;
     String type;
     String innerVersion;
-    int inStage;
+    Integer inStage;
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -91,11 +91,11 @@ public class DictModel {
         this.stdVersion = stdVersion;
     }
 
-    public int getHashCode() {
+    public Integer getHashCode() {
         return hashCode;
     }
 
-    public void setHashCode(int hashCode) {
+    public void setHashCode(Integer hashCode) {
         this.hashCode = hashCode;
     }
 
@@ -115,11 +115,11 @@ public class DictModel {
         this.innerVersion = innerVersion;
     }
 
-    public int getInStage() {
+    public Integer getInStage() {
         return inStage;
     }
 
-    public void setInStage(int inStage) {
+    public void setInStage(Integer inStage) {
         this.inStage = inStage;
     }
 }
