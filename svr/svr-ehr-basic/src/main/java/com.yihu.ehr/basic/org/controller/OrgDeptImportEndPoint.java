@@ -44,7 +44,7 @@ public class OrgDeptImportEndPoint extends EnvelopRestEndPoint {
     @ApiOperation("获取已存在部门编号")
     public List codeExistence(
             @ApiParam(name = "code", value = "", defaultValue = "")
-            @RequestBody String code) {
+            @RequestBody String code) throws Exception {
         List codes = orgDeptImportService.codeExistence(toEntity(code, String[].class));
         return  codes;
     }
@@ -53,7 +53,7 @@ public class OrgDeptImportEndPoint extends EnvelopRestEndPoint {
     @ApiOperation("获取已存在部门名称")
     public List nameExistence(
             @ApiParam(name = "name", value = "", defaultValue = "")
-            @RequestBody String name) {
+            @RequestBody String name) throws Exception {
         List names = orgDeptImportService.nameExistence(toEntity(name, String[].class));
         return  names;
     }
@@ -62,7 +62,7 @@ public class OrgDeptImportEndPoint extends EnvelopRestEndPoint {
     @ApiOperation("获取已存在的机构代码")
     public List orgCodeExistence(
             @ApiParam(name = "orgCode", value = "", defaultValue = "")
-            @RequestBody String orgCode) {
+            @RequestBody String orgCode) throws Exception {
         List orgCodes = orgService.orgCodeExistence(toEntity(orgCode, String[].class));
         return orgCodes;
     }

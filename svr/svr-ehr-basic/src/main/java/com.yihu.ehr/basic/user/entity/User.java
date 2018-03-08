@@ -1,5 +1,6 @@
 package com.yihu.ehr.basic.user.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.yihu.ehr.entity.BaseAssignedEntity;
 import com.yihu.ehr.entity.BaseIdentityEntity;
 import org.hibernate.annotations.GenericGenerator;
@@ -69,6 +70,7 @@ public class User  extends BaseAssignedEntity {
     public User() {
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @Column(name = "invalid_date",  nullable = true)
     public Date getInvalidDate() {
         return invalidDate;
@@ -77,6 +79,7 @@ public class User  extends BaseAssignedEntity {
         this.invalidDate = invalidDate;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @Column(name = "last_login_time",  nullable = true)
     public Date getLastLoginTime() {
         return lastLoginTime;

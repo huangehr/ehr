@@ -131,6 +131,9 @@
         <version.elasticsearch-sql>2.4.1.0</version.elasticsearch-sql>
         <version.jest>2.4.0</version.jest>
         <version.alibaba-druid>1.0.15</version.alibaba-druid>
+        <version.feign>9.5.0</version.feign>
+        <version.hystrix>1.5.10</version.hystrix>
+        <version.archaius>0.7.5</version.archaius>
         <version.ehr>1.2.0</version.ehr>
     </properties>
 
@@ -429,31 +432,25 @@
                 <version>${version.spring-cloud}</version>
             </dependency>
 
-            <!-- Hystrix family -->
+            <!-- Feign -->
             <dependency>
-                <groupId>com.netflix.archaius</groupId>
-                <artifactId>archaius-core</artifactId>
-                <version>0.7.4</version>
+                <groupId>io.github.openfeign</groupId>
+                <artifactId>feign-core</artifactId>
+                <version>${version.feign}</version>
             </dependency>
+
+            <!-- Hystrix -->
             <dependency>
                 <groupId>com.netflix.hystrix</groupId>
                 <artifactId>hystrix-core</artifactId>
-                <version>1.5.10</version>
+                <version>${version.hystrix}</version>
             </dependency>
+
+            <!-- Archaius -->
             <dependency>
-                <groupId>com.netflix.feign</groupId>
-                <artifactId>feign-core</artifactId>
-                <version>8.18.0</version>
-            </dependency>
-            <dependency>
-                <groupId>com.netflix.feign</groupId>
-                <artifactId>feign-jackson</artifactId>
-                <version>8.18.0</version>
-            </dependency>
-            <dependency>
-                <groupId>com.netflix.feign</groupId>
-                <artifactId>feign-ribbon</artifactId>
-                <version>8.18.0</version>
+                <groupId>com.netflix.archaius</groupId>
+                <artifactId>archaius-core</artifactId>
+                <version>${version.archaius}</version>
             </dependency>
 
             <!-- Spring data family -->
