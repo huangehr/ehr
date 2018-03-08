@@ -1,5 +1,6 @@
 package com.yihu.ehr.model.org;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
@@ -93,6 +94,7 @@ public class MOrganization implements Serializable{
         this.pyCode = pyCode;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getCreateDate() {
         return createDate;
     }
@@ -347,6 +349,7 @@ public class MOrganization implements Serializable{
         this.lat = lat;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getUpdateTime() {
         return updateTime;
     }
