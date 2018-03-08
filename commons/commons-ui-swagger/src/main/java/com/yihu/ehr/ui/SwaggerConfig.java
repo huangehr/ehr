@@ -21,6 +21,7 @@ import static springfox.documentation.builders.PathSelectors.regex;
 @Profile({"dev", "test"})
 public class SwaggerConfig {
 
+    public static final String API_VERSION = "v1.0";
     public static final String PUBLIC_API = "Default";
     public static final String PRIVATE_API = "Private";
     public static final String LEGACY_API = "Legacy";
@@ -101,7 +102,7 @@ public class SwaggerConfig {
         return new ApiInfoBuilder()
                 .title("医疗云平台API")
                 .description("医疗云平台API，提供后端基础数据接口")
-                .version("v1.2")
+                .version(API_VERSION)
                 .termsOfServiceUrl("http://www.jkzl.com")
                 .contact(new Contact("Jkzl Xiamen R & D Center Platform Development.", "http://www.jkzl.com", "jzkl@jkzl.com"))
                 .license("The Apache License, Version 2.0")
@@ -124,7 +125,7 @@ public class SwaggerConfig {
         return new ApiInfoBuilder()
                 .title("医疗云平台API")
                 .description("医疗云平台API，提供后端基础数据接口")
-                .version("v1.2")
+                .version(API_VERSION)
                 .termsOfServiceUrl("http://www.jkzl.com")
                 .contact(new Contact("Jkzl Xiamen R & D Center Platform Development.", "http://www.jkzl.com", "jzkl@jkzl.com"))
                 .license("The Apache License, Version 2.0")
@@ -146,7 +147,7 @@ public class SwaggerConfig {
         return new ApiInfoBuilder()
                 .title("医疗云平台API")
                 .description("医疗云平台API，提供后端基础数据接口")
-                .version("v1.2")
+                .version(API_VERSION)
                 .termsOfServiceUrl("http://www.jkzl.com")
                 .contact(new Contact("Jkzl Xiamen R & D Center Platform Development.", "http://www.jkzl.com", "jzkl@jkzl.com"))
                 .license("The Apache License, Version 2.0")
