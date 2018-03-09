@@ -28,6 +28,7 @@ import java.util.concurrent.TimeUnit;
 public class AgZuulFilter extends ZuulFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(AgZuulFilter.class);
+    private static final String ACCESS_TOKEN_PARAMETER = "accessToken";
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -75,9 +76,9 @@ public class AgZuulFilter extends ZuulFilter {
     }
 
     private String extractToken(HttpServletRequest request) {
-        String accessToken = request.getHeader("accessToken");
+        String accessToken = request.getHeader(ACCESS_TOKEN_PARAMETER);
         if (null == accessToken) {
-            accessToken = request.getParameter("accessToken");
+            accessToken = request.getParameter(ACCESS_TOKEN_PARAMETER);
         }
         return accessToken;
     }
