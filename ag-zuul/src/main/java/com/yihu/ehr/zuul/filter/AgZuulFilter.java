@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class AgZuulFilter extends ZuulFilter {
 
-    private static Logger logger = LoggerFactory.getLogger(AgZuulFilter.class);
+    private static final Logger logger = LoggerFactory.getLogger(AgZuulFilter.class);
 
     @Autowired
     private ObjectMapper objectMapper;
