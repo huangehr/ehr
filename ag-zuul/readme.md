@@ -11,7 +11,7 @@ Ag-Zuul
                   path: /svr-dfs/**      #该节点为相应的请求路径
                   serviceId: svr-dfs     #该节点为注册到Eureka上的微服务的服务名称(要将请求转发到自己的服务的时候可将其更改为自己的服务的名称[bootstrap.yml])
     c.请求方式：
-        请求svr-dfs: http://localhost:10001/svr-dfs/api/v1.0/fastDfs/page?page=1&size=15
+        请求svr-dfs: http://localhost:10001/1/api/v1.0/fastDfs/page?page=1&size=15
         请求svr-redis: http://localhost:10001/svr-redis/api/v1.0/redis/orgName?key=jkzl
         请求svr-resource: http://localhost:10001/svr-resource/api/v1.0/resources/64
     d.注意项：
