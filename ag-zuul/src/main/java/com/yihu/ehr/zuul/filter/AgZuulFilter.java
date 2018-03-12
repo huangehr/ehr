@@ -27,7 +27,8 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class AgZuulFilter extends ZuulFilter {
 
-    private static Logger logger = LoggerFactory.getLogger(AgZuulFilter.class);
+    private static final Logger logger = LoggerFactory.getLogger(AgZuulFilter.class);
+    private static final String ACCESS_TOKEN_PARAMETER = "accessToken";
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -61,28 +62,28 @@ public class AgZuulFilter extends ZuulFilter {
         }
         String accessToken = this.extractToken(request);
         if (null == accessToken) {
-            return this.forBidden(ctx, HttpStatus.FORBIDDEN.value(), "accessToken can not be null");
+            return this.forbidden(ctx, HttpStatus.FORBIDDEN.value(), "accessToken can not be null");
         }
         OAuth2AccessToken oAuth2AccessToken = defaultTokenServices.readAccessToken(accessToken);
         if (null == oAuth2AccessToken) {
-            return this.forBidden(ctx, HttpStatus.FORBIDDEN.value(), "invalid accessToken");
+            return this.forbidden(ctx, HttpStatus.FORBIDDEN.value(), "invalid accessToken");
         }
         if (oAuth2AccessToken.isExpired()) {
-            return this.forBidden(ctx, HttpStatus.FORBIDDEN.value(), "expired accessToken");
+            return this.forbidden(ctx, HttpStatus.FORBIDDEN.value(), "expired accessToken");
         }
-        OAuth2Authentication oAuth2Authentication = defaultTokenServices.loadAuthentication(accessToken);
+        //OAuth2Authentication oAuth2Authentication = defaultTokenServices.loadAuthentication(accessToken);
         return null;
     }
 
     private String extractToken(HttpServletRequest request) {
-        String accessToken = request.getHeader("accessToken");
+        String accessToken = request.getHeader(ACCESS_TOKEN_PARAMETER);
         if (null == accessToken) {
-            accessToken = request.getParameter("accessToken");
+            accessToken = request.getParameter(ACCESS_TOKEN_PARAMETER);
         }
         return accessToken;
     }
 
-    private Object forBidden(RequestContext requestContext, int status, String errorMsg) {
+    private Object forbidden(RequestContext requestContext, int status, String errorMsg) {
         requestContext.setSendZuulResponse(false);
         Envelop envelop = new Envelop();
         envelop.setErrorCode(status);
