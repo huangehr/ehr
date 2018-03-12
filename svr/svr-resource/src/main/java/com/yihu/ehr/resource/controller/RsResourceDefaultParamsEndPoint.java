@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -47,7 +48,7 @@ public class RsResourceDefaultParamsEndPoint extends EnvelopRestEndPoint {
     @ApiOperation("增加资源默认参数")
     public MResourceDefaultParam addResourceDefaultParams(
             @ApiParam(name = "json_data", value = "资源默认参数json串")
-            @RequestBody String jsonData){
+            @RequestBody String jsonData) throws IOException {
         RsResourceDefaultParam resourceDefaultParam = toEntity(jsonData, RsResourceDefaultParam.class);
         RsResourceDefaultParam resourceDefaultParamNew = resourceDefaultParamService.save(resourceDefaultParam);
         return convertToModel(resourceDefaultParamNew, MResourceDefaultParam.class);
@@ -57,7 +58,7 @@ public class RsResourceDefaultParamsEndPoint extends EnvelopRestEndPoint {
     @ApiOperation("更新资源默认参数")
     public MResourceDefaultParam updateResourceDefaultParams(
             @ApiParam(name = "json_data", value = "资源默认参数json串")
-            @RequestBody String jsonData){
+            @RequestBody String jsonData) throws IOException {
         RsResourceDefaultParam resourceDefaultParam = toEntity(jsonData, RsResourceDefaultParam.class);
         RsResourceDefaultParam resourceDefaultParamNew = resourceDefaultParamService.save(resourceDefaultParam);
         return convertToModel(resourceDefaultParamNew, MResourceDefaultParam.class);
