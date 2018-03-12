@@ -4,21 +4,25 @@ package com.yihu.ehr.profile.service;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.model.resource.MCdaTransformDto;
-import com.yihu.hos.model.standard.MCDADocument;
-import com.yihu.hos.model.standard.MCdaDataSet;
 import com.yihu.ehr.profile.dao.ArchiveTemplateDao;
 import com.yihu.ehr.profile.feign.CDADocumentClient;
 import com.yihu.ehr.profile.feign.RedisServiceClient;
 import com.yihu.ehr.profile.feign.ResourceClient;
+import com.yihu.ehr.profile.feign.XStdRedisServiceClient;
 import com.yihu.ehr.profile.model.ArchiveTemplate;
 import com.yihu.ehr.util.rest.Envelop;
+import com.yihu.hos.model.standard.MCDADocument;
+import com.yihu.hos.model.standard.MCdaDataSet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * CDA相关接口服务
@@ -34,6 +38,8 @@ public class ProfileCDAService {
     private ResourceClient resource;
     @Autowired
     private RedisServiceClient redisServiceClient;
+    @Autowired
+    private XStdRedisServiceClient stdRedisServiceClient;
     @Autowired
     private ArchiveTemplateDao templateDao;
     @Autowired
@@ -325,9 +331,9 @@ public class ProfileCDAService {
                         }
                         for (String key3 : temp.keySet()) {
                             String dataSetCode = key2;
-                            String dictId = redisServiceClient.getMetaDataDict(cdaVersion, dataSetCode, key3);
+                            String dictId = stdRedisServiceClient.getMetaDataDict(cdaVersion, dataSetCode, key3);
                             if (!StringUtils.isEmpty(dictId) && !dictId.equals("0")) {
-                                String dictValue = redisServiceClient.getDictEntryValue(cdaVersion, dictId, (String) temp.get(key3));
+                                String dictValue = stdRedisServiceClient.getDictEntryValue(cdaVersion, dictId, (String) temp.get(key3));
                                 if (!StringUtils.isEmpty(dictValue)) {
                                     temp.put(key3, dictValue);
                                 }
