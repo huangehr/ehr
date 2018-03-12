@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by yww on 2016/7/7.
@@ -191,6 +192,22 @@ public class RolesEndPoint extends EnvelopRestEndPoint{
             envelop.setDetailModelList(roles);
             envelop.setObj(roles.get(0).getId());
             return envelop;
+        }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.Roles.RoleFindByUserId, method = RequestMethod.GET)
+    @ApiOperation(value = "通过用户ID获取角色" )
+    public Envelop findRolesByUserId(
+            @ApiParam(name = "userId", value = "用户Id", required = true)
+            @RequestParam(value = "userId") String userId){
+        Envelop envelop = new Envelop();
+        List<Map<String,Object>> roles = rolesService.findRolesByUserId(userId);
+        if(roles != null && roles.size() >0){
+            envelop.setSuccessFlg(true);
+            envelop.setDetailModelList(roles);
+        }else{
+            envelop.setSuccessFlg(false);
         }
         return envelop;
     }
