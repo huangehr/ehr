@@ -4,6 +4,7 @@ import com.yihu.ehr.basic.apps.service.AppVersionService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.entity.app.version.AppVersion;
+import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -27,39 +28,27 @@ public class AppVersionEndPoint {
 
     @RequestMapping(value = ServiceApi.AppVersion.FindAppVersion, method = RequestMethod.GET)
     @ApiOperation(value = "获取App版本")
-    public Envelop getAppVersion(@ApiParam(name = "id", value = "当前版本ID", defaultValue = "")
-                                 @RequestParam(value = "id", required = true)String id,
-                                 @ApiParam(name = "verison", value = "要获取的版本", defaultValue = "")
-                                 @RequestParam(value = "verison", required = false)Double verison){
+    public Envelop getAppVersion(
+            @ApiParam(name = "id", value = "当前版本ID", defaultValue = "")
+            @RequestParam(value = "id")String id,
+            @ApiParam(name = "version", value = "要获取的版本", defaultValue = "")
+            @RequestParam(value = "verison", required = false)Double version){
         Envelop envelop = new Envelop();
-        try {
-            AppVersion temp = appVersionService.getAppVersion(id);
-            if (temp == null) {
-                envelop.setSuccessFlg(false);
-                envelop.setErrorCode(-1);
-                envelop.setErrorMsg("无效的APP类型失败！");
+        AppVersion temp = appVersionService.getAppVersion(id);
+        if (temp == null) {
+            throw new ApiException("无效的APP类型失败！");
+        }
+        if (version > 0) {
+            if (temp.getVersionInt() > version) {
+                // 有新的版本号
+                envelop.setSuccessFlg(true);
+                envelop.setObj(temp);
                 return envelop;
-            }
-            if (verison > 0) {
-                if (temp.getVersionInt() > verison) {
-                    // 有新的版本号
-                    envelop.setSuccessFlg(true);
-                    envelop.setObj(temp);
-                    return envelop;
-                } else {
-                    // 已是最新版本
-                    envelop.setSuccessFlg(false);
-                    envelop.setErrorCode(-2);
-                    envelop.setErrorMsg("已经是最新版本！");
-                    return envelop;
-                }
             } else {
-                return envelop;
+                // 已是最新版本
+                throw new ApiException("已经是最新版本！");
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            envelop.setErrorCode(-3);
-            envelop.setErrorMsg("获取失败！");
+        } else {
             return envelop;
         }
     }
