@@ -11,11 +11,13 @@ import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.entity.report.JsonReport;
 import com.yihu.ehr.entity.security.UserSecurity;
 import com.yihu.ehr.exception.ApiException;
+import com.yihu.ehr.util.compress.Zipper;
 import com.yihu.ehr.util.encrypt.RSA;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -59,7 +61,7 @@ public class QcDailyReportResolveController extends EnvelopRestEndPoint {
     @ApiOperation(value = "接收质控包")
     Envelop receiveReportFile(
             @ApiParam(name = "reportFile", value = "质控包", allowMultiple = true)
-            @RequestParam(value = "reportFile") MultipartFile reportFile,
+            @RequestParam(value = "reportFile") File reportFile,
             @ApiParam(name = "org_code", value = "机构代码")
             @RequestParam(value = "org_code") String orgCode,
             @ApiParam(name = "encrypt_pwd", value = "解压密码,二次加密")
@@ -77,10 +79,17 @@ public class QcDailyReportResolveController extends EnvelopRestEndPoint {
                 throw new ApiException(HttpStatus.FORBIDDEN, "Invalid private key, maybe you miss the organization code?");
             }
             password = RSA.decrypt(encryptPwd, RSA.genPrivateKey(key.getPrivateKey()));
-            InputStream in =  reportFile.getInputStream();
-            InputStream stream =  reportFile.getInputStream();
+            InputStream in =  new FileInputStream(reportFile);
             JsonReport jsonReport = reportService.receive(in, password, encryptPwd, md5, orgCode, type);
-            JsonNode jsonNode = objectMapper.readTree(stream);
+            String fileName = TempPath+System.currentTimeMillis()+".zip";
+            File newFile = new File(fileName);
+            reportFile.renameTo(newFile);
+            Zipper zipper = new Zipper();
+            zipper.unzipFile(newFile, TempPath, password);
+            File file = new File(TempPath+"events.json");
+            JsonNode jsonNode = objectMapper.readTree(file);
+            newFile.delete();
+            file.delete();
             saveQcPackage(jsonNode,jsonReport);
             if (jsonReport != null) {
                 envelop.setSuccessFlg(true);
