@@ -107,7 +107,7 @@ public class PatientsEndPoint {
                                 @RequestParam(value = "json", required = true) String patient) throws IOException, ParseException {
 
         if (isPatientRegistered(demographicId)) {
-            throw new ApiException(HttpStatus.NOT_FOUND, ErrorCode.PatientRegisterFailedForExist);
+            throw new ApiException("人口信息已存在");
         }
 
         return "";

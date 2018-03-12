@@ -2,9 +2,7 @@ package com.yihu.ehr.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.PageArg;
-import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -57,24 +55,15 @@ public class BaseRestEndPoint extends AbstractController {
         return target;
     }
 
-    public <T> T toEntity(String json, Class<T> entityCls) {
-        try {
-            objectMapper.setDateFormat(new SimpleDateFormat(DateTimeUtil.ISO8601Pattern));
-            T entity = objectMapper.readValue(json, entityCls);
-            return entity;
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            throw new ApiException(ErrorCode.SystemError, "Unable to parse json, " + ex.getMessage());
-        }
+    public <T> T toEntity(String json, Class<T> entityCls) throws IOException {
+        objectMapper.setDateFormat(new SimpleDateFormat(DateTimeUtil.simpleDateTimePattern));
+        T entity = objectMapper.readValue(json, entityCls);
+        return entity;
+
     }
 
-    public String toJson(Object obj) {
-        try {
-            return objectMapper.writeValueAsString(obj);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            return null;
-        }
+    public String toJson(Object obj) throws JsonProcessingException {
+        return objectMapper.writeValueAsString(obj);
     }
 
     /**

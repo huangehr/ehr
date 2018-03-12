@@ -5,12 +5,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
 import org.springframework.security.authentication.encoding.PasswordEncoder;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
@@ -21,21 +24,25 @@ import org.springframework.security.web.util.matcher.OrRequestMatcher;
  * @created 2016.03.03 21:57
  */
 @Configuration
-@EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true, proxyTargetClass = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Autowired
+    private EhrUserDetailsService userDetailsService;
+    @Autowired
+    private Md5PasswordEncoder md5PasswordEncoder;
 
     @Order(1)
     @Configuration
+    @EnableWebSecurity
     public static class AuthorizationApiSecurityConfig extends WebSecurityConfigurerAdapter {
 
         @Autowired
-        private EhrUserDetailsService userDetailsService;
-        @Autowired
-        private PasswordEncoder passwordEncoder;
+        private AuthenticationProvider authenticationProvider;
 
         @Override
         protected void configure(AuthenticationManagerBuilder authBuilder) throws Exception {
-            authBuilder.userDetailsService(userDetailsService).passwordEncoder(new Md5PasswordEncoder());
+            authBuilder.authenticationProvider(authenticationProvider);
+            //authBuilder.userDetailsService(userDetailsService).passwordEncoder(md5PasswordEncoder);
         }
 
         @Override
@@ -72,36 +79,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     }
 
-    //==========密码加密方式====================
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        PasswordEncoder passwordEncoder = new Md5PasswordEncoder();
+    public Md5PasswordEncoder passwordEncoder() {
+        Md5PasswordEncoder passwordEncoder = new Md5PasswordEncoder();
         return passwordEncoder;
     }
 
-    @Order(2)
-    @Configuration
-    public static class FormSecurityConfig extends WebSecurityConfigurerAdapter {
-        @Autowired
-        private EhrUserDetailsService userDetailsService;
-
-        @Override
-        protected void configure(AuthenticationManagerBuilder authBuilder) throws Exception {
-            authBuilder.userDetailsService(userDetailsService).passwordEncoder(new Md5PasswordEncoder());
-        }
-
-        @Override
-        protected void configure(HttpSecurity http) throws Exception {
-            http
-                    .csrf().disable()
-                    .authorizeRequests().antMatchers("/rest/v1.0/**").permitAll()
-                    .and()
-                    .authorizeRequests().anyRequest().authenticated()
-                    .and()
-                    .formLogin().loginPage("/login").defaultSuccessUrl("/login?logout").permitAll()
-                    .and().httpBasic();
-        }
-
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+        authenticationProvider.setUserDetailsService(userDetailsService);
+        authenticationProvider.setPasswordEncoder(md5PasswordEncoder);
+        return authenticationProvider;
     }
 
 //    /**

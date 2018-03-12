@@ -88,8 +88,10 @@ public class StdPackageResolver extends PackageResolver {
                     Map<String, Object> properties = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.CardInfo);
                     String cardId = (String) properties.get(MasterResourceFamily.BasicColumns.CardId);
                     String cardType = (String) properties.get(MasterResourceFamily.BasicColumns.CardType);
-                    if(!StringUtils.isEmpty(cardId) && !StringUtils.isEmpty(cardType)) {
+                    if(!StringUtils.isEmpty(cardId)) {
                         standardPackage.setCardId(cardId);
+                    }
+                    if(!StringUtils.isEmpty(cardType)) {
                         standardPackage.setCardType(cardType);
                     }
                 }
@@ -99,8 +101,10 @@ public class StdPackageResolver extends PackageResolver {
                     Map<String, Object> properties = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.Identity);
                     String demographicId = (String) properties.get(MasterResourceFamily.BasicColumns.DemographicId);
                     String patientName = (String) properties.get(MasterResourceFamily.BasicColumns.PatientName);
-                    if(!StringUtils.isEmpty(demographicId) && !StringUtils.isEmpty(patientName)) {
+                    if(!StringUtils.isEmpty(demographicId)) {
                         standardPackage.setDemographicId(demographicId);
+                    }
+                    if(!StringUtils.isEmpty(patientName)) {
                         standardPackage.setPatientName(patientName);
                     }
                 }
@@ -110,8 +114,10 @@ public class StdPackageResolver extends PackageResolver {
                     Map<String, Object> properties = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.EventInfo);
                     Date eventDate = (Date) properties.get(MasterResourceFamily.BasicColumns.EventDate);
                     EventType eventType = (EventType) properties.get(MasterResourceFamily.BasicColumns.EventType);
-                    if(eventDate != null && eventType != null) {
+                    if(eventDate != null) {
                         standardPackage.setEventDate(eventDate);
+                    }
+                    if(eventType != null) {
                         standardPackage.setEventType(eventType);
                     }
                 }

@@ -1,6 +1,8 @@
 package com.yihu.ehr.model.user;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -160,6 +162,7 @@ public class MUser implements Serializable{
         this.id = id;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getCreateDate() {
         return createDate;
     }
@@ -168,6 +171,7 @@ public class MUser implements Serializable{
         this.createDate = createDate;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getLastLoginTime() {
         return lastLoginTime;
     }
@@ -392,6 +396,7 @@ public class MUser implements Serializable{
         this.doctorId = doctorId;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getInvalidDate() {
         return invalidDate;
     }
@@ -408,6 +413,7 @@ public class MUser implements Serializable{
         this.creator = creator;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getModifyDate() {
         return modifyDate;
     }

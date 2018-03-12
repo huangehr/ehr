@@ -32,11 +32,21 @@ public class PackageQcService {
     private ElasticSearchUtil elasticSearchUtil;
 
     /**
-     * 通过Redis的消息订阅发布来处理质控规则
+     * 处理质控消息，统一入口，减少异步消息的数量
      *
      * @param zipPackage 档案包
      */
     @Async
+    public void qcHandle(ZipPackage zipPackage) {
+        sendQcMsg(zipPackage);
+        qcReceive(zipPackage);
+    }
+
+    /**
+     * 通过Redis的消息订阅发布来处理质控规则
+     *
+     * @param zipPackage 档案包
+     */
     public void sendQcMsg(ZipPackage zipPackage) {
         MPackage mPackage = zipPackage.getmPackage();
         Map<String, DataSetRecord> dataSets = zipPackage.getDataSets();
@@ -73,7 +83,6 @@ public class PackageQcService {
      *
      * @param zipPackage
      */
-    @Async
     public void qcReceive(ZipPackage zipPackage) {
         MPackage mPackage = zipPackage.getmPackage();
         Map<String, DataSetRecord> dataSets = zipPackage.getDataSets();
@@ -91,7 +100,8 @@ public class PackageQcService {
                 map.put("patientId", dataSetRecord.getPatientId());
                 map.put("eventNo", dataSetRecord.getEventNo());
                 map.put("eventTime", dataSetRecord.getEventTime());
-                map.put("eventType", dataSetRecord.getEventType()); //注意，此处的EventType可能不准确，包中未提供
+                //注意，此处的EventType可能不准确，包中未提供
+                map.put("eventType", dataSetRecord.getEventType());
                 map.put("receiveTime", mPackage.getReceiveDate());
                 map.put("packId", mPackage.getId());
                 try {

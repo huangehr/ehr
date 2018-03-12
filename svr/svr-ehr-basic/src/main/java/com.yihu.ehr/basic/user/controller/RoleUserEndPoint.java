@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -46,7 +47,7 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "为角色组配置人员，单个")
     public MRoleUser createRoleUser(
             @ApiParam(name = "data_json",value = "角色组-人员关系Json串")
-            @RequestBody String dataJson){
+            @RequestBody String dataJson) throws IOException {
         RoleUser roleUser = toEntity(dataJson,RoleUser.class);
         String[] fields = {"userId","roleId"};
         String[] values = {roleUser.getUserId(),roleUser.getRoleId()+""};
@@ -183,7 +184,7 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "为角色组配置机构，单个")
     public MRoleOrg createRoleOrg(
             @ApiParam(name = "data_json",value = "角色组-机构关系Json串")
-            @RequestBody String dataJson){
+            @RequestBody String dataJson) throws IOException {
         RoleOrg roleOrg = toEntity(dataJson,RoleOrg.class);
         roleOrg = roleOrgService.save(roleOrg);
         return convertToModel(roleOrg,MRoleOrg.class);

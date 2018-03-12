@@ -1376,6 +1376,19 @@ public class DateUtil {
         return years;
     }
 
+    public static Date formatCharDate(String str,String format ) {
+        if (str == null || str.trim().length() == 0) {
+            return null;
+        }
+        SimpleDateFormat sdf = new SimpleDateFormat(format);
+        ParsePosition pos = new ParsePosition(0);
+        java.util.Date date = sdf.parse(str, pos);
+        if (date == null) {
+            return null;
+        }
+        return new Date(date.getTime());
+    }
+
     public static Date formatCharDateYMDHMS(String str) {
         String format = DEFAULT_YMDHMSDATE_FORMAT;
         if (str == null || str.trim().length() == 0) {
