@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created by progr1mmer on 2017/12/27.
+ * Created by progr1mmer on 2017/12/27
  */
 @Component
 public class AgZuulFilter extends ZuulFilter {
