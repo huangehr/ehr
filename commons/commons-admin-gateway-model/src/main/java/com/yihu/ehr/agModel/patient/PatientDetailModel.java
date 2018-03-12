@@ -13,13 +13,15 @@ public class PatientDetailModel {
     private String birthPlace;
     private GeographyModel birthPlaceInfo;                    // 户籍地址
     private String birthPlaceFull;
+    /** 籍贯*/
     private String nativePlace;
     private String email;                            // 邮箱
     private String gender;                            // 性别
     private String name;                            // 姓名
     private String martialStatus;            // 婚姻情况
     private String martialStatusName;
-    private String nation;                            // 民族
+    /** 民族*/
+    private String nation;
     private String nationName;
     private String residenceType;            // 户口性质（农村、城镇）
     private String residenceTypeName;

@@ -64,14 +64,6 @@ public class TjDimensionMainController extends ExtendController<TjDimensionMain>
             List<Map<String,Object>> modelList = listResult.getDetailModelList();
             for(Map<String,Object> map : modelList){
                 TjDimensionMainModel tjDimensionMainModel = objectMapper.convertValue(map,TjDimensionMainModel.class);
-                if(tjDimensionMainModel.getCreateTime() != null){
-                    Date createTime = DateUtil.parseDate(tjDimensionMainModel.getCreateTime(),"yyyy-MM-dd'T'HH:mm:ss'Z'Z");
-                    tjDimensionMainModel.setCreateTime( DateTimeUtil.simpleDateTimeFormat(createTime));
-                }
-                if(tjDimensionMainModel.getUpdateTime() != null){
-                    Date updateTime = DateUtil.parseDate(tjDimensionMainModel.getUpdateTime(),"yyyy-MM-dd'T'HH:mm:ss'Z'Z");
-                    tjDimensionMainModel.setUpdateTime( DateTimeUtil.simpleDateTimeFormat(updateTime));
-                }
                 //获取类别字典
                 MConventionalDict dict = conventionalDictClient.getDimensionMainTypeList(String.valueOf(tjDimensionMainModel.getType()));
                 tjDimensionMainModel.setTypeName(dict == null ? "" : dict.getValue());

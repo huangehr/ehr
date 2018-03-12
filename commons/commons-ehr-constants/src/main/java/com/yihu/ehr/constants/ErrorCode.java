@@ -7,6 +7,7 @@ package com.yihu.ehr.constants;
  * @created 2015.08.10 17:49
  */
 public enum ErrorCode {
+
     MissingUserAgent("missing.user_agent"),
     RateLimitExceeding("rate_limit.exceeding"),
 
@@ -171,19 +172,23 @@ public enum ErrorCode {
     GetJobDetailFailed("ehr.scheduler.get.job.failed"),
     GetTriggerFailed("ehr.scheduler.get.trigger.failed"),
 
-
     //adaption
     RepeatAdapterOrg("ehr.adpter.org.repeat"),
     //Other
-    SystemError("ehr.system.error");
+    SystemError("ehr.system.error"),
 
-    private final String errorCode;
+    // new version code
+    REQUEST_NOT_IMPLEMENTED("request.not.implemented"),
+    REQUEST_FORBIDDEN("request.forbidden"),
+    MISSING_REQUEST_RESOURCE("messing.request.resource");
 
-    private ErrorCode(String errorCode) {
-        this.errorCode = errorCode;
+    private final String descriptionKey;
+
+    ErrorCode(String descriptionKey) {
+        this.descriptionKey = descriptionKey;
     }
 
-    public String getErrorCode() {
-        return errorCode;
+    public String getDescriptionKey() {
+        return descriptionKey;
     }
 }

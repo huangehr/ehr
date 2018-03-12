@@ -1,7 +1,5 @@
 package com.yihu.ehr.model.report;
 
-import java.util.Date;
-
 /**
  * Created by zdm on 2017/5/17
  */

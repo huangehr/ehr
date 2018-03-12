@@ -1,5 +1,7 @@
 package com.yihu.ehr.model.esb;// default package
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.util.Date;
 
 
@@ -56,6 +58,7 @@ public class MHosEsbMiniRelease implements java.io.Serializable {
         this.file = file;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getReleaseTime() {
         return releaseTime;
     }
