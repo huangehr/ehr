@@ -71,7 +71,7 @@ public class AgZuulFilter extends ZuulFilter {
         if (oAuth2AccessToken.isExpired()) {
             return this.forbidden(ctx, HttpStatus.FORBIDDEN.value(), "expired accessToken");
         }
-        OAuth2Authentication oAuth2Authentication = defaultTokenServices.loadAuthentication(accessToken);
+        //OAuth2Authentication oAuth2Authentication = defaultTokenServices.loadAuthentication(accessToken);
         return null;
     }
 
