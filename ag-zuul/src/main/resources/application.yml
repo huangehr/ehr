@@ -11,55 +11,123 @@ info:
     version: 1.0.0
 
 zuul:
+  ignored-services: '*'
   routes:
     svr-dfs:
-      path: /svr-dfs/**
+      path: /dfs/**
       serviceId: svr-dfs
     svr-ehr-basic:
-      path: /svr-ehr-basic/**
+      path: /basic/**
       serviceId: svr-ehr-basic
-    svr-health-profile:
-      path: /svr-health-profile/**
-      serviceId: svr-health-profile
-    svr-pack-mgr:
-      path: /svr-pack-mgr/**
-      serviceId: svr-pack-mgr
-    svr-pack-resolv:
-      path: /svr-pack-resolve/**
-      serviceId: svr-pack-resolve
     svr-quota:
-      path: /svr-quota/**
+      path: /quota/**
       serviceId: svr-quota
     svr-redis:
-      path: /svr-redis/**
+      path: /redis/**
       serivceId: svr-redis
     svr-resource:
-      path: /svr-resource/**
+      path: /resource/**
       serviceId: svr-resource
     svr-standard:
-      path: /svr-standard/**
+      path: /standard/**
       serviceId: svr-standard
+    svr-authentication:
+      path: /authentication/**
+      serviceId: svr-authentication
+    #档案包相关
+    svr-health-profile:
+      path: /profile/**
+      serviceId: svr-health-profile
+    svr-pack-analyzer:
+      path: /pack-analyzer/**
+      serviceId: svr-pack-analyzer
+    svr-pack-mgr:
+      path: /pack-mgr/**
+      serviceId: svr-pack-mgr
+    svr-pack-resolv:
+      path: /pack-resolve/**
+      serviceId: svr-pack-resolve
+
+spring:
+  redis:
+    database: 0
+    timeout: 0
+    pool:
+      max-active: 8
+      max-idle: 8
+      max-wait: -1
+      min-idle: 1
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    max-active: 20
+    max-idle: 8
+    min-idle: 8
+    validation-query: SELECT 1
+    test-on-borrow: true
+    dbcp2:
+      max-active: 20
+      max-idle: 8
+      min-idle: 8
+      validation-query: SELECT 1
+      test-on-borrow: true
 
 ---
 spring:
   profiles: dev
-
----
-spring:
-  profiles: alpha
+  datasource:
+    url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: weifuwu
+    password: weifuwu
+  redis:
+    host: 172.19.103.47
+    port: 6379
+    password: redis!@456
 
 ---
 spring:
   profiles: test
-
----
-spring:
-  profiles: prod
+  datasource:
+    url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: weifuwu
+    password: weifuwu
+  redis:
+    host: 172.19.103.47
+    port: 6379
+    password: redis!@456
 
 ---
 spring:
   profiles: prod_fz
+  datasource:
+    url: jdbc:mysql://11.1.2.5:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: healthcloud
+    password: GP8Qz4qU
+  redis:
+    host: 11.1.2.22 # Redis server host.
+    port: 6390
+    password: Kb6wKDQP1W4
 
 ---
 spring:
   profiles: prod_sr
+  datasource:
+    url: jdbc:mysql://10.176.97.9:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: healthcloud
+    password: GP8Qz4qU
+  redis:
+    host: 10.176.97.5
+    port: 6390
+    password: q4YaQemf
+
+
+---
+spring:
+  profiles: prod_fzzy
+  datasource:
+    url: jdbc:mysql://100.100.1.159:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: healthcloud
+    password: GP8Qz4qU
+  redis:
+    host: 100.100.1.161
+    port: 6390
+    password: q4YaQemf
