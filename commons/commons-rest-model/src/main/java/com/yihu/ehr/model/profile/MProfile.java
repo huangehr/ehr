@@ -1,5 +1,6 @@
 package com.yihu.ehr.model.profile;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.yihu.ehr.constants.EventType;
 import com.yihu.ehr.constants.ProfileType;
 import org.apache.commons.lang3.StringUtils;
@@ -34,6 +35,7 @@ public class MProfile {
         this.id = id;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getEventDate() {
         return eventDate;
     }

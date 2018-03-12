@@ -1,5 +1,6 @@
 package com.yihu.ehr.entity.patient;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -87,6 +88,7 @@ public class VirtualCard extends AbstractCard {
 	}
 
 	@Column(name = "create_date",  nullable = true)
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	public Date getCreateDate() {
 		return createDate;
 	}

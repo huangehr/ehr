@@ -1,5 +1,7 @@
 package com.yihu.ehr.model.profile;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.util.Date;
 import java.util.Map;
 import java.util.TreeMap;
@@ -31,6 +33,7 @@ public class MOriginFile {
         this.originUrl = originUrl;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getExpireDate() {
         return expireDate;
     }

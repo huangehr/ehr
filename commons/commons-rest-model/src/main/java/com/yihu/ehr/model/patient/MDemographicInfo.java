@@ -1,5 +1,7 @@
 package com.yihu.ehr.model.patient;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.util.Date;
 
 /**
@@ -160,6 +162,7 @@ public class MDemographicInfo {
         this.localPath = localPath;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getRegisterTime() {
         return registerTime;
     }

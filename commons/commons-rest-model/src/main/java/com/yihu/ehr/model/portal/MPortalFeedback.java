@@ -1,5 +1,7 @@
 package com.yihu.ehr.model.portal;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -50,6 +52,7 @@ public class MPortalFeedback implements Serializable {
         this.content = content;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getSubmitDate() {
         return submitDate;
     }
@@ -82,6 +85,7 @@ public class MPortalFeedback implements Serializable {
         this.replyUserId = replyUserId;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getReplyDate() {
         return replyDate;
     }

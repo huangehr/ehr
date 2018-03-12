@@ -1,5 +1,6 @@
 package com.yihu.ehr.entity.report;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import java.util.Date;
@@ -109,6 +110,7 @@ public class QcQuotaResultDetail {
 
     @Basic
     @Column(name = "event_time")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getEventTime() {
         return eventTime;
     }

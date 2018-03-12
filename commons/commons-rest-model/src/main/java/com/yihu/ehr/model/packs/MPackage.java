@@ -1,5 +1,6 @@
 package com.yihu.ehr.model.packs;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.yihu.ehr.constants.ArchiveStatus;
 import org.apache.commons.lang3.StringUtils;
 
@@ -47,6 +48,7 @@ public class MPackage implements Serializable {
         this.remotePath = remotePath;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getReceiveDate() {
         return receiveDate;
     }
@@ -54,6 +56,7 @@ public class MPackage implements Serializable {
         this.receiveDate = receiveDate;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getParseDate() {
         return parseDate;
     }
@@ -61,6 +64,7 @@ public class MPackage implements Serializable {
         this.parseDate = parseDate;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getFinishDate() {
         return finishDate;
     }

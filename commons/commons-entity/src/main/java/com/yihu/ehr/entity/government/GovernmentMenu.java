@@ -18,7 +18,6 @@ public class GovernmentMenu {
     private int status; // 状态 0-失效 1-生效
     private Date createTime;
     private String createUser;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+08:00")
     private Date updateTime;
     private String updateUser;
 
@@ -70,7 +69,7 @@ public class GovernmentMenu {
     }
 
     @Column(name = "create_time")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+08:00")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getCreateTime() {
         return createTime;
     }
@@ -89,6 +88,7 @@ public class GovernmentMenu {
     }
 
     @Column(name = "update_time")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getUpdateTime() {
         return updateTime;
     }

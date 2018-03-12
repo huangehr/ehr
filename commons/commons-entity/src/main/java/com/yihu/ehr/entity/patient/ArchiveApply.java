@@ -68,11 +68,11 @@ public class ArchiveApply  {
     }
 
     @Column(name = "apply_date")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getApplyDate() {
         return applyDate;
     }
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+08:00")
     public void setApplyDate(Date applyDate) {
         this.applyDate = applyDate;
     }
@@ -86,11 +86,11 @@ public class ArchiveApply  {
     }
 
     @Column(name = "audit_date")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getAuditDate() {
         return auditDate;
     }
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+08:00")
     public void setAuditDate(Date auditDate) {
         this.auditDate = auditDate;
     }
@@ -113,11 +113,11 @@ public class ArchiveApply  {
     }
 
     @Column(name = "vis_date")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getVisDate() {
         return visDate;
     }
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+08:00")
     public void setVisDate(Date visDate) {
         this.visDate = visDate;
     }

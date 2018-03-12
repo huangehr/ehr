@@ -1,5 +1,7 @@
 package com.yihu.ehr.model.report;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.util.Date;
 
 /**
@@ -60,6 +62,7 @@ public class MQcDailyReportDetail {
         this.eventNo = eventNo;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getEventTime() {
         return eventTime;
     }
@@ -84,6 +87,7 @@ public class MQcDailyReportDetail {
         this.timelyFlag = timelyFlag;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getAddDate() {
         return addDate;
     }
@@ -92,6 +96,7 @@ public class MQcDailyReportDetail {
         this.addDate = addDate;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getAcqTime() {
         return acqTime;
     }
@@ -100,6 +105,7 @@ public class MQcDailyReportDetail {
         this.acqTime = acqTime;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getStorageTime() {
         return storageTime;
     }

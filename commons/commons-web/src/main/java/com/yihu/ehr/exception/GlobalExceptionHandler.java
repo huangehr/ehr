@@ -30,9 +30,6 @@ public class GlobalExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
     @ExceptionHandler
     @ResponseBody
     public Envelop handle(HttpServletResponse response, Exception e) throws IOException {
@@ -49,24 +46,16 @@ public class GlobalExceptionHandler {
             response.setStatus(HttpStatus.BAD_REQUEST.value());
             envelop.setErrorCode(HttpStatus.BAD_REQUEST.value());
             envelop.setErrorMsg(e.getMessage());
+        } else if (e instanceof FeignException) { //执行Feign失败的时候默认当前服务做为网关执行请求的时候，从上游服务器接收到无效的响应
+            response.setStatus(HttpStatus.BAD_GATEWAY.value());
+            envelop.setErrorCode(HttpStatus.BAD_GATEWAY.value());
+            envelop.setErrorMsg("Execute Feign: " + e.getMessage());
         } else if (e instanceof ApiException) {
             ApiException apiException = (ApiException) e;
             response.setStatus(apiException.getHttpStatus().value());
             envelop.setErrorCode(apiException.getHttpStatus().value());
             envelop.setErrorMsg(e.getMessage());
             return envelop; //此异常不进行日志记录
-        } else if (e instanceof FeignException) {
-            String message = e.getMessage();
-            if (message.indexOf("{") != -1) {
-                String content = message.substring(message.indexOf("{"));
-                envelop = objectMapper.readValue(content, Envelop.class);
-                envelop.setErrorMsg(message.substring(0, message.indexOf(";") + 1) + " Caused by: " + envelop.getErrorMsg());
-                response.setStatus(envelop.getErrorCode());
-            } else {
-                response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-                envelop.setErrorCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
-                envelop.setErrorMsg(message);
-            }
         } else {
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
             envelop.setErrorCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
