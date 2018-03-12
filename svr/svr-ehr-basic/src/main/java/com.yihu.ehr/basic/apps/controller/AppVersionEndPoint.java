@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "AppVersion", description = "上饶APP资源版本", tags = {"上饶APP应用"})
+@Api(value = "AppVersion", description = "上饶APP资源版本", tags = {"上饶APP应用版本管理"})
 public class AppVersionEndPoint {
 
     @Autowired
