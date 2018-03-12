@@ -2,21 +2,25 @@ package com.yihu.ehr.api.rhip;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.unboundid.util.json.JSONObject;
 import com.yihu.ehr.agModel.geogrephy.GeographyModel;
 import com.yihu.ehr.agModel.patient.PatientDetailModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.exception.ApiException;
+import com.yihu.ehr.feign.AddressClient;
 import com.yihu.ehr.feign.ConventionalDictEntryClient;
 import com.yihu.ehr.feign.GeographyClient;
 import com.yihu.ehr.feign.PatientClient;
 import com.yihu.ehr.model.dict.MConventionalDict;
+import com.yihu.ehr.model.dict.MDictionaryEntry;
 import com.yihu.ehr.model.geography.MGeography;
 import com.yihu.ehr.model.geography.MGeographyDict;
 import com.yihu.ehr.model.patient.MDemographicInfo;
 import com.yihu.ehr.profile.util.DataSetParser;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
+import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -25,9 +29,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -57,6 +63,10 @@ public class RhipPatientsEndPoint extends BaseController {
 
     @Autowired
     private ConventionalDictEntryClient conventionalDictClient;
+    @Autowired
+    private AddressClient addressClient;
+    @Autowired
+    private ConventionalDictEntryClient dictEntryClient;
 
     @ApiOperation(value = "患者注册", notes = "根据患者的身份证号在健康档案平台中注册患者")
     @RequestMapping(value = "/patient/{demographic_id}", method = RequestMethod.POST)
@@ -67,7 +77,7 @@ public class RhipPatientsEndPoint extends BaseController {
             @RequestParam(value = "json", required = true) String patientInfo) throws Exception{
 
         if (isPatientRegistered(demographicId)) {
-            throw new ApiException(HttpStatus.NOT_FOUND, ErrorCode.PatientRegisterFailedForExist);
+            throw new ApiException("人口信息已存在");
         }
 
         PatientDetailModel detailModel = objectMapper.readValue(patientInfo, PatientDetailModel.class);
@@ -219,7 +229,7 @@ public class RhipPatientsEndPoint extends BaseController {
     /**
      * 根据身份证号查找人
      *
-     * @param idCardNo
+     * @param demographic_id
      * @return
      * @throws Exception
      */
@@ -334,9 +344,291 @@ public class RhipPatientsEndPoint extends BaseController {
 
     public int geographyToCode(String name,int code){
         String[] fields = {"name","pid"};
-        String[] values = {name,String.valueOf(code)};
-        List<MGeographyDict> geographyDictList = (List<MGeographyDict>) geographyClient.getAddressDict(fields,values);
-        return geographyDictList.get(0).getId();
+        if(!StringUtils.isEmpty(name)&&!StringUtils.isEmpty(code)){
+            String[] values = {name,String.valueOf(code)};
+            List<MGeographyDict> geographyDictList = (List<MGeographyDict>) geographyClient.getAddressDict(fields,values);
+            if(null != geographyDictList && geographyDictList.size()>0){
+                return geographyDictList.get(0).getId();
+            }else{
+                return 0;
+            }
+        }else{
+            return 0;
+        }
+    }
+
+    @ApiOperation(value = "通过json对象注册患者", notes = "根据患者的身份证号在健康档案平台中注册患者-弘扬对接接口")
+    @RequestMapping(value = "/registerPatientByPJson", method = RequestMethod.POST)
+    public Envelop registerPatientByPJson(
+            @ApiParam(name = "json", value = "患者人口学数据集")
+            @RequestParam(value = "json", required = true) String patientInfo) throws Exception{
+        String errorMsg = "";
+        PatientDetailModel detailModel = new PatientDetailModel();
+        Map<String, String>  detailModelJson = objectMapper.readValue(patientInfo, Map.class);
+        if(null != detailModelJson && detailModelJson.size()>0){
+            if (null != detailModelJson.get("name") && !StringUtils.isEmpty(detailModelJson.get("name").toString())) {
+                detailModel.setName(detailModelJson.get("name").toString());
+            }else{
+                errorMsg += "姓名不能为空!";
+            }
+            if (null != detailModelJson.get("idCardNo") && !StringUtils.isEmpty(detailModelJson.get("idCardNo").toString())) {
+                detailModel.setIdCardNo(detailModelJson.get("idCardNo").toString());
+                //身份证校验
+                if (patientClient.isRegistered(detailModel.getIdCardNo())) {
+                    return failed("身份证号已存在!");
+                }
+            }else{
+                errorMsg += "身份证号不能为空!";
+            }
+            if (null != detailModelJson.get("telephoneNo") && !StringUtils.isEmpty(detailModelJson.get("telephoneNo").toString())) {
+                if(isDigital(detailModelJson.get("telephoneNo").toString())){
+                    //联系电话
+                    Map<String, String> telphoneNo = new HashMap<>();
+                    String tag = "联系电话";
+                    telphoneNo.put(tag,detailModelJson.get("telephoneNo").toString());
+                    detailModel.setTelephoneNo(toJson(telphoneNo));
+                }else{
+                    errorMsg += "联系方式格式不正确!";
+                }
+
+            }else{
+                errorMsg += "联系方式不能为空!";
+            }
+            //籍贯 nativePlace
+            if (null != detailModelJson.get("nativePlace") && !StringUtils.isEmpty(detailModelJson.get("nativePlace").toString())) {
+                detailModel.setNativePlace(detailModelJson.get("nativePlace").toString());
+            }
+            //民族 nation
+            if (null != detailModelJson.get("nation") && !StringUtils.isEmpty(detailModelJson.get("nation").toString())) {
+                    detailModel.setNation(detailModelJson.get("nation").toString());
+            }
+            //出生日期 birthday
+            if (null != detailModelJson.get("birthday") && !StringUtils.isEmpty(detailModelJson.get("birthday").toString())) {
+                detailModel.setBirthday(detailModelJson.get("birthday").toString());
+            }
+
+            //邮箱 email
+            if (null != detailModelJson.get("email") &&!StringUtils.isEmpty(detailModelJson.get("email").toString())) {
+                detailModel.setName(detailModelJson.get("email").toString());
+            }
+            //性别 gender
+            if (null != detailModelJson.get("gender") && !StringUtils.isEmpty(detailModelJson.get("gender").toString())) {
+                    detailModel.setGender(detailModelJson.get("gender").toString());
+            }
+            //婚姻状况 martialStatus
+            if (null != detailModelJson.get("martialStatus") && !StringUtils.isEmpty(detailModelJson.get("martialStatus").toString())) {
+                    detailModel.setMartialStatus(detailModelJson.get("martialStatus").toString());
+            }
+            //户口性质 residenceType temp 农村，usual 非农村
+            if (null != detailModelJson.get("residenceType") && !StringUtils.isEmpty(detailModelJson.get("residenceType").toString())) {
+                detailModel.setResidenceType(detailModelJson.get("residenceType").toString());
+            }
+            //头像路径 picPath
+            if (null != detailModelJson.get("picPath") && !StringUtils.isEmpty(detailModelJson.get("picPath").toString())) {
+                detailModel.setPicPath(detailModelJson.get("picPath").toString());
+            }
+            GeographyModel geographyModel;
+            //新增户籍地址信息 出生地 birthPlace
+            if (null != detailModelJson.get("birthPlace") && !StringUtils.isEmpty(detailModelJson.get("birthPlace").toString())) {
+                geographyModel=  getAdressFormat(detailModelJson.get("birthPlace").toString());
+                if (!geographyModel.nullAddress()) {
+                    String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
+                    detailModel.setBirthPlace(addressId);
+                }
+            }
+            //工作地址 workAddress
+            if (null != detailModelJson.get("workAddress") && !StringUtils.isEmpty(detailModelJson.get("workAddress").toString())) {
+                geographyModel=  getAdressFormat(detailModelJson.get("workAddress").toString());
+                if (!geographyModel.nullAddress()) {
+                    String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
+                    detailModel.setWorkAddress(addressId);
+                }
+            }
+            //家庭住址 homeAddress
+            if (null != detailModelJson.get("homeAddress") && !StringUtils.isEmpty(detailModelJson.get("homeAddress").toString())) {
+                geographyModel=  getAdressFormat(detailModelJson.get("homeAddress").toString());
+                if (!geographyModel.nullAddress()) {
+                    String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
+                    detailModel.setHomeAddress(addressId);
+                }
+            }
+        }
+
+        if (!StringUtils.isEmpty(errorMsg)) {
+            return failed(errorMsg);
+        }
+        //新增人口信息
+        MDemographicInfo info = (MDemographicInfo) convertToModel(detailModel, MDemographicInfo.class);
+        try {
+            info.setBirthday(DateUtil.strToDate(detailModel.getBirthday()));
+            info = patientClient.createPatient(objectMapper.writeValueAsString(info));
+            if (info == null) {
+                return failed("保存失败!");
+            }
+            detailModel = convertToPatientDetailModel(info);
+            return success(detailModel);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return failed("保存失败,出生日期格式有误!");
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return failed("保存人口学信息失败!");
+        }
+    }
+
+
+    @ApiOperation(value = "通过json对象更新患者", notes = "根据患者的身份证号在健康档案平台中更新患者-弘扬对接接口")
+    @RequestMapping(value = "/updatePatientByPJson", method = RequestMethod.PUT)
+    public Envelop updatePatientByPJson(
+            @ApiParam(name = "json", value = "患者人口学数据集")
+            @RequestParam(value = "json", required = true) String patientInfo) throws Exception{
+        String errorMsg = "";
+        PatientDetailModel detailModel = new PatientDetailModel();
+        Map<String, String>  detailModelJson = objectMapper.readValue(patientInfo, Map.class);
+        if(null != detailModelJson && detailModelJson.size()>0){
+            if (null != detailModelJson.get("name") && !StringUtils.isEmpty(detailModelJson.get("name").toString())) {
+                detailModel.setName(detailModelJson.get("name").toString());
+            }else{
+                errorMsg += "姓名不能为空!";
+            }
+            if (null != detailModelJson.get("idCardNo") && !StringUtils.isEmpty(detailModelJson.get("idCardNo").toString())) {
+                detailModel.setIdCardNo(detailModelJson.get("idCardNo").toString());
+                //身份证校验
+                if (!patientClient.isRegistered(detailModel.getIdCardNo())) {
+                    return failed("身份证号不存在!");
+                }
+            }else{
+                errorMsg += "身份证号不能为空!";
+            }
+            if (null != detailModelJson.get("telephoneNo") && !StringUtils.isEmpty(detailModelJson.get("telephoneNo").toString())) {
+                if(isDigital(detailModelJson.get("telephoneNo").toString())){
+                    //联系电话
+                    Map<String, String> telphoneNo = new HashMap<>();
+                    String tag = "联系电话";
+                    telphoneNo.put(tag,detailModelJson.get("telephoneNo").toString());
+                    detailModel.setTelephoneNo(toJson(telphoneNo));
+                }else{
+                    errorMsg += "联系方式格式不正确!";
+                }
+            }else{
+                errorMsg += "联系方式不能为空!";
+            }
+            //籍贯 nativePlace
+            if (null != detailModelJson.get("nativePlace") && !StringUtils.isEmpty(detailModelJson.get("nativePlace").toString())) {
+                detailModel.setNativePlace(detailModelJson.get("nativePlace").toString());
+            }
+            //民族 nation
+            if (null != detailModelJson.get("nation") && !StringUtils.isEmpty(detailModelJson.get("nation").toString())) {
+                    detailModel.setNation(detailModelJson.get("nation").toString());
+            }
+            //出生日期 birthday
+            if (null != detailModelJson.get("birthday") && !StringUtils.isEmpty(detailModelJson.get("birthday").toString())) {
+                detailModel.setBirthday(detailModelJson.get("birthday").toString());
+            }
+
+            //邮箱 email
+            if (null != detailModelJson.get("email") &&!StringUtils.isEmpty(detailModelJson.get("email").toString())) {
+                detailModel.setName(detailModelJson.get("email").toString());
+            }
+            //性别 gender
+            if (null != detailModelJson.get("gender") && !StringUtils.isEmpty(detailModelJson.get("gender").toString())) {
+                    detailModel.setGender(detailModelJson.get("gender").toString());
+            }
+            //婚姻状况 martialStatus
+            if (null != detailModelJson.get("martialStatus") && !StringUtils.isEmpty(detailModelJson.get("martialStatus").toString())) {
+                detailModel.setMartialStatus(detailModelJson.get("martialStatus").toString());
+            }
+            //户口性质 residenceType temp 农村，usual 非农村
+            if (null != detailModelJson.get("residenceType") && !StringUtils.isEmpty(detailModelJson.get("residenceType").toString())) {
+                    detailModel.setResidenceType(detailModelJson.get("residenceType").toString());
+            }
+            //头像路径 picPath
+            if (null != detailModelJson.get("picPath") && !StringUtils.isEmpty(detailModelJson.get("picPath").toString())) {
+                detailModel.setPicPath(detailModelJson.get("picPath").toString());
+            }
+            GeographyModel geographyModel;
+            //新增户籍地址信息 出生地 birthPlace
+            if (null != detailModelJson.get("birthPlace") && !StringUtils.isEmpty(detailModelJson.get("birthPlace").toString())) {
+                geographyModel=  getAdressFormat(detailModelJson.get("birthPlace").toString());
+                if (!geographyModel.nullAddress()) {
+                    String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
+                    detailModel.setBirthPlace(addressId);
+                }
+            }
+            //工作地址 workAddress
+            if (null != detailModelJson.get("workAddress") && !StringUtils.isEmpty(detailModelJson.get("workAddress").toString())) {
+                geographyModel=  getAdressFormat(detailModelJson.get("workAddress").toString());
+                if (!geographyModel.nullAddress()) {
+                    String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
+                    detailModel.setWorkAddress(addressId);
+                }
+            }
+            //家庭住址 homeAddress
+            if (null != detailModelJson.get("homeAddress") && !StringUtils.isEmpty(detailModelJson.get("homeAddress").toString())) {
+                geographyModel=  getAdressFormat(detailModelJson.get("homeAddress").toString());
+                if (!geographyModel.nullAddress()) {
+                    String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
+                    detailModel.setHomeAddress(addressId);
+                }
+            }
+        }
+
+        if (!StringUtils.isEmpty(errorMsg)) {
+            return failed(errorMsg);
+        }
+        //新增人口信息
+        MDemographicInfo info = (MDemographicInfo) convertToModel(detailModel, MDemographicInfo.class);
+        try {
+            info.setBirthday(DateUtil.strToDate(detailModel.getBirthday()));
+            info = patientClient.updatePatient(objectMapper.writeValueAsString(info));
+            if (info == null) {
+                return failed("更新失败!");
+            }
+            detailModel = convertToPatientDetailModel(info);
+            return success(detailModel);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return failed("更新失败,出生日期格式有误!");
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return failed("更新人口学信息失败!");
+        }
+    }
+
+
+    /**
+     * 根据传过来的地址转换成地址对象
+     * @param adress
+     * @return
+     */
+    private GeographyModel  getAdressFormat(String adress){
+        GeographyModel geographyModel = new GeographyModel();
+        int  provinceLen =adress.indexOf("省")+1;
+        int  cityLen =adress.indexOf("市")+1;
+        String province ="" ;
+        String city ="" ;
+        String street ="";
+        if(provinceLen>0){
+            province =adress.substring(0,provinceLen) ;
+            geographyModel.setProvince(province);
+        }
+        if(cityLen>0){
+            city =adress.substring(provinceLen,cityLen) ;
+            geographyModel.setCity(city);
+            street =adress.substring(cityLen,adress.length()) ;
+            geographyModel.setStreet(street);
+        }
+        return geographyModel;
+    }
+
+    /**
+     * 数字验证
+     *
+     * @param str
+     * @return
+     */
+    public boolean isDigital(String str) {
+        return str == null || "".equals(str) ? false : str.matches("^[0-9]*$");
     }
 
 }

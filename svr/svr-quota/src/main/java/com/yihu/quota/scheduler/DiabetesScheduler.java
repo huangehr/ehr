@@ -72,15 +72,15 @@ public class DiabetesScheduler {
 	 * 每天2点 执行一次
 	 * @throws Exception
 	 */
-	@Scheduled(cron = "0 16 15 * * ?")
+	@Scheduled(cron = "0 0 2 * * ?")
 	public void validatorIdentityScheduler() throws Exception{
 
 		String q =  "health_problem:HP0047"; // 查询条件  HP0047 为糖尿病
 		String fq = ""; // 过滤条件
 		String dictSql = "";
 		String keyEventDate = "event_date";
-		String keyOrgArea = "org_area";
-		String keyOrgName = "org_name";
+		String keyArea = "EHR_001225";
+		String keyAreaName = "EHR_001225_VALUE";
 		String keyPatientName = "patient_name";
 		String keyDemographicId = "demographic_id";//身份证
 		String keyCardId = "card_id	";
@@ -125,9 +125,9 @@ public class DiabetesScheduler {
 					personalInfo.setCreateTime(new Date());
 					if(map.get(keyEventDate) != null){
 						personalInfo.setEventDate(DateUtil.formatCharDate(map.get(keyEventDate).toString(), DateUtil.DATE_WORLD_FORMAT));					}
-					if(map.get(keyOrgArea) != null){
-						personalInfo.setTown(map.get(keyOrgArea).toString());
-						personalInfo.setTownName(map.get(keyOrgName).toString());
+					if(map.get(keyArea) != null){
+						personalInfo.setTown(map.get(keyArea).toString());
+						personalInfo.setTownName(map.get(keyAreaName).toString());
 					}
 					if(map.get(keyPatientName) != null){
 						personalInfo.setName(map.get(keyPatientName).toString());
@@ -188,35 +188,23 @@ public class DiabetesScheduler {
 						String fastname = "";
 						String fastcode = "";
 						double val = Double.valueOf(map.get(keysugarToleranceVal).toString());
-						if(val < 7.8){
-							fastname = "7.8mmol/l 以下";
+						if(val >= 4.4 && val < 6.1){
+							fastname = "4.4~6.1mmol/L";
 							fastcode = "1";
 						}
-						if(val >= 7.8 && val < 11.1){
-							fastname = "7.8-11.1mmol/l";
+						if(val >= 6.1 && val < 7.0){
+							fastname = "6.1~7mmol/L";
 							fastcode = "2";
 						}
-						if( val > 11.1){
-							fastname = "11.1mmol/l 上";
+						if( val > 7.0){
+							fastname = "7.0mmol/L以上";
 							fastcode = "3";
 						}
+
 						CheckInfoModel checkInfo = setCheckInfoModel(baseCheckInfo);
 						checkInfo.setFastingBloodGlucoseName(fastname);
 						checkInfo.setFastingBloodGlucoseCode(fastcode);
 						checkInfo.setCheckCode("CH002");
-						checkInfoList.add(checkInfo);
-					}
-
-					if(map.get(keyWestMedicine) != null){
-						CheckInfoModel checkInfo = setCheckInfoModel(baseCheckInfo);
-						checkInfo.setCheckCode("CH003");
-						checkInfo.setMedicineName(map.get(keyWestMedicine).toString());
-						checkInfoList.add(checkInfo);
-					}
-					if(map.get(keyChineseMedicine) != null) {
-						CheckInfoModel checkInfo = setCheckInfoModel(baseCheckInfo);
-						checkInfo.setCheckCode("CH003");
-						checkInfo.setMedicineName(map.get(keyChineseMedicine).toString());
 						checkInfoList.add(checkInfo);
 					}
 					//葡萄糖（口服75 g葡萄糖后2 h)
@@ -225,25 +213,36 @@ public class DiabetesScheduler {
 						String sugarTolename = "";
 						String sugarToleCode = "";
 						double val = Double.valueOf(map.get(keysugarToleranceVal).toString());
-						if(val >= 4.4 && val < 6.1){
-							sugarTolename = "4.4-6.1mmol/l";
+						if(val < 7.8){
+							sugarTolename = "7.8 mmol/L以下";
 							sugarToleCode = "1";
 						}
-						if(val >= 6.1 && val < 7.0){
-							sugarTolename = "6.1-7.0mmol/l";
+						if(val >= 7.8 && val < 11.1){
+							sugarTolename = "7.8~11.1 mmol/L";
 							sugarToleCode = "2";
 						}
-						if( val > 7.0){
-							sugarTolename = "大于7.0mmol/l 上";
+						if( val > 11.1){
+							sugarTolename = "11.1 mmol/L以上";
 							sugarToleCode = "3";
 						}
 						CheckInfoModel checkInfo = setCheckInfoModel(baseCheckInfo);
 						checkInfo.setSugarToleranceName(sugarTolename);
 						checkInfo.setSugarToleranceCode(sugarToleCode);
-						checkInfo.setCheckCode("CH004");
+						checkInfo.setCheckCode("CH003");
 						checkInfoList.add(checkInfo);
 					}
-
+					if(map.get(keyWestMedicine) != null){
+						CheckInfoModel checkInfo = setCheckInfoModel(baseCheckInfo);
+						checkInfo.setCheckCode("CH004");
+						checkInfo.setMedicineName(map.get(keyWestMedicine).toString());
+						checkInfoList.add(checkInfo);
+					}
+					if(map.get(keyChineseMedicine) != null) {
+						CheckInfoModel checkInfo = setCheckInfoModel(baseCheckInfo);
+						checkInfo.setCheckCode("CH004");
+						checkInfo.setMedicineName(map.get(keyChineseMedicine).toString());
+						checkInfoList.add(checkInfo);
+					}
 
 				}
 				objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
@@ -278,7 +277,6 @@ public class DiabetesScheduler {
 					Map<String, Object> source = new HashMap<>();
 					String jsonCheck = objectMapper.writeValueAsString(checkInfo);
 					source = objectMapper.readValue(jsonCheck,Map.class);
-					elasticSearchClient.index(index,type, source);
 					if(checkInfo.getCheckCode().equals("CH001") && checkInfo.getDemographicId() != null){
 						List<Map<String, Object>> relist = elasticSearchUtil.findByField(index,type, "demographicId",checkInfo.getDemographicId());
 						if(relist== null || relist.size() ==0){

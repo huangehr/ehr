@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.unboundid.util.json.JSONObject;
+import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.entity.patient.DemographicId;
 import com.yihu.ehr.basic.patient.service.DemographicService;
 import com.yihu.ehr.basic.user.entity.Doctors;
@@ -193,8 +194,9 @@ public class PatientEndPoint extends EnvelopRestEndPoint {
             @RequestBody String patientModelJsonData) throws Exception{
         DemographicInfo demographicInfo = toEntity(patientModelJsonData, DemographicInfo.class);
         DemographicInfo old = demographicService.getDemographicInfo(demographicInfo.getIdCardNo());
-        if(old==null)
-            throw new ApiException(HttpStatus.NOT_FOUND, "该对象没找到");
+        if (old == null) {
+            throw new ApiException(ErrorCode.MISSING_REQUEST_RESOURCE, "该对象没找到");
+        }
         BeanUtils.copyProperties(demographicInfo, old, "registerTime");
         demographicService.savePatient(old);
         //同时修改用户信息

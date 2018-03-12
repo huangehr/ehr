@@ -54,7 +54,7 @@ public class ExtendEndPoint<T> extends EnvelopRestEndPoint {
     }
 
     protected ApiException errParm(){
-        return new ApiException(ErrorCode.InvalidParameter);
+        return new ApiException(ErrorCode.InvalidParameter, "参数有误");
     }
 
     protected ApiException errMissCode(){
@@ -66,7 +66,7 @@ public class ExtendEndPoint<T> extends EnvelopRestEndPoint {
     }
 
     protected ApiException errRepeatCode(){
-        return new ApiException(ErrorCode.RepeatCode);
+        return new ApiException(ErrorCode.RepeatCode, "重复的CODE");
     }
 
     protected ApiException errMissParm(String msg){
@@ -74,7 +74,7 @@ public class ExtendEndPoint<T> extends EnvelopRestEndPoint {
     }
 
     protected ApiException errNotFound(){
-        return new ApiException(ErrorCode.NotFoundObj);
+        return new ApiException(ErrorCode.NotFoundObj, "对象不存在");
     }
 
     protected ApiException errMissVersion(){

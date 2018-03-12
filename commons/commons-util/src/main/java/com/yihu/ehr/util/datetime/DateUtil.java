@@ -1376,8 +1376,7 @@ public class DateUtil {
         return years;
     }
 
-    public static Date formatCharDateYMDHMS(String str) {
-        String format = DEFAULT_YMDHMSDATE_FORMAT;
+    public static Date formatCharDate(String str,String format ) {
         if (str == null || str.trim().length() == 0) {
             return null;
         }
@@ -1390,8 +1389,8 @@ public class DateUtil {
         return new Date(date.getTime());
     }
 
-
-    public static Date formatCharDate(String str,String format ) {
+    public static Date formatCharDateYMDHMS(String str) {
+        String format = DEFAULT_YMDHMSDATE_FORMAT;
         if (str == null || str.trim().length() == 0) {
             return null;
         }
@@ -1438,8 +1437,9 @@ public class DateUtil {
         SimpleDateFormat newSdf = new SimpleDateFormat(format);
         String date= null;
         try {
-            if (!StringUtils.isEmpty(utcTime))
+            if (!StringUtils.isEmpty(utcTime)){
                 date = newSdf.format(utcSdf.parse(utcTime));
+            }
         } catch (ParseException e) {
             e.printStackTrace();
         }

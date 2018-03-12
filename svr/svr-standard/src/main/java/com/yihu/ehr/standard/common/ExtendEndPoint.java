@@ -66,7 +66,7 @@ public class ExtendEndPoint<T>  extends EnvelopRestEndPoint {
     }
 
     protected ApiException errRepeatCode(){
-        return new ApiException(ErrorCode.RepeatCode);
+        return new ApiException(ErrorCode.RepeatCode, "重复的CODE");
     }
 
     protected ApiException errMissParm(String msg){
@@ -74,7 +74,7 @@ public class ExtendEndPoint<T>  extends EnvelopRestEndPoint {
     }
 
     protected ApiException errNotFound(String objName, Object id){
-        return new ApiException(ErrorCode.NotFoundObj, objName, String.valueOf(id));
+        return new ApiException(ErrorCode.NotFoundObj, objName);
     }
 
     protected ApiException errMissVersion(){

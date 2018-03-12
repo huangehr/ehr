@@ -13,6 +13,8 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -92,7 +94,7 @@ public class HosAcqTaskController extends BaseController {
     @ApiOperation(value = "创建补采任务信息", notes = "创建补采任务信息")
     public Envelop createHosAcqTask(
             @ApiParam(name = "json_data", value = "", defaultValue = "")
-            @RequestParam(value = "json_data") String jsonData)  {
+            @RequestParam(value = "json_data") String jsonData) throws IOException {
         Envelop envelop = new Envelop();
         HosAcqTaskModel hosAcqTaskModel = toEntity(jsonData,HosAcqTaskModel.class);
         try {

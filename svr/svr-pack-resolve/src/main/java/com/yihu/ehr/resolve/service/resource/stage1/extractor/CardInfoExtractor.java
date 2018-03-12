@@ -27,9 +27,9 @@ public class CardInfoExtractor extends KeyDataExtractor {
     //就诊卡界定数据集
     private List<String> dataSets = new ArrayList<>();
     @Value("${ehr.pack-extractor.card.meta-data.card-no}")
-    private String CardType;
-    @Value("${ehr.pack-extractor.card.meta-data.card-no}")
     private String CardId;
+    @Value("${ehr.pack-extractor.card.meta-data.card-type}")
+    private String CardType;
 
     /**
      * 获取此数据集中的卡信息
@@ -49,7 +49,7 @@ public class CardInfoExtractor extends KeyDataExtractor {
                 //获取就诊卡号
                 if(StringUtils.isEmpty(cardId)) {
                     String val = record.getMetaData(CardId);
-                    if (val != null) {
+                    if (!StringUtils.isEmpty(val)) {
                         cardId = val;
                         cardType = record.getMetaData(CardType);
                         break;

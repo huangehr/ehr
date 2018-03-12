@@ -76,7 +76,7 @@ public class EhrAccessTokenEndpoint extends AbstractEndpoint {
         super.setTokenGranter(ehrTokenGranter);
     }
 
-    @RequestMapping(value =ServiceApi.Authentication.AccessToken, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Authentication.AccessToken, method = RequestMethod.POST)
     public ResponseEntity<Map<String, Object>> accessToken(@RequestParam Map<String, String> parameters) {
         String grant_type = parameters.get("grant_type");
         String client_id = parameters.get("client_id");

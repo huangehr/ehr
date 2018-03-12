@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -112,7 +113,7 @@ public class ResourceBrowseController extends BaseController {
             @ApiParam(name = "resourcesCode", value = "资源编码")
             @RequestParam(value = "resourcesCode") String resourcesCode,
             @ApiParam(name = "roleId", value = "角色id")
-            @RequestParam(value = "roleId") String roleId) {
+            @RequestParam(value = "roleId") String roleId) throws IOException {
         Envelop envelop = new Envelop();
         List<RsBrowseModel> rsBrowseModelList = new ArrayList<>();
         String resourceMetadata = resourceBrowseClient.getResourceMetadata(resourcesCode, roleId);

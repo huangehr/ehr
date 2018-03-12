@@ -1,5 +1,7 @@
 package com.yihu.ehr.model.archivesecurity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.util.Date;
 
 /**
@@ -57,6 +59,7 @@ public class MSmsMessageSend {
         this.phoneNumber = phoneNumber;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getSendTime() {
         return sendTime;
     }
@@ -65,6 +68,7 @@ public class MSmsMessageSend {
         this.sendTime = sendTime;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getValidTime() {
         return validTime;
     }
