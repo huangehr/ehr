@@ -19,9 +19,16 @@ public class HealthArchiveInfoModel {
     private String ageName;
     private String town;    // 所在区县
     private long result;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssZ", timezone = "GMT+8")// 2017-06-24T11:51:30+080
+    private String demographicId;   // 身份证号
+    private String cardId;  // 就诊卡号
+    private String orgCode; // 机构编码
+    private String orgName; // 机构名称
+    private String eventType;   // 就诊类型
+    private String address; // 常住地址
+    private String healthProblem;   // 健康问题
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssZ", timezone = "GMT+8")    // 2017-06-24T11:51:30+080
     private Date eventDate;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssZ", timezone = "GMT+8")// 2017-06-24T11:51:30+080
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssZ", timezone = "GMT+8")    // 2017-06-24T11:51:30+080
     @CreatedDate
     private Date createTime;//创建时间
 
@@ -87,6 +94,62 @@ public class HealthArchiveInfoModel {
 
     public void setResult(long result) {
         this.result = result;
+    }
+
+    public String getDemographicId() {
+        return demographicId;
+    }
+
+    public void setDemographicId(String demographicId) {
+        this.demographicId = demographicId;
+    }
+
+    public String getCardId() {
+        return cardId;
+    }
+
+    public void setCardId(String cardId) {
+        this.cardId = cardId;
+    }
+
+    public String getOrgCode() {
+        return orgCode;
+    }
+
+    public void setOrgCode(String orgCode) {
+        this.orgCode = orgCode;
+    }
+
+    public String getOrgName() {
+        return orgName;
+    }
+
+    public void setOrgName(String orgName) {
+        this.orgName = orgName;
+    }
+
+    public String getEventType() {
+        return eventType;
+    }
+
+    public void setEventType(String eventType) {
+        this.eventType = eventType;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getHealthProblem() {
+        return healthProblem;
+    }
+
+    public void setHealthProblem(String healthProblem) {
+        this.healthProblem = healthProblem;
     }
 
     public Date getEventDate() {
