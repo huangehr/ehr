@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.rest.Envelop;
@@ -84,14 +83,11 @@ public class BaseController extends AbstractController {
         return targets;
     }
 
-    public <T> T toEntity(String json, Class<T> entityCls) {
-        try {
-            objectMapper.setDateFormat(new SimpleDateFormat(DateTimeUtil.ISO8601Pattern));
-            T entity = objectMapper.readValue(json, entityCls);
-            return entity;
-        } catch (IOException ex) {
-            throw new ApiException(ErrorCode.SystemError, "无法转换json, " + ex.getMessage());
-        }
+    public <T> T toEntity(String json, Class<T> entityCls) throws IOException {
+        objectMapper.setDateFormat(new SimpleDateFormat(DateTimeUtil.simpleDateTimePattern));
+        T entity = objectMapper.readValue(json, entityCls);
+        return entity;
+
     }
 
     public String toJson(Object obj) {
@@ -179,33 +175,23 @@ public class BaseController extends AbstractController {
         return Integer.parseInt(responseEntity.getHeaders().get(X_Total_Count).get(0));
     }
 
-    public <T> T getEnvelopModel(String jsonData, Class<T> targetCls) {
-        try {
-            Envelop envelop = objectMapper.readValue(jsonData, Envelop.class);
-            String objJsonData = objectMapper.writeValueAsString(envelop.getObj());
-            T model = objectMapper.readValue(objJsonData, targetCls);
+    public <T> T getEnvelopModel(String jsonData, Class<T> targetCls) throws IOException {
+        Envelop envelop = objectMapper.readValue(jsonData, Envelop.class);
+        String objJsonData = objectMapper.writeValueAsString(envelop.getObj());
+        T model = objectMapper.readValue(objJsonData, targetCls);
+        return model;
 
-            return model;
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return null;
-        }
     }
 
-    public <T> Collection<T> getEnvelopList(String jsonData, Collection<T> targets, Class<T> targetCls) {
-        try {
-            Envelop envelop = objectMapper.readValue(jsonData, Envelop.class);
-            for (int i = 0; i < envelop.getDetailModelList().size(); i++) {
-                String objJsonData = objectMapper.writeValueAsString(envelop.getDetailModelList().get(i));
-                T model = objectMapper.readValue(objJsonData, targetCls);
+    public <T> Collection<T> getEnvelopList(String jsonData, Collection<T> targets, Class<T> targetCls) throws IOException {
+        Envelop envelop = objectMapper.readValue(jsonData, Envelop.class);
+        for (int i = 0; i < envelop.getDetailModelList().size(); i++) {
+            String objJsonData = objectMapper.writeValueAsString(envelop.getDetailModelList().get(i));
+            T model = objectMapper.readValue(objJsonData, targetCls);
 
-                targets.add(model);
-            }
-            return targets;
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return null;
+            targets.add(model);
         }
+        return targets;
 
     }
 
@@ -217,12 +203,7 @@ public class BaseController extends AbstractController {
      * @return 时间格式的日期
      */
     public Date StringToDate(String dateTime, String formatRule) {
-        try {
-            return dateTime == null ? null : DateUtil.strToDate(dateTime);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return null;
+        return dateTime == null ? null : DateUtil.strToDate(dateTime);
     }
 
     /**
@@ -233,12 +214,7 @@ public class BaseController extends AbstractController {
      * @return 日期字符串
      */
     public String DateToString(Date dateTime, String formatRule) {
-        try {
-            return dateTime == null ? null : DateTimeUtil.utcDateTimeFormat(dateTime);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return null;
+        return dateTime == null ? null : DateTimeUtil.utcDateTimeFormat(dateTime);
     }
 
     /**
@@ -248,12 +224,7 @@ public class BaseController extends AbstractController {
      * @return 日期字符串
      */
     public String dt2Str(Date dateTime) {
-        try {
-            return dateTime == null ? null : DateTimeUtil.simpleDateTimeFormat(dateTime);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return null;
+        return dateTime == null ? null : DateTimeUtil.simpleDateTimeFormat(dateTime);
     }
 
     /**

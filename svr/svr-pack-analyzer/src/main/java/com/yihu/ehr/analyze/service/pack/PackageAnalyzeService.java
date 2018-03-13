@@ -25,7 +25,8 @@ import java.util.Map;
 @Service
 public class PackageAnalyzeService {
     private final static Logger logger = LoggerFactory.getLogger(PackageAnalyzeService.class);
-
+    @Autowired
+    protected ObjectMapper objectMapper;
     @Autowired
     private PackQueueService packQueueService;
     @Autowired
@@ -34,11 +35,6 @@ public class PackageAnalyzeService {
     private PackageQcService packageQcService;
     @Autowired
     private ElasticSearchUtil elasticSearchUtil;
-    @Autowired
-    protected ObjectMapper objectMapper;
-    @PostConstruct
-    private void init() {
-    }
 
     /**
      * analyze 档案分析服务
@@ -63,8 +59,8 @@ public class PackageAnalyzeService {
 
                 mgrClient.analyzeStatus(mPackage.getId(), 3);
 
-                packageQcService.sendQcMsg(zipPackage);//发送Qc消息
-                packageQcService.qcReceive(zipPackage);
+                //处理质控
+                packageQcService.qcHandle(zipPackage);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -82,16 +78,20 @@ public class PackageAnalyzeService {
         }
     }
 
-    public Envelop esSaveData(String index, String type, String dataList){
+    public Envelop esSaveData(String index, String type, String dataList) {
         Envelop envelop = new Envelop();
         try {
-            List<Map<String, Object>> list = objectMapper.readValue(dataList,List.class);
+            List<Map<String, Object>> list = objectMapper.readValue(dataList, List.class);
             for (Map<String, Object> map : list) {
                 elasticSearchUtil.index(index, type, map);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return envelop;
+    }
+
+    @PostConstruct
+    private void init() {
     }
 }

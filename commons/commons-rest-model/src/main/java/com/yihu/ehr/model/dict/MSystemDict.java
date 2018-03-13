@@ -1,5 +1,7 @@
 package com.yihu.ehr.model.dict;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.util.Date;
 
 /**
@@ -55,6 +57,7 @@ public class MSystemDict {
         this.phoneticCode = phoneticCode;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getCreateDate() {
         return createDate;
     }

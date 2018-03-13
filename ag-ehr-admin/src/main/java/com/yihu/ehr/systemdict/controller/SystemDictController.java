@@ -55,22 +55,18 @@ public class SystemDictController extends BaseController {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) Integer page) {
 
-        try {
-            ResponseEntity<Collection<MSystemDict>> responseEntity = systemDictClient.getDictionaries(fields, filters, sorts, size, page);
-            List<MSystemDict> systemDicts = (List<MSystemDict>) responseEntity.getBody();
-            List<SystemDictModel> systemDictModelList = new ArrayList<>();
-            for (MSystemDict mSystemDict : systemDicts) {
-                SystemDictModel dictModel = convertToSysDictModel(mSystemDict);
-                systemDictModelList.add(dictModel);
-            }
-
-            Envelop envelop = getResult(systemDictModelList, getTotalCount(responseEntity), page, size);
-
-            return envelop;
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return failedSystem();
+        ResponseEntity<Collection<MSystemDict>> responseEntity = systemDictClient.getDictionaries(fields, filters, sorts, size, page);
+        List<MSystemDict> systemDicts = (List<MSystemDict>) responseEntity.getBody();
+        List<SystemDictModel> systemDictModelList = new ArrayList<>();
+        for (MSystemDict mSystemDict : systemDicts) {
+            SystemDictModel dictModel = convertToSysDictModel(mSystemDict);
+            systemDictModelList.add(dictModel);
         }
+
+        Envelop envelop = getResult(systemDictModelList, getTotalCount(responseEntity), page, size);
+
+        return envelop;
+
     }
 
     @ApiOperation(value = "创建字典", response = MSystemDict.class, produces = "application/json")

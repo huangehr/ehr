@@ -79,18 +79,6 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
             List<Map<String,Object>> list = listResult.getDetailModelList();
             for(Map<String,Object> map : list){
                 MTjQuotaModel tjQuotaModel = objectMapper.convertValue(map,MTjQuotaModel.class);
-                if(tjQuotaModel.getCreateTime() != null){
-                    Date createTime = DateUtil.parseDate(tjQuotaModel.getCreateTime(), "yyyy-MM-dd'T'HH:mm:ss'Z'Z");
-                    tjQuotaModel.setCreateTime( DateTimeUtil.simpleDateTimeFormat(createTime));
-                }
-                if(tjQuotaModel.getUpdateTime() != null){
-                    Date updateTime = DateUtil.parseDate(tjQuotaModel.getUpdateTime(),"yyyy-MM-dd'T'HH:mm:ss'Z'Z");
-                    tjQuotaModel.setUpdateTime( DateTimeUtil.simpleDateTimeFormat(updateTime));
-                }
-                if(tjQuotaModel.getExecTime() != null){
-                    Date execTime = DateUtil.parseDate(tjQuotaModel.getExecTime(),"yyyy-MM-dd'T'HH:mm:ss'Z'Z");
-                    tjQuotaModel.setExecTime( DateTimeUtil.simpleDateTimeFormat(execTime));
-                }
                 //获取类别字典
                 MConventionalDict dict = conventionalDictClient.getTjQuotaExecTypeList(tjQuotaModel.getExecType());
                 tjQuotaModel.setExecTypeName(dict == null ? "" : dict.getValue());

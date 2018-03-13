@@ -1,5 +1,7 @@
 package com.yihu.ehr.model.adaption;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.util.Date;
 
 /**
@@ -46,6 +48,7 @@ public class MOrgDict {
         this.name = name;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getCreateDate() {
         return createDate;
     }
@@ -54,6 +57,7 @@ public class MOrgDict {
         this.createDate = createDate;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getUpdateDate() {
         return updateDate;
     }

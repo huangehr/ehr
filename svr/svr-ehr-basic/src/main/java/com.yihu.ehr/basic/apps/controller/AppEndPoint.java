@@ -10,7 +10,6 @@ import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.entity.oauth2.OauthClientDetails;
-import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.app.MApp;
 import com.yihu.ehr.util.id.BizObject;
 import com.yihu.ehr.util.rest.Envelop;
@@ -98,7 +97,9 @@ public class AppEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "app", value = "对象JSON结构体", allowMultiple = true)
             @RequestBody String appJson) throws Exception {
         App app = toEntity(appJson, App.class);
-        if (appService.retrieve(app.getId()) == null) throw new ApiException(ErrorCode.InvalidAppId, "应用不存在");
+        if (appService.retrieve(app.getId()) == null) {
+            throw new RuntimeException("不存在相应appId：" + app.getId());
+        }
         appService.save(app);
         return convertToModel(app, MApp.class);
     }

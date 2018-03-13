@@ -7,6 +7,7 @@ import com.yihu.ehr.basic.report.service.QcDailyReportResolveService;
 import com.yihu.ehr.basic.security.service.UserSecurityService;
 import com.yihu.ehr.basic.statistics.feign.DailyReportClient;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.entity.report.JsonReport;
 import com.yihu.ehr.entity.security.UserSecurity;
@@ -67,28 +68,23 @@ public class QcDailyReportResolveController extends EnvelopRestEndPoint {
             @ApiParam(name = "md5", value = "档案包MD5")
             @RequestParam(value = "md5", required = false) String md5,
             @ApiParam(name = "type", value = "文件包类型 1 质控包 2 日报包")
-            @RequestParam(value = "type", defaultValue = "1", required = true) int type
-    ) throws Exception {
+            @RequestParam(value = "type", defaultValue = "1", required = true) int type) throws Exception {
         Envelop envelop = new Envelop();
         String password = null;
-        try {
-            UserSecurity key = userSecurityService.getKeyByOrgCode(orgCode);
-            if (key == null || key.getPrivateKey() == null) {
-                throw new ApiException(HttpStatus.FORBIDDEN, "Invalid private key, maybe you miss the organization code?");
-            }
-            password = RSA.decrypt(encryptPwd, RSA.genPrivateKey(key.getPrivateKey()));
-            InputStream in =  reportFile.getInputStream();
-            InputStream stream =  reportFile.getInputStream();
-            JsonReport jsonReport = reportService.receive(in, password, encryptPwd, md5, orgCode, type);
-            JsonNode jsonNode = objectMapper.readTree(stream);
-            saveQcPackage(jsonNode,jsonReport);
-            if (jsonReport != null) {
-                envelop.setSuccessFlg(true);
-            } else {
-                envelop.setSuccessFlg(false);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        UserSecurity key = userSecurityService.getKeyByOrgCode(orgCode);
+        if (key == null || key.getPrivateKey() == null) {
+            throw new ApiException(HttpStatus.FORBIDDEN, ErrorCode.REQUEST_FORBIDDEN, "Invalid private key, maybe you miss the organization code?");
+        }
+        password = RSA.decrypt(encryptPwd, RSA.genPrivateKey(key.getPrivateKey()));
+        InputStream in =  reportFile.getInputStream();
+        InputStream stream =  reportFile.getInputStream();
+        JsonReport jsonReport = reportService.receive(in, password, encryptPwd, md5, orgCode, type);
+        JsonNode jsonNode = objectMapper.readTree(stream);
+        saveQcPackage(jsonNode,jsonReport);
+        if (jsonReport != null) {
+            envelop.setSuccessFlg(true);
+        } else {
+            envelop.setSuccessFlg(false);
         }
         return envelop;
     }
