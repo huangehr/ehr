@@ -1,5 +1,7 @@
 package com.yihu.ehr.model.profile;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.util.Date;
 
 /**
@@ -83,6 +85,7 @@ public class MTemplate {
         this.cdaType = cdaType;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getCreateTime() {
         return createTime;
     }

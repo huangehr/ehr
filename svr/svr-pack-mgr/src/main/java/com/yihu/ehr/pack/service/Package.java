@@ -1,5 +1,6 @@
 package com.yihu.ehr.pack.service;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.yihu.ehr.constants.ArchiveStatus;
 
 import javax.persistence.*;
@@ -74,6 +75,7 @@ public class Package {
     }
 
     @Column(name = "receive_date")
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getReceiveDate() {
         return receiveDate;
     }
@@ -83,6 +85,7 @@ public class Package {
     }
 
     @Column(name = "parse_date")
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getParseDate() {
         return parseDate;
     }
@@ -92,6 +95,7 @@ public class Package {
     }
 
     @Column(name = "finish_date")
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getFinishDate() {
         return finishDate;
     }
@@ -173,6 +177,7 @@ public class Package {
     }
 
     @Column(name = "event_date")
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getEventDate() {
         return eventDate;
     }
@@ -218,6 +223,7 @@ public class Package {
     }
 
     @Column(name = "analyze_date")
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getAnalyzeDate() {
         return analyzeDate;
     }

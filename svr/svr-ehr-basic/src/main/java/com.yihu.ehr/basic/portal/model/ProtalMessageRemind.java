@@ -1,5 +1,7 @@
 package com.yihu.ehr.basic.portal.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -109,6 +111,7 @@ public class ProtalMessageRemind {
     }
 
     @Column(name = "create_date", nullable = true)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getCreateDate() {
         return createDate;
     }

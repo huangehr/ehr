@@ -3,7 +3,7 @@ package com.yihu.ehr.entity.government;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import javax.persistence.*;
-import java.util.Date;
+
 
 /**
  * Created by jansney on 2017/11/7.
@@ -11,12 +11,10 @@ import java.util.Date;
 @Entity
 @Table(name = "government_menu_report_monitor_type")
 public class GovernmentMenuReportMonitorType {
+
     private int id;
     private int reportCategoryId;   // 报表分类id
     private int governmentMenuId;
-
-
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

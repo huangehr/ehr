@@ -1,5 +1,7 @@
 package com.yihu.quota.model.jpa;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -38,6 +40,7 @@ public class TjQuotaLog {
         this.quotaCode = quotaCode;
     }
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getStartTime() {
         return startTime;
     }
@@ -46,6 +49,7 @@ public class TjQuotaLog {
         this.startTime = startTime;
     }
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getEndTime() {
         return endTime;
     }

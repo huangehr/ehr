@@ -1,5 +1,6 @@
 package com.yihu.ehr.entity.security;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.yihu.ehr.util.id.BizObject;
 import com.yihu.ehr.util.id.ObjectId;
 import org.hibernate.annotations.GenericGenerator;
@@ -72,6 +73,7 @@ public class UserToken implements Serializable {
     }
 
     @Column(name = "create_date",  nullable = true)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getCreateDate() {
         return createDate;
     }
@@ -80,6 +82,7 @@ public class UserToken implements Serializable {
     }
 
     @Column(name = "update_date",  nullable = true)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getUpdateDate() {
         return updateDate;
     }

@@ -1,5 +1,7 @@
 package com.yihu.quota.model.jpa.dimension;// default package
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.util.Date;
 import javax.persistence.*;
 
@@ -107,6 +109,7 @@ public class TjDimensionMain implements java.io.Serializable {
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "create_time", nullable = false, length = 0)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getCreateTime() {
         return this.createTime;
     }
@@ -135,6 +138,7 @@ public class TjDimensionMain implements java.io.Serializable {
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "update_time", nullable = false, length = 0)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getUpdateTime() {
         return this.updateTime;
     }

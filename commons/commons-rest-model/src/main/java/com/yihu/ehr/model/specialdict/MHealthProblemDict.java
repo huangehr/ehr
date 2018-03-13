@@ -80,6 +80,7 @@ public class MHealthProblemDict implements Serializable{
         this.updateUser = updateUser;
     }
 
+	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getUpdateDate() {
         return updateDate;
     }

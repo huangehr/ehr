@@ -1,5 +1,6 @@
 package com.yihu.ehr.entity.patient;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -91,6 +92,7 @@ public class PhysicalCard extends AbstractCard implements Serializable {
 	}
 
 	@Column(name = "create_date", nullable = true)
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	public Date getCreateDate() {
 		return createDate;
 	}
@@ -132,13 +134,16 @@ public class PhysicalCard extends AbstractCard implements Serializable {
 	}
 
 	@Column(name = "release_date", nullable = true)
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	public Date getReleaseDate() {
 		return releaseDate;
 	}
 	public void setReleaseDate(Date releaseDate) {
 		this.releaseDate = releaseDate;
 	}
+
 	@Column(name = "validity_date_begin", nullable = true)
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	public Date getValidityDateBegin() {
 		return validityDateBegin;
 	}
@@ -147,6 +152,7 @@ public class PhysicalCard extends AbstractCard implements Serializable {
 	}
 
 	@Column(name = "validity_date_end", nullable = true)
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	public Date getValidityDateEnd() {
 		return validityDateEnd;
 	}

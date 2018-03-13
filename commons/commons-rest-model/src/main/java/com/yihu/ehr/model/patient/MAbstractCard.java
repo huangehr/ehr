@@ -1,5 +1,7 @@
 package com.yihu.ehr.model.patient;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.util.Date;
 
 /**
@@ -86,6 +88,7 @@ public class MAbstractCard {
         this.description = description;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getCreateDate() {
         return createDate;
     }
@@ -126,6 +129,7 @@ public class MAbstractCard {
         this.releaseOrg = releaseOrg;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getReleaseDate() {
         return releaseDate;
     }
@@ -134,6 +138,7 @@ public class MAbstractCard {
         this.releaseDate = releaseDate;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getValidityDateBegin() {
         return validityDateBegin;
     }
@@ -142,6 +147,7 @@ public class MAbstractCard {
         this.validityDateBegin = validityDateBegin;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getValidityDateEnd() {
         return validityDateEnd;
     }

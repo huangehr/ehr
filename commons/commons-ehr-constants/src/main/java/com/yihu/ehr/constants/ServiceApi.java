@@ -398,6 +398,10 @@ public class ServiceApi {
         public static final String FindAppMenus = "/appFeature/findAppMenus";
     }
 
+    public static class AppVersion {
+        public static final String FindAppVersion = "/appVersion/getAppVersion";
+    }
+
     public static class AppApiParameter {
         public static final String AppApiParameters = "/appApiParameter";
         public static final String AppApiParameter = "/appApiParameter/{id}";

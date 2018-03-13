@@ -1,5 +1,6 @@
 package com.yihu.ehr.entity.patient;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -61,6 +62,7 @@ public class Authentication {
     }
 
     @Column(name = "apply_date", nullable = false)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getApplyDate() {
         return applyDate;
     }
@@ -79,6 +81,7 @@ public class Authentication {
     }
 
     @Column(name = "audit_date", nullable = true)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getAuditDate() {
         return auditDate;
     }

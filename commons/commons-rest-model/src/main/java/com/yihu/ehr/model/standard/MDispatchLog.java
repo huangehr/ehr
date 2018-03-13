@@ -1,5 +1,7 @@
 package com.yihu.ehr.model.standard;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.util.Date;
 
 /**
@@ -40,6 +42,7 @@ public class MDispatchLog {
         this.stdVersionId = stdVersionId;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getDispatchTime() {
         return dispatchTime;
     }
