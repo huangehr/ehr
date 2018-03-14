@@ -34,10 +34,22 @@ import java.util.List;
  */
 public class ApiException extends RuntimeException {
 
-    private HttpStatus httpStatus;
-    private ErrorCode errorCode; // 用于从配置环境中提取错误信息
-    private String documentURL;
-    private String message;  // 错误消息
+    private HttpStatus httpStatus; //Http 状态码，默认请求成功
+    private ErrorCode errorCode; //用于从配置环境中提取错误信息
+    private String message; //错误消息
+    private String documentURL; //文档连接
+
+    public ApiException(String message) {
+        this(ErrorCode.NOT_IMPLEMENTED, message);
+    }
+
+    public ApiException(ErrorCode errorCode, String message) {
+        this(HttpStatus.OK, errorCode, message);
+    }
+
+    public ApiException(HttpStatus httpStatus, ErrorCode errorCode, String message){
+        this(httpStatus, errorCode, message, null);
+    }
 
     public ApiException(HttpStatus httpStatus, ErrorCode errorCode, String message, String documentURL){
         super(message);
@@ -47,53 +59,21 @@ public class ApiException extends RuntimeException {
         this.documentURL = documentURL;
     }
 
-    public ApiException(HttpStatus httpStatus, ErrorCode errorCode, String message){
-        this(httpStatus, errorCode, message, null);
-    }
-
-    public ApiException(HttpStatus httpStatus, String message) {
-        this(httpStatus, ErrorCode.REQUEST_NOT_IMPLEMENTED, message);
-    }
-
-    public ApiException(ErrorCode errorCode, String message) {
-        this(HttpStatus.NOT_IMPLEMENTED, errorCode, message);
-    }
-
-    public ApiException(String message) {
-        this(ErrorCode.REQUEST_NOT_IMPLEMENTED, message);
-    }
-
-    public HttpStatus getHttpStatus() {
+    public HttpStatus httpStatus() {
         return httpStatus;
     }
 
-    public void setHttpStatus(HttpStatus httpStatus) {
-        this.httpStatus = httpStatus;
-    }
-
-    public ErrorCode getErrorCode() {
+    public ErrorCode errorCode() {
         return errorCode;
     }
 
-    public void setErrorCode(ErrorCode errorCode) {
-        this.errorCode = errorCode;
-    }
-
-    public String getDocumentURL() {
+    public String documentURL() {
         return documentURL;
-    }
-
-    public void setDocumentURL(String documentURL) {
-        this.documentURL = documentURL;
     }
 
     @Override
     public String getMessage() {
         return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
     }
 
 }

@@ -195,7 +195,7 @@ public class PatientEndPoint extends EnvelopRestEndPoint {
         DemographicInfo demographicInfo = toEntity(patientModelJsonData, DemographicInfo.class);
         DemographicInfo old = demographicService.getDemographicInfo(demographicInfo.getIdCardNo());
         if (old == null) {
-            throw new ApiException(ErrorCode.MISSING_REQUEST_RESOURCE, "该对象没找到");
+            throw new ApiException(ErrorCode.NOT_FOUND, "该对象没找到");
         }
         BeanUtils.copyProperties(demographicInfo, old, "registerTime");
         demographicService.savePatient(old);

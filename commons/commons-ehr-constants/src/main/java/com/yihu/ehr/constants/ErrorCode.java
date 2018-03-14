@@ -8,187 +8,107 @@ package com.yihu.ehr.constants;
  */
 public enum ErrorCode {
 
-    MissingUserAgent("missing.user_agent"),
-    RateLimitExceeding("rate_limit.exceeding"),
-
-    MissMethod("ehr.common.miss.method"),
-    MissTimestamp("ehr.common.miss.timestamp"),
-    MissAppKey("ehr.common.miss.appid"),
-    MissVersion("ehr.common.miss.version"),
-    MissSign("ehr.common.miss.sign"),
-    MissSignMethod("ehr.common.miss.signMethod"),
-
-    InvalidMethod("ehr.common.invalid.method"),
-    InvalidTimestamp("ehr.common.invalid.timestamp"),
-    InvalidAppId("ehr.common.invalid.appid"),
-    InvalidApiVersion("ehr.common.invalid.version"),
-    InvalidSign("ehr.common.invalid.sign"),
-    InvalidSignMethod("ehr.common.invalid.signMethod"),
-    MissRequiredArgument("ehr.common.miss.required.argument"),
-
-    MissParameter("ehr.common.miss.parameter"),
-    InvalidParameter("ehr.common.invalid.parameter"),
-    AppTokenExpired("ehr.common.appToken.expired"),
-
-    QueryNoData("ehr.common.query.null"),
-    QueryTotalCount("ehr.common.query.count"),
-    NotFoundObj("ehr.common.query.not.found"),
-    RepeatCode("ehr.commons.repeat.code"),
-    RepeatName("ehr.commons.repeat.name"),  // add by cws 20160223
-    RepeatRelation("ehr.commons.repeat.relation"),  // add by cws 20160225
-
-    SuccessSave("ehr.common.success.update"),
-    InvalidUpdate("ehr.common.invalid.update"),
-
-    SuccessAdd("ehr.common.success.create"),
-
-    SuccessDelete("ehr.common.success.delete"),
-    InvalidDelete("ehr.common.invalid.delete"),
-
-    InputRequestSingle("ehr.common.input.request.single"),
-    InputRequestMultiple("ehr.common.input.request.multiple"),
-
-    NotFoundEntity("ehr.common.notfound.entity"),//add by lincl 2016.3.3
-
-    InvalidUser("ehr.invalid.user"),
-    GetUserSecurityFailed("ehr.get.user.security.failed"),
-    InvalidUserNameOrPwd("ehr.invalid.username.or.pwd"),
-    InvalidValidateCode("ehr.login.validatecode.invalid"),
-    ExpireValidateCode("ehr.login.validatecode.expire"),
-    MailHasValidate("ehr.login.mail.hasinvaild"),
-    InvalidMail("ehr.login.mail.invaild"),
-
-    ExistUserForCreate("ehr.user.exist.create"),
-    SuccessPublicKeyCreate("ehr.publicKey.success.create"),
-
-    ExistOrgForCreate("ehr.org.exist.create"),
-
-    InvalidAppRegister("ehr.app.register.invalid"),
-
-    MissIdentityNo("ehr.patient.miss.identity.no"),
-    RepeatedIdentityNo("ehr.patient.repeat.identity.no"),
-    InvalidIdentityNo("ehr.patient.invalid.identity.no"),
-    PatientRegisterFailed("ehr.patient.register.failed"),
-    InvalidFormatPatientRegister("ehr.patient.invalid.register.info"),
-    PatientRegisterFailedForExist("ehr.patient.exist.create"),
-    CardIsToVoid("ehr.commons.repeat.code"),
-
-    MissArchiveFile("ehr.archive.miss.file"),
-    MissArchiveCrypto("ehr.archive.miss.cryptograph"),
-    ParseArchiveCryptoFailed("ehr.archive.parse.cryptograph.failed"),
-    SaveArchiveFailed("ehr.archive.save.failed"),
-
-    RepeatSysDictName("ehr.sysDict.name.repeat"),
-    RepeatOrgDict("ehr.orgDict.repeat"),
-    RepeatOrgDictItem("ehr.orgDictItem.repeat"),
-    RepeatOrgDataSet("ehr.orgDataSet.repeat"),
-    RepeatOrgMetaData("ehr.orgMetaData.repeat"),
-    InvalidCreateSysDict("ehr.sysDict.create.invalid"),
-    NotExistSysDict("ehr.sysDict.exist.invalid"),
-    InvalidDelSysDict("ehr.sysDict.del.invalid "),
-    InvalidUpdateSysDict("ehr.sysDict.update.invalid"),
-    RepeatSysDictEntryName("ehr.sysDictEntry.name.repeat"),
-    InvalidCreateSysDictEntry("ehr.sysDictEntry.create.invalid"),
-    InvalidSysDictEntry("ehr.sysDictEntry.name.invalid"),
-    InvalidDelSysDictEntry("ehr.sysDictEntry.del.invalid"),
-    InvalidUpdateSysDictEntry("ehr.sysDictEntry.update.invalid"),
-
-
-    GetGeographyFailed("ehr.geography.ger.invalid"),
-
-    ParamError("ehr.std.param.error"),
-    InvalidStdVersion("ehr.std.invalid.version"),
-    GenerateArchiveFailed("ehr.std.generate.schema.file.failed"),
-    GenerateArchiveFileStreamFailed("ehr.std.file.stream.generate.failed"),
-    DownArchiveFileFailed("ehr.std.file.down.failed"),
-    GenerateFileCryptographStreamFailed("ehr.std.file.cryptograph.generate.failed"),
-    GenerateFileCryptographFailed("ehr.std.file.cryptograph.generate.failed"),
-    GetStdVersionFailed("ehr.std.get.version.fail"),
-    UnknownStdVersion("ehr.std.version.unknown"),
-
-    GetCDAVersionListFailed("ehr.cda.version.list.get.failed"),
-    GetCDAVersionFailed("ehr.cda.version.get.failed"),
-    SaveCDAVersionFailed("ehr.cda.version.save.failed"),
-    GetCDAInfoFailed("ehr.std.get.CDA.list.failed"),
-    InValidCDAVersionStage("ehr.std.version.invalid.stage"),//add by lincl 2016.3.3
-
-
-    NotFoundDataSetView("ehr.dataset.view.notfound"),
-    GetCDATypeFailed("ehr.cda.type.get.failed"),
-    GetDataSetListFailed("ehr.datasetlist.Get.failed"),
-    GetDataSetFailed("ehr.dataset.Get.failed"),
-    SavedatasetFailed("ehr.dataset.Save.failed"),
-    DeleteDataSetFailed("ehr.dataset.delete.failed"),
-    RapeatDataSetCode("ehr.dataset.repeat.code"),
-
-    NotFoundMetaDataView("ehr.metadata.view.notfound"),
-    GetMetaDataListFaield("ehr.metadatalist.Get.failed"),
-    GetMetaDataFailed("ehr.metadata.Get.failed"),
-    SaveMetaDataFailed("ehr.metadata.save.failed"),
-    DeleteMetaDataFailed("ehr.metadata.delete.failed"),
-
-    NotFoundStdDictView("ehr.std.dict.view.notfound"),
-    GetDictListFaild("ehr.dictlist.Get.failed"),
-    GetDictFaild("ehr.dict.Get.failed"),
-    SaveDictFailed("ehr.dict.Save.failed"),
-    DeleteDictFailed("ehr.dict.delete.failed"),
-
-    NotFoundDictEntryView("ehr.dict.entry.view.notfound"),
-    GetDictEntryListFailed("ehr.dict.entries.get.failed"),
-    GetDictEntryFailed("ehr.dict.entry.get.failed"),
-    saveDictEntryFailed("ehr.dict.entry.save.failed"),
-    DeleteDictEntryFailed("ehr.dict.entry.delete.failed"),
-
-    GetStandardSourceFailed("ehr.std.get.source.list.failed"),
-
-    GenerateUserKeyFailed("ehr.security.generate.user.key.failed"),
-    GetUserKeyFailed("ehr.security.get.user.key.failed"),
-    UserAccessTokenExpired("ehr.security.token.expired"),
-    UserRefreshTokenError("ehr.security.token.refreshError"),
-    UserRevokeTokenFailed("ehr.security.token.revoke"),
-
-    CodeIsNull("ehr.system.code.null"),
-    NameIsNull("ehr.system.name.null"),
-    VersionCodeIsNull("ehr.system.versioncode.null"),
-
-    GetEhrArchiveFailed("ehr.ehr.get.archive"),
-    GetEhrDataSetFailed("ehr.ehr.get.data.set"),
-
-    CreateEhrDataSetTableFailed("ehr.ehr.create.data.set.table.failed"),
-    TruncateTableFailed("ehr.hbase.truncate.table.failed"),
-    GetTableFailed("ehr.hbase.get.table.failed"),
-
-    ClearSolrDataFailed("ehr.clear.solr.data.failed"),
-
-    //
-    UnknownJsonPackageId("ehr.json.package.unknown"),
-
-    // Quartz Scheduler
-    SchedulerStartFailed("ehr.scheduler.start.failed"),
-    SchedulerShutdownFailed("ehr.scheduler.shutdown.failed"),
-    SchedulerAddJobFailed("ehr.scheduler.add.job"),
-    SchedulerRemoveJobFailed("ehr.scheduler.remove.job"),
-
-    GetJobDetailFailed("ehr.scheduler.get.job.failed"),
-    GetTriggerFailed("ehr.scheduler.get.trigger.failed"),
-
-    //adaption
-    RepeatAdapterOrg("ehr.adpter.org.repeat"),
-    //Other
-    SystemError("ehr.system.error"),
-
     // new version code
-    REQUEST_NOT_IMPLEMENTED("request.not.implemented"),
-    REQUEST_FORBIDDEN("request.forbidden"),
-    MISSING_REQUEST_RESOURCE("messing.request.resource");
+    // --------------------- standard ---------------------
+    CONTINUE(100, "Continue"),
+    SWITCHING_PROTOCOLS(101, "Switching Protocols"),
+    PROCESSING(102, "Processing"),
+    CHECKPOINT(103, "Checkpoint"),
+    OK(200, "OK"),
+    CREATED(201, "Created"),
+    ACCEPTED(202, "Accepted"),
+    NON_AUTHORITATIVE_INFORMATION(203, "Non-Authoritative Information"),
+    NO_CONTENT(204, "No Content"),
+    RESET_CONTENT(205, "Reset Content"),
+    PARTIAL_CONTENT(206, "Partial Content"),
+    MULTI_STATUS(207, "Multi-Status"),
+    ALREADY_REPORTED(208, "Already Reported"),
+    IM_USED(226, "IM Used"),
+    MULTIPLE_CHOICES(300, "Multiple Choices"),
+    MOVED_PERMANENTLY(301, "Moved Permanently"),
+    FOUND(302, "Found"),
+    /** @deprecated */
+    @Deprecated
+    MOVED_TEMPORARILY(302, "Moved Temporarily"),
+    SEE_OTHER(303, "See Other"),
+    NOT_MODIFIED(304, "Not Modified"),
+    /** @deprecated */
+    @Deprecated
+    USE_PROXY(305, "Use Proxy"),
+    TEMPORARY_REDIRECT(307, "Temporary Redirect"),
+    PERMANENT_REDIRECT(308, "Permanent Redirect"),
+    BAD_REQUEST(400, "Bad Request"),
+    UNAUTHORIZED(401, "Unauthorized"),
+    PAYMENT_REQUIRED(402, "Payment Required"),
+    FORBIDDEN(403, "Forbidden"),
+    NOT_FOUND(404, "Not Found"),
+    METHOD_NOT_ALLOWED(405, "Method Not Allowed"),
+    NOT_ACCEPTABLE(406, "Not Acceptable"),
+    PROXY_AUTHENTICATION_REQUIRED(407, "Proxy Authentication Required"),
+    REQUEST_TIMEOUT(408, "Request Timeout"),
+    CONFLICT(409, "Conflict"),
+    GONE(410, "Gone"),
+    LENGTH_REQUIRED(411, "Length Required"),
+    PRECONDITION_FAILED(412, "Precondition Failed"),
+    PAYLOAD_TOO_LARGE(413, "Payload Too Large"),
+    /** @deprecated */
+    @Deprecated
+    REQUEST_ENTITY_TOO_LARGE(413, "Request Entity Too Large"),
+    URI_TOO_LONG(414, "URI Too Long"),
+    /** @deprecated */
+    @Deprecated
+    REQUEST_URI_TOO_LONG(414, "Request-URI Too Long"),
+    UNSUPPORTED_MEDIA_TYPE(415, "Unsupported Media Type"),
+    REQUESTED_RANGE_NOT_SATISFIABLE(416, "Requested range not satisfiable"),
+    EXPECTATION_FAILED(417, "Expectation Failed"),
+    I_AM_A_TEAPOT(418, "I'm a teapot"),
+    /** @deprecated */
+    @Deprecated
+    INSUFFICIENT_SPACE_ON_RESOURCE(419, "Insufficient Space On Resource"),
+    /** @deprecated */
+    @Deprecated
+    METHOD_FAILURE(420, "Method Failure"),
+    /** @deprecated */
+    @Deprecated
+    DESTINATION_LOCKED(421, "Destination Locked"),
+    UNPROCESSABLE_ENTITY(422, "Unprocessable Entity"),
+    LOCKED(423, "Locked"),
+    FAILED_DEPENDENCY(424, "Failed Dependency"),
+    UPGRADE_REQUIRED(426, "Upgrade Required"),
+    PRECONDITION_REQUIRED(428, "Precondition Required"),
+    TOO_MANY_REQUESTS(429, "Too Many Requests"),
+    REQUEST_HEADER_FIELDS_TOO_LARGE(431, "Request Header Fields Too Large"),
+    UNAVAILABLE_FOR_LEGAL_REASONS(451, "Unavailable For Legal Reasons"),
+    INTERNAL_SERVER_ERROR(500, "Internal Server Error"),
+    NOT_IMPLEMENTED(501, "Not Implemented"),
+    BAD_GATEWAY(502, "Bad Gateway"),
+    SERVICE_UNAVAILABLE(503, "Service Unavailable"),
+    GATEWAY_TIMEOUT(504, "Gateway Timeout"),
+    HTTP_VERSION_NOT_SUPPORTED(505, "HTTP Version not supported"),
+    VARIANT_ALSO_NEGOTIATES(506, "Variant Also Negotiates"),
+    INSUFFICIENT_STORAGE(507, "Insufficient Storage"),
+    LOOP_DETECTED(508, "Loop Detected"),
+    BANDWIDTH_LIMIT_EXCEEDED(509, "Bandwidth Limit Exceeded"),
+    NOT_EXTENDED(510, "Not Extended"),
+    NETWORK_AUTHENTICATION_REQUIRED(511, "Network Authentication Required"),
+    // --------------------- ehr ---------------------
+    MISSING_USER_AGENT(-1, "missing.user.agent"),
+    RATE_LIMIT_EXCEEDING(-2, "rate.limit.exceeding");
 
-    private final String descriptionKey;
+    private final int value;
+    private final String reasonPhrase;
 
-    ErrorCode(String descriptionKey) {
-        this.descriptionKey = descriptionKey;
+    ErrorCode (int value, String reasonPhrase) {
+        this.value = value;
+        this.reasonPhrase = reasonPhrase;
     }
 
-    public String getDescriptionKey() {
-        return descriptionKey;
+    public int value() {
+        return this.value;
     }
+
+    public String getReasonPhrase() {
+        return this.reasonPhrase;
+    }
+
 }

@@ -2,10 +2,12 @@ package com.yihu.ehr.profile.service;
 
 
 import com.yihu.ehr.profile.feign.*;
+import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 
@@ -28,18 +30,19 @@ public class ProfileInfoBaseService {
     public Map<String, Object> getPatientInfo(String demographicId, String version) {
         //时间排序
         Envelop envelop;
-        if(version != null) {
+        if (version != null) {
             envelop = resource.getMasterData("{\"q\":\"demographic_id:" + demographicId + "\"}", null, null, version);
-        }else {
+        } else {
             envelop = resource.getMasterData("{\"q\":\"demographic_id:" + demographicId + "\"}", null, null, null);
         }
         List<Map<String, Object>> list = envelop.getDetailModelList();
+        Map<String, Object> patientMap = new HashMap<>();
         if (list != null && list.size() > 0) {
+            Map<String, Object> result = new HashMap<>();
             if (list.size() == 1) {
-                return list.get(0);
+                result = list.get(0);
             } else {
                 //合并数据
-                Map<String, Object> result = new HashMap<>();
                 for (Map<String, Object> obj : list) {
                     for (String key : obj.keySet()) {
                         if (!result.containsKey(key)) {
@@ -47,10 +50,120 @@ public class ProfileInfoBaseService {
                         }
                     }
                 }
-                return result;
             }
+            //提取档案类型信息
+            // 1. 新生儿 -> 出生医学证明编号 新生儿姓名 新生儿性别代码 新生儿出生日期
+            if (result.get("EHR_001219") != null || result.get("EHR_001251") != null || result.get("EHR_001252") != null || result.get("EHR_001253") != null) {
+                patientMap.put("label", "新生儿");
+                //出生身高
+                patientMap.put("height", result.get("EHR_001256") == null ? "" : result.get("EHR_001256"));
+                //出生体重
+                patientMap.put("weight", result.get("EHR_001257") == null ? "" : result.get("EHR_001257")); //单位(g)
+                //2. 慢病
+            } else {
+                patientMap.put("label", "患病");
+                //身高
+                Object height = null;
+                if (result.get("EHR_000590") != null) {
+                    height = result.get("EHR_000590");
+                } else if (result.get("EHR_000778") != null) {
+                    height = result.get("EHR_000778");
+                } else if (result.get("EHR_001339") != null) {
+                    height = result.get("EHR_001339");
+                } else if (result.get("EHR_004263") != null) {
+                    height = result.get("EHR_004263");
+                } else if (result.get("EHR_005142") != null) {
+                    height = result.get("EHR_005142");
+                }
+                patientMap.put("height", height == null ? "" : height);
+                //体重
+                Object weight = null;
+                if (result.get("EHR_000073") != null) {
+                    weight = result.get("EHR_000073");
+                } else if (result.get("EHR_000785") != null) {
+                    weight = result.get("EHR_000785");
+                } else if (result.get("EHR_001340") != null) {
+                    weight = result.get("EHR_001340");
+                } else if (result.get("EHR_004002") != null) {
+                    weight = result.get("EHR_004002");
+                } else if (result.get("EHR_004718") != null) {
+                    weight = result.get("EHR_004718");
+                } else if (result.get("EHR_005148") != null) {
+                    weight = result.get("EHR_005148");
+                }
+                patientMap.put("weight", weight == null ? "" : weight);
+            }
+            //姓名
+            patientMap.put("name", result.get("patient_name") == null? "" : result.get("patient_name"));
+            //性别
+            String gender = result.get("EHR_000019") == null? "" : (String) result.get("EHR_000019");
+            if (gender.equals("1")) {
+                gender = "男";
+            } else if (gender.equals("2")) {
+                gender = "女";
+            }
+            patientMap.put("gender", gender == null ? "未知" : gender);
+            //出生日期
+            if (result.get("EHR_000007") != null) {
+                patientMap.put("birthday", result.get("EHR_000007"));
+            } else if(result.get("EHR_000320") != null) {
+                patientMap.put("birthday", result.get("EHR_000320"));
+            } else {
+                patientMap.put("birthday", "");
+            }
+            //年龄
+            if (!StringUtils.isEmpty(patientMap.get("birthday"))) {
+                String date1 = patientMap.get("birthday").toString();
+                String date2 = date1.substring(0, date1.indexOf("T"));
+                Date date3 = DateUtil.formatCharDateYMD(date2, "yyyy-MM-dd");
+                Calendar calendar = Calendar.getInstance();
+                int now = calendar.get(Calendar.YEAR);
+                Calendar calendar1 = Calendar.getInstance();
+                calendar1.setTime(date3);
+                int birthday = calendar1.get(Calendar.YEAR);
+                patientMap.put("age", String.valueOf(now - birthday));
+            } else {
+                patientMap.put("age", "");
+            }
+            //民族
+            patientMap.put("nation", result.get("EHR_000016_VALUE") == null ? "" : result.get("EHR_000016_VALUE"));
+            //婚姻状态
+            if (!StringUtils.isEmpty(result.get("EHR_000014_VALUE"))) {
+                patientMap.put("marriage", result.get("EHR_000014_VALUE"));
+            } else if (!StringUtils.isEmpty(result.get("EHR_004984_VALUE"))) {
+                patientMap.put("marriage", result.get("EHR_004984_VALUE"));
+            } else {
+                patientMap.put("marriage", "");
+            }
+            //婚育
+            patientMap.put("fertility", result.get("EHR_000540") == null ? "" : result.get("EHR_000540"));
+            //ABO血型
+            patientMap.put("ABO", result.get("EHR_000001") == null ? "" : result.get("EHR_000001"));
+            //Rh血型
+            patientMap.put("Rh", result.get("EHR_000002") == null ? "" : result.get("EHR_000002"));
+            //过敏药物
+            patientMap.put("allergyMedicine", result.get("EHR_004971") == null ? "" : result.get("EHR_004971"));
+            //过敏源
+            patientMap.put("allergens", result.get("EHR_000011") == null ? "" : result.get("EHR_000011"));
+            //电话
+            patientMap.put("patientTel", result.get("EHR_000003") == null ? "" : result.get("EHR_000003"));
+            //国籍
+            patientMap.put("country", result.get("EHR_004970_VALUE") == null ? "" : result.get("EHR_004970_VALUE"));
+            //工作单位
+            patientMap.put("employer", result.get("EHR_002930") == null ? "" : result.get("EHR_002930"));
+            //户籍
+            if (result.get("EHR_004945") != null && result.get("EHR_004946") != null) {
+                patientMap.put("householdRegister", result.get("EHR_004945") + "-" + result.get("EHR_004946"));
+            } else if (result.get("EHR_004945") != null && result.get("EHR_004946") == null) {
+                patientMap.put("householdRegister", result.get("EHR_004945"));
+            } else if (result.get("EHR_004945") == null && result.get("EHR_004946") != null) {
+                patientMap.put("householdRegister", result.get("EHR_004946"));
+            } else {
+                patientMap.put("householdRegister", "");
+            }
+            return patientMap;
         } else {
-            return null;
+            return patientMap;
         }
     }
 
@@ -92,9 +205,9 @@ public class ProfileInfoBaseService {
             int index = 1;
             for(Map temp : list2) {
                 String fillDate;
-                if(temp.get("EHR_002382") != null) {
+                if (temp.get("EHR_002382") != null) {
                     fillDate = (String) temp.get("EHR_002382");
-                }else {
+                } else {
                     fillDate = (String) temp.get("EHR_002393");
                 }
                 String name = (String) temp.get("EHR_002386");

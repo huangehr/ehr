@@ -143,15 +143,15 @@ public class HealthProfileEndPoint extends BaseController {
 
 
         @ApiOperation("患者用药清单OK")
-        @RequestMapping(value = ServiceApi.Profiles.MedicationStat, method = RequestMethod.GET)
+        @RequestMapping(value = ServiceApi.Profiles.MedicationRecords, method = RequestMethod.GET)
         public List<MMedicationStat> MedicalStat(
                 @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="360101200006011131")
                 @RequestParam(value = "demographic_id", required = true) String demographic_id,
-                @ApiParam(name = "hp_id", value = "健康问题")
-                @RequestParam(value = "hp_id", required = false) String hp_id) throws Exception{
+                @ApiParam(name = "hp_code", value = "健康问题")
+                @RequestParam(value = "hp_code", required = false) String hp_code) throws Exception{
             return (List<MMedicationStat>) convertToModels(
-                    healthProfileClient.MedicalStat(demographic_id, hp_id),
-                    new ArrayList<MMedicationStat>(healthProfileClient.MedicalStat(demographic_id, hp_id).size()),
+                    healthProfileClient.MedicalStat(demographic_id, hp_code),
+                    new ArrayList<MMedicationStat>(healthProfileClient.MedicalStat(demographic_id, hp_code).size()),
                     MMedicationStat.class, null);
         }
 

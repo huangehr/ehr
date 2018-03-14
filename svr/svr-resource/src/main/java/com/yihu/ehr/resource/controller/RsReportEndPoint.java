@@ -1,6 +1,7 @@
 package com.yihu.ehr.resource.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.exception.ApiException;
@@ -138,7 +139,7 @@ public class RsReportEndPoint extends EnvelopRestEndPoint {
             HttpServletResponse response) throws Exception {
         RsReport rsReport = rsReportService.getByCode(reportCode);
         if (rsReport == null || StringUtils.isEmpty(rsReport.getTemplatePath())) {
-            throw new ApiException(HttpStatus.NOT_FOUND, "模版未找到");
+            throw new ApiException(ErrorCode.NOT_FOUND, "模版未找到");
         }
         String[] paths = rsReport.getTemplatePath().split(":");
         byte[] bytes = fastDFSUtil.download(paths[0], paths[1]);
