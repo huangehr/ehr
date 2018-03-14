@@ -13,12 +13,12 @@ public class HealthArchiveInfoModel {
     @JestId
     private String id;
     private String name;    // 姓名
-    private int sex;    // 性别编号
+    private Integer sex;    // 性别编号
     private String sexName;
-    private int ageCode;    // 年龄段编号
+    private Integer ageCode;    // 年龄段编号
     private String ageName;
     private String town;    // 所在区县
-    private long result;
+    private Integer result;
     private String demographicId;   // 身份证号
     private String cardId;  // 就诊卡号
     private String orgCode; // 机构编码
@@ -48,11 +48,11 @@ public class HealthArchiveInfoModel {
         this.name = name;
     }
 
-    public int getSex() {
+    public Integer getSex() {
         return sex;
     }
 
-    public void setSex(int sex) {
+    public void setSex(Integer sex) {
         this.sex = sex;
     }
 
@@ -64,11 +64,11 @@ public class HealthArchiveInfoModel {
         this.sexName = sexName;
     }
 
-    public int getAgeCode() {
+    public Integer getAgeCode() {
         return ageCode;
     }
 
-    public void setAgeCode(int ageCode) {
+    public void setAgeCode(Integer ageCode) {
         this.ageCode = ageCode;
     }
 
@@ -88,11 +88,11 @@ public class HealthArchiveInfoModel {
         this.town = town;
     }
 
-    public long getResult() {
+    public Integer getResult() {
         return result;
     }
 
-    public void setResult(long result) {
+    public void setResult(Integer result) {
         this.result = result;
     }
 

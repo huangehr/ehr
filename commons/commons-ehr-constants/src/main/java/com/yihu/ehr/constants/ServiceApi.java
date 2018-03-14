@@ -1245,6 +1245,9 @@ public class ServiceApi {
         public static final String GetLineData = "/tj/getLineData";
         public static final String GetBarData = "/tj/getBarData";
 
+        public static final String GetArchiveCount = "/tj/getArchiveCount";
+        public static final String GetArchiveManCount = "/tj/getArchiveManCount";
+
     }
 
     public static class StasticReport {
