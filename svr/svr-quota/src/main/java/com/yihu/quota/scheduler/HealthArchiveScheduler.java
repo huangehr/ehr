@@ -3,6 +3,7 @@ package com.yihu.quota.scheduler;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.profile.core.ResourceCore;
+import com.yihu.ehr.redis.schema.HealthArchiveSchema;
 import com.yihu.ehr.solr.SolrUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.quota.service.scheduler.HealthArchiveSchedulerService;
@@ -31,7 +32,7 @@ public class HealthArchiveScheduler {
     @Autowired
     private HealthArchiveSchedulerService healthArchiveSchedulerService;
 
-    @Scheduled(cron = "25 41 9 * * ?")
+    @Scheduled(cron = "25 49 17 * * ?")
     public void validatorIdentityScheduler() throws Exception{
 
         String q =  ""; // 查询条件
@@ -49,15 +50,15 @@ public class HealthArchiveScheduler {
         String keyOrgCode = "org_code"; // 机构编码
         String keyOrgName = "org_name";
         String keyAddress = "EHR_001211"; //地址 EHR_001227
-        List<HealthArchiveInfoModel> healthArchiveInfoModelList = new ArrayList<>();
+
 
         BasesicUtil basesicUtil = new BasesicUtil();
         String initializeDate = "2018-03-15";
         Date now = new Date();
         String nowDate = DateUtil.formatDate(now,DateUtil.DEFAULT_DATE_YMD_FORMAT);
         boolean flag = true;
-        String startDate = "2015-10-01";
-        String endDate = "2015-11-01";
+        String startDate = "2015-11-01";
+        String endDate = "2015-12-01";
         while (flag) {
             // 当前时间大于初始化时间，就所有数据初始化，每个月递增查询，当前时间小于于初始时间每天抽取
             if(basesicUtil.compareDate(initializeDate,nowDate) == -1){
@@ -71,19 +72,19 @@ public class HealthArchiveScheduler {
                 startDate = DateUtil.formatDate(sDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
                 Date eDate = DateUtils.addMonths(DateUtil.parseDate(startDate,DateUtil.DEFAULT_DATE_YMD_FORMAT),1);
                 endDate = DateUtil.formatDate(eDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
-                if(startDate.equals("2018-04-01")){
+                if(startDate.equals("2017-04-01")){
                     flag = false;
                 }
                 System.out.println("startDate = " + startDate);
             }
-
+            List<HealthArchiveInfoModel> healthArchiveInfoModelList = new ArrayList<>();
             // 找出就诊档案数
             long count = solrUtil.count(ResourceCore.MasterTable, q, fq);
             List<String> rowKeyList = healthArchiveSchedulerService.selectSubRowKey(ResourceCore.MasterTable, q, fq, count);
             if(rowKeyList != null && rowKeyList.size() > 0){
                 List<Map<String,Object>> hbaseDataList = healthArchiveSchedulerService.selectHbaseData(rowKeyList);
-                if( hbaseDataList != null && hbaseDataList.size() > 0 ){
-                    for(Map<String,Object> map : hbaseDataList){
+                if( hbaseDataList != null && hbaseDataList.size() > 0 ) {
+                    for(Map<String,Object> map : hbaseDataList) {
                         // 档案信息 > 姓名等
                         HealthArchiveInfoModel healthArchiveInfoModel = new HealthArchiveInfoModel();
                         healthArchiveInfoModel.setCreateTime(new Date());

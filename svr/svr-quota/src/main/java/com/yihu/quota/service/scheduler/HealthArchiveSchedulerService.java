@@ -2,8 +2,10 @@ package com.yihu.quota.service.scheduler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.elasticsearch.ElasticSearchClient;
+import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.hbase.HBaseDao;
 import com.yihu.ehr.profile.core.ResourceCore;
+import com.yihu.ehr.redis.schema.HealthArchiveSchema;
 import com.yihu.ehr.solr.SolrUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.quota.etl.util.ElasticsearchUtil;
@@ -35,6 +37,10 @@ public class HealthArchiveSchedulerService {
     private ObjectMapper objectMapper;
     @Autowired
     private ElasticsearchUtil elasticsearchUtil;
+    @Autowired
+    private ElasticSearchUtil elasticSearchUtil;
+    @Autowired
+    private HealthArchiveSchema healthArchiveSchema;
 
     /**
      * ES保存
@@ -48,14 +54,20 @@ public class HealthArchiveSchedulerService {
         String jsonPer = objectMapper.writeValueAsString(archiveInfo);
         source = objectMapper.readValue(jsonPer, Map.class);
         if(null != archiveInfo.getDemographicId()) {
-            long countBySql = elasticsearchUtil.getCountBySql("SELECT count(*) from health_archive_index where demographicId = '" + archiveInfo.getDemographicId() + "'");
-            if(countBySql == 0){
-                elasticSearchClient.index(index, type, source);
+            List<Map<String, Object>> list = elasticSearchUtil.findByField(index, type, "demographicId", archiveInfo.getDemographicId());
+            if(list == null || list.size() == 0) {
+                if (!healthArchiveSchema.hasKey(archiveInfo.getDemographicId())) {
+                    healthArchiveSchema.set(archiveInfo.getDemographicId(), archiveInfo.getDemographicId(), 86400);
+                    elasticSearchClient.index(index, type, source);
+                }
             }
         }else if(null != archiveInfo.getCardId()) {
-            long countBySql = elasticsearchUtil.getCountBySql("SELECT count(*) from health_archive_index where cardId = '" + archiveInfo.getCardId() + "'");
-            if(countBySql  == 0){
-                elasticSearchClient.index(index, type, source);
+            List<Map<String, Object>> list = elasticSearchUtil.findByField(index, type, "cardId",archiveInfo.getCardId());
+            if(list == null || list.size() == 0) {
+                if (!healthArchiveSchema.hasKey(archiveInfo.getCardId())) {
+                    healthArchiveSchema.set(archiveInfo.getCardId(), archiveInfo.getCardId(), 86400);
+                    elasticSearchClient.index(index, type, source);
+                }
             }
         }else {
             elasticSearchClient.index(index, type, source);
