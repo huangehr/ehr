@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -43,44 +44,36 @@ public class RsResourceDefaultParamController extends BaseController {
     @ApiOperation("增加资源默认参数")
     public Envelop addResourceDefaultParams(
             @ApiParam(name = "json_data", value = "资源默认参数json串")
-            @RequestParam(value = "json_data") String jsonData){
-        try{
-            MResourceDefaultParam model = objectMapper.readValue(jsonData,MResourceDefaultParam.class);
+            @RequestParam(value = "json_data") String jsonData) throws IOException{
+        MResourceDefaultParam model = objectMapper.readValue(jsonData,MResourceDefaultParam.class);
 //            boolean bo = rsDefaultParamclient.isExistenceRsParamKeyValue(model.getResourcesId(),model.getParamKey(),model.getParamValue());
 //            if(bo){
 //                return failed("参数值不能重复！");
 //            }
-            MResourceDefaultParam modelNew = rsDefaultParamclient.addResourceDefaultParams(jsonData);
-            if(modelNew == null){
-                return failed("新增失败！");
-            }
-            return success(convertToModel(modelNew, ResourceDefaultParamModel.class));
-        }catch (Exception ex){
-            ex.printStackTrace();
-            return failed(ErrorCode.SystemError.toString());
+        MResourceDefaultParam modelNew = rsDefaultParamclient.addResourceDefaultParams(jsonData);
+        if(modelNew == null){
+            return failed("新增失败！");
         }
+        return success(convertToModel(modelNew, ResourceDefaultParamModel.class));
+
     }
 
     @RequestMapping(value = ServiceApi.Resources.Param,method = RequestMethod.PUT)
     @ApiOperation("更新资源默认参数")
     public Envelop updateResourceDefaultParams(
             @ApiParam(name = "json_data", value = "资源默认参数json串")
-            @RequestParam(value = "json_data") String jsonData){
-        try{
-            MResourceDefaultParam model = objectMapper.readValue(jsonData,MResourceDefaultParam.class);
-           /* boolean bo = rsDefaultParamclient.isExistenceRsParamKeyValue(model.getResourcesId(),model.getParamKey(),model.getParamValue());
-            if(bo){
-                return failed("参数值不能重复！");
-            }*/
-            MResourceDefaultParam modelNew = rsDefaultParamclient.addResourceDefaultParams(jsonData);
-            if(modelNew == null){
-                return failed("更新失败！");
-            }
-            return success(convertToModel(modelNew, ResourceDefaultParamModel.class));
-        }catch (Exception ex){
-            ex.printStackTrace();
-            return failed(ErrorCode.SystemError.toString());
+            @RequestParam(value = "json_data") String jsonData) throws IOException {
+        MResourceDefaultParam model = objectMapper.readValue(jsonData,MResourceDefaultParam.class);
+       /* boolean bo = rsDefaultParamclient.isExistenceRsParamKeyValue(model.getResourcesId(),model.getParamKey(),model.getParamValue());
+        if(bo){
+            return failed("参数值不能重复！");
+        }*/
+        MResourceDefaultParam modelNew = rsDefaultParamclient.addResourceDefaultParams(jsonData);
+        if(modelNew == null){
+            return failed("更新失败！");
         }
+        return success(convertToModel(modelNew, ResourceDefaultParamModel.class));
+
     }
 
     @RequestMapping(value = ServiceApi.Resources.ParamById,method = RequestMethod.DELETE)
@@ -108,14 +101,10 @@ public class RsResourceDefaultParamController extends BaseController {
             @RequestParam(value = "page", required = false) int page,
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size){
-        try{
-            ResponseEntity<List<MResourceDefaultParam>> responseEntity  = rsDefaultParamclient.searchRsDefaultParams(fields, filters, sorts, page, size);
-            List<MResourceDefaultParam> mResourceDefaultParams = responseEntity.getBody();
-            return getResult(mResourceDefaultParams, getTotalCount(responseEntity), page, size);
-        }catch (Exception ex){
-            ex.printStackTrace();
-            return failed(ErrorCode.SystemError.toString());
-        }
+        ResponseEntity<List<MResourceDefaultParam>> responseEntity  = rsDefaultParamclient.searchRsDefaultParams(fields, filters, sorts, page, size);
+        List<MResourceDefaultParam> mResourceDefaultParams = responseEntity.getBody();
+        return getResult(mResourceDefaultParams, getTotalCount(responseEntity), page, size);
+
     }
 
     @RequestMapping(value = ServiceApi.Resources.ParamsNoPage, method = RequestMethod.GET)
@@ -123,13 +112,9 @@ public class RsResourceDefaultParamController extends BaseController {
     public Envelop searchRsDefaultParamsNoPage(
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
             @RequestParam(value = "filters", required = false) String filters){
-        try{
-            List<MResourceDefaultParam> mResourceDefaultParams  = rsDefaultParamclient.searchRsDefaultParamsNoPage(filters);
-            return getResult(mResourceDefaultParams, mResourceDefaultParams.size(), 1, mResourceDefaultParams.size());
-        }catch (Exception ex){
-            ex.printStackTrace();
-            return failed(ErrorCode.SystemError.toString());
-        }
+        List<MResourceDefaultParam> mResourceDefaultParams  = rsDefaultParamclient.searchRsDefaultParamsNoPage(filters);
+        return getResult(mResourceDefaultParams, mResourceDefaultParams.size(), 1, mResourceDefaultParams.size());
+
     }
 
     @RequestMapping(value = ServiceApi.Resources.ParamKeyValueExistence, method = RequestMethod.GET)

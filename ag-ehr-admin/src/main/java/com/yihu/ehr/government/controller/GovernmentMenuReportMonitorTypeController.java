@@ -39,16 +39,11 @@ public class GovernmentMenuReportMonitorTypeController extends BaseController {
             @ApiParam(name = "rsReoportMonitorTypeId", value = "资源报表监测分类ID", required = true)
             @RequestParam(value = "rsReoportMonitorTypeId") String rsReoportMonitorTypeId) throws Exception {
         Envelop envelop = new Envelop();
-        try {
-            GovernmentMenuReportMonitorTypeModel newMGovernmentMenuReportMonitorType = governmentMenuReportMonitorTypeClient.add(rsReoportMonitorTypeId);
-            envelop.setObj(newMGovernmentMenuReportMonitorType);
-            envelop.setSuccessFlg(true);
-            return envelop;
-        } catch (Exception e) {
-            e.printStackTrace();
-            LogService.getLogger(GovernmentMenuReportMonitorTypeController.class).error(e.getMessage());
-            return failed(ErrorCode.SystemError.toString());
-        }
+        GovernmentMenuReportMonitorTypeModel newMGovernmentMenuReportMonitorType = governmentMenuReportMonitorTypeClient.add(rsReoportMonitorTypeId);
+        envelop.setObj(newMGovernmentMenuReportMonitorType);
+        envelop.setSuccessFlg(true);
+        return envelop;
+
     }
 
     @ApiOperation("删除政府服务平台菜单报表监测类型")
@@ -57,15 +52,10 @@ public class GovernmentMenuReportMonitorTypeController extends BaseController {
             @ApiParam(name = "id", value = "主键", required = true)
             @RequestParam(value = "id") Integer id) throws Exception {
         Envelop envelop = new Envelop();
-        try {
-            governmentMenuReportMonitorTypeClient.delete(id);
-            envelop.setSuccessFlg(true);
-            return envelop;
-        } catch (Exception e) {
-            e.printStackTrace();
-            LogService.getLogger(GovernmentMenuReportMonitorTypeController.class).error(e.getMessage());
-            return failed(ErrorCode.SystemError.toString());
-        }
+        governmentMenuReportMonitorTypeClient.delete(id);
+        envelop.setSuccessFlg(true);
+        return envelop;
+
     }
 
 }

@@ -35,16 +35,12 @@ public class RsResourceDefaultQueryController extends BaseController {
     public Envelop getByResourceId(
             @ApiParam(name = "resourceId", value = "视图主键")
             @RequestParam(value = "resourceId") String resourceId) throws Exception {
-        try {
-            Envelop envelop = new Envelop();
-            envelop.setSuccessFlg(true);
-            String query = rsResourceDefaultQueryClient.getByResourceId(resourceId);
-            envelop.setObj(query);
-            return envelop;
-        } catch (Exception e) {
-            LogService.getLogger(RsResourceDefaultQueryController.class).error(e.getMessage());
-            return failed(ErrorCode.SystemError.toString());
-        }
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(true);
+        String query = rsResourceDefaultQueryClient.getByResourceId(resourceId);
+        envelop.setObj(query);
+        return envelop;
+
     }
 
 }

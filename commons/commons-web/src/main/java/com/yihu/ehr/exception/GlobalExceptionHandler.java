@@ -50,10 +50,10 @@ public class GlobalExceptionHandler {
             response.setStatus(HttpStatus.BAD_GATEWAY.value());
             envelop.setErrorCode(HttpStatus.BAD_GATEWAY.value());
             envelop.setErrorMsg("Execute Feign: " + e.getMessage());
-        } else if (e instanceof ApiException) {
+        } else if (e instanceof ApiException) { //业务逻辑的异常默认为请求成功，但是前端需要判断成功标识
             ApiException apiException = (ApiException) e;
-            response.setStatus(apiException.getHttpStatus().value());
-            envelop.setErrorCode(apiException.getHttpStatus().value());
+            response.setStatus(apiException.httpStatus().value());
+            envelop.setErrorCode(apiException.errorCode().value());
             envelop.setErrorMsg(e.getMessage());
             return envelop; //此异常不进行日志记录
         } else {

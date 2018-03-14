@@ -69,16 +69,12 @@ public class RsReportMonitorTypeController extends BaseController {
     public Envelop getById(
             @ApiParam(name = "id", value = "id")
             @PathVariable(value = "id") Integer id) throws Exception {
-        try {
-            Envelop envelop = new Envelop();
-            envelop.setSuccessFlg(true);
-            MRsReportMonitorType mRsReportMonitorType = rsReportMonitorTypeClient.getById(id);
-            envelop.setObj(mRsReportMonitorType);
-            return envelop;
-        } catch (Exception e) {
-            LogService.getLogger(RsReportMonitorTypeController.class).error(e.getMessage());
-            return failed(ErrorCode.SystemError.toString());
-        }
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(true);
+        MRsReportMonitorType mRsReportMonitorType = rsReportMonitorTypeClient.getById(id);
+        envelop.setObj(mRsReportMonitorType);
+        return envelop;
+
     }
 
     @ApiOperation("新增资源报表监测分类")
@@ -87,16 +83,11 @@ public class RsReportMonitorTypeController extends BaseController {
             @ApiParam(name = "rsReportMonitorType", value = "资源报表监测分类JSON字符串", required = true)
             @RequestParam(value = "rsReportMonitorType") String rsReportMonitorType) throws Exception {
         Envelop envelop = new Envelop();
-        try {
-            MRsReportMonitorType newMRsReportMonitorType = rsReportMonitorTypeClient.add(rsReportMonitorType);
-            envelop.setObj(newMRsReportMonitorType);
-            envelop.setSuccessFlg(true);
-            return envelop;
-        } catch (Exception e) {
-            e.printStackTrace();
-            LogService.getLogger(RsReportMonitorTypeController.class).error(e.getMessage());
-            return failed(ErrorCode.SystemError.toString());
-        }
+        MRsReportMonitorType newMRsReportMonitorType = rsReportMonitorTypeClient.add(rsReportMonitorType);
+        envelop.setObj(newMRsReportMonitorType);
+        envelop.setSuccessFlg(true);
+        return envelop;
+
     }
 
     @ApiOperation("更新资源报表监测分类")
@@ -105,16 +96,11 @@ public class RsReportMonitorTypeController extends BaseController {
             @ApiParam(name = "rsReportMonitorType", value = "资源报表监测分类JSON字符串", required = true)
             @RequestParam(value = "rsReportMonitorType") String rsReportMonitorType) throws Exception {
         Envelop envelop = new Envelop();
-        try {
-            MRsReportMonitorType newMRsReportMonitorType = rsReportMonitorTypeClient.update(rsReportMonitorType);
-            envelop.setObj(newMRsReportMonitorType);
-            envelop.setSuccessFlg(true);
-            return envelop;
-        } catch (Exception e) {
-            e.printStackTrace();
-            LogService.getLogger(RsReportMonitorTypeController.class).error(e.getMessage());
-            return failed(ErrorCode.SystemError.toString());
-        }
+        MRsReportMonitorType newMRsReportMonitorType = rsReportMonitorTypeClient.update(rsReportMonitorType);
+        envelop.setObj(newMRsReportMonitorType);
+        envelop.setSuccessFlg(true);
+        return envelop;
+
     }
 
     @ApiOperation("删除资源报表监测分类")
@@ -123,15 +109,10 @@ public class RsReportMonitorTypeController extends BaseController {
             @ApiParam(name = "id", value = "主键", required = true)
             @RequestParam(value = "id") Integer id) throws Exception {
         Envelop envelop = new Envelop();
-        try {
-            rsReportMonitorTypeClient.delete(id);
-            envelop.setSuccessFlg(true);
-            return envelop;
-        } catch (Exception e) {
-            e.printStackTrace();
-            LogService.getLogger(RsReportMonitorTypeController.class).error(e.getMessage());
-            return failed(ErrorCode.SystemError.toString());
-        }
+        rsReportMonitorTypeClient.delete(id);
+        envelop.setSuccessFlg(true);
+        return envelop;
+
     }
 
     @ApiOperation("验证资源报表监测分类名称是否唯一")
@@ -142,18 +123,13 @@ public class RsReportMonitorTypeController extends BaseController {
             @ApiParam(name = "name", value = "资源报表监测分类名称", required = true)
             @RequestParam("name") String name) throws Exception {
         Envelop envelop = new Envelop();
-        try {
-            boolean result = rsReportMonitorTypeClient.isUniqueName(id, name);
-            envelop.setSuccessFlg(result);
-            if (!result) {
-                envelop.setErrorMsg("该名称已被使用，请重新填写！");
-            }
-            return envelop;
-        } catch (Exception e) {
-            e.printStackTrace();
-            LogService.getLogger(RsReportMonitorTypeController.class).error(e.getMessage());
-            return failed(ErrorCode.SystemError.toString());
+        boolean result = rsReportMonitorTypeClient.isUniqueName(id, name);
+        envelop.setSuccessFlg(result);
+        if (!result) {
+            envelop.setErrorMsg("该名称已被使用，请重新填写！");
         }
+        return envelop;
+
     }
 
     @RequestMapping(value = ServiceApi.Resources.RsReportMonitorTypesNoPage, method = RequestMethod.GET)

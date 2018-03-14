@@ -26,6 +26,7 @@ import java.util.*;
  * @created 2016.04.07 17:01
  */
 public class BaseRestEndPoint extends AbstractController {
+
     protected final static String ResourceCount = "X-Total-Count";
     protected final static String ResourceLink = "Link";
 
@@ -46,7 +47,7 @@ public class BaseRestEndPoint extends AbstractController {
      * @param <T>
      * @return
      */
-    public <T> T convertToModel(Object source, Class<T> targetCls, String... properties) {
+    protected <T> T convertToModel(Object source, Class<T> targetCls, String... properties) {
         if (source == null) {
             return null;
         }
@@ -55,14 +56,14 @@ public class BaseRestEndPoint extends AbstractController {
         return target;
     }
 
-    public <T> T toEntity(String json, Class<T> entityCls) throws IOException {
+    protected <T> T toEntity(String json, Class<T> entityCls) throws IOException {
         objectMapper.setDateFormat(new SimpleDateFormat(DateTimeUtil.simpleDateTimePattern));
         T entity = objectMapper.readValue(json, entityCls);
         return entity;
 
     }
 
-    public String toJson(Object obj) throws JsonProcessingException {
+    protected String toJson(Object obj) throws JsonProcessingException {
         return objectMapper.writeValueAsString(obj);
     }
 
@@ -75,7 +76,7 @@ public class BaseRestEndPoint extends AbstractController {
      * @param <T>
      * @return
      */
-    public <T> Collection<T> convertToModels(Collection sources, Collection<T> targets, Class<T> targetCls, String properties) {
+    protected <T> Collection<T> convertToModels(Collection sources, Collection<T> targets, Class<T> targetCls, String properties) {
         if (sources == null) {
             return null;
         }
@@ -119,7 +120,7 @@ public class BaseRestEndPoint extends AbstractController {
      *
      * @return
      */
-    public void pagedResponse(
+    protected void pagedResponse(
             HttpServletRequest request,
             HttpServletResponse response,
             Long resourceCount, Integer currentPage, Integer pageSize) {
@@ -151,15 +152,6 @@ public class BaseRestEndPoint extends AbstractController {
         response.setHeader(ResourceLink, linkMap(map));
     }
 
-    private String linkMap(Map<String, String> map) {
-        StringBuffer links = new StringBuffer("");
-        for (String key : map.keySet()) {
-            links.append(map.get(key)).append("; ").append(key);
-        }
-
-        return links.toString();
-    }
-
     protected Integer reducePage(Integer page) {
         if (page != null || page > 0) {
             page = page - 1;
@@ -179,7 +171,15 @@ public class BaseRestEndPoint extends AbstractController {
             }
         }
 
-
         return StringUtils.isEmpty(userAgent) ? "" : userAgent.split(" ").length>1?userAgent.split(" ")[1]:userAgent.split(" ")[0];
+    }
+
+    private String linkMap(Map<String, String> map) {
+        StringBuffer links = new StringBuffer("");
+        for (String key : map.keySet()) {
+            links.append(map.get(key)).append("; ").append(key);
+        }
+
+        return links.toString();
     }
 }

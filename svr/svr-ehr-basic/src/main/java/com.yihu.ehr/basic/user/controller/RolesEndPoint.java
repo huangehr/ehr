@@ -85,7 +85,7 @@ public class RolesEndPoint extends EnvelopRestEndPoint{
             @RequestBody String dataJson) throws IOException {
         Roles roles = toEntity(dataJson,Roles.class);
         if (null == rolesService.retrieve(roles.getId())) {
-            throw new ApiException(ErrorCode.MISSING_REQUEST_RESOURCE, "角色组未找到！");
+            throw new ApiException(ErrorCode.NOT_FOUND, "角色组未找到！");
         }
         Roles rolesNew = rolesService.save(roles);
         return convertToModel(rolesNew,MRoles.class,null);
@@ -107,7 +107,7 @@ public class RolesEndPoint extends EnvelopRestEndPoint{
             @PathVariable(value = "id") long id){
         Roles roles = rolesService.retrieve(id);
         if (roles == null) {
-            throw new ApiException(ErrorCode.MISSING_REQUEST_RESOURCE, "角色组未找到！");
+            throw new ApiException(ErrorCode.NOT_FOUND, "角色组未找到！");
         }
         return convertToModel(roles,MRoles.class);
     }

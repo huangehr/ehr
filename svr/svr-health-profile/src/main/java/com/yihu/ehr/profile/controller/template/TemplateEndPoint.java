@@ -1,6 +1,7 @@
 package com.yihu.ehr.profile.controller.template;
 
 import com.google.common.io.Files;
+import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.exception.ApiException;
@@ -83,7 +84,9 @@ public class TemplateEndPoint extends BaseRestEndPoint {
     public MTemplate getTemplate(@ApiParam(value = "模板ID")
                                  @PathVariable(value = "id") int id) {
         ArchiveTemplate template = templateService.getTemplate(id);
-        if (null == template) throw new ApiException(HttpStatus.NOT_FOUND, "Template not found");
+        if (null == template) {
+            throw new ApiException(ErrorCode.NOT_FOUND, "Template not found");
+        }
 
         return convertToModel(template, MTemplate.class, null);
     }
@@ -108,7 +111,9 @@ public class TemplateEndPoint extends BaseRestEndPoint {
                             @ApiParam(value = "模板JSON")
                             @RequestBody String model) throws IOException {
         ArchiveTemplate tpl = templateService.getTemplate(id);
-        if (null == tpl) throw new ApiException(HttpStatus.NOT_FOUND, "Template not found");
+        if (null == tpl) {
+            throw new ApiException(ErrorCode.NOT_FOUND, "Template not found");
+        }
 
         ArchiveTemplate template = toEntity(model, ArchiveTemplate.class);
         template.setId(id);
@@ -124,10 +129,12 @@ public class TemplateEndPoint extends BaseRestEndPoint {
                                    @RequestParam(value = "pc", defaultValue = "true") boolean pc,
                                    HttpServletResponse response) throws Exception {
         ArchiveTemplate template = templateService.getTemplate(id);
-        if (template == null) throw new ApiException(HttpStatus.NOT_FOUND, "Template not found");
-        if (StringUtils.isEmpty(template.getPcTplURL()))
-            throw new ApiException(HttpStatus.NOT_FOUND, "Template content is empty.");
-
+        if (template == null) {
+            throw new ApiException(ErrorCode.NOT_FOUND, "Template not found");
+        }
+        if (StringUtils.isEmpty(template.getPcTplURL())) {
+            throw new ApiException(ErrorCode.NOT_FOUND, "Template content is empty.");
+        }
         IOUtils.copy(new ByteArrayInputStream(template.getContent(pc)), response.getOutputStream());
 
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
@@ -144,7 +151,9 @@ public class TemplateEndPoint extends BaseRestEndPoint {
                                    @ApiParam(value = "展示文件")
                                    @RequestPart() MultipartFile file) throws Exception {
         ArchiveTemplate template = templateService.getTemplate(id);
-        if (template == null) throw new ApiException(HttpStatus.NOT_FOUND, "Template not found");
+        if (template == null) {
+            throw new ApiException(ErrorCode.NOT_FOUND, "Template not found");
+        }
 
         InputStream stream = file.getInputStream();
         template.setContent(pc, stream);
@@ -170,8 +179,7 @@ public class TemplateEndPoint extends BaseRestEndPoint {
             @ApiParam(name = "page", value = "页码")
             @RequestParam(value = "page", defaultValue = "1", required = false) int page,
             HttpServletRequest request,
-            HttpServletResponse response
-    ) throws Exception {
+            HttpServletResponse response) throws Exception {
         File tempFile = Files.createTempDir();
         String zipName = tempFile.getAbsolutePath() + ".zip";
         File zipFile = null;
@@ -186,20 +194,12 @@ public class TemplateEndPoint extends BaseRestEndPoint {
                 writeTplContent(tempFile, template, "-pc.html", pc);
                 writeTplContent(tempFile, template, "-mobile.html", mobile);
             }
-
             zipFile = new Zipper().zipFile(tempFile, zipName);
-
             // send file
             IOUtils.copy(new ByteArrayInputStream(FileUtils.readFileToByteArray(zipFile)), response.getOutputStream());
-
             response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
             response.setHeader("Content-Disposition", "attachment; filename=" + tempFile.getName() + ".zip");
             response.flushBuffer();
-        } catch (IOException e) {
-            String message = "Unable to download profile template, " + e.getMessage();
-
-            LogService.getLogger().error(message);
-            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, message);
         } finally {
             FileUtils.deleteQuietly(tempFile);
             FileUtils.deleteQuietly(zipFile);
