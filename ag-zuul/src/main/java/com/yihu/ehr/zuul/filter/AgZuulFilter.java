@@ -57,7 +57,7 @@ public class AgZuulFilter extends ZuulFilter {
         RequestContext ctx = RequestContext.getCurrentContext();
         HttpServletRequest request = ctx.getRequest();
         String url = request.getRequestURI();
-        if (url.startsWith("/authentication/")) {
+        if (url.startsWith("/authentication/") || url.equals("/basic/api/v1.0/users/h5/handshake")) {
             return null;
         }
         String accessToken = this.extractToken(request);

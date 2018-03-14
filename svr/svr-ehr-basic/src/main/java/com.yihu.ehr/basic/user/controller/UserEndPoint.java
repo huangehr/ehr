@@ -4,19 +4,20 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.basic.dict.service.SystemDictEntryService;
 import com.yihu.ehr.basic.patient.service.DemographicService;
 import com.yihu.ehr.basic.security.service.UserSecurityService;
-import com.yihu.ehr.constants.ServiceApi;
+import com.yihu.ehr.basic.user.entity.Doctors;
+import com.yihu.ehr.basic.user.entity.User;
+import com.yihu.ehr.basic.user.service.DoctorService;
+import com.yihu.ehr.basic.user.service.UserService;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.ServiceApi;
+import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.entity.dict.SystemDictEntry;
 import com.yihu.ehr.entity.patient.DemographicInfo;
 import com.yihu.ehr.entity.security.UserKey;
 import com.yihu.ehr.entity.security.UserSecurity;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
+import com.yihu.ehr.model.user.MH5Handshake;
 import com.yihu.ehr.model.user.MUser;
-import com.yihu.ehr.basic.user.entity.Doctors;
-import com.yihu.ehr.basic.user.entity.User;
-import com.yihu.ehr.basic.user.service.DoctorService;
-import com.yihu.ehr.basic.user.service.UserService;
-import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.id.BizObject;
 import com.yihu.ehr.util.log.LogService;
@@ -36,7 +37,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.text.ParseException;
@@ -54,6 +57,10 @@ public class UserEndPoint extends EnvelopRestEndPoint {
 
     @Value("${default.password}")
     private String default_password = "123456";
+    @Value("${h5.secret}")
+    private String secret;
+    @Value("${h5.appId}")
+    private String appId;
     @Autowired
     private UserService userService;
     @Autowired
@@ -102,7 +109,7 @@ public class UserEndPoint extends EnvelopRestEndPoint {
                 }
             }
             userList = userService.searchUsers(orgCodes, realName, userType, page, size);
-            Long totalCount =userService.searchUsersCount(orgCodes, realName, userType);
+            Long totalCount = userService.searchUsersCount(orgCodes, realName, userType);
             pagedResponse(request, response, totalCount, page, size);
 
         } else {
@@ -207,12 +214,12 @@ public class UserEndPoint extends EnvelopRestEndPoint {
         //User user = userManager.getUserByUserName(userName);
         //TODO 可根据帐户，手机号，身份证号登陆接口新增
         List<User> users = userService.getUserForLogin(userName);
-        if(users != null){
-            if(users.size() == 1){
+        if (users != null) {
+            if (users.size() == 1) {
                 return convertToModel(users.get(0), MUser.class);
             }
         }
-         return null;
+        return null;
     }
 
     @RequestMapping(value = ServiceApi.Users.UserAdminPassword, method = RequestMethod.PUT)
@@ -240,9 +247,9 @@ public class UserEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "重新分配密钥", notes = "重新分配密钥")
     public Map<String, String> distributeKey(
             @ApiParam(name = "user_id", value = "登录帐号", defaultValue = "")
-            @PathVariable(value = "user_id") String userId) throws Exception{
+            @PathVariable(value = "user_id") String userId) throws Exception {
         User user = userService.getUser(userId);
-        if(null == user) {
+        if (null == user) {
             return null;
         }
         UserSecurity userSecurity = userSecurityService.getKeyByUserId(userId, false);
@@ -265,10 +272,10 @@ public class UserEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "查询用户公钥", notes = "查询用户公钥")
     public Envelop getKey(
             @ApiParam(name = "user_id", value = "登录帐号", defaultValue = "")
-            @PathVariable(value = "user_id") String userId) throws Exception{
+            @PathVariable(value = "user_id") String userId) throws Exception {
         Envelop envelop = new Envelop();
         User user = userService.getUser(userId);
-        if(null == user) {
+        if (null == user) {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("用户不存在");
             return envelop;
@@ -344,7 +351,7 @@ public class UserEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Users.UserEmailNoExistence, method = RequestMethod.GET)
     @ApiOperation(value = "判断用户邮件是否存在")
     public boolean isEmailExists(@RequestParam(value = "email") String email) {
-        return  userService.getUserByEmail(email)!= null;
+        return userService.getUserByEmail(email) != null;
     }
 
     @RequestMapping(value = ServiceApi.Users.UserTelephoneNoExistence, method = RequestMethod.GET)
@@ -432,39 +439,40 @@ public class UserEndPoint extends EnvelopRestEndPoint {
     }
 
 
-    @RequestMapping(value = ServiceApi.Users.UserPhoneExistence,method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Users.UserPhoneExistence, method = RequestMethod.POST)
     @ApiOperation("获取已存在电话号码")
     public List idExistence(
-            @ApiParam(name="phones",value="phones",defaultValue = "")
+            @ApiParam(name = "phones", value = "phones", defaultValue = "")
             @RequestBody String phones) throws Exception {
 
         List existPhones = userService.idExist(toEntity(phones, String[].class));
         return existPhones;
     }
 
-    @RequestMapping(value = ServiceApi.Users.UserOnePhoneExistence,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Users.UserOnePhoneExistence, method = RequestMethod.GET)
     @ApiOperation("根据过滤条件判断是否存在")
     public boolean isExistence(
-            @ApiParam(name="filters",value="filters",defaultValue = "")
-            @RequestParam(value="filters") String filters) throws Exception {
+            @ApiParam(name = "filters", value = "filters", defaultValue = "")
+            @RequestParam(value = "filters") String filters) throws Exception {
 
-        List<User> user = userService.search("",filters,"", 1, 1);
-        return user!=null && user.size()>0;
+        List<User> user = userService.search("", filters, "", 1, 1);
+        return user != null && user.size() > 0;
     }
-    @RequestMapping(value = ServiceApi.Users.UserEmailExistence,method = RequestMethod.POST)
+
+    @RequestMapping(value = ServiceApi.Users.UserEmailExistence, method = RequestMethod.POST)
     @ApiOperation("获取已存在邮箱")
     public List emailsExistence(
-            @ApiParam(name="emails",value="emails",defaultValue = "")
+            @ApiParam(name = "emails", value = "emails", defaultValue = "")
             @RequestBody String emails) throws Exception {
 
         List existPhones = userService.emailsExistence(toEntity(emails, String[].class));
         return existPhones;
     }
 
-    @RequestMapping(value = ServiceApi.Users.UseridCardNoExistence,method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Users.UseridCardNoExistence, method = RequestMethod.POST)
     @ApiOperation("获取已存在身份证号码")
     public List idCardNoExistence(
-            @ApiParam(name="idCardNos",value="idCardNos",defaultValue = "")
+            @ApiParam(name = "idCardNos", value = "idCardNos", defaultValue = "")
             @RequestBody String idCardNos) throws Exception {
 
         List existidCardNos = userService.idCardNosExist(toEntity(idCardNos, String[].class));
@@ -485,7 +493,7 @@ public class UserEndPoint extends EnvelopRestEndPoint {
             @RequestBody String userJsonData) throws Exception {
         User user = toEntity(userJsonData, User.class);
         String userType = user.getUserType();
-        if(!StringUtils.isEmpty(userType)){
+        if (!StringUtils.isEmpty(userType)) {
             SystemDictEntry dict = dictEntryService.getDictEntry(15, userType);
             if (dict != null) {
                 user.setDType(userType);
@@ -502,10 +510,68 @@ public class UserEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "tel") String tel) throws Exception {
 
         User user = userService.getUserByTelephone(tel);
-        if(user == null){
+        if (user == null) {
             return null;
         }
         MUser mUser = convertToModel(user, MUser.class);
         return mUser;
+    }
+
+
+    @RequestMapping(value = ServiceApi.Users.H5Handshake, method = RequestMethod.GET)
+    @ApiOperation(value = "医疗服务:提供二次握手的URL", notes = "医疗服务:提供二次握手的URL")
+    public MH5Handshake getH5Handshake(
+            @ApiParam(name = "thirdPartyUserId", value = "第三方登录账号ID", defaultValue = "")
+            @RequestParam(name = "thirdPartyUserId") String thirdPartyUserId,
+            @ApiParam(name = "ts", value = "时间戳（相对于1970-1-1的毫秒数）", defaultValue = "")
+            @RequestParam(name = "ts") String ts,
+            @ApiParam(name = "sign", value = "签名串", defaultValue = "")
+            @RequestParam(name = "sign") String sign) {
+        MH5Handshake handshake = new MH5Handshake();
+        //校验合法性
+        if (!validSign(thirdPartyUserId, ts, sign)) {
+            handshake.setCode("-100001");
+            handshake.setMessage("签名校验失败");
+            return handshake;
+        }
+
+        User user = userService.getUser(thirdPartyUserId);
+        if (user == null) {
+            handshake.setCode("-10000");
+            handshake.setMessage("账号不存在");
+            return handshake;
+        }
+
+        handshake.setCode("10000");
+        handshake.setMessage("Yes");
+        handshake.setUserName(user.getRealName());
+        handshake.setCardNo(user.getIdCardNo());
+        if (!StringUtils.isEmpty(user.getGender())) {
+            handshake.setSex(Integer.parseInt(user.getGender()));
+        }
+        handshake.setTel(user.getTelephone());
+        return handshake;
+    }
+
+    /**
+     * 校验sign签名的合法性
+     * 算法为：thirdPartyUserId的值+ts的值+appId+secret（健康之路分配给第三方的秘钥） 字符串串起来的做SHA1签名，
+     * 最后将签名值转换为小写（其中加号表示字符串拼接，不代表实际字符）
+     *
+     * @param thirdPartyUserId 第三方登录账号ID
+     * @param ts               时间戳
+     * @param sign             签名串
+     * @return 如果通过返回 <code>true</code>
+     */
+    private boolean validSign(String thirdPartyUserId, String ts, String sign) {
+        String tempStr = new StringBuilder(thirdPartyUserId)
+                .append(ts)
+                .append(appId)
+                .append(secret).toString();
+        tempStr = DigestUtils.sha1Hex(tempStr).toLowerCase();
+        if (tempStr.equals(sign)) {
+            return true;
+        }
+        return false;
     }
 }
