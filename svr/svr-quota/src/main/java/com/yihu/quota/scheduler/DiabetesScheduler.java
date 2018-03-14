@@ -74,7 +74,7 @@ public class DiabetesScheduler {
 	 * 每天2点 执行一次
 	 * @throws Exception
 	 */
-	@Scheduled(cron = "0 45 16 * * ?")
+	@Scheduled(cron = "0 01 02 * * ?")
 	public void validatorIdentityScheduler(){
 
 		try {
@@ -166,7 +166,8 @@ public class DiabetesScheduler {
 						Map<String,Object> map = hbaseDao.getResultMap(ResourceCore.MasterTable, mainRowkey);
 						//个人信息 > 姓名，身份证，就诊卡号，性别，出生日期，出生年份，区县，常住地址，常住地址经纬度，疾病名称，疾病code
 						if(map.get(keyEventDate) != null){
-							personalInfo.setEventDate(DateUtil.formatCharDate(map.get(keyEventDate).toString(), DateUtil.DATE_WORLD_FORMAT));					}
+							Date eventDate = DateUtil.formatCharDate(map.get(keyEventDate).toString(), DateUtil.DATE_WORLD_FORMAT);
+							personalInfo.setEventDate(DateUtils.addHours(eventDate,8));					}
 						if(map.get(keyArea) != null){
 							personalInfo.setTown(map.get(keyArea).toString());
 							personalInfo.setTownName(map.get(keyAreaName).toString());
@@ -223,7 +224,7 @@ public class DiabetesScheduler {
 						if(map.get(keyPatientName) != null){
 							name = map.get(keyPatientName).toString();
 						}
-						fq = "rowkey:"+ subRowkey +"*";
+						fq = "rowkey:"+ mainRowkey +"*";
 						//查询主表对应的细表的数据 循环解析
 						List<String> subRrowKeyList2 = selectSubRowKey(ResourceCore.SubTable, null, fq, 10000);
 						//细表解析保存 start
