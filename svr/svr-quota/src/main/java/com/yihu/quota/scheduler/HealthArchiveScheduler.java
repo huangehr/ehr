@@ -31,7 +31,7 @@ public class HealthArchiveScheduler {
     @Autowired
     private HealthArchiveSchedulerService healthArchiveSchedulerService;
 
-    @Scheduled(cron = "25 28 9 * * ?")
+    @Scheduled(cron = "25 41 9 * * ?")
     public void validatorIdentityScheduler() throws Exception{
 
         String q =  ""; // 查询条件
@@ -56,8 +56,8 @@ public class HealthArchiveScheduler {
         Date now = new Date();
         String nowDate = DateUtil.formatDate(now,DateUtil.DEFAULT_DATE_YMD_FORMAT);
         boolean flag = true;
-        String startDate = "2017-10-01";
-        String endDate = "2017-11-01";
+        String startDate = "2015-10-01";
+        String endDate = "2015-11-01";
         while (flag) {
             // 当前时间大于初始化时间，就所有数据初始化，每个月递增查询，当前时间小于于初始时间每天抽取
             if(basesicUtil.compareDate(initializeDate,nowDate) == -1){
