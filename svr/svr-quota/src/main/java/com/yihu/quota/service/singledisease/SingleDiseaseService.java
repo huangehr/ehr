@@ -38,7 +38,7 @@ public class SingleDiseaseService {
         String sql = "select addressLngLat from single_disease_personal_index where addressLngLat is not null ";
         List<Map<String, Object>> listData = parseIntegerValue(sql);
         Map<String, Object> map = new HashMap<>();
-        if (null != listData && listData.get(0).size() > 0) {
+        if (null != listData && listData.size() > 0 && listData.get(0).size() > 0) {
             listData.forEach(item -> {
                 map.put(item.get("addressLngLat") + "", 1);
             });
