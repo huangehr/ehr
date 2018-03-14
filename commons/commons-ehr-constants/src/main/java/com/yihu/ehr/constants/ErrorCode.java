@@ -92,9 +92,10 @@ public enum ErrorCode {
     NOT_EXTENDED(510, "Not Extended"),
     NETWORK_AUTHENTICATION_REQUIRED(511, "Network Authentication Required"),
     // --------------------- ehr ---------------------
-    MISSING_USER_AGENT(-1, "Missing User Agent"),
-    RATE_LIMIT_EXCEEDING(-2, "Rate Limit Exceeding"),
-    OBJECT_NOT_FOUND(-3, "Object Not Found");
+    REQUEST_NOT_COMPLETED(-1, "Request Not Completed"), //默认错误码，请求未完成
+    MISSING_USER_AGENT(-2, "Missing User Agent"),
+    RATE_LIMIT_EXCEEDING(-3, "Rate Limit Exceeding"),
+    OBJECT_NOT_FOUND(-4, "Object Not Found");
 
     private final int value;
     private final String reasonPhrase;

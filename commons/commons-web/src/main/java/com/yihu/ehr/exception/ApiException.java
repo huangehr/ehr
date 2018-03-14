@@ -40,7 +40,7 @@ public class ApiException extends RuntimeException {
     private String documentURL; //文档连接
 
     public ApiException(String message) {
-        this(ErrorCode.NOT_IMPLEMENTED, message);
+        this(ErrorCode.REQUEST_NOT_COMPLETED, message);
     }
 
     public ApiException(ErrorCode errorCode, String message) {
