@@ -103,6 +103,7 @@ public class DiabetesScheduler {
 			String keyChineseMedicine= "EHR_000131";//中药
 			List<PersonalInfoModel> personalInfoList = new ArrayList<>();
 			List<CheckInfoModel> checkInfoList = new ArrayList<>();
+			objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
 			BasesicUtil basesicUtil = new BasesicUtil();
 			String initializeDate = "2018-03-13";
@@ -311,7 +312,6 @@ public class DiabetesScheduler {
 										checkInfoList.add(checkInfo);
 									}
 								}
-								objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 								//保存到ES库
 								//检查信息保存  并发症 去重处理，已保存的不在保存  身份证和就诊卡ID
 								for(CheckInfoModel checkInfo : checkInfoList){
