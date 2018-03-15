@@ -31,7 +31,7 @@ public class HealthArchiveScheduler {
     @Autowired
     private HealthArchiveSchedulerService healthArchiveSchedulerService;
 
-    @Scheduled(cron = "25 38 09 * * ?")
+    @Scheduled(cron = "44 40 12 * * ?")
     public void validatorIdentityScheduler() throws Exception{
 
         String q =  ""; // 查询条件
@@ -40,7 +40,7 @@ public class HealthArchiveScheduler {
         String keyEventType = "event_type"; // 就诊类型
         String keyArea = "org_area";  // 行政区划代码  EHR_001225
         String keyDemographicId = "demographic_id"; // 身份证
-        String keyCardId = "card_id	";
+        String keyCardId = "card_id";
         String keyHealthProblem = "health_problem"; // 健康问题
         String keyPatientName = "patient_name"; // 患者姓名
         String keySex = "EHR_000019";   // 性别
