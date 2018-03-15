@@ -42,6 +42,7 @@ public class MDemographicInfo {
         this.idCardNo = idCardNo;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getBirthday() {
         return birthday;
     }

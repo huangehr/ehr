@@ -68,7 +68,9 @@ public class SystemDictEntryEndPoint extends EnvelopRestEndPoint {
             @RequestBody String entryJson) throws IOException{
         SystemDictEntry entry = toEntity(entryJson, SystemDictEntry.class);
         SystemDict systemDict = dictService.retrieve(entry.getDictId());
-        if (systemDict == null) throw new ApiException(ErrorCode.GetDictFaild, "所属字典不存在");
+        if (systemDict == null) {
+            throw new ApiException(ErrorCode.NOT_FOUND, "所属字典不存在");
+        }
         int nextSort = systemDictEntryService.getNextSN(entry.getDictId());
         entry.setSort(nextSort);
         systemDictEntryService.createDictEntry(entry);
@@ -108,7 +110,7 @@ public class SystemDictEntryEndPoint extends EnvelopRestEndPoint {
         SystemDictEntry entry = toEntity(entryJson, SystemDictEntry.class);
         SystemDictEntry temp = systemDictEntryService.retrieve(new DictEntryKey(entry.getCode(), entry.getDictId()));
         if (null == temp) {
-            throw new ApiException(ErrorCode.InvalidSysDictEntry, "字典项不存在");
+            throw new ApiException(ErrorCode.NOT_FOUND, "字典项不存在");
         }
 
         systemDictEntryService.saveDictEntry(entry);

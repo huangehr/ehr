@@ -81,7 +81,9 @@ public class AppApiEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "appApi", value = "对象JSON结构体", allowMultiple = true)
             @RequestBody String appJson) throws Exception {
         AppApi appApi = toEntity(appJson, AppApi.class);
-        if (appApiService.retrieve(appApi.getId()) == null) throw new ApiException(ErrorCode.InvalidAppId, "应用不存在");
+        if (appApiService.retrieve(appApi.getId()) == null) {
+            throw new ApiException(ErrorCode.NOT_FOUND, "应用不存在");
+        }
         appApiService.save(appApi);
         return convertToModel(appApi, MAppApi.class);
     }
@@ -157,7 +159,7 @@ public class AppApiEndPoint extends EnvelopRestEndPoint {
         Envelop envelop = new Envelop();
         List<OpenAppApi> appApiList = appApiService.authApiList(clientId);
         List<OpenAppApi> resultList = new ArrayList<>(appApiList.size());
-        for(OpenAppApi openAppApi : appApiList) {
+        for (OpenAppApi openAppApi : appApiList) {
             openAppApi.setParameter(appApiParameterService.search("appApiId=" + openAppApi.getId()));
             openAppApi.setResponse(appApiResponseService.search("appApiId=" + openAppApi.getId()));
             resultList.add(openAppApi);

@@ -112,7 +112,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "package_crypto") String packageCrypto) throws Exception {
         MKey key = securityClient.getOrgKey(orgCode);
         if (key == null || key.getPublicKey() == null) {
-            throw new ApiException(HttpStatus.FORBIDDEN, "Invalid private key, maybe you miss the organization code?");
+            throw new ApiException(ErrorCode.FORBIDDEN, "Invalid private key, maybe you miss the organization code?");
         }
 
         return RSA.encrypt(packageCrypto, RSA.genPublicKey(key.getPublicKey()));
@@ -135,13 +135,13 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         MKey key = securityClient.getOrgKey(orgCode);
         Package aPackage;
         if (key == null || key.getPrivateKey() == null) {
-            throw new ApiException(HttpStatus.FORBIDDEN, "Invalid private key, maybe you miss the organization code?");
+            throw new ApiException(ErrorCode.FORBIDDEN, "Invalid private key, maybe you miss the organization code?");
         }
         try {
             String password = RSA.decrypt(packageCrypto, RSA.genPrivateKey(key.getPrivateKey()));
             aPackage = packService.receive(pack.getInputStream(), password, md5, orgCode, getClientId(request));
         } catch (Exception ex) {
-            throw new ApiException(HttpStatus.FORBIDDEN, "javax.crypto.BadPaddingException." + ex.getMessage());
+            throw new ApiException(ErrorCode.FORBIDDEN, "javax.crypto.BadPaddingException." + ex.getMessage());
         }
         MPackage mPackage = convertToModel(aPackage, MPackage.class);
         redisTemplate.opsForList().leftPush(RedisCollection.PackageList, objectMapper.writeValueAsString(mPackage));
@@ -244,7 +244,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
 
             return null;
         } catch (Exception ex) {
-            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Cannot download package from server. " + ex.getMessage());
+            throw new ApiException(ErrorCode.INTERNAL_SERVER_ERROR, "Cannot download package from server. " + ex.getMessage());
         }
     }
 
@@ -298,13 +298,15 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "md5") String md5) throws Exception {
 
         MultipartFile multipartFile = pack.getFile("file");
-        if (multipartFile == null) throw new ApiException(HttpStatus.FORBIDDEN, ErrorCode.MissParameter, "file");
+        if (multipartFile == null) {
+            throw new ApiException(ErrorCode.BAD_REQUEST, "file");
+        }
 
         MUser user = userClient.getUserByUserName(userName);
         MKey key = securityClient.getUserKey(user.getId());
         String privateKey = key.getPrivateKey();
         if (null == privateKey)
-            throw new ApiException(HttpStatus.FORBIDDEN, "Invalid public key, maybe you miss the user name?");
+            throw new ApiException(ErrorCode.FORBIDDEN, "Invalid public key, maybe you miss the user name?");
 
         String unzipPwd = RSA.decrypt(packageCrypto, RSA.genPrivateKey(privateKey));
         Package aPackage = packService.receive(multipartFile.getInputStream(), unzipPwd, md5, null, null);

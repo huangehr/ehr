@@ -296,16 +296,23 @@ public class ServiceApi {
      * 档案查询接口
      */
     public static class Profiles {
+        public static final String ProfileInfo = "/profile/baseInfo"; //基本信息
+        public static final String ProfileHistory = "/profile/history"; //患病史
+        public static final String HealthProblem = "/profile/healthProblem"; //主要健康问题
+        public static final String HealthProblemSub = "/profile/healthProblemSub"; //主要健康问题诊断情况
+        public static final String MedicalEvents = "/profile/medicalEvents"; //门诊/住院事件(时间轴)
+        public static final String CDAClass = "/profile/cdaClass"; //cda分类
+        public static final String CDAData = "/profile/cdaData"; //cda数据
+        public static final String MedicationRecords = "/profile/medicationRecords"; //患者用药清单
+        public static final String MedicationSub = "/profile/medicationSub"; //患者用药详情
+        public static final String InspectionRecords = "/profile/inspectionRecords"; //检查检验记录
+        public static final String InspectionSub = "/profile/inspectionSub"; //检查检验详情
+        // ------------------------------ 以上为已对接接口 ------------------------------
+
         public static final String ProfileLucene = "/profile/lucene"; //全文检索
-        public static final String ProfileInfo = "/{demographic_id}/profile/info"; //基本信息
-        public static final String ProfileHistory = "/{demographic_id}/profile/history"; //患病史
-        public static final String HealthProblem = "/{demographic_id}/profile/health_problem"; //主要健康问题
-        public static final String HealthProblemSub = "/{last_visit_record}/profile/health_problem_sub"; //主要健康问题诊断情况
         public static final String MedicalDisease = "/{demographic_id}/profile/medical_disease"; //就诊过疾病
         public static final String MedicalArea = "/{demographic_id}/profile/medical_area"; //就诊过区域
         public static final String MedicalYear = "/{demographic_id}/profile/medical_year"; //就诊过年份
-        public static final String MedicalEvents = "/{demographic_id}/profile/medical_events"; //门诊/住院事件(时间轴)
-        public static final String MedicationStat = "/{demographic_id}/profile/medication_stat"; //患者用药清单
         public static final String MedicationUsed = "/{demographic_id}/profile/medication_used"; //患者常用药（按次数）
         public static final String MedicalEvent = "/{event_no}/info"; //某次住院/门诊事件信息
 
@@ -328,16 +335,13 @@ public class ServiceApi {
         public static final String HospitalizedOrdersLongtime = "/{demographic_id}/hospitalized/orders/longtime"; //住院长期医嘱
         public static final String HospitalizedDeath = "/{demographic_id}/hospitalized/death"; //住院死因链情况
 
-
         public static final String CDADocumentId = "/profile/cda/document_id"; //cda模板（通过event_no + cda_type）
-        public static final String CDAClass = "/{profile_id}/cda_class"; //cda分类
-        public static final String CDAData = "/{profile_id}/cda_data"; //cda数据
+
         public static final String CDADocument = "/{profile_id}/cda_document"; //完整CDA文档
 
 
         public static final String ExaminationReport = "/{demographic_id}/examination"; //检查报告单
         public static final String ExaminationImg = "/{demographic_id}/examination/img"; //检查报告单图片
-
 
         public static final String LaboratoryReport = "/{demographic_id}/laboratory"; //检验报告单
         public static final String LaboratoryImg = "/{demographic_id}/laboratory/img"; //检验报告单图片
@@ -716,6 +720,7 @@ public class ServiceApi {
         public static final String GetOrgAndDeptRelation = "/users/getOrgAndDeptRelation";
         public static final String InitializeSystemUser = "/users/initialize";
         public static final String UsersByTel = "/users/tel";
+        public static final String H5Handshake = "/users/h5/handshake";
     }
 
     public static class TelVerification {
@@ -771,16 +776,13 @@ public class ServiceApi {
 
     }
 
-
     public static class HealthProfile {
         public static final String Profiles = "/health_profiles";
         public static final String ProfileSearch = "/health_profiles/search";
         public static final String Profile = "/health_profiles/{profile_id}";
         public static final String ProfileDocument = "/health_profiles/{profile_id}/documents/{document_id}";
-
         public static final String Diagnosis = "/health_profile/disease/diagnosis";
         public static final String MajorIssues = "/health_profile/disease/major_issues";
-
         public static final String Prescriptions = "/health_profile/prescriptions";
         public static final String Drugs = "/health_profile/drugs";
         public static final String Lis = "/health_profile/lis";
