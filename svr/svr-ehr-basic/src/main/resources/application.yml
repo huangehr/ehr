@@ -100,7 +100,9 @@ es:
   host: http://172.19.103.68:9200
   tHost: 172.19.103.68:9300
   clusterName: jkzl
-
+h5:
+  secret: RsjM5fMLrUI6D/fu31L2E5ePGqsxneTAKW0UjsnB2+jYaCTHEJz05xc4pi7G7oxg
+  appId: 9000401
 ---
 spring:
   profiles: prod_fz
