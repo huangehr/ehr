@@ -3,7 +3,6 @@ package com.yihu.quota.scheduler;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.profile.core.ResourceCore;
-import com.yihu.ehr.redis.schema.HealthArchiveSchema;
 import com.yihu.ehr.solr.SolrUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.quota.service.scheduler.HealthArchiveSchedulerService;
@@ -32,7 +31,7 @@ public class HealthArchiveScheduler {
     @Autowired
     private HealthArchiveSchedulerService healthArchiveSchedulerService;
 
-    @Scheduled(cron = "25 49 17 * * ?")
+    @Scheduled(cron = "25 38 09 * * ?")
     public void validatorIdentityScheduler() throws Exception{
 
         String q =  ""; // 查询条件
@@ -72,7 +71,7 @@ public class HealthArchiveScheduler {
                 startDate = DateUtil.formatDate(sDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
                 Date eDate = DateUtils.addMonths(DateUtil.parseDate(startDate,DateUtil.DEFAULT_DATE_YMD_FORMAT),1);
                 endDate = DateUtil.formatDate(eDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
-                if(startDate.equals("2017-04-01")){
+                if(startDate.equals("2018-04-01")){
                     flag = false;
                 }
                 System.out.println("startDate = " + startDate);

@@ -8,7 +8,6 @@ import com.yihu.ehr.profile.core.ResourceCore;
 import com.yihu.ehr.redis.schema.HealthArchiveSchema;
 import com.yihu.ehr.solr.SolrUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
-import com.yihu.quota.etl.util.ElasticsearchUtil;
 import com.yihu.quota.vo.HealthArchiveInfoModel;
 import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.CellUtil;
@@ -36,8 +35,6 @@ public class HealthArchiveSchedulerService {
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
-    private ElasticsearchUtil elasticsearchUtil;
-    @Autowired
     private ElasticSearchUtil elasticSearchUtil;
     @Autowired
     private HealthArchiveSchema healthArchiveSchema;
@@ -56,16 +53,16 @@ public class HealthArchiveSchedulerService {
         if(null != archiveInfo.getDemographicId()) {
             List<Map<String, Object>> list = elasticSearchUtil.findByField(index, type, "demographicId", archiveInfo.getDemographicId());
             if(list == null || list.size() == 0) {
-                if (!healthArchiveSchema.hasKey(archiveInfo.getDemographicId())) {
-                    healthArchiveSchema.set(archiveInfo.getDemographicId(), archiveInfo.getDemographicId(), 86400);
+                if (null == healthArchiveSchema.get(archiveInfo.getDemographicId())) {
+                    healthArchiveSchema.set(archiveInfo.getDemographicId(), archiveInfo.getDemographicId(), 54000);
                     elasticSearchClient.index(index, type, source);
                 }
             }
         }else if(null != archiveInfo.getCardId()) {
             List<Map<String, Object>> list = elasticSearchUtil.findByField(index, type, "cardId",archiveInfo.getCardId());
             if(list == null || list.size() == 0) {
-                if (!healthArchiveSchema.hasKey(archiveInfo.getCardId())) {
-                    healthArchiveSchema.set(archiveInfo.getCardId(), archiveInfo.getCardId(), 86400);
+                if (null == healthArchiveSchema.get(archiveInfo.getCardId())) {
+                    healthArchiveSchema.set(archiveInfo.getCardId(), archiveInfo.getCardId(), 54000);
                     elasticSearchClient.index(index, type, source);
                 }
             }
