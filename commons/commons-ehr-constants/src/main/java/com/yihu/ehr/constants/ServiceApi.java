@@ -720,6 +720,7 @@ public class ServiceApi {
         public static final String GetOrgAndDeptRelation = "/users/getOrgAndDeptRelation";
         public static final String InitializeSystemUser = "/users/initialize";
         public static final String UsersByTel = "/users/tel";
+        public static final String H5Handshake = "/users/h5/handshake";
     }
 
     public static class TelVerification {
