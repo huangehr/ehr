@@ -27,6 +27,9 @@ public class PersonalInfoModel {
     private String addressLngLat;//常住地址经纬度
     private String disease;//疾病
     private String diseaseName;
+    private String diseaseType;//疾病类型 1 I型糖尿病  2 II型糖尿病 3 妊娠糖尿病 4 其他糖尿病
+    private String diseaseTypeName;
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssZ")// 2017-06-24T11:51:30+080
     private Date eventDate;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssZ")// 2017-06-24T11:51:30+080
@@ -159,5 +162,21 @@ public class PersonalInfoModel {
 
     public void setEventDate(Date eventDate) {
         this.eventDate = eventDate;
+    }
+
+    public String getDiseaseType() {
+        return diseaseType;
+    }
+
+    public void setDiseaseType(String diseaseType) {
+        this.diseaseType = diseaseType;
+    }
+
+    public String getDiseaseTypeName() {
+        return diseaseTypeName;
+    }
+
+    public void setDiseaseTypeName(String diseaseTypeName) {
+        this.diseaseTypeName = diseaseTypeName;
     }
 }

@@ -38,7 +38,7 @@ public class SingleDiseaseService {
         String sql = "select addressLngLat from single_disease_personal_index where addressLngLat is not null ";
         List<Map<String, Object>> listData = parseIntegerValue(sql);
         Map<String, Object> map = new HashMap<>();
-        if (null != listData && listData.get(0).size() > 0) {
+        if (null != listData && listData.size() > 0 && listData.get(0).size() > 0) {
             listData.forEach(item -> {
                 map.put(item.get("addressLngLat") + "", 1);
             });
@@ -148,24 +148,22 @@ public class SingleDiseaseService {
      * @return
      */
     public Map<String, Object> getHealthProInfo(String code) {
-        String sql = "select count(*) from single_disease_personal_index";
+        String sql = "select diseaseTypeName,count(*) from single_disease_personal_index group by diseaseTypeName";
+        List<Map<String, Object>> listData = parseIntegerValue(sql);
         Map<String, Object> map = new HashMap<>();
         List<String> legendData = new ArrayList<>();
         List<Map<String, Object>> seriesData = new ArrayList<>();
-        legendData.add("患病人群");
-        legendData.add("健康人群");
-        // 获取患病人数
-        long diseaseCount = elasticsearchUtil.getCountBySql(sql);
-        Map<String, Object> diseaseMap = new HashMap<>();
-        diseaseMap.put("name", "患病人群");
-        diseaseMap.put("value", diseaseCount);
-        seriesData.add(diseaseMap);
-        // 获取健康人群人数
-        Map<String, Object> healthMap = new HashMap<>();
-        healthMap = getHealthCountInfo(healthMap, code);
-        seriesData.add(healthMap);
-        map.put("legendData", legendData);
-        map.put("seriesData", seriesData);
+        if (null != listData && listData.get(0).size() > 0) {
+            listData.forEach(one -> {
+                Map<String, Object> myMap = new HashMap<>();
+                legendData.add(one.get("diseaseTypeName") + "");
+                myMap.put("name", one.get("diseaseTypeName") + "");
+                myMap.put("value", one.get("COUNT(*)") + "");
+                seriesData.add(myMap);
+            });
+            map.put("legendData", legendData);
+            map.put("seriesData", seriesData);
+        }
         return map;
     }
 
