@@ -3,11 +3,13 @@ package com.yihu.quota.service.quota;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.elasticsearch.ElasticSearchClient;
 import com.yihu.ehr.elasticsearch.ElasticSearchPool;
+import com.yihu.ehr.profile.core.ResourceCore;
+import com.yihu.ehr.solr.SolrUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.quota.dao.jpa.TjQuotaDao;
-import com.yihu.quota.dao.jpa.TjQuotaGovProvisionDao;
 import com.yihu.quota.etl.extract.es.EsResultExtract;
 import com.yihu.quota.etl.model.EsConfig;
+import com.yihu.quota.etl.util.ElasticsearchUtil;
 import com.yihu.quota.model.jpa.TjQuota;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionMain;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionSlave;
@@ -55,7 +57,9 @@ public class BaseStatistsService {
     @Autowired
     ObjectMapper objectMapper;
     @Autowired
-    private TjQuotaGovProvisionDao tjQuotaGovProvisionDao;
+    private SolrUtil solrUtil;
+    @Autowired
+    private ElasticsearchUtil elasticsearchUtil;
 
     private static String orgHealthCategory = "orgHealthCategory";
     public static String orgHealthCategoryCode = "orgHealthCategoryCode";
@@ -115,24 +119,17 @@ public class BaseStatistsService {
     /**
      * 指标除法运算 分母为常量
      * @param molecular
+     * @param denominatorVal
      * @param dimension
      * @param filters
      * @param operation
      * @param operationValue
-     * @param constValue
-     * @param district
      * @return
      * @throws Exception
      */
     public List<Map<String, Object>>  divisionQuotaDenoConstant(String molecular, String dimension,String filters,
-                                                                String operation,String operationValue,String dateType,String constValue, String district) throws Exception {
-        Double denominatorVal = 0.0;
+                                                                String operation,String operationValue,String dateType,Double denominatorVal) throws Exception {
         List<Map<String, Object>> moleList = getQuotaResultList(molecular,dimension,filters,dateType);
-        // 获取分母的数值
-        if ("1".equals(constValue)) {
-            Long sumValue = tjQuotaGovProvisionDao.getSumByDistrict(district);
-            denominatorVal = sumValue.doubleValue();
-        }
         return divisionDenoConstant(dimension, moleList, denominatorVal, Integer.valueOf(operation), Integer.valueOf(operationValue));
     }
 
@@ -720,5 +717,25 @@ public class BaseStatistsService {
             }
         }
         return resultFilter;
+    }
+
+    /**
+     * 获取solr主表HealthProfile的总记录数
+     * @return
+     * @throws Exception
+     */
+    public long getArchiveCount() throws Exception {
+        long count = solrUtil.count(ResourceCore.MasterTable, "", "");
+        return count;
+    }
+
+    /**
+     * 获取ES中health_archive_index索引的总记录数
+     * @return
+     */
+    public long getArchiveManCount() {
+        String sql = "SELECT count(*) FROM health_archive_index";
+        long count = elasticsearchUtil.getCountBySql(sql);
+        return count;
     }
 }
