@@ -172,4 +172,9 @@ public class OrgMemberRelationService extends BaseJpaService<OrgMemberRelation, 
             save(item);
         }
     }
+
+    public List<OrgMemberRelation> getOrgMemberByDeptId(Integer deptId) {
+        List<OrgMemberRelation> orgOrgMemberRelations = relationRepository.getOrgMemberByDeptId(deptId);
+        return orgOrgMemberRelations;
+    }
 }

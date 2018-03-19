@@ -429,15 +429,12 @@ public class ServiceApi {
     public static class AppApiParameter {
         public static final String AppApiParameters = "/appApiParameter";
         public static final String AppApiParameter = "/appApiParameter/{id}";
-
     }
 
     public static class AppApiResponse {
         public static final String AppApiResponses = "/appApiResponse";
         public static final String AppApiResponse = "/appApiResponse/{id}";
     }
-
-
 
     public static class UserApp {
         public static final String UserAppList = "/userAppList";
@@ -743,6 +740,7 @@ public class ServiceApi {
         public static final String GetOrgAndDeptRelation = "/users/getOrgAndDeptRelation";
         public static final String InitializeSystemUser = "/users/initialize";
         public static final String UsersByTel = "/users/tel";
+        public static final String H5Handshake = "/users/h5/handshake";
 
         public static final String Save = "/users/save";
         public static final String Update = "/users/update";

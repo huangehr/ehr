@@ -6,16 +6,23 @@ import com.yihu.ehr.basic.patient.service.DemographicService;
 import com.yihu.ehr.basic.security.service.UserSecurityService;
 import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ServiceApi;
+import com.yihu.ehr.basic.user.entity.Doctors;
+import com.yihu.ehr.basic.user.entity.User;
+import com.yihu.ehr.basic.user.service.DoctorService;
+import com.yihu.ehr.basic.user.service.UserService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.entity.address.Address;
 import com.yihu.ehr.entity.address.AddressDict;
 import com.yihu.ehr.entity.api.AppApiCategory;
+import com.yihu.ehr.constants.ServiceApi;
+import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.entity.dict.SystemDictEntry;
 import com.yihu.ehr.entity.patient.DemographicInfo;
 import com.yihu.ehr.entity.security.UserKey;
 import com.yihu.ehr.entity.security.UserSecurity;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.patient.MDemographicInfo;
+import com.yihu.ehr.model.user.MH5Handshake;
 import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.basic.user.entity.Doctors;
 import com.yihu.ehr.basic.user.entity.User;
@@ -39,7 +46,6 @@ import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import javax.jws.soap.SOAPBinding;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
@@ -213,8 +219,8 @@ public class UserEndPoint extends EnvelopRestEndPoint {
         //User user = userManager.getUserByUserName(userName);
         //TODO 可根据帐户，手机号，身份证号登陆接口新增
         List<User> users = userService.getUserForLogin(userName);
-        if(users != null){
-            if (users.size() == 1){
+        if (users != null) {
+            if (users.size() == 1) {
                 return convertToModel(users.get(0), MUser.class);
             }
         }
@@ -491,7 +497,7 @@ public class UserEndPoint extends EnvelopRestEndPoint {
             @RequestBody String userJsonData) throws Exception {
         User user = toEntity(userJsonData, User.class);
         String userType = user.getUserType();
-        if(!StringUtils.isEmpty(userType)){
+        if (!StringUtils.isEmpty(userType)) {
             SystemDictEntry dict = dictEntryService.getDictEntry(15, userType);
             if (dict != null) {
                 user.setDType(userType);
@@ -508,11 +514,69 @@ public class UserEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "tel") String tel) throws Exception {
 
         User user = userService.getUserByTelephone(tel);
-        if(user == null){
+        if (user == null) {
             return null;
         }
         MUser mUser = convertToModel(user, MUser.class);
         return mUser;
+    }
+
+
+    @RequestMapping(value = ServiceApi.Users.H5Handshake, method = RequestMethod.GET)
+    @ApiOperation(value = "医疗服务:提供二次握手的URL", notes = "医疗服务:提供二次握手的URL")
+    public MH5Handshake getH5Handshake(
+            @ApiParam(name = "thirdPartyUserId", value = "第三方登录账号ID", defaultValue = "")
+            @RequestParam(name = "thirdPartyUserId") String thirdPartyUserId,
+            @ApiParam(name = "ts", value = "时间戳（相对于1970-1-1的毫秒数）", defaultValue = "")
+            @RequestParam(name = "ts") String ts,
+            @ApiParam(name = "sign", value = "签名串", defaultValue = "")
+            @RequestParam(name = "sign") String sign) {
+        MH5Handshake handshake = new MH5Handshake();
+        //校验合法性
+        if (!validSign(thirdPartyUserId, ts, sign)) {
+            handshake.setCode("-100001");
+            handshake.setMessage("签名校验失败");
+            return handshake;
+        }
+
+        User user = userService.getUser(thirdPartyUserId);
+        if (user == null) {
+            handshake.setCode("-10000");
+            handshake.setMessage("账号不存在");
+            return handshake;
+        }
+
+        handshake.setCode("10000");
+        handshake.setMessage("Yes");
+        handshake.setUserName(user.getRealName());
+        handshake.setCardNo(user.getIdCardNo());
+        if (!StringUtils.isEmpty(user.getGender())) {
+            handshake.setSex(Integer.parseInt(user.getGender()));
+        }
+        handshake.setTel(user.getTelephone());
+        return handshake;
+    }
+
+    /**
+     * 校验sign签名的合法性
+     * 算法为：thirdPartyUserId的值+ts的值+appId+secret（健康之路分配给第三方的秘钥） 字符串串起来的做SHA1签名，
+     * 最后将签名值转换为小写（其中加号表示字符串拼接，不代表实际字符）
+     *
+     * @param thirdPartyUserId 第三方登录账号ID
+     * @param ts               时间戳
+     * @param sign             签名串
+     * @return 如果通过返回 <code>true</code>
+     */
+    private boolean validSign(String thirdPartyUserId, String ts, String sign) {
+        String tempStr = new StringBuilder(thirdPartyUserId)
+                .append(ts)
+                .append(appId)
+                .append(secret).toString();
+        tempStr = DigestUtils.sha1Hex(tempStr).toLowerCase();
+        if (tempStr.equals(sign)) {
+            return true;
+        }
+        return false;
     }
 
     // ---------------------------- 适配zuul新代码 start -----------------------------------
