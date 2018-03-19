@@ -33,7 +33,7 @@ public interface RsResourceStatisticsClient {
 
     @ApiOperation(value = "获取特殊机构指标执行结果分页")
     @RequestMapping(value = ServiceApi.TJ.TjGetOrgHealthCategoryQuotaResult, method = RequestMethod.GET)
-    public Envelop getOrgHealthCategoryQuotaResult(
+    Envelop getOrgHealthCategoryQuotaResult(
             @ApiParam(name = "code", value = "指标任务code", required = true)
             @RequestParam(value = "code" , required = true) String code,
             @ApiParam(name = "filters", value = "检索条件", defaultValue = "")
@@ -44,11 +44,19 @@ public interface RsResourceStatisticsClient {
 
     @ApiOperation(value = "获取指标统计报表 二维表")
     @RequestMapping(value = ServiceApi.TJ.GetQuotaReportTwoDimensionalTable, method = RequestMethod.GET)
-    public List<Map<String, Object>> getQuotaReportTwoDimensionalTable(
+    List<Map<String, Object>> getQuotaReportTwoDimensionalTable(
             @ApiParam(name = "quotaCodeStr", value = "指标Code,多个用,拼接", required = true)
             @RequestParam(value = "quotaCodeStr" , required = true) String quotaCodeStr,
             @ApiParam(name = "filter", value = "过滤", defaultValue = "")
             @RequestParam(value = "filter", required = false) String filter,
             @ApiParam(name = "dimension", value = "维度字段", defaultValue = "quotaDate")
             @RequestParam(value = "dimension", required = false) String dimension);
+
+    @RequestMapping(value = ServiceApi.TJ.GetArchiveCount, method = RequestMethod.GET)
+    @ApiOperation(value = "获取档案总数")
+    Envelop getArchiveCount();
+
+    @RequestMapping(value = ServiceApi.TJ.GetArchiveManCount, method = RequestMethod.GET)
+    @ApiOperation(value = "健康档案的建档人数数量")
+    Envelop getArchiveManCount();
 }
