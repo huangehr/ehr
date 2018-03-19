@@ -65,13 +65,17 @@ public class PackageResourceJob implements InterruptableJob {
                 doResolve(pack, packageMgrClient);
             }
         } catch (Exception e) {
-            if(pack != null) {
-                if (StringUtils.isBlank(e.getMessage())) {
-                    packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Failed, "Internal server error, please see task log for detail message.");
-                    PackResolveLogger.error("Internal server error, please see task log for detail message.", e);
-                } else {
-                    packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Failed, e.getMessage());
-                    PackResolveLogger.error(e.getMessage(), e);
+            if (pack != null) {
+                try {
+                    if (StringUtils.isBlank(e.getMessage())) {
+                        packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Failed, "Internal server error, please see task log for detail message.");
+                        PackResolveLogger.error("Internal server error, please see task log for detail message.", e);
+                    } else {
+                        packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Failed, e.getMessage());
+                        PackResolveLogger.error(e.getMessage());
+                    }
+                } catch (Exception e1) {
+                    PackResolveLogger.error(e1.getMessage());
                 }
             }
         }

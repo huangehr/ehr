@@ -304,6 +304,7 @@ public class ServiceApi {
         public static final String CDAClass = "/profile/cdaClass"; //cda分类
         public static final String CDAData = "/profile/cdaData"; //cda数据
         public static final String MedicationRecords = "/profile/medicationRecords"; //患者用药清单
+        public static final String MedicationRanking = "/profile/medicationRanking"; //患者用药排行
         public static final String MedicationSub = "/profile/medicationSub"; //患者用药详情
         public static final String InspectionRecords = "/profile/inspectionRecords"; //检查检验记录
         public static final String InspectionSub = "/profile/inspectionSub"; //检查检验详情
@@ -379,8 +380,13 @@ public class ServiceApi {
         public static final String FilterList = "/apps/filterList";
         public static final String getAppTypeAndApps = "/getAppTypeAndApps";
         public static final String getApps = "/getApps";
-        public static final String AppFieldExistence = "/app/field/existence";
+
+        // ---------------- 开放平台 ----------------
+        public static final String CheckField = "/app/checkField";
+        public static final String CheckName = "/app/checkName";
         public static final String AppAuthClient = "/app/authClient";
+        public static final String SimpleUpdate = "/app/simpleUpdate";
+
     }
 
     public static class AppApi {
@@ -389,8 +395,22 @@ public class ServiceApi {
         public static final String AppApisNoPage = "/appApiNoPage";
         public static final String AppApiSearch = "/appApi/search";
         public static final String AppApiAuth = "/appApiAuth";
-        public static final String AppApiAuthList = "/appApi/auth/list";
+        public static final String Save = "/appApi/save";
+        public static final String Delete = "/appApi/delete";
+        public static final String Update = "/appApi/update";
+        public static final String Page = "/appApi/page";
+        public static final String AuthList = "/appApi/authList";
 
+    }
+
+    public static class AppApiCategory {
+        public static final String Base = "/appApiCategory";
+        public static final String Check = "/appApiCategory/check";
+    }
+
+    public static class AppApiErrorCode {
+        public static final String Base = "/appApiErrorCode";
+        public static final String CheckCode = "/appApiErrorCode/checkCode";
     }
 
     public static class AppFeature {
@@ -409,12 +429,15 @@ public class ServiceApi {
     public static class AppApiParameter {
         public static final String AppApiParameters = "/appApiParameter";
         public static final String AppApiParameter = "/appApiParameter/{id}";
+
     }
 
     public static class AppApiResponse {
         public static final String AppApiResponses = "/appApiResponse";
         public static final String AppApiResponse = "/appApiResponse/{id}";
     }
+
+
 
     public static class UserApp {
         public static final String UserAppList = "/userAppList";
@@ -720,6 +743,14 @@ public class ServiceApi {
         public static final String GetOrgAndDeptRelation = "/users/getOrgAndDeptRelation";
         public static final String InitializeSystemUser = "/users/initialize";
         public static final String UsersByTel = "/users/tel";
+
+        public static final String Save = "/users/save";
+        public static final String Update = "/users/update";
+        public static final String Check = "/users/check";
+        public static final String ChangePassword = "/users/changePassword";
+        public static final String DistributeSecurityKey = "/users/distributeSecurityKey";
+        public static final String GetSecurityKey = "/users/getSecurityKey";
+
     }
 
     public static class TelVerification {

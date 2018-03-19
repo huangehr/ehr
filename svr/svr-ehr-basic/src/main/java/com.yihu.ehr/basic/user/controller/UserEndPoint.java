@@ -4,13 +4,18 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.basic.dict.service.SystemDictEntryService;
 import com.yihu.ehr.basic.patient.service.DemographicService;
 import com.yihu.ehr.basic.security.service.UserSecurityService;
+import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.entity.address.Address;
+import com.yihu.ehr.entity.address.AddressDict;
+import com.yihu.ehr.entity.api.AppApiCategory;
 import com.yihu.ehr.entity.dict.SystemDictEntry;
 import com.yihu.ehr.entity.patient.DemographicInfo;
 import com.yihu.ehr.entity.security.UserKey;
 import com.yihu.ehr.entity.security.UserSecurity;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
+import com.yihu.ehr.model.patient.MDemographicInfo;
 import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.basic.user.entity.Doctors;
 import com.yihu.ehr.basic.user.entity.User;
@@ -34,6 +39,7 @@ import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import javax.jws.soap.SOAPBinding;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
@@ -208,7 +214,7 @@ public class UserEndPoint extends EnvelopRestEndPoint {
         //TODO 可根据帐户，手机号，身份证号登陆接口新增
         List<User> users = userService.getUserForLogin(userName);
         if(users != null){
-            if(users.size() == 1){
+            if (users.size() == 1){
                 return convertToModel(users.get(0), MUser.class);
             }
         }
@@ -508,4 +514,238 @@ public class UserEndPoint extends EnvelopRestEndPoint {
         MUser mUser = convertToModel(user, MUser.class);
         return mUser;
     }
+
+    // ---------------------------- 适配zuul新代码 start -----------------------------------
+
+    @RequestMapping(value = ServiceApi.Users.Save, method = RequestMethod.POST)
+    @ApiOperation("保存")
+    public Envelop save(
+            @ApiParam(name = "user", value = "Json串")
+            @RequestParam(value = "user") String user) throws Exception {
+        User user1 = objectMapper.readValue(user, User.class);
+        DemographicInfo patientModel = objectMapper.readValue(user, DemographicInfo.class);
+        String msg = this.basicVerify(user1, false);
+        if (!StringUtils.isEmpty(msg)) {
+            return failed(msg);
+        }
+        //设置默认密码为身份证后六位
+        if (!StringUtils.isEmpty(user1.getIdCardNo()) && user1.getIdCardNo().length() > 7){
+            String  defaultPassword = user1.getIdCardNo().substring(user1.getIdCardNo().length() - 6, user1.getIdCardNo().length());
+            user1.setPassword(DigestUtils.md5Hex(defaultPassword));
+        } else {
+            user1.setPassword(DigestUtils.md5Hex(default_password));
+        }
+        //增加居民注册账号时身份证号的校验，demographics表中已存在，users表增加demographic_id身份证号关联
+        if (demographicService.findByIdCardNo(user1.getIdCardNo()) != null) {
+            //新增居民demographics表中居民信息
+            String telephone = "{\"联系电话\":\"telephone\"}";
+            telephone = telephone.replace("telephone", "" + user1.getTelephone());
+            patientModel.setTelephoneNo(telephone);
+            patientModel.setName(user1.getRealName());
+               /* MDemographicInfo info = (MDemographicInfo) convertToModel(patientModel, MDemographicInfo.class);
+                info.setHomeAddress(detailModel.getProvinceName() + detailModel.getCityName() + detailModel.getAreaName());*/
+            //新增家庭地址信息
+            String homeAddress = "";
+            if (!StringUtils.isEmpty(user1.getProvinceName())) {
+                homeAddress += user1.getProvinceName();
+            }
+            if (!StringUtils.isEmpty(user1.getCityName())) {
+                homeAddress += user1.getCityName();
+            }
+            if (!StringUtils.isEmpty(user1.getAreaName())) {
+                homeAddress += user1.getAreaName();
+            }
+            if (!StringUtils.isEmpty(homeAddress)) {
+                patientModel.setHomeAddress(homeAddress);
+            }
+        }
+        user1.setId(getObjectId(BizObject.User));
+        user1.setCreateDate(new Date());
+        String userType = user1.getUserType();
+        SystemDictEntry dict = dictEntryService.getDictEntry(15, userType);
+        if (dict != null) {
+            user1.setDType(userType);
+        }
+        user1.setActivated(true);
+        User user2 = userService.save(user1, patientModel);
+        return success(user2);
+    }
+
+    @RequestMapping(value = ServiceApi.Users.Update, method = RequestMethod.POST)
+    @ApiOperation("更新")
+    public Envelop update(
+            @ApiParam(name = "user", value = "Json串")
+            @RequestParam(value = "user") String user) throws Exception {
+        User detailModel = toEntity(user, User.class);
+        String msg = this.basicVerify(detailModel, true);
+        if (!StringUtils.isEmpty(msg)) {
+            return failed(msg);
+        }
+        //修改时先修改所属角色组再修改用户，修改角色组失败（修改失败）、修改用户失败 （回显角色组）
+        String userType = detailModel.getUserType();
+        SystemDictEntry dict = dictEntryService.getDictEntry(15, userType);
+        if (dict != null) {
+            detailModel.setDType(userType);
+        }
+        //同时修改医生表及用户表信息
+        Doctors doctors = doctorService.getByIdCardNo(detailModel.getIdCardNo());
+        if (!StringUtils.isEmpty(doctors)) {
+            doctors.setName(detailModel.getRealName());
+            doctors.setPyCode(PinyinUtil.getPinYinHeadChar(detailModel.getRealName(), false));
+            doctors.setSex(detailModel.getGender());
+            doctors.setPhone(detailModel.getTelephone());
+        }
+        DemographicInfo demographicInfo = demographicService.getDemographicInfoByIdCardNo(detailModel.getIdCardNo());
+        if (!StringUtils.isEmpty(demographicInfo)) {
+            demographicInfo.setName(detailModel.getRealName());
+            demographicInfo.setTelephoneNo("{\"联系电话\":\"" + detailModel.getTelephone() + "\"}");
+            demographicInfo.setGender(detailModel.getGender());
+            demographicInfo.setMartialStatus(detailModel.getMartialStatus());
+            demographicInfo.setBirthday(DateUtil.strToDate(detailModel.getBirthday()));
+        }
+        User user1 = userService.update(detailModel, doctors, demographicInfo);
+        return success(user1);
+    }
+
+    @RequestMapping(value = ServiceApi.Users.Check, method = RequestMethod.GET)
+    @ApiOperation(value = "检查字段是否重复")
+    public Boolean check(
+            @ApiParam(name = "field", value = "检查字段", required = true)
+            @RequestParam(value = "field") String field,
+            @ApiParam(name = "value", value = "检查值", required = true)
+            @RequestParam(value = "value") String value) {
+        if (userService.findByField(field, value).size() <= 0) {
+            return false;
+        }
+        return true;
+    }
+
+    @RequestMapping(value = ServiceApi.Users.ChangePassword, method = RequestMethod.POST)
+    @ApiOperation(value = "修改密码")
+    public Boolean passwordChange(
+            @ApiParam(name = "userId", value = "用户ID", required = true)
+            @RequestParam(value = "userId") String userId,
+            @ApiParam(name = "password", value = "password", required = true)
+            @RequestParam(value = "password") String password) {
+        User user = userService.getUser(userId);
+        if (null == user) {
+            return false;
+        }
+        user.setPassword(DigestUtils.md5Hex(password));
+        userService.save(user);
+        return true;
+    }
+
+    @RequestMapping(value = ServiceApi.Users.DistributeSecurityKey, method = RequestMethod.POST)
+    @ApiOperation(value = "分配密钥", notes = "重新分配密钥")
+    public Map<String, String> distributeSecurityKey (
+            @ApiParam(name = "userId", value = "用户ID")
+            @RequestParam(value = "userId") String userId) throws Exception{
+        User user = userService.getUser(userId);
+        if(null == user) {
+            return null;
+        }
+        UserSecurity userSecurity = userSecurityService.getKeyByUserId(userId, false);
+        Map<String, String> keyMap = new HashMap<>();
+        if (userSecurity != null) {
+            // 删除原有的公私钥重新分配
+            List<UserKey> userKeyList = userSecurityService.getKeyMapByUserId(userId);
+            userSecurityService.deleteKey(userKeyList);
+        }
+        userSecurity = userSecurityService.createKeyByUserId(userId);
+        String validTime = DateFormatUtils.format(userSecurity.getFromDate(), "yyyy-MM-dd")
+                + "~" + DateFormatUtils.format(userSecurity.getExpiryDate(), "yyyy-MM-dd");
+        keyMap.put("publicKey", userSecurity.getPublicKey());
+        keyMap.put("validTime", validTime);
+        keyMap.put("startTime", DateFormatUtils.format(userSecurity.getFromDate(), "yyyy-MM-dd"));
+        return keyMap;
+    }
+
+    @RequestMapping(value = ServiceApi.Users.GetSecurityKey, method = RequestMethod.GET)
+    @ApiOperation(value = "查询用户公钥", notes = "查询用户公钥")
+    public Map<String, String> UserId(
+            @ApiParam(name = "userId", value = "登录帐号")
+            @RequestParam(value = "userId") String userId) throws Exception{
+        User user = userService.getUser(userId);
+        if(null == user) {
+            return null;
+        }
+        UserSecurity userSecurity = userSecurityService.getKeyByUserId(userId, true);
+        if (null == userSecurity) {
+            return null;
+        }
+        Map<String, String> keyMap = new HashMap<>();
+        String validTime = DateFormatUtils.format(userSecurity.getFromDate(), "yyyy-MM-dd")
+                + "~" + DateFormatUtils.format(userSecurity.getExpiryDate(), "yyyy-MM-dd");
+        keyMap.put("publicKey", userSecurity.getPublicKey());
+        keyMap.put("validTime", validTime);
+        keyMap.put("startTime", DateFormatUtils.format(userSecurity.getFromDate(), "yyyy-MM-dd"));
+        return keyMap;
+    }
+
+    /**
+     * 用户基本信息验证
+     * @param user
+     * @return
+     */
+    private String basicVerify(User user, boolean update) {
+        String errorMsg = "";
+        if (StringUtils.isEmpty(user.getLoginCode())) {
+            errorMsg += "账户不能为空!";
+        }
+        if (StringUtils.isEmpty(user.getRealName())) {
+            errorMsg += "姓名不能为空!";
+        }
+        if (StringUtils.isEmpty(user.getIdCardNo())) {
+            errorMsg += "身份证号不能为空!";
+        }
+        if (StringUtils.isEmpty(user.getEmail())) {
+            errorMsg += "邮箱不能为空!";
+        }
+        if (StringUtils.isEmpty(user.getTelephone())) {
+            errorMsg += "电话号码不能为空!";
+        }
+        if (StringUtils.isEmpty(user.getRole())) {
+            errorMsg += "用户角色不能为空!";
+        }
+        if (!StringUtils.isEmpty(errorMsg)) {
+            return errorMsg;
+        }
+
+        if (update) {
+            List<User> oldUserList1 = userService.findByField("id", user.getId());
+            if (oldUserList1.size() <= 0) {
+                return "操作用户不存在";
+            }
+            User oldUser = oldUserList1.get(0);
+            if (!user.getLoginCode().equals(oldUser.getLoginCode()) && userService.findByField("loginCode", user.getLoginCode()).size() > 0) {
+                return "账户已存在";
+            }
+            if (!user.getIdCardNo().equals(oldUser.getIdCardNo()) && userService.findByField("idCardNo", user.getIdCardNo()).size() > 0) {
+                return "身份证号已存在";
+            }
+            if (!user.getEmail().equals(oldUser.getEmail()) && userService.findByField("email", user.getEmail()).size() > 0) {
+                return "邮箱已存在";
+            }
+            if (!user.getTelephone().equals(oldUser.getTelephone()) && userService.findByField("telephone", user.getTelephone()).size() > 0) {
+                return "电话号码已存在";
+            }
+        } else {
+            if (userService.findByField("loginCode", user.getLoginCode()).size() > 0) {
+                return "账户已存在";
+            }
+            if (userService.findByField("idCardNo", user.getIdCardNo()).size() > 0) {
+                return "身份证号已存在";
+            }
+            if (userService.findByField("email", user.getEmail()).size() > 0) {
+                return "邮箱已存在";
+            }
+            if (userService.findByField("telephone", user.getTelephone()).size() > 0) {
+                return "电话号码已存在";
+            }
+        }
+
+        return errorMsg;
+    }
+
 }

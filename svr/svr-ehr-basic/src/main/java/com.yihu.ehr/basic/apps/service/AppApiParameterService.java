@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AppApiParameterService extends BaseJpaService<AppApiParameter, AppApiParameterRepository> {
 
     @Autowired
-    private AppApiParameterRepository appApiParRepo;
+    private AppApiParameterRepository appApiParameterRepository;
     public AppApiParameterService() {
 
     }
@@ -32,16 +32,16 @@ public class AppApiParameterService extends BaseJpaService<AppApiParameter, AppA
     }
 
     public AppApiParameter createAppApiParameter(AppApiParameter appApiParameter) {
-        appApiParRepo.save(appApiParameter);
+        appApiParameterRepository.save(appApiParameter);
         return appApiParameter;
     }
 
     public AppApiParameter updateAppApiParameter(AppApiParameter appApiParameter){
-        appApiParRepo.save(appApiParameter);
+        appApiParameterRepository.save(appApiParameter);
         return appApiParameter;
     }
 
-    public void  deleteAppApiParameter(String id){
-        appApiParRepo.delete(id);
+    public void  deleteAppApiParameter(Integer id){
+        appApiParameterRepository.delete(id);
     }
 }

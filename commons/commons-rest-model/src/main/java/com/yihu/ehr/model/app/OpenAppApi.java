@@ -9,17 +9,24 @@ import java.util.List;
 public class OpenAppApi {
 
     private int id;
+    private String appId;
     private String name;
     private String description;
     private String type;
     private String method;
     private String protocol;
     private String version;
+    private int parentId; //该字段弃用
+    private String parameterDemo; //请求参数示例
+    private String activityType;
+    private String responseDemo; //返回结果示例
     private String openLevel;
-    private String microServiceUrl;
-    private String msMethodName;
-    private List parameter;
-    private List response;
+    private String auditLevel;
+    private String methodName; //对外网关接口方法名
+    private String microServiceUri; //对外接口实际IP地址和端口
+    private String msMethodName; //内部实际微服务中方法名
+    private String microServiceName; //内部实际微服务名称
+    private Integer category; //业务类别
 
     public int getId() {
         return id;
@@ -27,6 +34,14 @@ public class OpenAppApi {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getAppId() {
+        return appId;
+    }
+
+    public void setAppId(String appId) {
+        this.appId = appId;
     }
 
     public String getName() {
@@ -77,6 +92,38 @@ public class OpenAppApi {
         this.version = version;
     }
 
+    public int getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(int parentId) {
+        this.parentId = parentId;
+    }
+
+    public String getParameterDemo() {
+        return parameterDemo;
+    }
+
+    public void setParameterDemo(String parameterDemo) {
+        this.parameterDemo = parameterDemo;
+    }
+
+    public String getActivityType() {
+        return activityType;
+    }
+
+    public void setActivityType(String activityType) {
+        this.activityType = activityType;
+    }
+
+    public String getResponseDemo() {
+        return responseDemo;
+    }
+
+    public void setResponseDemo(String responseDemo) {
+        this.responseDemo = responseDemo;
+    }
+
     public String getOpenLevel() {
         return openLevel;
     }
@@ -85,12 +132,28 @@ public class OpenAppApi {
         this.openLevel = openLevel;
     }
 
-    public String getMicroServiceUrl() {
-        return microServiceUrl;
+    public String getAuditLevel() {
+        return auditLevel;
     }
 
-    public void setMicroServiceUrl(String microServiceUrl) {
-        this.microServiceUrl = microServiceUrl;
+    public void setAuditLevel(String auditLevel) {
+        this.auditLevel = auditLevel;
+    }
+
+    public String getMethodName() {
+        return methodName;
+    }
+
+    public void setMethodName(String methodName) {
+        this.methodName = methodName;
+    }
+
+    public String getMicroServiceUri() {
+        return microServiceUri;
+    }
+
+    public void setMicroServiceUri(String microServiceUri) {
+        this.microServiceUri = microServiceUri;
     }
 
     public String getMsMethodName() {
@@ -101,19 +164,20 @@ public class OpenAppApi {
         this.msMethodName = msMethodName;
     }
 
-    public List getParameter() {
-        return parameter;
+    public String getMicroServiceName() {
+        return microServiceName;
     }
 
-    public void setParameter(List parameter) {
-        this.parameter = parameter;
+    public void setMicroServiceName(String microServiceName) {
+        this.microServiceName = microServiceName;
     }
 
-    public List getResponse() {
-        return response;
+    public Integer getCategory() {
+        return category;
     }
 
-    public void setResponse(List response) {
-        this.response = response;
+    public void setCategory(Integer category) {
+        this.category = category;
     }
+
 }

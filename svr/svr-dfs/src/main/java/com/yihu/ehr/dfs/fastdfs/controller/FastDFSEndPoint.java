@@ -187,7 +187,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
         Map<String, Object> source = elasticSearchService.findById(indexName, indexType, id);
         if (null == source) {
             throw new ApiException("无相关文件资源");
-            //throw new ApiException(HttpStatus.NOT_FOUND, "无相关文件资源");
+            //throw new ApiException(HttpStatus.NOT_FOUND, "无相关文件资源");3
         }
         String storagePath = source.get("path").toString();
         String groupName = storagePath.split(":")[0];

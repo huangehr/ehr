@@ -10,6 +10,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @version 1.0
  * @created 2016年7月7日21:05:41
  */
-public interface AppApiParameterRepository extends JpaRepository<AppApiParameter, String> {
+public interface AppApiParameterRepository extends JpaRepository<AppApiParameter, Integer> {
+
+    void deleteByAppApiId(Integer id);
 
 }

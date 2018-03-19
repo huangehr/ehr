@@ -58,8 +58,6 @@ public class DemographicService extends BaseJpaService {
     }
 
 
-
-
     public void save(DemographicInfo demographicInfo) throws JsonProcessingException {
         demographicInfoRepository.save(demographicInfo);
     }
@@ -393,9 +391,6 @@ public class DemographicService extends BaseJpaService {
         return demInfo;
     }
 
-
-
-
     //统计年龄段人口数
     public List<Object> getStatisticsDemographicsAgeCount() {
         Session session = session = entityManager.unwrap(Session.class);;
@@ -407,5 +402,9 @@ public class DemographicService extends BaseJpaService {
                 " )tt WHERE tt.age is not null  GROUP BY tt.age";
         SQLQuery query = session.createSQLQuery(sql);
         return query.list();
+    }
+
+    public DemographicInfo findByIdCardNo(String idCardNo) {
+        return demographicInfoRepository.findOne(idCardNo);
     }
 }

@@ -8,7 +8,7 @@ Ag-Zuul
             zuul:
               routes:
                 svr-dfs:                 #该节点配置微服务名称
-                  path: /dfs/**      #该节点为相应的请求路径
+                  path: /dfs/**          #该节点为相应的请求路径
                   serviceId: svr-dfs     #该节点为注册到Eureka上的微服务的服务名称(要将请求转发到自己的服务的时候可将其更改为自己的服务的名称[bootstrap.yml])
     c.请求方式：
         请求svr-dfs: http://localhost:10001/dfs/api/v1.0/fastDfs/page?page=1&size=15

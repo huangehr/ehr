@@ -40,7 +40,7 @@ public class AppApiResponseService extends BaseJpaService<AppApiResponse, AppApi
         return appApiResponse;
     }
 
-    public void  deleteAppApiResponse(String id){
+    public void  deleteAppApiResponse(Integer id){
         xAppApiResponseRepository.delete(id);
     }
 
