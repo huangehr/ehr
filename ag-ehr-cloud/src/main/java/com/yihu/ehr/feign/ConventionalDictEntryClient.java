@@ -2,7 +2,9 @@ package com.yihu.ehr.feign;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.model.dict.MConventionalDict;
+import com.yihu.ehr.model.dict.MDictionaryEntry;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -10,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import springfox.documentation.annotations.ApiIgnore;
+
+import java.util.List;
 
 /**
  * Created by AndyCai on 2016/1/19.
@@ -42,6 +46,12 @@ import springfox.documentation.annotations.ApiIgnore;
     MConventionalDict getNation(
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
             @RequestParam(value = "code") String code);
+
+    @RequestMapping(value = ServiceApi.SystemDict.getDictEntryByDictId,method = RequestMethod.POST)
+    @ApiOperation("根据字典代码获取字典项列表")
+    List<MDictionaryEntry> getDictEntryByDictId(
+            @ApiParam(name = "dictId", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "dictId") String dictId);
 
 
 }

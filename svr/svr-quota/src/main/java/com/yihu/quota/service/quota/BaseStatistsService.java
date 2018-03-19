@@ -3,10 +3,13 @@ package com.yihu.quota.service.quota;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.elasticsearch.ElasticSearchClient;
 import com.yihu.ehr.elasticsearch.ElasticSearchPool;
+import com.yihu.ehr.profile.core.ResourceCore;
+import com.yihu.ehr.solr.SolrUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.quota.dao.jpa.TjQuotaDao;
 import com.yihu.quota.etl.extract.es.EsResultExtract;
 import com.yihu.quota.etl.model.EsConfig;
+import com.yihu.quota.etl.util.ElasticsearchUtil;
 import com.yihu.quota.model.jpa.TjQuota;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionMain;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionSlave;
@@ -53,6 +56,11 @@ public class BaseStatistsService {
     private TjDataSourceService dataSourceService;
     @Autowired
     ObjectMapper objectMapper;
+    @Autowired
+    private SolrUtil solrUtil;
+    @Autowired
+    private ElasticsearchUtil elasticsearchUtil;
+
     private static String orgHealthCategory = "orgHealthCategory";
     public static String orgHealthCategoryCode = "orgHealthCategoryCode";
 
@@ -709,5 +717,25 @@ public class BaseStatistsService {
             }
         }
         return resultFilter;
+    }
+
+    /**
+     * 获取solr主表HealthProfile的总记录数
+     * @return
+     * @throws Exception
+     */
+    public long getArchiveCount() throws Exception {
+        long count = solrUtil.count(ResourceCore.MasterTable, "", "");
+        return count;
+    }
+
+    /**
+     * 获取ES中health_archive_index索引的总记录数
+     * @return
+     */
+    public long getArchiveManCount() {
+        String sql = "SELECT count(*) FROM health_archive_index";
+        long count = elasticsearchUtil.getCountBySql(sql);
+        return count;
     }
 }

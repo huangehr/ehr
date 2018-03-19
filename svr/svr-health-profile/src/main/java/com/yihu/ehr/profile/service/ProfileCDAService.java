@@ -4,19 +4,25 @@ package com.yihu.ehr.profile.service;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.model.resource.MCdaTransformDto;
-import com.yihu.hos.model.standard.MCDADocument;
-import com.yihu.hos.model.standard.MCdaDataSet;
 import com.yihu.ehr.profile.dao.ArchiveTemplateDao;
 import com.yihu.ehr.profile.feign.CDADocumentClient;
+import com.yihu.ehr.profile.feign.RedisServiceClient;
 import com.yihu.ehr.profile.feign.ResourceClient;
+import com.yihu.ehr.profile.feign.XStdRedisServiceClient;
 import com.yihu.ehr.profile.model.ArchiveTemplate;
 import com.yihu.ehr.util.rest.Envelop;
+import com.yihu.hos.model.standard.MCDADocument;
+import com.yihu.hos.model.standard.MCdaDataSet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * CDA相关接口服务
@@ -30,10 +36,12 @@ public class ProfileCDAService {
 
     @Autowired
     private ResourceClient resource;
-    //模板服务
+    @Autowired
+    private RedisServiceClient redisServiceClient;
+    @Autowired
+    private XStdRedisServiceClient stdRedisServiceClient;
     @Autowired
     private ArchiveTemplateDao templateDao;
-    //CDA服务
     @Autowired
     private CDADocumentClient cdaService;
     @Autowired
@@ -153,7 +161,7 @@ public class ProfileCDAService {
      * @param cdaDocumentId
      * @return
      */
-    public Map<String, Object> getCDAData(String profileId, String cdaDocumentId) {
+    public Map<String, Object> getCDAData(String profileId, String cdaDocumentId) throws Exception {
         Map<String, Object> result = new HashMap<>();
         //主表记录
         Envelop envelop = resource.getMasterData("{\"q\":\"rowkey:" + profileId + "\"}", 1, 1,null);
@@ -228,138 +236,150 @@ public class ProfileCDAService {
     /**
      * 获取CDA文档数据片段
      */
-    private Map<String, Object> getCDAPartData(Map<String, Object> event, boolean isPart, String...cdaDocumentIdList) {
-        try {
-            String profileId = event.get("rowkey").toString();
-            String cdaVersion = event.get("cda_version").toString();
-            List<String> singleDataSetCodeList = new ArrayList<>();
-            List<String> multiDataSetCodeList = new ArrayList<>();
-            Map<String, Object> result = new HashMap<>();
-            //获取CDA关联数据集
-            Map<String, Object> dataSetMap = new HashMap<>();
-            Map<String, List<String>> singleDataSetMap = new HashMap<>(1);
-            Map<String, List<String>> multiDataSetMap = new HashMap<>(1);
-            Map<String, List<MCdaDataSet>> CDADataSetMap = cdaService.getCDADataSetByCDAIdList(cdaVersion, cdaDocumentIdList);
-            /**
-            for(String key : CDADataSetMap.keySet()) {
-                List<MCdaDataSet> CDADataSet = CDADataSetMap.get(key);
-                if (CDADataSet != null && CDADataSet.size() > 0) {
-                    Map<String, List<Object>> dataList = new HashMap<>(CDADataSet.size());
-                    for (MCdaDataSet dataSet : CDADataSet) {
-                        String dataSetCode = dataSet.getDataSetCode();
-                        String multiRecord = dataSet.getMultiRecord();
-                        if (multiRecord.equals("0")) {
-                            //主表数据
-                            //singleDataSetCodeList.add(dataSetCode);
-                            String query = "{\"q\":\"rowkey:" + profileId + "\"}";
-                            Envelop envelop = resource.getResources(dataSetCode, "*", "*",  query, 1, 1);
-                            if(envelop.isSuccessFlg() && envelop.getDetailModelList() != null) {
-                                List<Map<String, Object>> middleList = (List<Map<String, Object>>)envelop.getDetailModelList();
-                                for(Map<String, Object> temp : middleList) {
-                                    temp.put("org_area", event.get("org_area"));
-                                    temp.put("org_name", event.get("org_name"));
-                                    temp.put("event_date", event.get("event_date"));
-                                }
-                                dataList.put(dataSetCode, envelop.getDetailModelList());
+    private Map<String, Object> getCDAPartData(Map<String, Object> event, boolean isPart, String...cdaDocumentIdList) throws Exception {
+        String profileId = event.get("rowkey").toString();
+        String cdaVersion = event.get("cda_version").toString();
+        List<String> singleDataSetCodeList = new ArrayList<>();
+        List<String> multiDataSetCodeList = new ArrayList<>();
+        Map<String, Object> result = new HashMap<>();
+        //获取CDA关联数据集
+        Map<String, Object> dataSetMap = new HashMap<>();
+        Map<String, List<String>> singleDataSetMap = new HashMap<>(1);
+        Map<String, List<String>> multiDataSetMap = new HashMap<>(1);
+        Map<String, List<MCdaDataSet>> CDADataSetMap = cdaService.getCDADataSetByCDAIdList(cdaVersion, cdaDocumentIdList);
+        /**
+        for(String key : CDADataSetMap.keySet()) {
+            List<MCdaDataSet> CDADataSet = CDADataSetMap.get(key);
+            if (CDADataSet != null && CDADataSet.size() > 0) {
+                Map<String, List<Object>> dataList = new HashMap<>(CDADataSet.size());
+                for (MCdaDataSet dataSet : CDADataSet) {
+                    String dataSetCode = dataSet.getDataSetCode();
+                    String multiRecord = dataSet.getMultiRecord();
+                    if (multiRecord.equals("0")) {
+                        //主表数据
+                        //singleDataSetCodeList.add(dataSetCode);
+                        String query = "{\"q\":\"rowkey:" + profileId + "\"}";
+                        Envelop envelop = resource.getResources(dataSetCode, "*", "*",  query, 1, 1);
+                        if(envelop.isSuccessFlg() && envelop.getDetailModelList() != null) {
+                            List<Map<String, Object>> middleList = (List<Map<String, Object>>)envelop.getDetailModelList();
+                            for(Map<String, Object> temp : middleList) {
+                                temp.put("org_area", event.get("org_area"));
+                                temp.put("org_name", event.get("org_name"));
+                                temp.put("event_date", event.get("event_date"));
                             }
-                        } else {
-                            //细表数据
-                            //multiDataSetCodeList.add(dataSetCode);
-                            String query = "{\"q\":\"rowkey:" + profileId + "$" + dataSetCode + "$*" + "\"}";
-                            Envelop envelop = resource.getResources(dataSetCode, "*", "*",  query, 1, 1);
-                            if(envelop.isSuccessFlg() && envelop.getDetailModelList() != null) {
-                                List<Map<String, Object>> middleList = (List<Map<String, Object>>)envelop.getDetailModelList();
-                                for(Map<String, Object> temp : middleList) {
-                                    temp.put("org_area", event.get("org_area"));
-                                    temp.put("org_name", event.get("org_name"));
-                                    temp.put("event_date", event.get("event_date"));
-                                }
-                                dataList.put(dataSetCode, envelop.getDetailModelList());
+                            dataList.put(dataSetCode, envelop.getDetailModelList());
+                        }
+                    } else {
+                        //细表数据
+                        //multiDataSetCodeList.add(dataSetCode);
+                        String query = "{\"q\":\"rowkey:" + profileId + "$" + dataSetCode + "$*" + "\"}";
+                        Envelop envelop = resource.getResources(dataSetCode, "*", "*",  query, 1, 1);
+                        if(envelop.isSuccessFlg() && envelop.getDetailModelList() != null) {
+                            List<Map<String, Object>> middleList = (List<Map<String, Object>>)envelop.getDetailModelList();
+                            for(Map<String, Object> temp : middleList) {
+                                temp.put("org_area", event.get("org_area"));
+                                temp.put("org_name", event.get("org_name"));
+                                temp.put("event_date", event.get("event_date"));
+                            }
+                            dataList.put(dataSetCode, envelop.getDetailModelList());
+                        }
+                    }
+                }
+                //singleDataSetMap.put(key, singleDataSetCodeList);
+                //multiDataSetMap.put(key, multiDataSetCodeList);
+                dataSetMap.put(key, dataList);
+            }
+        }
+        */
+        for (String key : CDADataSetMap.keySet()) {
+            List<MCdaDataSet> CDADataSet = CDADataSetMap.get(key);
+            if (CDADataSet != null && CDADataSet.size() > 0) {
+                for (MCdaDataSet dataSet : CDADataSet) {
+                    String dataSetCode = dataSet.getDataSetCode();
+                    String multiRecord = dataSet.getMultiRecord();
+                    if (multiRecord.equals("0")) {
+                        //主表数据
+                        singleDataSetCodeList.add(dataSetCode);
+                    } else {
+                        //细表数据
+                        multiDataSetCodeList.add(dataSetCode);
+                    }
+                }
+                singleDataSetMap.put(key, singleDataSetCodeList);
+                multiDataSetMap.put(key, multiDataSetCodeList);
+            }
+        }
+        //获取所有数据集数据
+        MCdaTransformDto cdaTransformDto = new MCdaTransformDto();
+        cdaTransformDto.setMasterJson(event);
+        cdaTransformDto.setMasterDatasetCodeList(singleDataSetMap);
+        cdaTransformDto.setMultiDatasetCodeList(multiDataSetMap);
+        dataSetMap = resource.getCDAData(objectMapper.writeValueAsString(cdaTransformDto));
+        for (String key :dataSetMap.keySet()) {
+            Map<String, Object> middleMap = (Map<String, Object>)dataSetMap.get(key);
+            for (String key2 : middleMap.keySet()) {
+                List<Map<String, Object>> middleList = (List<Map<String, Object>>)middleMap.get(key2);
+                for (Map<String, Object> temp : middleList) {
+                    //诊断代码
+                    if (temp.containsKey("JDSD00_79_021")) {
+                        String icd10Code = (String) temp.get("JDSD00_79_021");
+                        String icd10Name = redisServiceClient.getIcd10Name(icd10Code);
+                        if (!StringUtils.isEmpty(icd10Name)) {
+                            temp.put("JDSD00_79_021", icd10Name);
+                        }
+                    }
+                    for (String key3 : temp.keySet()) {
+                        String dataSetCode = key2;
+                        String dictId = stdRedisServiceClient.getMetaDataDict(cdaVersion, dataSetCode, key3);
+                        if (!StringUtils.isEmpty(dictId) && !dictId.equals("0")) {
+                            String dictValue = stdRedisServiceClient.getDictEntryValue(cdaVersion, dictId, (String) temp.get(key3));
+                            if (!StringUtils.isEmpty(dictValue)) {
+                                temp.put(key3, dictValue);
                             }
                         }
                     }
-                    //singleDataSetMap.put(key, singleDataSetCodeList);
-                    //multiDataSetMap.put(key, multiDataSetCodeList);
-                    dataSetMap.put(key, dataList);
+                    temp.put("org_area", event.get("org_area"));
+                    temp.put("org_name", event.get("org_name"));
+                    temp.put("event_date", event.get("event_date"));
                 }
             }
-            */
-            for (String key : CDADataSetMap.keySet()) {
-                List<MCdaDataSet> CDADataSet = CDADataSetMap.get(key);
-                if (CDADataSet != null && CDADataSet.size() > 0) {
-                    for (MCdaDataSet dataSet : CDADataSet) {
-                        String dataSetCode = dataSet.getDataSetCode();
-                        String multiRecord = dataSet.getMultiRecord();
-                        if (multiRecord.equals("0")) {
-                            //主表数据
-                            singleDataSetCodeList.add(dataSetCode);
-                        } else {
-                            //细表数据
-                            multiDataSetCodeList.add(dataSetCode);
-                        }
-                    }
-                    singleDataSetMap.put(key, singleDataSetCodeList);
-                    multiDataSetMap.put(key, multiDataSetCodeList);
-                }
-            }
-            //获取所有数据集数据
-            MCdaTransformDto cdaTransformDto = new MCdaTransformDto();
-            cdaTransformDto.setMasterJson(event);
-            cdaTransformDto.setMasterDatasetCodeList(singleDataSetMap);
-            cdaTransformDto.setMultiDatasetCodeList(multiDataSetMap);
-            dataSetMap = resource.getCDAData(objectMapper.writeValueAsString(cdaTransformDto));
-            for(String key :dataSetMap.keySet()) {
-                Map<String, Object> middleMap = (Map<String, Object>)dataSetMap.get(key);
-                for(String key2 : middleMap.keySet()) {
-                    List<Map<String, Object>> middleList = (List<Map<String, Object>>)middleMap.get(key2);
-                    for(Map<String, Object> temp : middleList) {
-                        temp.put("org_area", event.get("org_area"));
-                        temp.put("org_name", event.get("org_name"));
-                        temp.put("event_date", event.get("event_date"));
-                    }
-                }
-            }
+        }
 
-            //获取cda document数据
-            Map<String, MCDADocument> cdaMap = cdaService.getCDADocumentsList(cdaVersion, cdaDocumentIdList);
-            for (String key : cdaMap.keySet()) {
-                Map<String, Object> re = new HashMap<>();
-                re.put("cda_version", cdaVersion);
-                re.put("cda_document_id", key);
-                re.put("cda_document_name", cdaMap.get(key).getName());
-                re.put("data_sets", dataSetMap.get(key));
-                result.put(key, re);
-            }
-            //非结构化数据
-            Map<String, Envelop> rawFilesMap = resource.getRawFilesList(profileId, cdaDocumentIdList);
-            for (String key : rawFilesMap.keySet()) {
-                Envelop rawFiles = rawFilesMap.get(key);
-                if (rawFiles.getDetailModelList() != null && rawFiles.getDetailModelList().size() > 0) {
-                    Map<String, Object> rawFile = (Map<String, Object>) rawFiles.getDetailModelList().get(0);
-                    String fileString = rawFile.get("file_list").toString();
-                    JavaType javaType = objectMapper.getTypeFactory().constructParametricType(List.class, Map.class);
-                    List<Map<String, Object>> fileList = objectMapper.readValue(fileString, javaType);
-                    ((Map<String, Object>) result.get(key)).put("file_list", fileList);
-                }
-            }
-            //单独获取CDA片段数据额外信息
-            for (int i = 0; i < cdaDocumentIdList.length; i++) {
-                String key = cdaDocumentIdList[i];
-                if (isPart) {
-                    ((Map<String, Object>) result.get(key)).put("event_type", event.get("event_type"));
-                    ((Map<String, Object>) result.get(key)).put("patient_id", event.get("patient_id"));
-                    ((Map<String, Object>) result.get(key)).put("org_code", event.get("org_code"));
-                    ((Map<String, Object>) result.get(key)).put("org_name", event.get("org_name"));
-                    ((Map<String, Object>) result.get(key)).put("event_no", event.get("event_no"));
-                    ((Map<String, Object>) result.get(key)).put("event_date", event.get("event_date"));
-                }
-            }
-            return result;
+        //获取cda document数据
+        Map<String, MCDADocument> cdaMap = cdaService.getCDADocumentsList(cdaVersion, cdaDocumentIdList);
+        for (String key : cdaMap.keySet()) {
+            Map<String, Object> re = new HashMap<>();
+            re.put("cda_version", cdaVersion);
+            re.put("cda_document_id", key);
+            re.put("cda_document_name", cdaMap.get(key).getName());
+            re.put("data_sets", dataSetMap.get(key));
+            result.put(key, re);
         }
-        catch (IOException e) {
-            e.printStackTrace();
+        //非结构化数据
+        Map<String, Envelop> rawFilesMap = resource.getRawFilesList(profileId, cdaDocumentIdList);
+        for (String key : rawFilesMap.keySet()) {
+            Envelop rawFiles = rawFilesMap.get(key);
+            if (rawFiles.getDetailModelList() != null && rawFiles.getDetailModelList().size() > 0) {
+                Map<String, Object> rawFile = (Map<String, Object>) rawFiles.getDetailModelList().get(0);
+                String fileString = rawFile.get("file_list").toString();
+                JavaType javaType = objectMapper.getTypeFactory().constructParametricType(List.class, Map.class);
+                List<Map<String, Object>> fileList = objectMapper.readValue(fileString, javaType);
+                ((Map<String, Object>) result.get(key)).put("file_list", fileList);
+            }
         }
-        return null;
+        //单独获取CDA片段数据额外信息
+        for (int i = 0; i < cdaDocumentIdList.length; i++) {
+            String key = cdaDocumentIdList[i];
+            if (isPart) {
+                ((Map<String, Object>) result.get(key)).put("event_type", event.get("event_type"));
+                ((Map<String, Object>) result.get(key)).put("patient_id", event.get("patient_id"));
+                ((Map<String, Object>) result.get(key)).put("org_code", event.get("org_code"));
+                ((Map<String, Object>) result.get(key)).put("org_name", event.get("org_name"));
+                ((Map<String, Object>) result.get(key)).put("event_no", event.get("event_no"));
+                ((Map<String, Object>) result.get(key)).put("event_date", event.get("event_date"));
+            }
+        }
+        return result;
     }
 
 }

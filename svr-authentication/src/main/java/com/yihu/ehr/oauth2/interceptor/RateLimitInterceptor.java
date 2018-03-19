@@ -41,10 +41,7 @@ public class RateLimitInterceptor extends HandlerInterceptorAdapter {
         response.setHeader(HttpHeader.RATE_LIMIT_RESET, Long.toString(rateLimitService.getResetTime(request.getRemoteAddr())));
         response.setIntHeader(HttpHeader.RATE_LIMIT_REMAINING, exceeding ? 0 : limit - count);
         if (exceeding) {
-            throw new ApiException(HttpStatus.FORBIDDEN,
-                    ErrorCode.RateLimitExceeding,
-                    "https://ehr.yihu.com/docs/api/v1/#rate-limiting",
-                    request.getRemoteAddr());
+            throw new ApiException(HttpStatus.FORBIDDEN,  ErrorCode.RATE_LIMIT_EXCEEDING, "请求超限", "https://ehr.yihu.com/docs/api/v1/#rate-limiting");
         }
 
         return true;

@@ -3,6 +3,7 @@ package com.yihu.quota.service.singledisease;
 import com.yihu.quota.etl.extract.es.EsExtract;
 import com.yihu.quota.etl.util.ElasticsearchUtil;
 import com.yihu.quota.vo.DictModel;
+import org.apache.commons.lang.StringUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,7 @@ public class SingleDiseaseService {
      */
     public List<Map<String,String>>  getHeatMap() throws Exception {
         List<Map<String,String>> list = new ArrayList<>();
-        String sql = "select addressLngLat from single_disease_personal_index";
+        String sql = "select addressLngLat from single_disease_personal_index where addressLngLat is not null ";
         List<Map<String, Object>> listData = parseIntegerValue(sql);
         Map<String, Object> map = new HashMap<>();
         if (null != listData && listData.get(0).size() > 0) {
@@ -317,33 +318,47 @@ public class SingleDiseaseService {
      * @return
      */
     public Map<String, List<String>> getFastingBloodGlucoseDataInfo() {
-        String firstSql = "select fastingBloodGlucoseName, count(*) from single_disease_check_index where checkCode = 'CH002' and sex=1 group by fastingBloodGlucoseName";
-        String secondSql = "select fastingBloodGlucoseName, count(*) from single_disease_check_index where checkCode = 'CH002' and sex=2 group by fastingBloodGlucoseName";
-        List<Map<String, Object>> firstListData = parseIntegerValue(firstSql);
-        List<Map<String, Object>> secondListData = parseIntegerValue(secondSql);
+        String sql = "select fastingBloodGlucoseCode, count(*) from single_disease_check_index where checkCode = 'CH002' group by fastingBloodGlucoseCode,sexName";
+        List<Map<String, Object>> list = parseIntegerValue(sql);
         Map<String, List<String>> map = new HashMap<>();
         List<String> xData = new LinkedList<>();
-        List<String> valueData1 = new LinkedList<>();    // 存放第一个数据源
-        List<String> valueData2 = new LinkedList<>();    // 存放第二个数据源
-        if (null != firstListData && firstListData.get(0).size() > 0) {
-            firstListData.forEach(one -> {
-                xData.add(one.get("fastingBloodGlucoseName") + "");   // 获取横坐标
-                valueData1.add(one.get("COUNT(*)") + "");
+        // 获取横坐标
+        xData.add("4.4~6.1mmol/L");
+        xData.add("6.1~7mmol/L");
+        xData.add("7.0mmol/L以上");
+        Map<String,String> resultDataMap = new HashMap<>();
+        if (null != list && list.get(0).size() > 0) {
+            list.forEach(one -> {
+                String code =  one.get("fastingBloodGlucoseCode") + "";
+                String gender = one.get("sexName") + "";
+                String count = one.get("COUNT(*)") + "";
+                if(!code.equals("null") && StringUtils.isNotEmpty(code)){
+                    resultDataMap.put(code + "-"+ gender,count);
+                }
             });
-            map.put("valueData1", valueData1);
-        }
-        if (null != secondListData && secondListData.get(0).size() > 0) {
-            secondListData.forEach(one -> {
-                xData.add(one.get("fastingBloodGlucoseName") + "");
-                valueData2.add(one.get("COUNT(*)") + "");
-            });
-            map.put("valueData2", valueData2);
-        }
-        if (xData.size() > 0) {
-            Set<String> hash = new LinkedHashSet<>(xData);
-            xData.clear();
-            xData.addAll(hash);
+
+            for(int i =1;i<4 ;i++){
+                if( !resultDataMap.containsKey(i + "-" + "男性")) {
+                    resultDataMap.put(i + "-" + "男性","0");
+                }
+                if( !resultDataMap.containsKey(i + "-" + "女性")) {
+                    resultDataMap.put(i + "-" + "女性","0");
+                }
+            }
+
+            List<String> valueData1 = new LinkedList<>();    // 存放第一个数据源 男生
+            List<String> valueData2 = new LinkedList<>();    // 存放第二个数据源 女生
             map.put("xData", xData);
+            for(String key : resultDataMap.keySet()){
+                if(key.contains("男性")){
+                    valueData1.add(resultDataMap.get(key)+"");
+                }
+                if(key.contains("女性")){
+                    valueData2.add(resultDataMap.get(key)+"");
+                }
+            }
+            map.put("valueData1", valueData1);
+            map.put("valueData2", valueData2);
         }
         return map;
     }
@@ -353,33 +368,47 @@ public class SingleDiseaseService {
      * @return
      */
     public Map<String, List<String>> getSugarToleranceDataInfo() {
-        String firstSql = "select sugarToleranceName, count(*) from single_disease_check_index where checkCode = 'CH003' and sex=1 group by sugarToleranceName";
-        String secondSql = "select sugarToleranceName, count(*) from single_disease_check_index where checkCode = 'CH003' and sex=2 group by sugarToleranceName";
-        List<Map<String, Object>> firstListData = parseIntegerValue(firstSql);
-        List<Map<String, Object>> secondListData = parseIntegerValue(secondSql);
+        String sql = "select sugarToleranceCode, count(*) from single_disease_check_index where checkCode = 'CH003' group by sugarToleranceCode,sexName";
+        List<Map<String, Object>> list = parseIntegerValue(sql);
         Map<String, List<String>> map = new HashMap<>();
         List<String> xData = new LinkedList<>();
-        List<String> valueData1 = new LinkedList<>();    // 存放第一个数据源
-        List<String> valueData2 = new LinkedList<>();    // 存放第二个数据源
-        if (null != firstListData && firstListData.get(0).size() > 0) {
-            firstListData.forEach(one -> {
-                xData.add(one.get("sugarToleranceName") + "");   // 获取横坐标
-                valueData1.add(one.get("COUNT(*)") + "");
+        // 获取横坐标
+        xData.add("7.8 mmol/L以下");
+        xData.add("7.8~11.1 mmol/L");
+        xData.add("11.1 mmol/L以上");
+        Map<String,String> resultDataMap = new HashMap<>();
+        if (null != list && list.get(0).size() > 0) {
+            list.forEach(one -> {
+                String code =  one.get("sugarToleranceCode") + "";
+                String gender = one.get("sexName") + "";
+                String count = one.get("COUNT(*)") + "";
+                if(!code.equals("null") && StringUtils.isNotEmpty(code)){
+                    resultDataMap.put(code + "-"+ gender,count);
+                }
             });
-            map.put("valueData1", valueData1);
-        }
-        if (null != secondListData && secondListData.get(0).size() > 0) {
-            secondListData.forEach(one -> {
-                xData.add(one.get("sugarToleranceName") + "");
-                valueData2.add(one.get("COUNT(*)") + "");
-            });
-            map.put("valueData2", valueData2);
-        }
-        if (xData.size() > 0) {
-            Set<String> hash = new LinkedHashSet<>(xData);
-            xData.clear();
-            xData.addAll(hash);
+
+            for(int i =1;i<4 ;i++){
+                if( !resultDataMap.containsKey(i + "-" + "男性")) {
+                    resultDataMap.put(i + "-" + "男性","0");
+                }
+                if( !resultDataMap.containsKey(i + "-" + "女性")) {
+                    resultDataMap.put(i + "-" + "女性","0");
+                }
+            }
+
+            List<String> valueData1 = new LinkedList<>();    // 存放第一个数据源 男生
+            List<String> valueData2 = new LinkedList<>();    // 存放第二个数据源 女生
             map.put("xData", xData);
+            for(String key : resultDataMap.keySet()){
+                if(key.contains("男性")){
+                    valueData1.add(resultDataMap.get(key)+"");
+                }
+                if(key.contains("女性")){
+                    valueData2.add(resultDataMap.get(key)+"");
+                }
+            }
+            map.put("valueData1", valueData1);
+            map.put("valueData2", valueData2);
         }
         return map;
     }

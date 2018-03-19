@@ -82,10 +82,5 @@ public interface AppApiClient {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page);
 
-    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.AppApi.AppApiAuthList, method = RequestMethod.GET)
-    @ApiOperation(value = "获取AppApi列表")
-    Envelop authApiList(
-            @ApiParam(name = "clientId", value = "应用ID", required = true)
-            @RequestParam(value = "clientId") String clientId);
 
 }

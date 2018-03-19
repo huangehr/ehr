@@ -10,6 +10,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @version 1.0
  * @created 2016年7月7日21:05:46
  */
-public interface AppApiRepository extends JpaRepository<AppApi, String> {
+public interface AppApiRepository extends JpaRepository<AppApi, Integer> {
 
 }

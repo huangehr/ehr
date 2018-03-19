@@ -44,6 +44,7 @@ public class EsResultExtract {
     private String province;
     private String city;
     private String town;
+    private String townName;
     private String year;
     private String slaveKey1;
     private String slaveKey2;
@@ -72,6 +73,7 @@ public class EsResultExtract {
         this.province = null;
         this.city = null;
         this.town = null;
+        this.townName = null;
         this.year = null;
         this.quotaCode = null;
         this.result = null;
@@ -97,6 +99,8 @@ public class EsResultExtract {
                             this.city = params.get(key).toString();
                         else if(key.equals("town"))
                             this.town = params.get(key).toString();
+                        else if(key.equals("townName"))
+                            this.townName = params.get(key).toString();
                         else if(key.equals("year"))
                             this.year = params.get(key).toString();
                         else if(key.equals("slaveKey1"))
@@ -111,8 +115,9 @@ public class EsResultExtract {
             }
         }
         this.tjQuota = tjQuota;
-        if(tjQuota.getCode() != null)
+        if(null != tjQuota && StringUtils.isNotEmpty(tjQuota.getCode())){
             this.quotaCode = tjQuota.getCode();
+        }
         EsConfig esConfig = null;
         esConfig = getEsConfig(tjQuota);
         this.esConfig = esConfig;
@@ -248,6 +253,10 @@ public class EsResultExtract {
         }
         if( !StringUtils.isEmpty(town) ){
             QueryStringQueryBuilder termTown = QueryBuilders.queryStringQuery("town:" + town);
+            boolQueryBuilder.must(termTown);
+        }
+        if( !StringUtils.isEmpty(townName) ){
+            QueryStringQueryBuilder termTown = QueryBuilders.queryStringQuery("townName:" + townName);
             boolQueryBuilder.must(termTown);
         }
         if( !StringUtils.isEmpty(year) ){

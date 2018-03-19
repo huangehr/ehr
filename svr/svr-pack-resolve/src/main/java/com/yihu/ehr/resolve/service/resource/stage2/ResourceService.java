@@ -3,7 +3,7 @@ package com.yihu.ehr.resolve.service.resource.stage2;
 
 import com.yihu.ehr.resolve.dao.FileResourceDao;
 import com.yihu.ehr.resolve.dao.MasterResourceDao;
-import com.yihu.ehr.resolve.dao.RelationDao;
+import com.yihu.ehr.resolve.dao.ArchiveRelationDao;
 import com.yihu.ehr.resolve.dao.SubResourceDao;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.resolve.model.stage2.ResourceBucket;
@@ -28,7 +28,7 @@ public class ResourceService {
     @Autowired
     private FileResourceDao fileResRepo;
     @Autowired
-    private RelationService relationService;
+    private ArchiveRelationDao archiveRelationDao;
 
     public void save(ResourceBucket resourceBucket, StandardPackage standardPackage) throws Exception {
         // 资源主表
@@ -41,6 +41,6 @@ public class ResourceService {
         fileResRepo.save(resourceBucket);
 
         //保存MYSQL关联记录
-        relationService.relation(resourceBucket);
+        archiveRelationDao.relation(resourceBucket);
     }
 }

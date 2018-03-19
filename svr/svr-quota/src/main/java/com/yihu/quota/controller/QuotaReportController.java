@@ -775,4 +775,24 @@ public class QuotaReportController extends BaseController {
         }
         return num;
     }
+
+    @RequestMapping(value = ServiceApi.TJ.GetArchiveCount, method = RequestMethod.GET)
+    @ApiOperation(value = "获取档案总数")
+    public Envelop getArchiveCount() throws Exception {
+        Envelop envelop = new Envelop();
+        long archiveCount = baseStatistsService.getArchiveCount();
+        envelop.setObj(archiveCount);
+        envelop.setSuccessFlg(true);
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.TJ.GetArchiveManCount, method = RequestMethod.GET)
+    @ApiOperation(value = "健康档案的建档人数数量")
+    public Envelop getArchiveManCount() throws Exception {
+        Envelop envelop = new Envelop();
+        long archiveCount = baseStatistsService.getArchiveManCount();
+        envelop.setObj(archiveCount);
+        envelop.setSuccessFlg(true);
+        return envelop;
+    }
 }

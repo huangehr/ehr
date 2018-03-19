@@ -26,6 +26,7 @@ import org.elasticsearch.search.aggregations.bucket.terms.DoubleTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.LongTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.elasticsearch.search.aggregations.metrics.sum.InternalSum;
 import org.elasticsearch.search.aggregations.metrics.valuecount.InternalValueCount;
 import org.joda.time.DateTime;
 import org.nlpcn.es4sql.domain.Select;
@@ -554,8 +555,13 @@ public class EsExtract {
                     expainJson(gradeBucketItCh, map, sbTemp);
                 }
             }else {
+                if (b.getAggregations().asList().get(0) instanceof InternalValueCount) {
                     InternalValueCount count = (InternalValueCount) b.getAggregations().asList().get(0);
-                    map.put(new StringBuffer(sb.toString() + "-" + b.getKey()).toString() , Long.valueOf(count.getValue()).toString());
+                    map.put(new StringBuffer((sb == null ? "" : (sb.toString() + "-"))+ b.getKey()).toString() , Long.valueOf(count.getValue()).toString());
+                }else if (b.getAggregations().asList().get(0) instanceof InternalSum) {
+                    InternalSum count = (InternalSum) b.getAggregations().asList().get(0);
+                    map.put(new StringBuffer((sb == null ? "" : (sb.toString() + "-")) + "-" + b.getKey()).toString() , count.getValue() + "");
+                }
             }
         }
     }
@@ -602,7 +608,7 @@ public class EsExtract {
             }
         }
         String selectGroupField = allField.toString();
-        String whereGroupField = allField.toString();
+        String whereGroupField = allField.substring(0,allField.length() - 1);
         //拼接整个sql 语法
         StringBuffer sql = new StringBuffer();
         if(StringUtils.isEmpty(esConfig.getAggregation())){

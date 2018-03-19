@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -33,8 +34,8 @@ public class RoleApiRelationEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "为角色组配置api权限")
     public MRoleApiRelation createRoleApiRelation(
             @ApiParam(name = "data_json",value = "角色组-api关系对象json串")
-            @RequestBody String dataJson){
-        RoleApiRelation roleApiRelation = toEntity(dataJson,RoleApiRelation.class);
+            @RequestBody String dataJson) throws IOException {
+        RoleApiRelation roleApiRelation = toEntity(dataJson, RoleApiRelation.class);
         RoleApiRelation roleApiRelationNew = roleApiRelationService.save(roleApiRelation);
         return convertToModel(roleApiRelationNew,MRoleApiRelation.class);
     }

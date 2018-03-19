@@ -50,7 +50,7 @@ public class ProfileCDAEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "profile_id", value = "档案ID", required =  true, defaultValue = "41872607-49229004X_000406450000000UX0_1485608518000")
             @RequestParam(value = "profile_id") String profile_id,
             @ApiParam(name = "cda_document_id", value = "模板ID", required = true, defaultValue = "82e89929317a11e7b186a1ae879a6c51")
-            @RequestParam(value = "cda_document_id") String cda_document_id) {
+            @RequestParam(value = "cda_document_id") String cda_document_id) throws Exception {
         return profileCDAService.getCDAData(profile_id, cda_document_id);
     }
 

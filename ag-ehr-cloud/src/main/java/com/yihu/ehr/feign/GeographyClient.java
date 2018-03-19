@@ -32,7 +32,7 @@ public interface GeographyClient {
             @RequestParam(value = "city") String city,
             @RequestParam(value = "district") String district);
 
-    @RequestMapping(value = "/geography_entries/getAddressDict" , method = RequestMethod.GET)
+    @RequestMapping(value = ApiVersion.Version1_0 +  "/geography_entries/getAddressDict" , method = RequestMethod.GET)
     @ApiOperation(value = "根据地址中文名 查询地址编号")
     Collection<MGeographyDict> getAddressDict(
             @ApiParam(name = "fields", value = "fields", defaultValue = "")

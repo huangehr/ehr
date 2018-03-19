@@ -1338,16 +1338,12 @@ public class DateUtil {
     }
 
     public static String toStringFormatTime(long time, String format) {
-
         SimpleDateFormat sdf = new SimpleDateFormat(format);
-
         return sdf.format(new java.util.Date(time));
     }
 
     public static int getLastDay(int yy, int mm) {
-
         GregorianCalendar gc = new GregorianCalendar(yy, mm - 1, 1);
-
         return gc.getActualMaximum(GregorianCalendar.DATE);
     }
 
@@ -1358,100 +1354,80 @@ public class DateUtil {
     }
 
     public static int getYears(java.util.Date date0, java.util.Date date1) {
-
         Calendar calendar0 = Calendar.getInstance();
         calendar0.setTime(date0);
-
         Calendar calendar1 = Calendar.getInstance();
         calendar1.setTime(date1);
-
         int year0 = calendar0.get(Calendar.YEAR);
         int year1 = calendar1.get(Calendar.YEAR);
-
         int years = year1 - year0;
-
-
         return years;
     }
 
     public static String getDifferenceOfYears(java.util.Date dateFrom, java.util.Date dateTo) {
-
         String years = DEFAULT_YEARS;
-
         if (dateFrom == null || dateTo == null) {
-
             years = DEFAULT_YEARS;
         } else {
-
             int days = getDifferenceOfDays(dateFrom, dateTo);
             DecimalFormat df = new DecimalFormat("#.0");
-
             years = df.format(days / 365.0);
         }
-
         return years;
     }
 
-    public static Date formatCharDateYMDHMS(String str) {
-
-        String format = DEFAULT_YMDHMSDATE_FORMAT;
-
+    public static Date formatCharDate(String str,String format ) {
         if (str == null || str.trim().length() == 0) {
-
             return null;
         }
-
         SimpleDateFormat sdf = new SimpleDateFormat(format);
         ParsePosition pos = new ParsePosition(0);
         java.util.Date date = sdf.parse(str, pos);
-
         if (date == null) {
-
             return null;
         }
+        return new Date(date.getTime());
+    }
 
+    public static Date formatCharDateYMDHMS(String str) {
+        String format = DEFAULT_YMDHMSDATE_FORMAT;
+        if (str == null || str.trim().length() == 0) {
+            return null;
+        }
+        SimpleDateFormat sdf = new SimpleDateFormat(format);
+        ParsePosition pos = new ParsePosition(0);
+        java.util.Date date = sdf.parse(str, pos);
+        if (date == null) {
+            return null;
+        }
         return new Date(date.getTime());
     }
 
     public static Timestamp formatYMDToYMDHMS(String str) {
-
         String format = DEFAULT_YMDHMSDATE_FORMAT;
-
         if (str == null || str.trim().length() == 0) {
-
             return null;
         }
-
         str += " 00:00:00";
-
         SimpleDateFormat sdf = new SimpleDateFormat(format);
         ParsePosition pos = new ParsePosition(0);
         java.util.Date date = sdf.parse(str, pos);
-
         if (date == null) {
-
             return null;
         }
-
         Timestamp ts = DateUtil.fromatDateToTimestamp(new Date(date.getTime()));
-
         return ts;
     }
 
     public static Timestamp fromatDateToTimestamp(java.util.Date date) {
-
         Timestamp ts = new Timestamp(System.currentTimeMillis());
-
         try {
-
             SimpleDateFormat df = new SimpleDateFormat(DEFAULT_YMDHMSDATE_FORMAT);
             String time = df.format(date);
             ts = Timestamp.valueOf(time);
         } catch (Exception e) {
-
             return null;
         }
-
         return ts;
     }
 
@@ -1461,8 +1437,9 @@ public class DateUtil {
         SimpleDateFormat newSdf = new SimpleDateFormat(format);
         String date= null;
         try {
-            if (!StringUtils.isEmpty(utcTime))
+            if (!StringUtils.isEmpty(utcTime)){
                 date = newSdf.format(utcSdf.parse(utcTime));
+            }
         } catch (ParseException e) {
             e.printStackTrace();
         }

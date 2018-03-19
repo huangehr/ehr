@@ -1,6 +1,5 @@
 package com.yihu.ehr.model.tj;
 
-import java.util.Date;
 
 /**
  * Created by Administrator on 2017/6/12.

@@ -1,6 +1,7 @@
 package com.yihu.ehr.redis.cache;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
@@ -46,7 +47,7 @@ public class CacheCommonBiz {
         if (paramNames.size() != 0) {
             if (StringUtils.isEmpty(keyRuleParams)) {
                 errorMsg = "Key规则表达式中有命名参数，则Key规则命名参数的值必传。";
-                throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, errorMsg);
+                throw new ApiException(ErrorCode.BAD_REQUEST, errorMsg);
             }
 
             Map<String, Object> paramValues = objectMapper.readValue(keyRuleParams, Map.class);
@@ -55,7 +56,7 @@ public class CacheCommonBiz {
                 Object paramValue = paramValues.get(paramName);
                 if (paramValue == null) {
                     errorMsg = "命名参数 " + paramName + " 缺少值，或参数名错误。";
-                    throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, errorMsg);
+                    throw new ApiException(ErrorCode.BAD_REQUEST, errorMsg);
                 } else {
                     key = key.replace("{" + paramName + "}", paramValue.toString());
                 }
@@ -95,12 +96,12 @@ public class CacheCommonBiz {
             int innerStart = keyRule.indexOf("{", start + 1);
             if (leftBraceNum != rightBraceNum || (innerStart != -1 && innerStart < end)) {
                 errorMsg = "大括号\"{\"、\"}\"只能用于包裹参数名，参数名中或其他地方不能使用。";
-                throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, errorMsg);
+                throw new ApiException(ErrorCode.BAD_REQUEST, errorMsg);
             }
             // 参数名不能为空
             if (start == end - 1) {
                 errorMsg = "大括号中参数名不能为空。";
-                throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, errorMsg);
+                throw new ApiException(ErrorCode.BAD_REQUEST, errorMsg);
             }
 
             preIndex = keyRule.indexOf("{", end + 1);

@@ -54,7 +54,7 @@ public class RsResourceEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Resources.Resources, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public Envelop updateResources(
             @ApiParam(name="resource",value="资源")
-            @RequestBody String resource) {
+            @RequestBody String resource) throws IOException {
         Envelop envelop = new Envelop();
         RsResource rs = toEntity(resource,RsResource.class);
         RsResource newRsResource =  rsResourceService.saveResource(rs);

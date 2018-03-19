@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,12 +63,14 @@ public class SystemDictEntryEndPoint extends EnvelopRestEndPoint {
 
     @ApiOperation(value = "创建字典项")
     @RequestMapping(value = "/dictionaries/entries", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public MDictionaryEntry createDictEntry(
+    public MDictionaryEntry createDictEntry (
             @ApiParam(name = "entry", value = "字典JSON结构")
-            @RequestBody String entryJson) {
+            @RequestBody String entryJson) throws IOException{
         SystemDictEntry entry = toEntity(entryJson, SystemDictEntry.class);
         SystemDict systemDict = dictService.retrieve(entry.getDictId());
-        if (systemDict == null) throw new ApiException(ErrorCode.GetDictFaild, "所属字典不存在");
+        if (systemDict == null) {
+            throw new ApiException(ErrorCode.NOT_FOUND, "所属字典不存在");
+        }
         int nextSort = systemDictEntryService.getNextSN(entry.getDictId());
         entry.setSort(nextSort);
         systemDictEntryService.createDictEntry(entry);
@@ -103,11 +106,11 @@ public class SystemDictEntryEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = "/dictionaries/entries", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public MDictionaryEntry updateDictEntry(
             @ApiParam(name = "entry", value = "字典JSON结构")
-            @RequestBody String entryJson) {
+            @RequestBody String entryJson) throws IOException {
         SystemDictEntry entry = toEntity(entryJson, SystemDictEntry.class);
         SystemDictEntry temp = systemDictEntryService.retrieve(new DictEntryKey(entry.getCode(), entry.getDictId()));
         if (null == temp) {
-            throw new ApiException(ErrorCode.InvalidSysDictEntry, "字典项不存在");
+            throw new ApiException(ErrorCode.NOT_FOUND, "字典项不存在");
         }
 
         systemDictEntryService.saveDictEntry(entry);

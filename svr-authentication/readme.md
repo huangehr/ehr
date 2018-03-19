@@ -47,3 +47,4 @@
 单点登陆 sso
 1.GET http://172.19.103.73:10260/oauth/sso?response_type=token&client_id=uzs5G0HgTp&state=sxy&scope=read&redirect_uri=http://192.168.1.221:8010/ehr/browser/common/login/signin?idCardNo=362321200108017313&user=admin
 2.GET http://localhost:10260/oauth/sso?response_type=token&client_id=uzs5G0HgTp&state=sxy&scope=read&redirect_uri=http://localhost:8010/ehr/browser/common/login/signin?idCardNo=362321200108017313&user=admin
+3.GET http://172.19.103.73:10260/oauth/sso?response_type=token&client_id=uzs5G0HgTp&state=sxy&scope=read&redirect_uri=http://192.168.131.150:8010/ehr/browser/common/login/signin?idCardNo=362321200108017313&user=admin

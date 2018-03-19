@@ -58,16 +58,16 @@ public class PatientsEndPoint {
             MetaDataRecord record = dataSet.getRecord(key);
 
             if (StringUtils.isEmpty(demographicId)) {
-                throw new ApiException(HttpStatus.NOT_ACCEPTABLE, ErrorCode.MissParameter, "Missing identity card no.");
+                throw new ApiException(ErrorCode.BAD_REQUEST, "Missing identity card no.");
             }
 
             String error = IdValidator.validateIdCardNo(demographicId);
             if (!StringUtils.isEmpty(error)) {
-                throw new ApiException(HttpStatus.NOT_ACCEPTABLE, ErrorCode.InvalidIdentityNo, error);
+                throw new ApiException(ErrorCode.BAD_REQUEST, error);
             }
 
             if (isPatientRegistered(demographicId)) {
-                throw new ApiException(HttpStatus.NOT_ACCEPTABLE, ErrorCode.RepeatedIdentityNo, error);
+                throw new ApiException(ErrorCode.BAD_REQUEST, error);
             }
 
             MDemographicInfo demoInfo = new MDemographicInfo();
@@ -107,7 +107,7 @@ public class PatientsEndPoint {
                                 @RequestParam(value = "json", required = true) String patient) throws IOException, ParseException {
 
         if (isPatientRegistered(demographicId)) {
-            throw new ApiException(HttpStatus.NOT_FOUND, ErrorCode.PatientRegisterFailedForExist);
+            throw new ApiException("人口信息已存在");
         }
 
         return "";

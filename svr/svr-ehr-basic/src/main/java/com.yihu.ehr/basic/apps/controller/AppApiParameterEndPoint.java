@@ -71,7 +71,9 @@ public class AppApiParameterEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "AppApiParameter", value = "对象JSON结构体", allowMultiple = true)
             @RequestBody String appJson) throws Exception {
         AppApiParameter appApiParameter = toEntity(appJson, AppApiParameter.class);
-        if (appApiParameterService.retrieve(appApiParameter.getId()) == null) throw new ApiException(ErrorCode.InvalidAppId, "应用不存在");
+        if (appApiParameterService.retrieve(appApiParameter.getId()) == null) {
+            throw new ApiException(ErrorCode.NOT_FOUND, "应用不存在");
+        }
         appApiParameterService.save(appApiParameter);
         return convertToModel(appApiParameter, MAppApiParameter.class);
     }

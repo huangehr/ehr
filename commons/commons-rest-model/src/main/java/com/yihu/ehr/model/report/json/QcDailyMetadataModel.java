@@ -1,5 +1,7 @@
 package com.yihu.ehr.model.report.json;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.util.Date;
 
 /**
@@ -28,6 +30,7 @@ public class QcDailyMetadataModel {
         this.orgCode = orgCode;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getEventTime() {
         return eventTime;
     }
@@ -36,6 +39,7 @@ public class QcDailyMetadataModel {
         this.eventTime = eventTime;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getCreateDate() {
         return createDate;
     }

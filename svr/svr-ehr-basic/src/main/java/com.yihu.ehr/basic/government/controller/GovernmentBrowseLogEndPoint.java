@@ -29,7 +29,7 @@ public class GovernmentBrowseLogEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "新增浏览记录")
     public GovernmentBrowseLog create(
             @ApiParam(name = "jsonData", value = " 记录信息Json", defaultValue = "")
-            @RequestBody String jsonData) {
+            @RequestBody String jsonData) throws Exception {
         GovernmentBrowseLog governmentBrowseLog = toEntity(jsonData, GovernmentBrowseLog.class);
         governmentBrowseLog.setCreateTime(new Date());
         governmentBrowseLog = governmentBrowseLogService.saveGovernmentBrowseLog(governmentBrowseLog);

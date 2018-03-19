@@ -21,54 +21,59 @@ public interface RedisServiceClient {
 
     //("获取地址redis")
     @RequestMapping(value = ServiceApi.Redis.Address, method = RequestMethod.GET)
-    public String getAddressRedis(@RequestParam("key") String key);
+    String getAddressRedis(@RequestParam("key") String key);
 
 
     //("获取健康问题名称redis")
     @RequestMapping(value = ServiceApi.Redis.HealthProblem, method = RequestMethod.GET)
-    public String getHealthProblemRedis(@RequestParam("key") String key);
+    String getHealthProblemRedis(@RequestParam("key") String key);
 
 
     //("获取ICD10健康问题 redis")
     @RequestMapping(value = ServiceApi.Redis.Icd10HpR, method = RequestMethod.GET)
-    public String getIcd10HpRelationRedis(@RequestParam("key") String key);
+    String getIcd10HpRelationRedis(@RequestParam("key") String key);
 
+    /**
+     * 获取ICD10名称 redis
+     */
+    @RequestMapping(value = ServiceApi.Redis.Icd10Name, method = RequestMethod.GET)
+    String getIcd10Name(@RequestParam("key") String key);
 
     //("获取指标 redis")
     @RequestMapping(value = ServiceApi.Redis.IndicatorsDict, method = RequestMethod.GET)
-    public String getIndicatorsRedis(@RequestParam("key") String key);
+    String getIndicatorsRedis(@RequestParam("key") String key);
 
 
     //("获取机构redis")
     @RequestMapping(value = ServiceApi.Redis.OrgName, method = RequestMethod.GET)
-    public String getOrgRedis(@RequestParam("key") String key);
+    String getOrgRedis(@RequestParam("key") String key);
 
     //("获取机构区域redis")
     @RequestMapping(value = ServiceApi.Redis.OrgArea, method = RequestMethod.GET)
-    public String getOrgAreaRedis(@RequestParam("key") String key);
+    String getOrgAreaRedis(@RequestParam("key") String key);
 
     @RequestMapping(value = ServiceApi.Redis.OrgSaasArea, method = RequestMethod.GET)
-    public String getOrgSaasAreaRedis(@RequestParam("key") String key);
+    String getOrgSaasAreaRedis(@RequestParam("key") String key);
 
     @RequestMapping(value = ServiceApi.Redis.OrgSaasOrg, method = RequestMethod.GET)
-    public String getOrgSaasOrgRedis(@RequestParam("key") String key);
+    String getOrgSaasOrgRedis(@RequestParam("key") String key);
 
     /******************************************* 资源化相关Redis *******************************************************************/
     //("获取资源化字典映射 redis")
     @RequestMapping(value = ServiceApi.Redis.RsAdapterDict, method = RequestMethod.GET)
-    public String getRsAdaptionDict(@RequestParam("cdaVersion") String cdaVersion,
+    String getRsAdaptionDict(@RequestParam("cdaVersion") String cdaVersion,
                                     @RequestParam("srcDictCode") String srcDictCode,
                                     @RequestParam("srcDictEntryCode") String srcDictEntryCode);
 
     //("获取资源化数据元映射 redis")
     @RequestMapping(value = ServiceApi.Redis.RsAdapterMetadata, method = RequestMethod.GET)
-    public String getRsAdaptionMetaData(@RequestParam("cdaVersion") String cdaVersion,
+    String getRsAdaptionMetaData(@RequestParam("cdaVersion") String cdaVersion,
                                         @RequestParam("srcDataSetCode") String srcDataSetCode,
                                         @RequestParam("srcMetadataCode") String srcMetadataCode);
 
 
     //("获取资源化数据元映射 redis")
     @RequestMapping(value = ServiceApi.Redis.RsMetadata, method = RequestMethod.GET)
-    public String getRsMetaData(@RequestParam("key") String key);
+    String getRsMetaData(@RequestParam("key") String key);
 
 }

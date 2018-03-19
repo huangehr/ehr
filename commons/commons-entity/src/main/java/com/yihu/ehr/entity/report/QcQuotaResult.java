@@ -1,5 +1,6 @@
 package com.yihu.ehr.entity.report;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -47,6 +48,7 @@ public class QcQuotaResult {
 
     @Basic
     @Column(name = "quota_date")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getQuotaDate() {
         return quotaDate;
     }
@@ -137,6 +139,7 @@ public class QcQuotaResult {
     }
     @Basic
     @Column(name = "receive_time")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getReceiveTime() {
         return receiveTime;
     }
@@ -146,6 +149,7 @@ public class QcQuotaResult {
     }
     @Basic
     @Column(name = "event_time")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getEventTime() {
         return eventTime;
     }

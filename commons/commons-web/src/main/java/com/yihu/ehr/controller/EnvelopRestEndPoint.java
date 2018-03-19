@@ -1,5 +1,6 @@
 package com.yihu.ehr.controller;
 
+import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.util.id.BizObject;
 import com.yihu.ehr.util.id.ObjectId;
 import com.yihu.ehr.util.rest.Envelop;
@@ -21,7 +22,7 @@ import java.util.List;
 public class EnvelopRestEndPoint extends BaseRestEndPoint {
 
     @Value("${deploy.region}")
-    Short deployRegion = 3502;
+    protected Short deployRegion = 3502;
 
     /**
      * 返回一个信封对象。信封对象的返回场景参见 Envelop.
@@ -35,11 +36,10 @@ public class EnvelopRestEndPoint extends BaseRestEndPoint {
         envelop.setSuccessFlg(true);
         envelop.setDetailModelList(modelList);
         envelop.setTotalCount(totalCount);
-
         return envelop;
     }
 
-    public Envelop getPageResult(List detailModelList, int totalCount, int currPage, int rows) {
+    protected Envelop getPageResult(List detailModelList, int totalCount, int currPage, int rows) {
         Envelop result = new Envelop();
         result.setSuccessFlg(true);
         result.setDetailModelList(detailModelList);
@@ -54,17 +54,31 @@ public class EnvelopRestEndPoint extends BaseRestEndPoint {
         return result;
     }
 
-    public Envelop failed(String errMsg){
+    protected Envelop failed(String errMsg){
+        return failed(errMsg, ErrorCode.REQUEST_NOT_COMPLETED.value());
+    }
+
+    protected Envelop failed(String errMsg, int errorCode){
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
         envelop.setErrorMsg(errMsg);
+        envelop.setErrorCode(errorCode);
         return envelop;
     }
 
-    public Envelop success(Object object){
+    protected Envelop success(Object object){
+        return success(object, null);
+    }
+
+    protected Envelop success(List list){
+        return success(null, list);
+    }
+
+    protected Envelop success(Object object, List list){
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(true);
         envelop.setObj(object);
+        envelop.setDetailModelList(list);
         return envelop;
     }
 

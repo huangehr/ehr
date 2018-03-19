@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -65,7 +66,7 @@ public class SystemDictEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = "/dictionaries", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public MSystemDict createDictionary(
             @ApiParam(name = "dictionary", value = "字典JSON结构")
-            @RequestBody String dictJson) {
+            @RequestBody String dictJson) throws IOException {
         SystemDict dict = toEntity(dictJson, SystemDict.class);
         SystemDict systemDict = dictService.createDict(dict);
         return convertToModel(systemDict, MSystemDict.class, null);
@@ -77,7 +78,9 @@ public class SystemDictEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "id", value = "字典ID", defaultValue = "")
             @PathVariable(value = "id") long id) {
         SystemDict dict = dictService.retrieve(id);
-        if (dict == null) throw new ApiException(ErrorCode.GetDictFaild, "字典不存在");
+        if (dict == null) {
+            throw new ApiException(ErrorCode.NOT_FOUND, "字典不存在");
+        }
         return convertToModel(dict, MSystemDict.class);
     }
 
@@ -87,7 +90,9 @@ public class SystemDictEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "phoneticCode", value = "拼音编码", required = true)
             @PathVariable(value = "phoneticCode") String phoneticCode) {
         SystemDict dict = dictService.findByPhoneticCode(phoneticCode);
-        if (dict == null) throw new ApiException(ErrorCode.GetDictFaild, "字典不存在");
+        if (dict == null) {
+            throw new ApiException(ErrorCode.NOT_FOUND, "字典不存在");
+        }
         return convertToModel(dict, MSystemDict.class);
     }
 
@@ -97,7 +102,9 @@ public class SystemDictEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "dictionary", value = "字典JSON结构")
             @RequestBody String dictJson) throws Exception {
         SystemDict dict = toEntity(dictJson, SystemDict.class);
-        if (null == dictService.retrieve(dict.getId())) throw new ApiException(ErrorCode.GetDictFaild, "字典不存在");
+        if (null == dictService.retrieve(dict.getId())) {
+            throw new ApiException(ErrorCode.NOT_FOUND, "字典不存在");
+        }
         dictService.updateDict(dict);
         return convertToModel(dict, MSystemDict.class);
     }

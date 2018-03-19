@@ -62,6 +62,9 @@ es:
   host: http://172.19.103.68:9200
   tHost: 172.19.103.68:9300
   clusterName: jkzl
+h5:
+  secret: 8E29YVP2UZ1QNSIN33NZJXEG1KSLVXFL6YI59C5SC5D
+  appId: 9000401
 
 ---
 spring:
@@ -97,7 +100,9 @@ es:
   host: http://172.19.103.68:9200
   tHost: 172.19.103.68:9300
   clusterName: jkzl
-
+h5:
+  secret: 8E29YVP2UZ1QNSIN33NZJXEG1KSLVXFL6YI59C5SC5D
+  appId: 9000401
 ---
 spring:
   profiles: prod_fz
@@ -155,6 +160,9 @@ es:
   host: http://10.176.97.7:9200
   tHost: 10.176.97.7:9300
   clusterName: jkzl
+h5:
+  secret: 8E29YVP2UZ1QNSIN33NZJXEG1KSLVXFL6YI59C5SC5D
+  appId: 9000401
 
 ---
 spring:
@@ -184,3 +192,6 @@ es:
   host: http://100.100.1.158:9200
   tHost: 100.100.1.158:9300
   clusterName: jkzl
+h5:
+  secret: 8E29YVP2UZ1QNSIN33NZJXEG1KSLVXFL6YI59C5SC5D
+  appId: 9000401

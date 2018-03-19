@@ -513,10 +513,10 @@ public class ResourceBrowseService {
         Set<String> rsMetadataIdSet = new HashSet<String>();
         String grantType = rsResource.getGrantType();
         boolean isOtherVersion = false;
-        if(rsResource.getCode().split("\\$").length > 1) {
+        if (rsResource.getCode().split("\\$").length > 1) {
             isOtherVersion = true;
         }
-        if(isOtherVersion) {
+        if (isOtherVersion) {
             String version = rsResource.getCode().split("\\$")[1];
             String code = rsResource.getCode().split("\\$")[0];
             String otherStdMetadataStr = stdTransformClient.stdMetadataCodes(version, code); //省平台临时数据处理
