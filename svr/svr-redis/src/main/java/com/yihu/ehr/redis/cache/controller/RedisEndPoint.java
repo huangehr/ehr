@@ -259,7 +259,7 @@ public class RedisEndPoint extends EnvelopRestEndPoint {
             @RequestParam("dictId") String dictId,
             @ApiParam(value = "entryCode", defaultValue = "")
             @RequestParam("entryCode") String entryCode) {
-        return redisService.isDictValueExist(version, dictId, entryCode);
+        return redisService.isDictCodeExist(version, dictId, entryCode);
     }
     //------------------------------------ 标准相关 END -------------------------------------------------------
 
