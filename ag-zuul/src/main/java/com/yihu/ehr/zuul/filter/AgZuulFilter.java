@@ -59,6 +59,9 @@ public class AgZuulFilter extends ZuulFilter {
         if (url.startsWith("/authentication/") || url.contains("/users/h5/handshake")) {
             return null;
         }
+        if (url.startsWith("/jkzl/")) {
+            return null;
+        }
         String accessToken = this.extractToken(request);
         if (null == accessToken) {
             return this.forbidden(ctx, HttpStatus.FORBIDDEN.value(), "accessToken can not be null");
