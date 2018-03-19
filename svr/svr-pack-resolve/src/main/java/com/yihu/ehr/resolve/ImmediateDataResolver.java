@@ -54,6 +54,12 @@ public class ImmediateDataResolver {
             throw new IOException("Invalid json file when generate data set");
         }
 
+        JsonNode eventTypeNode = dataNode.get("event_type");
+
+        if (eventTypeNode == null){
+            throw new IOException("Not event_type in json data when generate data set");
+        }
+
         int eventType = dataNode.get("event_type").asInt();
 
         List<PackageDataSet> packageDataSetList = dataSetResolverWithTranslator.parseStructuredImmediateJson(dataNode);
