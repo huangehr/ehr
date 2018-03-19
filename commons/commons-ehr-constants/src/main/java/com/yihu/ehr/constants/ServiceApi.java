@@ -429,6 +429,7 @@ public class ServiceApi {
     public static class AppApiParameter {
         public static final String AppApiParameters = "/appApiParameter";
         public static final String AppApiParameter = "/appApiParameter/{id}";
+
     }
 
     public static class AppApiResponse {

@@ -1,6 +1,6 @@
 spring:
   application:
-    name: ag-zuul-sxy
+    name: ag-zuul
 
 ---
 spring:

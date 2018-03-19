@@ -4,31 +4,20 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.basic.dict.service.SystemDictEntryService;
 import com.yihu.ehr.basic.patient.service.DemographicService;
 import com.yihu.ehr.basic.security.service.UserSecurityService;
-import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.basic.user.entity.Doctors;
 import com.yihu.ehr.basic.user.entity.User;
 import com.yihu.ehr.basic.user.service.DoctorService;
 import com.yihu.ehr.basic.user.service.UserService;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.entity.address.Address;
-import com.yihu.ehr.entity.address.AddressDict;
-import com.yihu.ehr.entity.api.AppApiCategory;
-import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.entity.dict.SystemDictEntry;
 import com.yihu.ehr.entity.patient.DemographicInfo;
 import com.yihu.ehr.entity.security.UserKey;
 import com.yihu.ehr.entity.security.UserSecurity;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
-import com.yihu.ehr.model.patient.MDemographicInfo;
 import com.yihu.ehr.model.user.MH5Handshake;
 import com.yihu.ehr.model.user.MUser;
-import com.yihu.ehr.basic.user.entity.Doctors;
-import com.yihu.ehr.basic.user.entity.User;
-import com.yihu.ehr.basic.user.service.DoctorService;
-import com.yihu.ehr.basic.user.service.UserService;
-import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.id.BizObject;
 import com.yihu.ehr.util.log.LogService;
@@ -66,6 +55,10 @@ public class UserEndPoint extends EnvelopRestEndPoint {
 
     @Value("${default.password}")
     private String default_password = "123456";
+    @Value("${h5.secret}")
+    private String secret;
+    @Value("${h5.appId}")
+    private String appId;
     @Autowired
     private UserService userService;
     @Autowired
@@ -114,7 +107,7 @@ public class UserEndPoint extends EnvelopRestEndPoint {
                 }
             }
             userList = userService.searchUsers(orgCodes, realName, userType, page, size);
-            Long totalCount =userService.searchUsersCount(orgCodes, realName, userType);
+            Long totalCount = userService.searchUsersCount(orgCodes, realName, userType);
             pagedResponse(request, response, totalCount, page, size);
 
         } else {
@@ -224,7 +217,7 @@ public class UserEndPoint extends EnvelopRestEndPoint {
                 return convertToModel(users.get(0), MUser.class);
             }
         }
-         return null;
+        return null;
     }
 
     @RequestMapping(value = ServiceApi.Users.UserAdminPassword, method = RequestMethod.PUT)
@@ -252,9 +245,9 @@ public class UserEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "重新分配密钥", notes = "重新分配密钥")
     public Map<String, String> distributeKey(
             @ApiParam(name = "user_id", value = "登录帐号", defaultValue = "")
-            @PathVariable(value = "user_id") String userId) throws Exception{
+            @PathVariable(value = "user_id") String userId) throws Exception {
         User user = userService.getUser(userId);
-        if(null == user) {
+        if (null == user) {
             return null;
         }
         UserSecurity userSecurity = userSecurityService.getKeyByUserId(userId, false);
@@ -277,10 +270,10 @@ public class UserEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "查询用户公钥", notes = "查询用户公钥")
     public Envelop getKey(
             @ApiParam(name = "user_id", value = "登录帐号", defaultValue = "")
-            @PathVariable(value = "user_id") String userId) throws Exception{
+            @PathVariable(value = "user_id") String userId) throws Exception {
         Envelop envelop = new Envelop();
         User user = userService.getUser(userId);
-        if(null == user) {
+        if (null == user) {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("用户不存在");
             return envelop;
@@ -356,7 +349,7 @@ public class UserEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Users.UserEmailNoExistence, method = RequestMethod.GET)
     @ApiOperation(value = "判断用户邮件是否存在")
     public boolean isEmailExists(@RequestParam(value = "email") String email) {
-        return  userService.getUserByEmail(email)!= null;
+        return userService.getUserByEmail(email) != null;
     }
 
     @RequestMapping(value = ServiceApi.Users.UserTelephoneNoExistence, method = RequestMethod.GET)
@@ -444,39 +437,40 @@ public class UserEndPoint extends EnvelopRestEndPoint {
     }
 
 
-    @RequestMapping(value = ServiceApi.Users.UserPhoneExistence,method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Users.UserPhoneExistence, method = RequestMethod.POST)
     @ApiOperation("获取已存在电话号码")
     public List idExistence(
-            @ApiParam(name="phones",value="phones",defaultValue = "")
+            @ApiParam(name = "phones", value = "phones", defaultValue = "")
             @RequestBody String phones) throws Exception {
 
         List existPhones = userService.idExist(toEntity(phones, String[].class));
         return existPhones;
     }
 
-    @RequestMapping(value = ServiceApi.Users.UserOnePhoneExistence,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Users.UserOnePhoneExistence, method = RequestMethod.GET)
     @ApiOperation("根据过滤条件判断是否存在")
     public boolean isExistence(
-            @ApiParam(name="filters",value="filters",defaultValue = "")
-            @RequestParam(value="filters") String filters) throws Exception {
+            @ApiParam(name = "filters", value = "filters", defaultValue = "")
+            @RequestParam(value = "filters") String filters) throws Exception {
 
-        List<User> user = userService.search("",filters,"", 1, 1);
-        return user!=null && user.size()>0;
+        List<User> user = userService.search("", filters, "", 1, 1);
+        return user != null && user.size() > 0;
     }
-    @RequestMapping(value = ServiceApi.Users.UserEmailExistence,method = RequestMethod.POST)
+
+    @RequestMapping(value = ServiceApi.Users.UserEmailExistence, method = RequestMethod.POST)
     @ApiOperation("获取已存在邮箱")
     public List emailsExistence(
-            @ApiParam(name="emails",value="emails",defaultValue = "")
+            @ApiParam(name = "emails", value = "emails", defaultValue = "")
             @RequestBody String emails) throws Exception {
 
         List existPhones = userService.emailsExistence(toEntity(emails, String[].class));
         return existPhones;
     }
 
-    @RequestMapping(value = ServiceApi.Users.UseridCardNoExistence,method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Users.UseridCardNoExistence, method = RequestMethod.POST)
     @ApiOperation("获取已存在身份证号码")
     public List idCardNoExistence(
-            @ApiParam(name="idCardNos",value="idCardNos",defaultValue = "")
+            @ApiParam(name = "idCardNos", value = "idCardNos", defaultValue = "")
             @RequestBody String idCardNos) throws Exception {
 
         List existidCardNos = userService.idCardNosExist(toEntity(idCardNos, String[].class));

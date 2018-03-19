@@ -1,6 +1,6 @@
 spring:
   application:
-    name: svr-health-profile-sxy
+    name: svr-health-profile
 
 ---
 spring:
