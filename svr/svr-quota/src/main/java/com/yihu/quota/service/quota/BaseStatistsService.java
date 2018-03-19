@@ -813,12 +813,14 @@ public class BaseStatistsService {
     }
 
     public String getCostOfMedicalMonitor() {
+        NumberFormat nf = NumberFormat.getInstance();
+        nf.setGroupingUsed(false);
         // 获取门急诊费用
         Double costOfOutPatient = Double.parseDouble(getCostOfOutPatient());
         // 获取入院费用
         Double costOfInPatient = Double.parseDouble(getCostOfInPatient());
         // 医疗费用监测 = 获取门急诊费用 + 获取入院费用
         Double costOfMedicalMonitor = costOfInPatient + costOfOutPatient;
-        return costOfMedicalMonitor + "";
+        return nf.format(costOfMedicalMonitor);
     }
 }
