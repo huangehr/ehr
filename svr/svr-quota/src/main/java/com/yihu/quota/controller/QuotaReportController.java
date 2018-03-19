@@ -795,4 +795,35 @@ public class QuotaReportController extends BaseController {
         envelop.setSuccessFlg(true);
         return envelop;
     }
+
+    @RequestMapping(value = "/tj/getCostAndNumOfOutPatient", method = RequestMethod.GET)
+    @ApiOperation(value = "门急诊费用、人次")
+    public Map<String, String> getCostOfOutPatient() {
+        Map<String, String> map = new HashMap<>();
+        String costOfOutPatient = baseStatistsService.getCostOfOutPatient();
+        String numOfOutPatient = baseStatistsService.getNumOfOutPatient();
+        map.put("costOfOutPatient", costOfOutPatient);
+        map.put("numOfOutPatient", numOfOutPatient);
+        return map;
+    }
+
+    @RequestMapping(value = "/tj/getCostAndNumOfInPatient", method = RequestMethod.GET)
+    @ApiOperation(value = "入院费用、人次")
+    public Map<String, String> getNumOfOutPatient() {
+        Map<String, String> map = new HashMap<>();
+        String costOfInPatient = baseStatistsService.getCostOfInPatient();
+        String numOfInPatient = baseStatistsService.getNumOfInPatient();
+        map.put("costOfInPatient", costOfInPatient);
+        map.put("numOfInPatient", numOfInPatient);
+        return map;
+    }
+
+    @RequestMapping(value = "/tj/getMedicalMonitorInfo", method = RequestMethod.GET)
+    @ApiOperation(value = "医改监测信息")
+    public Map<String, String> getMedicalMonitorInfo() {
+        Map<String, String> map = new HashMap<>();
+        String costOfMedicalMonitor = baseStatistsService.getCostOfMedicalMonitor();
+        map.put("costOfMedicalMonitor", costOfMedicalMonitor);
+        return map;
+    }
 }

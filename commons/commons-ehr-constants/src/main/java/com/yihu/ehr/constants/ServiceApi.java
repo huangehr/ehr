@@ -1129,6 +1129,7 @@ public class ServiceApi {
         public static final String GetQcDailyReportPageList = "/report/getQcDailyReportPageList";
 
         public static final String GetJsonArchives = "/report/getGetJsonArchives";
+        public static final String GetArchivesInfo = "/report/getArchivesInfo";
 
 
         public static final String GetQcDailyReportDatasetsList = "/report/getQcDailyReportDatasetsList";

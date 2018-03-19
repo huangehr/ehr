@@ -1,11 +1,8 @@
 package com.yihu.quota.service.quota;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.elasticsearch.ElasticSearchClient;
-import com.yihu.ehr.elasticsearch.ElasticSearchPool;
 import com.yihu.ehr.profile.core.ResourceCore;
 import com.yihu.ehr.solr.SolrUtil;
-import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.quota.dao.jpa.TjQuotaDao;
 import com.yihu.quota.etl.extract.es.EsResultExtract;
 import com.yihu.quota.etl.model.EsConfig;
@@ -17,6 +14,7 @@ import com.yihu.quota.model.jpa.source.TjQuotaDataSource;
 import com.yihu.quota.service.dimension.TjDimensionMainService;
 import com.yihu.quota.service.dimension.TjDimensionSlaveService;
 import com.yihu.quota.service.orgHealthCategory.OrgHealthCategoryStatisticsService;
+import com.yihu.quota.service.singledisease.SingleDiseaseService;
 import com.yihu.quota.service.source.TjDataSourceService;
 import com.yihu.quota.util.BasesicUtil;
 import com.yihu.quota.vo.DictModel;
@@ -28,7 +26,6 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-import java.net.URLDecoder;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -60,6 +57,8 @@ public class BaseStatistsService {
     private SolrUtil solrUtil;
     @Autowired
     private ElasticsearchUtil elasticsearchUtil;
+    @Autowired
+    private SingleDiseaseService singleDiseaseService;
 
     private static String orgHealthCategory = "orgHealthCategory";
     public static String orgHealthCategoryCode = "orgHealthCategoryCode";
@@ -737,5 +736,89 @@ public class BaseStatistsService {
         String sql = "SELECT count(*) FROM health_archive_index";
         long count = elasticsearchUtil.getCountBySql(sql);
         return count;
+    }
+
+    /**
+     * 门急诊费用
+     * @return
+     */
+    public String getCostOfOutPatient() {
+        String sum = "0";
+        String sql = "select sum(result) from medical_service_index where quotaCode='HC041047'";
+        List<Map<String, Object>> listData = elasticsearchUtil.excuteDataModel(sql);
+        NumberFormat nf = NumberFormat.getInstance();
+        nf.setGroupingUsed(false);
+        if (null != listData && listData.size() > 0 && listData.get(0).size() > 0) {
+            for (Map<String, Object> map : listData) {
+                sum = nf.format(map.get("SUM(result)"));
+            }
+        }
+        return sum;
+    }
+
+    /**
+     * 门急诊人次
+     * @return
+     */
+    public String getNumOfOutPatient() {
+        int sum = 0;
+        String sql = "select sum(result) from medical_service_index where quotaCode='HC041008'";
+        List<Map<String, Object>> listData = singleDiseaseService.parseIntegerValue(sql);
+        NumberFormat nf = NumberFormat.getInstance();
+        nf.setGroupingUsed(false);
+        if (null != listData && listData.size() > 0 && listData.get(0).size() > 0) {
+            for (Map<String, Object> map : listData) {
+                String value = nf.format(map.get("SUM(result)"));
+                sum += Integer.parseInt(value);
+            }
+        }
+        return sum + "";
+    }
+
+    /**
+     * 入院费用
+     * @return
+     */
+    public String getCostOfInPatient() {
+        String sum = "0";
+        String sql = "select sum(result) from medical_service_index where quotaCode='HC041068";
+        List<Map<String, Object>> listData = elasticsearchUtil.excuteDataModel(sql);
+        NumberFormat nf = NumberFormat.getInstance();
+        nf.setGroupingUsed(false);
+        if (null != listData && listData.size() > 0 && listData.get(0).size() > 0) {
+            for (Map<String, Object> map : listData) {
+                sum = nf.format(map.get("SUM(result)"));
+            }
+        }
+        return sum;
+    }
+
+    /**
+     * 入院人次
+     * @return
+     */
+    public String getNumOfInPatient() {
+        int sum = 0;
+        String sql = "select sum(result) from medical_service_index where quotaCode='HC041000'";
+        List<Map<String, Object>> listData = singleDiseaseService.parseIntegerValue(sql);
+        NumberFormat nf = NumberFormat.getInstance();
+        nf.setGroupingUsed(false);
+        if (null != listData && listData.size() > 0 && listData.get(0).size() > 0) {
+            for (Map<String, Object> map : listData) {
+                String value = nf.format(map.get("SUM(result)"));
+                sum += Integer.parseInt(value);
+            }
+        }
+        return sum + "";
+    }
+
+    public String getCostOfMedicalMonitor() {
+        // 获取门急诊费用
+        Double costOfOutPatient = Double.parseDouble(getCostOfOutPatient());
+        // 获取入院费用
+        Double costOfInPatient = Double.parseDouble(getCostOfInPatient());
+        // 医疗费用监测 = 获取门急诊费用 + 获取入院费用
+        Double costOfMedicalMonitor = costOfInPatient + costOfOutPatient;
+        return costOfMedicalMonitor + "";
     }
 }
