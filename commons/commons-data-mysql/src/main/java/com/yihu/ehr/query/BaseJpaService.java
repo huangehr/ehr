@@ -1,5 +1,6 @@
 package com.yihu.ehr.query;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.PageArg;
 import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.util.http.HttpResponse;
@@ -46,6 +47,8 @@ public class BaseJpaService<T, R> {
     protected EntityManager entityManager;
     @Autowired
     protected JdbcTemplate jdbcTemplate;
+    @Autowired
+    protected ObjectMapper objectMapper;
 
     public BaseJpaService(){
         Type genType = getClass().getGenericSuperclass();

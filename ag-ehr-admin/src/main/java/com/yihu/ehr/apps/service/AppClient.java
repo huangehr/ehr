@@ -102,7 +102,7 @@ public interface AppClient {
             @ApiParam(name = "manageType", value = "APP管理类型，backStage：后台管理，client：客户端。")
             @RequestParam(value = "manageType", required = false) String manageType);
 
-    @RequestMapping(value =  ApiVersion.Version1_0 + ServiceApi.Apps.AppFieldExistence, method = RequestMethod.POST)
+    @RequestMapping(value =  ApiVersion.Version1_0 + ServiceApi.Apps.CheckField, method = RequestMethod.POST)
     @ApiOperation(value = "根据条件判断应用ID或者名称是否存在")
     Envelop isFieldExist(
             @ApiParam(name = "field", value = "字段", required = true)

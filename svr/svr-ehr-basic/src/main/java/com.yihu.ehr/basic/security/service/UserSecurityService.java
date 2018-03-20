@@ -83,14 +83,14 @@ public class UserSecurityService {
 
     public UserSecurity getKeyByUserId(String userId, boolean isNull) throws Exception {
         List<UserKey> keyMapList = keyMapRepository.findByUserId(userId);
-        if (keyMapList!=null && keyMapList.size()>0){
+        if (keyMapList != null && keyMapList.size() > 0){
             //1-2-2当UserKey存在的情况下，查询用户关联的用户密钥信息。
             String userSecurityId = keyMapList.get(0).getKey();
             return keyRepository.findOne(userSecurityId);
-        }else {
+        } else {
             if (isNull) {
                 return null;
-            }else{
+            } else{
                 UserSecurity key = createKey();
                 createUserKey(key.getId(), userId, PersonalKeyType);
                 return key;

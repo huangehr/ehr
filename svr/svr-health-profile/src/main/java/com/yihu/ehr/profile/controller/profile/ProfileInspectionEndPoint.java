@@ -36,7 +36,7 @@ public class ProfileInspectionEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "demographic_id") String demographic_id,
             @ApiParam(name = "hp_code", value = "健康问题代码（不传默认查找所有）")
             @RequestParam(value = "hp_code", required = false) String hp_code,
-            @ApiParam(name = "date", value = "时间")
+            @ApiParam(name = "date", value = "时间 {'start':'2018-03-12T12:00:00Z','end':'2018-03-15T12:00:00Z'}")
             @RequestParam(value = "date", required = false) String date,
             @ApiParam(name = "event_type", value = "事件类型")
             @RequestParam(value = "event_type", required = false) String event_type) throws Exception {
@@ -46,10 +46,8 @@ public class ProfileInspectionEndPoint extends EnvelopRestEndPoint {
     @ApiOperation("检查检验详情")
     @RequestMapping(value = ServiceApi.Profiles.InspectionSub, method = RequestMethod.GET)
     public List InspectionSub(
-            @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362321200108017313")
-            @RequestParam(value = "demographic_id") String demographic_id,
-            @ApiParam(name = "hp_code", value = "健康问题代码（不传默认查找所有）")
-            @RequestParam(value = "hp_code", required = false) String hp_code) throws Exception {
+            @ApiParam(name = "profile_id", value = "主表事件索引", required = true, defaultValue = "49229004X_000406450000000UX0_1485608518000")
+            @RequestParam(value = "profile_id") String profile_id) throws Exception {
 //        return profileInspectionService.inspectionRecords(demographic_id, hp_code);
         return null;
     }

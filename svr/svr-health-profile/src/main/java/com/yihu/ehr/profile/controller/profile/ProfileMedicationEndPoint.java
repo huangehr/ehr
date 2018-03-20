@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by progr1mmer on 2018/3/13.
@@ -40,6 +41,17 @@ public class ProfileMedicationEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "key_word", required = false) String key_word) throws Exception {
         return profileMedicationService.medicationRecords(demographic_id, hp_code, date, key_word);
     }
+
+    @ApiOperation("用药排行")
+    @RequestMapping(value = ServiceApi.Profiles.MedicationRanking, method = RequestMethod.GET)
+    public Map<String, Integer> medicationRanking(
+            @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362321200108017313")
+            @RequestParam(value = "demographic_id") String demographic_id,
+            @ApiParam(name = "hp_code", value = "健康问题代码（不传默认查找所有）")
+            @RequestParam(value = "hp_code", required = false) String hp_code) throws Exception {
+        return profileMedicationService.medicationRanking(demographic_id, hp_code);
+    }
+
 
     @ApiOperation("用药详情")
     @RequestMapping(value = ServiceApi.Profiles.MedicationSub, method = RequestMethod.GET)

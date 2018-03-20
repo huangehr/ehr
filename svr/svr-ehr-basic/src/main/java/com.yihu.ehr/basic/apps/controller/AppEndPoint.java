@@ -191,21 +191,32 @@ public class AppEndPoint extends EnvelopRestEndPoint {
 
     // -------------------------- 开放平台 ---------------------------------
 
-    @RequestMapping(value =  ServiceApi.Apps.AppFieldExistence, method = RequestMethod.POST)
-    @ApiOperation(value = "根据条件判断应用ID或者名称是否存在")
-    public Envelop isFieldExist(
+    @RequestMapping(value =  ServiceApi.Apps.CheckField, method = RequestMethod.POST)
+    @ApiOperation(value = "注册时根据条件判断应用ID或者名称是否存在")
+    public Boolean isFieldExist(
             @ApiParam(name = "field", value = "字段", required = true)
             @RequestParam(value = "field") String field,
             @ApiParam(name = "value", value = "值", required = true)
             @RequestParam(value = "value") String value) throws Exception{
-        Envelop envelop = new Envelop();
         List<App> appList = appService.search(field + "=" + value);
         if (appList != null && appList.size() > 0) {
-            envelop.setSuccessFlg(true);
-            return envelop;
+            return true;
         }
-        envelop.setSuccessFlg(false);
-        return envelop;
+        return false;
+    }
+
+    @RequestMapping(value =  ServiceApi.Apps.CheckName, method = RequestMethod.POST)
+    @ApiOperation(value = "更新的时候判断名字是否存在")
+    public Boolean checkName(
+            @ApiParam(name = "appId", value = "应用Id", required = true)
+            @RequestParam(value = "appId") String appId,
+            @ApiParam(name = "newName", value = "值", required = true)
+            @RequestParam(value = "newName") String newName) throws Exception{
+        App app = appService.findById(appId);
+        if (!app.getName().equals(newName) && appService.findByField("name", newName).size() > 0) {
+            return true;
+        }
+        return false;
     }
 
     @RequestMapping(value =  ServiceApi.Apps.AppAuthClient, method = RequestMethod.POST)
@@ -255,5 +266,26 @@ public class AppEndPoint extends EnvelopRestEndPoint {
         envelop.setObj(app);
         return envelop;
     }
+
+    @RequestMapping(value =  ServiceApi.Apps.SimpleUpdate, method = RequestMethod.POST)
+    @ApiOperation(value = "开放平台应用简单更新")
+    public Envelop simpleUpdate(
+            @ApiParam(name = "appId", value = "AppId", required = true)
+            @RequestParam(value = "appId") String appId,
+            @ApiParam(name = "name", value = "名称", required = true)
+            @RequestParam(value = "name") String name,
+            @ApiParam(name = "url", value = "回调地址", required = true)
+            @RequestParam(value = "url") String url) {
+        List<App> appList = appService.findByField("id", appId);
+        if (appList.size() <= 0) {
+            return failed("操作对象不存在", ErrorCode.OBJECT_NOT_FOUND.value());
+        }
+        App app1 = appList.get(0);
+        app1.setName(name);
+        app1.setUrl(url);
+        App app2 = appService.save(app1);
+        return success(app2);
+    }
+
 
 }
