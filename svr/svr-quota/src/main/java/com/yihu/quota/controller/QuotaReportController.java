@@ -208,6 +208,9 @@ public class QuotaReportController extends BaseController {
         List<String> charTypes = Arrays.asList(charstr.split(","));
         MChartInfoModel chartInfoModel = new MChartInfoModel();
         String dimensionName = dimension + "Name";
+        if ("quotaName".equals(dimension)) {
+            dimensionName = "quotaName";
+        }
         try {
             Option option = null;
             List<List<Object>> optionData = new ArrayList<>();
