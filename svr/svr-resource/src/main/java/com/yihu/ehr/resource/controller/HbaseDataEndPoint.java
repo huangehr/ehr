@@ -2,20 +2,21 @@ package com.yihu.ehr.resource.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.hbase.HBaseAdmin;
 import com.yihu.ehr.hbase.HBaseDao;
+import com.yihu.ehr.resource.service.ResourceStatisticService;
 import com.yihu.ehr.solr.SolrAdmin;
 import com.yihu.ehr.solr.SolrUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -38,6 +39,8 @@ public class HbaseDataEndPoint extends EnvelopRestEndPoint {
     private SolrUtil solrUtil;
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private ResourceStatisticService resourceStatisticService;
 
     @ApiOperation("模糊匹配表")
     @RequestMapping(value = "getTableList",method = RequestMethod.GET)
@@ -241,5 +244,19 @@ public class HbaseDataEndPoint extends EnvelopRestEndPoint {
             ex.printStackTrace();
             return ex.getMessage();
         }
+    }
+
+    @RequestMapping(value = ServiceApi.Report.GetArchivesInfo, method = RequestMethod.GET)
+    @ApiOperation(value = "居民档案数、接收档案包数")
+    public Map<String, Long> getArchiveInfo() throws Exception {
+        Map<String, Long> map = new HashMap<>();
+        //Todo 获取常驻人口数
+        // 获取居民档案数
+        long userArchiveCount = solrUtil.count("HealthProfile","*:*");
+        // 获取接收档案包数
+        long archivePackageCount = resourceStatisticService.getJsonArchiveCount();
+        map.put("userArchiveCount", userArchiveCount);
+        map.put("archivePackageCount", archivePackageCount);
+        return map;
     }
 }
