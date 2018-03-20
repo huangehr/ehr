@@ -58,7 +58,7 @@ public class HealthCheckTask {
                         .build();
                 scheduler.scheduleJob(jobDetail, trigger);
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         this.jobSetSize = jobInitSize;
@@ -71,7 +71,7 @@ public class HealthCheckTask {
         //检查集群信息
         try {
             hBaseAdmin.isTableExists("HealthProfile");
-        }catch (Exception e) {
+        } catch (Exception e) {
             try {
                 Set<JobKey> jobKeySet = scheduler.getJobKeys(groupMatcher);
                 if(jobKeySet != null) {
@@ -79,7 +79,7 @@ public class HealthCheckTask {
                         scheduler.deleteJob(jobKey);
                     }
                 }
-            }catch (SchedulerException se) {
+            } catch (SchedulerException se) {
                 PackResolveLogger.error(se.getMessage());
             }
             PackResolveLogger.error(e.getMessage());
@@ -87,22 +87,22 @@ public class HealthCheckTask {
         }
         //检查微服务信息
         List<ServiceInstance> mgr = discoveryClient.getInstances(SVR_PACK_MGR);
-        if(mgr.isEmpty()) {
+        if (mgr.isEmpty()) {
             try {
                 Set<JobKey> jobKeySet = scheduler.getJobKeys(groupMatcher);
-                if(jobKeySet != null) {
+                if (jobKeySet != null) {
                     for (JobKey jobKey : jobKeySet) {
                         scheduler.deleteJob(jobKey);
                     }
                 }
-            }catch (SchedulerException e) {
+            } catch (SchedulerException e) {
                 PackResolveLogger.error(e.getMessage());
             }
             return;
         }
         try {
             Set<JobKey> jobKeySet = scheduler.getJobKeys(groupMatcher);
-            if(jobKeySet != null) {
+            if (jobKeySet != null) {
                 int activeCount = jobKeySet.size();
                 for (int i = 0; i < jobSetSize - activeCount; i++) {
                     String suffix = UUID.randomUUID().toString().substring(0, 8);
@@ -116,8 +116,8 @@ public class HealthCheckTask {
                             .build();
                     scheduler.scheduleJob(jobDetail, trigger);
                 }
-            }else {
-                for (int i = 0; i < jobInitSize; i++) {
+            } else {
+                for (int i = 0; i < jobSetSize; i++) {
                     String suffix = UUID.randomUUID().toString().substring(0, 8);
                     JobDetail jobDetail = newJob(PackageResourceJob.class)
                             .withIdentity("PackResolveJob-" + suffix, "PackResolve")
@@ -130,21 +130,21 @@ public class HealthCheckTask {
                     scheduler.scheduleJob(jobDetail, trigger);
                 }
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             PackResolveLogger.error(e.getMessage());
         }
     }
 
     public void addJobSize(int addSize) {
         this.jobSetSize += addSize;
-        if(this.jobSetSize > jobMaxSize) {
+        if (this.jobSetSize > jobMaxSize) {
             jobSetSize = jobMaxSize;
         }
     }
 
     public void minusJobSize(int minusSize) {
         this.jobSetSize -= minusSize;
-        if(this.jobSetSize < 0) {
+        if (this.jobSetSize < 0) {
             jobSetSize = 0;
         }
     }

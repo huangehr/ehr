@@ -1,24 +1,25 @@
 package com.yihu.ehr.basic.apps.controller;
 
 import com.yihu.ehr.basic.apps.service.AppApiCategoryService;
+import com.yihu.ehr.basic.apps.service.AppApiService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.entity.api.AppApiCategory;
-import com.yihu.ehr.entity.emergency.Ambulance;
-import com.yihu.ehr.entity.emergency.Attendance;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -27,11 +28,13 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "AppApiCategory", description = "接口分类管理", tags = {"平台应用 - 接口分类管理"})
+@Api(value = "AppApiCategory", description = "接口分类管理", tags = {"平台应用-接口分类管理"})
 public class AppApiCategoryEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     private AppApiCategoryService appApiCategoryService;
+    @Autowired
+    private AppApiService appApiService;
 
     @RequestMapping(value = ServiceApi.AppApiCategory.Base, method = RequestMethod.POST)
     @ApiOperation("保存记录")
@@ -49,14 +52,19 @@ public class AppApiCategoryEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "ids", value = "id列表xxxx,xxxx,xxxx,...", required = true)
             @RequestParam(value = "ids") String ids){
         String [] idArr = ids.split(",");
+        String parent = "";
         for (String id : idArr) {
-
+            if (appApiService.findByCateId(new Integer(id)).size() > 0) {
+                parent += id + ",";
+            }
         }
-        Integer [] intIdArr = new Integer[idArr.length];
-        for (int i = 0; i < idArr.length; i ++) {
-            intIdArr[i] = new Integer(idArr[i]);
+        if (StringUtils.isNotEmpty(parent)) {
+            return failed("请先删除id：" +  parent + "的子类API");
         }
-        appApiCategoryService.delete(intIdArr);
+        List<String> strIdList = Arrays.asList(idArr);
+        List<Integer> intIdList = new ArrayList<>(idArr.length);
+        strIdList.forEach(item -> intIdList.add(new Integer(item)));
+        appApiCategoryService.delete(intIdList);
         return success(true);
     }
 

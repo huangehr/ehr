@@ -6,18 +6,18 @@ import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.entity.api.AppApiErrorCode;
-import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -26,7 +26,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "AppApiCategory", description = "接口错误码管理", tags = {"平台应用 - 接口错误码管理"})
+@Api(value = "AppApiCategory", description = "接口错误码管理", tags = {"平台应用-接口错误码管理"})
 public class AppApiErrorCodeEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
@@ -48,14 +48,10 @@ public class AppApiErrorCodeEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "ids", value = "id列表xxxx,xxxx,xxxx,...", required = true)
             @RequestParam(value = "ids") String ids){
         String [] idArr = ids.split(",");
-        for (String id : idArr) {
-
-        }
-        Integer [] intIdArr = new Integer[idArr.length];
-        for (int i = 0; i < idArr.length; i ++) {
-            intIdArr[i] = new Integer(idArr[i]);
-        }
-        appApiErrorCodeService.delete(intIdArr);
+        List<String> strIdList = Arrays.asList(idArr);
+        List<Integer> intIdList = new ArrayList<>(idArr.length);
+        strIdList.forEach(item -> intIdList.add(new Integer(item)));
+        appApiErrorCodeService.delete(intIdList);
         return success(true);
     }
 

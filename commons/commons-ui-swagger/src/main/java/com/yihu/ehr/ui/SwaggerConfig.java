@@ -18,7 +18,7 @@ import static springfox.documentation.builders.PathSelectors.regex;
 @Configuration
 @EnableSwagger2
 @ComponentScan("com.yihu.ehr.*.controller")
-@Profile({"dev", "test"})
+//@Profile({"dev", "test"})
 public class SwaggerConfig {
 
     public static final String API_VERSION = "v1.0";
