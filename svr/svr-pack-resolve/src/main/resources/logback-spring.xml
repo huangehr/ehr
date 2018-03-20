@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration scan="true">
 
-	<springProperty scope="context" name="dir" source="spring.application.name"/>
+	<springProperty scope="context" name="appName" source="spring.application.name"/>
 
-	<property name="log_home" value="/ehr-logs/${dir}" />
+	<property name="log_home" value="/ehr-logs/${appName}" />
 
 	<conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter" />
 	<conversionRule conversionWord="wex" converterClass="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter" />
 	<conversionRule conversionWord="wEx" converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter" />
 
 	<!-- 彩色日志格式 -->
-	<property name="CONSOLE_LOG_PATTERN" value="${CONSOLE_LOG_PATTERN:-%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}" />
+	<property name="CONSOLE_LOG_PATTERN" value="${CONSOLE_LOG_PATTERN:-%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr([${appName}]){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}" />
+	<!-- 文件日志格式 -->
+	<property name="FILE_LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss} [${appName}] %-5level --- [%thread] - %logger{36}: %msg%n" />
 
 	<!-- Standard output -->
 	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
@@ -26,7 +28,7 @@
             <fileNamePattern>${log_home}/api/info/%d{yyyy-MM-dd}.log</fileNamePattern>
         </rollingPolicy>
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level --- [ %thread] - %logger{36}: %msg%n</pattern>
+			<pattern>${FILE_LOG_PATTERN}</pattern>
             <charset class="java.nio.charset.Charset">UTF-8</charset>
         </encoder>
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
@@ -41,7 +43,7 @@
             <fileNamePattern>${log_home}/api/warn/%d{yyyy-MM-dd}.log</fileNamePattern>
         </rollingPolicy>
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level --- [ %thread] - %logger{36}: %msg%n</pattern>
+			<pattern>${FILE_LOG_PATTERN}</pattern>
             <charset class="java.nio.charset.Charset">UTF-8</charset>
         </encoder>
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
@@ -56,7 +58,7 @@
             <fileNamePattern>${log_home}/api/error/%d{yyyy-MM-dd}.log</fileNamePattern>
         </rollingPolicy>
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level --- [ %thread] - %logger{36}: %msg%n</pattern>
+			<pattern>${FILE_LOG_PATTERN}</pattern>
             <charset class="java.nio.charset.Charset">UTF-8</charset>
         </encoder>
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
@@ -84,7 +86,7 @@
 			<fileNamePattern>${log_home}/task/info/%d{yyyy-MM-dd}.log</fileNamePattern>
 		</rollingPolicy>
 		<encoder>
-			<pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level --- [ %thread] - %logger{36}: %msg%n</pattern>
+			<pattern>${FILE_LOG_PATTERN}</pattern>
 			<charset class="java.nio.charset.Charset">UTF-8</charset>
 		</encoder>
 		<filter class="ch.qos.logback.classic.filter.LevelFilter">
@@ -99,7 +101,7 @@
 			<fileNamePattern>${log_home}/task/warn/%d{yyyy-MM-dd}.log</fileNamePattern>
 		</rollingPolicy>
 		<encoder>
-			<pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level --- [ %thread] - %logger{36}: %msg%n</pattern>
+			<pattern>${FILE_LOG_PATTERN}</pattern>
 			<charset class="java.nio.charset.Charset">UTF-8</charset>
 		</encoder>
 		<filter class="ch.qos.logback.classic.filter.LevelFilter">
@@ -114,7 +116,7 @@
 			<fileNamePattern>${log_home}/task/error/%d{yyyy-MM-dd}.log</fileNamePattern>
 		</rollingPolicy>
 		<encoder>
-			<pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level --- [ %thread] - %logger{36}: %msg%n</pattern>
+			<pattern>${FILE_LOG_PATTERN}</pattern>
 			<charset class="java.nio.charset.Charset">UTF-8</charset>
 		</encoder>
 		<filter class="ch.qos.logback.classic.filter.LevelFilter">
