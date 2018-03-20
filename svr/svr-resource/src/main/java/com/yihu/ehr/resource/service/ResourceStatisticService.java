@@ -277,4 +277,13 @@ public class ResourceStatisticService extends BaseJpaService {
         return query.list();
     }
 
+    public long getJsonArchiveCount() {
+        Session session = currentSession();
+        String sql = "SELECT count(1) from json_archives";
+        Query query = session.createSQLQuery(sql);
+        query.setFlushMode(FlushMode.COMMIT);
+        BigInteger bigInteger = (BigInteger) query.uniqueResult();
+        return bigInteger.longValue();
+    }
+
 }
