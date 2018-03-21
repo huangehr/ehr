@@ -21,4 +21,8 @@ public class AppVersionService extends BaseJpaService<AppVersion, AppVersionRepo
     public AppVersion getAppVersion(String id){
         return appVersionRepository.findOne(id);
     }
+
+    public AppVersion getAppVersionByCode(String code){
+        return appVersionRepository.findBycode(code);
+    }
 }
