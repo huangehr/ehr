@@ -95,10 +95,10 @@ public class PackageResourceJob implements InterruptableJob {
         patientService.checkPatient(resourceBucket, pack.getId());
         //回填入库状态
         Map<String,String> map = new HashMap();
-        map.put("profileId",standardPackage.getId());
-        map.put("demographicId",standardPackage.getDemographicId());
+        map.put("profileId", standardPackage.getId());
+        map.put("demographicId", standardPackage.getDemographicId());
         map.put("eventType", standardPackage.getEventType() == null? "":String.valueOf(standardPackage.getEventType().getType()));
-        map.put("eventNo",standardPackage.getEventNo());
+        map.put("eventNo", standardPackage.getEventNo());
         map.put("eventDate", DateUtil.toStringLong(standardPackage.getEventDate()));
         map.put("patientId", standardPackage.getPatientId());
         map.put("reUploadFlg", String.valueOf(standardPackage.isReUploadFlg()));
