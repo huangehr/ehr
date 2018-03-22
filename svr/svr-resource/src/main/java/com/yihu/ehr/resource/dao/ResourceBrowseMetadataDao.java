@@ -2,7 +2,6 @@ package com.yihu.ehr.resource.dao;
 
 
 import com.yihu.ehr.resource.model.DtoResourceMetadata;
-import com.yihu.ehr.resource.model.RsMetadata;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;

@@ -94,7 +94,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
         Map<String, Object> newSource;
         try {
             newSource = elasticSearchService.index(indexName, indexType, source);
-        }catch (Exception e) {
+        } catch (Exception e) {
             try {
                 fastDFSService.delete(groupName, remoteFileName);
             } catch (Exception e1) {

@@ -3,7 +3,6 @@ package com.yihu.ehr.resource.service;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.hbase.HBaseDao;
 import com.yihu.ehr.profile.core.ResourceCore;
 import com.yihu.ehr.query.common.model.QueryCondition;
 import com.yihu.ehr.query.services.HbaseQuery;
@@ -29,6 +28,8 @@ import java.util.*;
 public class ResourceBrowseService {
 
     @Autowired
+    private ObjectMapper objectMapper;
+    @Autowired
     private SolrQuery solrQuery;
     @Autowired
     private HbaseQuery hbaseQuery;
@@ -43,8 +44,6 @@ public class ResourceBrowseService {
     @Autowired
     private RedisService redisService;
     @Autowired
-    private ObjectMapper objectMapper;
-    @Autowired
     private RsResourceDefaultQueryDao resourcesDefaultQueryDao;
     @Autowired
     private RsRolesResourceGrantService rsRolesResourceGrantService;
@@ -52,8 +51,6 @@ public class ResourceBrowseService {
     private RsRolesResourceMetadataGrantService rsRolesResourceMetadataGrantService;
     @Autowired
     private StdTransformClient stdTransformClient;
-    @Autowired
-    private HBaseDao hbaseDao;
 
     //忽略字段
     private List<String> ignoreField = new ArrayList<String>(Arrays.asList("rowkey", "event_type", "event_no", "event_date", "demographic_id", "patient_id", "org_code", "org_name", "profile_id", "cda_version", "client_id", "profile_type", "patient_name", "org_area", "diagnosis", "health_problem"));
