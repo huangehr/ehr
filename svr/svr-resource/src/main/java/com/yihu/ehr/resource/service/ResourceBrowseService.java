@@ -74,7 +74,7 @@ public class ResourceBrowseService {
         boolean isOtherVersion = false;
         String version = "";
         String code = "";
-        if(resourcesCode.split("\\$").length > 1) {
+        if (resourcesCode.split("\\$").length > 1) {
             isOtherVersion = true;
             version = resourcesCode.split("\\$")[1];
             code = resourcesCode.split("\\$")[0];
@@ -85,9 +85,9 @@ public class ResourceBrowseService {
         List<String> columnCode = new ArrayList<String>();
         List<String> columnType = new ArrayList<String>();
         List<String> columnDict = new ArrayList<String>();
-        if(metadataList != null) {
+        if (metadataList != null) {
             for (DtoResourceMetadata r : metadataList) {
-                if(!isOtherVersion) {
+                if (!isOtherVersion) {
                     columnName.add(r.getName());
                     if (!StringUtils.isEmpty(r.getDictCode())) {
                         columnCode.add(r.getId() + "_VALUE");
@@ -96,9 +96,9 @@ public class ResourceBrowseService {
                     }
                     columnType.add(r.getColumnType());
                     columnDict.add(r.getDictCode());
-                }else {
+                } else {
                     String name = stdTransformClient.stdMetadataName(version, code, correspondMap.get(r.getId()));
-                    if(!StringUtils.isEmpty(name)) {
+                    if (!StringUtils.isEmpty(name)) {
                         columnName.add(name);
                         if (!StringUtils.isEmpty(r.getDictCode())) {
                             columnCode.add(r.getId() + "_VALUE");
@@ -129,19 +129,19 @@ public class ResourceBrowseService {
         String queryParams = "";
         //获取资源信息
         RsResource rsResources = rsResourceDao.findByCode(resourcesCode);
-        if(rsResources != null) {
+        if (rsResources != null) {
             RsResourceDefaultQuery resourcesQuery = resourcesDefaultQueryDao.findByResourcesId(rsResources.getId());
             List<QueryCondition> ql = new ArrayList<>();
             //设置参数
             if (!StringUtils.isEmpty(queryCondition) && !queryCondition.equals("{}")) {
                 ql = parseCondition(queryCondition);
-            }else if(resourcesQuery != null && resourcesQuery.getResourcesType() == 1) {
+            } else if(resourcesQuery != null && resourcesQuery.getResourcesType() == 1) {
                 String defaultQuery = resourcesQuery.getQuery();
                 ql = parseCondition(defaultQuery);
             }
             queryParams = addParams(queryParams,"q", solrQuery.conditionToString(ql));
             return resourcesBrowse(resourcesCode, rsResources.getRsInterface(), roleId, orgCode, areaCode, queryParams, page, size);
-        }else {
+        } else {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("无效资源！");
             return envelop;
@@ -163,11 +163,11 @@ public class ResourceBrowseService {
         //获取结果集
         Envelop envelop = getResultData(resourcesCode, roleId, orgCode, areaCode, queryParams, page, size);
         //细表的话追加主表的数据
-        if(methodName.endsWith("Sub") && envelop.isSuccessFlg() && envelop.getDetailModelList() != null) {
+        if (methodName.endsWith("Sub") && envelop.isSuccessFlg() && envelop.getDetailModelList() != null) {
             List<Map<String,Object>> oldList = envelop.getDetailModelList();
-            for(Map<String, Object> temp : oldList) {
+            for (Map<String, Object> temp : oldList) {
                 String masterRowKey = (String)temp.get("profile_id");
-                if(masterRowKey != null) {
+                if (masterRowKey != null) {
                     Map<String, Object> masterMap = hbaseQuery.queryByRowKey(ResourceCore.MasterTable, masterRowKey);
                     temp.put("event_date", masterMap.get("event_date"));
                     temp.put("org_name", masterMap.get("org_name"));
@@ -175,7 +175,7 @@ public class ResourceBrowseService {
                     temp.put("demographic_id", masterMap.get("demographic_id"));
                     temp.put("patient_name", masterMap.get("patient_name"));
                     String eventType = (String)masterMap.get("event_type");
-                    if(null != eventType) {
+                    if (null != eventType) {
                         if ("0".equals(eventType)) {
                             temp.put("event_type", "门诊");
                         } else if ("1".equals(eventType)) {
@@ -183,7 +183,7 @@ public class ResourceBrowseService {
                         } else if ("2".equals(eventType)) {
                             temp.put("event_type", "体检");
                         }
-                    }else {
+                    } else {
                         temp.put("event_type", "未知类型");
                     }
                 }
@@ -206,32 +206,32 @@ public class ResourceBrowseService {
         /**
          * 资源判空检查
          */
-        for(String code : codeList) {
+        for (String code : codeList) {
             RsResource rsResources = rsResourceDao.findByCode(code);
-            if(rsResources == null) {
+            if (rsResources == null) {
                 envelop.setSuccessFlg(false);
                 envelop.setErrorMsg("无效的资源编码：" + code);
                 return envelop;
             }
         }
         //获取Saas权限参数
-        if(orgCode.equals("*") && areaCode.equals("*")) {
+        if (orgCode.equals("*") && areaCode.equals("*")) {
             saas.append("*");
-        }else {
+        } else {
             List<String> orgCodeList = objectMapper.readValue(orgCode, List.class);
             List<String> areaCodeList = objectMapper.readValue(areaCode, List.class);
-            if((orgCodeList != null && orgCodeList.size() > 0)) {
-                for(String oCode : orgCodeList) {
-                    if(StringUtils.isEmpty(saas.toString())) {
+            if ((orgCodeList != null && orgCodeList.size() > 0)) {
+                for (String oCode : orgCodeList) {
+                    if (StringUtils.isEmpty(saas.toString())) {
                         saas.append("org_code:" + oCode);
-                    }else {
+                    } else {
                         saas.append(" OR org_code:" + oCode);
                     }
                 }
             }
-            if(areaCodeList != null && areaCodeList.size() > 0) {
-                for(String aCode : areaCodeList) {
-                    if(StringUtils.isEmpty(saas.toString())) {
+            if (areaCodeList != null && areaCodeList.size() > 0) {
+                for (String aCode : areaCodeList) {
+                    if (StringUtils.isEmpty(saas.toString())) {
                         saas.append("org_area:" + aCode);
                     } else {
                         saas.append(" OR org_area:" + aCode);
@@ -239,7 +239,7 @@ public class ResourceBrowseService {
                 }
             }
         }
-        if(StringUtils.isEmpty(saas)) {
+        if (StringUtils.isEmpty(saas)) {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("无SAAS权限访问资源");
             return envelop;
@@ -248,13 +248,13 @@ public class ResourceBrowseService {
         if (!StringUtils.isEmpty(queryCondition)) {
             ql = parseCondition(queryCondition);
         }
-        if(ql.size() > 0) {
-            if(solrQuery.conditionToString(ql).contains(":")) {
+        if (ql.size() > 0) {
+            if (solrQuery.conditionToString(ql).contains(":")) {
                 queryParams = addParams(queryParams,"q", solrQuery.conditionToString(ql));
-            }else {
+            } else {
                 queryParams = addParams(queryParams,"q", "*:*");
             }
-        }else {
+        } else {
             queryParams = addParams(queryParams,"q", "*:*");
         }
         queryParams = addParams(queryParams,"saas", saas.toString());
@@ -264,17 +264,17 @@ public class ResourceBrowseService {
         String dealBasicStr = basicStr.substring(1, basicStr.length() - 1).replaceAll(" ", "");
         queryParams = addParams(queryParams,"basicFl", dealBasicStr);
         //数据元信息字段
-        if(metaData.equals("")) {
+        if (metaData.equals("")) {
             queryParams = addParams(queryParams,"dFl", "");
-        }else {
+        } else {
             //原始集合
             List<String> customizeList = (List<String>) mapper.readValue(metaData, List.class);
             //参数集合
             List<String> paramList = new ArrayList<String>(customizeList.size() * 2);
-            for(String id : customizeList) {
+            for (String id : customizeList) {
                 paramList.add(id);
                 String dictCode = redisService.getRsMetaData(id);
-                if(!StringUtils.isEmpty(dictCode)) {
+                if (!StringUtils.isEmpty(dictCode)) {
                     paramList.add(id + "_VALUE");
                 }
             }
@@ -283,13 +283,13 @@ public class ResourceBrowseService {
             queryParams = addParams(queryParams,"dFl", dealDStr);
         }
         Page<Map<String, Object>> result = resourceBrowseDao.getEhrCenter(queryParams, page, size);
-        if(result != null) {
+        if (result != null) {
             envelop.setSuccessFlg(true);
             envelop.setCurrPage(result.getNumber());
             envelop.setPageSize(result.getSize());
             envelop.setTotalCount(new Long(result.getTotalElements()).intValue());
             envelop.setDetailModelList(result.getContent());
-        }else {
+        } else {
             envelop.setErrorMsg("数据库数据检索失败");
         }
         return envelop;
@@ -309,7 +309,7 @@ public class ResourceBrowseService {
     public Envelop getResultData(String resourcesCode, String roleId, String orgCode, String areaCode, String queryParams, Integer page, Integer size) throws Exception{
         Envelop envelop = new Envelop();
         RsResource rsResources = rsResourceDao.findByCode(resourcesCode);
-        if(rsResources != null) {
+        if (rsResources != null) {
             String methodName = rsResources.getRsInterface(); //执行函数
             //获取资源结构权限，该部分新增其他标准数据集的判断
             List<DtoResourceMetadata> metadataList = getAccessMetadata(rsResources, roleId, new HashMap<>());
@@ -339,20 +339,19 @@ public class ResourceBrowseService {
                     }
                 }
             }
-            if(StringUtils.isEmpty(saas)) {
+            if (StringUtils.isEmpty(saas)) {
                 envelop.setSuccessFlg(false);
                 envelop.setErrorMsg("无SAAS权限访问资源[resourcesCode=" + resourcesCode+ "]");
                 return envelop;
-            }
-            else {
+            } else {
                 queryParams = addParams(queryParams,"saas", saas.toString());
             }
             //通过资源代码获取默认参数
             List<RsResourceDefaultParam> paramsList = resourceDefaultParamDao.findByResourcesCode(resourcesCode);
-            for(RsResourceDefaultParam param : paramsList) {
+            for (RsResourceDefaultParam param : paramsList) {
                 queryParams = addParams(queryParams, param.getParamKey(), param.getParamValue());
             }
-            if(metadataList != null && metadataList.size() > 0) {
+            if (metadataList != null && metadataList.size() > 0) {
                 /**
                 String groupFields = "";
                 String statsFields = "";
@@ -394,11 +393,11 @@ public class ResourceBrowseService {
                 queryParams = addParams(queryParams,"basicFl", dealBasicStr);
                 //数据元信息字段
                 List<String> metadataIdList = new ArrayList<String>();
-                for(DtoResourceMetadata metadata : metadataList) {
+                for (DtoResourceMetadata metadata : metadataList) {
                     String id = metadata.getId();
                     metadataIdList.add(id);
                     String dictCode = metadata.getDictCode();
-                    if(!StringUtils.isEmpty(dictCode)) {
+                    if (!StringUtils.isEmpty(dictCode)) {
                         metadataIdList.add(id + "_VALUE");
                     }
                 }
@@ -415,14 +414,13 @@ public class ResourceBrowseService {
                     envelop.setPageSize(result.getSize());
                     envelop.setTotalCount(new Long(result.getTotalElements()).intValue());
                     envelop.setDetailModelList(result.getContent());
-                }
-                else {
+                } else {
                     envelop.setErrorMsg("数据库数据检索失败");
                 }
-            }else {
+            } else {
                 envelop.setErrorMsg("资源无相关数据元");
             }
-        }else {
+        } else {
             envelop.setErrorMsg("无效资源");
         }
         return envelop;
@@ -439,16 +437,15 @@ public class ResourceBrowseService {
         ObjectMapper mapper = new ObjectMapper();
         JavaType javaType = mapper.getTypeFactory().constructParametricType(List.class, Map.class);
         List<Map<String, Object>> list = objectMapper.readValue(queryCondition, javaType);
-        if(list != null && list.size() > 0) {
-            for(Map<String,Object> item : list) {
+        if (list != null && list.size() > 0) {
+            for (Map<String,Object> item : list) {
                 String andOr = String.valueOf(item.get("andOr")).trim();
                 String field = String.valueOf(item.get("field")).trim();
                 String cond = String.valueOf(item.get("condition")).trim();
                 String value = String.valueOf(item.get("value"));
-                if(value.indexOf(",")>0) {
+                if (value.indexOf(",")>0) {
                     ql.add(new QueryCondition(andOr, cond, field, value.split(",")));
-                }
-                else{
+                } else {
                     ql.add(new QueryCondition(andOr, cond, field, value));
                 }
             }
@@ -464,7 +461,7 @@ public class ResourceBrowseService {
     public Envelop getRawFiles(String profileId,String cdaDocumentId,Integer page,Integer size) throws Exception{
         Envelop re = new Envelop();
         String queryParams = "{\"q\":\"rowkey:"+profileId+"*\"}";
-        if(cdaDocumentId!=null && cdaDocumentId.length()>0) {
+        if (cdaDocumentId!=null && cdaDocumentId.length()>0) {
             queryParams = "{\"q\":\"rowkey:"+profileId+"* AND cda_document_id:"+cdaDocumentId+"\"}";
         }
         Page<Map<String,Object>> result = resourceBrowseDao.getRawFiles(queryParams, page, size);
@@ -474,8 +471,7 @@ public class ResourceBrowseService {
             re.setPageSize(result.getSize());
             re.setTotalCount(new Long(result.getTotalElements()).intValue());
             re.setDetailModelList(result.getContent());
-        }
-        else{
+        } else {
             re.setSuccessFlg(false);
         }
 
@@ -488,16 +484,14 @@ public class ResourceBrowseService {
      */
     private String addParams(String oldParams, String key,String value) {
         String newParam = "";
-        if(value.startsWith("[") && value.endsWith("]")) {
+        if (value.startsWith("[") && value.endsWith("]")) {
             newParam = "\"" + key + "\":" + value;
-        }
-        else{
+        } else {
             newParam = "\"" + key + "\":\""+ value.replace("\"","\\\"") + "\"";
         }
-        if(oldParams!=null && oldParams.length()>3 && oldParams.startsWith("{") && oldParams.endsWith("}")) {
+        if (oldParams!=null && oldParams.length()>3 && oldParams.startsWith("{") && oldParams.endsWith("}")) {
             return oldParams.substring(0, oldParams.length() - 1) + "," + newParam + "}";
-        }
-        else{
+        } else {
             return "{" + newParam + "}";
         }
     }
@@ -522,9 +516,9 @@ public class ResourceBrowseService {
             String otherStdMetadataStr = stdTransformClient.stdMetadataCodes(version, code); //省平台临时数据处理
             String [] otherStdMetadataArr = otherStdMetadataStr.split(",");
             List<String> transformEhrMetadataList = new ArrayList<>(); // 此list存储其他标准数据集底下的数据元转换成的平台的数据元的id (EHR_XXXXX)
-            for(String otherStdMetadata : otherStdMetadataArr) {
+            for (String otherStdMetadata : otherStdMetadataArr) {
                 String dataSetAndMetadata = stdTransformClient.adapterMetadataCode("5a6951bff0bb", code, otherStdMetadata); //适配版本号
-                if(!StringUtils.isEmpty(dataSetAndMetadata) && dataSetAndMetadata.split("\\.").length > 1 ) {
+                if (!StringUtils.isEmpty(dataSetAndMetadata) && dataSetAndMetadata.split("\\.").length > 1 ) {
                     String [] dataSetAndMetadataArr = dataSetAndMetadata.split("\\.");
                     String ehrMetadata = redisService.getRsAdapterMetaData("59083976eebd", dataSetAndMetadataArr[0], dataSetAndMetadataArr[1]);
                     if (!StringUtils.isEmpty(ehrMetadata)) {
@@ -541,7 +535,7 @@ public class ResourceBrowseService {
                         List<RsRolesResourceMetadata> rsRolesResourceMetadataList = rsRolesResourceMetadataGrantService.findByRolesResourceIdAndValid(rsRolesResource.getId(), "1");
                         if (rsRolesResourceMetadataList != null) {
                             for (RsRolesResourceMetadata rsRolesResourceMetadata : rsRolesResourceMetadataList) {
-                                if(transformEhrMetadataList.contains(rsRolesResourceMetadata.getResourceMetadataId())) { // 如果其他标准数据集包含该数据元
+                                if (transformEhrMetadataList.contains(rsRolesResourceMetadata.getResourceMetadataId())) { // 如果其他标准数据集包含该数据元
                                     rsMetadataIdSet.add(rsRolesResourceMetadata.getResourceMetadataId());
                                 }
                             }
@@ -555,7 +549,7 @@ public class ResourceBrowseService {
                         rsMetadataIds.append(id);
                         rsMetadataIds.append("',");
                     }
-                    if(rsMetadataIds.length() <= 0 ) {
+                    if (rsMetadataIds.length() <= 0 ) {
                         return null;
                     }
                     return resourceBrowseMetadataDao.getAuthResourceMetadata(rsMetadataIds.substring(0, rsMetadataIds.length() - 1));
@@ -569,7 +563,7 @@ public class ResourceBrowseService {
                     rsMetadataIds.append(id);
                     rsMetadataIds.append("',");
                 }
-                if(rsMetadataIds.length() <= 0 ) {
+                if (rsMetadataIds.length() <= 0 ) {
                     return null;
                 }
                 return resourceBrowseMetadataDao.getRsMetadataByIds(rsMetadataIds.substring(0, rsMetadataIds.length() - 1));
@@ -631,34 +625,34 @@ public class ResourceBrowseService {
      */
     private List<String> containArea(List<String> areaListApp,String[] areaArray) {
         List<String> areaList = new ArrayList<>();
-        for(String area : areaArray) {
+        for (String area : areaArray) {
             //省
-            if(area.endsWith("0000")) {
+            if (area.endsWith("0000")) {
                 //全省
                 if(areaListApp.contains(area)) {
                     areaList.add(area);
                 }
                 //选定省所属
                 else {
-                    for(String areaApp:areaListApp) {
+                    for (String areaApp:areaListApp) {
                         //截取省代码
-                        if(area.substring(0,area.length()-4).equals(areaApp.substring(0,area.length()-4))) {
+                        if (area.substring(0, area.length() - 4).equals(areaApp.substring(0, area.length() - 4))) {
                             areaList.add(areaApp);
                         }
                     }
                 }
             }
             //市
-            else if(area.endsWith("00")) {
+            else if (area.endsWith("00")) {
                 //全市
-                if(areaListApp.contains(area) || areaListApp.contains(area.substring(0,area.length()-4)+"0000")) {
+                if (areaListApp.contains(area) || areaListApp.contains(area.substring(0, area.length() - 4) + "0000")) {
                     areaList.add(area);
                 }
                 //选定市所属
-                else{
-                    for(String areaApp:areaListApp) {
+                else {
+                    for (String areaApp:areaListApp) {
                         //截取市代码
-                        if(area.substring(0,area.length()-2).equals(areaApp.substring(0,area.length()-2))) {
+                        if (area.substring(0, area.length() - 2).equals(areaApp.substring(0, area.length() - 2))) {
                             areaList.add(areaApp);
                         }
                     }
@@ -666,7 +660,7 @@ public class ResourceBrowseService {
             }
             //区
             else {
-                if(areaListApp.contains(area) || areaListApp.contains(area.substring(0,area.length()-4)+"0000") || areaListApp.contains(area.substring(0,area.length()-2)+"00")) {
+                if(areaListApp.contains(area) || areaListApp.contains(area.substring(0, area.length() - 4) + "0000") || areaListApp.contains(area.substring(0, area.length() - 2) + "00")) {
                     areaList.add(area);
                 }
             }
@@ -693,16 +687,16 @@ public class ResourceBrowseService {
         Page<Map<String, Object>> page = resourceBrowseDao.getEhrCenterSub(q, 1, 500);
         List<Map<String, Object>> pageContent = page.getContent();
         Map<String, Object> resultMap = new HashMap<>();
-        for(Map<String, Object> temp : pageContent) {
+        for (Map<String, Object> temp : pageContent) {
             String subRowKey = temp.get("rowkey").toString();
             String dataSetCode = subRowKey.split("\\$")[1];
-            if(!resultMap.containsKey(dataSetCode)) {
+            if (!resultMap.containsKey(dataSetCode)) {
                 Map<String, Object> dataMap = new HashMap<>();
                 dataMap.put("name", redisService.getDataSetName(version, dataSetCode));
                 List<Map<String, Object>> dataList = new ArrayList<>();
                 Map<String, Object> tempMap = new HashMap<>(temp.size());
                 List<String> idsList = new ArrayList<>(temp.size());
-                for(String id : temp.keySet()) {
+                for (String id : temp.keySet()) {
                     if (id.startsWith("EHR")) {
                         idsList.add(id);
                     }
@@ -715,12 +709,12 @@ public class ResourceBrowseService {
                 dataList.add(tempMap);
                 dataMap.put("data", dataList);
                 resultMap.put(dataSetCode, dataMap);
-            }else {
+            } else {
                 Map<String, Object> dataMap = (Map<String, Object>) resultMap.get(dataSetCode);
                 List<Map<String, Object>> dataList = (List<Map<String,Object>>) dataMap.get("data");
                 Map<String, Object> tempMap = new HashMap<>(temp.size());
                 List<String> idsList = new ArrayList<>(temp.size());
-                for(String id : temp.keySet()) {
+                for (String id : temp.keySet()) {
                     if (id.startsWith("EHR")) {
                         idsList.add(id);
                     }
