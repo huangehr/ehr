@@ -34,10 +34,10 @@ public class ElasticSearchUtil {
 
     public void mapping(String index, String type, Map<String, Map<String, String>> source) throws IOException{
         XContentBuilder xContentBuilder = XContentFactory.jsonBuilder().startObject().startObject("properties");
-        for(String field : source.keySet()) {
+        for (String field : source.keySet()) {
             xContentBuilder.startObject(field);
             Map<String, String> propsMap = source.get(field);
-            for(String prop : propsMap.keySet()) {
+            for (String prop : propsMap.keySet()) {
                 xContentBuilder.field(prop, propsMap.get(prop));
             }
             xContentBuilder.endObject();
@@ -69,7 +69,7 @@ public class ElasticSearchUtil {
     }
 
     public Map<String, Object> update(String index, String type, String id, Map<String, Object> source) throws DocumentMissingException {
-        if(source.containsKey("_id")) {
+        if (source.containsKey("_id")) {
             source.remove("_id");
         }
         return elasticSearchClient.update(index, type, id, source);
@@ -103,42 +103,42 @@ public class ElasticSearchUtil {
 
     private QueryBuilder getQueryBuilder(List<Map<String, Object>> filter) {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-        for(Map<String, Object> param : filter) {
+        for (Map<String, Object> param : filter) {
             String andOr = String.valueOf(param.get("andOr"));
             String condition = String.valueOf(param.get("condition"));
             String field = String.valueOf(param.get("field"));
             Object value = param.get("value");
-            if(condition.equals("=")) {
+            if (condition.equals("=")) {
                 MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchPhraseQuery(field, value);
-                if("and".equals(andOr)) {
+                if ("and".equals(andOr)) {
                     boolQueryBuilder.must(matchQueryBuilder);
-                }else if("or".equals(andOr)) {
+                } else if ("or".equals(andOr)) {
                     boolQueryBuilder.should(matchQueryBuilder);
                 }
-            }else if (condition.equals("?")) {
+            } else if (condition.equals("?")) {
                 QueryStringQueryBuilder queryStringQueryBuilder = QueryBuilders.queryStringQuery(field + ":" + value);
-                if("and".equals(andOr)) {
+                if ("and".equals(andOr)) {
                     boolQueryBuilder.must(queryStringQueryBuilder);
-                }else if("or".equals(andOr)) {
+                } else if("or".equals(andOr)) {
                     boolQueryBuilder.should(queryStringQueryBuilder);
                 }
-            }else {
+            } else {
                 RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery(field);;
-                if(field.endsWith("Date")) {
+                if (field.endsWith("Date")) {
                     rangeQueryBuilder.format("yyyy-MM-dd HH:mm:ss");
                 }
-                if(condition.equals(">")) {
+                if (condition.equals(">")) {
                     rangeQueryBuilder.gt(value);
-                }else if(condition.equals(">=")) {
+                } else if (condition.equals(">=")) {
                     rangeQueryBuilder.gte(value);
-                }else if(condition.equals("<=")) {
+                } else if (condition.equals("<=")) {
                     rangeQueryBuilder.lte(value);
-                }else if(condition.equals("<")) {
+                } else if (condition.equals("<")) {
                     rangeQueryBuilder.lt(value);
                 }
-                if("and".equals(andOr)) {
+                if ("and".equals(andOr)) {
                     boolQueryBuilder.must(rangeQueryBuilder);
-                }else if("or".equals(andOr)) {
+                } else if ("or".equals(andOr)) {
                     boolQueryBuilder.should(rangeQueryBuilder);
                 }
             }
@@ -150,7 +150,7 @@ public class ElasticSearchUtil {
         List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
         try {
             Properties properties = new Properties();
-            properties.put("url", "jdbc:elasticsearch://"+clusterNodes+"/");
+            properties.put("url", "jdbc:elasticsearch://" + clusterNodes + "/");
             DruidDataSource dds= (DruidDataSource) ElasticSearchDruidDataSourceFactory
                     .createDataSource(properties);
             dds.setInitialSize(1);
@@ -167,7 +167,7 @@ public class ElasticSearchUtil {
             ps.close();
             connection.close();
             dds.close();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return list;
