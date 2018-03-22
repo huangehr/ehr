@@ -74,12 +74,11 @@ public class AmbulanceEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page") int page,
             @ApiParam(name = "size", value = "页码", required = true, defaultValue = "15")
             @RequestParam(value = "size") int size) throws Exception {
-        Envelop envelop = new Envelop();
         List<Object> resultList = new ArrayList<Object>();
         List<Ambulance> ambulanceList = ambulanceService.search(fields, filters, sorts, page, size);
         Date date = new Date();
         for (Ambulance ambulance : ambulanceList) {
-            if(ambulance.getStatus() != Ambulance.Status.down) {
+            if (ambulance.getStatus() != Ambulance.Status.down) {
                 List<Schedule> scheduleList = scheduleService.findMatch(ambulance.getId(), date);
                 if (scheduleList.size() >= 3) {
                     Map<String, Object> resultMap = new HashMap<String, Object>();
@@ -134,7 +133,7 @@ public class AmbulanceEndPoint extends EnvelopRestEndPoint {
                 statuses.add(Attendance.Status.arrival);
                 statuses.add(Attendance.Status.back);
                 Attendance attendance = attendanceService.findByCarIdAndStatus(carId, statuses);
-                if(attendance != null) {
+                if (attendance != null) {
                     attendance.setStatus(Attendance.Status.discontinue);
                     attendanceService.save(attendance);
                 }
@@ -152,25 +151,18 @@ public class AmbulanceEndPoint extends EnvelopRestEndPoint {
     public Envelop save(
             @ApiParam(name = "ambulance", value = "救护车")
             @RequestBody String ambulance) throws Exception {
-        Envelop envelop = new Envelop();
         Ambulance newAmbulance = objectMapper.readValue(ambulance, Ambulance.class);
         Ambulance oldAmbulance = ambulanceService.findById(newAmbulance.getId());
-        if(oldAmbulance != null) {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("车辆：" + newAmbulance.getId() + "已存在");
-            return envelop;
+        if (oldAmbulance != null) {
+            return failed("车辆：" + newAmbulance.getId() + "已存在");
         }
         oldAmbulance = ambulanceService.findByPhone(newAmbulance.getPhone());
-        if(oldAmbulance != null) {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("手机号：" + newAmbulance.getPhone() + "已存在");
-            return envelop;
+        if (oldAmbulance != null) {
+            return failed("手机号：" + newAmbulance.getPhone() + "已存在");
         }
         Location location = locationService.findById(newAmbulance.getLocation());
-        if(null == location) {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("待命地点：" + newAmbulance.getLocation() + "不存在");
-            return envelop;
+        if (null == location) {
+            return failed("待命地点：" + newAmbulance.getLocation() + "不存在");
         }
         newAmbulance.setOrgName(location.getInitAddress());
         /**
@@ -182,13 +174,11 @@ public class AmbulanceEndPoint extends EnvelopRestEndPoint {
         }
          */
         if (newAmbulance.getStatus() == Ambulance.Status.wait || newAmbulance.getStatus() == Ambulance.Status.down) {
-            ambulanceService.save(newAmbulance);
-            envelop.setSuccessFlg(true);
+            Ambulance ambulance1 = ambulanceService.save(newAmbulance);
+            return success(ambulance1);
         } else {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("车辆状态不能为执勤中");
+            return failed("车辆状态不能为执勤中");
         }
-        return envelop;
     }
 
     @RequestMapping(value = ServiceApi.Emergency.AmbulanceUpdate, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -200,20 +190,15 @@ public class AmbulanceEndPoint extends EnvelopRestEndPoint {
         Ambulance newAmbulance = objectMapper.readValue(ambulance, Ambulance.class);
         Ambulance oldAmbulance = ambulanceService.findById(newAmbulance.getId());
         if (oldAmbulance == null) {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("无相关车辆信息");
+            return failed("无相关车辆信息");
         } else {
             Ambulance oldAmbulance1 = ambulanceService.findByPhone(newAmbulance.getPhone());
-            if(oldAmbulance1 != null && !oldAmbulance1.getId().equals(newAmbulance.getId())) {
-                envelop.setSuccessFlg(false);
-                envelop.setErrorMsg("手机号码重复");
-                return envelop;
+            if (oldAmbulance1 != null && !oldAmbulance1.getId().equals(newAmbulance.getId())) {
+                return failed("手机号码重复");
             }
             Location location = locationService.findById(newAmbulance.getLocation());
-            if(null == location) {
-                envelop.setSuccessFlg(false);
-                envelop.setErrorMsg("待命地点：" + newAmbulance.getLocation() + "不存在");
-                return envelop;
+            if (null == location) {
+                return failed("待命地点：" + newAmbulance.getLocation() + "不存在");
             }
             newAmbulance.setCreator(oldAmbulance.getCreator());
             newAmbulance.setStatus(oldAmbulance.getStatus());
@@ -227,14 +212,12 @@ public class AmbulanceEndPoint extends EnvelopRestEndPoint {
             }
             */
             if (oldAmbulance.getStatus() == Ambulance.Status.wait || oldAmbulance.getStatus() == Ambulance.Status.down) {
-                ambulanceService.save(newAmbulance);
-                envelop.setSuccessFlg(true);
-            }else {
-                envelop.setSuccessFlg(false);
-                envelop.setErrorMsg("当前车辆处于执勤状态，无法更新");
+                Ambulance ambulance1 = ambulanceService.save(newAmbulance);
+                return success(ambulance1);
+            } else {
+                return failed("当前车辆处于执勤状态，无法更新");
             }
         }
-        return envelop;
     }
 
     @RequestMapping(value = ServiceApi.Emergency.AmbulanceDelete, method = RequestMethod.DELETE)
@@ -242,26 +225,20 @@ public class AmbulanceEndPoint extends EnvelopRestEndPoint {
     public Envelop delete(
             @ApiParam(name = "ids", value = "id列表xxxx,xxxx,xxxx,...", required = true)
             @RequestParam(value = "ids") String ids) throws Exception {
-        Envelop envelop = new Envelop();
         //List<String> idList = toEntity(ids, List.class);
         String [] idArr = ids.split(",");
         for (String id : idArr) {
             Ambulance ambulance = ambulanceService.findById(id);
             if (ambulance.getStatus() != Ambulance.Status.wait && ambulance.getStatus() != Ambulance.Status.down) {
-                envelop.setSuccessFlg(false);
-                envelop.setErrorMsg("车辆：" + id + "，处于执勤状态，无法删除");
-                return envelop;
+                return failed("车辆：" + id + "，处于执勤状态，无法删除");
             }
             List<Attendance> attendanceList = attendanceService.search("carId=" + id);
-            if(attendanceList != null && attendanceList.size() > 0) {
-                envelop.setSuccessFlg(false);
-                envelop.setErrorMsg("车辆：" + id + "，有执勤记录，无法删除");
-                return envelop;
+            if (attendanceList != null && attendanceList.size() > 0) {
+                return failed("车辆：" + id + "，有执勤记录，无法删除");
             }
         }
         ambulanceService.delete(idArr);
-        envelop.setSuccessFlg(true);
-        return envelop;
+        return success(true);
     }
 
     @RequestMapping(value = ServiceApi.Emergency.Ambulance, method = RequestMethod.GET)
@@ -269,13 +246,11 @@ public class AmbulanceEndPoint extends EnvelopRestEndPoint {
     public Envelop findById(
             @ApiParam(name = "id", value = "id")
             @RequestParam(value = "id") String id){
-        Envelop envelop = new Envelop();
         Ambulance ambulance = ambulanceService.findById(id);
-        if(null != ambulance) {
-            envelop.setSuccessFlg(true);
-            envelop.setObj(ambulance);
+        if (null != ambulance) {
+            return success(ambulance);
         }
-        return envelop;
+        return failed("无相关车辆");
     }
 
     @RequestMapping(value = ServiceApi.Emergency.AmbulanceIdOrPhoneExistence, method = RequestMethod.POST)
