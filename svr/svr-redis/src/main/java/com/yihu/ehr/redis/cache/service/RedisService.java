@@ -256,7 +256,7 @@ public class RedisService {
      * @return
      */
     public Boolean isDictCodeExist(String version, String dictId, String entryCode) {
-        return isDictCodeExist(version, dictId, entryCode);
+        return stdMetaDataKeySchema.isDictCodeExist(version, dictId, entryCode);
     }
 
     /**
@@ -268,7 +268,7 @@ public class RedisService {
      * @return
      */
     public Boolean isDictValueExist(String version, String dictId, String entryValue) {
-        return isDictValueExist(version, dictId, entryValue);
+        return stdMetaDataKeySchema.isDictValueExist(version, dictId, entryValue);
     }
     //------------------------------------ 标准相关 END -------------------------------------------------------
 }
