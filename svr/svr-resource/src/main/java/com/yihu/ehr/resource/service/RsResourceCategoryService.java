@@ -75,8 +75,7 @@ public class RsResourceCategoryService extends BaseJpaService<RsResourceCategory
      * @param id String Id
      * @return RsCategory
      */
-    public RsResourceCategory getRsCategoryById(String id)
-    {
+    public RsResourceCategory getRsCategoryById(String id) {
         return rsResourcesCategoryDao.findOne(id);
     }
 

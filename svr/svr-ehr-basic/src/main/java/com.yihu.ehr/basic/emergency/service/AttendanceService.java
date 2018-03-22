@@ -1,13 +1,14 @@
 package com.yihu.ehr.basic.emergency.service;
 
+import com.yihu.ehr.basic.emergency.dao.AmbulanceDao;
 import com.yihu.ehr.basic.emergency.dao.AttendanceDao;
+import com.yihu.ehr.entity.emergency.Ambulance;
 import com.yihu.ehr.entity.emergency.Attendance;
 import com.yihu.ehr.query.BaseJpaService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -23,23 +24,32 @@ public class AttendanceService extends BaseJpaService<Attendance, AttendanceDao>
     @Autowired
     private AttendanceDao attendanceDao;
     @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private AmbulanceDao ambulanceDao;
 
+    @Transactional(readOnly = true)
     public Attendance findByCarIdAndStatus(String carId, List<Attendance.Status> statuses) {
         return attendanceDao.findByCarIdAndStatus(carId, statuses);
     }
 
+    @Transactional(readOnly = true)
     public Attendance findByCreateDateAndCarId(Date startTime, String carId) {
         List<Attendance> attendanceList = attendanceDao.findByCreateDateAndCarId(startTime, carId);
         if (attendanceList != null && attendanceList.size() > 0) {
             return attendanceList.get(0);
-        }else {
+        } else {
             return null;
         }
     }
 
+    @Transactional(readOnly = true)
     public Attendance findById(int id) {
         return attendanceDao.findById(id);
+    }
+
+    public Attendance attendance(Attendance attendance, Ambulance ambulance) {
+        Attendance attendance1 = attendanceDao.save(attendance);
+        ambulanceDao.save(ambulance);
+        return attendance1;
     }
 
     public List<Map<String,Object>> queryChart1(String flag){
