@@ -1442,6 +1442,6 @@ public class ServiceApi {
         public static final String MessageTemplateAdmin = "/messageTemplate/admin/{messageTemplateId}";
         public static final String MessageTemplate = "/messageTemplate";
         public static final String MyMessageList = "/messageTemplate/MyMessageList";
-
+        public static final String MyMessage = "/messageTemplate/MyMessage/admin/{messageId}";
     }
 }
