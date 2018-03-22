@@ -8,7 +8,9 @@ import com.yihu.ehr.hbase.HBaseDao;
 import com.yihu.ehr.profile.core.ResourceCore;
 import com.yihu.ehr.solr.SolrUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
+import com.yihu.quota.etl.extract.ExtractUtil;
 import com.yihu.quota.util.BasesicUtil;
+import com.yihu.quota.util.LatitudeUtils;
 import com.yihu.quota.vo.CheckInfoModel;
 import com.yihu.quota.vo.DictModel;
 import com.yihu.quota.vo.PersonalInfoModel;
@@ -31,12 +33,12 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 
 /**
- * ÌÇÄò²¡µ¥²¡ÖÖ  ¼à²â¼ìÑé Êı¾İÍ³¼Æ
+ * ç³–å°¿ç—…å•ç—…ç§  å¹¶å‘ç—‡åˆ†æ æ•°æ®ç»Ÿè®¡
  */
 @Component
-public class DiabetesCheckScheduler {
+public class DiabetesSymptomScheduler {
 
-	private static final Logger log = LoggerFactory.getLogger(DiabetesCheckScheduler.class);
+	private static final Logger log = LoggerFactory.getLogger(DiabetesSymptomScheduler.class);
 
 	@Autowired
 	private SolrUtil solrUtil;
@@ -53,33 +55,32 @@ public class DiabetesCheckScheduler {
 
 
 	/**
-	 * Ê×ÏÈÒªÓĞÒ»¸ö³õÊ¼»¯¹ı³Ì
-	 * Ã¿Ìì2µã Ö´ĞĞÒ»´Î
+	 * é¦–å…ˆè¦æœ‰ä¸€ä¸ªåˆå§‹åŒ–è¿‡ç¨‹
+	 * æ¯å¤©2ç‚¹ æ‰§è¡Œä¸€æ¬¡
 	 * @throws Exception
 	 */
-	@Scheduled(cron = "0 20 2 * * ?")
+	@Scheduled(cron = "0 0 2 * * ?")
 	public void validatorIdentityScheduler(){
 		try {
-			String q2 = "EHR_000394:*ÌÇÄÍÁ¿*2HÑªÌÇ* OR EHR_000394:*ÌÇÄÍÁ¿*¿Õ¸¹ÑªÌÇ* OR EHR_000394:*ÆÏÌÑÌÇÄÍÁ¿ÊÔÑé*";
-			String fq = ""; // ¹ıÂËÌõ¼ş
+			String q2 = "EHR_000112:*ç³–å°¿ç—…*å¹¶å‘ç—‡* OR EHR_000295:*ç³–å°¿ç—…*å¹¶å‘ç—‡*";
+			String fq = ""; // è¿‡æ»¤æ¡ä»¶
 			String keyEventDate = "event_date";
 			String keyArea = "EHR_001225";
 			String keyAreaName = "EHR_001225_VALUE";
 			String keyPatientName = "patient_name";
-			String keyDemographicId = "demographic_id";//Éí·İÖ¤
+			String keyDemographicId = "demographic_id";//èº«ä»½è¯
 			String keyCardId = "card_id	";
-			String keySex = "EHR_000019";//ĞÔ±ğ
+			String keySex = "EHR_000019";//æ€§åˆ«
 			String keySexValue = "EHR_000019_VALUE";
-			String keyAge = "EHR_000007";//³öÉúÈÕÆÚ ÄêÁä
-			String keyAddress = "EHR_001211"; //µØÖ·
-			String keyDiseaseSymptom = "EHR_000112";//²¢·¢Ö¢  Õï¶ÏÃû³Æ(ÃÅÕï)
-			String keyDiseaseSymptom2 = "EHR_000295";//²¢·¢Ö¢  Õï¶ÏÃû³Æ£¨×¡Ôº£©
-			String keysugarToleranceName = "EHR_000392";//  ¼ìÑé-ÏîÄ¿½á¹û - ±¨¸æ×ÓÏîµÄLOINC±àÂë  14995-5 ÌÇÄÍÁ¿Öµ  14771-0 ¿Õ¸¹ÑªÌÇ
-			String keysugarToleranceVal = "EHR_000387";//¼ìÑé-ÏîÄ¿½á¹û -  ½á¹ûÖµ  ÌÇÄÍÁ¿Öµ
-			String keyChineseName = "EHR_000394";//×ÓÏîÄ¿ÖĞÎÄÃû³Æ
-			String keyWestMedicine= "EHR_000100";  //Î÷Ò©
-			String keyChineseMedicine= "EHR_000131";//ÖĞÒ©
-
+			String keyAge = "EHR_000007";//å‡ºç”Ÿæ—¥æœŸ å¹´é¾„
+			String keyAddress = "EHR_001211"; //åœ°å€
+			String keyDiseaseSymptom = "EHR_000112";//å¹¶å‘ç—‡  è¯Šæ–­åç§°(é—¨è¯Š)
+			String keyDiseaseSymptom2 = "EHR_000295";//å¹¶å‘ç—‡  è¯Šæ–­åç§°ï¼ˆä½é™¢ï¼‰
+			String keysugarToleranceName = "EHR_000392";//  æ£€éªŒ-é¡¹ç›®ç»“æœ - æŠ¥å‘Šå­é¡¹çš„LOINCç¼–ç   14995-5 ç³–è€é‡å€¼  14771-0 ç©ºè…¹è¡€ç³–
+			String keysugarToleranceVal = "EHR_000387";//æ£€éªŒ-é¡¹ç›®ç»“æœ -  ç»“æœå€¼  ç³–è€é‡å€¼
+			String keyChineseName = "EHR_000394";//å­é¡¹ç›®ä¸­æ–‡åç§°
+			String keyWestMedicine= "EHR_000100";  //è¥¿è¯
+			String keyChineseMedicine= "EHR_000131";//ä¸­è¯
 			objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
 			BasesicUtil basesicUtil = new BasesicUtil();
@@ -90,7 +91,7 @@ public class DiabetesCheckScheduler {
 			String startDate = "2015-01-01";
 			String endDate = "2015-02-01";
 			while(flag){
-				//  µ±Ç°Ê±¼ä´óÓÚ³õÊ¼»¯Ê±¼ä£¬¾ÍËùÓĞÊı¾İ³õÊ¼»¯£¬Ã¿¸öÔÂµİÔö²éÑ¯£¬µ±Ç°Ê±¼äĞ¡ÓÚÓÚ³õÊ¼Ê±¼äÃ¿Ìì³éÈ¡
+				//  å½“å‰æ—¶é—´å¤§äºåˆå§‹åŒ–æ—¶é—´ï¼Œå°±æ‰€æœ‰æ•°æ®åˆå§‹åŒ–ï¼Œæ¯ä¸ªæœˆé€’å¢æŸ¥è¯¢ï¼Œå½“å‰æ—¶é—´å°äºäºåˆå§‹æ—¶é—´æ¯å¤©æŠ½å–
 				if(basesicUtil.compareDate(initializeDate,nowDate) == -1){
 					Date yesterdayDate = DateUtils.addDays(now,-1);
 					String yesterday = DateUtil.formatDate(yesterdayDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
@@ -105,17 +106,17 @@ public class DiabetesCheckScheduler {
 					if(startDate.equals("2018-04-01")){
 						flag = false;
 					}
-					System.out.println("startDate=" + startDate);
 				}
-				//ÕÒ³öÌÇÄò²¡µÄ¾ÍÕïµµ°¸
-				System.out.println("¿ªÊ¼²éÑ¯ ¼ìÑé¼ì²âsolr, fq = " + fq);
-				List<String> subRrowKeyList = new ArrayList<>() ; //Ï¸±írowkey
+				//æ‰¾å‡ºç³–å°¿ç—…çš„å°±è¯Šæ¡£æ¡ˆ
+				//event_date:[2015-06-01T00:00:00Z TO  2015-07-01T00:00:00Z]
+				System.out.println("å¼€å§‹æŸ¥è¯¢ å¹¶å‘ç—‡solr, fq = " + fq);
+				List<String> subRrowKeyList = new ArrayList<>() ; //ç»†è¡¨rowkey
 				subRrowKeyList = selectSubRowKey(ResourceCore.SubTable, q2, fq, 10000);
-				System.out.println("¼ìÑé¼ì²â²éÑ¯½á¹ûÌõÊı£º"+subRrowKeyList.size());
+				System.out.println("å¹¶å‘ç—‡æŸ¥è¯¢ç»“æœæ¡æ•°ï¼š"+subRrowKeyList.size());
 				if(subRrowKeyList != null && subRrowKeyList.size() > 0){
-					//ÌÇÄò²¡Êı¾İ Start
-					for(String subRowkey:subRrowKeyList){//Ñ­»·ÌÇÄò²¡ ÕÒµ½Ö÷±í¾ÍÕïÈËĞÅÏ¢
-						//²éÑ¯´Ë´Î¾ÍÕï¼ÇÂ¼µÄÏà¹ØÊı¾İ ±£´æµ½¼ì²â¼ÇÂ¼ÖĞ
+					//ç³–å°¿ç—…æ•°æ® Start
+					for(String subRowkey:subRrowKeyList){//å¾ªç¯ç³–å°¿ç—… æ‰¾åˆ°ä¸»è¡¨å°±è¯Šäººä¿¡æ¯
+						//æŸ¥è¯¢æ­¤æ¬¡å°±è¯Šè®°å½•çš„ç›¸å…³æ•°æ® ä¿å­˜åˆ°æ£€æµ‹è®°å½•ä¸­
 						String name = "";
 						String demographicId = "";
 						String cardId = "";
@@ -132,21 +133,21 @@ public class DiabetesCheckScheduler {
 							}
 							if(map.get(keySex) != null) {
 								if(StringUtils.isNotEmpty(map.get(keySex).toString())){
-//									if(map.get(keySex).toString().equals("ÄĞ")){
-//										sex =1;
-//										sexName ="ÄĞ";
-//									}else if(map.get(keySex).toString().equals("Å®")){
-//										sex =2;
-//										sexName ="Å®";
-//									}else {
-//										sex =0;
-//										sexName ="Î´Öª";
-//									}
 									sex = Integer.valueOf(map.get(keySex).toString());
 									sexName = map.get(keySexValue).toString();
+//									if(map.get(keySex).toString().equals("ç”·")){
+//										sex =1;
+//										sexName ="ç”·";
+//									}else if(map.get(keySex).toString().equals("å¥³")){
+//										sex =2;
+//										sexName ="å¥³";
+//									}else {
+//										sex =0;
+//										sexName ="æœªçŸ¥";
+//									}
 								}else {
 									sex =0;
-									sexName ="Î´Öª";
+									sexName ="æœªçŸ¥";
 								}
 							}
 							if(map.get(keyPatientName) != null){
@@ -162,73 +163,49 @@ public class DiabetesCheckScheduler {
 						baseCheckInfo.setSexName(sexName);
 						Map<String,Object> submap = hbaseDao.getResultMap(ResourceCore.SubTable, subRowkey);
 						if(submap !=null){
-							//¼ì²éĞÅÏ¢ ĞÕÃû,Éí·İÖ¤£¬¾ÍÕï¿¨ºÅ,²¢·¢Ö¢£¬¿Õ¸¹ÑªÌÇÖµ£¬ÆÏÌÑÌÇÄÍÁ¿Öµ£¬ÓÃÒ©Ãû³Æ£¬¼ì²éĞÅÏ¢code £¨CH001 ²¢·¢Ö¢,CH002 ¿Õ¸¹ÑªÌÇ,CH003 ÆÏÌÑÌÇÄÍÁ¿,CH004 ÓÃÒ©Ãû³Æ£©
-							boolean fast = false;
-							if(submap.get(keyChineseName) != null){
-								// "ÌÇÄÍÁ¿(¿Õ¸¹ÑªÌÇ)" "ÆÏÌÑÌÇÄÍÁ¿ÊÔÑé"
-								String val = submap.get(keyChineseName).toString();
-								fast = (val.contains("ÌÇÄÍÁ¿") && val.contains("¿Õ¸¹ÑªÌÇ"))||val.equals("ÆÏÌÑÌÇÄÍÁ¿ÊÔÑé") ;
-							}
-							if(fast){
-								//7.8mmol/l ÒÔÏÂ 2£º7.8-11.1mmol/l  3:11.1 ÒÔÉÏ
-								String fastname = "";
-								String fastcode = "";
-								double val = Double.valueOf(submap.get(keysugarToleranceVal).toString());
-								if(val >= 4.4 && val < 6.1){
-									fastname = "4.4~6.1mmol/L";
-									fastcode = "1";
-								}
-								if(val >= 6.1 && val < 7.0){
-									fastname = "6.1~7mmol/L";
-									fastcode = "2";
-								}
-								if( val > 7.0){
-									fastname = "7.0mmol/LÒÔÉÏ";
-									fastcode = "3";
-								}
+							//æ£€æŸ¥ä¿¡æ¯ å§“å,èº«ä»½è¯ï¼Œå°±è¯Šå¡å·,å¹¶å‘ç—‡ï¼Œç©ºè…¹è¡€ç³–å€¼ï¼Œè‘¡è„ç³–è€é‡å€¼ï¼Œç”¨è¯åç§°ï¼Œæ£€æŸ¥ä¿¡æ¯code ï¼ˆCH001 å¹¶å‘ç—‡,CH002 ç©ºè…¹è¡€ç³–,CH003 è‘¡è„ç³–è€é‡,CH004 ç”¨è¯åç§°ï¼‰
+							if(submap.get(keyDiseaseSymptom) != null && submap.get(keyDiseaseSymptom).toString().contains("å¹¶å‘ç—‡")){
 								CheckInfoModel checkInfo = setCheckInfoModel(baseCheckInfo);
-								checkInfo.setFastingBloodGlucoseName(fastname);
-								checkInfo.setFastingBloodGlucoseCode(fastcode);
-								checkInfo.setCheckCode("CH002");
-								//±£´æµ½ES¿â
+								checkInfo.setCheckCode("CH001");
+								checkInfo.setSymptomName(submap.get(keyDiseaseSymptom).toString());
 								saveCheckInfo(checkInfo);
 							}
-							boolean tolerance = false;
-							if(submap.get(keyChineseName) != null){
-								String val = submap.get(keyChineseName).toString();
-								//	"ÌÇÄÍÁ¿(2HÑªÌÇ)";
-								tolerance = val.contains("ÌÇÄÍÁ¿") && val.contains("2HÑªÌÇ") ;
-							}
-							//ÆÏÌÑÌÇ£¨¿Ú·ş75 gÆÏÌÑÌÇºó2 h)
-							if(tolerance){
-								//7.8mmol/l ÒÔÏÂ 2£º7.8-11.1mmol/l  3:11.1 ÒÔÉÏ
-								String sugarTolename = "";
-								String sugarToleCode = "";
-								double val = Double.valueOf(submap.get(keysugarToleranceVal).toString());
-								if(val < 7.8){
-									sugarTolename = "7.8 mmol/LÒÔÏÂ";
-									sugarToleCode = "1";
-								}
-								if(val >= 7.8 && val < 11.1){
-									sugarTolename = "7.8~11.1 mmol/L";
-									sugarToleCode = "2";
-								}
-								if( val > 11.1){
-									sugarTolename = "11.1 mmol/LÒÔÉÏ";
-									sugarToleCode = "3";
-								}
+							if(submap.get(keyDiseaseSymptom2) != null && submap.get(keyDiseaseSymptom2).toString().contains("å¹¶å‘ç—‡")){
 								CheckInfoModel checkInfo = setCheckInfoModel(baseCheckInfo);
-								checkInfo.setSugarToleranceName(sugarTolename);
-								checkInfo.setSugarToleranceCode(sugarToleCode);
-								checkInfo.setCheckCode("CH003");
-								//±£´æµ½ES¿â
+								checkInfo.setCheckCode("CH001");
+								checkInfo.setSymptomName(submap.get(keyDiseaseSymptom2).toString());
 								saveCheckInfo(checkInfo);
 							}
 						}
 					}
-					//ÌÇÄò²¡Êı¾İ ¼ì²éÊı¾İ end
+					//ç³–å°¿ç—…æ•°æ®å¹¶å‘ç—‡ end
 				}
 
+			}
+		}catch (Exception e){
+			e.getMessage();
+		}
+	}
+
+	public void savePersonal(PersonalInfoModel personalInfo){
+		try{
+			String index = "singleDiseasePersonal";
+			String type = "personal_info";
+			Map<String, Object> source = new HashMap<>();
+			String jsonPer = objectMapper.writeValueAsString(personalInfo);
+			source = objectMapper.readValue(jsonPer, Map.class);
+			if(personalInfo.getDemographicId() != null){
+				List<Map<String, Object>> relist = elasticSearchUtil.findByField(index, type, "demographicId", personalInfo.getDemographicId());
+				if( !(relist != null && relist.size() >0)){
+					elasticSearchClient.index(index,type, source);
+				}
+			}else if(personalInfo.getCardId() != null){
+				List<Map<String, Object>> relist = elasticSearchUtil.findByField(index,type, "cardId",personalInfo.getCardId());
+				if( !(relist != null && relist.size() >0)){
+					elasticSearchClient.index(index,type, source);
+				}
+			}else {
+				elasticSearchClient.index(index,type, source);
 			}
 		}catch (Exception e){
 			e.getMessage();
@@ -242,12 +219,12 @@ public class DiabetesCheckScheduler {
 			Map<String, Object> source = new HashMap<>();
 			String jsonCheck = objectMapper.writeValueAsString(checkInfo);
 			source = objectMapper.readValue(jsonCheck,Map.class);
-			if(checkInfo.getCheckCode().equals("CH001") && checkInfo.getDemographicId() != null){
+			if(checkInfo.getCheckCode().equals("CH001") && StringUtils.isNotEmpty(checkInfo.getDemographicId()) ){
 				List<Map<String, Object>> relist = elasticSearchUtil.findByField(index,type, "demographicId",checkInfo.getDemographicId());
 				if( !(relist != null && relist.size() >0)){
 					elasticSearchClient.index(index,type, source);
 				}
-			}else if(checkInfo.getCheckCode().equals("CH001") && checkInfo.getCardId() != null){
+			}else if(checkInfo.getCheckCode().equals("CH001") && StringUtils.isNotEmpty(checkInfo.getCardId()) ){
 				List<Map<String, Object>> relist = elasticSearchUtil.findByField(index,type, "cardId",checkInfo.getCardId());
 				if( !(relist != null && relist.size() >0)){
 					elasticSearchClient.index(index,type, source);
@@ -270,7 +247,7 @@ public class DiabetesCheckScheduler {
 		checkInfo.setCreateTime(DateUtils.addHours(new Date(),8));
 		return  checkInfo;
 	}
-	//»ñÈ¡Î¬¶ÈµÄ×ÖµäÏî
+	//è·å–ç»´åº¦çš„å­—å…¸é¡¹
 	private Map<String, String> getdimensionDicMap(String dictSql){
 		BasesicUtil baseUtil = new BasesicUtil();
 		Map<String, String> dimensionDicMap = new HashMap<>();
@@ -283,10 +260,10 @@ public class DiabetesCheckScheduler {
 		return  dimensionDicMap;
 	}
 
-	//»ñÈ¡²éÑ¯½á¹ûÖĞµÄrowKey
+	//è·å–æŸ¥è¯¢ç»“æœä¸­çš„rowKey
 	private List<String> selectSubRowKey(String core ,String q,String fq,long count) throws Exception {
 		List<String> data = new ArrayList<>();
-		/***** Solr²éÑ¯ ********/
+		/***** SolræŸ¥è¯¢ ********/
 		SolrDocumentList solrList = solrUtil.query(core, q , fq, null, 1,count);
 		if(solrList!=null && solrList.getNumFound()>0){
 			for (SolrDocument doc : solrList){
@@ -297,11 +274,11 @@ public class DiabetesCheckScheduler {
 		return  data;
 	}
 
-	//²éÑ¯habaseÀïÃæÊı¾İ
+	//æŸ¥è¯¢habaseé‡Œé¢æ•°æ®
 	private List<Map<String,Object>> selectHbaseData(String table, List<String> list) throws Exception {
 		List<Map<String,Object>> data = new ArrayList<>();
-		/***** Hbase²éÑ¯ ********/
-		Result[] resultList = hbaseDao.getResultList(table,list, "", ""); //hbase½á¹û¼¯
+		/***** HbaseæŸ¥è¯¢ ********/
+		Result[] resultList = hbaseDao.getResultList(table,list, "", ""); //hbaseç»“æœé›†
 		if(resultList != null && resultList.length > 0){
 			for (Result result :resultList) {
 				Map<String,Object> obj = resultToMap(result, "");
@@ -313,13 +290,13 @@ public class DiabetesCheckScheduler {
 		return  data;
 	}
 
-	//²éÑ¯habaseÀïÃæÊı¾İ µ¥Ìõ
+	//æŸ¥è¯¢habaseé‡Œé¢æ•°æ® å•æ¡
 	private Map<String,Object> selectSingleHbaseData(String table, String rowKey) throws Exception {
 		return hbaseDao.getResultMap(table,rowKey);
 	}
 
 	/**
-	 * Result ×ª JSON
+	 * Result è½¬ JSON
 	 * @return
 	 */
 	private Map<String,Object> resultToMap(Result result,String fl){

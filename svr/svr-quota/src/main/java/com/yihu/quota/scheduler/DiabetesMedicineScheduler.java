@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 
 /**
- * ÌÇÄò²¡µ¥²¡ÖÖ  Ò© Êı¾İÍ³¼Æ
+ * ç³–å°¿ç—…å•ç—…ç§  è¯ æ•°æ®ç»Ÿè®¡
  */
 @Component
 public class DiabetesMedicineScheduler {
@@ -53,38 +53,38 @@ public class DiabetesMedicineScheduler {
 
 
 	/**
-	 * Ê×ÏÈÒªÓĞÒ»¸ö³õÊ¼»¯¹ı³Ì
-	 * Ã¿Ìì2µã Ö´ĞĞÒ»´Î
+	 * é¦–å…ˆè¦æœ‰ä¸€ä¸ªåˆå§‹åŒ–è¿‡ç¨‹
+	 * æ¯å¤©2ç‚¹ æ‰§è¡Œä¸€æ¬¡
 	 * @throws Exception
 	 */
 	@Scheduled(cron = "0 10 2 * * ?")
 	public void validatorIdentityScheduler(){
 		try {
-//			String q =  null; // ²éÑ¯Ìõ¼ş health_problem:HP0047  HP0047 ÎªÌÇÄò²¡
-			String q2 = "EHR_000295:*ÌÇÄò²¡* OR EHR_000112:*ÌÇÄò²¡*";
-//			String keyDiseaseNameH = "EHR_000295";//Õï¶ÏÃû×Ö£¨×¡Ôº£© *ÌÇÄò²¡*
-//			String keyDiseaseNameZ = "EHR_000112";//Õï¶ÏÃû×Ö£¨ÃÅÕï£©*ÌÇÄò²¡*
-			String fq = ""; // ¹ıÂËÌõ¼ş
+//			String q =  null; // æŸ¥è¯¢æ¡ä»¶ health_problem:HP0047  HP0047 ä¸ºç³–å°¿ç—…
+			String q2 = "EHR_000295:*ç³–å°¿ç—…* OR EHR_000112:*ç³–å°¿ç—…*";
+//			String keyDiseaseNameH = "EHR_000295";//è¯Šæ–­åå­—ï¼ˆä½é™¢ï¼‰ *ç³–å°¿ç—…*
+//			String keyDiseaseNameZ = "EHR_000112";//è¯Šæ–­åå­—ï¼ˆé—¨è¯Šï¼‰*ç³–å°¿ç—…*
+			String fq = ""; // è¿‡æ»¤æ¡ä»¶
 			String keyEventDate = "event_date";
 			String keyArea = "EHR_001225";
 			String keyAreaName = "EHR_001225_VALUE";
 			String keyPatientName = "patient_name";
-			String keyDemographicId = "demographic_id";//Éí·İÖ¤
+			String keyDemographicId = "demographic_id";//èº«ä»½è¯
 			String keyCardId = "card_id	";
 //			String keyHealthProblem = "health_problem";
-			String keySex = "EHR_000019";//ĞÔ±ğ
+			String keySex = "EHR_000019";//æ€§åˆ«
 			String keySexValue = "EHR_000019_VALUE";
-			String keyAge = "EHR_000007";//³öÉúÈÕÆÚ ÄêÁä
-			String keyAddress = "EHR_001211"; //µØÖ·
-//			String keyDiseaseType = "EHR_003810";//EHR_003810 Õï¶Ï´úÂë
-			String keyDiseaseSymptom = "EHR_000112";//²¢·¢Ö¢  Õï¶ÏÃû³Æ(ÃÅÕï)
-			String keyDiseaseSymptom2 = "EHR_000295";//²¢·¢Ö¢  Õï¶ÏÃû³Æ£¨×¡Ôº£©
-			String keysugarToleranceName = "EHR_000392";//  ¼ìÑé-ÏîÄ¿½á¹û - ±¨¸æ×ÓÏîµÄLOINC±àÂë  14995-5 ÌÇÄÍÁ¿Öµ  14771-0 ¿Õ¸¹ÑªÌÇ
-			String keysugarToleranceVal = "EHR_000387";//¼ìÑé-ÏîÄ¿½á¹û -  ½á¹ûÖµ  ÌÇÄÍÁ¿Öµ
-			String keyChineseName = "EHR_000394";//×ÓÏîÄ¿ÖĞÎÄÃû³Æ
-//			String keyEnglishName = "EHR_000393";//×ÓÏîÄ¿Ó¢ÎÄÃû³Æ
-			String keyWestMedicine= "EHR_000100";  //Î÷Ò©
-			String keyChineseMedicine= "EHR_000131";//ÖĞÒ©
+			String keyAge = "EHR_000007";//å‡ºç”Ÿæ—¥æœŸ å¹´é¾„
+			String keyAddress = "EHR_001211"; //åœ°å€
+//			String keyDiseaseType = "EHR_003810";//EHR_003810 è¯Šæ–­ä»£ç 
+			String keyDiseaseSymptom = "EHR_000112";//å¹¶å‘ç—‡  è¯Šæ–­åç§°(é—¨è¯Š)
+			String keyDiseaseSymptom2 = "EHR_000295";//å¹¶å‘ç—‡  è¯Šæ–­åç§°ï¼ˆä½é™¢ï¼‰
+			String keysugarToleranceName = "EHR_000392";//  æ£€éªŒ-é¡¹ç›®ç»“æœ - æŠ¥å‘Šå­é¡¹çš„LOINCç¼–ç   14995-5 ç³–è€é‡å€¼  14771-0 ç©ºè…¹è¡€ç³–
+			String keysugarToleranceVal = "EHR_000387";//æ£€éªŒ-é¡¹ç›®ç»“æœ -  ç»“æœå€¼  ç³–è€é‡å€¼
+			String keyChineseName = "EHR_000394";//å­é¡¹ç›®ä¸­æ–‡åç§°
+//			String keyEnglishName = "EHR_000393";//å­é¡¹ç›®è‹±æ–‡åç§°
+			String keyWestMedicine= "EHR_000100";  //è¥¿è¯
+			String keyChineseMedicine= "EHR_000131";//ä¸­è¯
 
 			objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
@@ -98,7 +98,7 @@ public class DiabetesMedicineScheduler {
 			List<String> rowKeyList = new ArrayList<>() ;
 			while(flag){
 				rowKeyList.clear();
-				//  µ±Ç°Ê±¼ä´óÓÚ³õÊ¼»¯Ê±¼ä£¬¾ÍËùÓĞÊı¾İ³õÊ¼»¯£¬Ã¿¸öÔÂµİÔö²éÑ¯£¬µ±Ç°Ê±¼äĞ¡ÓÚÓÚ³õÊ¼Ê±¼äÃ¿Ìì³éÈ¡
+				//  å½“å‰æ—¶é—´å¤§äºåˆå§‹åŒ–æ—¶é—´ï¼Œå°±æ‰€æœ‰æ•°æ®åˆå§‹åŒ–ï¼Œæ¯ä¸ªæœˆé€’å¢æŸ¥è¯¢ï¼Œå½“å‰æ—¶é—´å°äºäºåˆå§‹æ—¶é—´æ¯å¤©æŠ½å–
 				if(basesicUtil.compareDate(initializeDate,nowDate) == -1){
 					Date yesterdayDate = DateUtils.addDays(now,-1);
 					String yesterday = DateUtil.formatDate(yesterdayDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
@@ -115,17 +115,17 @@ public class DiabetesMedicineScheduler {
 					}
 					System.out.println("startDate=" + startDate);
 				}
-				//ÕÒ³öÌÇÄò²¡µÄ¾ÍÕïµµ°¸
+				//æ‰¾å‡ºç³–å°¿ç—…çš„å°±è¯Šæ¡£æ¡ˆ
 
-				List<String> subRrowKeyList = new ArrayList<>() ; //Ï¸±írowkey
+				List<String> subRrowKeyList = new ArrayList<>() ; //ç»†è¡¨rowkey
 				subRrowKeyList = selectSubRowKey(ResourceCore.SubTable, q2, fq, 10000);
-				System.out.println("Ò©Îï¿ªÊ¼²éÑ¯solr, fq = " + fq);
+				System.out.println("è¯ç‰©å¼€å§‹æŸ¥è¯¢solr, fq = " + fq);
 				System.out.println("subRrowKeyList, size = " + subRrowKeyList.size());
 				if(subRrowKeyList != null && subRrowKeyList.size() > 0){
-					//ÌÇÄò²¡Êı¾İ Start
-					for(String subRowkey:subRrowKeyList){//Ñ­»·ÌÇÄò²¡ ÕÒµ½Ö÷±í¾ÍÕïÈËĞÅÏ¢
+					//ç³–å°¿ç—…æ•°æ® Start
+					for(String subRowkey:subRrowKeyList){//å¾ªç¯ç³–å°¿ç—… æ‰¾åˆ°ä¸»è¡¨å°±è¯Šäººä¿¡æ¯
 						String mainRowkey = subRowkey.substring(0, subRowkey.indexOf("$"));
-						//²éÑ¯´Ë´Î¾ÍÕï¼ÇÂ¼µÄÏà¹ØÊı¾İ ±£´æµ½¼ì²â¼ÇÂ¼ÖĞ
+						//æŸ¥è¯¢æ­¤æ¬¡å°±è¯Šè®°å½•çš„ç›¸å…³æ•°æ® ä¿å­˜åˆ°æ£€æµ‹è®°å½•ä¸­
 						String name = "";
 						String demographicId = "";
 						String cardId = "";
@@ -145,19 +145,19 @@ public class DiabetesMedicineScheduler {
 									if(StringUtils.isNotEmpty(map.get(keySex).toString())){
 										sex = Integer.valueOf(map.get(keySex).toString());
 										sexName = map.get(keySexValue).toString();
-//										if(map.get(keySex).toString().equals("ÄĞ")){
+//										if(map.get(keySex).toString().equals("ç”·")){
 //											sex =1;
-//											sexName ="ÄĞ";
-//										}else if(map.get(keySex).toString().equals("Å®")){
+//											sexName ="ç”·";
+//										}else if(map.get(keySex).toString().equals("å¥³")){
 //											sex =2;
-//											sexName ="Å®";
+//											sexName ="å¥³";
 //										}else {
 //											sex =0;
-//											sexName ="Î´Öª";
+//											sexName ="æœªçŸ¥";
 //										}
 									}else {
 										sex =0;
-										sexName ="Î´Öª";
+										sexName ="æœªçŸ¥";
 									}
 								}
 								if(map.get(keyPatientName) != null){
@@ -166,10 +166,10 @@ public class DiabetesMedicineScheduler {
 							}
 
 							fq = "profile_id:"+ mainRowkey +"* AND EHR_000131:*";
-							//²éÑ¯Ö÷±í¶ÔÓ¦µÄÏ¸±íµÄÊı¾İ Ñ­»·½âÎö
+							//æŸ¥è¯¢ä¸»è¡¨å¯¹åº”çš„ç»†è¡¨çš„æ•°æ® å¾ªç¯è§£æ
 							List<String> subRrowKeyList2 = selectSubRowKey(ResourceCore.SubTable, null, fq, 10000);
-							System.out.println("Ò©Îï ²éÑ¯½á¹ûÌõÊı£º"+subRrowKeyList2.size());
-							//Ï¸±í½âÎö±£´æ start
+							System.out.println("è¯ç‰© æŸ¥è¯¢ç»“æœæ¡æ•°ï¼š"+subRrowKeyList2.size());
+							//ç»†è¡¨è§£æä¿å­˜ start
 							if(subRrowKeyList2 !=null && subRrowKeyList2.size() > 0){
 								List<Map<String,Object>> subhbaseDataList = selectHbaseData(ResourceCore.SubTable, subRrowKeyList2);
 								if( subhbaseDataList != null && subhbaseDataList.size() > 0 ){
@@ -184,24 +184,24 @@ public class DiabetesMedicineScheduler {
 											CheckInfoModel checkInfo = setCheckInfoModel(baseCheckInfo);
 											checkInfo.setCheckCode("CH004");
 											checkInfo.setMedicineName(submap.get(keyWestMedicine).toString());
-											//±£´æµ½ES¿â
+											//ä¿å­˜åˆ°ESåº“
 											saveCheckInfo(checkInfo);
 										}
 										if(submap.get(keyChineseMedicine) != null) {
 											CheckInfoModel checkInfo = setCheckInfoModel(baseCheckInfo);
 											checkInfo.setCheckCode("CH004");
 											checkInfo.setMedicineName(submap.get(keyChineseMedicine).toString());
-											//±£´æµ½ES¿â
+											//ä¿å­˜åˆ°ESåº“
 											saveCheckInfo(checkInfo);
 										}
 									}
 								}
 							}
-							//Ï¸±í½âÎö±£´æ end
+							//ç»†è¡¨è§£æä¿å­˜ end
 						}
 
 					}
-					//ÌÇÄò²¡Êı¾İ Start
+					//ç³–å°¿ç—…æ•°æ® Start
 				}
 
 			}
@@ -245,7 +245,7 @@ public class DiabetesMedicineScheduler {
 		checkInfo.setCreateTime(DateUtils.addHours(new Date(),8));
 		return  checkInfo;
 	}
-	//»ñÈ¡Î¬¶ÈµÄ×ÖµäÏî
+	//è·å–ç»´åº¦çš„å­—å…¸é¡¹
 	private Map<String, String> getdimensionDicMap(String dictSql){
 		BasesicUtil baseUtil = new BasesicUtil();
 		Map<String, String> dimensionDicMap = new HashMap<>();
@@ -258,10 +258,10 @@ public class DiabetesMedicineScheduler {
 		return  dimensionDicMap;
 	}
 
-	//»ñÈ¡²éÑ¯½á¹ûÖĞµÄrowKey
+	//è·å–æŸ¥è¯¢ç»“æœä¸­çš„rowKey
 	private List<String> selectSubRowKey(String core ,String q,String fq,long count) throws Exception {
 		List<String> data = new ArrayList<>();
-		/***** Solr²éÑ¯ ********/
+		/***** SolræŸ¥è¯¢ ********/
 		SolrDocumentList solrList = solrUtil.query(core, q , fq, null, 1,count);
 		if(solrList!=null && solrList.getNumFound()>0){
 			for (SolrDocument doc : solrList){
@@ -272,11 +272,11 @@ public class DiabetesMedicineScheduler {
 		return  data;
 	}
 
-	//²éÑ¯habaseÀïÃæÊı¾İ
+	//æŸ¥è¯¢habaseé‡Œé¢æ•°æ®
 	private List<Map<String,Object>> selectHbaseData(String table, List<String> list) throws Exception {
 		List<Map<String,Object>> data = new ArrayList<>();
-		/***** Hbase²éÑ¯ ********/
-		Result[] resultList = hbaseDao.getResultList(table,list, "", ""); //hbase½á¹û¼¯
+		/***** HbaseæŸ¥è¯¢ ********/
+		Result[] resultList = hbaseDao.getResultList(table,list, "", ""); //hbaseç»“æœé›†
 		if(resultList != null && resultList.length > 0){
 			for (Result result :resultList) {
 				Map<String,Object> obj = resultToMap(result, "");
@@ -288,13 +288,13 @@ public class DiabetesMedicineScheduler {
 		return  data;
 	}
 
-	//²éÑ¯habaseÀïÃæÊı¾İ µ¥Ìõ
+	//æŸ¥è¯¢habaseé‡Œé¢æ•°æ® å•æ¡
 	private Map<String,Object> selectSingleHbaseData(String table, String rowKey) throws Exception {
 		return hbaseDao.getResultMap(table,rowKey);
 	}
 
 	/**
-	 * Result ×ª JSON
+	 * Result è½¬ JSON
 	 * @return
 	 */
 	private Map<String,Object> resultToMap(Result result,String fl){
