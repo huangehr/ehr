@@ -79,7 +79,7 @@ public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.MessageTemplate.MessageTemplate, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建消息模板对象", notes = "创建消息模板对象")
     public MMessageTemplate createMessageTemplate(
-            @ApiParam(name = "messageTemplate_json_data", value = "", defaultValue = "")
+            @ApiParam(name = "messageTemplateJsonData", value = "", defaultValue = "")
             @RequestBody String messageTemplateJsonData) throws Exception {
         PortalMessageTemplate messageTemplate = toEntity(messageTemplateJsonData, PortalMessageTemplate.class);
         messageTemplateService.save(messageTemplate);
@@ -89,7 +89,7 @@ public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.MessageTemplate.MessageTemplate, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改消息模板对象", notes = "修改消息模板对象")
     public PortalMessageTemplate updateMessageTemplate(
-            @ApiParam(name = "messageTemplate_json_data", value = "", defaultValue = "")
+            @ApiParam(name = "messageTemplateJsonData", value = "", defaultValue = "")
             @RequestBody String messageTemplateJsonData) throws Exception {
         PortalMessageTemplate messageTemplate = toEntity(messageTemplateJsonData, PortalMessageTemplate.class);
         messageTemplateService.save(messageTemplate);
@@ -138,6 +138,7 @@ public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
             mMyMessage.setBeforeContent(template.getBeforeContent());
             mMyMessage.setAfterContent(template.getAfterContent());
             mMyMessage.setContentJson(toEntity(protalMessageRemind.getContent(), MMyMessage.ContentJson.class));
+            mMyMessage.setClassification(template.getClassification());
             mMyMessageList.add(mMyMessage);
         }
         return mMyMessageList;

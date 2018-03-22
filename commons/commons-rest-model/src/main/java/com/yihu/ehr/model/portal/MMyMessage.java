@@ -49,6 +49,11 @@ public class MMyMessage {
      */
     private String afterContent;
 
+    /**
+     * 消息分类
+     */
+    private String classification;
+
 
     public Long getId() {
         return id;
@@ -162,6 +167,14 @@ public class MMyMessage {
 
     public void setContentJson(ContentJson contentJson) {
         this.contentJson = contentJson;
+    }
+
+    public String getClassification() {
+        return classification;
+    }
+
+    public void setClassification(String classification) {
+        this.classification = classification;
     }
 
     public static class ContentJson {
