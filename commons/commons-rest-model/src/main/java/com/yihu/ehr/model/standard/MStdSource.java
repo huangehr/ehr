@@ -1,5 +1,7 @@
 package com.yihu.ehr.model.standard;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.util.Date;
 
 /**
@@ -67,6 +69,7 @@ public class MStdSource {
         this.sourceValue = sourceValue;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getCreateDate() {
         return createDate;
     }
@@ -83,6 +86,7 @@ public class MStdSource {
         this.createUser = createUser;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getUpdateDate() {
         return updateDate;
     }

@@ -1,5 +1,7 @@
 package com.yihu.ehr.entity.quota;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
@@ -57,6 +59,7 @@ public class TjQuotaWarn implements Serializable {
     }
 
     @Column(name = "create_time", nullable = true)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getCreateTime() {
         return createTime;
     }
@@ -66,6 +69,7 @@ public class TjQuotaWarn implements Serializable {
     }
 
     @Column(name = "update_time", nullable = true)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getUpdateTime() {
         return updateTime;
     }

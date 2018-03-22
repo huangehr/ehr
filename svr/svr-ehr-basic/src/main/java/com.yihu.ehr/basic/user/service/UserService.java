@@ -1,7 +1,10 @@
 package com.yihu.ehr.basic.user.service;
 
+import com.yihu.ehr.basic.patient.dao.XDemographicInfoRepository;
+import com.yihu.ehr.basic.user.dao.XDoctorRepository;
 import com.yihu.ehr.basic.user.dao.XUserRepository;
 import com.yihu.ehr.basic.user.entity.User;
+import com.yihu.ehr.entity.patient.DemographicInfo;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.basic.user.entity.Doctors;
 import com.yihu.ehr.util.datetime.DateUtil;
@@ -35,10 +38,18 @@ import java.util.UUID;
 @Transactional
 public class UserService extends BaseJpaService<User, XUserRepository> {
 
-    @Autowired
-    private XUserRepository userRepository;
+
     @Value("${default.password}")
     private String default_password;
+    @Autowired
+    private XUserRepository userRepository;
+    @Autowired
+    private RoleUserService roleUserService;
+    @Autowired
+    private XDemographicInfoRepository xDemographicInfoRepository;
+    @Autowired
+    private XDoctorRepository xDoctorRepository;
+
 
     @PostConstruct
     void init() {
@@ -314,7 +325,6 @@ public class UserService extends BaseJpaService<User, XUserRepository> {
         String hql = "SELECT COUNT(user.id) FROM Users user WHERE user.id IN(SELECT DISTINCT(u.id) from Users u INNER JOIN " +
                 "role_User ru ON u.id = ru.user_Id INNER JOIN Roles r ON ru.role_Id =  r.id " +
                 "WHERE r.org_code IN(:orgCode))";
-
         if (!StringUtils.isEmpty(realName)) {
             hql += " AND user.real_Name LIKE :realName";
         }
@@ -333,5 +343,24 @@ public class UserService extends BaseJpaService<User, XUserRepository> {
         }
         BigInteger count = (BigInteger) query.uniqueResult();
         return count.longValue();
+    }
+
+    public User save(User user, DemographicInfo demographicInfo) {
+        User user1 = userRepository.save(user);
+        xDemographicInfoRepository.save(demographicInfo);
+        roleUserService.batchCreateRoleUsersRelation(user.getId(), user.getRole());
+        return user1;
+    }
+
+    public User update(User user, Doctors doctors, DemographicInfo demographicInfo) {
+        User user1 = userRepository.save(user);
+        if (doctors != null) {
+            xDoctorRepository.save(doctors);
+        }
+        if (demographicInfo != null) {
+            xDemographicInfoRepository.save(demographicInfo);
+        }
+        roleUserService.batchUpdateRoleUsersRelation(user1.getId(), user.getRole());
+        return user1;
     }
 }

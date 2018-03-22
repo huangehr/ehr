@@ -32,8 +32,8 @@ public class UserAgentInterceptor extends HandlerInterceptorAdapter {
         }
 
         throw new ApiException(HttpStatus.FORBIDDEN,
-                ErrorCode.MissingUserAgent,
-                "https://ehr.yihu.com/docs",
-                request.getRemoteAddr());
+                ErrorCode.MISSING_USER_AGENT,
+                ErrorCode.MISSING_USER_AGENT.getReasonPhrase(),
+                "https://ehr.yihu.com/docs");
     }
 }

@@ -15,14 +15,15 @@ import javax.persistence.*;
 public class AppApiParameter {
 
     private int id;
-    private String name;
-    private String type;
-    private String dataType;
-    private String description;
-    private String required;
-    private int appApiId;
-    private String memo;
-    private String defaultValue;
+    private String name; //参数名
+    private String type; //参数类型
+    private String dataType; //数据类型
+    private String description; //说明
+    private String required; //是否必须
+    private int appApiId; //apiId
+    private String memo; //备注
+    private String defaultValue; //默认值
+    private Integer maxLength; //最大长度
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -102,5 +103,14 @@ public class AppApiParameter {
 
     public void setDefaultValue(String defaultValue) {
         this.defaultValue = defaultValue;
+    }
+
+    @Column(name = "max_length", nullable = true)
+    public Integer getMaxLength() {
+        return maxLength;
+    }
+
+    public void setMaxLength(Integer maxLength) {
+        this.maxLength = maxLength;
     }
 }

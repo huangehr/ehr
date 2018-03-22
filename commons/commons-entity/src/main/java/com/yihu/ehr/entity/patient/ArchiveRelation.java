@@ -105,11 +105,11 @@ public class ArchiveRelation {
     }
 
     @Column(name = "event_date")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getEventDate() {
         return eventDate;
     }
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+08:00")
     public void setEventDate(Date eventDate) {
         this.eventDate = eventDate;
     }
@@ -141,21 +141,21 @@ public class ArchiveRelation {
     }
 
     @Column(name = "relation_date")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getRelationDate() {
         return relationDate;
     }
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+08:00")
     public void setRelationDate(Date relationDate) {
         this.relationDate = relationDate;
     }
 
     @Column(name = "create_date")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getCreateDate() {
         return createDate;
     }
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+08:00")
     public void setCreateDate(Date createDate) {
         this.createDate = createDate;
     }

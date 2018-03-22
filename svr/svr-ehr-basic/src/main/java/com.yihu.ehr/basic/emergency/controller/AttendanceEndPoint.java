@@ -51,7 +51,7 @@ public class AttendanceEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "保存出勤记录")
     public Envelop save(
             @ApiParam(name = "attendance", value = "出勤记录")
-            @RequestBody String attendance) throws JsonProcessingException {
+            @RequestBody String attendance) throws Exception {
         Envelop envelop = new Envelop();
         Attendance newAttendance = toEntity(attendance, Attendance.class);
         //验证车辆

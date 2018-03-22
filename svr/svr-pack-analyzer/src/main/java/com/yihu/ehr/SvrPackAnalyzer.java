@@ -42,11 +42,6 @@ public class SvrPackAnalyzer extends SpringBootServletInitializer implements Com
     }
 
     @Override
-    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        return application.sources(SvrPackAnalyzer.class);
-    }
-
-    @Override
     public void run(String... strings) throws Exception {
         schedulerService.addJob(schedulerConfig.getJobMinSize(), schedulerConfig.getCronExp());
     }
@@ -55,10 +50,15 @@ public class SvrPackAnalyzer extends SpringBootServletInitializer implements Com
     public Executor asyncExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(2);
-        executor.setMaxPoolSize(5);
-        executor.setQueueCapacity(500);
+        executor.setMaxPoolSize(10);
+        executor.setQueueCapacity(1000);
         executor.setThreadNamePrefix("qc-");
         executor.initialize();
         return executor;
+    }
+
+    @Override
+    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+        return application.sources(SvrPackAnalyzer.class);
     }
 }

@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.yihu.ehr</groupId>
         <artifactId>ehr-cloud</artifactId>
-        <version>1.1.0</version>
+        <version>1.2.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -33,7 +33,7 @@
         <module>../svr/svr-redis-memory</module>
         <module>../svr/svr-quota</module>
         <module>../svr/svr-log-collection</module>
-        <!-- <module>../ag-zuul</module>-->
+        <module>../ag-zuul</module>
     </modules>
 
     <build>

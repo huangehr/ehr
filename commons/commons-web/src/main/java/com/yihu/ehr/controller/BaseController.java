@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.rest.Envelop;
@@ -49,7 +48,7 @@ public class BaseController extends AbstractController {
      * @param <T>
      * @return
      */
-    public <T> T convertToModel(Object source, Class<T> targetCls, String... properties) {
+    protected <T> T convertToModel(Object source, Class<T> targetCls, String... properties) {
         if (source == null) {
             return null;
         }
@@ -68,7 +67,7 @@ public class BaseController extends AbstractController {
      * @param <T>
      * @return
      */
-    public <T> Collection<T> convertToModels(Collection sources, Collection<T> targets, Class<T> targetCls, String properties) {
+    protected <T> Collection<T> convertToModels(Collection sources, Collection<T> targets, Class<T> targetCls, String properties) {
         if (sources == null) {
             return null;
         }
@@ -84,17 +83,14 @@ public class BaseController extends AbstractController {
         return targets;
     }
 
-    public <T> T toEntity(String json, Class<T> entityCls) {
-        try {
-            objectMapper.setDateFormat(new SimpleDateFormat(DateTimeUtil.ISO8601Pattern));
-            T entity = objectMapper.readValue(json, entityCls);
-            return entity;
-        } catch (IOException ex) {
-            throw new ApiException(ErrorCode.SystemError, "无法转换json, " + ex.getMessage());
-        }
+    protected <T> T toEntity(String json, Class<T> entityCls) throws IOException {
+        objectMapper.setDateFormat(new SimpleDateFormat(DateTimeUtil.simpleDateTimePattern));
+        T entity = objectMapper.readValue(json, entityCls);
+        return entity;
+
     }
 
-    public String toJson(Object obj) {
+    protected String toJson(Object obj) {
         try {
             return objectMapper.writeValueAsString(obj);
         } catch (JsonProcessingException e) {
@@ -126,7 +122,7 @@ public class BaseController extends AbstractController {
         return arrayList.toArray(new String[arrayList.size()]);
     }
 
-    public Envelop getResult(List detaiModelList, int totalCount, int currPage, int rows) {
+    protected Envelop getResult(List detaiModelList, int totalCount, int currPage, int rows) {
 
         Envelop result = new Envelop();
         result.setSuccessFlg(true);
@@ -143,31 +139,45 @@ public class BaseController extends AbstractController {
         return result;
     }
 
-    public String trimEnd(String param, String trimChars) {
+    protected String trimEnd(String param, String trimChars) {
         if (param.endsWith(trimChars)) {
             param = param.substring(0, param.length() - trimChars.length());
         }
         return param;
     }
 
-    public String trimStart(String param, String trimChars) {
+    protected String trimStart(String param, String trimChars) {
         if (param.startsWith(trimChars)) {
             param = param.substring(trimChars.length(), param.length());
         }
         return param;
     }
 
-    public Envelop failed(String errMsg) {
+    protected Envelop failed(String errMsg){
+        return failed(errMsg, ErrorCode.REQUEST_NOT_COMPLETED.value());
+    }
+
+    protected Envelop failed(String errMsg, int errorCode){
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
         envelop.setErrorMsg(errMsg);
+        envelop.setErrorCode(errorCode);
         return envelop;
     }
 
-    public Envelop success(Object object) {
+    protected Envelop success(Object object){
+        return success(object, null);
+    }
+
+    protected Envelop success(List list){
+        return success(null, list);
+    }
+
+    protected Envelop success(Object object, List list){
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(true);
         envelop.setObj(object);
+        envelop.setDetailModelList(list);
         return envelop;
     }
 
@@ -179,33 +189,23 @@ public class BaseController extends AbstractController {
         return Integer.parseInt(responseEntity.getHeaders().get(X_Total_Count).get(0));
     }
 
-    public <T> T getEnvelopModel(String jsonData, Class<T> targetCls) {
-        try {
-            Envelop envelop = objectMapper.readValue(jsonData, Envelop.class);
-            String objJsonData = objectMapper.writeValueAsString(envelop.getObj());
-            T model = objectMapper.readValue(objJsonData, targetCls);
+    protected <T> T getEnvelopModel(String jsonData, Class<T> targetCls) throws IOException {
+        Envelop envelop = objectMapper.readValue(jsonData, Envelop.class);
+        String objJsonData = objectMapper.writeValueAsString(envelop.getObj());
+        T model = objectMapper.readValue(objJsonData, targetCls);
+        return model;
 
-            return model;
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return null;
-        }
     }
 
-    public <T> Collection<T> getEnvelopList(String jsonData, Collection<T> targets, Class<T> targetCls) {
-        try {
-            Envelop envelop = objectMapper.readValue(jsonData, Envelop.class);
-            for (int i = 0; i < envelop.getDetailModelList().size(); i++) {
-                String objJsonData = objectMapper.writeValueAsString(envelop.getDetailModelList().get(i));
-                T model = objectMapper.readValue(objJsonData, targetCls);
+    protected <T> Collection<T> getEnvelopList(String jsonData, Collection<T> targets, Class<T> targetCls) throws IOException {
+        Envelop envelop = objectMapper.readValue(jsonData, Envelop.class);
+        for (int i = 0; i < envelop.getDetailModelList().size(); i++) {
+            String objJsonData = objectMapper.writeValueAsString(envelop.getDetailModelList().get(i));
+            T model = objectMapper.readValue(objJsonData, targetCls);
 
-                targets.add(model);
-            }
-            return targets;
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return null;
+            targets.add(model);
         }
+        return targets;
 
     }
 
@@ -216,13 +216,8 @@ public class BaseController extends AbstractController {
      * @param formatRule 转换格式
      * @return 时间格式的日期
      */
-    public Date StringToDate(String dateTime, String formatRule) {
-        try {
-            return dateTime == null ? null : DateUtil.strToDate(dateTime);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return null;
+    protected Date StringToDate(String dateTime, String formatRule) {
+        return dateTime == null ? null : DateUtil.strToDate(dateTime);
     }
 
     /**
@@ -232,13 +227,8 @@ public class BaseController extends AbstractController {
      * @param formatRule 转换格式
      * @return 日期字符串
      */
-    public String DateToString(Date dateTime, String formatRule) {
-        try {
-            return dateTime == null ? null : DateTimeUtil.utcDateTimeFormat(dateTime);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return null;
+    protected String DateToString(Date dateTime, String formatRule) {
+        return dateTime == null ? null : DateTimeUtil.utcDateTimeFormat(dateTime);
     }
 
     /**
@@ -247,13 +237,8 @@ public class BaseController extends AbstractController {
      * @param dateTime   日期
      * @return 日期字符串
      */
-    public String dt2Str(Date dateTime) {
-        try {
-            return dateTime == null ? null : DateTimeUtil.simpleDateTimeFormat(dateTime);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return null;
+    protected String dt2Str(Date dateTime) {
+        return dateTime == null ? null : DateTimeUtil.simpleDateTimeFormat(dateTime);
     }
 
     /**
@@ -262,7 +247,7 @@ public class BaseController extends AbstractController {
      * @param birthday
      * @return
      */
-    public static int getAgeByBirthday(Date birthday) {
+    protected static int getAgeByBirthday(Date birthday) {
 
         if (birthday == null)
             return 0;
@@ -309,7 +294,7 @@ public class BaseController extends AbstractController {
      * @return
      * @throws Exception
      */
-    public <T> T convertToMModel(Object source, Class<T> targetCls, String... properties) throws Exception {
+    protected <T> T convertToMModel(Object source, Class<T> targetCls, String... properties) throws Exception {
         if (source == null) {
             return null;
         }
@@ -339,7 +324,7 @@ public class BaseController extends AbstractController {
      * @return
      * @throws Exception
      */
-    public <T> T convertToModelDetail(Object source, Class<T> targetCls, String... properties) throws Exception {
+    protected <T> T convertToModelDetail(Object source, Class<T> targetCls, String... properties) throws Exception {
         if (source == null) {
             return null;
         }

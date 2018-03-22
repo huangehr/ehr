@@ -342,14 +342,5 @@ public class AppApiController extends BaseController {
         }
     }
 
-    //-------------------开放平台--------------------------
-
-    @RequestMapping(value = ServiceApi.AppApi.AppApiAuthList, method = RequestMethod.GET)
-    @ApiOperation(value = "获取AppApi列表")
-    public Envelop authApiList(
-            @ApiParam(name = "clientId", value = "应用ID", required = true)
-            @RequestParam(value = "clientId") String clientId) {
-        return appApiClient.authApiList(clientId);
-    }
 
 }

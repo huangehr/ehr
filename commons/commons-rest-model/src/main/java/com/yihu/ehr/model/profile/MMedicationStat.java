@@ -1,5 +1,7 @@
 package com.yihu.ehr.model.profile;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.util.Date;
 
 /**
@@ -73,6 +75,7 @@ public class MMedicationStat {
         this.specifications = specifications;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getLastTime() {
         return lastTime;
     }

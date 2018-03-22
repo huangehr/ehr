@@ -1,5 +1,7 @@
 package com.yihu.ehr.basic.portal.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -88,6 +90,7 @@ public class PortalNotices {
 
     @Basic
     @Column(name = "release_date", nullable = true, insertable = true, updatable = true)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getReleaseDate() {
         return releaseDate;
     }

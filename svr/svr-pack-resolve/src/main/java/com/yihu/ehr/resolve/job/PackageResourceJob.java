@@ -65,13 +65,17 @@ public class PackageResourceJob implements InterruptableJob {
                 doResolve(pack, packageMgrClient);
             }
         } catch (Exception e) {
-            if(pack != null) {
-                if (StringUtils.isBlank(e.getMessage())) {
-                    packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Failed, "Internal server error, please see task log for detail message.");
-                    PackResolveLogger.error("Internal server error, please see task log for detail message.", e);
-                } else {
-                    packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Failed, e.getMessage());
-                    PackResolveLogger.error(e.getMessage(), e);
+            if (pack != null) {
+                try {
+                    if (StringUtils.isBlank(e.getMessage())) {
+                        packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Failed, "Internal server error, please see task log for detail message.");
+                        PackResolveLogger.error("Internal server error, please see task log for detail message.", e);
+                    } else {
+                        packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Failed, e.getMessage());
+                        PackResolveLogger.error(e.getMessage());
+                    }
+                } catch (Exception e1) {
+                    PackResolveLogger.error(e1.getMessage());
                 }
             }
         }
@@ -91,10 +95,10 @@ public class PackageResourceJob implements InterruptableJob {
         patientService.checkPatient(resourceBucket, pack.getId());
         //回填入库状态
         Map<String,String> map = new HashMap();
-        map.put("profileId",standardPackage.getId());
-        map.put("demographicId",standardPackage.getDemographicId());
+        map.put("profileId", standardPackage.getId());
+        map.put("demographicId", standardPackage.getDemographicId());
         map.put("eventType", standardPackage.getEventType() == null? "":String.valueOf(standardPackage.getEventType().getType()));
-        map.put("eventNo",standardPackage.getEventNo());
+        map.put("eventNo", standardPackage.getEventNo());
         map.put("eventDate", DateUtil.toStringLong(standardPackage.getEventDate()));
         map.put("patientId", standardPackage.getPatientId());
         map.put("reUploadFlg", String.valueOf(standardPackage.isReUploadFlg()));

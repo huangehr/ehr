@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.yihu.ehr</groupId>
         <artifactId>ehr-cloud</artifactId>
-        <version>1.1.0</version>
+        <version>1.2.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -124,6 +124,11 @@
                 <groupId>com.yihu.ehr</groupId>
                 <artifactId>commons-web</artifactId>
                 <version>${version.ehr}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.yihu.hos</groupId>
+                <artifactId>common-rest-model</artifactId>
+                <version>${version.eip}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

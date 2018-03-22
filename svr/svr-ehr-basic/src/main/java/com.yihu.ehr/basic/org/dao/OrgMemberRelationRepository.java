@@ -49,4 +49,8 @@ public interface OrgMemberRelationRepository extends PagingAndSortingRepository<
     List<OrgMemberRelation> findByUserId(@Param("userId") String userId);
 
     Page<OrgMemberRelation> findByOrgIdAndUserNameLike( String orgId,String userName,Pageable pageable);
+
+    @Query("select r from OrgMemberRelation r where r.status=0  and r.deptId = :deptId")
+    List<OrgMemberRelation> getOrgMemberByDeptId(@Param("deptId") Integer deptId);
+
 }

@@ -5,7 +5,9 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.web.context.request.async.DeferredResult;
+import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.service.ApiInfo;
+import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
@@ -16,11 +18,13 @@ import static springfox.documentation.builders.PathSelectors.regex;
 @Configuration
 @EnableSwagger2
 @ComponentScan("com.yihu.ehr.*.controller")
-@Profile({"dev", "test"})
+//@Profile({"dev", "test"})
 public class SwaggerConfig {
-    public static final String LEGACY_API = "Legacy";
-    public static final String PRIVATE_API = "Private";
+
+    public static final String API_VERSION = "v1.0";
     public static final String PUBLIC_API = "Default";
+    public static final String PRIVATE_API = "Private";
+    public static final String LEGACY_API = "Legacy";
 
     @Bean
     public Docket publicAPI() {
@@ -94,21 +98,18 @@ public class SwaggerConfig {
                 "ac04-47ec-9a9a-7c47bbcbbbd1");
     }*/
 
-    private ApiInfo legacyApiInfo() {
-        ApiInfo apiInfo = new ApiInfo("健康档案平台开放API",
-                "健康档案平台开放API(历史兼容接口)，此部分API因为设计不规范，但已经发布，所以继续提供兼容。",
-                "1.0",
-                "No terms of service",
-                "wenfujian@jkzl.com",
-                "The Apache License, Version 2.0",
-                "http://www.apache.org/licenses/LICENSE-2.0.html"
-        );
-
-        return apiInfo;
-    }
-
     private ApiInfo publicApiInfo() {
-        ApiInfo apiInfo = new ApiInfo("健康档案平台开放API",
+        return new ApiInfoBuilder()
+                .title("医疗云平台API")
+                .description("医疗云平台API，提供后端基础数据接口")
+                .version(API_VERSION)
+                .termsOfServiceUrl("http://www.jkzl.com")
+                .contact(new Contact("Jkzl Xiamen R & D Center Platform Development.", "http://www.jkzl.com", "jzkl@jkzl.com"))
+                .license("The Apache License, Version 2.0")
+                .licenseUrl("http://www.apache.org/licenses/LICENSE-2.0.html")
+                .build();
+
+        /*ApiInfo apiInfo = new ApiInfo("EHR医疗云平台API",
                 "健康档案平台开放API，提供健康档案服务。",
                 "1.0",
                 "No terms of service",
@@ -117,11 +118,21 @@ public class SwaggerConfig {
                 "http://www.apache.org/licenses/LICENSE-2.0.html"
         );
 
-        return apiInfo;
+        return apiInfo;*/
     }
 
     private ApiInfo privateAPIInfo() {
-        ApiInfo apiInfo = new ApiInfo("健康档案平台私有API",
+        return new ApiInfoBuilder()
+                .title("医疗云平台API")
+                .description("医疗云平台API，提供后端基础数据接口")
+                .version(API_VERSION)
+                .termsOfServiceUrl("http://www.jkzl.com")
+                .contact(new Contact("Jkzl Xiamen R & D Center Platform Development.", "http://www.jkzl.com", "jzkl@jkzl.com"))
+                .license("The Apache License, Version 2.0")
+                .licenseUrl("http://www.apache.org/licenses/LICENSE-2.0.html")
+                .build();
+
+        /*ApiInfo apiInfo = new ApiInfo("健康档案平台私有API",
                 "健康档案平台私有API。",
                 "1.0",
                 "No terms of service",
@@ -129,7 +140,29 @@ public class SwaggerConfig {
                 "The Apache License, Version 2.0",
                 "http://www.apache.org/licenses/LICENSE-2.0.html"
         );
-
-        return apiInfo;
+        return apiInfo;*/
     }
+
+    private ApiInfo legacyApiInfo() {
+        return new ApiInfoBuilder()
+                .title("医疗云平台API")
+                .description("医疗云平台API，提供后端基础数据接口")
+                .version(API_VERSION)
+                .termsOfServiceUrl("http://www.jkzl.com")
+                .contact(new Contact("Jkzl Xiamen R & D Center Platform Development.", "http://www.jkzl.com", "jzkl@jkzl.com"))
+                .license("The Apache License, Version 2.0")
+                .licenseUrl("http://www.apache.org/licenses/LICENSE-2.0.html")
+                .build();
+
+        /*ApiInfo apiInfo = new ApiInfo("健康档案平台开放API",
+                "健康档案平台开放API(历史兼容接口)，此部分API因为设计不规范，但已经发布，所以继续提供兼容。",
+                "1.0",
+                "No terms of service",
+                "wenfujian@jkzl.com",
+                "The Apache License, Version 2.0",
+                "http://www.apache.org/licenses/LICENSE-2.0.html"
+        );
+        return apiInfo;*/
+    }
+
 }

@@ -1,5 +1,6 @@
 package com.yihu.ehr.profile.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -90,6 +91,7 @@ public class MedicationStat {
     }
 
     @Column(name = "last_time")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getLastTime() {
         return lastTime;
     }

@@ -1,5 +1,6 @@
 package com.yihu.ehr.resource.controller;
 
+import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.resource.MRsResources;
@@ -54,7 +55,7 @@ public class RsResourceEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Resources.Resources, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public Envelop updateResources(
             @ApiParam(name="resource",value="资源")
-            @RequestBody String resource) {
+            @RequestBody String resource) throws IOException {
         Envelop envelop = new Envelop();
         RsResource rs = toEntity(resource,RsResource.class);
         RsResource newRsResource =  rsResourceService.saveResource(rs);
@@ -88,14 +89,11 @@ public class RsResourceEndPoint extends EnvelopRestEndPoint {
             @PathVariable(value = "id") String id) {
         Envelop envelop = new Envelop();
         RsResource rsResource = rsResourceService.getResourceById(id);
-        if(rsResource != null) {
-            envelop.setSuccessFlg(true);
-            envelop.setObj(rsResource);
-        }else {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("无相关资源");
+        if (rsResource != null) {
+            return success(rsResource);
+        } else {
+            return failed("无相关资源id：" + id, ErrorCode.OBJECT_NOT_FOUND.value());
         }
-        return envelop;
     }
 
     @RequestMapping(value = ServiceApi.Resources.ResourceByCode, method = RequestMethod.GET)
@@ -105,14 +103,11 @@ public class RsResourceEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "code" ) String code) {
         Envelop envelop = new Envelop();
         RsResource rsResource = rsResourceService.getResourceByCode(code);
-        if(rsResource != null) {
-            envelop.setSuccessFlg(true);
-            envelop.setObj(rsResource);
-        }else {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("无相关资源");
+        if (rsResource != null) {
+            return success(rsResource);
+        } else {
+            return failed("无相关资源code：" + code, ErrorCode.OBJECT_NOT_FOUND.value());
         }
-        return envelop;
     }
 
     @RequestMapping(value = ServiceApi.Resources.ResourceTree, method = RequestMethod.GET)
@@ -123,20 +118,9 @@ public class RsResourceEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "userResource", value = "授权资源")
             @RequestParam(value = "userResource") String userResource,
             @ApiParam(name = "filters", value = "过滤条件(name)")
-            @RequestParam(value = "filters", required = false) String filters) {
-        Envelop envelop = new Envelop();
-        try{
-            List<Map<String, Object>> resultList = rsResourceService.getResourceTree(dataSource, userResource, filters);
-            envelop.setSuccessFlg(true);
-            envelop.setTotalCount(resultList.size());
-            envelop.setDetailModelList(resultList);
-            return envelop;
-        }catch (IOException e) {
-            e.printStackTrace();
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg(e.getMessage());
-            return envelop;
-        }
+            @RequestParam(value = "filters", required = false) String filters) throws Exception {
+        List<Map<String, Object>> resultList = rsResourceService.getResourceTree(dataSource, userResource, filters);
+        return success(resultList);
     }
 
     @RequestMapping(value = ServiceApi.Resources.ResourcePage, method = RequestMethod.GET)
@@ -149,20 +133,14 @@ public class RsResourceEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page") int page,
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
-            @RequestParam(value = "size") int size) {
+            @RequestParam(value = "size") int size) throws Exception {
+        List<RsResource> resultList = rsResourceService.getResourcePage(userResource, userId, page, size);
         Envelop envelop = new Envelop();
-        try{
-            List<RsResource> resultList = rsResourceService.getResourcePage(userResource, userId, page, size);
-            envelop.setSuccessFlg(true);
-            envelop.setCurrPage(page);
-            envelop.setPageSize(size);
-            envelop.setTotalCount(rsResourceService.getResourceCount(userResource, userId));
-            envelop.setDetailModelList(resultList);
-        }catch (Exception e) {
-            e.printStackTrace();
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg(e.getMessage());
-        }
+        envelop.setSuccessFlg(true);
+        envelop.setCurrPage(page);
+        envelop.setPageSize(size);
+        envelop.setTotalCount(rsResourceService.getResourceCount(userResource, userId));
+        envelop.setDetailModelList(resultList);
         return envelop;
     }
 

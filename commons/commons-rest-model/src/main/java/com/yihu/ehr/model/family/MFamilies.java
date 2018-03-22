@@ -1,5 +1,7 @@
 package com.yihu.ehr.model.family;// default package
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.util.Date;
 
 /**
@@ -38,6 +40,7 @@ public class MFamilies {
         this.creator = creator;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getCreateDate() {
         return createDate;
     }

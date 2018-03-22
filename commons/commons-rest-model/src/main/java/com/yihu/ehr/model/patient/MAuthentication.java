@@ -1,5 +1,7 @@
 package com.yihu.ehr.model.patient;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.util.Date;
 
 /**
@@ -48,6 +50,7 @@ public class MAuthentication {
         this.idCard = idCard;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getApplyDate() {
         return applyDate;
     }
@@ -64,6 +67,7 @@ public class MAuthentication {
         this.status = status;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getAuditDate() {
         return auditDate;
     }

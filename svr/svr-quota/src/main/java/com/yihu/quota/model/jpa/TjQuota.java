@@ -1,5 +1,7 @@
 package com.yihu.quota.model.jpa;// default package
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -102,8 +104,10 @@ public class TjQuota implements java.io.Serializable {
 	public void setJobClazz(String jobClazz) {
 		this.jobClazz = jobClazz;
 	}
+
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "create_time", nullable = false, length = 0)
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	public Date getCreateTime() {
 		return this.createTime;
 	}
@@ -129,8 +133,10 @@ public class TjQuota implements java.io.Serializable {
 	public void setCreateUserName(String createUserName) {
 		this.createUserName = createUserName;
 	}
+
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "update_time", nullable = false, length = 0)
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	public Date getUpdateTime() {
 		return this.updateTime;
 	}

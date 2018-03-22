@@ -65,7 +65,7 @@ public class PatientService extends BaseJpaService<DemographicInfo, PatientDao>{
                     PackResolveLogger.warn("档案包:" + packId + ",关联居民:" + idCardNo + ",注册失败!");
                 }
             }
-        }else {
+        } else {
             PackResolveLogger.warn("档案包:" + packId + ",身份证号码为空!");
         }
     }
@@ -82,14 +82,19 @@ public class PatientService extends BaseJpaService<DemographicInfo, PatientDao>{
 
     private DemographicInfo registered(DemographicInfo demographicInfo) {
         String password = "123456";
-        if(demographicInfo.getIdCardNo().length() > 7) {
-            password = demographicInfo.getIdCardNo().substring(demographicInfo.getIdCardNo().length()-6,demographicInfo.getIdCardNo().length());
+        if (demographicInfo.getIdCardNo().length() > 7) {
+            password = demographicInfo.getIdCardNo().substring(demographicInfo.getIdCardNo().length() - 6, demographicInfo.getIdCardNo().length());
             demographicInfo.setPassword(DigestUtils.md5Hex(password));
-        }else {
+        } else {
             demographicInfo.setPassword(DigestUtils.md5Hex(password));
         }
         demographicInfo.setRegisterTime(new Date());
-        return patientDao.save(demographicInfo);
+        try {
+            return patientDao.save(demographicInfo);
+        } catch (Exception e) {
+            PackResolveLogger.error(e.getMessage());
+        }
+        return null;
     }
 
 }

@@ -112,8 +112,8 @@ public class AddressEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "id" , value = "地址代码" ,defaultValue = "")
             @PathVariable (value = "id") String id) {
         Address address = geographyService.getAddressById(id);
-        if(address==null){
-            throw new ApiException(ErrorCode.GetGeographyFailed,"获取地址失败");
+        if(address == null){
+            throw new ApiException(ErrorCode.NOT_FOUND, "获取地址失败");
         }
         geographyService.deleteAddress(address);
         return true;

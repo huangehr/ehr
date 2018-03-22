@@ -1,9 +1,7 @@
 package com.yihu.ehr.entity.organizations;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 import javax.persistence.*;
-import java.util.Date;
 
 /**
  * 机构Saas授权

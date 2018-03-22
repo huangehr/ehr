@@ -2,9 +2,7 @@ package com.yihu.ehr.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.PageArg;
-import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -28,6 +26,7 @@ import java.util.*;
  * @created 2016.04.07 17:01
  */
 public class BaseRestEndPoint extends AbstractController {
+
     protected final static String ResourceCount = "X-Total-Count";
     protected final static String ResourceLink = "Link";
 
@@ -48,7 +47,7 @@ public class BaseRestEndPoint extends AbstractController {
      * @param <T>
      * @return
      */
-    public <T> T convertToModel(Object source, Class<T> targetCls, String... properties) {
+    protected <T> T convertToModel(Object source, Class<T> targetCls, String... properties) {
         if (source == null) {
             return null;
         }
@@ -57,24 +56,15 @@ public class BaseRestEndPoint extends AbstractController {
         return target;
     }
 
-    public <T> T toEntity(String json, Class<T> entityCls) {
-        try {
-            objectMapper.setDateFormat(new SimpleDateFormat(DateTimeUtil.ISO8601Pattern));
-            T entity = objectMapper.readValue(json, entityCls);
-            return entity;
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            throw new ApiException(ErrorCode.SystemError, "Unable to parse json, " + ex.getMessage());
-        }
+    protected <T> T toEntity(String json, Class<T> entityCls) throws IOException {
+        objectMapper.setDateFormat(new SimpleDateFormat(DateTimeUtil.simpleDateTimePattern));
+        T entity = objectMapper.readValue(json, entityCls);
+        return entity;
+
     }
 
-    public String toJson(Object obj) {
-        try {
-            return objectMapper.writeValueAsString(obj);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            return null;
-        }
+    protected String toJson(Object obj) throws JsonProcessingException {
+        return objectMapper.writeValueAsString(obj);
     }
 
     /**
@@ -86,7 +76,7 @@ public class BaseRestEndPoint extends AbstractController {
      * @param <T>
      * @return
      */
-    public <T> Collection<T> convertToModels(Collection sources, Collection<T> targets, Class<T> targetCls, String properties) {
+    protected <T> Collection<T> convertToModels(Collection sources, Collection<T> targets, Class<T> targetCls, String properties) {
         if (sources == null) {
             return null;
         }
@@ -130,7 +120,7 @@ public class BaseRestEndPoint extends AbstractController {
      *
      * @return
      */
-    public void pagedResponse(
+    protected void pagedResponse(
             HttpServletRequest request,
             HttpServletResponse response,
             Long resourceCount, Integer currentPage, Integer pageSize) {
@@ -162,15 +152,6 @@ public class BaseRestEndPoint extends AbstractController {
         response.setHeader(ResourceLink, linkMap(map));
     }
 
-    private String linkMap(Map<String, String> map) {
-        StringBuffer links = new StringBuffer("");
-        for (String key : map.keySet()) {
-            links.append(map.get(key)).append("; ").append(key);
-        }
-
-        return links.toString();
-    }
-
     protected Integer reducePage(Integer page) {
         if (page != null || page > 0) {
             page = page - 1;
@@ -190,7 +171,15 @@ public class BaseRestEndPoint extends AbstractController {
             }
         }
 
-
         return StringUtils.isEmpty(userAgent) ? "" : userAgent.split(" ").length>1?userAgent.split(" ")[1]:userAgent.split(" ")[0];
+    }
+
+    private String linkMap(Map<String, String> map) {
+        StringBuffer links = new StringBuffer("");
+        for (String key : map.keySet()) {
+            links.append(map.get(key)).append("; ").append(key);
+        }
+
+        return links.toString();
     }
 }

@@ -175,9 +175,9 @@ public class CardManager {
 
     public boolean saveCard(AbstractCard card) {
         if (card.getNumber().length() == 0 || card.getCardType() == null) {
-            throw new ApiException(ErrorCode.RepeatCode,"卡信息不全, 无法更新");
+            throw new ApiException("卡信息不全, 无法更新");
         } else if (card.getStatus() == systemDictEntryService.getDictEntry(9, "Invalid").getValue()) {
-            throw new ApiException(ErrorCode.CardIsToVoid,"卡已作废, 无法更新");
+            throw new ApiException("卡已作废, 无法更新");
         }
         return save(card);
     }

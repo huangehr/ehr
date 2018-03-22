@@ -1,5 +1,6 @@
 package com.yihu.ehr.model.app;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
@@ -115,6 +116,7 @@ public class MApp implements Serializable {
         this.auditor = auditor;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getCreateTime() {
         return createTime;
     }
@@ -122,6 +124,7 @@ public class MApp implements Serializable {
         this.createTime = createTime;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getAuditTime() {
         return auditTime;
     }

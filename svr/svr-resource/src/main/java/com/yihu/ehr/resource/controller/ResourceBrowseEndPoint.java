@@ -1,6 +1,5 @@
 package com.yihu.ehr.resource.controller;
 
-import com.google.common.collect.Lists;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
@@ -44,7 +43,7 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "resourcesCode", value = "资源编码")
             @RequestParam(value = "resourcesCode") String resourcesCode,
             @ApiParam(name = "roleId", value = "角色id")
-            @RequestParam(value = "roleId") String roleId)throws Exception {
+            @RequestParam(value = "roleId") String roleId) throws Exception {
         return resourceBrowseService.getResourceMetadata(resourcesCode, roleId);
     }
 
@@ -84,7 +83,6 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
 
     // ---------------------------------------------- 基础信息管理 End---------------------------------
 
-
     /**
      * 获取资源数据
      */
@@ -97,21 +95,13 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "orgCode") String orgCode,
             @ApiParam(name= "areaCode", value = "地区编码")
             @RequestParam(value = "areaCode") String areaCode,
-            @ApiParam(name = "queryParams",value = "json查询条件，{\"q\":\"*:*\"}")
+            @ApiParam(name = "queryParams", value = "json查询条件，{\"q\":\"*:*\"}")
             @RequestParam(value = "queryParams", required = false) String queryParams,
             @ApiParam(name = "page", value = "第几页")
             @RequestParam(value = "page", required = false) Integer page,
             @ApiParam(name = "size", value = "每页几条")
-            @RequestParam(value = "size", required = false) Integer size) {
-        Envelop envelop = new Envelop();
-        try {
-            envelop = resourceBrowseService.getResultData(resourcesCode, "*", orgCode, areaCode, queryParams, page, size);
-        }catch (Exception e) {
-            e.printStackTrace();
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg(e.getMessage());
-        }
-        return envelop;
+            @RequestParam(value = "size", required = false) Integer size) throws Exception {
+        return resourceBrowseService.getResultData(resourcesCode, "*", orgCode, areaCode, queryParams, page, size);
     }
 
     /**
@@ -143,7 +133,7 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
         Envelop envelop = new Envelop();
         try {
             envelop = resourceBrowseService.getResourcesSub(resourcesCode, "*", orgCode, areaCode, queryParams, page, size);
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg(e.getMessage());
@@ -176,56 +166,65 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "version", value = "版本号")
             @RequestParam(value = "version", required = false) String version) throws Exception {
         Envelop re = resourceBrowseService.getResultData(resourcesCode, roleId , orgCode, areaCode, queryParams, page, size);
-        if(version!=null && version.length()>0) {
+        if (version != null && version.length() > 0) {
             List<Map<String,Object>> list = re.getDetailModelList();
             re.setDetailModelList(resourcesTransformService.displayCodeConvert(list,version,null));
         }
         return re;
     }
 
-
-
     /**
      * 获取非结构化数据
      */
     @ApiOperation("获取非结构化数据")
     @RequestMapping(value = ServiceApi.Resources.ResourceRawFiles, method = RequestMethod.GET)
-    public Envelop getRawFiles(@ApiParam("profileId") @RequestParam(value = "profileId", required = true) String profileId,
-                               @ApiParam("cdaDocumentId") @RequestParam(value = "cdaDocumentId", required = false) String cdaDocumentId,
-                                @ApiParam("第几页") @RequestParam(value = "page", required = false) Integer page,
-                                @ApiParam("每页几条") @RequestParam(value = "size", required = false) Integer size) throws Exception {
-        return resourceBrowseService.getRawFiles(profileId,cdaDocumentId,page,size);
+    public Envelop getRawFiles(
+            @ApiParam(name = "profileId", value = "主表rowkey")
+            @RequestParam(value = "profileId") String profileId,
+            @ApiParam(name = "cdaDocumentId", value = "cda档案ID")
+            @RequestParam(value = "cdaDocumentId", required = false) String cdaDocumentId,
+            @ApiParam(name = "page", value = "第几页")
+            @RequestParam(value = "page", required = false) Integer page,
+            @ApiParam(name = "size", value = "每页几条")
+            @RequestParam(value = "size", required = false) Integer size) throws Exception {
+        return resourceBrowseService.getRawFiles(profileId, cdaDocumentId, page, size);
     }
-
 
     @ApiOperation("获取非结构化数据list")
     @RequestMapping(value = ServiceApi.Resources.ResourceRawFilesList, method = RequestMethod.GET)
-    public Map<String,Envelop> getRawFilesList(@RequestParam(value = "profileId", required = true) String profileId,
-                               @RequestParam(value = "cdaDocumentId", required = true) String[] cdaDocumentIdList) throws Exception {
+    public Map<String,Envelop> getRawFilesList(
+            @ApiParam(name = "profileId", value = "主表rowkey")
+            @RequestParam(value = "profileId") String profileId,
+            @ApiParam(name = "cdaDocumentId", value = "cda模板ID")
+            @RequestParam(value = "cdaDocumentId") String[] cdaDocumentIdList) throws Exception {
 
-        Map<String,Envelop> map=new HashMap<>();
-        for(int i=0;i<cdaDocumentIdList.length;i++)
-             map.put(cdaDocumentIdList[i],resourceBrowseService.getRawFiles(profileId,cdaDocumentIdList[i],null,null));
+        Map<String,Envelop> map = new HashMap<>();
+        for (int i = 0 ; i < cdaDocumentIdList.length; i++) {
+            map.put(cdaDocumentIdList[i], resourceBrowseService.getRawFiles(profileId, cdaDocumentIdList[i], null, null));
+        }
         return map;
     }
 
     @ApiOperation("Hbase主表")
     @RequestMapping(value = ServiceApi.Resources.ResourceMasterData, method = RequestMethod.GET)
-    public Envelop getEhrCenter(@ApiParam(name = "queryParams", defaultValue = "{\"q\":\"*:*\"}") @RequestParam(value = "queryParams", required = false) String queryParams,
-                                @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
-                                @ApiParam("size") @RequestParam(value = "size", required = false) Integer size,
-                                @ApiParam("version") @RequestParam(value = "version", required = false) String version) throws Exception {
+    public Envelop getEhrCenter(
+            @ApiParam(name = "queryParams", value = "检索条件", defaultValue = "{\"q\":\"*:*\"}")
+            @RequestParam(value = "queryParams", required = false) String queryParams,
+            @ApiParam(name = "page", value = "页数")
+            @RequestParam(value = "page", required = false) Integer page,
+            @ApiParam(name = "size", value = "分页大小")
+            @RequestParam(value = "size", required = false) Integer size,
+            @ApiParam(name = "version", value = "版本")
+            @RequestParam(value = "version", required = false) String version) throws Exception {
         Page<Map<String, Object>> result = resourceBrowseService.getEhrCenter(queryParams, page, size);
         Envelop re = new Envelop();
         re.setSuccessFlg(true);
         re.setCurrPage(result.getNumber());
         re.setPageSize(result.getSize());
         re.setTotalCount(new Long(result.getTotalElements()).intValue());
-        if(version!=null && version.length()>0)
-        {
-            re.setDetailModelList(resourcesTransformService.displayCodeConvert(result.getContent(),version,null));
-        }
-        else{
+        if (version != null && version.length() > 0) {
+            re.setDetailModelList(resourcesTransformService.displayCodeConvert(result.getContent(), version,null));
+        } else {
             re.setDetailModelList(result.getContent());
         }
         return re;
@@ -234,21 +233,23 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
     @ApiOperation("Hbase从表")
     @RequestMapping(value = ServiceApi.Resources.ResourceSubData, method = RequestMethod.GET)
     public Envelop getEhrCenterSub(
-            @ApiParam(name = "queryParams", defaultValue = "{\"table\":\"HDSC02_17\"}")
+            @ApiParam(name = "queryParams", value = "检索条件", defaultValue = "{\"table\":\"HDSC02_17\"}")
             @RequestParam(value = "queryParams", required = false) String queryParams,
-            @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
-            @ApiParam("size") @RequestParam(value = "size", required = false) Integer size,
-            @ApiParam("version") @RequestParam(value = "version", required = false) String version) throws Exception {
+            @ApiParam(name = "page", value = "页数")
+            @RequestParam(value = "page", required = false) Integer page,
+            @ApiParam(name = "size", value = "分页大小")
+            @RequestParam(value = "size", required = false) Integer size,
+            @ApiParam(name = "version", value = "版本")
+            @RequestParam(value = "version", required = false) String version) throws Exception {
         Page<Map<String, Object>> result = resourceBrowseService.getEhrCenterSub(queryParams, page, size);
         Envelop re = new Envelop();
         re.setCurrPage(result.getNumber());
         re.setPageSize(result.getSize());
         re.setTotalCount(new Long(result.getTotalElements()).intValue());
-        if(version!=null && version.length()>0) {
-            re.setDetailModelList(resourcesTransformService.displayCodeConvert(result.getContent(),version,null));
-        }
-        else{
-            if(result != null) {
+        if (version != null && version.length() > 0) {
+            re.setDetailModelList(resourcesTransformService.displayCodeConvert(result.getContent(), version,null));
+        } else {
+            if (result != null) {
                 re.setSuccessFlg(true);
                 re.setDetailModelList(result.getContent());
             }
@@ -259,36 +260,40 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
     @ApiOperation("获取Cda Data")
     @RequestMapping(value = ServiceApi.Resources.getCDAData, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public Map<String, Object> getCDAData(
-            @ApiParam(name = "cdaTransformDtoJson",value = "资源数据模型", required = true)
+            @ApiParam(name = "cdaTransformDtoJson", value = "资源数据模型", required = true)
             @RequestBody String cdaTransformDtoJson) throws Exception {
         MCdaTransformDto cdaTransformDto =  objectMapper.readValue(cdaTransformDtoJson, MCdaTransformDto.class);
         Map<String, Object> result = new HashMap<>();
         Map<String, Object> event = cdaTransformDto.getMasterJson();
+        if (null == event) {
+            return result;
+        }
         Map<String, List<String>> masterDataSetCodeMap = cdaTransformDto.getMasterDatasetCodeList();
         Map<String, List<String>> multiDataSetCodeMap = cdaTransformDto.getMultiDatasetCodeList();
         String profileId = event.get("rowkey").toString();
         String cdaVersion = event.get("cda_version").toString();
-        for(String key : masterDataSetCodeMap.keySet()) {
-            Map<String, Object> map = new HashMap<>();
-            List<String> masterDataSetList = masterDataSetCodeMap.get(key);
-            List<String> multiDataSetList = multiDataSetCodeMap.get(key);
+        for(String cdaId : masterDataSetCodeMap.keySet()) {
+            Map<String, Object> data = new HashMap<>();
+            List<String> masterDataSetList = masterDataSetCodeMap.get(cdaId);
+            List<String> multiDataSetList = multiDataSetCodeMap.get(cdaId);
             for (int i = 0; i < masterDataSetList.size(); i++) {
                 List<Map<String, Object>> dataList = new ArrayList<>();
                 String dataSet = masterDataSetList.get(i);
                 dataList.add(resourcesTransformService.stdMasterTransform(event, dataSet, cdaVersion));
-                map.put(dataSet, dataList);
+                data.put(dataSet, dataList);
             }
             for (int i = 0; i < multiDataSetList.size(); i++) {
                 String dataSet = multiDataSetList.get(i);
-                String q = "{\"table\":\"" + dataSet + "\",\"q\":\"profile_id:" + profileId + "\"}";
-                Page<Map<String, Object>> page = resourceBrowseService.getEhrCenterSub(q, null, null);
+                String q = "{\"q\":\"rowkey:" + profileId + "$" + dataSet + "$*\"}";
+                //String q = "{\"q\":\"profile_id:" + profileId + "\"}";
+                Page<Map<String, Object>> page = resourceBrowseService.getEhrCenterSub(q, 1, 500);
                 if (cdaVersion != null && cdaVersion.length() > 0) {
-                    map.put(dataSet, resourcesTransformService.displayCodeConvert(page.getContent(), cdaVersion, null));
+                    data.put(dataSet, resourcesTransformService.displayCodeConvert(page.getContent(), cdaVersion, dataSet));
                 } else {
-                    map.put(dataSet, page.getContent());
+                    data.put(dataSet, page.getContent());
                 }
             }
-            result.put(key,map);
+            result.put(cdaId, data);
         }
         return result;
     }
@@ -296,10 +301,13 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
 
     @ApiOperation("Hbase主表统计")
     @RequestMapping(value = ServiceApi.Resources.ResourceMasterStat, method = RequestMethod.GET)
-    public Envelop countEhrCenter(@ApiParam(value = "queryParams", defaultValue = "{\"groupFields\":\"org_code\"}")
-                                      @RequestParam(value = "queryParams", required = false) String queryParams,
-                                                    @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
-                                                    @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
+    public Envelop countEhrCenter(
+            @ApiParam(name = "queryParams", value = "检索条件", defaultValue = "{\"groupFields\":\"org_code\"}")
+            @RequestParam(value = "queryParams", required = false) String queryParams,
+            @ApiParam(name = "page", value = "页数")
+            @RequestParam(value = "page", required = false) Integer page,
+            @ApiParam(name = "size", value = "分页大小")
+            @RequestParam(value = "size", required = false) Integer size) throws Exception {
         Page<Map<String, Object>> result = resourceBrowseService.countEhrCenter(queryParams, page, size);
         Envelop re = new Envelop();
         re.setCurrPage(result.getNumber());
@@ -311,9 +319,13 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
 
     @ApiOperation("Hbase从表统计")
     @RequestMapping(value = ServiceApi.Resources.ResourceSubStat, method = RequestMethod.GET)
-    public Envelop countEhrCenterSub(@ApiParam("queryParams") @RequestParam(value = "queryParams", required = false) String queryParams,
-                                                       @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
-                                                       @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
+    public Envelop countEhrCenterSub(
+            @ApiParam(name = "queryParams", value = "检索条件")
+            @RequestParam(value = "queryParams", required = false) String queryParams,
+            @ApiParam(name = "page", value = "页数")
+            @RequestParam(value = "page", required = false) Integer page,
+            @ApiParam(name = "size", value = "分页大小")
+            @RequestParam(value = "size", required = false) Integer size) throws Exception {
         Page<Map<String, Object>> result = resourceBrowseService.countEhrCenterSub(queryParams, page, size);
         Envelop re = new Envelop();
         re.setCurrPage(result.getNumber());
@@ -325,9 +337,13 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
 
     @ApiOperation("Mysql查询")
     @RequestMapping(value = ServiceApi.Resources.ResourceMysql, method = RequestMethod.GET)
-    public Envelop getMysqlData(@ApiParam("queryParams") @RequestParam(value = "queryParams", required = false) String queryParams,
-                                                  @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
-                                                  @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
+    public Envelop getMysqlData(
+            @ApiParam(name = "queryParams", value = "检索条件")
+            @RequestParam(value = "queryParams", required = false) String queryParams,
+            @ApiParam(name = "page", value = "页数")
+            @RequestParam(value = "page", required = false) Integer page,
+            @ApiParam(name = "size", value = "分页大小")
+            @RequestParam(value = "size", required = false) Integer size) throws Exception {
         Page<Map<String, Object>> result = resourceBrowseService.getMysqlData(queryParams, page, size);
         Envelop re = new Envelop();
         re.setCurrPage(result.getNumber());
@@ -339,10 +355,15 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
 
     @ApiOperation("获取solr索引列表")
     @RequestMapping(value = ServiceApi.Resources.SolrIndexData, method = RequestMethod.GET)
-    public Envelop getSolrIndex(@ApiParam(name = "queryParams", defaultValue = "{\"q\":\"*:*\"}") @RequestParam(value = "queryParams", required = false) String queryParams,
-                                @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
-                                @ApiParam("size") @RequestParam(value = "size", required = false) Integer size,
-                                @ApiParam("version") @RequestParam(value = "version", required = false) String version) throws Exception {
+    public Envelop getSolrIndex(
+            @ApiParam(name = "queryParams", value = "检索条件", defaultValue = "{\"q\":\"*:*\"}")
+            @RequestParam(value = "queryParams", required = false) String queryParams,
+            @ApiParam(name = "page", value = "页数")
+            @RequestParam(value = "page", required = false) Integer page,
+            @ApiParam(name = "size", value = "分页大小")
+            @RequestParam(value = "size", required = false) Integer size,
+            @ApiParam(name = "version", value = "版本")
+            @RequestParam(value = "version", required = false) String version) throws Exception {
         Page<String> result = resourceBrowseService.getSolrIndexs(queryParams, page, size);
         Envelop re = new Envelop();
         re.setSuccessFlg(true);

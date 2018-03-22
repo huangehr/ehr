@@ -1,6 +1,8 @@
 package com.yihu.ehr.entity.report;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -71,6 +73,7 @@ public class JsonArchives {
     }
 
     @Column(name = "receive_date")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getReceiveDate() {
         return receiveDate;
     }
@@ -80,6 +83,7 @@ public class JsonArchives {
     }
 
     @Column(name = "parse_date")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getParseDate() {
         return parseDate;
     }
@@ -89,6 +93,7 @@ public class JsonArchives {
     }
 
     @Column(name = "finish_date")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getFinishDate() {
         return finishDate;
     }
@@ -170,6 +175,7 @@ public class JsonArchives {
     }
 
     @Column(name = "event_date")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getEventDate() {
         return eventDate;
     }

@@ -47,8 +47,9 @@ public interface ResourceClient {
             @RequestParam(value = "version", required = true) String version);
 
     //cda数据
-    @RequestMapping(value = ServiceApi.Resources.getCDAData, method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    Map<String,Object> getCDAData(@RequestBody String cdaTransformDtoJson);
+    @RequestMapping(value = ServiceApi.Resources.getCDAData, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    Map<String,Object> getCDAData(
+            @RequestBody String cdaTransformDtoJson);
 
 
     //查询主表数据

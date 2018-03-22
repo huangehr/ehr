@@ -147,4 +147,8 @@ public class AppService extends BaseJpaService<App, AppRepository> {
         return query.list();
     }
 
+    public App findById(String appId) {
+        return appRepo.findOne(appId);
+    }
+
 }

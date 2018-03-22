@@ -1,5 +1,6 @@
 package com.yihu.ehr.profile.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.lang.SpringContext;
@@ -85,6 +86,7 @@ public class ArchiveTemplate {
     }
 
     @Column(name = "create_time")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getCreateTime() {
         return createTime;
     }

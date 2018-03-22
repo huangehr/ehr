@@ -49,8 +49,8 @@ public class RoleUserService extends BaseJpaService<RoleUser,XRoleUserRepository
         return true;
     }
 
-    public boolean batchCreateRoleUsersRelation(String userId,String roleIds){
-        for(String roleId : roleIds.split(",")){
+    public boolean batchCreateRoleUsersRelation(String userId, String roleIds){
+        for (String roleId : roleIds.split(",")){
             RoleUser roleUser = new RoleUser();
             roleUser.setUserId(userId);
             roleUser.setRoleId(Long.parseLong(roleId));
@@ -93,7 +93,7 @@ public class RoleUserService extends BaseJpaService<RoleUser,XRoleUserRepository
         return true;
     }
 
-    public boolean batchUpdateRoleUsersRelation(String userId,String roleIds) throws Exception {
+    public boolean batchUpdateRoleUsersRelation(String userId,String roleIds) {
         roleUserRepository.deleteByUserId(userId);
         userAppRepository.deleteByUserId(userId);
         String[] arr = roleIds.split(",");
@@ -119,7 +119,7 @@ public class RoleUserService extends BaseJpaService<RoleUser,XRoleUserRepository
                 List<Map<String,Object>> list = jdbcTemplate.queryForList(sql);
                 appList.addAll(list);
             }
-            if(null != appList && appList.size() > 0) {
+            if (null != appList && appList.size() > 0) {
                 for (Map<String,Object> map:appList) {
                     hashSet.add(map.get("app_id").toString());
                 }
