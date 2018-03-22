@@ -12,12 +12,22 @@ import javax.persistence.*;
 @Access(value = AccessType.PROPERTY)
 public class AppVersion extends BaseAssignedEntity {
 
+    private String code; //版本（用于区分大小版本）
     private String name; //版本名称
     private Double versionInt; //数字版本号
     private String versionStr; //字符串版本号
     private String url; //更新链接地址
     private String info; //版本信息
     private Double size; //升级包大小，单位M
+
+    @Column(name = "code", nullable = false)
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
 
     @Column(name = "size", nullable = false)
     public Double getSize() {
