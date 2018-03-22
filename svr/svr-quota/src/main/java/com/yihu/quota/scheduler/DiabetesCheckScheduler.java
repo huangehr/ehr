@@ -12,6 +12,7 @@ import com.yihu.quota.util.BasesicUtil;
 import com.yihu.quota.vo.CheckInfoModel;
 import com.yihu.quota.vo.DictModel;
 import com.yihu.quota.vo.PersonalInfoModel;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.CellUtil;
@@ -56,7 +57,7 @@ public class DiabetesCheckScheduler {
 	 * 每天2点 执行一次
 	 * @throws Exception
 	 */
-	@Scheduled(cron = "0 25 14 * * ?")
+	@Scheduled(cron = "0 20 2 * * ?")
 	public void validatorIdentityScheduler(){
 		try {
 			String q2 = "EHR_000394:*糖耐量*2H血糖* OR EHR_000394:*糖耐量*空腹血糖* OR EHR_000394:*葡萄糖耐量试验*";
@@ -78,8 +79,7 @@ public class DiabetesCheckScheduler {
 			String keyChineseName = "EHR_000394";//子项目中文名称
 			String keyWestMedicine= "EHR_000100";  //西药
 			String keyChineseMedicine= "EHR_000131";//中药
-			List<PersonalInfoModel> personalInfoList = new ArrayList<>();
-			List<CheckInfoModel> checkInfoList = new ArrayList<>();
+
 			objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
 			BasesicUtil basesicUtil = new BasesicUtil();
@@ -111,7 +111,7 @@ public class DiabetesCheckScheduler {
 				System.out.println("开始查询 检验检测solr, fq = " + fq);
 				List<String> subRrowKeyList = new ArrayList<>() ; //细表rowkey
 				subRrowKeyList = selectSubRowKey(ResourceCore.SubTable, q2, fq, 10000);
-				System.out.println("查询结果条数："+subRrowKeyList.size());
+				System.out.println("检验检测查询结果条数："+subRrowKeyList.size());
 				if(subRrowKeyList != null && subRrowKeyList.size() > 0){
 					//糖尿病数据 Start
 					for(String subRowkey:subRrowKeyList){//循环糖尿病 找到主表就诊人信息
@@ -123,19 +123,37 @@ public class DiabetesCheckScheduler {
 						String sexName = "";
 						String mainRowkey = subRowkey.substring(0, subRowkey.indexOf("$"));
 						Map<String,Object> map = hbaseDao.getResultMap(ResourceCore.MasterTable, mainRowkey);
-						if(map.get(keyDemographicId) != null){
-							demographicId = map.get(keyDemographicId).toString();
+						if(map !=null){
+							if(map.get(keyDemographicId) != null){
+								demographicId = map.get(keyDemographicId).toString();
+							}
+							if(map.get(keyCardId) != null){
+								cardId = map.get(keyCardId).toString();
+							}
+							if(map.get(keySex) != null) {
+								if(StringUtils.isNotEmpty(map.get(keySex).toString())){
+//									if(map.get(keySex).toString().equals("男")){
+//										sex =1;
+//										sexName ="男";
+//									}else if(map.get(keySex).toString().equals("女")){
+//										sex =2;
+//										sexName ="女";
+//									}else {
+//										sex =0;
+//										sexName ="未知";
+//									}
+									sex = Integer.valueOf(map.get(keySex).toString());
+									sexName = map.get(keySexValue).toString();
+								}else {
+									sex =0;
+									sexName ="未知";
+								}
+							}
+							if(map.get(keyPatientName) != null){
+								name = map.get(keyPatientName).toString();
+							}
 						}
-						if(map.get(keyCardId) != null){
-							cardId = map.get(keyCardId).toString();
-						}
-						if(map.get(keySex) != null) {
-							sex = Integer.valueOf(map.get(keySex).toString());
-							sexName = map.get(keySexValue).toString();
-						}
-						if(map.get(keyPatientName) != null){
-							name = map.get(keyPatientName).toString();
-						}
+
 						CheckInfoModel baseCheckInfo = new CheckInfoModel();
 						baseCheckInfo.setName(name);
 						baseCheckInfo.setDemographicId(demographicId);
@@ -143,105 +161,74 @@ public class DiabetesCheckScheduler {
 						baseCheckInfo.setSex(sex);
 						baseCheckInfo.setSexName(sexName);
 						Map<String,Object> submap = hbaseDao.getResultMap(ResourceCore.SubTable, subRowkey);
-						//检查信息 姓名,身份证，就诊卡号,并发症，空腹血糖值，葡萄糖耐量值，用药名称，检查信息code （CH001 并发症,CH002 空腹血糖,CH003 葡萄糖耐量,CH004 用药名称）
-						boolean fast = false;
-						if(submap.get(keysugarToleranceName) != null){
-							fast = submap.get(keysugarToleranceName).equals("14771-0");
-							// "糖耐量(空腹血糖)" "葡萄糖耐量试验"
-							if(!fast){
+						if(submap !=null){
+							//检查信息 姓名,身份证，就诊卡号,并发症，空腹血糖值，葡萄糖耐量值，用药名称，检查信息code （CH001 并发症,CH002 空腹血糖,CH003 葡萄糖耐量,CH004 用药名称）
+							boolean fast = false;
+							if(submap.get(keyChineseName) != null){
+								// "糖耐量(空腹血糖)" "葡萄糖耐量试验"
 								String val = submap.get(keyChineseName).toString();
 								fast = (val.contains("糖耐量") && val.contains("空腹血糖"))||val.equals("葡萄糖耐量试验") ;
 							}
-						}
-						if(fast){
-							//7.8mmol/l 以下 2：7.8-11.1mmol/l  3:11.1 以上
-							String fastname = "";
-							String fastcode = "";
-							double val = Double.valueOf(submap.get(keysugarToleranceVal).toString());
-							if(val >= 4.4 && val < 6.1){
-								fastname = "4.4~6.1mmol/L";
-								fastcode = "1";
+							if(fast){
+								//7.8mmol/l 以下 2：7.8-11.1mmol/l  3:11.1 以上
+								String fastname = "";
+								String fastcode = "";
+								double val = Double.valueOf(submap.get(keysugarToleranceVal).toString());
+								if(val >= 4.4 && val < 6.1){
+									fastname = "4.4~6.1mmol/L";
+									fastcode = "1";
+								}
+								if(val >= 6.1 && val < 7.0){
+									fastname = "6.1~7mmol/L";
+									fastcode = "2";
+								}
+								if( val > 7.0){
+									fastname = "7.0mmol/L以上";
+									fastcode = "3";
+								}
+								CheckInfoModel checkInfo = setCheckInfoModel(baseCheckInfo);
+								checkInfo.setFastingBloodGlucoseName(fastname);
+								checkInfo.setFastingBloodGlucoseCode(fastcode);
+								checkInfo.setCheckCode("CH002");
+								//保存到ES库
+								saveCheckInfo(checkInfo);
 							}
-							if(val >= 6.1 && val < 7.0){
-								fastname = "6.1~7mmol/L";
-								fastcode = "2";
-							}
-							if( val > 7.0){
-								fastname = "7.0mmol/L以上";
-								fastcode = "3";
-							}
-							CheckInfoModel checkInfo = setCheckInfoModel(baseCheckInfo);
-							checkInfo.setFastingBloodGlucoseName(fastname);
-							checkInfo.setFastingBloodGlucoseCode(fastcode);
-							checkInfo.setCheckCode("CH002");
-							checkInfoList.add(checkInfo);
-						}
-						boolean tolerance = false;
-						if(submap.get(keysugarToleranceName) != null){
-							tolerance = submap.get(keysugarToleranceName).equals("14995-5");
-							if(!tolerance){
+							boolean tolerance = false;
+							if(submap.get(keyChineseName) != null){
 								String val = submap.get(keyChineseName).toString();
 								//	"糖耐量(2H血糖)";
 								tolerance = val.contains("糖耐量") && val.contains("2H血糖") ;
 							}
-						}
-						//葡萄糖（口服75 g葡萄糖后2 h)
-						if(tolerance){
-							//7.8mmol/l 以下 2：7.8-11.1mmol/l  3:11.1 以上
-							String sugarTolename = "";
-							String sugarToleCode = "";
-							double val = Double.valueOf(submap.get(keysugarToleranceVal).toString());
-							if(val < 7.8){
-								sugarTolename = "7.8 mmol/L以下";
-								sugarToleCode = "1";
+							//葡萄糖（口服75 g葡萄糖后2 h)
+							if(tolerance){
+								//7.8mmol/l 以下 2：7.8-11.1mmol/l  3:11.1 以上
+								String sugarTolename = "";
+								String sugarToleCode = "";
+								double val = Double.valueOf(submap.get(keysugarToleranceVal).toString());
+								if(val < 7.8){
+									sugarTolename = "7.8 mmol/L以下";
+									sugarToleCode = "1";
+								}
+								if(val >= 7.8 && val < 11.1){
+									sugarTolename = "7.8~11.1 mmol/L";
+									sugarToleCode = "2";
+								}
+								if( val > 11.1){
+									sugarTolename = "11.1 mmol/L以上";
+									sugarToleCode = "3";
+								}
+								CheckInfoModel checkInfo = setCheckInfoModel(baseCheckInfo);
+								checkInfo.setSugarToleranceName(sugarTolename);
+								checkInfo.setSugarToleranceCode(sugarToleCode);
+								checkInfo.setCheckCode("CH003");
+								//保存到ES库
+								saveCheckInfo(checkInfo);
 							}
-							if(val >= 7.8 && val < 11.1){
-								sugarTolename = "7.8~11.1 mmol/L";
-								sugarToleCode = "2";
-							}
-							if( val > 11.1){
-								sugarTolename = "11.1 mmol/L以上";
-								sugarToleCode = "3";
-							}
-							CheckInfoModel checkInfo = setCheckInfoModel(baseCheckInfo);
-							checkInfo.setSugarToleranceName(sugarTolename);
-							checkInfo.setSugarToleranceCode(sugarToleCode);
-							checkInfo.setCheckCode("CH003");
-							checkInfoList.add(checkInfo);
-						}
-						//保存到ES库
-						for(CheckInfoModel checkInfo : checkInfoList) {
-							saveCheckInfo(checkInfo);
 						}
 					}
 					//糖尿病数据 检查数据 end
 				}
 
-			}
-		}catch (Exception e){
-			e.getMessage();
-		}
-	}
-
-	public void savePersonal(PersonalInfoModel personalInfo){
-		try{
-			String index = "singleDiseasePersonal";
-			String type = "personal_info";
-			Map<String, Object> source = new HashMap<>();
-			String jsonPer = objectMapper.writeValueAsString(personalInfo);
-			source = objectMapper.readValue(jsonPer, Map.class);
-			if(personalInfo.getDemographicId() != null){
-				List<Map<String, Object>> relist = elasticSearchUtil.findByField(index, type, "demographicId", personalInfo.getDemographicId());
-				if(relist== null || relist.size() ==0){
-					elasticSearchClient.index(index,type, source);
-				}
-			}else if(personalInfo.getCardId() != null){
-				List<Map<String, Object>> relist = elasticSearchUtil.findByField(index,type, "cardId",personalInfo.getCardId());
-				if(relist== null || relist.size() ==0){
-					elasticSearchClient.index(index,type, source);
-				}
-			}else {
-				elasticSearchClient.index(index,type, source);
 			}
 		}catch (Exception e){
 			e.getMessage();
@@ -257,12 +244,12 @@ public class DiabetesCheckScheduler {
 			source = objectMapper.readValue(jsonCheck,Map.class);
 			if(checkInfo.getCheckCode().equals("CH001") && checkInfo.getDemographicId() != null){
 				List<Map<String, Object>> relist = elasticSearchUtil.findByField(index,type, "demographicId",checkInfo.getDemographicId());
-				if(relist== null || relist.size() ==0){
+				if( !(relist != null && relist.size() >0)){
 					elasticSearchClient.index(index,type, source);
 				}
 			}else if(checkInfo.getCheckCode().equals("CH001") && checkInfo.getCardId() != null){
 				List<Map<String, Object>> relist = elasticSearchUtil.findByField(index,type, "cardId",checkInfo.getCardId());
-				if(relist== null || relist.size() ==0){
+				if( !(relist != null && relist.size() >0)){
 					elasticSearchClient.index(index,type, source);
 				}
 			}else {

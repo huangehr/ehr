@@ -74,7 +74,7 @@ public class DiabetesScheduler {
 	 * 每天2点 执行一次
 	 * @throws Exception
 	 */
-	@Scheduled(cron = "0 25 14 * * ?")
+	@Scheduled(cron = "0 30 2 * * ?")
 	public void validatorIdentityScheduler(){
 		try {
 //			String q =  null; // 查询条件 health_problem:HP0047  HP0047 为糖尿病
@@ -83,7 +83,7 @@ public class DiabetesScheduler {
 //			String keyDiseaseNameZ = "EHR_000112";//诊断名字（门诊）*糖尿病*
 			String fq = ""; // 过滤条件
 			String keyEventDate = "event_date";
-			String keyArea = "EHR_001225";
+			String keyArea = "EHR_001225";  //行政区划代码
 			String keyAreaName = "EHR_001225_VALUE";
 			String keyPatientName = "patient_name";
 			String keyDemographicId = "demographic_id";//身份证
@@ -102,12 +102,11 @@ public class DiabetesScheduler {
 //			String keyEnglishName = "EHR_000393";//子项目英文名称
 			String keyWestMedicine= "EHR_000100";  //西药
 			String keyChineseMedicine= "EHR_000131";//中药
-			List<PersonalInfoModel> personalInfoList = new ArrayList<>();
-			List<CheckInfoModel> checkInfoList = new ArrayList<>();
+
 			objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
 			BasesicUtil basesicUtil = new BasesicUtil();
-			String initializeDate = "2018-03-20";
+			String initializeDate = "2018-03-22";
 			Date now = new Date();
 			String nowDate = DateUtil.formatDate(now,DateUtil.DEFAULT_DATE_YMD_FORMAT);
 			boolean flag = true;
@@ -134,9 +133,9 @@ public class DiabetesScheduler {
 					System.out.println("startDate=" + startDate);
 				}
 				//找出糖尿病的就诊档案
-				System.out.println("开始查询solr, fq = " + fq);
 				List<String> subRrowKeyList = new ArrayList<>() ; //细表rowkey
 				subRrowKeyList = selectSubRowKey(ResourceCore.SubTable, q2, fq, 10000);
+				System.out.println("个人开始查询solr, fq = " + fq);
 				System.out.println("查询结果条数："+subRrowKeyList.size());
 				if(subRrowKeyList != null && subRrowKeyList.size() > 0){
 					//糖尿病数据 Start
@@ -153,73 +152,93 @@ public class DiabetesScheduler {
 							PersonalInfoModel personalInfo = new PersonalInfoModel();
 							personalInfo.setCreateTime(DateUtils.addHours(new Date(),8));
 							Map<String,Object> subMap = hbaseDao.getResultMap(ResourceCore.SubTable, subRowkey);
-							String diseaseName = "";
-							if(subMap.get(keyDiseaseSymptom) != null){
-								diseaseName = subMap.get(keyDiseaseSymptom).toString();
-							}else if(subMap.get(keyDiseaseSymptom2) != null ){
-								diseaseName = subMap.get(keyDiseaseSymptom2).toString();
-							}
-							if(StringUtils.isNotEmpty(diseaseName)){
-								if(diseaseName.contains("1型")){
-									personalInfo.setDiseaseType("1");
-									personalInfo.setDiseaseTypeName("I型糖尿病");
-								}else if(diseaseName.contains("2型")){
-									personalInfo.setDiseaseType("2");
-									personalInfo.setDiseaseTypeName("II型糖尿病");
-								}else if(diseaseName.contains("妊娠")){
-									personalInfo.setDiseaseType("3");
-									personalInfo.setDiseaseTypeName("妊娠糖尿病");
-								}else{
-									personalInfo.setDiseaseType("4");
-									personalInfo.setDiseaseTypeName("其他糖尿病");
+							if(subMap !=null){
+								String diseaseName = "";
+								if(subMap.get(keyDiseaseSymptom) != null){
+									diseaseName = subMap.get(keyDiseaseSymptom).toString();
+								}else if(subMap.get(keyDiseaseSymptom2) != null ){
+									diseaseName = subMap.get(keyDiseaseSymptom2).toString();
+								}
+								if(StringUtils.isNotEmpty(diseaseName)){
+									if(diseaseName.contains("1型")){
+										personalInfo.setDiseaseType("1");
+										personalInfo.setDiseaseTypeName("I型糖尿病");
+									}else if(diseaseName.contains("2型")){
+										personalInfo.setDiseaseType("2");
+										personalInfo.setDiseaseTypeName("II型糖尿病");
+									}else if(diseaseName.contains("妊娠")){
+										personalInfo.setDiseaseType("3");
+										personalInfo.setDiseaseTypeName("妊娠糖尿病");
+									}else{
+										personalInfo.setDiseaseType("4");
+										personalInfo.setDiseaseTypeName("其他糖尿病");
+									}
 								}
 							}
+
 							Map<String,Object> map = hbaseDao.getResultMap(ResourceCore.MasterTable, mainRowkey);
-							//个人信息 > 姓名，身份证，就诊卡号，性别，出生日期，出生年份，区县，常住地址，常住地址经纬度，疾病名称，疾病code
-							if(map.get(keyEventDate) != null){
-								Date eventDate = DateUtil.formatCharDate(map.get(keyEventDate).toString(), DateUtil.DATE_WORLD_FORMAT);
-								personalInfo.setEventDate(DateUtils.addHours(eventDate,8));					}
-							if(map.get(keyArea) != null){
-								personalInfo.setTown(map.get(keyArea).toString());
-								personalInfo.setTownName(map.get(keyAreaName).toString());
-							}
-							if(map.get(keyPatientName) != null){
-								personalInfo.setName(map.get(keyPatientName).toString());
-							}
-							if(map.get(keyDemographicId) != null){
-								personalInfo.setDemographicId(map.get(keyDemographicId).toString());
-							}
-							if(map.get(keyCardId) != null){
-								personalInfo.setCardId(map.get(keyCardId).toString());
-							}
-							if(map.get(keySex) != null){
-								personalInfo.setSex(Integer.valueOf(map.get(keySex).toString()));
-								if(map.get(keySex).toString().equals("0")){
-									personalInfo.setSexName("未知");
+							if(map!=null){
+								//个人信息 > 姓名，身份证，就诊卡号，性别，出生日期，出生年份，区县，常住地址，常住地址经纬度，疾病名称，疾病code
+								if(map.get(keyEventDate) != null){
+									Date eventDate = DateUtil.formatCharDate(map.get(keyEventDate).toString(), DateUtil.DATE_WORLD_FORMAT);
+									personalInfo.setEventDate(DateUtils.addHours(eventDate,8));
+								}
+								if(map.get(keyArea) != null){
+									personalInfo.setTown(map.get(keyArea).toString());
+									personalInfo.setTownName(map.get(keyAreaName).toString());
+								}
+								if(map.get(keyPatientName) != null){
+									personalInfo.setName(map.get(keyPatientName).toString());
+								}
+								if(map.get(keyDemographicId) != null){
+									personalInfo.setDemographicId(map.get(keyDemographicId).toString());
+								}
+								if(map.get(keyCardId) != null){
+									personalInfo.setCardId(map.get(keyCardId).toString());
+								}
+								if(map.get(keySex) != null){
+									personalInfo.setSex(Integer.valueOf(map.get(keySex).toString()));
+									if(map.get(keySex).toString().equals("0")){
+										personalInfo.setSexName("未知");
+									}else {
+										personalInfo.setSexName(map.get(keySexValue).toString());
+									}
+//									if(map.get(keySex).toString().equals("男")){
+//										sex =1;
+//										sexName ="男";
+//									}else if(map.get(keySex).toString().equals("女")){
+//										sex =2;
+//										sexName ="女";
+//									}else {
+//										sex =0;
+//										sexName ="未知";
+//									}
 								}else {
-									personalInfo.setSexName(map.get(keySexValue).toString());
+									sex =0;
+									sexName ="未知";
 								}
-							}
-							if(map.get(keyAge) != null){
-								personalInfo.setBirthday( map.get(keyAge).toString().substring(0, 10));
-								int year = Integer.valueOf(map.get(keyAge).toString().substring(0, 4));
-								personalInfo.setBirthYear(year);
-							}
-							if(map.get(keyAddress) != null){
-								String address = map.get(keyAddress).toString();
-								personalInfo.setAddress(address);
-								try {
-									Map<String, String> json = LatitudeUtils.getGeocoderLatitude(address);
-									personalInfo.setAddressLngLat(json.get("lng")+";" + json.get("lat"));
-								}catch (Exception e){
-									System.out.println("没有外网无法解析常住地址！");
+								personalInfo.setSex(sex);
+								personalInfo.setSexName(sexName);
+								if(map.get(keyAge) != null){
+									personalInfo.setBirthday( map.get(keyAge).toString().substring(0, 10));
+									int year = Integer.valueOf(map.get(keyAge).toString().substring(0, 4));
+									personalInfo.setBirthYear(year);
 								}
+								if(map.get(keyAddress) != null){
+									String address = map.get(keyAddress).toString();
+									personalInfo.setAddress(address);
+									try {
+										Map<String, String> json = LatitudeUtils.getGeocoderLatitude(address);
+										personalInfo.setAddressLngLat(json.get("lng")+";" + json.get("lat"));
+									}catch (Exception e){
+										System.out.println("没有外网无法解析常住地址！");
+									}
+								}
+								personalInfo.setDisease("HP0047");
+								personalInfo.setDiseaseName("糖尿病");
+								//个人信息记录end
+								savePersonal(personalInfo);
 							}
-							personalInfo.setDisease("HP0047");
-							personalInfo.setDiseaseName("糖尿病");
-							personalInfoList.add(personalInfo);
-							//个人信息记录end
-							savePersonal(personalInfo);
 						}
 					}
 					//糖尿病数据 Start
@@ -240,37 +259,12 @@ public class DiabetesScheduler {
 			source = objectMapper.readValue(jsonPer, Map.class);
 			if(personalInfo.getDemographicId() != null){
 				List<Map<String, Object>> relist = elasticSearchUtil.findByField(index, type, "demographicId", personalInfo.getDemographicId());
-				if(relist== null || relist.size() ==0){
+				if( !(relist != null && relist.size() >0)){
 					elasticSearchClient.index(index,type, source);
 				}
 			}else if(personalInfo.getCardId() != null){
 				List<Map<String, Object>> relist = elasticSearchUtil.findByField(index,type, "cardId",personalInfo.getCardId());
-				if(relist== null || relist.size() ==0){
-					elasticSearchClient.index(index,type, source);
-				}
-			}else {
-				elasticSearchClient.index(index,type, source);
-			}
-		}catch (Exception e){
-			e.getMessage();
-		}
-	}
-
-	public void saveCheckInfo(CheckInfoModel checkInfo){
-		try{
-			String index = "singleDiseaseCheck";
-			String type = "check_info";
-			Map<String, Object> source = new HashMap<>();
-			String jsonCheck = objectMapper.writeValueAsString(checkInfo);
-			source = objectMapper.readValue(jsonCheck,Map.class);
-			if(checkInfo.getCheckCode().equals("CH001") && checkInfo.getDemographicId() != null){
-				List<Map<String, Object>> relist = elasticSearchUtil.findByField(index,type, "demographicId",checkInfo.getDemographicId());
-				if(relist== null || relist.size() ==0){
-					elasticSearchClient.index(index,type, source);
-				}
-			}else if(checkInfo.getCheckCode().equals("CH001") && checkInfo.getCardId() != null){
-				List<Map<String, Object>> relist = elasticSearchUtil.findByField(index,type, "cardId",checkInfo.getCardId());
-				if(relist== null || relist.size() ==0){
+				if( !(relist != null && relist.size() >0)){
 					elasticSearchClient.index(index,type, source);
 				}
 			}else {

@@ -752,13 +752,18 @@ public class QuotaReportController extends BaseController {
             } else {
                 map = singleDiseaseService.getSugarToleranceDataInfo();
             }
+//            if (null != map && map.size() > 0) {
+//                List<Map<String, Object>> list = new ArrayList<>();
+//                Map<String, Object> myMap = new HashMap<>();
+//                myMap.put("男", map.get("valueData1"));
+//                myMap.put("女", map.get("valueData2"));
+//                list.add(myMap);
+//                envelop.setDetailModelList(list);
+//                envelop.setObj(map.get("xData"));
+//            }
+
             if (null != map && map.size() > 0) {
-                List<Map<String, Object>> list = new ArrayList<>();
-                Map<String, Object> myMap = new HashMap<>();
-                myMap.put("男", map.get("valueData1"));
-                myMap.put("女", map.get("valueData2"));
-                list.add(myMap);
-                envelop.setDetailModelList(list);
+                envelop.setDetailModelList(map.get("valueData"));
                 envelop.setObj(map.get("xData"));
             }
         }

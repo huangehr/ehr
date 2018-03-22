@@ -59,7 +59,7 @@ public class DiabetesSymptomScheduler {
 	 * 每天2点 执行一次
 	 * @throws Exception
 	 */
-	@Scheduled(cron = "0 25 14 * * ?")
+	@Scheduled(cron = "0 0 2 * * ?")
 	public void validatorIdentityScheduler(){
 		try {
 			String q2 = "EHR_000112:*糖尿病*并发症* OR EHR_000295:*糖尿病*并发症*";
@@ -81,8 +81,6 @@ public class DiabetesSymptomScheduler {
 			String keyChineseName = "EHR_000394";//子项目中文名称
 			String keyWestMedicine= "EHR_000100";  //西药
 			String keyChineseMedicine= "EHR_000131";//中药
-			List<PersonalInfoModel> personalInfoList = new ArrayList<>();
-			List<CheckInfoModel> checkInfoList = new ArrayList<>();
 			objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
 			BasesicUtil basesicUtil = new BasesicUtil();
@@ -108,13 +106,13 @@ public class DiabetesSymptomScheduler {
 					if(startDate.equals("2018-04-01")){
 						flag = false;
 					}
-					System.out.println("startDate=" + startDate);
 				}
 				//找出糖尿病的就诊档案
+				//event_date:[2015-06-01T00:00:00Z TO  2015-07-01T00:00:00Z]
 				System.out.println("开始查询 并发症solr, fq = " + fq);
 				List<String> subRrowKeyList = new ArrayList<>() ; //细表rowkey
 				subRrowKeyList = selectSubRowKey(ResourceCore.SubTable, q2, fq, 10000);
-				System.out.println("查询结果条数："+subRrowKeyList.size());
+				System.out.println("并发症查询结果条数："+subRrowKeyList.size());
 				if(subRrowKeyList != null && subRrowKeyList.size() > 0){
 					//糖尿病数据 Start
 					for(String subRowkey:subRrowKeyList){//循环糖尿病 找到主表就诊人信息
@@ -126,19 +124,37 @@ public class DiabetesSymptomScheduler {
 						String sexName = "";
 						String mainRowkey = subRowkey.substring(0, subRowkey.indexOf("$"));
 						Map<String,Object> map = hbaseDao.getResultMap(ResourceCore.MasterTable, mainRowkey);
-						if(map.get(keyDemographicId) != null){
-							demographicId = map.get(keyDemographicId).toString();
+						if(map !=null){
+							if(map.get(keyDemographicId) != null){
+								demographicId = map.get(keyDemographicId).toString();
+							}
+							if(map.get(keyCardId) != null){
+								cardId = map.get(keyCardId).toString();
+							}
+							if(map.get(keySex) != null) {
+								if(StringUtils.isNotEmpty(map.get(keySex).toString())){
+									sex = Integer.valueOf(map.get(keySex).toString());
+									sexName = map.get(keySexValue).toString();
+//									if(map.get(keySex).toString().equals("男")){
+//										sex =1;
+//										sexName ="男";
+//									}else if(map.get(keySex).toString().equals("女")){
+//										sex =2;
+//										sexName ="女";
+//									}else {
+//										sex =0;
+//										sexName ="未知";
+//									}
+								}else {
+									sex =0;
+									sexName ="未知";
+								}
+							}
+							if(map.get(keyPatientName) != null){
+								name = map.get(keyPatientName).toString();
+							}
 						}
-						if(map.get(keyCardId) != null){
-							cardId = map.get(keyCardId).toString();
-						}
-						if(map.get(keySex) != null) {
-							sex = Integer.valueOf(map.get(keySex).toString());
-							sexName = map.get(keySexValue).toString();
-						}
-						if(map.get(keyPatientName) != null){
-							name = map.get(keyPatientName).toString();
-						}
+
 						CheckInfoModel baseCheckInfo = new CheckInfoModel();
 						baseCheckInfo.setName(name);
 						baseCheckInfo.setDemographicId(demographicId);
@@ -146,22 +162,20 @@ public class DiabetesSymptomScheduler {
 						baseCheckInfo.setSex(sex);
 						baseCheckInfo.setSexName(sexName);
 						Map<String,Object> submap = hbaseDao.getResultMap(ResourceCore.SubTable, subRowkey);
-						//检查信息 姓名,身份证，就诊卡号,并发症，空腹血糖值，葡萄糖耐量值，用药名称，检查信息code （CH001 并发症,CH002 空腹血糖,CH003 葡萄糖耐量,CH004 用药名称）
-						if(submap.get(keyDiseaseSymptom) != null && submap.get(keyDiseaseSymptom).toString().contains("并发症")){
-							CheckInfoModel checkInfo = setCheckInfoModel(baseCheckInfo);
-							checkInfo.setCheckCode("CH001");
-							checkInfo.setSymptomName(submap.get(keyDiseaseSymptom).toString());
-							checkInfoList.add(checkInfo);
-						}
-						if(submap.get(keyDiseaseSymptom2) != null && submap.get(keyDiseaseSymptom2).toString().contains("并发症")){
-							CheckInfoModel checkInfo = setCheckInfoModel(baseCheckInfo);
-							checkInfo.setCheckCode("CH001");
-							checkInfo.setSymptomName(submap.get(keyDiseaseSymptom2).toString());
-							checkInfoList.add(checkInfo);
-						}
-						//保存数据
-						for(CheckInfoModel checkInfo : checkInfoList) {
-							saveCheckInfo(checkInfo);
+						if(submap !=null){
+							//检查信息 姓名,身份证，就诊卡号,并发症，空腹血糖值，葡萄糖耐量值，用药名称，检查信息code （CH001 并发症,CH002 空腹血糖,CH003 葡萄糖耐量,CH004 用药名称）
+							if(submap.get(keyDiseaseSymptom) != null && submap.get(keyDiseaseSymptom).toString().contains("并发症")){
+								CheckInfoModel checkInfo = setCheckInfoModel(baseCheckInfo);
+								checkInfo.setCheckCode("CH001");
+								checkInfo.setSymptomName(submap.get(keyDiseaseSymptom).toString());
+								saveCheckInfo(checkInfo);
+							}
+							if(submap.get(keyDiseaseSymptom2) != null && submap.get(keyDiseaseSymptom2).toString().contains("并发症")){
+								CheckInfoModel checkInfo = setCheckInfoModel(baseCheckInfo);
+								checkInfo.setCheckCode("CH001");
+								checkInfo.setSymptomName(submap.get(keyDiseaseSymptom2).toString());
+								saveCheckInfo(checkInfo);
+							}
 						}
 					}
 					//糖尿病数据并发症 end
@@ -182,12 +196,12 @@ public class DiabetesSymptomScheduler {
 			source = objectMapper.readValue(jsonPer, Map.class);
 			if(personalInfo.getDemographicId() != null){
 				List<Map<String, Object>> relist = elasticSearchUtil.findByField(index, type, "demographicId", personalInfo.getDemographicId());
-				if(relist== null || relist.size() ==0){
+				if( !(relist != null && relist.size() >0)){
 					elasticSearchClient.index(index,type, source);
 				}
 			}else if(personalInfo.getCardId() != null){
 				List<Map<String, Object>> relist = elasticSearchUtil.findByField(index,type, "cardId",personalInfo.getCardId());
-				if(relist== null || relist.size() ==0){
+				if( !(relist != null && relist.size() >0)){
 					elasticSearchClient.index(index,type, source);
 				}
 			}else {
@@ -205,14 +219,14 @@ public class DiabetesSymptomScheduler {
 			Map<String, Object> source = new HashMap<>();
 			String jsonCheck = objectMapper.writeValueAsString(checkInfo);
 			source = objectMapper.readValue(jsonCheck,Map.class);
-			if(checkInfo.getCheckCode().equals("CH001") && checkInfo.getDemographicId() != null){
+			if(checkInfo.getCheckCode().equals("CH001") && StringUtils.isNotEmpty(checkInfo.getDemographicId()) ){
 				List<Map<String, Object>> relist = elasticSearchUtil.findByField(index,type, "demographicId",checkInfo.getDemographicId());
-				if(relist== null || relist.size() ==0){
+				if( !(relist != null && relist.size() >0)){
 					elasticSearchClient.index(index,type, source);
 				}
-			}else if(checkInfo.getCheckCode().equals("CH001") && checkInfo.getCardId() != null){
+			}else if(checkInfo.getCheckCode().equals("CH001") && StringUtils.isNotEmpty(checkInfo.getCardId()) ){
 				List<Map<String, Object>> relist = elasticSearchUtil.findByField(index,type, "cardId",checkInfo.getCardId());
-				if(relist== null || relist.size() ==0){
+				if( !(relist != null && relist.size() >0)){
 					elasticSearchClient.index(index,type, source);
 				}
 			}else {
