@@ -1,29 +1,23 @@
 package com.yihu.quota.scheduler;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.elasticsearch.ElasticSearchClient;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.hbase.HBaseDao;
 import com.yihu.ehr.profile.core.ResourceCore;
-import com.yihu.ehr.query.services.SolrQuery;
 import com.yihu.ehr.solr.SolrUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
-import com.yihu.quota.etl.extract.ExtractUtil;
 import com.yihu.quota.util.BasesicUtil;
-import com.yihu.quota.util.LatitudeUtils;
 import com.yihu.quota.vo.CheckInfoModel;
 import com.yihu.quota.vo.DictModel;
 import com.yihu.quota.vo.PersonalInfoModel;
-import com.yihu.quota.vo.SaveModel;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.CellUtil;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.apache.solr.client.solrj.response.RangeFacet;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.slf4j.Logger;
@@ -34,29 +28,18 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.beans.BeanInfo;
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
-import java.io.File;
-import java.lang.reflect.InvocationTargetException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
- * 糖尿病单病种 分析 数据统计
+ * 糖尿病单病种  药 数据统计
  */
 @Component
-public class DiabetesScheduler {
+public class DiabetesMedicineScheduler {
 
-	private static final Logger log = LoggerFactory.getLogger(DiabetesScheduler.class);
+	private static final Logger log = LoggerFactory.getLogger(DiabetesMedicineScheduler.class);
 
 	@Autowired
 	private SolrUtil solrUtil;
-	@Autowired
-	private ExtractUtil extractUtil;
 	@Autowired
 	private ElasticSearchUtil elasticSearchUtil;
 	@Autowired
@@ -74,7 +57,7 @@ public class DiabetesScheduler {
 	 * 每天2点 执行一次
 	 * @throws Exception
 	 */
-	@Scheduled(cron = "0 30 2 * * ?")
+	@Scheduled(cron = "0 10 2 * * ?")
 	public void validatorIdentityScheduler(){
 		try {
 //			String q =  null; // 查询条件 health_problem:HP0047  HP0047 为糖尿病
@@ -83,7 +66,7 @@ public class DiabetesScheduler {
 //			String keyDiseaseNameZ = "EHR_000112";//诊断名字（门诊）*糖尿病*
 			String fq = ""; // 过滤条件
 			String keyEventDate = "event_date";
-			String keyArea = "EHR_001225";  //行政区划代码
+			String keyArea = "EHR_001225";
 			String keyAreaName = "EHR_001225_VALUE";
 			String keyPatientName = "patient_name";
 			String keyDemographicId = "demographic_id";//身份证
@@ -106,12 +89,12 @@ public class DiabetesScheduler {
 			objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
 			BasesicUtil basesicUtil = new BasesicUtil();
-			String initializeDate = "2018-03-22";
+			String initializeDate = "2018-03-20";
 			Date now = new Date();
 			String nowDate = DateUtil.formatDate(now,DateUtil.DEFAULT_DATE_YMD_FORMAT);
 			boolean flag = true;
-			String startDate = "2015-01-01";
-			String endDate = "2015-02-01";
+			String startDate = "2015-06-01";
+			String endDate = "2015-07-01";
 			List<String> rowKeyList = new ArrayList<>() ;
 			while(flag){
 				rowKeyList.clear();
@@ -133,10 +116,11 @@ public class DiabetesScheduler {
 					System.out.println("startDate=" + startDate);
 				}
 				//找出糖尿病的就诊档案
+
 				List<String> subRrowKeyList = new ArrayList<>() ; //细表rowkey
 				subRrowKeyList = selectSubRowKey(ResourceCore.SubTable, q2, fq, 10000);
-				System.out.println("个人开始查询solr, fq = " + fq);
-				System.out.println("查询结果条数："+subRrowKeyList.size());
+				System.out.println("药物开始查询solr, fq = " + fq);
+				System.out.println("subRrowKeyList, size = " + subRrowKeyList.size());
 				if(subRrowKeyList != null && subRrowKeyList.size() > 0){
 					//糖尿病数据 Start
 					for(String subRowkey:subRrowKeyList){//循环糖尿病 找到主表就诊人信息
@@ -149,97 +133,73 @@ public class DiabetesScheduler {
 						String sexName = "";
 						if(!rowKeyList.contains(mainRowkey)){
 							rowKeyList.add(mainRowkey);
-							PersonalInfoModel personalInfo = new PersonalInfoModel();
-							personalInfo.setCreateTime(DateUtils.addHours(new Date(),8));
-							Map<String,Object> subMap = hbaseDao.getResultMap(ResourceCore.SubTable, subRowkey);
-							if(subMap !=null){
-								String diseaseName = "";
-								if(subMap.get(keyDiseaseSymptom) != null){
-									diseaseName = subMap.get(keyDiseaseSymptom).toString();
-								}else if(subMap.get(keyDiseaseSymptom2) != null ){
-									diseaseName = subMap.get(keyDiseaseSymptom2).toString();
+							Map<String,Object> map = hbaseDao.getResultMap(ResourceCore.MasterTable, mainRowkey);
+							if(map !=null){
+								if(map.get(keyDemographicId) != null){
+									demographicId = map.get(keyDemographicId).toString();
 								}
-								if(StringUtils.isNotEmpty(diseaseName)){
-									if(diseaseName.contains("1型")){
-										personalInfo.setDiseaseType("1");
-										personalInfo.setDiseaseTypeName("I型糖尿病");
-									}else if(diseaseName.contains("2型")){
-										personalInfo.setDiseaseType("2");
-										personalInfo.setDiseaseTypeName("II型糖尿病");
-									}else if(diseaseName.contains("妊娠")){
-										personalInfo.setDiseaseType("3");
-										personalInfo.setDiseaseTypeName("妊娠糖尿病");
-									}else{
-										personalInfo.setDiseaseType("4");
-										personalInfo.setDiseaseTypeName("其他糖尿病");
+								if(map.get(keyCardId) != null){
+									cardId = map.get(keyCardId).toString();
+								}
+								if(map.get(keySex) != null) {
+									if(StringUtils.isNotEmpty(map.get(keySex).toString())){
+										sex = Integer.valueOf(map.get(keySex).toString());
+										sexName = map.get(keySexValue).toString();
+//										if(map.get(keySex).toString().equals("男")){
+//											sex =1;
+//											sexName ="男";
+//										}else if(map.get(keySex).toString().equals("女")){
+//											sex =2;
+//											sexName ="女";
+//										}else {
+//											sex =0;
+//											sexName ="未知";
+//										}
+									}else {
+										sex =0;
+										sexName ="未知";
 									}
+								}
+								if(map.get(keyPatientName) != null){
+									name = map.get(keyPatientName).toString();
 								}
 							}
 
-							Map<String,Object> map = hbaseDao.getResultMap(ResourceCore.MasterTable, mainRowkey);
-							if(map!=null){
-								//个人信息 > 姓名，身份证，就诊卡号，性别，出生日期，出生年份，区县，常住地址，常住地址经纬度，疾病名称，疾病code
-								if(map.get(keyEventDate) != null){
-									Date eventDate = DateUtil.formatCharDate(map.get(keyEventDate).toString(), DateUtil.DATE_WORLD_FORMAT);
-									personalInfo.setEventDate(DateUtils.addHours(eventDate,8));
-								}
-								if(map.get(keyArea) != null){
-									personalInfo.setTown(map.get(keyArea).toString());
-									personalInfo.setTownName(map.get(keyAreaName).toString());
-								}
-								if(map.get(keyPatientName) != null){
-									personalInfo.setName(map.get(keyPatientName).toString());
-								}
-								if(map.get(keyDemographicId) != null){
-									personalInfo.setDemographicId(map.get(keyDemographicId).toString());
-								}
-								if(map.get(keyCardId) != null){
-									personalInfo.setCardId(map.get(keyCardId).toString());
-								}
-								if(map.get(keySex) != null){
-									personalInfo.setSex(Integer.valueOf(map.get(keySex).toString()));
-									if(map.get(keySex).toString().equals("0")){
-										personalInfo.setSexName("未知");
-									}else {
-										personalInfo.setSexName(map.get(keySexValue).toString());
-									}
-//									if(map.get(keySex).toString().equals("男")){
-//										sex =1;
-//										sexName ="男";
-//									}else if(map.get(keySex).toString().equals("女")){
-//										sex =2;
-//										sexName ="女";
-//									}else {
-//										sex =0;
-//										sexName ="未知";
-//									}
-								}else {
-									sex =0;
-									sexName ="未知";
-								}
-								personalInfo.setSex(sex);
-								personalInfo.setSexName(sexName);
-								if(map.get(keyAge) != null){
-									personalInfo.setBirthday( map.get(keyAge).toString().substring(0, 10));
-									int year = Integer.valueOf(map.get(keyAge).toString().substring(0, 4));
-									personalInfo.setBirthYear(year);
-								}
-								if(map.get(keyAddress) != null){
-									String address = map.get(keyAddress).toString();
-									personalInfo.setAddress(address);
-									try {
-										Map<String, String> json = LatitudeUtils.getGeocoderLatitude(address);
-										personalInfo.setAddressLngLat(json.get("lng")+";" + json.get("lat"));
-									}catch (Exception e){
-										System.out.println("没有外网无法解析常住地址！");
+							fq = "profile_id:"+ mainRowkey +"* AND EHR_000131:*";
+							//查询主表对应的细表的数据 循环解析
+							List<String> subRrowKeyList2 = selectSubRowKey(ResourceCore.SubTable, null, fq, 10000);
+							System.out.println("药物 查询结果条数："+subRrowKeyList2.size());
+							//细表解析保存 start
+							if(subRrowKeyList2 !=null && subRrowKeyList2.size() > 0){
+								List<Map<String,Object>> subhbaseDataList = selectHbaseData(ResourceCore.SubTable, subRrowKeyList2);
+								if( subhbaseDataList != null && subhbaseDataList.size() > 0 ){
+									for(Map<String,Object> submap : subhbaseDataList){
+										CheckInfoModel baseCheckInfo = new CheckInfoModel();
+										baseCheckInfo.setName(name);
+										baseCheckInfo.setDemographicId(demographicId);
+										baseCheckInfo.setCardId(cardId);
+										baseCheckInfo.setSex(sex);
+										baseCheckInfo.setSexName(sexName);
+										if(submap.get(keyWestMedicine) != null){
+											CheckInfoModel checkInfo = setCheckInfoModel(baseCheckInfo);
+											checkInfo.setCheckCode("CH004");
+											checkInfo.setMedicineName(submap.get(keyWestMedicine).toString());
+											//保存到ES库
+											saveCheckInfo(checkInfo);
+										}
+										if(submap.get(keyChineseMedicine) != null) {
+											CheckInfoModel checkInfo = setCheckInfoModel(baseCheckInfo);
+											checkInfo.setCheckCode("CH004");
+											checkInfo.setMedicineName(submap.get(keyChineseMedicine).toString());
+											//保存到ES库
+											saveCheckInfo(checkInfo);
+										}
 									}
 								}
-								personalInfo.setDisease("HP0047");
-								personalInfo.setDiseaseName("糖尿病");
-								//个人信息记录end
-								savePersonal(personalInfo);
 							}
+							//细表解析保存 end
 						}
+
 					}
 					//糖尿病数据 Start
 				}
@@ -250,20 +210,20 @@ public class DiabetesScheduler {
 		}
 	}
 
-	public void savePersonal(PersonalInfoModel personalInfo){
+	public void saveCheckInfo(CheckInfoModel checkInfo){
 		try{
-			String index = "singleDiseasePersonal";
-			String type = "personal_info";
+			String index = "singleDiseaseCheck";
+			String type = "check_info";
 			Map<String, Object> source = new HashMap<>();
-			String jsonPer = objectMapper.writeValueAsString(personalInfo);
-			source = objectMapper.readValue(jsonPer, Map.class);
-			if(personalInfo.getDemographicId() != null){
-				List<Map<String, Object>> relist = elasticSearchUtil.findByField(index, type, "demographicId", personalInfo.getDemographicId());
+			String jsonCheck = objectMapper.writeValueAsString(checkInfo);
+			source = objectMapper.readValue(jsonCheck,Map.class);
+			if(checkInfo.getCheckCode().equals("CH001") && checkInfo.getDemographicId() != null){
+				List<Map<String, Object>> relist = elasticSearchUtil.findByField(index,type, "demographicId",checkInfo.getDemographicId());
 				if( !(relist != null && relist.size() >0)){
 					elasticSearchClient.index(index,type, source);
 				}
-			}else if(personalInfo.getCardId() != null){
-				List<Map<String, Object>> relist = elasticSearchUtil.findByField(index,type, "cardId",personalInfo.getCardId());
+			}else if(checkInfo.getCheckCode().equals("CH001") && checkInfo.getCardId() != null){
+				List<Map<String, Object>> relist = elasticSearchUtil.findByField(index,type, "cardId",checkInfo.getCardId());
 				if( !(relist != null && relist.size() >0)){
 					elasticSearchClient.index(index,type, source);
 				}
