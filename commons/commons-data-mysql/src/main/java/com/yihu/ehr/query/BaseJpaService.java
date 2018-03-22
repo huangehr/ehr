@@ -230,7 +230,7 @@ public class BaseJpaService<T, R> {
         }
     }
 
-//    public static void main(String arg[])throws Exception{
+    public static void main(String arg[])throws Exception{
 //       //获取token。.
 ////        Map<String,Object> params = new HashMap();
 ////        params.put("grant_type","password");
@@ -249,11 +249,12 @@ public class BaseJpaService<T, R> {
 ////        params.put("userId","0dae00035aa0a0a2319e6d516fe200e1");
 ////        HttpResponse response = HttpUtils.doGet("http://localhost:10001/svr-ehr-basic/api/v1.0/roles/findByUserId",params,null);
 ////        System.out.print(response.toString());
-//        //获取版本号
-////        Map<String,Object> params = new HashMap();
-////        params.put("id","1");
-////        params.put("verison","0.1");
-////        HttpResponse response = HttpUtils.doGet("http://localhost:10001/basic/api/v1.0/appVersion/getAppVersion",params,null);
-////        System.out.print(response.getContent());
-//    }
+        //获取版本号
+        Map<String,Object> params = new HashMap();
+        params.put("code","app_doc");
+        Double d = 0.1;
+        params.put("version",d+"");
+        HttpResponse response = HttpUtils.doGet("http://localhost:10001/basic/api/v1.0/appVersion/getAppVersion",params,null);
+        System.out.print(response.getContent());
+    }
 }
