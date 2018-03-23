@@ -138,7 +138,7 @@ public class ProfileMedicationService {
             if (subList.size() > 0) {
                 for (Map<String, Object> subMap : subList) {
                     Map<String, Object> dataMap = new HashMap<>();
-                    String rowKey = (String) subMap.get("rowkey");
+                    //String rowKey = (String) subMap.get("rowkey");
                     dataMap.put("prescriptionNumber", subMap.get("EHR_000086")); //处方编号
                     dataMap.put("substancesForDrugUse", subMap.get("EHR_000101")); //药物使用次剂量
                     dataMap.put("prescriptionDrugGroupNumber", subMap.get("EHR_000127")); //处方药品组号

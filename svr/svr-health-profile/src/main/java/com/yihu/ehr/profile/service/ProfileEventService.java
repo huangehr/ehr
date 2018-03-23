@@ -39,13 +39,13 @@ public class ProfileEventService {
         Envelop envelop;
         if (StringUtils.isEmpty(filter)) {
             query = "{\"q\":\"demographic_id:" + demographicId + "\"}";
-        } else if("0".equals(filter)) { //门诊
+        } else if ("0".equals(filter)) { //门诊 clinic
             query = "{\"q\":\"demographic_id:" + demographicId + " AND event_type:0\"}";
-        } else if("1".equals(filter)) { //住院
+        } else if ("1".equals(filter)) { //住院 resident
             query = "{\"q\":\"demographic_id:" + demographicId + " AND event_type:1\"}";
-        } else if("3".equals(filter)) { //体检
+        } else if ("3".equals(filter)) { //体检 medicalExam
             query = "{\"q\":\"demographic_id:" + demographicId + " AND event_type:2\"}";
-        } else if("4".equals(filter)) { //检验
+        } else if ("4".equals(filter)) { //检验 inspect
             try {
                 query = "{\"q\":\"demographic_id:" + demographicId + " AND EHR_000379:* OR EHR_000353:* OR EHR_000341:* OR EHR_000338:* OR EHR_000366:*\"}";
                 envelop = resource.getMasterData(query, null, null, null);
@@ -96,9 +96,9 @@ public class ProfileEventService {
                 }
                 return resultList;
             }
-        } else if("6".equals(filter)) { //免疫
+        } else if ("6".equals(filter)) { //免疫 immunity
             query = "{\"q\":\"demographic_id:" + demographicId + " AND EHR_002443:*\"}";
-        } else if("2".equals(filter)){ //影像
+        } else if ("2".equals(filter)){ //影像 imagery
             query = "{\"q\":\"demographic_id:" + demographicId + "\"}";
             envelop = resource.getMasterData(query, null, null, null);
             List<Map<String, Object>> masterList = envelop.getDetailModelList();
@@ -154,38 +154,35 @@ public class ProfileEventService {
      */
     private  List<String> geyProfileByEventType(List<String> rowkeys,String eventType) throws Exception {
         List<String> re = new ArrayList<>();
-        if(rowkeys!=null && rowkeys.size()>0) {
+        if (rowkeys != null && rowkeys.size() > 0) {
             String rowkeyString = "";
             String datasetString = "";
             //筛选事件
-            for(String rowkey:rowkeys) {
-                if(rowkeyString.length()>0) {
+            for (String rowkey:rowkeys) {
+                if (rowkeyString.length()>0) {
                     rowkeyString += " OR profile_id:"+rowkey;
-                }
-                else {
+                } else {
                     rowkeyString = "profile_id:"+rowkey;
                 }
             }
             //筛选对应数据集
             String[] datasets = eventTypeDataset.get(eventType);
-            if(datasets!=null && datasets.length>0) {
-                for(String dataset:datasets) {
-                    if(datasetString.length()>0) {
+            if (datasets!=null && datasets.length>0) {
+                for (String dataset:datasets) {
+                    if (datasetString.length()>0) {
                         datasetString += " OR rowkey:*"+dataset+"*";
-                    }
-                    else{
+                    } else {
                         datasetString = "rowkey:*"+dataset+"*";
                     }
                 }
-            }
-            else{
+            } else {
                 return re;
             }
             String query = "{\"groupFields\":\"profile_id\",\"q\":\"("+rowkeyString+") AND ("+datasetString+")\"}";
             Envelop result = resource.getSubStat(query.replace(" ","+"), null ,null);
-            if(result.getDetailModelList()!=null && result.getDetailModelList().size()>0) {
+            if (result.getDetailModelList()!=null && result.getDetailModelList().size()>0) {
                 List<Map<String,Object>> list = result.getDetailModelList();
-                for(Map<String,Object> map:list) {
+                for (Map<String,Object> map:list) {
                     re.add(map.get("profile_id").toString());
                 }
             }
@@ -200,11 +197,10 @@ public class ProfileEventService {
         Map<String, Object> re = new HashMap<>();
         //获取相关门诊住院记录
         Envelop result = resource.getResources(BasisConstant.patientEvent, "*", "*", "{\"q\":\"org_code:"+orgCode+"+AND+event_no:" + eventNo + "\"}",1,1);
-        if(result.getDetailModelList()!=null&& result.getDetailModelList().size()>0) {
+        if (result.getDetailModelList()!=null&& result.getDetailModelList().size()>0) {
             re = (Map<String, Object>)result.getDetailModelList().get(0);
-        }
-        else{
-            throw new Exception("不存在该档案信息！（event_no:"+eventNo+"）");
+        } else {
+            throw new Exception("不存在该档案信息！（event_no:" + eventNo + "）");
         }
         return re;
     }

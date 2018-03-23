@@ -298,6 +298,7 @@ public class ServiceApi {
     public static class Profiles {
         public static final String ProfileInfo = "/profile/baseInfo"; //基本信息
         public static final String ProfileHistory = "/profile/history"; //患病史
+        public static final String PersonHistory = "/profile/personHistory"; //患病史
         public static final String HealthProblem = "/profile/healthProblem"; //主要健康问题
         public static final String HealthProblemSub = "/profile/healthProblemSub"; //主要健康问题诊断情况
         public static final String MedicalEvents = "/profile/medicalEvents"; //门诊/住院事件(时间轴)
