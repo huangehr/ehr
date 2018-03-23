@@ -34,10 +34,10 @@ public class ElasticSearchPool {
 
     @PostConstruct
     private void init() {
-        if(clientPool == null) {
+        if (clientPool == null) {
             clientPool = new ArrayList<TransportClient>();
         }
-        synchronized (ElasticSearchClient.class) {
+        synchronized (clientPool) {
             while (clientPool.size() < initSize) {
                 Settings settings = Settings.builder()
                         .put("cluster.name", elasticSearchConfig.getClusterName())
@@ -70,18 +70,18 @@ public class ElasticSearchPool {
         int last_index = clientPool.size() - 1;
         TransportClient transportClient = clientPool.get(last_index);
         clientPool.remove(last_index);
-        if(clientPool.isEmpty()) {
+        if (clientPool.isEmpty()) {
             init();
         }
         return transportClient;
     }
 
     public synchronized void releaseClient(TransportClient transportClient) {
-        if(clientPool.size() > maxSize) {
+        if (clientPool.size() > maxSize) {
             if (null != transportClient) {
                 transportClient.close();
             }
-        }else {
+        } else {
             clientPool.add(transportClient);
         }
     }

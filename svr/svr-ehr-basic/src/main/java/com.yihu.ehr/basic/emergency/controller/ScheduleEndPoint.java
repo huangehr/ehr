@@ -13,7 +13,6 @@ import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.lang.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
@@ -51,19 +50,10 @@ public class ScheduleEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "page", value = "分页大小", required = true, defaultValue = "1")
             @RequestParam(value = "page") int page,
             @ApiParam(name = "size", value = "页码", required = true, defaultValue = "15")
-            @RequestParam(value = "size") int size) {
-        Envelop envelop = new Envelop();
-        try {
-            List<Schedule> schedules = scheduleService.search(fields, filters, sorts, page, size);
-            int count = (int)scheduleService.getCount(filters);
-            envelop = getPageResult(schedules, count, page, size);
-            envelop.setSuccessFlg(true);
-            envelop.setDetailModelList(schedules);
-        }catch (Exception e) {
-            e.printStackTrace();
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg(e.getMessage());
-        }
+            @RequestParam(value = "size") int size) throws Exception {
+        List<Schedule> schedules = scheduleService.search(fields, filters, sorts, page, size);
+        int count = (int)scheduleService.getCount(filters);
+        Envelop envelop = getPageResult(schedules, count, page, size);
         return envelop;
     }
 
@@ -76,20 +66,12 @@ public class ScheduleEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page") int page,
             @ApiParam(name = "size", value = "页码", required = true, defaultValue = "15")
             @RequestParam(value = "size") int size) throws ParseException {
-        Envelop envelop = new Envelop();
         if (StringUtils.isEmpty(date)) {
-            try {
-                List<Object> resultList = scheduleService.getLevel(page, size);
-                Integer count = scheduleService.getLevelCount();
-                envelop = getPageResult(resultList, count, page, size);
-                return envelop;
-            } catch (ParseException e) {
-                e.printStackTrace();
-                envelop.setSuccessFlg(false);
-                envelop.setErrorMsg(e.getMessage());
-                return envelop;
-            }
-        }else {
+            List<Object> resultList = scheduleService.getLevel(page, size);
+            Integer count = scheduleService.getLevelCount();
+            Envelop envelop = getPageResult(resultList, count, page, size);
+            return envelop;
+        } else {
             List<Object> resultList = new ArrayList<Object>();
             List<java.sql.Date> dateGroup = scheduleService.getDateGroup(date, page, size);
             for(int i = 0; i < dateGroup.size(); i ++) {
@@ -202,7 +184,7 @@ public class ScheduleEndPoint extends EnvelopRestEndPoint {
                 }
             }
             int count = scheduleService.getDateGroupCount(date);
-            envelop = getPageResult(resultList, count, page, size);
+            Envelop envelop = getPageResult(resultList, count, page, size);
             return envelop;
         }
     }
@@ -211,62 +193,39 @@ public class ScheduleEndPoint extends EnvelopRestEndPoint {
     @ApiOperation("保存单条记录")
     public Envelop save(
             @ApiParam(name = "schedule", value = "排班")
-            @RequestBody String schedule){
-        Envelop envelop = new Envelop();
-        try {
-            Schedule newSchedule = objectMapper.readValue(schedule, Schedule.class);
-            Ambulance ambulance = ambulanceService.findById(newSchedule.getCarId());
-            if (ambulance == null) {
-                envelop.setSuccessFlg(false);
-                envelop.setErrorMsg("无相关车辆信息");
-                return envelop;
-            }
-            scheduleService.save(newSchedule);
-            envelop.setSuccessFlg(true);
-        }catch (Exception e) {
-            e.printStackTrace();
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg(e.getMessage());
+            @RequestBody String schedule) throws Exception {
+        Schedule newSchedule = objectMapper.readValue(schedule, Schedule.class);
+        Ambulance ambulance = ambulanceService.findById(newSchedule.getCarId());
+        if (ambulance == null) {
+            return failed("无相关车辆信息");
         }
-        return envelop;
+        scheduleService.save(newSchedule);
+        return success(true);
     }
 
     @RequestMapping(value = ServiceApi.Emergency.ScheduleUpdate, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("更新单条记录，历史记录不能更新")
     public Envelop update(
             @ApiParam(name = "schedule", value = "排班")
-            @RequestBody String schedule){
+            @RequestBody String schedule) throws Exception {
         Envelop envelop = new Envelop();
-        try {
-            Schedule newSchedule = objectMapper.readValue(schedule, Schedule.class);
-            Schedule oldSchedule  = scheduleService.findById(newSchedule.getId());
-            if(oldSchedule == null) {
-                envelop.setSuccessFlg(false);
-                envelop.setErrorMsg("无相关排班信息");
-                return envelop;
-            }
-            if(new Date().getTime() > oldSchedule.getDate().getTime()) {
-                envelop.setSuccessFlg(false);
-                envelop.setErrorMsg("历史记录不能更新");
-                return envelop;
-            }
-            Ambulance ambulance = ambulanceService.findById(newSchedule.getCarId());
-            if(ambulance == null) {
-                envelop.setSuccessFlg(false);
-                envelop.setErrorMsg("无相关车辆信息");
-            }else if(ambulance.getStatus() == Ambulance.Status.wait || ambulance.getStatus() == Ambulance.Status.down) {
-                scheduleService.save(newSchedule);
-                envelop.setSuccessFlg(true);
-            }else {
-                envelop.setSuccessFlg(false);
-                envelop.setErrorMsg("相关车辆处于执勤状态");
-            }
-        }catch (Exception e) {
-            e.printStackTrace();
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg(e.getMessage());
+        Schedule newSchedule = objectMapper.readValue(schedule, Schedule.class);
+        Schedule oldSchedule  = scheduleService.findById(newSchedule.getId());
+        if (oldSchedule == null) {
+            return failed("无相关排班信息");
         }
-        return envelop;
+        if (new Date().getTime() > oldSchedule.getDate().getTime()) {
+            return failed("历史记录不能更新");
+        }
+        Ambulance ambulance = ambulanceService.findById(newSchedule.getCarId());
+        if (ambulance == null) {
+            return failed("无相关车辆信息");
+        } else if(ambulance.getStatus() == Ambulance.Status.wait || ambulance.getStatus() == Ambulance.Status.down) {
+            scheduleService.save(newSchedule);
+            return success(true);
+        } else {
+            return failed("相关车辆处于执勤状态");
+        }
     }
 
     @RequestMapping(value = ServiceApi.Emergency.ScheduleBathUpdate, method = RequestMethod.PUT)
@@ -274,20 +233,15 @@ public class ScheduleEndPoint extends EnvelopRestEndPoint {
     public Envelop bathUpdate(
             @ApiParam(name = "schedules", value = "排班")
             @RequestParam(value = "schedules") String schedules) throws IOException{
-        Envelop envelop = new Envelop();
         List<Map<String, Object>> scheduleList = objectMapper.readValue(schedules, List.class);
-        for(Map<String, Object> newSchedule : scheduleList) {
+        for (Map<String, Object> newSchedule : scheduleList) {
             Schedule old = scheduleService.findById((int)newSchedule.get("id"));
             Ambulance ambulance = ambulanceService.findById(old.getCarId());
-            if(ambulance.getStatus() != Ambulance.Status.wait && ambulance.getStatus() != Ambulance.Status.down) {
-                envelop.setSuccessFlg(false);
-                envelop.setErrorMsg("相关车辆正在执勤，不允许更新");
-                return envelop;
+            if (ambulance.getStatus() != Ambulance.Status.wait && ambulance.getStatus() != Ambulance.Status.down) {
+                return failed("相关车辆正在执勤，不允许更新");
             }
-            if((new Date().getTime() - old.getDate().getTime()) > 0 ) {
-                envelop.setSuccessFlg(false);
-                envelop.setErrorMsg("历史记录不能更新");
-                return envelop;
+            if ((new Date().getTime() - old.getDate().getTime()) > 0 ) {
+                return failed("历史记录不能更新");
             }
             old.setDutyName(newSchedule.get("dutyName") == null? "": newSchedule.get("dutyName").toString());
             old.setGender(newSchedule.get("gender") == null? "": newSchedule.get("gender").toString());
@@ -295,14 +249,13 @@ public class ScheduleEndPoint extends EnvelopRestEndPoint {
             old.setDutyPhone(newSchedule.get("dutyPhone") == null? "": newSchedule.get("dutyPhone").toString());
             scheduleService.save(old);
         }
-        envelop.setSuccessFlg(true);
-        return envelop;
+        return success(true);
     }
 
     @RequestMapping(value = ServiceApi.Emergency.ScheduleBatch, method = RequestMethod.POST)
     @ApiOperation("批量导入排班信息")
     public boolean createSchedulesBatch(
-            @ApiParam(name = "schedules", value = "排班信息", defaultValue = "")
+            @ApiParam(name = "schedules", value = "排班信息")
             @RequestParam(value = "schedules") String schedules) throws Exception{
         List models = objectMapper.readValue(schedules, new TypeReference<List>() {});
         scheduleService.addSchedulesBatch(models);

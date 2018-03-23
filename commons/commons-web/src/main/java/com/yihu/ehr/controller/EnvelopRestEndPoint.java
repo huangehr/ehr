@@ -59,10 +59,19 @@ public class EnvelopRestEndPoint extends BaseRestEndPoint {
     }
 
     protected Envelop failed(String errMsg, int errorCode){
+        return failed(errMsg, errorCode, null);
+    }
+
+    protected Envelop failed(String errMsg, Object object){
+        return failed(errMsg, ErrorCode.REQUEST_NOT_COMPLETED.value(), object);
+    }
+
+    protected Envelop failed(String errMsg, int errorCode, Object object){
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
         envelop.setErrorMsg(errMsg);
         envelop.setErrorCode(errorCode);
+        envelop.setObj(object);
         return envelop;
     }
 

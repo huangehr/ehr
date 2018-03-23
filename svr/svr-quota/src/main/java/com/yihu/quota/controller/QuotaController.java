@@ -153,7 +153,11 @@ public class QuotaController extends BaseController {
                     //除法指标查询输出结果
                     molecularFilter = baseStatistsService.handleFilter(esConfig.getMolecularFilter(), molecularFilter);
                     denominatorFilter = baseStatistsService.handleFilter(esConfig.getDenominatorFilter(), denominatorFilter);
-                    resultList =  baseStatistsService.divisionQuota(esConfig.getMolecular(), esConfig.getDenominator(), dimension, molecularFilter, denominatorFilter, esConfig.getPercentOperation(), esConfig.getPercentOperationValue(),dateType);
+                    if (StringUtils.isNotEmpty(esConfig.getConstValue())) {
+                        resultList = baseStatistsService.divisionQuotaDenoConstant(esConfig.getMolecular(), dimension, filters, esConfig.getPercentOperation(), esConfig.getPercentOperationValue(), dateType, esConfig.getConstValue(), esConfig.getDistrict());
+                    } else {
+                        resultList =  baseStatistsService.divisionQuota(esConfig.getMolecular(), esConfig.getDenominator(), dimension, molecularFilter, denominatorFilter, esConfig.getPercentOperation(), esConfig.getPercentOperationValue(),dateType);
+                    }
                 }else {
                     if(StringUtils.isNotEmpty(esConfig.getSuperiorBaseQuotaCode())){
                         //通过基础指标 抽取查询

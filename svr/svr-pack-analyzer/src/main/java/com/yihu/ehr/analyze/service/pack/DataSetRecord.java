@@ -1,7 +1,5 @@
 package com.yihu.ehr.analyze.service.pack;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 import java.util.Date;
 import java.util.Map;
 import java.util.Set;
@@ -86,7 +84,6 @@ public class DataSetRecord {
         this.version = version;
     }
 
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getEventTime() {
         return eventTime;
     }
@@ -95,7 +92,6 @@ public class DataSetRecord {
         this.eventTime = eventTime;
     }
 
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getCreateTime() {
         return createTime;
     }

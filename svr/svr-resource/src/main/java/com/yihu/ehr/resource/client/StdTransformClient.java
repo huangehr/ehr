@@ -12,7 +12,7 @@ import springfox.documentation.annotations.ApiIgnore;
  * Created by progr1mmer on 2018/1/24.
  */
 @ApiIgnore
-@FeignClient(name = "hos-admin")
+@FeignClient(name = MicroServices.StdRedis)
 @RequestMapping(value = ApiVersion.Version1_0)
 public interface StdTransformClient {
 
