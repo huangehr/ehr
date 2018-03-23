@@ -1,8 +1,10 @@
 package com.yihu.ehr.analyze.service.qc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.analyze.feign.HosAdminServiceClient;
 import com.yihu.ehr.analyze.feign.RedisServiceClient;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
+import com.yihu.ehr.util.datetime.DateUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,6 +30,8 @@ public class QcRuleCheckService {
     @Autowired
     private RedisServiceClient redisServiceClient;
     @Autowired
+    private HosAdminServiceClient hosAdminServiceClient;
+    @Autowired
     private ElasticSearchUtil elasticSearchUtil;
 
     /**
@@ -39,7 +44,7 @@ public class QcRuleCheckService {
             DataElementValue value = parse(data);
             logger.info("code:" + value.getCode() + ",value:" + value.getValue());
 
-            Boolean isNullable = redisServiceClient.isMetaDataNullable(value.getVersion(), value.getTable(), value.getCode());
+            Boolean isNullable = hosAdminServiceClient.isMetaDataNullable(value.getVersion(), value.getTable(), value.getCode());
             if (!isNullable && StringUtils.isEmpty(value.getValue())) {
                 saveCheckResult(value, "E00001", "不能为空");
             }
@@ -59,7 +64,7 @@ public class QcRuleCheckService {
     public void typeCheck(String data) {
         try {
             DataElementValue value = parse(data);
-            String type = redisServiceClient.getMetaDataType(value.getVersion(), value.getTable(), value.getCode());
+            String type = hosAdminServiceClient.getMetaDataType(value.getVersion(), value.getTable(), value.getCode());
             switch (type) {
                 case "L":
                     break;
@@ -99,13 +104,13 @@ public class QcRuleCheckService {
         try {
             DataElementValue value = parse(data);
             logger.info("code:" + value.getCode() + ",value:" + value.getValue());
-            String dict = redisServiceClient.getMetaDataDict(value.getVersion(), value.getTable(), value.getCode());
+            String dict = hosAdminServiceClient.getMetaDataDict(value.getVersion(), value.getTable(), value.getCode());
             if (StringUtils.isEmpty(dict) || dict.equals("0")) {
                 return;
             }
 
             logger.info("code:" + value.getCode() + ",value:" + value.getValue() + ",dict:" + dict);
-            Boolean isExist = redisServiceClient.isDictCodeExist(value.getVersion(), dict, value.getCode());
+            Boolean isExist = hosAdminServiceClient.isDictCodeExist(value.getVersion(), dict, value.getCode());
             if (!isExist) {
                 saveCheckResult(value, "E00002", "超出值域范围");
             }
@@ -126,8 +131,10 @@ public class QcRuleCheckService {
             map.put("orgCode", value.getOrgCode());
             map.put("patientId", value.getPatientId());
             map.put("eventNo", value.getEventNo());
-            map.put("eventTime", value.getEventTime());
-            map.put("receiveTime", value.getReceiveTime());
+            Date eventTime = DateUtil.strToDate(value.getEventTime());
+            map.put("eventTime", eventTime);
+            Date receiveTime = DateUtil.strToDate(value.getReceiveTime());
+            map.put("receiveTime", receiveTime);
             map.put("errorCode", errorCode);
             map.put("errorMsg", errorMsg);
 

@@ -20,6 +20,9 @@ public class PortalFeedback {
     private String replyContent;
     private String replyUserId;
     private Date replyDate;
+    private String feedBackType;//消息反馈类型(功能异常、功能优化、新功能建议、其他)
+    private String tel;// 联系方式
+    private String pigPath;//上传图片(多张图片地址，用逗号隔开)
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -114,6 +117,36 @@ public class PortalFeedback {
         this.replyDate = replyDate;
     }
 
+    @Basic
+    @Column(name = "feedbacktype", nullable = true, insertable = true, updatable = true)
+    public String getFeedBackType() {
+        return feedBackType;
+    }
+
+    public void setFeedBackType(String feedBackType) {
+        this.feedBackType = feedBackType;
+    }
+
+    @Basic
+    @Column(name = "tel", nullable = true, insertable = true, updatable = true)
+    public String getTel() {
+        return tel;
+    }
+
+    public void setTel(String tel) {
+        this.tel = tel;
+    }
+
+    @Basic
+    @Column(name = "pigpath", nullable = true, insertable = true, updatable = true)
+    public String getPigPath() {
+        return pigPath;
+    }
+
+    public void setPigPath(String pigPath) {
+        this.pigPath = pigPath;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -130,6 +163,10 @@ public class PortalFeedback {
         if (replyContent != null ? !replyContent.equals(that.replyContent) : that.replyContent != null) return false;
         if (replyUserId != null ? !replyUserId.equals(that.replyUserId) : that.replyUserId != null) return false;
         if (replyDate != null ? !replyDate.equals(that.replyDate) : that.replyDate != null) return false;
+
+        if (feedBackType != null ? !feedBackType.equals(that.feedBackType) : that.feedBackType != null) return false;
+        if (tel != null ? !tel.equals(that.tel) : that.tel != null) return false;
+        if (pigPath != null ? !pigPath.equals(that.pigPath) : that.pigPath != null) return false;
 
         return true;
     }

@@ -37,8 +37,7 @@ public class ElasticSearchEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "type") String type,
             @ApiParam(name = "source", value = "Json串值", required = true)
             @RequestParam(value = "source") String source) throws Exception {
-        String mapper = source.replaceAll("\\[","{").replaceAll("\\]","}");
-        Map<String, Map<String, String>> Mapping = objectMapper.readValue(mapper, Map.class);
+        Map<String, Map<String, String>> Mapping = objectMapper.readValue(source, Map.class);
         elasticSearchService.mapping(index, type, Mapping);
         return success(true);
     }
