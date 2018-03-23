@@ -1,6 +1,5 @@
 package com.yihu.ehr.agModel.org;
 
-import java.util.Date;
 
 /**
  * 用于Grid显示

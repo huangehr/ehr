@@ -1,8 +1,5 @@
 package com.yihu.ehr.agModel.tj;
 
-
-import java.util.Date;
-
 /**
  * @author janseny
  * @version 1.0

@@ -1,5 +1,7 @@
 package com.yihu.ehr.agModel.specialdict;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -53,6 +55,7 @@ public class HpIcd10RelationModel implements Serializable{
         this.createUser = createUser;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getCreateDate() {
         return createDate;
     }

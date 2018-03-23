@@ -1,6 +1,5 @@
 package com.yihu.ehr.agModel.report;
 
-import java.util.Date;
 import java.util.List;
 
 /**
