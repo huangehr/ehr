@@ -2,6 +2,7 @@ package com.yihu.quota.etl.extract.mysql;
 
 import com.yihu.ehr.query.services.SolrQuery;
 import com.yihu.ehr.solr.SolrUtil;
+import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.quota.etl.Contant;
 import com.yihu.quota.etl.extract.ExtractUtil;
 import com.yihu.quota.etl.model.EsConfig;
@@ -17,10 +18,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by janseny on 2017/7/10.
@@ -58,6 +56,7 @@ public class MysqlExtract {
         this.timeLevel = timeLevel;
         this.quotaVo = quotaVo;
         this.esConfig = esConfig;
+        initParams(this.startTime ,this.endTime);
 
         List<SaveModel> returnList = new ArrayList<>();
         //获取mysql
@@ -97,6 +96,13 @@ public class MysqlExtract {
 
     }
 
+    public void initParams(String startTime, String endTime) {
+        // 初始执行指标，起止日期没有值
+        this.startTime = startTime == null ? null : startTime.substring(0,10);
+        String now = DateUtil.formatDate(new Date(),DateUtil.DEFAULT_DATE_YMD_FORMAT);
+        this.endTime = endTime == null ? now : endTime.substring(0,10);;
+    }
+
     /**
      * @param tjQuotaDimensionMains
      * @param tjQuotaDimensionSlaves
@@ -128,15 +134,19 @@ public class MysqlExtract {
                 whereSql.append(" and " + timeKey + " >= '" + startTime + "'");
                 whereSql.append( " and " + timeKey + " < '" + endTime + "'");
             }
+            if ( !StringUtils.isEmpty(esConfig.getFullQuery() ) && esConfig.getFullQuery().equals("true")) {
+                whereSql.append( " and " + timeKey + " < '" + endTime + "'");
+            }
+
             selectGroupField += " DATE_FORMAT(" + timeKey + ",'%Y-%m-%d') as quotaDate ,";
-            whereGroupField += "quotaDate";
+            whereGroupField += timeKey;
         }else{
             whereGroupField = allField.substring(0,allField.length() - 1);
         }
         //拼接整个sql 语法
         StringBuffer sql = new StringBuffer();
         if(StringUtils.isEmpty(esConfig.getAggregation())){
-                sql.append("select " + selectGroupField + " count(*) result from " + tableName + whereSql + " group by " + whereGroupField);
+            sql.append("select " + selectGroupField + " count(*) result from " + tableName + whereSql + " group by " + whereGroupField);
         }else if(esConfig.getAggregation().equals(Contant.quota.aggregation_sum)){
             if(StringUtils.isEmpty(selectGroupField)|| selectGroupField.length()==0){
                 sql.append("select sum(" ).append(esConfig.getAggregationKey()).append(" ) result  from " + tableName + whereSql);
