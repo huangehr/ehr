@@ -25,14 +25,15 @@ public class EsConfig {
     private String especialType; //特殊类型  orgHealthCategory：卫生机构类型
     private String superiorBaseQuotaCode;  // 上级基础指标code
 
+    private String fullQuery;  //全量查询
     private String constValue;  // 分母为常量的类型 1总人口数 2……
     private String district;    // 所属区域  根据区域获取该区域下的总人口数
-
 
     //已停止使用
     private String thousandFlag; //每千，每万 1000,10000
     private String thousandDmolecular; //每千，每万 统计分子
     private String thousandDenominator; //每千，每万 统计分母
+
 
 
     public String getSuperiorBaseQuotaCode() {
@@ -218,5 +219,13 @@ public class EsConfig {
 
     public void setDistrict(String district) {
         this.district = district;
+    }
+
+    public String getFullQuery() {
+        return fullQuery;
+    }
+
+    public void setFullQuery(String fullQuery) {
+        this.fullQuery = fullQuery;
     }
 }

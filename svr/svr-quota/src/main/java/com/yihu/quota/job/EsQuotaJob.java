@@ -49,7 +49,7 @@ public class EsQuotaJob implements Job {
     private String endTime; // 结束时间
     private String startTime; //开始时间
     private String timeLevel; //时间
-    private String executeFlag; // 执行动作
+    private String executeFlag; // 执行动作 1 手动执行 2 周期执行
 
     @Autowired
     private TjQuotaLogDao tjQuotaLogDao;
