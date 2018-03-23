@@ -147,8 +147,8 @@ public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.MessageTemplate.MyMessage, method = RequestMethod.GET)
     @ApiOperation(value = "获取我的消息对象", notes = "获取我的消息对象")
-    public MMyMessage MyMessage(
-            @ApiParam(name = "messageId", value = "模板id", defaultValue = "")
+    public MMyMessage myMessage(
+            @ApiParam(name = "messageId", value = "消息id", defaultValue = "")
             @PathVariable(value = "messageId") Long messageId) throws IOException {
         ProtalMessageRemind protalMessageRemind = messageRemindService.getMessageRemind(messageId);
         if (protalMessageRemind.getMessageTemplateId() == null) {
