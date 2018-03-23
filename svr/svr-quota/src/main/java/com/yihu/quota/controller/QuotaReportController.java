@@ -43,7 +43,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(description = "Ö¸±ê±¨±íÍ³¼Æ -Ö¸±ê±¨±íÍ³¼Æ¿ØÖÆÈë¿Ú")
+@Api(description = "æŒ‡æ ‡æŠ¥è¡¨ç»Ÿè®¡ -æŒ‡æ ‡æŠ¥è¡¨ç»Ÿè®¡æ§åˆ¶å…¥å£")
 public class QuotaReportController extends BaseController {
 
     @Autowired
@@ -68,19 +68,19 @@ public class QuotaReportController extends BaseController {
     public static String orgHealthCategoryCode = "orgHealthCategoryCode";
 
     /**
-     * »ñÈ¡Ö¸±êÍ³¼Æ½á¹û
+     * è·å–æŒ‡æ ‡ç»Ÿè®¡ç»“æœ
      *
      * @param id
      * @return
      */
-    @ApiOperation(value = "»ñÈ¡Ö¸±êÍ³¼Æ½á¹û")
+    @ApiOperation(value = "è·å–æŒ‡æ ‡ç»Ÿè®¡ç»“æœ")
     @RequestMapping(value = ServiceApi.TJ.GetQuotaReport, method = RequestMethod.GET)
     public Envelop getQuotaReport(
-            @ApiParam(name = "id", value = "Ö¸±êÈÎÎñID", required = true)
+            @ApiParam(name = "id", value = "æŒ‡æ ‡ä»»åŠ¡ID", required = true)
             @RequestParam(value = "id", required = true) int id,
-            @ApiParam(name = "filters", value = "¼ìË÷Ìõ¼ş", defaultValue = "")
+            @ApiParam(name = "filters", value = "æ£€ç´¢æ¡ä»¶", defaultValue = "")
             @RequestParam(value = "filters", required = false) String filters,
-            @ApiParam(name = "dimension", value = "Î¬¶È×Ö¶Î", defaultValue = "quotaDate")
+            @ApiParam(name = "dimension", value = "ç»´åº¦å­—æ®µ", defaultValue = "quotaDate")
             @RequestParam(value = "dimension", required = false) String dimension
     ) {
         Envelop envelop = new Envelop();
@@ -90,20 +90,20 @@ public class QuotaReportController extends BaseController {
             return envelop;
         } catch (Exception e) {
             error(e);
-            invalidUserException(e, -1, "²éÑ¯Ê§°Ü:" + e.getMessage());
+            invalidUserException(e, -1, "æŸ¥è¯¢å¤±è´¥:" + e.getMessage());
         }
         envelop.setSuccessFlg(false);
         return envelop;
     }
 
-    @ApiOperation(value = "»ñÈ¡Í³¼Æ±¨±íÒ»¸öÊÓÍ¼ÏÂ¶à¸öÖ¸±ê×éºÏ  ¶şÎ¬±íÊı¾İ")
+    @ApiOperation(value = "è·å–ç»Ÿè®¡æŠ¥è¡¨ä¸€ä¸ªè§†å›¾ä¸‹å¤šä¸ªæŒ‡æ ‡ç»„åˆ  äºŒç»´è¡¨æ•°æ®")
     @RequestMapping(value = ServiceApi.TJ.GetQuotaReportTwoDimensionalTable, method = RequestMethod.GET)
     public List<Map<String, Object>> getQuotaReportTwoDimensionalTable(
-            @ApiParam(name = "quotaCodeStr", value = "Ö¸±êCode,¶à¸öÓÃ,Æ´½Ó", required = true)
+            @ApiParam(name = "quotaCodeStr", value = "æŒ‡æ ‡Code,å¤šä¸ªç”¨,æ‹¼æ¥", required = true)
             @RequestParam(value = "quotaCodeStr", required = true) String quotaCodeStr,
-            @ApiParam(name = "filter", value = "¹ıÂË", defaultValue = "")
+            @ApiParam(name = "filter", value = "è¿‡æ»¤", defaultValue = "")
             @RequestParam(value = "filter", required = false) String filter,
-            @ApiParam(name = "dimension", value = "Î¬¶È×Ö¶Î", defaultValue = "quotaDate")
+            @ApiParam(name = "dimension", value = "ç»´åº¦å­—æ®µ", defaultValue = "quotaDate")
             @RequestParam(value = "dimension", required = false) String dimension
     ) {
         NumberFormat nf = NumberFormat.getInstance();
@@ -128,7 +128,7 @@ public class QuotaReportController extends BaseController {
                     otherQuotaViewResult.put(key, quotaViewResult.get(key));
                 }
             }
-            //ÒÔ²éÑ¯½á¹ûÊı¾İ×î¶àµÄÖ¸±êÎªÖ÷£¬ÆäËûÖ¸±ê¶ÔÓ¦Î¬¶ÈÃ»ÓĞÊı¾İµÄ²¹³ä0
+            //ä»¥æŸ¥è¯¢ç»“æœæ•°æ®æœ€å¤šçš„æŒ‡æ ‡ä¸ºä¸»ï¼Œå…¶ä»–æŒ‡æ ‡å¯¹åº”ç»´åº¦æ²¡æœ‰æ•°æ®çš„è¡¥å……0
             for (Map<String, Object> vMap : quotaViewResult.get(maxQuotaCode)) {
                 vMap.put(maxQuotaCode, vMap.get("result")==null ? 0 : nf.format(Double.valueOf(vMap.get("result").toString())));
                 for (String viewQuotaCode : otherQuotaViewResult.keySet()) {
@@ -148,7 +148,7 @@ public class QuotaReportController extends BaseController {
             }
             List<Map<String, Object>> resultList = quotaViewResult.get(maxQuotaCode);
 
-            if(dimension.equals(orgHealthCategoryCode)){//Èç¹ûÊÇÌØÊâ»ú¹¹ÀàĞÍÊ÷×´»ú¹¹ĞèÒª×ª³ÉÊ÷×´½á¹¹
+            if(dimension.equals(orgHealthCategoryCode)){//å¦‚æœæ˜¯ç‰¹æ®Šæœºæ„ç±»å‹æ ‘çŠ¶æœºæ„éœ€è¦è½¬æˆæ ‘çŠ¶ç»“æ„
                 List<Map<String, Object>> orgHealthCategoryList = orgHealthCategoryStatisticsService.getOrgHealthCategoryTreeByPid(-1);
                 dataList = baseStatistsService.setResult(maxQuotaCode, orgHealthCategoryList, resultList, null);
             }else {
@@ -157,10 +157,10 @@ public class QuotaReportController extends BaseController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        //¼ÆËãºÏ¼Æ
+        //è®¡ç®—åˆè®¡
         if(dataList != null && dataList.size() > 0){
             Map<String, Object> sumMap = new HashMap<>();
-            sumMap.put("firstColumn","ºÏ¼Æ");
+            sumMap.put("firstColumn","åˆè®¡");
             for (String code : quotaCodes) {
                 double sum = 0;
                 sum = calculateSum(sum,code,dataList);
@@ -168,13 +168,13 @@ public class QuotaReportController extends BaseController {
             }
             dataList.add(0,sumMap);
         }
-        //¶ş´ÎÖ¸±êÎª³ı·¨ÔËËãµÄ  ºÏ¼ÆĞèÒªÖØĞÂ¼ÆËã
+        //äºŒæ¬¡æŒ‡æ ‡ä¸ºé™¤æ³•è¿ç®—çš„  åˆè®¡éœ€è¦é‡æ–°è®¡ç®—
         //TODO
         return dataList;
     }
 
     /**
-     * Í³¼ÆÃ¿ÁĞºÏ¼Æ
+     * ç»Ÿè®¡æ¯åˆ—åˆè®¡
      * @param sum
      * @param code
      * @param dataList
@@ -190,18 +190,18 @@ public class QuotaReportController extends BaseController {
         return sum;
     }
 
-    @ApiOperation(value = "»ñÈ¡Ö¸±êÍ³¼Æ½á¹ûechartÍ¼±í£¬Ö§³Ö¶àÌõ×éºÏ")
+    @ApiOperation(value = "è·å–æŒ‡æ ‡ç»Ÿè®¡ç»“æœechartå›¾è¡¨ï¼Œæ”¯æŒå¤šæ¡ç»„åˆ")
     @RequestMapping(value = ServiceApi.TJ.GetMoreQuotaGraphicReportPreviews, method = RequestMethod.GET)
     public MChartInfoModel getQuotaGraphicReports(
-            @ApiParam(name = "quotaIdStr", value = "Ö¸±êID,¶à¸öÓÃ,Æ´½Ó", required = true)
+            @ApiParam(name = "quotaIdStr", value = "æŒ‡æ ‡ID,å¤šä¸ªç”¨,æ‹¼æ¥", required = true)
             @RequestParam(value = "quotaIdStr" , required = true) String quotaIdStr,
-            @ApiParam(name = "charstr", value = "¶àÍ¼±íÀàĞÍÓÃ,Æ´½Ó,»ìºÏÀàĞÍÖ»Ö§³ÖÖù×´ºÍÏßĞÔ", defaultValue = "1")
+            @ApiParam(name = "charstr", value = "å¤šå›¾è¡¨ç±»å‹ç”¨,æ‹¼æ¥,æ··åˆç±»å‹åªæ”¯æŒæŸ±çŠ¶å’Œçº¿æ€§", defaultValue = "1")
             @RequestParam(value = "charstr", required = true) String charstr,
-            @ApiParam(name = "filter", value = "¹ıÂË", defaultValue = "")
+            @ApiParam(name = "filter", value = "è¿‡æ»¤", defaultValue = "")
             @RequestParam(value = "filter", required = false) String filter,
-            @ApiParam(name = "dimension", value = "Î¬¶È×Ö¶Î", defaultValue = "quotaDate")
+            @ApiParam(name = "dimension", value = "ç»´åº¦å­—æ®µ", defaultValue = "quotaDate")
             @RequestParam(value = "dimension", required = false) String dimension,
-            @ApiParam(name = "title", value = "ÊÓÍ¼Ãû³Æ", defaultValue = "")
+            @ApiParam(name = "title", value = "è§†å›¾åç§°", defaultValue = "")
             @RequestParam(value = "title", required = false) String title
     ) {
         List<String> quotaIds = Arrays.asList(quotaIdStr.split(","));
@@ -229,8 +229,8 @@ public class QuotaReportController extends BaseController {
                         for (Map<String, Object> map : resultListMap) {
                             if (map != null && map.size() > 0) {
                                 listMap.add(map);
-                                //µÚÒ»ÖÖ ES¿âÖĞÓĞ¶¨ÒåµÄÎ¬¶È Èçorg,slaveKey1
-                                //µÚ¶şÖÖ ES¿âÖĞÎ´¶¨ÒåµÄÎ¬¶È Èçlevel£¬economic
+                                //ç¬¬ä¸€ç§ ESåº“ä¸­æœ‰å®šä¹‰çš„ç»´åº¦ å¦‚org,slaveKey1
+                                //ç¬¬äºŒç§ ESåº“ä¸­æœªå®šä¹‰çš„ç»´åº¦ å¦‚levelï¼Œeconomic
                                 if (map.containsKey(dimensionName)) {
                                     dataMap.put(map.get(dimensionName).toString(), map.get("result"));
                                     xAxisMap.put(map.get(dimensionName).toString(), map.get(dimension).toString());
@@ -300,14 +300,14 @@ public class QuotaReportController extends BaseController {
                         if(resultMap.get(dimensionName) != null){
                             map.put("NAME",resultMap.get(dimensionName));
                         }else {
-                            //·Ç Ö¸±êÖĞÅäÖÃµÄÎ¬¶È ¹ØÁª³öÀ´µÄ×Ö¶Î
+                            //é æŒ‡æ ‡ä¸­é…ç½®çš„ç»´åº¦ å…³è”å‡ºæ¥çš„å­—æ®µ
                             if(dimensionName.equals("levelName")){
                                 if(resultMap.get(dimension).equals("1")){
-                                    map.put("NAME","Ò»¼¶Ò½Ôº");
+                                    map.put("NAME","ä¸€çº§åŒ»é™¢");
                                 }else  if(resultMap.get(dimension).equals("2")){
-                                    map.put("NAME","¶ş¼¶Ò½Ôº");
+                                    map.put("NAME","äºŒçº§åŒ»é™¢");
                                 }else  if(resultMap.get(dimension).equals("3")){
-                                    map.put("NAME","Èı¼¶Ò½Ôº");
+                                    map.put("NAME","ä¸‰çº§åŒ»é™¢");
                                 }
                             }
                         }
@@ -323,24 +323,24 @@ public class QuotaReportController extends BaseController {
             return chartInfoModel;
         } catch (Exception e) {
             error(e);
-            invalidUserException(e, -1, "²éÑ¯Ê§°Ü:" + e.getMessage());
+            invalidUserException(e, -1, "æŸ¥è¯¢å¤±è´¥:" + e.getMessage());
             return null;
         }
     }
 
 
-//    @ApiOperation(value = "»ñÈ¡Ö¸±êÍ³¼Æ½á¹ûechartÍ¼±í£¬Ö§³Ö¶àÌõ×éºÏ")
+//    @ApiOperation(value = "è·å–æŒ‡æ ‡ç»Ÿè®¡ç»“æœechartå›¾è¡¨ï¼Œæ”¯æŒå¤šæ¡ç»„åˆ")
 //    @RequestMapping(value = ServiceApi.TJ.GetMoreQuotaGraphicReportPreviews, method = RequestMethod.GET)
 //    public MChartInfoModel getQuotaGraphicReports(
-//            @ApiParam(name = "quotaIdStr", value = "Ö¸±êID,¶à¸öÓÃ,Æ´½Ó", required = true)
+//            @ApiParam(name = "quotaIdStr", value = "æŒ‡æ ‡ID,å¤šä¸ªç”¨,æ‹¼æ¥", required = true)
 //            @RequestParam(value = "quotaIdStr" , required = true) String quotaIdStr,
-//            @ApiParam(name = "charstr", value = "¶àÍ¼±íÀàĞÍÓÃ,Æ´½Ó,»ìºÏÀàĞÍÖ»Ö§³ÖÖù×´ºÍÏßĞÔ", defaultValue = "1")
+//            @ApiParam(name = "charstr", value = "å¤šå›¾è¡¨ç±»å‹ç”¨,æ‹¼æ¥,æ··åˆç±»å‹åªæ”¯æŒæŸ±çŠ¶å’Œçº¿æ€§", defaultValue = "1")
 //            @RequestParam(value = "charstr" , required = true) String charstr,
-//            @ApiParam(name = "filter", value = "¹ıÂË", defaultValue = "")
+//            @ApiParam(name = "filter", value = "è¿‡æ»¤", defaultValue = "")
 //            @RequestParam(value = "filter", required = false) String filter,
-//            @ApiParam(name = "dimension", value = "Î¬¶È×Ö¶Î", defaultValue = "quotaDate")
+//            @ApiParam(name = "dimension", value = "ç»´åº¦å­—æ®µ", defaultValue = "quotaDate")
 //            @RequestParam(value = "dimension", required = false) String dimension,
-//            @ApiParam(name = "title", value = "ÊÓÍ¼Ãû³Æ", defaultValue = "")
+//            @ApiParam(name = "title", value = "è§†å›¾åç§°", defaultValue = "")
 //            @RequestParam(value = "title", required = false) String title
 //    ) {
 //        List<String> quotaIds = Arrays.asList(quotaIdStr.split(","));
@@ -361,7 +361,7 @@ public class QuotaReportController extends BaseController {
 //                    if(StringUtils.isNotEmpty(dictSql)){
 //                        BasesicUtil baseUtil = new BasesicUtil();
 //                        if(dimension.contains("slaveKey")){
-//                            //²éÑ¯×ÖµäÊı¾İ
+//                            //æŸ¥è¯¢å­—å…¸æ•°æ®
 //                            List<DictModel> dictDatas = jdbcTemplate.query(dictSql, new BeanPropertyRowMapper(DictModel.class));
 //                            for (DictModel dictModel : dictDatas) {
 //                                String name = baseUtil.getFieldValueByName("name", dictModel);
@@ -382,12 +382,12 @@ public class QuotaReportController extends BaseController {
 //
 //                    Map<String, Object> groupDataMap = new HashMap<>();
 //                    if(tjQuota.getResultGetType().trim().equals("1")){
-//                        //Ê¹ÓÃ·Ö×é¼ÆËã ·µ»Ø½á¹ûÊµÀı£º groupDataMap -> "4205000000-¶ù-1": 200 =>group by Èı¸ö×Ö¶Î
+//                        //ä½¿ç”¨åˆ†ç»„è®¡ç®— è¿”å›ç»“æœå®ä¾‹ï¼š groupDataMap -> "4205000000-å„¿-1": 200 =>group by ä¸‰ä¸ªå­—æ®µ
 //                        Map<String, Integer> resultDataMap =  quotaService.searcherSumByGroupBySql(tjQuota, dimension, filter,"result","","");
 //                        for(String key: resultDataMap.keySet()){
 //                            groupDataMap.put(key,resultDataMap.get(key));
 //                        }
-//                    }else{//¶ş´ÎÍ³¼ÆÖ¸±ê»ñÈ¡ ½á¹û½Ó¿Ú
+//                    }else{//äºŒæ¬¡ç»Ÿè®¡æŒ‡æ ‡è·å– ç»“æœæ¥å£
 //                        List<Map<String, Object>> listMap = baseStatistsService.getSimpleQuotaReport(tjQuota.getCode(), filter, dimension);
 //                        if(listMap != null && listMap.size() > 0){
 //                            for(Map<String, Object> map : listMap){
@@ -456,20 +456,20 @@ public class QuotaReportController extends BaseController {
 //            return chartInfoModel;
 //        } catch (Exception e) {
 //            error(e);
-//            invalidUserException(e, -1, "²éÑ¯Ê§°Ü:" + e.getMessage());
+//            invalidUserException(e, -1, "æŸ¥è¯¢å¤±è´¥:" + e.getMessage());
 //            return null;
 //        }
 //    }
 
 
-    @ApiOperation(value = "Ö¸±êÍ³¼Æ·Ö×é²éÑ¯")
+    @ApiOperation(value = "æŒ‡æ ‡ç»Ÿè®¡åˆ†ç»„æŸ¥è¯¢")
     @RequestMapping(value = ServiceApi.TJ.GetQuotaGroupBy, method = RequestMethod.GET)
     public Envelop getQuotaGroupBy(
-            @ApiParam(name = "id", value = "Ö¸±êÈÎÎñID", required = true)
+            @ApiParam(name = "id", value = "æŒ‡æ ‡ä»»åŠ¡ID", required = true)
             @RequestParam(value = "id", required = true) int id,
-            @ApiParam(name = "filters", value = "¼ìË÷Ìõ¼ş", defaultValue = "")
+            @ApiParam(name = "filters", value = "æ£€ç´¢æ¡ä»¶", defaultValue = "")
             @RequestParam(value = "filters", required = false) String filters,
-            @ApiParam(name = "dimension", value = "Î¬¶È×Ö¶Î", defaultValue = "quotaDate")
+            @ApiParam(name = "dimension", value = "ç»´åº¦å­—æ®µ", defaultValue = "quotaDate")
             @RequestParam(value = "dimension", required = false) String dimension
     ) {
         Envelop envelop = new Envelop();
@@ -481,7 +481,7 @@ public class QuotaReportController extends BaseController {
             return envelop;
         } catch (Exception e) {
             error(e);
-            invalidUserException(e, -1, "²éÑ¯Ê§°Ü:" + e.getMessage());
+            invalidUserException(e, -1, "æŸ¥è¯¢å¤±è´¥:" + e.getMessage());
         }
         envelop.setSuccessFlg(false);
         return envelop;
@@ -490,7 +490,7 @@ public class QuotaReportController extends BaseController {
 
     private String getQuotaDimensionDictSql(String quotaCode, String dimension) {
         String dictSql = "";
-        //²éÑ¯Î¬¶È
+        //æŸ¥è¯¢ç»´åº¦
         List<TjQuotaDimensionMain> dimensionMains = tjDimensionMainService.findTjQuotaDimensionMainByQuotaCode(quotaCode);
         if (dimensionMains != null && dimensionMains.size() > 0) {
             for (TjQuotaDimensionMain main : dimensionMains) {
@@ -511,16 +511,16 @@ public class QuotaReportController extends BaseController {
         return dictSql;
     }
 
-    @ApiOperation(value = "»ñÈ¡Ö¸±êÍ³¼Æ½á¹ûechart radarÀ×´ïÍ¼±í")
+    @ApiOperation(value = "è·å–æŒ‡æ ‡ç»Ÿè®¡ç»“æœechart radaré›·è¾¾å›¾è¡¨")
     @RequestMapping(value = ServiceApi.TJ.GetQuotaRadarGraphicReportPreviews, method = RequestMethod.GET)
     public MChartInfoModel getQuotaRadarGraphicReports(
-            @ApiParam(name = "quotaIdStr", value = "Ö¸±êID,¶à¸öÓÃ,Æ´½Ó", required = true)
+            @ApiParam(name = "quotaIdStr", value = "æŒ‡æ ‡ID,å¤šä¸ªç”¨,æ‹¼æ¥", required = true)
             @RequestParam(value = "quotaIdStr", required = true) String quotaIdStr,
-            @ApiParam(name = "filter", value = "¹ıÂË", defaultValue = "")
+            @ApiParam(name = "filter", value = "è¿‡æ»¤", defaultValue = "")
             @RequestParam(value = "filter", required = false) String filter,
-            @ApiParam(name = "dimension", value = "Î¬¶È×Ö¶Î", defaultValue = "")
+            @ApiParam(name = "dimension", value = "ç»´åº¦å­—æ®µ", defaultValue = "")
             @RequestParam(value = "dimension", required = false) String dimension,
-            @ApiParam(name = "title", value = "Ãû³Æ", defaultValue = "")
+            @ApiParam(name = "title", value = "åç§°", defaultValue = "")
             @RequestParam(value = "title", required = false) String title) {
         List<String> quotaIds = Arrays.asList(quotaIdStr.split(","));
         MChartInfoModel chartInfoModel = new MChartInfoModel();
@@ -540,7 +540,7 @@ public class QuotaReportController extends BaseController {
                     String dictSql = getQuotaDimensionDictSql(tjQuota.getCode(), dimension);
                     Map<String, String> dimensionDicMap = new HashMap<>();
                     dimensionDicMap = setDimensionMap(dictSql, dimension, dimensionDicMap);
-                    //Ê¹ÓÃ·Ö×é¼ÆËã ·µ»Ø½á¹ûÊµÀı£º groupDataMap -> "4205000000-¶ù-1": 200 =>group by Èı¸ö×Ö¶Î
+                    //ä½¿ç”¨åˆ†ç»„è®¡ç®— è¿”å›ç»“æœå®ä¾‹ï¼š groupDataMap -> "4205000000-å„¿-1": 200 =>group by ä¸‰ä¸ªå­—æ®µ
                     Map<String, Integer> groupDataMap = quotaService.searcherSumByGroupBySql(tjQuota, dimension, filter, "result", "", "");
                     for (String key : groupDataMap.keySet()) {
                         key = key.toLowerCase();
@@ -558,8 +558,8 @@ public class QuotaReportController extends BaseController {
             }
             ReportOption reportOption = new ReportOption();
             Integer[] array = arrayNum.toArray(new Integer[arrayNum.size()]);
-            Arrays.sort(array); // ½øĞĞÉıĞòÅÅĞò
-            polorCount += array[arrayNum.size() - 1];   // À×´ïÍ¼¼«×ø±ê
+            Arrays.sort(array); // è¿›è¡Œå‡åºæ’åº
+            polorCount += array[arrayNum.size() - 1];   // é›·è¾¾å›¾æåæ ‡
             option = reportOption.getRadarEchartOption(title, listData, polorCount);
             chartInfoModel.setOption(option.toString());
             chartInfoModel.setTitle(title);
@@ -567,23 +567,23 @@ public class QuotaReportController extends BaseController {
             return chartInfoModel;
         } catch (Exception e) {
             error(e);
-            invalidUserException(e, -1, "²éÑ¯Ê§°Ü:" + e.getMessage());
+            invalidUserException(e, -1, "æŸ¥è¯¢å¤±è´¥:" + e.getMessage());
             return null;
         }
     }
 
-    @ApiOperation(value = "»ñÈ¡Ö¸±êÍ³¼Æ½á¹ûechart NestedPieÍ¼±í")
+    @ApiOperation(value = "è·å–æŒ‡æ ‡ç»Ÿè®¡ç»“æœechart NestedPieå›¾è¡¨")
     @RequestMapping(value = ServiceApi.TJ.GetQuotaNestedPieReportPreviews, method = RequestMethod.GET)
     public MChartInfoModel getQuotaNestedPieGraphicReports(
-            @ApiParam(name = "resourceId", value = "×ÊÔ´ID", defaultValue = "")
+            @ApiParam(name = "resourceId", value = "èµ„æºID", defaultValue = "")
             @RequestParam(value = "resourceId") String resourceId,
-            @ApiParam(name = "quotaIdStr", value = "Ö¸±êID,¶à¸öÓÃ,Æ´½Ó", required = true)
+            @ApiParam(name = "quotaIdStr", value = "æŒ‡æ ‡ID,å¤šä¸ªç”¨,æ‹¼æ¥", required = true)
             @RequestParam(value = "quotaIdStr", required = true) String quotaIdStr,
-            @ApiParam(name = "filter", value = "¹ıÂË", defaultValue = "")
+            @ApiParam(name = "filter", value = "è¿‡æ»¤", defaultValue = "")
             @RequestParam(value = "filter", required = false) String filter,
-            @ApiParam(name = "dimension", value = "Î¬¶È×Ö¶Î", defaultValue = "")
+            @ApiParam(name = "dimension", value = "ç»´åº¦å­—æ®µ", defaultValue = "")
             @RequestParam(value = "dimension", required = false) String dimension,
-            @ApiParam(name = "title", value = "Ãû³Æ", defaultValue = "")
+            @ApiParam(name = "title", value = "åç§°", defaultValue = "")
             @RequestParam(value = "title", required = false) String title) {
         List<String> quotaIds = Arrays.asList(quotaIdStr.split(","));
         Option option = null;
@@ -591,7 +591,7 @@ public class QuotaReportController extends BaseController {
         Map<String, String> xAxisMap = new HashMap<>();
         try {
             Integer quotaCount = resourceQuotaService.getQuotaCount(resourceId);
-            // »ñÈ¡×î¶¥²ãµÄ×ÊÔ´
+            // è·å–æœ€é¡¶å±‚çš„èµ„æº
             List<Integer> quotaId = new ArrayList<>();
             ChartDataModel chartDataModel = getChartDataModel(quotaId, quotaCount, resourceId, dimension, filter, xAxisMap);
             ReportOption reportOption = new ReportOption();
@@ -603,7 +603,7 @@ public class QuotaReportController extends BaseController {
             return chartInfoModel;
         } catch (Exception e) {
             error(e);
-            invalidUserException(e, -1, "²éÑ¯Ê§°Ü:" + e.getMessage());
+            invalidUserException(e, -1, "æŸ¥è¯¢å¤±è´¥:" + e.getMessage());
             return null;
         }
     }
@@ -626,7 +626,7 @@ public class QuotaReportController extends BaseController {
                     String dictSql = getQuotaDimensionDictSql(tjQuota.getCode(), dimension);
                     Map<String, String> dimensionDicMap = new HashMap<>();
                     dimensionDicMap = setDimensionMap(dictSql, dimension, dimensionDicMap);
-                    //Ê¹ÓÃ·Ö×é¼ÆËã ·µ»Ø½á¹ûÊµÀı£º groupDataMap -> "4205000000-¶ù-1": 200 =>group by Èı¸ö×Ö¶Î
+                    //ä½¿ç”¨åˆ†ç»„è®¡ç®— è¿”å›ç»“æœå®ä¾‹ï¼š groupDataMap -> "4205000000-å„¿-1": 200 =>group by ä¸‰ä¸ªå­—æ®µ
                     Map<String, Integer> groupDataMap = quotaService.searcherSumByGroupBySql(tjQuota, dimension, filter, "result", "", "");
                     for (String key : groupDataMap.keySet()) {
                         key = key.toLowerCase();
@@ -658,7 +658,7 @@ public class QuotaReportController extends BaseController {
         if (StringUtils.isNotEmpty(dictSql)) {
             BasesicUtil baseUtil = new BasesicUtil();
             if (dimension.contains("slaveKey")) {
-                //²éÑ¯×ÖµäÊı¾İ
+                //æŸ¥è¯¢å­—å…¸æ•°æ®
                 List<DictModel> dictDatas = jdbcTemplate.query(dictSql, new BeanPropertyRowMapper(DictModel.class));
                 for (DictModel dictModel : dictDatas) {
                     String name = baseUtil.getFieldValueByName("name", dictModel);
@@ -680,7 +680,7 @@ public class QuotaReportController extends BaseController {
     }
 
     @RequestMapping(value = ServiceApi.TJ.GetHeatMapByQuotaCode, method = RequestMethod.GET)
-    @ApiOperation(value = "ÈÈÁ¦Í¼")
+    @ApiOperation(value = "çƒ­åŠ›å›¾")
     public Envelop getHeatMap() throws Exception {
         Envelop envelop = new Envelop();
         List<Map<String,String>>  heatMapPoint = singleDiseaseService.getHeatMap();
@@ -692,7 +692,7 @@ public class QuotaReportController extends BaseController {
     }
 
     @RequestMapping(value = ServiceApi.TJ.GetNumberOfDiabetes, method = RequestMethod.GET)
-    @ApiOperation(value = "ÌÇÄò²¡»¼ÕßÊı")
+    @ApiOperation(value = "ç³–å°¿ç—…æ‚£è€…æ•°")
     public Envelop getNumberOfDiabetes() throws Exception {
         Envelop envelop = new Envelop();
         List<Map<String, Object>> numberOfDiabetes = singleDiseaseService.getNumberOfDiabetes();
@@ -702,11 +702,11 @@ public class QuotaReportController extends BaseController {
     }
 
     @RequestMapping(value = ServiceApi.TJ.GetPieData, method = RequestMethod.GET)
-    @ApiOperation(value = "»ñÈ¡±ıÍ¼Êı¾İ")
+    @ApiOperation(value = "è·å–é¥¼å›¾æ•°æ®")
     public Envelop getPieData(
-            @ApiParam(name = "type", value = "ÀàĞÍ")
+            @ApiParam(name = "type", value = "ç±»å‹")
             @RequestParam(value = "type") String type,
-            @ApiParam(name = "code", value = "×Öµä±àÂë")
+            @ApiParam(name = "code", value = "å­—å…¸ç¼–ç ")
             @RequestParam(value = "code") String code) throws Exception {
         Envelop envelop = new Envelop();
         Map<String, Object> pieDataInfo = singleDiseaseService.getPieDataInfo(type, code);
@@ -720,7 +720,7 @@ public class QuotaReportController extends BaseController {
     }
 
     @RequestMapping(value = ServiceApi.TJ.GetLineData, method = RequestMethod.GET)
-    @ApiOperation(value = "»ñÈ¡ÕÛÏßÍ¼Êı¾İ")
+    @ApiOperation(value = "è·å–æŠ˜çº¿å›¾æ•°æ®")
     public Envelop getLineData() throws Exception {
         Envelop envelop = new Envelop();
         Map<String, List<String>> map = singleDiseaseService.getLineDataInfo();
@@ -733,9 +733,9 @@ public class QuotaReportController extends BaseController {
     }
 
     @RequestMapping(value = ServiceApi.TJ.GetBarData, method = RequestMethod.GET)
-    @ApiOperation(value = "»ñÈ¡Öù×´Í¼Êı¾İ")
+    @ApiOperation(value = "è·å–æŸ±çŠ¶å›¾æ•°æ®")
     public Envelop getBarData(
-            @ApiParam(name = "type", value = "ÀàĞÍ 1²¢·¢Ö¢ 2ÓÃÒ©»¼ÕßÊı 3¿Õ¸¹ÑªÌÇÍ³¼Æ 4ÌÇÄÍÁ¿")
+            @ApiParam(name = "type", value = "ç±»å‹ 1å¹¶å‘ç—‡ 2ç”¨è¯æ‚£è€…æ•° 3ç©ºè…¹è¡€ç³–ç»Ÿè®¡ 4ç³–è€é‡")
             @RequestParam(value = "type") String type) throws Exception {
         Envelop envelop = new Envelop();
         Map<String, List<String>> map = null;
@@ -758,8 +758,8 @@ public class QuotaReportController extends BaseController {
 //            if (null != map && map.size() > 0) {
 //                List<Map<String, Object>> list = new ArrayList<>();
 //                Map<String, Object> myMap = new HashMap<>();
-//                myMap.put("ÄĞ", map.get("valueData1"));
-//                myMap.put("Å®", map.get("valueData2"));
+//                myMap.put("ç”·", map.get("valueData1"));
+//                myMap.put("å¥³", map.get("valueData2"));
 //                list.add(myMap);
 //                envelop.setDetailModelList(list);
 //                envelop.setObj(map.get("xData"));
