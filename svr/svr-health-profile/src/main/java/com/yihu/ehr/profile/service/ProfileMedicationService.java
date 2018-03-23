@@ -18,6 +18,8 @@ public class ProfileMedicationService {
     private ResourceClient resource; //资源服务
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private ProfileInfoBaseService profileInfoBaseService;
 
     public List medicationRecords(String demographicId, String hpCode, String date, String keyWord) throws Exception {
         List<Map<String, Object>> resultList = new ArrayList<>();
@@ -28,14 +30,14 @@ public class ProfileMedicationService {
             masterQ = "{\"q\":\"demographic_id:" + demographicId + "\"}";
         }
         masterQ = getQuery(date, masterQ);
-        Envelop masterEnvelop = resource.getMasterData(masterQ, null, null, null);
+        Envelop masterEnvelop = resource.getMasterData(masterQ, 1, 500, null);
         if (masterEnvelop.isSuccessFlg()) {
             List<Map<String, Object>> masterList = masterEnvelop.getDetailModelList();
             //循环获取结果集
             for (Map<String, Object> masterMap : masterList) {
                 String rowKey = (String) masterMap.get("rowkey");
                 String subQ = "{\"q\":\"profile_id:" + rowKey + " AND (rowkey:*HDSD00_83* OR rowkey:*HDSD00_84*)\"}";
-                Envelop subEnvelop = resource.getSubData(subQ, null, null, null);
+                Envelop subEnvelop = resource.getSubData(subQ, 1, 500, null);
                 if (subEnvelop.isSuccessFlg()) {
                     List<Map<String, Object>> subList = subEnvelop.getDetailModelList();
                     if (subList.size() > 0) {
@@ -91,14 +93,14 @@ public class ProfileMedicationService {
             masterQ = "{\"q\":\"demographic_id:" + demographicId + "\"}";
         }
         Map<String, Integer> dataMap = new HashMap<>();
-        Envelop masterEnvelop = resource.getMasterData(masterQ, null, null, null);
+        Envelop masterEnvelop = resource.getMasterData(masterQ, 1, 500, null);
         if (masterEnvelop.isSuccessFlg()) {
             List<Map<String, Object>> masterList = masterEnvelop.getDetailModelList();
             //循环获取结果集
             for (Map<String, Object> masterMap : masterList) {
                 String rowKey = (String) masterMap.get("rowkey");
                 String subQ = "{\"q\":\"profile_id:" + rowKey + " AND (rowkey:*HDSD00_83* OR rowkey:*HDSD00_84*)\"}";
-                Envelop subEnvelop = resource.getSubData(subQ, null, null, null);
+                Envelop subEnvelop = resource.getSubData(subQ, 1, 500, null);
                 if (subEnvelop.isSuccessFlg()) {
                     List<Map<String, Object>> subList = subEnvelop.getDetailModelList();
                     if (subList.size() > 0) {
@@ -129,35 +131,63 @@ public class ProfileMedicationService {
         return sortByValue(dataMap);
     }
 
-    public List medicationSub(String profileId) {
-        List<Map<String, Object>> resultList = new ArrayList<>();
+    public Map<String, Object> medicationSub(String profileId) {
+        Map<String, Object> resultMap = new HashMap<>();
+        String masterQ = "{\"q\":\"rowkey:" + profileId + "\"}";
+        Envelop masterEnvelop = resource.getSubData(masterQ, 1, 1, null);
+        List<Map<String, Object>> masterList = masterEnvelop.getDetailModelList();
+        Map<String, Object> event = masterList.get(0);
+        Map<String, Object> baseInfo = new HashMap<>();
+        //姓名
+        baseInfo.put("name", event.get("patient_name") == null? "" : event.get("patient_name"));
+        //性别
+        String gender = event.get("EHR_000019") == null? "" : (String) event.get("EHR_000019");
+        if (gender.equals("1")) {
+            gender = "男";
+        } else if (gender.equals("2")) {
+            gender = "女";
+        }
+        baseInfo.put("gender", gender == null ? "未知" : gender);
+        //出生日期
+        if (event.get("EHR_000007") != null) {
+            baseInfo.put("birthday", event.get("EHR_000007"));
+        } else if(event.get("EHR_000320") != null) {
+            baseInfo.put("birthday", event.get("EHR_000320"));
+        } else {
+            baseInfo.put("birthday", "");
+        }
+        //基本信息
+        resultMap.put("base", baseInfo);
+        //临床诊断
+        resultMap.put("diagnosis", event.get("diagnosis"));
+        //详情
         String subQ = "{\"q\":\"profile_id:" + profileId + " AND (rowkey:*HDSD00_83* OR rowkey:*HDSD00_84*)\"}";
-        Envelop subEnvelop = resource.getSubData(subQ, null, null, null);
-        if (subEnvelop.isSuccessFlg()) {
-            List<Map<String, Object>> subList = subEnvelop.getDetailModelList();
-            if (subList.size() > 0) {
-                for (Map<String, Object> subMap : subList) {
-                    Map<String, Object> dataMap = new HashMap<>();
-                    //String rowKey = (String) subMap.get("rowkey");
-                    dataMap.put("prescriptionNumber", subMap.get("EHR_000086")); //处方编号
-                    dataMap.put("substancesForDrugUse", subMap.get("EHR_000101")); //药物使用次剂量
-                    dataMap.put("prescriptionDrugGroupNumber", subMap.get("EHR_000127")); //处方药品组号
-                    dataMap.put("drugSpecifications", subMap.get("EHR_000129")); //药物规格
-                    dataMap.put("drugFormulationCode", subMap.get("EHR_000130")); //药物剂型代码
-                    dataMap.put("drugFormulationValue", subMap.get("EHR_000130_VALUE")); //药物剂型值
-                    dataMap.put("drugName", subMap.get("EHR_000131")); //药物名称
-                    dataMap.put("drugsUseDosageUnits", subMap.get("EHR_000133")); //药物使用剂量单位
-                    dataMap.put("drugUsageFrequencyCode", subMap.get("EHR_000134")); //药物使用频次代码
-                    dataMap.put("drugUsageFrequencyValue", subMap.get("EHR_000134_VALUE")); //药物使用频次值
-                    dataMap.put("totalDoseOfDrugUsed", subMap.get("EHR_000135")); //药物使用总剂量
-                    dataMap.put("medicationRouteCode", subMap.get("EHR_000136")); //用药途径代码
-                    dataMap.put("medicationRouteValue", subMap.get("EHR_000136_VALUE")); //用药途径值
-                    dataMap.put("drugUseTotalDoseUnit", subMap.get("EHR_001249")); //药物使用总剂量单位
-                    resultList.add(dataMap);
-                }
+        Envelop subEnvelop = resource.getSubData(subQ, 1, 500, null);
+        List<Map<String, Object>> subList = subEnvelop.getDetailModelList();
+        List<Map<String, Object>> dataList = new ArrayList<>();
+        if (subList.size() > 0) {
+            for (Map<String, Object> subMap : subList) {
+                Map<String, Object> dataMap = new HashMap<>();
+                //String rowKey = (String) subMap.get("rowkey");
+                dataMap.put("prescriptionNumber", subMap.get("EHR_000086")); //处方编号
+                dataMap.put("substancesForDrugUse", subMap.get("EHR_000101")); //药物使用次剂量
+                dataMap.put("prescriptionDrugGroupNumber", subMap.get("EHR_000127")); //处方药品组号
+                dataMap.put("drugSpecifications", subMap.get("EHR_000129")); //药物规格
+                dataMap.put("drugFormulationCode", subMap.get("EHR_000130")); //药物剂型代码
+                dataMap.put("drugFormulationValue", subMap.get("EHR_000130_VALUE")); //药物剂型值
+                dataMap.put("drugName", subMap.get("EHR_000131")); //药物名称
+                dataMap.put("drugsUseDosageUnits", subMap.get("EHR_000133")); //药物使用剂量单位
+                dataMap.put("drugUsageFrequencyCode", subMap.get("EHR_000134")); //药物使用频次代码
+                dataMap.put("drugUsageFrequencyValue", subMap.get("EHR_000134_VALUE")); //药物使用频次值
+                dataMap.put("totalDoseOfDrugUsed", subMap.get("EHR_000135")); //药物使用总剂量
+                dataMap.put("medicationRouteCode", subMap.get("EHR_000136")); //用药途径代码
+                dataMap.put("medicationRouteValue", subMap.get("EHR_000136_VALUE")); //用药途径值
+                dataMap.put("drugUseTotalDoseUnit", subMap.get("EHR_001249")); //药物使用总剂量单位
+                dataList.add(dataMap);
             }
         }
-        return resultList;
+        resultMap.put("details", dataList);
+        return resultMap;
     }
 
     private String getQuery(String date, String q) throws Exception {

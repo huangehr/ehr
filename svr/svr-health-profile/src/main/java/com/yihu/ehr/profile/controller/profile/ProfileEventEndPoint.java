@@ -21,10 +21,12 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * EndPoint - 档案事件接口（兼容 pc & mobile）
  * 档案事件接口
  * @author hzp
  * @version 1.0
  * @created 2017.06.22
+ * @modifier progr1mmer
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)

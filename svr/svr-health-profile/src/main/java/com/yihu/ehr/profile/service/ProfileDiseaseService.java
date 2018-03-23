@@ -59,7 +59,7 @@ public class ProfileDiseaseService {
     public List<Map<String, Object>> getHealthProblem(String demographicId) {
         List<Map<String, Object>> result = new ArrayList<>();
         //获取门诊住院记录
-        Envelop envelop = resource.getMasterData("{\"q\":\"demographic_id:" + demographicId + "\"}", null, null, null);
+        Envelop envelop = resource.getMasterData("{\"q\":\"demographic_id:" + demographicId + "\"}", 1, 500, null);
         Map<String, List<Map<String, Object>>> hpMap = new HashedMap();
         if (envelop.getDetailModelList() != null && envelop.getDetailModelList().size() > 0) {
             List<Map<String, Object>> eventList = envelop.getDetailModelList();
@@ -119,6 +119,7 @@ public class ProfileDiseaseService {
                 }
                 obj.put("visitTimes", visitTimes);
                 obj.put("hospitalizationTimes", hospitalizationTimes);
+                obj.put("demographicId", demographicId);
                 result.add(obj);
             }
         }
@@ -128,9 +129,49 @@ public class ProfileDiseaseService {
     /*
      * @根据患者最后一次诊断记录获取诊断详情
      */
-    public List<Map<String, Object>> getHealthProblemSub(String lastVisitRecord, String eventType) {
+    public List<Map<String, Object>> getHealthProblemSub(String lastVisitRecord, String eventType, String demographicId) {
+        //mobile
+        if (demographicId != null) {
+            List<Map<String, Object>> healthProblem = getHealthProblem(demographicId);
+            for (Map<String, Object> temp : healthProblem){
+                if (temp.get("lastVisitRecord").equals(lastVisitRecord)) {
+                    List<Map<String, Object>> result = new ArrayList<>();
+                    Envelop envelop = resource.getSubData("{\"q\":\"profile_id:" + lastVisitRecord + "\"}", 1, 500, null);
+                    List<Map<String, Object>> envelopList = envelop.getDetailModelList();
+                    Map<String, Object> onlyMap = new HashMap<>();
+                    for (Map<String, Object> temp1 : envelopList) {
+                        for (String key : temp1.keySet()) {
+                            if (!onlyMap.containsKey(key)) {
+                                onlyMap.put(key, temp1.get(key));
+                            }
+                        }
+                    }
+                    Map<String, Object> newKeyObject = temp;
+                    if (eventType.equals("0")) {
+                        newKeyObject.put("DiagnosticTypeCode", "门诊");
+                        newKeyObject.put("DiagnosticDate", onlyMap.get("EHR_000113") != null ? onlyMap.get("EHR_000113") : "");
+                        newKeyObject.put("SignatureDoctor", onlyMap.get("EHR_000106") != null ? onlyMap.get("EHR_000106") : "");
+                        newKeyObject.put("DiagnosticName", onlyMap.get("EHR_000112") != null ? onlyMap.get("EHR_000112") : "");
+                        newKeyObject.put("DiagnosticInstructions", onlyMap.get("EHR_000114") != null ? onlyMap.get("EHR_000114") : "");
+                    } else if (eventType.equals("1")) {
+                        newKeyObject.put("DiagnosticTypeCode", "住院");
+                        newKeyObject.put("DiagnosticDate", onlyMap.get("EHR_000296") != null ? onlyMap.get("EHR_000296") : "");
+                        newKeyObject.put("SignatureDoctor", onlyMap.get("EHR_000290") != null ? onlyMap.get("EHR_000290") : "");
+                        newKeyObject.put("DiagnosticName", onlyMap.get("EHR_000295") != null ? onlyMap.get("EHR_000295") : "");
+                        newKeyObject.put("DiagnosticInstructions", onlyMap.get("EHR_000297") != null ? onlyMap.get("EHR_000297") : "");
+                    } else if (eventType.equals("2")) {
+                        newKeyObject.put("DiagnosticTypeCode", "体检");
+                    } else {
+                        newKeyObject.put("DiagnosticTypeCode", eventType);
+                    }
+                    result.add(newKeyObject);
+                    return result;
+                }
+            }
+        }
+        //pc
         List<Map<String, Object>> result = new ArrayList<>();
-        Envelop envelop = resource.getSubData("{\"q\":\"profile_id:" + lastVisitRecord + "\"}", null, null, null);
+        Envelop envelop = resource.getSubData("{\"q\":\"profile_id:" + lastVisitRecord + "\"}", 1, 500, null);
         List<Map<String, Object>> envelopList = envelop.getDetailModelList();
         Map<String, Object> onlyMap = new HashMap<>();
         for (Map<String, Object> temp : envelopList) {

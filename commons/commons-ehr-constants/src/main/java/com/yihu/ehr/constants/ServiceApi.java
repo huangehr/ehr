@@ -297,8 +297,10 @@ public class ServiceApi {
      */
     public static class Profiles {
         public static final String ProfileInfo = "/profile/baseInfo"; //基本信息
-        public static final String ProfileHistory = "/profile/history"; //患病史
-        public static final String PersonHistory = "/profile/personHistory"; //患病史
+        public static final String PastHistory = "/profile/pastHistory"; //既往史
+        public static final String PersonHistory = "/profile/personHistory"; //个人史
+        public static final String AllergensHistory = "/profile/allergensHistory"; //过敏史
+        public static final String FamilyHistory = "/profile/familyHistory"; //家族史
         public static final String HealthProblem = "/profile/healthProblem"; //主要健康问题
         public static final String HealthProblemSub = "/profile/healthProblemSub"; //主要健康问题诊断情况
         public static final String MedicalEvents = "/profile/medicalEvents"; //门诊/住院事件(时间轴)
@@ -308,7 +310,6 @@ public class ServiceApi {
         public static final String MedicationRanking = "/profile/medicationRanking"; //患者用药排行
         public static final String MedicationSub = "/profile/medicationSub"; //患者用药详情
         public static final String InspectionRecords = "/profile/inspectionRecords"; //检查检验记录
-        public static final String InspectionSub = "/profile/inspectionSub"; //检查检验详情
         // ------------------------------ 以上为已对接接口 ------------------------------
 
         public static final String ProfileLucene = "/profile/lucene"; //全文检索

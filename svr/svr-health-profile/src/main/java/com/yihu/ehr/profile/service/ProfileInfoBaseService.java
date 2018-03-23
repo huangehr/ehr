@@ -172,38 +172,40 @@ public class ProfileInfoBaseService {
      * @param demographic_id
      * @return
      */
-    public List<Map<String, Object>> profileHistory(String demographic_id) {
+    public List<Map<String, Object>> pastHistory(String demographic_id) {
         List<Map<String, Object>> resultList = new ArrayList<>();
-        //疾病史
+        //药物过敏
+        Map<String, Object> patientInfo = getPatientInfo(demographic_id, null);
+        Map<String, Object> allergyMedicine = new HashMap<>();
+        allergyMedicine.put("label", "药物过敏");
+        allergyMedicine.put("info", patientInfo.get("allergyMedicine"));
+        resultList.add(allergyMedicine);
+
+        //疾病
+        Map<String, Object> medicalHistory = new HashMap<>();
         List<Map<String, Object>> list1 =  profileDiseaseService.getHealthProblem(demographic_id);
-        if(list1 != null && list1.size() > 0) {
-            Map<String, Object> medicalHistory = new HashMap<>(2);
-            StringBuilder stringBuilder = new StringBuilder("患者于：");
-            int index = 1;
+        StringBuilder stringBuilder1 = new StringBuilder();
+        if (list1 != null && list1.size() > 0) {
             for (Map temp : list1) {
-                String firstVisitDate = (String) temp.get("firstVisitDate");
                 String healthProblemName = (String) temp.get("healthProblemName");
-                stringBuilder.append("(" + index + ").");
-                stringBuilder.append(firstVisitDate.substring(0, firstVisitDate.indexOf("T")));
-                stringBuilder.append("，被诊断：");
-                stringBuilder.append(healthProblemName);
-                stringBuilder.append(";");
-                index ++;
+                stringBuilder1.append(healthProblemName);
+                stringBuilder1.append("、");
             }
-            medicalHistory.put("label", "疾病史");
-            medicalHistory.put("info", stringBuilder.toString());
-            resultList.add(medicalHistory);
         }
+        medicalHistory.put("label", "疾病");
+        medicalHistory.put("info", stringBuilder1.toString());
+        resultList.add(medicalHistory);
+
+        //传染病 #
         Envelop envelop;
-        //传染病史
         String q2 = "{\"q\":\"demographic_id:" + demographic_id + " AND EHR_002393:*\"}";
-        envelop = resource.getMasterData(q2, null, null, null);
+        envelop = resource.getMasterData(q2, 1, 500, null);
         List<Map<String, Object>> list2 = envelop.getDetailModelList();
-        if(list2 != null && list2.size() > 0) {
+        if (list2 != null && list2.size() > 0) {
             Map<String, Object> infectiousDisease = new HashMap<>(2);
             StringBuilder stringBuilder = new StringBuilder("患者于：");
             int index = 1;
-            for(Map temp : list2) {
+            for (Map temp : list2) {
                 String fillDate;
                 if (temp.get("EHR_002382") != null) {
                     fillDate = (String) temp.get("EHR_002382");
@@ -222,36 +224,31 @@ public class ProfileInfoBaseService {
             infectiousDisease.put("info", stringBuilder.toString());
             resultList.add(infectiousDisease);
         }
-        //预防接种史
+
+        //预防接种
+        Map<String, Object> vaccination = new HashMap<>(2);
         String q3 = "{\"q\":\"demographic_id:" + demographic_id + " AND EHR_002443:*\"}";
-        envelop = resource.getMasterData(q3, null, null, null);
+        envelop = resource.getMasterData(q3, 1, 500, null);
         List<Map<String, Object>> list3 = envelop.getDetailModelList();
-        if(list3 != null && list3.size() > 0) {
-            Map<String, Object> vaccination = new HashMap<>(2);
-            StringBuilder stringBuilder = new StringBuilder("患者于：");
-            int index = 1;
+        StringBuilder stringBuilder3 = new StringBuilder("患者于：");
+        if (list3 != null && list3.size() > 0) {
             for (Map temp : list3) {
-                String vaccinationDate = (String) temp.get("EHR_002443");
                 String name = (String) temp.get("EHR_002449");
-                stringBuilder.append("(" + index + ").");
-                stringBuilder.append(vaccinationDate.substring(0, vaccinationDate.indexOf("T")));
-                stringBuilder.append("，接种：");
-                stringBuilder.append(name);
-                stringBuilder.append(";");
-                index ++;
+                stringBuilder3.append(name);
+                stringBuilder3.append("、");
             }
-            vaccination.put("label", "预防接种史");
-            vaccination.put("info", stringBuilder.toString());
-            resultList.add(vaccination);
         }
-        //手术史
+        vaccination.put("label", "预防接种");
+        vaccination.put("info", stringBuilder3.toString());
+        resultList.add(vaccination);
+
+        //手术
+        Map<String, Object> surgery = new HashMap<>();
         String q4 = "{\"q\":\"demographic_id:" + demographic_id + "\"}";
-        envelop = resource.getMasterData(q4, null, null, null);
+        envelop = resource.getMasterData(q4, 1, null, null);
         List<Map<String, Object>> list4 = envelop.getDetailModelList();
-        if(list4 != null && list4.size() > 0) {
-            Map<String, Object> surgery = new HashMap<>(2);
-            StringBuilder stringBuilder = new StringBuilder("患者于：");
-            int index = 1;
+        StringBuilder stringBuilder4 = new StringBuilder();
+        if (list4 != null && list4.size() > 0) {
             for (Map temp : list4) {
                 String masterRowKey = (String) temp.get("rowkey");
                 String subQ = "{\"q\":\"rowkey:" + masterRowKey + "$HDSD00_06$*" + "\"}";
@@ -259,34 +256,40 @@ public class ProfileInfoBaseService {
                 List<Map<String, Object>> subList = envelop.getDetailModelList();
                 if (subList != null && subList.size() > 0) {
                     for (Map subTemp : subList) {
-                        String eventDate = (String) temp.get("event_date");
                         String operateName;
                         if (temp.get("EHR_000418") != null) {
                             operateName = (String) subTemp.get("EHR_000418");
                         } else {
                             operateName = (String) subTemp.get("EHR_004045");
                         }
-                        stringBuilder.append("(" + index + ").");
-                        stringBuilder.append(eventDate.substring(0, eventDate.indexOf("T")));
-                        stringBuilder.append("，进行手术：");
-                        stringBuilder.append(operateName);
-                        stringBuilder.append(";");
-                        index ++;
+                        stringBuilder4.append(operateName);
+                        stringBuilder4.append("、");
                         break;
                     }
                 }
             }
-            if(index > 1) {
-                surgery.put("label", "手术史");
-                surgery.put("info", stringBuilder.toString());
-                resultList.add(surgery);
-            }
         }
-        //孕产史
+        surgery.put("label", "手术");
+        surgery.put("info", stringBuilder4.toString());
+        resultList.add(surgery);
+
+        //外伤
+        Map<String, Object> trauma = new HashMap<>();
+        trauma.put("label", "外伤");
+        trauma.put("info", "");
+        resultList.add(trauma);
+
+        //输血
+        Map<String, Object> bloodTransfusion = new HashMap<>();
+        bloodTransfusion.put("label", "输血");
+        bloodTransfusion.put("info", "");
+        resultList.add(bloodTransfusion);
+
+        //孕产 #
         String q5 = "{\"q\":\"demographic_id:" + demographic_id + " AND EHR_002443:*\"}";
         envelop = resource.getMasterData(q5, null, null, null);
         List<Map<String, Object>> list5 = envelop.getDetailModelList();
-        if(list5 != null && list5.size() > 0) {
+        if (list5 != null && list5.size() > 0) {
             Map<String, Object> childbirth = new HashMap<>(2);
             StringBuilder stringBuilder = new StringBuilder("患者于：\r\n");
             int index = 1;
@@ -300,13 +303,43 @@ public class ProfileInfoBaseService {
                 stringBuilder.append(";");
                 index ++;
             }
-            childbirth.put("label", "孕产史");
+            childbirth.put("label", "孕产");
             childbirth.put("info", stringBuilder.toString());
             resultList.add(childbirth);
         }
         return resultList;
     }
 
+    /**
+     * 过敏史
+     * @param demographic_id
+     * @return
+     */
+    public Map<String, Object> allergensHistory(String demographic_id) {
+        Map<String, Object> patientInfo = getPatientInfo(demographic_id, null);
+        Map<String, Object> allergens = new HashMap<>();
+        allergens.put("label", "过敏源");
+        allergens.put("info", patientInfo.get("allergens"));
+        return allergens;
+    }
+
+    /**
+     * 家族史
+     * @param demographic_id
+     * @return
+     */
+    public Map<String, Object> familyHistory(String demographic_id) {
+        Map<String, Object> familyHistory = new HashMap<>();
+        familyHistory.put("label", "家族史");
+        familyHistory.put("info", "");
+        return familyHistory;
+    }
+
+    /**
+     * 个人史
+     * @param demographic_id
+     * @return
+     */
     public Map<String, Object> personHistory(String demographic_id) {
         Envelop envelop = resource.getMasterData("{\"q\":\"demographic_id:" + demographic_id + "\"}", 1, 500, null);
         List<Map<String, Object>> list = envelop.getDetailModelList();
@@ -326,16 +359,16 @@ public class ProfileInfoBaseService {
                 }
             }
             personHistory.put("name", result.get("patient_name") == null? "" : result.get("patient_name"));
-            personHistory.put("placeOfBirth", "place of birth"); //出生地
-            personHistory.put("placeOfResidence", "Place of residence"); //居住地
-            personHistory.put("livingCondition", "living condition"); //生活条件
-            personHistory.put("educationLevel", "living condition"); //文化程度
-            personHistory.put("career", "living condition"); //职业
-            personHistory.put("smoke", "living condition"); //嗜烟
-            personHistory.put("alcohol", "living condition"); //嗜酒
-            personHistory.put("epidemicWater contact", "living condition"); //疫水接触
-            personHistory.put("infectedArea", "living condition"); //疫区接触
-            personHistory.put("radioactiveMaterialContact", "living condition"); //放射性物质接触
+            personHistory.put("placeOfBirth", ""); //出生地
+            personHistory.put("placeOfResidence", ""); //居住地
+            personHistory.put("livingCondition", ""); //生活条件
+            personHistory.put("educationLevel", ""); //文化程度
+            personHistory.put("career", ""); //职业
+            personHistory.put("smoke", ""); //嗜烟
+            personHistory.put("alcohol", ""); //嗜酒
+            personHistory.put("epidemicWater contact", ""); //疫水接触
+            personHistory.put("infectedArea", ""); //疫区接触
+            personHistory.put("radioactiveMaterialContact", ""); //放射性物质接触
         }
         return personHistory;
     }
@@ -369,12 +402,12 @@ public class ProfileInfoBaseService {
      */
     public Envelop getProfileLucene(String startTime, String endTime,List<String> lucene, Integer page, Integer size) throws Exception {
         String queryParams = "";
-        if(startTime!=null && startTime.length()>0 && endTime!=null && endTime.length()>0) {
+        if (startTime != null && startTime.length() > 0 && endTime != null && endTime.length() > 0) {
             queryParams = BasisConstant.eventDate+":["+startTime+" TO "+endTime+"]";
         } else {
             if (startTime!=null && startTime.length()>0) {
                 queryParams = BasisConstant.eventDate+":["+startTime+" TO *]";
-            } else if(endTime!=null && endTime.length()>0){
+            } else if (endTime!=null && endTime.length()>0){
                 queryParams = BasisConstant.eventDate+":[* TO "+endTime+"]";
             }
         }

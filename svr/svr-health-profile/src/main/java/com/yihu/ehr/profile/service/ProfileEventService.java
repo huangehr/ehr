@@ -48,7 +48,7 @@ public class ProfileEventService {
         } else if ("4".equals(filter)) { //检验 inspect
             try {
                 query = "{\"q\":\"demographic_id:" + demographicId + " AND EHR_000379:* OR EHR_000353:* OR EHR_000341:* OR EHR_000338:* OR EHR_000366:*\"}";
-                envelop = resource.getMasterData(query, null, null, null);
+                envelop = resource.getMasterData(query, 1, 500, null);
                 if (envelop.isSuccessFlg()) {
                     List<Map<String, Object>> eventList = envelop.getDetailModelList();
                     if (eventList != null && eventList.size() > 0) {
@@ -71,7 +71,7 @@ public class ProfileEventService {
             } catch (Exception e) { // 为主细表变更做的临时处理
                 e.printStackTrace();
                 query = "{\"q\":\"demographic_id:" + demographicId + "\"}";
-                envelop = resource.getMasterData(query, null, null, null);
+                envelop = resource.getMasterData(query, 1, 500, null);
                 List<Map<String, Object>> masterList = envelop.getDetailModelList();
                 if (masterList != null && masterList.size() > 0) {
                     for (Map<String ,Object> temp : masterList) {
@@ -100,13 +100,13 @@ public class ProfileEventService {
             query = "{\"q\":\"demographic_id:" + demographicId + " AND EHR_002443:*\"}";
         } else if ("2".equals(filter)){ //影像 imagery
             query = "{\"q\":\"demographic_id:" + demographicId + "\"}";
-            envelop = resource.getMasterData(query, null, null, null);
+            envelop = resource.getMasterData(query, 1, 500, null);
             List<Map<String, Object>> masterList = envelop.getDetailModelList();
             if (masterList != null && masterList.size() > 0) {
                 for (Map<String ,Object> temp : masterList) {
                     String masterRowKey = (String) temp.get("rowkey");
                     String subQ = "{\"q\":\"rowkey:" + masterRowKey + "$HDSD00_19_02$*" + "\"}";
-                    envelop = resource.getSubData(subQ, null, null, null);
+                    envelop = resource.getSubData(subQ, 1, 500, null);
                     List<Map<String, Object>> subList = envelop.getDetailModelList();
                     if (subList != null && subList.size() > 0) {
                         Map<String, Object> resultMap = new HashMap<>();
@@ -127,7 +127,7 @@ public class ProfileEventService {
         } else {
             return resultList;
         }
-        envelop = resource.getMasterData(query, null, null, null);
+        envelop = resource.getMasterData(query, 1, 500, null);
         if (envelop.isSuccessFlg()) {
             List<Map<String, Object>> eventList = envelop.getDetailModelList();
             if (eventList != null && eventList.size() > 0) {

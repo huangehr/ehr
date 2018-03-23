@@ -3,7 +3,6 @@ package com.yihu.ehr.profile.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.model.resource.MCdaTransformDto;
-import com.yihu.ehr.profile.dao.ArchiveTemplateDao;
 import com.yihu.ehr.profile.feign.CDADocumentClient;
 import com.yihu.ehr.profile.feign.RedisServiceClient;
 import com.yihu.ehr.profile.feign.ResourceClient;
@@ -39,7 +38,7 @@ public class ProfileCDAService {
     @Autowired
     private XStdRedisServiceClient stdRedisServiceClient;
     @Autowired
-    private ArchiveTemplateDao templateDao;
+    private ArchiveTemplateService archiveTemplateService;
     @Autowired
     private CDADocumentClient cdaService;
     @Autowired
@@ -57,7 +56,7 @@ public class ProfileCDAService {
     /**
      * 根据ProfileId查询CDA分类
      */
-    public List<Map<String, Object>> getCDAClass(String profileId) {
+    public List<Map<String, Object>> getCDAClass(String profileId, String templateName) throws Exception {
         List<Map<String, Object>> result = new ArrayList<>();
         //根据profileId或者eventNo获取主记录
         String query = "{\"q\":\"rowkey:" + profileId + "\"}";
@@ -70,7 +69,14 @@ public class ProfileCDAService {
             if (profileType.equals("0")) {
                 String orgCode = obj.get("org_code").toString();
                 //根据机构获取定制模板
-                List<ArchiveTemplate> list = templateDao.findByOrganizationCodeAndCdaVersion(orgCode, cdaVersion);
+                List<ArchiveTemplate> list;
+                if (StringUtils.isEmpty(templateName)) {
+                    //pc接口
+                    list = archiveTemplateService.findByOrganizationCodeAndCdaVersion(orgCode, cdaVersion);
+                } else {
+                    //mobile接口
+                    list = archiveTemplateService.search("organizationCode=" + orgCode + ";cdaVersion=" + cdaVersion + ";title?" + templateName);
+                }
                 //遍历模板
                 if (list.size() > 0) {
                     //获取档案相关数据集编码列表
@@ -158,13 +164,12 @@ public class ProfileCDAService {
     public Map<String, Object> getCDADocumentId(String orgCode,String eventNo, String cdaCode) throws Exception {
         Map<String, Object> re = new HashMap<>();
         Envelop result = resource.getResources(BasisConstant.patientEvent, "*", "*", "{\"q\":\"org_code:"+orgCode+"+AND+event_no:" + eventNo + "\"}", null, null);
-
         //是否有数据
         if (result.getDetailModelList() != null && result.getTotalCount() > 0) {
             Map<String, Object> obj = (Map<String, Object>) result.getDetailModelList().get(0);
             String cdaVersion = obj.get("cda_version").toString();
             //获取模板ID
-            ArchiveTemplate template = templateDao.findByOrganizationCodeAndCdaVersionAndCdaCode(orgCode, cdaVersion, cdaCode);
+            ArchiveTemplate template = archiveTemplateService.findByOrganizationCodeAndCdaVersionAndCdaCode(orgCode, cdaVersion, cdaCode);
             if (template != null) {
                 re.put("template_id",template.getId());
                 re.put("profile_id",obj.get("rowkey"));
@@ -191,7 +196,7 @@ public class ProfileCDAService {
             re.put("event_no",profileMap.get("event_no"));
 
             //获取有数据的cda class
-            List<Map<String, Object>> cdaClassList = getCDAClass(profileId);
+            List<Map<String, Object>> cdaClassList = getCDAClass(profileId, null);
             List<Map<String, Object>> CDADataList = new ArrayList<>();
             List<String>cdaDocumentIdList=new ArrayList<>();
             for (Map<String, Object> cda : cdaClassList) {
