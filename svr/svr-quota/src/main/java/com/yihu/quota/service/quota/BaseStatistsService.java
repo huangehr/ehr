@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.profile.core.ResourceCore;
 import com.yihu.ehr.solr.SolrUtil;
 import com.yihu.quota.dao.jpa.TjQuotaDao;
+import com.yihu.quota.dao.jpa.TjQuotaGovProvisionDao;
 import com.yihu.quota.etl.extract.es.EsResultExtract;
 import com.yihu.quota.etl.model.EsConfig;
 import com.yihu.quota.etl.util.ElasticsearchUtil;
@@ -59,6 +60,8 @@ public class BaseStatistsService {
     private ElasticsearchUtil elasticsearchUtil;
     @Autowired
     private SingleDiseaseService singleDiseaseService;
+    @Autowired
+    private TjQuotaGovProvisionDao tjQuotaGovProvisionDao;
 
     private static String orgHealthCategory = "orgHealthCategory";
     public static String orgHealthCategoryCode = "orgHealthCategoryCode";
@@ -118,7 +121,6 @@ public class BaseStatistsService {
     /**
      * 指标除法运算 分母为常量
      * @param molecular
-     * @param denominatorVal
      * @param dimension
      * @param filters
      * @param operation
@@ -127,8 +129,14 @@ public class BaseStatistsService {
      * @throws Exception
      */
     public List<Map<String, Object>>  divisionQuotaDenoConstant(String molecular, String dimension,String filters,
-                                                                String operation,String operationValue,String dateType,Double denominatorVal) throws Exception {
+                                                                String operation,String operationValue,String dateType,String constValue, String district) throws Exception {
+        Double denominatorVal = 0.0;
         List<Map<String, Object>> moleList = getQuotaResultList(molecular,dimension,filters,dateType);
+        // 获取分母的数值
+        if ("1".equals(constValue)) {
+            Long sumValue = tjQuotaGovProvisionDao.getSumByDistrict(district);
+            denominatorVal = sumValue.doubleValue();
+        }
         return divisionDenoConstant(dimension, moleList, denominatorVal, Integer.valueOf(operation), Integer.valueOf(operationValue));
     }
 
@@ -161,13 +169,14 @@ public class BaseStatistsService {
                 map.put("result",0);
                 divisionResultList.add(map);
             } else {
-                int point = 0;
+                double point = 0;
+                DecimalFormat df = new DecimalFormat("0.0");
                 if (operation == 1) {
                     point = (int) (moleResultVal / denominatorVal) * operationValue;
                 } else if (operation == 2) {
-                    point = (int) (moleResultVal / denominatorVal) / operationValue;
+                    point =  (moleResultVal / denominatorVal) / operationValue;
                 }
-                map.put("result", point);
+                map.put("result", df.format(point));
                 divisionResultList.add(map);
             }
         }

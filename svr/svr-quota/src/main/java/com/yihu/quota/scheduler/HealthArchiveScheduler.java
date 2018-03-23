@@ -31,7 +31,7 @@ public class HealthArchiveScheduler {
     @Autowired
     private HealthArchiveSchedulerService healthArchiveSchedulerService;
 
-    @Scheduled(cron = "44 40 12 * * ?")
+    @Scheduled(cron = "44 40 03 * * ?")
     public void validatorIdentityScheduler() throws Exception{
 
         String q =  ""; // 查询条件
