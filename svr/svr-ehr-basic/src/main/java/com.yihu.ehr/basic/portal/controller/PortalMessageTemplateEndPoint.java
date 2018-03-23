@@ -1,5 +1,6 @@
 package com.yihu.ehr.basic.portal.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.yihu.ehr.basic.portal.model.PortalMessageTemplate;
 import com.yihu.ehr.basic.portal.model.ProtalMessageRemind;
 import com.yihu.ehr.basic.portal.service.PortalMessageRemindService;
@@ -126,24 +127,11 @@ public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
         List<ProtalMessageRemind> messageRemindList = messageRemindService.search(fields, filters, sorts, page, size);
         pagedResponse(request, response, messageRemindService.getCount(filters), page, size);
         for (ProtalMessageRemind protalMessageRemind : messageRemindList) {
-            if (protalMessageRemind.getMessageTemplateId() == null) {
-                throw new ApiException("模板ID不存在");
-            }
-            PortalMessageTemplate template = messageTemplateService.getMessageTemplate(protalMessageRemind.getMessageTemplateId());
-            if (template == null) {
-                throw new ApiException("模板对象不存在");
-            }
-            MMyMessage mMyMessage = convertToModel(protalMessageRemind, MMyMessage.class);
-            mMyMessage.setTitle(template.getTitle());
-            mMyMessage.setBeforeContent(template.getBeforeContent());
-            mMyMessage.setAfterContent(template.getAfterContent());
-            mMyMessage.setContentJson(toEntity(protalMessageRemind.getContent(), MMyMessage.ContentJson.class));
-            mMyMessage.setClassification(template.getClassification());
+            MMyMessage mMyMessage = convertToMMyMessage(protalMessageRemind);
             mMyMessageList.add(mMyMessage);
         }
         return mMyMessageList;
     }
-
 
     @RequestMapping(value = ServiceApi.MessageTemplate.MyMessage, method = RequestMethod.GET)
     @ApiOperation(value = "获取我的消息对象", notes = "获取我的消息对象")
@@ -151,6 +139,17 @@ public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "messageId", value = "消息id", defaultValue = "")
             @PathVariable(value = "messageId") Long messageId) throws IOException {
         ProtalMessageRemind protalMessageRemind = messageRemindService.getMessageRemind(messageId);
+        return convertToMMyMessage(protalMessageRemind);
+    }
+
+
+    /**
+     * 数据转换
+     *
+     * @param protalMessageRemind 消息提醒对象
+     * @return
+     */
+    private MMyMessage convertToMMyMessage(ProtalMessageRemind protalMessageRemind) {
         if (protalMessageRemind.getMessageTemplateId() == null) {
             throw new ApiException("模板ID不存在");
         }
@@ -162,9 +161,8 @@ public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
         mMyMessage.setTitle(template.getTitle());
         mMyMessage.setBeforeContent(template.getBeforeContent());
         mMyMessage.setAfterContent(template.getAfterContent());
-        mMyMessage.setContentJson(toEntity(protalMessageRemind.getContent(), MMyMessage.ContentJson.class));
+        mMyMessage.setContentJsons(JSON.parseArray(protalMessageRemind.getContent(), MMyMessage.ContentJson.class));
         mMyMessage.setClassification(template.getClassification());
-
         return mMyMessage;
     }
 

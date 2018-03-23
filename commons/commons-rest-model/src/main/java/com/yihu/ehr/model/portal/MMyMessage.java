@@ -3,6 +3,7 @@ package com.yihu.ehr.model.portal;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author <a href="mailto:yhy23456@163.com">huiyang.yu</a>
@@ -43,7 +44,7 @@ public class MMyMessage {
     /**
      * 主体内容
      */
-    private ContentJson contentJson;
+    private List<ContentJson> contentJsons;
     /**
      * 主体之后内容
      */
@@ -161,12 +162,12 @@ public class MMyMessage {
         this.workUri = workUri;
     }
 
-    public ContentJson getContentJson() {
-        return contentJson;
+    public List<ContentJson> getContentJsons() {
+        return contentJsons;
     }
 
-    public void setContentJson(ContentJson contentJson) {
-        this.contentJson = contentJson;
+    public void setContentJsons(List<ContentJson> contentJsons) {
+        this.contentJsons = contentJsons;
     }
 
     public String getClassification() {
