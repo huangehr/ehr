@@ -29,12 +29,12 @@ public class ProfileInfoBaseService {
      */
     public Map<String, Object> getPatientInfo(String demographicId, String version) {
         //时间排序
-        Envelop envelop;
-        if (version != null) {
+        /*if (version != null) {
             envelop = resource.getMasterData("{\"q\":\"demographic_id:" + demographicId + "\"}", null, null, version);
         } else {
             envelop = resource.getMasterData("{\"q\":\"demographic_id:" + demographicId + "\"}", null, null, null);
-        }
+        }*/
+        Envelop envelop = resource.getMasterData("{\"q\":\"demographic_id:" + demographicId + "\"}", 1, 500, null);
         List<Map<String, Object>> list = envelop.getDetailModelList();
         Map<String, Object> patientMap = new HashMap<>();
         if (list != null && list.size() > 0) {
@@ -307,43 +307,74 @@ public class ProfileInfoBaseService {
         return resultList;
     }
 
+    public Map<String, Object> personHistory(String demographic_id) {
+        Envelop envelop = resource.getMasterData("{\"q\":\"demographic_id:" + demographic_id + "\"}", 1, 500, null);
+        List<Map<String, Object>> list = envelop.getDetailModelList();
+        Map<String, Object> personHistory = new HashMap<>();
+        if (list != null && list.size() > 0) {
+            Map<String, Object> result = new HashMap<>();
+            if (list.size() == 1) {
+                result = list.get(0);
+            } else {
+                //合并数据
+                for (Map<String, Object> obj : list) {
+                    for (String key : obj.keySet()) {
+                        if (!result.containsKey(key)) {
+                            result.put(key, obj.get(key));
+                        }
+                    }
+                }
+            }
+            personHistory.put("name", result.get("patient_name") == null? "" : result.get("patient_name"));
+            personHistory.put("placeOfBirth", "place of birth"); //出生地
+            personHistory.put("placeOfResidence", "Place of residence"); //居住地
+            personHistory.put("livingCondition", "living condition"); //生活条件
+            personHistory.put("educationLevel", "living condition"); //文化程度
+            personHistory.put("career", "living condition"); //职业
+            personHistory.put("smoke", "living condition"); //嗜烟
+            personHistory.put("alcohol", "living condition"); //嗜酒
+            personHistory.put("epidemicWater contact", "living condition"); //疫水接触
+            personHistory.put("infectedArea", "living condition"); //疫区接触
+            personHistory.put("radioactiveMaterialContact", "living condition"); //放射性物质接触
+        }
+        return personHistory;
+    }
 
-    private int CompareAgeOfDisease(String AgeOfDisease1,String AgeOfDisease2){
-        int year1=0;
-        int month1=0;
-        int year2=0;
-        int month2=0;
-        if(AgeOfDisease1.split("年|个月").length>1) {
+    private int CompareAgeOfDisease(String AgeOfDisease1, String AgeOfDisease2){
+        int year1 = 0;
+        int month1 = 0;
+        int year2 = 0;
+        int month2 = 0;
+        if (AgeOfDisease1.split("年|个月").length>1) {
             year1 = Integer.parseInt(AgeOfDisease1.split("年|个月")[0]);
             month1 = Integer.parseInt(AgeOfDisease1.split("年|个月")[1]);
-        }
-        else
+        } else {
             month1 = Integer.parseInt(AgeOfDisease1.split("年|个月")[0]);
-        if(AgeOfDisease2.split("年|个月").length>1) {
+        }
+        if (AgeOfDisease2.split("年|个月").length>1) {
             year2 = Integer.parseInt(AgeOfDisease2.split("年|个月")[0]);
             month2 = Integer.parseInt(AgeOfDisease2.split("年|个月")[1]);
-        }
-        else
+        } else {
             month2 = Integer.parseInt(AgeOfDisease2.split("年|个月")[0]);
-        if(year1 * 12 + month1 <= year2 * 12 + month2)
+        }
+        if (year1 * 12 + month1 <= year2 * 12 + month2) {
             return 1;
-        else
+        } else {
             return 0;
+        }
     }
 
     /**
      * 全文检索
      */
-    public Envelop getProfileLucene(String startTime,String endTime,List<String> lucene,Integer page,Integer size) throws Exception {
+    public Envelop getProfileLucene(String startTime, String endTime,List<String> lucene, Integer page, Integer size) throws Exception {
         String queryParams = "";
         if(startTime!=null && startTime.length()>0 && endTime!=null && endTime.length()>0) {
             queryParams = BasisConstant.eventDate+":["+startTime+" TO "+endTime+"]";
-        }
-        else {
-            if(startTime!=null && startTime.length()>0) {
+        } else {
+            if (startTime!=null && startTime.length()>0) {
                 queryParams = BasisConstant.eventDate+":["+startTime+" TO *]";
-            }
-            else if(endTime!=null && endTime.length()>0){
+            } else if(endTime!=null && endTime.length()>0){
                 queryParams = BasisConstant.eventDate+":[* TO "+endTime+"]";
             }
         }

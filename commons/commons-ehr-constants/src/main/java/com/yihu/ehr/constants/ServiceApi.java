@@ -298,6 +298,7 @@ public class ServiceApi {
     public static class Profiles {
         public static final String ProfileInfo = "/profile/baseInfo"; //基本信息
         public static final String ProfileHistory = "/profile/history"; //患病史
+        public static final String PersonHistory = "/profile/personHistory"; //患病史
         public static final String HealthProblem = "/profile/healthProblem"; //主要健康问题
         public static final String HealthProblemSub = "/profile/healthProblemSub"; //主要健康问题诊断情况
         public static final String MedicalEvents = "/profile/medicalEvents"; //门诊/住院事件(时间轴)
@@ -650,7 +651,7 @@ public class ServiceApi {
         public static final String VersionLatestExistence = "/std/versions/{version}/latest/existence";
 
         public static final String Documents = "/std/documents";
-        public static final String DocumentNoPage="/std/document/noPage";
+        public static final String DocumentNoPage = "/std/document/noPage";
         public static final String Document = "/std/documents/{id}";
         public static final String DocumentList = "/std/documentsList";
         public static final String DocumentFileExistence = "/std/documents/{id}/file/existence";
@@ -1438,4 +1439,10 @@ public class ServiceApi {
         public static final String StatisticDeptTransferTreatmentSum = "/outpatientServiceStatistic/statisticDeptTransferTreatmentSum";
     }
 
+    public class MessageTemplate {
+        public static final String MessageTemplateAdmin = "/messageTemplate/admin/{messageTemplateId}";
+        public static final String MessageTemplate = "/messageTemplate";
+        public static final String MyMessageList = "/messageTemplate/MyMessageList";
+        public static final String MyMessage = "/messageTemplate/MyMessage/admin/{messageId}";
+    }
 }

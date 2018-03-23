@@ -7,6 +7,7 @@ import java.util.Date;
 
 /**
  * 消息提醒
+ *
  * @author HZY
  * @vsrsion 1.0
  * Created at 2017/2/20.
@@ -23,8 +24,9 @@ public class ProtalMessageRemind {
     private String typeId;
     private String content;
     private String workUri;
-    private Integer  readed;
+    private Integer readed;
     private Date createDate;
+    private Long messageTemplateId;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -118,5 +120,13 @@ public class ProtalMessageRemind {
 
     public void setCreateDate(Date createDate) {
         this.createDate = createDate;
+    }
+
+    public Long getMessageTemplateId() {
+        return messageTemplateId;
+    }
+
+    public void setMessageTemplateId(Long messageTemplateId) {
+        this.messageTemplateId = messageTemplateId;
     }
 }
