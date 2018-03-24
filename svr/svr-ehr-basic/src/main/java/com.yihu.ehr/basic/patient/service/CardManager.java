@@ -61,8 +61,8 @@ public class CardManager {
         String cardType = (String)args.get("cardType");   //","otherCard
         int rows = (Integer)args.get("rows");
         int page = (Integer)args.get("page");
-        String sqlPhysical="from AbstractPhysicalCard card where (card.number like :number)";
-        String sqlVirtual="from AbstractVirtualCard card where (card.number like :number)";
+        String sqlPhysical="from PhysicalCard card where (card.number like :number)";
+        String sqlVirtual="from VirtualCard card where (card.number like :number)";
         if ("bind_card".equals(type) && !StringUtils.isEmpty(idCardNo)){
             sqlPhysical += " and (card.idCardNo=:idCardNo)";
             sqlVirtual += " and (card.idCardNo=:idCardNo)";
@@ -118,7 +118,7 @@ public class CardManager {
         String number = (String)args.get("number");
         String type = (String) args.get("type");
         String cardType = (String)args.get("cardType");   //","otherCard
-        String sql="select count(*) from AbstractPhysicalCard card where (card.number like :number)";
+        String sql="select count(*) from PhysicalCard card where (card.number like :number)";
         if ("bind_card".equals(type) && !StringUtils.isEmpty(idCardNo)){
             sql += " and (card.idCardNo=:idCardNo)";
         }else{
