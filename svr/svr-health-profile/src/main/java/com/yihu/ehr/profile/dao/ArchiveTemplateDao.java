@@ -22,5 +22,5 @@ public interface ArchiveTemplateDao extends PagingAndSortingRepository<ArchiveTe
     @Query("SELECT count(e) FROM ArchiveTemplate e WHERE e.title = ?1 AND e.cdaVersion = ?2 AND e.organizationCode = ?3")
     int countByTitleAndCdaVersionAndOrgCode(String title, String cdaVersion, String orgCode);
 
-    ArchiveTemplate findByOrganizationCodeAndCdaVersionAndCdaCode(String orgCode, String cdaVersion, String CdaCode);
+    ArchiveTemplate findByOrganizationCodeAndCdaVersionAndCdaCode(String orgCode, String cdaVersion, String cdaCode);
 }

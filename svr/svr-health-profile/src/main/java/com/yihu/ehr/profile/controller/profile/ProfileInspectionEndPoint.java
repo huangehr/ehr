@@ -1,6 +1,5 @@
 package com.yihu.ehr.profile.controller.profile;
 
-import com.netflix.discovery.converters.Auto;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
@@ -10,7 +9,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 /**
+ * EndPoint - 检查检验（兼容 pc & mobile）
  * Created by progr1mmer on 2018/3/13.
  */
 @RestController
@@ -41,15 +40,6 @@ public class ProfileInspectionEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "event_type", value = "事件类型")
             @RequestParam(value = "event_type", required = false) String event_type) throws Exception {
         return profileInspectionService.inspectionRecords(demographic_id, hp_code, date, event_type);
-    }
-
-    @ApiOperation("检查检验详情")
-    @RequestMapping(value = ServiceApi.Profiles.InspectionSub, method = RequestMethod.GET)
-    public List InspectionSub(
-            @ApiParam(name = "profile_id", value = "主表事件索引", required = true, defaultValue = "49229004X_000406450000000UX0_1485608518000")
-            @RequestParam(value = "profile_id") String profile_id) throws Exception {
-//        return profileInspectionService.inspectionRecords(demographic_id, hp_code);
-        return null;
     }
 
 }

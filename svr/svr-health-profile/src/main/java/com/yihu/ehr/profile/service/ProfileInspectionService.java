@@ -47,10 +47,6 @@ public class ProfileInspectionService {
         return resultList;
     }
 
-    private void inspectionSub(String profileId) {
-
-    }
-
     private String getQuery(String hpCode, String date, String eventType, String q) throws Exception {
         Map<String, String> qMap = objectMapper.readValue(q, Map.class);
         String param = qMap.get("q");

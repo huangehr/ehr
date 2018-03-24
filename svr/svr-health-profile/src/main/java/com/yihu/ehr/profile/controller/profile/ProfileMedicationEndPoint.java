@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * EndPoint - 用药记录（兼容 pc & mobile）
  * Created by progr1mmer on 2018/3/13.
  */
 @RestController
@@ -55,7 +56,7 @@ public class ProfileMedicationEndPoint extends EnvelopRestEndPoint {
 
     @ApiOperation("用药详情")
     @RequestMapping(value = ServiceApi.Profiles.MedicationSub, method = RequestMethod.GET)
-    public List medicationSub(
+    public Map<String, Object> medicationSub(
             @ApiParam(name = "profile_id", value = "主表事件索引", required = true, defaultValue = "49229004X_000406450000000UX0_1485608518000")
             @RequestParam(value = "profile_id") String profile_id) throws Exception {
         return profileMedicationService.medicationSub(profile_id);

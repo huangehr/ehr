@@ -127,6 +127,15 @@ public class ArchiveTemplateService extends BaseJpaService<ArchiveTemplate, Arch
         return cdaDocumentMap;
     }
 
+    @Transactional(readOnly = true)
+    public List<ArchiveTemplate> findByOrganizationCodeAndCdaVersion(String orgCode, String cdaVersion){
+        return templateDao.findByOrganizationCodeAndCdaVersion(orgCode, cdaVersion);
+    }
+
+    @Transactional(readOnly = true)
+    public ArchiveTemplate findByOrganizationCodeAndCdaVersionAndCdaCode(String orgCode, String cdaVersion, String cdaCode) {
+        return templateDao.findByOrganizationCodeAndCdaVersionAndCdaCode(orgCode, cdaVersion, cdaCode);
+    }
 }
 
 
