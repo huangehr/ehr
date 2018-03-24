@@ -152,10 +152,10 @@ public class HealthArchiveSchedulerService {
     }
 
     //查询habase里面数据
-    public List<Map<String,Object>> selectHbaseData(List<String> list) throws Exception {
+    public List<Map<String,Object>> selectHbaseData(String table, List<String> list) throws Exception {
         List<Map<String,Object>> data = new ArrayList<>();
         /***** Hbase查询 ********/
-        Result[] resultList = hbaseDao.getResultList(ResourceCore.MasterTable,list, "", ""); // hbase结果集
+        Result[] resultList = hbaseDao.getResultList(table,list, "", ""); // hbase结果集
         if(resultList != null && resultList.length > 0){
             for (Result result :resultList) {
                 Map<String,Object> obj = resultToMap(result, "");
