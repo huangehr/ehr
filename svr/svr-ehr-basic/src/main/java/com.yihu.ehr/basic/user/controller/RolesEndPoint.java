@@ -1,6 +1,7 @@
 package com.yihu.ehr.basic.user.controller;
 
 import com.yihu.ehr.basic.user.entity.Roles;
+import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
@@ -20,9 +21,11 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by yww on 2016/7/7.
@@ -32,6 +35,7 @@ import java.util.List;
 @RequestMapping(ApiVersion.Version1_0)
 @Api(value = "roles",description = "角色管理", tags = {"安全管理-角色管理"})
 public class RolesEndPoint extends EnvelopRestEndPoint{
+
     @Autowired
     private RolesService rolesService;
 
@@ -41,7 +45,7 @@ public class RolesEndPoint extends EnvelopRestEndPoint{
             @ApiParam(name = "data_json",value = "新增角色组Json字符串")
             @RequestBody String dataJson,
             @ApiParam(name = "orgCodes", value = "多机构编码拼接字符串")
-            @RequestParam(value = "orgCodes") String orgCodes){
+            @RequestParam(value = "orgCodes") String orgCodes) throws IOException {
         Roles roles = toEntity(dataJson,Roles.class);
         Roles rolesNew = null;
         if(StringUtils.isNotEmpty(orgCodes)){
@@ -68,7 +72,7 @@ public class RolesEndPoint extends EnvelopRestEndPoint{
     @ApiOperation(value = "新增角色组")
     public MRoles createRoles(
             @ApiParam(name = "data_json",value = "新增角色组Json字符串")
-            @RequestBody String dataJson){
+            @RequestBody String dataJson) throws IOException {
         Roles roles = toEntity(dataJson,Roles.class);
         Roles rolesNew = rolesService.save(roles);
         return convertToModel(rolesNew,MRoles.class,null);
@@ -78,9 +82,11 @@ public class RolesEndPoint extends EnvelopRestEndPoint{
     @ApiOperation(value = "修改角色组")
     public MRoles updateRoles(
             @ApiParam(name = "data_json",value = "修改角色组Json字符串")
-            @RequestBody String dataJson){
+            @RequestBody String dataJson) throws IOException {
         Roles roles = toEntity(dataJson,Roles.class);
-        if(null == rolesService.retrieve(roles.getId())) throw  new ApiException(HttpStatus.NOT_FOUND,"角色组未找到！");
+        if (null == rolesService.retrieve(roles.getId())) {
+            throw new ApiException(ErrorCode.NOT_FOUND, "角色组未找到！");
+        }
         Roles rolesNew = rolesService.save(roles);
         return convertToModel(rolesNew,MRoles.class,null);
     }
@@ -100,7 +106,9 @@ public class RolesEndPoint extends EnvelopRestEndPoint{
             @ApiParam(name = "id",value = "角色组id")
             @PathVariable(value = "id") long id){
         Roles roles = rolesService.retrieve(id);
-        if(roles == null) throw new ApiException(HttpStatus.NOT_FOUND,"角色组未找到！");
+        if (roles == null) {
+            throw new ApiException(ErrorCode.NOT_FOUND, "角色组未找到！");
+        }
         return convertToModel(roles,MRoles.class);
     }
 
@@ -191,6 +199,22 @@ public class RolesEndPoint extends EnvelopRestEndPoint{
             envelop.setDetailModelList(roles);
             envelop.setObj(roles.get(0).getId());
             return envelop;
+        }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.Roles.RoleFindByUserId, method = RequestMethod.GET)
+    @ApiOperation(value = "通过用户ID获取角色" )
+    public Envelop findRolesByUserId(
+            @ApiParam(name = "userId", value = "用户Id", required = true)
+            @RequestParam(value = "userId") String userId){
+        Envelop envelop = new Envelop();
+        List<Map<String,Object>> roles = rolesService.findRolesByUserId(userId);
+        if(roles != null && roles.size() >0){
+            envelop.setSuccessFlg(true);
+            envelop.setDetailModelList(roles);
+        }else{
+            envelop.setSuccessFlg(false);
         }
         return envelop;
     }

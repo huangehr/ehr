@@ -13,6 +13,7 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -89,7 +90,7 @@ public class GovernmentMenuEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "jsonData", value = " 菜单信息Json", defaultValue = "")
             @RequestBody String jsonData,
             @ApiParam(name = "ids", value = "资源报表监测类型ids", defaultValue = "")
-            @RequestParam(value = "ids", required = false) String ids){
+            @RequestParam(value = "ids", required = false) String ids) throws IOException {
         GovernmentMenu governmentMenu = toEntity(jsonData, GovernmentMenu.class);
         governmentMenu = governmentMenuService.saveGovernmentMenu(governmentMenu, ids);
         return governmentMenu;
@@ -101,7 +102,7 @@ public class GovernmentMenuEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "jsonData", value = " 菜单信息Json", defaultValue = "")
             @RequestBody String jsonData,
             @ApiParam(name = "ids", value = "资源报表监测类型ids", defaultValue = "")
-            @RequestParam(value = "ids", required = false) String ids){
+            @RequestParam(value = "ids", required = false) String ids) throws IOException {
         GovernmentMenu governmentMenu = toEntity(jsonData, GovernmentMenu.class);
         governmentMenu = governmentMenuService.updateGovernmentMenu(governmentMenu, ids);
         return governmentMenu;

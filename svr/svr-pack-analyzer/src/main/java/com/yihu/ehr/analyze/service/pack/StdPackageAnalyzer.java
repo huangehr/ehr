@@ -36,9 +36,10 @@ public class StdPackageAnalyzer extends PackageAnalyzer {
         parseFiles(zipPackage, standardFolder.listFiles(), false);
 
         //解析原始数据
-        String originPath = root.getAbsolutePath() + File.separator + OriginFolder;
+        // 目前没用到原始数据，质控校验也无法判断，故注释掉。 -- by zjj 2018.3.22
+        /*String originPath = root.getAbsolutePath() + File.separator + OriginFolder;
         File originFolder = new File(originPath);
-        parseFiles(zipPackage, originFolder.listFiles(), true);
+        parseFiles(zipPackage, originFolder.listFiles(), true);*/
     }
 
     /**

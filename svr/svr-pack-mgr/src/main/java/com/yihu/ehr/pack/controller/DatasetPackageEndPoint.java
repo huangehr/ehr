@@ -1,10 +1,7 @@
 package com.yihu.ehr.pack.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.ArchiveStatus;
-import com.yihu.ehr.constants.RedisCollection;
-import com.yihu.ehr.constants.ServiceApi;
+import com.yihu.ehr.constants.*;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
@@ -143,17 +140,17 @@ public class DatasetPackageEndPoint extends EnvelopRestEndPoint {
 
         MApp app = appClient.getApp(appKey);
         String secret = null;
-        if (app!=null && !StringUtils.isEmpty(app.getSecret())){
+        if (app != null && !StringUtils.isEmpty(app.getSecret())){
             secret = app.getSecret();
-        }else {
-            throw new ApiException(HttpStatus.FORBIDDEN, "Invalid app key, maybe you used the error appKey?");
+        } else {
+            throw new ApiException(ErrorCode.FORBIDDEN, "Invalid app key, maybe you used the error appKey?");
         }
         DatasetPackage aPackage =null;
         try {
             String password = MD5.hash(secret+packPwdSeed+secret);//MD5 生成zip包密码
             aPackage = datasetPackService.receiveDatasets(pack.getInputStream(), password, md5, orgCode, getClientId(request));
         } catch (Exception ex) {
-            throw new ApiException(HttpStatus.FORBIDDEN, "javax.crypto.BadPaddingException." + ex.getMessage());
+            throw new ApiException(ErrorCode.FORBIDDEN, "javax.crypto.BadPaddingException." + ex.getMessage());
         }
         redisTemplate.opsForList().leftPush(RedisCollection.PackageList, objectMapper.writeValueAsString(aPackage));
         //messageBuffer.putMessage(convertToModel(aPackage, MPackage.class));

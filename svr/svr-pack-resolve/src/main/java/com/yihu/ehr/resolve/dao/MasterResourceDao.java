@@ -31,7 +31,7 @@ public class MasterResourceDao {
     public void saveOrUpdate(ResourceBucket resBucket, StandardPackage standardPackage) throws Exception {
         String rowKey = resBucket.getId();
         TableBundle bundle = new TableBundle();
-        if(resBucket.isReUploadFlg()) { //补传处理
+        if (resBucket.isReUploadFlg()) { //补传处理
             Map<String, String> originResult = hbaseDao.get(ResourceCore.MasterTable, rowKey, MasterResourceFamily.Data);
             if(!originResult.isEmpty()) {
                 MasterRecord masterRecord = resBucket.getMasterRecord();
@@ -50,7 +50,7 @@ public class MasterResourceDao {
             }else {
                 throw new RuntimeException("Please upload the complete package(" + rowKey + ") first !");
             }
-        }else {
+        } else {
             // delete legacy data if they are exist
             /**
             String legacyRowKeys[] = hbaseDao.findRowKeys(ResourceCore.MasterTable, "^" + rowKey);

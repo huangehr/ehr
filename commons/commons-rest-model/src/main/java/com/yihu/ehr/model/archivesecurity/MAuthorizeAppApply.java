@@ -1,5 +1,7 @@
 package com.yihu.ehr.model.archivesecurity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.util.Date;
 
 /**
@@ -56,6 +58,7 @@ public class MAuthorizeAppApply {
         this.status = status;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getAuthorizeTime() {
         return authorizeTime;
     }
@@ -64,6 +67,7 @@ public class MAuthorizeAppApply {
         this.authorizeTime = authorizeTime;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getValidTime() {
         return validTime;
     }

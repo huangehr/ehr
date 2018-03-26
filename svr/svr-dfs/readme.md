@@ -16,13 +16,12 @@ ElasticSearch
 				    - 参数格式："<type>"
 				    - 参数说明：索引类型
 			    source
-				    - 参数格式：["<field>":{"type":"<string|byte|short|integer|long|float|double|boolean|date>","store":"<yes|or>"},"<...>":{<...>}]
+				    - 参数格式：{"<field>":{"type":"<string|byte|short|integer|long|float|double|boolean|date>","store":"<yes|or>"},"<...>":{<...>}}
 				    - 参数说明：
-                        因{"...":{...}}格式的字符串FeignClient请求的时候会出错，故用[]替换{}到后台的时候再进行替换处理
                         field值为字段名称，字段可选属性还有index、analyzer、search_analyzer、format
-                        当字段不分词时形如：["name":{"type":"string","index":"not_analyzed"}]
-                        当字段要分词时形如：["name":{"type":"string","analyzer":"ik","search_analyzer":"ik"}]
-                        当字段为date类型时可指定时间格式：["createDate":{"type":"date","format":"yyyy-MM-dd HH:mm:ss"}]
+                        当字段不分词时形如：{"name":{"type":"string","index":"not_analyzed"}}
+                        当字段要分词时形如：{"name":{"type":"string","analyzer":"ik","search_analyzer":"ik"}}
+                        当字段为date类型时可指定时间格式：["createDate":{"type":"date","format":"yyyy-MM-dd HH:mm:ss"}}
                         当字段特别长的时候可选择store为yes否则默认为no
         2.索引文档（相当于插入数据）
             1).请求index接口

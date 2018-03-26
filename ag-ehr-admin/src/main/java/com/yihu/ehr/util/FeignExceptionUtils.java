@@ -33,7 +33,7 @@ public class FeignExceptionUtils {
             T entity = objectMapper.readValue(json, entityCls);
             return entity;
         } catch (IOException ex) {
-            throw new ApiException(ErrorCode.SystemError, "Convert JSON to entity failed, " + ex.getMessage());
+            throw new ApiException("Convert JSON to entity failed, " + ex.getMessage());
         }
     }
 }

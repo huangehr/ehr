@@ -99,12 +99,36 @@ public class BaseUIController {
         return envelop;
     }
 
+    public Envelop failed(String errMsg, int errorCode){
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(false);
+        envelop.setErrorMsg(errMsg);
+        envelop.setErrorCode(errorCode);
+        return envelop;
+    }
+
     public Envelop success(Object object) {
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(true);
         envelop.setObj(object);
         return envelop;
     }
+
+    public Envelop success(List list){
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(list);
+        return envelop;
+    }
+
+    public Envelop success(Object object, List list){
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(true);
+        envelop.setObj(object);
+        envelop.setDetailModelList(list);
+        return envelop;
+    }
+
     public String encodeStr(String str) {
         try {
             if (str == null) {

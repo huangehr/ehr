@@ -77,7 +77,7 @@ public class RhipPatientsEndPoint extends BaseController {
             @RequestParam(value = "json", required = true) String patientInfo) throws Exception{
 
         if (isPatientRegistered(demographicId)) {
-            throw new ApiException(HttpStatus.NOT_FOUND, ErrorCode.PatientRegisterFailedForExist);
+            throw new ApiException("人口信息已存在");
         }
 
         PatientDetailModel detailModel = objectMapper.readValue(patientInfo, PatientDetailModel.class);

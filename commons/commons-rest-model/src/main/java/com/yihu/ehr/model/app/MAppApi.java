@@ -26,10 +26,10 @@ public class MAppApi implements Serializable {
     private String openLevel;
     private String auditLevel;
     private String methodName;
-
     private String microServiceUri;
     private String msMethodName;
     private String microServiceName;
+    private Integer category;
 
     public String getMicroServiceUri() {
         return microServiceUri;
@@ -169,5 +169,13 @@ public class MAppApi implements Serializable {
 
     public void setMethodName(String methodName) {
         this.methodName = methodName;
+    }
+
+    public Integer getCategory() {
+        return category;
+    }
+
+    public void setCategory(Integer category) {
+        this.category = category;
     }
 }

@@ -446,7 +446,7 @@ public class AppController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value =  ServiceApi.Apps.AppFieldExistence, method = RequestMethod.POST)
+    @RequestMapping(value =  ServiceApi.Apps.CheckField, method = RequestMethod.POST)
     @ApiOperation(value = "根据条件判断应用ID或者名称是否存在")
     public Envelop isFieldExist(
             @ApiParam(name = "field", value = "字段", required = true)

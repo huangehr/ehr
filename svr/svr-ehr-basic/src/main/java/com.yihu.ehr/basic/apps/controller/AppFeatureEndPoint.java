@@ -92,8 +92,9 @@ public class AppFeatureEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "AppFeature", value = "对象JSON结构体", allowMultiple = true)
             @RequestBody String appJson) throws Exception {
         AppFeature appFeature = toEntity(appJson, AppFeature.class);
-        if (appFeatureService.retrieve(appFeature.getId()) == null)
-            throw new ApiException(ErrorCode.InvalidAppId, "应用不存在");
+        if (appFeatureService.retrieve(appFeature.getId()) == null) {
+            throw new ApiException(ErrorCode.NOT_FOUND, "应用不存在");
+        }
         // 拼接菜单JSON对象字符串
         appFeature = appFeatureService.joinMenuItemJsonStr(appFeature);
         appFeatureService.save(appFeature);

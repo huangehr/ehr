@@ -39,16 +39,12 @@ public class RsReportController extends BaseController {
     public Envelop getById(
             @ApiParam(name = "id", value = "id")
             @PathVariable(value = "id") Integer id) throws Exception {
-        try {
-            Envelop envelop = new Envelop();
-            envelop.setSuccessFlg(true);
-            MRsReport mRsReport = rsReportClient.getById(id);
-            envelop.setObj(mRsReport);
-            return envelop;
-        } catch (Exception e) {
-            LogService.getLogger(RsReportController.class).error(e.getMessage());
-            return failed(ErrorCode.SystemError.toString());
-        }
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(true);
+        MRsReport mRsReport = rsReportClient.getById(id);
+        envelop.setObj(mRsReport);
+        return envelop;
+
     }
 
     @ApiOperation("根据编码获取资源报表")
@@ -56,16 +52,12 @@ public class RsReportController extends BaseController {
     public Envelop findByCode(
             @ApiParam(name = "code", value = "编码")
             @RequestParam(value = "code") String code) throws Exception {
-        try {
-            Envelop envelop = new Envelop();
-            envelop.setSuccessFlg(true);
-            MRsReport mRsReport = rsReportClient.findByCode(code);
-            envelop.setObj(mRsReport);
-            return envelop;
-        } catch (Exception e) {
-            LogService.getLogger(RsReportController.class).error(e.getMessage());
-            return failed(ErrorCode.SystemError.toString());
-        }
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(true);
+        MRsReport mRsReport = rsReportClient.findByCode(code);
+        envelop.setObj(mRsReport);
+        return envelop;
+
     }
 
     @ApiOperation(value = "根据条件获取资源报表")
@@ -82,16 +74,11 @@ public class RsReportController extends BaseController {
             @ApiParam(name = "size", value = "分页大小")
             @RequestParam(value = "size", required = false) int size) throws Exception {
         Envelop envelop = new Envelop();
-        try {
-            ResponseEntity<List<MRsReport>> responseEntity = rsReportClient.search(fields, filters, sorts, page, size);
-            List<MRsReport> mRsReportList = responseEntity.getBody();
-            envelop = getResult(mRsReportList, getTotalCount(responseEntity), page, size);
-            return envelop;
-        } catch (Exception e) {
-            e.printStackTrace();
-            LogService.getLogger(RsReportController.class).error(e.getMessage());
-            return failed(ErrorCode.SystemError.toString());
-        }
+        ResponseEntity<List<MRsReport>> responseEntity = rsReportClient.search(fields, filters, sorts, page, size);
+        List<MRsReport> mRsReportList = responseEntity.getBody();
+        envelop = getResult(mRsReportList, getTotalCount(responseEntity), page, size);
+        return envelop;
+
     }
 
     @ApiOperation("新增资源报表")
@@ -100,16 +87,11 @@ public class RsReportController extends BaseController {
             @ApiParam(name = "rsReport", value = "资源报表JSON字符串", required = true)
             @RequestParam(value = "rsReport") String rsReport) throws Exception {
         Envelop envelop = new Envelop();
-        try {
-            MRsReport newMRsReport = rsReportClient.add(rsReport);
-            envelop.setObj(newMRsReport);
-            envelop.setSuccessFlg(true);
-            return envelop;
-        } catch (Exception e) {
-            e.printStackTrace();
-            LogService.getLogger(RsReportController.class).error(e.getMessage());
-            return failed(ErrorCode.SystemError.toString());
-        }
+        MRsReport newMRsReport = rsReportClient.add(rsReport);
+        envelop.setObj(newMRsReport);
+        envelop.setSuccessFlg(true);
+        return envelop;
+
     }
 
     @ApiOperation("更新资源报表")
@@ -118,16 +100,11 @@ public class RsReportController extends BaseController {
             @ApiParam(name = "rsReport", value = "资源报表JSON字符串", required = true)
             @RequestParam(value = "rsReport") String rsReport) throws Exception {
         Envelop envelop = new Envelop();
-        try {
-            MRsReport newMRsReport = rsReportClient.update(rsReport);
-            envelop.setObj(newMRsReport);
-            envelop.setSuccessFlg(true);
-            return envelop;
-        } catch (Exception e) {
-            e.printStackTrace();
-            LogService.getLogger(RsReportController.class).error(e.getMessage());
-            return failed(ErrorCode.SystemError.toString());
-        }
+        MRsReport newMRsReport = rsReportClient.update(rsReport);
+        envelop.setObj(newMRsReport);
+        envelop.setSuccessFlg(true);
+        return envelop;
+
     }
 
     @ApiOperation("删除资源报表")
@@ -136,22 +113,17 @@ public class RsReportController extends BaseController {
             @ApiParam(name = "id", value = "主键", required = true)
             @RequestParam(value = "id") Integer id) throws Exception {
         Envelop envelop = new Envelop();
-        try {
-            boolean isReportAccredited = roleReportRelationClient.isReportAccredited(id);
-            if(isReportAccredited) {
-                envelop.setSuccessFlg(false);
-                envelop.setErrorMsg("该资源报表已被授权，不能删除。");
-                return envelop;
-            }
-
-            rsReportClient.delete(id);
-            envelop.setSuccessFlg(true);
+        boolean isReportAccredited = roleReportRelationClient.isReportAccredited(id);
+        if(isReportAccredited) {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("该资源报表已被授权，不能删除。");
             return envelop;
-        } catch (Exception e) {
-            e.printStackTrace();
-            LogService.getLogger(RsReportController.class).error(e.getMessage());
-            return failed(ErrorCode.SystemError.toString());
         }
+
+        rsReportClient.delete(id);
+        envelop.setSuccessFlg(true);
+        return envelop;
+
     }
 
     @ApiOperation("验证资源报表编码是否唯一")
@@ -162,18 +134,13 @@ public class RsReportController extends BaseController {
             @ApiParam(name = "code", value = "资源报表编码", required = true)
             @RequestParam("code") String code) throws Exception {
         Envelop envelop = new Envelop();
-        try {
-            boolean result = rsReportClient.isUniqueCode(id, code);
-            envelop.setSuccessFlg(result);
-            if (!result) {
-                envelop.setErrorMsg("该编码已被使用，请重新填写！");
-            }
-            return envelop;
-        } catch (Exception e) {
-            e.printStackTrace();
-            LogService.getLogger(RsReportController.class).error(e.getMessage());
-            return failed(ErrorCode.SystemError.toString());
+        boolean result = rsReportClient.isUniqueCode(id, code);
+        envelop.setSuccessFlg(result);
+        if (!result) {
+            envelop.setErrorMsg("该编码已被使用，请重新填写！");
         }
+        return envelop;
+
     }
 
     @ApiOperation("验证资源报表名称是否唯一")
@@ -184,18 +151,13 @@ public class RsReportController extends BaseController {
             @ApiParam(name = "name", value = "资源报表名称", required = true)
             @RequestParam("name") String name) throws Exception {
         Envelop envelop = new Envelop();
-        try {
-            boolean result = rsReportClient.isUniqueName(id, name);
-            envelop.setSuccessFlg(result);
-            if (!result) {
-                envelop.setErrorMsg("该名称已被使用，请重新填写！");
-            }
-            return envelop;
-        } catch (Exception e) {
-            e.printStackTrace();
-            LogService.getLogger(RsReportController.class).error(e.getMessage());
-            return failed(ErrorCode.SystemError.toString());
+        boolean result = rsReportClient.isUniqueName(id, name);
+        envelop.setSuccessFlg(result);
+        if (!result) {
+            envelop.setErrorMsg("该名称已被使用，请重新填写！");
         }
+        return envelop;
+
     }
 
     @ApiOperation("获取报表模版内容")
@@ -204,16 +166,11 @@ public class RsReportController extends BaseController {
             @ApiParam(name = "reportCode", value = "资源报表Code", required = true)
             @RequestParam("reportCode") String reportCode) throws Exception {
         Envelop envelop = new Envelop();
-        try {
-            String templateContent = rsReportClient.getTemplateContent(reportCode);
-            envelop.setObj(templateContent);
-            envelop.setSuccessFlg(true);
-            return envelop;
-        } catch (Exception e) {
-            e.printStackTrace();
-            LogService.getLogger(RsReportController.class).error(e.getMessage());
-            return failed(ErrorCode.SystemError.toString());
-        }
+        String templateContent = rsReportClient.getTemplateContent(reportCode);
+        envelop.setObj(templateContent);
+        envelop.setSuccessFlg(true);
+        return envelop;
+
     }
 
 }

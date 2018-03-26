@@ -3,6 +3,7 @@ package com.yihu.ehr.profile.controller.profile;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseRestEndPoint;
+import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.model.resource.MStdTransformDto;
 import com.yihu.ehr.profile.feign.TransformClient;
 import com.yihu.ehr.profile.service.*;
@@ -20,15 +21,17 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * EndPoint - 档案事件接口（兼容 pc & mobile）
  * 档案事件接口
  * @author hzp
  * @version 1.0
  * @created 2017.06.22
+ * @modifier progr1mmer
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @Api(value = "ProfileEventEndPoint", description = "档案事件接口", tags = {"档案影像服务 - 档案事件接口"})
-public class ProfileEventEndPoint extends BaseRestEndPoint {
+public class ProfileEventEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     private ProfileEventService patientEvent;

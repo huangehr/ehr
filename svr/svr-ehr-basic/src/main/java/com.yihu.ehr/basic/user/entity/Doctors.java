@@ -1,4 +1,6 @@
 package com.yihu.ehr.basic.user.entity;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -196,6 +198,7 @@ public class Doctors {
         this.status = status;
     }
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getInsertTime() {
         return insertTime;
     }
@@ -204,6 +207,7 @@ public class Doctors {
         this.insertTime = insertTime;
     }
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getUpdateTime() {
         return updateTime;
     }

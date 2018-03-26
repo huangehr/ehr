@@ -1,5 +1,6 @@
 package com.yihu.ehr.entity.report;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -80,6 +81,7 @@ public class QcDailyReportDetail {
 
     @Basic
     @Column(name = "event_time")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getEventTime() {
         return eventTime;
     }
@@ -110,6 +112,7 @@ public class QcDailyReportDetail {
 
     @Basic
     @Column(name = "add_date")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getAddDate() {
         return addDate;
     }
@@ -120,6 +123,7 @@ public class QcDailyReportDetail {
 
     @Basic
     @Column(name = "acq_time")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getAcqTime() {
         return acqTime;
     }
@@ -130,6 +134,7 @@ public class QcDailyReportDetail {
 
     @Basic
     @Column(name = "storage_time")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getStorageTime() {
         return storageTime;
     }

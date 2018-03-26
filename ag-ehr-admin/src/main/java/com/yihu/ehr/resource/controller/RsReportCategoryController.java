@@ -38,16 +38,12 @@ public class RsReportCategoryController extends BaseController {
     public Envelop getById(
             @ApiParam(name = "id", value = "id")
             @PathVariable(value = "id") Integer id) throws Exception {
-        try {
-            Envelop envelop = new Envelop();
-            envelop.setSuccessFlg(true);
-            MRsReportCategory mRsReportCategory = rsReportCategoryClient.getById(id);
-            envelop.setObj(mRsReportCategory);
-            return envelop;
-        } catch (Exception e) {
-            LogService.getLogger(RsReportCategoryController.class).error(e.getMessage());
-            return failed(ErrorCode.SystemError.toString());
-        }
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(true);
+        MRsReportCategory mRsReportCategory = rsReportCategoryClient.getById(id);
+        envelop.setObj(mRsReportCategory);
+        return envelop;
+
     }
 
     @ApiOperation(value = "根据条件，获取资源报表分类")
@@ -55,33 +51,23 @@ public class RsReportCategoryController extends BaseController {
     public Envelop getTreeData(
             @ApiParam(name = "codeName", value = "资源报表分类编码或名称")
             @RequestParam(value = "codeName", required = false) String codeName) throws Exception {
-        try {
-            Envelop envelop = new Envelop();
-            envelop.setSuccessFlg(true);
-            List<MRsReportCategory> resultList = rsReportCategoryClient.search(codeName);
-            envelop.setDetailModelList(resultList);
-            return envelop;
-        } catch (Exception e) {
-            e.printStackTrace();
-            LogService.getLogger(RsReportCategoryController.class).error(e.getMessage());
-            return failed(ErrorCode.SystemError.toString());
-        }
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(true);
+        List<MRsReportCategory> resultList = rsReportCategoryClient.search(codeName);
+        envelop.setDetailModelList(resultList);
+        return envelop;
+
     }
 
     @ApiOperation(value = "获取资源报表分类树形下拉框数据")
     @RequestMapping(value = ServiceApi.Resources.RsReportCategoryComboTree, method = RequestMethod.GET)
     public Envelop getComboTreeData() throws Exception {
-        try {
-            Envelop envelop = new Envelop();
-            envelop.setSuccessFlg(true);
-            List<MRsReportCategory> treeList = rsReportCategoryClient.getComboTreeData();
-            envelop.setDetailModelList(treeList);
-            return envelop;
-        } catch (Exception e) {
-            e.printStackTrace();
-            LogService.getLogger(RsReportCategoryController.class).error(e.getMessage());
-            return failed(ErrorCode.SystemError.toString());
-        }
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(true);
+        List<MRsReportCategory> treeList = rsReportCategoryClient.getComboTreeData();
+        envelop.setDetailModelList(treeList);
+        return envelop;
+
     }
 
     @ApiOperation("新增资源报表分类")
@@ -90,16 +76,10 @@ public class RsReportCategoryController extends BaseController {
             @ApiParam(name = "rsReportCategory", value = "资源报表分类JSON字符串", required = true)
             @RequestParam(value = "rsReportCategory") String rsReportCategory) throws Exception {
         Envelop envelop = new Envelop();
-        try {
-            MRsReportCategory newMRsReportCategory = rsReportCategoryClient.add(rsReportCategory);
-            envelop.setObj(newMRsReportCategory);
-            envelop.setSuccessFlg(true);
-            return envelop;
-        } catch (Exception e) {
-            e.printStackTrace();
-            LogService.getLogger(RsReportCategoryController.class).error(e.getMessage());
-            return failed(ErrorCode.SystemError.toString());
-        }
+        MRsReportCategory newMRsReportCategory = rsReportCategoryClient.add(rsReportCategory);
+        envelop.setObj(newMRsReportCategory);
+        envelop.setSuccessFlg(true);
+        return envelop;
     }
 
     @ApiOperation("更新资源报表分类")
@@ -108,16 +88,11 @@ public class RsReportCategoryController extends BaseController {
             @ApiParam(name = "rsReportCategory", value = "资源报表分类JSON字符串", required = true)
             @RequestParam(value = "rsReportCategory") String rsReportCategory) throws Exception {
         Envelop envelop = new Envelop();
-        try {
-            MRsReportCategory newMRsReportCategory = rsReportCategoryClient.update(rsReportCategory);
-            envelop.setObj(newMRsReportCategory);
-            envelop.setSuccessFlg(true);
-            return envelop;
-        } catch (Exception e) {
-            e.printStackTrace();
-            LogService.getLogger(RsReportCategoryController.class).error(e.getMessage());
-            return failed(ErrorCode.SystemError.toString());
-        }
+        MRsReportCategory newMRsReportCategory = rsReportCategoryClient.update(rsReportCategory);
+        envelop.setObj(newMRsReportCategory);
+        envelop.setSuccessFlg(true);
+        return envelop;
+
     }
 
     @ApiOperation("删除资源报表分类")
@@ -126,22 +101,17 @@ public class RsReportCategoryController extends BaseController {
             @ApiParam(name = "id", value = "主键", required = true)
             @RequestParam(value = "id") Integer id) throws Exception {
         Envelop envelop = new Envelop();
-        try {
-            boolean isCategoryApplied = rsReportClient.isCategoryApplied(id);
-            if(isCategoryApplied) {
-                envelop.setSuccessFlg(false);
-                envelop.setErrorMsg("该资源报表分类已经被应用，不能删除。");
-                return envelop;
-            }
-
-            rsReportCategoryClient.delete(id);
-            envelop.setSuccessFlg(true);
+        boolean isCategoryApplied = rsReportClient.isCategoryApplied(id);
+        if(isCategoryApplied) {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("该资源报表分类已经被应用，不能删除。");
             return envelop;
-        } catch (Exception e) {
-            e.printStackTrace();
-            LogService.getLogger(RsReportCategoryController.class).error(e.getMessage());
-            return failed(ErrorCode.SystemError.toString());
         }
+
+        rsReportCategoryClient.delete(id);
+        envelop.setSuccessFlg(true);
+        return envelop;
+
     }
 
     @ApiOperation("验证资源报表分类编码是否唯一")
@@ -152,18 +122,13 @@ public class RsReportCategoryController extends BaseController {
             @ApiParam(name = "code", value = "资源报表分类编码", required = true)
             @RequestParam("code") String code) throws Exception {
         Envelop envelop = new Envelop();
-        try {
-            boolean result = rsReportCategoryClient.isUniqueCode(id, code);
-            envelop.setSuccessFlg(result);
-            if (!result) {
-                envelop.setErrorMsg("该编码已被使用，请重新填写！");
-            }
-            return envelop;
-        } catch (Exception e) {
-            e.printStackTrace();
-            LogService.getLogger(RsReportCategoryController.class).error(e.getMessage());
-            return failed(ErrorCode.SystemError.toString());
+        boolean result = rsReportCategoryClient.isUniqueCode(id, code);
+        envelop.setSuccessFlg(result);
+        if (!result) {
+            envelop.setErrorMsg("该编码已被使用，请重新填写！");
         }
+        return envelop;
+
     }
 
     @ApiOperation("验证资源报表分类名称是否唯一")
@@ -174,18 +139,13 @@ public class RsReportCategoryController extends BaseController {
             @ApiParam(name = "name", value = "资源报表分类名称", required = true)
             @RequestParam("name") String name) throws Exception {
         Envelop envelop = new Envelop();
-        try {
-            boolean result = rsReportCategoryClient.isUniqueName(id, name);
-            envelop.setSuccessFlg(result);
-            if (!result) {
-                envelop.setErrorMsg("该名称已被使用，请重新填写！");
-            }
-            return envelop;
-        } catch (Exception e) {
-            e.printStackTrace();
-            LogService.getLogger(RsReportCategoryController.class).error(e.getMessage());
-            return failed(ErrorCode.SystemError.toString());
+        boolean result = rsReportCategoryClient.isUniqueName(id, name);
+        envelop.setSuccessFlg(result);
+        if (!result) {
+            envelop.setErrorMsg("该名称已被使用，请重新填写！");
         }
+        return envelop;
+
     }
 
 }

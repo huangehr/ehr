@@ -1,6 +1,5 @@
 package com.yihu.ehr.agModel.government;
 
-import java.util.Date;
 
 /**
  * Created by wxw on 2017/11/2.

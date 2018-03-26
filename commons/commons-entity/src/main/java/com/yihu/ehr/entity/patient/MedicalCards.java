@@ -65,31 +65,31 @@ public class MedicalCards {
     }
 
     @Column(name = "release_date")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getReleaseDate() {
         return releaseDate;
     }
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+08:00")
     public void setReleaseDate(Date releaseDate) {
         this.releaseDate = releaseDate;
     }
 
     @Column(name = "validity_date_begin")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getValidityDateBegin() {
         return validityDateBegin;
     }
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+08:00")
     public void setValidityDateBegin(Date validityDateBegin) {
         this.validityDateBegin = validityDateBegin;
     }
 
     @Column(name = "validity_date_end")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getValidityDateEnd() {
         return validityDateEnd;
     }
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+08:00")
     public void setValidityDateEnd(Date validityDateEnd) {
         this.validityDateEnd = validityDateEnd;
     }
@@ -112,11 +112,11 @@ public class MedicalCards {
     }
 
     @Column(name = "create_date")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getCreateDate() {
         return createDate;
     }
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+08:00")
     public void setCreateDate(Date createDate) {
         this.createDate = createDate;
     }
@@ -130,11 +130,11 @@ public class MedicalCards {
     }
 
     @Column(name = "update_date")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getUpdateDate() {
         return updateDate;
     }
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+08:00")
     public void setUpdateDate(Date updateDate) {
         this.updateDate = updateDate;
     }

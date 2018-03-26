@@ -1,5 +1,6 @@
 package com.yihu.ehr.entity.user;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.yihu.ehr.entity.BaseIdentityEntity;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -59,6 +60,7 @@ public class UserTelVerification  implements Serializable{
     }
 
     @Column(name = "effective_period",  nullable = true)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getEffectivePeriod() {
         return effectivePeriod;
     }

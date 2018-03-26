@@ -2,10 +2,12 @@ package com.yihu.ehr.profile.service;
 
 
 import com.yihu.ehr.profile.feign.*;
+import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 
@@ -27,19 +29,20 @@ public class ProfileInfoBaseService {
      */
     public Map<String, Object> getPatientInfo(String demographicId, String version) {
         //时间排序
-        Envelop envelop;
-        if(version != null) {
+        /*if (version != null) {
             envelop = resource.getMasterData("{\"q\":\"demographic_id:" + demographicId + "\"}", null, null, version);
-        }else {
+        } else {
             envelop = resource.getMasterData("{\"q\":\"demographic_id:" + demographicId + "\"}", null, null, null);
-        }
+        }*/
+        Envelop envelop = resource.getMasterData("{\"q\":\"demographic_id:" + demographicId + "\"}", 1, 500, null);
         List<Map<String, Object>> list = envelop.getDetailModelList();
+        Map<String, Object> patientMap = new HashMap<>();
         if (list != null && list.size() > 0) {
+            Map<String, Object> result = new HashMap<>();
             if (list.size() == 1) {
-                return list.get(0);
+                result = list.get(0);
             } else {
                 //合并数据
-                Map<String, Object> result = new HashMap<>();
                 for (Map<String, Object> obj : list) {
                     for (String key : obj.keySet()) {
                         if (!result.containsKey(key)) {
@@ -47,10 +50,120 @@ public class ProfileInfoBaseService {
                         }
                     }
                 }
-                return result;
             }
+            //提取档案类型信息
+            // 1. 新生儿 -> 出生医学证明编号 新生儿姓名 新生儿性别代码 新生儿出生日期
+            if (result.get("EHR_001219") != null || result.get("EHR_001251") != null || result.get("EHR_001252") != null || result.get("EHR_001253") != null) {
+                patientMap.put("label", "新生儿");
+                //出生身高
+                patientMap.put("height", result.get("EHR_001256") == null ? "" : result.get("EHR_001256"));
+                //出生体重
+                patientMap.put("weight", result.get("EHR_001257") == null ? "" : result.get("EHR_001257")); //单位(g)
+                //2. 慢病
+            } else {
+                patientMap.put("label", "患病");
+                //身高
+                Object height = null;
+                if (result.get("EHR_000590") != null) {
+                    height = result.get("EHR_000590");
+                } else if (result.get("EHR_000778") != null) {
+                    height = result.get("EHR_000778");
+                } else if (result.get("EHR_001339") != null) {
+                    height = result.get("EHR_001339");
+                } else if (result.get("EHR_004263") != null) {
+                    height = result.get("EHR_004263");
+                } else if (result.get("EHR_005142") != null) {
+                    height = result.get("EHR_005142");
+                }
+                patientMap.put("height", height == null ? "" : height);
+                //体重
+                Object weight = null;
+                if (result.get("EHR_000073") != null) {
+                    weight = result.get("EHR_000073");
+                } else if (result.get("EHR_000785") != null) {
+                    weight = result.get("EHR_000785");
+                } else if (result.get("EHR_001340") != null) {
+                    weight = result.get("EHR_001340");
+                } else if (result.get("EHR_004002") != null) {
+                    weight = result.get("EHR_004002");
+                } else if (result.get("EHR_004718") != null) {
+                    weight = result.get("EHR_004718");
+                } else if (result.get("EHR_005148") != null) {
+                    weight = result.get("EHR_005148");
+                }
+                patientMap.put("weight", weight == null ? "" : weight);
+            }
+            //姓名
+            patientMap.put("name", result.get("patient_name") == null? "" : result.get("patient_name"));
+            //性别
+            String gender = result.get("EHR_000019") == null? "" : (String) result.get("EHR_000019");
+            if (gender.equals("1")) {
+                gender = "男";
+            } else if (gender.equals("2")) {
+                gender = "女";
+            }
+            patientMap.put("gender", gender == null ? "未知" : gender);
+            //出生日期
+            if (result.get("EHR_000007") != null) {
+                patientMap.put("birthday", result.get("EHR_000007"));
+            } else if(result.get("EHR_000320") != null) {
+                patientMap.put("birthday", result.get("EHR_000320"));
+            } else {
+                patientMap.put("birthday", "");
+            }
+            //年龄
+            if (!StringUtils.isEmpty(patientMap.get("birthday"))) {
+                String date1 = patientMap.get("birthday").toString();
+                String date2 = date1.substring(0, date1.indexOf("T"));
+                Date date3 = DateUtil.formatCharDateYMD(date2, "yyyy-MM-dd");
+                Calendar calendar = Calendar.getInstance();
+                int now = calendar.get(Calendar.YEAR);
+                Calendar calendar1 = Calendar.getInstance();
+                calendar1.setTime(date3);
+                int birthday = calendar1.get(Calendar.YEAR);
+                patientMap.put("age", String.valueOf(now - birthday));
+            } else {
+                patientMap.put("age", "");
+            }
+            //民族
+            patientMap.put("nation", result.get("EHR_000016_VALUE") == null ? "" : result.get("EHR_000016_VALUE"));
+            //婚姻状态
+            if (!StringUtils.isEmpty(result.get("EHR_000014_VALUE"))) {
+                patientMap.put("marriage", result.get("EHR_000014_VALUE"));
+            } else if (!StringUtils.isEmpty(result.get("EHR_004984_VALUE"))) {
+                patientMap.put("marriage", result.get("EHR_004984_VALUE"));
+            } else {
+                patientMap.put("marriage", "");
+            }
+            //婚育
+            patientMap.put("fertility", result.get("EHR_000540") == null ? "" : result.get("EHR_000540"));
+            //ABO血型
+            patientMap.put("ABO", result.get("EHR_000001") == null ? "" : result.get("EHR_000001"));
+            //Rh血型
+            patientMap.put("Rh", result.get("EHR_000002") == null ? "" : result.get("EHR_000002"));
+            //过敏药物
+            patientMap.put("allergyMedicine", result.get("EHR_004971") == null ? "" : result.get("EHR_004971"));
+            //过敏源
+            patientMap.put("allergens", result.get("EHR_000011") == null ? "" : result.get("EHR_000011"));
+            //电话
+            patientMap.put("patientTel", result.get("EHR_000003") == null ? "" : result.get("EHR_000003"));
+            //国籍
+            patientMap.put("country", result.get("EHR_004970_VALUE") == null ? "" : result.get("EHR_004970_VALUE"));
+            //工作单位
+            patientMap.put("employer", result.get("EHR_002930") == null ? "" : result.get("EHR_002930"));
+            //户籍
+            if (result.get("EHR_004945") != null && result.get("EHR_004946") != null) {
+                patientMap.put("householdRegister", result.get("EHR_004945") + "-" + result.get("EHR_004946"));
+            } else if (result.get("EHR_004945") != null && result.get("EHR_004946") == null) {
+                patientMap.put("householdRegister", result.get("EHR_004945"));
+            } else if (result.get("EHR_004945") == null && result.get("EHR_004946") != null) {
+                patientMap.put("householdRegister", result.get("EHR_004946"));
+            } else {
+                patientMap.put("householdRegister", "");
+            }
+            return patientMap;
         } else {
-            return null;
+            return patientMap;
         }
     }
 
@@ -59,42 +172,44 @@ public class ProfileInfoBaseService {
      * @param demographic_id
      * @return
      */
-    public List<Map<String, Object>> profileHistory(String demographic_id) {
+    public List<Map<String, Object>> pastHistory(String demographic_id) {
         List<Map<String, Object>> resultList = new ArrayList<>();
-        //疾病史
+        //药物过敏
+        Map<String, Object> patientInfo = getPatientInfo(demographic_id, null);
+        Map<String, Object> allergyMedicine = new HashMap<>();
+        allergyMedicine.put("label", "药物过敏");
+        allergyMedicine.put("info", patientInfo.get("allergyMedicine"));
+        resultList.add(allergyMedicine);
+
+        //疾病
+        Map<String, Object> medicalHistory = new HashMap<>();
         List<Map<String, Object>> list1 =  profileDiseaseService.getHealthProblem(demographic_id);
-        if(list1 != null && list1.size() > 0) {
-            Map<String, Object> medicalHistory = new HashMap<>(2);
-            StringBuilder stringBuilder = new StringBuilder("患者于：");
-            int index = 1;
+        StringBuilder stringBuilder1 = new StringBuilder();
+        if (list1 != null && list1.size() > 0) {
             for (Map temp : list1) {
-                String firstVisitDate = (String) temp.get("firstVisitDate");
                 String healthProblemName = (String) temp.get("healthProblemName");
-                stringBuilder.append("(" + index + ").");
-                stringBuilder.append(firstVisitDate.substring(0, firstVisitDate.indexOf("T")));
-                stringBuilder.append("，被诊断：");
-                stringBuilder.append(healthProblemName);
-                stringBuilder.append(";");
-                index ++;
+                stringBuilder1.append(healthProblemName);
+                stringBuilder1.append("、");
             }
-            medicalHistory.put("label", "疾病史");
-            medicalHistory.put("info", stringBuilder.toString());
-            resultList.add(medicalHistory);
         }
+        medicalHistory.put("label", "疾病");
+        medicalHistory.put("info", stringBuilder1.toString());
+        resultList.add(medicalHistory);
+
+        //传染病 #
         Envelop envelop;
-        //传染病史
         String q2 = "{\"q\":\"demographic_id:" + demographic_id + " AND EHR_002393:*\"}";
-        envelop = resource.getMasterData(q2, null, null, null);
+        envelop = resource.getMasterData(q2, 1, 500, null);
         List<Map<String, Object>> list2 = envelop.getDetailModelList();
-        if(list2 != null && list2.size() > 0) {
+        if (list2 != null && list2.size() > 0) {
             Map<String, Object> infectiousDisease = new HashMap<>(2);
             StringBuilder stringBuilder = new StringBuilder("患者于：");
             int index = 1;
-            for(Map temp : list2) {
+            for (Map temp : list2) {
                 String fillDate;
-                if(temp.get("EHR_002382") != null) {
+                if (temp.get("EHR_002382") != null) {
                     fillDate = (String) temp.get("EHR_002382");
-                }else {
+                } else {
                     fillDate = (String) temp.get("EHR_002393");
                 }
                 String name = (String) temp.get("EHR_002386");
@@ -109,36 +224,31 @@ public class ProfileInfoBaseService {
             infectiousDisease.put("info", stringBuilder.toString());
             resultList.add(infectiousDisease);
         }
-        //预防接种史
+
+        //预防接种
+        Map<String, Object> vaccination = new HashMap<>(2);
         String q3 = "{\"q\":\"demographic_id:" + demographic_id + " AND EHR_002443:*\"}";
-        envelop = resource.getMasterData(q3, null, null, null);
+        envelop = resource.getMasterData(q3, 1, 500, null);
         List<Map<String, Object>> list3 = envelop.getDetailModelList();
-        if(list3 != null && list3.size() > 0) {
-            Map<String, Object> vaccination = new HashMap<>(2);
-            StringBuilder stringBuilder = new StringBuilder("患者于：");
-            int index = 1;
+        StringBuilder stringBuilder3 = new StringBuilder("患者于：");
+        if (list3 != null && list3.size() > 0) {
             for (Map temp : list3) {
-                String vaccinationDate = (String) temp.get("EHR_002443");
                 String name = (String) temp.get("EHR_002449");
-                stringBuilder.append("(" + index + ").");
-                stringBuilder.append(vaccinationDate.substring(0, vaccinationDate.indexOf("T")));
-                stringBuilder.append("，接种：");
-                stringBuilder.append(name);
-                stringBuilder.append(";");
-                index ++;
+                stringBuilder3.append(name);
+                stringBuilder3.append("、");
             }
-            vaccination.put("label", "预防接种史");
-            vaccination.put("info", stringBuilder.toString());
-            resultList.add(vaccination);
         }
-        //手术史
+        vaccination.put("label", "预防接种");
+        vaccination.put("info", stringBuilder3.toString());
+        resultList.add(vaccination);
+
+        //手术
+        Map<String, Object> surgery = new HashMap<>();
         String q4 = "{\"q\":\"demographic_id:" + demographic_id + "\"}";
-        envelop = resource.getMasterData(q4, null, null, null);
+        envelop = resource.getMasterData(q4, 1, null, null);
         List<Map<String, Object>> list4 = envelop.getDetailModelList();
-        if(list4 != null && list4.size() > 0) {
-            Map<String, Object> surgery = new HashMap<>(2);
-            StringBuilder stringBuilder = new StringBuilder("患者于：");
-            int index = 1;
+        StringBuilder stringBuilder4 = new StringBuilder();
+        if (list4 != null && list4.size() > 0) {
             for (Map temp : list4) {
                 String masterRowKey = (String) temp.get("rowkey");
                 String subQ = "{\"q\":\"rowkey:" + masterRowKey + "$HDSD00_06$*" + "\"}";
@@ -146,34 +256,40 @@ public class ProfileInfoBaseService {
                 List<Map<String, Object>> subList = envelop.getDetailModelList();
                 if (subList != null && subList.size() > 0) {
                     for (Map subTemp : subList) {
-                        String eventDate = (String) temp.get("event_date");
                         String operateName;
                         if (temp.get("EHR_000418") != null) {
                             operateName = (String) subTemp.get("EHR_000418");
                         } else {
                             operateName = (String) subTemp.get("EHR_004045");
                         }
-                        stringBuilder.append("(" + index + ").");
-                        stringBuilder.append(eventDate.substring(0, eventDate.indexOf("T")));
-                        stringBuilder.append("，进行手术：");
-                        stringBuilder.append(operateName);
-                        stringBuilder.append(";");
-                        index ++;
+                        stringBuilder4.append(operateName);
+                        stringBuilder4.append("、");
                         break;
                     }
                 }
             }
-            if(index > 1) {
-                surgery.put("label", "手术史");
-                surgery.put("info", stringBuilder.toString());
-                resultList.add(surgery);
-            }
         }
-        //孕产史
+        surgery.put("label", "手术");
+        surgery.put("info", stringBuilder4.toString());
+        resultList.add(surgery);
+
+        //外伤
+        Map<String, Object> trauma = new HashMap<>();
+        trauma.put("label", "外伤");
+        trauma.put("info", "");
+        resultList.add(trauma);
+
+        //输血
+        Map<String, Object> bloodTransfusion = new HashMap<>();
+        bloodTransfusion.put("label", "输血");
+        bloodTransfusion.put("info", "");
+        resultList.add(bloodTransfusion);
+
+        //孕产 #
         String q5 = "{\"q\":\"demographic_id:" + demographic_id + " AND EHR_002443:*\"}";
         envelop = resource.getMasterData(q5, null, null, null);
         List<Map<String, Object>> list5 = envelop.getDetailModelList();
-        if(list5 != null && list5.size() > 0) {
+        if (list5 != null && list5.size() > 0) {
             Map<String, Object> childbirth = new HashMap<>(2);
             StringBuilder stringBuilder = new StringBuilder("患者于：\r\n");
             int index = 1;
@@ -187,50 +303,111 @@ public class ProfileInfoBaseService {
                 stringBuilder.append(";");
                 index ++;
             }
-            childbirth.put("label", "孕产史");
+            childbirth.put("label", "孕产");
             childbirth.put("info", stringBuilder.toString());
             resultList.add(childbirth);
         }
         return resultList;
     }
 
+    /**
+     * 过敏史
+     * @param demographic_id
+     * @return
+     */
+    public Map<String, Object> allergensHistory(String demographic_id) {
+        Map<String, Object> patientInfo = getPatientInfo(demographic_id, null);
+        Map<String, Object> allergens = new HashMap<>();
+        allergens.put("label", "过敏源");
+        allergens.put("info", patientInfo.get("allergens"));
+        return allergens;
+    }
 
-    private int CompareAgeOfDisease(String AgeOfDisease1,String AgeOfDisease2){
-        int year1=0;
-        int month1=0;
-        int year2=0;
-        int month2=0;
-        if(AgeOfDisease1.split("年|个月").length>1) {
+    /**
+     * 家族史
+     * @param demographic_id
+     * @return
+     */
+    public Map<String, Object> familyHistory(String demographic_id) {
+        Map<String, Object> familyHistory = new HashMap<>();
+        familyHistory.put("label", "家族史");
+        familyHistory.put("info", "");
+        return familyHistory;
+    }
+
+    /**
+     * 个人史
+     * @param demographic_id
+     * @return
+     */
+    public Map<String, Object> personHistory(String demographic_id) {
+        Envelop envelop = resource.getMasterData("{\"q\":\"demographic_id:" + demographic_id + "\"}", 1, 500, null);
+        List<Map<String, Object>> list = envelop.getDetailModelList();
+        Map<String, Object> personHistory = new HashMap<>();
+        if (list != null && list.size() > 0) {
+            Map<String, Object> result = new HashMap<>();
+            if (list.size() == 1) {
+                result = list.get(0);
+            } else {
+                //合并数据
+                for (Map<String, Object> obj : list) {
+                    for (String key : obj.keySet()) {
+                        if (!result.containsKey(key)) {
+                            result.put(key, obj.get(key));
+                        }
+                    }
+                }
+            }
+            personHistory.put("name", result.get("patient_name") == null? "" : result.get("patient_name"));
+            personHistory.put("placeOfBirth", ""); //出生地
+            personHistory.put("placeOfResidence", ""); //居住地
+            personHistory.put("livingCondition", ""); //生活条件
+            personHistory.put("educationLevel", ""); //文化程度
+            personHistory.put("career", ""); //职业
+            personHistory.put("smoke", ""); //嗜烟
+            personHistory.put("alcohol", ""); //嗜酒
+            personHistory.put("epidemicWater contact", ""); //疫水接触
+            personHistory.put("infectedArea", ""); //疫区接触
+            personHistory.put("radioactiveMaterialContact", ""); //放射性物质接触
+        }
+        return personHistory;
+    }
+
+    private int CompareAgeOfDisease(String AgeOfDisease1, String AgeOfDisease2){
+        int year1 = 0;
+        int month1 = 0;
+        int year2 = 0;
+        int month2 = 0;
+        if (AgeOfDisease1.split("年|个月").length>1) {
             year1 = Integer.parseInt(AgeOfDisease1.split("年|个月")[0]);
             month1 = Integer.parseInt(AgeOfDisease1.split("年|个月")[1]);
-        }
-        else
+        } else {
             month1 = Integer.parseInt(AgeOfDisease1.split("年|个月")[0]);
-        if(AgeOfDisease2.split("年|个月").length>1) {
+        }
+        if (AgeOfDisease2.split("年|个月").length>1) {
             year2 = Integer.parseInt(AgeOfDisease2.split("年|个月")[0]);
             month2 = Integer.parseInt(AgeOfDisease2.split("年|个月")[1]);
-        }
-        else
+        } else {
             month2 = Integer.parseInt(AgeOfDisease2.split("年|个月")[0]);
-        if(year1 * 12 + month1 <= year2 * 12 + month2)
+        }
+        if (year1 * 12 + month1 <= year2 * 12 + month2) {
             return 1;
-        else
+        } else {
             return 0;
+        }
     }
 
     /**
      * 全文检索
      */
-    public Envelop getProfileLucene(String startTime,String endTime,List<String> lucene,Integer page,Integer size) throws Exception {
+    public Envelop getProfileLucene(String startTime, String endTime,List<String> lucene, Integer page, Integer size) throws Exception {
         String queryParams = "";
-        if(startTime!=null && startTime.length()>0 && endTime!=null && endTime.length()>0) {
+        if (startTime != null && startTime.length() > 0 && endTime != null && endTime.length() > 0) {
             queryParams = BasisConstant.eventDate+":["+startTime+" TO "+endTime+"]";
-        }
-        else {
-            if(startTime!=null && startTime.length()>0) {
+        } else {
+            if (startTime!=null && startTime.length()>0) {
                 queryParams = BasisConstant.eventDate+":["+startTime+" TO *]";
-            }
-            else if(endTime!=null && endTime.length()>0){
+            } else if (endTime!=null && endTime.length()>0){
                 queryParams = BasisConstant.eventDate+":[* TO "+endTime+"]";
             }
         }

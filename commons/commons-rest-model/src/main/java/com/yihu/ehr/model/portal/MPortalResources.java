@@ -1,5 +1,7 @@
 package com.yihu.ehr.model.portal;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.util.Date;
 
 /**
@@ -126,6 +128,7 @@ public class MPortalResources {
         this.uploadUser = uploadUser;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getUploadTime() {
         return uploadTime;
     }

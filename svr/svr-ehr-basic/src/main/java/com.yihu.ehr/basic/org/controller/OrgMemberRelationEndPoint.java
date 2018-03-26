@@ -242,4 +242,15 @@ public class OrgMemberRelationEndPoint extends EnvelopRestEndPoint {
         list = new ArrayList<MOrgDeptData>(mOrgDeptDataCollection);
         return list;
     }
+
+
+    @RequestMapping(value ="orgDeptMember/admin/listOrgDeptMemberByOrgIdAndDeptId", method = RequestMethod.GET)
+    @ApiOperation(value = "根据部门id获取部门成员信息")
+    public List<MOrgMemberRelation> listOrgDeptMemberByOrgIdAndDeptId(
+            @ApiParam(name = "deptId", value = "", defaultValue = "")
+            @RequestParam(value = "deptId") Integer deptId) {
+        List<OrgMemberRelation> orgMemberRelations  = relationService.getOrgMemberByDeptId(deptId);
+        return (List<MOrgMemberRelation>) convertToModels(orgMemberRelations, new ArrayList<MOrgMemberRelation>(orgMemberRelations.size()), MOrgMemberRelation.class, null);
+    }
+
 }

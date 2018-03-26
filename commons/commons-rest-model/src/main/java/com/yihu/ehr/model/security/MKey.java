@@ -1,5 +1,7 @@
 package com.yihu.ehr.model.security;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -51,6 +53,7 @@ public class MKey implements Serializable{
 		this.publicKey = publicKey;
 	}
 
+	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	public Date getFromDate() {
 		return fromDate;
 	}
@@ -59,6 +62,7 @@ public class MKey implements Serializable{
 		this.fromDate = fromDate;
 	}
 
+	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	public Date getExpiryDate() {
 		return expiryDate;
 	}

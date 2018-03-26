@@ -74,7 +74,7 @@ public interface HealthProfileClient {
 
 
         @ApiOperation("患者患病史JSON")
-        @RequestMapping(value = ServiceApi.Profiles.ProfileHistory, method = RequestMethod.GET)
+        @RequestMapping(value = ServiceApi.Profiles.PastHistory, method = RequestMethod.GET)
         String ProfileHistory(
                 @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="360101200006011131")
                 @RequestParam(value = "demographic_id", required = true) String demographic_id) throws Exception;
@@ -141,12 +141,12 @@ public interface HealthProfileClient {
 
 
         @ApiOperation("患者用药清单OK")
-        @RequestMapping(value = ServiceApi.Profiles.MedicationStat, method = RequestMethod.GET)
+        @RequestMapping(value = ServiceApi.Profiles.MedicationRecords, method = RequestMethod.GET)
         List<MMedicationStat> MedicalStat(
                 @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="360101200006011131")
                 @RequestParam(value = "demographic_id", required = true) String demographic_id,
-                @ApiParam(name = "hp_id", value = "健康问题")
-                @RequestParam(value = "hp_id", required = false) String hp_id) throws Exception;
+                @ApiParam(name = "hp_code", value = "健康问题")
+                @RequestParam(value = "hp_code", required = false) String hp_code) throws Exception;
 
         @ApiOperation("CDA分类OK")
         @RequestMapping(value = ServiceApi.Profiles.CDAClass, method = RequestMethod.GET)

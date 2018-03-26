@@ -7,8 +7,7 @@ package com.yihu.ehr.agModel.tj;
  * @updated 2017年6月8日
  */
 
-public class TjQuotaDimensionMainModel
-{
+public class TjQuotaDimensionMainModel {
 
 
     private Long id;

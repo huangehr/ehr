@@ -1,13 +1,19 @@
 package com.yihu.ehr.query;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.PageArg;
 import com.yihu.ehr.lang.SpringContext;
+import com.yihu.ehr.util.http.HttpResponse;
+import com.yihu.ehr.util.http.HttpUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.impl.WeakHashtable;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,9 +28,7 @@ import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * Service基础类。此类基于Spring Data JPA进行封装（Spring Data JPA又是基于JPA封装，EHR平台使用Hibernate作为JPA实现者）。
@@ -33,7 +37,7 @@ import java.util.List;
  * @author lincl
  * @author Sand
  * @version 1.0
- * @created 2016.2.3
+ * @created 2016.2.3。
  */
 @Transactional(propagation = Propagation.SUPPORTS)
 public class BaseJpaService<T, R> {
@@ -41,6 +45,10 @@ public class BaseJpaService<T, R> {
 
     @PersistenceContext
     protected EntityManager entityManager;
+    @Autowired
+    protected JdbcTemplate jdbcTemplate;
+    @Autowired
+    protected ObjectMapper objectMapper;
 
     public BaseJpaService(){
         Type genType = getClass().getGenericSuperclass();
@@ -187,6 +195,12 @@ public class BaseJpaService<T, R> {
                 .getResultList() ;
     }
 
+    public List<Map<String,Object>> findRolesByUserId(String userId){
+        String sql = "select DISTINCT r.code,r.`name`,r.id FROM roles r JOIN role_user u ON r.id = u.role_id WHERE u.user_id =?";
+        List<Map<String,Object>> list = jdbcTemplate.queryForList(sql,new Object[]{userId});
+        return list;
+    }
+
     public String getClzName(){
         return getEntityClass().getName();
     }
@@ -214,5 +228,33 @@ public class BaseJpaService<T, R> {
                 entityManager.clear();
             }
         }
+    }
+
+    public static void main(String arg[])throws Exception{
+//       //获取token。.
+////        Map<String,Object> params = new HashMap();
+////        params.put("grant_type","password");
+////        params.put("client_id","WYo0l73F8e");
+////        params.put("username","yzh");
+////        params.put("password","019990");
+////        HttpResponse response = HttpUtils.doPost("http://localhost:10001/authentication/oauth/accessToken",params,null);
+////        System.out.print(response.getContent());
+//        //获取居民信息
+////        Map<String,Object> params = new HashMap();
+////        params.put("userName","yzh");
+////        HttpResponse response = HttpUtils.doGet("http://localhost:10001/svr-ehr-basic/api/v1.0/users/yzh",params,null);
+////        System.out.print(response.toString());
+//        //获取权限
+////        Map<String,Object> params = new HashMap();
+////        params.put("userId","0dae00035aa0a0a2319e6d516fe200e1");
+////        HttpResponse response = HttpUtils.doGet("http://localhost:10001/svr-ehr-basic/api/v1.0/roles/findByUserId",params,null);
+////        System.out.print(response.toString());
+        //获取版本号
+        Map<String,Object> params = new HashMap();
+        params.put("code","app_doc");
+        Double d = 0.1;
+        params.put("version",d+"");
+        HttpResponse response = HttpUtils.doGet("http://localhost:10001/basic/api/v1.0/appVersion/getAppVersion",params,null);
+        System.out.print(response.getContent());
     }
 }
