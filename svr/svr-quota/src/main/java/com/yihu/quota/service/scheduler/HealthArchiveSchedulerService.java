@@ -141,7 +141,7 @@ public class HealthArchiveSchedulerService {
     public List<String> selectSubRowKey(String core , String q, String fq, long count) throws Exception {
         List<String> data = new ArrayList<>();
         /***** Solr查询 ********/
-        SolrDocumentList solrList = solrUtil.query(core, q , fq, null, 1,count);
+        SolrDocumentList solrList = solrUtil.query(core, q , fq, null, 0, count);
         if(solrList!=null && solrList.getNumFound()>0){
             for (SolrDocument doc : solrList){
                 String rowkey = String.valueOf(doc.getFieldValue("rowkey"));
