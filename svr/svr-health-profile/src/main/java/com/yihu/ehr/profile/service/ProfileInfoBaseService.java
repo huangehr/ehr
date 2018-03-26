@@ -161,6 +161,7 @@ public class ProfileInfoBaseService {
             } else {
                 patientMap.put("householdRegister", "");
             }
+            patientMap.put("img", "");
             return patientMap;
         } else {
             return patientMap;
@@ -196,34 +197,23 @@ public class ProfileInfoBaseService {
         medicalHistory.put("info", stringBuilder1.toString());
         resultList.add(medicalHistory);
 
-        //传染病 #
+        //传染病
         Envelop envelop;
+        Map<String, Object> infectiousDisease = new HashMap<>(2);
         String q2 = "{\"q\":\"demographic_id:" + demographic_id + " AND EHR_002393:*\"}";
         envelop = resource.getMasterData(q2, 1, 500, null);
         List<Map<String, Object>> list2 = envelop.getDetailModelList();
+        StringBuilder stringBuilder2 = new StringBuilder();
         if (list2 != null && list2.size() > 0) {
-            Map<String, Object> infectiousDisease = new HashMap<>(2);
-            StringBuilder stringBuilder = new StringBuilder("患者于：");
-            int index = 1;
             for (Map temp : list2) {
-                String fillDate;
-                if (temp.get("EHR_002382") != null) {
-                    fillDate = (String) temp.get("EHR_002382");
-                } else {
-                    fillDate = (String) temp.get("EHR_002393");
-                }
                 String name = (String) temp.get("EHR_002386");
-                stringBuilder.append("(" + index + ").");
-                stringBuilder.append(fillDate.substring(0, fillDate.indexOf("T")));
-                stringBuilder.append("，感染：");
-                stringBuilder.append(name);
-                stringBuilder.append(";");
-                index ++;
+                stringBuilder2.append(name);
+                stringBuilder2.append("、");
             }
-            infectiousDisease.put("label", "传染病史");
-            infectiousDisease.put("info", stringBuilder.toString());
-            resultList.add(infectiousDisease);
         }
+        infectiousDisease.put("label", "传染病史");
+        infectiousDisease.put("info", stringBuilder2.toString());
+        resultList.add(infectiousDisease);
 
         //预防接种
         Map<String, Object> vaccination = new HashMap<>(2);
@@ -285,13 +275,13 @@ public class ProfileInfoBaseService {
         bloodTransfusion.put("info", "");
         resultList.add(bloodTransfusion);
 
-        //孕产 #
+        //孕产(针对女性，有的话才能展示) #
         String q5 = "{\"q\":\"demographic_id:" + demographic_id + " AND EHR_002443:*\"}";
         envelop = resource.getMasterData(q5, null, null, null);
         List<Map<String, Object>> list5 = envelop.getDetailModelList();
         if (list5 != null && list5.size() > 0) {
             Map<String, Object> childbirth = new HashMap<>(2);
-            StringBuilder stringBuilder = new StringBuilder("患者于：\r\n");
+            StringBuilder stringBuilder = new StringBuilder();
             int index = 1;
             for (Map temp : list5) {
                 String childbirthDate = (String) temp.get("EHR_001630");
@@ -359,16 +349,60 @@ public class ProfileInfoBaseService {
                 }
             }
             personHistory.put("name", result.get("patient_name") == null? "" : result.get("patient_name"));
-            personHistory.put("placeOfBirth", ""); //出生地
-            personHistory.put("placeOfResidence", ""); //居住地
-            personHistory.put("livingCondition", ""); //生活条件
-            personHistory.put("educationLevel", ""); //文化程度
-            personHistory.put("career", ""); //职业
-            personHistory.put("smoke", ""); //嗜烟
-            personHistory.put("alcohol", ""); //嗜酒
-            personHistory.put("epidemicWater contact", ""); //疫水接触
-            personHistory.put("infectedArea", ""); //疫区接触
-            personHistory.put("radioactiveMaterialContact", ""); //放射性物质接触
+            //出生地
+            String placeOfBirth = "";
+            String province = (String) result.get("EHR_004945");
+            String city = (String) result.get("EHR_004946") ;
+            String county = (String) result.get("EHR_004947");
+            if (!StringUtils.isEmpty(province) && !province.equals("-")) {
+                placeOfBirth += province + "-";
+            }
+            if (!StringUtils.isEmpty(city) && !city.equals("-")) {
+                placeOfBirth += city + "-";
+            }
+            if (!StringUtils.isEmpty(county) && !county.equals("-")) {
+                placeOfBirth += county;
+            }
+            personHistory.put("placeOfBirth", placeOfBirth);
+            //居住地
+            String placeOfResidence = "";
+            if (!StringUtils.isEmpty(result.get("EHR_000760"))) {
+                placeOfResidence = (String) result.get("EHR_000760");
+            }
+            if (!StringUtils.isEmpty(placeOfResidence) && !StringUtils.isEmpty(result.get("EHR_003051"))) {
+                placeOfResidence = (String) result.get("EHR_003051");
+            }
+            personHistory.put("placeOfResidence", placeOfResidence);
+            //生活条件
+            personHistory.put("livingCondition", "");
+            //文化程度
+            personHistory.put("educationLevel", result.get("EHR_000790") == null? "" : result.get("EHR_000790"));
+            //职业
+            personHistory.put("career", result.get("EHR_000022_VALUE") == null? "" : result.get("EHR_000022_VALUE"));
+            //嗜烟
+            String smoke = "";
+            if (!StringUtils.isEmpty(result.get("EHR_002114"))) {
+                smoke = (String) result.get("EHR_002114");
+            }
+            if (!StringUtils.isEmpty(smoke) && !StringUtils.isEmpty(result.get("EHR_004722"))) {
+                smoke = (String) result.get("EHR_004722");
+            }
+            personHistory.put("smoke", smoke);
+            //嗜酒
+            String alcohol = "";
+            if (!StringUtils.isEmpty(result.get("EHR_002117"))) {
+                alcohol = (String) result.get("EHR_002117");
+            }
+            if (!StringUtils.isEmpty(alcohol) && !StringUtils.isEmpty(result.get("EHR_004728"))) {
+                alcohol = (String) result.get("EHR_004728");
+            }
+            personHistory.put("alcohol", alcohol);
+            //疫水接触
+            personHistory.put("epidemicWater contact", "");
+            //疫区接触
+            personHistory.put("infectedArea", "");
+            //放射性物质接触
+            personHistory.put("radioactiveMaterialContact", "");
         }
         return personHistory;
     }

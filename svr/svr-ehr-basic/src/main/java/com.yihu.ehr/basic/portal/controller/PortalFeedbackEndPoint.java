@@ -52,22 +52,22 @@ public class PortalFeedbackEndPoint extends EnvelopRestEndPoint {
         return (List<MPortalFeedback>) convertToModels(portalFeedbackList, new ArrayList<MPortalFeedback>(portalFeedbackList.size()), MPortalFeedback.class, fields);
     }
 
-    @RequestMapping(value = ServiceApi.PortalFeedback.PortalFeedback, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.PortalFeedback.PortalFeedback, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建意见反馈", notes = "创建意见反馈信息")
     public MPortalFeedback createPortalFeedback(
             @ApiParam(name = "portalFeedbackJsonData", value = "", defaultValue = "")
-            @RequestParam String portalFeedbackJsonData) throws Exception {
+            @RequestBody String portalFeedbackJsonData) throws Exception {
         PortalFeedback portalFeedback = toEntity(portalFeedbackJsonData, PortalFeedback.class);
 
         portalFeedbackService.save(portalFeedback);
         return convertToModel(portalFeedback, MPortalFeedback.class);
     }
 
-    @RequestMapping(value = ServiceApi.PortalFeedback.PortalFeedback, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.PortalFeedback.PortalFeedback, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改意见反馈", notes = "重新绑定意见反馈信息")
     public MPortalFeedback updatePortalFeedback(
             @ApiParam(name = "portalFeedbackJsonData", value = "", defaultValue = "")
-            @RequestParam String portalFeedbackJsonData) throws Exception {
+            @RequestBody String portalFeedbackJsonData) throws Exception {
         PortalFeedback portalFeedback = toEntity(portalFeedbackJsonData, PortalFeedback.class);
         portalFeedbackService.save(portalFeedback);
         return convertToModel(portalFeedback, MPortalFeedback.class);
