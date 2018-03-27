@@ -141,7 +141,7 @@ public class HealthArchiveSchedulerService {
     public List<String> selectSubRowKey(String core , String q, String fq, long count) throws Exception {
         List<String> data = new ArrayList<>();
         /***** Solr查询 ********/
-        SolrDocumentList solrList = solrUtil.query(core, q , fq, null, 1,count);
+        SolrDocumentList solrList = solrUtil.query(core, q , fq, null, 0, count);
         if(solrList!=null && solrList.getNumFound()>0){
             for (SolrDocument doc : solrList){
                 String rowkey = String.valueOf(doc.getFieldValue("rowkey"));
@@ -152,10 +152,10 @@ public class HealthArchiveSchedulerService {
     }
 
     //查询habase里面数据
-    public List<Map<String,Object>> selectHbaseData(List<String> list) throws Exception {
+    public List<Map<String,Object>> selectHbaseData(String table, List<String> list) throws Exception {
         List<Map<String,Object>> data = new ArrayList<>();
         /***** Hbase查询 ********/
-        Result[] resultList = hbaseDao.getResultList(ResourceCore.MasterTable,list, "", ""); // hbase结果集
+        Result[] resultList = hbaseDao.getResultList(table,list, "", ""); // hbase结果集
         if(resultList != null && resultList.length > 0){
             for (Result result :resultList) {
                 Map<String,Object> obj = resultToMap(result, "");
