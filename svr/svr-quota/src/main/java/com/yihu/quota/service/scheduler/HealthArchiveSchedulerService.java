@@ -8,6 +8,7 @@ import com.yihu.ehr.profile.core.ResourceCore;
 import com.yihu.ehr.redis.schema.HealthArchiveSchema;
 import com.yihu.ehr.solr.SolrUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
+import com.yihu.quota.vo.DictModel;
 import com.yihu.quota.vo.HealthArchiveInfoModel;
 import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.CellUtil;
@@ -16,6 +17,8 @@ import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -38,6 +41,8 @@ public class HealthArchiveSchedulerService {
     private ElasticSearchUtil elasticSearchUtil;
     @Autowired
     private HealthArchiveSchema healthArchiveSchema;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     /**
      * ES保存
@@ -195,5 +200,23 @@ public class HealthArchiveSchedulerService {
         }else{
             return null;
         }
+    }
+
+    /**
+     * 系统字典中获取定时任务的开始时间
+     * @return
+     */
+    public String getDictValue(String code) {
+        String sql = "select code, value as name from system_dict_entries where dict_id = 159 and code = ?";
+        List<DictModel> dictDatas = jdbcTemplate.query(sql, new BeanPropertyRowMapper(DictModel.class), code);
+        if (null != dictDatas && dictDatas.size() > 0) {
+            return dictDatas.get(0).getName();
+        }
+        return null;
+    }
+
+    public void updateDictValue(String value, String code) {
+        String sql = "UPDATE system_dict_entries SET value = ? WHERE dict_id = 159 and code = ?";
+        jdbcTemplate.update(sql, new Object[] {value,code});
     }
 }

@@ -11,10 +11,12 @@ import com.yihu.quota.etl.util.ElasticsearchUtil;
 import com.yihu.quota.model.jpa.TjQuota;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionMain;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionSlave;
+import com.yihu.quota.model.jpa.save.TjQuotaDataSave;
 import com.yihu.quota.model.jpa.source.TjQuotaDataSource;
 import com.yihu.quota.service.dimension.TjDimensionMainService;
 import com.yihu.quota.service.dimension.TjDimensionSlaveService;
 import com.yihu.quota.service.orgHealthCategory.OrgHealthCategoryStatisticsService;
+import com.yihu.quota.service.save.TjDataSaveService;
 import com.yihu.quota.service.singledisease.SingleDiseaseService;
 import com.yihu.quota.service.source.TjDataSourceService;
 import com.yihu.quota.util.BasesicUtil;
@@ -62,6 +64,8 @@ public class BaseStatistsService {
     private SingleDiseaseService singleDiseaseService;
     @Autowired
     private TjQuotaGovProvisionDao tjQuotaGovProvisionDao;
+    @Autowired
+    private TjDataSaveService dataSaveService;
 
     private static String orgHealthCategory = "orgHealthCategory";
     public static String orgHealthCategoryCode = "orgHealthCategoryCode";
@@ -690,10 +694,15 @@ public class BaseStatistsService {
         EsConfig esConfig= (EsConfig) JSONObject.toBean(obj,EsConfig.class);
         String configFilter = esConfig.getFilter();
         if(StringUtils.isNotEmpty(configFilter) && quotaDataSource.getSourceCode().equals("1")){//数据源为ES库
-            if(StringUtils.isNotEmpty(filters)){
-                filters += " and " + configFilter;
-            }else {
-                filters = configFilter;
+            TjQuotaDataSave quotaDataSave = dataSaveService.findByQuota(code);
+            JSONObject objSave = new JSONObject().fromObject(quotaDataSave.getConfigJson());
+            EsConfig esConfigSave = (EsConfig) JSONObject.toBean(objSave,EsConfig.class);
+            if(esConfig.getIndex().equals(esConfigSave.getIndex())){
+                if(StringUtils.isNotEmpty(filters)){
+                    filters += " and " + configFilter;
+                }else {
+                    filters = configFilter;
+                }
             }
         }
         String molecularFilter = filters;
