@@ -140,21 +140,13 @@ public class QuotaController extends BaseController {
             String configFilter = esConfig.getFilter();
             if(StringUtils.isNotEmpty(configFilter) && quotaDataSource.getSourceCode().equals("1")){//数据源为ES库
                 TjQuotaDataSave quotaDataSave = dataSaveService.findByQuota(code);
-                if (StringUtils.isEmpty(quotaDataSave.getConfigJson())) {
+                JSONObject objSave = new JSONObject().fromObject(quotaDataSave.getConfigJson());
+                EsConfig esConfigSave = (EsConfig) JSONObject.toBean(objSave,EsConfig.class);
+                if(StringUtils.isEmpty(esConfig.getIndex()) || esConfig.getIndex().equals(esConfigSave.getIndex()) ){
                     if(StringUtils.isNotEmpty(filters)){
                         filters += " and " + configFilter;
                     }else {
                         filters = configFilter;
-                    }
-                } else {
-                    JSONObject objSave = new JSONObject().fromObject(quotaDataSave.getConfigJson());
-                    EsConfig esConfigSave = (EsConfig) JSONObject.toBean(objSave,EsConfig.class);
-                    if(esConfig.getIndex().equals(esConfigSave.getIndex())){
-                        if(StringUtils.isNotEmpty(filters)){
-                            filters += " and " + configFilter;
-                        }else {
-                            filters = configFilter;
-                        }
                     }
                 }
             }
