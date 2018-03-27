@@ -807,7 +807,7 @@ public class BaseStatistsService {
      */
     public String getCostOfInPatient() {
         String sum = "0";
-        String sql = "select sum(result) from medical_service_index where quotaCode='HC041068";
+        String sql = "select sum(result) from medical_service_index where quotaCode='HC041068'";
         List<Map<String, Object>> listData = elasticsearchUtil.excuteDataModel(sql);
         NumberFormat nf = NumberFormat.getInstance();
         nf.setGroupingUsed(false);
