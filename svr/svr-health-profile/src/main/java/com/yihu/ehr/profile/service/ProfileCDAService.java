@@ -9,7 +9,7 @@ import com.yihu.ehr.profile.feign.ResourceClient;
 import com.yihu.ehr.profile.feign.XStdRedisServiceClient;
 import com.yihu.ehr.profile.model.ArchiveTemplate;
 import com.yihu.ehr.util.rest.Envelop;
-import com.yihu.hos.model.standard.MCDADocument;
+import com.yihu.ehr.profile.model.MCDADocument;
 import com.yihu.hos.model.standard.MCdaDataSet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -203,14 +203,13 @@ public class ProfileCDAService {
                 cdaDocumentIdList.add(cda.get("cda_document_id").toString());
             }
             Map<String, Object> CDAData = getCDAPartData(profileMap, false,(String[])cdaDocumentIdList.toArray(new String[cdaDocumentIdList.size()]));
-            for(String key :CDAData.keySet()){
+            for (String key :CDAData.keySet()){
                 CDADataList.add((Map<String, Object>)CDAData.get(key));
             }
             re.put("cda_documents",CDADataList);
 
-        }
-        else{
-            throw new Exception("未找到该CDA档案！（profile_id："+profileId+"）");
+        } else{
+            throw new Exception("未找到该CDA档案！（profile_id：" + profileId + "）");
         }
 
         return re;

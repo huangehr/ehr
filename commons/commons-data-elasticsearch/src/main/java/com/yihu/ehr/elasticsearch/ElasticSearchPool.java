@@ -34,8 +34,8 @@ public class ElasticSearchPool {
 
     @PostConstruct
     private void init() {
-        if (clientPool == null) {
-            clientPool = new ArrayList<TransportClient>();
+        if (null == clientPool) {
+            clientPool = new ArrayList<>();
         }
         synchronized (clientPool) {
             while (clientPool.size() < initSize) {

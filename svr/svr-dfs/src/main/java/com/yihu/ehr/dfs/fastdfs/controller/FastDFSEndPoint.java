@@ -11,20 +11,17 @@ import com.yihu.ehr.dfs.fastdfs.service.SystemDictEntryService;
 import com.yihu.ehr.dfs.fastdfs.service.SystemDictService;
 import com.yihu.ehr.entity.dict.SystemDict;
 import com.yihu.ehr.entity.dict.SystemDictEntry;
-import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
-import org.csource.common.MyException;
 import org.csource.fastdfs.FileInfo;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -203,6 +200,9 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "path", value = "文件路径", required = true)
             @RequestParam(value = "path") String path) throws Exception {
         //String path = java.net.URLDecoder.decode(storagePath, "UTF-8");
+        if (path.split(":").length < 2) {
+            return failed("参数有误");
+        }
         // 删除文件
         fastDFSService.delete(path.split(":")[0], path.split(":")[1]);
         List<Map<String, Object>> resultList = elasticSearchService.findByField(indexName, indexType,"path", path);
@@ -266,6 +266,9 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
         if (null == source) {
             return failed("无相关文件资源");
         }
+        if (path.split(":").length < 2) {
+            return failed("参数有误");
+        }
         // 删除旧文件
         fastDFSService.delete(path.split(":")[0], path.split(":")[1]);
         // 上传新文件
@@ -304,7 +307,6 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
     public Envelop modify(
             @ApiParam(name = "jsonData", value = "文件资源", required = true)
             @RequestBody String jsonData) throws Exception {
-        Envelop envelop = new Envelop();
         Map<String, String> paramMap = toEntity(jsonData, Map.class);
         String _id = paramMap.get("_id");
         Map<String, Object> source = elasticSearchService.findById(indexName, indexType, _id);

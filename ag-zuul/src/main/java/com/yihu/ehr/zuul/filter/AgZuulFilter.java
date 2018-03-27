@@ -59,7 +59,8 @@ public class AgZuulFilter extends ZuulFilter {
         if (url.startsWith("/authentication/")
                 || url.startsWith("/jkzl/")
                 || url.contains("/users/h5/handshake")
-                || url.contains("/appVersion/getAppVersion")) {
+                || url.contains("/appVersion/getAppVersion")
+                || url.contains("/open/")) {
             return null;
         }
         String accessToken = this.extractToken(request);
