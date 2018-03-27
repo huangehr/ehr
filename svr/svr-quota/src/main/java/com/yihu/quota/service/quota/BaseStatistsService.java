@@ -695,13 +695,21 @@ public class BaseStatistsService {
         String configFilter = esConfig.getFilter();
         if(StringUtils.isNotEmpty(configFilter) && quotaDataSource.getSourceCode().equals("1")){//数据源为ES库
             TjQuotaDataSave quotaDataSave = dataSaveService.findByQuota(code);
-            JSONObject objSave = new JSONObject().fromObject(quotaDataSave.getConfigJson());
-            EsConfig esConfigSave = (EsConfig) JSONObject.toBean(objSave,EsConfig.class);
-            if(esConfig.getIndex().equals(esConfigSave.getIndex())){
+            if (StringUtils.isEmpty(quotaDataSave.getConfigJson())) {
                 if(StringUtils.isNotEmpty(filters)){
                     filters += " and " + configFilter;
                 }else {
                     filters = configFilter;
+                }
+            } else {
+                JSONObject objSave = new JSONObject().fromObject(quotaDataSave.getConfigJson());
+                EsConfig esConfigSave = (EsConfig) JSONObject.toBean(objSave,EsConfig.class);
+                if(esConfig.getIndex().equals(esConfigSave.getIndex())){
+                    if(StringUtils.isNotEmpty(filters)){
+                        filters += " and " + configFilter;
+                    }else {
+                        filters = configFilter;
+                    }
                 }
             }
         }
