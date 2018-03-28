@@ -64,6 +64,11 @@ public class MUser implements Serializable{
     private Date modifyDate;
     /** 修改者 */
     private String modifier;
+    /**
+     * 居民行业
+     */
+    private  String profession;
+
 
 
     public int getProvinceId() {
@@ -428,5 +433,13 @@ public class MUser implements Serializable{
 
     public void setModifier(String modifier) {
         this.modifier = modifier;
+    }
+
+    public String getProfession() {
+        return profession;
+    }
+
+    public void setProfession(String profession) {
+        this.profession = profession;
     }
 }
