@@ -1,7 +1,10 @@
 package com.yihu.quota.controller;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.elasticsearch.ElasticSearchClient;
+import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.query.common.model.SolrGroupEntity;
 import com.yihu.ehr.solr.SolrUtil;
 import com.yihu.quota.etl.model.EsConfig;
@@ -9,6 +12,7 @@ import com.yihu.quota.etl.util.ElasticsearchUtil;
 import com.yihu.quota.etl.util.EsClientUtil;
 import com.yihu.quota.etl.util.EsConfigUtil;
 import com.yihu.quota.service.quota.StatisticsService;
+import com.yihu.quota.vo.PersonalInfoModel;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -281,5 +285,54 @@ public class ElasticSearchController extends BaseController {
             ex.printStackTrace();
         }
         return  f;
+    }
+
+    @Autowired
+    private ElasticsearchUtil searchUtil;
+    @Autowired
+    private ElasticSearchUtil elasticSearchUtil;
+    @Autowired
+    private ElasticSearchClient elasticSearchClient;
+
+    @RequestMapping(value = "/elasticSearch/testQueryElasticSearch", method = RequestMethod.POST)
+    @ApiOperation("测试查询数据")
+    public void addElasticSearch(
+            @ApiParam(name = "data", value = "参数")
+            @RequestParam(value = "data") String data
+    ){
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        String index = "singleDiseasePersonal";
+        String type = "personal_info";
+        int i =0;
+        while(i<2){
+            PersonalInfoModel personalInfo = new PersonalInfoModel();
+            personalInfo.setDisease("HP0047");
+            personalInfo.setDiseaseName("糖尿病");
+            personalInfo.setDemographicId(data);
+            try {
+                String sql = "SELECT count(demographicId) FROM single_disease_personal_index where demographicId ="+data+" group by demographicId ";
+                long count2 = searchUtil.getCountBySql(sql);
+                System.out.println("结果条数 count2="+count2);
+
+//                List<Map<String, Object>> relist = elasticSearchUtil.findByField(index, type, "demographicId", data);
+//                List<Map<String, Object>> filter = new ArrayList<>();
+//                Map<String,Object> paramMap = new HashMap<>();
+//                paramMap.put("demographicId",data);
+//                filter.add(paramMap);
+//               long count = elasticSearchUtil.count(index, type,filter);
+//                System.out.println("结果条数 count="+count);
+//                System.out.println("结果条数="+ relist.size());
+//                if(relist== null || relist.size() ==0){
+                if(count2 == 0){
+                    Map<String, Object> source = new HashMap<>();
+                    String jsonPer = objectMapper.writeValueAsString(personalInfo);
+                    source = objectMapper.readValue(jsonPer, Map.class);
+                    elasticSearchClient.index(index,type, source);
+                }
+                i++;
+            }catch (Exception e){
+                e.getMessage();
+            }
+        }
     }
 }

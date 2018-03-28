@@ -119,7 +119,7 @@ public class StdMetaDataKeySchema extends KeySchema {
     public Boolean isDictCodeExist(String version, String dictId, String entryCode) {
         assert StringUtils.isNotBlank(version) && StringUtils.isNotBlank(entryCode);
 
-        return redisClient.hasKey(makeKey(DictEntryTable + version, dictId + "." + entryCode, DictEntryValueColumn));
+        return redisClient.hasKey(makeKey(DictEntryTable + version, dictId + "." + entryCode, DictEntryCodeColumn));
     }
 
     public Boolean isDictValueExist(String version, String dictId, String entryValue) {
