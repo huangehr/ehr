@@ -28,7 +28,7 @@ import java.io.IOException;
 public class AgZuulFilter extends ZuulFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(AgZuulFilter.class);
-    private static final String ACCESS_TOKEN_PARAMETER = "accessToken";
+    private static final String ACCESS_TOKEN_PARAMETER = "token";
 
     @Autowired
     private ObjectMapper objectMapper;
