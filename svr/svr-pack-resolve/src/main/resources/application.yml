@@ -59,14 +59,9 @@ ehr:
       data-sets:
         - HDSC01_02: Clinic #门诊-挂号 v1.0
         - HDSD00_85: Clinic #门诊-挂号 v1.3
-        - HDSD00_72: Clinic #门诊-症状 v1.3
         - HDSB03_10: Clinic #门诊-传染病报告卡信息 v1.3
         - HDSC02_09: Resident #住院-入院记录 v1.0
-        - HDSC02_01: Resident #检验-报告单 v1.0
-        - HDSC02_02: Resident #检验-图片报告单 v1.0
         - HDSD00_13: Resident #住院-入院记录 v1.3
-        - HDSD00_77: Resident #检验-报告单 v1.3
-        - HDSD00_76: Resident #检验-图片报告单 v1.3
         - HDSB05_03: MedicalExam #体检-登记信息 v1.3
       meta-data:
         - HDSD00_01_457 #门诊-就诊日期时间 v.1.0 & v.13
@@ -93,17 +88,20 @@ ehr:
       meta-data:
         id-card-no: HDSA00_01_017 #身份证号码 v1.0 & v1.3
         id-card-type: HDSA00_01_016 #身份证类型 v1.0 & v1.3
-        patient-name: HDSA00_01_009 #本人姓名 v1.3    (v1.0:HDSD00_01_002)
+        patient-name: HDSA00_01_009 #本人姓名 v1.3 (v1.0:HDSD00_01_002)
     #卡提取参数，从就诊摘要提取
     card:
       data-sets:
-        - HDSD00_85 #门诊-挂号 v1.3
-        - HDSD00_13 #住院-入院记录 v1.3
         - HDSC01_02 #门诊-挂号 v1.0
+        - HDSD00_85 #门诊-挂号 v1.3
         - HDSC02_09 #住院-入院记录 v1.0
-      meta-data:
-        card-no: JDSD00_85_005 #就诊卡号 CARD_NO
-        card-type: JDSD00_85_006  #就诊卡类型 CARD_TYPE
+        - HDSD00_13 #住院-入院记录 v1.3
+      card-num:
+        - JDSD00_85_005 #门诊-就诊卡号 CARD_NUM
+        - JDSD00_13_006 #住院-就诊卡号 CARD_NUM
+      card-type:
+        - JDSD00_85_006 #门诊-就诊卡类型 CARD_TYPE
+        - JDSD00_13_007 #住院-就诊卡类型 CARD_TYPE
   eventIndex: #病人事件索引信息
     patientId:
       - JDSA00_01_001 #v1.3
