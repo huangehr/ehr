@@ -25,11 +25,11 @@ public class SingleDiseaseService {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    public static final String HEALTHPROBLEM = "1"; // ½¡¿µÎÊÌâ
-    public static final String AGE = "2"; // ÄêÁä¶Î·Ö²¼
-    public static final String SEX = "3"; // ĞÔ±ğ
+    public static final String HEALTHPROBLEM = "1"; // å¥åº·é—®é¢˜
+    public static final String AGE = "2"; // å¹´é¾„æ®µåˆ†å¸ƒ
+    public static final String SEX = "3"; // æ€§åˆ«
     /**
-     * ÈÈÁ¦Í¼Êı¾İ
+     * çƒ­åŠ›å›¾æ•°æ®
      * @return
      * @throws Exception
      */
@@ -57,7 +57,7 @@ public class SingleDiseaseService {
     }
 
     /**
-     * »ñÈ¡ÌÇÄò²¡»¼ÕßÊı
+     * è·å–ç³–å°¿ç—…æ‚£è€…æ•°
      * @return
      * @throws Exception
      */
@@ -69,7 +69,7 @@ public class SingleDiseaseService {
     }
 
     /**
-     * ²¹È«¸£Öİ¸÷¸öÇøÏØµÄ»¼²¡ÈËÊı
+     * è¡¥å…¨ç¦å·å„ä¸ªåŒºå¿çš„æ‚£ç—…äººæ•°
      * @param dataList
      * @return
      */
@@ -104,7 +104,7 @@ public class SingleDiseaseService {
     }
 
     /**
-     * ĞÂÔö»¼ÕßÄêÇ÷ÊÆ
+     * æ–°å¢æ‚£è€…å¹´è¶‹åŠ¿
      * @return
      */
     public Map<String, List<String>> getLineDataInfo() {
@@ -115,7 +115,7 @@ public class SingleDiseaseService {
         List<String> valueData = new ArrayList<>();
         if (null != listData && listData.get(0).size() > 0) {
             listData.forEach(one -> {
-                // "date_histogram(field=eventDate,interval=year)":"2015-01-01 00:00:00",ÒòÎªÊÇ»ñÈ¡Äê·İ£¬ËùÒÔ½ØÈ¡Ç°4Î»
+                // "date_histogram(field=eventDate,interval=year)":"2015-01-01 00:00:00",å› ä¸ºæ˜¯è·å–å¹´ä»½ï¼Œæ‰€ä»¥æˆªå–å‰4ä½
                 xData.add((one.get("date_histogram(field=eventDate,interval=year)") + "").substring(0,4));
                 valueData.add(one.get("COUNT(*)") + "");
             });
@@ -126,9 +126,9 @@ public class SingleDiseaseService {
     }
 
     /**
-     * »ñÈ¡±ı×´Í¼Êı¾İ
-     * @param type ½¡¿µ×´¿ö¡¢ÄêÁä¶Î¡¢ĞÔ±ğ
-     * @param code ×Öµäcode
+     * è·å–é¥¼çŠ¶å›¾æ•°æ®
+     * @param type å¥åº·çŠ¶å†µã€å¹´é¾„æ®µã€æ€§åˆ«
+     * @param code å­—å…¸code
      * @return
      */
     public Map<String, Object> getPieDataInfo(String type, String code) {
@@ -144,7 +144,7 @@ public class SingleDiseaseService {
     }
 
     /**
-     * »ñÈ¡½¡¿µ×´¿ö
+     * è·å–å¥åº·çŠ¶å†µ
      * @return
      */
     public Map<String, Object> getHealthProInfo(String code) {
@@ -168,7 +168,7 @@ public class SingleDiseaseService {
     }
 
     /**
-     * »ñÈ¡È«ÊĞ×ÜÈË¿ÚÊı
+     * è·å–å…¨å¸‚æ€»äººå£æ•°
      * @param healthMap
      * @param code
      * @return
@@ -177,22 +177,22 @@ public class SingleDiseaseService {
         String sql = "select code, value as name from system_dict_entries where dict_id = 158 and code = ?";
         List<DictModel> dictDatas = jdbcTemplate.query(sql, new BeanPropertyRowMapper(DictModel.class), code);
 
-        healthMap.put("name", "½¡¿µÈËÈº");
+        healthMap.put("name", "å¥åº·äººç¾¤");
         healthMap.put("value", null != dictDatas && dictDatas.size() > 0 ? dictDatas.get(0).getName() : "0");
         return healthMap;
     }
 
     /**
-     * »ñÈ¡ÄêÁä¶ÎÊı¾İ
+     * è·å–å¹´é¾„æ®µæ•°æ®
      * @return
      */
     public Map<String, Object> getAgeInfo() {
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR) + 1;
         /*
-        * ÄêÁä¶Î·ÖÎª0-6¡¢7-17¡¢18-40¡¢41-65¡¢65ÒÔÉÏ
-        * Ê×ÏÈ»ñÈ¡µ±Ç°Äê·İ£¬ÓÉÓÚES²éÑ¯ÊÇ×ó°üº¬£¬ÓÒ²»°ü£¬ËùÒÔµ±Ç°Äê·İĞèÒª+1
-        * ÏÂÃæÎª¹¹ÔìÄêÁä¶ÎµÄËãÊ½£¬ÆäÖĞyear-151ÏŞ¶¨ÁË·¶Î§ÊÇ66-150Ëê ¼´66ÒÔÉÏ£¬ÆäËûÀàËÆ
+        * å¹´é¾„æ®µåˆ†ä¸º0-6ã€7-17ã€18-40ã€41-65ã€65ä»¥ä¸Š
+        * é¦–å…ˆè·å–å½“å‰å¹´ä»½ï¼Œç”±äºESæŸ¥è¯¢æ˜¯å·¦åŒ…å«ï¼Œå³ä¸åŒ…ï¼Œæ‰€ä»¥å½“å‰å¹´ä»½éœ€è¦+1
+        * ä¸‹é¢ä¸ºæ„é€ å¹´é¾„æ®µçš„ç®—å¼ï¼Œå…¶ä¸­year-151é™å®šäº†èŒƒå›´æ˜¯66-150å² å³66ä»¥ä¸Šï¼Œå…¶ä»–ç±»ä¼¼
         * */
         String range = "range(birthYear," + (year - 151) + "," + (year - 66) + "," + (year - 41) + "," + (year - 18) + "," + (year - 7) + "," + year + ")";
         String sql = "select count(*) from single_disease_personal_index where birthYear <> 0  group by " + range;
@@ -203,11 +203,11 @@ public class SingleDiseaseService {
         if (null != listData && listData.get(0).size() > 0) {
             listData.forEach(one -> {
                 String rangeName = one.get(range) + "";
-                // rangeName£º"1978.0-2001.0"
+                // rangeNameï¼š"1978.0-2001.0"
                 int first = (int) Double.parseDouble(rangeName.split("-")[0]);
                 int last = (int) Double.parseDouble(rangeName.split("-")[1]);
                 Integer result = last - first;
-                // ×ª³ÉÏàÓ¦µÄÄêÁä¶Î
+                // è½¬æˆç›¸åº”çš„å¹´é¾„æ®µ
                 String keyName = exchangeInfo(result);
                 Map<String, Object> myMap = new HashMap<>();
                 legendData.add(keyName);
@@ -225,19 +225,19 @@ public class SingleDiseaseService {
         String keyName = "";
         switch (result) {
             case 85:
-                keyName = "66ËêÒÔÉÏ";
+                keyName = "66å²ä»¥ä¸Š";
                 break;
             case 25:
-                keyName = "41-65Ëê";
+                keyName = "41-65å²";
                 break;
             case 23:
-                keyName = "18-40Ëê";
+                keyName = "18-40å²";
                 break;
             case 11:
-                keyName = "7-17Ëê";
+                keyName = "7-17å²";
                 break;
             case 7:
-                keyName = "0-6Ëê";
+                keyName = "0-6å²";
                 break;
             default:
                 break;
@@ -246,7 +246,7 @@ public class SingleDiseaseService {
     }
 
     /**
-     * »ñÈ¡ĞÔ±ğÊı¾İ
+     * è·å–æ€§åˆ«æ•°æ®
      * @return
      */
     public Map<String, Object> getGenderInfo() {
@@ -270,7 +270,7 @@ public class SingleDiseaseService {
     }
 
     /**
-     * »ñÈ¡²¢·¢Ö¢Êı¾İ
+     * è·å–å¹¶å‘ç—‡æ•°æ®
      * @return
      */
     public Map<String, List<String>> getSymptomDataInfo() {
@@ -291,7 +291,7 @@ public class SingleDiseaseService {
     }
 
     /**
-     * ÓÃÒ©»¼ÕßÊı·Ö²¼
+     * ç”¨è¯æ‚£è€…æ•°åˆ†å¸ƒ
      * @return
      */
     public Map<String, List<String>> getMedicineDataInfo() {
@@ -312,7 +312,7 @@ public class SingleDiseaseService {
     }
 
     /**
-     *  ¿Õ¸¹ÑªÌÇÍ³¼Æ
+     *  ç©ºè…¹è¡€ç³–ç»Ÿè®¡
      * @return
      */
     public Map<String, List<String>> getFastingBloodGlucoseDataInfo() {
@@ -320,10 +320,10 @@ public class SingleDiseaseService {
         List<Map<String, Object>> list = parseIntegerValue(sql);
         Map<String, List<String>> map = new HashMap<>();
         List<String> xData = new LinkedList<>();
-        // »ñÈ¡ºá×ø±ê
+        // è·å–æ¨ªåæ ‡
         xData.add("4.4~6.1mmol/L");
         xData.add("6.1~7mmol/L");
-        xData.add("7.0mmol/LÒÔÉÏ");
+        xData.add("7.0mmol/Lä»¥ä¸Š");
         Map<String,String> resultDataMap = new HashMap<>();
 //        if (null != list && list.get(0).size() > 0) {
 //            list.forEach(one -> {
@@ -337,22 +337,22 @@ public class SingleDiseaseService {
 //            });
 //
 //            for(int i =1;i<4 ;i++){
-//                if( !resultDataMap.containsKey(i + "-" + "ÄĞĞÔ")) {
-//                    resultDataMap.put(i + "-" + "ÄĞĞÔ","0");
+//                if( !resultDataMap.containsKey(i + "-" + "ç”·æ€§")) {
+//                    resultDataMap.put(i + "-" + "ç”·æ€§","0");
 //                }
-//                if( !resultDataMap.containsKey(i + "-" + "Å®ĞÔ")) {
-//                    resultDataMap.put(i + "-" + "Å®ĞÔ","0");
+//                if( !resultDataMap.containsKey(i + "-" + "å¥³æ€§")) {
+//                    resultDataMap.put(i + "-" + "å¥³æ€§","0");
 //                }
 //            }
 //
-//            List<String> valueData1 = new LinkedList<>();    // ´æ·ÅµÚÒ»¸öÊı¾İÔ´ ÄĞÉú
-//            List<String> valueData2 = new LinkedList<>();    // ´æ·ÅµÚ¶ş¸öÊı¾İÔ´ Å®Éú
+//            List<String> valueData1 = new LinkedList<>();    // å­˜æ”¾ç¬¬ä¸€ä¸ªæ•°æ®æº ç”·ç”Ÿ
+//            List<String> valueData2 = new LinkedList<>();    // å­˜æ”¾ç¬¬äºŒä¸ªæ•°æ®æº å¥³ç”Ÿ
 //            map.put("xData", xData);
 //            for(String key : resultDataMap.keySet()){
-//                if(key.contains("ÄĞĞÔ")){
+//                if(key.contains("ç”·æ€§")){
 //                    valueData1.add(resultDataMap.get(key)+"");
 //                }
-//                if(key.contains("Å®ĞÔ")){
+//                if(key.contains("å¥³æ€§")){
 //                    valueData2.add(resultDataMap.get(key)+"");
 //                }
 //            }
@@ -360,7 +360,7 @@ public class SingleDiseaseService {
 //            map.put("valueData2", valueData2);
 //        }
 
-        //ÎŞĞÔ±ğÊä³ö
+        //æ— æ€§åˆ«è¾“å‡º
         List<String> valueData = new ArrayList<>();
         if (null != list && list.get(0).size() > 0) {
             list.forEach(one -> {
@@ -373,7 +373,7 @@ public class SingleDiseaseService {
     }
 
     /**
-     * ÌÇÄÍÁ¿Í³¼Æ
+     * ç³–è€é‡ç»Ÿè®¡
      * @return
      */
     public Map<String, List<String>> getSugarToleranceDataInfo() {
@@ -381,10 +381,10 @@ public class SingleDiseaseService {
         List<Map<String, Object>> list = parseIntegerValue(sql);
         Map<String, List<String>> map = new HashMap<>();
         List<String> xData = new LinkedList<>();
-        // »ñÈ¡ºá×ø±ê
-        xData.add("7.8 mmol/LÒÔÏÂ");
+        // è·å–æ¨ªåæ ‡
+        xData.add("7.8 mmol/Lä»¥ä¸‹");
         xData.add("7.8~11.1 mmol/L");
-        xData.add("11.1 mmol/LÒÔÉÏ");
+        xData.add("11.1 mmol/Lä»¥ä¸Š");
 //        Map<String,String> resultDataMap = new HashMap<>();
 //        if (null != list && list.get(0).size() > 0) {
 //            list.forEach(one -> {
@@ -397,22 +397,22 @@ public class SingleDiseaseService {
 //            });
 //
 //            for(int i =1;i<4 ;i++){
-//                if( !resultDataMap.containsKey(i + "-" + "ÄĞĞÔ")) {
-//                    resultDataMap.put(i + "-" + "ÄĞĞÔ","0");
+//                if( !resultDataMap.containsKey(i + "-" + "ç”·æ€§")) {
+//                    resultDataMap.put(i + "-" + "ç”·æ€§","0");
 //                }
-//                if( !resultDataMap.containsKey(i + "-" + "Å®ĞÔ")) {
-//                    resultDataMap.put(i + "-" + "Å®ĞÔ","0");
+//                if( !resultDataMap.containsKey(i + "-" + "å¥³æ€§")) {
+//                    resultDataMap.put(i + "-" + "å¥³æ€§","0");
 //                }
 //            }
 //
-//            List<String> valueData1 = new LinkedList<>();    // ´æ·ÅµÚÒ»¸öÊı¾İÔ´ ÄĞÉú
-//            List<String> valueData2 = new LinkedList<>();    // ´æ·ÅµÚ¶ş¸öÊı¾İÔ´ Å®Éú
+//            List<String> valueData1 = new LinkedList<>();    // å­˜æ”¾ç¬¬ä¸€ä¸ªæ•°æ®æº ç”·ç”Ÿ
+//            List<String> valueData2 = new LinkedList<>();    // å­˜æ”¾ç¬¬äºŒä¸ªæ•°æ®æº å¥³ç”Ÿ
 //            map.put("xData", xData);
 //            for(String key : resultDataMap.keySet()){
-//                if(key.contains("ÄĞĞÔ")){
+//                if(key.contains("ç”·æ€§")){
 //                    valueData1.add(resultDataMap.get(key)+"");
 //                }
-//                if(key.contains("Å®ĞÔ")){
+//                if(key.contains("å¥³æ€§")){
 //                    valueData2.add(resultDataMap.get(key)+"");
 //                }
 //            }
@@ -420,7 +420,7 @@ public class SingleDiseaseService {
 //            map.put("valueData2", valueData2);
 //        }
 
-        //ÎŞĞÔ±ğÊä³ö
+        //æ— æ€§åˆ«è¾“å‡º
         List<String> valueData = new ArrayList<>();
         if (null != list && list.get(0).size() > 0) {
             list.forEach(one -> {
@@ -433,7 +433,7 @@ public class SingleDiseaseService {
     }
 
     /**
-     * ¶Ô²éÑ¯½á¹ûkey°üº¬count¡¢sumµÄvalueÈ¥µôĞ¡Êıµã
+     * å¯¹æŸ¥è¯¢ç»“æœkeyåŒ…å«countã€sumçš„valueå»æ‰å°æ•°ç‚¹
      * @param sql
      * @return
      */
