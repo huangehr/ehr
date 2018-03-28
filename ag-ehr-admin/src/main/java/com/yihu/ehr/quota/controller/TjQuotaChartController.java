@@ -182,7 +182,7 @@ public class TjQuotaChartController extends ExtendController<TjQuotaChart> {
                 }
             }
             List<String> list = getAllCheckedTjQuotaChart(filters);
-            for (int i = 0; i < list.size(); i++) {
+            for (int i = 0; i < mainModelList.size(); i++) {
                 if (list.contains(mainModelList.get(i).getCode())) {
                     mainModelList.get(i).setChecked(true);
                 } else {
