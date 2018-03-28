@@ -1,5 +1,6 @@
 package com.yihu.ehr.agModel.patient;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.yihu.ehr.agModel.geogrephy.GeographyModel;
 
 import java.util.Date;
@@ -38,7 +39,7 @@ public class PatientDetailModel {
     private Date registerTime;   //注册时间
     private String userId;//居民账户id
 
-
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getRegisterTime() {
         return registerTime;
     }

@@ -55,11 +55,23 @@
         </dependency>
         <!-- Jdbc-->
 
+        <!-- Redis  -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+            <scope>${dependency.scope}</scope>
+        </dependency>
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <scope>${dependency.scope}</scope>
+        </dependency>
+        <!-- Redis  -->
+
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-util</artifactId>
         </dependency>
-
     </dependencies>
 
 </project>

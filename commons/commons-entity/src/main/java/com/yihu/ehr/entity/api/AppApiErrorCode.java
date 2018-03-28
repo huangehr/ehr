@@ -1,6 +1,6 @@
 package com.yihu.ehr.entity.api;
 
-import com.yihu.ehr.entity.BaseIdentityEntity;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 
@@ -11,13 +11,26 @@ import javax.persistence.*;
 @Entity
 @Table(name = "app_api_error_code")
 @Access(value = AccessType.PROPERTY)
-public class AppApiErrorCode extends BaseIdentityEntity {
+public class AppApiErrorCode {
 
+    private Integer id; //id
     private Integer apiId; //apiId
     private Integer code; //错误码
     private String description; //描述
     private String solve; //解决方案
     private Integer sort; //序号
+
+    @Id
+    @GeneratedValue(generator = "Generator")
+    @GenericGenerator(name = "Generator", strategy = "identity")
+    @Column(name = "id", unique = true, nullable = false)
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     @Column(name = "api_id", nullable = false)
     public Integer getApiId() {

@@ -14,10 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 标准档案包解析器.
@@ -58,7 +55,7 @@ public class StdPackageResolver extends PackageResolver {
         for(File file : files) {
             PackageDataSet dataSet = generateDataSet(file, origin);
             packageDataSetList.add(dataSet);
-            if(dataSet.isReUploadFlg()){
+            if (dataSet.isReUploadFlg()){
                 standardPackage.setReUploadFlg(true);
             }
         }
@@ -88,10 +85,10 @@ public class StdPackageResolver extends PackageResolver {
                     Map<String, Object> properties = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.CardInfo);
                     String cardId = (String) properties.get(MasterResourceFamily.BasicColumns.CardId);
                     String cardType = (String) properties.get(MasterResourceFamily.BasicColumns.CardType);
-                    if(!StringUtils.isEmpty(cardId)) {
+                    if (!StringUtils.isEmpty(cardId)) {
                         standardPackage.setCardId(cardId);
                     }
-                    if(!StringUtils.isEmpty(cardType)) {
+                    if (!StringUtils.isEmpty(cardType)) {
                         standardPackage.setCardType(cardType);
                     }
                 }
@@ -101,10 +98,10 @@ public class StdPackageResolver extends PackageResolver {
                     Map<String, Object> properties = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.Identity);
                     String demographicId = (String) properties.get(MasterResourceFamily.BasicColumns.DemographicId);
                     String patientName = (String) properties.get(MasterResourceFamily.BasicColumns.PatientName);
-                    if(!StringUtils.isEmpty(demographicId)) {
+                    if (!StringUtils.isEmpty(demographicId)) {
                         standardPackage.setDemographicId(demographicId);
                     }
-                    if(!StringUtils.isEmpty(patientName)) {
+                    if (!StringUtils.isEmpty(patientName)) {
                         standardPackage.setPatientName(patientName);
                     }
                 }
@@ -114,19 +111,19 @@ public class StdPackageResolver extends PackageResolver {
                     Map<String, Object> properties = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.EventInfo);
                     Date eventDate = (Date) properties.get(MasterResourceFamily.BasicColumns.EventDate);
                     EventType eventType = (EventType) properties.get(MasterResourceFamily.BasicColumns.EventType);
-                    if(eventDate != null) {
+                    if (eventDate != null) {
                         standardPackage.setEventDate(eventDate);
                     }
-                    if(eventType != null) {
+                    if (eventType != null) {
                         standardPackage.setEventType(eventType);
                     }
                 }
 
                 //门诊或住院诊断
-                if(standardPackage.getDiagnosisList() == null || standardPackage.getDiagnosisList().size() <= 0 ) {
+                if (standardPackage.getDiagnosisList() == null || standardPackage.getDiagnosisList().size() <= 0 ) {
                     Map<String, Object> properties = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.Diagnosis);
                     List<String> diagnosisList = (List<String>) properties.get(MasterResourceFamily.BasicColumns.Diagnosis);
-                    if (diagnosisList != null && diagnosisList.size() > 0) {
+                    if (diagnosisList.size() > 0) {
                         standardPackage.setDiagnosisList(diagnosisList);
                     }
                 }
@@ -137,6 +134,9 @@ public class StdPackageResolver extends PackageResolver {
             standardPackage.setCdaVersion(dataSet.getCdaVersion());
             standardPackage.setCreateDate(dataSet.getCreateTime());
             standardPackage.insertDataSet(dataSetCode, dataSet);
+        }
+        if (StringUtils.isEmpty(standardPackage.getDemographicId())) {
+            standardPackage.setDemographicId(UUID.randomUUID().toString());
         }
     }
 

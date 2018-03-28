@@ -208,6 +208,9 @@ public class QuotaReportController extends BaseController {
         List<String> charTypes = Arrays.asList(charstr.split(","));
         MChartInfoModel chartInfoModel = new MChartInfoModel();
         String dimensionName = dimension + "Name";
+        if ("quotaName".equals(dimension)) {
+            dimensionName = "quotaName";
+        }
         try {
             Option option = null;
             List<List<Object>> optionData = new ArrayList<>();
@@ -282,6 +285,8 @@ public class QuotaReportController extends BaseController {
             for (String typeStr : charTypes) {
                 if (typeStr.equals("common")) {
                     typeStr = "1";
+                } else if (typeStr.equals("twoDimensional")) { // 这个需要与前端商榷  访问2次（二维表类型）
+                    return null;
                 }
                 int type = Integer.valueOf(typeStr);
                 if (type == ReportOption.bar) {
@@ -752,13 +757,18 @@ public class QuotaReportController extends BaseController {
             } else {
                 map = singleDiseaseService.getSugarToleranceDataInfo();
             }
+//            if (null != map && map.size() > 0) {
+//                List<Map<String, Object>> list = new ArrayList<>();
+//                Map<String, Object> myMap = new HashMap<>();
+//                myMap.put("男", map.get("valueData1"));
+//                myMap.put("女", map.get("valueData2"));
+//                list.add(myMap);
+//                envelop.setDetailModelList(list);
+//                envelop.setObj(map.get("xData"));
+//            }
+
             if (null != map && map.size() > 0) {
-                List<Map<String, Object>> list = new ArrayList<>();
-                Map<String, Object> myMap = new HashMap<>();
-                myMap.put("男", map.get("valueData1"));
-                myMap.put("女", map.get("valueData2"));
-                list.add(myMap);
-                envelop.setDetailModelList(list);
+                envelop.setDetailModelList(map.get("valueData"));
                 envelop.setObj(map.get("xData"));
             }
         }
@@ -775,24 +785,34 @@ public class QuotaReportController extends BaseController {
         }
         return num;
     }
-
-    @RequestMapping(value = ServiceApi.TJ.GetArchiveCount, method = RequestMethod.GET)
-    @ApiOperation(value = "获取档案总数")
-    public Envelop getArchiveCount() throws Exception {
-        Envelop envelop = new Envelop();
-        long archiveCount = baseStatistsService.getArchiveCount();
-        envelop.setObj(archiveCount);
-        envelop.setSuccessFlg(true);
-        return envelop;
+    @RequestMapping(value = "/tj/getCostAndNumOfOutPatient", method = RequestMethod.GET)
+    @ApiOperation(value = "门急诊费用、人次")
+    public Map<String, String> getCostOfOutPatient() {
+        Map<String, String> map = new HashMap<>();
+        String costOfOutPatient = baseStatistsService.getCostOfOutPatient();
+        String numOfOutPatient = baseStatistsService.getNumOfOutPatient();
+        map.put("costOfOutPatient", costOfOutPatient);
+        map.put("numOfOutPatient", numOfOutPatient);
+        return map;
     }
 
-    @RequestMapping(value = ServiceApi.TJ.GetArchiveManCount, method = RequestMethod.GET)
-    @ApiOperation(value = "健康档案的建档人数数量")
-    public Envelop getArchiveManCount() throws Exception {
-        Envelop envelop = new Envelop();
-        long archiveCount = baseStatistsService.getArchiveManCount();
-        envelop.setObj(archiveCount);
-        envelop.setSuccessFlg(true);
-        return envelop;
+    @RequestMapping(value = "/tj/getCostAndNumOfInPatient", method = RequestMethod.GET)
+    @ApiOperation(value = "入院费用、人次")
+    public Map<String, String> getNumOfOutPatient() {
+        Map<String, String> map = new HashMap<>();
+        String costOfInPatient = baseStatistsService.getCostOfInPatient();
+        String numOfInPatient = baseStatistsService.getNumOfInPatient();
+        map.put("costOfInPatient", costOfInPatient);
+        map.put("numOfInPatient", numOfInPatient);
+        return map;
+    }
+
+    @RequestMapping(value = "/tj/getMedicalMonitorInfo", method = RequestMethod.GET)
+    @ApiOperation(value = "医改监测信息")
+    public Map<String, String> getMedicalMonitorInfo() {
+        Map<String, String> map = new HashMap<>();
+        String costOfMedicalMonitor = baseStatistsService.getCostOfMedicalMonitor();
+        map.put("costOfMedicalMonitor", costOfMedicalMonitor);
+        return map;
     }
 }

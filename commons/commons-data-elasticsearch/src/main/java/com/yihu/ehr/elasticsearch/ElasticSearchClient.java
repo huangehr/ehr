@@ -40,7 +40,7 @@ public class ElasticSearchClient {
             CreateIndexRequestBuilder createIndexRequestBuilder = transportClient.admin().indices().prepareCreate(index);
             createIndexRequestBuilder.addMapping(type, xContentBuilder);
             createIndexRequestBuilder.get();
-        }finally {
+        } finally {
             elasticSearchPool.releaseClient(transportClient);
         }
     }
@@ -50,7 +50,7 @@ public class ElasticSearchClient {
         try {
             DeleteIndexRequestBuilder deleteIndexRequestBuilder = transportClient.admin().indices().prepareDelete(index);
             deleteIndexRequestBuilder.get();
-        }finally {
+        } finally {
             elasticSearchPool.releaseClient(transportClient);
         }
     }
@@ -61,7 +61,7 @@ public class ElasticSearchClient {
             IndexResponse response = transportClient.prepareIndex(index, type).setSource(source).get();
             source.put("_id", response.getId());
             return source;
-        }finally {
+        } finally {
             elasticSearchPool.releaseClient(transportClient);
         }
     }
@@ -72,7 +72,7 @@ public class ElasticSearchClient {
             for (String id : idArr) {
                 transportClient.prepareDelete(index, type, id).get();
             }
-        }finally {
+        } finally {
             elasticSearchPool.releaseClient(transportClient);
         }
     }
@@ -82,7 +82,7 @@ public class ElasticSearchClient {
         try {
             transportClient.prepareUpdate(index, type, id).setDoc(source).get();
             return findById(index, type, id);
-        }finally {
+        } finally {
             elasticSearchPool.releaseClient(transportClient);
         }
     }
@@ -97,7 +97,7 @@ public class ElasticSearchClient {
                 source.put("_id", response.getId());
             }
             return source;
-        }finally {
+        } finally {
             elasticSearchPool.releaseClient(transportClient);
         }
     }
@@ -119,7 +119,7 @@ public class ElasticSearchClient {
                 resultList.add(source);
             }
             return resultList;
-        }finally {
+        } finally {
             elasticSearchPool.releaseClient(transportClient);
         }
     }
@@ -142,7 +142,7 @@ public class ElasticSearchClient {
                 resultList.add(source);
             }
             return resultList;
-        }finally {
+        } finally {
             elasticSearchPool.releaseClient(transportClient);
         }
     }
@@ -163,7 +163,7 @@ public class ElasticSearchClient {
                 resultList.add(hit.getId());
             }
             return resultList;
-        }finally {
+        } finally {
             elasticSearchPool.releaseClient(transportClient);
         }
     }
@@ -177,7 +177,7 @@ public class ElasticSearchClient {
             builder.setQuery(queryBuilder);
             builder.setExplain(true);
             return builder.get().getHits().totalHits();
-        }finally {
+        } finally {
             elasticSearchPool.releaseClient(transportClient);
         }
     }

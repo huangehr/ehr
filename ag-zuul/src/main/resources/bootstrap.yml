@@ -14,16 +14,6 @@ spring:
 
 ---
 spring:
-  profiles: alpha
-  cloud:
-    config:
-      username: user
-      password: configuration
-      uri: http://172.19.103.11:1221
-      label: dev
-
----
-spring:
   profiles: test
   cloud:
     config:

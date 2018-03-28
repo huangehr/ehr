@@ -3,7 +3,6 @@ package com.yihu.ehr.profile.controller.profile;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
-import com.yihu.ehr.profile.service.ProfileDiseaseService;
 import com.yihu.ehr.profile.service.ProfileInfoBaseService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -19,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * EndPoint - 患者基本信息（兼容 pc & mobile）
  * Created by progr1mmer on 2018/1/7.
  */
 @RestController
@@ -39,12 +39,45 @@ public class ProfilePatientEndPoint extends EnvelopRestEndPoint{
         return patientInfoBaseService.getPatientInfo(demographic_id, version);
     }
 
-    @ApiOperation("既往史")
+    @ApiOperation("既往史 - pc档案浏览器")
     @RequestMapping(value = ServiceApi.Profiles.ProfileHistory, method = RequestMethod.GET)
     public List<Map<String, Object>> profileHistory(
             @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362321200108017313")
             @RequestParam(value = "demographic_id") String demographic_id) {
         return patientInfoBaseService.profileHistory(demographic_id);
     }
+
+    @ApiOperation("既往史 - mobile居民端")
+    @RequestMapping(value = ServiceApi.Profiles.PastHistory, method = RequestMethod.GET)
+    public List<Map<String, Object>> pastHistory(
+            @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362321200108017313")
+            @RequestParam(value = "demographic_id") String demographic_id) {
+        return patientInfoBaseService.pastHistory(demographic_id);
+    }
+
+    @ApiOperation("过敏史")
+    @RequestMapping(value = ServiceApi.Profiles.AllergensHistory, method = RequestMethod.GET)
+    public Map<String, Object> allergensHistory(
+            @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362321200108017313")
+            @RequestParam(value = "demographic_id") String demographic_id) {
+        return patientInfoBaseService.allergensHistory(demographic_id);
+    }
+
+    @ApiOperation("家族史")
+    @RequestMapping(value = ServiceApi.Profiles.FamilyHistory, method = RequestMethod.GET)
+    public Map<String, Object> familyHistory(
+            @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362321200108017313")
+            @RequestParam(value = "demographic_id") String demographic_id) {
+        return patientInfoBaseService.familyHistory(demographic_id);
+    }
+
+    @ApiOperation("个人史")
+    @RequestMapping(value = ServiceApi.Profiles.PersonHistory, method = RequestMethod.GET)
+    public Map<String, Object> personHistory(
+            @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362321200108017313")
+            @RequestParam(value = "demographic_id") String demographic_id) {
+        return patientInfoBaseService.personHistory(demographic_id);
+    }
+
 
 }

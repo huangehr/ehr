@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @version 1.0
  * @created 2016.03.05 15:38
  */
-public class EhrTokenStoreService implements TokenStore {
+public class EhrInMemoryTokenStoreService implements TokenStore {
 
     private static final int DEFAULT_FLUSH_INTERVAL = 1000;
 

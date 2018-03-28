@@ -61,7 +61,7 @@ public class GlobalExceptionHandler {
             envelop.setErrorCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
             envelop.setErrorMsg(e.getMessage());
         }
-        logger.error("[" + appName + "] " + e.getMessage(), e);
+        logger.error(e.getMessage(), e);
         return envelop;
     }
 

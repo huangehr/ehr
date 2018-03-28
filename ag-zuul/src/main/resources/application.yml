@@ -37,7 +37,7 @@ zuul:
     #档案包相关
     svr-health-profile:
       path: /profile/**
-      serviceId: svr-health-profile-sxy
+      serviceId: svr-health-profile
     svr-pack-analyzer:
       path: /pack-analyzer/**
       serviceId: svr-pack-analyzer
@@ -82,6 +82,13 @@ spring:
     host: 172.19.103.47
     port: 6379
     password: redis!@456
+zuul:
+  routes:
+    jkzl-server:
+      path: /jkzl/**
+      url: http://ssotest.yihu.cn/OpenPlatform/cgiBin/1.0/
+#正式环境URL
+#      url: http://apitest.yihu.com.cn/OpenPlatform/cgiBin/1.0/
 
 ---
 spring:
@@ -94,6 +101,11 @@ spring:
     host: 172.19.103.47
     port: 6379
     password: redis!@456
+zuul:
+  routes:
+    jkzl-server:
+      path: /jkzl/**
+      url: http://ssotest.yihu.cn/OpenPlatform/cgiBin/1.0/
 
 ---
 spring:
@@ -118,7 +130,6 @@ spring:
     host: 10.176.97.5
     port: 6390
     password: q4YaQemf
-
 
 ---
 spring:

@@ -297,17 +297,21 @@ public class ServiceApi {
      */
     public static class Profiles {
         public static final String ProfileInfo = "/profile/baseInfo"; //基本信息
-        public static final String ProfileHistory = "/profile/history"; //患病史
+        public static final String ProfileHistory = "/profile/profileHistory"; //既往史 - pc档案浏览器
+        public static final String PastHistory = "/profile/pastHistory"; //既往史 - mobile居民端
+        public static final String PersonHistory = "/profile/personHistory"; //个人史
+        public static final String AllergensHistory = "/profile/allergensHistory"; //过敏史
+        public static final String FamilyHistory = "/profile/familyHistory"; //家族史
         public static final String HealthProblem = "/profile/healthProblem"; //主要健康问题
         public static final String HealthProblemSub = "/profile/healthProblemSub"; //主要健康问题诊断情况
         public static final String MedicalEvents = "/profile/medicalEvents"; //门诊/住院事件(时间轴)
+        public static final String RecentMedicalEvents = "/profile/recentMedicalEvents"; //最近就诊记录
         public static final String CDAClass = "/profile/cdaClass"; //cda分类
         public static final String CDAData = "/profile/cdaData"; //cda数据
         public static final String MedicationRecords = "/profile/medicationRecords"; //患者用药清单
         public static final String MedicationRanking = "/profile/medicationRanking"; //患者用药排行
         public static final String MedicationSub = "/profile/medicationSub"; //患者用药详情
         public static final String InspectionRecords = "/profile/inspectionRecords"; //检查检验记录
-        public static final String InspectionSub = "/profile/inspectionSub"; //检查检验详情
         // ------------------------------ 以上为已对接接口 ------------------------------
 
         public static final String ProfileLucene = "/profile/lucene"; //全文检索
@@ -650,7 +654,7 @@ public class ServiceApi {
         public static final String VersionLatestExistence = "/std/versions/{version}/latest/existence";
 
         public static final String Documents = "/std/documents";
-        public static final String DocumentNoPage="/std/document/noPage";
+        public static final String DocumentNoPage = "/std/document/noPage";
         public static final String Document = "/std/documents/{id}";
         public static final String DocumentList = "/std/documentsList";
         public static final String DocumentFileExistence = "/std/documents/{id}/file/existence";
@@ -1129,6 +1133,7 @@ public class ServiceApi {
         public static final String GetQcDailyReportPageList = "/report/getQcDailyReportPageList";
 
         public static final String GetJsonArchives = "/report/getGetJsonArchives";
+        public static final String GetArchivesInfo = "/report/getArchivesInfo";
 
 
         public static final String GetQcDailyReportDatasetsList = "/report/getQcDailyReportDatasetsList";
@@ -1437,4 +1442,10 @@ public class ServiceApi {
         public static final String StatisticDeptTransferTreatmentSum = "/outpatientServiceStatistic/statisticDeptTransferTreatmentSum";
     }
 
+    public class MessageTemplate {
+        public static final String MessageTemplateAdmin = "/messageTemplate/admin/{messageTemplateId}";
+        public static final String MessageTemplate = "/messageTemplate";
+        public static final String MyMessageList = "/messageTemplate/MyMessageList";
+        public static final String MyMessage = "/messageTemplate/MyMessage/admin/{messageId}";
+    }
 }

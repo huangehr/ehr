@@ -265,31 +265,35 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
         MCdaTransformDto cdaTransformDto =  objectMapper.readValue(cdaTransformDtoJson, MCdaTransformDto.class);
         Map<String, Object> result = new HashMap<>();
         Map<String, Object> event = cdaTransformDto.getMasterJson();
+        if (null == event) {
+            return result;
+        }
         Map<String, List<String>> masterDataSetCodeMap = cdaTransformDto.getMasterDatasetCodeList();
         Map<String, List<String>> multiDataSetCodeMap = cdaTransformDto.getMultiDatasetCodeList();
         String profileId = event.get("rowkey").toString();
         String cdaVersion = event.get("cda_version").toString();
-        for(String key : masterDataSetCodeMap.keySet()) {
-            Map<String, Object> map = new HashMap<>();
-            List<String> masterDataSetList = masterDataSetCodeMap.get(key);
-            List<String> multiDataSetList = multiDataSetCodeMap.get(key);
+        for(String cdaId : masterDataSetCodeMap.keySet()) {
+            Map<String, Object> data = new HashMap<>();
+            List<String> masterDataSetList = masterDataSetCodeMap.get(cdaId);
+            List<String> multiDataSetList = multiDataSetCodeMap.get(cdaId);
             for (int i = 0; i < masterDataSetList.size(); i++) {
                 List<Map<String, Object>> dataList = new ArrayList<>();
                 String dataSet = masterDataSetList.get(i);
                 dataList.add(resourcesTransformService.stdMasterTransform(event, dataSet, cdaVersion));
-                map.put(dataSet, dataList);
+                data.put(dataSet, dataList);
             }
             for (int i = 0; i < multiDataSetList.size(); i++) {
                 String dataSet = multiDataSetList.get(i);
-                String q = "{\"table\":\"" + dataSet + "\",\"q\":\"profile_id:" + profileId + "\"}";
-                Page<Map<String, Object>> page = resourceBrowseService.getEhrCenterSub(q, null, null);
+                String q = "{\"q\":\"rowkey:" + profileId + "$" + dataSet + "$*\"}";
+                //String q = "{\"q\":\"profile_id:" + profileId + "\"}";
+                Page<Map<String, Object>> page = resourceBrowseService.getEhrCenterSub(q, 1, 500);
                 if (cdaVersion != null && cdaVersion.length() > 0) {
-                    map.put(dataSet, resourcesTransformService.displayCodeConvert(page.getContent(), cdaVersion, null));
+                    data.put(dataSet, resourcesTransformService.displayCodeConvert(page.getContent(), cdaVersion, dataSet));
                 } else {
-                    map.put(dataSet, page.getContent());
+                    data.put(dataSet, page.getContent());
                 }
             }
-            result.put(key,map);
+            result.put(cdaId, data);
         }
         return result;
     }

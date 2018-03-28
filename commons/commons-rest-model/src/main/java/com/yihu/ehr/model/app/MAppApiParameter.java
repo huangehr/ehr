@@ -20,6 +20,7 @@ public class MAppApiParameter implements Serializable {
     private int appApiId;
     private String memo;
     private String defaultValue;
+    private Integer maxLength;
 
     public int getId() {
         return id;
@@ -94,5 +95,11 @@ public class MAppApiParameter implements Serializable {
         this.defaultValue = defaultValue;
     }
 
+    public Integer getMaxLength() {
+        return maxLength;
+    }
 
+    public void setMaxLength(Integer maxLength) {
+        this.maxLength = maxLength;
+    }
 }

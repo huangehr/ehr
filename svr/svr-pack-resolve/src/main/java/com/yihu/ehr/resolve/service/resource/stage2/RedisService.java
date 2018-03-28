@@ -58,7 +58,7 @@ public class RedisService {
      * @return
      */
     public String getRsAdapterDict(String cdaVersion, String dictCode, String srcDictEntryCode) {
-        return rsAdapterDictKeySchema.getMetaData(cdaVersion,dictCode,srcDictEntryCode);
+        return rsAdapterDictKeySchema.getMetaData(cdaVersion, dictCode, srcDictEntryCode);
     }
 
     /**
@@ -66,7 +66,7 @@ public class RedisService {
      * @return
      */
     public String getRsAdapterMetaData(String cdaVersion, String dictCode, String srcDictEntryCode) {
-        return rsAdapterMetaKeySchema.getMetaData(cdaVersion,dictCode,srcDictEntryCode);
+        return rsAdapterMetaKeySchema.getMetaData(cdaVersion, dictCode, srcDictEntryCode);
     }
 
     /**

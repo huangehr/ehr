@@ -11,6 +11,7 @@ public class MapSort {
 
     @Test
     public void test() {
+
         Map<String, Integer> dataMap = new HashMap<String, Integer>();
         dataMap.put("name1", 5);
         dataMap.put("name2", 4);
@@ -23,7 +24,7 @@ public class MapSort {
         resultMap.forEach((k, v) -> System.out.println("key:" + k + "; " + "value:" + v));
     }
 
-    private static Map<String, Integer> sortByValue(Map<String, Integer> sourceMap) {
+    private Map<String, Integer> sortByValue(Map<String, Integer> sourceMap) {
         if (sourceMap == null || sourceMap.isEmpty()) {
             return null;
         }
@@ -41,7 +42,7 @@ public class MapSort {
     }
 
 
-    static class MapValueComparator implements Comparator<Map.Entry<String, Integer>> {
+    class MapValueComparator implements Comparator<Map.Entry<String, Integer>> {
 
         @Override
         public int compare(Map.Entry<String, Integer> me1, Map.Entry<String, Integer> me2) {

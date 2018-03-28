@@ -31,7 +31,7 @@ public class EventInfoExtractor extends KeyDataExtractor {
     private List<String> metaData = new ArrayList<>();
 
     @Override
-    public Map<String,Object> extract(PackageDataSet dataSet) throws Exception {
+    public Map<String, Object> extract(PackageDataSet dataSet) throws Exception {
         Map<String,Object> properties = new HashedMap();
         Date eventDate = null;
         EventType eventType = null;
@@ -39,13 +39,13 @@ public class EventInfoExtractor extends KeyDataExtractor {
             for (String rowKey : dataSet.getRecordKeys()) {
                 MetaDataRecord record = dataSet.getRecord(rowKey);
                 //获取就诊时间
-                if(eventDate == null) {
+                if (eventDate == null) {
                     for (String metaDataCode : metaData) {
                         String value = record.getMetaData(metaDataCode);
                         if (StringUtils.isNotEmpty(value)) {
                             eventDate = DateUtil.strToDate(value);
                         }
-                        if(eventDate != null) {
+                        if (eventDate != null) {
                             eventType = EventType.valueOf(dataSets.get(dataSet.getCode()));
                             break;
                         }

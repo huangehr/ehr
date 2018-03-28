@@ -39,8 +39,8 @@ import java.util.Map;
 @Transactional
 public class AppApiService extends BaseJpaService<AppApi, AppApiRepository> {
 
-    private static final String DELETE = "delete";
     private static final String ADD = "add";
+    private static final String DELETE = "delete";
     private static final String UPDATE = "update";
     private static final String DATA_STATUS = "__status";
     private static final Integer NEW_DATA = 0;
@@ -84,7 +84,7 @@ public class AppApiService extends BaseJpaService<AppApi, AppApiRepository> {
     public AppApi completeSave(String appApiStr, String apiParamStr, String apiResponseStr, String apiErrorCodeStr) throws IOException {
         AppApi appApi = objectMapper.readValue(appApiStr, AppApi.class);
         AppApi newAppApi = appApiRepository.save(appApi);
-        saveParamAndResponse(newAppApi.getId(), apiParamStr, apiResponseStr, apiErrorCodeStr);
+        saveParamAndResponseAndErrorCode(newAppApi.getId(), apiParamStr, apiResponseStr, apiErrorCodeStr);
         return newAppApi;
     }
 
@@ -100,6 +100,10 @@ public class AppApiService extends BaseJpaService<AppApi, AppApiRepository> {
         return appApiRepository.findOne(id);
     }
 
+    public List<AppApi> findByCateId(Integer categoryId) {
+        return appApiRepository.findByCategory(categoryId);
+    }
+
     public List<AppApi> authApiList(String clientId) {
         String sql =  "SELECT aa.* FROM apps_api aa \n" +
                 "\tLEFT JOIN role_api_relation rar ON rar.app_api_id = aa.id \n" +
@@ -110,13 +114,13 @@ public class AppApiService extends BaseJpaService<AppApi, AppApiRepository> {
     }
 
     /**
-     * 操作apiParam及apiResponse
+     * 操作apiParam及apiResponse及apiErrorCode
      *
      * @param apiId
      * @param apiParam
      * @param apiResponse
      */
-    private void saveParamAndResponse(Integer apiId, String apiParam, String apiResponse, String apiErrorCode) throws IOException {
+    private void saveParamAndResponseAndErrorCode(Integer apiId, String apiParam, String apiResponse, String apiErrorCode) throws IOException {
         List<Map<String, Object>> list;
         if (!StringUtils.isEmpty(apiParam)) {
             list = objectMapper.readValue(apiParam, List.class);
@@ -128,7 +132,7 @@ public class AppApiService extends BaseJpaService<AppApi, AppApiRepository> {
                     paramMap.put("appApiId", apiId);
                     String json = objectMapper.writeValueAsString(paramMap);
                     AppApiParameter appApiParameter = objectMapper.readValue(json, AppApiParameter.class);
-                    if (NEW_DATA == paramMap.get("id")) {
+                    if (ADD.equals(paramMap.get(DATA_STATUS))) {
                         appApiParameterRepository.save(appApiParameter);
                     } else if (UPDATE.equals(paramMap.get(DATA_STATUS))) {
                         AppApiParameter oldAppApiParameter = appApiParameterRepository.findOne(appApiParameter.getId());
@@ -181,7 +185,7 @@ public class AppApiService extends BaseJpaService<AppApi, AppApiRepository> {
                     } else if (UPDATE.equals(paramMap.get(DATA_STATUS))) {
                         AppApiErrorCode oldAppApiErrorCode = appApiErrorCodeDao.findOne(appApiErrorCode.getId());
                         if (oldAppApiErrorCode == null) {
-                            throw new ApiException(ErrorCode.OBJECT_NOT_FOUND, "更新的返回参数不存在：" + appApiErrorCode.getId());
+                            throw new ApiException(ErrorCode.OBJECT_NOT_FOUND, "更新的错误码说明不存在：" + appApiErrorCode.getId());
                         }
                         appApiErrorCodeDao.save(appApiErrorCode);
                     } else if (DELETE.equals(paramMap.get(DATA_STATUS))) {

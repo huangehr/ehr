@@ -74,7 +74,7 @@ public interface HealthProfileClient {
 
 
         @ApiOperation("患者患病史JSON")
-        @RequestMapping(value = ServiceApi.Profiles.ProfileHistory, method = RequestMethod.GET)
+        @RequestMapping(value = ServiceApi.Profiles.PastHistory, method = RequestMethod.GET)
         String ProfileHistory(
                 @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="360101200006011131")
                 @RequestParam(value = "demographic_id", required = true) String demographic_id) throws Exception;
