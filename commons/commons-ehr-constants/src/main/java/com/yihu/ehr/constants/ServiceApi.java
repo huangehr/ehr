@@ -297,13 +297,15 @@ public class ServiceApi {
      */
     public static class Profiles {
         public static final String ProfileInfo = "/profile/baseInfo"; //基本信息
-        public static final String PastHistory = "/profile/pastHistory"; //既往史
+        public static final String ProfileHistory = "/profile/profileHistory"; //既往史 - pc档案浏览器
+        public static final String PastHistory = "/profile/pastHistory"; //既往史 - mobile居民端
         public static final String PersonHistory = "/profile/personHistory"; //个人史
         public static final String AllergensHistory = "/profile/allergensHistory"; //过敏史
         public static final String FamilyHistory = "/profile/familyHistory"; //家族史
         public static final String HealthProblem = "/profile/healthProblem"; //主要健康问题
         public static final String HealthProblemSub = "/profile/healthProblemSub"; //主要健康问题诊断情况
         public static final String MedicalEvents = "/profile/medicalEvents"; //门诊/住院事件(时间轴)
+        public static final String RecentMedicalEvents = "/profile/recentMedicalEvents"; //最近就诊记录
         public static final String CDAClass = "/profile/cdaClass"; //cda分类
         public static final String CDAData = "/profile/cdaData"; //cda数据
         public static final String MedicationRecords = "/profile/medicationRecords"; //患者用药清单

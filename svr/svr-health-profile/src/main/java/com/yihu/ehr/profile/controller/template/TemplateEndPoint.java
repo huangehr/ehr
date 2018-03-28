@@ -126,19 +126,30 @@ public class TemplateEndPoint extends BaseRestEndPoint {
             @ApiParam(value = "模板ID")
             @PathVariable(value = "id") int id,
             @ApiParam(value = "true表示PC端，false表示移动端")
-            @RequestParam(value = "pc", defaultValue = "true") boolean pc,
-            HttpServletResponse response) throws Exception {
+            @RequestParam(value = "pc", defaultValue = "true") boolean pc, HttpServletResponse response) throws Exception {
         ArchiveTemplate template = templateService.getTemplate(id);
         if (template == null) {
             throw new ApiException(ErrorCode.NOT_FOUND, "Template not found");
         }
-        if (StringUtils.isEmpty(template.getPcTplURL())) {
+        if (pc && StringUtils.isEmpty(template.getPcTplURL())) {
+            throw new ApiException(ErrorCode.NOT_FOUND, "Template content is empty.");
+        }
+        if (!pc && StringUtils.isEmpty(template.getMobileTplURL())) {
             throw new ApiException(ErrorCode.NOT_FOUND, "Template content is empty.");
         }
         IOUtils.copy(new ByteArrayInputStream(template.getContent(pc)), response.getOutputStream());
-
+        String extension = ".file";
+        if (pc) {
+            if (template.getPcTplURL().split("\\.").length == 2) {
+                extension = template.getPcTplURL().split("\\.")[1];
+            }
+        } else {
+            if (template.getMobileTplURL().split("\\.").length == 2) {
+                extension = template.getMobileTplURL().split("\\.")[1];
+            }
+        }
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
-        response.setHeader("Content-Disposition", "attachment; filename=" + template.getTitle() + ".html");
+        response.setHeader("Content-Disposition", "attachment; filename=" + template.getTitle() + "." + extension);
         response.flushBuffer();
     }
 
