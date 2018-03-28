@@ -285,6 +285,8 @@ public class QuotaReportController extends BaseController {
             for (String typeStr : charTypes) {
                 if (typeStr.equals("common")) {
                     typeStr = "1";
+                } else if (typeStr.equals("twoDimensional")) { // 这个需要与前端商榷  访问2次（二维表类型）
+                    return null;
                 }
                 int type = Integer.valueOf(typeStr);
                 if (type == ReportOption.bar) {
