@@ -229,7 +229,6 @@ public class ProfileEventService {
      */
     public Map<String, Object> recentMedicalEvents(String demographicId) throws Exception {
         Map<String, Object> resultMap = new HashMap<>();
-        resultMap.put("show", false);
         String q = "{\"q\":\"demographic_id:" + demographicId + "\"}";
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, 0);
@@ -278,10 +277,10 @@ public class ProfileEventService {
                 }
             }
             if (!StringUtils.isEmpty(healthProblemName)) {
-                resultMap.put("show", true);
                 resultMap.put("healthProblemName", healthProblemName);
+                return resultMap;
             }
-            return resultMap;
+            return new HashMap<>();
         }
         return resultMap;
     }
