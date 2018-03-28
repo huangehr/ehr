@@ -13,7 +13,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -24,6 +23,8 @@ import java.util.List;
  */
 @Service
 public class EhrUserDetailsService implements UserDetailsService {
+
+    private static final String DEFAULT_USER_DETAILS_STATEMENT = "SELECT * FROM users u WHERE u.login_code = ? OR u.telephone = ? OR u.id_card_no = ?";
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -37,8 +38,7 @@ public class EhrUserDetailsService implements UserDetailsService {
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        String finalSql = "select * from users u where 1=1 and (u.login_code=? or u.telephone=? or u.id_card_no=?)";
-        List<UserVO> users = jdbcTemplate.query(finalSql, new BeanPropertyRowMapper(UserVO.class), username, username, username);
+        List<UserVO> users = jdbcTemplate.query(DEFAULT_USER_DETAILS_STATEMENT, new BeanPropertyRowMapper(UserVO.class), username, username, username);
         if (users == null || users.size() == 0) {
             throw new UsernameNotFoundException(username);
         }
@@ -47,8 +47,6 @@ public class EhrUserDetailsService implements UserDetailsService {
         /*if (username.equals("admin")){
             return new User("admin", "e10adc3949ba59abbe56e057f20f883e", getGrantedAuthorities(username));
         }
-
-
         return null;*/
     }
 

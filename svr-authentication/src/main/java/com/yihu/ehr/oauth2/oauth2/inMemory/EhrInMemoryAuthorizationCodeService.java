@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @version 1.0
  * @created 2016.03.05 11:03
  */
-public class EhrAuthorizationCodeService extends RandomValueAuthorizationCodeServices {
+public class EhrInMemoryAuthorizationCodeService extends RandomValueAuthorizationCodeServices {
     protected final ConcurrentHashMap<String, OAuth2Authentication> authorizationCodeStore = new ConcurrentHashMap<String, OAuth2Authentication>();
 
     @Override

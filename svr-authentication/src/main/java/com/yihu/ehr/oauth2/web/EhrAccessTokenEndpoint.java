@@ -13,10 +13,9 @@ package com.yihu.ehr.oauth2.web;
 
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.oauth2.oauth2.EhrTokenGranter;
-import com.yihu.ehr.oauth2.oauth2.EhrAuthorizationServerTokenServices;
+import com.yihu.ehr.oauth2.oauth2.EhrTokenServices;
 import com.yihu.ehr.oauth2.oauth2.jdbc.EhrJdbcClientDetailsService;
 import com.yihu.ehr.oauth2.oauth2.redis.EhrRedisApiAccessValidator;
-import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,7 +60,7 @@ public class EhrAccessTokenEndpoint extends AbstractEndpoint {
     @Autowired
     private EhrJdbcClientDetailsService ehrJdbcClientDetailsService;
     @Autowired
-    private EhrAuthorizationServerTokenServices ehrAuthorizationServerTokenServices;
+    private EhrTokenServices ehrTokenServices;
     @Autowired
     private EhrTokenGranter ehrTokenGranter;
     @Autowired
@@ -161,7 +160,7 @@ public class EhrAccessTokenEndpoint extends AbstractEndpoint {
         @ApiParam(name = "api", value = "访问api")
         @RequestParam(value = "api", required = false)String api) throws IllegalAccessException {
         //根据accessToken查询相应的访问授权数据行
-        OAuth2AccessToken auth2AccessToken = ehrAuthorizationServerTokenServices.readAccessToken(accessToken);
+        OAuth2AccessToken auth2AccessToken = ehrTokenServices.readAccessToken(accessToken);
         if (auth2AccessToken == null) {
             throw  new InvalidTokenException("Invalid accessToken");
         }
@@ -170,7 +169,7 @@ public class EhrAccessTokenEndpoint extends AbstractEndpoint {
                 throw  new InvalidTokenException("Expired accessToken");
             } else {
                 //判断ClientId
-                OAuth2Authentication authentication = ehrAuthorizationServerTokenServices.loadAuthentication(accessToken);
+                OAuth2Authentication authentication = ehrTokenServices.loadAuthentication(accessToken);
                 String authenticationClientId = authentication.getOAuth2Request().getClientId();
                 if(authenticationClientId != null && authenticationClientId.equals(clientId)) {
                     Map<String, Object> successMap = new HashMap<>();
@@ -204,7 +203,7 @@ public class EhrAccessTokenEndpoint extends AbstractEndpoint {
     }
 
     private void putVerificationApi(TokenRequest tokenRequest, OAuth2AccessToken token) {
-        OAuth2Authentication authentication = ehrAuthorizationServerTokenServices.loadAuthentication(token.getValue());
+        OAuth2Authentication authentication = ehrTokenServices.loadAuthentication(token.getValue());
         String clientId = tokenRequest.getClientId();
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = (UsernamePasswordAuthenticationToken)authentication.getUserAuthentication();
         String userName = usernamePasswordAuthenticationToken.getName();

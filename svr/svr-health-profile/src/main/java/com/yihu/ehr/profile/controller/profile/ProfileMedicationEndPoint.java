@@ -34,7 +34,7 @@ public class ProfileMedicationEndPoint extends EnvelopRestEndPoint {
     public List medicationRecords(
             @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362321200108017313")
             @RequestParam(value = "demographic_id") String demographic_id,
-            @ApiParam(name = "filter", value = "健康问题health_problem=hpCode（不传默认查找所有）")
+            @ApiParam(name = "filter", value = "健康问题health_problem?hpCode（不传默认查找所有）")
             @RequestParam(value = "filter", required = false) String filter,
             @ApiParam(name = "date", value = "时间")
             @RequestParam(value = "date", required = false) String date,

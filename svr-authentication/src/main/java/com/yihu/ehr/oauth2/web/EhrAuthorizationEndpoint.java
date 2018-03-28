@@ -4,6 +4,7 @@ import com.yihu.ehr.oauth2.oauth2.EhrTokenGranter;
 import com.yihu.ehr.oauth2.oauth2.EhrUserDetailsService;
 import com.yihu.ehr.oauth2.oauth2.jdbc.*;
 import com.yihu.ehr.oauth2.oauth2.redis.EhrRedisApiAccessValidator;
+import com.yihu.ehr.oauth2.oauth2.redis.EhrRedisTokenStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -66,8 +67,10 @@ public class EhrAuthorizationEndpoint extends AbstractEndpoint {
 
     @Autowired
     private AuthorizationCodeServices inMemoryAuthorizationCodeServices;
+    /*@Autowired
+    private EhrJdbcTokenStore ehrJdbcTokenStore;*/
     @Autowired
-    private EhrJdbcTokenStore ehrJdbcTokenStore;
+    private EhrRedisTokenStore ehrRedisTokenStore;
     @Autowired
     private EhrJdbcClientDetailsService ehrJdbcClientDetailsService;
     @Autowired
@@ -95,7 +98,7 @@ public class EhrAuthorizationEndpoint extends AbstractEndpoint {
     public void init() throws Exception {
         AuthorizationServerEndpointsConfigurer configurer = configuration.getEndpointsConfigurer();
         configurer.setClientDetailsService(ehrJdbcClientDetailsService);
-        configurer.tokenStore(ehrJdbcTokenStore);
+        configurer.tokenStore(ehrRedisTokenStore);
         configurer.authorizationCodeServices(inMemoryAuthorizationCodeServices);
         FrameworkEndpointHandlerMapping mapping = configuration.getEndpointsConfigurer().getFrameworkEndpointHandlerMapping();
         this.setUserApprovalPage(extractPath(mapping, "/oauth/confirm_access"));

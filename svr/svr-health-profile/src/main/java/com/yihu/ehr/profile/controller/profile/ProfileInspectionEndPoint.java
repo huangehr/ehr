@@ -33,7 +33,7 @@ public class ProfileInspectionEndPoint extends EnvelopRestEndPoint {
     public List inspectionRecords(
             @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362321200108017313")
             @RequestParam(value = "demographic_id") String demographic_id,
-            @ApiParam(name = "filter", value = "健康问题health_problem=hpCode（不传默认查找所有）")
+            @ApiParam(name = "filter", value = "健康问题health_problem?hpCode（不传默认查找所有）")
             @RequestParam(value = "filter", required = false) String filter,
             @ApiParam(name = "date", value = "时间 {'start':'2018-03-12T12:00:00Z','end':'2018-03-15T12:00:00Z'}")
             @RequestParam(value = "date", required = false) String date) throws Exception {

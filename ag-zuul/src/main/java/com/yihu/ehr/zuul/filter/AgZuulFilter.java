@@ -9,16 +9,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
-import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
+import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
+import org.springframework.security.oauth2.provider.token.store.redis.RedisTokenStore;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by progr1mmer on 2017/12/27
@@ -31,10 +32,10 @@ public class AgZuulFilter extends ZuulFilter {
 
     @Autowired
     private ObjectMapper objectMapper;
+    //@Autowired
+    //private DataSource dataSource;
     @Autowired
-    private DataSource dataSource;
-    @Autowired
-    private DefaultTokenServices defaultTokenServices;
+    private TokenStore tokenStore;
 
     @Override
     public String filterType() {
@@ -67,14 +68,14 @@ public class AgZuulFilter extends ZuulFilter {
         if (null == accessToken) {
             return this.forbidden(ctx, HttpStatus.FORBIDDEN.value(), "accessToken can not be null");
         }
-        OAuth2AccessToken oAuth2AccessToken = defaultTokenServices.readAccessToken(accessToken);
+        OAuth2AccessToken oAuth2AccessToken = tokenStore.readAccessToken(accessToken);
         if (null == oAuth2AccessToken) {
             return this.forbidden(ctx, HttpStatus.FORBIDDEN.value(), "invalid accessToken");
         }
         if (oAuth2AccessToken.isExpired()) {
             return this.forbidden(ctx, HttpStatus.UNAUTHORIZED.value(), "expired accessToken"); //返回401 需要重新获取 token
         }
-        //OAuth2Authentication oAuth2Authentication = defaultTokenServices.loadAuthentication(accessToken);
+        //OAuth2Authentication oAuth2Authentication = tokenStore.readAuthentication(accessToken);
         return null;
     }
 
@@ -103,19 +104,13 @@ public class AgZuulFilter extends ZuulFilter {
 
     @Bean
     @Primary
-    public JdbcTokenStore tokenStore() {
-        return new JdbcTokenStore(dataSource);
+    public RedisTokenStore redisTokenStore(JedisConnectionFactory jedisConnectionFactory) {
+        return new RedisTokenStore(jedisConnectionFactory);
     }
 
-    @Bean
+    /*@Bean
     @Primary
-    public DefaultTokenServices tokenService() {
-        DefaultTokenServices tokenServices = new DefaultTokenServices();
-        tokenServices.setTokenStore(tokenStore());
-        //tokenServices.setClientDetailsService(clientDetails());
-        //tokenServices.setTokenEnhancer(endpoints.getTokenEnhancer());
-        tokenServices.setSupportRefreshToken(true);
-        tokenServices.setAccessTokenValiditySeconds((int) TimeUnit.DAYS.toSeconds(30)); // 30天
-        return tokenServices;
-    }
+    public JdbcTokenStore tokenStore() {
+        return new JdbcTokenStore(dataSource);
+    }*/
 }
