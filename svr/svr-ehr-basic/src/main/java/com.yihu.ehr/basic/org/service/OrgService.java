@@ -1,10 +1,10 @@
 package com.yihu.ehr.basic.org.service;
 
+import com.yihu.ehr.basic.address.service.AddressService;
 import com.yihu.ehr.basic.org.dao.OrganizationRepository;
 import com.yihu.ehr.basic.org.model.OrgDept;
 import com.yihu.ehr.basic.org.model.Organization;
 import com.yihu.ehr.entity.address.Address;
-import com.yihu.ehr.basic.address.service.AddressService;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.util.id.BizObject;
 import com.yihu.ehr.util.id.ObjectId;
@@ -169,8 +169,8 @@ public class OrgService extends BaseJpaService<Organization, OrganizationReposit
     protected String getObjectId(BizObject bizObject){
         return new ObjectId(deployRegion, bizObject).toString();
     }
-    @Transactional(propagation = Propagation.REQUIRED)
 
+    @Transactional(propagation = Propagation.REQUIRED)
     public boolean addOrgBatch(List<Map<String, Object>> orgDepts) {
         Map<String, Object> map;
         Address geography =null;
@@ -237,6 +237,34 @@ public class OrgService extends BaseJpaService<Organization, OrganizationReposit
                 berth=Integer.valueOf( map .get("berth").toString());
             }
             organization.setBerth(berth);
+
+            /****************2018年3月27日  新增和总部同步字段 开始*******************/
+            if(null!=map.get("hosHierarchy")){
+                organization.setHosHierarchy(map.get("hosHierarchy").toString());
+            }
+            if(null!=map.get("hosEconomic")){
+                organization.setHosEconomic(map.get("hosEconomic").toString());
+            }
+            if(null!=map.get("classification")){
+                organization.setClassification(map.get("classification").toString());
+            }
+            if(null!=map.get("bigClassification")){
+                organization.setBigClassification(map.get("bigClassification").toString());
+            }
+            if(null!=map.get("nature")){
+                organization.setNature(map.get("nature").toString());
+            }
+            if(null!=map.get("branchType")){
+                organization.setBranchType(map.get("branchType").toString());
+            }
+            if(null!=map.get("displayStatus")){
+                organization.setDisplayStatus(map.get("displayStatus").toString());
+            }
+            if(null!=map.get("jkzlOrgId")){
+                organization.setJkzlOrgId(map.get("jkzlOrgId").toString());
+            }
+            /****************2018年3月27日  新增和总部同步字段 结束*******************/
+
             Organization org=organizationRepository.save(organization);
             List<Long> orgList= organizationRepository.getOrgIdByOrgCode(organization.getOrgCode());
             Long Id=new Long(1);
