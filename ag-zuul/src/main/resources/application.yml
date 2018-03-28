@@ -37,7 +37,7 @@ zuul:
     #档案包相关
     svr-health-profile:
       path: /profile/**
-      serviceId: svr-health-profile-sxy
+      serviceId: svr-health-profile
     svr-pack-analyzer:
       path: /pack-analyzer/**
       serviceId: svr-pack-analyzer
