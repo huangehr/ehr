@@ -165,6 +165,8 @@ public class Organization  {
 
     private String displayStatus;//与总部同步数据补充字段是否开放显示：0：不显示 1:显示
 
+    private String jkzlOrgId;//总部机构id-同步数据使用
+
     public Organization() {
         //tags = new HashSet<>();
     }
@@ -573,5 +575,13 @@ public class Organization  {
 
     public void setDisplayStatus(String displayStatus) {
         this.displayStatus = displayStatus;
+    }
+
+    public String getJkzlOrgId() {
+        return jkzlOrgId;
+    }
+
+    public void setJkzlOrgId(String jkzlOrgId) {
+        this.jkzlOrgId = jkzlOrgId;
     }
 }

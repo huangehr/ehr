@@ -260,6 +260,9 @@ public class OrgService extends BaseJpaService<Organization, OrganizationReposit
             if(null!=map.get("displayStatus")){
                 organization.setDisplayStatus(map.get("displayStatus").toString());
             }
+            if(null!=map.get("jkzlOrgId")){
+                organization.setJkzlOrgId(map.get("jkzlOrgId").toString());
+            }
             /****************2018年3月27日  新增和总部同步字段 结束*******************/
 
             Organization org=organizationRepository.save(organization);
