@@ -14,6 +14,7 @@ public class OrgDeptModel {
     private String name;
     private Integer delFlag;
     private Integer sortNo;
+    private Integer jkzlHosDeptId;
 
     private OrgDeptDetailModel deptDetail;
 
@@ -79,5 +80,13 @@ public class OrgDeptModel {
 
     public void setSortNo(Integer sortNo) {
         this.sortNo = sortNo;
+    }
+
+    public Integer getJkzlHosDeptId() {
+        return jkzlHosDeptId;
+    }
+
+    public void setJkzlHosDeptId(Integer jkzlHosDeptId) {
+        this.jkzlHosDeptId = jkzlHosDeptId;
     }
 }
