@@ -3,10 +3,6 @@ package com.yihu.ehr.util.fzgateway;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.http.HttpClientUtil;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,26 +13,21 @@ import java.util.Map;
  * @author 张进军
  * @date 2018/3/29 11:44
  */
-@Component
-@Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class FzGatewayUtil {
-
-    @Value("${fz-gateway.url}")
-    private String gatewayUrl;
-    @Value("${fz-gateway.clientId}")
-    private String clientId;
-    @Value("${fz-gateway.clientVersion}")
-    private String clientVersion;
 
     /**
      * HTTP POST 调用福州总部网关接口
      *
-     * @param api        API 名称，格式为 a.b.c
-     * @param apiParams  请求参数
-     * @param apiVersion API 版本号，版本号为整型，从数字 1 开始递增
+     * @param gatewayUrl    总部网关地址
+     * @param clientId      渠道ID
+     * @param clientVersion 接入方系统版本号
+     * @param api           API 名称，格式为 a.b.c
+     * @param apiParams     请求参数
+     * @param apiVersion    API 版本号，版本号为整型，从数字 1 开始递增
      * @return 响应参数
      */
-    public String httpPost(String api, Map apiParams, int apiVersion) {
+    public static String httpPost(String gatewayUrl, String clientId, String clientVersion,
+                                  String api, Map apiParams, int apiVersion) {
         Map<String, String> authInfoMap = new HashMap<>();
         authInfoMap.put("ClientId", clientId);
         authInfoMap.put("ClientVersion", clientVersion);
