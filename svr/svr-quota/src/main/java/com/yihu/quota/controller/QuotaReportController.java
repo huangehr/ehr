@@ -157,6 +157,34 @@ public class QuotaReportController extends BaseController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        for(Map<String, Object> map : dataList){
+            if(map.get("firstColumn") == null || map.get("firstColumn").toString().equals("null") || StringUtils.isEmpty(map.get("firstColumn").toString())){
+                if(map.get("level")!= null && StringUtils.isNotEmpty(map.get("level").toString())){
+                    String level = map.get("level").toString();
+                    if (level.equals("1")){
+                        level = "一级";
+                    }else if (level.equals("2")){
+                        level = "二级";
+                    }else if (level.equals("3")){
+                        level = "三级";
+                    }else {
+                        level = "未指定";
+                    }
+                    map.put("firstColumn",level);
+                }
+                if(map.get("economic")!= null && StringUtils.isNotEmpty(map.get("economic").toString())){
+                    String economic = map.get("economic").toString();
+                    if (economic.equals("1021")){
+                        economic = "公立";
+                    }else if (economic.equals("1022")){
+                        economic = "非公立";
+                    }else {
+                        economic = "其他";
+                    }
+                    map.put("firstColumn",economic);
+                }
+            }
+        }
         //计算合计
         if(dataList != null && dataList.size() > 0){
             Map<String, Object> sumMap = new HashMap<>();
