@@ -365,7 +365,16 @@ public class OrganizationController extends BaseController {
         }
 
         //新增同步到总部逻辑
-        synOrg(mOrganization, orgDetailModel);
+        Map<String, Object> result = saveSynOrg(mOrganization, orgDetailModel);
+        if (result.get("Code").toString().equals("10000")) {
+            //同步成功
+            mOrgNew.setJkzlOrgId(result.get("orgId").toString());
+            String mOrgNewJson = objectMapper.writeValueAsString(mOrgNew);
+            orgClient.update(mOrgNewJson);
+        } else {
+            //同步失败
+            //TODO
+        }
 
         return success(convertToOrgDetailModel(mOrgNew));
 
@@ -378,7 +387,7 @@ public class OrganizationController extends BaseController {
      * @param orgDetailModel
      * @throws Exception
      */
-    private void synOrg(MOrganization mOrganization, OrgDetailModel orgDetailModel) throws Exception {
+    private Map<String, Object> saveSynOrg(MOrganization mOrganization, OrgDetailModel orgDetailModel) throws Exception {
         String api = "baseinfo.HospitalApi.addLevelHosptial";
         Map<String, Object> apiParamMap = new HashMap<>();
         apiParamMap.put("typeId", mOrganization.getHosTypeId());//医院类型
@@ -400,6 +409,7 @@ public class OrganizationController extends BaseController {
         String url = gatewayUrl;
         String resultStr = HttpClientUtil.doPost(url, params);
         logger.info(resultStr);
+        return objectMapper.readValue(resultStr, Map.class);
 
 
     }

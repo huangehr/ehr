@@ -15,6 +15,7 @@ import com.yihu.ehr.model.org.MOrgMemberRelation;
 import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.organization.service.OrgDeptClient;
 import com.yihu.ehr.organization.service.OrgDeptMemberClient;
+import com.yihu.ehr.organization.service.OrganizationClient;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.users.service.UserClient;
 import com.yihu.ehr.util.datetime.DateUtil;
@@ -54,6 +55,8 @@ public class OrgDeptController extends BaseController {
     private UserClient userClient;
     @Autowired
     private ConventionalDictEntryClient conventionalDictClient;
+    @Autowired
+    private OrganizationClient orgClient;
     @Value("${service-gateway.url}")
     private String gatewayUrl;
     @Value("${service-gateway.clientId}")
@@ -199,7 +202,16 @@ public class OrgDeptController extends BaseController {
                 return failed("保存失败!");
             }
             //同步科室信息
-            saveSynDept(orgDeptModel);
+            Map<String, Object> result = saveSynDept(orgDeptModel);
+            if (result.get("Code").toString().equals("10000")) {
+                //同步成功
+                mOrgDeptNew.setJkzlHosDeptId(Integer.parseInt(result.get("hosDeptId").toString()));
+                String mOrgDeptNewJson = objectMapper.writeValueAsString(orgDeptModel);
+                orgDeptClient.updateOrgDept(mOrgDeptNewJson);
+            } else {
+                //同步失败
+                //TODO
+            }
 
             return success(mOrgDeptNew);
         } catch (Exception ex) {
@@ -213,18 +225,25 @@ public class OrgDeptController extends BaseController {
      *
      * @param orgDeptModel
      */
-    private void saveSynDept(OrgDeptModel orgDeptModel) throws Exception {
+    private Map<String, Object> saveSynDept(OrgDeptModel orgDeptModel) throws Exception {
         String api = "baseinfo.HosDeptApi.insertHosDept";
+        String orgId = orgClient.getOrgById(orgDeptModel.getOrgId()).getJkzlOrgId();
+        int parentDeptId = 0;
+        if (orgDeptModel.getParentDeptId() != 0) {
+            MOrgDept dept = orgDeptClient.searchDeptDetail(orgDeptModel.getParentDeptId());
+            parentDeptId = dept.getJkzlHosDeptId();
+        }
+
         Map<String, Object> apiParamMap = new HashMap<>();
-        apiParamMap.put("orgId", orgDeptModel.getOrgId());//医院orgId
-        apiParamMap.put("parentDeptID", orgDeptModel.getParentDeptId());//上级科室 如果没有上级科室传0
+        apiParamMap.put("orgId", orgId);//医院orgId
+        apiParamMap.put("parentDeptID", parentDeptId);//上级科室 如果没有上级科室传0
         apiParamMap.put("typeId", orgDeptModel.getDeptDetail().getTypeId());//科室类型
         apiParamMap.put("deptName", orgDeptModel.getDeptDetail().getName());//科室名称
         Map<String, Object> params = jkzlGateway(api, apiParamMap);
         String url = gatewayUrl;
         String resultStr = HttpClientUtil.doPost(url, params);
         logger.info(resultStr);
-
+        return objectMapper.readValue(resultStr, Map.class);
     }
 
     @RequestMapping(value = "/orgDept", method = RequestMethod.PUT)
