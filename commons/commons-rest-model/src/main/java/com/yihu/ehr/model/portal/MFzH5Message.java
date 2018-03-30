@@ -85,6 +85,7 @@ public class MFzH5Message {
     private String cAddress;
     private String regSn;
     private boolean isSuccess;
+    private String userId;//健康之路用户ID
 
     public int getHosDeptId() {
         return hosDeptId;
@@ -380,5 +381,13 @@ public class MFzH5Message {
 
     public void setIsSuccess(boolean isSuccess) {
         this.isSuccess = isSuccess;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 }

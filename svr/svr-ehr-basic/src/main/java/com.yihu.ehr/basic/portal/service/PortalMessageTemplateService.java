@@ -10,6 +10,7 @@ import com.yihu.ehr.model.portal.MTemplateContent;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.util.reflection.MethodUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,18 +22,16 @@ import java.util.*;
  */
 @Service
 @Transactional
+@EnableFeignClients
 public class PortalMessageTemplateService extends BaseJpaService<PortalMessageTemplate, PortalMessageTemplateRepository> {
 
-    private PortalMessageTemplateRepository portalMessageTemplateRepository;
-
-    private PortalMessageRemindRepository messageRemindRepository;
-
     @Autowired
-    public PortalMessageTemplateService(PortalMessageTemplateRepository portalMessageTemplateRepository,
-                                        PortalMessageRemindRepository messageRemindRepository) {
-        this.portalMessageTemplateRepository = portalMessageTemplateRepository;
-        this.messageRemindRepository = messageRemindRepository;
-    }
+    private PortalMessageTemplateRepository portalMessageTemplateRepository;
+    @Autowired
+    private PortalMessageRemindRepository messageRemindRepository;
+    @Autowired
+    private FzGatewayClient fzGatewayClient;
+
 
     public PortalMessageTemplate getMessageTemplate(Long messageTemplateId) {
         return portalMessageTemplateRepository.findOne(messageTemplateId);
@@ -49,7 +48,7 @@ public class PortalMessageTemplateService extends BaseJpaService<PortalMessageTe
      * @param messageTemplateId
      * @throws NoSuchMethodException
      */
-    public void saveH5MessagePush(MFzH5Message mFzH5Message, long messageTemplateId) throws NoSuchMethodException {
+    public void saveH5MessagePush(MFzH5Message mFzH5Message, long messageTemplateId) throws Exception {
         PortalMessageTemplate template = portalMessageTemplateRepository.findOne(messageTemplateId);
         List<MTemplateContent> mTemplateContents = JSON.parseArray(template.getContent(), MTemplateContent.class);
         List<Map<String, String>> list = new ArrayList<>();
@@ -69,7 +68,7 @@ public class PortalMessageTemplateService extends BaseJpaService<PortalMessageTe
         remind.setAppId("WYo0l73F8e");
         remind.setAppName("EHR");
         remind.setFromUserId("system");
-        remind.setToUserId("");//TODO 未完成
+        remind.setToUserId(fzGatewayClient.getEhrUserId(mFzH5Message.getUserId()));
         remind.setTypeId("7");//固定值
         remind.setContent(contentJson);
         remind.setWorkUri("");
