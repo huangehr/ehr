@@ -12,6 +12,8 @@ public class ServiceApi {
 
     public static class GateWay {
         public static final String admin = "/admin";
+
+        public static final String FzGateway = "/admin/gateway/fz";
     }
 
     public static class Adaptions {
@@ -1453,5 +1455,7 @@ public class ServiceApi {
         public static final String MessageTemplate = "/messageTemplate";
         public static final String MyMessageList = "/messageTemplate/MyMessageList";
         public static final String MyMessage = "/messageTemplate/MyMessage/admin/{messageId}";
+        public static final String MessageOrderPush = "/messageTemplate/messageOrderPush";
     }
+
 }
