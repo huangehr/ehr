@@ -15,6 +15,7 @@ public class OrgDept {
     private String name;
     private Integer delFlag;
     private Integer sortNo;
+    private Integer jkzlHosDeptId;
 
     private OrgDeptDetail deptDetail;
 
@@ -29,7 +30,7 @@ public class OrgDept {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id",unique = true,nullable = false)
+    @Column(name = "id", unique = true, nullable = false)
     public int getId() {
         return id;
     }
@@ -92,6 +93,14 @@ public class OrgDept {
         this.sortNo = sortNo;
     }
 
+    public Integer getJkzlHosDeptId() {
+        return jkzlHosDeptId;
+    }
+
+    public void setJkzlHosDeptId(Integer jkzlHosDeptId) {
+        this.jkzlHosDeptId = jkzlHosDeptId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -106,6 +115,7 @@ public class OrgDept {
         if (name != null ? !name.equals(orgDept.name) : orgDept.name != null) return false;
         if (delFlag != null ? !delFlag.equals(orgDept.delFlag) : orgDept.delFlag != null) return false;
         if (sortNo != null ? !sortNo.equals(orgDept.sortNo) : orgDept.sortNo != null) return false;
+        if (jkzlHosDeptId != null ? !jkzlHosDeptId.equals(orgDept.jkzlHosDeptId) : orgDept.jkzlHosDeptId != null) return false;
 
         return true;
     }
@@ -119,6 +129,7 @@ public class OrgDept {
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (delFlag != null ? delFlag.hashCode() : 0);
         result = 31 * result + (sortNo != null ? sortNo.hashCode() : 0);
+        result = 31 * result + (jkzlHosDeptId != null ? jkzlHosDeptId.hashCode() : 0);
         return result;
     }
 }

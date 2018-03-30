@@ -253,4 +253,11 @@ public class OrgMemberRelationEndPoint extends EnvelopRestEndPoint {
         return (List<MOrgMemberRelation>) convertToModels(orgMemberRelations, new ArrayList<MOrgMemberRelation>(orgMemberRelations.size()), MOrgMemberRelation.class, null);
     }
 
+    @RequestMapping(value = "/orgDeptMember/getJkzlOrgIds", method = RequestMethod.GET)
+    @ApiOperation(value = "根据userId获取总部orgId列表")
+    public List<String> getJkzlOrgIds(String userId) {
+        List<String> list = relationService.getJkzlOrgIds(userId);
+        return list;
+    }
+
 }

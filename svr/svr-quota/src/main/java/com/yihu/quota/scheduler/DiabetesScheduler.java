@@ -74,7 +74,7 @@ public class DiabetesScheduler {
 	 * 每天2点 执行一次
 	 * @throws Exception
 	 */
-	@Scheduled(cron = "0 30 2 * * ?")
+//	@Scheduled(cron = "0 30 2 * * ?")
 	public void validatorIdentityScheduler(){
 		try {
 //			String q =  null; // 查询条件 health_problem:HP0047  HP0047 为糖尿病

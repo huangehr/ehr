@@ -1,6 +1,5 @@
 package com.yihu.ehr.organization.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.org.OrgDeptDetailModel;
 import com.yihu.ehr.agModel.org.OrgDeptMemberModel;
 import com.yihu.ehr.agModel.org.OrgDeptModel;
@@ -15,10 +14,10 @@ import com.yihu.ehr.model.org.MOrgMemberRelation;
 import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.organization.service.OrgDeptClient;
 import com.yihu.ehr.organization.service.OrgDeptMemberClient;
+import com.yihu.ehr.organization.service.OrganizationClient;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.users.service.UserClient;
-import com.yihu.ehr.util.datetime.DateUtil;
-import com.yihu.ehr.util.http.HttpClientUtil;
+import com.yihu.ehr.util.fzgateway.FzGatewayUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -54,6 +53,8 @@ public class OrgDeptController extends BaseController {
     private UserClient userClient;
     @Autowired
     private ConventionalDictEntryClient conventionalDictClient;
+    @Autowired
+    private OrganizationClient orgClient;
     @Value("${service-gateway.url}")
     private String gatewayUrl;
     @Value("${service-gateway.clientId}")
@@ -199,7 +200,16 @@ public class OrgDeptController extends BaseController {
                 return failed("保存失败!");
             }
             //同步科室信息
-            saveSynDept(orgDeptModel);
+            Map<String, Object> result = saveSynDept(orgDeptModel);
+            if (result.get("Code").toString().equals("10000")) {
+                //同步成功
+                mOrgDeptNew.setJkzlHosDeptId(Integer.parseInt(result.get("hosDeptId").toString()));
+                String mOrgDeptNewJson = objectMapper.writeValueAsString(orgDeptModel);
+                orgDeptClient.updateOrgDept(mOrgDeptNewJson);
+            } else {
+                //同步失败
+                //TODO
+            }
 
             return success(mOrgDeptNew);
         } catch (Exception ex) {
@@ -213,18 +223,23 @@ public class OrgDeptController extends BaseController {
      *
      * @param orgDeptModel
      */
-    private void saveSynDept(OrgDeptModel orgDeptModel) throws Exception {
+    private Map<String, Object> saveSynDept(OrgDeptModel orgDeptModel) throws Exception {
         String api = "baseinfo.HosDeptApi.insertHosDept";
+        String orgId = orgClient.getOrgById(orgDeptModel.getOrgId()).getJkzlOrgId();
+        int parentDeptId = 0;
+        if (orgDeptModel.getParentDeptId() != 0) {
+            MOrgDept dept = orgDeptClient.searchDeptDetail(orgDeptModel.getParentDeptId());
+            parentDeptId = dept.getJkzlHosDeptId();
+        }
+
         Map<String, Object> apiParamMap = new HashMap<>();
-        apiParamMap.put("orgId", orgDeptModel.getOrgId());//医院orgId
-        apiParamMap.put("parentDeptID", orgDeptModel.getParentDeptId());//上级科室 如果没有上级科室传0
+        apiParamMap.put("orgId", orgId);//医院orgId
+        apiParamMap.put("parentDeptID", parentDeptId);//上级科室 如果没有上级科室传0
         apiParamMap.put("typeId", orgDeptModel.getDeptDetail().getTypeId());//科室类型
         apiParamMap.put("deptName", orgDeptModel.getDeptDetail().getName());//科室名称
-        Map<String, Object> params = jkzlGateway(api, apiParamMap);
-        String url = gatewayUrl;
-        String resultStr = HttpClientUtil.doPost(url, params);
+        String resultStr = FzGatewayUtil.httpPost(gatewayUrl, clientId, clientVersion, api, apiParamMap, 1);
         logger.info(resultStr);
-
+        return objectMapper.readValue(resultStr, Map.class);
     }
 
     @RequestMapping(value = "/orgDept", method = RequestMethod.PUT)
@@ -721,32 +736,6 @@ public class OrgDeptController extends BaseController {
             envelop.setSuccessFlg(false);
             return envelop;
         }
-    }
-
-
-    //拼接总部统一网关的参数。
-    public Map<String, Object> jkzlGateway(String api, Map apiParam) throws Exception {
-        //统一接口授权信息
-        Map<String, String> authInfo = new HashMap<>();
-        authInfo.put("ClientId", clientId);
-        //接入方系统版本号
-        authInfo.put("ClientVersion", clientVersion);
-        authInfo.put("Sign", "");
-        authInfo.put("SessionKey", "");
-        ObjectMapper objectMapper = new ObjectMapper();
-        String authInfoS = objectMapper.writeValueAsString(authInfo);
-        String apiParamS = objectMapper.writeValueAsString(apiParam);
-
-        Map<String, Object> params = new HashMap<>();
-        params.put("AuthInfo", authInfoS);
-        params.put("SequenceNo", DateUtil.getNowDate().toString());
-        params.put("Api", api);
-        params.put("Param", apiParamS);
-        params.put("ParamType", 0);
-        params.put("OutType", 0);
-        params.put("V", 1);
-
-        return params;
     }
 
 }

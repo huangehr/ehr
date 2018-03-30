@@ -306,4 +306,11 @@ public class OrgService extends BaseJpaService<Organization, OrganizationReposit
         List<Organization> list = organizationRepository.getOrgListByAddressPid(pid);
         return list;
     }
+
+    public List getJkzlOrgIdsByEhrOrgId(String[] orgIds) {
+        String sql = "SELECT jkzl_org_id FROM organizations WHERE id in(:orgIds) AND  jkzl_org_id IS NOT NULL";
+        SQLQuery sqlQuery = currentSession().createSQLQuery(sql);
+        sqlQuery.setParameterList("orgIds", orgIds);
+        return sqlQuery.list();
+    }
 }
