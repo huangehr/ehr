@@ -151,7 +151,7 @@ public class ZipPackage {
 
         TableBundle bundle = new TableBundle();
         if (dataSetRecord.isReUploadFlg()) {
-            String legacyRowKeys[] = hBaseDao.findRowKeys(table, "^" + rowKeyPrefix);
+            String legacyRowKeys[] = hBaseDao.findRowKeys(table, rowKeyPrefix, rowKeyPrefix.substring(0, rowKeyPrefix.length() - 1) + "z",  "^" + rowKeyPrefix);
             if (legacyRowKeys != null && legacyRowKeys.length > 0) {
                 bundle.addRows(legacyRowKeys);
                 hBaseDao.delete(table, bundle);

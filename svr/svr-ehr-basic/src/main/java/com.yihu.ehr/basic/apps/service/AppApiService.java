@@ -177,7 +177,7 @@ public class AppApiService extends BaseJpaService<AppApi, AppApiRepository> {
                 if (DELETE.equals(paramMap.get(DATA_STATUS)) && NEW_DATA.equals(paramMap.get("id") + "")) {
                     continue;
                 } else {
-                    paramMap.put("appApiId", apiId);
+                    paramMap.put("apiId", apiId);
                     String json = objectMapper.writeValueAsString(paramMap);
                     AppApiErrorCode appApiErrorCode = objectMapper.readValue(json, AppApiErrorCode.class);
                     if (ADD.equals(paramMap.get(DATA_STATUS))) {

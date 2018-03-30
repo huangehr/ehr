@@ -269,7 +269,7 @@ public class ServiceApi {
 
         public static final String StatisticsGetDoctorsGroupByTown = "/resources/statistics/getDoctorsGroupByTown";
 
-        //资源中心首页
+        //资源中心 - 统计相关
         public static final String GetPatientArchiveCount = "/resource/center/getPatientArchiveCount";
         public static final String GetMedicalResourcesCount = "/resource/center/getMedicalResourcesCount";
         public static final String GetHealthArchiveCount = "/resource/center/getHealthArchiveCount";
@@ -289,6 +289,12 @@ public class ServiceApi {
         public static final String GetElectronicMedicalOrgDistributed = "/resource/center/getElectronicMedicalOrgDistributed";
         public static final String GetElectronicMedicalDeptDistributed = "/resource/center/getElectronicMedicalDeptDistributed";
         public static final String GetElectronicMedicalAcquisitionSituation = "/resource/center/getElectronicMedicalAcquisitionSituation";
+
+        //资源中心 - 大数据展示相关
+        public static final String Achievements = "/resource/center/achievements";
+        public static final String Visualization = "/resource/center/visualization";
+        public static final String DataAnalysis = "/resource/center/dataAnalysis";
+        public static final String HierarchicalManagement = "/resource/center/hierarchicalManagement";
 
     }
 

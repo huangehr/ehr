@@ -24,19 +24,19 @@ public class AppApi {
     private String appId; //所属应用ID
     private String name; //Api名称
     private String description; //Api描述
-    private String type; //类别
-    private String method; //请求方式
-    private String protocol; //对外协议 RESTful or ...
-    private String innerProtocol; //对内协议 RESTful or ...
-    private TransferProtocol transferProtocol; //HTTP OR HTTPS
+    private String type; //类别 1 - API;  2 - 应用; 3 - SDK
+    private String method; //请求方式 0 - GET;  1 - POST;  2 - DELETE;  3 - PUT
+    private String protocol; //对外协议 0 - WebService;  1 - RESTful
+    private String innerProtocol; //对内协议 0 - WebService;  1 - RESTful
+    private TransferProtocol transferProtocol; //0 - HTTP;  1 - HTTPS
     private String version; //版本
     private int parentId; //该字段弃用
-    private String activityType; //生失效标识 1 - 有效
+    private String activityType; //生失效标识 0 - 无效果;  1 - 有效
     private String parameterDemo; //请求参数示例
     private String responseDemo; //返回结果示例
     private String errorDemo; //接口请求错误示例
-    private String openLevel; //开放程度 1 - 公开
-    private String auditLevel; //审计程度 1 - 审计
+    private String openLevel; //开放程度 0 - 私有;  1 - 公开
+    private String auditLevel; //审计程度 0 - 不审计;  1 - 审计
     private String methodName; //对外网关接口方法名
     private String microServiceUri; //对外接口实际IP地址和端口
     private String msMethodName; //内部实际微服务中方法名
