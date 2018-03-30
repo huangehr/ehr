@@ -18,6 +18,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDate;
 import java.util.*;
 
 /**
@@ -130,15 +131,16 @@ public class MysqlExtract {
         String whereGroupField = allField.toString();
         String timeKey = esConfig.getTimekey();
         if ( !StringUtils.isEmpty(timeKey)) {
-            if ( !StringUtils.isEmpty(startTime) && !StringUtils.isEmpty(endTime)) {
-                whereSql.append(" and " + timeKey + " >= '" + startTime + "'");
-                whereSql.append( " and " + timeKey + " < '" + endTime + "'");
-            }
             if ( !StringUtils.isEmpty(esConfig.getFullQuery() ) && esConfig.getFullQuery().equals("true")) {
                 whereSql.append( " and " + timeKey + " < '" + endTime + "'");
+                selectGroupField += " '"+ LocalDate.now().toString() +"' as quotaDate ,";
+            }else{
+                if ( !StringUtils.isEmpty(startTime) && !StringUtils.isEmpty(endTime)) {
+                    whereSql.append(" and " + timeKey + " >= '" + startTime + "'");
+                    whereSql.append( " and " + timeKey + " < '" + endTime + "'");
+                }
+                selectGroupField += " DATE_FORMAT(" + timeKey + ",'%Y-%m-%d') as quotaDate ,";
             }
-
-            selectGroupField += " DATE_FORMAT(" + timeKey + ",'%Y-%m-%d') as quotaDate ,";
             whereGroupField += timeKey;
         }else{
             whereGroupField = allField.substring(0,allField.length() - 1);
