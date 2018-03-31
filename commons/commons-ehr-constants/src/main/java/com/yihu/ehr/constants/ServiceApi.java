@@ -370,7 +370,6 @@ public class ServiceApi {
     public static class Families {
         public static final String Families = "/families";
         public static final String Family = "/families/{id}";
-
         public static final String FamiliesMembers = "/families/members";
         public static final String FamilyMembers = "/families/{families_id}/members";
         public static final String FamilyMember = "/families/{families_id}/members/{id_card_no}";
@@ -1184,7 +1183,6 @@ public class ServiceApi {
 
     public static class TJ {
 
-
         public static final String GetTjDimensionMainList = "/tj/getTjDimensionMainList";
         public static final String TjDimensionMain = "/tj/tjDimensionMain";
         public static final String TjDimensionMainId = "/tj/tjDimensionMainId/{id}";
@@ -1368,11 +1366,20 @@ public class ServiceApi {
         public static final String GetRescue = "/statistics/rescue";
 
         //政府服务平台-门诊仪表盘-end
-
     }
 
+    /**
+     * 系统字典
+     */
     public static class SystemDict {
         public static final String getDictEntryByDictId = "/systemDict/getDictEntryByDictId/{dictId}";
+        public static final String Crud = "/dictionaries";
+        public static final String FindById = "/dictionaries/{id}";
+        public static final String FindByPhoneticCode = "/dictionary/{phoneticCode}";
+        public static final String DeleteById = "/dictionaries/{id}";
+        public static final String CheckName = "/dictionaries/existence";
+        public static final String CheckCode = "/dictionaries/checkCode";
+
     }
 
     /**

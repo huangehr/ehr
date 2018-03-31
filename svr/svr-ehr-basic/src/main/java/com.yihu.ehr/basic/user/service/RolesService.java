@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by yww on 2016/7/7.
@@ -32,5 +33,11 @@ public class RolesService extends BaseJpaService<Roles,XRolesRepository> {
 
     public List<Roles> getRoleByAppId(String appId) {
         return rolesRepository.findByAppId(appId);
+    }
+
+    public List<Map<String,Object>> findRolesByUserIdAndAppId(String userId, String appId){
+        String sql = "select DISTINCT r.code,r.`name`,r.id FROM roles r JOIN role_user u ON r.id = u.role_id WHERE u.user_id =? AND r.app_id = ?";
+        List<Map<String,Object>> list = jdbcTemplate.queryForList(sql,new Object[]{userId,appId});
+        return list;
     }
 }
