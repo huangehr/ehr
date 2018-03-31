@@ -257,4 +257,10 @@ public class BaseJpaService<T, R> {
         HttpResponse response = HttpUtils.doGet("http://localhost:10001/basic/api/v1.0/appVersion/getAppVersion",params,null);
         System.out.print(response.getContent());
     }
+
+    public List<Map<String,Object>> findRolesByUserIdAndAppId(String userId,String appId){
+        String sql = "select DISTINCT r.code,r.`name`,r.id FROM roles r JOIN role_user u ON r.id = u.role_id WHERE u.user_id =? AND r.app_id = ?";
+        List<Map<String,Object>> list = jdbcTemplate.queryForList(sql,new Object[]{userId,appId});
+        return list;
+    }
 }

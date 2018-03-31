@@ -772,6 +772,7 @@ public class ServiceApi {
         public static final String RoleBatchAdd = "/roles/roleBatchAdd";
         public static final String RoleFindByField = "/roles/findByField";
         public static final String RoleFindByUserId = "/roles/findByUserId";
+        public static final String RoleFindByUserIdAndAppId = "/roles/findByUserIdAndAppId";
 
         public static final String RoleUser = "/roles/role_user";
         public static final String RoleUserByUserId = "/roles/role_user/{user_id}";

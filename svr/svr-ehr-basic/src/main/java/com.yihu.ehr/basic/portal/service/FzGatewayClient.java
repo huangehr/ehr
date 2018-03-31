@@ -21,5 +21,5 @@ public interface FzGatewayClient {
 
     @RequestMapping(value = ServiceApi.GateWay.FzGateway, method = RequestMethod.GET)
     @ApiOperation(value = "获取健康上饶的用户id")
-    String getEhrUserId(@RequestParam String userId);
+    String getEhrUserId(@RequestParam(value = "userId",required = true) String userId);
 }
