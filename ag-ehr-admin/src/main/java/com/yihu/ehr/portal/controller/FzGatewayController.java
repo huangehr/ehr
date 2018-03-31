@@ -46,10 +46,9 @@ public class FzGatewayController extends BaseController {
         apiParamMap.put("Userid", userId);//医院类型
         apiParamMap.put("Logintype", clientId);//医院等级
         String resultStr = FzGatewayUtil.httpPost(gatewayUrl, clientId, clientVersion, api, apiParamMap, 1);
-        Map<String, String> result = objectMapper.readValue(resultStr, Map.class);
-        if (result.get("Code").equals("10000")) {
-            String data = result.get("Result");
-            List<Map<String, String>> list = objectMapper.readValue(data, new TypeReference<List<Map<String, String>>>() {});
+        Map<String, Object> result = objectMapper.readValue(resultStr, Map.class);
+        if (String.valueOf(result.get("Code")).equals("10000")) {
+            List<Map<String, String>> list = (List) result.get("Result");
             if (list.size() > 0) {
                 Map<String, String> beanMap = list.get(0);
                 return beanMap.get("Loginid");
