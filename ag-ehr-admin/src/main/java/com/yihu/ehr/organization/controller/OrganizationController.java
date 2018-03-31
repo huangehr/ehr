@@ -364,7 +364,7 @@ public class OrganizationController extends BaseController {
             e.printStackTrace();
         }
 
-        //新增同步到总部逻辑
+   /*     //新增同步到总部逻辑
         Map<String, Object> result = saveSynOrg(mOrganization, orgDetailModel);
         if (result.get("Code").toString().equals("10000")) {
             //同步成功
@@ -374,7 +374,7 @@ public class OrganizationController extends BaseController {
         } else {
             //同步失败
             //TODO
-        }
+        }*/
 
         return success(convertToOrgDetailModel(mOrgNew));
 

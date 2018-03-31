@@ -40,7 +40,7 @@ public class FzGatewayController extends BaseController {
      * @return
      */
     @GetMapping(ServiceApi.GateWay.FzGateway)
-    public String getEhrUserId(@RequestParam String userId) throws IOException {
+    public String getEhrUserId(@RequestParam(value = "userId",required = true) String userId) throws IOException {
         String api = "UserMgmt.UserAccount.getAccLoginInfo";
         Map<String, Object> apiParamMap = new HashMap<>();
         apiParamMap.put("Userid", userId);//医院类型
