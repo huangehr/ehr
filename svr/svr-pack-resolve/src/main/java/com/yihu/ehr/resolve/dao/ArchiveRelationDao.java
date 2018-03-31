@@ -23,7 +23,7 @@ public class ArchiveRelationDao {
     private ObjectMapper objectMapper;
 
     public void relation(ResourceBucket resourceBucket) throws Exception {
-        if(!resourceBucket.isReUploadFlg()) {
+        if (!resourceBucket.isReUploadFlg()) {
             ArchiveRelation relation = new ArchiveRelation();
             relation.setName(resourceBucket.getPatientName());
             relation.setOrgCode(resourceBucket.getOrgCode());
