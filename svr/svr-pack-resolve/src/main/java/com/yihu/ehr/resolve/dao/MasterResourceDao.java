@@ -52,16 +52,9 @@ public class MasterResourceDao {
             }
         } else {
             // delete legacy data if they are exist
-            /**
-            String legacyRowKeys[] = hbaseDao.findRowKeys(ResourceCore.MasterTable, "^" + rowKey);
-            if (legacyRowKeys != null && legacyRowKeys.length > 0) {
-                bundle.addRows(legacyRowKeys);
-                hbaseDao.delete(ResourceCore.MasterTable, bundle);
-            }
-            */
             //主表直接GET
             String legacy = hbaseDao.get(ResourceCore.MasterTable, rowKey);
-            if(StringUtils.isNotEmpty(legacy)) {
+            if (StringUtils.isNotEmpty(legacy)) {
                 hbaseDao.delete(ResourceCore.MasterTable, rowKey);
             }
             // now save the data to hbase

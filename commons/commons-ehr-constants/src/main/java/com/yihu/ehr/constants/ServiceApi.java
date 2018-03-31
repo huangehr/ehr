@@ -12,6 +12,8 @@ public class ServiceApi {
 
     public static class GateWay {
         public static final String admin = "/admin";
+
+        public static final String FzGateway = "/admin/gateway/fz";
     }
 
     public static class Adaptions {
@@ -269,7 +271,7 @@ public class ServiceApi {
 
         public static final String StatisticsGetDoctorsGroupByTown = "/resources/statistics/getDoctorsGroupByTown";
 
-        //资源中心首页
+        //资源中心 - 统计相关
         public static final String GetPatientArchiveCount = "/resource/center/getPatientArchiveCount";
         public static final String GetMedicalResourcesCount = "/resource/center/getMedicalResourcesCount";
         public static final String GetHealthArchiveCount = "/resource/center/getHealthArchiveCount";
@@ -289,6 +291,12 @@ public class ServiceApi {
         public static final String GetElectronicMedicalOrgDistributed = "/resource/center/getElectronicMedicalOrgDistributed";
         public static final String GetElectronicMedicalDeptDistributed = "/resource/center/getElectronicMedicalDeptDistributed";
         public static final String GetElectronicMedicalAcquisitionSituation = "/resource/center/getElectronicMedicalAcquisitionSituation";
+
+        //资源中心 - 大数据展示相关
+        public static final String Achievements = "/resource/center/achievements";
+        public static final String Visualization = "/resource/center/visualization";
+        public static final String DataAnalysis = "/resource/center/dataAnalysis";
+        public static final String HierarchicalManagement = "/resource/center/hierarchicalManagement";
 
     }
 
@@ -770,6 +778,7 @@ public class ServiceApi {
         public static final String RoleBatchAdd = "/roles/roleBatchAdd";
         public static final String RoleFindByField = "/roles/findByField";
         public static final String RoleFindByUserId = "/roles/findByUserId";
+        public static final String RoleFindByUserIdAndAppId = "/roles/findByUserIdAndAppId";
 
         public static final String RoleUser = "/roles/role_user";
         public static final String RoleUserByUserId = "/roles/role_user/{user_id}";
@@ -1447,5 +1456,7 @@ public class ServiceApi {
         public static final String MessageTemplate = "/messageTemplate";
         public static final String MyMessageList = "/messageTemplate/MyMessageList";
         public static final String MyMessage = "/messageTemplate/MyMessage/admin/{messageId}";
+        public static final String MessageOrderPush = "/messageTemplate/messageOrderPush";
     }
+
 }

@@ -56,7 +56,7 @@ public class SubResourceDao {
             }
         } else {
             // delete legacy data if they are exist
-            String legacyRowKeys[] = hbaseDao.findRowKeys(ResourceCore.SubTable, "^" + rowKey);
+            String legacyRowKeys[] = hbaseDao.findRowKeys(ResourceCore.SubTable, rowKey, rowKey.substring(0, rowKey.length() - 1) + "1", "^" + rowKey);
             if (legacyRowKeys != null && legacyRowKeys.length > 0) {
                 bundle.addRows(legacyRowKeys);
                 hbaseDao.delete(ResourceCore.SubTable, bundle);

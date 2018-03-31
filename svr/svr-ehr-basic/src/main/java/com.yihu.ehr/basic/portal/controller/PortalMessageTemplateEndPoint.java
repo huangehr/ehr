@@ -9,12 +9,14 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.exception.ApiException;
+import com.yihu.ehr.model.portal.MFzH5Message;
 import com.yihu.ehr.model.portal.MMessageTemplate;
 import com.yihu.ehr.model.portal.MMyMessage;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +26,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:yhy23456@163.com">huiyang.yu</a>
@@ -37,6 +40,17 @@ public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
     private PortalMessageTemplateService messageTemplateService;
 
     private PortalMessageRemindService messageRemindService;
+
+    /**
+     * 秘钥
+     */
+    @Value("${h5.secret}")
+    public String secretKey;
+    /**
+     * 渠道ID
+     */
+    @Value("${h5.appId}")
+    public String clientId;
 
     @Autowired
     public PortalMessageTemplateEndPoint(PortalMessageTemplateService messageTemplateService,
@@ -165,5 +179,28 @@ public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
         mMyMessage.setClassification(template.getClassification());
         return mMyMessage;
     }
+
+
+    @RequestMapping(value = ServiceApi.MessageTemplate.MessageOrderPush, method = RequestMethod.POST)
+    @ApiOperation(value = "接收H5挂号订单消息推送", notes = "接收H5挂号订单消息推送")
+    public boolean messageOrderPush(@ApiParam(name = "jsonData", value = "", defaultValue = "")
+                                    @RequestBody String jsonData) throws Exception {
+        logger.info(String.format("收到H5挂号订单消息推送%s", jsonData));
+        Map<String, String> map = toEntity(jsonData, Map.class);
+        MFzH5Message message = toEntity(map.get("Param"), MFzH5Message.class);
+        long messageTemplateId = 1;
+        if (message.getOrderPushType() == 101) {
+            //挂号推送
+            messageTemplateId = 1;
+        } else if (message.getOrderPushType() == 102) {
+            //退号结果推送,目前先不推送
+            messageTemplateId = 2;
+            return true;
+        }
+        messageTemplateService.saveH5MessagePush(message, messageTemplateId);
+
+        return true;
+    }
+
 
 }

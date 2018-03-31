@@ -18,7 +18,9 @@ import java.util.List;
  * Created by Progr1mmer on 2018/01/05.
  */
 @Service
-public class ResourceStatisticService extends BaseJpaService {
+public class ResourceCenterService extends BaseJpaService {
+
+    // ------------------------------- 统计相关 start ------------------------------------
 
     public BigInteger getPatientArchiveCount() {
         Session session = currentSession();
@@ -158,6 +160,14 @@ public class ResourceStatisticService extends BaseJpaService {
         return  (BigInteger) query.uniqueResult();
     }
 
+    public BigInteger getJsonArchiveTotalCount() {
+        Session session = currentSession();
+        String sql = "SELECT COUNT(1) FROM json_archives";
+        Query query = session.createSQLQuery(sql);
+        query.setFlushMode(FlushMode.COMMIT);
+        return (BigInteger)query.uniqueResult();
+    }
+
     public BigInteger getJsonArchiveCount(String status) {
         Session session = currentSession();
         String sql = "SELECT COUNT(1) FROM json_archives WHERE archive_status = :status";
@@ -185,6 +195,7 @@ public class ResourceStatisticService extends BaseJpaService {
                 " SELECT CASE when length(id)=15  then CONCAT('19',substr(id ,7,6)) ELSE substr(id ,7,8) end  id  from demographics t )t1 "+
                 " )tt WHERE tt.age is not null  GROUP BY tt.age";
         SQLQuery query = session.createSQLQuery(sql);
+        query.setFlushMode(FlushMode.COMMIT);
         return query.list();
     }
 
@@ -196,6 +207,7 @@ public class ResourceStatisticService extends BaseJpaService {
                 " SELECT CASE when length(id)=15  then CONCAT('19',substr(id ,7,6)) ELSE substr(id ,7,8) end  id ,gender from demographics t )t1 " +
                 " )tt WHERE tt.age is not null AND  gender IN ('1', '2') GROUP BY tt.age, tt.gender";
         SQLQuery query = session.createSQLQuery(sql);
+        query.setFlushMode(FlushMode.COMMIT);
         return query.list();
     }
 
@@ -272,8 +284,8 @@ public class ResourceStatisticService extends BaseJpaService {
         Session session = currentSession();
         String sql = "SELECT id, name FROM address_dict WHERE pid = :pid";
         Query query = session.createSQLQuery(sql);
-        query.setInteger("pid", currentCityId);
         query.setFlushMode(FlushMode.COMMIT);
+        query.setInteger("pid", currentCityId);
         return query.list();
     }
 
@@ -284,6 +296,106 @@ public class ResourceStatisticService extends BaseJpaService {
         query.setFlushMode(FlushMode.COMMIT);
         BigInteger bigInteger = (BigInteger) query.uniqueResult();
         return bigInteger.longValue();
+    }
+
+    // ------------------------------- 统计相关 end ------------------------------------
+
+    // ------------------------------- 大数据展示相关 start ------------------------------------
+
+    public List<Object[]> findAppFeatureIdAndNameByAppIdAndCode(String code, String appId) {
+        Session session = currentSession();
+        String sql = "SELECT id, name FROM apps_feature WHERE code = :code AND app_id = :appId";
+        SQLQuery query = session.createSQLQuery(sql);
+        query.setFlushMode(FlushMode.COMMIT);
+        query.setString("code", code);
+        query.setString("appId", appId);
+        return query.list();
+    }
+
+    public BigInteger getTotalViewCount(Integer dataSource) {
+        Session session = currentSession();
+        String sql;
+        if (dataSource != null) {
+            sql = "SELECT COUNT(1) FROM rs_resource WHERE data_source = :dataSource";
+        } else {
+            sql = "SELECT COUNT(1) FROM  rs_resource";
+        }
+        SQLQuery query = session.createSQLQuery(sql);
+        query.setFlushMode(FlushMode.COMMIT);
+        if (dataSource != null) {
+            query.setInteger("dataSource", dataSource);
+        }
+        return (BigInteger)query.uniqueResult();
+    }
+
+    public List<Object[]> getResourceCategoryIdAndNameList(){
+        Session session = currentSession();
+        String sql = "SELECT id, name FROM rs_resource_category";
+        SQLQuery query = session.createSQLQuery(sql);
+        query.setFlushMode(FlushMode.COMMIT);
+        return query.list();
+    }
+
+    public BigInteger countResourceByResourceCateIdAndDataSource (String cateId, Integer dataSource) {
+        Session session = currentSession();
+        String sql = "SELECT COUNT(1) FROM rs_resource WHERE category_id = :cateId AND data_source = :dataSource";
+        SQLQuery query = session.createSQLQuery(sql);
+        query.setFlushMode(FlushMode.COMMIT);
+        query.setString("cateId", cateId);
+        query.setInteger("dataSource", dataSource);
+        return (BigInteger) query.uniqueResult();
+    }
+
+    public BigInteger getTotalReportCount() {
+        Session session = currentSession();
+        String sql;
+        sql = "SELECT COUNT(1) FROM rs_report";
+        SQLQuery query = session.createSQLQuery(sql);
+        query.setFlushMode(FlushMode.COMMIT);
+        return (BigInteger)query.uniqueResult();
+    }
+
+    public List<Object[]> getReportCategoryIdAndNameList(){
+        Session session = currentSession();
+        String sql = "SELECT id, name FROM rs_report_category";
+        SQLQuery query = session.createSQLQuery(sql);
+        query.setFlushMode(FlushMode.COMMIT);
+        return query.list();
+    }
+
+    public BigInteger countReportByReportCateId (Integer cateId) {
+        Session session = currentSession();
+        String sql = "SELECT COUNT(1) FROM rs_report WHERE report_category_id = :cateId";
+        SQLQuery query = session.createSQLQuery(sql);
+        query.setFlushMode(FlushMode.COMMIT);
+        query.setInteger("cateId", cateId);
+        return (BigInteger) query.uniqueResult();
+    }
+
+    public BigInteger getTotalQuotaCount() {
+        Session session = currentSession();
+        String sql;
+        sql = "SELECT COUNT(1) FROM tj_quota";
+        SQLQuery query = session.createSQLQuery(sql);
+        query.setFlushMode(FlushMode.COMMIT);
+        return (BigInteger)query.uniqueResult();
+    }
+
+    public List<Object[]> getQuotaCategoryIdAndNameList(){
+        Session session = currentSession();
+        String sql = "SELECT id, name FROM tj_quota_category";
+        SQLQuery query = session.createSQLQuery(sql);
+        query.setFlushMode(FlushMode.COMMIT);
+        return query.list();
+    }
+
+    public BigInteger countQuotaByQuotaCateId (Integer cateId) {
+        Session session = currentSession();
+        String sql = "SELECT COUNT(1) FROM tj_quota WHERE quota_type = :cateId";
+        SQLQuery query = session.createSQLQuery(sql);
+        query.setFlushMode(FlushMode.COMMIT);
+        query.setInteger("cateId", cateId);
+        return (BigInteger) query.uniqueResult();
     }
 
 }

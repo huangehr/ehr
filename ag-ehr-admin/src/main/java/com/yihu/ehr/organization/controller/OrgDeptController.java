@@ -1,6 +1,5 @@
 package com.yihu.ehr.organization.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.org.OrgDeptDetailModel;
 import com.yihu.ehr.agModel.org.OrgDeptMemberModel;
 import com.yihu.ehr.agModel.org.OrgDeptModel;
@@ -18,8 +17,7 @@ import com.yihu.ehr.organization.service.OrgDeptMemberClient;
 import com.yihu.ehr.organization.service.OrganizationClient;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.users.service.UserClient;
-import com.yihu.ehr.util.datetime.DateUtil;
-import com.yihu.ehr.util.http.HttpClientUtil;
+import com.yihu.ehr.util.fzgateway.FzGatewayUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -239,9 +237,7 @@ public class OrgDeptController extends BaseController {
         apiParamMap.put("parentDeptID", parentDeptId);//上级科室 如果没有上级科室传0
         apiParamMap.put("typeId", orgDeptModel.getDeptDetail().getTypeId());//科室类型
         apiParamMap.put("deptName", orgDeptModel.getDeptDetail().getName());//科室名称
-        Map<String, Object> params = jkzlGateway(api, apiParamMap);
-        String url = gatewayUrl;
-        String resultStr = HttpClientUtil.doPost(url, params);
+        String resultStr = FzGatewayUtil.httpPost(gatewayUrl, clientId, clientVersion, api, apiParamMap, 1);
         logger.info(resultStr);
         return objectMapper.readValue(resultStr, Map.class);
     }
@@ -740,32 +736,6 @@ public class OrgDeptController extends BaseController {
             envelop.setSuccessFlg(false);
             return envelop;
         }
-    }
-
-
-    //拼接总部统一网关的参数。
-    public Map<String, Object> jkzlGateway(String api, Map apiParam) throws Exception {
-        //统一接口授权信息
-        Map<String, String> authInfo = new HashMap<>();
-        authInfo.put("ClientId", clientId);
-        //接入方系统版本号
-        authInfo.put("ClientVersion", clientVersion);
-        authInfo.put("Sign", "");
-        authInfo.put("SessionKey", "");
-        ObjectMapper objectMapper = new ObjectMapper();
-        String authInfoS = objectMapper.writeValueAsString(authInfo);
-        String apiParamS = objectMapper.writeValueAsString(apiParam);
-
-        Map<String, Object> params = new HashMap<>();
-        params.put("AuthInfo", authInfoS);
-        params.put("SequenceNo", DateUtil.getNowDate().toString());
-        params.put("Api", api);
-        params.put("Param", apiParamS);
-        params.put("ParamType", 0);
-        params.put("OutType", 0);
-        params.put("V", 1);
-
-        return params;
     }
 
 }

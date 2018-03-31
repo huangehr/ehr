@@ -154,11 +154,11 @@ public class HBaseDao extends AbstractHBaseClient {
      * @return
      * @throws Exception
      */
-    public String[] findRowKeys(String tableName, String rowKeyRegEx) throws Exception {
+    public String[] findRowKeys(String tableName, String startRow, String stopRow, String rowKeyRegEx) throws Exception {
         Scan scan = new Scan();
         scan.addFamily(Bytes.toBytes("basic"));
-        scan.setStartRow(rowKeyRegEx.substring(1, rowKeyRegEx.length()).getBytes());
-        //scan.setStopRow(rowKeyRegEx.substring(1, rowKeyRegEx.length()).getBytes());
+        scan.setStartRow(startRow.getBytes());
+        scan.setStopRow(stopRow.getBytes());
         scan.setFilter(new RowFilter(CompareFilter.CompareOp.EQUAL, new RegexStringComparator(rowKeyRegEx)));
         List<String> list = new LinkedList<>();
         hbaseTemplate.find(tableName, scan, new RowMapper<Void>() {
