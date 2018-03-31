@@ -70,4 +70,8 @@ public class SystemDictService extends BaseJpaService<SystemDict, SystemDictRepo
         return dictRepo.findByPhoneticCode(code);
     }
 
+    public SystemDict findOne(long id) {
+        return  dictRepo.findOne(id);
+    }
+
 }
