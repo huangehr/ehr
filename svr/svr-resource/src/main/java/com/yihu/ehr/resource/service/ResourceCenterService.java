@@ -122,17 +122,17 @@ public class ResourceCenterService extends BaseJpaService {
         if("Doctor".equals(roleType)) {
             sql = "SELECT o.administrative_division, COUNT(1) " +
                     "FROM doctors d " +
-                    "LEFT JOIN organizations o ON o.org_code = d.orgCode " +
+                    "LEFT JOIN organizations o ON o.org_code = d.org_code " +
                     "WHERE d.role_type IN ('10', '11') " +
                     "AND o.administrative_division IN (SELECT id FROM address_dict WHERE pid = :pid) " +
-                    "GROUP BY d.orgCode, o.administrative_division";
+                    "GROUP BY d.org_code, o.administrative_division";
         }else {
             sql = "SELECT o.administrative_division, COUNT(1) " +
                     "FROM doctors d " +
-                    "LEFT JOIN organizations o ON o.org_code = d.orgCode " +
+                    "LEFT JOIN organizations o ON o.org_code = d.org_code " +
                     "WHERE d.role_type = '8' " +
                     "AND o.administrative_division IN (SELECT id FROM address_dict WHERE pid = :pid) " +
-                    "GROUP BY d.orgCode, o.administrative_division";
+                    "GROUP BY d.org_code, o.administrative_division";
         }
         Query query = session.createSQLQuery(sql);
         query.setFlushMode(FlushMode.COMMIT);
@@ -145,12 +145,12 @@ public class ResourceCenterService extends BaseJpaService {
         String sql;
         if("Doctor".equals(roleType)) {
             sql = "SELECT COUNT(1) FROM doctors d " +
-                    "LEFT JOIN organizations o ON o.org_code = d.orgCode " +
+                    "LEFT JOIN organizations o ON o.org_code = d.org_code " +
                     "WHERE d.role_type IN ('10', '11') " +
                     "AND o.administrative_division IN (SELECT id FROM address_dict WHERE pid = :pid)";
         }else {
             sql = "SELECT COUNT(1) FROM doctors d " +
-                    "LEFT JOIN organizations o ON o.org_code = d.orgCode " +
+                    "LEFT JOIN organizations o ON o.org_code = d.org_code " +
                     "WHERE role_type = '8' " +
                     "AND o.administrative_division IN (SELECT id FROM address_dict WHERE pid = :pid)";
         }

@@ -20,6 +20,7 @@ public class AppApiResponse {
     private String description;
     private int appApiId;
     private String memo;
+    private Integer sort; //序号
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -75,6 +76,15 @@ public class AppApiResponse {
 
     public void setMemo(String memo) {
         this.memo = memo;
+    }
+
+    @Column(name = "sort", nullable = false)
+    public Integer getSort() {
+        return sort;
+    }
+
+    public void setSort(Integer sort) {
+        this.sort = sort;
     }
 
 }

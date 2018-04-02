@@ -21,7 +21,7 @@ public class ProfileInspectionService {
     @Autowired
     private ResourceClient resource; //资源服务
 
-    public List inspectionRecords(String demographicId, String filter, String date) throws Exception {
+    public List inspectionRecords(String demographicId, String filter, String date, String searchParam) throws Exception {
         List<Map<String, Object>> resultList = new ArrayList<>();
         // EHR_000318 报告生成时间
         String query = "{\"q\":\"demographic_id:" + demographicId + " AND (EHR_000318:* OR EHR_000353:*)\"}";
@@ -64,7 +64,14 @@ public class ProfileInspectionService {
                 }
                 resultMap.put("healthProblemName", healthProblemName);
                 //追加诊断名称 end
-                resultList.add(resultMap);
+                if (!StringUtils.isEmpty(searchParam)) {
+                    String orgName = (String) masterMap.get("org_name");
+                    if (orgName.contains(searchParam) || healthProblemName.contains(searchParam)) {
+                        resultList.add(resultMap);
+                    }
+                } else {
+                    resultList.add(resultMap);
+                }
             }
         }
         return resultList;

@@ -35,9 +35,9 @@ public class RoleApiRelationService extends BaseJpaService<RoleApiRelation,XRole
 
     public boolean deleteRoleApiRelationByRoleId(Long roleId){
         Collection<RoleApiRelation> relations =findByField("roleId", roleId);
-        if(relations.size()>0){
+        if (relations.size()>0){
             List<Long> deleteIds = new ArrayList<>();
-            for(RoleApiRelation relation:relations){
+            for (RoleApiRelation relation:relations){
                 deleteIds.add(relation.getId());
             }
             delete(deleteIds);
@@ -62,7 +62,7 @@ public class RoleApiRelationService extends BaseJpaService<RoleApiRelation,XRole
                 oldApiIds.add(relationList.get(i).getApiId());
             }
         }
-        for(long apiId : addApiIds){
+        for (long apiId : addApiIds){
             if(oldApiIds !=null && oldApiIds.contains(apiId)){
                 continue;
             }
@@ -74,4 +74,7 @@ public class RoleApiRelationService extends BaseJpaService<RoleApiRelation,XRole
         return true;
     }
 
+    public void deleteByApiIdAndRoleId(long apiId, long roleId) {
+        roleApiRelationRepository.deleteByApiIdAndRoleId(apiId, roleId);
+    }
 }

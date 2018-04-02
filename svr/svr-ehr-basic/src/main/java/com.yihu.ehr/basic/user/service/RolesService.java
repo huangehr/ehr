@@ -40,4 +40,8 @@ public class RolesService extends BaseJpaService<Roles,XRolesRepository> {
         List<Map<String,Object>> list = jdbcTemplate.queryForList(sql,new Object[]{userId,appId});
         return list;
     }
+
+    public Roles findByCodeAndAppId(String code, String appId) {
+        return rolesRepository.findByCodeAndAppId(code, appId);
+    }
 }

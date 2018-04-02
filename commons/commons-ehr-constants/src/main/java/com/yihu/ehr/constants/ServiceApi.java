@@ -411,7 +411,8 @@ public class ServiceApi {
         public static final String Update = "/appApi/update";
         public static final String Page = "/appApi/page";
         public static final String AuthList = "/appApi/authList";
-
+        public static final String AuthApi = "/appApi/authApi";
+        public static final String CheckName = "/appApi/checkName";
     }
 
     public static class AppApiCategory {
