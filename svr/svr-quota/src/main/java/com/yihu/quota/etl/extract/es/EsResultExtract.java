@@ -392,7 +392,12 @@ public class EsResultExtract {
                     .append(dateDime).append("')").append(" limit 10000 ");
             System.out.println("查询分组 mysql= " + mysql.toString());
             List<Map<String, Object>> listMap = elasticsearchUtil.excuteDataModel(mysql.toString());
-            return  listMap;
+            if(listMap != null &&  listMap.size() > 0){
+                if(listMap.get(0).get("SUM(result)") != null){
+                    return  listMap;
+                }
+            }
+            return  new ArrayList<>();
         }catch (Exception e){
             e.getMessage();
         }finally {
@@ -434,7 +439,12 @@ public class EsResultExtract {
             mysql.append(" limit 10000 ");
             System.out.println("查询分组 mysql= " + mysql.toString());
             List<Map<String, Object>> listMap = elasticsearchUtil.excuteDataModel(mysql.toString());
-            return  listMap;
+            if(listMap != null &&  listMap.size() > 0){
+                if(listMap.get(0).get("SUM(result)") != null){
+                    return  listMap;
+                }
+            }
+            return  new ArrayList<>();
         }catch (Exception e){
             e.getMessage();
         }finally {
