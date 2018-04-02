@@ -210,9 +210,11 @@ public class QuotaReportController extends BaseController {
      */
     private double calculateSum( double sum,String code,List<Map<String, Object>> dataList){
         for(Map<String, Object> map : dataList){
-            sum += Double.valueOf(map.get(code).toString());
-            if(map.containsKey("children")){
-                calculateSum(sum,code,(List<Map<String, Object>>) map.get("children"));
+            if(map.get(code) != null){
+                sum += Double.valueOf(map.get(code).toString());
+                if(map.containsKey("children")){
+                    calculateSum(sum,code,(List<Map<String, Object>>) map.get("children"));
+                }
             }
         }
         return sum;

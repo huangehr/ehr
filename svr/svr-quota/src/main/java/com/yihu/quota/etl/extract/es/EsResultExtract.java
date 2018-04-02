@@ -386,13 +386,18 @@ public class EsResultExtract {
             StringBuffer mysql = new StringBuffer("SELECT ")
                     .append(aggsFields)
                     .append(" sum(result) FROM ").append(esConfig.getIndex())
-                    .append(" where ").append(filter)
+                    .append(" where quotaDate is not null and ").append(filter)
                     .append(" group by ").append(aggsFields)
                     .append(" date_histogram(field='quotaDate','interval'='")
                     .append(dateDime).append("')").append(" limit 10000 ");
             System.out.println("查询分组 mysql= " + mysql.toString());
             List<Map<String, Object>> listMap = elasticsearchUtil.excuteDataModel(mysql.toString());
-            return  listMap;
+            if(listMap != null &&  listMap.size() > 0){
+                if(listMap.get(0).get("SUM(result)") != null){
+                    return  listMap;
+                }
+            }
+            return  new ArrayList<>();
         }catch (Exception e){
             e.getMessage();
         }finally {
@@ -426,7 +431,7 @@ public class EsResultExtract {
             mysql.append(aggsFields)
                     .append(" ,sum(").append(sumField).append(") ")
                     .append(" from ").append(esConfig.getIndex())
-                    .append(" where ").append(filter)
+                    .append(" where quotaDate is not null and ").append(filter)
                     .append(" group by ").append(aggsFields);
             if(StringUtils.isNotEmpty(orderFild) && StringUtils.isNotEmpty(order)){
                 mysql.append(" order by ").append(orderFild).append(" ").append(order);
@@ -434,7 +439,12 @@ public class EsResultExtract {
             mysql.append(" limit 10000 ");
             System.out.println("查询分组 mysql= " + mysql.toString());
             List<Map<String, Object>> listMap = elasticsearchUtil.excuteDataModel(mysql.toString());
-            return  listMap;
+            if(listMap != null &&  listMap.size() > 0){
+                if(listMap.get(0).get("SUM(result)") != null){
+                    return  listMap;
+                }
+            }
+            return  new ArrayList<>();
         }catch (Exception e){
             e.getMessage();
         }finally {

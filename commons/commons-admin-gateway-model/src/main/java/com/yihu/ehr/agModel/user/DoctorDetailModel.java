@@ -5,29 +5,40 @@ package com.yihu.ehr.agModel.user;
  */
 public class DoctorDetailModel {
     private Long id;
-    private String userId;
-    private String code;
-    private String name;
-    private String pyCode;
-    private String sex;
-    private String photo;
-    private String skill;
-    private String workPortal;
-    private String email;
-    private String phone;
-    private String secondPhone;
-    private String familyTel;
-    private String officeTel;
-    private String introduction;
-    private String jxzc;
-    private String lczc;
-    private String xlzc;
-    private String xzzc;
-    private String status;
-    private String insertTime;
-    private String updateTime;
-    private String idCardNo;
-    private String roleType;
+    private String userId; // 云平台用户ID
+    private String code; // 医生标识
+    private String name; // 姓名
+    private String pyCode; // 拼音首字母
+    private String sex; // 性别(1男，2女)
+    private String photo; // 医生头像
+    private String skill; // 医生专长
+    private String workPortal; // 医生专长
+    private String email; // 邮箱
+    private String phone; // 联系电话
+    private String secondPhone; // 备用电话
+    private String familyTel; // 家庭电话（固）
+    private String officeTel; // 办公电话（固）
+    private String introduction; // 简介
+    private String jxzc; // 教学职称 变更为是否制证。参考系统字典 制证标识
+    private String lczc; // 临床职称--改成技术职称，值参考系统字典 技术职称
+    private String xlzc; // 学历职称
+    private String xzzc; // 行政职称
+    private String status; // 1生效，0失效
+    private String insertTime; // 创建时间
+    private String updateTime; // 更新时间
+    private String idCardNo; // 身份证号码
+    private String orgId; // 机构id
+    private String orgCode; // 机构code
+    private String orgFullName; // 机构名称
+    private String roleType; // 参考系统字典 人员类别
+    private String deptName; // 部门名称
+    private String jobType; // 参考系统字典 执业类别
+    private String jobLevel; // 参考系统字典 执业级别
+    private String jobScope; // 参考系统字典 执业范围
+    private String jobState; // 参考系统字典 执业状态
+    private String registerFlag; // 是否考试库连带注册-数据手动导入。默认0为是，1为否
+
+    private String lczcName;
 
     public Long getId() {
         return id;
@@ -213,11 +224,91 @@ public class DoctorDetailModel {
         this.idCardNo = idCardNo;
     }
 
+    public String getOrgId() {
+        return orgId;
+    }
+
+    public void setOrgId(String orgId) {
+        this.orgId = orgId;
+    }
+
+    public String getOrgCode() {
+        return orgCode;
+    }
+
+    public void setOrgCode(String orgCode) {
+        this.orgCode = orgCode;
+    }
+
+    public String getOrgFullName() {
+        return orgFullName;
+    }
+
+    public void setOrgFullName(String orgFullName) {
+        this.orgFullName = orgFullName;
+    }
+
     public String getRoleType() {
         return roleType;
     }
 
     public void setRoleType(String roleType) {
         this.roleType = roleType;
+    }
+
+    public String getDeptName() {
+        return deptName;
+    }
+
+    public void setDeptName(String deptName) {
+        this.deptName = deptName;
+    }
+
+    public String getJobType() {
+        return jobType;
+    }
+
+    public void setJobType(String jobType) {
+        this.jobType = jobType;
+    }
+
+    public String getJobLevel() {
+        return jobLevel;
+    }
+
+    public void setJobLevel(String jobLevel) {
+        this.jobLevel = jobLevel;
+    }
+
+    public String getJobScope() {
+        return jobScope;
+    }
+
+    public void setJobScope(String jobScope) {
+        this.jobScope = jobScope;
+    }
+
+    public String getJobState() {
+        return jobState;
+    }
+
+    public void setJobState(String jobState) {
+        this.jobState = jobState;
+    }
+
+    public String getRegisterFlag() {
+        return registerFlag;
+    }
+
+    public void setRegisterFlag(String registerFlag) {
+        this.registerFlag = registerFlag;
+    }
+
+    public String getLczcName() {
+        return lczcName;
+    }
+
+    public void setLczcName(String lczcName) {
+        this.lczcName = lczcName;
     }
 }
