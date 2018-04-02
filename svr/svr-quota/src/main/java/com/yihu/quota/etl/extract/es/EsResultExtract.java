@@ -386,7 +386,7 @@ public class EsResultExtract {
             StringBuffer mysql = new StringBuffer("SELECT ")
                     .append(aggsFields)
                     .append(" sum(result) FROM ").append(esConfig.getIndex())
-                    .append(" where ").append(filter)
+                    .append(" where quotaDate is not null and ").append(filter)
                     .append(" group by ").append(aggsFields)
                     .append(" date_histogram(field='quotaDate','interval'='")
                     .append(dateDime).append("')").append(" limit 10000 ");
@@ -431,7 +431,7 @@ public class EsResultExtract {
             mysql.append(aggsFields)
                     .append(" ,sum(").append(sumField).append(") ")
                     .append(" from ").append(esConfig.getIndex())
-                    .append(" where ").append(filter)
+                    .append(" where quotaDate is not null and ").append(filter)
                     .append(" group by ").append(aggsFields);
             if(StringUtils.isNotEmpty(orderFild) && StringUtils.isNotEmpty(order)){
                 mysql.append(" order by ").append(orderFild).append(" ").append(order);
