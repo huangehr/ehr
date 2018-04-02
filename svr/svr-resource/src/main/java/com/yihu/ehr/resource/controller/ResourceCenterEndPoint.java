@@ -3,15 +3,13 @@ package com.yihu.ehr.resource.controller;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
-import com.yihu.ehr.entity.dict.SystemDictEntry;
 import com.yihu.ehr.model.tj.EchartReportModel;
 import com.yihu.ehr.model.tj.MapDataModel;
-import com.yihu.ehr.resource.service.ResourceStatisticService;
+import com.yihu.ehr.resource.service.ResourceCenterService;
 import com.yihu.ehr.solr.SolrUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.models.auth.In;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
@@ -35,18 +33,20 @@ import java.util.*;
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
 @Api(value = "ResourceCenterStatisticsEndPoint", description = "数据资源中心首页", tags = {"资源服务-数据资源中心首页"})
-public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
+public class ResourceCenterEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
-    private ResourceStatisticService statisticService;
+    private ResourceCenterService resourceCenterService;
     @Autowired
     private SolrUtil solrUtil;
+
+    // ------------------------------- 统计相关 start ------------------------------------
 
     @RequestMapping(value = ServiceApi.Resources.GetPatientArchiveCount, method = RequestMethod.GET)
     @ApiOperation(value = "顶部栏 - 居民建档数")
     public Envelop getPatientArchiveCount(){
         Envelop envelop = new Envelop();
-        BigInteger count = statisticService.getPatientArchiveCount();
+        BigInteger count = resourceCenterService.getPatientArchiveCount();
         envelop.setSuccessFlg(true);
         envelop.setObj(count);
         return envelop;
@@ -56,7 +56,7 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "顶部栏 - 医疗资源建档数")
     public Envelop getMedicalResourcesCount() {
         Envelop envelop = new Envelop();
-        BigInteger count = statisticService.getMedicalResourcesCount();
+        BigInteger count = resourceCenterService.getMedicalResourcesCount();
         envelop.setSuccessFlg(true);
         envelop.setObj(count);
         return envelop;
@@ -66,7 +66,7 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "顶部栏 - 健康档案建档数")
     public Envelop getHealthArchiveCount() {
         Envelop envelop = new Envelop();
-        BigInteger count = statisticService.getJsonArchiveCount("3");
+        BigInteger count = resourceCenterService.getJsonArchiveCount("3");
         envelop.setSuccessFlg(true);
         envelop.setObj(count);
         return envelop;
@@ -95,9 +95,9 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
         map.put("gender", null);
         map.put("startDate", null);
         map.put("endDate", null);
-        BigInteger totalDemographicsNum = statisticService.getDemographicCount();
+        BigInteger totalDemographicsNum = resourceCenterService.getDemographicCount();
         //获取绑卡量 userCardsNum
-        BigInteger userCardsNum = statisticService.getUseCardCount();
+        BigInteger userCardsNum = resourceCenterService.getUseCardCount();
         // 计算未绑卡量 nonBindingCardNum、
         DecimalFormat df = new DecimalFormat("0.00");//格式化小数
         BigInteger nonBindingCardNum = totalDemographicsNum.subtract(userCardsNum);
@@ -128,9 +128,9 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
     public Envelop getInfoDistribution() {
         Envelop envelop = new Envelop();
         List<Map> resultList = new ArrayList(1);
-        int currentCityId = statisticService.getCurrentCityId();
-        List districtList = statisticService.getDistrict(currentCityId);
-        List areaIdGroupList = statisticService.getOrgAreaIdGroup(currentCityId);
+        int currentCityId = resourceCenterService.getCurrentCityId();
+        List districtList = resourceCenterService.getDistrict(currentCityId);
+        List areaIdGroupList = resourceCenterService.getOrgAreaIdGroup(currentCityId);
         Map<Integer, BigInteger> distinctMap = new HashMap();
         for(int i = 0; i < areaIdGroupList.size(); i ++) {
             Object [] dataArr = (Object[]) areaIdGroupList.get(i);
@@ -186,7 +186,7 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
         calendar.set(Calendar.MILLISECOND, 0);
         Date now = calendar.getTime();
         Date before = DateUtils.addDays(now, -30);
-        List dateGroupList = statisticService.getArchiveRelationDateGroup(before);
+        List dateGroupList = resourceCenterService.getArchiveRelationDateGroup(before);
         List<String> xData = new ArrayList<>(30);
         List<Long> yData = new ArrayList<>(30);
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -223,9 +223,9 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "医疗资源库 - 医疗机构建档分布")
     public Envelop getOrgArchives() {
         Envelop envelop = new Envelop();
-        int currentCityId = statisticService.getCurrentCityId();
-        List districtList = statisticService.getDistrict(currentCityId);
-        List allGroup = statisticService.getOrgAreaNameGroupByClazz(null, currentCityId);
+        int currentCityId = resourceCenterService.getCurrentCityId();
+        List districtList = resourceCenterService.getDistrict(currentCityId);
+        List allGroup = resourceCenterService.getOrgAreaNameGroupByClazz(null, currentCityId);
         Map<String, BigInteger> distinctMap = new HashMap();
         for(int i = 0; i < allGroup.size(); i ++) {
             Object [] dataArr = (Object[]) allGroup.get(i);
@@ -261,7 +261,7 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
                 yData.add(count);
             }
         }*/
-        List group1 = statisticService.getOrgAreaNameGroupByClazz("1", currentCityId);
+        List group1 = resourceCenterService.getOrgAreaNameGroupByClazz("1", currentCityId);
         List<String> xData1 = new ArrayList<>(xData.size());
         List<BigInteger> yData1 = new ArrayList<>(xData.size());
         for(int i = 0; i < xData.size(); i ++) {
@@ -284,7 +284,7 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
                 yData1.add(new BigInteger("0"));
             }
         }
-        List group2 = statisticService.getOrgAreaNameGroupByClazz("2", currentCityId);
+        List group2 = resourceCenterService.getOrgAreaNameGroupByClazz("2", currentCityId);
         List<String> xData2 = new ArrayList<>(xData.size());
         List<BigInteger> yData2 = new ArrayList<>(xData.size());
         for(int i = 0; i < xData.size(); i ++) {
@@ -307,7 +307,7 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
                 yData2.add(new BigInteger("0"));
             }
         }
-        List group3 = statisticService.getOrgAreaNameGroupByClazz("3", currentCityId);
+        List group3 = resourceCenterService.getOrgAreaNameGroupByClazz("3", currentCityId);
         List<String> xData3 = new ArrayList<>(xData.size());
         List<BigInteger> yData3 = new ArrayList<>(xData.size());
         for(int i = 0; i < xData.size(); i ++) {
@@ -330,7 +330,7 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
                 yData3.add(new BigInteger("0"));
             }
         }
-        List group4 = statisticService.getOrgAreaNameGroupByClazz("4", currentCityId);
+        List group4 = resourceCenterService.getOrgAreaNameGroupByClazz("4", currentCityId);
         List<String> xData4 = new ArrayList<>(xData.size());
         List<BigInteger> yData4 = new ArrayList<>(xData.size());
         for(int i = 0; i < xData.size(); i ++) {
@@ -393,12 +393,12 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "医疗资源库 - 医疗人员分布")
     public Envelop getMedicalStaffDistribution() {
         Envelop envelop = new Envelop();
-        int currentCityId = statisticService.getCurrentCityId();
-        List districtList = statisticService.getDistrict(currentCityId);
+        int currentCityId = resourceCenterService.getCurrentCityId();
+        List districtList = resourceCenterService.getDistrict(currentCityId);
         List<Map> eChartReportModels = new ArrayList<>(2);
         Map<Integer, BigInteger> distinctMap = new HashMap();
         //医生信息
-        List doctorGroup = statisticService.getMedicalAreaCountGroupByRole("Doctor", currentCityId);
+        List doctorGroup = resourceCenterService.getMedicalAreaCountGroupByRole("Doctor", currentCityId);
         for(int i = 0; i < doctorGroup.size(); i ++) {
             Object [] dataArr = (Object[]) doctorGroup.get(i);
             if(dataArr[0] != null) {
@@ -428,7 +428,7 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
         }
         //护士信息
         distinctMap.clear();
-        List nurseGroup = statisticService.getMedicalAreaCountGroupByRole("Nurse", currentCityId);
+        List nurseGroup = resourceCenterService.getMedicalAreaCountGroupByRole("Nurse", currentCityId);
         for(int i = 0; i < nurseGroup.size(); i ++) {
             Object [] dataArr = (Object[]) nurseGroup.get(i);
             if(dataArr[0] != null) {
@@ -480,15 +480,15 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
         Envelop envelop = new Envelop();
         EchartReportModel echartReportModel = new EchartReportModel();
         //根据角色/医院获取Doctor总数
-        int currentCityId = statisticService.getCurrentCityId();
-        BigInteger doctorCount = statisticService.getMedicalCountByRoleType("Doctor", currentCityId);
+        int currentCityId = resourceCenterService.getCurrentCityId();
+        BigInteger doctorCount = resourceCenterService.getMedicalCountByRoleType("Doctor", currentCityId);
         List<MapDataModel> MapDataModelList = new ArrayList<>();
         MapDataModel mapDataModel = new MapDataModel();
         mapDataModel.setName("医生");
         mapDataModel.setValue(String.valueOf(doctorCount));
         MapDataModelList.add(mapDataModel);
 
-        BigInteger nurseCount = statisticService.getMedicalCountByRoleType("Nurse", currentCityId);
+        BigInteger nurseCount = resourceCenterService.getMedicalCountByRoleType("Nurse", currentCityId);
         mapDataModel = new MapDataModel();
         mapDataModel.setName("护士");
         mapDataModel.setValue(String.valueOf(nurseCount));
@@ -503,7 +503,7 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "健康档案 - 累计整合档案数")
     public Envelop getCumulativeIntegration() {
         Envelop envelop = new Envelop();
-        BigInteger count = statisticService.getJsonArchiveCount("3");
+        BigInteger count = resourceCenterService.getJsonArchiveCount("3");
         envelop.setSuccessFlg(true);
         envelop.setObj(count);
         return envelop;
@@ -513,7 +513,7 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "健康档案 - 累计待整合档案数")
     public Envelop gteTotallyToBeIntegrated() {
         Envelop envelop = new Envelop();
-        BigInteger count = statisticService.getJsonArchiveCount("0");
+        BigInteger count = resourceCenterService.getJsonArchiveCount("0");
         envelop.setSuccessFlg(true);
         envelop.setObj(count);
         return envelop;
@@ -523,9 +523,9 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "健康档案 - 档案来源分布情况")
     public Envelop getArchiveSource() {
         Envelop envelop = new Envelop();
-        BigInteger clinic = statisticService.getArchiveRelationCountByEventType("0");
-        BigInteger resident = statisticService.getArchiveRelationCountByEventType("1");
-        BigInteger medicalExam = statisticService.getArchiveRelationCountByEventType("2");
+        BigInteger clinic = resourceCenterService.getArchiveRelationCountByEventType("0");
+        BigInteger resident = resourceCenterService.getArchiveRelationCountByEventType("1");
+        BigInteger medicalExam = resourceCenterService.getArchiveRelationCountByEventType("2");
         List<Map> eChartReportModelList = new ArrayList<>(3);
         Map<String, Object> clinicMap = new HashMap<>(2);
         clinicMap.put("name", "门诊");
@@ -667,7 +667,7 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
             return envelop;
         }*/
         Map<String, Integer> ageMap = getDefaultAgeMap();
-        List<Object []> allGroup = statisticService.newStatisticsDemographicsAgeCount();
+        List<Object []> allGroup = resourceCenterService.newStatisticsDemographicsAgeCount();
         Map<String, BigInteger> maleGroup = new HashMap<>();
         Map<String, BigInteger> femaleGroup = new HashMap<>();
         for(Object [] dataArr : allGroup) {
@@ -737,7 +737,7 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
         calendar.set(Calendar.MILLISECOND, 0);
         Date now = calendar.getTime();
         Date before = DateUtils.addDays(now, -30);
-        List receiveGroup = statisticService.getJsonArchiveReceiveDateGroup(before);
+        List receiveGroup = resourceCenterService.getJsonArchiveReceiveDateGroup(before);
         List<String> xData = new ArrayList<>(30);
         List<Long> yData = new ArrayList<>(30);
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -759,7 +759,7 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
                 yData.add((long)0);
             }
         }
-        List finishGroup = statisticService.getJsonArchiveFinishDateGroup(before);
+        List finishGroup = resourceCenterService.getJsonArchiveFinishDateGroup(before);
         List<String> xData1 = new ArrayList<>(30);
         List<Long> yData1 = new ArrayList<>(30);
         for(int i = 0; i < 30; i ++) {
@@ -840,15 +840,15 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "电子病例 - 电子病历采集医院分布")
     public Envelop getElectronicMedicalOrgDistributed() throws Exception {
         Envelop envelop = new Envelop();
-        int currentCityId = statisticService.getCurrentCityId();
+        int currentCityId = resourceCenterService.getCurrentCityId();
         FacetField facetField = solrUtil.getFacetField("HealthProfile", "org_code", null, 0, 0, 1000000, false);
         List<FacetField.Count> countList = facetField.getValues();
         Map<String, Long> dataMap = new HashMap<>(countList.size());
         for (FacetField.Count count : countList) {
             String orgCode = count.getName();
-            Integer areaId = statisticService.getOrgAreaByCode(orgCode, currentCityId);
+            Integer areaId = resourceCenterService.getOrgAreaByCode(orgCode, currentCityId);
             if(areaId != null && areaId != 0) {
-                String orgName = statisticService.getOrgNameByCode(orgCode);
+                String orgName = resourceCenterService.getOrgNameByCode(orgCode);
                 if (!StringUtils.isEmpty(orgName)) {
                     long count1 = count.getCount();
                     dataMap.put(orgName, count1);
@@ -884,7 +884,7 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
         Map<String, Long> dataMap = new HashMap<>(countList.size());
         for (FacetField.Count count : countList) {
             String deptCode = count.getName();
-            String deptName = statisticService.getDeptNameByCode(deptCode);
+            String deptName = resourceCenterService.getDeptNameByCode(deptCode);
             if (!StringUtils.isEmpty(deptName)) {
                 long count1 = count.getCount();
                 dataMap.put(deptName, count1);
@@ -927,5 +927,247 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
         envelop.setDetailModelList(resultList);
         return envelop;
     }
+    // ------------------------------- 统计相关 end ------------------------------------
 
+    // ------------------------------- 大数据展示相关 start ------------------------------------
+    @RequestMapping(value = ServiceApi.Resources.Achievements, method = RequestMethod.GET)
+    @ApiOperation(value = "成果展示")
+    public Envelop achievements() throws Exception {
+        List<Map<String, Object>> resultList = new ArrayList<>();
+        //数据采集
+        List<Object[]> list1 = resourceCenterService.findAppFeatureIdAndNameByAppIdAndCode("EHR_Quality_Trend", "zkGuSIm2Fg");
+        if (list1.size() > 0) {
+            Map<String, Object> dataMap1 = new LinkedHashMap<>();
+            Object [] data = list1.get(0);
+            Integer id = (Integer) data[0];
+            String name = (String) data[1];
+            dataMap1.put("label", "数据采集");
+            dataMap1.put("appId", "zkGuSIm2Fg");
+            dataMap1.put("name", name);
+            dataMap1.put("menuId", id);
+            BigInteger total = resourceCenterService.getJsonArchiveTotalCount();
+            dataMap1.put("total", total);
+            Map<String, Object> dataMap2 = new HashMap<>();
+            List<Map<String, Object>> pieList1 = new ArrayList<>();
+            BigInteger count1 = resourceCenterService.getJsonArchiveCount("3");
+            Map<String, Object> pieMap1 = new HashMap<>();
+            pieMap1.put("成功总量", count1);
+            pieList1.add(pieMap1);
+            BigInteger count2 = resourceCenterService.getJsonArchiveCount("2");
+            Map<String, Object> pieMap2 = new HashMap<>();
+            pieMap2.put("失败总量", count2);
+            pieList1.add(pieMap2);
+            dataMap2.put("1", pieList1);
+            dataMap1.put("view", dataMap2);
+            resultList.add(dataMap1);
+        }
+        //数据存储
+        List<Object[]> list2 = resourceCenterService.findAppFeatureIdAndNameByAppIdAndCode("Ehr_Data_Gateway", "R1yHNdX5Ud");
+        if (list2.size() > 0) {
+            Map<String, Object> dataMap1 = new LinkedHashMap<>();
+            Object [] data = list2.get(0);
+            Integer id = (Integer) data[0];
+            String name = (String) data[1];
+            dataMap1.put("label", "数据存储");
+            dataMap1.put("appId", "R1yHNdX5Ud");
+            dataMap1.put("name", name);
+            dataMap1.put("menuId", id);
+            Map<String, Object> dataMap2 = new HashMap<>();
+            List<Map<String, Object>> pieList1 = new ArrayList<>();
+            BigInteger count1 = resourceCenterService.getPatientArchiveCount();
+            Map<String, Object> pieMap1 = new HashMap<>();
+            pieMap1.put("patient", count1);
+            pieList1.add(pieMap1);
+            BigInteger count2 = resourceCenterService.getMedicalResourcesCount();
+            Map<String, Object> pieMap2 = new HashMap<>();
+            pieMap2.put("medicalResources", count2);
+            pieList1.add(pieMap2);
+            BigInteger count3 = resourceCenterService.getJsonArchiveCount("3");
+            Map<String, Object> pieMap3 = new HashMap<>();
+            pieMap3.put("healthArchive", count3);
+            pieList1.add(pieMap3);
+            long count4 = solrUtil.count("HealthProfile", "*:*");
+            Map<String, Object> pieMap4 = new HashMap<>();
+            pieMap4.put("electronicCases", count4);
+            pieList1.add(pieMap4);
+            dataMap2.put("1", pieList1);
+            dataMap1.put("view", dataMap2);
+            resultList.add(dataMap1);
+        }
+        return success(resultList);
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.Visualization, method = RequestMethod.GET)
+    @ApiOperation(value = "可视化")
+    public Envelop visualization() throws Exception {
+        List<Map<String, Object>> resultList = new ArrayList<>();
+        //已配置视图
+        List<Object[]> list1 = resourceCenterService.findAppFeatureIdAndNameByAppIdAndCode("Resource_ResourceManage_Initial", "zkGuSIm2Fg");
+        if (list1.size() > 0) {
+            Map<String, Object> dataMap1 = new LinkedHashMap<>();
+            Object [] data = list1.get(0);
+            Integer id = (Integer) data[0];
+            String name = (String) data[1];
+            dataMap1.put("label", "已配置视图");
+            dataMap1.put("appId", "zkGuSIm2Fg");
+            dataMap1.put("name", name);
+            dataMap1.put("menuId", id);
+            BigInteger total = resourceCenterService.getTotalViewCount(null);
+            dataMap1.put("total", total);
+            //大分类
+            Map<String, Object> dataMap2 = new HashMap<>();
+            List<Map<String, Object>> pieList1 = new ArrayList<>();
+            BigInteger dataSource1 = resourceCenterService.getTotalViewCount(1);
+            Map<String, Object> pieMap1 = new LinkedHashMap<>();
+            pieMap1.put("档案数据", dataSource1);
+            pieList1.add(pieMap1);
+            BigInteger dataSource2 = resourceCenterService.getTotalViewCount(2);
+            Map<String, Object> pieMap2 = new LinkedHashMap<>();
+            pieMap2.put("指标统计", dataSource2);
+            pieList1.add(pieMap2);
+            dataMap2.put("1", pieList1);
+            //小分类
+            List<Map<String, Object>> pieList2 = new ArrayList<>();
+            List<Object[]> cateList = resourceCenterService.getResourceCategoryIdAndNameList();
+            for (Object [] temp : cateList) {
+                Map<String, Object> pieMap3 = new HashMap<>();
+                String cateId = (String) temp[0];
+                String cateName = (String) temp[1];
+                BigInteger count1 = resourceCenterService.countResourceByResourceCateIdAndDataSource(cateId, 1);
+                if (count1.compareTo(new BigInteger("0")) > 0) {
+                    pieMap3.put(cateName, count1);
+                    pieList2.add(pieMap3);
+                }
+            }
+            for (Object [] temp : cateList) {
+                Map<String, Object> pieMap3 = new HashMap<>();
+                String cateId = (String) temp[0];
+                String cateName = (String) temp[1];
+                BigInteger count1 = resourceCenterService.countResourceByResourceCateIdAndDataSource(cateId, 2);
+                if (count1.compareTo(new BigInteger("0")) > 0) {
+                    pieMap3.put(cateName, count1);
+                    pieList2.add(pieMap3);
+                }
+            }
+            dataMap2.put("2", pieList2);
+            dataMap1.put("view", dataMap2);
+            resultList.add(dataMap1);
+        }
+        //已配置资源报表
+        List<Object[]> list2 = resourceCenterService.findAppFeatureIdAndNameByAppIdAndCode("Ehr_Resource_Report_Index", "zkGuSIm2Fg");
+        if (list2.size() > 0) {
+            Map<String, Object> dataMap1 = new LinkedHashMap<>();
+            Object [] data = list2.get(0);
+            Integer id = (Integer) data[0];
+            String name = (String) data[1];
+            dataMap1.put("label", "已配置资源报表");
+            dataMap1.put("appId", "zkGuSIm2Fg");
+            dataMap1.put("name", name);
+            dataMap1.put("menuId", id);
+            BigInteger total = resourceCenterService.getTotalReportCount();
+            dataMap1.put("total", total);
+            Map<String, Object> dataMap2 = new HashMap<>();
+            List<Map<String, Object>> pieList1 = new ArrayList<>();
+            List<Object[]> cateList = resourceCenterService.getReportCategoryIdAndNameList();
+            for (Object [] temp : cateList) {
+                Map<String, Object> pieMap3 = new HashMap<>();
+                Integer cateId = (Integer) temp[0];
+                String cateName = (String) temp[1];
+                BigInteger count1 = resourceCenterService.countReportByReportCateId(cateId);
+                if (count1.compareTo(new BigInteger("0")) > 0) {
+                    pieMap3.put(cateName, count1);
+                    pieList1.add(pieMap3);
+                }
+            }
+            dataMap2.put("1", pieList1);
+            dataMap1.put("view", dataMap2);
+            resultList.add(dataMap1);
+        }
+        return success(resultList);
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.DataAnalysis, method = RequestMethod.GET)
+    @ApiOperation(value = "数据分析")
+    public Envelop dataAnalysis() throws Exception {
+        List<Map<String, Object>> resultList = new ArrayList<>();
+        //已注册指标
+        List<Object[]> list1 = resourceCenterService.findAppFeatureIdAndNameByAppIdAndCode("Ehr_Zhibiao_Initial", "zkGuSIm2Fg");
+        if (list1.size() > 0) {
+            Map<String, Object> dataMap1 = new LinkedHashMap<>();
+            Object [] data = list1.get(0);
+            Integer id = (Integer) data[0];
+            String name = (String) data[1];
+            dataMap1.put("label", "已注册指标");
+            dataMap1.put("appId", "zkGuSIm2Fg");
+            dataMap1.put("name", name);
+            dataMap1.put("menuId", id);
+            BigInteger total = resourceCenterService.getTotalQuotaCount();
+            dataMap1.put("total", total);
+            Map<String, Object> dataMap2 = new HashMap<>();
+            List<Map<String, Object>> pieList1 = new ArrayList<>();
+            List<Object[]> cateList = resourceCenterService.getQuotaCategoryIdAndNameList();
+            for (Object [] temp : cateList) {
+                Map<String, Object> pieMap3 = new HashMap<>();
+                Integer cateId = (Integer) temp[0];
+                String cateName = (String) temp[1];
+                BigInteger count1 = resourceCenterService.countQuotaByQuotaCateId(cateId);
+                if (count1.compareTo(new BigInteger("0")) > 0) {
+                    pieMap3.put(cateName, count1);
+                    pieList1.add(pieMap3);
+                }
+            }
+            dataMap2.put("1", pieList1);
+            dataMap1.put("view", dataMap2);
+            resultList.add(dataMap1);
+        }
+        return success(resultList);
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.HierarchicalManagement, method = RequestMethod.GET)
+    @ApiOperation(value = "分级管理")
+    public Envelop hierarchicalManagement() throws Exception {
+        List<Map<String, Object>> resultList = new ArrayList<>();
+        //机构数据授权
+        List<Object[]> list1 = resourceCenterService.findAppFeatureIdAndNameByAppIdAndCode("Ehr_Security_Org_Auth", "zkGuSIm2Fg");
+        if (list1.size() > 0) {
+            Map<String, Object> dataMap = new LinkedHashMap<>();
+            Object [] data = list1.get(0);
+            Integer id = (Integer) data[0];
+            String name = (String) data[1];
+            dataMap.put("label", "机构数据授权");
+            dataMap.put("appId", "zkGuSIm2Fg");
+            dataMap.put("name", name);
+            dataMap.put("menuId", id);
+            resultList.add(dataMap);
+        }
+        //应用授权
+        List<Object[]> list2 = resourceCenterService.findAppFeatureIdAndNameByAppIdAndCode("Ehr_Public_Thirdparty_App", "zkGuSIm2Fg");
+        if (list2.size() > 0) {
+            Map<String, Object> dataMap = new LinkedHashMap<>();
+            Object [] data = list2.get(0);
+            Integer id = (Integer) data[0];
+            String name = (String) data[1];
+            dataMap.put("label", "应用授权");
+            dataMap.put("appId", "zkGuSIm2Fg");
+            dataMap.put("name", name);
+            dataMap.put("menuId", id);
+            resultList.add(dataMap);
+        }
+        //角色授权
+        List<Object[]> list3 = resourceCenterService.findAppFeatureIdAndNameByAppIdAndCode("UserRoles_Initial", "zkGuSIm2Fg");
+        if (list3.size() > 0) {
+            Map<String, Object> dataMap = new LinkedHashMap<>();
+            Object [] data = list3.get(0);
+            Integer id = (Integer) data[0];
+            String name = (String) data[1];
+            dataMap.put("label", "角色授权");
+            dataMap.put("appId", "zkGuSIm2Fg");
+            dataMap.put("name", name);
+            dataMap.put("menuId", id);
+            resultList.add(dataMap);
+        }
+        return success(resultList);
+    }
+
+    // ------------------------------- 大数据展示相关 end ------------------------------------
 }

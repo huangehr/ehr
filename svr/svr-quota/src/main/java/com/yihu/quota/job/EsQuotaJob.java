@@ -135,9 +135,15 @@ public class EsQuotaJob implements Job {
 
     private void deleteRecord() throws Exception {
         EsConfig esConfig = extractHelper.getEsConfig(quotaVo.getCode());
+        EsConfig sourceEsConfig = extractHelper.getDataSourceEsConfig(quotaVo.getCode());
+
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         QueryStringQueryBuilder termQueryQuotaCode = QueryBuilders.queryStringQuery("quotaCode:" + quotaVo.getCode().replaceAll("_", ""));
         boolQueryBuilder.must(termQueryQuotaCode);
+        if(sourceEsConfig.getFullQuery() !=null && sourceEsConfig.getFullQuery().equals("true")){
+            startTime = LocalDate.now().toString();
+            endTime = LocalDate.now().toString();
+        }
         if (!StringUtils.isEmpty(startTime)) {
             RangeQueryBuilder rangeQueryStartTime = QueryBuilders.rangeQuery("quotaDate").gte(startTime);
             boolQueryBuilder.must(rangeQueryStartTime);

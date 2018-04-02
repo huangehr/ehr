@@ -218,4 +218,22 @@ public class RolesEndPoint extends EnvelopRestEndPoint{
         }
         return envelop;
     }
+
+    @RequestMapping(value = ServiceApi.Roles.RoleFindByUserIdAndAppId, method = RequestMethod.GET)
+    @ApiOperation(value = "通过用户ID、应用id获取角色" )
+    public Envelop findRolesByUserIdAndAppId(
+            @ApiParam(name = "userId", value = "用户Id", required = true)
+            @RequestParam(value = "userId") String userId,
+            @ApiParam(name = "appId", value = "应用Id", required = true)
+            @RequestParam(value = "appId") String appId){
+        Envelop envelop = new Envelop();
+        List<Map<String,Object>> roles = rolesService.findRolesByUserIdAndAppId(userId,appId);
+        if(roles != null && roles.size() >0){
+            envelop.setSuccessFlg(true);
+            envelop.setDetailModelList(roles);
+        }else{
+            envelop.setSuccessFlg(false);
+        }
+        return envelop;
+    }
 }

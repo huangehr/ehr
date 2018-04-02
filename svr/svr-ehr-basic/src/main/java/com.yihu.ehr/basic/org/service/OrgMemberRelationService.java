@@ -181,13 +181,16 @@ public class OrgMemberRelationService extends BaseJpaService<OrgMemberRelation, 
         return orgOrgMemberRelations;
     }
 
-    public List<String> getJkzlOrgIds(String userId) {
+    public String getJkzlOrgIds(String userId) {
         List<String> orgIds = relationRepository.findOrgIdByUserId(userId);
-        List<String> jkzlOrgIds=null;
+        String jkzlOrgId="";
         if(orgIds.size() > 0){
             String[] orgIdsStr = orgIds.toArray(new String[orgIds.size()]);
-            jkzlOrgIds = orgService.getJkzlOrgIdsByEhrOrgId(orgIdsStr);
+            List<String>  jkzlOrgIds = orgService.getJkzlOrgIdsByEhrOrgId(orgIdsStr);
+            if(jkzlOrgIds.size()>0){
+                jkzlOrgId = jkzlOrgIds.get(0);
+            }
         }
-        return jkzlOrgIds;
+        return jkzlOrgId;
     }
 }

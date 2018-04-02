@@ -1,4 +1,4 @@
-package com.yihu.ehr.feign;
+package com.yihu.ehr.resolve.feign;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
@@ -13,9 +13,10 @@ import springfox.documentation.annotations.ApiIgnore;
  * @author hzp
  * @created 2017.04.28
  */
-@ApiIgnore
-@FeignClient(name = MicroServices.StdRedis)
-@RequestMapping(ApiVersion.Version1_0)
+//@ApiIgnore
+//@FeignClient(name = MicroServices.StdRedis)
+//@RequestMapping(ApiVersion.Version1_0)
+@Deprecated
 public interface StdRedisServiceClient {
 
     //("获取标准版本 redis")

@@ -10,6 +10,7 @@ import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.*;
 import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.impl.client.BasicCredentialsProvider;
@@ -47,35 +48,35 @@ public class HttpUtils {
         CloseableHttpClient httpClient = null;
         CloseableHttpResponse closeableHttpResponse = null;
         List<NameValuePair> nameValuePairList = new ArrayList<NameValuePair>();
-        if(params != null) {
-            for(String key : params.keySet()) {
+        if (params != null) {
+            for (String key : params.keySet()) {
                 Object value = params.get(key);
-                if(value != null) {
+                if (value != null) {
                     nameValuePairList.add(new BasicNameValuePair(key, String.valueOf(params.get(key))));
                 }
             }
         }
         String paramStr = EntityUtils.toString(new UrlEncodedFormEntity(nameValuePairList, "UTF-8"));
         HttpGet httpGet = new HttpGet(url + "?" + paramStr);
-        if(headers != null) {
-            for(String key : headers.keySet()) {
+        if (headers != null) {
+            for (String key : headers.keySet()) {
                 httpGet.addHeader(key, headers.get(key));
             }
         }
         try {
-            if(!StringUtils.isEmpty(username) && !StringUtils.isEmpty(password)) {
+            if (!StringUtils.isEmpty(username) && !StringUtils.isEmpty(password)) {
                 UsernamePasswordCredentials usernamePasswordCredentials = new UsernamePasswordCredentials(username, password);
                 CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
                 credentialsProvider.setCredentials(AuthScope.ANY, usernamePasswordCredentials);
                 httpClient = HttpClients.custom().setDefaultCredentialsProvider(credentialsProvider).build();
-            }else {
+            } else {
                 httpClient = HttpClients.createDefault();
             }
             closeableHttpResponse = httpClient.execute(httpGet);
             HttpEntity resEntity = closeableHttpResponse.getEntity();
             status = closeableHttpResponse.getStatusLine().getStatusCode();
             response = getRespString(resEntity);
-        }finally {
+        } finally {
             try {
                 if (closeableHttpResponse != null) {
                     closeableHttpResponse.close();
@@ -87,7 +88,7 @@ public class HttpUtils {
                 e.printStackTrace();
             }
         }
-        if(status != HttpStatus.SC_OK) {
+        if (status != HttpStatus.SC_OK) {
             LogService.getLogger().error(" GET: " + url + " " + status);
         }
         HttpResponse httpResponse = new HttpResponse(status, response);
@@ -110,17 +111,17 @@ public class HttpUtils {
         CloseableHttpResponse closeableHttpResponse = null;
         HttpPost httpPost = new HttpPost(url);
         List<NameValuePair> nameValuePairList = new ArrayList<NameValuePair>();
-        if(params != null) {
-            for(String key : params.keySet()) {
+        if (params != null) {
+            for (String key : params.keySet()) {
                 Object value = params.get(key);
-                if(value != null) {
+                if (value != null) {
                     nameValuePairList.add(new BasicNameValuePair(key, String.valueOf(params.get(key))));
                 }
             }
         }
         httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairList, "UTF-8"));
-        if(headers != null) {
-            for(String key : headers.keySet()) {
+        if (headers != null) {
+            for (String key : headers.keySet()) {
                 httpPost.addHeader(key, headers.get(key));
             }
         }
@@ -130,14 +131,14 @@ public class HttpUtils {
                 CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
                 credentialsProvider.setCredentials(AuthScope.ANY, usernamePasswordCredentials);
                 httpClient = HttpClients.custom().setDefaultCredentialsProvider(credentialsProvider).build();
-            }else {
+            } else {
                 httpClient = HttpClients.createDefault();
             }
             closeableHttpResponse = httpClient.execute(httpPost);
             HttpEntity resEntity = closeableHttpResponse.getEntity();
             status = closeableHttpResponse.getStatusLine().getStatusCode();
             response = getRespString(resEntity);
-        }finally {
+        } finally {
             try {
                 if (closeableHttpResponse != null) {
                     closeableHttpResponse.close();
@@ -146,6 +147,51 @@ public class HttpUtils {
                     httpClient.close();
                 }
             }catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        if(status != HttpStatus.SC_OK) {
+            LogService.getLogger().error(" POST: " + url + " " + status);
+        }
+        HttpResponse httpResponse = new HttpResponse(status, response);
+        return httpResponse;
+    }
+
+    public static HttpResponse doJsonPost(String url, String jsonData, Map<String, String> headers, String username, String password) throws Exception{
+        String response;
+        int status;
+        CloseableHttpClient httpClient = null;
+        CloseableHttpResponse closeableHttpResponse = null;
+        HttpPost httpPost = new HttpPost(url);
+        httpPost.setHeader("Content-Type", "application/json;charset=UTF-8");
+        httpPost.setEntity(new StringEntity(jsonData, "UTF-8"));
+        if (headers != null) {
+            for (String key : headers.keySet()) {
+                httpPost.addHeader(key, headers.get(key));
+            }
+        }
+        try {
+            if (!StringUtils.isEmpty(username) && !StringUtils.isEmpty(password)) {
+                UsernamePasswordCredentials usernamePasswordCredentials = new UsernamePasswordCredentials(username, password);
+                CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+                credentialsProvider.setCredentials(AuthScope.ANY, usernamePasswordCredentials);
+                httpClient = HttpClients.custom().setDefaultCredentialsProvider(credentialsProvider).build();
+            } else {
+                httpClient = HttpClients.createDefault();
+            }
+            closeableHttpResponse = httpClient.execute(httpPost);
+            HttpEntity resEntity = closeableHttpResponse.getEntity();
+            status = closeableHttpResponse.getStatusLine().getStatusCode();
+            response = getRespString(resEntity);
+        } finally {
+            try {
+                if (closeableHttpResponse != null) {
+                    closeableHttpResponse.close();
+                }
+                if (httpClient != null) {
+                    httpClient.close();
+                }
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -171,17 +217,17 @@ public class HttpUtils {
         CloseableHttpResponse closeableHttpResponse = null;
         HttpPut httpPut = new HttpPut(url);
         List<NameValuePair> nameValuePairList = new ArrayList<NameValuePair>();
-        if(params != null) {
-            for(String key : params.keySet()) {
+        if (params != null) {
+            for (String key : params.keySet()) {
                 Object value = params.get(key);
-                if(value != null) {
+                if (value != null) {
                     nameValuePairList.add(new BasicNameValuePair(key, String.valueOf(params.get(key))));
                 }
             }
         }
         httpPut.setEntity(new UrlEncodedFormEntity(nameValuePairList, "UTF-8"));
-        if(headers != null) {
-            for(String key : headers.keySet()) {
+        if (headers != null) {
+            for (String key : headers.keySet()) {
                 httpPut.addHeader(key, headers.get(key));
             }
         }
@@ -191,14 +237,14 @@ public class HttpUtils {
                 CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
                 credentialsProvider.setCredentials(AuthScope.ANY, usernamePasswordCredentials);
                 httpClient = HttpClients.custom().setDefaultCredentialsProvider(credentialsProvider).build();
-            }else {
+            } else {
                 httpClient = HttpClients.createDefault();
             }
             closeableHttpResponse = httpClient.execute(httpPut);
             HttpEntity resEntity = closeableHttpResponse.getEntity();
             status = closeableHttpResponse.getStatusLine().getStatusCode();
             response = getRespString(resEntity);
-        }finally {
+        } finally {
             try {
                 if (closeableHttpResponse != null) {
                     closeableHttpResponse.close();
@@ -206,11 +252,56 @@ public class HttpUtils {
                 if (httpClient != null) {
                     httpClient.close();
                 }
-            }catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        if(status != HttpStatus.SC_OK) {
+        if (status != HttpStatus.SC_OK) {
+            LogService.getLogger().error(" PUT: " + url + " " + status);
+        }
+        HttpResponse httpResponse = new HttpResponse(status, response);
+        return httpResponse;
+    }
+
+    public static HttpResponse doJsonPut(String url, String jsonData, Map<String, String> headers, String username, String password) throws Exception {
+        String response;
+        int status;
+        CloseableHttpClient httpClient = null;
+        CloseableHttpResponse closeableHttpResponse = null;
+        HttpPut httpPut = new HttpPut(url);
+        httpPut.setHeader("Content-Type", "application/json;charset=UTF-8");
+        httpPut.setEntity(new StringEntity(jsonData, "UTF-8"));
+        if (headers != null) {
+            for (String key : headers.keySet()) {
+                httpPut.addHeader(key, headers.get(key));
+            }
+        }
+        try {
+            if (!StringUtils.isEmpty(username) && !StringUtils.isEmpty(password)) {
+                UsernamePasswordCredentials usernamePasswordCredentials = new UsernamePasswordCredentials(username, password);
+                CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+                credentialsProvider.setCredentials(AuthScope.ANY, usernamePasswordCredentials);
+                httpClient = HttpClients.custom().setDefaultCredentialsProvider(credentialsProvider).build();
+            } else {
+                httpClient = HttpClients.createDefault();
+            }
+            closeableHttpResponse = httpClient.execute(httpPut);
+            HttpEntity resEntity = closeableHttpResponse.getEntity();
+            status = closeableHttpResponse.getStatusLine().getStatusCode();
+            response = getRespString(resEntity);
+        } finally {
+            try {
+                if (closeableHttpResponse != null) {
+                    closeableHttpResponse.close();
+                }
+                if (httpClient != null) {
+                    httpClient.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        if (status != HttpStatus.SC_OK) {
             LogService.getLogger().error(" PUT: " + url + " " + status);
         }
         HttpResponse httpResponse = new HttpResponse(status, response);
@@ -231,18 +322,18 @@ public class HttpUtils {
         CloseableHttpClient httpClient = null;
         CloseableHttpResponse closeableHttpResponse = null;
         List<NameValuePair> nameValuePairList = new ArrayList<NameValuePair>();
-        if(params != null) {
-            for(String key : params.keySet()) {
+        if (params != null) {
+            for (String key : params.keySet()) {
                 Object value = params.get(key);
-                if(value != null) {
+                if (value != null) {
                     nameValuePairList.add(new BasicNameValuePair(key, String.valueOf(params.get(key))));
                 }
             }
         }
         String paramStr = EntityUtils.toString(new UrlEncodedFormEntity(nameValuePairList, "UTF-8"));
         HttpDelete httpDelete = new HttpDelete(url + "?" + paramStr);
-        if(headers != null) {
-            for(String key : headers.keySet()) {
+        if (headers != null) {
+            for (String key : headers.keySet()) {
                 httpDelete.addHeader(key, headers.get(key));
             }
         }
@@ -252,14 +343,14 @@ public class HttpUtils {
                 CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
                 credentialsProvider.setCredentials(AuthScope.ANY, usernamePasswordCredentials);
                 httpClient = HttpClients.custom().setDefaultCredentialsProvider(credentialsProvider).build();
-            }else {
+            } else {
                 httpClient = HttpClients.createDefault();
             }
             closeableHttpResponse = httpClient.execute(httpDelete);
             HttpEntity resEntity = closeableHttpResponse.getEntity();
             status = closeableHttpResponse.getStatusLine().getStatusCode();
             response = getRespString(resEntity);
-        }finally {
+        } finally {
             try {
                 if (closeableHttpResponse != null) {
                     closeableHttpResponse.close();
@@ -271,7 +362,7 @@ public class HttpUtils {
                 e.printStackTrace();
             }
         }
-        if(status != HttpStatus.SC_OK) {
+        if (status != HttpStatus.SC_OK) {
             LogService.getLogger().error(" DELETE: " + url + " " + status);
         }
         HttpResponse httpResponse = new HttpResponse(status, response);
@@ -298,13 +389,13 @@ public class HttpUtils {
         if (params != null) {
             for (String key : params.keySet()) {
                 Object value = params.get(key);
-                if(value != null) {
+                if (value != null) {
                     multipartEntityBuilder.addTextBody(key, String.valueOf(params.get(key)), ContentType.TEXT_PLAIN);
                 }
             }
         }
         if (headers != null) {
-            for(String key : headers.keySet()) {
+            for (String key : headers.keySet()) {
                 httpPost.addHeader(key, headers.get(key));
             }
         }
@@ -316,14 +407,14 @@ public class HttpUtils {
                 CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
                 credentialsProvider.setCredentials(AuthScope.ANY, usernamePasswordCredentials);
                 httpClient = HttpClients.custom().setDefaultCredentialsProvider(credentialsProvider).build();
-            }else {
+            } else {
                 httpClient = HttpClients.createDefault();
             }
             closeableHttpResponse = httpClient.execute(httpPost);
             HttpEntity resEntity = closeableHttpResponse.getEntity();
             status = closeableHttpResponse.getStatusLine().getStatusCode();
             response = getRespString(resEntity);
-        }finally {
+        } finally {
             try {
                 if (closeableHttpResponse != null) {
                     closeableHttpResponse.close();
@@ -335,7 +426,7 @@ public class HttpUtils {
                 e.printStackTrace();
             }
         }
-        if(status != HttpStatus.SC_OK) {
+        if (status != HttpStatus.SC_OK) {
             LogService.getLogger().error(" POST UPLOAD: " + url + " " + status);
         }
         HttpResponse httpResponse = new HttpResponse(status, response);

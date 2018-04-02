@@ -16,15 +16,13 @@ import java.util.Date;
 @Table(name = "system_dicts")
 @Access(value = AccessType.PROPERTY)
 public class SystemDict {
-    long id;
-    String name;
-    String reference;
-    String authorId;
-    String phoneticCode;
+    private long id;
+    private String name;
+    private String reference;
+    private String authorId;
+    private String phoneticCode;
+    private String code;
     Date createDate = new Date();
-
-    public SystemDict(){
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -76,5 +74,14 @@ public class SystemDict {
     }
     public void setCreateDate(Date createDate) {
         this.createDate = createDate;
+    }
+
+    @Column(name = "code", nullable = false)
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 }
