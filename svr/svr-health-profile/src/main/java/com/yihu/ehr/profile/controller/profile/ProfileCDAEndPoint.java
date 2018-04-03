@@ -45,12 +45,14 @@ public class ProfileCDAEndPoint extends EnvelopRestEndPoint {
 
     @ApiOperation("CDA数据")
     @RequestMapping(value = ServiceApi.Profiles.CDAData, method = RequestMethod.GET)
-    public Map<String,Object> CDAData(
-            @ApiParam(name = "profile_id", value = "档案ID", required =  true, defaultValue = "41872607-49229004X_000406450000000UX0_1485608518000")
+    public Map<String, Object> CDAData(
+            @ApiParam(name = "profile_id", value = "档案ID", required =  true, defaultValue = "449229004X_000001186960_1513419334000")
             @RequestParam(value = "profile_id") String profile_id,
-            @ApiParam(name = "cda_document_id", value = "模板ID", required = true, defaultValue = "82e89929317a11e7b186a1ae879a6c51")
-            @RequestParam(value = "cda_document_id") String cda_document_id) throws Exception {
-        return profileCDAService.getCDAData(profile_id, cda_document_id);
+            @ApiParam(name = "cda_document_id", value = "模板ID", required = true, defaultValue = "82e8a0b5317a11e7b186a1ae879a6c51")
+            @RequestParam(value = "cda_document_id") String cda_document_id,
+            @ApiParam(name = "transform", value = "是否转换成标准数据", defaultValue = "false")
+            @RequestParam(value = "transform", required = false) boolean transform) throws Exception {
+        return profileCDAService.getCDAData(profile_id, cda_document_id, true);
     }
 
     /*@ApiOperation("完整CDA文档")
