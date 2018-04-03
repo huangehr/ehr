@@ -733,6 +733,7 @@ public class ServiceApi {
 
     public static class Users {
         public static final String Users = "/users";
+        public static final String UsersOfApp = "/usersOfApp";
         public static final String User = "/users/{user_name}";
         public static final String UserExistence = "/users/{user_name}/existence";
         public static final String UserVerification = "/users/verification";
