@@ -2,6 +2,8 @@ package com.yihu.ehr.basic.org.service;
 
 import com.yihu.ehr.basic.org.dao.OrgMemberRelationRepository;
 import com.yihu.ehr.basic.org.model.OrgMemberRelation;
+import com.yihu.ehr.basic.user.service.DoctorService;
+import com.yihu.ehr.basic.user.service.UserService;
 import com.yihu.ehr.model.org.MOrgDeptData;
 import com.yihu.ehr.query.BaseJpaService;
 import org.hibernate.Query;
@@ -32,6 +34,10 @@ public class OrgMemberRelationService extends BaseJpaService<OrgMemberRelation, 
     private OrgService orgService;
     @Autowired
     private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private DoctorService doctorService;
+    @Autowired
+    private UserService userService;
 
     public List<OrgMemberRelation> searchByDeptId(Integer deptId) {
         return relationRepository.searchByDeptId(deptId);
@@ -182,7 +188,8 @@ public class OrgMemberRelationService extends BaseJpaService<OrgMemberRelation, 
     }
 
     public String getJkzlOrgIds(String userId) {
-        List<String> orgIds = relationRepository.findOrgIdByUserId(userId);
+        //根据用户id获取医生表orgId
+        List<String> orgIds = orgService.getEhrOrgIdsByUserId(userId);
         String jkzlOrgId="";
         if(orgIds.size() > 0){
             String[] orgIdsStr = orgIds.toArray(new String[orgIds.size()]);

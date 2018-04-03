@@ -449,7 +449,7 @@ public class BaseStatistsService {
         Map<String,String>  dimensionDicMap = getDimensionDicMap(code,dimension);
         List<String> dimenList = getDimenList(dimension);
         String groupDimension = joinDimen(dimension);
-        List<Map<String, Object>>  dimenListResult = esResultExtract.searcherSumGroup(tjQuota, groupDimension, filter, "result", "", "");
+        List<Map<String, Object>>  dimenListResult = esResultExtract.searcherSumGroup(tjQuota, groupDimension, filter, "result", groupDimension, "asc");
 
         List<Map<String, Object>> resultList = new ArrayList<>();
         for(Map<String, Object> map : dimenListResult){

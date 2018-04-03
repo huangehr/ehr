@@ -37,7 +37,7 @@ public class OutPatientCostScheduler {
 
     private static final Logger log = LoggerFactory.getLogger(HealthArchiveScheduler.class);
 
-    @Scheduled(cron = "0 36 15 * * ?")
+    @Scheduled(cron = "0 36 02 * * ?")
     public void statisticDiseaseCostScheduler() throws Exception {
         String q =  "EHR_000109:*"; // 查询条件 诊断代码（门诊）
         String sq = "";
@@ -124,7 +124,7 @@ public class OutPatientCostScheduler {
         }
     }
 
-    @Scheduled(cron = "0 05 20 * * ?")
+    @Scheduled(cron = "0 05 03 * * ?")
     public void statisticDeptCostScheduler() throws Exception {
         String q = "EHR_000081:* AND event_type:0";   // 科室
         String sq = "";
