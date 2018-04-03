@@ -131,10 +131,47 @@ public class DiabetesMedicineScheduler {
 						String cardId = "";
 						Integer sex = 0;
 						String sexName = "";
+						String symptomName = "";
+						String diseaseType = "";
+						String diseaseTypeName = "";
+						String birthday = "";
+						int birthYear = 0;
+						Map<String,Object> subMap = hbaseDao.getResultMap(ResourceCore.SubTable, subRowkey);
+						if(subMap !=null){
+							String diseaseName = "";
+							if(subMap.get(keyDiseaseSymptom) != null){
+								diseaseName = subMap.get(keyDiseaseSymptom).toString();
+							}else if(subMap.get(keyDiseaseSymptom2) != null ){
+								diseaseName = subMap.get(keyDiseaseSymptom2).toString();
+							}
+							if(StringUtils.isNotEmpty(diseaseName)){
+								if(diseaseName.contains("并发症")){
+									symptomName = diseaseName;
+								}
+								if(diseaseName.contains("1型")){
+									diseaseType = "1";
+									diseaseTypeName = "I型糖尿病";
+								}else if(diseaseName.contains("2型")){
+									diseaseType = "2";
+									diseaseTypeName = "II型糖尿病";
+								}else if(diseaseName.contains("妊娠")){
+									diseaseType = "3";
+									diseaseTypeName = "妊娠糖尿病";
+								}else{
+									diseaseType = "4";
+									diseaseTypeName = "其他糖尿病";
+								}
+							}
+						}
+
 						if(!rowKeyList.contains(mainRowkey)){
 							rowKeyList.add(mainRowkey);
 							Map<String,Object> map = hbaseDao.getResultMap(ResourceCore.MasterTable, mainRowkey);
 							if(map !=null){
+								if(map.get(keyAge) != null){
+									birthday= map.get(keyAge).toString().substring(0, 10);
+									birthYear = Integer.valueOf(map.get(keyAge).toString().substring(0, 4));
+								}
 								if(map.get(keyDemographicId) != null){
 									demographicId = map.get(keyDemographicId).toString();
 								}
@@ -180,6 +217,11 @@ public class DiabetesMedicineScheduler {
 										baseCheckInfo.setCardId(cardId);
 										baseCheckInfo.setSex(sex);
 										baseCheckInfo.setSexName(sexName);
+										baseCheckInfo.setBirthday(birthday);
+										baseCheckInfo.setBirthYear(birthYear);
+										baseCheckInfo.setDiseaseType(diseaseType);
+										baseCheckInfo.setDiseaseTypeName(diseaseTypeName);
+										baseCheckInfo.setSymptomName(symptomName);
 										if(submap.get(keyWestMedicine) != null){
 											CheckInfoModel checkInfo = setCheckInfoModel(baseCheckInfo);
 											checkInfo.setCheckCode("CH004");

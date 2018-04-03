@@ -121,9 +121,42 @@ public class DiabetesCheckScheduler {
 						String cardId = "";
 						Integer sex = 0;
 						String sexName = "";
+						String diseaseType = "";
+						String diseaseTypeName = "";
+						String birthday = "";
+						int birthYear = 0;
+						Map<String,Object> subMap = hbaseDao.getResultMap(ResourceCore.SubTable, subRowkey);
+						if(subMap !=null){
+							String diseaseName = "";
+							if(subMap.get(keyDiseaseSymptom) != null){
+								diseaseName = subMap.get(keyDiseaseSymptom).toString();
+							}else if(subMap.get(keyDiseaseSymptom2) != null ){
+								diseaseName = subMap.get(keyDiseaseSymptom2).toString();
+							}
+							if(StringUtils.isNotEmpty(diseaseName)){
+								if(diseaseName.contains("1型")){
+									diseaseType = "1";
+									diseaseTypeName = "I型糖尿病";
+								}else if(diseaseName.contains("2型")){
+									diseaseType = "2";
+									diseaseTypeName = "II型糖尿病";
+								}else if(diseaseName.contains("妊娠")){
+									diseaseType = "3";
+									diseaseTypeName = "妊娠糖尿病";
+								}else{
+									diseaseType = "4";
+									diseaseTypeName = "其他糖尿病";
+								}
+							}
+						}
 						String mainRowkey = subRowkey.substring(0, subRowkey.indexOf("$"));
 						Map<String,Object> map = hbaseDao.getResultMap(ResourceCore.MasterTable, mainRowkey);
 						if(map !=null){
+
+							if(map.get(keyAge) != null){
+								birthday= map.get(keyAge).toString().substring(0, 10);
+								birthYear = Integer.valueOf(map.get(keyAge).toString().substring(0, 4));
+							}
 							if(map.get(keyDemographicId) != null){
 								demographicId = map.get(keyDemographicId).toString();
 							}
@@ -160,6 +193,10 @@ public class DiabetesCheckScheduler {
 						baseCheckInfo.setCardId(cardId);
 						baseCheckInfo.setSex(sex);
 						baseCheckInfo.setSexName(sexName);
+						baseCheckInfo.setBirthday(birthday);
+						baseCheckInfo.setBirthYear(birthYear);
+						baseCheckInfo.setDiseaseType(diseaseType);
+						baseCheckInfo.setDiseaseTypeName(diseaseTypeName);
 						Map<String,Object> submap = hbaseDao.getResultMap(ResourceCore.SubTable, subRowkey);
 						if(submap !=null){
 							//检查信息 姓名,身份证，就诊卡号,并发症，空腹血糖值，葡萄糖耐量值，用药名称，检查信息code （CH001 并发症,CH002 空腹血糖,CH003 葡萄糖耐量,CH004 用药名称）
