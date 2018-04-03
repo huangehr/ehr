@@ -9,8 +9,10 @@ import org.springframework.security.oauth2.common.DefaultThrowableAnalyzer;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.common.exceptions.InsufficientScopeException;
 import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
+import org.springframework.security.oauth2.provider.NoSuchClientException;
 import org.springframework.security.oauth2.provider.error.WebResponseExceptionTranslator;
 import org.springframework.security.web.util.ThrowableAnalyzer;
+import org.springframework.stereotype.Component;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 
 import java.io.IOException;
@@ -22,6 +24,7 @@ import java.io.IOException;
  * @version 1.0
  * @created 2016.03.05 17:07
  */
+@Component
 public class EhrOAuth2ExceptionTranslator implements WebResponseExceptionTranslator {
 
     private ThrowableAnalyzer throwableAnalyzer = new DefaultThrowableAnalyzer();
@@ -30,13 +33,15 @@ public class EhrOAuth2ExceptionTranslator implements WebResponseExceptionTransla
 
         // Try to extract a SpringSecurityException from the stacktrace
         Throwable[] causeChain = throwableAnalyzer.determineCauseChain(e);
-        Exception ase = (OAuth2Exception) throwableAnalyzer.getFirstThrowableOfType(OAuth2Exception.class, causeChain);
+        Exception ase = (OAuth2Exception) throwableAnalyzer.getFirstThrowableOfType(
+                OAuth2Exception.class, causeChain);
 
         if (ase != null) {
             return handleOAuth2Exception((OAuth2Exception) ase);
         }
 
-        ase = (AuthenticationException) throwableAnalyzer.getFirstThrowableOfType(AuthenticationException.class, causeChain);
+        ase = (AuthenticationException) throwableAnalyzer.getFirstThrowableOfType(AuthenticationException.class,
+                causeChain);
         if (ase != null) {
             return handleOAuth2Exception(new UnauthorizedException(e.getMessage(), e));
         }
@@ -59,7 +64,7 @@ public class EhrOAuth2ExceptionTranslator implements WebResponseExceptionTransla
 
     private ResponseEntity<OAuth2Exception> handleOAuth2Exception(OAuth2Exception e) throws IOException {
 
-        int status = e.getHttpErrorCode();
+        int status = HttpStatus.UNAUTHORIZED.value();
         HttpHeaders headers = new HttpHeaders();
         headers.set("Cache-Control", "no-store");
         headers.set("Pragma", "no-cache");
@@ -67,7 +72,8 @@ public class EhrOAuth2ExceptionTranslator implements WebResponseExceptionTransla
             headers.set("WWW-Authenticate", String.format("%s %s", OAuth2AccessToken.BEARER_TYPE, e.getSummary()));
         }
 
-        ResponseEntity<OAuth2Exception> response = new ResponseEntity(e, headers, HttpStatus.valueOf(status));
+        ResponseEntity<OAuth2Exception> response = new ResponseEntity<OAuth2Exception>(e, headers,
+                HttpStatus.valueOf(status));
 
         return response;
 
@@ -108,6 +114,7 @@ public class EhrOAuth2ExceptionTranslator implements WebResponseExceptionTransla
         public int getHttpErrorCode() {
             return 500;
         }
+
     }
 
     @SuppressWarnings("serial")
@@ -141,5 +148,6 @@ public class EhrOAuth2ExceptionTranslator implements WebResponseExceptionTransla
         public int getHttpErrorCode() {
             return 405;
         }
+
     }
 }
