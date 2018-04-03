@@ -806,4 +806,50 @@ public class UserEndPoint extends EnvelopRestEndPoint {
         return errorMsg;
     }
 
+
+    @RequestMapping(value = ServiceApi.Users.UsersOfApp, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "创建用户", notes = "App用户注册信息")
+    public Envelop appCreateUser(
+            @ApiParam(name = "user_json_data", required = true,value = "", defaultValue = "")
+            @RequestBody String userJsonData) throws Exception {
+        Envelop envelop = new Envelop();
+        User user = toEntity(userJsonData, User.class);
+        if( StringUtils.isEmpty(user.getDemographicId()) ){
+            envelop.setErrorMsg("身份证不能为空");
+            return envelop;
+        }
+        if( StringUtils.isEmpty(user.getTelephone()) ){
+            envelop.setErrorMsg("手机号不能为空");
+            return envelop;
+        }
+        if( StringUtils.isEmpty(user.getPassword()) ){
+            envelop.setErrorMsg("密码不能为空");
+            return envelop;
+        }
+        user.setId(getObjectId(BizObject.User));
+        user.setCreateDate(new Date());
+        if (!StringUtils.isEmpty(user.getPassword())) {
+            user.setPassword(DigestUtils.md5Hex(user.getPassword()));
+        } else {
+            user.setPassword(DigestUtils.md5Hex(default_password));
+        }
+        user.setRealName(user.getDemographicId());
+        user.setLoginCode(user.getDemographicId());
+        user.setDType("Patient");
+        user.setActivated(true);
+        if (userService.findByField("loginCode", user.getDemographicId()).size() > 0) {
+            envelop.setErrorMsg("账户已存在");
+            return envelop;
+        }
+        if (userService.findByField("demographicId", user.getDemographicId()).size() > 0) {
+            envelop.setErrorMsg("身份证号已存在");
+            return envelop;
+        }
+
+        user = userService.saveUser(user);
+        envelop.setObj(convertToModel(user, MUser.class, null));
+        envelop.setSuccessFlg(true);
+        return envelop ;
+    }
+
 }
