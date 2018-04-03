@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * 标准档案包解析器.
@@ -24,13 +25,15 @@ import java.util.*;
 @Component
 public class StdPackageResolver extends PackageResolver {
 
+    private static final Pattern pattern = Pattern.compile("^[A-Za-z0-9\\-]+$");
+
     @Override
     public List<StandardPackage> resolveDataSets(File root, String clientId) throws Exception {
         return null;
     }
 
     @Override
-    public void resolve(StandardPackage standardPackage, File root) throws IOException, Exception {
+    public void resolve(StandardPackage standardPackage, File root) throws Exception {
         //解析标准数据
         File standardFolder = new File(root.getAbsolutePath() + File.separator + PackModelFactory.StandardFolder);
         parseFiles(standardPackage, standardFolder.listFiles(), false);
@@ -135,7 +138,7 @@ public class StdPackageResolver extends PackageResolver {
             standardPackage.setCreateDate(dataSet.getCreateTime());
             standardPackage.insertDataSet(dataSetCode, dataSet);
         }
-        if (StringUtils.isEmpty(standardPackage.getDemographicId())) {
+        if (StringUtils.isEmpty(standardPackage.getDemographicId()) || !pattern.matcher(standardPackage.getDemographicId()).find()) {
             standardPackage.setDemographicId(UUID.randomUUID().toString());
         }
     }
