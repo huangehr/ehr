@@ -13,6 +13,7 @@ import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.math.BigInteger;
 import java.util.Date;
@@ -28,51 +29,42 @@ public class PatientService extends BaseJpaService<DemographicInfo, PatientDao>{
 
     @Autowired
     private PatientDao patientDao;
-    private String regex = "^[A-Za-z0-9\\-]+$";
-    private Pattern pattern = Pattern.compile(regex);
 
     public void checkPatient(ResourceBucket resourceBucket, String packId) throws Exception {
         //获取注册信息
-        String idCardNo = resourceBucket.getDemographicId() == null ? "":resourceBucket.getDemographicId().toString().trim();
-        if(!idCardNo.equals("") && pattern.matcher(idCardNo).find()) {
-            boolean isRegistered = isExists(idCardNo);
-            if (!isRegistered) {
-                DemographicInfo demographicInfo = new DemographicInfo();
-                demographicInfo.setIdCardNo(idCardNo);
-                String name = resourceBucket.getPatientName() == null ? "":resourceBucket.getPatientName().toString();
-                demographicInfo.setName(name);
-                String telephoneNo = resourceBucket.getMasterRecord().getResourceValue("EHR_000003") == null ? "":resourceBucket.getMasterRecord().getResourceValue("EHR_000003").toString();
-                demographicInfo.setTelephoneNo("{\"联系电话\":\"" + telephoneNo + "\"}");
-                String email = resourceBucket.getMasterRecord().getResourceValue("EHR_000008") == null ? "":resourceBucket.getMasterRecord().getResourceValue("EHR_000008").toString();
-                demographicInfo.setEmail(email);
-                String birthPlace = resourceBucket.getMasterRecord().getResourceValue("EHR_000013") == null ? "":resourceBucket.getMasterRecord().getResourceValue("EHR_000013").toString();
-                demographicInfo.setBirthPlace(birthPlace);
-                String martialStatus = resourceBucket.getMasterRecord().getResourceValue("EHR_000014") == null ? "":resourceBucket.getMasterRecord().getResourceValue("EHR_000014").toString();
-                demographicInfo.setMartialStatus(martialStatus);
-                String nativePlace = resourceBucket.getMasterRecord().getResourceValue("EHR_000015") == null ? "":resourceBucket.getMasterRecord().getResourceValue("EHR_000015").toString();
-                demographicInfo.setNativePlace(nativePlace);
-                String nation = resourceBucket.getMasterRecord().getResourceValue("EHR_000016") ==  null ? "":resourceBucket.getMasterRecord().getResourceValue("EHR_000016").toString();
-                demographicInfo.setNation(nation);
-                String gender = resourceBucket.getMasterRecord().getResourceValue("EHR_000019") == null ? "":resourceBucket.getMasterRecord().getResourceValue("EHR_000019").toString();
-                demographicInfo.setGender(gender);
-                Date birthday = resourceBucket.getMasterRecord().getResourceValue("EHR_000320") == null ? null:DateTimeUtil.simpleDateParse(resourceBucket.getMasterRecord().getResourceValue("EHR_000320"));
-                demographicInfo.setBirthday(birthday);
-                String homeAddress = resourceBucket.getMasterRecord().getResourceValue("EHR_001227") == null ? "":resourceBucket.getMasterRecord().getResourceValue("EHR_001227").toString();
-                demographicInfo.setHomeAddress(homeAddress);
-                //注册
-                DemographicInfo demographicInfo1 = registered(demographicInfo);
-                if(null == demographicInfo1.getRegisterTime()) {
-                    PackResolveLogger.warn("档案包:" + packId + ",关联居民:" + idCardNo + ",注册失败!");
-                }
-            }
-        } else {
-            PackResolveLogger.warn("档案包:" + packId + ",身份证号码为空!");
+        String idCardNo = String.valueOf(resourceBucket.getDemographicId().trim());
+        boolean isRegistered = this.isExists(idCardNo);
+        if (!isRegistered) {
+            DemographicInfo demographicInfo = new DemographicInfo();
+            demographicInfo.setIdCardNo(idCardNo);
+            String name = resourceBucket.getPatientName() == null ? "":resourceBucket.getPatientName().toString();
+            demographicInfo.setName(name);
+            String telephoneNo = resourceBucket.getMasterRecord().getResourceValue("EHR_000003") == null ? "":resourceBucket.getMasterRecord().getResourceValue("EHR_000003").toString();
+            demographicInfo.setTelephoneNo("{\"联系电话\":\"" + telephoneNo + "\"}");
+            String email = resourceBucket.getMasterRecord().getResourceValue("EHR_000008") == null ? "":resourceBucket.getMasterRecord().getResourceValue("EHR_000008").toString();
+            demographicInfo.setEmail(email);
+            String birthPlace = resourceBucket.getMasterRecord().getResourceValue("EHR_000013") == null ? "":resourceBucket.getMasterRecord().getResourceValue("EHR_000013").toString();
+            demographicInfo.setBirthPlace(birthPlace);
+            String martialStatus = resourceBucket.getMasterRecord().getResourceValue("EHR_000014") == null ? "":resourceBucket.getMasterRecord().getResourceValue("EHR_000014").toString();
+            demographicInfo.setMartialStatus(martialStatus);
+            String nativePlace = resourceBucket.getMasterRecord().getResourceValue("EHR_000015") == null ? "":resourceBucket.getMasterRecord().getResourceValue("EHR_000015").toString();
+            demographicInfo.setNativePlace(nativePlace);
+            String nation = resourceBucket.getMasterRecord().getResourceValue("EHR_000016") ==  null ? "":resourceBucket.getMasterRecord().getResourceValue("EHR_000016").toString();
+            demographicInfo.setNation(nation);
+            String gender = resourceBucket.getMasterRecord().getResourceValue("EHR_000019") == null ? "":resourceBucket.getMasterRecord().getResourceValue("EHR_000019").toString();
+            demographicInfo.setGender(gender);
+            Date birthday = resourceBucket.getMasterRecord().getResourceValue("EHR_000320") == null ? null:DateTimeUtil.simpleDateParse(resourceBucket.getMasterRecord().getResourceValue("EHR_000320"));
+            demographicInfo.setBirthday(birthday);
+            String homeAddress = resourceBucket.getMasterRecord().getResourceValue("EHR_001227") == null ? "":resourceBucket.getMasterRecord().getResourceValue("EHR_001227").toString();
+            demographicInfo.setHomeAddress(homeAddress);
+            //注册
+            this.registered(demographicInfo);
         }
     }
 
     private boolean isExists(String idCardNo) {
         Session session = currentSession();
-        String sql = "SELECT COUNT(id) FROM demographics WHERE id = :id";
+        String sql = "SELECT COUNT(1) FROM demographics WHERE id = :id";
         Query query = session.createSQLQuery(sql);
         query.setFlushMode(FlushMode.COMMIT);
         query.setString("id", idCardNo);
@@ -80,7 +72,7 @@ public class PatientService extends BaseJpaService<DemographicInfo, PatientDao>{
         return count.compareTo(new BigInteger("0")) > 0;
     }
 
-    private DemographicInfo registered(DemographicInfo demographicInfo) {
+    private void registered(DemographicInfo demographicInfo) {
         String password = "123456";
         if (demographicInfo.getIdCardNo().length() > 7) {
             password = demographicInfo.getIdCardNo().substring(demographicInfo.getIdCardNo().length() - 6, demographicInfo.getIdCardNo().length());
@@ -89,12 +81,7 @@ public class PatientService extends BaseJpaService<DemographicInfo, PatientDao>{
             demographicInfo.setPassword(DigestUtils.md5Hex(password));
         }
         demographicInfo.setRegisterTime(new Date());
-        try {
-            return patientDao.save(demographicInfo);
-        } catch (Exception e) {
-            PackResolveLogger.error(e.getMessage());
-        }
-        return null;
+        patientDao.save(demographicInfo);
     }
 
 }
