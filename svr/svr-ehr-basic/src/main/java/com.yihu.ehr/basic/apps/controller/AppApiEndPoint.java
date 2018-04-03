@@ -3,15 +3,18 @@ package com.yihu.ehr.basic.apps.controller;
 import com.yihu.ehr.basic.apps.model.AppApi;
 import com.yihu.ehr.basic.apps.model.AppApiParameter;
 import com.yihu.ehr.basic.apps.model.AppApiResponse;
-import com.yihu.ehr.basic.apps.service.AppApiCategoryService;
-import com.yihu.ehr.basic.apps.service.AppApiParameterService;
-import com.yihu.ehr.basic.apps.service.AppApiResponseService;
-import com.yihu.ehr.basic.apps.service.AppApiService;
+import com.yihu.ehr.basic.apps.service.*;
+import com.yihu.ehr.basic.user.entity.RoleApiRelation;
+import com.yihu.ehr.basic.user.entity.RoleAppRelation;
+import com.yihu.ehr.basic.user.entity.Roles;
+import com.yihu.ehr.basic.user.service.RoleApiRelationService;
+import com.yihu.ehr.basic.user.service.RolesService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.entity.api.AppApiCategory;
+import com.yihu.ehr.entity.api.AppApiErrorCode;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.app.MAppApi;
 import com.yihu.ehr.model.app.MAppApiDetail;
@@ -49,6 +52,8 @@ public class AppApiEndPoint extends EnvelopRestEndPoint {
     private AppApiResponseService appApiResponseService;
     @Autowired
     private AppApiCategoryService appApiCategoryService;
+    @Autowired
+    private AppApiErrorCodeService appApiErrorCodeService;
 
     @RequestMapping(value = ServiceApi.AppApi.AppApis, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建AppApi")
@@ -156,6 +161,27 @@ public class AppApiEndPoint extends EnvelopRestEndPoint {
 
     //------------------------ 开放平台基本请求部分 -------------------------
 
+    @RequestMapping(value = ServiceApi.AppApi.CheckName, method = RequestMethod.GET)
+    @ApiOperation(value = "检查名称")
+    public Boolean checkName(
+            @ApiParam(name = "name", value = "api名称", required = true)
+            @RequestParam(value = "name") String name,
+            @ApiParam(name = "appApiId", value = "appApiId")
+            @RequestParam(value = "appApiId", required = false) Integer appApiId) throws Exception {
+        if (null == appApiId) {
+            if (appApiService.findByName(name).size() > 0) {
+                return true;
+            }
+            return false;
+        } else {
+            AppApi appApi = appApiService.findById(appApiId);
+            if (!appApi.getName().equals(name) && appApiService.findByName(name).size() > 0) {
+                return true;
+            }
+            return false;
+        }
+    }
+
     @RequestMapping(value = ServiceApi.AppApi.Save, method = RequestMethod.POST)
     @ApiOperation(value = "新增Api")
     public Envelop save(
@@ -170,10 +196,12 @@ public class AppApiEndPoint extends EnvelopRestEndPoint {
         AppApi appApi1 = appApiService.completeSave(appApi, apiParam, apiResponse, apiErrorCode);
         List<AppApiParameter> appApiParameters = appApiParameterService.search("appApiId=" + appApi1.getId());
         List<AppApiResponse> appApiResponses = appApiResponseService.search("appApiId=" + appApi1.getId());
+        List<AppApiErrorCode> appApiErrorCodes = appApiErrorCodeService.search("appApiId=" + appApi1.getId());
         List resultLis = new ArrayList();
         Map<String, Object> dataMap = new HashMap<>();
         dataMap.put("param", appApiParameters);
         dataMap.put("response", appApiResponses);
+        dataMap.put("errorCode", appApiErrorCodes);
         resultLis.add(dataMap);
         return success(appApi1, resultLis);
     }
@@ -205,10 +233,12 @@ public class AppApiEndPoint extends EnvelopRestEndPoint {
         AppApi newAppApi = appApiService.completeSave(appApi, apiParam, apiResponse, apiErrorCode);
         List<AppApiParameter> appApiParameters = appApiParameterService.search("appApiId=" + newAppApi.getId());
         List<AppApiResponse> appApiResponses = appApiResponseService.search("appApiId=" + newAppApi.getId());
+        List<AppApiErrorCode> appApiErrorCodes = appApiErrorCodeService.search("appApiId=" + appApi1.getId());
         List resultLis = new ArrayList();
         Map<String, Object> dataMap = new HashMap<>();
         dataMap.put("param", appApiParameters);
         dataMap.put("response", appApiResponses);
+        dataMap.put("errorCode", appApiErrorCodes);
         resultLis.add(dataMap);
         return success(appApi1, resultLis);
     }
@@ -249,12 +279,46 @@ public class AppApiEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.AppApi.AuthList, method = RequestMethod.GET)
     @ApiOperation(value = "获取AppApi列表")
     public List<AppApi> authApiList(
-            @ApiParam(name = "clientId", value = "应用ID", required = true)
-            @RequestParam(value = "clientId") String clientId) throws Exception{
-        List<AppApi> appApiList = appApiService.authApiList(clientId);
-        return appApiList;
+            @ApiParam(name = "appId", value = "应用ID", required = true)
+            @RequestParam(value = "appId") String appId) throws Exception{
+        List<AppApi> appApiList = appApiService.authApiList(appId);
+        List<AppApi> appApiList2 = new ArrayList<>(appApiList.size());
+        for (AppApi appApi : appApiList) {
+            if (appApi.getCategory() != null) {
+                AppApiCategory appApiCategory = appApiCategoryService.findOne(appApi.getCategory());
+                if (appApiCategory != null) {
+                    appApi.setCategoryName(appApiCategory.getName());
+                }
+            }
+            appApiList2.add(appApi);
+        }
+        return appApiList2;
     }
 
+    @RequestMapping(value = ServiceApi.AppApi.AuthApi, method = RequestMethod.POST)
+    @ApiOperation(value = "授权AppApi")
+    public Boolean authApi(
+            @ApiParam(name = "appId", value = "角色appId", required = true)
+            @RequestParam(value = "appId") String appId,
+            @ApiParam(name = "code", value = "角色编码", required = true)
+            @RequestParam(value = "code") String code,
+            @ApiParam(name = "apiId", value = "apiId", required = true)
+            @RequestParam(value = "apiId") String apiId) throws Exception{
+        appApiService.authApi(code, appId, apiId);
+        return true;
+    }
 
+    @RequestMapping(value = ServiceApi.AppApi.AuthApi, method = RequestMethod.DELETE)
+    @ApiOperation(value = "取消AppApi授权")
+    public Boolean unAuthApi(
+            @ApiParam(name = "appId", value = "角色appId", required = true)
+            @RequestParam(value = "appId") String appId,
+            @ApiParam(name = "code", value = "角色编码", required = true)
+            @RequestParam(value = "code") String code,
+            @ApiParam(name = "apiId", value = "apiId", required = true)
+            @RequestParam(value = "apiId") String apiId) throws Exception{
+        appApiService.unAuthApi(code, appId, apiId);
+        return true;
+    }
 
 }

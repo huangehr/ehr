@@ -21,6 +21,7 @@ public class MAppApiParameter implements Serializable {
     private String memo;
     private String defaultValue;
     private Integer maxLength;
+    private Integer sort;
 
     public int getId() {
         return id;
@@ -101,5 +102,13 @@ public class MAppApiParameter implements Serializable {
 
     public void setMaxLength(Integer maxLength) {
         this.maxLength = maxLength;
+    }
+
+    public Integer getSort() {
+        return sort;
+    }
+
+    public void setSort(Integer sort) {
+        this.sort = sort;
     }
 }
