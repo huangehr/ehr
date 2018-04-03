@@ -12,6 +12,7 @@
 package com.yihu.ehr.oauth2.web;
 
 import com.yihu.ehr.constants.ServiceApi;
+import com.yihu.ehr.oauth2.oauth2.EhrOAuth2ExceptionTranslator;
 import com.yihu.ehr.oauth2.oauth2.EhrTokenGranter;
 import com.yihu.ehr.oauth2.oauth2.EhrTokenServices;
 import com.yihu.ehr.oauth2.oauth2.jdbc.EhrJdbcClientDetailsService;
@@ -65,10 +66,11 @@ public class EhrAccessTokenEndpoint extends AbstractEndpoint {
     private EhrTokenGranter ehrTokenGranter;
     @Autowired
     private EhrRedisApiAccessValidator ehrRedisApiAccessValidator;
+    @Autowired
+    private EhrOAuth2ExceptionTranslator ehrOAuth2ExceptionTranslator;
 
     private OAuth2RequestFactory oAuth2RequestFactory;
     private OAuth2RequestValidator oAuth2RequestValidator = new DefaultOAuth2RequestValidator();
-    private WebResponseExceptionTranslator providerExceptionHandler = new DefaultWebResponseExceptionTranslator();
 
     @PostConstruct
     private void init() {
@@ -84,22 +86,22 @@ public class EhrAccessTokenEndpoint extends AbstractEndpoint {
         if (StringUtils.isEmpty(client_id)) {
             throw new InvalidClientException("client id can not be null!");
         }
-        if(StringUtils.isEmpty(grant_type)) {
+        if (StringUtils.isEmpty(grant_type)) {
             throw new InvalidRequestException("Missing grant type");
         }
         Map<String, String> param = new HashMap<>();
         param.put("grant_type", grant_type);
         param.put("client_id", client_id);
         param.put("scope", scope);
-        if(grant_type.equals("authorization_code")) {
+        if (grant_type.equals("authorization_code")) {
             param.put("code", parameters.get("code"));
             param.put("redirect_uri", parameters.get("redirect_uri"));
-        }else if(grant_type.equals("password")) {
+        } else if (grant_type.equals("password")) {
             param.put("username", parameters.get("username"));
             param.put("password", parameters.get("password"));
-        }else if(grant_type.equals("refresh_token")){
+        } else if (grant_type.equals("refresh_token")){
             param.put("refresh_token", parameters.get("refresh_token"));
-        }else {
+        } else {
             throw new UnsupportedGrantTypeException("unsupported grant type: " + grant_type);
         }
         ClientDetails authenticatedClient = ehrJdbcClientDetailsService.loadClientByClientId(client_id);
@@ -140,10 +142,10 @@ public class EhrAccessTokenEndpoint extends AbstractEndpoint {
             tokenMap.put("tokenType", token.getTokenType());
             tokenMap.put("expiresIn", token.getExpiresIn());
             tokenMap.put("refreshToken", token.getRefreshToken().getValue());
-            if(!StringUtils.isEmpty(parameters.get("state"))) {
+            if (!StringUtils.isEmpty(parameters.get("state"))) {
                 tokenMap.put("state", parameters.get("state"));
             }
-            if(grant_type.equals("password")) {
+            if (grant_type.equals("password")) {
                 tokenMap.put("user", parameters.get("username"));
             }
             putVerificationApi(tokenRequest, token);
@@ -163,29 +165,28 @@ public class EhrAccessTokenEndpoint extends AbstractEndpoint {
         OAuth2AccessToken auth2AccessToken = ehrTokenServices.readAccessToken(accessToken);
         if (auth2AccessToken == null) {
             throw  new InvalidTokenException("Invalid accessToken");
-        }
-        else {
+        } else {
             if (!auth2AccessToken.getValue().equals(accessToken) || auth2AccessToken.isExpired()) {
                 throw  new InvalidTokenException("Expired accessToken");
             } else {
                 //判断ClientId
                 OAuth2Authentication authentication = ehrTokenServices.loadAuthentication(accessToken);
                 String authenticationClientId = authentication.getOAuth2Request().getClientId();
-                if(authenticationClientId != null && authenticationClientId.equals(clientId)) {
+                if (authenticationClientId != null && authenticationClientId.equals(clientId)) {
                     Map<String, Object> successMap = new HashMap<>();
                     UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = (UsernamePasswordAuthenticationToken) authentication.getUserAuthentication();
-                    if(api != null) {
-                        if(ehrRedisApiAccessValidator.verificationApi(clientId, usernamePasswordAuthenticationToken.getName(), api)){
+                    if (api != null) {
+                        if (ehrRedisApiAccessValidator.verificationApi(clientId, usernamePasswordAuthenticationToken.getName(), api)){
                             successMap.put("successFlg", true);
                             successMap.put("accessToken", auth2AccessToken.getValue());
                             successMap.put("tokenType", auth2AccessToken.getTokenType());
                             successMap.put("expiresIn", auth2AccessToken.getExpiresIn());
                             successMap.put("refreshToken", auth2AccessToken.getRefreshToken().getValue());
                             return getResponse(successMap);
-                        }else {
+                        } else {
                             throw new InvalidRequestException("Illegal api request");
                         }
-                    }else {
+                    } else {
                         successMap.put("successFlg", true);
                         successMap.put("accessToken", auth2AccessToken.getValue());
                         successMap.put("tokenType", auth2AccessToken.getTokenType());
@@ -194,8 +195,7 @@ public class EhrAccessTokenEndpoint extends AbstractEndpoint {
                         successMap.put("user", usernamePasswordAuthenticationToken.getName());
                         return getResponse(successMap);
                     }
-                }
-                else{
+                } else {
                     throw new InvalidClientException("Illegal client id");
                 }
             }
@@ -235,19 +235,19 @@ public class EhrAccessTokenEndpoint extends AbstractEndpoint {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<OAuth2Exception> handleException(Exception e) throws Exception {
-        LOG.info("Handling error: " + e.getClass().getSimpleName() + ", " + e.getMessage());
+        LOG.warn("Handling error: " + e.getClass().getSimpleName() + ", " + e.getMessage());
         return getExceptionTranslator().translate(e);
     }
 
     @ExceptionHandler(ClientRegistrationException.class)
     public ResponseEntity<OAuth2Exception> handleClientRegistrationException(Exception e) throws Exception {
-        LOG.info("Handling error: " + e.getClass().getSimpleName() + ", " + e.getMessage());
+        LOG.warn("Handling error: " + e.getClass().getSimpleName() + ", " + e.getMessage());
         return getExceptionTranslator().translate(new BadClientCredentialsException());
     }
 
     @ExceptionHandler(OAuth2Exception.class)
     public ResponseEntity<OAuth2Exception> handleException(OAuth2Exception e) throws Exception {
-        LOG.info("Handling error: " + e.getClass().getSimpleName() + ", " + e.getMessage());
+        LOG.warn("Handling error: " + e.getClass().getSimpleName() + ", " + e.getMessage());
         return getExceptionTranslator().translate(e);
     }
 
@@ -279,9 +279,10 @@ public class EhrAccessTokenEndpoint extends AbstractEndpoint {
         return this.authenticationManager;
     }
 
+
     @Override
     protected WebResponseExceptionTranslator getExceptionTranslator() {
-        return providerExceptionHandler;
+        return ehrOAuth2ExceptionTranslator;
     }
 
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {

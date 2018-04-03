@@ -73,7 +73,7 @@ public class OAuth2Config {
                     .authorizationCodeServices(inMemoryAuthorizationCodeServices)
                     .tokenServices(ehrTokenServices)
                     .tokenStore(ehrRedisTokenStore)
-                    .exceptionTranslator(new EhrOAuth2ExceptionTranslator())
+                    //.exceptionTranslator(new EhrOAuth2ExceptionTranslator())
                     .tokenGranter(ehrTokenGranter)
                     .setClientDetailsService(ehrJdbcClientDetailsService);
         }

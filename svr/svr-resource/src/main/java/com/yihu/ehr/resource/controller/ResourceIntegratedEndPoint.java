@@ -108,7 +108,7 @@ public class ResourceIntegratedEndPoint extends EnvelopRestEndPoint {
         /**
          * 根据资源数据类型保存相关数据元和搜索条件
          */
-        if (newResources.getDataSource() == 1) { //档案数据
+        if (rsResources.getDataSource() == 1) { //档案数据
             //处理关联档案数据元
             if (!paraMap.containsKey("metadatas")) {
                 return failed("档案数据元不能为空");
@@ -133,7 +133,7 @@ public class ResourceIntegratedEndPoint extends EnvelopRestEndPoint {
             resourcesQuery.setResourcesType(1);
             newResources = resourcesIntegratedService.profileCompleteSave(rsResources, Arrays.asList(rsMetadatas), resourcesQuery);
             return success(newResources.getId());
-        } else if (newResources.getDataSource() == 2) { //统计指标
+        } else if (rsResources.getDataSource() == 2) { //统计指标
             //处理关联指标数据元
             if (!paraMap.containsKey("quotas")) {
                 return failed("指标数据元不能为空");

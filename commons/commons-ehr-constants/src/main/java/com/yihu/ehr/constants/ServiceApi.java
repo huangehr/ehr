@@ -556,7 +556,7 @@ public class ServiceApi {
     public static class Authentication {
         public static final String AccessToken = "/oauth/accessToken";
         public static final String ValidToken = "/oauth/validToken";
-        public static final String RefreshToken = "/oauth/refreshToken";
+        public static final String Login = "/oauth/login";
     }
 
     public static class MessageRemind {
