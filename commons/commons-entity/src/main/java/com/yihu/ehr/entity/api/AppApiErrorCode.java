@@ -14,7 +14,7 @@ import javax.persistence.*;
 public class AppApiErrorCode {
 
     private Integer id; //id
-    private Integer apiId; //apiId
+    private Integer appApiId; //apiId
     private Integer code; //错误码
     private String description; //描述
     private String solve; //解决方案
@@ -32,13 +32,13 @@ public class AppApiErrorCode {
         this.id = id;
     }
 
-    @Column(name = "api_id", nullable = false)
-    public Integer getApiId() {
-        return apiId;
+    @Column(name = "app_api_id", nullable = false)
+    public Integer getAppApiId() {
+        return appApiId;
     }
 
-    public void setApiId(Integer apiId) {
-        this.apiId = apiId;
+    public void setAppApiId(Integer appApiId) {
+        this.appApiId = appApiId;
     }
 
     @Column(name = "code", nullable = false)

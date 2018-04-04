@@ -22,6 +22,10 @@ public class OrgMemberRelation {
     private String parentUserName;
     private String remark;
     private Integer status;
+    private String jkzlDoctorUid; // 总部的医生uid
+    private String jkzlUserId; // 总部的医生userid
+    private String jkzlDoctorSn; // 总部的坐诊sn
+    private String jkzlHosDeptId; // 总部的科室Id
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -151,6 +155,42 @@ public class OrgMemberRelation {
         this.status = status;
     }
 
+    @Column(name = "jkzl_doctor_uid")
+    public String getJkzlDoctorUid() {
+        return jkzlDoctorUid;
+    }
+
+    public void setJkzlDoctorUid(String jkzlDoctorUid) {
+        this.jkzlDoctorUid = jkzlDoctorUid;
+    }
+
+    @Column(name = "jkzl_user_id")
+    public String getJkzlUserId() {
+        return jkzlUserId;
+    }
+
+    public void setJkzlUserId(String jkzlUserId) {
+        this.jkzlUserId = jkzlUserId;
+    }
+
+    @Column(name = "jkzl_doctor_sn")
+    public String getJkzlDoctorSn() {
+        return jkzlDoctorSn;
+    }
+
+    public void setJkzlDoctorSn(String jkzlDoctorSn) {
+        this.jkzlDoctorSn = jkzlDoctorSn;
+    }
+
+    @Column(name = "jkzl_hos_dept_id")
+    public String getJkzlHosDeptId() {
+        return jkzlHosDeptId;
+    }
+
+    public void setJkzlHosDeptId(String jkzlHosDeptId) {
+        this.jkzlHosDeptId = jkzlHosDeptId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -174,6 +214,10 @@ public class OrgMemberRelation {
             return false;
         if (remark != null ? !remark.equals(that.remark) : that.remark != null) return false;
         if (status != null ? !status.equals(that.status) : that.status != null) return false;
+        if (jkzlDoctorUid != null ? !jkzlDoctorUid.equals(that.jkzlDoctorUid) : that.jkzlDoctorUid != null) return false;
+        if (jkzlUserId != null ? !jkzlUserId.equals(that.jkzlUserId) : that.jkzlUserId != null) return false;
+        if (jkzlDoctorSn != null ? !jkzlDoctorSn.equals(that.jkzlDoctorSn) : that.jkzlDoctorSn != null) return false;
+        if (jkzlHosDeptId != null ? !jkzlHosDeptId.equals(that.jkzlHosDeptId) : that.jkzlHosDeptId != null) return false;
 
         return true;
     }
@@ -194,6 +238,10 @@ public class OrgMemberRelation {
         result = 31 * result + (parentUserName != null ? parentUserName.hashCode() : 0);
         result = 31 * result + (remark != null ? remark.hashCode() : 0);
         result = 31 * result + (status != null ? status.hashCode() : 0);
+        result = 31 * result + (jkzlDoctorUid != null ? jkzlDoctorUid.hashCode() : 0);
+        result = 31 * result + (jkzlUserId != null ? jkzlUserId.hashCode() : 0);
+        result = 31 * result + (jkzlDoctorSn != null ? jkzlDoctorSn.hashCode() : 0);
+        result = 31 * result + (jkzlHosDeptId != null ? jkzlHosDeptId.hashCode() : 0);
         return result;
     }
 }

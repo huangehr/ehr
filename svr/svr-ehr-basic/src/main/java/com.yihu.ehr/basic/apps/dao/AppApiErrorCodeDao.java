@@ -9,6 +9,6 @@ import org.springframework.data.repository.PagingAndSortingRepository;
  */
 public interface AppApiErrorCodeDao extends PagingAndSortingRepository<AppApiErrorCode, Integer> {
 
-    void deleteByApiId(Integer apiId);
+    void deleteByAppApiId(Integer apiId);
 
 }

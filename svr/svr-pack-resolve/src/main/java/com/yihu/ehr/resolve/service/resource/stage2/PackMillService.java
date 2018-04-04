@@ -40,24 +40,24 @@ public class PackMillService {
         BeanUtils.copyProperties(stdPack, resourceBucket);
         //获取机构名称
         String orgName = redisService.getOrgName(resourceBucket.getOrgCode());
-        if(!StringUtils.isBlank(orgName)) {
+        if (!StringUtils.isBlank(orgName)) {
             resourceBucket.setOrgName(orgName);
         }
         //获取机构区域
         String orgArea = redisService.getOrgArea(resourceBucket.getOrgCode());
-        if(!StringUtils.isBlank(orgArea)) {
+        if (!StringUtils.isBlank(orgArea)) {
             resourceBucket.setOrgArea(orgArea);
         }
 
         //门诊/住院诊断、健康问题
-        if(stdPack.getDiagnosisList() != null && stdPack.getDiagnosisList().size() > 0) {
+        if (stdPack.getDiagnosisList() != null && stdPack.getDiagnosisList().size() > 0) {
             List<String> healthProblemList = new ArrayList<>();
-            for(String diagnosis : stdPack.getDiagnosisList()) {
+            for (String diagnosis : stdPack.getDiagnosisList()) {
                 String healthProblem = redisService.getHpCodeByIcd10(diagnosis);//通过ICD10获取健康问题
-                if(!StringUtils.isEmpty(healthProblem)) {
+                if (!StringUtils.isEmpty(healthProblem)) {
                     String[] hpCodeList = healthProblem.split(";");
-                    for(String hpCode : hpCodeList) {
-                        if(!healthProblemList.contains(hpCode)) {
+                    for (String hpCode : hpCodeList) {
+                        if (!healthProblemList.contains(hpCode)) {
                             healthProblemList.add(hpCode);
                         }
                     }
@@ -70,13 +70,13 @@ public class PackMillService {
         //获取数据集的集合
         Collection<PackageDataSet> packageDataSets = stdPack.getDataSets();
         //遍历数据集
-        for(PackageDataSet srcDataSet : packageDataSets){
+        for (PackageDataSet srcDataSet : packageDataSets){
             //如果为原始数据集，则跳过
-            if(DataSetUtil.isOriginDataSet(srcDataSet.getCode())){
+            if (DataSetUtil.isOriginDataSet(srcDataSet.getCode())){
                 continue;
             }
             Boolean isMultiRecord = redisService.getDataSetMultiRecord(srcDataSet.getCdaVersion(), srcDataSet.getCode());
-            if(null == isMultiRecord) {
+            if (null == isMultiRecord) {
                 throw new RuntimeException("IsMultiRecord can not be null.");
             }
             Set<String> keys = srcDataSet.getRecordKeys();
@@ -104,10 +104,10 @@ public class PackMillService {
                     SubRecord subRecord = new SubRecord();
                     if (stdPack.getProfileType() == ProfileType.DataSet){
                         subRecord.setRowkey(stdPack.getId(), srcDataSet.getCode(), srcDataSet.getPk());
-                    }else {
-                        if(resourceBucket.isReUploadFlg()) {
+                    } else {
+                        if (resourceBucket.isReUploadFlg()) {
                             subRecord.setRowkey(stdPack.getId(), srcDataSet.getCode(), ("") + (cIndex ++));
-                        }else {
+                        } else {
                             subRecord.setRowkey(stdPack.getId(), srcDataSet.getCode(), index ++);
                         }
                     }
@@ -120,7 +120,7 @@ public class PackMillService {
                         //subRecord.addResource(resourceMetaData, metaDataRecord.getMetaData(metaDataCode));
                         dictTransform(subRecord, stdPack.getCdaVersion(), resourceMetaData, metaDataRecord.getMetaData(metaDataCode));
                     }
-                    if(subRecord.getDataGroup().size() > 0) {
+                    if (subRecord.getDataGroup().size() > 0) {
                         subRecords.addRecord(subRecord);
                     }
                 }
@@ -143,7 +143,7 @@ public class PackMillService {
      */
      protected String getResMetadata(String cdaVersion, String srcDataSetCode, String srcMetadataCode){
          // TODO: 翻译时需要的内容：对CODE与VALUE处理后再翻译
-         if("rBUSINESS_DATE".equals(srcMetadataCode)) {
+         if ("rBUSINESS_DATE".equals(srcMetadataCode)) {
              return null;
          }
          String resMetadata = redisService.getRsAdapterMetaData(cdaVersion, srcDataSetCode, srcMetadataCode);
@@ -169,10 +169,10 @@ public class PackMillService {
         //查询对应内部EHR字段是否有对应字典
         String dictCode = getMetadataDict(metadataId);
         //内部EHR数据元字典不为空情况
-        if(StringUtils.isNotBlank(dictCode) && StringUtils.isNotBlank(value)) {
+        if (StringUtils.isNotBlank(dictCode) && StringUtils.isNotBlank(value)) {
             //判断是否为时间格式
-            if(dictCode.equals("DATECONDITION")) {
-                if(!value.contains("T") && !value.contains("Z")) {
+            if (dictCode.equals("DATECONDITION")) {
+                if (!value.contains("T") && !value.contains("Z")) {
                     StringBuilder error = new StringBuilder();
                     error.append("Invalid date time format ")
                             .append(metadataId)
@@ -183,17 +183,18 @@ public class PackMillService {
                             .append(", do not deal with fail-tolerant.");
                     throw new RuntimeException(error.toString());
                 }
-            }
-            //查找对应的字典数据
-            String[] dict = getDict(cdaVersion, dictCode, value);
-            //对应字典不为空情况下，转换EHR内部字典，并保存字典对应值，为空则不处理
-            if(dict != null && dict.length > 1) {
-                //保存标准字典值编码(code)
-                dataRecord.addResource(metadataId, dict[0]);
-                //保存标准字典值名称(value)
-                dataRecord.addResource(metadataId + "_VALUE", dict[1]);
             } else {
-                dataRecord.addResource(metadataId, value);
+                //查找对应的字典数据
+                String[] dict = getDict(cdaVersion, dictCode, value);
+                //对应字典不为空情况下，转换EHR内部字典，并保存字典对应值，为空则不处理
+                if (dict.length > 1) {
+                    //保存标准字典值编码(code)
+                    dataRecord.addResource(metadataId, dict[0]);
+                    //保存标准字典值名称(value)
+                    dataRecord.addResource(metadataId + "_VALUE", dict[1]);
+                } else {
+                    dataRecord.addResource(metadataId, value);
+                }
             }
         } else {   //内部EHR数据元字典为空不处理
             dataRecord.addResource(metadataId, value);
@@ -206,8 +207,7 @@ public class PackMillService {
      * @return
      */
     public String getMetadataDict(String metadataId) {
-        String dictCode = redisService.getRsMetaData(metadataId);
-        return dictCode;
+        return redisService.getRsMetaData(metadataId);
     }
 
     /**
@@ -221,8 +221,7 @@ public class PackMillService {
         String dict = redisService.getRsAdapterDict(version, dictCode, srcDictEntryCode);
         if (dict != null) {
             return dict.split("&");
-        } else {
-            return null;
         }
+        return "".split("&");
     }
 }

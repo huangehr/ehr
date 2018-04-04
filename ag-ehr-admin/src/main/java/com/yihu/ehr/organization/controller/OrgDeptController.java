@@ -193,24 +193,24 @@ public class OrgDeptController extends BaseController {
             if (StringUtils.isNotEmpty(errorMsg)) {
                 return failed(errorMsg);
             }
-
+            //云门户保存
             String mOrganizationJson = objectMapper.writeValueAsString(orgDeptModel);
             MOrgDept mOrgDeptNew = orgDeptClient.saveOrgDept(mOrganizationJson);
             if (mOrgDeptNew == null) {
                 return failed("保存失败!");
             }
-            //同步科室信息
+          /*  //同步科室信息
             Map<String, Object> result = saveSynDept(orgDeptModel);
             if (result.get("Code").toString().equals("10000")) {
                 //同步成功
                 mOrgDeptNew.setJkzlHosDeptId(Integer.parseInt(result.get("hosDeptId").toString()));
                 String mOrgDeptNewJson = objectMapper.writeValueAsString(orgDeptModel);
                 orgDeptClient.updateOrgDept(mOrgDeptNewJson);
+
             } else {
                 //同步失败
-                //TODO
-            }
-
+                return failed("保存失败!");
+            }*/
             return success(mOrgDeptNew);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -235,8 +235,16 @@ public class OrgDeptController extends BaseController {
         Map<String, Object> apiParamMap = new HashMap<>();
         apiParamMap.put("orgId", orgId);//医院orgId
         apiParamMap.put("parentDeptID", parentDeptId);//上级科室 如果没有上级科室传0
-        apiParamMap.put("typeId", orgDeptModel.getDeptDetail().getTypeId());//科室类型
+        if(null == orgDeptModel.getDeptDetail().getTypeId()){
+            apiParamMap.put("typeId", 2);//科室类型
+        }else{
+            apiParamMap.put("typeId", orgDeptModel.getDeptDetail().getTypeId());//科室类型
+        }
         apiParamMap.put("deptName", orgDeptModel.getDeptDetail().getName());//科室名称
+        apiParamMap.put("intro", orgDeptModel.getDeptDetail().getIntroduction());//科室简介
+        apiParamMap.put("place", orgDeptModel.getDeptDetail().getPlace());//科室位置
+        apiParamMap.put("deptCode", orgDeptModel.getDeptDetail().getDeptId());//科室代码
+        apiParamMap.put("displayStatus", orgDeptModel.getDeptDetail().getDisplayStatus());//显示状态
         String resultStr = FzGatewayUtil.httpPost(gatewayUrl, clientId, clientVersion, api, apiParamMap, 1);
         logger.info(resultStr);
         return objectMapper.readValue(resultStr, Map.class);

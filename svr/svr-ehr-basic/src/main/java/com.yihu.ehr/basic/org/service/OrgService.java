@@ -307,6 +307,17 @@ public class OrgService extends BaseJpaService<Organization, OrganizationReposit
         return list;
     }
 
+    /**
+     * 根据用户id获取医生所在的机构id
+     * @param userId
+     * @return
+     */
+    public List getEhrOrgIdsByUserId(String userId) {
+        String sql = "SELECT d.org_id FROM doctors d  JOIN  users u WHERE d.id = u.doctor_id AND u.id = :userId";
+        SQLQuery sqlQuery = currentSession().createSQLQuery(sql);
+        sqlQuery.setParameter("userId", userId);
+        return sqlQuery.list();
+    }
     public List getJkzlOrgIdsByEhrOrgId(String[] orgIds) {
         String sql = "SELECT jkzl_org_id FROM organizations WHERE id in(:orgIds) AND  jkzl_org_id IS NOT NULL";
         SQLQuery sqlQuery = currentSession().createSQLQuery(sql);

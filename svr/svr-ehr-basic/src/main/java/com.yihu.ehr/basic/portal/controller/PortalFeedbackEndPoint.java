@@ -6,9 +6,11 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.model.portal.MPortalFeedback;
+import com.yihu.ehr.util.datetime.DateUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -38,7 +41,7 @@ public class PortalFeedbackEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
             @RequestParam(value = "filters", required = false) String filters,
-            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "")
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "-submitDate")
             @RequestParam(value = "sorts", required = false) String sorts,
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
@@ -46,6 +49,9 @@ public class PortalFeedbackEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page", required = false) int page,
             HttpServletRequest request,
             HttpServletResponse response) throws ParseException {
+        if(StringUtils.isEmpty(sorts)){
+            sorts = "-submitDate";
+        }
         List<PortalFeedback> portalFeedbackList = portalFeedbackService.search(fields, filters, sorts, page, size);
         pagedResponse(request, response, portalFeedbackService.getCount(filters), page, size);
 
@@ -58,7 +64,7 @@ public class PortalFeedbackEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "portalFeedbackJsonData", value = "", defaultValue = "")
             @RequestBody String portalFeedbackJsonData) throws Exception {
         PortalFeedback portalFeedback = toEntity(portalFeedbackJsonData, PortalFeedback.class);
-
+        portalFeedback.setSubmitDate(DateUtil.getSysDateTime());
         portalFeedbackService.save(portalFeedback);
         return convertToModel(portalFeedback, MPortalFeedback.class);
     }
@@ -69,6 +75,7 @@ public class PortalFeedbackEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "portalFeedbackJsonData", value = "", defaultValue = "")
             @RequestBody String portalFeedbackJsonData) throws Exception {
         PortalFeedback portalFeedback = toEntity(portalFeedbackJsonData, PortalFeedback.class);
+        portalFeedback.setSubmitDate(DateUtil.getSysDateTime());
         portalFeedbackService.save(portalFeedback);
         return convertToModel(portalFeedback, MPortalFeedback.class);
     }

@@ -1,28 +1,35 @@
 package com.yihu.ehr.basic.user.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.basic.patient.dao.XDemographicInfoRepository;
-import com.yihu.ehr.basic.user.dao.XUserRepository;
-import com.yihu.ehr.basic.user.entity.User;
-import com.yihu.ehr.entity.patient.DemographicInfo;
+import com.yihu.ehr.basic.fileresource.service.FileResourceManager;
 import com.yihu.ehr.basic.org.dao.OrganizationRepository;
 import com.yihu.ehr.basic.org.model.Organization;
-import com.yihu.ehr.query.BaseJpaService;
+import com.yihu.ehr.basic.org.service.OrgService;
+import com.yihu.ehr.basic.patient.dao.XDemographicInfoRepository;
 import com.yihu.ehr.basic.user.dao.XDoctorRepository;
+import com.yihu.ehr.basic.user.dao.XUserRepository;
 import com.yihu.ehr.basic.user.entity.Doctors;
+import com.yihu.ehr.basic.user.entity.User;
+import com.yihu.ehr.entity.patient.DemographicInfo;
+import com.yihu.ehr.exception.ApiException;
+import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.util.datetime.DateUtil;
+import com.yihu.ehr.util.fzgateway.FzGatewayUtil;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,6 +41,15 @@ import java.util.Map;
 @Transactional
 public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
 
+    @Value("${fz-gateway.url}")
+    private String fzGatewayUrl;
+    @Value("${fz-gateway.clientId}")
+    private String fzClientId;
+    @Value("${fz-gateway.clientVersion}")
+    private String fzClientVersion;
+    @Value("${fast-dfs.public-server}")
+    private String dfsPublicUrl;
+
     @Autowired
     private XUserRepository userRepository;
     @Autowired
@@ -44,6 +60,10 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
     private OrganizationRepository organizationRepository;
     @Autowired
     private XDemographicInfoRepository demographicInfoRepository;
+    @Autowired
+    private FileResourceManager fileResourceManager;
+    @Autowired
+    private OrgService orgService;
 
     /**
      * 根据用户ID获取医生信息
@@ -143,9 +163,8 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
      * 批量创建医生
      */
     @Transactional(propagation = Propagation.REQUIRED)
-    public String addDoctorBatch(List<Map<String, Object>> doctorLs)
-    {
-        String header = "INSERT INTO doctors(code, name, sex,orgCode,orgId,org_full_name,dept_name, skill, work_portal, email, phone,jxzc,lczc,xlzc,xzzc,introduction,id_card_no,insert_time, office_tel, status) VALUES \n";
+    public String addDoctorBatch(List<Map<String, Object>> doctorLs) {
+        String header = "INSERT INTO doctors(code, name, sex, org_code, org_id, org_full_name, dept_name, skill, work_portal, email, phone, jxzc, lczc, xlzc, xzzc, introduction, id_card_no, insert_time, office_tel, status, role_type, job_type, job_level, job_scope, job_state, register_flag) VALUES \n";
         StringBuilder sql = new StringBuilder(header) ;
         Map<String, Object> map;
         SQLQuery query;
@@ -153,33 +172,43 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
         DemographicInfo demographicInfo =null;
         for(int i=1; i<=doctorLs.size(); i++){
             map = doctorLs.get(i-1);
-            sql.append("('"+ null2Space(map .get("code")) +"'");
-            sql.append(",'"+ map .get("name") +"'");
-            sql.append(",'"+ map .get("sex") +"'");
-            sql.append(",'"+ map .get("orgCode") +"'");
-            Organization org= getOrg(map .get("orgCode").toString());
+            sql.append("('"+ null2Space(map.get("code")) +"'");
+            sql.append(",'"+ map.get("name") +"'");
+            sql.append(",'"+ map.get("sex") +"'");
+            sql.append(",'"+ map.get("orgCode") +"'");
+            Organization org= getOrg(map.get("orgCode").toString());
             sql.append(",'"+ org.getId() +"'");
-            sql.append(",'"+ map .get("orgFullName") +"'");
-            sql.append(",'"+ map .get("orgDeptName") +"'");
-            sql.append(",'"+ map .get("skill") +"'");
-            sql.append(",'"+ map .get("workPortal") +"'");
-            sql.append(",'"+ null2Space(map .get("email")) +"'");
-            sql.append(",'"+ null2Space(map .get("phone")) +"'");
-            sql.append(",'"+ map .get("jxzc") +"'");
-            sql.append(",'"+ map .get("lczc") +"'");
-            sql.append(",'"+ map .get("xlzc") +"'");
-            sql.append(",'"+ map .get("xzzc") +"'");
-            sql.append(",'"+ map .get("introduction") +"'");
-            sql.append(",'"+ map .get("idCardNo") +"'");
+            sql.append(",'"+ map.get("orgFullName") +"'");
+            sql.append(",'"+ map.get("orgDeptName") +"'");
+            sql.append(",'"+ map.get("skill") +"'");
+            sql.append(",'"+ map.get("workPortal") +"'");
+            sql.append(",'"+ null2Space(map.get("email")) +"'");
+            sql.append(",'"+ null2Space(map.get("phone")) +"'");
+            sql.append(",'"+ map.get("jxzc") +"'");
+            sql.append(",'"+ map.get("lczc") +"'");
+            sql.append(",'"+ map.get("xlzc") +"'");
+            sql.append(",'"+ map.get("xzzc") +"'");
+            sql.append(",'"+ map.get("introduction") +"'");
+            sql.append(",'"+ map.get("idCardNo") +"'");
             sql.append(",'"+ DateUtil.getNowDateTime()+"'");
-            sql.append(",'"+ map .get("officeTel") +"','1')\n");
+            sql.append(",'"+ map.get("officeTel") +"'");
+            sql.append(",'1'");
+            sql.append(",'"+ map.get("roleType") +"'");
+            sql.append(",'"+ map.get("jobType") +"'");
+            sql.append(",'"+ map.get("jobLevel") +"'");
+            sql.append(",'"+ map.get("jobScope") +"'");
+            sql.append(",'"+ map.get("jobState") +"'");
+            sql.append(",'"+ map.get("registerFlag") +"'");
+            sql.append(")\n");
 
             if(i%100==0 || i == doctorLs.size()){
                 query = currentSession().createSQLQuery(sql.toString());
                 total += query.executeUpdate();
                 sql = new StringBuilder(header) ;
-            }else
+            } else {
                 sql.append(",");
+            }
+
             //创建居民
             demographicInfo =new DemographicInfo();
             String idCardNo="123456";
@@ -196,16 +225,17 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
             demographicInfo.setGender(String.valueOf(map .get("sex")));
             demographicInfoRepository.save(demographicInfo);
         }
+
         Map<String, Object> phoneMap;
-        StringBuffer stringBuffer = new StringBuffer();
+        StringBuffer phonesStr = new StringBuffer();
         for(int i=1; i<=doctorLs.size(); i++) {
             phoneMap = doctorLs.get(i - 1);
-
-            stringBuffer.append("\""+phoneMap.get("phone")+"\",");
+            phonesStr.append("\""+phoneMap.get("phone")+"\",");
         }
 
-        return stringBuffer.toString();
+        return phonesStr.toString();
     }
+
     private Object null2Space(Object o){
         return o==null? "" : o;
     }
@@ -320,4 +350,63 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
         BigInteger count = (BigInteger ) q.uniqueResult();
         return count.longValue();
     }
+
+    /**
+     * 同步科室医生信息到福州总部
+     *
+     * @param doctor 医生信息
+     * @param orgId 机构ID
+     * @param deptName 部门名称
+     * @return 总部的科室医生信息
+     */
+    public Map<String, Object> syncDoctor(Doctors doctor, String orgId, String deptName) {
+        String api = "baseinfo.DoctorInfoApi.addDoctorFromMedicalCloud";
+        int apiVersion = 1;
+        Map<String, Object> params = new HashMap<>();
+        Organization org = orgService.getOrgById(orgId);
+        params.put("orgID", org.getJkzlOrgId());
+        params.put("deptName", deptName);
+        params.put("doctorName", doctor.getName());
+        // 云平台：0（未知），总部：3（未知）
+        String sex = "0".equals(doctor.getSex()) ? "3" : doctor.getSex();
+        params.put("sex", sex);
+        // 转换共同临床职称
+        String lczc = "";
+        if ("1".equals(doctor.getLczc())) { // 主任医师
+            lczc = "0";
+        } else if ("2".equals(doctor.getLczc())) { // 副主任医师
+            lczc = "1";
+        } else if ("3".equals(doctor.getLczc())) { // 主治医师
+            lczc = "2";
+        } else if ("4".equals(doctor.getLczc())) { // 医师
+            lczc = "4";
+        }
+        params.put("lczc", lczc);
+        params.put("phone", doctor.getPhone());
+        params.put("skill", doctor.getSkill());
+        params.put("intro", doctor.getIntroduction());
+        String photoUrl = "";
+        if (!StringUtils.isEmpty(doctor.getPhoto())) {
+            photoUrl = dfsPublicUrl + "/" +  fileResourceManager.getStoragePathById(doctor.getPhoto()).replace(":", "/");
+        }
+        params.put("photoUri", photoUrl);
+        String syncResult = FzGatewayUtil.httpPost(fzGatewayUrl, fzClientId, fzClientVersion, api, params, apiVersion);
+
+        Map<String, Object> syncResultMap = null;
+        try {
+            syncResultMap = objectMapper.readValue(syncResult, Map.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if ("10000".equals(syncResultMap.get("Code").toString())) {
+            syncResultMap.remove("Code");
+            syncResultMap.remove("Message");
+        } else {
+            throw new ApiException(String.format("同步医生信息到福州总部失败：%s", syncResultMap.get("Message").toString()));
+        }
+
+        return syncResultMap;
+    }
+
 }

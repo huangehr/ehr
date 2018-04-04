@@ -1,11 +1,15 @@
 package com.yihu.ehr.oauth2.web;
 
+import com.yihu.ehr.oauth2.oauth2.EhrOAuth2ExceptionTranslator;
 import com.yihu.ehr.oauth2.oauth2.EhrTokenGranter;
 import com.yihu.ehr.oauth2.oauth2.EhrUserDetailsService;
 import com.yihu.ehr.oauth2.oauth2.jdbc.*;
 import com.yihu.ehr.oauth2.oauth2.redis.EhrRedisApiAccessValidator;
 import com.yihu.ehr.oauth2.oauth2.redis.EhrRedisTokenStore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -13,7 +17,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextHolderStrategy;
-import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.common.exceptions.*;
@@ -25,10 +28,12 @@ import org.springframework.security.oauth2.provider.approval.DefaultUserApproval
 import org.springframework.security.oauth2.provider.approval.UserApprovalHandler;
 import org.springframework.security.oauth2.provider.code.AuthorizationCodeServices;
 import org.springframework.security.oauth2.provider.endpoint.*;
+import org.springframework.security.oauth2.provider.error.WebResponseExceptionTranslator;
 import org.springframework.security.oauth2.provider.implicit.ImplicitTokenRequest;
 import org.springframework.security.oauth2.provider.request.DefaultOAuth2RequestValidator;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
@@ -65,6 +70,10 @@ import java.util.*;
 @SessionAttributes("authorizationRequest")
 public class EhrAuthorizationEndpoint extends AbstractEndpoint {
 
+    private static final Logger LOG = LoggerFactory.getLogger(EhrAuthorizationEndpoint.class);
+
+    @Autowired
+    private EhrOAuth2ExceptionTranslator ehrOAuth2ExceptionTranslator;
     @Autowired
     private AuthorizationCodeServices inMemoryAuthorizationCodeServices;
     /*@Autowired
@@ -138,7 +147,7 @@ public class EhrAuthorizationEndpoint extends AbstractEndpoint {
         try {
             String userName = "unAuth";
             if (!(principal instanceof Authentication) || !((Authentication) principal).isAuthenticated()) {
-                if(parameters.containsKey("pk")) {
+                if (parameters.containsKey("pk")) {
                     String pk = parameters.get("pk");
                     String keyId = ehrJDBCUserSecurityService.getDefaultKeyIdSelectStatement(pk);
                     String userId = ehrJDBCUserSecurityService.getDefaultUserIdByKeyIdSelectStatement(keyId);
@@ -154,8 +163,7 @@ public class EhrAuthorizationEndpoint extends AbstractEndpoint {
                     SecurityContextHolderStrategy securityContextHolderStrategy = SecurityContextHolder.getContextHolderStrategy();
                     securityContextHolderStrategy.setContext(securityContext);
                     principal = userToken;
-                }
-                else {
+                } else {
                     throw new InsufficientAuthenticationException("A pk must be present.");
                 }
             }
@@ -165,9 +173,9 @@ public class EhrAuthorizationEndpoint extends AbstractEndpoint {
             //String redirectUriParameter = authorizationRequest.getRequestParameters().get(OAuth2Utils.REDIRECT_URI);
             String redirectUriParameter = authorizationRequest.getRequestParameters().get(OAuth2Utils.REDIRECT_URI);
             String resolvedRedirect = redirectResolver.resolveRedirect(redirectUriParameter, client);
-            if(!StringUtils.hasText(resolvedRedirect)) {
+            if (!StringUtils.hasText(resolvedRedirect)) {
                 throw new RedirectMismatchException("A redirectUri must be either supplied or preconfigured in the ClientDetails");
-            }else {
+            } else {
                 authorizationRequest.setRedirectUri(resolvedRedirect);
                 // We intentionally only validate the parameters requested by the client (ignoring any data that may have
                 // been added to the request by the manager).
@@ -199,7 +207,7 @@ public class EhrAuthorizationEndpoint extends AbstractEndpoint {
             }
         } catch (RuntimeException e) {
             throw e;
-        }finally {
+        } finally {
             sessionStatus.setComplete();
         }
     }
@@ -229,7 +237,7 @@ public class EhrAuthorizationEndpoint extends AbstractEndpoint {
         }
         try {
             if (!(principal instanceof Authentication) || !((Authentication) principal).isAuthenticated()) {
-                if(parameters.containsKey("user")) {
+                if (parameters.containsKey("user")) {
                     String userName = parameters.get("user");
                     UserDetails userDetails = ehrUserDetailsService.loadUserByUsername(userName);
                     UsernamePasswordAuthenticationToken userToken = new UsernamePasswordAuthenticationToken(userDetails.getUsername(), userDetails.getPassword(), userDetails.getAuthorities());
@@ -280,7 +288,7 @@ public class EhrAuthorizationEndpoint extends AbstractEndpoint {
             return getUserApprovalPageResponse(model, authorizationRequest, (Authentication) principal);
         } catch (RuntimeException e) {
             throw e;
-        }finally {
+        } finally {
             sessionStatus.setComplete();
         }
     }
@@ -558,5 +566,28 @@ public class EhrAuthorizationEndpoint extends AbstractEndpoint {
     @Override
     protected TokenGranter getTokenGranter() {
         return this.ehrTokenGranter;
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<OAuth2Exception> handleException(Exception e) throws Exception {
+        LOG.warn("Handling error: " + e.getClass().getSimpleName() + ", " + e.getMessage());
+        return getExceptionTranslator().translate(e);
+    }
+
+    @ExceptionHandler(ClientRegistrationException.class)
+    public ResponseEntity<OAuth2Exception> handleClientRegistrationException(Exception e) throws Exception {
+        LOG.warn("Handling error: " + e.getClass().getSimpleName() + ", " + e.getMessage());
+        return getExceptionTranslator().translate(new BadClientCredentialsException());
+    }
+
+    @ExceptionHandler(OAuth2Exception.class)
+    public ResponseEntity<OAuth2Exception> handleException(OAuth2Exception e) throws Exception {
+        LOG.warn("Handling error: " + e.getClass().getSimpleName() + ", " + e.getMessage());
+        return getExceptionTranslator().translate(e);
+    }
+
+    @Override
+    protected WebResponseExceptionTranslator getExceptionTranslator() {
+        return ehrOAuth2ExceptionTranslator;
     }
 }

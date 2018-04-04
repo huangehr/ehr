@@ -23,7 +23,8 @@ public interface DataSetPackageMgrClient {
      * @return
      */
     @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.DatasetPackages.Package, method = RequestMethod.GET)
-    String acquireDatasetPackage(@RequestParam(value = "id") String datasetId);
+    String acquireDatasetPackage(
+            @RequestParam(value = "id") String datasetId);
 
     /**
      * 回写数据集档案

@@ -1,9 +1,7 @@
 server:
   port: ${svr-ehr-basic.server.port}
-
 management:
   port: ${server.port}
-
 spring:
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
@@ -12,7 +10,6 @@ spring:
     min-idle: 8
     validation-query: SELECT 1
     test-on-borrow: true
-
 fast-dfs:
   connect-timeout: 2
   network-timeout: 30
@@ -49,15 +46,26 @@ spring:
       password: admin
       authenticationDatabase: admin
       database: ehr
-
+  elasticsearch:
+    jest:
+      uris: http://172.19.103.68:9200
 fast-dfs:
   tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52:80
-
-
+es:
+  index: wlyy_quota_test
+  type: wlyy_quota_test
+  host: http://172.19.103.68:9200
+  tHost: 172.19.103.68:9300
+  clusterName: jkzl
 h5:
   secret: 8E29YVP2UZ1QNSIN33NZJXEG1KSLVXFL6YI59C5SC5D
   appId: 9000401
+#福州总部网关参数配置
+fz-gateway:
+  url: http://service.yihu.com:8085/WSGW/rest
+  clientId: 9000401
+  clientVersion: 1.0
 
 ---
 spring:
@@ -80,15 +88,27 @@ spring:
       password: admin
       authenticationDatabase: admin
       database: ehr
-
+  elasticsearch:
+    jest:
+      uris: http://172.19.103.68:9200
 fast-dfs:
   tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52:80
-
-
+es:
+  index: wlyy_quota_test
+  type: wlyy_quota_test
+  host: http://172.19.103.68:9200
+  tHost: 172.19.103.68:9300
+  clusterName: jkzl
 h5:
   secret: 8E29YVP2UZ1QNSIN33NZJXEG1KSLVXFL6YI59C5SC5D
   appId: 9000401
+#福州总部网关参数配置
+fz-gateway:
+  url: http://service.yihu.com:8085/WSGW/rest
+  clientId: 9000401
+  clientVersion: 1.0
+
 ---
 spring:
   profiles: prod_fz
@@ -104,10 +124,23 @@ spring:
       password: GMLBq1LG
       authenticationDatabase: admin
       database: ehr
-
+  elasticsearch:
+    jest:
+      uris: http://172.19.103.68:9200
 fast-dfs:
   tracker-server: 11.1.2.9:22122
   public-server: http://11.1.2.9:80
+es:
+  index: wlyy_quota_test
+  type: wlyy_quota_test
+  host: http://172.19.103.68:9200
+  tHost: 172.19.103.68:9300
+  clusterName: jkzl
+#福州总部网关参数配置
+fz-gateway:
+  url: http://service.yihu.com:8080/WSGW/rest
+  clientId: 9000401
+  clientVersion: 1.0
 
 ---
 spring:
@@ -124,14 +157,26 @@ spring:
       password: GMLBq1LG
       authenticationDatabase: admin
       database: ehr
-
+  elasticsearch:
+    jest:
+      uris: http://10.176.97.7:9200
 fast-dfs:
   tracker-server: 10.176.97.5:22122
   public-server: http://10.176.97.5:8888
-
+es:
+  index: wlyy_quota_test
+  type: wlyy_quota_test
+  host: http://10.176.97.7:9200
+  tHost: 10.176.97.7:9300
+  clusterName: jkzl
 h5:
   secret: 8E29YVP2UZ1QNSIN33NZJXEG1KSLVXFL6YI59C5SC5D
   appId: 9000401
+#福州总部网关参数配置
+fz-gateway:
+  url: http://service.yihu.com:8080/WSGW/rest
+  clientId: 9000401
+  clientVersion: 1.0
 
 ---
 spring:
@@ -148,11 +193,23 @@ spring:
       password: GMLBq1LG
       authenticationDatabase: admin
       database: ehr
-
+  elasticsearch:
+    jest:
+      uris: http://100.100.1.158:9200
 fast-dfs:
   tracker-server: 100.100.1.157:22122
   public-server: http://100.100.1.157:8888
-
+es:
+  index: wlyy_quota_test
+  type: wlyy_quota_test
+  host: http://100.100.1.158:9200
+  tHost: 100.100.1.158:9300
+  clusterName: jkzl
 h5:
   secret: 8E29YVP2UZ1QNSIN33NZJXEG1KSLVXFL6YI59C5SC5D
   appId: 9000401
+#福州总部网关参数配置
+fz-gateway:
+  url: http://service.yihu.com:8080/WSGW/rest
+  clientId: 9000401
+  clientVersion: 1.0

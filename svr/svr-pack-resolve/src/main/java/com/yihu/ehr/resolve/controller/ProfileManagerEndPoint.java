@@ -37,8 +37,7 @@ public class ProfileManagerEndPoint {
             @ApiParam(value = "处方笺列表json", defaultValue = "")
             @RequestBody String data,
             @ApiParam(value = "返回档案数据")
-            @RequestParam("existed") Integer existed) throws Throwable
-    {
+            @RequestParam("existed") Integer existed) throws Throwable {
         List<Map<String, String>> list = objectMapper.readValue(data,List.class);
         List<Map<String,Object>> re = prescriptionService.savePrescription(profileId,list,existed);
 

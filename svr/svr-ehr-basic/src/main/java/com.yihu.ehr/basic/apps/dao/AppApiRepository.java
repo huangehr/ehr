@@ -16,4 +16,6 @@ public interface AppApiRepository extends JpaRepository<AppApi, Integer> {
 
     List<AppApi> findByCategory(Integer categoryId);
 
+    List<AppApi> findByName(String name);
+
 }

@@ -58,10 +58,12 @@ public class AgZuulFilter extends ZuulFilter {
         HttpServletRequest request = ctx.getRequest();
         String url = request.getRequestURI();
         if (url.startsWith("/authentication/")
+                || url.contains("/usersOfApp")
                 || url.contains("/open/")
                 || url.startsWith("/jkzl/")
                 || url.contains("/users/h5/handshake")
-                || url.contains("/appVersion/getAppVersion")) {
+                || url.contains("/appVersion/getAppVersion")
+                || url.contains("/messageTemplate/messageOrderPush")) {
             return null;
         }
         String accessToken = this.extractToken(request);

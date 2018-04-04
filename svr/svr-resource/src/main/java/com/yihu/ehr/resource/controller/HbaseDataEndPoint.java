@@ -6,7 +6,7 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.hbase.HBaseAdmin;
 import com.yihu.ehr.hbase.HBaseDao;
-import com.yihu.ehr.resource.service.ResourceStatisticService;
+import com.yihu.ehr.resource.service.ResourceCenterService;
 import com.yihu.ehr.solr.SolrAdmin;
 import com.yihu.ehr.solr.SolrUtil;
 import io.swagger.annotations.Api;
@@ -40,7 +40,7 @@ public class HbaseDataEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
-    private ResourceStatisticService resourceStatisticService;
+    private ResourceCenterService resourceCenterService;
 
     @ApiOperation("模糊匹配表")
     @RequestMapping(value = "getTableList",method = RequestMethod.GET)
@@ -254,7 +254,7 @@ public class HbaseDataEndPoint extends EnvelopRestEndPoint {
         // 获取居民档案数
         long userArchiveCount = solrUtil.count("HealthProfile","*:*");
         // 获取接收档案包数
-        long archivePackageCount = resourceStatisticService.getJsonArchiveCount();
+        long archivePackageCount = resourceCenterService.getJsonArchiveCount();
         map.put("userArchiveCount", userArchiveCount);
         map.put("archivePackageCount", archivePackageCount);
         return map;

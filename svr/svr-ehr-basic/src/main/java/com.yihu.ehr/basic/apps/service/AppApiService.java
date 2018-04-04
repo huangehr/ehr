@@ -8,8 +8,11 @@ import com.yihu.ehr.basic.apps.model.AppApi;
 import com.yihu.ehr.basic.apps.model.AppApiParameter;
 import com.yihu.ehr.basic.apps.model.AppApiResponse;
 import com.yihu.ehr.basic.user.dao.XRoleApiRelationRepository;
+import com.yihu.ehr.basic.user.dao.XRoleAppRelationRepository;
+import com.yihu.ehr.basic.user.dao.XRolesRepository;
 import com.yihu.ehr.basic.user.entity.RoleApiRelation;
 import com.yihu.ehr.basic.user.entity.RoleAppRelation;
+import com.yihu.ehr.basic.user.entity.Roles;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.entity.api.AppApiErrorCode;
 import com.yihu.ehr.exception.ApiException;
@@ -54,9 +57,13 @@ public class AppApiService extends BaseJpaService<AppApi, AppApiRepository> {
     @Autowired
     private AppApiResponseRepository appApiResponseRepository;
     @Autowired
-    private XRoleApiRelationRepository apiRelationRepository;
+    private XRoleApiRelationRepository xRoleApiRelationRepository;
+    @Autowired
+    private XRoleAppRelationRepository xRoleAppRelationRepository;
     @Autowired
     private AppApiErrorCodeDao appApiErrorCodeDao;
+    @Autowired
+    private XRolesRepository xRolesRepository;
 
     public Page<AppApi> getAppApiList(String sorts, int page, int size){
         AppApiRepository repo = (AppApiRepository)getJpaRepository();
@@ -91,8 +98,8 @@ public class AppApiService extends BaseJpaService<AppApi, AppApiRepository> {
     public void completeDelete(Integer id) {
         appApiParameterRepository.deleteByAppApiId(id);
         appApiResponseRepository.deleteByAppApiId(id);
-        apiRelationRepository.deleteByApiId((long)id);
-        appApiErrorCodeDao.deleteByApiId(id);
+        xRoleApiRelationRepository.deleteByApiId((long)id);
+        appApiErrorCodeDao.deleteByAppApiId(id);
         appApiRepository.delete(id);
     }
 
@@ -111,6 +118,44 @@ public class AppApiService extends BaseJpaService<AppApi, AppApiRepository> {
                 "\tAND LENGTH(aa.micro_service_url) > 0 AND LENGTH(aa.ms_method_name) > 0";
         RowMapper rowMapper = BeanPropertyRowMapper.newInstance(AppApi.class);
         return (List<AppApi>)jdbcTemplate.query(sql, rowMapper);
+    }
+
+    public void authApi(String code, String appId, String appApiId) {
+        Roles roles =  xRolesRepository.findByCodeAndAppId(code, appId);
+        if (null == roles) {
+            //创建扩展角色
+            roles = new Roles();
+            roles.setCode(code);
+            roles.setName("扩展开发者");
+            roles.setDescription("开放平台扩展开发者");
+            roles.setAppId(appId);
+            roles.setType("0");
+            roles = xRolesRepository.save(roles);
+            RoleAppRelation roleAppRelation = new RoleAppRelation();
+            roleAppRelation.setAppId(code);
+            roleAppRelation.setRoleId(roles.getId());
+            xRoleAppRelationRepository.save(roleAppRelation);
+        }
+        String [] appApiIdArr = appApiId.split(",");
+        for (String id : appApiIdArr) {
+            if (null == xRoleApiRelationRepository.findRelation(new Long(id), roles.getId())) {
+                RoleApiRelation roleApiRelation = new RoleApiRelation();
+                roleApiRelation.setRoleId(roles.getId());
+                roleApiRelation.setApiId(new Long(id));
+                xRoleApiRelationRepository.save(roleApiRelation);
+            }
+        }
+    }
+
+    public void unAuthApi(String code, String appId, String appApiId) {
+        Roles roles =  xRolesRepository.findByCodeAndAppId(code, appId);
+        if (null == roles) {
+            return;
+        }
+        String [] appApiIdArr = appApiId.split(",");
+        for (String id : appApiIdArr) {
+            xRoleApiRelationRepository.deleteByApiIdAndRoleId(new Long(id), roles.getId());
+        }
     }
 
     /**
@@ -194,6 +239,10 @@ public class AppApiService extends BaseJpaService<AppApi, AppApiRepository> {
                 }
             }
         }
+    }
+
+    public List<AppApi> findByName(String name) {
+        return appApiRepository.findByName(name);
     }
 
 }

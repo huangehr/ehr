@@ -36,7 +36,9 @@ public class EventInfoExtractor extends KeyDataExtractor {
         Date eventDate = null;
         EventType eventType = null;
         if (dataSets.containsKey(dataSet.getCode())) {
-            for (String rowKey : dataSet.getRecordKeys()) {
+            eventDate = dataSet.getEventTime();
+            eventType = EventType.valueOf(dataSets.get(dataSet.getCode()));
+            /*for (String rowKey : dataSet.getRecordKeys()) {
                 MetaDataRecord record = dataSet.getRecord(rowKey);
                 //获取就诊时间
                 if (eventDate == null) {
@@ -51,7 +53,7 @@ public class EventInfoExtractor extends KeyDataExtractor {
                         }
                     }
                 }
-            }
+            }*/
         }
         properties.put(MasterResourceFamily.BasicColumns.EventDate, eventDate);
         properties.put(MasterResourceFamily.BasicColumns.EventType, eventType);

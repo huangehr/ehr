@@ -17,6 +17,7 @@ public class MAppApiResponse implements Serializable {
     private String description;
     private int appApiId;
     private String memo;
+    private Integer sort;
 
     public int getId() {
         return id;
@@ -67,4 +68,11 @@ public class MAppApiResponse implements Serializable {
         this.memo = memo;
     }
 
+    public Integer getSort() {
+        return sort;
+    }
+
+    public void setSort(Integer sort) {
+        this.sort = sort;
+    }
 }

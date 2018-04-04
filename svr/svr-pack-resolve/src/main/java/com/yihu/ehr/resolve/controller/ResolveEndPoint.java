@@ -5,9 +5,7 @@ import com.yihu.ehr.constants.ArchiveStatus;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
-import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.model.packs.MPackage;
-import com.yihu.ehr.resolve.config.MetricNames;
 import com.yihu.ehr.resolve.dao.DataSetPackageDao;
 import com.yihu.ehr.resolve.feign.DataSetPackageMgrClient;
 import com.yihu.ehr.resolve.feign.PackageMgrClient;
@@ -15,8 +13,8 @@ import com.yihu.ehr.resolve.model.stage1.DataSetPackage;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.resolve.model.stage2.ResourceBucket;
 import com.yihu.ehr.resolve.service.resource.stage1.PackageResolveService;
+import com.yihu.ehr.resolve.service.resource.stage2.ArchivingService;
 import com.yihu.ehr.resolve.service.resource.stage2.PackMillService;
-import com.yihu.ehr.resolve.service.resource.stage2.PatientService;
 import com.yihu.ehr.resolve.service.resource.stage2.ResourceService;
 import com.yihu.ehr.util.datetime.DateUtil;
 import io.swagger.annotations.Api;
@@ -47,8 +45,6 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private ResourceService resourceService;
     @Autowired
-    private PatientService patientService;
-    @Autowired
     private PackMillService packMillService;
     @Autowired
     private FastDFSUtil fastDFSUtil;
@@ -60,6 +56,8 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
     private DataSetPackageMgrClient datasetPackageMgrClient;
     @Autowired
     private DataSetPackageDao dataSetPackageDao;
+    @Autowired
+    private ArchivingService archivingService;
 
     @ApiOperation(value = "健康档案包入库", notes = "若包ID为空，则取最旧的未解析健康档案包", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @RequestMapping(value = ServiceApi.Packages.PackageResolve, method = RequestMethod.PUT)
@@ -85,9 +83,8 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
             String zipFile = downloadTo(pack.getRemotePath());
             StandardPackage standardPackage = packageResolveService.doResolve(pack, zipFile);
             ResourceBucket resourceBucket = packMillService.grindingPackModel(standardPackage);
+            archivingService.archiving(resourceBucket, standardPackage);
             resourceService.save(resourceBucket, standardPackage);
-            //居民信息注册
-            patientService.checkPatient(resourceBucket, packId);
             //回填入库状态
             Map<String, String> map = new HashMap();
             map.put("profileId", standardPackage.getId());
@@ -135,14 +132,13 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
         MPackage pack = objectMapper.readValue(packString, MPackage.class);  //已修改包状态为1 正在入库库
         String packId = pack.getId();
         try {
-            long start = System.currentTimeMillis();
             if (StringUtils.isEmpty(pack.getClientId())) pack.setClientId(clientId);
             String zipFile = downloadTo(pack.getRemotePath());
             List<StandardPackage> standardPackages = packageResolveService.doResolveNonArchive(pack, zipFile);
             for (StandardPackage standardPackage : standardPackages) {
                 ResourceBucket resourceBucket = packMillService.grindingPackModel(standardPackage);
+                archivingService.archiving(resourceBucket, standardPackage);
                 resourceService.save(resourceBucket, standardPackage);
-                patientService.checkPatient(resourceBucket, packId);
                 String json = standardPackage.toJson();
                 returnJson.add(json);
             }
@@ -196,7 +192,6 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
         MPackage pack = objectMapper.readValue(packStr, MPackage.class);
         String packId = pack.getId();
         try {
-            long start = System.currentTimeMillis();
             if (StringUtils.isEmpty(pack.getClientId())) {
                 pack.setClientId(clientId);
             }
@@ -265,8 +260,8 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
             standardPackage.setClientId(clientId);
             ResourceBucket resourceBucket = packMillService.grindingPackModel(standardPackage);
             if (persist) {
+                archivingService.archiving(resourceBucket, standardPackage);
                 resourceService.save(resourceBucket, standardPackage);
-                patientService.checkPatient(resourceBucket, packageId);
             }
             return new ResponseEntity<>(standardPackage.toJson(), HttpStatus.OK);
         } catch (Exception e) {
@@ -311,12 +306,10 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "echo", value = "返回档案数据")
             @RequestParam(value = "echo",required = false,defaultValue = "true") boolean echo) throws Throwable {
 
-        long start = System.currentTimeMillis();
         StandardPackage standardPackage = packageResolveService.doResolveImmediateData(data,clientId);
         ResourceBucket resourceBucket = packMillService.grindingPackModel(standardPackage);
+        archivingService.archiving(resourceBucket, standardPackage);
         resourceService.save(resourceBucket, standardPackage);
-        //居民信息注册
-        patientService.checkPatient(resourceBucket, null);
         //回填入库状态
         Map<String, String> map = new HashMap();
         map.put("profileId", standardPackage.getId());
@@ -325,7 +318,6 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
         map.put("eventNo", standardPackage.getEventNo());
         map.put("eventDate", DateUtil.toStringLong(standardPackage.getEventDate()));
         map.put("patientId", standardPackage.getPatientId());
-
         //是否返回数据
         if (echo) {
             return standardPackage.toJson();
