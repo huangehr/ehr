@@ -5,6 +5,7 @@ import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.portal.MPortalSetting;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -85,4 +86,12 @@ public interface LogClient {
             @RequestParam(value = "page", required = false) int page
     );
 
+    @RequestMapping(value = "/getOperatorLogByAppKey", method = RequestMethod.GET)
+    @ApiOperation(value = "根据id进行MONGODB日志的查询")
+    Envelop getOperatorLogByAppKey(
+            @ApiParam(name = "appKey", value = "应用ID appkey就是appId", defaultValue = "")
+            @RequestParam(value = "appKey", required = true) String appKey,
+            @ApiParam(name = "responseFlag", value = "接口请求返回标识 1 成功 2 失败", defaultValue = "1")
+            @RequestParam(value = "responseFlag", required = true) int responseFlag
+    );
 }

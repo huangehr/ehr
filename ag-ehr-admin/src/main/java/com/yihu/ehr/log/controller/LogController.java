@@ -155,6 +155,18 @@ public class LogController extends BaseController {
     }
 
 
+    @RequestMapping(value = "/getOperatorLogByAppKey", method = RequestMethod.GET)
+    @ApiOperation(value = "根据id进行MONGODB日志的查询")
+    public Envelop getOperatorLogByAppKey(
+            @ApiParam(name = "appKey", value = "应用ID appkey就是appId", defaultValue = "")
+            @RequestParam(value = "appKey", required = true) String appKey,
+            @ApiParam(name = "responseFlag", value = "接口请求返回标识 1 成功 2 失败", defaultValue = "1")
+            @RequestParam(value = "responseFlag", required = true) int responseFlag) throws Exception{
+
+        return logClient.getOperatorLogByAppKey(appKey,responseFlag);
+    }
+
+
 
 }
 
