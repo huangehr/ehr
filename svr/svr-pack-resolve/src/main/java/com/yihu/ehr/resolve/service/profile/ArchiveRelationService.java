@@ -63,10 +63,11 @@ public class ArchiveRelationService {
             String idCardNo = resourceBucket.getDemographicId();
             relation.setIdCardNo(idCardNo);
             relation.setRelationDate(new Date());
-            if (idCardNo.indexOf("-") == -1) {
-                relation.setStatus("1");
+            relation.setStatus("1");
+            if (resourceBucket.isIdentifyFlag()) {
+                relation.setIdentifyFlag("1");
             } else {
-                relation.setStatus("0");
+                relation.setIdentifyFlag("0");
             }
             archiveRelationClient.archiveRelation(objectMapper.writeValueAsString(relation));
         }

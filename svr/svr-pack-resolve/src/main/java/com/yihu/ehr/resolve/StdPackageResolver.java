@@ -98,7 +98,7 @@ public class StdPackageResolver extends PackageResolver {
                     String demographicId = (String) properties.get(MasterResourceFamily.BasicColumns.DemographicId);
                     String patientName = (String) properties.get(MasterResourceFamily.BasicColumns.PatientName);
                     if (!StringUtils.isEmpty(demographicId)) {
-                        standardPackage.setDemographicId(demographicId);
+                        standardPackage.setDemographicId(demographicId.trim());
                     }
                     if (!StringUtils.isEmpty(patientName)) {
                         standardPackage.setPatientName(patientName);

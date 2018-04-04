@@ -5,6 +5,7 @@ import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.resolve.model.stage2.ResourceBucket;
 import com.yihu.ehr.resolve.service.profile.ArchiveRelationService;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
+import com.yihu.ehr.util.validate.IdCardValidator;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,8 +19,9 @@ import java.util.regex.Pattern;
  * Created by progr1mmer on 2018/4/3.
  */
 @Service
-public class ArchivingService {
+public class IdentifyService {
 
+    private static final IdCardValidator idCardValidator = new IdCardValidator();
     private static final Pattern pattern = Pattern.compile("^[A-Za-z0-9\\-]+$");
     private static final String DEFAULT_VALUE = "default";
 
@@ -28,9 +30,10 @@ public class ArchivingService {
     @Autowired
     private PatientService patientService;
 
-    public void archiving (ResourceBucket resourceBucket, StandardPackage standardPackage) throws Exception {
+    public void identify (ResourceBucket resourceBucket, StandardPackage standardPackage) throws Exception {
         if (StringUtils.isEmpty(standardPackage.getDemographicId()) || !pattern.matcher(standardPackage.getDemographicId()).find()) {
             boolean recognition = false;
+            boolean identify = false;
             String demographicId = UUID.randomUUID().toString();
             if (!StringUtils.isEmpty(standardPackage.getCardId())) {
                 List<String> idCardNos = archiveRelationService.findByCardNo(standardPackage.getCardId());
@@ -77,8 +80,16 @@ public class ArchivingService {
                     }
                 }
             }
+            if (demographicId.length() == 18) {
+                identify = idCardValidator.is18Idcard(demographicId);
+            }
+            if (demographicId.length() == 15) {
+                identify = idCardValidator.is15Idcard(demographicId);
+            }
             standardPackage.setDemographicId(demographicId);
             resourceBucket.setDemographicId(demographicId);
+            standardPackage.setIdentifyFlag(identify);
+            resourceBucket.setIdentifyFlag(identify);
         }
     }
 

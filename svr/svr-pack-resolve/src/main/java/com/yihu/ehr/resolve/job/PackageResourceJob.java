@@ -10,7 +10,7 @@ import com.yihu.ehr.resolve.feign.PackageMgrClient;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.resolve.model.stage2.ResourceBucket;
 import com.yihu.ehr.resolve.service.resource.stage1.PackageResolveService;
-import com.yihu.ehr.resolve.service.resource.stage2.ArchivingService;
+import com.yihu.ehr.resolve.service.resource.stage2.IdentifyService;
 import com.yihu.ehr.resolve.service.resource.stage2.PackMillService;
 import com.yihu.ehr.resolve.service.resource.stage2.ResourceService;
 import com.yihu.ehr.resolve.util.PackResolveLogger;
@@ -84,13 +84,13 @@ public class PackageResourceJob implements InterruptableJob {
     private void doResolve(MPackage pack, PackageMgrClient packageMgrClient) throws Exception {
         PackageResolveService resolveEngine = SpringContext.getService(PackageResolveService.class);
         PackMillService packMill = SpringContext.getService(PackMillService.class);
-        ArchivingService archivingService = SpringContext.getService(ArchivingService.class);
+        IdentifyService identifyService = SpringContext.getService(IdentifyService.class);
         ResourceService resourceService = SpringContext.getService(ResourceService.class);
         ObjectMapper objectMapper = new ObjectMapper();
         //long start = System.currentTimeMillis();
         StandardPackage standardPackage = resolveEngine.doResolve(pack, downloadTo(pack.getRemotePath()));
         ResourceBucket resourceBucket = packMill.grindingPackModel(standardPackage);
-        archivingService.archiving(resourceBucket, standardPackage);
+        identifyService.identify(resourceBucket, standardPackage);
         resourceService.save(resourceBucket, standardPackage);
         //回填入库状态
         Map<String,String> map = new HashMap();

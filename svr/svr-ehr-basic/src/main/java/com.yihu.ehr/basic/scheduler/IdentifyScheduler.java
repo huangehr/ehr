@@ -17,7 +17,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 
-@Component
+//@Component
 public class IdentifyScheduler {
 
 	private static final Logger log = LoggerFactory.getLogger(IdentifyScheduler.class);
@@ -47,7 +47,7 @@ public class IdentifyScheduler {
 			if(StringUtils.isEmpty(archiveRelation.getIdentifyFlag()) && StringUtils.isNotEmpty(archiveRelation.getIdCardNo())){
 				if(archiveRelation.getIdCardNo().equals("null")){
 					re = false;
-				}else{
+				} else{
 
 					if(archiveRelation.getIdCardNo().length()==18){
 						re = idcardValidator.is18Idcard(archiveRelation.getIdCardNo());

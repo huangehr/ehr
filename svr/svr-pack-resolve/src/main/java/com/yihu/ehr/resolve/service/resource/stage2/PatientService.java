@@ -31,6 +31,9 @@ public class PatientService extends BaseJpaService<DemographicInfo, PatientDao>{
     @Transactional(readOnly = true)
     public void checkPatient(ResourceBucket resourceBucket) throws Exception {
         //获取注册信息
+        if (!resourceBucket.isIdentifyFlag()) {
+            return;
+        }
         String idCardNo = String.valueOf(resourceBucket.getDemographicId().trim());
         boolean isRegistered = this.isExists(idCardNo);
         if (!isRegistered) {

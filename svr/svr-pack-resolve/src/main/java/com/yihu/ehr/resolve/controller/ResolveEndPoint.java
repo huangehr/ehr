@@ -13,7 +13,7 @@ import com.yihu.ehr.resolve.model.stage1.DataSetPackage;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.resolve.model.stage2.ResourceBucket;
 import com.yihu.ehr.resolve.service.resource.stage1.PackageResolveService;
-import com.yihu.ehr.resolve.service.resource.stage2.ArchivingService;
+import com.yihu.ehr.resolve.service.resource.stage2.IdentifyService;
 import com.yihu.ehr.resolve.service.resource.stage2.PackMillService;
 import com.yihu.ehr.resolve.service.resource.stage2.ResourceService;
 import com.yihu.ehr.util.datetime.DateUtil;
@@ -57,7 +57,7 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private DataSetPackageDao dataSetPackageDao;
     @Autowired
-    private ArchivingService archivingService;
+    private IdentifyService identifyService;
 
     @ApiOperation(value = "健康档案包入库", notes = "若包ID为空，则取最旧的未解析健康档案包", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @RequestMapping(value = ServiceApi.Packages.PackageResolve, method = RequestMethod.PUT)
@@ -83,7 +83,7 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
             String zipFile = downloadTo(pack.getRemotePath());
             StandardPackage standardPackage = packageResolveService.doResolve(pack, zipFile);
             ResourceBucket resourceBucket = packMillService.grindingPackModel(standardPackage);
-            archivingService.archiving(resourceBucket, standardPackage);
+            identifyService.identify(resourceBucket, standardPackage);
             resourceService.save(resourceBucket, standardPackage);
             //回填入库状态
             Map<String, String> map = new HashMap();
@@ -137,7 +137,7 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
             List<StandardPackage> standardPackages = packageResolveService.doResolveNonArchive(pack, zipFile);
             for (StandardPackage standardPackage : standardPackages) {
                 ResourceBucket resourceBucket = packMillService.grindingPackModel(standardPackage);
-                archivingService.archiving(resourceBucket, standardPackage);
+                identifyService.identify(resourceBucket, standardPackage);
                 resourceService.save(resourceBucket, standardPackage);
                 String json = standardPackage.toJson();
                 returnJson.add(json);
@@ -260,7 +260,7 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
             standardPackage.setClientId(clientId);
             ResourceBucket resourceBucket = packMillService.grindingPackModel(standardPackage);
             if (persist) {
-                archivingService.archiving(resourceBucket, standardPackage);
+                identifyService.identify(resourceBucket, standardPackage);
                 resourceService.save(resourceBucket, standardPackage);
             }
             return new ResponseEntity<>(standardPackage.toJson(), HttpStatus.OK);
@@ -308,7 +308,7 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
 
         StandardPackage standardPackage = packageResolveService.doResolveImmediateData(data,clientId);
         ResourceBucket resourceBucket = packMillService.grindingPackModel(standardPackage);
-        archivingService.archiving(resourceBucket, standardPackage);
+        identifyService.identify(resourceBucket, standardPackage);
         resourceService.save(resourceBucket, standardPackage);
         //回填入库状态
         Map<String, String> map = new HashMap();

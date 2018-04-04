@@ -24,7 +24,7 @@ import java.util.List;
  */
 @Transactional
 @Service
-public class ArchiveRelationService  extends BaseJpaService<ArchiveRelation, XArchiveRelationDao> {
+public class ArchiveRelationService extends BaseJpaService<ArchiveRelation, XArchiveRelationDao> {
 
     @Autowired
     private XArchiveRelationDao archiveRelationDao;

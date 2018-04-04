@@ -44,4 +44,10 @@ public class RolesService extends BaseJpaService<Roles,XRolesRepository> {
     public Roles findByCodeAndAppId(String code, String appId) {
         return rolesRepository.findByCodeAndAppId(code, appId);
     }
+
+    public List<Map<String,Object>> findRolesByUserId(String userId){
+        String sql = "select DISTINCT r.code,r.`name`,r.id FROM roles r JOIN role_user u ON r.id = u.role_id WHERE u.user_id =?";
+        List<Map<String,Object>> list = jdbcTemplate.queryForList(sql,new Object[]{userId});
+        return list;
+    }
 }

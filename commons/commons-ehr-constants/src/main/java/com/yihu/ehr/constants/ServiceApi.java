@@ -507,6 +507,9 @@ public class ServiceApi {
         public static final String QcValue = "packAnalyzer/qc/check/value";
     }
 
+    public static class ArchiveRelation {
+        public static final String Crud = "/archiveRelation";
+    }
 
     public static class Patients {
         public static final String GetUserCards = "/getUserCards";// 就诊卡列表
