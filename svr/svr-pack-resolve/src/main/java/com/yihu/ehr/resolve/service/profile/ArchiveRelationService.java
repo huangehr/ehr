@@ -11,7 +11,6 @@ import com.yihu.ehr.resolve.feign.ArchiveRelationClient;
 import com.yihu.ehr.resolve.model.stage2.ResourceBucket;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.Date;
@@ -73,8 +72,8 @@ public class ArchiveRelationService {
         }
     }
 
-    public List<String> findByOrgCodeAndCardNo(String orgCode, String cardNo){
-        return archiveRelationDao.findByOrgCodeAndCardNo(orgCode, cardNo);
+    public List<String> findByCardNo(String cardNo){
+        return archiveRelationDao.findByCardNo(cardNo);
     }
 
 }

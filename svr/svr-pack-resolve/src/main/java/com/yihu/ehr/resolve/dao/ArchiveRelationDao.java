@@ -12,7 +12,7 @@ import java.util.List;
  */
 public interface ArchiveRelationDao extends PagingAndSortingRepository<ArchiveRelation, Long> {
 
-    @Query("SELECT ar.idCardNo FROM ArchiveRelation ar WHERE ar.orgCode = :orgCode AND ar.cardNo = :cardNo")
-    List<String> findByOrgCodeAndCardNo(@Param("orgCode") String orgCode, @Param("cardNo") String cardNo);
+    @Query("SELECT ar.idCardNo FROM ArchiveRelation ar WHERE ar.cardNo = :cardNo")
+    List<String> findByCardNo(@Param("cardNo") String cardNo);
 
 }

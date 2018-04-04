@@ -33,7 +33,7 @@ public class ArchivingService {
             boolean recognition = false;
             String demographicId = UUID.randomUUID().toString();
             if (!StringUtils.isEmpty(standardPackage.getCardId())) {
-                List<String> idCardNos = archiveRelationService.findByOrgCodeAndCardNo(standardPackage.getOrgCode(), standardPackage.getCardId());
+                List<String> idCardNos = archiveRelationService.findByCardNo(standardPackage.getCardId());
                 if (!idCardNos.isEmpty()) {
                     recognition = true;
                     demographicId = idCardNos.get(0);
