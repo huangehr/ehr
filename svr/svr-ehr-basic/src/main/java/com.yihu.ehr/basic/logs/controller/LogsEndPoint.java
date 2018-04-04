@@ -6,6 +6,7 @@ import com.yihu.ehr.constants.SessionAttributeKeys;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.basic.logs.model.CloudOperatorLog;
 import com.yihu.ehr.model.common.ListResult;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -395,6 +396,43 @@ public class LogsEndPoint extends EnvelopRestEndPoint {
             listResult.setTotalCount(0);
         }
         return listResult;
+    }
+
+    @RequestMapping(value = "/getOperatorLogByAppKey", method = RequestMethod.GET)
+    @ApiOperation(value = "根据id进行MONGODB日志的查询")
+    public Envelop getOperatorLogByAppKey(
+            @ApiParam(name = "appKey", value = "应用ID appkey就是appId", defaultValue = "")
+            @RequestParam(value = "appKey", required = true) String appKey,
+            @ApiParam(name = "responseFlag", value = "接口请求返回标识 1 成功 2 失败", defaultValue = "1")
+            @RequestParam(value = "responseFlag", required = true) int responseFlag) throws Exception{
+
+        Query query = new Query();
+        Criteria cr = new Criteria();
+        List<Criteria> criteriaList = new ArrayList<>();
+        if(StringUtils.isNotEmpty(appKey)){
+            Criteria crCaller = new Criteria().where("appKey").is(appKey);
+            criteriaList.add(crCaller);
+        }
+        if(responseFlag ==1){
+            Criteria crCaller = new Criteria().where("responseFlag").is("200");
+            criteriaList.add(crCaller);
+        }else {
+            Criteria crCaller = new Criteria().where("responseFlag").ne("200");
+            criteriaList.add(crCaller);
+        }
+        if(criteriaList != null && criteriaList.size() > 0 ){
+            Criteria[] criterias = new  Criteria[criteriaList.size()];
+            for(int i=0 ;i < criteriaList.size() ; i++){
+                criterias[i] = criteriaList.get(i);
+            }
+            cr.andOperator(criterias);
+        }
+        query.addCriteria(cr);
+        long totalCount = mongoTemplate.count(query, CloudBusinessLog.class);
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(true);
+        envelop.setObj(totalCount);
+        return envelop;
     }
 
 

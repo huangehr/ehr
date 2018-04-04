@@ -126,6 +126,7 @@ public class DiabetesSymptomScheduler {
 						String diseaseTypeName = "";
 						String birthday = "";
 						int birthYear = 0;
+						Date eventDate = null;
 						Map<String,Object> subMap = hbaseDao.getResultMap(ResourceCore.SubTable, subRowkey);
 						if(subMap !=null){
 							String diseaseName = "";
@@ -154,6 +155,10 @@ public class DiabetesSymptomScheduler {
 						String mainRowkey = subRowkey.substring(0, subRowkey.indexOf("$"));
 						Map<String,Object> map = hbaseDao.getResultMap(ResourceCore.MasterTable, mainRowkey);
 						if(map !=null){
+							if(map.get(keyEventDate) != null){
+								eventDate = DateUtil.formatCharDate(map.get(keyEventDate).toString(), DateUtil.DATE_WORLD_FORMAT);
+								eventDate = DateUtils.addHours(eventDate,8);
+							}
 							if(map.get(keyAge) != null){
 								birthday= map.get(keyAge).toString().substring(0, 10);
 								birthYear = Integer.valueOf(map.get(keyAge).toString().substring(0, 4));
@@ -198,6 +203,7 @@ public class DiabetesSymptomScheduler {
 						baseCheckInfo.setBirthYear(birthYear);
 						baseCheckInfo.setDiseaseType(diseaseType);
 						baseCheckInfo.setDiseaseTypeName(diseaseTypeName);
+						baseCheckInfo.setEventDate(eventDate);
 						Map<String,Object> submap = hbaseDao.getResultMap(ResourceCore.SubTable, subRowkey);
 						if(submap !=null){
 							//检查信息 姓名,身份证，就诊卡号,并发症，空腹血糖值，葡萄糖耐量值，用药名称，检查信息code （CH001 并发症,CH002 空腹血糖,CH003 葡萄糖耐量,CH004 用药名称）
