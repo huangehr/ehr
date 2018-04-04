@@ -213,3 +213,39 @@ fz-gateway:
   url: http://service.yihu.com:8080/WSGW/rest
   clientId: 9000401
   clientVersion: 1.0
+
+---
+spring:
+  profiles: prod_srformal
+  datasource:
+    url: jdbc:mysql://192.168.40.34:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: healthcloud
+    password: GP8Qz4qU
+  data:
+    mongodb:
+      host: 192.168.50.26
+      port: 20000
+      username: jkzlehr
+      password: GMLBq1LG
+      authenticationDatabase: admin
+      database: ehr
+  elasticsearch:
+    jest:
+      uris: http://172.10.10.2:9200
+fast-dfs:
+  tracker-server: 192.168.50.116:22122,192.168.50.119:22122
+  public-server: http://192.168.50.37:8888
+es:
+  index: wlyy_quota_test
+  type: wlyy_quota_test
+  host: http://172.10.10.2:9200
+  tHost: 172.10.10.2:9300
+  clusterName: jkzl
+h5:
+  secret: 8E29YVP2UZ1QNSIN33NZJXEG1KSLVXFL6YI59C5SC5D
+  appId: 9000401
+#福州总部网关参数配置
+fz-gateway:
+  url: http://service.yihu.com:8080/WSGW/rest
+  clientId: 9000401
+  clientVersion: 1.0
