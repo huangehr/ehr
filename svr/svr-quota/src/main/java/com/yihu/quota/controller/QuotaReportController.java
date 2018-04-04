@@ -823,11 +823,13 @@ public class QuotaReportController extends BaseController {
         Envelop envelop = new Envelop();
         Map<String, List<String>> diseaseTypeInfo = singleDiseaseService.getDiseaseTypeAnalysisInfo(type, filter);
         List<Map<String, Object>> listMap = new ArrayList<>();
+        envelop.setSuccessFlg(true);
         if (null != diseaseTypeInfo && diseaseTypeInfo.size() > 0) {
-            envelop.setSuccessFlg(true);
-            Map<String, String> map = new HashMap<>();
-            map.put("name", diseaseTypeInfo.get("name") + "");
-            map.put("xName", diseaseTypeInfo.get("xName") + "");
+            Map<String, List<String>> map = new HashMap<>();
+            List<String> list = diseaseTypeInfo.get("xName");
+            List<String> list1 = diseaseTypeInfo.get("name");
+            map.put("name", list1);
+            map.put("xName", list);
             envelop.setObj(map);
             for (int i = 1; i < 5; i++) {
                 Map<String, Object> valueMap = new HashMap<>();
@@ -850,11 +852,11 @@ public class QuotaReportController extends BaseController {
         Envelop envelop = new Envelop();
         Map<String, List<String>> diseaseTypeInfo = singleDiseaseService.getSexAnalysisInfo(type, filter);
         List<Map<String, Object>> listMap = new ArrayList<>();
+        envelop.setSuccessFlg(true);
         if (null != diseaseTypeInfo && diseaseTypeInfo.size() > 0) {
-            envelop.setSuccessFlg(true);
-            Map<String, String> map = new HashMap<>();
-            map.put("name", diseaseTypeInfo.get("name") + "");
-            map.put("xName", diseaseTypeInfo.get("xName") + "");
+            Map<String, List<String>> map = new HashMap<>();
+            map.put("name", diseaseTypeInfo.get("name"));
+            map.put("xName", diseaseTypeInfo.get("xName"));
             envelop.setObj(map);
             for (int i = 1; i < 4; i++) {
                 Map<String, Object> valueMap = new HashMap<>();
@@ -877,11 +879,11 @@ public class QuotaReportController extends BaseController {
         Envelop envelop = new Envelop();
         Map<String, List<String>> diseaseTypeInfo = singleDiseaseService.getAgeAnalysisInfo(type, filter);
         List<Map<String, Object>> listMap = new ArrayList<>();
+        envelop.setSuccessFlg(true);
         if (null != diseaseTypeInfo && diseaseTypeInfo.size() > 0) {
-            envelop.setSuccessFlg(true);
-            Map<String, String> map = new HashMap<>();
-            map.put("name", diseaseTypeInfo.get("name") + "");
-            map.put("xName", diseaseTypeInfo.get("xName") + "");
+            Map<String, List<String>> map = new HashMap<>();
+            map.put("name", diseaseTypeInfo.get("name"));
+            map.put("xName", diseaseTypeInfo.get("xName"));
             envelop.setObj(map);
             for (int i = 1; i < 6; i++) {
                 Map<String, Object> valueMap = new HashMap<>();
