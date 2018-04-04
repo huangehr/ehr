@@ -1,7 +1,6 @@
 package com.yihu.ehr.analysis.listener;
 
 import com.yihu.ehr.analysis.listener.save.LogSaver;
-import com.yihu.ehr.analysis.listener.save.impl.ESLogSaver;
 import com.yihu.ehr.analysis.model.BusinessDataModel;
 import com.yihu.ehr.analysis.model.OperatorDataModel;
 import org.apache.kafka.clients.consumer.ConsumerRecord;

@@ -1,7 +1,9 @@
 server:
   port: ${svr-ehr-basic.server.port}
+
 management:
   port: ${server.port}
+
 spring:
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
@@ -10,6 +12,7 @@ spring:
     min-idle: 8
     validation-query: SELECT 1
     test-on-borrow: true
+
 fast-dfs:
   connect-timeout: 2
   network-timeout: 30
@@ -52,6 +55,7 @@ spring:
 fast-dfs:
   tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52:80
+
 es:
   index: wlyy_quota_test
   type: wlyy_quota_test
@@ -94,6 +98,7 @@ spring:
 fast-dfs:
   tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52:80
+
 es:
   index: wlyy_quota_test
   type: wlyy_quota_test
@@ -163,6 +168,7 @@ spring:
 fast-dfs:
   tracker-server: 10.176.97.5:22122
   public-server: http://10.176.97.5:8888
+
 es:
   index: wlyy_quota_test
   type: wlyy_quota_test
@@ -199,6 +205,7 @@ spring:
 fast-dfs:
   tracker-server: 100.100.1.157:22122
   public-server: http://100.100.1.157:8888
+
 es:
   index: wlyy_quota_test
   type: wlyy_quota_test
