@@ -76,12 +76,12 @@ public class SingleDiseasesController {
             name = " and symptomName = '" + name + "'";
             yearSql = "select count(*) count from single_disease_check_index where checkCode = 'CH001' " + name + " group by date_histogram(field='eventDate','interval'='year')";
             typeSql = "select diseaseTypeName,count(*) count from single_disease_check_index where checkCode = 'CH001' " + name + " group by diseaseTypeName";
-            ageSql = "select count(*) count from single_disease_check_index where checkCode = 'CH001' and birthYear <> 0 " + name + " group by " + range;
+            ageSql = "select count(*) from single_disease_check_index where checkCode = 'CH001' and birthYear <> 0 " + name + " group by " + range;
             sexSql = "select sexName, count(*) count from single_disease_check_index where checkCode = 'CH001' " + name + " group by sexName";
         }else {
             yearSql = "select count(*) count from single_disease_check_index where checkCode = 'CH001' group by date_histogram(field='eventDate','interval'='year')";
             typeSql = "select diseaseTypeName,count(*) count from single_disease_check_index where checkCode = 'CH001' group by diseaseTypeName";
-            ageSql = "select count(*) count from single_disease_check_index where checkCode = 'CH001'and birthYear <> 0  group by " + range;
+            ageSql = "select count(*) from single_disease_check_index where checkCode = 'CH001'and birthYear <> 0  group by " + range;
             sexSql = "select sexName, count(*) count from single_disease_check_index where checkCode = 'CH001' group by sexName";
         }
         //按年趋势 柱状图
