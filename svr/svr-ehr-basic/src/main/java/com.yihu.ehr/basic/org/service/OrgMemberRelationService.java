@@ -2,6 +2,7 @@ package com.yihu.ehr.basic.org.service;
 
 import com.yihu.ehr.basic.org.dao.OrgMemberRelationRepository;
 import com.yihu.ehr.basic.org.model.OrgMemberRelation;
+import com.yihu.ehr.model.org.MOrgDeptData;
 import com.yihu.ehr.query.BaseJpaService;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -13,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author HZY
@@ -176,5 +179,15 @@ public class OrgMemberRelationService extends BaseJpaService<OrgMemberRelation, 
     public List<OrgMemberRelation> getOrgMemberByDeptId(Integer deptId) {
         List<OrgMemberRelation> orgOrgMemberRelations = relationRepository.getOrgMemberByDeptId(deptId);
         return orgOrgMemberRelations;
+    }
+
+    public List<String> getJkzlOrgIds(String userId) {
+        List<String> orgIds = relationRepository.findOrgIdByUserId(userId);
+        List<String> jkzlOrgIds=null;
+        if(orgIds.size() > 0){
+            String[] orgIdsStr = orgIds.toArray(new String[orgIds.size()]);
+            jkzlOrgIds = orgService.getJkzlOrgIdsByEhrOrgId(orgIdsStr);
+        }
+        return jkzlOrgIds;
     }
 }

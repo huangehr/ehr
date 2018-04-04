@@ -26,10 +26,8 @@ public class CardInfoExtractor extends KeyDataExtractor {
 
     //就诊卡界定数据集
     private List<String> dataSets = new ArrayList<>();
-    @Value("${ehr.pack-extractor.card.meta-data.card-no}")
-    private String CardId;
-    @Value("${ehr.pack-extractor.card.meta-data.card-type}")
-    private String CardType;
+    private List<String> cardNum = new ArrayList<>();
+    private List<String> cardType = new ArrayList<>();
 
     /**
      * 获取此数据集中的卡信息
@@ -38,32 +36,53 @@ public class CardInfoExtractor extends KeyDataExtractor {
      * @throws Exception
      */
     @Override
-    public Map<String,Object> extract(PackageDataSet dataSet) throws Exception {
+    public Map<String, Object> extract(PackageDataSet dataSet) throws Exception {
         Map<String,Object> properties = new HashedMap();
-        String cardId = "";
-        String cardType = "";
+        String id = "";
+        String type = "";
         //获取就诊卡号和卡类型
         if (dataSets.contains(dataSet.getCode())) {
             for (String key : dataSet.getRecordKeys()) {
-                MetaDataRecord record = dataSet.getRecord(key);
-                //获取就诊卡号
-                if(StringUtils.isEmpty(cardId)) {
-                    String val = record.getMetaData(CardId);
-                    if (!StringUtils.isEmpty(val)) {
-                        cardId = val;
-                        cardType = record.getMetaData(CardType);
-                        break;
+                if (StringUtils.isEmpty(id) || StringUtils.isEmpty(type)) {
+                    MetaDataRecord record = dataSet.getRecord(key);
+                    if (StringUtils.isEmpty(id)) {
+                        for (String item : cardNum) {
+                            String _id = record.getMetaData(item);
+                            if (!StringUtils.isEmpty(_id)) {
+                                id = _id;
+                                break;
+                            }
+                        }
                     }
+                    if (StringUtils.isEmpty(type)) {
+                        for (String item : cardType) {
+                            String _type = record.getMetaData(item);
+                            if (!StringUtils.isEmpty(_type)) {
+                                type = _type;
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    break;
                 }
             }
         }
-
-        properties.put(MasterResourceFamily.BasicColumns.CardId, cardId);
-        properties.put(MasterResourceFamily.BasicColumns.CardType, cardType);
+        properties.put(MasterResourceFamily.BasicColumns.CardId, id);
+        properties.put(MasterResourceFamily.BasicColumns.CardType, type);
         return properties;
     }
 
     public List<String> getDataSets() {
         return this.dataSets;
     }
+
+    public List<String> getCardNum() {
+        return cardNum;
+    }
+
+    public List<String> getCardType() {
+        return cardType;
+    }
+
 }

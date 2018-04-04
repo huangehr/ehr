@@ -244,8 +244,8 @@ public class ProfileInfoBaseService {
             for (Map temp : list4) {
                 String masterRowKey = (String) temp.get("rowkey");
                 String subQ = "{\"q\":\"rowkey:" + masterRowKey + "$HDSD00_06$*" + "\"}";
-                envelop = resource.getSubData(subQ, 1, 500, null);
-                List<Map<String, Object>> subList = envelop.getDetailModelList();
+                Envelop subEnvelop = resource.getSubData(subQ, 1, 500, null);
+                List<Map<String, Object>> subList = subEnvelop.getDetailModelList();
                 if (subList != null && subList.size() > 0) {
                     for (Map subTemp : subList) {
                         String operateName;

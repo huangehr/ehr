@@ -59,7 +59,7 @@ public class DiabetesSymptomScheduler {
 	 * 每天2点 执行一次
 	 * @throws Exception
 	 */
-	@Scheduled(cron = "0 0 2 * * ?")
+//	@Scheduled(cron = "0 0 2 * * ?")
 	public void validatorIdentityScheduler(){
 		try {
 			String q2 = "EHR_000112:*糖尿病*并发症* OR EHR_000295:*糖尿病*并发症*";

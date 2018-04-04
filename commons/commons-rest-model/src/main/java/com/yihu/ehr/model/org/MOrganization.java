@@ -60,7 +60,21 @@ public class MOrganization implements Serializable{
 
     private boolean checked;    //是否选中
 
-    private String hosEconomic; // 经济类型代码
+    private String hosHierarchy;//医院等次 ：1：特等、2：甲等、3：乙等、4：丙等、9：未评
+
+    private String hosEconomic;//经济类型代码 与 资源字典对应
+
+    private String classification;//卫生机构分类，值参考系统字典卫生机构分类
+
+    private String bigClassification;//卫生机构大分类，值参考系统字典卫生机构大分类
+
+    private String nature;//机构性质1，1公立、2民营
+
+    private String branchType;//机构性质Ⅱ，1总院、2分院
+
+    private String displayStatus;//与总部同步数据补充字段是否开放显示：0：不显示 1:显示
+
+    private String jkzlOrgId;//总部机构id-同步数据使用
 
     public MOrganization() {
     }
@@ -380,5 +394,61 @@ public class MOrganization implements Serializable{
 
     public void setHosEconomic(String hosEconomic) {
         this.hosEconomic = hosEconomic;
+    }
+
+    public String getHosHierarchy() {
+        return hosHierarchy;
+    }
+
+    public void setHosHierarchy(String hosHierarchy) {
+        this.hosHierarchy = hosHierarchy;
+    }
+
+    public String getClassification() {
+        return classification;
+    }
+
+    public void setClassification(String classification) {
+        this.classification = classification;
+    }
+
+    public String getBigClassification() {
+        return bigClassification;
+    }
+
+    public void setBigClassification(String bigClassification) {
+        this.bigClassification = bigClassification;
+    }
+
+    public String getNature() {
+        return nature;
+    }
+
+    public void setNature(String nature) {
+        this.nature = nature;
+    }
+
+    public String getBranchType() {
+        return branchType;
+    }
+
+    public void setBranchType(String branchType) {
+        this.branchType = branchType;
+    }
+
+    public String getDisplayStatus() {
+        return displayStatus;
+    }
+
+    public void setDisplayStatus(String displayStatus) {
+        this.displayStatus = displayStatus;
+    }
+
+    public String getJkzlOrgId() {
+        return jkzlOrgId;
+    }
+
+    public void setJkzlOrgId(String jkzlOrgId) {
+        this.jkzlOrgId = jkzlOrgId;
     }
 }

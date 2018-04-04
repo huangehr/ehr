@@ -65,6 +65,10 @@ public class User  extends BaseAssignedEntity {
     private String demographicId;
     private String doctorId;
     private String realnameFlag;
+    /**
+     * 居民行业
+     */
+    private  String profession;
 
 
     public User() {
@@ -406,5 +410,14 @@ public class User  extends BaseAssignedEntity {
 
     public void setStreet(String street) {
         this.street = street;
+    }
+
+    @Column(name = "profession",  nullable = true)
+    public String getProfession() {
+        return profession;
+    }
+
+    public void setProfession(String profession) {
+        this.profession = profession;
     }
 }

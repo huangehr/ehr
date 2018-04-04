@@ -17,6 +17,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -127,15 +128,16 @@ public class TemplateEndPoint extends BaseRestEndPoint {
             @PathVariable(value = "id") int id,
             @ApiParam(value = "true表示PC端，false表示移动端")
             @RequestParam(value = "pc", defaultValue = "true") boolean pc, HttpServletResponse response) throws Exception {
+        response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
         ArchiveTemplate template = templateService.getTemplate(id);
         if (template == null) {
-            throw new ApiException(ErrorCode.NOT_FOUND, "Template not found");
+            throw new ApiException(HttpStatus.NO_CONTENT, ErrorCode.NO_CONTENT, "Template not found");
         }
         if (pc && StringUtils.isEmpty(template.getPcTplURL())) {
-            throw new ApiException(ErrorCode.NOT_FOUND, "Template content is empty.");
+            throw new ApiException(HttpStatus.NO_CONTENT, ErrorCode.NO_CONTENT, "Template content is empty.");
         }
         if (!pc && StringUtils.isEmpty(template.getMobileTplURL())) {
-            throw new ApiException(ErrorCode.NOT_FOUND, "Template content is empty.");
+            throw new ApiException(HttpStatus.NO_CONTENT, ErrorCode.NO_CONTENT, "Template content is empty.");
         }
         IOUtils.copy(new ByteArrayInputStream(template.getContent(pc)), response.getOutputStream());
         String extension = ".file";
@@ -148,7 +150,6 @@ public class TemplateEndPoint extends BaseRestEndPoint {
                 extension = template.getMobileTplURL().split("\\.")[1];
             }
         }
-        response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
         response.setHeader("Content-Disposition", "attachment; filename=" + template.getTitle() + "." + extension);
         response.flushBuffer();
     }

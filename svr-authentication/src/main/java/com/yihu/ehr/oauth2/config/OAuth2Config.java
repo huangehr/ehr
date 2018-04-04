@@ -2,10 +2,12 @@ package com.yihu.ehr.oauth2.config;
 
 import com.yihu.ehr.oauth2.oauth2.*;
 import com.yihu.ehr.oauth2.oauth2.jdbc.*;
+import com.yihu.ehr.oauth2.oauth2.redis.EhrRedisTokenStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -43,12 +45,6 @@ public class OAuth2Config {
 
     private static final String RESOURCE_ID = "ehr";
 
-    @Value("${spring.redis.host}")
-    public String redisHost;
-    @Value("${spring.redis.port}")
-    public Integer redisPort;
-    @Value("${spring.redis.password}")
-    public String redisPassword;
     @Autowired
     private DataSource dataSource;
 
@@ -61,22 +57,22 @@ public class OAuth2Config {
         @Autowired
         private AuthorizationCodeServices inMemoryAuthorizationCodeServices;
         @Autowired
-        private AuthorizationServerTokenServices ehrAuthorizationServerTokenServices;
+        private AuthorizationServerTokenServices ehrTokenServices;
         @Autowired
         private ClientDetailsService ehrJdbcClientDetailsService;
         @Autowired
         private TokenGranter ehrTokenGranter;
+        /*@Autowired
+        private TokenStore ehrJdbcTokenStore;*/
         @Autowired
-        private TokenStore ehrJdbcTokenStore;
-        //@Autowired
-        //private TokenStore ehrRedisTokenStore;
+        private TokenStore ehrRedisTokenStore;
 
         @Override
         public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
             endpoints.authenticationManager(authenticationManager)
                     .authorizationCodeServices(inMemoryAuthorizationCodeServices)
-                    .tokenServices(ehrAuthorizationServerTokenServices)
-                    .tokenStore(ehrJdbcTokenStore)
+                    .tokenServices(ehrTokenServices)
+                    .tokenStore(ehrRedisTokenStore)
                     .exceptionTranslator(new EhrOAuth2ExceptionTranslator())
                     .tokenGranter(ehrTokenGranter)
                     .setClientDetailsService(ehrJdbcClientDetailsService);
@@ -95,9 +91,10 @@ public class OAuth2Config {
     }
 
     @Bean
+    @Primary
     EhrTokenGranter ehrTokenGranter(
             AuthenticationManager authenticationManager,
-            EhrAuthorizationServerTokenServices tokenServices,
+            EhrTokenServices tokenServices,
             AuthorizationCodeServices authorizationCodeService,
             ClientDetailsService clientDetailsService,
             EhrJdbcUserSecurityService ehrJDBCUserSecurityService,
@@ -114,16 +111,8 @@ public class OAuth2Config {
     }
 
     @Bean
-    JedisConnectionFactory jedisConnectionFactory() {
-        JedisConnectionFactory jedisConnectionFactory = new JedisConnectionFactory();
-        jedisConnectionFactory.setHostName(redisHost);
-        jedisConnectionFactory.setPort(redisPort);
-        jedisConnectionFactory.setPassword(redisPassword);
-        return jedisConnectionFactory;
-    }
-
-    @Bean
-    RedisTemplate<String, Serializable> redisTemplate(RedisConnectionFactory jedisConnectionFactory) {
+    @Primary
+    RedisTemplate<String, Serializable> redisTemplate(JedisConnectionFactory jedisConnectionFactory) {
         RedisTemplate<String, Serializable> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(jedisConnectionFactory);
         redisTemplate.setKeySerializer(new StringRedisSerializer());
@@ -139,6 +128,7 @@ public class OAuth2Config {
      * @return
      */
     @Bean
+    @Primary
     EhrJdbcClientDetailsService ehrJdbcClientDetailsService() {
         return new EhrJdbcClientDetailsService(dataSource);
     }
@@ -159,6 +149,7 @@ public class OAuth2Config {
      * @return
      */
     @Bean
+    @Primary
     InMemoryAuthorizationCodeServices inMemoryAuthorizationCodeServices() {
         return new InMemoryAuthorizationCodeServices();
     }
@@ -167,43 +158,45 @@ public class OAuth2Config {
      * jdbc store access_token
      * @return
      */
-    @Bean
+    /*@Bean
     EhrJdbcTokenStore ehrJdbcTokenStore() {
         EhrJdbcTokenStore tokenStoreService = new EhrJdbcTokenStore(dataSource);
         return tokenStoreService;
-    }
+    }*/
 
     /**
      * redis store access_token
-     * @param jedisConnectionFactory
      * @return
      */
-    /**
     @Bean
+    @Primary
     EhrRedisTokenStore ehrRedisTokenStore(JedisConnectionFactory jedisConnectionFactory) {
         return  new EhrRedisTokenStore(jedisConnectionFactory);
     }
-    */
 
     @Bean
-    EhrAuthorizationServerTokenServices ehrAuthorizationServerTokenServices(
+    @Primary
+    EhrTokenServices ehrTokenServices(
             ClientDetailsService ehrJdbcClientDetailsService,
-            TokenStore ehrJdbcTokenStore,
+            TokenStore ehrRedisTokenStore,
             JdbcTemplate jdbcTemplate) {
-        EhrAuthorizationServerTokenServices tokenServices = new EhrAuthorizationServerTokenServices();
+        EhrTokenServices tokenServices = new EhrTokenServices();
         tokenServices.setReuseRefreshToken(true);
         tokenServices.setSupportRefreshToken(true);
-        tokenServices.setTokenStore(ehrJdbcTokenStore);
+        tokenServices.setTokenStore(ehrRedisTokenStore);
         tokenServices.setJdbcTemplate(jdbcTemplate);
         tokenServices.setClientDetailsService(ehrJdbcClientDetailsService);
         return tokenServices;
     }
 
     @Bean
+    @Primary
     EhrJdbcAccessUrlService ehrJDBCAccessUrlService(DataSource dataSource) {
         return new EhrJdbcAccessUrlService(dataSource);
     }
+
     @Bean
+    @Primary
     EhrJdbcUserSecurityService ehrJDBCUserSecurityService(DataSource dataSource) {
         return new EhrJdbcUserSecurityService(dataSource);
     }
@@ -213,7 +206,7 @@ public class OAuth2Config {
     public static class ResourceServer extends ResourceServerConfigurerAdapter {
 
         @Autowired
-        private EhrAuthorizationServerTokenServices tokenServices;
+        private EhrTokenServices tokenServices;
 
         @Override
         public void configure(HttpSecurity http) throws Exception {

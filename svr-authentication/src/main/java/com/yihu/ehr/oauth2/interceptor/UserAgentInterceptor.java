@@ -1,8 +1,5 @@
 package com.yihu.ehr.oauth2.interceptor;
 
-import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.exception.ApiException;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
@@ -17,8 +14,9 @@ import javax.servlet.http.HttpServletResponse;
  * @version 1.0
  * @created 2016.02.26 18:04
  */
-@Component
+//@Component
 public class UserAgentInterceptor extends HandlerInterceptorAdapter {
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String userAgent = request.getHeader("User-Agent");
@@ -30,10 +28,6 @@ public class UserAgentInterceptor extends HandlerInterceptorAdapter {
                 return true;
             }
         }
-
-        throw new ApiException(HttpStatus.FORBIDDEN,
-                ErrorCode.MISSING_USER_AGENT,
-                ErrorCode.MISSING_USER_AGENT.getReasonPhrase(),
-                "https://ehr.yihu.com/docs");
+        return true;
     }
 }
