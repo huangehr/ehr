@@ -2,12 +2,8 @@ package com.yihu.quota.service.singledisease;
 
 import com.yihu.quota.etl.extract.es.EsExtract;
 import com.yihu.quota.etl.util.ElasticsearchUtil;
-import com.yihu.quota.vo.DictModel;
 import org.apache.commons.lang.StringUtils;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +21,7 @@ public class SingleDiseaseService {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    public static final String HEALTHPROBLEM = "1"; // 健康问题
+    public static final String HEALTH_PROBLEM = "1"; // 健康问题
     public static final String AGE = "2"; // 年龄段分布
     public static final String SEX = "3"; // 性别
     /**
@@ -33,9 +29,12 @@ public class SingleDiseaseService {
      * @return
      * @throws Exception
      */
-    public List<Map<String,String>>  getHeatMap() throws Exception {
+    public List<Map<String,String>>  getHeatMap(String condition) throws Exception {
         List<Map<String,String>> list = new ArrayList<>();
-        String sql = "select addressLngLat from single_disease_personal_index where addressLngLat is not null ";
+        String sql = "select addressLngLat from single_disease_personal_index where addressLngLat is not null";
+        if (!StringUtils.isEmpty(condition)) {
+            sql += " and " + condition;
+        }
         List<Map<String, Object>> listData = parseIntegerValue(sql);
         Map<String, Object> map = new HashMap<>();
         if (null != listData && listData.size() > 0 && listData.get(0).size() > 0) {
@@ -61,9 +60,14 @@ public class SingleDiseaseService {
      * @return
      * @throws Exception
      */
-    public List<Map<String, Object>> getNumberOfDiabetes() throws Exception {
-        String sql = "select town, count(*) from single_disease_personal_index where town is not null group by town";
-        List<Map<String, Object>> list = parseIntegerValue(sql);
+    public List<Map<String, Object>> getNumberOfDiabetes(String condition) throws Exception {
+        StringBuffer sql = new StringBuffer();
+        sql.append("select town, count(*) from single_disease_personal_index where town is not null");
+        if (!StringUtils.isEmpty(condition)) {
+            sql.append(" and " + condition);
+        }
+        sql.append(" group by town");
+        List<Map<String, Object>> list = parseIntegerValue(sql.toString());
         List<Map<String, Object>> dataList = fillNoDataColumn(list);
         return dataList;
     }
@@ -107,13 +111,18 @@ public class SingleDiseaseService {
      * 新增患者年趋势
      * @return
      */
-    public Map<String, List<String>> getLineDataInfo() {
-        String sql = "select eventDate, count(*) from single_disease_personal_index group by date_histogram(field='eventDate','interval'='year')";
-        List<Map<String, Object>> listData = parseIntegerValue(sql);
+    public Map<String, List<String>> getLineDataInfo(String condition) {
+        StringBuffer sql = new StringBuffer();
+        sql.append("select eventDate, count(*) from single_disease_personal_index");
+        if (!StringUtils.isEmpty(condition)) {
+            sql.append(" where " + condition);
+        }
+        sql.append(" group by date_histogram(field='eventDate','interval'='year')");
+        List<Map<String, Object>> listData = parseIntegerValue(sql.toString());
         Map<String, List<String>> map = new HashMap<>();
         List<String> xData = new ArrayList<>();
         List<String> valueData = new ArrayList<>();
-        if (null != listData && listData.get(0).size() > 0) {
+        if (null != listData && listData.size() > 0 && listData.get(0).size() > 0) {
             listData.forEach(one -> {
                 // "date_histogram(field=eventDate,interval=year)":"2015-01-01 00:00:00",因为是获取年份，所以截取前4位
                 xData.add((one.get("date_histogram(field=eventDate,interval=year)") + "").substring(0,4));
@@ -128,17 +137,16 @@ public class SingleDiseaseService {
     /**
      * 获取饼状图数据
      * @param type 健康状况、年龄段、性别
-     * @param code 字典code
      * @return
      */
-    public Map<String, Object> getPieDataInfo(String type, String code) {
+    public Map<String, Object> getPieDataInfo(String type, String condition) {
         Map<String, Object> map = new HashMap<>();
-        if (HEALTHPROBLEM.equals(type)) {
-            map = getHealthProInfo(code);
+        if (HEALTH_PROBLEM.equals(type)) {
+            map = getHealthProInfo(condition);
         } else if (AGE.equals(type)) {
-            map = getAgeInfo();
+            map = getAgeInfo(condition);
         } else if (SEX.equals(type)) {
-            map = getGenderInfo();
+            map = getGenderInfo(condition);
         }
         return map;
     }
@@ -147,13 +155,18 @@ public class SingleDiseaseService {
      * 获取健康状况
      * @return
      */
-    public Map<String, Object> getHealthProInfo(String code) {
-        String sql = "select diseaseTypeName,count(*) from single_disease_personal_index group by diseaseTypeName";
-        List<Map<String, Object>> listData = parseIntegerValue(sql);
+    public Map<String, Object> getHealthProInfo(String condition) {
+        StringBuffer sql = new StringBuffer();
+        sql.append("select diseaseTypeName,count(*) from single_disease_personal_index");
+        if (!StringUtils.isEmpty(condition)) {
+            sql.append(" where " + condition);
+        }
+        sql.append(" group by diseaseTypeName");
+        List<Map<String, Object>> listData = parseIntegerValue(sql.toString());
         Map<String, Object> map = new HashMap<>();
         List<String> legendData = new ArrayList<>();
         List<Map<String, Object>> seriesData = new ArrayList<>();
-        if (null != listData && listData.get(0).size() > 0) {
+        if (null != listData && listData.size() > 0 && listData.get(0).size() > 0) {
             listData.forEach(one -> {
                 Map<String, Object> myMap = new HashMap<>();
                 legendData.add(one.get("diseaseTypeName") + "");
@@ -168,25 +181,11 @@ public class SingleDiseaseService {
     }
 
     /**
-     * 获取全市总人口数
-     * @param healthMap
-     * @param code
-     * @return
-     */
-    public Map<String, Object> getHealthCountInfo(Map<String, Object> healthMap, String code) {
-        String sql = "select code, value as name from system_dict_entries where dict_id = 158 and code = ?";
-        List<DictModel> dictDatas = jdbcTemplate.query(sql, new BeanPropertyRowMapper(DictModel.class), code);
-
-        healthMap.put("name", "健康人群");
-        healthMap.put("value", null != dictDatas && dictDatas.size() > 0 ? dictDatas.get(0).getName() : "0");
-        return healthMap;
-    }
-
-    /**
      * 获取年龄段数据
      * @return
      */
-    public Map<String, Object> getAgeInfo() {
+    public Map<String, Object> getAgeInfo(String condition) {
+        StringBuffer sql = new StringBuffer();
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR) + 1;
         /*
@@ -195,12 +194,16 @@ public class SingleDiseaseService {
         * 下面为构造年龄段的算式，其中year-151限定了范围是66-150岁 即66以上，其他类似
         * */
         String range = "range(birthYear," + (year - 151) + "," + (year - 66) + "," + (year - 41) + "," + (year - 18) + "," + (year - 7) + "," + year + ")";
-        String sql = "select count(*) from single_disease_personal_index where birthYear <> 0  group by " + range;
-        List<Map<String, Object>> listData = parseIntegerValue(sql);
+        sql.append("select count(*) from single_disease_personal_index where birthYear <> 0");
+        if (!StringUtils.isEmpty(condition)) {
+            sql.append(" and " + condition);
+        }
+        sql.append(" group by " + range);
+        List<Map<String, Object>> listData = parseIntegerValue(sql.toString());
         Map<String, Object> map = new HashMap<>();
         List<String> legendData = new ArrayList<>();
         List<Map<String, Object>> seriesData = new ArrayList<>();
-        if (null != listData && listData.get(0).size() > 0) {
+        if (null != listData && listData.size() > 0 && listData.get(0).size() > 0) {
             listData.forEach(one -> {
                 String rangeName = one.get(range) + "";
                 // rangeName："1978.0-2001.0"
@@ -249,13 +252,18 @@ public class SingleDiseaseService {
      * 获取性别数据
      * @return
      */
-    public Map<String, Object> getGenderInfo() {
-        String sql = "select sexName, count(*) from single_disease_personal_index group by sexName";
-        List<Map<String, Object>> listData = parseIntegerValue(sql);
+    public Map<String, Object> getGenderInfo(String condition) {
+        StringBuffer sql = new StringBuffer();
+        sql.append("select sexName, count(*) from single_disease_personal_index");
+        if (!StringUtils.isEmpty(condition)) {
+            sql.append(" where " + condition);
+        }
+        sql.append(" group by sexName");
+        List<Map<String, Object>> listData = parseIntegerValue(sql.toString());
         Map<String, Object> map = new HashMap<>();
         List<String> legendData = new ArrayList<>();
         List<Map<String, Object>> seriesData = new ArrayList<>();
-        if (null != listData && listData.get(0).size() > 0) {
+        if (null != listData && listData.size() > 0 && listData.get(0).size() > 0) {
             listData.forEach(one -> {
                 Map<String, Object> myMap = new HashMap<>();
                 legendData.add(one.get("sexName") + "");
@@ -273,13 +281,18 @@ public class SingleDiseaseService {
      * 获取并发症数据
      * @return
      */
-    public Map<String, List<String>> getSymptomDataInfo() {
-        String sql = "select symptomName, count(*) from single_disease_check_index where checkCode = 'CH001' group by symptomName";
-        List<Map<String, Object>> listData = parseIntegerValue(sql);
+    public Map<String, List<String>> getSymptomDataInfo(String condition) {
+        StringBuffer sql = new StringBuffer();
+        sql.append("select symptomName, count(*) from single_disease_check_index where checkCode = 'CH001'");
+        if (!StringUtils.isEmpty(condition)) {
+            sql.append(" and " + condition);
+        }
+        sql.append(" group by symptomName");
+        List<Map<String, Object>> listData = parseIntegerValue(sql.toString());
         Map<String, List<String>> map = new HashMap<>();
         List<String> xData = new ArrayList<>();
         List<String> valueData = new ArrayList<>();
-        if (null != listData && listData.get(0).size() > 0) {
+        if (null != listData && listData.size() > 0 && listData.get(0).size() > 0) {
             listData.forEach(one -> {
                 xData.add(one.get("symptomName") + "");
                 valueData.add(one.get("COUNT(*)") + "");
@@ -294,13 +307,18 @@ public class SingleDiseaseService {
      * 用药患者数分布
      * @return
      */
-    public Map<String, List<String>> getMedicineDataInfo() {
-        String sql = "select medicineName, count(*) from single_disease_check_index where checkCode = 'CH004' group by medicineName";
-        List<Map<String, Object>> listData = parseIntegerValue(sql);
+    public Map<String, List<String>> getMedicineDataInfo(String condition) {
+        StringBuffer sql = new StringBuffer();
+        sql.append("select medicineName, count(*) from single_disease_check_index where checkCode = 'CH004'");
+        if (!StringUtils.isEmpty(condition)) {
+            sql.append(" and " + condition);
+        }
+        sql.append(" group by medicineName");
+        List<Map<String, Object>> listData = parseIntegerValue(sql.toString());
         Map<String, List<String>> map = new HashMap<>();
         List<String> xData = new ArrayList<>();
         List<String> valueData = new ArrayList<>();
-        if (null != listData && listData.get(0).size() > 0) {
+        if (null != listData && listData.size() > 0 && listData.get(0).size() > 0) {
             listData.forEach(one -> {
                 xData.add(one.get("medicineName") + "");
                 valueData.add(one.get("COUNT(*)") + "");
@@ -315,9 +333,16 @@ public class SingleDiseaseService {
      *  空腹血糖统计
      * @return
      */
-    public Map<String, List<String>> getFastingBloodGlucoseDataInfo() {
-        String sql = "select fastingBloodGlucoseCode, count(*) from single_disease_check_index where checkCode = 'CH002' group by fastingBloodGlucoseCode";
-        List<Map<String, Object>> list = parseIntegerValue(sql);
+    public Map<String, List<String>> getFastingBloodGlucoseDataInfo(String condition) {
+        StringBuffer sql = new StringBuffer();
+        sql.append("select fastingBloodGlucoseCode, count(*) from single_disease_check_index where checkCode = 'CH002'");
+        if (!StringUtils.isEmpty(condition)) {
+            //先把过滤条件忽略性别的过滤
+            condition = changeCondition(condition);
+            sql.append(" and " + condition);
+        }
+        sql.append(" group by fastingBloodGlucoseCode");
+        List<Map<String, Object>> list = parseIntegerValue(sql.toString());
         Map<String, List<String>> map = new HashMap<>();
         List<String> xData = new LinkedList<>();
         // 获取横坐标
@@ -362,7 +387,7 @@ public class SingleDiseaseService {
 
         //无性别输出
         List<String> valueData = new ArrayList<>();
-        if (null != list && list.get(0).size() > 0) {
+        if (null != list && list.size() > 0 && list.get(0).size() > 0) {
             list.forEach(one -> {
                 valueData.add(one.get("COUNT(*)") + "");
             });
@@ -376,9 +401,16 @@ public class SingleDiseaseService {
      * 糖耐量统计
      * @return
      */
-    public Map<String, List<String>> getSugarToleranceDataInfo() {
-        String sql = "select sugarToleranceCode, count(*) from single_disease_check_index where checkCode = 'CH003' group by sugarToleranceCode";
-        List<Map<String, Object>> list = parseIntegerValue(sql);
+    public Map<String, List<String>> getSugarToleranceDataInfo(String condition) {
+        StringBuffer sql = new StringBuffer();
+        sql.append("select sugarToleranceCode, count(*) from single_disease_check_index where checkCode = 'CH003'");
+        if (!StringUtils.isEmpty(condition)) {
+            //先把过滤条件忽略性别的过滤
+            condition = changeCondition(condition);
+            sql.append(" and " + condition);
+        }
+        sql.append(" group by sugarToleranceCode");
+        List<Map<String, Object>> list = parseIntegerValue(sql.toString());
         Map<String, List<String>> map = new HashMap<>();
         List<String> xData = new LinkedList<>();
         // 获取横坐标
@@ -422,7 +454,7 @@ public class SingleDiseaseService {
 
         //无性别输出
         List<String> valueData = new ArrayList<>();
-        if (null != list && list.get(0).size() > 0) {
+        if (null != list && list.size() > 0 && list.get(0).size() > 0) {
             list.forEach(one -> {
                 valueData.add(one.get("COUNT(*)") + "");
             });
@@ -453,4 +485,20 @@ public class SingleDiseaseService {
         return handleData;
     }
 
+    /**
+     * 采集出来的空腹血糖和糖耐量用户的性别基本都是未知（状态为0），所以先忽略性别的过滤
+     * @param condition
+     * @return
+     */
+    private String changeCondition(String condition) {
+        StringBuffer buffer = new StringBuffer();
+        String[] ands = condition.split("and");
+        for (String and : ands) {
+            if (!and.contains("sex")) {
+                buffer.append(and.trim() + " and ");
+            }
+        }
+        String newCondition = buffer.toString();
+        return newCondition.substring(0, newCondition.length() - 4).trim();
+    }
 }

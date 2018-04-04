@@ -709,11 +709,13 @@ public class QuotaReportController extends BaseController {
         return dimensionDicMap;
     }
 
-    @RequestMapping(value = ServiceApi.TJ.GetHeatMapByQuotaCode, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.TJ.GetHeatMap, method = RequestMethod.GET)
     @ApiOperation(value = "热力图")
-    public Envelop getHeatMap() throws Exception {
+    public Envelop getHeatMap(
+            @ApiParam(name = "condition", value = "过滤条件", defaultValue = "")
+            @RequestParam(value = "condition", required = false) String condition) throws Exception {
         Envelop envelop = new Envelop();
-        List<Map<String,String>>  heatMapPoint = singleDiseaseService.getHeatMap();
+        List<Map<String,String>>  heatMapPoint = singleDiseaseService.getHeatMap(condition);
         envelop.setSuccessFlg(true);
         if (null != heatMapPoint && heatMapPoint.size() > 0) {
             envelop.setDetailModelList(heatMapPoint);
@@ -723,9 +725,11 @@ public class QuotaReportController extends BaseController {
 
     @RequestMapping(value = ServiceApi.TJ.GetNumberOfDiabetes, method = RequestMethod.GET)
     @ApiOperation(value = "糖尿病患者数")
-    public Envelop getNumberOfDiabetes() throws Exception {
+    public Envelop getNumberOfDiabetes(
+            @ApiParam(name = "condition", value = "过滤条件", defaultValue = "")
+            @RequestParam(value = "condition", required = false) String condition) throws Exception {
         Envelop envelop = new Envelop();
-        List<Map<String, Object>> numberOfDiabetes = singleDiseaseService.getNumberOfDiabetes();
+        List<Map<String, Object>> numberOfDiabetes = singleDiseaseService.getNumberOfDiabetes(condition);
         envelop.setSuccessFlg(true);
         envelop.setDetailModelList(numberOfDiabetes);
         return envelop;
@@ -734,12 +738,12 @@ public class QuotaReportController extends BaseController {
     @RequestMapping(value = ServiceApi.TJ.GetPieData, method = RequestMethod.GET)
     @ApiOperation(value = "获取饼图数据")
     public Envelop getPieData(
-            @ApiParam(name = "type", value = "类型")
+            @ApiParam(name = "type", value = "类型", required = true)
             @RequestParam(value = "type") String type,
-            @ApiParam(name = "code", value = "字典编码")
-            @RequestParam(value = "code") String code) throws Exception {
+            @ApiParam(name = "condition", value = "过滤条件", defaultValue = "")
+            @RequestParam(value = "condition", required = false) String condition) throws Exception {
         Envelop envelop = new Envelop();
-        Map<String, Object> pieDataInfo = singleDiseaseService.getPieDataInfo(type, code);
+        Map<String, Object> pieDataInfo = singleDiseaseService.getPieDataInfo(type, condition);
         envelop.setSuccessFlg(true);
         if (null != pieDataInfo && pieDataInfo.size() > 0) {
             envelop.setObj(pieDataInfo.get("legendData"));
@@ -751,9 +755,11 @@ public class QuotaReportController extends BaseController {
 
     @RequestMapping(value = ServiceApi.TJ.GetLineData, method = RequestMethod.GET)
     @ApiOperation(value = "获取折线图数据")
-    public Envelop getLineData() throws Exception {
+    public Envelop getLineData(
+            @ApiParam(name = "condition", value = "过滤条件", defaultValue = "")
+            @RequestParam(value = "condition", required = false) String condition) throws Exception {
         Envelop envelop = new Envelop();
-        Map<String, List<String>> map = singleDiseaseService.getLineDataInfo();
+        Map<String, List<String>> map = singleDiseaseService.getLineDataInfo(condition);
         envelop.setSuccessFlg(true);
         if (null != map && map.size() > 0) {
             envelop.setDetailModelList(map.get("valueData"));
@@ -765,15 +771,17 @@ public class QuotaReportController extends BaseController {
     @RequestMapping(value = ServiceApi.TJ.GetBarData, method = RequestMethod.GET)
     @ApiOperation(value = "获取柱状图数据")
     public Envelop getBarData(
-            @ApiParam(name = "type", value = "类型 1并发症 2用药患者数 3空腹血糖统计 4糖耐量")
-            @RequestParam(value = "type") String type) throws Exception {
+            @ApiParam(name = "type", required = true, value = "类型 1并发症 2用药患者数 3空腹血糖统计 4糖耐量")
+            @RequestParam(value = "type") String type,
+            @ApiParam(name = "condition", value = "过滤条件", defaultValue = "")
+            @RequestParam(value = "condition", required = false) String condition) throws Exception {
         Envelop envelop = new Envelop();
         Map<String, List<String>> map = null;
         if ("1".equals(type) || "2".equals(type)) {
             if ("1".equals(type)) {
-                map = singleDiseaseService.getSymptomDataInfo();
+                map = singleDiseaseService.getSymptomDataInfo(condition);
             } else {
-                map = singleDiseaseService.getMedicineDataInfo();
+                map = singleDiseaseService.getMedicineDataInfo(condition);
             }
             if (null != map && map.size() > 0) {
                 envelop.setDetailModelList(map.get("valueData"));
@@ -781,9 +789,9 @@ public class QuotaReportController extends BaseController {
             }
         } else if ("3".equals(type) || "4".equals(type)){
             if ("3".equals(type)) {
-                map = singleDiseaseService.getFastingBloodGlucoseDataInfo();
+                map = singleDiseaseService.getFastingBloodGlucoseDataInfo(condition);
             } else {
-                map = singleDiseaseService.getSugarToleranceDataInfo();
+                map = singleDiseaseService.getSugarToleranceDataInfo(condition);
             }
 //            if (null != map && map.size() > 0) {
 //                List<Map<String, Object>> list = new ArrayList<>();

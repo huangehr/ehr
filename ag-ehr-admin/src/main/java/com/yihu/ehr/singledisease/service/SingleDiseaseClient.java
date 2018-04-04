@@ -19,26 +19,27 @@ import springfox.documentation.annotations.ApiIgnore;
 @ApiIgnore
 public interface SingleDiseaseClient {
 
-    @RequestMapping(value = ServiceApi.TJ.GetHeatMapByQuotaCode, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.TJ.GetHeatMap, method = RequestMethod.GET)
     @ApiOperation(value = "热力图")
-    Envelop getHeatMap();
+    Envelop getHeatMap(@RequestParam(value = "condition", required = false) String condition);
 
     @RequestMapping(value = ServiceApi.TJ.GetNumberOfDiabetes, method = RequestMethod.GET)
     @ApiOperation(value = "糖尿病患者数")
-    Envelop getNumberOfDiabetes();
+    Envelop getNumberOfDiabetes(@RequestParam(value = "condition", required = false) String condition);
 
     @RequestMapping(value = ServiceApi.TJ.GetPieData, method = RequestMethod.GET)
     @ApiOperation(value = "获取饼图数据")
     Envelop getPieData(
             @RequestParam(value = "type") String type,
-            @RequestParam(value = "code") String code);
+            @RequestParam(value = "condition", required = false) String condition);
 
     @RequestMapping(value = ServiceApi.TJ.GetLineData, method = RequestMethod.GET)
     @ApiOperation(value = "获取折线图数据")
-    Envelop getLineData();
+    Envelop getLineData(@RequestParam(value = "condition", required = false) String condition);
 
     @RequestMapping(value = ServiceApi.TJ.GetBarData, method = RequestMethod.GET)
     @ApiOperation(value = "获取柱状图数据")
     Envelop getBarData(
-            @RequestParam(value = "type") String type);
+            @RequestParam(value = "type") String type,
+            @RequestParam(value = "condition", required = false) String condition);
 }

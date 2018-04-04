@@ -1275,7 +1275,7 @@ public class ServiceApi {
 
         public static final String getQuotaCategoryByName = "/quotaCategory/getQuotaCategoryByName";
 
-        public static final String GetHeatMapByQuotaCode = "/tj/getHeatMapByQuotaCode";
+        public static final String GetHeatMap = "/tj/getHeatMap";
         public static final String GetNumberOfDiabetes = "/tj/getNumberOfDiabetes";
         public static final String GetPieData = "/tj/getPieData";
         public static final String GetLineData = "/tj/getLineData";
