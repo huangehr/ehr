@@ -143,7 +143,7 @@ public class HBaseDao extends AbstractHBaseClient {
     /**
      * 修改某行某列值
      */
-    public void put(String tableName ,String rowKey, String familyName, String qualifier, String value) throws Exception {
+    public void put(String tableName, String rowKey, String familyName, String qualifier, String value) throws Exception {
         hbaseTemplate.put(tableName, rowKey, familyName, qualifier, value.getBytes());
     }
 

@@ -62,12 +62,14 @@ ehr:
         - HDSB03_10: Clinic #门诊-传染病报告卡信息 v1.3
         - HDSC02_09: Resident #住院-入院记录 v1.0
         - HDSD00_13: Resident #住院-入院记录 v1.3
+        - HDSD00_16: Resident #住院-出院小结 v1.3
         - HDSB05_03: MedicalExam #体检-登记信息 v1.3
       meta-data:
         - HDSD00_01_457 #门诊-就诊日期时间 v.1.0 & v.13
         - HDSB03_10_033 #门诊-传染病报告卡信息填报日期 v1.3
         - HDSD00_01_575 #住院-入院日期时间 v1.0
         - HDSD00_13_057 #住院-入院日期时间 v1.3
+        - HDSD00_16_005 #住院-出院日期时间 v1.3
         - HDSB05_03_011 #体检-体检日期 v1.3
     #诊断信息
     diagnosis:

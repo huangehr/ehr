@@ -33,7 +33,7 @@ public class MasterResourceDao {
         TableBundle bundle = new TableBundle();
         if (resBucket.isReUploadFlg()) { //补传处理
             Map<String, String> originResult = hbaseDao.get(ResourceCore.MasterTable, rowKey, MasterResourceFamily.Data);
-            if(!originResult.isEmpty()) {
+            if (!originResult.isEmpty()) {
                 MasterRecord masterRecord = resBucket.getMasterRecord();
                 Map<String, String> supplement = masterRecord.getDataGroup();
                 originResult.putAll(supplement);
@@ -47,7 +47,7 @@ public class MasterResourceDao {
                 }
                 standardPackage.setDemographicId(basicResult.get("demographic_id"));
                 resBucket.setDemographicId(basicResult.get("demographic_id"));
-            }else {
+            } else {
                 throw new RuntimeException("Please upload the complete package(" + rowKey + ") first !");
             }
         } else {

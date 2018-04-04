@@ -8,14 +8,12 @@ import com.yihu.ehr.profile.util.PackageDataSet;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.resolve.service.resource.stage1.PackModelFactory;
 import com.yihu.ehr.resolve.service.resource.stage1.extractor.KeyDataExtractor;
-import com.yihu.ehr.util.datetime.DateUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.regex.Pattern;
 
 /**
  * 标准档案包解析器.
@@ -24,8 +22,6 @@ import java.util.regex.Pattern;
  */
 @Component
 public class StdPackageResolver extends PackageResolver {
-
-    private static final Pattern pattern = Pattern.compile("^[A-Za-z0-9\\-]+$");
 
     @Override
     public List<StandardPackage> resolveDataSets(File root, String clientId) throws Exception {
@@ -55,14 +51,14 @@ public class StdPackageResolver extends PackageResolver {
     private void parseFiles(StandardPackage standardPackage, File[] files, boolean origin) throws Exception, IOException {
         List<PackageDataSet> packageDataSetList = new ArrayList<>(files.length);
         //新增补传判断---------------Start---------------
-        for(File file : files) {
+        for (File file : files) {
             PackageDataSet dataSet = generateDataSet(file, origin);
             packageDataSetList.add(dataSet);
             if (dataSet.isReUploadFlg()){
                 standardPackage.setReUploadFlg(true);
             }
         }
-        if(standardPackage.isReUploadFlg()) {
+        if (standardPackage.isReUploadFlg()) {
             for(PackageDataSet dataSet : packageDataSetList) {
                 String dataSetCode = origin ? DataSetUtil.originDataSetCode(dataSet.getCode()) : dataSet.getCode();
                 dataSet.setCode(dataSetCode);
@@ -137,9 +133,6 @@ public class StdPackageResolver extends PackageResolver {
             standardPackage.setCdaVersion(dataSet.getCdaVersion());
             standardPackage.setCreateDate(dataSet.getCreateTime());
             standardPackage.insertDataSet(dataSetCode, dataSet);
-        }
-        if (StringUtils.isEmpty(standardPackage.getDemographicId()) || !pattern.matcher(standardPackage.getDemographicId()).find()) {
-            standardPackage.setDemographicId(UUID.randomUUID().toString());
         }
     }
 
