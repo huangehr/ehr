@@ -12,6 +12,7 @@
 package com.yihu.ehr.oauth2.web;
 
 import com.yihu.ehr.constants.ServiceApi;
+import com.yihu.ehr.oauth2.model.AccessToken;
 import com.yihu.ehr.oauth2.oauth2.EhrOAuth2ExceptionTranslator;
 import com.yihu.ehr.oauth2.oauth2.EhrTokenGranter;
 import com.yihu.ehr.oauth2.oauth2.EhrTokenServices;
@@ -42,6 +43,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -78,13 +80,13 @@ public class EhrAccessTokenEndpoint extends AbstractEndpoint {
     }
 
     @RequestMapping(value = ServiceApi.Authentication.AccessToken, method = RequestMethod.POST)
-    public ResponseEntity<Map<String, Object>> accessToken(@RequestParam Map<String, String> parameters) {
+    public ResponseEntity<AccessToken> accessToken(@RequestParam Map<String, String> parameters) {
         String grant_type = parameters.get("grant_type");
         String client_id = parameters.get("client_id");
         String scope = parameters.get("scope");
         //检查基本参数
         if (StringUtils.isEmpty(client_id)) {
-            throw new InvalidClientException("client id can not be null!");
+            throw new InvalidRequestException("Missing client id");
         }
         if (StringUtils.isEmpty(grant_type)) {
             throw new InvalidRequestException("Missing grant type");
@@ -133,67 +135,67 @@ public class EhrAccessTokenEndpoint extends AbstractEndpoint {
             tokenRequest.setScope(OAuth2Utils.parseParameterList(parameters.get(OAuth2Utils.SCOPE)));
         }
 
-        Map<String, Object> tokenMap = new HashMap<>();
+        AccessToken accessToken = new AccessToken();
         OAuth2AccessToken token = getTokenGranter().grant(grant_type, tokenRequest);
         if (token == null) {
             throw new UnsupportedGrantTypeException("Unsupported grant type: " + grant_type);
         } else {
-            tokenMap.put("accessToken", token.getValue());
-            tokenMap.put("tokenType", token.getTokenType());
-            tokenMap.put("expiresIn", token.getExpiresIn());
-            tokenMap.put("refreshToken", token.getRefreshToken().getValue());
-            if (!StringUtils.isEmpty(parameters.get("state"))) {
-                tokenMap.put("state", parameters.get("state"));
-            }
-            if (grant_type.equals("password")) {
-                tokenMap.put("user", parameters.get("username"));
-            }
+            accessToken.setAccessToken(token.getValue());
+            accessToken.setTokenType(token.getTokenType());
+            accessToken.setExpiresIn(token.getExpiresIn());
+            accessToken.setRefreshToken(token.getRefreshToken().getValue());
+            accessToken.setState(parameters.get("state"));
+            accessToken.setUser(parameters.get("username"));
             putVerificationApi(tokenRequest, token);
         }
-        return getResponse(tokenMap);
+        return getResponse(accessToken);
     }
 
     @RequestMapping(value = ServiceApi.Authentication.ValidToken, method = RequestMethod.POST)
-    public ResponseEntity<Map<String, Object>> validToken(
-        @ApiParam(name = "clientId", value = "应用ID", required = true)
-        @RequestParam(value = "clientId") String clientId,
-        @ApiParam(name = "accessToken", value = "accessToken", required = true)
-        @RequestParam(value = "accessToken") String accessToken,
-        @ApiParam(name = "api", value = "访问api")
-        @RequestParam(value = "api", required = false)String api) throws IllegalAccessException {
+    public ResponseEntity<AccessToken> validToken(@RequestParam Map<String, String> parameters) throws IllegalAccessException {
         //根据accessToken查询相应的访问授权数据行
+        String clientId = parameters.get("clientId");
+        String accessToken = parameters.get("accessToken");
+        String api = parameters.get("api");
+        if (StringUtils.isEmpty(clientId)) {
+            throw new InvalidRequestException("Missing clientId");
+        }
+        if (StringUtils.isEmpty(accessToken)) {
+            throw new InvalidRequestException("Missing accessToken");
+        }
         OAuth2AccessToken auth2AccessToken = ehrTokenServices.readAccessToken(accessToken);
         if (auth2AccessToken == null) {
-            throw  new InvalidTokenException("Invalid accessToken");
+            throw new InvalidTokenException("Invalid accessToken");
         } else {
             if (!auth2AccessToken.getValue().equals(accessToken) || auth2AccessToken.isExpired()) {
-                throw  new InvalidTokenException("Expired accessToken");
+                throw new InvalidTokenException("Expired accessToken");
             } else {
                 //判断ClientId
                 OAuth2Authentication authentication = ehrTokenServices.loadAuthentication(accessToken);
                 String authenticationClientId = authentication.getOAuth2Request().getClientId();
                 if (authenticationClientId != null && authenticationClientId.equals(clientId)) {
-                    Map<String, Object> successMap = new HashMap<>();
+                    AccessToken accessToken1 = new AccessToken();
                     UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = (UsernamePasswordAuthenticationToken) authentication.getUserAuthentication();
-                    if (api != null) {
+                    if (StringUtils.isEmpty(api)) {
+                        accessToken1.setAccessToken(auth2AccessToken.getValue());
+                        accessToken1.setTokenType(auth2AccessToken.getTokenType());
+                        accessToken1.setExpiresIn(auth2AccessToken.getExpiresIn());
+                        accessToken1.setRefreshToken(auth2AccessToken.getRefreshToken().getValue());
+                        accessToken1.setUser(usernamePasswordAuthenticationToken.getName());
+                        accessToken1.setState(parameters.get("state"));
+                        return getResponse(accessToken1);
+                    } else {
                         if (ehrRedisApiAccessValidator.verificationApi(clientId, usernamePasswordAuthenticationToken.getName(), api)){
-                            successMap.put("successFlg", true);
-                            successMap.put("accessToken", auth2AccessToken.getValue());
-                            successMap.put("tokenType", auth2AccessToken.getTokenType());
-                            successMap.put("expiresIn", auth2AccessToken.getExpiresIn());
-                            successMap.put("refreshToken", auth2AccessToken.getRefreshToken().getValue());
-                            return getResponse(successMap);
+                            accessToken1.setAccessToken(auth2AccessToken.getValue());
+                            accessToken1.setTokenType(auth2AccessToken.getTokenType());
+                            accessToken1.setExpiresIn(auth2AccessToken.getExpiresIn());
+                            accessToken1.setRefreshToken(auth2AccessToken.getRefreshToken().getValue());
+                            accessToken1.setUser(usernamePasswordAuthenticationToken.getName());
+                            accessToken1.setState(parameters.get("state"));
+                            return getResponse(accessToken1);
                         } else {
                             throw new InvalidRequestException("Illegal api request");
                         }
-                    } else {
-                        successMap.put("successFlg", true);
-                        successMap.put("accessToken", auth2AccessToken.getValue());
-                        successMap.put("tokenType", auth2AccessToken.getTokenType());
-                        successMap.put("expiresIn", auth2AccessToken.getExpiresIn());
-                        successMap.put("refreshToken", auth2AccessToken.getRefreshToken().getValue());
-                        successMap.put("user", usernamePasswordAuthenticationToken.getName());
-                        return getResponse(successMap);
                     }
                 } else {
                     throw new InvalidClientException("Illegal client id");
@@ -251,11 +253,11 @@ public class EhrAccessTokenEndpoint extends AbstractEndpoint {
         return getExceptionTranslator().translate(e);
     }
 
-    private ResponseEntity<Map<String, Object>> getResponse(Map<String, Object> accessToken) {
+    private ResponseEntity<AccessToken> getResponse(AccessToken accessToken) {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Cache-Control", "no-store");
         headers.set("Pragma", "no-cache");
-        return new ResponseEntity<Map<String, Object>>(accessToken, headers, HttpStatus.OK);
+        return new ResponseEntity<>(accessToken, headers, HttpStatus.OK);
     }
 
     private boolean isRefreshTokenRequest(Map<String, String> parameters) {

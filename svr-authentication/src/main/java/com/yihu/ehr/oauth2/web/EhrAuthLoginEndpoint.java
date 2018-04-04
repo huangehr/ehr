@@ -1,8 +1,11 @@
 package com.yihu.ehr.oauth2.web;
 
 import com.yihu.ehr.constants.ServiceApi;
+import com.yihu.ehr.oauth2.model.EhrUserDetails;
+import com.yihu.ehr.oauth2.model.EhrUserSimple;
 import com.yihu.ehr.oauth2.oauth2.EhrOAuth2ExceptionTranslator;
 import com.yihu.ehr.oauth2.oauth2.EhrTokenGranter;
+import com.yihu.ehr.oauth2.oauth2.EhrUserDetailsService;
 import com.yihu.ehr.oauth2.oauth2.jdbc.EhrJdbcClientDetailsService;
 import com.yihu.ehr.oauth2.oauth2.redis.EhrRedisTokenStore;
 import org.slf4j.Logger;
@@ -50,6 +53,8 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
     private EhrOAuth2ExceptionTranslator ehrOAuth2ExceptionTranslator;
     @Autowired
     private EhrRedisTokenStore ehrRedisTokenStore;
+    @Autowired
+    private EhrUserDetailsService ehrUserDetailsService;
 
     @PostConstruct
     private void init() {
@@ -57,12 +62,12 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
     }
 
     @RequestMapping(value = ServiceApi.Authentication.Login, method = RequestMethod.POST)
-    public ResponseEntity<Map<String, Object>> login(@RequestParam Map<String, String> parameters, HttpServletRequest request) {
+    public ResponseEntity<EhrUserSimple> login(@RequestParam Map<String, String> parameters, HttpServletRequest request) {
         String client_id = parameters.get("client_id");
         String scope = parameters.get("scope");
         //检查基本参数
         if (StringUtils.isEmpty(client_id)) {
-            throw new InvalidClientException("client id can not be null!");
+            throw new InvalidRequestException("Missing clientId");
         }
         Map<String, String> param = new HashMap<>();
         param.put("grant_type", DEFAULT_GRANT_TYPE);
@@ -82,7 +87,6 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
         if (!client_id.equals(tokenRequest.getClientId())) {
             throw new InvalidClientException("Given client ID does not match authenticated client");
         }
-        Map<String, Object> tokenMap = new HashMap<>();
         OAuth2AccessToken token = getTokenGranter().grant(DEFAULT_GRANT_TYPE, tokenRequest);
         /*如果是移动端登陆则移除之前的token，
         在网关处通过HTTP状态告知前端是过期（401）还是账号在别处登陆（403），
@@ -92,19 +96,17 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
             ehrRedisTokenStore.removeRefreshToken(token.getRefreshToken().getValue());
             token = getTokenGranter().grant(DEFAULT_GRANT_TYPE, tokenRequest);
         }
+        EhrUserSimple ehrUserSimple = ehrUserDetailsService.loadUserSimpleByUsername(parameters.get("username"));
         if (token == null) {
             throw new UnsupportedGrantTypeException("Unsupported grant type: " + DEFAULT_GRANT_TYPE);
         } else {
-            tokenMap.put("accessToken", token.getValue());
-            tokenMap.put("tokenType", token.getTokenType());
-            tokenMap.put("expiresIn", token.getExpiresIn());
-            tokenMap.put("refreshToken", token.getRefreshToken().getValue());
-            if (!StringUtils.isEmpty(parameters.get("state"))) {
-                tokenMap.put("state", parameters.get("state"));
-            }
-            tokenMap.put("user", parameters.get("username"));
+            ehrUserSimple.setAccessToken(token.getValue());
+            ehrUserSimple.setTokenType(token.getTokenType());
+            ehrUserSimple.setExpiresIn(token.getExpiresIn());
+            ehrUserSimple.setRefreshToken(token.getRefreshToken().getValue());
+            ehrUserSimple.setUser(parameters.get("username"));
         }
-        return getResponse(tokenMap);
+        return getResponse(ehrUserSimple);
     }
 
     @Override
@@ -139,11 +141,11 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
         oAuth2RequestFactory = new DefaultOAuth2RequestFactory(ehrJdbcClientDetailsService);
     }
 
-    private ResponseEntity<Map<String, Object>> getResponse(Map<String, Object> accessToken) {
+    private ResponseEntity<EhrUserSimple> getResponse(EhrUserSimple ehrUserSimple) {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Cache-Control", "no-store");
         headers.set("Pragma", "no-cache");
-        return new ResponseEntity<>(accessToken, headers, HttpStatus.OK);
+        return new ResponseEntity<>(ehrUserSimple, headers, HttpStatus.OK);
     }
 
     @Override

@@ -7,7 +7,7 @@ import java.util.Date;
  * @version 1.0
  * @updated 02-6月-2015 20:25:02
  */
-public class UserVO {
+public class EhrUserDetails {
     private String id;
     private Date createDate;
     private Date lastLoginTime;

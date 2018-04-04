@@ -1,6 +1,7 @@
 package com.yihu.ehr.oauth2.oauth2;
 
-import com.yihu.ehr.oauth2.model.UserVO;
+import com.yihu.ehr.oauth2.model.EhrUserDetails;
+import com.yihu.ehr.oauth2.model.EhrUserSimple;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -38,7 +39,7 @@ public class EhrUserDetailsService implements UserDetailsService {
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        List<UserVO> users = jdbcTemplate.query(DEFAULT_USER_DETAILS_STATEMENT, new BeanPropertyRowMapper(UserVO.class), username, username, username);
+        List<EhrUserDetails> users = jdbcTemplate.query(DEFAULT_USER_DETAILS_STATEMENT, new BeanPropertyRowMapper(EhrUserDetails.class), username, username, username);
         if (users == null || users.size() == 0) {
             throw new UsernameNotFoundException(username);
         }
@@ -55,4 +56,13 @@ public class EhrUserDetailsService implements UserDetailsService {
         authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
         return authorities;
     }
+
+    public EhrUserSimple loadUserSimpleByUsername(String username) throws UsernameNotFoundException {
+        List<EhrUserSimple> users = jdbcTemplate.query(DEFAULT_USER_DETAILS_STATEMENT, new BeanPropertyRowMapper(EhrUserSimple.class), username, username, username);
+        if (users == null || users.size() == 0) {
+            throw new UsernameNotFoundException(username);
+        }
+        return users.get(0);
+    }
+
 }
