@@ -1468,4 +1468,12 @@ public class ServiceApi {
         public static final String MessageOrderPush = "/messageTemplate/messageOrderPush";
     }
 
+    public static class SingleDisease {
+        public static final String GetDropdownList = "/singleDisease/getDropdownList";
+        public static final String GetSymptomDetailData = "/singleDisease/getSymptomDetailData";
+        public static final String GetMedicineDetailData = "/singleDisease/getMedicineDetailData";
+
+
+    }
+
 }
