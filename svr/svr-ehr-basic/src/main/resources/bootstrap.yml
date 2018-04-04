@@ -1,6 +1,6 @@
 spring:
   application:
-    name: svr-ehr-basic-sxy
+    name: svr-ehr-basic
 
 ---
 spring:

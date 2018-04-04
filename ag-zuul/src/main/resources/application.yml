@@ -33,7 +33,7 @@ zuul:
       serviceId: svr-standard
     svr-authentication:
       path: /authentication/**
-      serviceId: svr-authentication-sxy
+      serviceId: svr-authentication
     #档案包相关
     svr-health-profile:
       path: /profile/**
