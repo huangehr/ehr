@@ -29,6 +29,11 @@ public class CheckInfoModel {
     private String medicineCode;//用药编码
     private String medicineName;//用药名称
 
+    private String diseaseType;//疾病类型 1 I型糖尿病  2 II型糖尿病 3 妊娠糖尿病 4 其他糖尿病
+    private String diseaseTypeName;
+    private String birthday;//出生年月
+    private int birthYear;//出生年份
+
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssZ")// 2017-06-24T11:51:30+080
     @CreatedDate
@@ -160,5 +165,37 @@ public class CheckInfoModel {
 
     public void setMedicineName(String medicineName) {
         this.medicineName = medicineName;
+    }
+
+    public String getDiseaseType() {
+        return diseaseType;
+    }
+
+    public void setDiseaseType(String diseaseType) {
+        this.diseaseType = diseaseType;
+    }
+
+    public String getDiseaseTypeName() {
+        return diseaseTypeName;
+    }
+
+    public void setDiseaseTypeName(String diseaseTypeName) {
+        this.diseaseTypeName = diseaseTypeName;
+    }
+
+    public String getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(String birthday) {
+        this.birthday = birthday;
+    }
+
+    public int getBirthYear() {
+        return birthYear;
+    }
+
+    public void setBirthYear(int birthYear) {
+        this.birthYear = birthYear;
     }
 }
