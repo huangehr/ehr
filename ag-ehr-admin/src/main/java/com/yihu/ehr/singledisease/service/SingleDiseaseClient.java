@@ -42,4 +42,22 @@ public interface SingleDiseaseClient {
     Envelop getBarData(
             @RequestParam(value = "type") String type,
             @RequestParam(value = "condition", required = false) String condition);
+
+    @RequestMapping(value = ServiceApi.TJ.GetDiseaseTypeAnalysisInfo, method = RequestMethod.GET)
+    @ApiOperation(value = "获取疾病类型分析数据")
+    Envelop getDiseaseTypeInfo(
+            @RequestParam(value = "type") String type,
+            @RequestParam(value = "filter", required = false) String filter);
+
+    @RequestMapping(value = ServiceApi.TJ.GetSexAnalysisInfo, method = RequestMethod.GET)
+    @ApiOperation(value = "获取疾病类型分析数据")
+    Envelop getSexAnalysisInfo(
+            @RequestParam(value = "type", defaultValue = "1") String type,
+            @RequestParam(value = "filter", required = false) String filter);
+
+    @RequestMapping(value = ServiceApi.TJ.GetAgeAnalysisInfo, method = RequestMethod.GET)
+    @ApiOperation(value = "获取疾病类型分析数据")
+    Envelop getAgeAnalysisInfo(
+            @RequestParam(value = "type", defaultValue = "1") String type,
+            @RequestParam(value = "filter", required = false) String filter);
 }

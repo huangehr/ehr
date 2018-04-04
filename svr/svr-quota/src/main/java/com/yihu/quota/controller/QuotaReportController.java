@@ -813,6 +813,87 @@ public class QuotaReportController extends BaseController {
         return envelop;
     }
 
+    @RequestMapping(value = ServiceApi.TJ.GetDiseaseTypeAnalysisInfo, method = RequestMethod.GET)
+    @ApiOperation(value = "获取疾病类型分析数据")
+    public Envelop getDiseaseTypeAnalysisInfo(
+            @ApiParam(name = "type", required = true, value = "1 年份 2 月趋势")
+            @RequestParam(value = "type", defaultValue = "1") String type,
+            @ApiParam(name = "filter", value = "过滤的年份")
+            @RequestParam(value = "filter", required = false) String filter) {
+        Envelop envelop = new Envelop();
+        Map<String, List<String>> diseaseTypeInfo = singleDiseaseService.getDiseaseTypeAnalysisInfo(type, filter);
+        List<Map<String, Object>> listMap = new ArrayList<>();
+        if (null != diseaseTypeInfo && diseaseTypeInfo.size() > 0) {
+            envelop.setSuccessFlg(true);
+            Map<String, String> map = new HashMap<>();
+            map.put("name", diseaseTypeInfo.get("name") + "");
+            map.put("xName", diseaseTypeInfo.get("xName") + "");
+            envelop.setObj(map);
+            for (int i = 1; i < 5; i++) {
+                Map<String, Object> valueMap = new HashMap<>();
+                valueMap.put("name", singleDiseaseService.getNameByIdType(i, "1"));
+                valueMap.put("value", diseaseTypeInfo.get("type" + i));
+                listMap.add(valueMap);
+            }
+            envelop.setDetailModelList(listMap);
+        }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.TJ.GetSexAnalysisInfo, method = RequestMethod.GET)
+    @ApiOperation(value = "获取疾病类型分析数据")
+    public Envelop getSexAnalysisInfo(
+            @ApiParam(name = "type", required = true, value = "1 年份 2 月趋势")
+            @RequestParam(value = "type", defaultValue = "1") String type,
+            @ApiParam(name = "filter", value = "过滤的年份")
+            @RequestParam(value = "filter", required = false) String filter) {
+        Envelop envelop = new Envelop();
+        Map<String, List<String>> diseaseTypeInfo = singleDiseaseService.getSexAnalysisInfo(type, filter);
+        List<Map<String, Object>> listMap = new ArrayList<>();
+        if (null != diseaseTypeInfo && diseaseTypeInfo.size() > 0) {
+            envelop.setSuccessFlg(true);
+            Map<String, String> map = new HashMap<>();
+            map.put("name", diseaseTypeInfo.get("name") + "");
+            map.put("xName", diseaseTypeInfo.get("xName") + "");
+            envelop.setObj(map);
+            for (int i = 1; i < 4; i++) {
+                Map<String, Object> valueMap = new HashMap<>();
+                valueMap.put("name", singleDiseaseService.getNameByIdType(i, "2"));
+                valueMap.put("value", diseaseTypeInfo.get("type" + i));
+                listMap.add(valueMap);
+            }
+            envelop.setDetailModelList(listMap);
+        }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.TJ.GetAgeAnalysisInfo, method = RequestMethod.GET)
+    @ApiOperation(value = "获取疾病类型分析数据")
+    public Envelop getAgeAnalysisInfo(
+            @ApiParam(name = "type", required = true, value = "1 年份 2 月趋势")
+            @RequestParam(value = "type", defaultValue = "1") String type,
+            @ApiParam(name = "filter", value = "过滤的年份")
+            @RequestParam(value = "filter", required = false) String filter) {
+        Envelop envelop = new Envelop();
+        Map<String, List<String>> diseaseTypeInfo = singleDiseaseService.getAgeAnalysisInfo(type, filter);
+        List<Map<String, Object>> listMap = new ArrayList<>();
+        if (null != diseaseTypeInfo && diseaseTypeInfo.size() > 0) {
+            envelop.setSuccessFlg(true);
+            Map<String, String> map = new HashMap<>();
+            map.put("name", diseaseTypeInfo.get("name") + "");
+            map.put("xName", diseaseTypeInfo.get("xName") + "");
+            envelop.setObj(map);
+            for (int i = 1; i < 6; i++) {
+                Map<String, Object> valueMap = new HashMap<>();
+                valueMap.put("name", singleDiseaseService.getNameByIdType(i, "3"));
+                valueMap.put("value", diseaseTypeInfo.get("type" + i));
+                listMap.add(valueMap);
+            }
+            envelop.setDetailModelList(listMap);
+        }
+        return envelop;
+    }
+
     private Integer getNum(Map<String, Object> dataMap) {
         Integer num = 0;
         for (String key : dataMap.keySet()) {

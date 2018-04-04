@@ -3,6 +3,8 @@ package com.yihu.quota.service.singledisease;
 import com.yihu.quota.etl.extract.es.EsExtract;
 import com.yihu.quota.etl.util.ElasticsearchUtil;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,8 @@ public class SingleDiseaseService {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    private static final Logger log = LoggerFactory.getLogger(SingleDiseaseService.class);
+
     public static final String HEALTH_PROBLEM = "1"; // 健康问题
     public static final String AGE = "2"; // 年龄段分布
     public static final String SEX = "3"; // 性别
@@ -35,6 +39,7 @@ public class SingleDiseaseService {
         if (!StringUtils.isEmpty(condition)) {
             sql += " and " + condition;
         }
+        log.info("sql = " + sql);
         List<Map<String, Object>> listData = parseIntegerValue(sql);
         Map<String, Object> map = new HashMap<>();
         if (null != listData && listData.size() > 0 && listData.get(0).size() > 0) {
@@ -67,6 +72,7 @@ public class SingleDiseaseService {
             sql.append(" and " + condition);
         }
         sql.append(" group by town");
+        log.info("sql = " + sql.toString());
         List<Map<String, Object>> list = parseIntegerValue(sql.toString());
         List<Map<String, Object>> dataList = fillNoDataColumn(list);
         return dataList;
@@ -118,6 +124,7 @@ public class SingleDiseaseService {
             sql.append(" where " + condition);
         }
         sql.append(" group by date_histogram(field='eventDate','interval'='year')");
+        log.info("sql = " + sql.toString());
         List<Map<String, Object>> listData = parseIntegerValue(sql.toString());
         Map<String, List<String>> map = new HashMap<>();
         List<String> xData = new ArrayList<>();
@@ -162,6 +169,7 @@ public class SingleDiseaseService {
             sql.append(" where " + condition);
         }
         sql.append(" group by diseaseTypeName");
+        log.info("sql = " + sql.toString());
         List<Map<String, Object>> listData = parseIntegerValue(sql.toString());
         Map<String, Object> map = new HashMap<>();
         List<String> legendData = new ArrayList<>();
@@ -199,6 +207,7 @@ public class SingleDiseaseService {
             sql.append(" and " + condition);
         }
         sql.append(" group by " + range);
+        log.info("sql = " + sql.toString());
         List<Map<String, Object>> listData = parseIntegerValue(sql.toString());
         Map<String, Object> map = new HashMap<>();
         List<String> legendData = new ArrayList<>();
@@ -259,6 +268,7 @@ public class SingleDiseaseService {
             sql.append(" where " + condition);
         }
         sql.append(" group by sexName");
+        log.info("sql = " + sql.toString());
         List<Map<String, Object>> listData = parseIntegerValue(sql.toString());
         Map<String, Object> map = new HashMap<>();
         List<String> legendData = new ArrayList<>();
@@ -288,6 +298,7 @@ public class SingleDiseaseService {
             sql.append(" and " + condition);
         }
         sql.append(" group by symptomName");
+        log.info("sql = " + sql.toString());
         List<Map<String, Object>> listData = parseIntegerValue(sql.toString());
         Map<String, List<String>> map = new HashMap<>();
         List<String> xData = new ArrayList<>();
@@ -314,6 +325,7 @@ public class SingleDiseaseService {
             sql.append(" and " + condition);
         }
         sql.append(" group by medicineName");
+        log.info("sql = " + sql.toString());
         List<Map<String, Object>> listData = parseIntegerValue(sql.toString());
         Map<String, List<String>> map = new HashMap<>();
         List<String> xData = new ArrayList<>();
@@ -342,6 +354,7 @@ public class SingleDiseaseService {
             sql.append(" and " + condition);
         }
         sql.append(" group by fastingBloodGlucoseCode");
+        log.info("sql = " + sql.toString());
         List<Map<String, Object>> list = parseIntegerValue(sql.toString());
         Map<String, List<String>> map = new HashMap<>();
         List<String> xData = new LinkedList<>();
@@ -410,6 +423,7 @@ public class SingleDiseaseService {
             sql.append(" and " + condition);
         }
         sql.append(" group by sugarToleranceCode");
+        log.info("sql = " + sql.toString());
         List<Map<String, Object>> list = parseIntegerValue(sql.toString());
         Map<String, List<String>> map = new HashMap<>();
         List<String> xData = new LinkedList<>();
@@ -500,5 +514,388 @@ public class SingleDiseaseService {
         }
         String newCondition = buffer.toString();
         return newCondition.substring(0, newCondition.length() - 4).trim();
+    }
+
+    /**
+     * 获取糖尿病类型分析
+     * @param type
+     * @param filter
+     * @return
+     */
+    public Map<String, List<String>> getDiseaseTypeAnalysisInfo(String type, String filter) {
+        String sql = "";
+        if ("1".equals(type)) {
+            sql = "select count(*) from single_disease_personal_index group by diseaseTypeName,date_histogram(field='eventDate','interval'='year') order by eventDate,diseaseType";
+        } else {
+            sql = "select count(*) from single_disease_personal_index  where " + filter + " group by diseaseTypeName,date_histogram(field='eventDate','interval'='month')";
+        }
+        log.info("sql = " + sql);
+        List<Map<String, Object>> listData = parseIntegerValue(sql);
+        Map<String, List<String>> map = new HashMap<>();
+        List<String> xData = new ArrayList<>();
+        List<String> valueData = new ArrayList<>();
+        Set<String> hashSet = new TreeSet<>();
+        Map<String, String> value = new HashMap<>();
+        if (null != listData && listData.size() > 0 && listData.get(0).size() > 0) {
+            if ("1".equals(type)) {
+                listData.forEach(one -> {
+                    hashSet.add((one.get("date_histogram(field=eventDate,interval=year)") + "").substring(0,4));
+                    value.put((one.get("date_histogram(field=eventDate,interval=year)") + "").substring(0,4) + "-"+ one.get("diseaseTypeName"), one.get("COUNT(*)") + "");
+                });
+            } else {
+                hashSet.clear();
+                hashSet.add("01");
+                hashSet.add("02");
+                hashSet.add("03");
+                hashSet.add("04");
+                hashSet.add("05");
+                hashSet.add("06");
+                hashSet.add("07");
+                hashSet.add("08");
+                hashSet.add("09");
+                hashSet.add("10");
+                hashSet.add("11");
+                hashSet.add("12");
+                listData.forEach(one -> {
+                    value.put((one.get("date_histogram(field=eventDate,interval=month)") + "").substring(5,7) + "-"+ one.get("diseaseTypeName"), one.get("COUNT(*)") + "");
+                });
+            }
+        }
+        List<String> name = new ArrayList<>();
+        name.add("I型糖尿病");
+        name.add("II型糖尿病");
+        name.add("妊娠糖尿病");
+        name.add("其他糖尿病");
+        if (hashSet.size() > 0 && value.size() > 0) {
+            for (String year : hashSet) {
+                for (int i = 1; i <= 4; i++) {
+                    if (!value.containsKey(year + "-I型糖尿病")) {
+                        value.put(year + "-I型糖尿病", "0");
+                    }
+                    if (!value.containsKey(year + "-II型糖尿病")) {
+                        value.put(year + "-II型糖尿病", "0");
+                    }
+                    if (!value.containsKey(year + "-妊娠糖尿病")) {
+                        value.put(year + "-妊娠糖尿病", "0");
+                    }
+                    if (!value.containsKey(year + "-其他糖尿病")) {
+                        value.put(year + "-其他糖尿病", "0");
+                    }
+                }
+
+            }
+            List<String> list1 = new ArrayList<>(); // I型糖尿病
+            List<String> list2 = new ArrayList<>(); // II型糖尿病
+            List<String> list3 = new ArrayList<>(); // 妊娠糖尿病
+            List<String> list4 = new ArrayList<>(); // 其他糖尿病
+            for (String year : hashSet) {
+                for (String key : value.keySet()) {
+                    if (key.contains(year + "-I型糖尿病")) {
+                        list1.add(value.get(year + "-I型糖尿病"));
+                    }
+                    if (key.contains(year + "-II型糖尿病")) {
+                        list2.add(value.get(year + "-II型糖尿病"));
+                    }
+                    if (key.contains(year + "-妊娠糖尿病")) {
+                        list3.add(value.get(year + "-妊娠糖尿病"));
+                    }
+                    if (key.contains(year + "-其他糖尿病")) {
+                        list4.add(value.get(year + "-其他糖尿病"));
+                    }
+                }
+            }
+            xData.clear();
+            xData.addAll(hashSet);
+            map.put("name", name);
+            map.put("xName", xData);
+            map.put("type1", list1);
+            map.put("type2", list2);
+            map.put("type3", list3);
+            map.put("type4", list4);
+        }
+        return map;
+    }
+
+    /**
+     * 性别分析
+     * @param type
+     * @param filter
+     * @return
+     */
+    public Map<String, List<String>> getSexAnalysisInfo(String type, String filter) {
+        String sql = "";
+        if ("1".equals(type)) {
+            sql = "select count(*) from single_disease_personal_index group by sexName,date_histogram(field='eventDate','interval'='year')";
+        } else {
+            sql = "select count(*) from single_disease_personal_index where " + filter + "group by sexName,date_histogram(field='eventDate','interval'='month')";
+        }
+        log.info("sql = " + sql);
+        List<Map<String, Object>> listData = parseIntegerValue(sql);
+        Map<String, List<String>> map = new HashMap<>();
+        List<String> xData = new ArrayList<>();
+        Set<String> hashSet = new TreeSet<>();
+        Map<String, String> value = new HashMap<>();
+        if (null != listData && listData.size() > 0 && listData.get(0).size() > 0) {
+            if ("1".equals(type)) {
+                listData.forEach(one -> {
+                    hashSet.add((one.get("date_histogram(field=eventDate,interval=year)") + "").substring(0,4));
+                    value.put((one.get("date_histogram(field=eventDate,interval=year)") + "").substring(0,4) + "-"+ one.get("sexName"), one.get("COUNT(*)") + "");
+                });
+            } else {
+                hashSet.clear();
+                hashSet.add("01");
+                hashSet.add("02");
+                hashSet.add("03");
+                hashSet.add("04");
+                hashSet.add("05");
+                hashSet.add("06");
+                hashSet.add("07");
+                hashSet.add("08");
+                hashSet.add("09");
+                hashSet.add("10");
+                hashSet.add("11");
+                hashSet.add("12");
+                listData.forEach(one -> {
+                    value.put((one.get("date_histogram(field=eventDate,interval=month)") + "").substring(5,7) + "-"+ one.get("sexName"), one.get("COUNT(*)") + "");
+                });
+            }
+        }
+        List<String> name = new ArrayList<>();
+        name.add("女性");
+        name.add("男性");
+        name.add("未知");
+        if (hashSet.size() > 0 && value.size() > 0) {
+            for (String year : hashSet) {
+                for (int i = 1; i <= 3; i++) {
+                    if (!value.containsKey(year + "-女性")) {
+                        value.put(year + "-女性", "0");
+                    }
+                    if (!value.containsKey(year + "-男性")) {
+                        value.put(year + "-男性", "0");
+                    }
+                    if (!value.containsKey(year + "-未知")) {
+                        value.put(year + "-未知", "0");
+                    }
+                }
+
+            }
+            List<String> list1 = new ArrayList<>(); // 女性
+            List<String> list2 = new ArrayList<>(); // 男性
+            List<String> list3 = new ArrayList<>(); // 未知
+            for (String year : hashSet) {
+                for (String key : value.keySet()) {
+                    if (key.contains(year + "-女性")) {
+                        list1.add(value.get(year + "-女性"));
+                    }
+                    if (key.contains(year + "-男性")) {
+                        list2.add(value.get(year + "-男性"));
+                    }
+                    if (key.contains(year + "-未知")) {
+                        list3.add(value.get(year + "-未知"));
+                    }
+                }
+            }
+            xData.clear();
+            xData.addAll(hashSet);
+            map.put("name", name);
+            map.put("xName", xData);
+            map.put("type1", list1);
+            map.put("type2", list2);
+            map.put("type3", list3);
+        }
+        return map;
+    }
+
+    /**
+     * 年龄段分析
+     * @param type
+     * @param filter
+     * @return
+     */
+    public Map<String, List<String>> getAgeAnalysisInfo(String type, String filter) {
+        String sql = "";
+        Calendar calendar = Calendar.getInstance();
+        int years = calendar.get(Calendar.YEAR) + 1;
+        /*
+        * 年龄段分为0-6、7-17、18-40、41-65、65以上
+        * 首先获取当前年份，由于ES查询是左包含，右不包，所以当前年份需要+1
+        * 下面为构造年龄段的算式，其中year-151限定了范围是66-150岁 即66以上，其他类似
+        * */
+        String range = "range(birthYear," + (years - 151) + "," + (years - 66) + "," + (years - 41) + "," + (years - 18) + "," + (years - 7) + "," + years + ")";
+        if ("1".equals(type)) {
+            sql = "select count(birthYear) from single_disease_personal_index group by " + range + ",date_histogram(field='eventDate','interval'='year')";
+        } else {
+            sql = "select count(birthYear) from single_disease_personal_index where " + filter + " group by " + range + ",date_histogram(field='eventDate','interval'='month')";
+        }
+        log.info("sql = " + sql);
+        List<Map<String, Object>> listData = parseIntegerValue(sql);
+        Map<String, List<String>> map = new HashMap<>();
+        List<String> xData = new ArrayList<>();
+        Set<String> hashSet = new TreeSet<>();
+        Map<String, String> value = new HashMap<>();
+        if (null != listData && listData.size() > 0 && listData.get(0).size() > 0) {
+            if ("1".equals(type)) {
+                listData.forEach(one -> {
+                    String rangeName = one.get(range) + "";
+                    // rangeName："1978.0-2001.0"
+                    int first = (int) Double.parseDouble(rangeName.split("-")[0]);
+                    int last = (int) Double.parseDouble(rangeName.split("-")[1]);
+                    Integer result = last - first;
+                    // 转成相应的年龄段
+                    String keyName = exchangeInfo(result);
+                    hashSet.add((one.get("date_histogram(field=eventDate,interval=year)") + "").substring(0,4));
+                    value.put((one.get("date_histogram(field=eventDate,interval=year)") + "").substring(0,4) + "-"+ keyName, one.get("COUNT(birthYear)") + "");
+                });
+            } else {
+                hashSet.clear();
+                hashSet.add("01");
+                hashSet.add("02");
+                hashSet.add("03");
+                hashSet.add("04");
+                hashSet.add("05");
+                hashSet.add("06");
+                hashSet.add("07");
+                hashSet.add("08");
+                hashSet.add("09");
+                hashSet.add("10");
+                hashSet.add("11");
+                hashSet.add("12");
+                listData.forEach(one -> {
+                    String rangeName = one.get(range) + "";
+                    // rangeName："1978.0-2001.0"
+                    int first = (int) Double.parseDouble(rangeName.split("-")[0]);
+                    int last = (int) Double.parseDouble(rangeName.split("-")[1]);
+                    Integer result = last - first;
+                    // 转成相应的年龄段
+                    String keyName = exchangeInfo(result);
+                    value.put((one.get("date_histogram(field=eventDate,interval=month)") + "").substring(5,7) + "-"+ keyName, one.get("COUNT(birthYear)") + "");
+                });
+            }
+        }
+        List<String> name = new ArrayList<>();
+        name.add("0-6岁");
+        name.add("7-17岁");
+        name.add("18-40岁");
+        name.add("41-65岁");
+        name.add("66岁以上");
+        if (hashSet.size() > 0 && value.size() > 0) {
+            for (String year : hashSet) {
+                for (int i = 1; i <= 5; i++) {
+                    if (!value.containsKey(year + "-0-6岁")) {
+                        value.put(year + "-0-6岁", "0");
+                    }
+                    if (!value.containsKey(year + "-7-17岁")) {
+                        value.put(year + "-7-17岁", "0");
+                    }
+                    if (!value.containsKey(year + "-18-40岁")) {
+                        value.put(year + "-18-40岁", "0");
+                    }
+                    if (!value.containsKey(year + "-41-65岁")) {
+                        value.put(year + "-41-65岁", "0");
+                    }
+                    if (!value.containsKey(year + "-66岁以上")) {
+                        value.put(year + "-66岁以上", "0");
+                    }
+                }
+
+            }
+            List<String> list1 = new ArrayList<>(); // 0-6岁
+            List<String> list2 = new ArrayList<>(); // 7-17岁
+            List<String> list3 = new ArrayList<>(); // 18-40岁
+            List<String> list4 = new ArrayList<>(); // 41-65岁
+            List<String> list5 = new ArrayList<>(); // 66岁以上
+            for (String year : hashSet) {
+                for (String key : value.keySet()) {
+                    if (key.contains(year + "-0-6岁")) {
+                        list1.add(value.get(year + "-0-6岁"));
+                    }
+                    if (key.contains(year + "-7-17岁")) {
+                        list2.add(value.get(year + "-7-17岁"));
+                    }
+                    if (key.contains(year + "-18-40岁")) {
+                        list3.add(value.get(year + "-18-40岁"));
+                    }
+                    if (key.contains(year + "-41-65岁")) {
+                        list4.add(value.get(year + "-41-65岁"));
+                    }
+                    if (key.contains(year + "-66岁以上")) {
+                        list5.add(value.get(year + "-66岁以上"));
+                    }
+                }
+            }
+            xData.clear();
+            xData.addAll(hashSet);
+            map.put("name", name);
+            map.put("xName", xData);
+            map.put("type1", list1);
+            map.put("type2", list2);
+            map.put("type3", list3);
+            map.put("type4", list4);
+            map.put("type5", list5);
+        }
+        return map;
+    }
+
+    /**
+     *
+     * @param i
+     * @param type 1糖尿病类型 2性别 3年龄
+     * @return
+     */
+    public String getNameByIdType(int i, String type) {
+        String result = "";
+        if ("1".equals(type)) {
+            switch (i) {
+                case 1:
+                    result = "I型糖尿病";
+                    break;
+                case 2:
+                    result = "II型糖尿病";
+                    break;
+                case 3:
+                    result = "妊娠糖尿病";
+                    break;
+                case 4:
+                    result = "其他糖尿病";
+                    break;
+                default:
+                    break;
+            }
+        } else if ("2".equals(type)) {
+            switch (i) {
+                case 1:
+                    result = "女性";
+                    break;
+                case 2:
+                    result = "男性";
+                    break;
+                case 3:
+                    result = "未知";
+                    break;
+                default:
+                    break;
+            }
+        } else if ("3".equals(type)) {
+            switch (i) {
+                case 1:
+                    result = "0-6岁";
+                    break;
+                case 2:
+                    result = "7-17岁";
+                    break;
+                case 3:
+                    result = "18-40岁";
+                    break;
+                case 4:
+                    result = "41-65岁";
+                    break;
+                case 5:
+                    result = "66岁以上";
+                    break;
+                default:
+                    break;
+            }
+        }
+        return result;
     }
 }

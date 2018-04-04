@@ -69,4 +69,34 @@ public class SingleDiseaseController extends EnvelopRestEndPoint {
             @RequestParam(value = "condition", required = false) String condition) {
         return singleDiseaseClient.getBarData(type, condition);
     }
+
+    @RequestMapping(value = ServiceApi.TJ.GetDiseaseTypeAnalysisInfo, method = RequestMethod.GET)
+    @ApiOperation(value = "获取疾病类型分析数据")
+    public Envelop getDiseaseTypeInfo(
+            @ApiParam(name = "type", required = true, value = "1 年份 2 月趋势")
+            @RequestParam(value = "type") String type,
+            @ApiParam(name = "filter", value = "过滤的年份")
+            @RequestParam(value = "filter", required = false) String filter) {
+        return singleDiseaseClient.getDiseaseTypeInfo(type, filter);
+    }
+
+    @RequestMapping(value = ServiceApi.TJ.GetSexAnalysisInfo, method = RequestMethod.GET)
+    @ApiOperation(value = "获取疾病类型分析数据")
+    public Envelop getSexAnalysisInfo(
+            @ApiParam(name = "type", required = true, value = "1 年份 2 月趋势")
+            @RequestParam(value = "type", defaultValue = "1") String type,
+            @ApiParam(name = "filter", value = "过滤的年份")
+            @RequestParam(value = "filter", required = false) String filter) {
+        return singleDiseaseClient.getSexAnalysisInfo(type, filter);
+    }
+
+    @RequestMapping(value = ServiceApi.TJ.GetAgeAnalysisInfo, method = RequestMethod.GET)
+    @ApiOperation(value = "获取疾病类型分析数据")
+    public Envelop getAgeAnalysisInfo(
+            @ApiParam(name = "type", required = true, value = "1 年份 2 月趋势")
+            @RequestParam(value = "type", defaultValue = "1") String type,
+            @ApiParam(name = "filter", value = "过滤的年份")
+            @RequestParam(value = "filter", required = false) String filter) {
+        return singleDiseaseClient.getAgeAnalysisInfo(type, filter);
+    }
 }
