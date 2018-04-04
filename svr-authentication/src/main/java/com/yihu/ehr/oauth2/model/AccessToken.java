@@ -1,9 +1,11 @@
 package com.yihu.ehr.oauth2.model;
 
+import java.io.Serializable;
+
 /**
  * Created by hzp on 2017/4/27.
  */
-public class AccessToken {
+public class AccessToken implements Serializable {
     private String accessToken;
     private String refreshToken;
     private String tokenType;
