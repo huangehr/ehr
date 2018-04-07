@@ -544,18 +544,7 @@ public class SingleDiseaseService {
                 });
             } else {
                 hashSet.clear();
-                hashSet.add("01");
-                hashSet.add("02");
-                hashSet.add("03");
-                hashSet.add("04");
-                hashSet.add("05");
-                hashSet.add("06");
-                hashSet.add("07");
-                hashSet.add("08");
-                hashSet.add("09");
-                hashSet.add("10");
-                hashSet.add("11");
-                hashSet.add("12");
+                hashSet.addAll(getMonthInfo());
                 listData.forEach(one -> {
                     value.put((one.get("date_histogram(field=eventDate,interval=month)") + "").substring(5,7) + "-"+ one.get("diseaseTypeName"), one.get("COUNT(*)") + "");
                 });
@@ -590,16 +579,16 @@ public class SingleDiseaseService {
             List<String> list4 = new ArrayList<>(); // 其他糖尿病
             for (String year : hashSet) {
                 for (String key : value.keySet()) {
-                    if (key.contains(year + "-I型糖尿病")) {
+                    if (key.equals(year + "-I型糖尿病")) {
                         list1.add(value.get(year + "-I型糖尿病"));
                     }
-                    if (key.contains(year + "-II型糖尿病")) {
+                    if (key.equals(year + "-II型糖尿病")) {
                         list2.add(value.get(year + "-II型糖尿病"));
                     }
-                    if (key.contains(year + "-妊娠糖尿病")) {
+                    if (key.equals(year + "-妊娠糖尿病")) {
                         list3.add(value.get(year + "-妊娠糖尿病"));
                     }
-                    if (key.contains(year + "-其他糖尿病")) {
+                    if (key.equals(year + "-其他糖尿病")) {
                         list4.add(value.get(year + "-其他糖尿病"));
                     }
                 }
@@ -643,18 +632,7 @@ public class SingleDiseaseService {
                 });
             } else {
                 hashSet.clear();
-                hashSet.add("01");
-                hashSet.add("02");
-                hashSet.add("03");
-                hashSet.add("04");
-                hashSet.add("05");
-                hashSet.add("06");
-                hashSet.add("07");
-                hashSet.add("08");
-                hashSet.add("09");
-                hashSet.add("10");
-                hashSet.add("11");
-                hashSet.add("12");
+                hashSet.addAll(getMonthInfo());
                 listData.forEach(one -> {
                     value.put((one.get("date_histogram(field=eventDate,interval=month)") + "").substring(5,7) + "-"+ one.get("sexName"), one.get("COUNT(*)") + "");
                 });
@@ -684,13 +662,13 @@ public class SingleDiseaseService {
             List<String> list3 = new ArrayList<>(); // 未知
             for (String year : hashSet) {
                 for (String key : value.keySet()) {
-                    if (key.contains(year + "-女性")) {
+                    if (key.equals(year + "-女性")) {
                         list1.add(value.get(year + "-女性"));
                     }
-                    if (key.contains(year + "-男性")) {
+                    if (key.equals(year + "-男性")) {
                         list2.add(value.get(year + "-男性"));
                     }
-                    if (key.contains(year + "-未知")) {
+                    if (key.equals(year + "-未知")) {
                         list3.add(value.get(year + "-未知"));
                     }
                 }
@@ -748,18 +726,7 @@ public class SingleDiseaseService {
                 });
             } else {
                 hashSet.clear();
-                hashSet.add("01");
-                hashSet.add("02");
-                hashSet.add("03");
-                hashSet.add("04");
-                hashSet.add("05");
-                hashSet.add("06");
-                hashSet.add("07");
-                hashSet.add("08");
-                hashSet.add("09");
-                hashSet.add("10");
-                hashSet.add("11");
-                hashSet.add("12");
+                hashSet.addAll(getMonthInfo());
                 listData.forEach(one -> {
                     String rangeName = one.get(range) + "";
                     // rangeName："1978.0-2001.0"
@@ -806,19 +773,19 @@ public class SingleDiseaseService {
             List<String> list5 = new ArrayList<>(); // 66岁以上
             for (String year : hashSet) {
                 for (String key : value.keySet()) {
-                    if (key.contains(year + "-0-6岁")) {
+                    if (key.equals(year + "-0-6岁")) {
                         list1.add(value.get(year + "-0-6岁"));
                     }
-                    if (key.contains(year + "-7-17岁")) {
+                    if (key.equals(year + "-7-17岁")) {
                         list2.add(value.get(year + "-7-17岁"));
                     }
-                    if (key.contains(year + "-18-40岁")) {
+                    if (key.equals(year + "-18-40岁")) {
                         list3.add(value.get(year + "-18-40岁"));
                     }
-                    if (key.contains(year + "-41-65岁")) {
+                    if (key.equals(year + "-41-65岁")) {
                         list4.add(value.get(year + "-41-65岁"));
                     }
-                    if (key.contains(year + "-66岁以上")) {
+                    if (key.equals(year + "-66岁以上")) {
                         list5.add(value.get(year + "-66岁以上"));
                     }
                 }
@@ -897,5 +864,22 @@ public class SingleDiseaseService {
             }
         }
         return result;
+    }
+
+    public Set<String> getMonthInfo() {
+        Set<String> hashSet = new TreeSet<>();
+        hashSet.add("01");
+        hashSet.add("02");
+        hashSet.add("03");
+        hashSet.add("04");
+        hashSet.add("05");
+        hashSet.add("06");
+        hashSet.add("07");
+        hashSet.add("08");
+        hashSet.add("09");
+        hashSet.add("10");
+        hashSet.add("11");
+        hashSet.add("12");
+        return hashSet;
     }
 }
