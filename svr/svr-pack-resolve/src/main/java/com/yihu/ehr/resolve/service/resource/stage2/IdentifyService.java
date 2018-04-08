@@ -38,8 +38,13 @@ public class IdentifyService {
             if (!StringUtils.isEmpty(standardPackage.getCardId())) {
                 List<String> idCardNos = archiveRelationService.findByCardNo(standardPackage.getCardId());
                 if (!idCardNos.isEmpty()) {
-                    recognition = true;
-                    demographicId = idCardNos.get(0);
+                    for (String idCardNo : idCardNos) {
+                        if (StringUtils.isNotEmpty(idCardNo)) {
+                            recognition = true;
+                            demographicId = idCardNo;
+                            break;
+                        }
+                    }
                 }
             }
             if (!recognition) {
