@@ -22,9 +22,10 @@ public class SingleDiseaseServiceNew {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    public static final String HEALTHPROBLEM = "1"; // 健康问题
+    public static final String HEALTHPROBLEM = "1"; // 疾病类型
     public static final String AGE = "2"; // 年龄段分布
     public static final String SEX = "3"; // 性别
+    public static final String SYMPTOM = "4"; // 并发症
     /**
      * 热力图数据
      * @return
@@ -141,7 +142,7 @@ public class SingleDiseaseServiceNew {
     }
 
     /**
-     * 获取健康状况
+     * 疾病类型
      * @return
      */
     public Map<String, Object> getHealthProInfo(String code) {
@@ -267,38 +268,22 @@ public class SingleDiseaseServiceNew {
     }
 
     /**
-     * 获取并发症数据
+     * 数据查询
      * @return
      */
-    public Map<String, List<String>> getSymptomDataInfo(String sql ,String xdataName) {
-        List<Map<String, Object>> listData = parseIntegerValue(sql);
-        Map<String, List<String>> map = new LinkedHashMap<>();
-        List<String> xData = new ArrayList<>();
-        List<String> valueData = new ArrayList<>();
-        if (null != listData && listData.get(0).size() > 0) {
-            listData.forEach(one -> {
-                xData.add(one.get(xdataName) + "");
-                valueData.add(one.get("COUNT(*)") + "");
-            });
-            map.put("xData", xData);
-            map.put("valueData", valueData);
-        }
-        return map;
-    }
-
-    /**
-     * 用药患者数分布
-     * @return
-     */
-    public Map<String, List<String>> getMedicineDataInfo(String sql ,String xdataName) {
+    public Map<String, List<String>> getDataInfo(String sql ,String xdataName) {
         List<Map<String, Object>> listData = parseIntegerValue(sql);
         Map<String, List<String>> map = new HashMap<>();
         List<String> xData = new ArrayList<>();
         List<String> valueData = new ArrayList<>();
         if (null != listData && listData.get(0).size() > 0) {
             listData.forEach(one -> {
-                xData.add(one.get(xdataName) + "");
-                valueData.add(one.get("COUNT(*)") + "");
+                if(xdataName.contains("date_histogram")){
+                    xData.add(one.get(xdataName).toString().substring(0,4) + "");
+                }else {
+                    xData.add(one.get(xdataName) + "");
+                }
+                valueData.add(one.get("count") + "");
             });
             map.put("xData", xData);
             map.put("valueData", valueData);
@@ -438,7 +423,7 @@ public class SingleDiseaseServiceNew {
         listData.forEach(item -> {
             Map<String, Object> myMap = new HashMap<>();
             item.forEach((k,v) -> {
-                if (k.contains("COUNT") || k.contains("SUM")) {
+                if (k.contains("COUNT") || k.contains("SUM") || k.contains("count")) {
                     v = (int) Double.parseDouble(v + "");
                 }
                 myMap.put(k,v);
@@ -447,5 +432,89 @@ public class SingleDiseaseServiceNew {
         });
         return handleData;
     }
+
+
+
+    /**
+     * 获取饼状图数据
+     * @param type 健康状况、年龄段、性别
+     * @param groupName 分组字段
+     * @return
+     */
+    public Map<String, Object> getPieDataInfoBySql(String type, String sql,String groupName) {
+        Map<String, Object> map = new HashMap<>();
+        if (HEALTHPROBLEM.equals(type)) {
+            map = getHealthProInfoBySql(sql, groupName);
+        } else if (AGE.equals(type)) {
+            map = getAgeInfoBySql(sql);
+        } else if (SEX.equals(type)) {
+            map = getHealthProInfoBySql(sql, groupName);
+        }else if (SYMPTOM.equals(type)) {
+            map = getHealthProInfoBySql(sql, groupName);
+        }
+        return map;
+    }
+
+    /**
+     * @return
+     */
+    public Map<String, Object> getHealthProInfoBySql(String sql,String groupName) {
+        List<Map<String, Object>> listData = parseIntegerValue(sql);
+        Map<String, Object> map = new HashMap<>();
+        List<String> legendData = new ArrayList<>();
+        List<Map<String, Object>> seriesData = new ArrayList<>();
+        if (null != listData && listData.get(0).size() > 0) {
+            listData.forEach(one -> {
+                Map<String, Object> myMap = new HashMap<>();
+                legendData.add(one.get(groupName) + "");
+                myMap.put("name", one.get(groupName) + "");
+                myMap.put("value", one.get("count") + "");
+                seriesData.add(myMap);
+            });
+            map.put("legendData", legendData);
+            map.put("seriesData", seriesData);
+        }
+        return map;
+    }
+
+    /**
+     * 获取年龄段数据
+     * @return
+     */
+    public Map<String, Object> getAgeInfoBySql(String sql) {
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR) + 1;
+        /*
+        * 年龄段分为0-6、7-17、18-40、41-65、65以上
+        * 首先获取当前年份，由于ES查询是左包含，右不包，所以当前年份需要+1
+        * 下面为构造年龄段的算式，其中year-151限定了范围是66-150岁 即66以上，其他类似
+        * */
+        String range = "range(birthYear," + (year - 151) + "," + (year - 66) + "," + (year - 41) + "," + (year - 18) + "," + (year - 7) + "," + year + ")";
+//        String sql = "select count(*) from single_disease_personal_index where birthYear <> 0  group by " + range;
+        List<Map<String, Object>> listData = parseIntegerValue(sql);
+        Map<String, Object> map = new HashMap<>();
+        List<String> legendData = new ArrayList<>();
+        List<Map<String, Object>> seriesData = new ArrayList<>();
+        if (null != listData && listData.get(0).size() > 0) {
+            listData.forEach(one -> {
+                String rangeName = one.get(range) + "";
+                // rangeName："1978.0-2001.0"
+                int first = (int) Double.parseDouble(rangeName.split("-")[0]);
+                int last = (int) Double.parseDouble(rangeName.split("-")[1]);
+                Integer result = last - first;
+                // 转成相应的年龄段
+                String keyName = exchangeInfo(result);
+                Map<String, Object> myMap = new HashMap<>();
+                legendData.add(keyName);
+                myMap.put("name", keyName);
+                myMap.put("value", one.get("COUNT(*)") + "");
+                seriesData.add(myMap);
+            });
+            map.put("legendData", legendData);
+            map.put("seriesData", seriesData);
+        }
+        return map;
+    }
+
 
 }

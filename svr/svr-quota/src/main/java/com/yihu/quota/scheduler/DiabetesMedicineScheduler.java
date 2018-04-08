@@ -57,13 +57,11 @@ public class DiabetesMedicineScheduler {
 	 * 每天2点 执行一次
 	 * @throws Exception
 	 */
-//	@Scheduled(cron = "0 10 2 * * ?")
+	@Scheduled(cron = "0 45 15 * * ?")
 	public void validatorIdentityScheduler(){
 		try {
 //			String q =  null; // 查询条件 health_problem:HP0047  HP0047 为糖尿病
-			String q2 = "EHR_000295:*糖尿病* OR EHR_000112:*糖尿病*";
-//			String keyDiseaseNameH = "EHR_000295";//诊断名字（住院） *糖尿病*
-//			String keyDiseaseNameZ = "EHR_000112";//诊断名字（门诊）*糖尿病*
+			String q2 = "EHR_000295:*糖尿病* OR EHR_000112:*糖尿病*"; //门诊和住院 诊断名称
 			String fq = ""; // 过滤条件
 			String keyEventDate = "event_date";
 			String keyArea = "EHR_001225";
@@ -71,12 +69,10 @@ public class DiabetesMedicineScheduler {
 			String keyPatientName = "patient_name";
 			String keyDemographicId = "demographic_id";//身份证
 			String keyCardId = "card_id	";
-//			String keyHealthProblem = "health_problem";
 			String keySex = "EHR_000019";//性别
 			String keySexValue = "EHR_000019_VALUE";
 			String keyAge = "EHR_000007";//出生日期 年龄
 			String keyAddress = "EHR_001211"; //地址
-//			String keyDiseaseType = "EHR_003810";//EHR_003810 诊断代码
 			String keyDiseaseSymptom = "EHR_000112";//并发症  诊断名称(门诊)
 			String keyDiseaseSymptom2 = "EHR_000295";//并发症  诊断名称（住院）
 			String keysugarToleranceName = "EHR_000392";//  检验-项目结果 - 报告子项的LOINC编码  14995-5 糖耐量值  14771-0 空腹血糖
@@ -89,7 +85,7 @@ public class DiabetesMedicineScheduler {
 			objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
 			BasesicUtil basesicUtil = new BasesicUtil();
-			String initializeDate = "2018-03-20";
+			String initializeDate = "2018-04-10";
 			Date now = new Date();
 			String nowDate = DateUtil.formatDate(now,DateUtil.DEFAULT_DATE_YMD_FORMAT);
 			boolean flag = true;
@@ -201,6 +197,9 @@ public class DiabetesMedicineScheduler {
 										sex =0;
 										sexName ="未知";
 									}
+								}else {
+									sex =0;
+									sexName ="未知";
 								}
 								if(map.get(keyPatientName) != null){
 									name = map.get(keyPatientName).toString();
@@ -229,18 +228,19 @@ public class DiabetesMedicineScheduler {
 										baseCheckInfo.setSymptomName(symptomName);
 										baseCheckInfo.setEventDate(eventDate);
 										if(submap.get(keyWestMedicine) != null){
-											CheckInfoModel checkInfo = setCheckInfoModel(baseCheckInfo);
-											checkInfo.setCheckCode("CH004");
-											checkInfo.setMedicineName(submap.get(keyWestMedicine).toString());
+//											CheckInfoModel checkInfo = setCheckInfoModel(baseCheckInfo);
+											baseCheckInfo.setCreateTime(DateUtils.addHours(new Date(),8));
+											baseCheckInfo.setCheckCode("CH004");
+											baseCheckInfo.setMedicineName(submap.get(keyWestMedicine).toString());
 											//保存到ES库
-											saveCheckInfo(checkInfo);
+											saveCheckInfo(baseCheckInfo);
 										}
 										if(submap.get(keyChineseMedicine) != null) {
-											CheckInfoModel checkInfo = setCheckInfoModel(baseCheckInfo);
-											checkInfo.setCheckCode("CH004");
-											checkInfo.setMedicineName(submap.get(keyChineseMedicine).toString());
+											baseCheckInfo.setCreateTime(DateUtils.addHours(new Date(),8));
+											baseCheckInfo.setCheckCode("CH004");
+											baseCheckInfo.setMedicineName(submap.get(keyChineseMedicine).toString());
 											//保存到ES库
-											saveCheckInfo(checkInfo);
+											saveCheckInfo(baseCheckInfo);
 										}
 									}
 								}
@@ -291,6 +291,11 @@ public class DiabetesMedicineScheduler {
 		checkInfo.setCardId(baseCheckInfo.getCardId());
 		checkInfo.setName(baseCheckInfo.getName());
 		checkInfo.setCreateTime(DateUtils.addHours(new Date(),8));
+		checkInfo.setEventDate(baseCheckInfo.getEventDate());
+		checkInfo.setDiseaseTypeName(baseCheckInfo.getDiseaseTypeName());
+		checkInfo.setDiseaseType(baseCheckInfo.getDiseaseType());
+		checkInfo.setBirthday(baseCheckInfo.getBirthday());
+		checkInfo.setBirthYear(baseCheckInfo.getBirthYear());
 		return  checkInfo;
 	}
 	//获取维度的字典项

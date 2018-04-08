@@ -57,7 +57,7 @@ public class DiabetesCheckScheduler {
 	 * 每天2点 执行一次
 	 * @throws Exception
 	 */
-//	@Scheduled(cron = "0 20 2 * * ?")
+	@Scheduled(cron = "0 21 15 * * ?")
 	public void validatorIdentityScheduler(){
 		try {
 			String q2 = "EHR_000394:*糖耐量*2H血糖* OR EHR_000394:*糖耐量*空腹血糖* OR EHR_000394:*葡萄糖耐量试验*";
@@ -83,7 +83,7 @@ public class DiabetesCheckScheduler {
 			objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
 			BasesicUtil basesicUtil = new BasesicUtil();
-			String initializeDate = "2018-03-20";
+			String initializeDate = "2018-04-10";
 			Date now = new Date();
 			String nowDate = DateUtil.formatDate(now,DateUtil.DEFAULT_DATE_YMD_FORMAT);
 			boolean flag = true;
@@ -185,6 +185,9 @@ public class DiabetesCheckScheduler {
 									sex =0;
 									sexName ="未知";
 								}
+							}else {
+								sex =0;
+								sexName ="未知";
 							}
 							if(map.get(keyPatientName) != null){
 								name = map.get(keyPatientName).toString();
@@ -228,12 +231,13 @@ public class DiabetesCheckScheduler {
 									fastname = "7.0mmol/L以上";
 									fastcode = "3";
 								}
-								CheckInfoModel checkInfo = setCheckInfoModel(baseCheckInfo);
-								checkInfo.setFastingBloodGlucoseName(fastname);
-								checkInfo.setFastingBloodGlucoseCode(fastcode);
-								checkInfo.setCheckCode("CH002");
+//								CheckInfoModel checkInfo = setCheckInfoModel(baseCheckInfo);
+								baseCheckInfo.setCreateTime(DateUtils.addHours(new Date(),8));
+								baseCheckInfo.setFastingBloodGlucoseName(fastname);
+								baseCheckInfo.setFastingBloodGlucoseCode(fastcode);
+								baseCheckInfo.setCheckCode("CH002");
 								//保存到ES库
-								saveCheckInfo(checkInfo);
+								saveCheckInfo(baseCheckInfo);
 							}
 							boolean tolerance = false;
 							if(submap.get(keyChineseName) != null){
@@ -259,12 +263,13 @@ public class DiabetesCheckScheduler {
 									sugarTolename = "11.1 mmol/L以上";
 									sugarToleCode = "3";
 								}
-								CheckInfoModel checkInfo = setCheckInfoModel(baseCheckInfo);
-								checkInfo.setSugarToleranceName(sugarTolename);
-								checkInfo.setSugarToleranceCode(sugarToleCode);
-								checkInfo.setCheckCode("CH003");
+//								CheckInfoModel checkInfo = setCheckInfoModel(baseCheckInfo);
+								baseCheckInfo.setCreateTime(DateUtils.addHours(new Date(),8));
+								baseCheckInfo.setSugarToleranceName(sugarTolename);
+								baseCheckInfo.setSugarToleranceCode(sugarToleCode);
+								baseCheckInfo.setCheckCode("CH003");
 								//保存到ES库
-								saveCheckInfo(checkInfo);
+								saveCheckInfo(baseCheckInfo);
 							}
 						}
 					}

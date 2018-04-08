@@ -59,10 +59,10 @@ public class DiabetesSymptomScheduler {
 	 * 每天2点 执行一次
 	 * @throws Exception
 	 */
-//	@Scheduled(cron = "0 0 2 * * ?")
+	@Scheduled(cron = "0 24 15 * * ?")
 	public void validatorIdentityScheduler(){
 		try {
-			String q2 = "EHR_000112:*糖尿病*并发症* OR EHR_000295:*糖尿病*并发症*";
+			String q2 = "EHR_000112:*糖尿病*并发症* OR EHR_000295:*糖尿病*并发症*"; //门诊和住院 诊断名称
 			String fq = ""; // 过滤条件
 			String keyEventDate = "event_date";
 			String keyArea = "EHR_001225";
@@ -84,7 +84,7 @@ public class DiabetesSymptomScheduler {
 			objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
 			BasesicUtil basesicUtil = new BasesicUtil();
-			String initializeDate = "2018-03-20";
+			String initializeDate = "2018-04-10";
 			Date now = new Date();
 			String nowDate = DateUtil.formatDate(now,DateUtil.DEFAULT_DATE_YMD_FORMAT);
 			boolean flag = true;
@@ -187,6 +187,9 @@ public class DiabetesSymptomScheduler {
 									sex =0;
 									sexName ="未知";
 								}
+							}else {
+								sex =0;
+								sexName ="未知";
 							}
 							if(map.get(keyPatientName) != null){
 								name = map.get(keyPatientName).toString();
@@ -208,16 +211,18 @@ public class DiabetesSymptomScheduler {
 						if(submap !=null){
 							//检查信息 姓名,身份证，就诊卡号,并发症，空腹血糖值，葡萄糖耐量值，用药名称，检查信息code （CH001 并发症,CH002 空腹血糖,CH003 葡萄糖耐量,CH004 用药名称）
 							if(submap.get(keyDiseaseSymptom) != null && submap.get(keyDiseaseSymptom).toString().contains("并发症")){
-								CheckInfoModel checkInfo = setCheckInfoModel(baseCheckInfo);
-								checkInfo.setCheckCode("CH001");
-								checkInfo.setSymptomName(submap.get(keyDiseaseSymptom).toString());
-								saveCheckInfo(checkInfo);
+//								CheckInfoModel checkInfo = setCheckInfoModel(baseCheckInfo);
+								baseCheckInfo.setCreateTime(DateUtils.addHours(new Date(),8));
+								baseCheckInfo.setCheckCode("CH001");
+								baseCheckInfo.setSymptomName(submap.get(keyDiseaseSymptom).toString());
+								saveCheckInfo(baseCheckInfo);
 							}
 							if(submap.get(keyDiseaseSymptom2) != null && submap.get(keyDiseaseSymptom2).toString().contains("并发症")){
-								CheckInfoModel checkInfo = setCheckInfoModel(baseCheckInfo);
-								checkInfo.setCheckCode("CH001");
-								checkInfo.setSymptomName(submap.get(keyDiseaseSymptom2).toString());
-								saveCheckInfo(checkInfo);
+//								CheckInfoModel checkInfo = setCheckInfoModel(baseCheckInfo);
+								baseCheckInfo.setCreateTime(DateUtils.addHours(new Date(),8));
+								baseCheckInfo.setCheckCode("CH001");
+								baseCheckInfo.setSymptomName(submap.get(keyDiseaseSymptom2).toString());
+								saveCheckInfo(baseCheckInfo);
 							}
 						}
 					}
