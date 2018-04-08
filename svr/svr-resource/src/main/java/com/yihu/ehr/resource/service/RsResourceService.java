@@ -6,6 +6,7 @@ import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.resource.dao.*;
 import com.yihu.ehr.resource.model.RsResource;
 import com.yihu.ehr.resource.model.RsResourceCategory;
+import com.yihu.ehr.resource.model.RsRolesResource;
 import org.hibernate.FlushMode;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -42,7 +43,9 @@ public class RsResourceService extends BaseJpaService<RsResource, RsResourceDao>
     @Autowired
     private RsResourceDefaultParamDao rsResourceDefaultParamDao;
     @Autowired
-    private ObjectMapper objectMapper;
+    private RsRolesResourceDao rsRolesResourceDao;
+    @Autowired
+    private RsRolesResourceMetadataDao rsRolesResourceMetadataDao;
 
     /**
      * 资源创建
@@ -60,10 +63,15 @@ public class RsResourceService extends BaseJpaService<RsResource, RsResourceDao>
      */
     public void deleteResource(String id) {
         String[] ids = id.split(",");
-        for(String id_ : ids) {
+        for (String id_ : ids) {
             rsResourceDefaultQueryDao.deleteByResourcesId(id_);
             rsResourceDefaultParamDao.deleteByResourcesId(id_);
             rsResourceMetadataDao.deleteByResourcesId(id_);
+            List<RsRolesResource> rsRolesResourceList =  rsRolesResourceDao.findByResourceId(id_);
+            rsRolesResourceList.forEach(item -> {
+                rsRolesResourceMetadataDao.deleteByRolesResourceId(item.getId());
+            });
+            rsRolesResourceDao.deleteByResourceId(id_);
             rsResourceDao.delete(id_);
         }
     }

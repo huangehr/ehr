@@ -1,6 +1,6 @@
 package com.yihu.ehr.basic.user.service;
 
-import com.yihu.ehr.basic.user.dao.XRoleApiRelationRepository;
+import com.yihu.ehr.basic.user.dao.RoleApiRelationDao;
 import com.yihu.ehr.basic.user.entity.RoleApiRelation;
 import com.yihu.ehr.query.BaseJpaService;
 import org.apache.commons.lang.StringUtils;
@@ -20,9 +20,9 @@ import java.util.List;
  */
 @Transactional
 @Service
-public class RoleApiRelationService extends BaseJpaService<RoleApiRelation,XRoleApiRelationRepository> {
+public class RoleApiRelationService extends BaseJpaService<RoleApiRelation,RoleApiRelationDao> {
     @Autowired
-    private XRoleApiRelationRepository roleApiRelationRepository;
+    private RoleApiRelationDao roleApiRelationRepository;
 
     public Page<RoleApiRelation> getRoleApiRelationList(String sorts, int page, int size) {
         Pageable pageable = new PageRequest(page, size, parseSorts(sorts));

@@ -1,6 +1,6 @@
 package com.yihu.ehr.basic.user.service;
 
-import com.yihu.ehr.basic.user.dao.XRoleAppRelationRepository;
+import com.yihu.ehr.basic.user.dao.RoleAppRelationDao;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.basic.user.entity.RoleAppRelation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +18,9 @@ import java.util.List;
  */
 @Transactional
 @Service
-public class RoleAppRelationService extends BaseJpaService<RoleAppRelation,XRoleAppRelationRepository> {
+public class RoleAppRelationService extends BaseJpaService<RoleAppRelation,RoleAppRelationDao> {
     @Autowired
-    private XRoleAppRelationRepository roleAppRelationRepository;
+    private RoleAppRelationDao roleAppRelationRepository;
 
     public RoleAppRelation findRelation(String appId,long roleId){
         return  roleAppRelationRepository.findRelation(appId, roleId);

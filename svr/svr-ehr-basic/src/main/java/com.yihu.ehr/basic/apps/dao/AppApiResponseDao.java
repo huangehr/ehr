@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @version 1.0
  * @created 2015.12.16 15:10
  */
-public interface AppApiResponseRepository extends JpaRepository<AppApiResponse, Integer> {
+public interface AppApiResponseDao extends JpaRepository<AppApiResponse, Integer> {
 
     void deleteByAppApiId(Integer id);
 }

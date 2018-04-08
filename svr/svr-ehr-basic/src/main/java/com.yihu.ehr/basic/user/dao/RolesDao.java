@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Created by yww on 2016/7/7.
  */
-public interface XRolesRepository extends PagingAndSortingRepository<Roles,Long> {
+public interface RolesDao extends PagingAndSortingRepository<Roles, Long> {
 
     Roles findById(long id);
 
@@ -21,4 +21,7 @@ public interface XRolesRepository extends PagingAndSortingRepository<Roles,Long>
 
     @Query("SELECT roles FROM Roles roles WHERE roles.code = :code AND roles.appId = :appId")
     Roles findByCodeAndAppId(@Param("code") String code, @Param("appId") String appId);
+
+    void deleteByAppId(String appId);
+
 }

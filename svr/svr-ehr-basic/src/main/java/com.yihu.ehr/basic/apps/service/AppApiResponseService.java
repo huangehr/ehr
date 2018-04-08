@@ -1,6 +1,6 @@
 package com.yihu.ehr.basic.apps.service;
 
-import com.yihu.ehr.basic.apps.dao.AppApiResponseRepository;
+import com.yihu.ehr.basic.apps.dao.AppApiResponseDao;
 import com.yihu.ehr.basic.apps.model.AppApiResponse;
 import com.yihu.ehr.query.BaseJpaService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,15 +17,15 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
-public class AppApiResponseService extends BaseJpaService<AppApiResponse, AppApiResponseRepository> {
+public class AppApiResponseService extends BaseJpaService<AppApiResponse, AppApiResponseDao> {
     @Autowired
-    private AppApiResponseRepository xAppApiResponseRepository;
+    private AppApiResponseDao xAppApiResponseRepository;
     public AppApiResponseService() {
 
     }
 
     public Page<AppApiResponse> getAppApiResponseList(String sorts, int page, int size){
-        AppApiResponseRepository repo = (AppApiResponseRepository)getJpaRepository();
+        AppApiResponseDao repo = (AppApiResponseDao)getJpaRepository();
         Pageable pageable = new PageRequest(page, size, parseSorts(sorts));
         return repo.findAll(pageable);
     }

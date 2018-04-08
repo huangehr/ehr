@@ -1,6 +1,6 @@
 package com.yihu.ehr.basic.apps.service;
 
-import com.yihu.ehr.basic.apps.dao.AppApiParameterRepository;
+import com.yihu.ehr.basic.apps.dao.AppApiParameterDao;
 import com.yihu.ehr.basic.apps.model.AppApiParameter;
 import com.yihu.ehr.query.BaseJpaService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,16 +17,16 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
-public class AppApiParameterService extends BaseJpaService<AppApiParameter, AppApiParameterRepository> {
+public class AppApiParameterService extends BaseJpaService<AppApiParameter, AppApiParameterDao> {
 
     @Autowired
-    private AppApiParameterRepository appApiParameterRepository;
+    private AppApiParameterDao appApiParameterRepository;
     public AppApiParameterService() {
 
     }
 
     public Page<AppApiParameter> getAppApiParameterList(String sorts, int page, int size){
-        AppApiParameterRepository repo = (AppApiParameterRepository)getJpaRepository();
+        AppApiParameterDao repo = (AppApiParameterDao)getJpaRepository();
         Pageable pageable = new PageRequest(page, size, parseSorts(sorts));
         return repo.findAll(pageable);
     }

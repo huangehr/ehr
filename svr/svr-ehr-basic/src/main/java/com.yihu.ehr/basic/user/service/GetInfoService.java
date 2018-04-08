@@ -5,7 +5,7 @@ import com.yihu.ehr.basic.org.dao.OrganizationRepository;
 import com.yihu.ehr.basic.org.model.OrgMemberRelation;
 import com.yihu.ehr.basic.org.service.OrgMemberRelationService;
 import com.yihu.ehr.basic.org.service.OrgService;
-import com.yihu.ehr.basic.user.dao.XRolesRepository;
+import com.yihu.ehr.basic.user.dao.RolesDao;
 import com.yihu.ehr.basic.user.dao.XUserRepository;
 import com.yihu.ehr.basic.user.dao.XRoleUserRepository;
 import org.apache.commons.lang.StringUtils;
@@ -30,7 +30,7 @@ public class GetInfoService {
     @Autowired
     private XRoleUserRepository roleUserRepository;
     @Autowired
-    private XRolesRepository rolesRepository;
+    private RolesDao rolesRepository;
     @Autowired
     private OrganizationRepository organizationRepository;
     @Autowired

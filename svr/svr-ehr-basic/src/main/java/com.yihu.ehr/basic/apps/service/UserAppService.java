@@ -1,6 +1,6 @@
 package com.yihu.ehr.basic.apps.service;
 
-import com.yihu.ehr.basic.apps.dao.UserAppRepository;
+import com.yihu.ehr.basic.apps.dao.UserAppDao;
 import com.yihu.ehr.basic.apps.model.UserApp;
 import com.yihu.ehr.query.BaseJpaService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,9 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
-public class UserAppService extends BaseJpaService<UserApp, UserAppRepository> {
+public class UserAppService extends BaseJpaService<UserApp, UserAppDao> {
     @Autowired
-    private UserAppRepository userAppRepository;
+    private UserAppDao userAppRepository;
 
     public UserApp findByAppIdAndUserId(String appId, String userId){
         return  userAppRepository.findByAppIdAndUserId(appId,userId);

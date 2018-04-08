@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Created by wxw on 2017/8/22.
  */
-public interface XRoleReportRelationRepository extends PagingAndSortingRepository<RoleReportRelation,Long> {
+public interface RoleReportRelationDao extends PagingAndSortingRepository<RoleReportRelation,Long> {
 
     List<RoleReportRelation> findByRsReportId(@Param("rsReportId") Long rsReportId);
 

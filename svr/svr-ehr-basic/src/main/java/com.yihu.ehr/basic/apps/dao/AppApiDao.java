@@ -12,10 +12,13 @@ import java.util.List;
  * @version 1.0
  * @created 2016年7月7日21:05:46
  */
-public interface AppApiRepository extends JpaRepository<AppApi, Integer> {
+public interface AppApiDao extends JpaRepository<AppApi, Integer> {
 
     List<AppApi> findByCategory(Integer categoryId);
 
     List<AppApi> findByName(String name);
 
+    void deleteByAppId(String appId);
+
+    List<AppApi> findByAppId(String appId);
 }

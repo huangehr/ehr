@@ -3,6 +3,7 @@ package com.yihu.ehr.basic.apps.controller;
 import com.yihu.ehr.basic.apps.model.App;
 import com.yihu.ehr.basic.apps.service.AppService;
 import com.yihu.ehr.basic.apps.service.OauthClientDetailsService;
+import com.yihu.ehr.basic.dict.service.SystemDictEntryService;
 import com.yihu.ehr.basic.user.entity.RoleAppRelation;
 import com.yihu.ehr.basic.user.entity.Roles;
 import com.yihu.ehr.basic.user.service.RoleAppRelationService;
@@ -11,8 +12,10 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.entity.dict.SystemDictEntry;
 import com.yihu.ehr.entity.oauth2.OauthClientDetails;
 import com.yihu.ehr.model.app.MApp;
+import com.yihu.ehr.model.dict.SystemDictEntryAppModel;
 import com.yihu.ehr.util.id.BizObject;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
@@ -22,16 +25,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author linaz
@@ -49,11 +47,9 @@ public class AppEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private AppService appService;
     @Autowired
-    private OauthClientDetailsService oauthClientDetailsService;
-    @Autowired
-    private RoleAppRelationService roleAppRelationService;
-    @Autowired
     private RolesService roleAppRelation;
+    @Autowired
+    private SystemDictEntryService systemDictEntryService;
 
     @RequestMapping(value = ServiceApi.Apps.Apps, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建App")
@@ -126,19 +122,19 @@ public class AppEndPoint extends EnvelopRestEndPoint {
     public boolean deleteApp(
             @ApiParam(name = "app_id", value = "id")
             @PathVariable(value = "app_id") String app_id) throws Exception {
-        appService.delete(app_id);
-        //删除Oauth
-        if (oauthClientDetailsService.findByField("clientId", app_id).size() > 0) {
-            oauthClientDetailsService.delete(app_id);
-        }
-        //删除应用角色
-        List<RoleAppRelation> relationList = roleAppRelationService.search("appId=" + app_id);
-        if(relationList != null && relationList.size() > 0) {
-            for(RoleAppRelation roleAppRelation : relationList) {
-                roleAppRelationService.delete(roleAppRelation.getId());
-            }
+        if (appService.retrieve(app_id) != null) {
+            appService.delete(app_id);
         }
         return true;
+    }
+
+    @RequestMapping(value = ServiceApi.Apps.App, method = RequestMethod.GET)
+    @ApiOperation(value = "获取App信息")
+    public MApp app (
+            @ApiParam(name = "app_id", value = "id")
+            @PathVariable(value = "app_id") String app_id) throws Exception {
+        App app = appService.retrieve(app_id);
+        return convertToModel(app, MApp.class);
     }
 
     @RequestMapping(value = ServiceApi.Apps.AppStatus, method = RequestMethod.PUT)
@@ -174,10 +170,9 @@ public class AppEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "获取过滤App列表")
     public Boolean getAppFilter(
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
-            @RequestParam(value = "filters", required = false) String filters
-    ) throws Exception {
+            @RequestParam(value = "filters", required = false) String filters) throws Exception {
         Long count = appService.getCount(filters);
-        return count>0?true:false;
+        return count > 0 ? true : false;
     }
 
     @RequestMapping(value =  ServiceApi.Apps.getApps, method = RequestMethod.GET)
@@ -192,6 +187,38 @@ public class AppEndPoint extends EnvelopRestEndPoint {
         List<App> appList = appService.getApps(userId, catalog, manageType);
         return convertToModels(appList,new ArrayList<MApp>(appList.size()),MApp.class,"");
     }
+
+    @RequestMapping(value = ServiceApi.Apps.getAppTypeAndApps, method = RequestMethod.GET)
+    @ApiOperation(value = "根据条件，获取APP类型及其所拥有的应用")
+    public Envelop getAppTypeAndApps(
+            @ApiParam(name = "userId", value = "用户ID", required = true)
+            @RequestParam(value = "userId") String userId,
+            @ApiParam(name = "manageType", value = "APP管理类型，backStage：后台管理，client：客户端。")
+            @RequestParam(value = "manageType", required = false) String manageType) throws Exception {
+        Envelop envelop = new Envelop();
+        //获取系统字典项（App类型）
+        String filters = "dictId=" + 1;
+        String fields = "";
+        String sort = "+sort";
+        int page = 1;
+        int size = 999;
+        List<SystemDictEntry> systemDictEntryList = systemDictEntryService.search(fields, filters, sort, size, page);
+        List<SystemDictEntryAppModel> systemDictEntryModelList = (List<SystemDictEntryAppModel>) convertToModels(systemDictEntryList, new ArrayList<SystemDictEntryAppModel>(systemDictEntryList.size()), SystemDictEntryAppModel.class, null);
+        List<SystemDictEntryAppModel> DictEntryModelList=new ArrayList<>();
+        if (systemDictEntryList.size() > 0) {
+            for (SystemDictEntryAppModel dict : systemDictEntryModelList){
+                Collection<App> mAppList = appService.getApps(userId, dict.getCode(), manageType);
+                List<MApp> appModelList = (List<MApp>) convertToModels(mAppList, new ArrayList<MApp>(mAppList.size()), MApp.class, null);
+                dict.setChildren(appModelList);
+                DictEntryModelList.add(dict);
+            }
+        }
+        //应用列表
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(DictEntryModelList);
+        return envelop;
+    }
+
 
     // -------------------------- 开放平台 ---------------------------------
 
