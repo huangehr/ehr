@@ -55,6 +55,12 @@ public interface SingleDiseaseClient {
             @RequestParam(value = "type", defaultValue = "1") String type,
             @RequestParam(value = "filter", required = false) String filter);
 
+    @RequestMapping(value = ServiceApi.TJ.GetAgeAnalysisInfo, method = RequestMethod.GET)
+    @ApiOperation(value = "获取疾病类型分析数据")
+    Envelop getAgeAnalysisInfo(
+            @RequestParam(value = "type", defaultValue = "1") String type,
+            @RequestParam(value = "filter", required = false) String filter);
+
     @RequestMapping(value = ServiceApi.SingleDisease.GetDropdownList, method = RequestMethod.GET)
     @ApiOperation(value = "获取并发症和药品查询下拉列表前十 数据")
     Envelop getDropdownList(
