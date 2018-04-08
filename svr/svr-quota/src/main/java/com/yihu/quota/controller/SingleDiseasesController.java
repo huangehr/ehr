@@ -222,7 +222,7 @@ public class SingleDiseasesController {
     @RequestMapping(value = ServiceApi.SingleDisease.GetDropdownList, method = RequestMethod.GET)
     @ApiOperation(value = "获取并发症和药品查询下拉列表前十 数据")
     public Envelop getDropdownList(
-            @ApiParam(name = "type", value = "类型 1并发症 2 药品")
+            @ApiParam(name = "type", value = "类型 1并发症 2 药品 3年份")
             @RequestParam(value = "type" ,required =  true ) String type) throws Exception {
         Envelop envelop = new Envelop();
         String sql = "";
@@ -230,9 +230,12 @@ public class SingleDiseasesController {
         if ("1".equals(type)) {
             sql = "select symptomName, count(*) count from single_disease_check_index where checkCode = 'CH001' group by symptomName order by count desc";
             map = singleDiseaseServiceNew.getDataInfo(sql, "symptomName");
-        } else {
+        } else if ("2".equals(type)) {
             sql = "select medicineName, count(*) count from single_disease_check_index where checkCode = 'CH004' group by medicineName order by count desc";
             map = singleDiseaseServiceNew.getDataInfo(sql, "medicineName");
+        } else {
+            sql = "select count(*) from single_disease_personal_index group by date_histogram(field='eventDate','interval'='year') order by eventDate";
+            map = singleDiseaseServiceNew.getDataInfo(sql, "date_histogram(field=eventDate,interval=year)");
         }
         if (null != map && map.size() > 0) {
             if(map.get("xData").size()>9){
