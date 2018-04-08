@@ -601,51 +601,26 @@ public class UserEndPoint extends EnvelopRestEndPoint {
         } else {
             user1.setPassword(DigestUtils.md5Hex(default_password));
         }
-        //增加居民注册账号时身份证号的校验，demographics表中已存在，users表增加demographic_id身份证号关联
-        if (demographicService.findByIdCardNo(user1.getIdCardNo()) != null) {
-            //新增居民demographics表中居民信息
-            demographicInfo = demographicService.findByIdCardNo(user1.getIdCardNo());
-            String telephone = "{\"联系电话\":\"telephone\"}";
-            telephone = telephone.replace("telephone", user1.getTelephone());
-            demographicInfo.setTelephoneNo(telephone);
-            demographicInfo.setName(user1.getRealName());
-               /* MDemographicInfo info = (MDemographicInfo) convertToModel(patientModel, MDemographicInfo.class);
-                info.setHomeAddress(detailModel.getProvinceName() + detailModel.getCityName() + detailModel.getAreaName());*/
-            //新增家庭地址信息
-            String homeAddress = "";
-            if (!StringUtils.isEmpty(user1.getProvinceName())) {
-                homeAddress += user1.getProvinceName();
-            }
-            if (!StringUtils.isEmpty(user1.getCityName())) {
-                homeAddress += user1.getCityName();
-            }
-            if (!StringUtils.isEmpty(user1.getAreaName())) {
-                homeAddress += user1.getAreaName();
-            }
-            if (!StringUtils.isEmpty(homeAddress)) {
-                demographicInfo.setHomeAddress(homeAddress);
-            }
-        } else {
-            String telephone = "{\"联系电话\":\"telephone\"}";
-            telephone = telephone.replace("telephone", user1.getTelephone());
-            demographicInfo.setTelephoneNo(telephone);
-            demographicInfo.setName(user1.getRealName());
-               /* MDemographicInfo info = (MDemographicInfo) convertToModel(patientModel, MDemographicInfo.class);
-                info.setHomeAddress(detailModel.getProvinceName() + detailModel.getCityName() + detailModel.getAreaName());*/
-            //新增家庭地址信息
-            String homeAddress = "";
-            if (!StringUtils.isEmpty(user1.getProvinceName())) {
-                homeAddress += user1.getProvinceName();
-            }
-            if (!StringUtils.isEmpty(user1.getCityName())) {
-                homeAddress += user1.getCityName();
-            }
-            if (!StringUtils.isEmpty(user1.getAreaName())) {
-                homeAddress += user1.getAreaName();
-            }
-            if (!StringUtils.isEmpty(homeAddress)) {
-                demographicInfo.setHomeAddress(homeAddress);
-            }
+        //更新居民demographics表中居民信息（无则创建，有则更新）
+        String telephone = "{\"联系电话\":\"telephone\"}";
+        telephone = telephone.replace("telephone", user1.getTelephone());
+        demographicInfo.setTelephoneNo(telephone);
+        demographicInfo.setName(user1.getRealName());
+           /* MDemographicInfo info = (MDemographicInfo) convertToModel(patientModel, MDemographicInfo.class);
+            info.setHomeAddress(detailModel.getProvinceName() + detailModel.getCityName() + detailModel.getAreaName());*/
+        //新增家庭地址信息
+        String homeAddress = "";
+        if (!StringUtils.isEmpty(user1.getProvinceName())) {
+            homeAddress += user1.getProvinceName();
+        }
+        if (!StringUtils.isEmpty(user1.getCityName())) {
+            homeAddress += user1.getCityName();
+        }
+        if (!StringUtils.isEmpty(user1.getAreaName())) {
+            homeAddress += user1.getAreaName();
+        }
+        if (!StringUtils.isEmpty(homeAddress)) {
+            demographicInfo.setHomeAddress(homeAddress);
         }
         user1.setId(getObjectId(BizObject.User));
         user1.setCreateDate(new Date());
