@@ -4,6 +4,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.basic.dict.service.SystemDictEntryService;
 import com.yihu.ehr.basic.patient.service.DemographicService;
 import com.yihu.ehr.basic.security.service.UserSecurityService;
+import com.yihu.ehr.basic.user.entity.RoleUser;
+import com.yihu.ehr.basic.user.entity.Roles;
+import com.yihu.ehr.basic.user.service.RoleUserService;
+import com.yihu.ehr.basic.user.service.RolesService;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.basic.user.entity.Doctors;
 import com.yihu.ehr.basic.user.entity.User;
@@ -61,6 +65,10 @@ public class UserEndPoint extends EnvelopRestEndPoint {
     private String appId;
     @Autowired
     private UserService userService;
+    @Autowired
+    private RoleUserService roleUserService;
+    @Autowired
+    private RolesService rolesService;
     @Autowired
     private UserSecurityService userSecurityService;
     @Autowired
@@ -847,6 +855,13 @@ public class UserEndPoint extends EnvelopRestEndPoint {
         }
 
         user = userService.saveUser(user);
+        Roles roles = rolesService.findByCodeAndAppId("Patient",appId);
+        if(roles != null){
+            RoleUser roleUser = new RoleUser();
+            roleUser.setUserId(user.getId());
+            roleUser.setRoleId(roles.getId());
+            roleUserService.save(roleUser);
+        }
         envelop.setObj(convertToModel(user, MUser.class, null));
         envelop.setSuccessFlg(true);
         return envelop ;
