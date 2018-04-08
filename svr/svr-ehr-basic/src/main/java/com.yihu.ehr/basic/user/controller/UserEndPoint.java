@@ -606,8 +606,6 @@ public class UserEndPoint extends EnvelopRestEndPoint {
         telephone = telephone.replace("telephone", user1.getTelephone());
         demographicInfo.setTelephoneNo(telephone);
         demographicInfo.setName(user1.getRealName());
-           /* MDemographicInfo info = (MDemographicInfo) convertToModel(patientModel, MDemographicInfo.class);
-            info.setHomeAddress(detailModel.getProvinceName() + detailModel.getCityName() + detailModel.getAreaName());*/
         //新增家庭地址信息
         String homeAddress = "";
         if (!StringUtils.isEmpty(user1.getProvinceName())) {
