@@ -581,14 +581,14 @@ public class UserEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "user", value = "Json串")
             @RequestParam(value = "user") String user) throws Exception {
         User user1 = objectMapper.readValue(user, User.class);
-        DemographicInfo patientModel = objectMapper.readValue(user, DemographicInfo.class);
+        DemographicInfo demographicInfo = objectMapper.readValue(user, DemographicInfo.class);
         String msg = this.basicVerify(user1, false);
         if (!StringUtils.isEmpty(msg)) {
             return failed(msg);
         }
         //设置默认密码为身份证后六位
         if (!StringUtils.isEmpty(user1.getIdCardNo()) && user1.getIdCardNo().length() > 7){
-            String  defaultPassword = user1.getIdCardNo().substring(user1.getIdCardNo().length() - 6, user1.getIdCardNo().length());
+            String defaultPassword = user1.getIdCardNo().substring(user1.getIdCardNo().length() - 6, user1.getIdCardNo().length());
             user1.setPassword(DigestUtils.md5Hex(defaultPassword));
         } else {
             user1.setPassword(DigestUtils.md5Hex(default_password));
@@ -596,10 +596,11 @@ public class UserEndPoint extends EnvelopRestEndPoint {
         //增加居民注册账号时身份证号的校验，demographics表中已存在，users表增加demographic_id身份证号关联
         if (demographicService.findByIdCardNo(user1.getIdCardNo()) != null) {
             //新增居民demographics表中居民信息
+            demographicInfo = demographicService.findByIdCardNo(user1.getIdCardNo());
             String telephone = "{\"联系电话\":\"telephone\"}";
-            telephone = telephone.replace("telephone", "" + user1.getTelephone());
-            patientModel.setTelephoneNo(telephone);
-            patientModel.setName(user1.getRealName());
+            telephone = telephone.replace("telephone", user1.getTelephone());
+            demographicInfo.setTelephoneNo(telephone);
+            demographicInfo.setName(user1.getRealName());
                /* MDemographicInfo info = (MDemographicInfo) convertToModel(patientModel, MDemographicInfo.class);
                 info.setHomeAddress(detailModel.getProvinceName() + detailModel.getCityName() + detailModel.getAreaName());*/
             //新增家庭地址信息
@@ -614,7 +615,28 @@ public class UserEndPoint extends EnvelopRestEndPoint {
                 homeAddress += user1.getAreaName();
             }
             if (!StringUtils.isEmpty(homeAddress)) {
-                patientModel.setHomeAddress(homeAddress);
+                demographicInfo.setHomeAddress(homeAddress);
+            }
+        } else {
+            String telephone = "{\"联系电话\":\"telephone\"}";
+            telephone = telephone.replace("telephone", user1.getTelephone());
+            demographicInfo.setTelephoneNo(telephone);
+            demographicInfo.setName(user1.getRealName());
+               /* MDemographicInfo info = (MDemographicInfo) convertToModel(patientModel, MDemographicInfo.class);
+                info.setHomeAddress(detailModel.getProvinceName() + detailModel.getCityName() + detailModel.getAreaName());*/
+            //新增家庭地址信息
+            String homeAddress = "";
+            if (!StringUtils.isEmpty(user1.getProvinceName())) {
+                homeAddress += user1.getProvinceName();
+            }
+            if (!StringUtils.isEmpty(user1.getCityName())) {
+                homeAddress += user1.getCityName();
+            }
+            if (!StringUtils.isEmpty(user1.getAreaName())) {
+                homeAddress += user1.getAreaName();
+            }
+            if (!StringUtils.isEmpty(homeAddress)) {
+                demographicInfo.setHomeAddress(homeAddress);
             }
         }
         user1.setId(getObjectId(BizObject.User));
@@ -622,10 +644,10 @@ public class UserEndPoint extends EnvelopRestEndPoint {
         String userType = user1.getUserType();
         SystemDictEntry dict = dictEntryService.getDictEntry(15, userType);
         if (dict != null) {
-            user1.setDType(userType);
+            user1.setUserType(userType);
         }
         user1.setActivated(true);
-        User user2 = userService.save(user1, patientModel);
+        User user2 = userService.save(user1, demographicInfo);
         return success(user2);
     }
 
@@ -643,25 +665,42 @@ public class UserEndPoint extends EnvelopRestEndPoint {
         String userType = detailModel.getUserType();
         SystemDictEntry dict = dictEntryService.getDictEntry(15, userType);
         if (dict != null) {
-            detailModel.setDType(userType);
+            detailModel.setUserType(userType);
         }
         //同时修改医生表及用户表信息
-        Doctors doctors = doctorService.getByIdCardNo(detailModel.getIdCardNo());
-        if (!StringUtils.isEmpty(doctors)) {
-            doctors.setName(detailModel.getRealName());
-            doctors.setPyCode(PinyinUtil.getPinYinHeadChar(detailModel.getRealName(), false));
-            doctors.setSex(detailModel.getGender());
-            doctors.setPhone(detailModel.getTelephone());
+        Doctors doctor = doctorService.getByIdCardNo(detailModel.getIdCardNo());
+        if (doctor != null) {
+            doctor.setName(detailModel.getRealName());
+            doctor.setPyCode(PinyinUtil.getPinYinHeadChar(detailModel.getRealName(), false));
+            doctor.setSex(detailModel.getGender());
+            doctor.setPhone(detailModel.getTelephone());
         }
         DemographicInfo demographicInfo = demographicService.getDemographicInfoByIdCardNo(detailModel.getIdCardNo());
-        if (!StringUtils.isEmpty(demographicInfo)) {
+        if (demographicInfo != null) {
             demographicInfo.setName(detailModel.getRealName());
             demographicInfo.setTelephoneNo("{\"联系电话\":\"" + detailModel.getTelephone() + "\"}");
             demographicInfo.setGender(detailModel.getGender());
             demographicInfo.setMartialStatus(detailModel.getMartialStatus());
             demographicInfo.setBirthday(DateUtil.strToDate(detailModel.getBirthday()));
+        } else {
+            demographicInfo = objectMapper.readValue(user, DemographicInfo.class);
+            demographicInfo.setName(detailModel.getRealName());
+            demographicInfo.setTelephoneNo("{\"联系电话\":\"" + detailModel.getTelephone() + "\"}");
+            String homeAddress = "";
+            if (!StringUtils.isEmpty(detailModel.getProvinceName())) {
+                homeAddress += detailModel.getProvinceName();
+            }
+            if (!StringUtils.isEmpty(detailModel.getCityName())) {
+                homeAddress += detailModel.getCityName();
+            }
+            if (!StringUtils.isEmpty(detailModel.getAreaName())) {
+                homeAddress += detailModel.getAreaName();
+            }
+            if (!StringUtils.isEmpty(homeAddress)) {
+                demographicInfo.setHomeAddress(homeAddress);
+            }
         }
-        User user1 = userService.update(detailModel, doctors, demographicInfo);
+        User user1 = userService.update(detailModel, doctor, demographicInfo);
         return success(user1);
     }
 
