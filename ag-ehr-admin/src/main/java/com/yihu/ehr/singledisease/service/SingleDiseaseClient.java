@@ -55,9 +55,18 @@ public interface SingleDiseaseClient {
             @RequestParam(value = "type", defaultValue = "1") String type,
             @RequestParam(value = "filter", required = false) String filter);
 
-    @RequestMapping(value = ServiceApi.TJ.GetAgeAnalysisInfo, method = RequestMethod.GET)
-    @ApiOperation(value = "获取疾病类型分析数据")
-    Envelop getAgeAnalysisInfo(
-            @RequestParam(value = "type", defaultValue = "1") String type,
-            @RequestParam(value = "filter", required = false) String filter);
+    @RequestMapping(value = ServiceApi.SingleDisease.GetDropdownList, method = RequestMethod.GET)
+    @ApiOperation(value = "获取并发症和药品查询下拉列表前十 数据")
+    Envelop getDropdownList(
+            @RequestParam(value = "type" ,required =  true ) String type);
+
+    @RequestMapping(value = ServiceApi.SingleDisease.GetSymptomDetailData, method = RequestMethod.GET)
+    @ApiOperation(value = "获取并发症详细查询页 数据")
+    Object getSymptomDetailData(
+            @RequestParam(value = "name" ,required = false ,defaultValue = "") String name);
+
+    @RequestMapping(value = ServiceApi.SingleDisease.GetMedicineDetailData, method = RequestMethod.GET)
+    @ApiOperation(value = "获取药品详细查询页 数据")
+    Object getMedicineDetailData(
+            @RequestParam(value = "name" ,required =  false, defaultValue = "") String name);
 }

@@ -2,18 +2,16 @@ package com.yihu.ehr.analysis.model;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.yihu.ehr.analysis.service.AppFeatureService;
+import com.yihu.ehr.analysis.service.AppService;
+import com.yihu.hos.model.syspermission.MApp;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
 /**
  * Created by Administrator on 2017/2/9.
@@ -32,7 +30,8 @@ import java.util.UUID;
 public class OperatorDataModel extends DataModel implements Serializable {
 
     @Autowired
-    private AppFeatureService appFeatureService;
+    private AppService appService;
+
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXX")
     @CreatedDate
@@ -42,6 +41,7 @@ public class OperatorDataModel extends DataModel implements Serializable {
     private String response;
     private String api;
     private String appKey;
+    private String appName;
     private String url;
     private String params;
 
@@ -61,6 +61,12 @@ public class OperatorDataModel extends DataModel implements Serializable {
             JSONObject paramsChild = chlidren.getJSONObject("params");
             operatorDataModel.setApi(paramsChild.getString("api"));
             operatorDataModel.setAppKey(paramsChild.getString("appKey"));
+            if( ! StringUtils.isEmpty(paramsChild.getString("appKey") ) ){
+                MApp app = appService.getApp(paramsChild.getString("appKey"));
+                if(app != null){
+                    operatorDataModel.setAppName(app.getName());
+                }
+            }
             operatorDataModel.setParams(paramsChild.getString("param"));
 
         } catch (Exception e) {
@@ -125,4 +131,11 @@ public class OperatorDataModel extends DataModel implements Serializable {
         this.appKey = appKey;
     }
 
+    public String getAppName() {
+        return appName;
+    }
+
+    public void setAppName(String appName) {
+        this.appName = appName;
+    }
 }

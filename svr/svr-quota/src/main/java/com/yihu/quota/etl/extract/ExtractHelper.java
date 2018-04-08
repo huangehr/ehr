@@ -59,6 +59,16 @@ public class ExtractHelper {
         return  esConfig;
     }
 
+    public EsConfig getDataSourceEsConfig(String quotaCode) throws Exception {
+        TjQuotaDataSource quotaDataSource= dataSourceService.findSourceByQuotaCode(quotaCode);
+        if (quotaDataSource == null) {
+            throw new Exception("quotaDataSource data error");
+        }
+        JSONObject obj = new JSONObject().fromObject(quotaDataSource.getConfigJson());
+        EsConfig esConfig= (EsConfig) JSONObject.toBean(obj,EsConfig.class);
+        return  esConfig;
+    }
+
     /**
      * 抽取数据统计值
      *

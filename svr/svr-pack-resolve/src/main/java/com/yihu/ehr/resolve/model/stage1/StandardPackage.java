@@ -59,6 +59,8 @@ public class StandardPackage {
     private List<String> diagnosisList;
     //重传标识
     private boolean reUploadFlg;
+    //身份识别标志
+    private boolean identifyFlag;
     //数据集合
     protected Map<String, PackageDataSet> dataSets = new TreeMap<>();
 
@@ -261,6 +263,14 @@ public class StandardPackage {
         this.reUploadFlg = reUploadFlg;
     }
 
+    public boolean isIdentifyFlag() {
+        return identifyFlag;
+    }
+
+    public void setIdentifyFlag(boolean identifyFlag) {
+        this.identifyFlag = identifyFlag;
+    }
+
     /**
      * ICD10诊断列表
      * @return
@@ -319,6 +329,7 @@ public class StandardPackage {
         root.put("patientName", this.getPatientName());
         root.put("diagnosis", StringUtils.join(this.getDiagnosisList(),";"));
         root.put("reUploadFlg", this.isReUploadFlg());
+        root.put("identifyFlag", this.isIdentifyFlag());
         ObjectNode dataSetsNode = root.putObject("dataSets");
         for (String dataSetCode : dataSets.keySet()) {
             PackageDataSet dataSet = dataSets.get(dataSetCode);

@@ -4,7 +4,9 @@ import com.yihu.ehr.basic.apps.model.App;
 import com.yihu.ehr.basic.apps.service.AppService;
 import com.yihu.ehr.basic.apps.service.OauthClientDetailsService;
 import com.yihu.ehr.basic.user.entity.RoleAppRelation;
+import com.yihu.ehr.basic.user.entity.Roles;
 import com.yihu.ehr.basic.user.service.RoleAppRelationService;
+import com.yihu.ehr.basic.user.service.RolesService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.ServiceApi;
@@ -50,6 +52,8 @@ public class AppEndPoint extends EnvelopRestEndPoint {
     private OauthClientDetailsService oauthClientDetailsService;
     @Autowired
     private RoleAppRelationService roleAppRelationService;
+    @Autowired
+    private RolesService roleAppRelation;
 
     @RequestMapping(value = ServiceApi.Apps.Apps, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建App")
@@ -220,14 +224,12 @@ public class AppEndPoint extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value =  ServiceApi.Apps.AppAuthClient, method = RequestMethod.POST)
-    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     @ApiOperation(value = "开放平台审核结果处理接口，包含App初始化和应用角色分配")
     public Envelop authClient(
             @ApiParam(name = "appJson", value = "App", required = true)
             @RequestParam(value = "appJson") String appJson,
-            @ApiParam(name = "roleId", value = "角色ID", required = true)
-            @RequestParam(value = "roleId") Integer roleId) throws Exception{
-        Envelop envelop = new Envelop();
+            @ApiParam(name = "roleId", value = "基础角色ID", required = true)
+            @RequestParam(value = "roleId") Long roleId) throws Exception{
         //app 表
         App app = objectMapper.readValue(appJson, App.class);
         app.setCreateTime(new Date());
@@ -239,7 +241,6 @@ public class AppEndPoint extends EnvelopRestEndPoint {
         app.setCode("DEFAULT");
         app.setManageType("client");
         app.setReleaseFlag(1);
-        appService.save(app);
         //oauth 表
         OauthClientDetails oauthClientDetails = new OauthClientDetails();
         oauthClientDetails.setClientId(app.getId());
@@ -251,20 +252,20 @@ public class AppEndPoint extends EnvelopRestEndPoint {
         oauthClientDetails.setAccessTokenValidity(null);
         oauthClientDetails.setAccessTokenValidity(null);
         oauthClientDetails.setAutoApprove("true");
-        oauthClientDetailsService.save(oauthClientDetails);
-        //应用角色表
-        RoleAppRelation roleAppRelation = new RoleAppRelation();
-        roleAppRelation.setAppId(app.getId());
-        roleAppRelation.setRoleId(roleId);
-        String[] fields = {"appId", "roleId"};
-        String[] values = {roleAppRelation.getAppId(), roleAppRelation.getRoleId() + ""};
-        List<RoleAppRelation> roleAppRelations = roleAppRelationService.findByFields(fields, values);
-        if(roleAppRelations == null || roleAppRelations.size() <= 0){
-            roleAppRelationService.save(roleAppRelation);
+        //验证基础角色
+        Roles basicRole = roleAppRelation.retrieve(roleId);
+        if (null == basicRole) {
+            return failed("基础角色为空");
         }
-        envelop.setSuccessFlg(true);
-        envelop.setObj(app);
-        return envelop;
+        //创建扩展角色
+        Roles additionRole = new Roles();
+        additionRole.setCode(app.getId());
+        additionRole.setName("扩展开发者");
+        additionRole.setDescription("开放平台扩展开发者");
+        additionRole.setAppId(basicRole.getAppId()); //此处设置角色所属的应用ID
+        additionRole.setType("0");
+        App newApp = appService.authClient(app, oauthClientDetails, basicRole, additionRole);
+        return success(newApp);
     }
 
     @RequestMapping(value =  ServiceApi.Apps.SimpleUpdate, method = RequestMethod.POST)

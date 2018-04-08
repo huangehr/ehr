@@ -117,7 +117,7 @@ public class ThridPrescriptionService extends BaseJpaService<ArchiveTemplate, Ar
         }
 
         //获取CDA数据
-        Map<String, Object> model = profileCDAService.getCDAData(profileId, temp.getCdaDocumentId());
+        Map<String, Object> model = profileCDAService.getCDAData(profileId, temp.getCdaDocumentId(), true);
 
         return CDAToImage(model, type, width, height);
     }

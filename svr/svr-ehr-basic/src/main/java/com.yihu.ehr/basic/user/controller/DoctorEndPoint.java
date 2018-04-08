@@ -1,23 +1,23 @@
 package com.yihu.ehr.basic.user.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.yihu.ehr.basic.patient.service.DemographicService;
-import com.yihu.ehr.constants.ServiceApi;
-import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.controller.EnvelopRestEndPoint;
-import com.yihu.ehr.entity.patient.DemographicInfo;
-import com.yihu.ehr.model.org.MOrgDeptJson;
-import com.yihu.ehr.model.user.MDoctor;
 import com.yihu.ehr.basic.org.model.OrgDept;
 import com.yihu.ehr.basic.org.model.OrgMemberRelation;
 import com.yihu.ehr.basic.org.model.Organization;
 import com.yihu.ehr.basic.org.service.OrgDeptService;
 import com.yihu.ehr.basic.org.service.OrgMemberRelationService;
 import com.yihu.ehr.basic.org.service.OrgService;
+import com.yihu.ehr.basic.patient.service.DemographicService;
 import com.yihu.ehr.basic.user.entity.Doctors;
 import com.yihu.ehr.basic.user.entity.User;
 import com.yihu.ehr.basic.user.service.DoctorService;
 import com.yihu.ehr.basic.user.service.UserService;
+import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.ServiceApi;
+import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.entity.patient.DemographicInfo;
+import com.yihu.ehr.model.org.MOrgDeptJson;
+import com.yihu.ehr.model.user.MDoctor;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.id.BizObject;
 import com.yihu.ehr.util.phonics.PinyinUtil;
@@ -39,6 +39,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 2017-02-04 add  by hzp
@@ -110,7 +111,7 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
     public MDoctor createDoctor(
             @ApiParam(name = "doctor_json_data", value = "", defaultValue = "")
             @RequestBody String doctoJsonData,
-            @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
+            @ApiParam(name = "model", value = "所属机构部门关系", defaultValue = "")
             @RequestParam("model") String model) throws Exception {
         Doctors doctor = toEntity(doctoJsonData, Doctors.class);
         doctor.setInsertTime(new Date());
@@ -118,6 +119,7 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
         doctor.setStatus("1");
         doctor.setPyCode(PinyinUtil.getPinYinHeadChar(doctor.getName(), false));
         Doctors d= doctorService.save(doctor);
+
         //创建账户
         User user =new User();
         user.setId(getObjectId(BizObject.User));
@@ -134,7 +136,6 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
         }else{
           user.setUserType(d.getRoleType());
         }
-
         user.setIdCardNo(d.getIdCardNo());
         user.setDoctorId(d.getId().toString());
         user.setEmail(d.getEmail());
@@ -163,9 +164,11 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
         demographicInfo.setTelephoneNo("{\"联系电话\":\""+d.getPhone()+"\"}");
         demographicInfo.setGender(d.getSex());
         demographicService.savePatient(demographicInfo);
+
         //创建用户与机构关系
         List<MOrgDeptJson> orgDeptJsonList = objectMapper.readValue(model, new TypeReference<List<MOrgDeptJson>>() {});
-        orgMemberRelationInfo(orgDeptJsonList, user);
+        orgMemberRelationInfo(orgDeptJsonList, user, d);
+
         return convertToModel(doctor, MDoctor.class);
     }
 
@@ -180,6 +183,7 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
         Doctors doctors = toEntity(doctoJsonData, Doctors.class);
         doctors.setUpdateTime(new Date());
         doctorService.save(doctors);
+
         //同时修改用户表
         User user = userManager.getUserByIdCardNo(doctors.getIdCardNo());
         if (!StringUtils.isEmpty(user)) {
@@ -188,6 +192,7 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
             user.setTelephone(doctors.getPhone());
             userManager.save(user);
         }
+        //修改居民
         DemographicInfo demographicInfo = demographicService.getDemographicInfoByIdCardNo(doctors.getIdCardNo());
         if (!StringUtils.isEmpty(demographicInfo)) {
             demographicInfo.setName(doctors.getName());
@@ -197,7 +202,7 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
         }
         //修改用户与机构关系
         List<MOrgDeptJson> orgDeptJsonList = objectMapper.readValue(model, new TypeReference<List<MOrgDeptJson>>() {});
-        orgMemberRelationInfo(orgDeptJsonList, user);
+        orgMemberRelationInfo(orgDeptJsonList, user, doctors);
         return convertToModel(doctors, MDoctor.class);
     }
 
@@ -256,8 +261,9 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
     public boolean createDoctorsPatch(
             @ApiParam(name="doctors",value="医生JSON",defaultValue = "")
             @RequestBody String doctors) throws Exception {
-        List models = objectMapper.readValue(doctors, new TypeReference<List>() {});
-        String phones=doctorService.addDoctorBatch(models);
+        List<Map<String, Object>> doctorMapList = objectMapper.readValue(doctors, new TypeReference<List>() {});
+        String phones = doctorService.addDoctorBatch(doctorMapList);
+
         List list =new ArrayList<>();
         if(!"".equals(phones)){
             phones="["+phones.substring(0,phones.length()-1)+"]";
@@ -265,94 +271,92 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
         }
         List<Doctors> existPhonesList=new ArrayList<Doctors>();
         Doctors d;
-        for(int i = 0 ;i < list.size() ; i++){
-           Object[] objectList=(Object[])list.get(i);
-          if(null!=objectList){
-            d=new Doctors();
-              //INSERT INTO users(login_code, real_name, gender, tech_title, email, telephone, password,doctor_id
-              d.setId(Long.parseLong(objectList[0].toString()) );
-              d.setName(objectList[3].toString());
-              d.setCode(objectList[2].toString());
-              d.setSex(objectList[5].toString());
-              d.setSkill(objectList[7].toString());
-              d.setEmail(objectList[9].toString());
-              d.setPhone(objectList[10].toString());
-              d.setIdCardNo(objectList[22].toString());
+        for (int i = 0; i < list.size(); i++) {
+            Object[] objectList = (Object[]) list.get(i);
+            if (null != objectList) {
+                d = new Doctors();
+                //INSERT INTO users(login_code, real_name, gender, tech_title, email, telephone, password,doctor_id
+                d.setId(Long.parseLong(objectList[0].toString()));
+                d.setName(objectList[3].toString());
+                d.setCode(objectList[2].toString());
+                d.setSex(objectList[5].toString());
+                d.setSkill(objectList[7].toString());
+                d.setEmail(objectList[9].toString());
+                d.setPhone(objectList[10].toString());
+                d.setIdCardNo(objectList[22].toString());
 
-              //根据身份证和电话号码，判断账户表中是否存在该用户。若存在 将用户表与医生表关联；若不存在，为该医生初始化账户。
-              StringBuffer stringBuffer = new StringBuffer();
-              stringBuffer.append("idCardNo=" + d.getIdCardNo()+ ";");
-              stringBuffer.append("telephone=" + d.getPhone()+ ";");
-              String filters = stringBuffer.toString();
-              List<User> userList = userManager.search("", filters, "", 1, 1);
-              String userId = "";
-              //若存在 将用户表与医生表关联
-              if(null!=userList&&userList.size()>0){
-                  for(User user:userList){
-                      user.setDoctorId(String.valueOf(d.getId()));
-                      user = userManager.saveUser(user);
-                      userId = user.getId();
-                  }
-              }else{
-
-                  //若不存在，为该医生初始化账户。
+                //根据身份证和电话号码，判断账户表中是否存在该用户。若存在 将用户表与医生表关联；若不存在，为该医生初始化账户。
+                StringBuffer stringBuffer = new StringBuffer();
+                stringBuffer.append("idCardNo=" + d.getIdCardNo() + ";");
+                stringBuffer.append("telephone=" + d.getPhone() + ";");
+                String filters = stringBuffer.toString();
+                List<User> userList = userManager.search("", filters, "", 1, 1);
+                String userId = "";
+                //若存在 将用户表与医生表关联
+                if (null != userList && userList.size() > 0) {
+                    for (User user : userList) {
+                        user.setDoctorId(String.valueOf(d.getId()));
+                        user = userManager.saveUser(user);
+                        userId = user.getId();
+                    }
+                } else {
+                    //若不存在，为该医生初始化账户。
 //                  existPhonesList.add(d);
-                  User user = new User();
-                  user.setId(getObjectId(BizObject.User));
-                  user.setLoginCode(d.getIdCardNo());
-                  user.setTelephone(d.getPhone());
-                  user.setRealName(d.getName());
-                  user.setIdCardNo(d.getIdCardNo());
-                  user.setGender(d.getSex());
-                  user.setTechTitle(d.getSkill());
-                  user.setEmail(d.getEmail());
-                  String defaultPassword="";
-                  if(!StringUtils.isEmpty(d.getIdCardNo())&&d.getIdCardNo().length()>7){
-                      defaultPassword=d.getIdCardNo().substring(d.getIdCardNo().length()-6,d.getIdCardNo().length());
-                      user.setPassword(DigestUtils.md5Hex(defaultPassword));
-                  }else{
-                      user.setPassword(DigestUtils.md5Hex(default_password));
-                  }
+                    User user = new User();
+                    user.setId(getObjectId(BizObject.User));
+                    user.setLoginCode(d.getIdCardNo());
+                    user.setTelephone(d.getPhone());
+                    user.setRealName(d.getName());
+                    user.setIdCardNo(d.getIdCardNo());
+                    user.setGender(d.getSex());
+                    user.setTechTitle(d.getSkill());
+                    user.setEmail(d.getEmail());
+                    String defaultPassword = "";
+                    if (!StringUtils.isEmpty(d.getIdCardNo()) && d.getIdCardNo().length() > 7) {
+                        defaultPassword = d.getIdCardNo().substring(d.getIdCardNo().length() - 6, d.getIdCardNo().length());
+                        user.setPassword(DigestUtils.md5Hex(defaultPassword));
+                    } else {
+                        user.setPassword(DigestUtils.md5Hex(default_password));
+                    }
+                    user.setCreateDate(DateUtil.strToDate(DateUtil.getNowDateTime()));
+                    user.setActivated(true);
+                    if (StringUtils.isEmpty(d.getRoleType())) {
+                        user.setUserType("5");
+                        user.setDType("5");
+                    } else {
+                        user.setUserType(d.getRoleType());
+                        user.setDType(d.getRoleType());
+                    }
+                    user.setDoctorId(d.getId() + "");
+                    user.setProvinceId(0);
+                    user.setCityId(0);
+                    user.setAreaId(0);
+                    user = userManager.saveUser(user);
+                    userId = user.getId();
+                }
 
-                  user.setCreateDate(DateUtil.strToDate(DateUtil.getNowDateTime()));
-                  user.setActivated(true);
-                  if(StringUtils.isEmpty(d.getRoleType())){
-                      user.setUserType("5");
-                      user.setDType("5");
-                  }else{
-                      user.setUserType(d.getRoleType());
-                      user.setDType(d.getRoleType());
-                  }
-                  user.setDoctorId(d.getId() + "");
-                  user.setProvinceId(0);
-                  user.setCityId(0);
-                  user.setAreaId(0);
-                  user = userManager.saveUser(user);
-                  userId = user.getId();
-              }
-              String orgId="";
-              if(!StringUtils.isEmpty(objectList[23])){
-                  orgId=objectList[23].toString();
-              }
-              String deptName="";
-              if(!StringUtils.isEmpty(objectList[27])){
-                  deptName=objectList[27].toString();
-              }
-              // 根据机构id和部门名称 获取部门id
-            int deptId=  orgDeptService.getOrgDeptByOrgIdAndName(orgId, deptName);
+                String orgId = "";
+                if (!StringUtils.isEmpty(objectList[23])) {
+                    orgId = objectList[23].toString();
+                }
+                String deptName = "";
+                if (!StringUtils.isEmpty(objectList[27])) {
+                    deptName = objectList[27].toString();
+                }
+                int deptId = orgDeptService.getOrgDeptByOrgIdAndName(orgId, deptName);
 
-              OrgMemberRelation memberRelation = new OrgMemberRelation();
-              memberRelation.setOrgId(orgId);
-              if(!StringUtils.isEmpty(objectList[25])){
-                  memberRelation.setOrgName(objectList[25].toString());
-              }
-              memberRelation.setDeptId(deptId);
-              memberRelation.setDeptName(deptName);
-              memberRelation.setUserId(String.valueOf(userId));
-              memberRelation.setUserName(d.getName());
-              memberRelation.setStatus(0);
-              relationService.save(memberRelation);
-          }
+                OrgMemberRelation memberRelation = new OrgMemberRelation();
+                memberRelation.setOrgId(orgId);
+                if (!StringUtils.isEmpty(objectList[25])) {
+                    memberRelation.setOrgName(objectList[25].toString());
+                }
+                memberRelation.setDeptId(deptId);
+                memberRelation.setDeptName(deptName);
+                memberRelation.setUserId(String.valueOf(userId));
+                memberRelation.setUserName(d.getName());
+                memberRelation.setStatus(0);
+                relationService.save(memberRelation);
+            }
         }
 //        if(null!=existPhonesList&&existPhonesList.size()>0){
 //            userManager.addUserBatch(existPhonesList);
@@ -407,7 +411,7 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
     }
 
     //创建用户与机构的关联
-    private void orgMemberRelationInfo(List<MOrgDeptJson> orgDeptJsonList, User user) {
+    private void orgMemberRelationInfo(List<MOrgDeptJson> orgDeptJsonList, User user, Doctors doctor) {
         if (null != orgDeptJsonList && orgDeptJsonList.size() > 0) {
             String[] orgIds = new String[orgDeptJsonList.size()];
             for (int i=0; i<orgDeptJsonList.size(); i++) {
@@ -425,6 +429,21 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
                     OrgDept orgDept = orgDeptService.searchBydeptId(Integer.parseInt(deptId));
                     if (null != organization && null != orgDept) {
                         OrgMemberRelation memberRelation = new OrgMemberRelation();
+
+                        // 同步科室医生信息到福州总部，随后返回总部的科室医生信息
+                        // 对 主任医师、副主任医师、主治医师、医师 才做同步
+                        if ("1".equals(doctor.getLczc()) || "2".equals(doctor.getLczc()) || "3".equals(doctor.getLczc()) || "4".equals(doctor.getLczc())) {
+                            Map<String, Object> deptDoc = doctorService.syncDoctor(doctor, orgDeptJson.getOrgId(), orgDept.getName());
+                            if (deptDoc.size() != 0) {
+                                if (deptDoc.get("userId") != null) {
+                                    memberRelation.setJkzlUserId(deptDoc.get("userId").toString());
+                                }
+                                memberRelation.setJkzlDoctorUid(deptDoc.get("doctorUid").toString());
+                                memberRelation.setJkzlDoctorSn(deptDoc.get("doctorSn").toString());
+                                memberRelation.setJkzlHosDeptId(deptDoc.get("hosDeptId").toString());
+                            }
+                        }
+
                         memberRelation.setOrgId(orgDeptJson.getOrgId());
                         memberRelation.setOrgName(organization.getFullName());
                         memberRelation.setDeptId(Integer.parseInt(deptId));

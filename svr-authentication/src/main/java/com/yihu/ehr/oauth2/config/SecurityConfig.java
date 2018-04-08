@@ -53,12 +53,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .antMatchers("/configuration/**")
                     .antMatchers("/webjars/springfox-swagger-ui/**")
                     //swagger-ui界面---end
-                    .antMatchers("/oauth/accessToken")
-                    .antMatchers("/oauth/refreshToken")
-                    .antMatchers("/oauth/validToken")
-                    .antMatchers("/oauth/confirm_access")
                     .antMatchers("/oauth/sso")
-                    .antMatchers("/oauth/authorize");
+                    .antMatchers("/oauth/login")
+                    .antMatchers("/oauth/authorize")
+                    .antMatchers("/oauth/accessToken")
+                    .antMatchers("/oauth/validToken")
+                    .antMatchers("/oauth/confirm_access");
         }
 
         @Override

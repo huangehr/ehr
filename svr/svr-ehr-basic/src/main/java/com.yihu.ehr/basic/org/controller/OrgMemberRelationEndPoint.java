@@ -13,6 +13,7 @@ import com.yihu.ehr.basic.org.service.OrgMemberRelationService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -255,9 +256,12 @@ public class OrgMemberRelationEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = "/orgDeptMember/getJkzlOrgIds", method = RequestMethod.GET)
     @ApiOperation(value = "根据userId获取总部orgId列表")
-    public List<String> getJkzlOrgIds(String userId) {
-        List<String> list = relationService.getJkzlOrgIds(userId);
-        return list;
+    public String  getJkzlOrgIds(String userId) {
+        String jkzlOrgId = relationService.getJkzlOrgIds(userId);
+        if(StringUtils.isEmpty(jkzlOrgId)){
+            jkzlOrgId="该用户没有关联机构！";
+        }
+        return jkzlOrgId;
     }
 
 }

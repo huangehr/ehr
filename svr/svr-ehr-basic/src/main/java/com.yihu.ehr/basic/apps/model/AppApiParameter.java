@@ -24,6 +24,7 @@ public class AppApiParameter {
     private String memo; //备注
     private String defaultValue; //默认值
     private Integer maxLength; //最大长度
+    private Integer sort; //序号
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -112,5 +113,14 @@ public class AppApiParameter {
 
     public void setMaxLength(Integer maxLength) {
         this.maxLength = maxLength;
+    }
+
+    @Column(name = "sort", nullable = false)
+    public Integer getSort() {
+        return sort;
+    }
+
+    public void setSort(Integer sort) {
+        this.sort = sort;
     }
 }

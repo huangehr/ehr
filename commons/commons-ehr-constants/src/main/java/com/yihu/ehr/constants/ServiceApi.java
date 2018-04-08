@@ -12,6 +12,8 @@ public class ServiceApi {
 
     public static class GateWay {
         public static final String admin = "/admin";
+
+        public static final String FzGateway = "/admin/gateway/fz";
     }
 
     public static class Adaptions {
@@ -269,7 +271,7 @@ public class ServiceApi {
 
         public static final String StatisticsGetDoctorsGroupByTown = "/resources/statistics/getDoctorsGroupByTown";
 
-        //资源中心首页
+        //资源中心 - 统计相关
         public static final String GetPatientArchiveCount = "/resource/center/getPatientArchiveCount";
         public static final String GetMedicalResourcesCount = "/resource/center/getMedicalResourcesCount";
         public static final String GetHealthArchiveCount = "/resource/center/getHealthArchiveCount";
@@ -289,6 +291,12 @@ public class ServiceApi {
         public static final String GetElectronicMedicalOrgDistributed = "/resource/center/getElectronicMedicalOrgDistributed";
         public static final String GetElectronicMedicalDeptDistributed = "/resource/center/getElectronicMedicalDeptDistributed";
         public static final String GetElectronicMedicalAcquisitionSituation = "/resource/center/getElectronicMedicalAcquisitionSituation";
+
+        //资源中心 - 大数据展示相关
+        public static final String Achievements = "/resource/center/achievements";
+        public static final String Visualization = "/resource/center/visualization";
+        public static final String DataAnalysis = "/resource/center/dataAnalysis";
+        public static final String HierarchicalManagement = "/resource/center/hierarchicalManagement";
 
     }
 
@@ -362,7 +370,6 @@ public class ServiceApi {
     public static class Families {
         public static final String Families = "/families";
         public static final String Family = "/families/{id}";
-
         public static final String FamiliesMembers = "/families/members";
         public static final String FamilyMembers = "/families/{families_id}/members";
         public static final String FamilyMember = "/families/{families_id}/members/{id_card_no}";
@@ -404,7 +411,8 @@ public class ServiceApi {
         public static final String Update = "/appApi/update";
         public static final String Page = "/appApi/page";
         public static final String AuthList = "/appApi/authList";
-
+        public static final String AuthApi = "/appApi/authApi";
+        public static final String CheckName = "/appApi/checkName";
     }
 
     public static class AppApiCategory {
@@ -499,6 +507,9 @@ public class ServiceApi {
         public static final String QcValue = "packAnalyzer/qc/check/value";
     }
 
+    public static class ArchiveRelation {
+        public static final String Crud = "/archiveRelation";
+    }
 
     public static class Patients {
         public static final String GetUserCards = "/getUserCards";// 就诊卡列表
@@ -548,7 +559,7 @@ public class ServiceApi {
     public static class Authentication {
         public static final String AccessToken = "/oauth/accessToken";
         public static final String ValidToken = "/oauth/validToken";
-        public static final String RefreshToken = "/oauth/refreshToken";
+        public static final String Login = "/oauth/login";
     }
 
     public static class MessageRemind {
@@ -725,6 +736,7 @@ public class ServiceApi {
 
     public static class Users {
         public static final String Users = "/users";
+        public static final String UsersOfApp = "/usersOfApp";
         public static final String User = "/users/{user_name}";
         public static final String UserExistence = "/users/{user_name}/existence";
         public static final String UserVerification = "/users/verification";
@@ -770,6 +782,7 @@ public class ServiceApi {
         public static final String RoleBatchAdd = "/roles/roleBatchAdd";
         public static final String RoleFindByField = "/roles/findByField";
         public static final String RoleFindByUserId = "/roles/findByUserId";
+        public static final String RoleFindByUserIdAndAppId = "/roles/findByUserIdAndAppId";
 
         public static final String RoleUser = "/roles/role_user";
         public static final String RoleUserByUserId = "/roles/role_user/{user_id}";
@@ -1175,7 +1188,6 @@ public class ServiceApi {
 
     public static class TJ {
 
-
         public static final String GetTjDimensionMainList = "/tj/getTjDimensionMainList";
         public static final String TjDimensionMain = "/tj/tjDimensionMain";
         public static final String TjDimensionMainId = "/tj/tjDimensionMainId/{id}";
@@ -1362,11 +1374,20 @@ public class ServiceApi {
         public static final String GetRescue = "/statistics/rescue";
 
         //政府服务平台-门诊仪表盘-end
-
     }
 
+    /**
+     * 系统字典
+     */
     public static class SystemDict {
         public static final String getDictEntryByDictId = "/systemDict/getDictEntryByDictId/{dictId}";
+        public static final String Crud = "/dictionaries";
+        public static final String FindById = "/dictionaries/{id}";
+        public static final String FindByPhoneticCode = "/dictionary/{phoneticCode}";
+        public static final String DeleteById = "/dictionaries/{id}";
+        public static final String CheckName = "/dictionaries/existence";
+        public static final String CheckCode = "/dictionaries/checkCode";
+
     }
 
     /**
@@ -1450,5 +1471,15 @@ public class ServiceApi {
         public static final String MessageTemplate = "/messageTemplate";
         public static final String MyMessageList = "/messageTemplate/MyMessageList";
         public static final String MyMessage = "/messageTemplate/MyMessage/admin/{messageId}";
+        public static final String MessageOrderPush = "/messageTemplate/messageOrderPush";
     }
+
+    public static class SingleDisease {
+        public static final String GetDropdownList = "/singleDisease/getDropdownList";
+        public static final String GetSymptomDetailData = "/singleDisease/getSymptomDetailData";
+        public static final String GetMedicineDetailData = "/singleDisease/getMedicineDetailData";
+
+
+    }
+
 }

@@ -1,12 +1,15 @@
 package com.yihu.ehr.basic.quota.controller;
 
 import com.yihu.ehr.basic.quota.service.TjQuotaCategoryService;
+import com.yihu.ehr.basic.quota.service.TjQuotaService;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.entity.quota.TjQuotaCategory;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.tj.MQuotaCategory;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -28,8 +31,11 @@ import java.util.Map;
 @RequestMapping(ApiVersion.Version1_0)
 @Api(value = "TjQuotaCategoryEndPoint", description = "指标分类管理", tags = {"指标分类-管理"})
 public class TjQuotaCategoryEndPoint extends EnvelopRestEndPoint {
+
     @Autowired
     private TjQuotaCategoryService quotaCategoryService;
+    @Autowired
+    private TjQuotaService tjQuotaService;
 
     @RequestMapping(value = "/quotaCategory/pageList", method = RequestMethod.GET)
     @ApiOperation(value = "根据查询条件查询指标分类列表")
@@ -49,13 +55,13 @@ public class TjQuotaCategoryEndPoint extends EnvelopRestEndPoint {
 
         ListResult listResult = new ListResult();
         List<TjQuotaCategory> quotaCategoryList = quotaCategoryService.search(fields, filters, sorts, page, size);
-        if(quotaCategoryList != null){
+        if (quotaCategoryList != null){
             listResult.setDetailModelList(quotaCategoryList);
             listResult.setTotalCount((int)quotaCategoryService.getCount(filters));
             listResult.setCode(200);
             listResult.setCurrPage(page);
             listResult.setPageSize(size);
-        }else{
+        } else{
             listResult.setCode(200);
             listResult.setMessage("查询无数据");
             listResult.setTotalCount(0);
@@ -90,12 +96,21 @@ public class TjQuotaCategoryEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = "/quotaCategory/delete", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除指标分类")
-    public boolean deleteQquotaCategory(
-            @ApiParam(name = "id", value = "id")
-            @RequestParam(value = "id", required = true) Integer id
-    ) throws Exception {
+    public Envelop deleteQuotaCategory(
+            @ApiParam(name = "id", value = "id", required = true)
+            @RequestParam(value = "id") Integer id) throws Exception {
+        TjQuotaCategory tjQuotaCategory = quotaCategoryService.getById(id);
+        if (null == tjQuotaCategory) {
+            return failed( "操作对象不存在", ErrorCode.OBJECT_NOT_FOUND.value());
+        }
+        if (quotaCategoryService.findByField("parentId", id).size() > 0) {
+            return failed("含有子分类，不能删除");
+        }
+        if (tjQuotaService.findByField("quotaType", id).size() > 0) {
+            return failed("含有子类，不能删除");
+        }
         quotaCategoryService.deleteQuotaCategory(id);
-        return true;
+        return success(true);
     }
 
     @RequestMapping(value = "/quotaCategory/checkName" , method = RequestMethod.PUT)

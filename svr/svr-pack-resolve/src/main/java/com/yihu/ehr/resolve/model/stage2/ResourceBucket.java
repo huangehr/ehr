@@ -52,6 +52,8 @@ public class ResourceBucket {
     private String healthProblem;
     //重传标识
     private boolean reUploadFlg;
+    //身份识别标志
+    private boolean identifyFlag;
     // 主记录
     protected MasterRecord masterRecord;
     //子记录
@@ -223,5 +225,13 @@ public class ResourceBucket {
 
     public void setReUploadFlg(boolean reUploadFlg) {
         this.reUploadFlg = reUploadFlg;
+    }
+
+    public boolean isIdentifyFlag() {
+        return identifyFlag;
+    }
+
+    public void setIdentifyFlag(boolean identifyFlag) {
+        this.identifyFlag = identifyFlag;
     }
 }

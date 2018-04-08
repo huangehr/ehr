@@ -24,7 +24,7 @@ import java.util.List;
  */
 @Transactional
 @Service
-public class ArchiveRelationService  extends BaseJpaService<ArchiveRelation, XArchiveRelationDao> {
+public class ArchiveRelationService extends BaseJpaService<ArchiveRelation, XArchiveRelationDao> {
 
     @Autowired
     private XArchiveRelationDao archiveRelationDao;
@@ -83,18 +83,14 @@ public class ArchiveRelationService  extends BaseJpaService<ArchiveRelation, XAr
     /**
      * 建立档案关联
      */
-    public ArchiveRelation archiveRelation(ArchiveRelation relation) throws Exception
-    {
+    public ArchiveRelation archiveRelation(ArchiveRelation relation) throws Exception {
         //根据profileId 判断是否存在
         String profileId = relation.getProfileId();
         ArchiveRelation ar =  archiveRelationDao.findByProfileId(profileId);
-        if(ar != null)
-        {
+        if (ar != null) {
             relation.setId(ar.getId());
         }
-
         relation = archiveRelationDao.save(relation);
-
         return relation;
     }
 

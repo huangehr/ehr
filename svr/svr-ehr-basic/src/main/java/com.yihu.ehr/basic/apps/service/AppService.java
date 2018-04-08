@@ -1,9 +1,17 @@
 package com.yihu.ehr.basic.apps.service;
 
 import com.yihu.ehr.basic.apps.dao.AppRepository;
+import com.yihu.ehr.basic.apps.dao.OauthClientDetailsDao;
 import com.yihu.ehr.basic.apps.dao.UserAppRepository;
 import com.yihu.ehr.basic.apps.model.App;
 import com.yihu.ehr.basic.apps.model.UserApp;
+import com.yihu.ehr.basic.user.dao.XRoleApiRelationRepository;
+import com.yihu.ehr.basic.user.dao.XRoleAppRelationRepository;
+import com.yihu.ehr.basic.user.dao.XRolesRepository;
+import com.yihu.ehr.basic.user.entity.RoleApiRelation;
+import com.yihu.ehr.basic.user.entity.RoleAppRelation;
+import com.yihu.ehr.basic.user.entity.Roles;
+import com.yihu.ehr.entity.oauth2.OauthClientDetails;
 import com.yihu.ehr.query.BaseJpaService;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.SQLQuery;
@@ -36,6 +44,14 @@ public class AppService extends BaseJpaService<App, AppRepository> {
     private UserAppRepository userAppRepository;
     @Autowired
     private AppRepository appRepo;
+    @Autowired
+    private OauthClientDetailsDao oauthClientDetailsDao;
+    @Autowired
+    private XRoleAppRelationRepository xRoleAppRelationRepository;
+    @Autowired
+    private XRoleApiRelationRepository xRoleApiRelationRepository;
+    @Autowired
+    private XRolesRepository xRolesRepository;
 
     @Value("${fast-dfs.public-server}")
     private String fastDfsPublicServers;
@@ -149,6 +165,31 @@ public class AppService extends BaseJpaService<App, AppRepository> {
 
     public App findById(String appId) {
         return appRepo.findOne(appId);
+    }
+
+    public App authClient(App app, OauthClientDetails oauthClientDetails, Roles basicRole, Roles additionRole) {
+        App newApp = appRepo.save(app);
+        oauthClientDetailsDao.save(oauthClientDetails);
+        //扩展角色关联
+        if (null == xRolesRepository.findByCodeAndAppId(additionRole.getCode(), additionRole.getAppId())) {
+            additionRole = xRolesRepository.save(additionRole);
+        }
+        additionRole = xRolesRepository.findByCodeAndAppId(additionRole.getCode(), additionRole.getAppId());
+        RoleAppRelation additionRoleAppRelation = new RoleAppRelation();
+        additionRoleAppRelation.setAppId(app.getId());
+        additionRoleAppRelation.setRoleId(additionRole.getId());
+        if (null == xRoleAppRelationRepository.findRelation(additionRoleAppRelation.getAppId(), additionRoleAppRelation.getRoleId())) {
+            xRoleAppRelationRepository.save(additionRoleAppRelation);
+        }
+        //通过基础开发者角色扩展api关联
+        List<RoleApiRelation> roleApiRelationList = xRoleApiRelationRepository.findByRoleId(basicRole.getId());
+        for (RoleApiRelation temp : roleApiRelationList) {
+            RoleApiRelation roleApiRelation1 = new RoleApiRelation();
+            roleApiRelation1.setRoleId(additionRole.getId());
+            roleApiRelation1.setApiId(temp.getApiId());
+            xRoleApiRelationRepository.save(roleApiRelation1);
+        }
+        return newApp;
     }
 
 }
