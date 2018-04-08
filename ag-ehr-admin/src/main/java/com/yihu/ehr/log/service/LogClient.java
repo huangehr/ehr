@@ -90,7 +90,7 @@ public interface LogClient {
     @ApiOperation(value = "根据id进行MONGODB日志的查询")
     Envelop getOperatorLogByAppKey(
             @ApiParam(name = "appKey", value = "应用ID appkey就是appId", defaultValue = "")
-            @RequestParam(value = "appKey", required = true) String appKey,
+            @RequestParam(value = "appKey", required = false) String appKey,
             @ApiParam(name = "responseFlag", value = "接口请求返回标识 1 成功 2 失败", defaultValue = "1")
             @RequestParam(value = "responseFlag", required = true) int responseFlag
     );
