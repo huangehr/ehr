@@ -176,6 +176,11 @@
             <artifactId>commons-util</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.yihu.ehr</groupId>
+            <artifactId>commons-rest-model</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>

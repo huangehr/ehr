@@ -106,7 +106,8 @@ public class DiabetesScheduler {
 			objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
 			BasesicUtil basesicUtil = new BasesicUtil();
-			String initializeDate = "2018-03-22";
+			String initializeDate = "2018-04-07";//上线改为 总院那边时间 2015-
+			String executeStartDate = "2015-04-10";
 			Date now = new Date();
 			String nowDate = DateUtil.formatDate(now,DateUtil.DEFAULT_DATE_YMD_FORMAT);
 			boolean flag = true;
@@ -117,9 +118,22 @@ public class DiabetesScheduler {
 				rowKeyList.clear();
 				//  当前时间大于初始化时间，就所有数据初始化，每个月递增查询，当前时间小于于初始时间每天抽取
 				if(basesicUtil.compareDate(initializeDate,nowDate) == -1){
-					Date yesterdayDate = DateUtils.addDays(now,-1);
-					String yesterday = DateUtil.formatDate(yesterdayDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
-					fq = "event_date:[" + yesterday + "T00:00:00Z TO  " + yesterday + "T23:59:59Z]";
+//					Date yesterdayDate = DateUtils.addDays(now,-1);
+//					String yesterday = DateUtil.formatDate(yesterdayDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
+//					fq = "event_date:[" + yesterday + "T00:00:00Z TO  " + yesterday + "T23:59:59Z]";
+//					flag = false;
+					Date exeStartDate = DateUtil.parseDate(initializeDate, DateUtil.DEFAULT_DATE_YMD_FORMAT);
+					Calendar calendar = Calendar.getInstance();
+					calendar.setTime(exeStartDate);
+					int day1 = calendar.get(Calendar.DAY_OF_YEAR);
+					Calendar endCalendar = Calendar.getInstance();
+					endCalendar.setTime(now);
+					int day2 = endCalendar.get(Calendar.DAY_OF_YEAR);
+					int num = day2 - day1;
+					//总院那边是一天采集24天的数据，所以初始化完后，每天采集15天的数据
+					Date executeEndDate = DateUtils.addDays(DateUtil.parseDate(executeStartDate, DateUtil.DEFAULT_DATE_YMD_FORMAT), 15*num);
+					endDate = DateUtil.formatDate(executeEndDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
+					fq = "event_date:[" + executeStartDate + "T00:00:00Z TO  " + endDate + "T23:59:59Z]";
 					flag = false;
 				}else{
 					fq = "event_date:[" + startDate + "T00:00:00Z TO  " + endDate + "T00:00:00Z]";
@@ -127,7 +141,7 @@ public class DiabetesScheduler {
 					startDate = DateUtil.formatDate(sDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
 					Date eDate = DateUtils.addMonths(DateUtil.parseDate(startDate,DateUtil.DEFAULT_DATE_YMD_FORMAT),1);
 					endDate = DateUtil.formatDate(eDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
-					if(startDate.equals("2018-04-01")){
+					if(startDate.equals("2018-04-01")){//结束时间
 						flag = false;
 					}
 					System.out.println("startDate=" + startDate);

@@ -18,7 +18,9 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by llh on 2017/5/9.
@@ -399,13 +401,16 @@ public class LogsEndPoint extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value = "/getOperatorLogByAppKey", method = RequestMethod.GET)
-    @ApiOperation(value = "根据id进行MONGODB日志的查询")
+    @ApiOperation(value = "根据id进行MONGODB日志的查询,调用次数和失败率")
     public Envelop getOperatorLogByAppKey(
             @ApiParam(name = "appKey", value = "应用ID appkey就是appId", defaultValue = "")
             @RequestParam(value = "appKey", required = true) String appKey,
             @ApiParam(name = "responseFlag", value = "接口请求返回标识 1 成功 2 失败", defaultValue = "1")
-            @RequestParam(value = "responseFlag", required = true) int responseFlag) throws Exception{
+            @RequestParam(value = "responseFlag", required = false) int responseFlag) throws Exception{
 
+        long successCount = 0;
+        long failCount = 0;
+        Map resultMap = new HashMap<>();
         Query query = new Query();
         Criteria cr = new Criteria();
         List<Criteria> criteriaList = new ArrayList<>();
@@ -413,25 +418,41 @@ public class LogsEndPoint extends EnvelopRestEndPoint {
             Criteria crCaller = new Criteria().where("appKey").is(appKey);
             criteriaList.add(crCaller);
         }
-        if(responseFlag ==1){
+        if(responseFlag == 1){
             Criteria crCaller = new Criteria().where("responseFlag").is("200");
             criteriaList.add(crCaller);
-        }else {
+            if(criteriaList != null && criteriaList.size() > 0 ){
+                Criteria[] criterias = new  Criteria[criteriaList.size()];
+                for(int i=0 ;i < criteriaList.size() ; i++){
+                    criterias[i] = criteriaList.get(i);
+                }
+                cr.andOperator(criterias);
+            }
+            query.addCriteria(cr);
+            successCount = mongoTemplate.count(query, CloudBusinessLog.class);
+            resultMap.put("count",successCount);
+        }else if(responseFlag == 2){
             Criteria crCaller = new Criteria().where("responseFlag").ne("200");
             criteriaList.add(crCaller);
-        }
-        if(criteriaList != null && criteriaList.size() > 0 ){
-            Criteria[] criterias = new  Criteria[criteriaList.size()];
-            for(int i=0 ;i < criteriaList.size() ; i++){
-                criterias[i] = criteriaList.get(i);
+            if(criteriaList != null && criteriaList.size() > 0 ){
+                Criteria[] criterias = new  Criteria[criteriaList.size()];
+                for(int i=0 ;i < criteriaList.size() ; i++){
+                    criterias[i] = criteriaList.get(i);
+                }
+                cr.andOperator(criterias);
             }
-            cr.andOperator(criterias);
+            query.addCriteria(cr);
+            failCount = mongoTemplate.count(query, CloudBusinessLog.class);
+            resultMap.put("count",failCount);
         }
-        query.addCriteria(cr);
-        long totalCount = mongoTemplate.count(query, CloudBusinessLog.class);
+        if(failCount != 0 || successCount != 0){
+            resultMap.put("failureRate",failCount/(failCount+successCount));
+        }else {
+            resultMap.put("failureRate",0);
+        }
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(true);
-        envelop.setObj(totalCount);
+        envelop.setObj(resultMap);
         return envelop;
     }
 
