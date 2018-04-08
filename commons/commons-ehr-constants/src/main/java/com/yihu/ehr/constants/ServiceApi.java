@@ -1287,11 +1287,14 @@ public class ServiceApi {
 
         public static final String getQuotaCategoryByName = "/quotaCategory/getQuotaCategoryByName";
 
-        public static final String GetHeatMapByQuotaCode = "/tj/getHeatMapByQuotaCode";
+        public static final String GetHeatMap = "/tj/getHeatMap";
         public static final String GetNumberOfDiabetes = "/tj/getNumberOfDiabetes";
         public static final String GetPieData = "/tj/getPieData";
         public static final String GetLineData = "/tj/getLineData";
         public static final String GetBarData = "/tj/getBarData";
+        public static final String GetDiseaseTypeAnalysisInfo = "/tj/getDiseaseTypeAnalysisInfo";
+        public static final String GetSexAnalysisInfo = "/tj/getSexAnalysisInfo";
+        public static final String GetAgeAnalysisInfo = "/tj/getAgeAnalysisInfo";
 
         public static final String GetArchiveCount = "/tj/getArchiveCount";
         public static final String GetArchiveManCount = "/tj/getArchiveManCount";
