@@ -32,6 +32,193 @@ public class SingleDiseasesController {
     @Autowired
     private SingleDiseaseServiceNew singleDiseaseServiceNew;
 
+    @RequestMapping(value = ServiceApi.TJ.GetHeatMap, method = RequestMethod.GET)
+    @ApiOperation(value = "热力图")
+    public Envelop getHeatMap(
+            @ApiParam(name = "condition", value = "过滤条件", defaultValue = "")
+            @RequestParam(value = "condition", required = false) String condition) throws Exception {
+        Envelop envelop = new Envelop();
+        List<Map<String,String>>  heatMapPoint = singleDiseaseService.getHeatMap(condition);
+        envelop.setSuccessFlg(true);
+        if (null != heatMapPoint && heatMapPoint.size() > 0) {
+            envelop.setDetailModelList(heatMapPoint);
+        }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.TJ.GetNumberOfDiabetes, method = RequestMethod.GET)
+    @ApiOperation(value = "糖尿病患者数")
+    public Envelop getNumberOfDiabetes(
+            @ApiParam(name = "condition", value = "过滤条件", defaultValue = "")
+            @RequestParam(value = "condition", required = false) String condition) throws Exception {
+        Envelop envelop = new Envelop();
+        List<Map<String, Object>> numberOfDiabetes = singleDiseaseService.getNumberOfDiabetes(condition);
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(numberOfDiabetes);
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.TJ.GetPieData, method = RequestMethod.GET)
+    @ApiOperation(value = "获取饼图数据")
+    public Envelop getPieData(
+            @ApiParam(name = "type", value = "类型", required = true)
+            @RequestParam(value = "type") String type,
+            @ApiParam(name = "condition", value = "过滤条件", defaultValue = "")
+            @RequestParam(value = "condition", required = false) String condition) throws Exception {
+        Envelop envelop = new Envelop();
+        Map<String, Object> pieDataInfo = singleDiseaseService.getPieDataInfo(type, condition);
+        envelop.setSuccessFlg(true);
+        if (null != pieDataInfo && pieDataInfo.size() > 0) {
+            envelop.setObj(pieDataInfo.get("legendData"));
+            ArrayList<Map<String, Object>> seriesData = (ArrayList<Map<String, Object>>) pieDataInfo.get("seriesData");
+            envelop.setDetailModelList(seriesData);
+        }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.TJ.GetLineData, method = RequestMethod.GET)
+    @ApiOperation(value = "获取折线图数据")
+    public Envelop getLineData(
+            @ApiParam(name = "condition", value = "过滤条件", defaultValue = "")
+            @RequestParam(value = "condition", required = false) String condition) throws Exception {
+        Envelop envelop = new Envelop();
+        Map<String, List<String>> map = singleDiseaseService.getLineDataInfo(condition);
+        envelop.setSuccessFlg(true);
+        if (null != map && map.size() > 0) {
+            envelop.setDetailModelList(map.get("valueData"));
+            envelop.setObj(map.get("xData"));
+        }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.TJ.GetBarData, method = RequestMethod.GET)
+    @ApiOperation(value = "获取柱状图数据")
+    public Envelop getBarData(
+            @ApiParam(name = "type", required = true, value = "类型 1并发症 2用药患者数 3空腹血糖统计 4糖耐量")
+            @RequestParam(value = "type") String type,
+            @ApiParam(name = "condition", value = "过滤条件", defaultValue = "")
+            @RequestParam(value = "condition", required = false) String condition) throws Exception {
+        Envelop envelop = new Envelop();
+        Map<String, List<String>> map = null;
+        if ("1".equals(type) || "2".equals(type)) {
+            if ("1".equals(type)) {
+                map = singleDiseaseService.getSymptomDataInfo(condition);
+            } else {
+                map = singleDiseaseService.getMedicineDataInfo(condition);
+            }
+            if (null != map && map.size() > 0) {
+                envelop.setDetailModelList(map.get("valueData"));
+                envelop.setObj(map.get("xData"));
+            }
+        } else if ("3".equals(type) || "4".equals(type)){
+            if ("3".equals(type)) {
+                map = singleDiseaseService.getFastingBloodGlucoseDataInfo(condition);
+            } else {
+                map = singleDiseaseService.getSugarToleranceDataInfo(condition);
+            }
+//            if (null != map && map.size() > 0) {
+//                List<Map<String, Object>> list = new ArrayList<>();
+//                Map<String, Object> myMap = new HashMap<>();
+//                myMap.put("男", map.get("valueData1"));
+//                myMap.put("女", map.get("valueData2"));
+//                list.add(myMap);
+//                envelop.setDetailModelList(list);
+//                envelop.setObj(map.get("xData"));
+//            }
+
+            if (null != map && map.size() > 0) {
+                envelop.setDetailModelList(map.get("valueData"));
+                envelop.setObj(map.get("xData"));
+            }
+        }
+        envelop.setSuccessFlg(true);
+
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.TJ.GetDiseaseTypeAnalysisInfo, method = RequestMethod.GET)
+    @ApiOperation(value = "获取疾病类型分析数据")
+    public Envelop getDiseaseTypeAnalysisInfo(
+            @ApiParam(name = "type", required = true, value = "1 年份 2 月趋势")
+            @RequestParam(value = "type", defaultValue = "1") String type,
+            @ApiParam(name = "filter", value = "过滤的年份")
+            @RequestParam(value = "filter", required = false) String filter) {
+        Envelop envelop = new Envelop();
+        Map<String, List<String>> diseaseTypeInfo = singleDiseaseService.getDiseaseTypeAnalysisInfo(type, filter);
+        List<Map<String, Object>> listMap = new ArrayList<>();
+        envelop.setSuccessFlg(true);
+        if (null != diseaseTypeInfo && diseaseTypeInfo.size() > 0) {
+            Map<String, List<String>> map = new HashMap<>();
+            List<String> list = diseaseTypeInfo.get("xName");
+            List<String> list1 = diseaseTypeInfo.get("name");
+            map.put("name", list1);
+            map.put("xName", list);
+            envelop.setObj(map);
+            for (int i = 1; i < 5; i++) {
+                Map<String, Object> valueMap = new HashMap<>();
+                valueMap.put("name", singleDiseaseService.getNameByIdType(i, "1"));
+                valueMap.put("value", diseaseTypeInfo.get("type" + i));
+                listMap.add(valueMap);
+            }
+            envelop.setDetailModelList(listMap);
+        }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.TJ.GetSexAnalysisInfo, method = RequestMethod.GET)
+    @ApiOperation(value = "获取疾病类型分析数据")
+    public Envelop getSexAnalysisInfo(
+            @ApiParam(name = "type", required = true, value = "1 年份 2 月趋势")
+            @RequestParam(value = "type", defaultValue = "1") String type,
+            @ApiParam(name = "filter", value = "过滤的年份")
+            @RequestParam(value = "filter", required = false) String filter) {
+        Envelop envelop = new Envelop();
+        Map<String, List<String>> diseaseTypeInfo = singleDiseaseService.getSexAnalysisInfo(type, filter);
+        List<Map<String, Object>> listMap = new ArrayList<>();
+        envelop.setSuccessFlg(true);
+        if (null != diseaseTypeInfo && diseaseTypeInfo.size() > 0) {
+            Map<String, List<String>> map = new HashMap<>();
+            map.put("name", diseaseTypeInfo.get("name"));
+            map.put("xName", diseaseTypeInfo.get("xName"));
+            envelop.setObj(map);
+            for (int i = 1; i < 4; i++) {
+                Map<String, Object> valueMap = new HashMap<>();
+                valueMap.put("name", singleDiseaseService.getNameByIdType(i, "2"));
+                valueMap.put("value", diseaseTypeInfo.get("type" + i));
+                listMap.add(valueMap);
+            }
+            envelop.setDetailModelList(listMap);
+        }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.TJ.GetAgeAnalysisInfo, method = RequestMethod.GET)
+    @ApiOperation(value = "获取疾病类型分析数据")
+    public Envelop getAgeAnalysisInfo(
+            @ApiParam(name = "type", required = true, value = "1 年份 2 月趋势")
+            @RequestParam(value = "type", defaultValue = "1") String type,
+            @ApiParam(name = "filter", value = "过滤的年份")
+            @RequestParam(value = "filter", required = false) String filter) {
+        Envelop envelop = new Envelop();
+        Map<String, List<String>> diseaseTypeInfo = singleDiseaseService.getAgeAnalysisInfo(type, filter);
+        List<Map<String, Object>> listMap = new ArrayList<>();
+        envelop.setSuccessFlg(true);
+        if (null != diseaseTypeInfo && diseaseTypeInfo.size() > 0) {
+            Map<String, List<String>> map = new HashMap<>();
+            map.put("name", diseaseTypeInfo.get("name"));
+            map.put("xName", diseaseTypeInfo.get("xName"));
+            envelop.setObj(map);
+            for (int i = 1; i < 6; i++) {
+                Map<String, Object> valueMap = new HashMap<>();
+                valueMap.put("name", singleDiseaseService.getNameByIdType(i, "3"));
+                valueMap.put("value", diseaseTypeInfo.get("type" + i));
+                listMap.add(valueMap);
+            }
+            envelop.setDetailModelList(listMap);
+        }
+        return envelop;
+    }
+
     @RequestMapping(value = ServiceApi.SingleDisease.GetDropdownList, method = RequestMethod.GET)
     @ApiOperation(value = "获取并发症和药品查询下拉列表前十 数据")
     public Envelop getDropdownList(
