@@ -323,7 +323,7 @@ public class SingleDiseasesController {
         String typeSql = "";
         String symptomSql = "";
         if(StringUtils.isNotEmpty(name)){
-            name = "medicineName = '" + name + "'";
+            name = "and medicineName = '" + name + "'";
             yearsql = "select count(*) count from single_disease_check_index where checkCode = 'CH004' " + name +  " group by date_histogram(field='eventDate','interval'='year')";
             typeSql = "select diseaseTypeName,count(*) count from single_disease_check_index where checkCode = 'CH004' " + name + " group by diseaseTypeName";
             symptomSql = "select symptomName,count(*) count from single_disease_check_index where checkCode = 'CH004' " + name + " group by symptomName";
