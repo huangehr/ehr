@@ -57,7 +57,7 @@ public class DiabetesCheckScheduler {
 	 * 每天2点 执行一次
 	 * @throws Exception
 	 */
-	@Scheduled(cron = "0 30 18 * * ?")
+	@Scheduled(cron = "0 59 21 * * ?")
 	public void validatorIdentityScheduler(){
 		try {
 			String q2 = "EHR_000394:*糖耐量*2H血糖* OR EHR_000394:*糖耐量*空腹血糖* OR EHR_000394:*葡萄糖耐量试验*";
@@ -84,7 +84,7 @@ public class DiabetesCheckScheduler {
 
 			BasesicUtil basesicUtil = new BasesicUtil();
 			String initializeDate = "2018-04-10";// job初始化时间
-			String executeStartDate = "2015-05-01";
+			String executeStartDate = "2015-06-01";
 			Date now = new Date();
 			String nowDate = DateUtil.formatDate(now,DateUtil.DEFAULT_DATE_YMD_FORMAT);
 			boolean flag = true;
@@ -93,10 +93,6 @@ public class DiabetesCheckScheduler {
 			while(flag){
 				//  当前时间大于初始化时间，就所有数据初始化，每个月递增查询，当前时间小于于初始时间每天抽取
 				if(basesicUtil.compareDate(initializeDate,nowDate) == -1){
-//					Date yesterdayDate = DateUtils.addDays(now,-1);
-//					String yesterday = DateUtil.formatDate(yesterdayDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
-//					fq = "event_date:[" + yesterday + "T00:00:00Z TO  " + yesterday + "T23:59:59Z]";
-//					flag = false;
 					Date exeStartDate = DateUtil.parseDate(initializeDate, DateUtil.DEFAULT_DATE_YMD_FORMAT);
 					Calendar calendar = Calendar.getInstance();
 					calendar.setTime(exeStartDate);
@@ -116,16 +112,16 @@ public class DiabetesCheckScheduler {
 					startDate = DateUtil.formatDate(sDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
 					Date eDate = DateUtils.addDays(DateUtil.parseDate(startDate, DateUtil.DEFAULT_DATE_YMD_FORMAT), 15);
 					endDate = DateUtil.formatDate(eDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
-					if(basesicUtil.compareDate("2015-05-01",startDate) == 1){//结束时间
+					if(basesicUtil.compareDate("2017-05-01",startDate) != 1){//结束时间
 						flag = false;
 					}
 					System.out.println("startDate=" + startDate);
 				}
 				//找出糖尿病的就诊档案
-				System.out.println("开始查询 检验检测solr, fq = " + fq);
+				System.out.println("tangnai 开始查询 检验检测tangnai solr, fq = " + fq);
 				List<String> subRrowKeyList = new ArrayList<>() ; //细表rowkey
 				subRrowKeyList = selectSubRowKey(ResourceCore.SubTable, q2, fq, 10000);
-				System.out.println("检验检测查询结果条数："+subRrowKeyList.size());
+				System.out.println("tangnai 检验检测查询结果条数 tangnai count ："+subRrowKeyList.size());
 				if(subRrowKeyList != null && subRrowKeyList.size() > 0){
 					//糖尿病数据 Start
 					for(String subRowkey:subRrowKeyList){//循环糖尿病 找到主表就诊人信息
@@ -183,18 +179,16 @@ public class DiabetesCheckScheduler {
 							}
 							if(map.get(keySex) != null) {
 								if(StringUtils.isNotEmpty(map.get(keySex).toString())){
-//									if(map.get(keySex).toString().equals("男")){
-//										sex =1;
-//										sexName ="男";
-//									}else if(map.get(keySex).toString().equals("女")){
-//										sex =2;
-//										sexName ="女";
-//									}else {
-//										sex =0;
-//										sexName ="未知";
-//									}
-									sex = Integer.valueOf(map.get(keySex).toString());
-									sexName = map.get(keySexValue).toString();
+									if(map.get(keySex).toString().contains("男")){
+										sex =1;
+										sexName ="男";
+									}else if(map.get(keySex).toString().contains("女")){
+										sex =2;
+										sexName ="女";
+									}else {
+										sex = Integer.valueOf(map.get(keySex).toString());
+										sexName = map.get(keySexValue).toString();
+									}
 								}else {
 									sex =0;
 									sexName ="未知";

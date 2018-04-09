@@ -57,7 +57,7 @@ public class DiabetesMedicineScheduler {
 	 * 每天2点 执行一次
 	 * @throws Exception
 	 */
-	@Scheduled(cron = "0 15 18 * * ?")
+	@Scheduled(cron = "0 49 21 * * ?")
 	public void validatorIdentityScheduler(){
 		try {
 //			String q =  null; // 查询条件 health_problem:HP0047  HP0047 为糖尿病
@@ -86,7 +86,7 @@ public class DiabetesMedicineScheduler {
 
 			BasesicUtil basesicUtil = new BasesicUtil();
 			String initializeDate = "2018-04-10";// job初始化时间
-			String executeStartDate = "2015-05-01";
+			String executeStartDate = "2015-06-01";
 			Date now = new Date();
 			String nowDate = DateUtil.formatDate(now,DateUtil.DEFAULT_DATE_YMD_FORMAT);
 			boolean flag = true;
@@ -97,10 +97,6 @@ public class DiabetesMedicineScheduler {
 				rowKeyList.clear();
 				//  当前时间大于初始化时间，就所有数据初始化，每个月递增查询，当前时间小于于初始时间每天抽取
 				if(basesicUtil.compareDate(initializeDate,nowDate) == -1){
-//					Date yesterdayDate = DateUtils.addDays(now,-1);
-//					String yesterday = DateUtil.formatDate(yesterdayDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
-//					fq = "event_date:[" + yesterday + "T00:00:00Z TO  " + yesterday + "T23:59:59Z]";
-//					flag = false;
 					Date exeStartDate = DateUtil.parseDate(initializeDate, DateUtil.DEFAULT_DATE_YMD_FORMAT);
 					Calendar calendar = Calendar.getInstance();
 					calendar.setTime(exeStartDate);
@@ -120,17 +116,17 @@ public class DiabetesMedicineScheduler {
 					startDate = DateUtil.formatDate(sDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
 					Date eDate = DateUtils.addDays(DateUtil.parseDate(startDate, DateUtil.DEFAULT_DATE_YMD_FORMAT), 15);
 					endDate = DateUtil.formatDate(eDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
-					if(basesicUtil.compareDate("2015-05-01",startDate) == 1){//结束时间
+					if(basesicUtil.compareDate("2017-05-01",startDate) != 1){//结束时间
 						flag = false;
 					}
-					System.out.println("startDate=" + startDate);
+					System.out.println("medicine startDate=" + startDate);
 				}
 				//找出糖尿病的就诊档案
 
 				List<String> subRrowKeyList = new ArrayList<>() ; //细表rowkey
 				subRrowKeyList = selectSubRowKey(ResourceCore.SubTable, q2, fq, 10000);
-				System.out.println("药物开始查询solr, fq = " + fq);
-				System.out.println("subRrowKeyList, size = " + subRrowKeyList.size());
+				System.out.println("medicine 药物开始查询medicine solr, fq = " + fq);
+				System.out.println("medicine subRrowKeyList, size = " + subRrowKeyList.size());
 				if(subRrowKeyList != null && subRrowKeyList.size() > 0){
 					//糖尿病数据 Start
 					for(String subRowkey:subRrowKeyList){//循环糖尿病 找到主表就诊人信息
@@ -195,18 +191,16 @@ public class DiabetesMedicineScheduler {
 								}
 								if(map.get(keySex) != null) {
 									if(StringUtils.isNotEmpty(map.get(keySex).toString())){
-										sex = Integer.valueOf(map.get(keySex).toString());
-										sexName = map.get(keySexValue).toString();
-//										if(map.get(keySex).toString().equals("男")){
-//											sex =1;
-//											sexName ="男";
-//										}else if(map.get(keySex).toString().equals("女")){
-//											sex =2;
-//											sexName ="女";
-//										}else {
-//											sex =0;
-//											sexName ="未知";
-//										}
+										if(map.get(keySex).toString().contains("男")){
+											sex =1;
+											sexName ="男";
+										}else if(map.get(keySex).toString().contains("女")){
+											sex =2;
+											sexName ="女";
+										}else {
+											sex = Integer.valueOf(map.get(keySex).toString());
+											sexName = map.get(keySexValue).toString();
+										}
 									}else {
 										sex =0;
 										sexName ="未知";
@@ -223,7 +217,7 @@ public class DiabetesMedicineScheduler {
 							fq = "profile_id:"+ mainRowkey +"* AND EHR_000131:*";
 							//查询主表对应的细表的数据 循环解析
 							List<String> subRrowKeyList2 = selectSubRowKey(ResourceCore.SubTable, null, fq, 10000);
-							System.out.println("药物 查询结果条数："+subRrowKeyList2.size());
+							System.out.println("meidcine 药物 查询结果条数："+subRrowKeyList2.size());
 							//细表解析保存 start
 							if(subRrowKeyList2 !=null && subRrowKeyList2.size() > 0){
 								List<Map<String,Object>> subhbaseDataList = selectHbaseData(ResourceCore.SubTable, subRrowKeyList2);
