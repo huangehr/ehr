@@ -402,6 +402,7 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         if (!"10000".equals(syncResultMap.get("Code").toString())) {
             String message = String.format("同步医生信息到福州总部失败：%s，orgId：%s", syncResultMap.get("Message").toString(), orgId);
             logger.warn(message);
