@@ -133,7 +133,14 @@ service-gateway:
   username: user
   password: eureka
   url: http://10.176.97.10:10000/api/v1.0/admin
-
+  data:
+    mongodb:
+      host: 10.176.97.9
+      port: 29000
+      username: jkzlehr
+      password: GMLBq1LG
+      authenticationDatabase: admin
+      database: ehr
 kafka:
   broker:
     address: 10.176.97.7:6667
@@ -175,4 +182,34 @@ es:
   type: wlyy_quota
   host:  http://100.100.1.158:9300
   tHost: 100.100.1.158:9300
+  clusterName: jkzl
+
+---
+spring:
+  profiles: prod_srformal
+  datasource:
+    url: jdbc:mysql://192.168.40.34:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: healthcloud
+    password: GP8Qz4qU
+
+service-gateway:
+  username: user
+  password: eureka
+  url: http://192.168.220.84:10000/api/v1.0/admin
+  data:
+    mongodb:
+      host: 192.168.50.26
+      port: 20000
+      username: jkzlehr
+      password: GMLBq1LG
+      authenticationDatabase: admin
+      database: ehr
+kafka:
+  broker:
+    address: 172.10.10.2:6667,172.10.10.5:6667
+es:
+  index: wlyy_quota
+  type: wlyy_quota
+  host:  http://172.10.10.2:9200
+  tHost: 172.10.10.2:9300
   clusterName: jkzl
