@@ -57,7 +57,7 @@ public class DiabetesCheckScheduler {
 	 * 每天2点 执行一次
 	 * @throws Exception
 	 */
-	@Scheduled(cron = "0 21 15 * * ?")
+	@Scheduled(cron = "0 30 18 * * ?")
 	public void validatorIdentityScheduler(){
 		try {
 			String q2 = "EHR_000394:*糖耐量*2H血糖* OR EHR_000394:*糖耐量*空腹血糖* OR EHR_000394:*葡萄糖耐量试验*";
@@ -83,8 +83,8 @@ public class DiabetesCheckScheduler {
 			objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
 			BasesicUtil basesicUtil = new BasesicUtil();
-			String initializeDate = "2018-04-07";//上线改为 总院那边时间 2015-
-			String executeStartDate = "2015-04-10";
+			String initializeDate = "2018-04-10";// job初始化时间
+			String executeStartDate = "2015-05-01";
 			Date now = new Date();
 			String nowDate = DateUtil.formatDate(now,DateUtil.DEFAULT_DATE_YMD_FORMAT);
 			boolean flag = true;
@@ -112,11 +112,11 @@ public class DiabetesCheckScheduler {
 					flag = false;
 				}else{
 					fq = "event_date:[" + startDate + "T00:00:00Z TO  " + endDate + "T00:00:00Z]";
-					Date sDate = DateUtils.addMonths(DateUtil.parseDate(startDate,DateUtil.DEFAULT_DATE_YMD_FORMAT),1);
+					Date sDate = DateUtils.addDays(DateUtil.parseDate(startDate, DateUtil.DEFAULT_DATE_YMD_FORMAT), 15);
 					startDate = DateUtil.formatDate(sDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
-					Date eDate = DateUtils.addMonths(DateUtil.parseDate(startDate,DateUtil.DEFAULT_DATE_YMD_FORMAT),1);
+					Date eDate = DateUtils.addDays(DateUtil.parseDate(startDate, DateUtil.DEFAULT_DATE_YMD_FORMAT), 15);
 					endDate = DateUtil.formatDate(eDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
-					if(startDate.equals("2018-04-01")){//结束时间
+					if(basesicUtil.compareDate("2015-05-01",startDate) == 1){//结束时间
 						flag = false;
 					}
 					System.out.println("startDate=" + startDate);

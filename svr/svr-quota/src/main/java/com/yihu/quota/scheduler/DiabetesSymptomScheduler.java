@@ -59,7 +59,7 @@ public class DiabetesSymptomScheduler {
 	 * 每天2点 执行一次
 	 * @throws Exception
 	 */
-	@Scheduled(cron = "0 48 16 * * ?")
+	@Scheduled(cron = "0 25 18 * * ?")
 	public void validatorIdentityScheduler(){
 		try {
 			String q2 = "EHR_000112:*糖尿病*并发症* OR EHR_000295:*糖尿病*并发症*"; //门诊和住院 诊断名称
@@ -84,8 +84,8 @@ public class DiabetesSymptomScheduler {
 			objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
 			BasesicUtil basesicUtil = new BasesicUtil();
-			String initializeDate = "2018-04-07";//上线改为 总院那边时间 2015-
-			String executeStartDate = "2015-04-10";
+			String initializeDate = "2018-04-10";// job初始化时间
+			String executeStartDate = "2015-05-01";
 			Date now = new Date();
 			String nowDate = DateUtil.formatDate(now,DateUtil.DEFAULT_DATE_YMD_FORMAT);
 			boolean flag = true;
@@ -103,17 +103,17 @@ public class DiabetesSymptomScheduler {
 					int day2 = endCalendar.get(Calendar.DAY_OF_YEAR);
 					int num = day2 - day1;
 					//总院那边是一天采集24天的数据，所以初始化完后，每天采集15天的数据
-					Date executeEndDate = DateUtils.addDays(DateUtil.parseDate(executeStartDate, DateUtil.DEFAULT_DATE_YMD_FORMAT), 15*num);
+					Date executeEndDate = DateUtils.addDays(DateUtil.parseDate(executeStartDate, DateUtil.DEFAULT_DATE_YMD_FORMAT), 15 * num);
 					endDate = DateUtil.formatDate(executeEndDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
 					fq = "event_date:[" + executeStartDate + "T00:00:00Z TO  " + endDate + "T23:59:59Z]";
 					flag = false;
 				}else{
 					fq = "event_date:[" + startDate + "T00:00:00Z TO  " + endDate + "T00:00:00Z]";
-					Date sDate = DateUtils.addMonths(DateUtil.parseDate(startDate,DateUtil.DEFAULT_DATE_YMD_FORMAT),1);
+					Date sDate = DateUtils.addDays(DateUtil.parseDate(startDate, DateUtil.DEFAULT_DATE_YMD_FORMAT), 15);
 					startDate = DateUtil.formatDate(sDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
-					Date eDate = DateUtils.addMonths(DateUtil.parseDate(startDate,DateUtil.DEFAULT_DATE_YMD_FORMAT),1);
+					Date eDate = DateUtils.addDays(DateUtil.parseDate(startDate, DateUtil.DEFAULT_DATE_YMD_FORMAT), 15);
 					endDate = DateUtil.formatDate(eDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
-					if(startDate.equals("2015-04-01")){//结束时间
+					if(basesicUtil.compareDate("2015-05-01",startDate) == 1){//结束时间
 						flag = false;
 					}
 				}
