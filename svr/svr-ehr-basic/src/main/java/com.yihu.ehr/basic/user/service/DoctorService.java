@@ -20,6 +20,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -40,6 +42,8 @@ import java.util.Map;
 @Service
 @Transactional
 public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
+
+    Logger logger = LoggerFactory.getLogger(DoctorService.class);
 
     @Value("${fz-gateway.url}")
     private String fzGatewayUrl;
@@ -398,12 +402,10 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        if ("10000".equals(syncResultMap.get("Code").toString())) {
-            syncResultMap.remove("Code");
-            syncResultMap.remove("Message");
-        } else {
-            throw new ApiException(String.format("同步医生信息到福州总部失败：%s", syncResultMap.get("Message").toString()));
+        if (!"10000".equals(syncResultMap.get("Code").toString())) {
+            String message = String.format("同步医生信息到福州总部失败：%s，orgId：%s", syncResultMap.get("Message").toString(), orgId);
+            logger.warn(message);
+            throw new ApiException(message);
         }
 
         return syncResultMap;
