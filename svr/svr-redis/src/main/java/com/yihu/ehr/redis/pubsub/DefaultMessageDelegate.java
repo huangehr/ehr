@@ -73,10 +73,10 @@ public class DefaultMessageDelegate implements MessageDelegate {
                     redisMqMessageLog.setConsumedNum(oldConsumeNum + 1);
                     redisMqMessageLogService.save(redisMqMessageLog);
 
-                    logger.info("\n--- Redis发布订阅消费的消息 ---\nchannel: " + channel
+                    /*logger.info("\n--- Redis发布订阅消费的消息 ---\nchannel: " + channel
                             + ", messageLogId: " + messageLogId
                             + ", subscribedUrl: " + subscribedUrl
-                            + ", message: " + messageContent);
+                            + ", message: " + messageContent);*/
                 }
             }
         } catch (Exception e) {
