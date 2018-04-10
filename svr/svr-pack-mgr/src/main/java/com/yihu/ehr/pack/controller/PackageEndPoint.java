@@ -121,7 +121,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.Packages.Packages, method = RequestMethod.POST)
     @ApiOperation(value = "接收档案", notes = "从集成开放平台接收健康档案数据包")
-    public void savePackageWithOrg(
+    public boolean savePackageWithOrg (
             @ApiParam(name = "pack", value = "档案包", allowMultiple = true)
             @RequestPart() MultipartFile pack,
             @ApiParam(name = "org_code", value = "机构代码")
@@ -145,6 +145,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         }
         MPackage mPackage = convertToModel(aPackage, MPackage.class);
         redisTemplate.opsForList().leftPush(RedisCollection.PackageList, objectMapper.writeValueAsString(mPackage));
+        return true;
         //messageBuffer.putMessage(convertToModel(aPackage, MPackage.class));
     }
 
