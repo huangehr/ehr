@@ -31,10 +31,10 @@ public class IdentifyService {
     private PatientService patientService;
 
     public void identify (ResourceBucket resourceBucket, StandardPackage standardPackage) throws Exception {
+        boolean identify = false;
+        String demographicId = UUID.randomUUID().toString();
         if (StringUtils.isEmpty(standardPackage.getDemographicId()) || !pattern.matcher(standardPackage.getDemographicId()).find()) {
             boolean recognition = false;
-            boolean identify = false;
-            String demographicId = UUID.randomUUID().toString();
             if (!StringUtils.isEmpty(standardPackage.getCardId())) {
                 List<String> idCardNos = archiveRelationService.findByCardNo(standardPackage.getCardId());
                 if (!idCardNos.isEmpty()) {
@@ -85,17 +85,19 @@ public class IdentifyService {
                     }
                 }
             }
-            if (demographicId.length() == 18) {
-                identify = idCardValidator.is18Idcard(demographicId);
-            }
-            if (demographicId.length() == 15) {
-                identify = idCardValidator.is15Idcard(demographicId);
-            }
-            standardPackage.setDemographicId(demographicId);
-            resourceBucket.setDemographicId(demographicId);
-            standardPackage.setIdentifyFlag(identify);
-            resourceBucket.setIdentifyFlag(identify);
+        } else {
+            demographicId = standardPackage.getDemographicId();
         }
+        if (demographicId.length() == 18) {
+            identify = idCardValidator.is18Idcard(demographicId);
+        }
+        if (demographicId.length() == 15) {
+            identify = idCardValidator.is15Idcard(demographicId);
+        }
+        standardPackage.setDemographicId(demographicId);
+        resourceBucket.setDemographicId(demographicId);
+        standardPackage.setIdentifyFlag(identify);
+        resourceBucket.setIdentifyFlag(identify);
     }
 
 }
