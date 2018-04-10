@@ -67,7 +67,7 @@ public class IdentifyService {
                             match ++;
                         }
                         if (demographicInfo.getBirthday() != null && birthday.getTime() == demographicInfo.getBirthday().getTime()) {
-                            match++;
+                            match ++;
                         }
                         if (telephoneNo.equals(demographicInfo.getTelephoneNo())) {
                             match ++;
