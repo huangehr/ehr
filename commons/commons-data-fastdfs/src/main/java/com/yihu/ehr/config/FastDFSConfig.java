@@ -5,8 +5,6 @@ import com.yihu.ehr.fastdfs.FastDFSUtil;
 import org.csource.common.MyException;
 import org.csource.fastdfs.ClientGlobal;
 import org.csource.fastdfs.TrackerGroup;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,10 +20,6 @@ import java.net.InetSocketAddress;
 @Configuration
 public class FastDFSConfig {
 
-    @Value("${fast-dfs.pool.init-size}")
-    private int initPoolSize;
-    @Value("${fast-dfs.pool.max-size}")
-    private int maxPoolSize;
     @Value("${fast-dfs.pool.wait-time}")
     private int waitTime;
     @Value("${fast-dfs.connect-timeout}")
@@ -88,15 +82,12 @@ public class FastDFSConfig {
     }
 
     @Bean
-    public FastDFSClientPool fastDFSClientPool(){
-        FastDFSClientPool clientPool = new FastDFSClientPool();
-        clientPool.setMaxPoolSize(maxPoolSize);
-        return clientPool;
+    public FastDFSClientPool fastDFSClientPool() {
+        return new FastDFSClientPool();
     }
 
     @Bean
     public FastDFSUtil fastDFSUtil(){
-        FastDFSUtil util = new FastDFSUtil();
-        return util;
+        return new FastDFSUtil();
     }
 }

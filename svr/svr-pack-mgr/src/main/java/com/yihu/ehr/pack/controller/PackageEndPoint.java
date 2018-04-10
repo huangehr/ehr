@@ -130,19 +130,20 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "package_crypto") String packageCrypto,
             @ApiParam(name = "md5", value = "档案包MD5")
             @RequestParam(value = "md5", required = false) String md5,
-            HttpServletRequest request) throws JsonProcessingException {
+            HttpServletRequest request) throws Exception {
 
         MKey key = securityClient.getOrgKey(orgCode);
         Package aPackage;
         if (key == null || key.getPrivateKey() == null) {
             throw new ApiException(HttpStatus.FORBIDDEN, ErrorCode.FORBIDDEN, "Invalid private key, maybe you miss the organization code?");
         }
+        String password;
         try {
-            String password = RSA.decrypt(packageCrypto, RSA.genPrivateKey(key.getPrivateKey()));
-            aPackage = packService.receive(pack.getInputStream(), password, md5, orgCode, getClientId(request));
+            password = RSA.decrypt(packageCrypto, RSA.genPrivateKey(key.getPrivateKey()));
         } catch (Exception ex) {
             throw new ApiException(HttpStatus.FORBIDDEN, ErrorCode.FORBIDDEN, "javax.crypto.BadPaddingException." + ex.getMessage());
         }
+        aPackage = packService.receive(pack.getInputStream(), password, md5, orgCode, getClientId(request));
         MPackage mPackage = convertToModel(aPackage, MPackage.class);
         redisTemplate.opsForList().leftPush(RedisCollection.PackageList, objectMapper.writeValueAsString(mPackage));
         return true;

@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
@@ -41,12 +42,12 @@ public class PackageService extends BaseJpaService<Package, XPackageRepository> 
     @Autowired
     private XDatasetPackageRepository datasetPackageRepository;
 
-    public Package receive(InputStream is, String pwd, String md5, String orgCode, String clientId) {
+    public Package receive(InputStream is, String pwd, String md5, String orgCode, String clientId) throws Exception {
         Map<String, String> metaData = storeJsonPackage(is);
         return checkIn(metaData.get("id"), metaData.get("path"), pwd, md5, orgCode, clientId);
     }
 
-    public DatasetPackage receiveDatasets(InputStream is, String pwd, String md5, String orgCode, String clientId) {
+    public DatasetPackage receiveDatasets(InputStream is, String pwd, String md5, String orgCode, String clientId) throws Exception {
         Map<String, String> metaData = storeJsonPackage(is);
         return checkDatasetIn(metaData.get("id"), metaData.get("path"), pwd, md5, orgCode, clientId);
     }
@@ -93,28 +94,21 @@ public class PackageService extends BaseJpaService<Package, XPackageRepository> 
      * @param is 文件流
      * @return 完整路径
      */
-    Map<String, String> storeJsonPackage(InputStream is) {
+    Map<String, String> storeJsonPackage(InputStream is) throws Exception {
         ObjectId objectId = new ObjectId(adminRegion, BizObject.JsonPackage);
 
-        try {
-            ObjectNode msg = fastDFSUtil.upload(is, "zip", "健康档案JSON临时文件");
-            String group = msg.get(FastDFSUtil.GROUP_NAME).asText();
-            String remoteFile = msg.get(FastDFSUtil.REMOTE_FILE_NAME).asText();
+        ObjectNode msg = fastDFSUtil.upload(is, "zip", "健康档案JSON临时文件");
+        String group = msg.get(FastDFSUtil.GROUP_NAME).asText();
+        String remoteFile = msg.get(FastDFSUtil.REMOTE_FILE_NAME).asText();
 
-            // 将组与文件ID使用英文分号隔开, 提取的时候, 只需要将它们这个串拆开, 就可以得到组与文件ID
-            String remoteFilePath = String.join(Package.pathSeparator, new String[]{group, remoteFile});
+        // 将组与文件ID使用英文分号隔开, 提取的时候, 只需要将它们这个串拆开, 就可以得到组与文件ID
+        String remoteFilePath = String.join(Package.pathSeparator, new String[]{group, remoteFile});
 
-            Map<String, String> metaData = new HashMap<>();
-            metaData.put("id", objectId.toString());
-            metaData.put("path", remoteFilePath);
+        Map<String, String> metaData = new HashMap<>();
+        metaData.put("id", objectId.toString());
+        metaData.put("path", remoteFilePath);
 
-            return metaData;
-        } catch (Exception e) {
-            LogService.getLogger(PackageService.class)
-                    .error("存病人档案文件失败, 错误原因: " + ExceptionUtils.getStackTrace(e));
-
-            return null;
-        }
+        return metaData;
     }
 
     /**
@@ -124,26 +118,19 @@ public class PackageService extends BaseJpaService<Package, XPackageRepository> 
      * @param pwd  zip密码
      * @return 索引存储成功
      */
-    Package checkIn(String id, String path, String pwd, String md5, String orgCode, String clientId) {
-        try {
-            Package aPackage = new Package();
-            aPackage.setId(id);
-            aPackage.setMd5(md5);
-            aPackage.setOrgCode(orgCode);
-            aPackage.setClientId(clientId);
-            aPackage.setRemotePath(path);
-            aPackage.setPwd(pwd);
-            aPackage.setReceiveDate(new Date());
-            aPackage.setArchiveStatus(ArchiveStatus.Received);
-            aPackage.setFailCount(0);
-            getRepo().save(aPackage);
-
-            return aPackage;
-        } catch (HibernateException ex) {
-            LogService.getLogger(PackageService.class).error(ex.getMessage());
-
-            return null;
-        }
+    private Package checkIn(String id, String path, String pwd, String md5, String orgCode, String clientId) {
+        Package aPackage = new Package();
+        aPackage.setId(id);
+        aPackage.setMd5(md5);
+        aPackage.setOrgCode(orgCode);
+        aPackage.setClientId(clientId);
+        aPackage.setRemotePath(path);
+        aPackage.setPwd(pwd);
+        aPackage.setReceiveDate(new Date());
+        aPackage.setArchiveStatus(ArchiveStatus.Received);
+        aPackage.setFailCount(0);
+        getRepo().save(aPackage);
+        return aPackage;
     }
 
     /**
