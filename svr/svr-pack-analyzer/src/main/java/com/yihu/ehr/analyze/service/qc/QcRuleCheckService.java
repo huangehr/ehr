@@ -42,11 +42,12 @@ public class QcRuleCheckService {
     public void emptyCheck(String data) {
         try {
             DataElementValue value = parse(data);
+            logger.debug("code:" + value.getCode() + ",value:" + value.getValue());
 
             Boolean isNullable = hosAdminServiceClient.isMetaDataNullable(value.getVersion(), value.getTable(), value.getCode());
             if (!isNullable && StringUtils.isEmpty(value.getValue())) {
                 saveCheckResult(value, "E00001", "不能为空");
-                logger.info("code:" + value.getCode() + ",value:" + value.getValue());
+                logger.warn("code:" + value.getCode() + ",value:" + value.getValue());
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -103,15 +104,17 @@ public class QcRuleCheckService {
     public void valueCheck(String data) {
         try {
             DataElementValue value = parse(data);
+            logger.debug("code:" + value.getCode() + ",value:" + value.getValue());
             String dict = hosAdminServiceClient.getMetaDataDict(value.getVersion(), value.getTable(), value.getCode());
             if (StringUtils.isEmpty(dict) || dict.equals("0")) {
                 return;
             }
 
+            logger.debug("code:" + value.getCode() + ",value:" + value.getValue() + ",dict:" + dict);
             Boolean isExist = hosAdminServiceClient.isDictCodeExist(value.getVersion(), dict, value.getCode());
             if (!isExist) {
                 saveCheckResult(value, "E00002", "超出值域范围");
-                logger.info("code:" + value.getCode() + ",value:" + value.getValue() + ",dict:" + dict);
+                logger.warn("code:" + value.getCode() + ",value:" + value.getValue() + ",dict:" + dict);
             }
         } catch (IOException e) {
             e.printStackTrace();
