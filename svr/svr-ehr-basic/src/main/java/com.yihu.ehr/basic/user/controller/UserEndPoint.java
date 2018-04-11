@@ -54,7 +54,7 @@ import java.util.*;
 public class UserEndPoint extends EnvelopRestEndPoint {
 
     @Value("${default.password}")
-    private String default_password = "123456";
+    private String default_password = "12345678";
     @Value("${h5.secret}")
     private String secret;
     @Value("${h5.appId}")
@@ -221,7 +221,7 @@ public class UserEndPoint extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value = ServiceApi.Users.UserAdminPassword, method = RequestMethod.PUT)
-    @ApiOperation(value = "重设密码", notes = "用户忘记密码管理员帮助重新还原密码，初始密码123456")
+    @ApiOperation(value = "重设密码", notes = "用户忘记密码管理员帮助重新还原密码，初始密码12345678")
     public boolean resetPass(
             @ApiParam(name = "user_id", value = "id", defaultValue = "")
             @PathVariable(value = "user_id") String userId) throws Exception {
@@ -587,8 +587,8 @@ public class UserEndPoint extends EnvelopRestEndPoint {
             return failed(msg);
         }
         //设置默认密码为身份证后六位
-        if (!StringUtils.isEmpty(user1.getIdCardNo()) && user1.getIdCardNo().length() > 7){
-            String  defaultPassword = user1.getIdCardNo().substring(user1.getIdCardNo().length() - 6, user1.getIdCardNo().length());
+        if (!StringUtils.isEmpty(user1.getIdCardNo()) && user1.getIdCardNo().length() > 9){
+            String  defaultPassword = user1.getIdCardNo().substring(user1.getIdCardNo().length() - 8);
             user1.setPassword(DigestUtils.md5Hex(defaultPassword));
         } else {
             user1.setPassword(DigestUtils.md5Hex(default_password));
@@ -810,7 +810,7 @@ public class UserEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Users.UsersOfApp, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建用户", notes = "App用户注册信息")
     public Envelop appCreateUser(
-            @ApiParam(name = "user_json_data", required = true,value = "", defaultValue = "")
+            @ApiParam(name = "userJsonData", required = true,value = "", defaultValue = "")
             @RequestBody String userJsonData) throws Exception {
         Envelop envelop = new Envelop();
         User user = toEntity(userJsonData, User.class);

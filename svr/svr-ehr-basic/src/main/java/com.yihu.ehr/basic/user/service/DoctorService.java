@@ -96,13 +96,13 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
                 {
                     user = objectMapper.readValue(json,User.class);
                     user.setLoginCode(phone);  //手机号码默认登录账号
-                    //密码默认123456
-                    String password = "123456";
-                    //有身份证 默认身份证后6位
+                    //密码默认12345678
+                    String password = "12345678";
+                    //有身份证 默认身份证后8位
                     String number = user.getIdCardNo();
                     if(!StringUtils.isEmpty(number))
                     {
-                        password = number.substring(number.length()-6);
+                        password = number.substring(number.length()-8);
                     }
                     user.setPassword(DigestUtils.md5Hex(password));
                     user.setRealName(doctor.getName());
@@ -215,12 +215,12 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
 
             //创建居民
             demographicInfo =new DemographicInfo();
-            String idCardNo="123456";
-            if(null!=map .get("idCardNo")&&StringUtils.isEmpty(map .get("idCardNo").toString())){
-                idCardNo=map .get("idCardNo").toString();
-                demographicInfo.setPassword(DigestUtils.md5Hex(idCardNo));
+            if(null!=map .get("idCardNo")&&StringUtils.isNotEmpty(map .get("idCardNo").toString())&&map .get("idCardNo").toString().length()>9){
+                String idCardNo=map .get("idCardNo").toString();
+                String defaultPassword=idCardNo.substring(idCardNo.length()-8);
+                demographicInfo.setPassword(DigestUtils.md5Hex(defaultPassword));
             }else{
-                demographicInfo.setPassword(DigestUtils.md5Hex("123456"));
+                demographicInfo.setPassword(DigestUtils.md5Hex("12345678"));
             }
             demographicInfo.setRegisterTime(new Date());
             demographicInfo.setIdCardNo(String.valueOf(map .get("idCardNo")));

@@ -73,9 +73,9 @@ public class PatientService extends BaseJpaService<DemographicInfo, PatientDao>{
     }
 
     private void registered(DemographicInfo demographicInfo) {
-        String password = "123456";
-        if (demographicInfo.getIdCardNo().length() > 7) {
-            password = demographicInfo.getIdCardNo().substring(demographicInfo.getIdCardNo().length() - 6, demographicInfo.getIdCardNo().length());
+        String password = "12345678";
+        if (demographicInfo.getIdCardNo().length() > 9) {
+            password = demographicInfo.getIdCardNo().substring(demographicInfo.getIdCardNo().length() - 8);
             demographicInfo.setPassword(DigestUtils.md5Hex(password));
         } else {
             demographicInfo.setPassword(DigestUtils.md5Hex(password));

@@ -38,6 +38,7 @@ import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -278,8 +279,11 @@ public class PatientController extends BaseController {
         mUser.setLoginCode(loginCode);
         mUser.setDemographicId(detailModel.getIdCardNo());
 //       账号信息密码设为默认
-        mUser.setPassword("123456");
-
+        if(null != detailModel.getIdCardNo()){
+            mUser.setPassword(DigestUtils.md5Hex(detailModel.getIdCardNo().substring(detailModel.getIdCardNo().length()-8)));
+        }else{
+            mUser.setPassword("12345678");
+        }
         mUser.setId(detailModel.getUserId());
         mUser.setRealName(detailModel.getName());
         mUser.setIdCardNo(detailModel.getIdCardNo());
@@ -555,7 +559,7 @@ public class PatientController extends BaseController {
      * @throws Exception
      */
     @RequestMapping(value = "/populations/password/{id_card_no}", method = RequestMethod.PUT)
-    @ApiOperation(value = "初始化密码", notes = "用户忘记密码时重置密码，初始密码为123456")
+    @ApiOperation(value = "初始化密码", notes = "用户忘记密码时重置密码，初始密码为12345678")
     public boolean resetPass(
             @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
             @PathVariable(value = "id_card_no") String idCardNo) throws Exception {

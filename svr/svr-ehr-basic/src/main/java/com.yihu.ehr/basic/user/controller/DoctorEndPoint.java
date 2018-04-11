@@ -62,7 +62,7 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private OrgMemberRelationService relationService;
     @Value("${default.password}")
-    private String default_password = "123456";
+    private String default_password = "12345678";
     @Autowired
     private DemographicService demographicService;
     @Autowired
@@ -138,8 +138,8 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
         user.setId(getObjectId(BizObject.User));
         user.setCreateDate(new Date());
         String defaultPassword="";
-        if(!StringUtils.isEmpty(doctor.getIdCardNo())&&doctor.getIdCardNo().length()>7){
-            defaultPassword=doctor.getIdCardNo().substring(doctor.getIdCardNo().length()-6,doctor.getIdCardNo().length());
+        if(!StringUtils.isEmpty(doctor.getIdCardNo())&&doctor.getIdCardNo().length()>9){
+            defaultPassword=doctor.getIdCardNo().substring(doctor.getIdCardNo().length()-8);
             user.setPassword(DigestUtils.md5Hex(defaultPassword));
         }else{
             user.setPassword(DigestUtils.md5Hex(default_password));
@@ -165,8 +165,8 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
 
         //创建居民
         DemographicInfo demographicInfo =new DemographicInfo();
-        if(!StringUtils.isEmpty(doctor.getIdCardNo())&&doctor.getIdCardNo().length()>7){
-            defaultPassword=doctor.getIdCardNo().substring(doctor.getIdCardNo().length()-6,doctor.getIdCardNo().length());
+        if(!StringUtils.isEmpty(doctor.getIdCardNo())&&doctor.getIdCardNo().length()>9){
+            defaultPassword=doctor.getIdCardNo().substring(doctor.getIdCardNo().length()-8);
             demographicInfo.setPassword(DigestUtils.md5Hex(defaultPassword));
         }else{
             demographicInfo.setPassword(DigestUtils.md5Hex(default_password));
@@ -332,8 +332,8 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
                     user.setTechTitle(d.getSkill());
                     user.setEmail(d.getEmail());
                     String defaultPassword = "";
-                    if (!StringUtils.isEmpty(d.getIdCardNo()) && d.getIdCardNo().length() > 7) {
-                        defaultPassword = d.getIdCardNo().substring(d.getIdCardNo().length() - 6, d.getIdCardNo().length());
+                    if (!StringUtils.isEmpty(d.getIdCardNo()) && d.getIdCardNo().length() > 9) {
+                        defaultPassword = d.getIdCardNo().substring(d.getIdCardNo().length() - 8);
                         user.setPassword(DigestUtils.md5Hex(defaultPassword));
                     } else {
                         user.setPassword(DigestUtils.md5Hex(default_password));
