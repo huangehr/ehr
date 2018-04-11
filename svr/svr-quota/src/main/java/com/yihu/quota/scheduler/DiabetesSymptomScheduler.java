@@ -167,7 +167,7 @@ public class DiabetesSymptomScheduler {
 						if(map !=null){
 							if(map.get(keyEventDate) != null){
 								eventDate = DateUtil.formatCharDate(map.get(keyEventDate).toString(), DateUtil.DATE_WORLD_FORMAT);
-								eventDate = DateUtils.addYears(eventDate,-1);
+								eventDate = DateUtils.addHours(eventDate, 8);
 							}
 							if(map.get(keyAge) != null){
 								birthday= map.get(keyAge).toString().substring(0, 10);
