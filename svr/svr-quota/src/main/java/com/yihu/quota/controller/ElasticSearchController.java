@@ -310,7 +310,7 @@ public class ElasticSearchController extends BaseController {
             personalInfo.setDiseaseName("糖尿病");
             personalInfo.setDemographicId(data);
             try {
-                String sql = "SELECT count(demographicId) FROM single_disease_personal_index where demographicId ="+data+" group by demographicId ";
+                String sql = "SELECT count(demographicId) FROM singleDiseasePersonal where demographicId ="+data+" group by demographicId ";
                 long count2 = searchUtil.getCountBySql(sql);
                 System.out.println("结果条数 count2="+count2);
 

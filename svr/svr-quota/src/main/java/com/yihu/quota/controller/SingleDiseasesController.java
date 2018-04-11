@@ -38,6 +38,13 @@ public class SingleDiseasesController {
             @ApiParam(name = "condition", value = "过滤条件", defaultValue = "")
             @RequestParam(value = "condition", required = false) String condition) throws Exception {
         Envelop envelop = new Envelop();
+        if(StringUtils.isEmpty(condition)){
+            condition = "";
+        }else {
+            if( condition.contains("undefined")){
+                condition = "";
+            }
+        }
         List<Map<String,String>>  heatMapPoint = singleDiseaseService.getHeatMap(condition);
         envelop.setSuccessFlg(true);
         if (null != heatMapPoint && heatMapPoint.size() > 0) {
@@ -52,6 +59,13 @@ public class SingleDiseasesController {
             @ApiParam(name = "condition", value = "过滤条件", defaultValue = "")
             @RequestParam(value = "condition", required = false) String condition) throws Exception {
         Envelop envelop = new Envelop();
+        if(StringUtils.isEmpty(condition)){
+            condition = "";
+        }else {
+            if( condition.contains("undefined")){
+                condition = "";
+            }
+        }
         List<Map<String, Object>> numberOfDiabetes = singleDiseaseService.getNumberOfDiabetes(condition);
         envelop.setSuccessFlg(true);
         envelop.setDetailModelList(numberOfDiabetes);
@@ -66,6 +80,13 @@ public class SingleDiseasesController {
             @ApiParam(name = "condition", value = "过滤条件", defaultValue = "")
             @RequestParam(value = "condition", required = false) String condition) throws Exception {
         Envelop envelop = new Envelop();
+        if(StringUtils.isEmpty(condition)){
+            condition = "";
+        }else {
+            if( condition.contains("undefined")){
+                condition = "";
+            }
+        }
         Map<String, Object> pieDataInfo = singleDiseaseService.getPieDataInfo(type, condition);
         envelop.setSuccessFlg(true);
         if (null != pieDataInfo && pieDataInfo.size() > 0) {
@@ -82,6 +103,13 @@ public class SingleDiseasesController {
             @ApiParam(name = "condition", value = "过滤条件", defaultValue = "")
             @RequestParam(value = "condition", required = false) String condition) throws Exception {
         Envelop envelop = new Envelop();
+        if(StringUtils.isEmpty(condition)){
+            condition = "";
+        }else {
+            if( condition.contains("undefined")){
+                condition = "";
+            }
+        }
         Map<String, List<String>> map = singleDiseaseService.getLineDataInfo(condition);
         envelop.setSuccessFlg(true);
         if (null != map && map.size() > 0) {
@@ -99,6 +127,13 @@ public class SingleDiseasesController {
             @ApiParam(name = "condition", value = "过滤条件", defaultValue = "")
             @RequestParam(value = "condition", required = false) String condition) throws Exception {
         Envelop envelop = new Envelop();
+        if(StringUtils.isEmpty(condition)){
+            condition = "";
+        }else {
+            if( condition.contains("undefined")){
+                condition = "";
+            }
+        }
         Map<String, List<String>> map = null;
         if ("1".equals(type) || "2".equals(type)) {
             if ("1".equals(type)) {
@@ -144,6 +179,13 @@ public class SingleDiseasesController {
             @ApiParam(name = "filter", value = "过滤的年份")
             @RequestParam(value = "filter", required = false) String filter) {
         Envelop envelop = new Envelop();
+        if(StringUtils.isEmpty(filter)){
+            filter = "";
+        }else {
+            if( filter.contains("undefined")){
+                filter = "";
+            }
+        }
         Map<String, List<String>> diseaseTypeInfo = singleDiseaseService.getDiseaseTypeAnalysisInfo(type, filter);
         List<Map<String, Object>> listMap = new ArrayList<>();
         envelop.setSuccessFlg(true);
@@ -173,6 +215,13 @@ public class SingleDiseasesController {
             @ApiParam(name = "filter", value = "过滤的年份")
             @RequestParam(value = "filter", required = false) String filter) {
         Envelop envelop = new Envelop();
+        if(StringUtils.isEmpty(filter)){
+            filter = "";
+        }else {
+            if( filter.contains("undefined")){
+                filter = "";
+            }
+        }
         Map<String, List<String>> diseaseTypeInfo = singleDiseaseService.getSexAnalysisInfo(type, filter);
         List<Map<String, Object>> listMap = new ArrayList<>();
         envelop.setSuccessFlg(true);
@@ -200,6 +249,13 @@ public class SingleDiseasesController {
             @ApiParam(name = "filter", value = "过滤的年份")
             @RequestParam(value = "filter", required = false) String filter) {
         Envelop envelop = new Envelop();
+        if(StringUtils.isEmpty(filter)){
+            filter = "";
+        }else {
+            if( filter.contains("undefined")){
+                filter = "";
+            }
+        }
         Map<String, List<String>> diseaseTypeInfo = singleDiseaseService.getAgeAnalysisInfo(type, filter);
         List<Map<String, Object>> listMap = new ArrayList<>();
         envelop.setSuccessFlg(true);
@@ -228,15 +284,16 @@ public class SingleDiseasesController {
         String sql = "";
         Map<String, List<String>> map = null;
         if ("1".equals(type)) {
-            sql = "select symptomName, count(*) count from single_disease_check_index where checkCode = 'CH001' group by symptomName order by count desc";
+            sql = "select symptomName, count(*) count from singleDiseaseCheck where checkCode = 'CH001' group by symptomName order by count desc";
             map = singleDiseaseServiceNew.getDataInfo(sql, "symptomName");
         } else if ("2".equals(type)) {
-            sql = "select medicineName, count(*) count from single_disease_check_index where checkCode = 'CH004' group by medicineName order by count desc";
+            sql = "select medicineName, count(*) count from singleDiseaseCheck where checkCode = 'CH004' group by medicineName order by count desc";
             map = singleDiseaseServiceNew.getDataInfo(sql, "medicineName");
         } else {
-            sql = "select count(*) from single_disease_personal_index group by date_histogram(field='eventDate','interval'='year') order by eventDate";
+            sql = "select count(*) from singleDiseasePersonal group by date_histogram(field='eventDate','interval'='year') order by eventDate";
             map = singleDiseaseServiceNew.getDataInfo(sql, "date_histogram(field=eventDate,interval=year)");
         }
+        System.out.println("listData count 3333" + map.size());
         if (null != map && map.size() > 0) {
             if(map.get("xData").size()>9){
                 envelop.setDetailModelList(map.get("xData").subList(0,10));
@@ -262,17 +319,24 @@ public class SingleDiseasesController {
         String typeSql = "";
         String ageSql = "";
         String sexSql = "";
+        if(StringUtils.isEmpty(name)){
+            name = "";
+        }else {
+            if( name.contains("undefined")){
+                name = "";
+            }
+        }
         if(StringUtils.isNotEmpty(name)) {
             name = " and symptomName = '" + name + "'";
-            yearSql = "select count(*) count from single_disease_check_index where checkCode = 'CH001' " + name + " group by date_histogram(field='eventDate','interval'='year')";
-            typeSql = "select diseaseTypeName,count(*) count from single_disease_check_index where checkCode = 'CH001' " + name + " group by diseaseTypeName";
-            ageSql = "select count(*) from single_disease_check_index where checkCode = 'CH001' and birthYear <> 0 " + name + " group by " + range;
-            sexSql = "select sexName, count(*) count from single_disease_check_index where checkCode = 'CH001' " + name + " group by sexName";
+            yearSql = "select count(*) count from singleDiseaseCheck where checkCode = 'CH001' " + name + " group by date_histogram(field='eventDate','interval'='year')";
+            typeSql = "select diseaseTypeName,count(*) count from singleDiseaseCheck where checkCode = 'CH001' " + name + " group by diseaseTypeName";
+            ageSql = "select count(*) from singleDiseaseCheck where checkCode = 'CH001' and birthYear <> 0 " + name + " group by " + range;
+            sexSql = "select sexName, count(*) count from singleDiseaseCheck where checkCode = 'CH001' " + name + " group by sexName";
         }else {
-            yearSql = "select count(*) count from single_disease_check_index where checkCode = 'CH001' group by date_histogram(field='eventDate','interval'='year')";
-            typeSql = "select diseaseTypeName,count(*) count from single_disease_check_index where checkCode = 'CH001' group by diseaseTypeName";
-            ageSql = "select count(*) from single_disease_check_index where checkCode = 'CH001'and birthYear <> 0  group by " + range;
-            sexSql = "select sexName, count(*) count from single_disease_check_index where checkCode = 'CH001' group by sexName";
+            yearSql = "select count(*) count from singleDiseaseCheck where checkCode = 'CH001' group by date_histogram(field='eventDate','interval'='year')";
+            typeSql = "select diseaseTypeName,count(*) count from singleDiseaseCheck where checkCode = 'CH001' group by diseaseTypeName";
+            ageSql = "select count(*) from singleDiseaseCheck where checkCode = 'CH001'and birthYear <> 0  group by " + range;
+            sexSql = "select sexName, count(*) count from singleDiseaseCheck where checkCode = 'CH001' group by sexName";
         }
         //按年趋势 柱状图
         Map<String, List<String>>  map = singleDiseaseServiceNew.getDataInfo(yearSql,"date_histogram(field=eventDate,interval=year)");
@@ -325,15 +389,22 @@ public class SingleDiseasesController {
         String yearsql = "";
         String typeSql = "";
         String symptomSql = "";
+        if(StringUtils.isEmpty(name)){
+            name = "";
+        }else {
+            if( name.contains("undefined")){
+                name = "";
+            }
+        }
         if(StringUtils.isNotEmpty(name)){
             name = "and medicineName = '" + name + "'";
-            yearsql = "select count(*) count from single_disease_check_index where checkCode = 'CH004' " + name +  " group by date_histogram(field='eventDate','interval'='year')";
-            typeSql = "select diseaseTypeName,count(*) count from single_disease_check_index where checkCode = 'CH004' " + name + " group by diseaseTypeName";
-            symptomSql = "select symptomName,count(*) count from single_disease_check_index where checkCode = 'CH004' " + name + " group by symptomName";
+            yearsql = "select count(*) count from singleDiseaseCheck where checkCode = 'CH004' " + name +  " group by date_histogram(field='eventDate','interval'='year')";
+            typeSql = "select diseaseTypeName,count(*) count from singleDiseaseCheck where checkCode = 'CH004' " + name + " group by diseaseTypeName";
+            symptomSql = "select symptomName,count(*) count from singleDiseaseCheck where checkCode = 'CH004' " + name + " group by symptomName";
         }else {
-            yearsql = "select count(*) count from single_disease_check_index where checkCode = 'CH004' group by date_histogram(field='eventDate','interval'='year')";
-            typeSql = "select diseaseTypeName,count(*) count from single_disease_check_index where checkCode = 'CH004' group by diseaseTypeName";
-            symptomSql = "select symptomName,count(*) count from single_disease_check_index where checkCode = 'CH004' group by symptomName";
+            yearsql = "select count(*) count from singleDiseaseCheck where checkCode = 'CH004' group by date_histogram(field='eventDate','interval'='year')";
+            typeSql = "select diseaseTypeName,count(*) count from singleDiseaseCheck where checkCode = 'CH004' group by diseaseTypeName";
+            symptomSql = "select symptomName,count(*) count from singleDiseaseCheck where checkCode = 'CH004' group by symptomName";
         }
         //按年趋势
         Map<String, List<String>> map = singleDiseaseServiceNew.getDataInfo(yearsql, "date_histogram(field=eventDate,interval=year)");
