@@ -10,11 +10,17 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.portal.MFzH5Message;
+import com.yihu.ehr.model.portal.MH5Message;
 import com.yihu.ehr.model.portal.MMessageTemplate;
 import com.yihu.ehr.model.portal.MMyMessage;
+import com.yihu.ehr.util.datetime.DateUtil;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -25,6 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -36,7 +43,7 @@ import java.util.Map;
 @RequestMapping(ApiVersion.Version1_0)
 @Api(value = "PortalMessageTemplate", description = "消息模板管理", tags = {"云门户-消息模板管理"})
 public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
-
+    private static final Logger LOG = LoggerFactory.getLogger(PortalMessageTemplateEndPoint.class);
     private PortalMessageTemplateService messageTemplateService;
 
     private PortalMessageRemindService messageRemindService;
@@ -179,27 +186,127 @@ public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
         mMyMessage.setClassification(template.getClassification());
         return mMyMessage;
     }
-
+    //TODO 待完全确认后，可以删除
+    @RequestMapping(value = "/messageTemplate/messageOrderPushOld", method = RequestMethod.POST)
+    @ApiOperation(value = "旧接口-接收H5挂号订单消息推送", notes = "接收H5挂号订单消息推送")
+    public String messageOrderPushOld(
+            @ApiParam(name = "jsonData", value = "消息模型")
+            @RequestParam(value = "jsonData", required = false) String jsonData) throws Exception {
+        LOG.info(String.format("收到H5挂号订单消息推送start---%s", jsonData));
+        MH5Message message = toEntity(jsonData, MH5Message.class);
+        ProtalMessageRemind protalMessageRemind = null;
+        Map<String, Object> retMap =new HashMap<>();
+        if(message.getData() != null){
+            long messageTemplateId = 1;
+            //TODO 改成，通过type获取messageTemplateId。
+            if (message.getType() == 101) {
+                //挂号推送
+                messageTemplateId = 3;
+            } else if (message.getType() == 102) {
+                //退号结果推送,目前先不推送
+                messageTemplateId = 2;
+            }
+            protalMessageRemind = messageTemplateService.saveH5MessagePush(message, messageTemplateId);
+            if (protalMessageRemind != null){
+                //成功
+                retMap.put("status","0");
+                retMap.put("statusInfo",null);
+                retMap.put("t", System.currentTimeMillis());
+            } else{
+                //失败
+                retMap.put("status","1");
+                retMap.put("statusInfo","消息解析失败");
+                retMap.put("t", System.currentTimeMillis());
+                LOG.info("消息解析失败");
+            }
+        } else{
+            //失败
+            retMap.put("status","1");
+            retMap.put("statusInfo","data消息缺失！");
+            retMap.put("t", System.currentTimeMillis());
+            LOG.info("data消息缺失！");
+        }
+        return toJson(retMap);
+    }
 
     @RequestMapping(value = ServiceApi.MessageTemplate.MessageOrderPush, method = RequestMethod.POST)
     @ApiOperation(value = "接收H5挂号订单消息推送", notes = "接收H5挂号订单消息推送")
-    public boolean messageOrderPush(@ApiParam(name = "jsonData", value = "", defaultValue = "")
-                                    @RequestBody String jsonData) throws Exception {
-        logger.info(String.format("收到H5挂号订单消息推送%s", jsonData));
-        Map<String, String> map = toEntity(jsonData, Map.class);
-        MFzH5Message message = toEntity(map.get("Param"), MFzH5Message.class);
-        long messageTemplateId = 1;
-        if (message.getOrderPushType() == 101) {
-            //挂号推送
-            messageTemplateId = 1;
-        } else if (message.getOrderPushType() == 102) {
-            //退号结果推送,目前先不推送
-            messageTemplateId = 2;
-            return true;
+    public String messageOrderPush(
+            @ApiParam(name = "sign", value = "根据分配给第三方的秘钥对参数进行的签名")
+            @RequestParam(value = "sign", required = false) String sign,
+            @ApiParam(name = "timestamp", value = "时间戳")
+            @RequestParam(value = "timestamp", required = false) Long timestamp,
+            @ApiParam(name = "appId", value = "渠道ID")
+            @RequestParam(value = "appId", required = false) String appId,
+            @ApiParam(name = "agencyAbb", value = "定值yihuwang",defaultValue = "yihuwang")
+            @RequestParam(value = "agencyAbb", required = false) String agencyAbb,
+            @ApiParam(name = "orderId", value = "健康之路订单号")
+            @RequestParam(value = "orderId", required = false) String orderId,
+            @ApiParam(name = "type", value = "推送类型",defaultValue = "101")
+            @RequestParam(value = "type", required = false) Integer type,
+            @ApiParam(name = "isSuccess", value = "是否成功",defaultValue = "0")
+            @RequestParam(value = "isSuccess", required = false) Integer isSuccess,
+            @ApiParam(name = "thirdPartyOrderId", value = "第三方订单ID")
+            @RequestParam(value = "thirdPartyOrderId", required = false) String thirdPartyOrderId,
+            @ApiParam(name = "thirdPartyUserId", value = "第三方用户ID")
+            @RequestParam(value = "thirdPartyUserId", required = false) String thirdPartyUserId,
+            @ApiParam(name = "userId", value = "健康之路用户ID")
+            @RequestParam(value = "userId", required = false) String userId,
+            @ApiParam(name = "data", value = "消息string(json)")
+            @RequestParam(value = "data", required = false) String data
+            ) throws Exception {
+        LOG.info(String.format("收到H5挂号订单消息推送start---%s", data));
+        Map<String,String> messMap = toEntity(data, Map.class);
+        MH5Message mH5Message = new MH5Message();
+        mH5Message.setAgencyAbb(agencyAbb);
+        mH5Message.setAppId(appId);
+        mH5Message.setData(messMap);
+        if(null != isSuccess){
+            mH5Message.setIsSuccess(isSuccess);
+        }else{
+            throw new ApiException("isSuccess not null!");
         }
-        messageTemplateService.saveH5MessagePush(message, messageTemplateId);
-
-        return true;
+        mH5Message.setOrderId(orderId);
+        mH5Message.setSign(sign);
+        mH5Message.setThirdPartyOrderId(thirdPartyOrderId);
+        mH5Message.setThirdPartyUserId(thirdPartyUserId);
+        mH5Message.setUserId(userId);
+        mH5Message.setType(type);
+        mH5Message.setTimestamp(timestamp);
+        ProtalMessageRemind protalMessageRemind = null;
+        Map<String, Object> retMap =new HashMap<>();
+        if(StringUtils.isNotEmpty(data)){
+            List<PortalMessageTemplate> messageTemplateList = messageTemplateService.getMessageTemplate(String.valueOf(isSuccess),String.valueOf(type),"0");
+            long messageTemplateId = 1;
+            if(null != messageTemplateList && messageTemplateList.size()>0){
+                messageTemplateId = messageTemplateList.get(0).getId();
+            }else{
+                retMap.put("status","1");
+                retMap.put("statusInfo","消息模板不存在！");
+                retMap.put("t", System.currentTimeMillis());
+                LOG.info("消息模板不存在！");
+            }
+            protalMessageRemind = messageTemplateService.saveH5MessagePush(mH5Message, messageTemplateId);
+            if (protalMessageRemind != null){
+                //成功
+                retMap.put("status","0");
+                retMap.put("statusInfo",null);
+                retMap.put("t", System.currentTimeMillis());
+            } else{
+                //失败
+                retMap.put("status","1");
+                retMap.put("statusInfo","消息解析失败");
+                retMap.put("t", System.currentTimeMillis());
+                LOG.info("消息解析失败");
+            }
+        } else{
+            //失败
+            retMap.put("status","1");
+            retMap.put("statusInfo","data消息缺失！");
+            retMap.put("t", System.currentTimeMillis());
+            LOG.info("data消息缺失！");
+        }
+        return toJson(retMap);
     }
 
 
