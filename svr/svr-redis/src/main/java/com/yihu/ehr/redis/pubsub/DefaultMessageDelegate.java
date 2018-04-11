@@ -59,6 +59,11 @@ public class DefaultMessageDelegate implements MessageDelegate {
                 for (RedisMqSubscriber subscriber : subscriberList) {
                     String subscribedUrl = subscriber.getSubscribedUrl();
 
+                    logger.debug("\n--- Redis发布订阅消费的消息 ---\nchannel: " + channel
+                            + ", messageLogId: " + messageLogId
+                            + ", subscribedUrl: " + subscribedUrl
+                            + ", message: " + messageContent);
+
                     // 推送消息到指定服务地址
                     HttpHeaders headers = new HttpHeaders();
                     headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
@@ -72,11 +77,6 @@ public class DefaultMessageDelegate implements MessageDelegate {
                     redisMqMessageLog.setIsRealConsumed("1");
                     redisMqMessageLog.setConsumedNum(oldConsumeNum + 1);
                     redisMqMessageLogService.save(redisMqMessageLog);
-
-                    logger.info("\n--- Redis发布订阅消费的消息 ---\nchannel: " + channel
-                            + ", messageLogId: " + messageLogId
-                            + ", subscribedUrl: " + subscribedUrl
-                            + ", message: " + messageContent);
                 }
             }
         } catch (Exception e) {
