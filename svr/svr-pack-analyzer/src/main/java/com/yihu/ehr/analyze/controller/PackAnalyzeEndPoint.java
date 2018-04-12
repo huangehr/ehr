@@ -26,12 +26,12 @@ public class PackAnalyzeEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "ES数据保存")
     @RequestMapping(value = ServiceApi.PackageAnalyzer.EsSaveData, method = RequestMethod.POST)
     public Envelop esSaveData(
-            @ApiParam(name = "index", value = "ES index")
-            @RequestParam(value = "index", required = true) String index,
-            @ApiParam(name = "type", value = "ES type")
-            @RequestParam(value = "type", required = true) String type,
-            @ApiParam(name = "dataList", value = "上传的数据集")
-            @RequestParam(value = "dataList", required = true) String dataList) {
+            @ApiParam(name = "index", value = "ES index", required = true)
+            @RequestParam(value = "index") String index,
+            @ApiParam(name = "type", value = "ES type", required = true)
+            @RequestParam(value = "type") String type,
+            @ApiParam(name = "dataList", value = "上传的数据集", required = true)
+            @RequestParam(value = "dataList") String dataList) {
         return packageAnalyzeService.esSaveData(index, type, dataList);
     }
 }

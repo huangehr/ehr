@@ -2,8 +2,6 @@ package com.yihu.ehr.analyze.service.scheduler;
 
 import com.yihu.ehr.analyze.config.SchedulerConfig;
 import com.yihu.ehr.analyze.job.PackageAnalyzeJob;
-import com.yihu.ehr.constants.ServiceApi;
-import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.quartz.*;
 import org.quartz.impl.matchers.GroupMatcher;
@@ -11,8 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Set;
@@ -36,8 +32,6 @@ public class SchedulerService {
     @Autowired
     private SchedulerConfig config;
 
-    @ApiOperation(value = "设置任务调度器状态")
-    @RequestMapping(value = ServiceApi.PackageAnalyzer.Scheduler, method = RequestMethod.PUT)
     public ResponseEntity<String> updateScheduler(
             @ApiParam(name = "pause", value = "true:暂停 , false:执行", required = true, defaultValue = "true")
             @RequestParam(value = "pause") boolean pause) {
@@ -53,8 +47,6 @@ public class SchedulerService {
         }
     }
 
-    @ApiOperation(value = "调整当前任务数量，返回当前系统最大任务限制数")
-    @RequestMapping(value = ServiceApi.PackageAnalyzer.Scheduler, method = RequestMethod.POST)
     public ResponseEntity<Integer> addJob(
             @ApiParam(name = "count", value = "任务数量（不要超过系统设定值）", required = true, defaultValue = "4")
             @RequestParam(value = "count") int count,
@@ -100,8 +92,6 @@ public class SchedulerService {
         }
     }
 
-    @ApiOperation(value = "删除解析任务")
-    @RequestMapping(value = ServiceApi.PackageAnalyzer.Scheduler, method = RequestMethod.DELETE)
     public ResponseEntity<String> removeJob(
             @ApiParam(name = "count", value = "任务数量", required = true, defaultValue = "4")
             @RequestParam(value = "count") int count) {
@@ -120,8 +110,6 @@ public class SchedulerService {
         }
     }
 
-    @ApiOperation(value = "获取当前任务数量")
-    @RequestMapping(value = ServiceApi.PackageAnalyzer.Scheduler, method = RequestMethod.GET)
     public ResponseEntity<Integer> count() {
         try {
             GroupMatcher groupMatcher = GroupMatcher.groupEquals(PACK_ANALYZER);

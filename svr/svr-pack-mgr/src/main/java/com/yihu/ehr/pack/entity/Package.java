@@ -1,4 +1,4 @@
-package com.yihu.ehr.pack.service;
+package com.yihu.ehr.pack.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.yihu.ehr.constants.ArchiveStatus;
@@ -18,9 +18,10 @@ import java.util.Date;
  * @author Sand
  * @created 2015.07.09 15:08
  */
-@Entity
+/*@Entity
 @Table(name = "json_archives")
-@Access(value = AccessType.PROPERTY)
+@Access(value = AccessType.PROPERTY)*/
+@Deprecated
 public class Package {
     public final static String pathSeparator = ":";     // 使用冒号作为路径分隔符，与Linux一致
 

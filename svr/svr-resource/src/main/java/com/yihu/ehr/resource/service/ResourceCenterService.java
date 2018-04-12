@@ -1,5 +1,6 @@
 package com.yihu.ehr.resource.service;
 
+import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.entity.dict.SystemDictEntry;
 import com.yihu.ehr.query.BaseJpaService;
 import org.apache.commons.lang.StringUtils;
@@ -7,11 +8,12 @@ import org.hibernate.FlushMode;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
-import java.util.Date;
-import java.util.List;
+import java.sql.ResultSet;
+import java.util.*;
 
 /**
  * Service - 数据资源中心
@@ -20,15 +22,10 @@ import java.util.List;
 @Service
 public class ResourceCenterService extends BaseJpaService {
 
-    // ------------------------------- 统计相关 start ------------------------------------
+    @Autowired
+    private ElasticSearchUtil elasticSearchUtil;
 
-    public BigInteger getPatientArchiveCount() {
-        Session session = currentSession();
-        String sql = "SELECT COUNT(1) FROM archive_relation";
-        Query query = session.createSQLQuery(sql);
-        query.setFlushMode(FlushMode.COMMIT);
-        return (BigInteger)query.uniqueResult();
-    }
+    // ------------------------------- 统计相关 start ------------------------------------
 
     public BigInteger getMedicalResourcesCount() {
         Session session = currentSession();
@@ -59,17 +56,33 @@ public class ResourceCenterService extends BaseJpaService {
         return (BigInteger)query.uniqueResult();
     }
 
-    public List getOrgAreaIdGroup(int currentCityId) {
+    public List getOrgAreaIdGroup(int currentCityId) throws Exception {
+        String sql1 = "SELECT org_code, COUNT(org_code) FROM archive_relation GROUP BY org_code";
+        ResultSet resultSet = elasticSearchUtil.findBySql(sql1);
+        Map<String, Double> esResult = new HashMap<>();
+        while (resultSet.next()) {
+            String code = resultSet.getString("org_code");
+            double count = resultSet.getDouble("COUNT(org_code)");
+            esResult.put(code, count);
+        }
         Session session = currentSession();
-        String sql = "SELECT o.administrative_division, COUNT(1) " +
-                "FROM archive_relation a " +
-                "LEFT JOIN organizations o ON a.org_code = o.org_code " +
-                "WHERE o.administrative_division IN (SELECT id FROM address_dict WHERE pid = :pid) " +
-                "GROUP BY a.org_code, o.administrative_division";
+        String sql = "SELECT o.org_code, o.administrative_division FROM organizations o " +
+                "WHERE o.administrative_division IN (SELECT id FROM address_dict WHERE pid = :pid) ";
         Query query = session.createSQLQuery(sql);
         query.setFlushMode(FlushMode.COMMIT);
         query.setInteger("pid", currentCityId);
-        return query.list();
+        List<Object []> list = query.list();
+        List<Object []> result = new ArrayList<>();
+        list.forEach(item -> {
+            if (item.length == 2) {
+                if (esResult.containsKey(item[0])) {
+                    result.add(new Object[]{
+                            item[1], esResult.get(item[0])
+                    });
+                }
+            }
+        });
+        return result;
     }
 
     public String getAreaNameById(int id) {
@@ -160,21 +173,17 @@ public class ResourceCenterService extends BaseJpaService {
         return  (BigInteger) query.uniqueResult();
     }
 
-    public BigInteger getJsonArchiveTotalCount() {
-        Session session = currentSession();
-        String sql = "SELECT COUNT(1) FROM json_archives";
-        Query query = session.createSQLQuery(sql);
-        query.setFlushMode(FlushMode.COMMIT);
-        return (BigInteger)query.uniqueResult();
+    public double getJsonArchiveTotalCount() throws Exception {
+        String sql = "SELECT COUNT(*) FROM json_archives";
+        ResultSet resultSet =  elasticSearchUtil.findBySql(sql);
+        resultSet.next();
+        return (double)resultSet.getObject("COUNT(*)");
     }
 
-    public BigInteger getJsonArchiveCount(String status) {
-        Session session = currentSession();
-        String sql = "SELECT COUNT(1) FROM json_archives WHERE archive_status = :status";
-        Query query = session.createSQLQuery(sql);
-        query.setFlushMode(FlushMode.COMMIT);
-        query.setString("status", status);
-        return (BigInteger)query.uniqueResult();
+    public double getJsonArchiveCount(String status) throws Exception {
+        String sql = "SELECT COUNT(*) FROM json_archives WHERE archive_status = " + status;
+        ResultSet resultSet = elasticSearchUtil.findBySql(sql);
+        return (double)resultSet.getObject("COUNT(*)");
     }
 
     public List<SystemDictEntry> getSystemDictEntry(Long dictId) {
@@ -229,15 +238,6 @@ public class ResourceCenterService extends BaseJpaService {
         return query.list();
     }
 
-    public BigInteger getArchiveRelationCountByEventType(String eventType) {
-        Session session = currentSession();
-        String sql = "SELECT COUNT(1) FROM archive_relation WHERE event_type = :eventType";
-        Query query = session.createSQLQuery(sql);
-        query.setFlushMode(FlushMode.COMMIT);
-        query.setString("eventType", eventType);
-        return (BigInteger)query.uniqueResult();
-    }
-
     public Integer getOrgAreaByCode(String orgCode, int currentCityId) {
         Session session = currentSession();
         String sql = "SELECT o.administrative_division FROM organizations o " +
@@ -287,15 +287,6 @@ public class ResourceCenterService extends BaseJpaService {
         query.setFlushMode(FlushMode.COMMIT);
         query.setInteger("pid", currentCityId);
         return query.list();
-    }
-
-    public long getJsonArchiveCount() {
-        Session session = currentSession();
-        String sql = "SELECT count(1) from json_archives";
-        Query query = session.createSQLQuery(sql);
-        query.setFlushMode(FlushMode.COMMIT);
-        BigInteger bigInteger = (BigInteger) query.uniqueResult();
-        return bigInteger.longValue();
     }
 
     // ------------------------------- 统计相关 end ------------------------------------

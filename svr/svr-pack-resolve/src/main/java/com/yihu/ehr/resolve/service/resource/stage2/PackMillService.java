@@ -183,6 +183,7 @@ public class PackMillService {
                             .append(", do not deal with fail-tolerant.");
                     throw new RuntimeException(error.toString());
                 }
+                dataRecord.addResource(metadataId, value);
             } else {
                 //查找对应的字典数据
                 String[] dict = getDict(cdaVersion, dictCode, value);

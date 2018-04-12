@@ -1,5 +1,7 @@
 package com.yihu.ehr.elasticsearch;
 
+import com.alibaba.druid.pool.DruidDataSource;
+import com.alibaba.druid.pool.ElasticSearchDruidDataSourceFactory;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
@@ -15,6 +17,7 @@ import javax.annotation.PreDestroy;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Created by progr1mmer on 2018/1/4.
@@ -28,7 +31,7 @@ public class ElasticSearchPool {
     @Value("${elasticsearch.pool.max-size}")
     private int maxSize;
     private List<TransportClient> clientPool;
-
+    private DruidDataSource druidDataSource;
     @Autowired
     private ElasticSearchConfig elasticSearchConfig;
 
@@ -55,6 +58,9 @@ public class ElasticSearchPool {
                 clientPool.add(transportClient);
             }
         }
+        if (clientPool.isEmpty()) {
+            throw new RuntimeException("ElasticSearch连接池初始化失败，请检查相关配置");
+        }
     }
 
     @PreDestroy
@@ -67,12 +73,12 @@ public class ElasticSearchPool {
     }
 
     public synchronized TransportClient getClient() {
-        int last_index = clientPool.size() - 1;
-        TransportClient transportClient = clientPool.get(last_index);
-        clientPool.remove(last_index);
         if (clientPool.isEmpty()) {
             init();
         }
+        int last_index = clientPool.size() - 1;
+        TransportClient transportClient = clientPool.get(last_index);
+        clientPool.remove(last_index);
         return transportClient;
     }
 
@@ -84,6 +90,15 @@ public class ElasticSearchPool {
         } else {
             clientPool.add(transportClient);
         }
+    }
+
+    public DruidDataSource getDruidDataSource() throws Exception {
+        Properties properties = new Properties();
+        properties.put("url", "jdbc:elasticsearch://" + elasticSearchConfig.getClusterNodes() + "/");
+        DruidDataSource druidDataSource = (DruidDataSource) ElasticSearchDruidDataSourceFactory
+                .createDataSource(properties);
+        druidDataSource.setInitialSize(1);
+        return druidDataSource;
     }
 
 }

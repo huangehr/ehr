@@ -2,15 +2,13 @@ package com.yihu.ehr.pack.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.constants.ArchiveStatus;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.Channel;
 import com.yihu.ehr.model.packs.MPackage;
-import com.yihu.ehr.pack.service.Package;
+import com.yihu.ehr.pack.entity.Package;
 import com.yihu.ehr.pack.service.PackageService;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
-import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,10 +29,11 @@ import java.util.*;
  * @version 1.0
  * @created 2016.03.31 16:24
  */
-@RestController
-@RequestMapping(ApiVersion.Version1_0)
+//@RestController
+//@RequestMapping(ApiVersion.Version1_0)
 //@Api(value = "MessageEndPoint", description = "消息服务", tags = {"档案包服务-消息服务"})
-@ApiIgnore
+//@ApiIgnore
+@Deprecated
 public class MessageEndPoint extends EnvelopRestEndPoint {
 
     @Autowired

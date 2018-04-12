@@ -248,13 +248,13 @@ public class HbaseDataEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.Report.GetArchivesInfo, method = RequestMethod.GET)
     @ApiOperation(value = "居民档案数、接收档案包数")
-    public Map<String, Long> getArchiveInfo() throws Exception {
-        Map<String, Long> map = new HashMap<>();
+    public Map<String, Object> getArchiveInfo() throws Exception {
+        Map<String, Object> map = new HashMap<>();
         //Todo 获取常驻人口数
         // 获取居民档案数
         long userArchiveCount = solrUtil.count("HealthProfile","*:*");
         // 获取接收档案包数
-        long archivePackageCount = resourceCenterService.getJsonArchiveCount();
+        double archivePackageCount = resourceCenterService.getJsonArchiveTotalCount();
         map.put("userArchiveCount", userArchiveCount);
         map.put("archivePackageCount", archivePackageCount);
         return map;

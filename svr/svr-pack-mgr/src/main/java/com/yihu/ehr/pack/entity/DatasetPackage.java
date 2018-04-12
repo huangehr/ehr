@@ -1,4 +1,4 @@
-package com.yihu.ehr.pack.service;
+package com.yihu.ehr.pack.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.yihu.ehr.constants.ArchiveStatus;

@@ -12,6 +12,7 @@ import java.util.Date;
  * @version 1.0
  * @created 2016.02.01 16:11
  */
+@Deprecated
 public class MPackage implements Serializable {
 
     private String id;

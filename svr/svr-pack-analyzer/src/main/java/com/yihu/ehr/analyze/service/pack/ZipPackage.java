@@ -6,7 +6,7 @@ import com.yihu.ehr.hbase.HBaseAdmin;
 import com.yihu.ehr.hbase.HBaseDao;
 import com.yihu.ehr.hbase.TableBundle;
 import com.yihu.ehr.lang.SpringContext;
-import com.yihu.ehr.model.packs.MPackage;
+import com.yihu.ehr.model.packs.EsSimplePackage;
 import com.yihu.ehr.util.compress.Zipper;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.log.LogService;
@@ -35,7 +35,7 @@ public class ZipPackage {
     //    private static final String ORIGIN = "origin";
     public static final String DATA = "d";
     private final static String TempPath = System.getProperty("java.io.tmpdir") + java.io.File.separator;
-    private MPackage mPackage;
+    private EsSimplePackage esSimplePackage;
     private Zipper zipper = new Zipper();
     //数据集合
     private Map<String, DataSetRecord> dataSets = new TreeMap<>();
@@ -45,12 +45,12 @@ public class ZipPackage {
     private File packFile;  //解压后文件目录
     private Set<String> tableSet = new HashSet<>();
 
-    public ZipPackage(MPackage mPackage) {
-        this.mPackage = mPackage;
+    public ZipPackage(EsSimplePackage esSimplePackage) {
+        this.esSimplePackage = esSimplePackage;
     }
 
-    public MPackage getmPackage() {
-        return mPackage;
+    public EsSimplePackage getEsSimplePackage() {
+        return esSimplePackage;
     }
 
     public Map<String, DataSetRecord> getDataSets() {
@@ -73,7 +73,7 @@ public class ZipPackage {
 
     public void download() throws IOException, MyException {
         FastdfsConfig config = SpringContext.getService(FastdfsConfig.class);
-        String remotePath = mPackage.getRemotePath();
+        String remotePath = esSimplePackage.getRemote_path();
         String url = config.getPublicServer() + "/" + remotePath.replace(":", "/");
 
         RestTemplate restTemplate = new RestTemplate();
@@ -86,7 +86,7 @@ public class ZipPackage {
                 HttpMethod.GET, entity, byte[].class);
 
         if (response.getStatusCode() == HttpStatus.OK) {
-            Path path = Files.write(Paths.get(TempPath + mPackage.getId() + ".zip"), response.getBody());
+            Path path = Files.write(Paths.get(TempPath + esSimplePackage.get_id() + ".zip"), response.getBody());
             zipFile = path.toFile();
         } else {
             zipFile = null;
@@ -98,10 +98,10 @@ public class ZipPackage {
         if (zipFile == null) {
             return;
         }
-        String temp = TempPath + mPackage.getId();
-        packFile = zipper.unzipFile(zipFile, temp, mPackage.getPwd());
+        String temp = TempPath + esSimplePackage.get_id();
+        packFile = zipper.unzipFile(zipFile, temp, esSimplePackage.getPwd());
         if (packFile == null || packFile.list() == null) {
-            throw new RuntimeException("Invalid package file, package id: " + mPackage.getId());
+            throw new RuntimeException("Invalid package file, package id: " + esSimplePackage.get_id());
         }
     }
 
@@ -118,7 +118,7 @@ public class ZipPackage {
         ProfileType profileType = getProfileType();
         //目前只解析标准档案包
         if (profileType != ProfileType.Standard) {
-            throw new RuntimeException("not a package file, package id: " + mPackage.getId());
+            throw new RuntimeException("not a package file, package id: " + esSimplePackage.get_id());
         }
 
         ApplicationContext context = SpringContext.getApplicationContext();
@@ -167,7 +167,7 @@ public class ZipPackage {
             }
 
             Map<String, String> dataGroup = metaDataRecord.getDataGroup();
-            String receiveTime = DateUtil.toString(mPackage.getReceiveDate(), DateUtil.DEFAULT_YMDHMSDATE_FORMAT);
+            String receiveTime = DateUtil.toString(esSimplePackage.getReceive_date(), DateUtil.DEFAULT_YMDHMSDATE_FORMAT);
             dataGroup.put("receiveTime", receiveTime);  //增加接收时间
             bundle.clear();
             bundle.addValues(

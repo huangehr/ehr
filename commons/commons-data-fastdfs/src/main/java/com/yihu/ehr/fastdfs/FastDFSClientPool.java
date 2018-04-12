@@ -6,6 +6,7 @@ import org.csource.fastdfs.TrackerServer;
 import org.springframework.beans.factory.annotation.Value;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +21,8 @@ public class FastDFSClientPool {
     @Value("${fast-dfs.pool.max-size}")
     private int maxPoolSize;
     private List<StorageClient> clientPool;
+    private TrackerServer trackerServer;
+//    private final List<TrackerServer> trackerServerList = new ArrayList<>();
 
     @PostConstruct
     private void init() {
@@ -29,34 +32,45 @@ public class FastDFSClientPool {
         try {
             synchronized (clientPool) {
                 while (clientPool.size() < initPoolSize) {
-                    clientPool.add(getNewStorageClient());
+                    clientPool.add(new StorageClient(getTrackerServer(), null));
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+        if (clientPool.isEmpty()) {
+            throw new RuntimeException("FastDFS连接池初始化失败，请检查相关配置");
+        }
     }
 
-    public TrackerServer getTrackerServer() throws IOException {
-        TrackerClient tracker = new TrackerClient();
-        return tracker.getConnection();
+    @PreDestroy
+    private void destroy() throws IOException{
+        if (trackerServer != null) {
+            trackerServer.close();
+        }
+        /*for (TrackerServer trackerServer : trackerServerList) {
+            if (trackerServer != null) {
+                trackerServer.close();
+            }
+        }*/
     }
 
-    private StorageClient getNewStorageClient() throws IOException {
-        TrackerClient tracker = new TrackerClient();
-        TrackerServer trackerServer = tracker.getConnection();
-        StorageClient client = new StorageClient(trackerServer, null);
-        return client;
+    public synchronized TrackerServer getTrackerServer() throws IOException {
+        if (null == trackerServer) {
+            TrackerClient tracker = new TrackerClient();
+            trackerServer = tracker.getConnection();
+        }
+        return trackerServer;
     }
 
     public synchronized StorageClient getStorageClient() throws IOException {
-        int last_index = clientPool.size() - 1;
-        StorageClient transportClient = clientPool.get(last_index);
-        clientPool.remove(last_index);
         if (clientPool.isEmpty()) {
             init();
         }
-        return transportClient;
+        int last_index = clientPool.size() - 1;
+        StorageClient storageClient = clientPool.get(last_index);
+        clientPool.remove(last_index);
+        return storageClient;
     }
 
     public synchronized void releaseStorageClient(StorageClient client) {
@@ -68,4 +82,5 @@ public class FastDFSClientPool {
             clientPool.add(client);
         }
     }
+
 }

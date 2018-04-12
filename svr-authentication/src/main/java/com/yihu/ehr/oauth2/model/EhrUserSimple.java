@@ -14,7 +14,6 @@ public class EhrUserSimple {
     private String telephone;
     private String gender;
     private String idCardNo;
-    private String martialStatus;
     private String organization;
     private String imgRemotePath;
     private String imgLocalPath;
@@ -96,14 +95,6 @@ public class EhrUserSimple {
 
     public void setIdCardNo(String idCardNo) {
         this.idCardNo = idCardNo;
-    }
-
-    public String getMartialStatus() {
-        return martialStatus;
-    }
-
-    public void setMartialStatus(String martialStatus) {
-        this.martialStatus = martialStatus;
     }
 
     public String getOrganization() {

@@ -30,8 +30,8 @@ public class DailyReportEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "档案日报上传")
     @RequestMapping(value = ServiceApi.PackageAnalyzer.DailyReport, method = RequestMethod.POST)
     public Envelop dailyReport(
-            @ApiParam(name = "report", value = "日报json对象")
-            @RequestParam(value = "report", required = true) String report) {
+            @ApiParam(name = "report", value = "日报json对象", required = true)
+            @RequestParam(value = "report") String report) {
         return dailyReportService.dailyReport(report);
     }
 

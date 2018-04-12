@@ -371,21 +371,21 @@ public class FastDFSUtil {
                 resultMap.put("fileCount", groupCount);
                 for (String key : groupCount.keySet()) {
                     if (finalGroupCount.containsKey(key)) {
-                        for (String key2 : finalGroupCount.keySet()) {
-                            if (key2.equals(key)) {
+                        for(String key2 : finalGroupCount.keySet()) {
+                            if(key2.equals(key)) {
                                 long count = finalGroupCount.get(key2) + groupCount.get(key2);
                                 finalGroupCount.put(key2, count);
                             }
                         }
-                    } else {
+                    }else {
                         finalGroupCount.put(key, groupCount.get(key));
                     }
                 }
                 resultList.add(resultMap);
                 totalMb += singleTotalMb;
                 freeMb += singleFreeMb;
-            } finally {
-                if (null != trackerServer) {
+            }finally {
+                if(null != trackerServer) {
                     trackerServer.close();
                 }
             }
