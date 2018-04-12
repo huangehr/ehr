@@ -284,6 +284,7 @@ public class BaseStatistsService {
      * @return
      */
     public List<Map<String,Object>> setResult(String quotaCode,List<Map<String,Object>> orgHealthCategoryList,List<Map<String, Object>> dimenListResult,String dateType){
+        String[] quotaCodes = quotaCode.split(";");
         List<Map<String,Object>> result = new ArrayList<>();
         for(int i=0 ; i < orgHealthCategoryList.size() ; i++ ){
             Map<String,Object> mapCategory = orgHealthCategoryList.get(i);
@@ -299,11 +300,19 @@ public class BaseStatistsService {
                     if(StringUtils.isNotEmpty(dateType)){
                         mapCategory.put(dimenMap.get(dateType).toString(),dimenMap.get("result"));
                     }
-                    mapCategory.put(quotaCode,dimenMap.get("result"));
+                    for (String s : quotaCodes) {
+                        if (dimenMap.containsKey(s)) {
+                            mapCategory.put(s,dimenMap.get("result"));
+                        } else {
+                            mapCategory.put(s, 0);
+                        }
+                    }
                     break;
                 }else {
+                    for (String s : quotaCodes) {
+                        mapCategory.put(s,0);
+                    }
                     mapCategory.put("result",0);
-                    mapCategory.put(quotaCode,0);
                 }
             }
 

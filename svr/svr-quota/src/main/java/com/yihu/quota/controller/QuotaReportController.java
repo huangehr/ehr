@@ -112,6 +112,7 @@ public class QuotaReportController extends BaseController {
         Map<String, List<Map<String, Object>>> quotaViewResult = new HashMap<>();
         List<String> quotaCodes = Arrays.asList(quotaCodeStr.split(","));
         String maxQuotaCode = "";
+        String maxQuotaCodes = "";
         int num = 0;
         try {
             for (String code : quotaCodes) {
@@ -124,6 +125,7 @@ public class QuotaReportController extends BaseController {
             }
             Map<String, List<Map<String, Object>>> otherQuotaViewResult = new HashMap<>();
             for (String key : quotaViewResult.keySet()) {
+                maxQuotaCodes += key + ";";
                 if (key != maxQuotaCode) {
                     otherQuotaViewResult.put(key, quotaViewResult.get(key));
                 }
@@ -150,7 +152,7 @@ public class QuotaReportController extends BaseController {
 
             if(dimension.equals(orgHealthCategoryCode)){//如果是特殊机构类型树状机构需要转成树状结构
                 List<Map<String, Object>> orgHealthCategoryList = orgHealthCategoryStatisticsService.getOrgHealthCategoryTreeByPid(-1);
-                dataList = baseStatistsService.setResult(maxQuotaCode, orgHealthCategoryList, resultList, null);
+                dataList = baseStatistsService.setResult(maxQuotaCodes.substring(0, maxQuotaCodes.length()), orgHealthCategoryList, resultList, null);
             }else {
                 dataList = resultList;
             }
