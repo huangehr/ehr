@@ -1,4 +1,4 @@
-package com.yihu.ehr.resource.model;
+package com.yihu.ehr.entity.report;
 
 import javax.persistence.*;
 

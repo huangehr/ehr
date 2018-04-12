@@ -2,7 +2,7 @@ package com.yihu.ehr.resource.service;
 
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.resource.dao.RsAppResourceMetadataDao;
-import com.yihu.ehr.resource.model.RsAppResourceMetadata;
+import com.yihu.ehr.entity.resource.RsAppResourceMetadata;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.transform.Transformers;
@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 

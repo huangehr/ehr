@@ -2,7 +2,7 @@ package com.yihu.ehr.resource.service;
 
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.resource.dao.RsAppResourceDao;
-import com.yihu.ehr.resource.model.RsAppResource;
+import com.yihu.ehr.entity.resource.RsAppResource;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

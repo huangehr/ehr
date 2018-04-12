@@ -246,7 +246,7 @@ public class FastDFSUtil {
         StorageClient client = clientPool.getStorageClient();
         try {
             return client.set_metadata(groupName, remoteFilename, metaList, opFlag);
-        }finally {
+        } finally {
             clientPool.releaseStorageClient(client);
         }
     }
@@ -255,7 +255,7 @@ public class FastDFSUtil {
         StorageClient client = clientPool.getStorageClient();
         try {
             return client.get_file_info(groupName, remoteFileName);
-        }finally {
+        } finally {
             clientPool.releaseStorageClient(client);
         }
     }
@@ -264,7 +264,7 @@ public class FastDFSUtil {
         StorageClient client = clientPool.getStorageClient();
         try {
             return client.get_metadata(groupName, remoteFileName);
-        }finally {
+        } finally {
             clientPool.releaseStorageClient(client);
         }
     }
@@ -348,7 +348,7 @@ public class FastDFSUtil {
                 for (StructGroupStat structGroupStat : structGroupStats) {
                     String groupName = structGroupStat.getGroupName();
                     StructStorageStat [] structStorageStats = trackerClient.listStorages(trackerServer, groupName);
-                    if(structStorageStats.length > 0) {
+                    if (structStorageStats.length > 0) {
                         for (StructStorageStat structStorageStat : structStorageStats) {
                             long count = structStorageStat.getSuccessUploadCount() - structStorageStat.getSuccessDeleteCount();
                             if (!groupCount.containsKey(groupName)) {
@@ -357,7 +357,7 @@ public class FastDFSUtil {
                                 groupCount.put(groupName, groupCount.get(groupName) + count);
                             }
                         }
-                    }else {
+                    } else {
                         groupCount.put(groupName, (long)0);
                     }
                     long singleTotalMb1 = structGroupStat.getTotalMB();
@@ -369,23 +369,23 @@ public class FastDFSUtil {
                 resultMap.put("total", singleTotalMb / 1024);
                 resultMap.put("free", singleFreeMb / 1024);
                 resultMap.put("fileCount", groupCount);
-                for(String key : groupCount.keySet()) {
-                    if(finalGroupCount.containsKey(key)) {
-                        for(String key2 : finalGroupCount.keySet()) {
-                            if(key2.equals(key)) {
+                for (String key : groupCount.keySet()) {
+                    if (finalGroupCount.containsKey(key)) {
+                        for (String key2 : finalGroupCount.keySet()) {
+                            if (key2.equals(key)) {
                                 long count = finalGroupCount.get(key2) + groupCount.get(key2);
                                 finalGroupCount.put(key2, count);
                             }
                         }
-                    }else {
+                    } else {
                         finalGroupCount.put(key, groupCount.get(key));
                     }
                 }
                 resultList.add(resultMap);
                 totalMb += singleTotalMb;
                 freeMb += singleFreeMb;
-            }finally {
-                if(null != trackerServer) {
+            } finally {
+                if (null != trackerServer) {
                     trackerServer.close();
                 }
             }

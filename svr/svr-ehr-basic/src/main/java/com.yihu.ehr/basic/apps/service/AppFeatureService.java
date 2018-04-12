@@ -2,7 +2,7 @@ package com.yihu.ehr.basic.apps.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.basic.apps.dao.AppApiFeatureRepository;
+import com.yihu.ehr.basic.apps.dao.AppFeatureDao;
 import com.yihu.ehr.basic.apps.model.AppFeature;
 import com.yihu.ehr.query.BaseJpaService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,17 +26,17 @@ import java.util.Map;
  */
 @Service
 @Transactional
-public class AppFeatureService extends BaseJpaService<AppFeature, AppApiFeatureRepository> {
+public class AppFeatureService extends BaseJpaService<AppFeature, AppFeatureDao> {
 
     @Autowired
-    private AppApiFeatureRepository xAppFeatureRepository;
+    private AppFeatureDao xAppFeatureRepository;
     @Autowired
     private JdbcTemplate jdbcTemplate;
     @Autowired
     ObjectMapper objectMapper;
 
     public Page<AppFeature> getAppFeatureList(String sorts, int page, int size){
-        AppApiFeatureRepository repo = (AppApiFeatureRepository)getJpaRepository();
+        AppFeatureDao repo = (AppFeatureDao)getJpaRepository();
         Pageable pageable = new PageRequest(page, size, parseSorts(sorts));
         return repo.findAll(pageable);
     }

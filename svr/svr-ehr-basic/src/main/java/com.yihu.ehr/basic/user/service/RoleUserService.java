@@ -1,10 +1,10 @@
 package com.yihu.ehr.basic.user.service;
 
-import com.yihu.ehr.basic.apps.dao.UserAppRepository;
+import com.yihu.ehr.basic.apps.dao.UserAppDao;
 import com.yihu.ehr.basic.user.entity.Roles;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.basic.user.dao.XRoleUserRepository;
-import com.yihu.ehr.basic.user.dao.XRolesRepository;
+import com.yihu.ehr.basic.user.dao.RolesDao;
 import com.yihu.ehr.basic.user.entity.RoleUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -25,11 +25,11 @@ public class RoleUserService extends BaseJpaService<RoleUser,XRoleUserRepository
     @Autowired
     private XRoleUserRepository roleUserRepository;
     @Autowired
-    private XRolesRepository rolesRepository;
+    private RolesDao rolesRepository;
     @Autowired
     private JdbcTemplate jdbcTemplate;
     @Autowired
-    private UserAppRepository userAppRepository;
+    private UserAppDao userAppRepository;
 
     public Page<RoleUser> getRoleUserList(String sorts, int page, int size) {
         Pageable pageable = new PageRequest(page, size, parseSorts(sorts));

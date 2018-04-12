@@ -28,7 +28,6 @@ public class PatientService extends BaseJpaService<DemographicInfo, PatientDao>{
     @Autowired
     private PatientDao patientDao;
 
-    @Transactional(readOnly = true)
     public void checkPatient(ResourceBucket resourceBucket) throws Exception {
         //获取注册信息
         if (!resourceBucket.isIdentifyFlag()) {

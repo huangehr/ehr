@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @version 1.0
  * @created 2016年7月7日21:05:13
  */
-public interface AppApiFeatureRepository extends JpaRepository<AppFeature, String> {
+public interface AppFeatureDao extends JpaRepository<AppFeature, String> {
 
+    void deleteByAppId(String appId);
 }

@@ -68,14 +68,14 @@ public class AgZuulFilter extends ZuulFilter {
         }
         String accessToken = this.extractToken(request);
         if (null == accessToken) {
-            return this.forbidden(ctx, HttpStatus.FORBIDDEN.value(), "accessToken can not be null");
+            return this.forbidden(ctx, HttpStatus.FORBIDDEN.value(), "token can not be null");
         }
         OAuth2AccessToken oAuth2AccessToken = tokenStore.readAccessToken(accessToken);
         if (null == oAuth2AccessToken) {
-            return this.forbidden(ctx, HttpStatus.FORBIDDEN.value(), "invalid accessToken");
+            return this.forbidden(ctx, HttpStatus.FORBIDDEN.value(), "invalid token");
         }
         if (oAuth2AccessToken.isExpired()) {
-            return this.forbidden(ctx, HttpStatus.UNAUTHORIZED.value(), "expired accessToken"); //返回401 需要重新获取 token
+            return this.forbidden(ctx, HttpStatus.UNAUTHORIZED.value(), "expired token"); //返回401 需要重新获取 token
         }
         //OAuth2Authentication oAuth2Authentication = tokenStore.readAuthentication(accessToken);
         return null;

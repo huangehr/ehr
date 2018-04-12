@@ -3,22 +3,38 @@ package com.yihu.ehr.fastdfs;
 import org.csource.fastdfs.StorageClient;
 import org.csource.fastdfs.TrackerClient;
 import org.csource.fastdfs.TrackerServer;
+import org.springframework.beans.factory.annotation.Value;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by szx on 2015/9/19.
  */
 public class FastDFSClientPool {
+
+    @Value("${fast-dfs.pool.init-size}")
+    private int initPoolSize;
+    @Value("${fast-dfs.pool.max-size}")
     private int maxPoolSize;
+    private List<StorageClient> clientPool;
 
-    private Map<StorageClient, Boolean> map = new HashMap<>();
-
-    public void setMaxPoolSize(int poolSize){
-        this.maxPoolSize = poolSize;
+    @PostConstruct
+    private void init() {
+        if (null == clientPool) {
+            clientPool = new ArrayList<>();
+        }
+        try {
+            synchronized (clientPool) {
+                while (clientPool.size() < initPoolSize) {
+                    clientPool.add(getNewStorageClient());
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public TrackerServer getTrackerServer() throws IOException {
@@ -29,37 +45,27 @@ public class FastDFSClientPool {
     private StorageClient getNewStorageClient() throws IOException {
         TrackerClient tracker = new TrackerClient();
         TrackerServer trackerServer = tracker.getConnection();
-
         StorageClient client = new StorageClient(trackerServer, null);
         return client;
     }
 
     public synchronized StorageClient getStorageClient() throws IOException {
-        StorageClient client = null;
-        for (Entry<StorageClient, Boolean> entry : map.entrySet()) {
-            if (entry.getValue()) {
-                client = entry.getKey();
-                map.put(client, false);
-                break;
-            }
+        int last_index = clientPool.size() - 1;
+        StorageClient transportClient = clientPool.get(last_index);
+        clientPool.remove(last_index);
+        if (clientPool.isEmpty()) {
+            init();
         }
-        if (client == null) {
-            if (map.size() < maxPoolSize) {
-                client = getNewStorageClient();
-                map.put(client, false);
-            }
-        }
-
-        return client;
+        return transportClient;
     }
 
-    public void releaseStorageClient(StorageClient client) {
-        if (client == null) return;
-
-        if (map.containsKey(client)) {
-            map.put(client, true);
+    public synchronized void releaseStorageClient(StorageClient client) {
+        if (clientPool.size() > maxPoolSize) {
+            if (client != null) {
+                client = null;
+            }
         } else {
-            client = null;
+            clientPool.add(client);
         }
     }
 }

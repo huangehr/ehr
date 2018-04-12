@@ -1,15 +1,16 @@
 package com.yihu.ehr.basic.apps.service;
 
-import com.yihu.ehr.basic.apps.dao.AppRepository;
-import com.yihu.ehr.basic.apps.dao.OauthClientDetailsDao;
-import com.yihu.ehr.basic.apps.dao.UserAppRepository;
+import com.yihu.ehr.basic.apps.dao.*;
 import com.yihu.ehr.basic.apps.model.App;
+import com.yihu.ehr.basic.apps.model.AppApi;
 import com.yihu.ehr.basic.apps.model.UserApp;
-import com.yihu.ehr.basic.user.dao.XRoleApiRelationRepository;
-import com.yihu.ehr.basic.user.dao.XRoleAppRelationRepository;
-import com.yihu.ehr.basic.user.dao.XRolesRepository;
+import com.yihu.ehr.basic.user.dao.RoleApiRelationDao;
+import com.yihu.ehr.basic.user.dao.RoleAppRelationDao;
+import com.yihu.ehr.basic.user.dao.RoleReportRelationDao;
+import com.yihu.ehr.basic.user.dao.RolesDao;
 import com.yihu.ehr.basic.user.entity.RoleApiRelation;
 import com.yihu.ehr.basic.user.entity.RoleAppRelation;
+import com.yihu.ehr.basic.user.entity.RoleReportRelation;
 import com.yihu.ehr.basic.user.entity.Roles;
 import com.yihu.ehr.entity.oauth2.OauthClientDetails;
 import com.yihu.ehr.query.BaseJpaService;
@@ -35,23 +36,41 @@ import java.util.Random;
  */
 @Service
 @Transactional
-public class AppService extends BaseJpaService<App, AppRepository> {
+public class AppService extends BaseJpaService<App, AppDao> {
 
     private static final int AppIdLength = 10;
     private static final int AppSecretLength = 16;
 
     @Autowired
-    private UserAppRepository userAppRepository;
+    private UserAppDao userAppDao;
     @Autowired
-    private AppRepository appRepo;
+    private AppDao appDao;
     @Autowired
     private OauthClientDetailsDao oauthClientDetailsDao;
     @Autowired
-    private XRoleAppRelationRepository xRoleAppRelationRepository;
+    private RoleAppRelationDao roleAppRelationDao;
     @Autowired
-    private XRoleApiRelationRepository xRoleApiRelationRepository;
+    private RoleApiRelationDao roleApiRelationDao;
     @Autowired
-    private XRolesRepository xRolesRepository;
+    private RolesDao rolesDao;
+    @Autowired
+    private AppApiDao appApiDao;
+    @Autowired
+    private AppApiErrorCodeDao appApiErrorCodeDao;
+    @Autowired
+    private AppApiParameterDao appApiParameterDao;
+    @Autowired
+    private AppApiResponseDao appApiResponseDao;
+    @Autowired
+    private AppFeatureDao appFeatureDao;
+    @Autowired
+    private ReportCategoryAppRelationDao reportCategoryAppRelationDao;
+    @Autowired
+    private RsAppResourceDao rsAppResourceDao;
+    @Autowired
+    private RsAppResourceMetadataDao rsAppResourceMetadataDao;
+    @Autowired
+    private RoleReportRelationDao roleReportRelationDao;
 
     @Value("${fast-dfs.public-server}")
     private String fastDfsPublicServers;
@@ -60,7 +79,7 @@ public class AppService extends BaseJpaService<App, AppRepository> {
     }
 
     public Page<App> getAppList(String sorts, int page, int size){
-        AppRepository repo = (AppRepository)getJpaRepository();
+        AppDao repo = (AppDao)getJpaRepository();
         Pageable pageable = new PageRequest(page, size, parseSorts(sorts));
 
         return repo.findAll(pageable);
@@ -71,8 +90,7 @@ public class AppService extends BaseJpaService<App, AppRepository> {
         app.setSecret(getRandomString(AppSecretLength));
         app.setCreateTime(new Date());
         app.setStatus("WaitingForApprove");
-        appRepo.save(app);
-
+        appDao.save(app);
         return app;
     }
 
@@ -84,12 +102,12 @@ public class AppService extends BaseJpaService<App, AppRepository> {
      * @return
      */
     public boolean verifyApp(String id, String secret) {
-        App app = appRepo.findOne(id);
+        App app = appDao.findOne(id);
         return app != null && app.getSecret().equals(secret);
     }
 
     public boolean isAppNameExists(String name){
-        App app = appRepo.findByName(name);
+        App app = appDao.findByName(name);
         return app != null;
     }
 
@@ -107,10 +125,10 @@ public class AppService extends BaseJpaService<App, AppRepository> {
     }
 
     public void checkStatus(String appId, String status) {
-        App app = appRepo.getOne(appId);
+        App app = appDao.getOne(appId);
         //开启：Approved；禁用：Forbidden;
         app.setStatus(status);
-        appRepo.save(app);
+        appDao.save(app);
         //是否显示showFlag
         String showFlag="1";
         if(status.equals("Forbidden")){
@@ -121,17 +139,17 @@ public class AppService extends BaseJpaService<App, AppRepository> {
         if(userAppList != null) {
             for (UserApp userApp : userAppList) {
                 userApp.setShowFlag(Integer.parseInt(showFlag));
-                userAppRepository.save(userApp);
+                userAppDao.save(userApp);
             }
         }
     }
 
     public List<UserApp> findByAppId(String appId){
-        return  userAppRepository.findByAppId(appId);
+        return  userAppDao.findByAppId(appId);
     }
 
     public boolean findByIdAndSecret(String appId, String secret) {
-        return appRepo.findByIdAndSecret(appId, secret).size()>0;
+        return appDao.findByIdAndSecret(appId, secret).size()>0;
     }
 
     /**
@@ -164,30 +182,56 @@ public class AppService extends BaseJpaService<App, AppRepository> {
     }
 
     public App findById(String appId) {
-        return appRepo.findOne(appId);
+        return appDao.findOne(appId);
+    }
+
+    public void delete(String appId) {
+        List<Roles> rolesList = rolesDao.findByAppId(appId);
+        rolesList.forEach(item -> {
+            roleReportRelationDao.deleteByRoleId(item.getId());
+        });
+        roleAppRelationDao.deleteByAppId(appId);
+        rolesDao.deleteByAppId(appId);
+        userAppDao.deleteByAppId(appId);
+        List<AppApi> appApiList = appApiDao.findByAppId(appId);
+        appApiList.forEach(item -> {
+            roleApiRelationDao.deleteByApiId(item.getId());
+            appApiErrorCodeDao.deleteByAppApiId(item.getId());
+            appApiParameterDao.deleteByAppApiId(item.getId());
+            appApiResponseDao.deleteByAppApiId(item.getId());
+        });
+        appApiDao.deleteByAppId(appId);
+        appFeatureDao.deleteByAppId(appId);
+        reportCategoryAppRelationDao.deleteByAppId(appId);
+        rsAppResourceDao.deleteByAppId(appId);
+        rsAppResourceMetadataDao.deleteByAppId(appId);
+        if (oauthClientDetailsDao.findOne(appId) != null) {
+            oauthClientDetailsDao.delete(appId);
+        }
+        appDao.delete(appId);
     }
 
     public App authClient(App app, OauthClientDetails oauthClientDetails, Roles basicRole, Roles additionRole) {
-        App newApp = appRepo.save(app);
+        App newApp = appDao.save(app);
         oauthClientDetailsDao.save(oauthClientDetails);
         //扩展角色关联
-        if (null == xRolesRepository.findByCodeAndAppId(additionRole.getCode(), additionRole.getAppId())) {
-            additionRole = xRolesRepository.save(additionRole);
+        if (null == rolesDao.findByCodeAndAppId(additionRole.getCode(), additionRole.getAppId())) {
+            additionRole = rolesDao.save(additionRole);
         }
-        additionRole = xRolesRepository.findByCodeAndAppId(additionRole.getCode(), additionRole.getAppId());
+        additionRole = rolesDao.findByCodeAndAppId(additionRole.getCode(), additionRole.getAppId());
         RoleAppRelation additionRoleAppRelation = new RoleAppRelation();
         additionRoleAppRelation.setAppId(app.getId());
         additionRoleAppRelation.setRoleId(additionRole.getId());
-        if (null == xRoleAppRelationRepository.findRelation(additionRoleAppRelation.getAppId(), additionRoleAppRelation.getRoleId())) {
-            xRoleAppRelationRepository.save(additionRoleAppRelation);
+        if (null == roleAppRelationDao.findRelation(additionRoleAppRelation.getAppId(), additionRoleAppRelation.getRoleId())) {
+            roleAppRelationDao.save(additionRoleAppRelation);
         }
         //通过基础开发者角色扩展api关联
-        List<RoleApiRelation> roleApiRelationList = xRoleApiRelationRepository.findByRoleId(basicRole.getId());
+        List<RoleApiRelation> roleApiRelationList = roleApiRelationDao.findByRoleId(basicRole.getId());
         for (RoleApiRelation temp : roleApiRelationList) {
             RoleApiRelation roleApiRelation1 = new RoleApiRelation();
             roleApiRelation1.setRoleId(additionRole.getId());
             roleApiRelation1.setApiId(temp.getApiId());
-            xRoleApiRelationRepository.save(roleApiRelation1);
+            roleApiRelationDao.save(roleApiRelation1);
         }
         return newApp;
     }

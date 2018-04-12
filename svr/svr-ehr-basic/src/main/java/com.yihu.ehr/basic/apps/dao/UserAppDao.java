@@ -13,7 +13,7 @@ import java.util.List;
  * @version 1.0
  * @created 2017年2月16日18:04:13
  */
-public interface UserAppRepository extends JpaRepository<UserApp, String> {
+public interface UserAppDao extends JpaRepository<UserApp, String> {
 
     @Query("select userApp from UserApp userApp where userApp.appId = :appId and userApp.userId = :userId" )
     UserApp findByAppIdAndUserId(@Param("appId") String appId, @Param("userId") String userId);

@@ -1,6 +1,6 @@
 package com.yihu.ehr.resource.dao;
 
-import com.yihu.ehr.resource.model.ReportCategoryAppRelation;
+import com.yihu.ehr.entity.report.ReportCategoryAppRelation;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;

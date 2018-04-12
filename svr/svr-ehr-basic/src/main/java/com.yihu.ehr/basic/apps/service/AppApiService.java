@@ -1,22 +1,21 @@
 package com.yihu.ehr.basic.apps.service;
 
 import com.yihu.ehr.basic.apps.dao.AppApiErrorCodeDao;
-import com.yihu.ehr.basic.apps.dao.AppApiParameterRepository;
-import com.yihu.ehr.basic.apps.dao.AppApiRepository;
-import com.yihu.ehr.basic.apps.dao.AppApiResponseRepository;
+import com.yihu.ehr.basic.apps.dao.AppApiParameterDao;
+import com.yihu.ehr.basic.apps.dao.AppApiDao;
+import com.yihu.ehr.basic.apps.dao.AppApiResponseDao;
 import com.yihu.ehr.basic.apps.model.AppApi;
 import com.yihu.ehr.basic.apps.model.AppApiParameter;
 import com.yihu.ehr.basic.apps.model.AppApiResponse;
-import com.yihu.ehr.basic.user.dao.XRoleApiRelationRepository;
-import com.yihu.ehr.basic.user.dao.XRoleAppRelationRepository;
-import com.yihu.ehr.basic.user.dao.XRolesRepository;
+import com.yihu.ehr.basic.user.dao.RoleApiRelationDao;
+import com.yihu.ehr.basic.user.dao.RoleAppRelationDao;
+import com.yihu.ehr.basic.user.dao.RolesDao;
 import com.yihu.ehr.basic.user.entity.RoleApiRelation;
 import com.yihu.ehr.basic.user.entity.RoleAppRelation;
 import com.yihu.ehr.basic.user.entity.Roles;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.entity.api.AppApiErrorCode;
 import com.yihu.ehr.exception.ApiException;
-import com.yihu.ehr.model.app.OpenAppApi;
 import com.yihu.ehr.query.BaseJpaService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +39,7 @@ import java.util.Map;
  */
 @Service
 @Transactional
-public class AppApiService extends BaseJpaService<AppApi, AppApiRepository> {
+public class AppApiService extends BaseJpaService<AppApi, AppApiDao> {
 
     private static final String ADD = "add";
     private static final String DELETE = "delete";
@@ -51,22 +50,22 @@ public class AppApiService extends BaseJpaService<AppApi, AppApiRepository> {
     @Autowired
     private JdbcTemplate jdbcTemplate;
     @Autowired
-    private AppApiRepository appApiRepository;
+    private AppApiDao appApiRepository;
     @Autowired
-    private AppApiParameterRepository appApiParameterRepository;
+    private AppApiParameterDao appApiParameterRepository;
     @Autowired
-    private AppApiResponseRepository appApiResponseRepository;
+    private AppApiResponseDao appApiResponseRepository;
     @Autowired
-    private XRoleApiRelationRepository xRoleApiRelationRepository;
+    private RoleApiRelationDao xRoleApiRelationRepository;
     @Autowired
-    private XRoleAppRelationRepository xRoleAppRelationRepository;
+    private RoleAppRelationDao xRoleAppRelationRepository;
     @Autowired
     private AppApiErrorCodeDao appApiErrorCodeDao;
     @Autowired
-    private XRolesRepository xRolesRepository;
+    private RolesDao xRolesRepository;
 
     public Page<AppApi> getAppApiList(String sorts, int page, int size){
-        AppApiRepository repo = (AppApiRepository)getJpaRepository();
+        AppApiDao repo = (AppApiDao)getJpaRepository();
         Pageable pageable = new PageRequest(page, size, parseSorts(sorts));
         return repo.findAll(pageable);
     }

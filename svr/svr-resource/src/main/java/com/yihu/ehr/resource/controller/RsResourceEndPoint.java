@@ -67,8 +67,8 @@ public class RsResourceEndPoint extends EnvelopRestEndPoint {
     @ApiOperation("资源删除")
     @RequestMapping(value=ServiceApi.Resources.Resource, method = RequestMethod.DELETE)
     public boolean deleteResources(
-            @ApiParam(name="id",value="资源ID",defaultValue = "")
-            @PathVariable(value="id") String id) throws Exception {
+            @ApiParam(name="id", value = "资源ID")
+            @PathVariable(value = "id") String id) throws Exception {
         rsResourceService.deleteResource(id);
         return true;
     }

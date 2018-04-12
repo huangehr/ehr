@@ -2,7 +2,7 @@ package com.yihu.ehr.resource.service;
 
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.resource.dao.RsReportCategoryAppDao;
-import com.yihu.ehr.resource.model.ReportCategoryAppRelation;
+import com.yihu.ehr.entity.report.ReportCategoryAppRelation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
