@@ -306,7 +306,46 @@ public class BaseStatistsService {
                     mapCategory.put(quotaCode,0);
                 }
             }
+            result.add(mapCategory);
+            if(mapCategory.get("children") != null){
+                List<Map<String,Object>> childrenOrgHealthCategoryList = (List<Map<String, Object>>) mapCategory.get("children");
+                mapCategory.put("children",setResult(quotaCode,childrenOrgHealthCategoryList,dimenListResult,dateType));
+            }
+        }
+        return  result;
+    }
 
+
+    /**
+     * 递归循环 查询机构类型对应的名称和父节点
+     * @param orgHealthCategoryList
+     * @param dimenListResult
+     * @param
+     * @return
+     */
+    public List<Map<String,Object>> setResultAllDimenMap(String quotaCode,List<Map<String,Object>> orgHealthCategoryList,List<Map<String, Object>> dimenListResult,String dateType){
+        List<Map<String,Object>> result = new ArrayList<>();
+        for(int i=0 ; i < orgHealthCategoryList.size() ; i++ ){
+            Map<String,Object> mapCategory = orgHealthCategoryList.get(i);
+            String code = mapCategory.get("code").toString();
+            mapCategory.put("firstColumn",mapCategory.get("text"));
+            for(Map<String, Object> dimenMap : dimenListResult){
+                if(dimenMap.get(code) != null){
+                    mapCategory.putAll(dimenMap);
+                    if(dimenMap.containsKey(code)){
+                        mapCategory.put(code,dimenMap.get(code));
+                        mapCategory.put("result",dimenMap.get("result")!=null ? dimenMap.get("result"):dimenMap.get(code));
+                    }
+                    if(StringUtils.isNotEmpty(dateType)){
+                        mapCategory.put(dimenMap.get(dateType).toString(),dimenMap.get("result"));
+                    }
+                    mapCategory.put(quotaCode,dimenMap.get("result"));
+                    break;
+                }else {
+                    mapCategory.put("result",0);
+                    mapCategory.put(quotaCode,0);
+                }
+            }
             result.add(mapCategory);
             if(mapCategory.get("children") != null){
                 List<Map<String,Object>> childrenOrgHealthCategoryList = (List<Map<String, Object>>) mapCategory.get("children");
