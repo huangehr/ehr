@@ -250,12 +250,11 @@ public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "thirdPartyOrderId", required = false) String thirdPartyOrderId,
             @ApiParam(name = "thirdPartyUserId", value = "第三方用户ID")
             @RequestParam(value = "thirdPartyUserId", required = false) String thirdPartyUserId,
-            @ApiParam(name = "userId", value = "健康之路用户ID")
-            @RequestParam(value = "userId", required = false) String userId,
             @ApiParam(name = "data", value = "消息string(json)")
             @RequestParam(value = "data", required = false) String data
             ) throws Exception {
-        LOG.info(String.format("收到H5挂号订单消息推送start---%s", data));
+        LOG.info(String.format("收到H5挂号订单消息推送-%s", data));
+        Map<String, Object> retMap =new HashMap<>();
         Map<String,String> messMap = toEntity(data, Map.class);
         MH5Message mH5Message = new MH5Message();
         mH5Message.setAgencyAbb(agencyAbb);
@@ -264,17 +263,20 @@ public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
         if(null != isSuccess){
             mH5Message.setIsSuccess(isSuccess);
         }else{
-            throw new ApiException("isSuccess not null!");
+            //失败
+            retMap.put("status","1");
+            retMap.put("statusInfo","isSuccess 不能为空!");
+            retMap.put("t", System.currentTimeMillis());
+            LOG.error("isSuccess not null");
         }
         mH5Message.setOrderId(orderId);
         mH5Message.setSign(sign);
         mH5Message.setThirdPartyOrderId(thirdPartyOrderId);
         mH5Message.setThirdPartyUserId(thirdPartyUserId);
-        mH5Message.setUserId(userId);
         mH5Message.setType(type);
         mH5Message.setTimestamp(timestamp);
         ProtalMessageRemind protalMessageRemind = null;
-        Map<String, Object> retMap =new HashMap<>();
+
         if(StringUtils.isNotEmpty(data)){
             List<PortalMessageTemplate> messageTemplateList = messageTemplateService.getMessageTemplate(String.valueOf(isSuccess),String.valueOf(type),"0");
             long messageTemplateId = 1;
@@ -297,14 +299,14 @@ public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
                 retMap.put("status","1");
                 retMap.put("statusInfo","消息解析失败");
                 retMap.put("t", System.currentTimeMillis());
-                LOG.info("消息解析失败");
+                LOG.error("消息解析失败");
             }
         } else{
             //失败
             retMap.put("status","1");
             retMap.put("statusInfo","data消息缺失！");
             retMap.put("t", System.currentTimeMillis());
-            LOG.info("data消息缺失！");
+            LOG.error("data消息缺失！");
         }
         return toJson(retMap);
     }

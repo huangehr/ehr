@@ -21,4 +21,7 @@ public interface XRolesRepository extends PagingAndSortingRepository<Roles,Long>
 
     @Query("SELECT roles FROM Roles roles WHERE roles.code = :code AND roles.appId = :appId")
     Roles findByCodeAndAppId(@Param("code") String code, @Param("appId") String appId);
+
+    @Query("SELECT roles FROM Roles roles WHERE roles.code = :code AND roles.appId = :appId AND roles.orgCode = :orgCode")
+    List<Roles> findByCodeAndAppIdAndOrgCode(@Param("orgCode") String orgCode,@Param("code") String code, @Param("appId") String appId);
 }

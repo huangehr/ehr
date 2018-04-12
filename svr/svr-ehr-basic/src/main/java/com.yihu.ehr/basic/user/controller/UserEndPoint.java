@@ -2,8 +2,12 @@ package com.yihu.ehr.basic.user.controller;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.basic.dict.service.SystemDictEntryService;
+import com.yihu.ehr.basic.org.model.OrgMemberRelation;
 import com.yihu.ehr.basic.patient.service.DemographicService;
 import com.yihu.ehr.basic.security.service.UserSecurityService;
+import com.yihu.ehr.basic.user.entity.Roles;
+import com.yihu.ehr.basic.user.service.RoleUserService;
+import com.yihu.ehr.basic.user.service.RolesService;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.basic.user.entity.Doctors;
 import com.yihu.ehr.basic.user.entity.User;
@@ -16,6 +20,7 @@ import com.yihu.ehr.entity.patient.DemographicInfo;
 import com.yihu.ehr.entity.security.UserKey;
 import com.yihu.ehr.entity.security.UserSecurity;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
+import com.yihu.ehr.model.patient.MDemographicInfo;
 import com.yihu.ehr.model.user.MH5Handshake;
 import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.util.datetime.DateUtil;
@@ -32,6 +37,8 @@ import org.csource.common.MyException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -59,6 +66,8 @@ public class UserEndPoint extends EnvelopRestEndPoint {
     private String secret;
     @Value("${h5.appId}")
     private String appId;
+    @Value("${jksr-app.orgcode}")
+    private String orgcode;
     @Autowired
     private UserService userService;
     @Autowired
@@ -71,6 +80,10 @@ public class UserEndPoint extends EnvelopRestEndPoint {
     private DoctorService doctorService;
     @Autowired
     private DemographicService demographicService;
+    @Autowired
+    private RolesService rolesService;
+    @Autowired
+    private RoleUserService roleUserService;
 
     @RequestMapping(value = ServiceApi.Users.Users, method = RequestMethod.GET)
     @ApiOperation(value = "获取用户列表", notes = "根据查询条件获取用户列表在前端表格展示")
@@ -807,11 +820,14 @@ public class UserEndPoint extends EnvelopRestEndPoint {
     }
 
 
-    @RequestMapping(value = ServiceApi.Users.UsersOfApp, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "创建用户", notes = "App用户注册信息")
+    @RequestMapping(value = ServiceApi.Users.UsersOfApp, method = RequestMethod.POST)
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    @ApiOperation(value = "App用户注册信息-创建用户", notes = "App用户注册信息")
     public Envelop appCreateUser(
-            @ApiParam(name = "userJsonData", required = true,value = "", defaultValue = "")
-            @RequestBody String userJsonData) throws Exception {
+            @ApiParam(name = "userJsonData", required = true,value = "用户json", defaultValue = "")
+            @RequestParam(value = "userJsonData") String userJsonData,
+            @ApiParam(name = "appId", value = "应用id-健康上饶appid", defaultValue = "WYo0l73F8e")
+            @RequestParam(value = "appId") String appId) throws Exception {
         Envelop envelop = new Envelop();
         User user = toEntity(userJsonData, User.class);
         if( StringUtils.isEmpty(user.getDemographicId()) ){
@@ -826,8 +842,10 @@ public class UserEndPoint extends EnvelopRestEndPoint {
             envelop.setErrorMsg("密码不能为空");
             return envelop;
         }
-        user.setId(getObjectId(BizObject.User));
+        String userId = getObjectId(BizObject.User);
+        user.setId(userId);
         user.setCreateDate(new Date());
+        user.setIdCardNo(user.getDemographicId());
         if (!StringUtils.isEmpty(user.getPassword())) {
             user.setPassword(DigestUtils.md5Hex(user.getPassword()));
         } else {
@@ -845,8 +863,26 @@ public class UserEndPoint extends EnvelopRestEndPoint {
             envelop.setErrorMsg("身份证号已存在");
             return envelop;
         }
-
         user = userService.saveUser(user);
+        // orgcode卫计委机构编码-PDY026797 添加居民的时候 默认 加到卫计委-居民角色中
+        List<Roles> rolesList = rolesService.findByCodeAndAppIdAndOrgCode(orgcode,appId,"Patient");
+        //在org_member_relation 表里追加关联关系
+        if(null != rolesList && rolesList.size()>0){
+            roleUserService.batchCreateRoleUsersRelation(userId,String.valueOf(rolesList.get(0).getId()));
+        }else{
+            envelop.setErrorMsg("角色不存在！");
+            return envelop;
+        }
+        // 根据身份证号码查找居民，若不存在则创建居民。
+        DemographicInfo demographicInfo = demographicService.getDemographicInfo(user.getDemographicId());
+        if(null == demographicInfo){
+            demographicInfo = new DemographicInfo();
+            demographicInfo.setIdCardNo(user.getIdCardNo());
+            demographicInfo.setTelephoneNo("{\"联系电话\":\"" + user.getTelephone() + "\"}");
+            demographicInfo.setName(user.getRealName());
+            demographicInfo.setPassword(user.getPassword());
+            demographicService.savePatient(demographicInfo);
+        }
         envelop.setObj(convertToModel(user, MUser.class, null));
         envelop.setSuccessFlg(true);
         return envelop ;

@@ -24,6 +24,9 @@ fast-dfs:
     secret-key: FastDFS1234567890
 eip:
   tenant: jkzl
+  #健康上饶app-卫计委机构编码--用于居民注册设置默认权限
+jksr-app:
+  orgcode: PDY026797
 
 ---
 spring:

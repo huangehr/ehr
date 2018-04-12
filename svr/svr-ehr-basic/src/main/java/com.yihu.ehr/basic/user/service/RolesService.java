@@ -44,4 +44,14 @@ public class RolesService extends BaseJpaService<Roles,XRolesRepository> {
     public Roles findByCodeAndAppId(String code, String appId) {
         return rolesRepository.findByCodeAndAppId(code, appId);
     }
+
+    /**
+     * @param orgcode
+     * @param code
+     * @param appId
+     * @return
+     */
+    public List<Roles> findByCodeAndAppIdAndOrgCode(String orgcode, String appId, String code) {
+        return rolesRepository.findByCodeAndAppIdAndOrgCode(orgcode,code, appId);
+    }
 }
