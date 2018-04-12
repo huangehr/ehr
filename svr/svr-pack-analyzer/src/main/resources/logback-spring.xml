@@ -82,7 +82,7 @@
 
 	<!-- 开发环境配置 -->
 	<springProfile name="dev">
-		<root level="DEBUG">
+		<root level="INFO">
 			<appender-ref ref="console"/>
 		</root>
 	</springProfile>

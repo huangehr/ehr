@@ -59,7 +59,7 @@ public class DefaultMessageDelegate implements MessageDelegate {
                 for (RedisMqSubscriber subscriber : subscriberList) {
                     String subscribedUrl = subscriber.getSubscribedUrl();
 
-                    logger.debug("\n--- Redis发布订阅消费的消息 ---\nchannel: " + channel
+                    logger.info("\n--- Redis发布订阅消费的消息 ---\nchannel: " + channel
                             + ", messageLogId: " + messageLogId
                             + ", subscribedUrl: " + subscribedUrl
                             + ", message: " + messageContent);
