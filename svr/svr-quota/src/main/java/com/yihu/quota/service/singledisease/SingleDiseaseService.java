@@ -35,8 +35,8 @@ public class SingleDiseaseService {
      */
     public List<Map<String,String>>  getHeatMap(String condition) throws Exception {
         List<Map<String,String>> list = new ArrayList<>();
-        String sql = "select addressLngLat from single_disease_personal_index where addressLngLat is not null";
-        if (!StringUtils.isEmpty(condition)) {
+        String sql = "select addressLngLat from singleDiseasePersonal where addressLngLat is not null";
+        if (!StringUtils.isEmpty(condition) && !condition.contains("undefined")) {
             sql += " and " + condition;
         }
         log.info("sql = " + sql);
@@ -67,8 +67,8 @@ public class SingleDiseaseService {
      */
     public List<Map<String, Object>> getNumberOfDiabetes(String condition) throws Exception {
         StringBuffer sql = new StringBuffer();
-        sql.append("select town, count(*) from single_disease_personal_index where town is not null");
-        if (!StringUtils.isEmpty(condition)) {
+        sql.append("select town, count(*) from singleDiseasePersonal where town is not null");
+        if (!StringUtils.isEmpty(condition)&& !condition.contains("undefined")) {
             sql.append(" and " + condition);
         }
         sql.append(" group by town");
@@ -119,8 +119,8 @@ public class SingleDiseaseService {
      */
     public Map<String, List<String>> getLineDataInfo(String condition) {
         StringBuffer sql = new StringBuffer();
-        sql.append("select eventDate, count(*) from single_disease_personal_index");
-        if (!StringUtils.isEmpty(condition)) {
+        sql.append("select eventDate, count(*) from singleDiseasePersonal");
+        if (!StringUtils.isEmpty(condition)&& !condition.contains("undefined")) {
             sql.append(" where " + condition);
         }
         sql.append(" group by date_histogram(field='eventDate','interval'='year')");
@@ -148,6 +148,9 @@ public class SingleDiseaseService {
      */
     public Map<String, Object> getPieDataInfo(String type, String condition) {
         Map<String, Object> map = new HashMap<>();
+        if(condition.contains("undefined")){
+            condition = "";
+        }
         if (HEALTH_PROBLEM.equals(type)) {
             map = getHealthProInfo(condition);
         } else if (AGE.equals(type)) {
@@ -164,7 +167,7 @@ public class SingleDiseaseService {
      */
     public Map<String, Object> getHealthProInfo(String condition) {
         StringBuffer sql = new StringBuffer();
-        sql.append("select diseaseTypeName,count(*) from single_disease_personal_index");
+        sql.append("select diseaseTypeName,count(*) from singleDiseasePersonal");
         if (!StringUtils.isEmpty(condition)) {
             sql.append(" where " + condition);
         }
@@ -202,7 +205,7 @@ public class SingleDiseaseService {
         * 下面为构造年龄段的算式，其中year-151限定了范围是66-150岁 即66以上，其他类似
         * */
         String range = "range(birthYear," + (year - 151) + "," + (year - 66) + "," + (year - 41) + "," + (year - 18) + "," + (year - 7) + "," + year + ")";
-        sql.append("select count(*) from single_disease_personal_index where birthYear <> 0");
+        sql.append("select count(*) from singleDiseasePersonal where birthYear <> 0");
         if (!StringUtils.isEmpty(condition)) {
             sql.append(" and " + condition);
         }
@@ -263,7 +266,7 @@ public class SingleDiseaseService {
      */
     public Map<String, Object> getGenderInfo(String condition) {
         StringBuffer sql = new StringBuffer();
-        sql.append("select sexName, count(*) from single_disease_personal_index");
+        sql.append("select sexName, count(*) from singleDiseasePersonal");
         if (!StringUtils.isEmpty(condition)) {
             sql.append(" where " + condition);
         }
@@ -293,7 +296,7 @@ public class SingleDiseaseService {
      */
     public Map<String, List<String>> getSymptomDataInfo(String condition) {
         StringBuffer sql = new StringBuffer();
-        sql.append("select symptomName, count(*) from single_disease_check_index where checkCode = 'CH001'");
+        sql.append("select symptomName, count(*) from singleDiseaseCheck where checkCode = 'CH001'");
         if (!StringUtils.isEmpty(condition)) {
             sql.append(" and " + condition);
         }
@@ -320,7 +323,7 @@ public class SingleDiseaseService {
      */
     public Map<String, List<String>> getMedicineDataInfo(String condition) {
         StringBuffer sql = new StringBuffer();
-        sql.append("select medicineName, count(*) from single_disease_check_index where checkCode = 'CH004'");
+        sql.append("select medicineName, count(*) from singleDiseaseCheck where checkCode = 'CH004'");
         if (!StringUtils.isEmpty(condition)) {
             sql.append(" and " + condition);
         }
@@ -347,8 +350,8 @@ public class SingleDiseaseService {
      */
     public Map<String, List<String>> getFastingBloodGlucoseDataInfo(String condition) {
         StringBuffer sql = new StringBuffer();
-        sql.append("select fastingBloodGlucoseCode, count(*) from single_disease_check_index where checkCode = 'CH002'");
-        if (!StringUtils.isEmpty(condition)) {
+        sql.append("select fastingBloodGlucoseCode, count(*) from singleDiseaseCheck where checkCode = 'CH002'");
+        if (!StringUtils.isEmpty(condition) && !condition.contains("undefined")) {
             //先把过滤条件忽略性别的过滤
             condition = changeCondition(condition);
             sql.append(" and " + condition);
@@ -416,8 +419,8 @@ public class SingleDiseaseService {
      */
     public Map<String, List<String>> getSugarToleranceDataInfo(String condition) {
         StringBuffer sql = new StringBuffer();
-        sql.append("select sugarToleranceCode, count(*) from single_disease_check_index where checkCode = 'CH003'");
-        if (!StringUtils.isEmpty(condition)) {
+        sql.append("select sugarToleranceCode, count(*) from singleDiseaseCheck where checkCode = 'CH003'");
+        if (!StringUtils.isEmpty(condition) && !condition.contains("undefined")) {
             //先把过滤条件忽略性别的过滤
             condition = changeCondition(condition);
             sql.append(" and " + condition);
@@ -525,9 +528,13 @@ public class SingleDiseaseService {
     public Map<String, List<String>> getDiseaseTypeAnalysisInfo(String type, String filter) {
         String sql = "";
         if ("1".equals(type)) {
-            sql = "select count(*) from single_disease_personal_index group by diseaseTypeName,date_histogram(field='eventDate','interval'='year') order by eventDate,diseaseType";
+            sql = "select count(*) from singleDiseasePersonal group by diseaseTypeName,date_histogram(field='eventDate','interval'='year') order by eventDate,diseaseType";
         } else {
-            sql = "select count(*) from single_disease_personal_index  where " + filter + " group by diseaseTypeName,date_histogram(field='eventDate','interval'='month')";
+            if(filter.isEmpty()){
+                sql = "select count(*) from singleDiseasePersonal group by diseaseTypeName,date_histogram(field='eventDate','interval'='month')";
+            }else {
+                sql = "select count(*) from singleDiseasePersonal  where " + filter + " group by diseaseTypeName,date_histogram(field='eventDate','interval'='month')";
+            }
         }
         log.info("sql = " + sql);
         List<Map<String, Object>> listData = parseIntegerValue(sql);
@@ -614,9 +621,13 @@ public class SingleDiseaseService {
     public Map<String, List<String>> getSexAnalysisInfo(String type, String filter) {
         String sql = "";
         if ("1".equals(type)) {
-            sql = "select count(*) from single_disease_personal_index group by sexName,date_histogram(field='eventDate','interval'='year')";
+            sql = "select count(*) from singleDiseasePersonal group by sexName,date_histogram(field='eventDate','interval'='year')";
         } else {
-            sql = "select count(*) from single_disease_personal_index where " + filter + "group by sexName,date_histogram(field='eventDate','interval'='month')";
+            if(filter.isEmpty()){
+                sql = "select count(*) from singleDiseasePersonal group by sexName,date_histogram(field='eventDate','interval'='month')";
+            }else {
+                sql = "select count(*) from singleDiseasePersonal where " + filter + "group by sexName,date_histogram(field='eventDate','interval'='month')";
+            }
         }
         log.info("sql = " + sql);
         List<Map<String, Object>> listData = parseIntegerValue(sql);
@@ -701,9 +712,13 @@ public class SingleDiseaseService {
         * */
         String range = "range(birthYear," + (years - 151) + "," + (years - 66) + "," + (years - 41) + "," + (years - 18) + "," + (years - 7) + "," + years + ")";
         if ("1".equals(type)) {
-            sql = "select count(birthYear) from single_disease_personal_index group by " + range + ",date_histogram(field='eventDate','interval'='year')";
+            sql = "select count(birthYear) from singleDiseasePersonal group by " + range + ",date_histogram(field='eventDate','interval'='year')";
         } else {
-            sql = "select count(birthYear) from single_disease_personal_index where " + filter + " group by " + range + ",date_histogram(field='eventDate','interval'='month')";
+            if(filter.isEmpty()){
+                sql = "select count(birthYear) from singleDiseasePersonal group by " + range + ",date_histogram(field='eventDate','interval'='month')";
+            }else {
+                sql = "select count(birthYear) from singleDiseasePersonal where " + filter + " group by " + range + ",date_histogram(field='eventDate','interval'='month')";
+            }
         }
         log.info("sql = " + sql);
         List<Map<String, Object>> listData = parseIntegerValue(sql);
@@ -735,7 +750,11 @@ public class SingleDiseaseService {
                     Integer result = last - first;
                     // 转成相应的年龄段
                     String keyName = exchangeInfo(result);
-                    value.put((one.get("date_histogram(field=eventDate,interval=month)") + "").substring(5,7) + "-"+ keyName, one.get("COUNT(birthYear)") + "");
+                    String strDate = one.get("date_histogram(field=eventDate,interval=month)") + "";
+                    System.out.println("age rturn data = "+ strDate);
+                    if(StringUtils.isNotEmpty(strDate) && strDate.length() > 7){
+                        value.put(strDate.substring(5, 7) + "-"+ keyName, one.get("COUNT(birthYear)") + "");
+                    }
                 });
             }
         }
