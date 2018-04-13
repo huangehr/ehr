@@ -27,6 +27,10 @@ public class ProtalMessageRemind {
     private Integer readed;
     private Date createDate;
     private Long messageTemplateId;
+    /**
+     * 推送过来的消息
+     */
+    private String receivedMessages;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -128,5 +132,13 @@ public class ProtalMessageRemind {
 
     public void setMessageTemplateId(Long messageTemplateId) {
         this.messageTemplateId = messageTemplateId;
+    }
+    @Column(name = "received_messages", nullable = true)
+    public String getReceivedMessages() {
+        return receivedMessages;
+    }
+
+    public void setReceivedMessages(String receivedMessages) {
+        this.receivedMessages = receivedMessages;
     }
 }

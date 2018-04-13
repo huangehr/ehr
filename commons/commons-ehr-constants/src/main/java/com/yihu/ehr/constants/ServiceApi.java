@@ -1481,8 +1481,14 @@ public class ServiceApi {
         public static final String GetDropdownList = "/singleDisease/getDropdownList";
         public static final String GetSymptomDetailData = "/singleDisease/getSymptomDetailData";
         public static final String GetMedicineDetailData = "/singleDisease/getMedicineDetailData";
-
-
     }
+
+    /**
+     * 转发福州总部开放平台接口相关
+     */
+    public static class Fz {
+        public static final String OpenApi = "/fz/open/api";
+    }
+
 
 }

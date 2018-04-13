@@ -50,4 +50,14 @@ public class RolesService extends BaseJpaService<Roles,RolesDao> {
         List<Map<String,Object>> list = jdbcTemplate.queryForList(sql,new Object[]{userId});
         return list;
     }
+
+    /**
+     * @param orgcode
+     * @param code
+     * @param appId
+     * @return
+     */
+    public List<Roles> findByCodeAndAppIdAndOrgCode(String orgcode, String appId, String code) {
+        return rolesRepository.findByCodeAndAppIdAndOrgCode(orgcode,code, appId);
+    }
 }

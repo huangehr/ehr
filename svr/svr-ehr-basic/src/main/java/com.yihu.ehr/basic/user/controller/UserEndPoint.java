@@ -2,9 +2,13 @@ package com.yihu.ehr.basic.user.controller;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.basic.dict.service.SystemDictEntryService;
+import com.yihu.ehr.basic.org.model.OrgMemberRelation;
 import com.yihu.ehr.basic.patient.service.DemographicService;
 import com.yihu.ehr.basic.security.service.UserSecurityService;
 import com.yihu.ehr.basic.user.entity.RoleUser;
+import com.yihu.ehr.basic.user.entity.Roles;
+import com.yihu.ehr.basic.user.service.RoleUserService;
+import com.yihu.ehr.basic.user.service.RolesService;
 import com.yihu.ehr.basic.user.entity.Roles;
 import com.yihu.ehr.basic.user.service.RoleUserService;
 import com.yihu.ehr.basic.user.service.RolesService;
@@ -20,6 +24,7 @@ import com.yihu.ehr.entity.patient.DemographicInfo;
 import com.yihu.ehr.entity.security.UserKey;
 import com.yihu.ehr.entity.security.UserSecurity;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
+import com.yihu.ehr.model.patient.MDemographicInfo;
 import com.yihu.ehr.model.user.MH5Handshake;
 import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.util.datetime.DateUtil;
@@ -36,6 +41,8 @@ import org.csource.common.MyException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -58,11 +65,13 @@ import java.util.*;
 public class UserEndPoint extends EnvelopRestEndPoint {
 
     @Value("${default.password}")
-    private String default_password = "123456";
+    private String default_password = "12345678";
     @Value("${h5.secret}")
     private String secret;
     @Value("${h5.appId}")
     private String appId;
+    @Value("${jksr-app.orgcode}")
+    private String orgcode;
     @Autowired
     private UserService userService;
     @Autowired
@@ -229,7 +238,7 @@ public class UserEndPoint extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value = ServiceApi.Users.UserAdminPassword, method = RequestMethod.PUT)
-    @ApiOperation(value = "重设密码", notes = "用户忘记密码管理员帮助重新还原密码，初始密码123456")
+    @ApiOperation(value = "重设密码", notes = "用户忘记密码管理员帮助重新还原密码，初始密码12345678")
     public boolean resetPass(
             @ApiParam(name = "user_id", value = "id", defaultValue = "")
             @PathVariable(value = "user_id") String userId) throws Exception {
@@ -595,8 +604,8 @@ public class UserEndPoint extends EnvelopRestEndPoint {
             return failed(msg);
         }
         //设置默认密码为身份证后六位
-        if (!StringUtils.isEmpty(user1.getIdCardNo()) && user1.getIdCardNo().length() > 7){
-            String defaultPassword = user1.getIdCardNo().substring(user1.getIdCardNo().length() - 6, user1.getIdCardNo().length());
+        if (!StringUtils.isEmpty(user1.getIdCardNo()) && user1.getIdCardNo().length() > 9){
+            String  defaultPassword = user1.getIdCardNo().substring(user1.getIdCardNo().length() - 8);
             user1.setPassword(DigestUtils.md5Hex(defaultPassword));
         } else {
             user1.setPassword(DigestUtils.md5Hex(default_password));
@@ -827,11 +836,14 @@ public class UserEndPoint extends EnvelopRestEndPoint {
     }
 
 
-    @RequestMapping(value = ServiceApi.Users.UsersOfApp, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "创建用户", notes = "App用户注册信息")
+    @RequestMapping(value = ServiceApi.Users.UsersOfApp, method = RequestMethod.POST)
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    @ApiOperation(value = "App用户注册信息-创建用户", notes = "App用户注册信息")
     public Envelop appCreateUser(
-            @ApiParam(name = "user_json_data", required = true,value = "", defaultValue = "")
-            @RequestBody String userJsonData) throws Exception {
+            @ApiParam(name = "userJsonData", required = true,value = "用户json", defaultValue = "")
+            @RequestParam(value = "userJsonData") String userJsonData,
+            @ApiParam(name = "appId", value = "应用id-健康上饶appid", defaultValue = "WYo0l73F8e")
+            @RequestParam(value = "appId") String appId) throws Exception {
         Envelop envelop = new Envelop();
         User user = toEntity(userJsonData, User.class);
         if( StringUtils.isEmpty(user.getDemographicId()) ){
@@ -846,8 +858,10 @@ public class UserEndPoint extends EnvelopRestEndPoint {
             envelop.setErrorMsg("密码不能为空");
             return envelop;
         }
-        user.setId(getObjectId(BizObject.User));
+        String userId = getObjectId(BizObject.User);
+        user.setId(userId);
         user.setCreateDate(new Date());
+        user.setIdCardNo(user.getDemographicId());
         if (!StringUtils.isEmpty(user.getPassword())) {
             user.setPassword(DigestUtils.md5Hex(user.getPassword()));
         } else {
@@ -865,14 +879,25 @@ public class UserEndPoint extends EnvelopRestEndPoint {
             envelop.setErrorMsg("身份证号已存在");
             return envelop;
         }
-
         user = userService.saveUser(user);
-        Roles roles = rolesService.findByCodeAndAppId("Patient",appId);
-        if(roles != null){
-            RoleUser roleUser = new RoleUser();
-            roleUser.setUserId(user.getId());
-            roleUser.setRoleId(roles.getId());
-            roleUserService.save(roleUser);
+        // orgcode卫计委机构编码-PDY026797 添加居民的时候 默认 加到卫计委-居民角色中
+        List<Roles> rolesList = rolesService.findByCodeAndAppIdAndOrgCode(orgcode,appId,"Patient");
+        //在org_member_relation 表里追加关联关系
+        if(null != rolesList && rolesList.size()>0){
+            roleUserService.batchCreateRoleUsersRelation(userId,String.valueOf(rolesList.get(0).getId()));
+        }else{
+            envelop.setErrorMsg("角色不存在！");
+            return envelop;
+        }
+        // 根据身份证号码查找居民，若不存在则创建居民。
+        DemographicInfo demographicInfo = demographicService.getDemographicInfo(user.getDemographicId());
+        if(null == demographicInfo){
+            demographicInfo = new DemographicInfo();
+            demographicInfo.setIdCardNo(user.getIdCardNo());
+            demographicInfo.setTelephoneNo("{\"联系电话\":\"" + user.getTelephone() + "\"}");
+            demographicInfo.setName(user.getRealName());
+            demographicInfo.setPassword(user.getPassword());
+            demographicService.savePatient(demographicInfo);
         }
         envelop.setObj(convertToModel(user, MUser.class, null));
         envelop.setSuccessFlg(true);

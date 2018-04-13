@@ -60,5 +60,6 @@ public class MicroServices {
     public static final String Analyzer = "svr-pack-analyzer";
 
     public static final String FzGateway = "ag-admin";
+    public static final String AgZuul = "ag-zuul";
 
 }

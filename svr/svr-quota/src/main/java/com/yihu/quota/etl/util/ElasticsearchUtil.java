@@ -14,6 +14,7 @@ import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
@@ -318,6 +319,7 @@ public class ElasticsearchUtil {
      */
     public List<Map<String, Object>> excuteDataModel(String sql) {
         List<Map<String, Object>> returnModels = new ArrayList<>();
+        TransportClient client = elasticSearchPool.getClient();
         try {
             SQLExprParser parser = new ElasticSqlExprParser(sql);
             SQLExpr expr = parser.expr();
@@ -331,11 +333,11 @@ public class ElasticsearchUtil {
             SqlElasticSearchRequestBuilder requestBuilder = null;
             if (select.isAgg) {
                 //包含计算的的排序分组的
-                action = new AggregationQueryAction(elasticSearchPool.getClient(), select);
+                action = new AggregationQueryAction(client, select);
                 requestBuilder = action.explain();
             } else {
                 //封装成自己的Select对象
-                Client client = elasticSearchPool.getClient();
+//                Client client = elasticSearchPool.getClient();
                 queryAction = new DefaultQueryAction(client, select);
                 requestBuilder = queryAction.explain();
             }
@@ -363,12 +365,15 @@ public class ElasticsearchUtil {
                 }
             });
         } catch (Exception e) {
+            elasticSearchPool.releaseClient(client);
             e.printStackTrace();
         }
+        elasticSearchPool.releaseClient(client);
         return returnModels;
     }
 
     public long getCountBySql(String sql) {
+        TransportClient client = elasticSearchPool.getClient();
         try {
             SQLExprParser parser = new ElasticSqlExprParser(sql);
             SQLExpr expr = parser.expr();
@@ -382,11 +387,11 @@ public class ElasticsearchUtil {
             SqlElasticSearchRequestBuilder requestBuilder = null;
             if (select.isAgg) {
                 //包含计算的的排序分组的
-                action = new AggregationQueryAction(elasticSearchPool.getClient(), select);
+                action = new AggregationQueryAction(client, select);
                 requestBuilder = action.explain();
             } else {
                 //封装成自己的Select对象
-                Client client = elasticSearchPool.getClient();
+//                Client client = elasticSearchPool.getClient();
                 queryAction = new DefaultQueryAction(client, select);
                 requestBuilder = queryAction.explain();
             }
@@ -395,8 +400,10 @@ public class ElasticsearchUtil {
             if(hits != null){
                 return hits.totalHits();
             }
+            elasticSearchPool.releaseClient(client);
             return 0;
         } catch (Exception e) {
+            elasticSearchPool.releaseClient(client);
             e.printStackTrace();
             return 0;
         }

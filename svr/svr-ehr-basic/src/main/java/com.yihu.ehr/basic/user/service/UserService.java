@@ -54,7 +54,7 @@ public class UserService extends BaseJpaService<User, XUserRepository> {
     @PostConstruct
     void init() {
         if (default_password.startsWith("$")) {
-            default_password = "123456";
+            default_password = "12345678";
         }
     }
 

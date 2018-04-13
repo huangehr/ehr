@@ -33,10 +33,10 @@ public class SingleDiseaseServiceNew {
      */
     public List<Map<String,String>>  getHeatMap() throws Exception {
         List<Map<String,String>> list = new ArrayList<>();
-        String sql = "select addressLngLat from single_disease_personal_index where addressLngLat is not null ";
+        String sql = "select addressLngLat from singleDiseasePersonal where addressLngLat is not null ";
         List<Map<String, Object>> listData = parseIntegerValue(sql);
         Map<String, Object> map = new HashMap<>();
-        if (null != listData && listData.size() > 0 && listData.get(0).size() > 0) {
+        if (null != listData  && listData.size() >0 && listData.get(0) !=null ) {
             listData.forEach(item -> {
                 map.put(item.get("addressLngLat") + "", 1);
             });
@@ -50,6 +50,8 @@ public class SingleDiseaseServiceNew {
                 temp.put("count", v + "");
                 list.add(temp);
             });
+        }else {
+            System.out.println("ssss5"+listData.size());
         }
         return list;
     }
@@ -60,7 +62,7 @@ public class SingleDiseaseServiceNew {
      * @throws Exception
      */
     public List<Map<String, Object>> getNumberOfDiabetes() throws Exception {
-        String sql = "select town, count(*) from single_disease_personal_index where town is not null group by town";
+        String sql = "select town, count(*) from singleDiseasePersonal where town is not null group by town";
         List<Map<String, Object>> list = parseIntegerValue(sql);
         List<Map<String, Object>> dataList = fillNoDataColumn(list);
         return dataList;
@@ -106,12 +108,12 @@ public class SingleDiseaseServiceNew {
      * @return
      */
     public Map<String, List<String>> getLineDataInfo() {
-        String sql = "select eventDate, count(*) from single_disease_personal_index group by date_histogram(field='eventDate','interval'='year')";
+        String sql = "select eventDate, count(*) from singleDiseasePersonal group by date_histogram(field='eventDate','interval'='year')";
         List<Map<String, Object>> listData = parseIntegerValue(sql);
         Map<String, List<String>> map = new HashMap<>();
         List<String> xData = new ArrayList<>();
         List<String> valueData = new ArrayList<>();
-        if (null != listData && listData.get(0).size() > 0) {
+        if (null != listData  && listData.size() >0 && listData.get(0) !=null ) {
             listData.forEach(one -> {
                 // "date_histogram(field=eventDate,interval=year)":"2015-01-01 00:00:00",因为是获取年份，所以截取前4位
                 xData.add((one.get("date_histogram(field=eventDate,interval=year)") + "").substring(0,4));
@@ -119,6 +121,8 @@ public class SingleDiseaseServiceNew {
             });
             map.put("xData", xData);
             map.put("valueData", valueData);
+        }else {
+            System.out.println("ssss9"+listData.size());
         }
         return map;
     }
@@ -146,12 +150,12 @@ public class SingleDiseaseServiceNew {
      * @return
      */
     public Map<String, Object> getHealthProInfo(String code) {
-        String sql = "select diseaseTypeName,count(*) from single_disease_personal_index group by diseaseTypeName";
+        String sql = "select diseaseTypeName,count(*) from singleDiseasePersonal group by diseaseTypeName";
         List<Map<String, Object>> listData = parseIntegerValue(sql);
         Map<String, Object> map = new HashMap<>();
         List<String> legendData = new ArrayList<>();
         List<Map<String, Object>> seriesData = new ArrayList<>();
-        if (null != listData && listData.get(0).size() > 0) {
+        if (null != listData  && listData.size() >0 && listData.get(0) !=null ) {
             listData.forEach(one -> {
                 Map<String, Object> myMap = new HashMap<>();
                 legendData.add(one.get("diseaseTypeName") + "");
@@ -161,6 +165,8 @@ public class SingleDiseaseServiceNew {
             });
             map.put("legendData", legendData);
             map.put("seriesData", seriesData);
+        }else {
+            System.out.println("ssss8"+listData.size());
         }
         return map;
     }
@@ -193,12 +199,12 @@ public class SingleDiseaseServiceNew {
         * 下面为构造年龄段的算式，其中year-151限定了范围是66-150岁 即66以上，其他类似
         * */
         String range = "range(birthYear," + (year - 151) + "," + (year - 66) + "," + (year - 41) + "," + (year - 18) + "," + (year - 7) + "," + year + ")";
-        String sql = "select count(*) from single_disease_personal_index where birthYear <> 0  group by " + range;
+        String sql = "select count(*) from singleDiseasePersonal where birthYear <> 0  group by " + range;
         List<Map<String, Object>> listData = parseIntegerValue(sql);
         Map<String, Object> map = new HashMap<>();
         List<String> legendData = new ArrayList<>();
         List<Map<String, Object>> seriesData = new ArrayList<>();
-        if (null != listData && listData.get(0).size() > 0) {
+        if (null != listData  && listData.size() >0 && listData.get(0) !=null ) {
             listData.forEach(one -> {
                 String rangeName = one.get(range) + "";
                 // rangeName："1978.0-2001.0"
@@ -215,6 +221,8 @@ public class SingleDiseaseServiceNew {
             });
             map.put("legendData", legendData);
             map.put("seriesData", seriesData);
+        }else {
+            System.out.println("ssss7"+listData.size());
         }
         return map;
     }
@@ -248,12 +256,12 @@ public class SingleDiseaseServiceNew {
      * @return
      */
     public Map<String, Object> getGenderInfo() {
-        String sql = "select sexName, count(*) from single_disease_personal_index group by sexName";
+        String sql = "select sexName, count(*) from singleDiseasePersonal group by sexName";
         List<Map<String, Object>> listData = parseIntegerValue(sql);
         Map<String, Object> map = new HashMap<>();
         List<String> legendData = new ArrayList<>();
         List<Map<String, Object>> seriesData = new ArrayList<>();
-        if (null != listData && listData.get(0).size() > 0) {
+        if (null != listData  && listData.size() >0 && listData.get(0) !=null ) {
             listData.forEach(one -> {
                 Map<String, Object> myMap = new HashMap<>();
                 legendData.add(one.get("sexName") + "");
@@ -263,6 +271,8 @@ public class SingleDiseaseServiceNew {
             });
             map.put("legendData", legendData);
             map.put("seriesData", seriesData);
+        }else {
+            System.out.println("ssss6"+listData.size());
         }
         return map;
     }
@@ -276,8 +286,10 @@ public class SingleDiseaseServiceNew {
         Map<String, List<String>> map = new HashMap<>();
         List<String> xData = new ArrayList<>();
         List<String> valueData = new ArrayList<>();
-        if (null != listData && listData.get(0).size() > 0) {
+        System.out.println("listData count " + listData.size());
+        if (null != listData  && listData.size() >0 && listData.get(0) !=null ) {
             listData.forEach(one -> {
+                System.out.println("listData count 2222" + listData.size());
                 if(xdataName.contains("date_histogram")){
                     xData.add(one.get(xdataName).toString().substring(0,4) + "");
                 }else {
@@ -287,6 +299,8 @@ public class SingleDiseaseServiceNew {
             });
             map.put("xData", xData);
             map.put("valueData", valueData);
+        }else {
+            System.out.println("ssss4"+listData.size());
         }
         return map;
     }
@@ -296,7 +310,7 @@ public class SingleDiseaseServiceNew {
      * @return
      */
     public Map<String, List<String>> getFastingBloodGlucoseDataInfo() {
-        String sql = "select fastingBloodGlucoseCode, count(*) from single_disease_check_index where checkCode = 'CH002' group by fastingBloodGlucoseCode";
+        String sql = "select fastingBloodGlucoseCode, count(*) from singleDiseaseCheck where checkCode = 'CH002' group by fastingBloodGlucoseCode";
         List<Map<String, Object>> list = parseIntegerValue(sql);
         Map<String, List<String>> map = new HashMap<>();
         List<String> xData = new LinkedList<>();
@@ -357,7 +371,7 @@ public class SingleDiseaseServiceNew {
      * @return
      */
     public Map<String, List<String>> getSugarToleranceDataInfo() {
-        String sql = "select sugarToleranceCode, count(*) from single_disease_check_index where checkCode = 'CH003' group by sugarToleranceCode";
+        String sql = "select sugarToleranceCode, count(*) from singleDiseaseCheck where checkCode = 'CH003' group by sugarToleranceCode";
         List<Map<String, Object>> list = parseIntegerValue(sql);
         Map<String, List<String>> map = new HashMap<>();
         List<String> xData = new LinkedList<>();
@@ -463,7 +477,7 @@ public class SingleDiseaseServiceNew {
         Map<String, Object> map = new HashMap<>();
         List<String> legendData = new ArrayList<>();
         List<Map<String, Object>> seriesData = new ArrayList<>();
-        if (null != listData && listData.get(0).size() > 0) {
+        if (null != listData  && listData.size() >0 && listData.get(0) !=null ) {
             listData.forEach(one -> {
                 Map<String, Object> myMap = new HashMap<>();
                 legendData.add(one.get(groupName) + "");
@@ -473,6 +487,8 @@ public class SingleDiseaseServiceNew {
             });
             map.put("legendData", legendData);
             map.put("seriesData", seriesData);
+        }else {
+            System.out.println("ssss3"+listData.size());
         }
         return map;
     }
@@ -490,12 +506,12 @@ public class SingleDiseaseServiceNew {
         * 下面为构造年龄段的算式，其中year-151限定了范围是66-150岁 即66以上，其他类似
         * */
         String range = "range(birthYear," + (year - 151) + "," + (year - 66) + "," + (year - 41) + "," + (year - 18) + "," + (year - 7) + "," + year + ")";
-//        String sql = "select count(*) from single_disease_personal_index where birthYear <> 0  group by " + range;
+//        String sql = "select count(*) from singleDiseasePersonal where birthYear <> 0  group by " + range;
         List<Map<String, Object>> listData = parseIntegerValue(sql);
         Map<String, Object> map = new HashMap<>();
         List<String> legendData = new ArrayList<>();
         List<Map<String, Object>> seriesData = new ArrayList<>();
-        if (null != listData && listData.get(0).size() > 0) {
+        if (null != listData  && listData.size() >0 && listData.get(0) !=null ) {
             listData.forEach(one -> {
                 String rangeName = one.get(range) + "";
                 // rangeName："1978.0-2001.0"
@@ -512,6 +528,8 @@ public class SingleDiseaseServiceNew {
             });
             map.put("legendData", legendData);
             map.put("seriesData", seriesData);
+        }else {
+            System.out.println("ssss2"+listData.size());
         }
         return map;
     }

@@ -2,6 +2,7 @@ package com.yihu.ehr;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.model.packs.MPackage;
+import com.yihu.ehr.util.http.IPInfoUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,6 +23,8 @@ public class Test {
         String sorts = "sn desc;name asc";
         String [] sortArr = sorts.split(";");
         System.out.println(sortArr[0].split(" ")[1].trim());
+
+        System.out.println(IPInfoUtils.isInnerIP("223.84.134.42"));
     }
 
 

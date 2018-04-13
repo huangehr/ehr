@@ -132,17 +132,21 @@ public class QuotaReportController extends BaseController {
             for (Map<String, Object> vMap : quotaViewResult.get(maxQuotaCode)) {
                 vMap.put(maxQuotaCode, vMap.get("result")==null ? 0 : nf.format(Double.valueOf(vMap.get("result").toString())));
                 for (String viewQuotaCode : otherQuotaViewResult.keySet()) {
-                    for (Map<String, Object> quotaResultMap : otherQuotaViewResult.get(viewQuotaCode)) {
-                        if (quotaResultMap.get(dimension) != null) {
-                            if (vMap.get(dimension).toString().trim().equals(quotaResultMap.get(dimension).toString().trim())) {
-                                vMap.put(viewQuotaCode, quotaResultMap.get("result")==null ? 0 : nf.format(Double.valueOf(quotaResultMap.get("result").toString())));
-                                break;
+                    if(otherQuotaViewResult != null && otherQuotaViewResult.get(viewQuotaCode) != null && otherQuotaViewResult.get(viewQuotaCode).size()>0 ){
+                        for (Map<String, Object> quotaResultMap : otherQuotaViewResult.get(viewQuotaCode)) {
+                            if (quotaResultMap.get(dimension) != null) {
+                                if (vMap.get(dimension).toString().trim().equals(quotaResultMap.get(dimension).toString().trim())) {
+                                    vMap.put(viewQuotaCode, quotaResultMap.get("result")==null ? 0 : nf.format(Double.valueOf(quotaResultMap.get("result").toString())));
+                                    break;
+                                } else {
+                                    vMap.put(viewQuotaCode, 0);
+                                }
                             } else {
                                 vMap.put(viewQuotaCode, 0);
                             }
-                        } else {
-                            vMap.put(viewQuotaCode, 0);
                         }
+                    }else {
+                        vMap.put(viewQuotaCode, 0);
                     }
                 }
             }
@@ -150,7 +154,7 @@ public class QuotaReportController extends BaseController {
 
             if(dimension.equals(orgHealthCategoryCode)){//如果是特殊机构类型树状机构需要转成树状结构
                 List<Map<String, Object>> orgHealthCategoryList = orgHealthCategoryStatisticsService.getOrgHealthCategoryTreeByPid(-1);
-                dataList = baseStatistsService.setResult(maxQuotaCode, orgHealthCategoryList, resultList, null);
+                dataList = baseStatistsService.setResultAllDimenMap(maxQuotaCode, orgHealthCategoryList, resultList, null);
             }else {
                 dataList = resultList;
             }

@@ -20,6 +20,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -40,6 +42,8 @@ import java.util.Map;
 @Service
 @Transactional
 public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
+
+    Logger logger = LoggerFactory.getLogger(DoctorService.class);
 
     @Value("${fz-gateway.url}")
     private String fzGatewayUrl;
@@ -92,13 +96,13 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
                 {
                     user = objectMapper.readValue(json,User.class);
                     user.setLoginCode(phone);  //手机号码默认登录账号
-                    //密码默认123456
-                    String password = "123456";
-                    //有身份证 默认身份证后6位
+                    //密码默认12345678
+                    String password = "12345678";
+                    //有身份证 默认身份证后8位
                     String number = user.getIdCardNo();
                     if(!StringUtils.isEmpty(number))
                     {
-                        password = number.substring(number.length()-6);
+                        password = number.substring(number.length()-8);
                     }
                     user.setPassword(DigestUtils.md5Hex(password));
                     user.setRealName(doctor.getName());
@@ -211,12 +215,12 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
 
             //创建居民
             demographicInfo =new DemographicInfo();
-            String idCardNo="123456";
-            if(null!=map .get("idCardNo")&&StringUtils.isEmpty(map .get("idCardNo").toString())){
-                idCardNo=map .get("idCardNo").toString();
-                demographicInfo.setPassword(DigestUtils.md5Hex(idCardNo));
+            if(null!=map .get("idCardNo")&&StringUtils.isNotEmpty(map .get("idCardNo").toString())&&map .get("idCardNo").toString().length()>9){
+                String idCardNo=map .get("idCardNo").toString();
+                String defaultPassword=idCardNo.substring(idCardNo.length()-8);
+                demographicInfo.setPassword(DigestUtils.md5Hex(defaultPassword));
             }else{
-                demographicInfo.setPassword(DigestUtils.md5Hex("123456"));
+                demographicInfo.setPassword(DigestUtils.md5Hex("12345678"));
             }
             demographicInfo.setRegisterTime(new Date());
             demographicInfo.setIdCardNo(String.valueOf(map .get("idCardNo")));
@@ -399,11 +403,10 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
             e.printStackTrace();
         }
 
-        if ("10000".equals(syncResultMap.get("Code").toString())) {
-            syncResultMap.remove("Code");
-            syncResultMap.remove("Message");
-        } else {
-            throw new ApiException(String.format("同步医生信息到福州总部失败：%s", syncResultMap.get("Message").toString()));
+        if (!"10000".equals(syncResultMap.get("Code").toString())) {
+            String message = String.format("同步医生信息到福州总部失败：%s，orgId：%s", syncResultMap.get("Message").toString(), orgId);
+            logger.warn(message);
+            throw new ApiException(message);
         }
 
         return syncResultMap;
