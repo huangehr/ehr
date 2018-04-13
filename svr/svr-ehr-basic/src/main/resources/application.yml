@@ -70,6 +70,7 @@ fz-gateway:
   url: http://service.yihu.com:8085/WSGW/rest
   clientId: 9000401
   clientVersion: 1.0
+  secret: 8E29YVP2UZ1QNSIN33NZJXEG1KSLVXFL6YI59C5SC5D
 
 ---
 spring:
@@ -113,6 +114,7 @@ fz-gateway:
   url: http://service.yihu.com:8085/WSGW/rest
   clientId: 9000401
   clientVersion: 1.0
+  secret: 8E29YVP2UZ1QNSIN33NZJXEG1KSLVXFL6YI59C5SC5D
 
 ---
 spring:
@@ -150,6 +152,7 @@ fz-gateway:
   url: http://service.yihu.com:8080/WSGW/rest
   clientId: 9000401
   clientVersion: 1.0
+  secret: 8E29YVP2UZ1QNSIN33NZJXEG1KSLVXFL6YI59C5SC5D
 
 ---
 spring:
@@ -187,6 +190,7 @@ fz-gateway:
   url: http://service.yihu.com:8080/WSGW/rest
   clientId: 9000401
   clientVersion: 1.0
+  secret: 8E29YVP2UZ1QNSIN33NZJXEG1KSLVXFL6YI59C5SC5D
 
 ---
 spring:
@@ -224,6 +228,7 @@ fz-gateway:
   url: http://service.yihu.com:8080/WSGW/rest
   clientId: 9000401
   clientVersion: 1.0
+  secret: 8E29YVP2UZ1QNSIN33NZJXEG1KSLVXFL6YI59C5SC5D
 
 ---
 spring:
@@ -261,3 +266,4 @@ fz-gateway:
   url: http://service.yihu.com:8080/WSGW/rest
   clientId: 9000401
   clientVersion: 1.0
+  secret: 8E29YVP2UZ1QNSIN33NZJXEG1KSLVXFL6YI59C5SC5D

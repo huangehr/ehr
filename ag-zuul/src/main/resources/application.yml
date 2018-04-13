@@ -84,11 +84,10 @@ spring:
     password: redis!@456
 zuul:
   routes:
+    # 福州总部开放平台接口相关
     jkzl-server:
       path: /jkzl/**
       url: http://ssotest.yihu.cn/OpenPlatform/cgiBin/1.0/
-#正式环境URL
-#      url: http://apitest.yihu.com.cn/OpenPlatform/cgiBin/1.0/
 
 ---
 spring:
@@ -103,6 +102,7 @@ spring:
     password: redis!@456
 zuul:
   routes:
+    # 福州总部开放平台接口相关
     jkzl-server:
       path: /jkzl/**
       url: http://ssotest.yihu.cn/OpenPlatform/cgiBin/1.0/
@@ -137,6 +137,7 @@ spring:
     password: q4YaQemf
 zuul:
   routes:
+    # 福州总部开放平台接口相关
     jkzl-server:
       path: /jkzl/**
       url: http://ssotest.yihu.cn/OpenPlatform/cgiBin/1.0/
@@ -154,6 +155,7 @@ spring:
     password: q4YaQemf
 zuul:
   routes:
+    # 福州总部开放平台接口相关
     jkzl-server:
       path: /jkzl/**
       url: http://ssotest.yihu.cn/OpenPlatform/cgiBin/1.0/
@@ -171,6 +173,7 @@ spring:
     password: q4YaQemf
 zuul:
   routes:
+    # 福州总部开放平台接口相关
     jkzl-server:
       path: /jkzl/**
       url: http://ssotest.yihu.cn/OpenPlatform/cgiBin/1.0/
