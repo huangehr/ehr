@@ -258,3 +258,6 @@ hadoop:
   hbase-properties:
     #- hbase.zookeeper.quorum: node2.jkzl.com,node3.jkzl.com,node1.jkzl.com
     hbase.zookeeper.quorum: node1.jkzl.com,node2.jkzl.com,node4.jkzl.com
+elasticsearch:
+  cluster-name: elasticsearch
+  cluster-nodes: 172.10.10.2:9300
