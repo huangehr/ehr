@@ -6,9 +6,11 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.model.portal.MMessageRemind;
+import com.yihu.ehr.query.common.model.DataList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -123,5 +125,34 @@ public class PortalMessageRemindEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "filters", required = false) String filters )throws ParseException {
         long num  = messageRemindService.getCount(filters);
         return Integer.parseInt(String.valueOf(num));
+    }
+
+    @RequestMapping(value = ServiceApi.MessageRemind.MessageRemindByType, method = RequestMethod.GET)
+    @ApiOperation(value = "按分类获取提醒消息列表", notes = "根据按分类获取提醒消息列表")
+    public List<MMessageRemind> searchMessageRemindByType(
+            @ApiParam(name = "type", value = "模板消息类型：101：挂号结果推送，102：退号结果推送，-101：订单操作推送，100满意度调查", defaultValue = "101")
+            @RequestParam(value = "type", required = false) String type,
+            @ApiParam(name = "appId", value = "应用id", defaultValue = "WYo0l73F8e")
+            @RequestParam(value = "appId", required = false) String appId,
+            @ApiParam(name = "toUserId", value = "当前用户id", defaultValue = "")
+            @RequestParam(value = "toUserId", required = false) String toUserId,
+            @ApiParam(name = "typeId", value = "消息类型，默认7为健康上饶app的消息", defaultValue = "7")
+            @RequestParam(value = "typeId", required = false) String typeId,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "3")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page) throws ParseException {
+        List<ProtalMessageRemind> messageRemindList = null;
+        //如果type为空的话，默认获取当前用户的所有消息。否则获取指定消息模板的消息。
+        if(StringUtils.isNotEmpty(type)){
+            DataList list = messageRemindService.listMessageRemind(appId, toUserId, typeId, page, size);
+        }else{
+//            messageRemindList = messageRemindService.search(fields, filters, sorts, page, size);
+        }
+
+
+//        pagedResponse(request, response, messageRemindService.getCount(filters), page, size);
+
+        return (List<MMessageRemind>) convertToModels(messageRemindList, new ArrayList<MMessageRemind>(messageRemindList.size()), MMessageRemind.class, "");
     }
 }

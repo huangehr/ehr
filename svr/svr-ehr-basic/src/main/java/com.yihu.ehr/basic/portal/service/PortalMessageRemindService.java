@@ -3,7 +3,10 @@ package com.yihu.ehr.basic.portal.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.basic.portal.dao.PortalMessageRemindRepository;
 import com.yihu.ehr.basic.portal.model.ProtalMessageRemind;
+import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.query.BaseJpaService;
+import com.yihu.ehr.query.common.model.DataList;
+import com.yihu.ehr.query.services.DBQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +26,9 @@ public class PortalMessageRemindService extends BaseJpaService<ProtalMessageRemi
 
     @Autowired
     ObjectMapper objectMapper;
+
+    @Autowired
+    DBQuery dbQuery;
 
     /**
      * 根据ID获取提醒消息接口.
@@ -54,6 +60,19 @@ public class PortalMessageRemindService extends BaseJpaService<ProtalMessageRemi
         messageRemind.setReaded(1);
         messageRemindRepository.save(messageRemind);
         return messageRemind;
+    }
+
+    public DataList listMessageRemind(String appId,String toUserId,String typeId,int page,int size){
+        String sql = "select p.* from portal_message_remind p where p.type_id='" +typeId+"'" +
+                " AND p.to_user_id='" +toUserId+"' " +" AND p.app_id='" +appId+"' " +"order by p.create_date desc ";
+        DataList list= null;
+        try{
+            list= dbQuery.queryBySql(sql,page,size);
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new ApiException("Query error!");
+        }
+        return list;
     }
 
 }
