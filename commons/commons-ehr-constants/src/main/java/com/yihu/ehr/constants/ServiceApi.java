@@ -1484,7 +1484,7 @@ public class ServiceApi {
      * 转发福州总部开放平台接口相关
      */
     public static class Fz {
-        public static final String Open = "/fz/open";
+        public static final String OpenApi = "/fz/open/api";
     }
 
 
