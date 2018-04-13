@@ -59,3 +59,12 @@ eureka:
   instance:
     ip-address: 100.100.1.162:8761
     prefer-ip-address: true
+
+---
+spring:
+  profiles: prod_srformal
+
+eureka:
+  instance:
+    ip-address: 192.168.200.61:8761
+    prefer-ip-address: true

@@ -43,7 +43,7 @@ public class OPPlaintTextUtil {
             stringBuilder.append(key).append(paramMap.get(key));
         }
         String codes = stringBuilder.append(secret).toString();
-        org.apache.commons.codec.digest.DigestUtils.sha1Hex("1");
+        DigestUtils.sha1Hex("1");
         // SHA-1编码，
         // 这里使用的是Apache-codec，即可获得签名(shaHex()会首先将中文转换为UTF8编码然后进行sha1计算，使用其他的工具包请注意UTF8编码转换)
         String sign = DigestUtils.sha1Hex(codes).toUpperCase();

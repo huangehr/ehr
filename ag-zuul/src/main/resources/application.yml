@@ -120,10 +120,9 @@ spring:
     password: Kb6wKDQP1W4
 zuul:
   routes:
-    # 福州总部开放平台接口相关
     jkzl-server:
       path: /jkzl/**
-      url:
+      url: http://ssotest.yihu.cn/OpenPlatform/cgiBin/1.0/
 
 ---
 spring:
@@ -141,7 +140,7 @@ zuul:
     # 福州总部开放平台接口相关
     jkzl-server:
       path: /jkzl/**
-      url:
+      url: http://ssotest.yihu.cn/OpenPlatform/cgiBin/1.0/
 
 ---
 spring:
@@ -159,4 +158,22 @@ zuul:
     # 福州总部开放平台接口相关
     jkzl-server:
       path: /jkzl/**
-      url:
+      url: http://ssotest.yihu.cn/OpenPlatform/cgiBin/1.0/
+
+---
+spring:
+  profiles: prod_srformal
+  datasource:
+    url: jdbc:mysql://192.168.40.34:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: healthcloud
+    password: GP8Qz4qU
+  redis:
+    host: 192.168.50.82
+    port: 6379
+    password: q4YaQemf
+zuul:
+  routes:
+    # 福州总部开放平台接口相关
+    jkzl-server:
+      path: /jkzl/**
+      url: http://ssotest.yihu.cn/OpenPlatform/cgiBin/1.0/

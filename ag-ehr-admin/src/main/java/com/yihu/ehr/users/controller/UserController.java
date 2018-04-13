@@ -521,7 +521,7 @@ public class UserController extends BaseController {
 
 
     @RequestMapping(value = "users/password/{user_id}", method = RequestMethod.PUT)
-    @ApiOperation(value = "重设密码", notes = "用户忘记密码管理员帮助重新还原密码，初始密码123456")
+    @ApiOperation(value = "重设密码", notes = "用户忘记密码管理员帮助重新还原密码，初始密码12345678")
     public boolean resetPass(
             @ApiParam(name = "user_id", value = "id", defaultValue = "")
             @PathVariable(value = "user_id") String userId) {
@@ -886,7 +886,7 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping(value = "systemUsersResetPass/password/{user_id}", method = RequestMethod.PUT)
-    @ApiOperation(value = "账户体系-重设密码", notes = "账户体系-密码重置。用户忘记密码管理员帮助重新还原密码，初始密码123456")
+    @ApiOperation(value = "账户体系-重设密码", notes = "账户体系-密码重置。用户忘记密码管理员帮助重新还原密码，初始密码12345678")
     public Envelop systemUsersResetPass(
             @ApiParam(name = "userId", value = "用户id", defaultValue = "")
             @PathVariable(value = "userId") String userId) {
