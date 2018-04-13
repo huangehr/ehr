@@ -215,7 +215,7 @@ hadoop:
 spring:
   profiles: prod_srformal
   datasource:
-    url: jdbc:mysql://192.168.40.34:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    url: jdbc:mysql://192.168.210.3:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: healthcloud
     password: GP8Qz4qU
   redis:
@@ -231,7 +231,7 @@ spring:
         host: localhost
         port: 8125
 fast-dfs:
-  tracker-server: 192.168.50.116:22122,192.168.50.119:22122
+  tracker-server: 192.168.50.116:22122
   public-server: http://192.168.50.37:8888
 elasticsearch:
   cluster-name: elasticsearch
