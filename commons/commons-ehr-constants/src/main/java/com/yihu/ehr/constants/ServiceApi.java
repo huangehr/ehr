@@ -1468,4 +1468,11 @@ public class ServiceApi {
         public static final String MessageOrderPush = "/messageTemplate/messageOrderPush";
     }
 
+    /**
+     * 转发福州总部开放平台接口相关
+     */
+    public static class Fz {
+        public static final String Open = "/fz/open";
+    }
+
 }
