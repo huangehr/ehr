@@ -471,6 +471,7 @@ public class ServiceApi {
         public static final String AddResolveQueue = "/packages/addResolveQueue";
         public static final String QueueSize = "/packages/queueSize";
         public static final String PackageCrypto = "/packages/crypto";
+        public static final String Fetch = "/packages/fetch/{id}";
         public static final String ImmediateResolve = "/immediate/resolve";
     }
 
@@ -1459,6 +1460,7 @@ public class ServiceApi {
         public static final String FindByField = "/elasticSearch/findByField";
         public static final String Page = "/elasticSearch/page";
         public static final String FindBySql = "/elasticSearch/findBySql";
+        public static final String DateHistogram = "/elasticSearch/dateHistogram";
 
     }
 

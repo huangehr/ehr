@@ -4,6 +4,7 @@ import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.entity.dict.SystemDictEntry;
 import com.yihu.ehr.query.BaseJpaService;
 import org.apache.commons.lang.StringUtils;
+import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.hibernate.FlushMode;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
@@ -92,15 +93,6 @@ public class ResourceCenterService extends BaseJpaService {
         query.setFlushMode(FlushMode.COMMIT);
         query.setInteger("id", id);
         return (String)query.uniqueResult();
-    }
-
-    public List getArchiveRelationDateGroup(Date before) {
-        Session session = currentSession();
-        String hql = "SELECT DATE_FORMAT(createDate, '%Y-%m-%d'), COUNT(1) FROM ArchiveRelation archiveRelation WHERE archiveRelation.createDate > :before GROUP BY DATE_FORMAT(createDate, '%Y-%m-%d')";
-        Query query = session.createQuery(hql);
-        query.setFlushMode(FlushMode.COMMIT);
-        query.setDate("before", before);
-        return query.list();
     }
 
     public List getOrgAreaNameGroupByClazz(String clazz, int currentCityId) {
@@ -220,22 +212,14 @@ public class ResourceCenterService extends BaseJpaService {
         return query.list();
     }
 
-    public List getJsonArchiveReceiveDateGroup(Date before) {
-        Session session = currentSession();
-        String hql = "SELECT DATE_FORMAT(receiveDate, '%Y-%m-%d'), COUNT(1) FROM JsonArchives jsonArchives WHERE jsonArchives.receiveDate > :before GROUP BY DATE_FORMAT(receiveDate, '%Y-%m-%d')";
-        Query query = session.createQuery(hql);
-        query.setFlushMode(FlushMode.COMMIT);
-        query.setDate("before", before);
-        return query.list();
+    public List getJsonArchiveReceiveDateGroup(Date start, Date end) {
+        List<Map<String, Long>> esData = elasticSearchUtil.dateHistogram("json_archives", "info", new ArrayList<>(0), start, end , "receive_date", DateHistogramInterval.days(1),"yyyy-MM-dd");
+        return esData;
     }
 
-    public List getJsonArchiveFinishDateGroup(Date before) {
-        Session session = currentSession();
-        String hql = "SELECT DATE_FORMAT(finishDate, '%Y-%m-%d'), COUNT(1) FROM JsonArchives jsonArchives WHERE jsonArchives.finishDate > :before GROUP BY DATE_FORMAT(finishDate, '%Y-%m-%d')";
-        Query query = session.createQuery(hql);
-        query.setFlushMode(FlushMode.COMMIT);
-        query.setDate("before", before);
-        return query.list();
+    public List getJsonArchiveFinishDateGroup(Date start, Date end) {
+        List<Map<String, Long>> esData = elasticSearchUtil.dateHistogram("json_archives", "info", new ArrayList<>(0), start, end , "finish_date", DateHistogramInterval.days(1),"yyyy-MM-dd");
+        return esData;
     }
 
     public Integer getOrgAreaByCode(String orgCode, int currentCityId) {

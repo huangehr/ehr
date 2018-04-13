@@ -164,14 +164,14 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
      * <p>
      */
     @ApiOperation(value = "获取档案解析包内容", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @RequestMapping(value = "/packages/fetch/{id}", method = RequestMethod.GET)
-    public ResponseEntity<String> fetch(
+    @RequestMapping(value = ServiceApi.Packages.Fetch, method = RequestMethod.GET)
+    public String fetch(
             @ApiParam(name = "id", value = "档案包ID", required = true)
             @PathVariable(value = "id") String id) throws Throwable {
         EsSimplePackage esSimplePackage = packageMgrClient.getPackage(id);
         String zipFile = downloadTo(esSimplePackage.getRemote_path());
         StandardPackage packModel = packageResolveService.doResolve(esSimplePackage, zipFile);
-        return new ResponseEntity<>(packModel.toJson(), HttpStatus.OK);
+        return packModel.toJson();
     }
 
 

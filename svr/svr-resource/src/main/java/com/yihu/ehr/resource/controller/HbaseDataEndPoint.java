@@ -14,6 +14,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -230,33 +231,14 @@ public class HbaseDataEndPoint extends EnvelopRestEndPoint {
     /********************************** solr操作 ********************************************/
     @ApiOperation("删除Solr")
     @RequestMapping(value = "deleteSolr",method = RequestMethod.POST)
-    public String deleteSolr(@ApiParam(value="core",defaultValue = "HealthProfile")
-                             @RequestParam String core,
-                             @ApiParam(value="key",defaultValue = "")
-                             @RequestParam String key)
-    {
-        try {
-            solrAdmin.delete(core,key);
-            return "删除Solr成功！";
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-            return ex.getMessage();
-        }
+    @ApiIgnore
+    public String deleteSolr(
+            @ApiParam(value = "core", defaultValue = "HealthProfile")
+            @RequestParam String core,
+            @ApiParam(value = "key")
+            @RequestParam String key) throws Exception  {
+        solrAdmin.delete(core, key);
+        return "删除Solr成功！";
     }
 
-    @RequestMapping(value = ServiceApi.Report.GetArchivesInfo, method = RequestMethod.GET)
-    @ApiOperation(value = "居民档案数、接收档案包数")
-    public Map<String, Object> getArchiveInfo() throws Exception {
-        Map<String, Object> map = new HashMap<>();
-        //Todo 获取常驻人口数
-        // 获取居民档案数
-        long userArchiveCount = solrUtil.count("HealthProfile","*:*");
-        // 获取接收档案包数
-        double archivePackageCount = resourceCenterService.getJsonArchiveTotalCount();
-        map.put("userArchiveCount", userArchiveCount);
-        map.put("archivePackageCount", archivePackageCount);
-        return map;
-    }
 }

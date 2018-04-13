@@ -15,6 +15,9 @@ import org.elasticsearch.index.engine.DocumentMissingException;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramBuilder;
+import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
+import org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
 import org.elasticsearch.search.sort.SortBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -253,6 +256,38 @@ public class ElasticSearchClient {
             if (druidDataSource != null) {
                 druidDataSource.close();
             }
+        }
+    }
+
+    public List<Map<String, Long>> dateHistogram (String index, String type, QueryBuilder queryBuilder, Date start, Date end, String field, DateHistogramInterval interval, String format) {
+        TransportClient transportClient = elasticSearchPool.getClient();
+        try {
+            List<Map<String, Long>> resultList = new ArrayList<>();
+            SearchRequestBuilder builder = transportClient.prepareSearch(index);
+            builder.setTypes(type);
+            builder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
+            builder.setQuery(queryBuilder);
+            DateHistogramBuilder dateHistogramBuilder = new DateHistogramBuilder(index + "-" + field);
+            dateHistogramBuilder.field(field);
+            dateHistogramBuilder.interval(interval);
+            if (!StringUtils.isEmpty(format)) {
+                dateHistogramBuilder.format(format);
+            }
+            dateHistogramBuilder.minDocCount(0);
+            dateHistogramBuilder.extendedBounds(start.getTime(), end.getTime());
+            builder.addAggregation(dateHistogramBuilder);
+            builder.setSize(0);
+            builder.setExplain(true);
+            SearchResponse response = builder.get();
+            Histogram histogram = response.getAggregations().get(index + "-" + field);
+            histogram.getBuckets().forEach(item -> {
+                Map<String, Long> temp = new HashMap<>();
+                temp.put(item.getKeyAsString(), item.getDocCount());
+                resultList.add(temp);
+            });
+            return resultList;
+        } finally {
+            elasticSearchPool.releaseClient(transportClient);
         }
     }
 

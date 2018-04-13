@@ -159,37 +159,24 @@ public class ResourceCenterEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.Resources.GetNewSituation, method = RequestMethod.GET)
     @ApiOperation(value = "全员人口个案库 - 新增情况")
-    public Envelop getNewSituation() {
+    public Envelop getNewSituation() throws Exception {
         List<Map> resultList = new ArrayList(1);
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
-        Date now = calendar.getTime();
+        Date now = DateUtils.addDays(calendar.getTime(), 1);
         Date before = DateUtils.addDays(now, -30);
-        List dateGroupList = resourceCenterService.getArchiveRelationDateGroup(before);
+        List<RangeFacet> solrList = solrUtil.getFacetDateRange("HealthProfile", "create_date", DateUtils.addHours(before, 8), DateUtils.addHours(now, 8), "+1DAY",  "*:*");
+        RangeFacet rangeFacet = solrList.get(0);
+        List<RangeFacet.Count> rangeFacetCounts = rangeFacet.getCounts();
         List<String> xData = new ArrayList<>(30);
-        List<Long> yData = new ArrayList<>(30);
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        for (int i = 0; i < 30; i ++) {
-            Date xDate = DateUtils.addDays(before, i + 1);
-            boolean init = false;
-            String xDateStr = dateFormat.format(xDate);
-            xData.add(xDateStr);
-            for (int j = 0; j < dateGroupList.size(); j ++) {
-                Object [] dataArr = (Object[]) dateGroupList.get(j);
-                String temp = (String) dataArr[0];
-                if (temp.equals(xDateStr)) {
-                    yData.add((long) dataArr[1]);
-                    init = true;
-                    break;
-                }
-            }
-            if (!init) {
-                yData.add((long)0);
-            }
-        }
+        List<Integer> yData = new ArrayList<>(30);
+        rangeFacetCounts.forEach(item -> {
+            xData.add(item.getValue().substring(0, 10));
+            yData.add(item.getCount());
+        });
         Map<String, Object> resultMap = new HashMap<>(4);
         resultMap.put("name", "人口个案新增情况");
         resultMap.put("dataModels", null);
@@ -686,57 +673,32 @@ public class ResourceCenterEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.Resources.GetStorageAnalysis, method = RequestMethod.GET)
     @ApiOperation(value = "健康档案 - 健康档案入库情况分析")
-    public Envelop getStorageAnalysis() {
+    public Envelop getStorageAnalysis() throws Exception {
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
-        Date now = calendar.getTime();
-        Date before = DateUtils.addDays(now, -30);
-        List receiveGroup = resourceCenterService.getJsonArchiveReceiveDateGroup(before);
-        List<String> xData = new ArrayList<>(30);
-        List<Long> yData = new ArrayList<>(30);
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        for (int i = 0; i < 30; i ++) {
-            Date xDate = DateUtils.addDays(before, i + 1);
-            boolean init = false;
-            String xDateStr = dateFormat.format(xDate);
-            xData.add(xDateStr);
-            for (int j = 0; j < receiveGroup.size(); j ++) {
-                Object [] dataArr = (Object[]) receiveGroup.get(j);
-                String temp = (String) dataArr[0];
-                if (temp.equals(xDateStr)) {
-                    yData.add((long) dataArr[1]);
-                    init = true;
-                    break;
-                }
-            }
-            if (!init) {
-                yData.add((long)0);
-            }
-        }
-        List finishGroup = resourceCenterService.getJsonArchiveFinishDateGroup(before);
-        List<String> xData1 = new ArrayList<>(30);
-        List<Long> yData1 = new ArrayList<>(30);
-        for (int i = 0; i < 30; i ++) {
-            Date xDate = DateUtils.addDays(before, i + 1);
-            boolean init = false;
-            String xDateStr = dateFormat.format(xDate);
-            xData1.add(xDateStr);
-            for (int j = 0; j < finishGroup.size(); j ++) {
-                Object [] dataArr = (Object[]) finishGroup.get(j);
-                String temp = (String) dataArr[0];
-                if (temp.equals(xDateStr)) {
-                    yData1.add((long) dataArr[1]);
-                    init = true;
-                    break;
-                }
-            }
-            if (!init) {
-                yData1.add((long)0);
-            }
-        }
+        Date now = DateUtils.addDays(calendar.getTime(), 1);
+        Date before = DateUtils.addDays(now, -29);
+        List<Map<String, Long>> receiveGroup = resourceCenterService.getJsonArchiveReceiveDateGroup(before, now);
+        List<String> xData = new ArrayList<>();
+        List<Long> yData = new ArrayList<>();
+        receiveGroup.forEach(item -> {
+            item.forEach((key, value) -> {
+                xData.add(key);
+                yData.add(value);
+            });
+        });
+        List<Map<String, Long>> finishGroup = resourceCenterService.getJsonArchiveFinishDateGroup(before, now);
+        List<String> xData1 = new ArrayList<>();
+        List<Long> yData1 = new ArrayList<>();
+        finishGroup.forEach(item -> {
+            item.forEach((key, value) -> {
+                xData1.add(key);
+                yData1.add(value);
+            });
+        });
         List<Map> resultList = new ArrayList<>(2);
         Map<String, Object> resultMap = new HashMap<>(4);
         resultMap.put("name", "采集量");

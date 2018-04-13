@@ -31,7 +31,6 @@ public class JsonReport {
     private Integer status;     //  0 未解析  1 已解析 2 已统计
 
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Integer getId() {

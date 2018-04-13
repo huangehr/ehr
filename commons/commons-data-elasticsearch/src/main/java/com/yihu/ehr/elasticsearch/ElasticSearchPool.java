@@ -31,7 +31,6 @@ public class ElasticSearchPool {
     @Value("${elasticsearch.pool.max-size}")
     private int maxSize;
     private List<TransportClient> clientPool;
-    private DruidDataSource druidDataSource;
     @Autowired
     private ElasticSearchConfig elasticSearchConfig;
 

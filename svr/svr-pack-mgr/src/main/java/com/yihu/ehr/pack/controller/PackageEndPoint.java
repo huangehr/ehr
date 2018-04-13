@@ -259,6 +259,27 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
+    @RequestMapping(value = ServiceApi.Packages.PackageSearch, method = RequestMethod.GET)
+    @ApiOperation(value = "搜索档案包")
+    public Collection<EsDetailsPackage> search (
+            @ApiParam(name = "filters", value = "过滤条件")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "page", value = "页码", required = true, defaultValue = "1")
+            @RequestParam(value = "page") int page,
+            @ApiParam(name = "size", value = "分页大小", required = true, defaultValue = "15")
+            @RequestParam(value = "size") int size) throws Exception {
+        List<Map<String, Object>> filterMap;
+        if (!StringUtils.isEmpty(filters)) {
+            filterMap = objectMapper.readValue(filters, List.class);
+        } else {
+            filterMap = new ArrayList<>(0);
+        }
+        List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, filterMap, sorts, page, size);
+        return convertToModels(resultList, new ArrayList<EsDetailsPackage>(resultList.size()), EsDetailsPackage.class, null);
+    }
+
     @RequestMapping(value = ServiceApi.Packages.Package, method = RequestMethod.GET)
     @ApiOperation(value = "获取档案包", notes = "获取档案包的信息")
     public EsSimplePackage getPackage(
