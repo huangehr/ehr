@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Map;
 
 /**
- * 福州总部接口调用工具类
+ * 福州总部接口调用工具类（AES的加密方式）
  */
 public class OPUtil {
 
@@ -25,7 +25,7 @@ public class OPUtil {
      * @throws Exception
      */
     public static String callApi(String appId, String secret, String apiUrl,
-                                 Map<String, String> paramMap) throws Exception {
+                                 Map<String, Object> paramMap) throws Exception {
         String result = null;
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -33,10 +33,10 @@ public class OPUtil {
 
         String timestamp = Long.toString(System.currentTimeMillis());
         MsgCrypt pc = new MsgCrypt(secret, appId);
-        Map<String, String> mingwen = pc.encryptMsg(replyMsg, timestamp);
+        Map<String, Object> mingwen = pc.encryptMsg(replyMsg, timestamp);
         logger.info("加密后: " + mingwen.toString());
-        String encrypt = mingwen.get("encrypt");
-        String sign = mingwen.get("sign");
+        String encrypt = mingwen.get("encrypt").toString();
+        String sign = mingwen.get("sign").toString();
         String result2 = pc.decryptMsg(sign, timestamp, encrypt);
         logger.info("解密后明文: " + result2);
 

@@ -18,7 +18,7 @@ import java.util.Map;
 
 public class HttpUtil {
 
-    public static String httpPost(String url, Map<String, String> params) throws IOException {
+    public static String httpPost(String url, Map<String, Object> params) throws IOException {
         CloseableHttpClient httpclient = HttpClients.createDefault();
         try {
             RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(30000).setConnectTimeout(5000).build();//设置请求和传输超时时间
@@ -27,7 +27,7 @@ public class HttpUtil {
             httpPost.setConfig(requestConfig);
             if (params != null && params.size() > 0) {
                 List<NameValuePair> valuePairs = new ArrayList<NameValuePair>(params.size());
-                for (Map.Entry<String, String> entry : params.entrySet()) {
+                for (Map.Entry<String, Object> entry : params.entrySet()) {
                     NameValuePair nameValuePair = new BasicNameValuePair(entry.getKey(), String.valueOf(entry.getValue()));
                     valuePairs.add(nameValuePair);
                 }
