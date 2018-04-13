@@ -1,7 +1,7 @@
 package com.yihu.ehr.basic.fzopen.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.basic.fzopen.utils.OPPlaintTextUtil;
+import com.yihu.ehr.basic.fzopen.utils.OPUtil;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.constants.ServiceApi;
@@ -44,20 +44,20 @@ public class OpenEndPoint extends EnvelopRestEndPoint {
 
     @ApiOperation("转发福州总部开放平台接口")
     @RequestMapping(value = ServiceApi.Fz.Open, method = RequestMethod.POST)
-    public Envelop fzHttpPost(
+    public Envelop fzOpen(
             @ApiParam(name = "apiUrl", value = "相对接口路径，不用\"/\"开头", required = true)
             @RequestParam(value = "apiUrl") String apiUrl,
-            @ApiParam(name = "paramsJson", value = "参数JSON字符串", required = true)
+            @ApiParam(name = "paramsJson", value = "参数JSON字符串，timestamp 不用传，后台添加", required = true)
             @RequestParam(value = "paramsJson") String paramsJson) {
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
         try {
-            Map<String, String> params = objectMapper.readValue(paramsJson, Map.class);
+            Map<String, Object> params = objectMapper.readValue(paramsJson, Map.class);
             ServiceInstance serviceInstance = discoveryClient.getInstances(MicroServices.AgZuul).get(0);
             if (serviceInstance != null) {
                 // URL前缀与 ag-zuul 配置文件中的 zuul.routes.jkzl-server.path 前缀一致。
                 String url = serviceInstance.getUri() + "/jkzl/" + apiUrl;
-                String result = OPPlaintTextUtil.callApi(fzAppId, fzSecret, url, params);
+                String result = OPUtil.callApi(fzAppId, fzSecret, url, params);
                 envelop.setObj(result);
                 envelop.setSuccessFlg(true);
             }

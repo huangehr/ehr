@@ -25,7 +25,7 @@ public class OPPlaintTextUtil {
      * @throws Exception
      */
     public static String callApi(String appId, String secret, String apiUrl,
-                                 Map<String, String> paramMap) throws Exception {
+                                 Map<String, Object> paramMap) throws Exception {
         String result = null;
 
         //加入时间戳

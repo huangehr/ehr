@@ -205,7 +205,7 @@ public class MsgCrypt {
 	 * @return 加密后的可以直接回复用户的密文，包括msg_signature, timestamp, encrypt的MAP
 	 * @throws AesException 执行失败，请查看该异常的错误码和具体的错误信息
 	 */
-	public Map<String,String>  encryptMsg(String replyMsg, String timestamp) throws AesException {
+	public Map<String,Object>  encryptMsg(String replyMsg, String timestamp) throws AesException {
 		// 加密
 		String encrypt = encrypt(getRandomStr(), replyMsg);
 
@@ -215,7 +215,7 @@ public class MsgCrypt {
 		}
 
 		String signature = SHA1.getSHA1(timestamp, encrypt);
-		Map<String,String> result=new HashMap<String,String>();
+		Map<String,Object> result=new HashMap<>();
 		result.put("encrypt", encrypt);
 		result.put("sign", signature);
 		result.put("timestamp", timestamp);
