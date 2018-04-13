@@ -33,6 +33,14 @@ public class PortalMessageTemplate {
      * 主体之后内容
      */
     private String afterContent;
+    /**
+     * 部推送类型 ，101：挂号结果推送，102：退号结果推送，-101：订单操作推送
+     */
+    private String type;
+    /**
+     * 模板状态：0生效，1失效
+     */
+    private String state;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -83,5 +91,21 @@ public class PortalMessageTemplate {
 
     public void setAfterContent(String afterContent) {
         this.afterContent = afterContent;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
     }
 }

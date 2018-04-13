@@ -25,6 +25,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -49,6 +51,8 @@ import java.util.Map;
 @Api(value = "doctors", description = "医生管理接口", tags = {"基础信息-医生管理"})
 public class DoctorEndPoint extends EnvelopRestEndPoint {
 
+    Logger logger = LoggerFactory.getLogger(DoctorEndPoint.class);
+
     @Autowired
     DoctorService doctorService;
     @Autowired
@@ -58,7 +62,7 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private OrgMemberRelationService relationService;
     @Value("${default.password}")
-    private String default_password = "123456";
+    private String default_password = "12345678";
     @Autowired
     private DemographicService demographicService;
     @Autowired
@@ -113,11 +117,20 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
             @RequestBody String doctoJsonData,
             @ApiParam(name = "model", value = "所属机构部门关系", defaultValue = "")
             @RequestParam("model") String model) throws Exception {
+        List<MOrgDeptJson> orgDeptJsonList = objectMapper.readValue(model, new TypeReference<List<MOrgDeptJson>>() {});
+        MOrgDeptJson mOrgDeptJson = orgDeptJsonList.get(0);
+        Organization organization = orgService.getOrgById(mOrgDeptJson.getOrgId());
+        OrgDept orgDept = orgDeptService.searchBydeptId(Integer.parseInt(mOrgDeptJson.getDeptIds().split(",")[0]));
+
         Doctors doctor = toEntity(doctoJsonData, Doctors.class);
         doctor.setInsertTime(new Date());
         doctor.setUpdateTime(new Date());
         doctor.setStatus("1");
         doctor.setPyCode(PinyinUtil.getPinYinHeadChar(doctor.getName(), false));
+        doctor.setOrgId(organization.getId().toString());
+        doctor.setOrgCode(organization.getOrgCode());
+        doctor.setOrgFullName(organization.getFullName());
+        doctor.setDeptName(orgDept.getName());
         Doctors d= doctorService.save(doctor);
 
         //创建账户
@@ -125,8 +138,8 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
         user.setId(getObjectId(BizObject.User));
         user.setCreateDate(new Date());
         String defaultPassword="";
-        if(!StringUtils.isEmpty(doctor.getIdCardNo())&&doctor.getIdCardNo().length()>7){
-            defaultPassword=doctor.getIdCardNo().substring(doctor.getIdCardNo().length()-6,doctor.getIdCardNo().length());
+        if(!StringUtils.isEmpty(doctor.getIdCardNo())&&doctor.getIdCardNo().length()>9){
+            defaultPassword=doctor.getIdCardNo().substring(doctor.getIdCardNo().length()-8);
             user.setPassword(DigestUtils.md5Hex(defaultPassword));
         }else{
             user.setPassword(DigestUtils.md5Hex(default_password));
@@ -152,8 +165,8 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
 
         //创建居民
         DemographicInfo demographicInfo =new DemographicInfo();
-        if(!StringUtils.isEmpty(doctor.getIdCardNo())&&doctor.getIdCardNo().length()>7){
-            defaultPassword=doctor.getIdCardNo().substring(doctor.getIdCardNo().length()-6,doctor.getIdCardNo().length());
+        if(!StringUtils.isEmpty(doctor.getIdCardNo())&&doctor.getIdCardNo().length()>9){
+            defaultPassword=doctor.getIdCardNo().substring(doctor.getIdCardNo().length()-8);
             demographicInfo.setPassword(DigestUtils.md5Hex(defaultPassword));
         }else{
             demographicInfo.setPassword(DigestUtils.md5Hex(default_password));
@@ -166,7 +179,6 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
         demographicService.savePatient(demographicInfo);
 
         //创建用户与机构关系
-        List<MOrgDeptJson> orgDeptJsonList = objectMapper.readValue(model, new TypeReference<List<MOrgDeptJson>>() {});
         orgMemberRelationInfo(orgDeptJsonList, user, d);
 
         return convertToModel(doctor, MDoctor.class);
@@ -180,7 +192,16 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
             @RequestBody String doctoJsonData,
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestParam("model") String model) throws Exception {
+        List<MOrgDeptJson> orgDeptJsonList = objectMapper.readValue(model, new TypeReference<List<MOrgDeptJson>>() {});
+        MOrgDeptJson mOrgDeptJson = orgDeptJsonList.get(0);
+        Organization organization = orgService.getOrgById(mOrgDeptJson.getOrgId());
+        OrgDept orgDept = orgDeptService.searchBydeptId(Integer.parseInt(mOrgDeptJson.getDeptIds().split(",")[0]));
+
         Doctors doctors = toEntity(doctoJsonData, Doctors.class);
+        doctors.setOrgId(organization.getId().toString());
+        doctors.setOrgCode(organization.getOrgCode());
+        doctors.setOrgFullName(organization.getFullName());
+        doctors.setDeptName(orgDept.getName());
         doctors.setUpdateTime(new Date());
         doctorService.save(doctors);
 
@@ -201,7 +222,6 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
             demographicService.save(demographicInfo);
         }
         //修改用户与机构关系
-        List<MOrgDeptJson> orgDeptJsonList = objectMapper.readValue(model, new TypeReference<List<MOrgDeptJson>>() {});
         orgMemberRelationInfo(orgDeptJsonList, user, doctors);
         return convertToModel(doctors, MDoctor.class);
     }
@@ -312,8 +332,8 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
                     user.setTechTitle(d.getSkill());
                     user.setEmail(d.getEmail());
                     String defaultPassword = "";
-                    if (!StringUtils.isEmpty(d.getIdCardNo()) && d.getIdCardNo().length() > 7) {
-                        defaultPassword = d.getIdCardNo().substring(d.getIdCardNo().length() - 6, d.getIdCardNo().length());
+                    if (!StringUtils.isEmpty(d.getIdCardNo()) && d.getIdCardNo().length() > 9) {
+                        defaultPassword = d.getIdCardNo().substring(d.getIdCardNo().length() - 8);
                         user.setPassword(DigestUtils.md5Hex(defaultPassword));
                     } else {
                         user.setPassword(DigestUtils.md5Hex(default_password));
@@ -434,7 +454,7 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
                         // 对 主任医师、副主任医师、主治医师、医师 才做同步
                         if ("1".equals(doctor.getLczc()) || "2".equals(doctor.getLczc()) || "3".equals(doctor.getLczc()) || "4".equals(doctor.getLczc())) {
                             Map<String, Object> deptDoc = doctorService.syncDoctor(doctor, orgDeptJson.getOrgId(), orgDept.getName());
-                            if (deptDoc.size() != 0) {
+                            if ("10000".equals(deptDoc.get("Code").toString())) {
                                 if (deptDoc.get("userId") != null) {
                                     memberRelation.setJkzlUserId(deptDoc.get("userId").toString());
                                 }

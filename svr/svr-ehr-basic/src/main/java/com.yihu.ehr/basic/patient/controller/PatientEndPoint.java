@@ -169,9 +169,9 @@ public class PatientEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "json_data", value = "身份证号", defaultValue = "")
             @RequestBody String jsonData) throws Exception{
         DemographicInfo demographicInfo = toEntity(jsonData, DemographicInfo.class);
-        String pwd = "123456";
-        if(!StringUtils.isEmpty(demographicInfo.getIdCardNo())&&demographicInfo.getIdCardNo().length()>7){
-            pwd=demographicInfo.getIdCardNo().substring(demographicInfo.getIdCardNo().length()-6,demographicInfo.getIdCardNo().length());
+        String pwd = "12345678";
+        if(!StringUtils.isEmpty(demographicInfo.getIdCardNo())&&demographicInfo.getIdCardNo().length()>9){
+            pwd=demographicInfo.getIdCardNo().substring(demographicInfo.getIdCardNo().length()-8);
             demographicInfo.setPassword(DigestUtils.md5Hex(pwd));
         }else{
             demographicInfo.setPassword(DigestUtils.md5Hex(pwd));
@@ -230,7 +230,7 @@ public class PatientEndPoint extends EnvelopRestEndPoint {
      * @throws Exception
      */
     @RequestMapping(value = "/populations/password/{id_card_no}",method = RequestMethod.PUT)
-    @ApiOperation(value = "初始化密码",notes = "用户忘记密码时重置密码，初始密码为123456")
+    @ApiOperation(value = "初始化密码",notes = "用户忘记密码时重置密码，初始密码为12345678")
     public boolean resetPass(
             @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
             @PathVariable(value = "id_card_no") String idCardNo) throws Exception{

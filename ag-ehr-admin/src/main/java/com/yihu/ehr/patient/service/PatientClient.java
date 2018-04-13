@@ -89,7 +89,7 @@ public interface PatientClient {
             @RequestBody String patientModelJsonData);
 
     @RequestMapping(value = "/populations/password/{id_card_no}",method = RequestMethod.PUT)
-    @ApiOperation(value = "初始化密码",notes = "用户忘记密码时重置密码，初始密码为123456")
+    @ApiOperation(value = "初始化密码",notes = "用户忘记密码时重置密码，初始密码为12345678")
     boolean resetPass(
             @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
             @PathVariable(value = "id_card_no") String idCardNo);

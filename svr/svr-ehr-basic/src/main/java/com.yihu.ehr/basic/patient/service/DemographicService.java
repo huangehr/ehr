@@ -135,7 +135,7 @@ public class DemographicService extends BaseJpaService {
 
     public void resetPass(String id) {
 
-        String pwd = "123456";
+        String pwd = "12345678";
         DemographicInfo demInfo = getDemographicInfo(id);
         demInfo.setPassword(DigestUtils.md5Hex(pwd));
         demographicInfoRepository.save(demInfo);

@@ -32,9 +32,9 @@ import java.util.Map;
 @Api(description = "转发福州总部开放平台接口", tags = {"转发福州总部开放平台接口"})
 public class OpenEndPoint extends EnvelopRestEndPoint {
 
-    @Value("${fzopen-gateway.clientId}")
+    @Value("${fz-gateway.clientId}")
     private String fzAppId;
-    @Value("${fzopen-gateway.secret}")
+    @Value("${fz-gateway.secret}")
     private String fzSecret;
 
     @Autowired
