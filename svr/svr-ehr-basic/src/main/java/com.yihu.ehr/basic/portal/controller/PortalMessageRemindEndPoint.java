@@ -166,6 +166,7 @@ public class PortalMessageRemindEndPoint extends EnvelopRestEndPoint {
                     }else{
                         protalMessageRemind.setContent("我的就诊信息");
                     }
+                    protalMessageRemind.setReaded(Integer.valueOf(dataMap.get("readed").toString()));
                     messageRemindList.add(protalMessageRemind);
                 }
             }
