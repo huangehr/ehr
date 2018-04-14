@@ -9,7 +9,6 @@ public class EhrUserSimple {
     private String loginCode;
     private String email;
     private String realName;
-    private Boolean activated;
     private String userType;
     private String telephone;
     private String gender;
@@ -55,14 +54,6 @@ public class EhrUserSimple {
 
     public void setRealName(String realName) {
         this.realName = realName;
-    }
-
-    public Boolean getActivated() {
-        return activated;
-    }
-
-    public void setActivated(Boolean activated) {
-        this.activated = activated;
     }
 
     public String getUserType() {
