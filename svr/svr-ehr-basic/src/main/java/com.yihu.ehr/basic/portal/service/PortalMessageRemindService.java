@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 提醒消息接口实现类.
@@ -62,17 +63,32 @@ public class PortalMessageRemindService extends BaseJpaService<ProtalMessageRemi
         return messageRemind;
     }
 
-    public DataList listMessageRemind(String appId,String toUserId,String typeId,int page,int size){
+    public DataList listMessageRemind(String appId, String toUserId, String typeId, int page, int size) throws Exception {
         String sql = "select p.* from portal_message_remind p where p.type_id='" +typeId+"'" +
                 " AND p.to_user_id='" +toUserId+"' " +" AND p.app_id='" +appId+"' " +"order by p.create_date desc ";
-        DataList list= null;
-        try{
-            list= dbQuery.queryBySql(sql,page,size);
-        }catch (Exception e){
-            e.printStackTrace();
-            throw new ApiException("Query error!");
-        }
+        DataList list= dbQuery.queryBySql(sql, page, size);
         return list;
     }
+
+    /**
+     * 获取就诊信息列表
+     * @param appId
+     * @param toUserId
+     * @param typeId
+     * @param page
+     * @param size
+     * @return
+     */
+    public DataList listMessageRemindValue(String appId, String toUserId, String typeId,String type,int page, int size) throws Exception {
+        String sql = "select p.* from portal_message_remind p " +
+                "JOIN portal_message_template pt " +
+                "on p.message_template_id =pt.id " +
+                "where pt.type='"+type+"'"+" AND pt.classification='0'"+
+                "AND p.type_id='" +typeId+"'" +
+                " AND p.to_user_id='" +toUserId+"' " +" AND p.app_id='" +appId+"' " +"order by p.create_date desc ";
+        DataList list= dbQuery.queryBySql(sql,page,size);
+        return list;
+    }
+
 
 }

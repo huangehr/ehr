@@ -49,6 +49,8 @@ spring:
       password: admin
       authenticationDatabase: admin
       database: ehr
+    solr:
+      zk-host: node1.hde.h3c.com,node2.hde.h3c.com:2181/solr
   elasticsearch:
     jest:
       uris: http://172.19.103.68:9200
@@ -71,6 +73,9 @@ fz-gateway:
   clientId: 9000401
   clientVersion: 1.0
   secret: 8E29YVP2UZ1QNSIN33NZJXEG1KSLVXFL6YI59C5SC5D
+hadoop:
+  user:
+    name: root
 
 ---
 spring:
@@ -93,6 +98,8 @@ spring:
       password: admin
       authenticationDatabase: admin
       database: ehr
+    solr:
+      zk-host: node1.hde.h3c.com,node2.hde.h3c.com:2181/solr
   elasticsearch:
     jest:
       uris: http://172.19.103.68:9200
@@ -115,6 +122,9 @@ fz-gateway:
   clientId: 9000401
   clientVersion: 1.0
   secret: 8E29YVP2UZ1QNSIN33NZJXEG1KSLVXFL6YI59C5SC5D
+hadoop:
+  user:
+    name: root
 
 ---
 spring:
@@ -131,6 +141,8 @@ spring:
       password: GMLBq1LG
       authenticationDatabase: admin
       database: ehr
+    solr:
+      zk-host: node1.hde.h3c.com,node2.hde.h3c.com:2181/solr
   elasticsearch:
     jest:
       uris: http://172.19.103.68:9200
@@ -153,6 +165,9 @@ fz-gateway:
   clientId: 9000401
   clientVersion: 1.0
   secret: 8E29YVP2UZ1QNSIN33NZJXEG1KSLVXFL6YI59C5SC5D
+hadoop:
+  user:
+    name: root
 
 ---
 spring:
@@ -169,6 +184,8 @@ spring:
       password: GMLBq1LG
       authenticationDatabase: admin
       database: ehr
+    solr:
+      zk-host: node1.hde.h3c.com,node2.hde.h3c.com:2181/solr
   elasticsearch:
     jest:
       uris: http://10.176.97.7:9200
@@ -191,6 +208,9 @@ fz-gateway:
   clientId: 9000401
   clientVersion: 1.0
   secret: 8E29YVP2UZ1QNSIN33NZJXEG1KSLVXFL6YI59C5SC5D
+hadoop:
+  user:
+    name: root
 
 ---
 spring:
@@ -207,6 +227,8 @@ spring:
       password: GMLBq1LG
       authenticationDatabase: admin
       database: ehr
+    solr:
+      zk-host: node1.hde.h3c.com,node2.hde.h3c.com:2181/solr
   elasticsearch:
     jest:
       uris: http://100.100.1.158:9200
@@ -229,6 +251,9 @@ fz-gateway:
   clientId: 9000401
   clientVersion: 1.0
   secret: 8E29YVP2UZ1QNSIN33NZJXEG1KSLVXFL6YI59C5SC5D
+hadoop:
+  user:
+    name: root
 
 ---
 spring:
@@ -245,6 +270,8 @@ spring:
       password: GMLBq1LG
       authenticationDatabase: admin
       database: ehr
+    solr:
+      zk-host: node1.hde.h3c.com,node2.hde.h3c.com:2181/solr
   elasticsearch:
     jest:
       uris: http://172.10.10.2:9200
@@ -267,3 +294,6 @@ fz-gateway:
   clientId: 9000401
   clientVersion: 1.0
   secret: 8E29YVP2UZ1QNSIN33NZJXEG1KSLVXFL6YI59C5SC5D
+hadoop:
+  user:
+    name: root

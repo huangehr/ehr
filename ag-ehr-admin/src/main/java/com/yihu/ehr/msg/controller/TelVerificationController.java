@@ -124,7 +124,7 @@ public class TelVerificationController extends BaseController {
             @RequestParam(value = "appId", required = false) String appId,
             @ApiParam(name = "tel", value = "手机号码", defaultValue = "")
             @RequestParam(value = "tel", required = false) String tel,
-            @ApiParam(name = "verificationCode", value = "手机号码", defaultValue = "")
+            @ApiParam(name = "verificationCode", value = "手机验证码", defaultValue = "")
             @RequestParam(value = "verificationCode", required = false) String verificationCode) throws Exception {
         Envelop envelop = new Envelop();
         envelop = telVerificationClient.validationTelVerification(tel, appId, verificationCode);
