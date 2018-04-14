@@ -3,7 +3,7 @@ package com.yihu.ehr.analysis.model;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.yihu.ehr.analysis.service.AppService;
-import com.yihu.hos.model.syspermission.MApp;
+import com.yihu.ehr.model.app.MApp;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.CreatedDate;
