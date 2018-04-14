@@ -1,4 +1,4 @@
-package com.yihu.ehr.resolve.service.resource.stage2;
+package com.yihu.ehr.profile.service;
 
 
 
@@ -41,11 +41,20 @@ public class RedisService {
     }
 
     /**
+     * 获取ICD10名称 redis
+     */
+    public String getIcd10Name(String key) {
+        return icd10KeySchema.get(key);
+    }
+
+
+    /**
      *获取ICD10对应健康问题 redis
      */
     public String getHpCodeByIcd10(String key) {
         return icd10KeySchema.getHpCode(key);
     }
+
 
     /**
      *获取机构名称redis

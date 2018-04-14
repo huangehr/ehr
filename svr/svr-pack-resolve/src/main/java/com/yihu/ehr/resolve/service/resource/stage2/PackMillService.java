@@ -8,16 +8,12 @@ import com.yihu.ehr.resolve.model.stage1.FilePackage;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.resolve.model.stage2.*;
 import com.yihu.ehr.resolve.util.PackResolveLogger;
-import com.yihu.ehr.util.log.LogService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 档案包压碎机，将档案数据包压碎成资源点。
@@ -51,20 +47,23 @@ public class PackMillService {
 
         //门诊/住院诊断、健康问题
         if (stdPack.getDiagnosisList() != null && stdPack.getDiagnosisList().size() > 0) {
-            List<String> healthProblemList = new ArrayList<>();
+            Set<String> healthProblemList = new HashSet<>();
+            Set<String> healthProblemNameList = new HashSet<>();
             for (String diagnosis : stdPack.getDiagnosisList()) {
                 String healthProblem = redisService.getHpCodeByIcd10(diagnosis);//通过ICD10获取健康问题
                 if (!StringUtils.isEmpty(healthProblem)) {
                     String[] hpCodeList = healthProblem.split(";");
                     for (String hpCode : hpCodeList) {
-                        if (!healthProblemList.contains(hpCode)) {
-                            healthProblemList.add(hpCode);
-                        }
+                        String hpName = redisService.getHealthProblem(hpCode);
+                        healthProblemList.add(hpCode);
+                        healthProblemNameList.add(hpName);
                     }
                 }
             }
-            resourceBucket.setDiagnosis(StringUtils.join(stdPack.getDiagnosisList().toArray(),";"));          //ICD10
-            resourceBucket.setHealthProblem(StringUtils.join(healthProblemList.toArray(),";"));    //健康问题
+            resourceBucket.setDiagnosis(StringUtils.join(stdPack.getDiagnosisList().toArray(),";"));//ICD10
+            resourceBucket.setDiagnosisName(StringUtils.join(stdPack.getDiagnosisNameList().toArray(),";"));//ICD10名称
+            resourceBucket.setHealthProblem(StringUtils.join(healthProblemList.toArray(),";"));//健康问题
+            resourceBucket.setHealthProblemName(StringUtils.join(healthProblemNameList.toArray(),";"));//健康问题名称
         }
 
         //获取数据集的集合

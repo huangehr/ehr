@@ -36,16 +36,14 @@ public class ResourceStorageUtil {
             map.put(MasterResourceFamily.BasicColumns.PatientId, resourceBucket.getPatientId());
             map.put(MasterResourceFamily.BasicColumns.PatientName, resourceBucket.getPatientName());
             map.put(MasterResourceFamily.BasicColumns.Diagnosis, resourceBucket.getDiagnosis());
+            map.put(MasterResourceFamily.BasicColumns.DiagnosisName, resourceBucket.getDiagnosisName());
             map.put(MasterResourceFamily.BasicColumns.HealthProblem, resourceBucket.getHealthProblem());
+            map.put(MasterResourceFamily.BasicColumns.HealthProblemName, resourceBucket.getHealthProblemName());
             map.put(MasterResourceFamily.BasicColumns.EventNo, resourceBucket.getEventNo());
             map.put(MasterResourceFamily.BasicColumns.EventDate, DateTimeUtil.utcDateTimeFormat(resourceBucket.getEventDate()));
-            map.put(MasterResourceFamily.BasicColumns.EventType, StringUtils.isEmpty(resourceBucket.getEventType())?"":Integer.toString(resourceBucket.getEventType().ordinal()));
+            map.put(MasterResourceFamily.BasicColumns.EventType, StringUtils.isEmpty(resourceBucket.getEventType()) ? "" : Integer.toString(resourceBucket.getEventType().ordinal()));
             map.put(MasterResourceFamily.BasicColumns.ProfileType, Integer.toString(resourceBucket.getProfileType().ordinal()));
-            String demographicId  = resourceBucket.getDemographicId();
-            if(StringUtils.isEmpty(demographicId) || demographicId.equals("null")) {
-                demographicId = "";
-            }
-            map.put(MasterResourceFamily.BasicColumns.DemographicId, demographicId);
+            map.put(MasterResourceFamily.BasicColumns.DemographicId, resourceBucket.getDemographicId());
             map.put(MasterResourceFamily.BasicColumns.ClientId, resourceBucket.getClientId());
             map.put(MasterResourceFamily.BasicColumns.CreateDate, DateTimeUtil.utcDateTimeFormat(new Date()));
             map.put(MasterResourceFamily.BasicColumns.CdaVersion, resourceBucket.getCdaVersion());

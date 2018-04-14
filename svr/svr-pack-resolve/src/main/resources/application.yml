@@ -30,8 +30,8 @@ spring:
       repositories.enabled: true # Enable Solr repositories.
 
 fast-dfs:
-  connect-timeout: 2
-  network-timeout: 30
+  connect-timeout: 10
+  network-timeout: 60
   charset: ISO8859-1
   pool:
     init-size: 5
@@ -84,10 +84,14 @@ ehr:
         - HDSC02_17 #住院-诊断记录 v1.0
         - HDSD00_69 #住院-诊断记录 v1.3
         - HDSB05_84 #体检-诊断记录 v1.3
-      meta-data:
-        - HDSD00_01_550 #门诊-疾病临床诊断在特定分类体系中的代码 v1.0(住院代码相同) & v1.3
+      code-meta-data:
+        - HDSD00_01_550 #门诊-疾病临床诊断在特定分类体系中的代码 v1.0 & v1.3
         - HDSD00_69_002 #住院-疾病临床诊断在特定分类体系中的代码 v1.3
         - JDSB05_84_003 #体检-疾病临床诊断在特定分类体系中的代码 v1.3
+      name-meta-data:
+        - HDSD00_01_549 #门诊-疾病临床诊断在特定分类体系中的名称 v1.0 & v1.3
+        - HDSD00_69_001 #住院-疾病临床诊断在特定分类体系中的名称 v1.3
+        - JDSB05_84_004 #体检-疾病临床诊断在特定分类体系中的名称 v1.3
     #身份提取参数，从人口学提取
     identity:
       data-sets:

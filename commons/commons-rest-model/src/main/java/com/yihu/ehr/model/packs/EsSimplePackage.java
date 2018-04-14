@@ -1,7 +1,9 @@
 package com.yihu.ehr.model.packs;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.io.Serializable;
-import java.sql.Date;
+import java.util.Date;
 
 /**
  * Created by progr1mmer on 2018/4/11.
@@ -10,7 +12,7 @@ public class EsSimplePackage implements Serializable {
 
     private String _id;
     private String pwd; //密码
-    private java.util.Date receive_date; //接收时间
+    private Date receive_date; //接收时间
     private String remote_path; //fastDfs文件地址
     private String client_id; //应用ID
 
@@ -26,7 +28,8 @@ public class EsSimplePackage implements Serializable {
         return pwd;
     }
 
-    public java.util.Date getReceive_date() {
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    public Date getReceive_date() {
         return receive_date;
     }
 
