@@ -58,7 +58,7 @@ public class OpenEndPoint extends EnvelopRestEndPoint {
                 // URL前缀与 ag-zuul 配置文件中的 zuul.routes.jkzl-server.path 前缀一致。
                 String url = serviceInstance.getUri() + "/jkzl/" + apiUrl;
                 String result = OPUtil.callApi(fzAppId, fzSecret, url, params);
-                envelop.setObj(result);
+                envelop.setObj(objectMapper.readValue(result, Map.class));
                 envelop.setSuccessFlg(true);
             }
         } catch (Exception e) {
