@@ -1,9 +1,6 @@
 server:
   port: ${svr-pack-mgr.server.port}
 
-management:
-  port: ${server.port}
-
 info:
   app:
     name: JsonPackageService
@@ -36,13 +33,19 @@ fast-dfs:
     init-size: 5
     max-size: 20
     wait-time: 500
-  connect-timeout: 2
-  network-timeout: 30
+  connect-timeout: 10
+  network-timeout: 60
   charset: ISO8859-1
   http:
     tracker-http-port: 80
     anti-steal-token: no
     secret-key: FastDFS1234567890
+
+elasticsearch:
+  pool:
+    init-size: 10
+    max-size: 20
+
 eip:
   tenant: jkzl
 
@@ -57,14 +60,12 @@ spring:
     host: 172.19.103.47 # Redis server host.
     port: 6379
     password: redis!@456
-  metrics:
-    export:
-      statsd:
-        host: 172.19.103.73
-        port: 8125
 fast-dfs:
   tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52:80
+elasticsearch:
+  cluster-name: elasticsearch
+  cluster-nodes: 172.19.103.9:9300
 
 ---
 spring:
@@ -77,14 +78,12 @@ spring:
     host: 172.19.103.47 # Redis server host.
     port: 6379
     password: redis!@456
-  metrics:
-    export:
-      statsd:
-        host: 172.19.103.73
-        port: 8125
 fast-dfs:
   tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52:80
+elasticsearch:
+  cluster-name: elasticsearch
+  cluster-nodes: 172.19.103.9:9300
 
 ---
 spring:
@@ -100,6 +99,9 @@ spring:
 fast-dfs:
   tracker-server: 11.1.2.9:22122
   public-server: http://11.1.2.9:80
+elasticsearch:
+  cluster-name: elasticsearch
+  cluster-nodes: 11.1.2.7:9300
 
 ---
 spring:
@@ -115,6 +117,9 @@ spring:
 fast-dfs:
   tracker-server: 10.176.97.5:22122
   public-server: http://10.176.97.5:8888
+elasticsearch:
+  cluster-name: elasticsearch
+  cluster-nodes: 10.176.97.7:9300
 
 ---
 spring:
@@ -130,6 +135,9 @@ spring:
 fast-dfs:
   tracker-server: 100.100.1.157:22122
   public-server: http://100.100.1.157:8888
+elasticsearch:
+  cluster-name: elasticsearch
+  cluster-nodes: 100.100.1.158:9300
 
 ---
 spring:
@@ -145,3 +153,6 @@ spring:
 fast-dfs:
   tracker-server: 192.168.50.116:22122,192.168.50.119:22122
   public-server: http://192.168.50.37:8888
+elasticsearch:
+  cluster-name: elasticsearch
+  cluster-nodes: 172.10.10.2:9300

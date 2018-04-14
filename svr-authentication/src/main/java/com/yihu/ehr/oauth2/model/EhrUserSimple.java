@@ -9,12 +9,10 @@ public class EhrUserSimple {
     private String loginCode;
     private String email;
     private String realName;
-    private Boolean activated;
     private String userType;
     private String telephone;
     private String gender;
     private String idCardNo;
-    private String martialStatus;
     private String organization;
     private String imgRemotePath;
     private String imgLocalPath;
@@ -58,14 +56,6 @@ public class EhrUserSimple {
         this.realName = realName;
     }
 
-    public Boolean getActivated() {
-        return activated;
-    }
-
-    public void setActivated(Boolean activated) {
-        this.activated = activated;
-    }
-
     public String getUserType() {
         return userType;
     }
@@ -96,14 +86,6 @@ public class EhrUserSimple {
 
     public void setIdCardNo(String idCardNo) {
         this.idCardNo = idCardNo;
-    }
-
-    public String getMartialStatus() {
-        return martialStatus;
-    }
-
-    public void setMartialStatus(String martialStatus) {
-        this.martialStatus = martialStatus;
     }
 
     public String getOrganization() {
