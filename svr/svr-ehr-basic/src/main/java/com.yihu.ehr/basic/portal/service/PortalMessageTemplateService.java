@@ -5,10 +5,7 @@ import com.yihu.ehr.basic.portal.dao.PortalMessageRemindRepository;
 import com.yihu.ehr.basic.portal.dao.PortalMessageTemplateRepository;
 import com.yihu.ehr.basic.portal.model.PortalMessageTemplate;
 import com.yihu.ehr.basic.portal.model.ProtalMessageRemind;
-import com.yihu.ehr.model.portal.MFzH5Message;
-import com.yihu.ehr.model.portal.MH5Message;
-import com.yihu.ehr.model.portal.MMyMessage;
-import com.yihu.ehr.model.portal.MTemplateContent;
+import com.yihu.ehr.model.portal.*;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.util.reflection.MethodUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,10 +91,9 @@ public class PortalMessageTemplateService extends BaseJpaService<PortalMessageTe
      * @param messageTemplateId
      * @throws NoSuchMethodException
      */
-    public ProtalMessageRemind saveH5MessagePush(MH5Message mH5Message, long messageTemplateId) throws Exception {
+    public ProtalMessageRemind saveH5MessagePush(MProtalOrderMessage mProtalOrderMessage, MH5Message mH5Message, long messageTemplateId) throws Exception {
         PortalMessageTemplate template = portalMessageTemplateRepository.findOne(messageTemplateId);
         List<MTemplateContent> mTemplateContents = JSON.parseArray(template.getContent(), MTemplateContent.class);
-
         List<Map<String, String>> list = new ArrayList<>();
         for (MTemplateContent content : mTemplateContents) {
             String value = "";
@@ -130,6 +126,7 @@ public class PortalMessageTemplateService extends BaseJpaService<PortalMessageTe
         remind.setCreateDate(new Date(System.currentTimeMillis()));
         remind.setMessageTemplateId(template.getId());
         remind.setReceivedMessages(JSON.toJSONString(mH5Message));
+        remind.setOrder_info(JSON.toJSONString(mProtalOrderMessage));
         ProtalMessageRemind protalMessageRemind =messageRemindRepository.save(remind);
         return protalMessageRemind;
     }

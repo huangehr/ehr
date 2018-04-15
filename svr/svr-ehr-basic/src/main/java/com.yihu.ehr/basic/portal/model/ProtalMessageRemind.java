@@ -31,6 +31,10 @@ public class ProtalMessageRemind {
      * 推送过来的消息
      */
     private String receivedMessages;
+    /**
+     * 保存 从消息推送过来的时间到当前时间 的订单信息
+     */
+    private String order_info;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -140,5 +144,13 @@ public class ProtalMessageRemind {
 
     public void setReceivedMessages(String receivedMessages) {
         this.receivedMessages = receivedMessages;
+    }
+    @Column(name = "order_info", nullable = true)
+    public String getOrder_info() {
+        return order_info;
+    }
+
+    public void setOrder_info(String order_info) {
+        this.order_info = order_info;
     }
 }
