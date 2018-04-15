@@ -1,6 +1,6 @@
 spring:
   application:
-    name: ag-zuul-dm
+    name: ag-zuul
 
 ---
 spring:
