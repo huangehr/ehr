@@ -7,10 +7,13 @@ import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.query.common.model.DataList;
 import com.yihu.ehr.query.services.DBQuery;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
+import com.yihu.ehr.util.datetime.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -80,12 +83,14 @@ public class PortalMessageRemindService extends BaseJpaService<ProtalMessageRemi
      * @return
      */
     public DataList listMessageRemindValue(String appId, String toUserId, String typeId,String type,int page, int size) throws Exception {
+        String date = DateUtil.getNowDate(DateUtil.DEFAULT_YMDHMSDATE_FORMAT);
         String sql = "select p.* from portal_message_remind p " +
                 "JOIN portal_message_template pt " +
                 "on p.message_template_id =pt.id " +
                 "where pt.type='"+type+"'"+" AND pt.classification='0'"+
                 "AND p.type_id='" +typeId+"'" +
-                " AND p.to_user_id='" +toUserId+"' " +" AND p.app_id='" +appId+"' " +"order by p.create_date desc ";
+                " AND p.to_user_id='" +toUserId+"' " +" AND p.app_id='" +appId+"' "+
+                "AND p.visit_time > "+ date +"order by p.create_date desc ";
         DataList list= dbQuery.queryBySql(sql,page,size);
         return list;
     }

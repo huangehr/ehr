@@ -570,6 +570,7 @@ public class ServiceApi {
         public static final String MessageRemindAdmin = "/messageRemind/admin/{messageRemind_id}";
         public static final String MessageRemindReaded = "/messageRemind/readed/{remindId}";
         public static final String MessageRemindByType = "/MessageRemindByType";
+        public static final String MessageReminInfodByType = "/MessageRemindInfoInfoByType";
     }
 
     public static class Portal {

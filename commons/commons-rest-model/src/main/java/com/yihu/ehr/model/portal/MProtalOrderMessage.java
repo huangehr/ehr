@@ -73,7 +73,7 @@ public class MProtalOrderMessage  implements Serializable {
         this.result = result;
     }
 
-    static  class Order{
+    public  class Order{
         /**
          * 下单时间	格式：yyyy-mm-dd hh24:mi:ss
          */

@@ -38,13 +38,13 @@ public class ProtalMessageRemind {
      */
     private Date visit_time;
     /**
-     * 就诊部门地址
-     */
-    private String deptAdress;
-    /**
      * 保存 从消息推送过来的时间到当前时间 的订单信息
      */
     private String order_info;
+    /**
+     * 健康之路-预约挂号订单号
+     */
+    private String order_id;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -167,14 +167,6 @@ public class ProtalMessageRemind {
         this.visit_time = visit_time;
     }
 
-
-    public String getDeptAdress() {
-        return deptAdress;
-    }
-
-    public void setDeptAdress(String deptAdress) {
-        this.deptAdress = deptAdress;
-    }
     @Column(name = "order_info", nullable = true)
     public String getOrder_info() {
         return order_info;
@@ -182,5 +174,13 @@ public class ProtalMessageRemind {
 
     public void setOrder_info(String order_info) {
         this.order_info = order_info;
+    }
+    @Column(name = "order_id", nullable = true)
+    public String getOrder_id() {
+        return order_id;
+    }
+
+    public void setOrder_id(String order_id) {
+        this.order_id = order_id;
     }
 }

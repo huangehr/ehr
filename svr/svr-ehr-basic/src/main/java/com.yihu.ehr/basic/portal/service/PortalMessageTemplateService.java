@@ -7,6 +7,7 @@ import com.yihu.ehr.basic.portal.model.PortalMessageTemplate;
 import com.yihu.ehr.basic.portal.model.ProtalMessageRemind;
 import com.yihu.ehr.model.portal.*;
 import com.yihu.ehr.query.BaseJpaService;
+import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.reflection.MethodUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,6 +15,7 @@ import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -127,6 +129,12 @@ public class PortalMessageTemplateService extends BaseJpaService<PortalMessageTe
         remind.setCreate_date(new Date(System.currentTimeMillis()));
         remind.setMessage_template_id(template.getId());
         remind.setReceived_messages(JSON.toJSONString(mH5Message));
+        remind.setOrder_id(mH5Message.getOrderId());
+        if(null != mProtalOrderMessage && mProtalOrderMessage.getResult().size()>0){
+            MProtalOrderMessage.Order Order= (MProtalOrderMessage.Order)mProtalOrderMessage.getResult().get(0);
+            SimpleDateFormat format =  new SimpleDateFormat(DateUtil.DEFAULT_YMDHMSDATE_FORMAT);
+            remind.setVisit_time(format.parse(Order.getRegisterDate()));
+        }
         remind.setOrder_info(JSON.toJSONString(mProtalOrderMessage));
         ProtalMessageRemind protalMessageRemind =messageRemindRepository.save(remind);
         return protalMessageRemind;
