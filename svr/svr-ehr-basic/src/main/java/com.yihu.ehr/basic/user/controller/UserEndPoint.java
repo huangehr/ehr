@@ -867,7 +867,6 @@ public class UserEndPoint extends EnvelopRestEndPoint {
         } else {
             user.setPassword(DigestUtils.md5Hex(default_password));
         }
-        user.setRealName(user.getDemographicId());
         user.setLoginCode(user.getDemographicId());
         user.setDType("Patient");
         user.setActivated(true);

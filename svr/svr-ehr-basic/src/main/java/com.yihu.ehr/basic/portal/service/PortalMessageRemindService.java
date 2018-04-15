@@ -3,12 +3,16 @@ package com.yihu.ehr.basic.portal.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.basic.portal.dao.PortalMessageRemindRepository;
 import com.yihu.ehr.basic.portal.model.ProtalMessageRemind;
+import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.query.BaseJpaService;
+import com.yihu.ehr.query.common.model.DataList;
+import com.yihu.ehr.query.services.DBQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 提醒消息接口实现类.
@@ -23,6 +27,9 @@ public class PortalMessageRemindService extends BaseJpaService<ProtalMessageRemi
 
     @Autowired
     ObjectMapper objectMapper;
+
+    @Autowired
+    DBQuery dbQuery;
 
     /**
      * 根据ID获取提醒消息接口.
@@ -55,5 +62,33 @@ public class PortalMessageRemindService extends BaseJpaService<ProtalMessageRemi
         messageRemindRepository.save(messageRemind);
         return messageRemind;
     }
+
+    public DataList listMessageRemind(String appId, String toUserId, String typeId, int page, int size) throws Exception {
+        String sql = "select p.* from portal_message_remind p where p.type_id='" +typeId+"'" +
+                " AND p.to_user_id='" +toUserId+"' " +" AND p.app_id='" +appId+"' " +"order by p.create_date desc ";
+        DataList list= dbQuery.queryBySql(sql, page, size);
+        return list;
+    }
+
+    /**
+     * 获取就诊信息列表
+     * @param appId
+     * @param toUserId
+     * @param typeId
+     * @param page
+     * @param size
+     * @return
+     */
+    public DataList listMessageRemindValue(String appId, String toUserId, String typeId,String type,int page, int size) throws Exception {
+        String sql = "select p.* from portal_message_remind p " +
+                "JOIN portal_message_template pt " +
+                "on p.message_template_id =pt.id " +
+                "where pt.type='"+type+"'"+" AND pt.classification='0'"+
+                "AND p.type_id='" +typeId+"'" +
+                " AND p.to_user_id='" +toUserId+"' " +" AND p.app_id='" +appId+"' " +"order by p.create_date desc ";
+        DataList list= dbQuery.queryBySql(sql,page,size);
+        return list;
+    }
+
 
 }

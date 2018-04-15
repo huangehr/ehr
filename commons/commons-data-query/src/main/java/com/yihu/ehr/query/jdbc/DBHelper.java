@@ -29,7 +29,7 @@ public class DBHelper {
     @Autowired
     ConnectionFactory factory;
     private String name = "";
-    public DBType dbType; //当前连接数据库类型
+    public DBType dbType = DBType.Mysql; //当前连接数据库类型
 
     /**
      * 获取当前连接

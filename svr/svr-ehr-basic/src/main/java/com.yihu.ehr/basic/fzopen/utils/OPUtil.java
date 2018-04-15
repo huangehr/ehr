@@ -25,7 +25,7 @@ public class OPUtil {
      * @throws Exception
      */
     public static String callApi(String appId, String secret, String apiUrl,
-                                 Map<String, Object> paramMap) throws Exception {
+                                 Map<String, String> paramMap) throws Exception {
         String result = null;
 
         ObjectMapper objectMapper = new ObjectMapper();

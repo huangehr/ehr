@@ -172,10 +172,10 @@ public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
      * @return
      */
     private MMyMessage convertToMMyMessage(ProtalMessageRemind protalMessageRemind) {
-        if (protalMessageRemind.getMessageTemplateId() == null) {
+        if (protalMessageRemind.getMessage_template_id() == null) {
             throw new ApiException("模板ID不存在");
         }
-        PortalMessageTemplate template = messageTemplateService.getMessageTemplate(protalMessageRemind.getMessageTemplateId());
+        PortalMessageTemplate template = messageTemplateService.getMessageTemplate(protalMessageRemind.getMessage_template_id());
         if (template == null) {
             throw new ApiException("模板对象不存在");
         }
