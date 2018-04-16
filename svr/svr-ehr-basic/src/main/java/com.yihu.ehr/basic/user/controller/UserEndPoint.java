@@ -868,6 +868,7 @@ public class UserEndPoint extends EnvelopRestEndPoint {
             user.setPassword(DigestUtils.md5Hex(default_password));
         }
         user.setLoginCode(user.getDemographicId());
+        user.setRealName(user.getTelephone());
         user.setDType("Patient");
         user.setActivated(true);
         if (userService.findByField("loginCode", user.getDemographicId()).size() > 0) {
@@ -876,6 +877,11 @@ public class UserEndPoint extends EnvelopRestEndPoint {
         }
         if (userService.findByField("demographicId", user.getDemographicId()).size() > 0) {
             envelop.setErrorMsg("身份证号已存在");
+            return envelop;
+        }
+
+        if (userService.findByField("telephone", user.getTelephone()).size() > 0) {
+            envelop.setErrorMsg("电话号码已存在");
             return envelop;
         }
         user = userService.saveUser(user);

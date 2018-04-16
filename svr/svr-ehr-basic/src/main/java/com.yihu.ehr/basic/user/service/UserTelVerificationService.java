@@ -57,9 +57,9 @@ public class UserTelVerificationService extends BaseJpaService<UserTelVerificati
 
     /**
      * 验证手机验证码的有效性
-     * @param telNo
-     * @param verificationCode
-     * @param appId
+     * @param telNo  电话号码
+     * @param verificationCode  验证码
+     * @param appId 应用id
      */
     public Boolean telValidation(String telNo, String verificationCode, String appId) {
         List<UserTelVerification> telVerificationList = xUserTelVerificationRepository.ListUserTelVerificationByTelNoAndAppId(telNo, appId,verificationCode);
@@ -74,7 +74,7 @@ public class UserTelVerificationService extends BaseJpaService<UserTelVerificati
             if (telVerification.getEffectivePeriod() != null) {
                 int validationResult = telVerification.getEffectivePeriod().compareTo(DateUtil.getSysDate());
                 //验证码未超期且验证通过，则返回成功
-                if (validationResult > 0 && verificationCode.equals(telVerification.getVerificationCode().toString())) {
+                if (validationResult > 0 && (verificationCode.toLowerCase()).equals(telVerification.getVerificationCode().toString().toLowerCase())) {
                     return true;
                 } else {
                     return false;

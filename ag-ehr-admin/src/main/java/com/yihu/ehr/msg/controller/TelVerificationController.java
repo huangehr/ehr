@@ -105,10 +105,13 @@ public class TelVerificationController extends BaseController {
                     envelop.setSuccessFlg(true);
                     envelop.setErrorMsg("短信验证码发送成功！");
                 } else {
-                    envelop.setSuccessFlg(true);
+                    envelop.setSuccessFlg(false);
                     envelop.setErrorCode(resultCode);
                     envelop.setErrorMsg("短信验证码发送失败！");
                 }
+            }else{
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg("短信验证码发送失败！");
             }
         }
         return envelop;
