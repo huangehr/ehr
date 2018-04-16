@@ -55,6 +55,14 @@ public class OrgHealthCategoryStatisticsService {
                 item.put("slaveKey2Name", endpoint.get("slaveKey2Name"));
                 item.put("slaveKey3", endpoint.get("slaveKey3"));
                 item.put("slaveKey3Name", endpoint.get("slaveKey3Name"));
+                if(endpoint.get("economic") != null){
+                    item.put("economic", endpoint.get("economic"));
+                    item.put("economicName", endpoint.get("economicName"));
+                }
+                if(endpoint.get("level") != null){
+                    item.put("level", endpoint.get("level"));
+                    item.put("levelName", endpoint.get("levelName"));
+                }
             }
         }
 
@@ -67,16 +75,6 @@ public class OrgHealthCategoryStatisticsService {
                 item.put("result", countResult(itemEndpointList));
             }
         }
-
-//        // 添加【合计】到卫生机构类别集合
-//        int totalResult = countResult(endpointsStatisticList);
-//        Map<String, Object> totalMap = new HashMap<>();
-//        totalMap.put("id", "-1");
-//        totalMap.put("code", "SUM");
-//        totalMap.put("name", "合计");
-//        totalMap.put("result", totalResult);
-//        allOrgHealthCategoryList.add(totalMap);
-
         return translateModel(endpointsStatisticList, allOrgHealthCategoryList);
     }
 
@@ -150,6 +148,10 @@ public class OrgHealthCategoryStatisticsService {
             String slaveKey1Name = null;
             String slaveKey2Name = null;
             String slaveKey3Name = null;
+            String economic = null;
+            String economicName = null;
+            String level = null;
+            String levelName = null;
             if (endpointsStatisticList.size() > 0) {
                 Map<String, Object> endpoint = endpointsStatisticList.get(0);
                 quotaCode = endpoint.get("quotaCode").toString().replaceAll("_", "");
@@ -172,6 +174,11 @@ public class OrgHealthCategoryStatisticsService {
                 slaveKey2Name = item.get("slaveKey2Name") == null ? null : item.get("slaveKey2Name").toString();
                 slaveKey3Name = item.get("slaveKey3Name") == null ? null : item.get("slaveKey3Name").toString();
 
+                economic = item.get("economic") == null ? null : item.get("economic").toString();
+                economicName = item.get("economicName") == null ? null : item.get("economicName").toString();
+                level = item.get("level") == null ? null : item.get("level").toString();
+                levelName = item.get("levelName") == null ? null : item.get("levelName").toString();
+
                 model.setQuotaCode(quotaCode);
                 model.setQuotaName(quotaName);
                 model.setQuotaDate(quotaDate);
@@ -185,6 +192,10 @@ public class OrgHealthCategoryStatisticsService {
                 model.setSlaveKey1Name(slaveKey1Name);
                 model.setSlaveKey2Name(slaveKey2Name);
                 model.setSlaveKey3Name(slaveKey3Name);
+                model.setEconomic(economic);
+                model.setEconomicName(economicName);
+                model.setLevel(level);
+                model.setLevelName(levelName);
                 model.setCreateTime(new Date());
                 model.setOrgHealthCategoryId(item.get("id").toString());
                 String pid = item.get("pid") == null ? null : item.get("pid").toString();
