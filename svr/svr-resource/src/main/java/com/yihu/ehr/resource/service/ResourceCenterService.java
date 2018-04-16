@@ -175,6 +175,7 @@ public class ResourceCenterService extends BaseJpaService {
     public double getJsonArchiveCount(String status) throws Exception {
         String sql = "SELECT COUNT(*) FROM json_archives WHERE archive_status = " + status;
         ResultSet resultSet = elasticSearchUtil.findBySql(sql);
+        resultSet.next();
         return (double)resultSet.getObject("COUNT(*)");
     }
 

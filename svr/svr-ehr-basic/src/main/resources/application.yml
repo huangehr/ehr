@@ -11,8 +11,8 @@ spring:
     validation-query: SELECT 1
     test-on-borrow: true
 fast-dfs:
-  connect-timeout: 2
-  network-timeout: 30
+  connect-timeout: 10
+  network-timeout: 60
   charset: ISO8859-1
   pool:
     init-size: 5

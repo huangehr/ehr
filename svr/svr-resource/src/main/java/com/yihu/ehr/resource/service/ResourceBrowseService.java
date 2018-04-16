@@ -3,6 +3,8 @@ package com.yihu.ehr.resource.service;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.constants.ErrorCode;
+import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.profile.core.ResourceCore;
 import com.yihu.ehr.query.common.model.QueryCondition;
 import com.yihu.ehr.query.services.HbaseQuery;
@@ -10,7 +12,6 @@ import com.yihu.ehr.query.services.SolrQuery;
 import com.yihu.ehr.resource.client.StdTransformClient;
 import com.yihu.ehr.resource.dao.*;
 import com.yihu.ehr.resource.model.*;
-import com.yihu.ehr.util.rest.Envelop;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -121,8 +122,7 @@ public class ResourceBrowseService {
      * 资源浏览
      * @return
      */
-    public Envelop getResourceData(String resourcesCode, String roleId, String orgCode, String areaCode, String queryCondition, Integer page, Integer size) throws Exception {
-        Envelop envelop = new Envelop();
+    public Page<Map<String, Object>> getResourceData(String resourcesCode, String roleId, String orgCode, String areaCode, String queryCondition, Integer page, Integer size) throws Exception {
         String queryParams = "";
         //获取资源信息
         RsResource rsResources = rsResourceDao.findByCode(resourcesCode);
@@ -138,11 +138,8 @@ public class ResourceBrowseService {
             }
             queryParams = addParams(queryParams,"q", solrQuery.conditionToString(ql));
             return resourcesBrowse(resourcesCode, rsResources.getRsInterface(), roleId, orgCode, areaCode, queryParams, page, size);
-        } else {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("无效资源！");
-            return envelop;
         }
+        throw new ApiException(ErrorCode.OBJECT_NOT_FOUND, "无相关资源");
     }
 
     /**
@@ -156,12 +153,12 @@ public class ResourceBrowseService {
      * @return
      * @throws Exception
      */
-    public Envelop resourcesBrowse(String resourcesCode, String methodName, String roleId, String orgCode, String areaCode, String queryParams, Integer page, Integer size) throws Exception {
+    public  Page<Map<String, Object>> resourcesBrowse(String resourcesCode, String methodName, String roleId, String orgCode, String areaCode, String queryParams, Integer page, Integer size) throws Exception {
         //获取结果集
-        Envelop envelop = getResultData(resourcesCode, roleId, orgCode, areaCode, queryParams, page, size);
+        Page<Map<String,Object>> resultData = getResultData(resourcesCode, roleId, orgCode, areaCode, queryParams, page, size);
         //细表的话追加主表的数据
-        if (methodName.endsWith("Sub") && envelop.isSuccessFlg() && envelop.getDetailModelList() != null) {
-            List<Map<String,Object>> oldList = envelop.getDetailModelList();
+        if (methodName.endsWith("Sub") && !resultData.getContent().isEmpty()) {
+            List<Map<String,Object>> oldList = resultData.getContent();
             for (Map<String, Object> temp : oldList) {
                 String masterRowKey = (String)temp.get("profile_id");
                 if (masterRowKey != null) {
@@ -186,29 +183,24 @@ public class ResourceBrowseService {
                 }
             }
         }
-        return envelop;
+        return resultData;
     }
 
     /**
      * 综合查询档案数据检索
      * @return
      */
-    public Envelop getCustomizeData(String resourcesCodes, String metaData, String orgCode, String areaCode, String queryCondition, Integer page, Integer size) throws Exception {
-        Envelop envelop = new Envelop();
+    public Page<Map<String, Object>> getCustomizeData(String resourcesCodes, String metaData, String orgCode, String areaCode, String queryCondition, Integer page, Integer size) throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         String queryParams = "";
         StringBuilder saas = new StringBuilder();
         //获取资源编码列表
         List<String> codeList = (List<String>) mapper.readValue(resourcesCodes, List.class);
-        /**
-         * 资源判空检查
-         */
+        //资源判空检查
         for (String code : codeList) {
             RsResource rsResources = rsResourceDao.findByCode(code);
             if (rsResources == null) {
-                envelop.setSuccessFlg(false);
-                envelop.setErrorMsg("无效的资源编码：" + code);
-                return envelop;
+                throw new ApiException(ErrorCode.BAD_REQUEST, "无效的资源编码" + code);
             }
         }
         //获取Saas权限参数
@@ -237,9 +229,7 @@ public class ResourceBrowseService {
             }
         }
         if (StringUtils.isEmpty(saas)) {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("无SAAS权限访问资源");
-            return envelop;
+            throw new ApiException(ErrorCode.FORBIDDEN, "无SAAS权限访问资源");
         }
         List<QueryCondition> ql = new ArrayList<>();
         if (!StringUtils.isEmpty(queryCondition)) {
@@ -280,16 +270,7 @@ public class ResourceBrowseService {
             queryParams = addParams(queryParams,"dFl", dealDStr);
         }
         Page<Map<String, Object>> result = resourceBrowseDao.getEhrCenter(queryParams, page, size);
-        if (result != null) {
-            envelop.setSuccessFlg(true);
-            envelop.setCurrPage(result.getNumber());
-            envelop.setPageSize(result.getSize());
-            envelop.setTotalCount(new Long(result.getTotalElements()).intValue());
-            envelop.setDetailModelList(result.getContent());
-        } else {
-            envelop.setErrorMsg("数据库数据检索失败");
-        }
-        return envelop;
+        return result;
     }
 
     /**
@@ -303,8 +284,7 @@ public class ResourceBrowseService {
      * @return
      * @throws Exception
      */
-    public Envelop getResultData(String resourcesCode, String roleId, String orgCode, String areaCode, String queryParams, Integer page, Integer size) throws Exception{
-        Envelop envelop = new Envelop();
+    public Page<Map<String, Object>> getResultData(String resourcesCode, String roleId, String orgCode, String areaCode, String queryParams, Integer page, Integer size) throws Exception{
         RsResource rsResources = rsResourceDao.findByCode(resourcesCode);
         if (rsResources != null) {
             String methodName = rsResources.getRsInterface(); //执行函数
@@ -337,12 +317,9 @@ public class ResourceBrowseService {
                 }
             }
             if (StringUtils.isEmpty(saas)) {
-                envelop.setSuccessFlg(false);
-                envelop.setErrorMsg("无SAAS权限访问资源[resourcesCode=" + resourcesCode+ "]");
-                return envelop;
-            } else {
-                queryParams = addParams(queryParams,"saas", saas.toString());
+                throw new ApiException(ErrorCode.FORBIDDEN, "无SAAS权限访问资源[resourcesCode=" + resourcesCode+ "]");
             }
+            queryParams = addParams(queryParams,"saas", saas.toString());
             //通过资源代码获取默认参数
             List<RsResourceDefaultParam> paramsList = resourceDefaultParamDao.findByResourcesCode(resourcesCode);
             for (RsResourceDefaultParam param : paramsList) {
@@ -405,22 +382,11 @@ public class ResourceBrowseService {
                 Class<ResourceBrowseDao> classType = ResourceBrowseDao.class;
                 Method method = classType.getMethod(methodName, new Class[]{String.class, Integer.class, Integer.class});
                 Page<Map<String,Object>> result = (Page<Map<String,Object>>)method.invoke(resourceBrowseDao, queryParams, page, size);
-                if (result != null) {
-                    envelop.setSuccessFlg(true);
-                    envelop.setCurrPage(result.getNumber());
-                    envelop.setPageSize(result.getSize());
-                    envelop.setTotalCount(new Long(result.getTotalElements()).intValue());
-                    envelop.setDetailModelList(result.getContent());
-                } else {
-                    envelop.setErrorMsg("数据库数据检索失败");
-                }
-            } else {
-                envelop.setErrorMsg("资源无相关数据元");
+                return result;
             }
-        } else {
-            envelop.setErrorMsg("无效资源");
+            throw new ApiException("资源无相关数据元");
         }
-        return envelop;
+        throw new ApiException(ErrorCode.OBJECT_NOT_FOUND, "无相关资源");
     }
 
     /**
@@ -455,24 +421,13 @@ public class ResourceBrowseService {
      * @return
      * @throws Exception
      */
-    public Envelop getRawFiles(String profileId,String cdaDocumentId,Integer page,Integer size) throws Exception{
-        Envelop re = new Envelop();
-        String queryParams = "{\"q\":\"rowkey:"+profileId+"*\"}";
-        if (cdaDocumentId!=null && cdaDocumentId.length()>0) {
-            queryParams = "{\"q\":\"rowkey:"+profileId+"* AND cda_document_id:"+cdaDocumentId+"\"}";
+    public Page<Map<String,Object>> getRawFiles(String profileId,String cdaDocumentId,Integer page,Integer size) throws Exception{
+        String queryParams = "{\"q\":\"rowkey:" + profileId + "*\"}";
+        if (cdaDocumentId != null && cdaDocumentId.length() > 0) {
+            queryParams = "{\"q\":\"rowkey:" + profileId + "* AND cda_document_id:" + cdaDocumentId + "\"}";
         }
         Page<Map<String,Object>> result = resourceBrowseDao.getRawFiles(queryParams, page, size);
-        if (result != null) {
-            re.setSuccessFlg(true);
-            re.setCurrPage(result.getNumber());
-            re.setPageSize(result.getSize());
-            re.setTotalCount(new Long(result.getTotalElements()).intValue());
-            re.setDetailModelList(result.getContent());
-        } else {
-            re.setSuccessFlg(false);
-        }
-
-        return re;
+        return result;
     }
 
     /**
