@@ -141,13 +141,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
     public boolean deletePackages(
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
             @RequestParam(value = "filters", required = false) String filters) throws Exception {
-        List<Map<String, Object>> filterMap;
-        if (!StringUtils.isEmpty(filters)) {
-            filterMap = objectMapper.readValue(filters, List.class);
-        } else {
-            filterMap = new ArrayList<>(0);
-        }
-        List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, filterMap, 1, 10000);
+        List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, filters, 1, 10000);
         for (Map<String, Object> temp : resultList) {
             String [] tokens =  String.valueOf(temp.get("remote_path")).split(":");
             fastDFSUtil.delete(tokens[0], tokens[1]);
@@ -247,21 +241,15 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page") int page,
             @ApiParam(name = "size", value = "分页大小", required = true, defaultValue = "15")
             @RequestParam(value = "size") int size) throws Exception {
-        List<Map<String, Object>> filterMap;
-        if (!StringUtils.isEmpty(filters)) {
-            filterMap = objectMapper.readValue(filters, List.class);
-        } else {
-            filterMap = new ArrayList<>(0);
-        }
-        List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, filterMap, page, size);
-        int count = (int)elasticSearchUtil.count(INDEX, TYPE, filterMap);
+        List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, filters, page, size);
+        int count = (int)elasticSearchUtil.count(INDEX, TYPE, filters);
         Envelop envelop = getPageResult(resultList, count, page, size);
         return envelop;
     }
 
     @RequestMapping(value = ServiceApi.Packages.PackageSearch, method = RequestMethod.GET)
     @ApiOperation(value = "搜索档案包")
-    public Collection<EsDetailsPackage> search (
+    public List<EsDetailsPackage> search (
             @ApiParam(name = "filters", value = "过滤条件")
             @RequestParam(value = "filters", required = false) String filters,
             @ApiParam(name = "sorts", value = "排序")
@@ -270,14 +258,12 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page") int page,
             @ApiParam(name = "size", value = "分页大小", required = true, defaultValue = "15")
             @RequestParam(value = "size") int size) throws Exception {
-        List<Map<String, Object>> filterMap;
-        if (!StringUtils.isEmpty(filters)) {
-            filterMap = objectMapper.readValue(filters, List.class);
-        } else {
-            filterMap = new ArrayList<>(0);
+        List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, filters, sorts, page, size);
+        List<EsDetailsPackage> esDetailsPackages = new ArrayList<>();
+        for (Map<String, Object> temp : resultList) {
+            esDetailsPackages.add(objectMapper.readValue(objectMapper.writeValueAsString(temp), EsDetailsPackage.class));
         }
-        List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, filterMap, sorts, page, size);
-        return convertToModels(resultList, new ArrayList<EsDetailsPackage>(resultList.size()), EsDetailsPackage.class, null);
+        return esDetailsPackages;
     }
 
     @RequestMapping(value = ServiceApi.Packages.Package, method = RequestMethod.GET)
@@ -357,18 +343,11 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "sorts", required = false) String sorts,
             @ApiParam(name = "count", value = "数量（不要超过10000）", required = true, defaultValue = "500")
             @RequestParam(value = "count") int count) throws Exception {
-        List<Map<String, Object>> filters = new ArrayList<>();
-        Map<String, Object> temp = new HashMap<>();
-        temp.put("andOr", "and");
-        temp.put("condition", "=");
-        temp.put("field", "archive_status");
-        temp.put("value", status.ordinal());
-        filters.add(temp);
         if (status == ArchiveStatus.Received || status == ArchiveStatus.Acquired) {
             if (redisTemplate.opsForList().size(RedisCollection.PackageList) > 0) {
                 return "添加失败，队列中存在消息！";
             } else {
-                List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, filters, sorts, 1, count);
+                List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, "archive_status=" + status.ordinal(), sorts, 1, count);
                 for (Map<String, Object> item : resultList) {
                     EsSimplePackage esSimplePackage = new EsSimplePackage();
                     esSimplePackage.set_id(String.valueOf(item.get("_id")));
@@ -379,7 +358,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
                 }
             }
         } else {
-            List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, filters, sorts, 1, count);
+            List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, "archive_status=" + status.ordinal(), sorts, 1, count);
             for (Map<String, Object> item : resultList) {
                 Map<String, Object> updateSource = new HashMap<>();
                 updateSource.put("archive_status", 0);

@@ -331,26 +331,12 @@ public class QcDailyReportResolveService {
 
     //判断是否入库
     public EsDetailsPackage checkIsInStorage(String eventNo, String patientId, String orgCode) throws Exception {
-        List<Map<String, Object>> paramList = new ArrayList<>();
-        Map<String, Object> paramMap1 = new HashMap<>();
-        paramMap1.put("andOr", "and");
-        paramMap1.put("condition", "=");
-        paramMap1.put("field", "event_no");
-        paramMap1.put("value", eventNo);
-        paramList.add(paramMap1);
-        Map<String, Object> paramMap2 = new HashMap<>();
-        paramMap2.put("andOr", "and");
-        paramMap2.put("condition", "=");
-        paramMap2.put("field", "patient_id");
-        paramMap2.put("value", patientId);
-        paramList.add(paramMap2);
-        Map<String, Object> paramMap3 = new HashMap<>();
-        paramMap3.put("andOr", "and");
-        paramMap3.put("condition", "=");
-        paramMap3.put("field", "org_code");
-        paramMap3.put("value", orgCode);
-        paramList.add(paramMap3);
-        Collection<EsDetailsPackage> mPackages = packMgrClient.packageList(objectMapper.writeValueAsString(paramList), null, 1, 1);
+        //查找是否入库
+        StringBuffer filters = new StringBuffer();
+        filters.append("event_no=").append(eventNo).append(";")
+                .append("patient_id=").append(patientId).append(";")
+                .append("org_code=").append(orgCode).append(";");
+        Collection<EsDetailsPackage> mPackages = packMgrClient.packageList(filters.toString(), null, 1, 1);
         EsDetailsPackage esDetailsPackage = null;
         for (EsDetailsPackage temp : mPackages) {
             esDetailsPackage = temp;
@@ -375,20 +361,7 @@ public class QcDailyReportResolveService {
         int page = 1;
         int pageSize = 1000;
         Map<String,List<Map<String,Object>>> map = new HashMap<String,List<Map<String,Object>>>();
-        List<Map<String, Object>> paramList = new ArrayList<>();
-        Map<String, Object> paramMap1 = new HashMap<>();
-        paramMap1.put("andOr", "and");
-        paramMap1.put("condition", ">=");
-        paramMap1.put("field", "receive_date");
-        paramMap1.put("value", beginDate);
-        paramList.add(paramMap1);
-        Map<String, Object> paramMap2 = new HashMap<>();
-        paramMap2.put("andOr", "and");
-        paramMap2.put("condition", "<");
-        paramMap2.put("field", "receive_date");
-        paramMap2.put("value", beginDate);
-        paramList.add(paramMap2);
-        Collection<EsDetailsPackage> mPackages = packMgrClient.packageList(objectMapper.writeValueAsString(paramList), "receive_date asc", page, pageSize);
+        Collection<EsDetailsPackage> mPackages = packMgrClient.packageList("receive_date>=" + beginDate + ";receive_date<" + endDate, "+receive_date", page, pageSize);
         while (!mPackages.isEmpty()) {
             for (EsDetailsPackage mPackage : mPackages) {
                 try{
@@ -413,10 +386,10 @@ public class QcDailyReportResolveService {
                     patient.put("dataSets",dataSets);
                     List<Map<String,Object>> list = map.get(orgCode);
                     //根据orgCode分组
-                    if (list!=null){
+                    if (list != null){
                         list.add(patient);
                     } else {
-                        list = new ArrayList<Map<String,Object>>();
+                        list = new ArrayList<>();
                         list.add(patient);
                         map.put(orgCode, list);
                     }
@@ -426,7 +399,7 @@ public class QcDailyReportResolveService {
                 }
             }
             page ++;
-            mPackages = packMgrClient.packageList(objectMapper.writeValueAsString(paramList), "receive_date asc", page, pageSize);
+            mPackages = packMgrClient.packageList("receive_date>=" + beginDate + ";receive_date<" + endDate, "+receive_date", page, pageSize);
         }
         getData(map);
         this.setQcBeginDate(endDate);

@@ -38,16 +38,9 @@ public class FailTolerantTask {
 
     @Scheduled(cron = "0 0/1 * * * ?")
     public void delayPushTask() throws Exception {
-        List<Map<String, Object>> filters = new ArrayList<>();
-        Map<String, Object> temp = new HashMap<>();
-        temp.put("andOr", "and");
-        temp.put("condition", "=");
-        temp.put("field", "archive_status");
-        temp.put("value", 0);
-        filters.add(temp);
         //当解析队列为空，将数据库中状态为缓存状态的档案包加入解析队列
         if (redisTemplate.opsForList().size(RedisCollection.PackageList) <= 0) {
-            List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, filters, "receive_date asc", 1, 1000);
+            List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, "archive_status=0", "+receive_date", 1, 1000);
             for (Map<String, Object> pack : resultList) {
                 String packStr = objectMapper.writeValueAsString(pack);
                 EsSimplePackage esSimplePackage = objectMapper.readValue(packStr, EsSimplePackage.class);
@@ -58,21 +51,8 @@ public class FailTolerantTask {
 
     @Scheduled(cron = "30 0/1 * * * ?")
     public void exceptionTask() throws Exception{
-        List<Map<String, Object>> filters = new ArrayList<>();
         //将解析状态为失败且错误次数小于三次的档案包重新加入解析队列
-        Map<String, Object> temp = new HashMap<>();
-        temp.put("andOr", "and");
-        temp.put("condition", "=");
-        temp.put("field", "archive_status");
-        temp.put("value", 2);
-        filters.add(temp);
-        Map<String, Object> temp1 = new HashMap<>();
-        temp1.put("andOr", "and");
-        temp1.put("condition", "<");
-        temp1.put("field", "fail_count");
-        temp1.put("value", 3);
-        filters.add(temp1);
-        List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, filters, "receive_date asc", 1, 100);
+        List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, "archive_status=2;fail_count<3", "+receive_date", 1, 100);
         for (Map<String, Object> pack : resultList) {
             String packStr = objectMapper.writeValueAsString(pack);
             EsSimplePackage esSimplePackage = objectMapper.readValue(packStr, EsSimplePackage.class);
@@ -81,23 +61,9 @@ public class FailTolerantTask {
             elasticSearchUtil.update(INDEX, TYPE, esSimplePackage.get_id(), updateSource);
             redisTemplate.opsForList().leftPush(RedisCollection.PackageList, objectMapper.writeValueAsString(esSimplePackage));
         }
-        filters.clear();
-        temp.clear();
-        temp1.clear();
-        //将解析状态为正在解析但解析开始时间超过当前时间一定范围内的档案包重新加入解析队列
-        temp.put("andOr", "and");
-        temp.put("condition", "=");
-        temp.put("field", "archive_status");
-        temp.put("value", 1);
-        filters.add(temp);
-        temp1.put("andOr", "and");
-        temp1.put("condition", "<");
-        temp1.put("field", "parse_date");
         Date past = DateUtils.addDays(new Date(), -1);
-        String pastStr = dateFormat.format(past);
-        temp1.put("value", pastStr + " 00:00:00");
-        filters.add(temp1);
-        resultList = elasticSearchUtil.page(INDEX, TYPE, filters, "receive_date asc", 1, 100);
+        String pastStr = dateFormat.format(past) + " 00:00:00";
+        resultList = elasticSearchUtil.page(INDEX, TYPE, "archive_status=1;parse_date<" + pastStr, "+receive_date", 1, 100);
         for (Map<String, Object> pack : resultList) {
             String packStr = objectMapper.writeValueAsString(pack);
             EsSimplePackage esSimplePackage = objectMapper.readValue(packStr, EsSimplePackage.class);
