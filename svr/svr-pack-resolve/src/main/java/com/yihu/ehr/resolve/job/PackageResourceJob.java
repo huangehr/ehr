@@ -98,10 +98,10 @@ public class PackageResourceJob implements InterruptableJob {
         Map<String, Object> map = new HashMap();
         map.put("profile_id", standardPackage.getId());
         map.put("demographic_id", standardPackage.getDemographicId());
-        map.put("event_type", standardPackage.getEventType() == null ? null : standardPackage.getEventType().getType());
-        map.put("event_no", standardPackage.getEventNo());
-        map.put("event_date", DateUtil.toStringLong(standardPackage.getEventDate()));
-        map.put("patient_id", standardPackage.getPatientId());
+        //map.put("event_type", standardPackage.getEventType() == null ? null : standardPackage.getEventType().getType());
+        //map.put("event_no", standardPackage.getEventNo());
+        //map.put("event_date", DateUtil.toStringLong(standardPackage.getEventDate()));
+        //map.put("patient_id", standardPackage.getPatientId());
         map.put("re_upload_flg", String.valueOf(standardPackage.isReUploadFlg()));
         packageMgrClient.reportStatus(pack.get_id(), ArchiveStatus.Finished, objectMapper.writeValueAsString(map));
     }

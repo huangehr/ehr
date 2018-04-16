@@ -262,6 +262,9 @@ public class QuotaReportController extends BaseController {
                     if (resultListMap != null && resultListMap.size() > 0) {
                         for (Map<String, Object> map : resultListMap) {
                             if (map != null && map.size() > 0) {
+                                if (map.containsKey("quotaName")) {
+                                    map.put("quotaName",tjQuota.getName());
+                                }
                                 listMap.add(map);
                                 //第一种 ES库中有定义的维度 如org,slaveKey1
                                 //第二种 ES库中未定义的维度 如level，economic

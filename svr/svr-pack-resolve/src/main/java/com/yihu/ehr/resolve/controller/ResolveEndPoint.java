@@ -18,7 +18,6 @@ import com.yihu.ehr.resolve.service.resource.stage1.PackageResolveService;
 import com.yihu.ehr.resolve.service.resource.stage2.IdentifyService;
 import com.yihu.ehr.resolve.service.resource.stage2.PackMillService;
 import com.yihu.ehr.resolve.service.resource.stage2.ResourceService;
-import com.yihu.ehr.util.datetime.DateUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -91,10 +90,10 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
             Map<String, Object> map = new HashMap();
             map.put("profile_id", standardPackage.getId());
             map.put("demographic_id", standardPackage.getDemographicId());
-            map.put("event_type", standardPackage.getEventType() == null ? null : standardPackage.getEventType().getType());
-            map.put("event_no", standardPackage.getEventNo());
-            map.put("event_date", DateUtil.toStringLong(standardPackage.getEventDate()));
-            map.put("patient_id", standardPackage.getPatientId());
+            //map.put("event_type", standardPackage.getEventType() == null ? null : standardPackage.getEventType().getType());
+            //map.put("event_no", standardPackage.getEventNo());
+            //map.put("event_date", DateUtil.toStringLong(standardPackage.getEventDate()));
+            //map.put("patient_id", standardPackage.getPatientId());
             map.put("re_upload_flg", String.valueOf(standardPackage.isReUploadFlg()));
             packageMgrClient.reportStatus(packId, ArchiveStatus.Finished, objectMapper.writeValueAsString(map));
             //是否返回数据
@@ -192,13 +191,13 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
         identifyService.identify(resourceBucket, standardPackage);
         resourceService.save(resourceBucket, standardPackage);
         //回填入库状态
-        Map<String, String> map = new HashMap();
+       /* Map<String, String> map = new HashMap();
         map.put("profileId", standardPackage.getId());
         map.put("demographicId", standardPackage.getDemographicId());
         map.put("eventType", String.valueOf(standardPackage.getEventType().getType()));
         map.put("eventNo", standardPackage.getEventNo());
         map.put("eventDate", DateUtil.toStringLong(standardPackage.getEventDate()));
-        map.put("patientId", standardPackage.getPatientId());
+        map.put("patientId", standardPackage.getPatientId());*/
         //是否返回数据
         if (echo) {
             return standardPackage.toJson();
@@ -252,10 +251,10 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
             Map<String, String> map = new HashMap();
             map.put("profileId", standardPackages.get(0).getId());
             map.put("demographicId", standardPackages.get(0).getDemographicId());
-            map.put("eventType", standardPackages.get(0).getEventType() == null ? "" : String.valueOf(standardPackages.get(0).getEventType().getType()));
-            map.put("eventNo", standardPackages.get(0).getEventNo());
-            map.put("eventDate", DateUtil.toStringLong(standardPackages.get(0).getEventDate()));
-            map.put("patientId", standardPackages.get(0).getPatientId());
+            //map.put("eventType", standardPackages.get(0).getEventType() == null ? "" : String.valueOf(standardPackages.get(0).getEventType().getType()));
+            //map.put("eventNo", standardPackages.get(0).getEventNo());
+            //map.put("eventDate", DateUtil.toStringLong(standardPackages.get(0).getEventDate()));
+            //map.put("patientId", standardPackages.get(0).getPatientId());
             map.put("reUploadFlg", String.valueOf(standardPackages.get(0).isReUploadFlg()));
             datasetPackageMgrClient.reportStatus(packId, ArchiveStatus.Finished, objectMapper.writeValueAsString(map));
             if (echo) {
