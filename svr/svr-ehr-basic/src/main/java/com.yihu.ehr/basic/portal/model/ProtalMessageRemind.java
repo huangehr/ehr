@@ -38,13 +38,13 @@ public class ProtalMessageRemind {
      */
     private Date visit_time;
     /**
-     * 保存 从消息推送过来的时间到当前时间 的订单信息
-     */
-    private String order_info;
-    /**
      * 健康之路-预约挂号订单号
      */
     private String order_id;
+    /**
+     * 我的就诊-是否通知：0为通知，1为不通知。我的档案：0未评价、1为已评价
+     */
+    private String notifie_flag;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -167,14 +167,6 @@ public class ProtalMessageRemind {
         this.visit_time = visit_time;
     }
 
-    @Column(name = "order_info", nullable = true)
-    public String getOrder_info() {
-        return order_info;
-    }
-
-    public void setOrder_info(String order_info) {
-        this.order_info = order_info;
-    }
     @Column(name = "order_id", nullable = true)
     public String getOrder_id() {
         return order_id;
@@ -182,5 +174,13 @@ public class ProtalMessageRemind {
 
     public void setOrder_id(String order_id) {
         this.order_id = order_id;
+    }
+    @Column(name = "notifie_flag", nullable = true)
+    public String getNotifie_flag() {
+        return notifie_flag;
+    }
+
+    public void setNotifie_flag(String notifie_flag) {
+        this.notifie_flag = notifie_flag;
     }
 }

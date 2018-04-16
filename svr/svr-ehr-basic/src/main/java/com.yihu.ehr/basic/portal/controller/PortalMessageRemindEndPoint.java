@@ -178,9 +178,14 @@ public class PortalMessageRemindEndPoint extends EnvelopRestEndPoint {
                         protalMessageRemind.setContent("我的就诊信息");
                     }
                     protalMessageRemind.setReaded(Integer.valueOf(dataMap.get("readed").toString()));
-                    protalMessageRemind.setId((Long)dataMap.get("id"));
+                    protalMessageRemind.setId(Long.parseLong(dataMap.get("id").toString()));
                     if(null != dataMap.get("order_id")){
                         protalMessageRemind.setOrder_id(dataMap.get("order_id").toString());
+                    }
+                    if(null != dataMap.get("order_info")){
+                        protalMessageRemind.setOrder_info(dataMap.get("order_info").toString());
+                        Map order = objectMapper.readValue(dataMap.get("order_info").toString(), Map.class);
+                        protalMessageRemind.setResult(order);
                     }
                     messageRemindList.add(protalMessageRemind);
                 }
@@ -215,7 +220,9 @@ public class PortalMessageRemindEndPoint extends EnvelopRestEndPoint {
                 mMessageRemind.setContent(protalMessageRemind.getContent());
                 Map order= (Map)mProtalOrderMessage.getResult().get(0);
                 if(null != order && orderId.equals(order.get("orderId"))){
+
                     //订单详情
+                    mMessageRemind.setResult(order);
                     mMessageRemind.setOrder_info(objectMapper.writeValueAsString(order));
                     //根据医院名称、科室名称查找科室位置
                     String orgName = order.get("hospitalName") == null ? "" : order.get("hospitalName").toString();

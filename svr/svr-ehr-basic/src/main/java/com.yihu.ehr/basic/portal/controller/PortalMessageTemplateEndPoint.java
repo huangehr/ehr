@@ -1,6 +1,8 @@
 package com.yihu.ehr.basic.portal.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.yihu.ehr.basic.appointment.entity.Registration;
+import com.yihu.ehr.basic.appointment.service.RegistrationService;
 import com.yihu.ehr.basic.fzopen.service.OpenService;
 import com.yihu.ehr.basic.portal.model.PortalMessageTemplate;
 import com.yihu.ehr.basic.portal.model.ProtalMessageRemind;
@@ -15,6 +17,7 @@ import com.yihu.ehr.model.portal.MH5Message;
 import com.yihu.ehr.model.portal.MMessageTemplate;
 import com.yihu.ehr.model.portal.MMyMessage;
 import com.yihu.ehr.util.datetime.DateUtil;
+import com.yihu.ehr.util.id.UuidUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -48,6 +51,8 @@ public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     private OpenService openService;
+    @Autowired
+    private RegistrationService registrationService;
 
     /**
      * 秘钥
@@ -236,6 +241,13 @@ public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
         mH5Message.setTimestamp(timestamp);
         //根据用户id，到总部获取订单列表
         MProtalOrderMessage mProtalOrderMessage = openServiceGetOrderInfo(thirdPartyUserId,timestamp);
+        Registration newEntity = new Registration();
+        if(null != mProtalOrderMessage && mProtalOrderMessage.getTotal()>0){
+            String str = toJson(mProtalOrderMessage.getResult().get(0));
+            newEntity = objectMapper.readValue(str, Registration.class);
+            newEntity.setId(UuidUtil.randomUUID());
+            registrationService.save(newEntity);
+        }
         ProtalMessageRemind protalMessageRemind = null;
         if(StringUtils.isNotEmpty(data)){
             List<PortalMessageTemplate> messageTemplateList = messageTemplateService.getMessageTemplate(String.valueOf(isSuccess),String.valueOf(type),"0");
@@ -248,7 +260,7 @@ public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
                 retMap.put("t", System.currentTimeMillis());
                 LOG.info("消息模板不存在！");
             }
-            protalMessageRemind = messageTemplateService.saveH5MessagePush(mProtalOrderMessage,mH5Message, messageTemplateId);
+            protalMessageRemind = messageTemplateService.saveH5MessagePush(newEntity,mH5Message, messageTemplateId);
             if (protalMessageRemind != null){
                 //成功
                 retMap.put("status","0");

@@ -18,7 +18,7 @@ import java.util.Date;
 public class Registration extends BaseAssignedEntity {
 
     public String orderId; // 订单号
-    public Date orderCreateTime; // 下单时间
+    public String orderCreateTime; // 下单时间
     public String patientName; // 患者姓名
     public String hospitalName; // 医院名称
     public String deptName; // 科室名称
@@ -44,11 +44,11 @@ public class Registration extends BaseAssignedEntity {
     }
 
     @Column(name = "order_create_time")
-    public Date getOrderCreateTime() {
+    public String getOrderCreateTime() {
         return orderCreateTime;
     }
 
-    public void setOrderCreateTime(Date orderCreateTime) {
+    public void setOrderCreateTime(String orderCreateTime) {
         this.orderCreateTime = orderCreateTime;
     }
 

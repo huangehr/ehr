@@ -1,6 +1,7 @@
 package com.yihu.ehr.basic.portal.service;
 
 import com.alibaba.fastjson.JSON;
+import com.yihu.ehr.basic.appointment.entity.Registration;
 import com.yihu.ehr.basic.portal.dao.PortalMessageRemindRepository;
 import com.yihu.ehr.basic.portal.dao.PortalMessageTemplateRepository;
 import com.yihu.ehr.basic.portal.model.PortalMessageTemplate;
@@ -94,19 +95,12 @@ public class PortalMessageTemplateService extends BaseJpaService<PortalMessageTe
      * @param messageTemplateId
      * @throws NoSuchMethodException
      */
-    public ProtalMessageRemind saveH5MessagePush(MProtalOrderMessage mProtalOrderMessage,MH5Message mH5Message, long messageTemplateId) throws Exception {
+    public ProtalMessageRemind saveH5MessagePush(Registration newEntity, MH5Message mH5Message, long messageTemplateId) throws Exception {
         PortalMessageTemplate template = portalMessageTemplateRepository.findOne(messageTemplateId);
         List<MTemplateContent> mTemplateContents = JSON.parseArray(template.getContent(), MTemplateContent.class);
         List<Map<String, String>> list = new ArrayList<>();
         for (MTemplateContent content : mTemplateContents) {
-            String value = "";
-            //成功
-            if(mH5Message.getIsSuccess() == 0){
-                value = mH5Message.getData().get("smsContent").toString();
-            } else if(mH5Message.getIsSuccess() == 1){
-               //失败
-                value = mH5Message.getData().get("failMsg").toString();
-            }
+            String value = String.valueOf(MethodUtil.invokeGet(newEntity, content.getCode()));
             if (value.equals("null")) {
                 value = "";
             }
@@ -130,12 +124,8 @@ public class PortalMessageTemplateService extends BaseJpaService<PortalMessageTe
         remind.setMessage_template_id(template.getId());
         remind.setReceived_messages(JSON.toJSONString(mH5Message));
         remind.setOrder_id(mH5Message.getOrderId());
-        if(null != mProtalOrderMessage && mProtalOrderMessage.getResult().size()>0){
-            MProtalOrderMessage.Order Order= (MProtalOrderMessage.Order)mProtalOrderMessage.getResult().get(0);
-            SimpleDateFormat format =  new SimpleDateFormat(DateUtil.DEFAULT_YMDHMSDATE_FORMAT);
-            remind.setVisit_time(format.parse(Order.getRegisterDate()));
-        }
-        remind.setOrder_info(JSON.toJSONString(mProtalOrderMessage));
+        SimpleDateFormat format =  new SimpleDateFormat(DateUtil.DEFAULT_YMDHMSDATE_FORMAT);
+        remind.setVisit_time(format.parse(newEntity.getRegisterDate()));
         ProtalMessageRemind protalMessageRemind =messageRemindRepository.save(remind);
         return protalMessageRemind;
     }

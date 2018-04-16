@@ -84,13 +84,26 @@ public class PortalMessageRemindService extends BaseJpaService<ProtalMessageRemi
      */
     public DataList listMessageRemindValue(String appId, String toUserId, String typeId,String type,int page, int size) throws Exception {
         String date = DateUtil.getNowDate(DateUtil.DEFAULT_YMDHMSDATE_FORMAT);
-        String sql = "select p.* from portal_message_remind p " +
-                "JOIN portal_message_template pt " +
-                "on p.message_template_id =pt.id " +
-                "where pt.type='"+type+"'"+" AND pt.classification='0'"+
-                "AND p.type_id='" +typeId+"'" +
-                " AND p.to_user_id='" +toUserId+"' " +" AND p.app_id='" +appId+"' "+
-                "AND p.visit_time > "+ date +"order by p.create_date desc ";
+        String sql ="";
+        //我的就诊-列表，获取就诊时间前的数据
+        if(type.equals("101")){
+            sql = "select p.* from portal_message_remind p " +
+                    "JOIN portal_message_template pt " +
+                    "on p.message_template_id =pt.id " +
+                    "where pt.type='"+type+"'"+" AND pt.classification='0'"+
+                    "AND p.type_id='" +typeId+"'" +
+                    " AND p.to_user_id='" +toUserId+"' " +" AND p.app_id='" +appId+"' "+
+                    "AND p.visit_time >  '"+ date +"' order by p.create_date desc ";
+        }else{
+            //满意度调查，获取待评价消息
+            sql = "select p.* from portal_message_remind p " +
+                    "JOIN portal_message_template pt " +
+                    "on p.message_template_id =pt.id " +
+                    "where pt.type='"+type+"'"+" AND pt.classification='0'"+
+                    "AND p.type_id='" +typeId+"'" +
+                    " AND p.to_user_id='" +toUserId+"' " +" AND p.app_id='" +appId+"' "+
+                     " order by p.create_date desc ";
+        }
         DataList list= dbQuery.queryBySql(sql,page,size);
         return list;
     }
