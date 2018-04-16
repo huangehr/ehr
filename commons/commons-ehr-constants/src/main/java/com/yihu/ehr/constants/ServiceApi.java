@@ -1490,5 +1490,16 @@ public class ServiceApi {
         public static final String OpenApi = "/fz/open/api";
     }
 
+    /**
+     * 预约-挂号单
+     */
+    public static class Registration {
+        public static final String Prefix = "/appointment/registration/";
+        public static final String GetById = "/appointment/registration/{id}";
+        public static final String Search = "/appointment/registration/search";
+        public static final String Save = "/appointment/registration/save";
+        public static final String Delete = "/appointment/registration/delete";
+    }
+
 
 }
