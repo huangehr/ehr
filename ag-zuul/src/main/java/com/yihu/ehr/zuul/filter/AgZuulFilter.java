@@ -55,7 +55,7 @@ public class AgZuulFilter extends ZuulFilter {
         RequestContext ctx = RequestContext.getCurrentContext();
         HttpServletRequest request = ctx.getRequest();
         String url = request.getRequestURI();
-        if (url.startsWith("/authentication/")
+        if (url.contains("/authentication/")
                 || url.contains("/usersOfApp")
                 || url.contains("/open/")
                 || url.startsWith("/jkzl/")
