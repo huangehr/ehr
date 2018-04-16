@@ -351,7 +351,7 @@ public class BaseStatistsService {
             result.add(mapCategory);
             if(mapCategory.get("children") != null){
                 List<Map<String,Object>> childrenOrgHealthCategoryList = (List<Map<String, Object>>) mapCategory.get("children");
-                mapCategory.put("children",setResult(quotaCode,childrenOrgHealthCategoryList,dimenListResult,dateType));
+                mapCategory.put("children",setResultAllDimenMap(quotaCode,childrenOrgHealthCategoryList,dimenListResult,dateType));
             }
         }
         return  result;
