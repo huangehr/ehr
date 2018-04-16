@@ -2,14 +2,19 @@ package com.yihu.ehr.basic.org.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.basic.user.entity.User;
+import com.yihu.ehr.basic.user.service.UserService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.exception.ApiException;
+import com.yihu.ehr.model.org.MJkzlOrgMemberRelation;
 import com.yihu.ehr.model.org.MOrgDeptData;
 import com.yihu.ehr.model.org.MOrgDeptJson;
 import com.yihu.ehr.model.org.MOrgMemberRelation;
 import com.yihu.ehr.basic.org.model.OrgMemberRelation;
 import com.yihu.ehr.basic.org.service.OrgMemberRelationService;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -35,7 +40,8 @@ public class OrgMemberRelationEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     private OrgMemberRelationService relationService;
-
+    @Autowired
+    private UserService userService;
 
     @RequestMapping(value = "/orgDeptMember/getAllOrgDeptMember", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "查询所有成员列表")
@@ -256,12 +262,44 @@ public class OrgMemberRelationEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = "/orgDeptMember/getJkzlOrgIds", method = RequestMethod.GET)
     @ApiOperation(value = "根据userId获取总部orgId列表")
-    public String  getJkzlOrgIds(String userId) {
-        String jkzlOrgId = relationService.getJkzlOrgIds(userId);
-        if(StringUtils.isEmpty(jkzlOrgId)){
-            jkzlOrgId="该用户没有关联机构！";
+    public Envelop getJkzlOrgIds(
+            @ApiParam(name = "userId", value = "用户id")
+            @RequestParam(value = "userId", required = false) String userId,
+            @ApiParam(name = "loginCode", value = "用户登录账号")
+            @RequestParam(value = "loginCode", required = false) String loginCode) throws Exception{
+        Envelop envelop = new Envelop();
+        String seaUserId="";
+        if(StringUtils.isNotEmpty(userId)){
+            seaUserId = userId;
+        } else if(StringUtils.isNotEmpty(loginCode)){
+             List<User> users = userService.getUserForLogin(loginCode);
+             if(null != users && users.size()>0){
+                 seaUserId = users.get(0).getId();
+             }else{
+                 envelop.setErrorMsg("用户不存在！");
+                 envelop.setSuccessFlg(false);
+                 return envelop;
+             }
+        }else {
+            envelop.setErrorMsg("用户id和登录账户不能同时为空！");
+            envelop.setSuccessFlg(false);
+            return envelop;
         }
-        return jkzlOrgId;
+        //医生在总部库中的对应关系
+        MJkzlOrgMemberRelation mJkzlOrgMemberRelation = new MJkzlOrgMemberRelation();
+        List<OrgMemberRelation> memberRelationList = relationService.getByUserId(seaUserId);
+        if(null != memberRelationList && memberRelationList.size()>0){
+            OrgMemberRelation  orgMemberRelation = memberRelationList.get(0);
+            mJkzlOrgMemberRelation.setJkzlDoctorSn(orgMemberRelation.getJkzlDoctorSn());
+            mJkzlOrgMemberRelation.setJkzlDoctorUid(orgMemberRelation.getJkzlDoctorUid());
+            mJkzlOrgMemberRelation.setJkzlHosDeptId(orgMemberRelation.getJkzlHosDeptId());
+            mJkzlOrgMemberRelation.setJkzlUserId(orgMemberRelation.getJkzlUserId());
+        }
+        String jkzlOrgId = relationService.getJkzlOrgIds(seaUserId);
+        mJkzlOrgMemberRelation.setJkzlHosId(jkzlOrgId);
+        envelop.setObj(mJkzlOrgMemberRelation);
+        envelop.setSuccessFlg(true);
+        return envelop;
     }
 
 }

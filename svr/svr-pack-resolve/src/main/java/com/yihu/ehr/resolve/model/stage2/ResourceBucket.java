@@ -5,6 +5,7 @@ import com.yihu.ehr.constants.ProfileType;
 import com.yihu.ehr.resolve.model.stage1.CdaDocument;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -48,8 +49,12 @@ public class ResourceBucket {
     private String patientName;
     //ICD10诊断，分号分隔
     private String diagnosis;
+    //ICD10诊断名称, 分号分隔
+    private String diagnosisName;
     //健康问题，分号分隔
     private String healthProblem;
+    //健康问题名称，分号分隔
+    private String healthProblemName;
     //重传标识
     private boolean reUploadFlg;
     //身份识别标志
@@ -211,12 +216,28 @@ public class ResourceBucket {
         this.diagnosis = diagnosis;
     }
 
+    public String getDiagnosisName() {
+        return diagnosisName;
+    }
+
+    public void setDiagnosisName(String diagnosisName) {
+        this.diagnosisName = diagnosisName;
+    }
+
     public String getHealthProblem() {
         return healthProblem;
     }
 
     public void setHealthProblem(String healthProblem) {
         this.healthProblem = healthProblem;
+    }
+
+    public String getHealthProblemName() {
+        return healthProblemName;
+    }
+
+    public void setHealthProblemName(String healthProblemName) {
+        this.healthProblemName = healthProblemName;
     }
 
     public boolean isReUploadFlg() {

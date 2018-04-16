@@ -47,6 +47,7 @@ public class QcRuleCheckService {
             Boolean isNullable = hosAdminServiceClient.isMetaDataNullable(value.getVersion(), value.getTable(), value.getCode());
             if (!isNullable && StringUtils.isEmpty(value.getValue())) {
                 saveCheckResult(value, "E00001", "不能为空");
+                logger.warn("code:" + value.getCode() + ",value:" + value.getValue());
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -113,6 +114,7 @@ public class QcRuleCheckService {
             Boolean isExist = hosAdminServiceClient.isDictCodeExist(value.getVersion(), dict, value.getCode());
             if (!isExist) {
                 saveCheckResult(value, "E00002", "超出值域范围");
+                logger.warn("code:" + value.getCode() + ",value:" + value.getValue() + ",dict:" + dict);
             }
         } catch (IOException e) {
             e.printStackTrace();

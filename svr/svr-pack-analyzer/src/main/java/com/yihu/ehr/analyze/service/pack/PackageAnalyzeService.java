@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.analyze.feign.PackageMgrClient;
 import com.yihu.ehr.analyze.service.qc.PackageQcService;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
+import com.yihu.ehr.model.packs.EsSimplePackage;
 import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.util.rest.Envelop;
 import org.slf4j.Logger;
@@ -46,18 +47,18 @@ public class PackageAnalyzeService {
      * @created 2018.01.15
      */
     public void analyze() {
-        MPackage mPackage = null;
+        EsSimplePackage esSimplePackage = null;
         ZipPackage zipPackage = null;
         try {
-            mPackage = packQueueService.pop();
-            if (mPackage != null) {
-                zipPackage = new ZipPackage(mPackage);
+            esSimplePackage = packQueueService.pop();
+            if (esSimplePackage != null) {
+                zipPackage = new ZipPackage(esSimplePackage);
                 zipPackage.download();
                 zipPackage.unZip();
                 zipPackage.resolve();
                 zipPackage.save();
 
-                mgrClient.analyzeStatus(mPackage.getId(), 3);
+                mgrClient.analyzeStatus(esSimplePackage.get_id(), 3);
 
                 //处理质控
                 packageQcService.qcHandle(zipPackage);
@@ -67,7 +68,7 @@ public class PackageAnalyzeService {
             logger.error(e.getMessage());
 
             try {
-                mgrClient.analyzeStatus(mPackage.getId(), 2);
+                mgrClient.analyzeStatus(esSimplePackage.get_id(), 2);
             } catch (Exception e1) {
                 e1.printStackTrace();
             }

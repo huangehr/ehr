@@ -462,15 +462,16 @@ public class ServiceApi {
         public static final String Package = "/packages/{id}";
         public static final String PackageResolve = "/packages/resolve";
         public static final String PackageSearch = "/packages/search";
-        public static final String PackageDownloads = "/packages/{id}/downloads";
+        public static final String PackageDownload = "/packages/download/{id}";
         public static final String ResolveMessage = "/message/resolve";
         public static final String MessageTimer = "/message/timer";
         public static final String LegacyPackages = "/json_package";
         public static final String Prescription = "/prescription"; //处方笺维护
         public static final String ArchiveRelation = "/archiveRelation"; //档案关联
-        public static final String ResolveQueue = "/packages/resolveQueue";
+        public static final String AddResolveQueue = "/packages/addResolveQueue";
         public static final String QueueSize = "/packages/queueSize";
-        public static final String PackageCrypto = "/PackageCrypto";
+        public static final String PackageCrypto = "/packages/crypto";
+        public static final String Fetch = "/packages/fetch/{id}";
         public static final String ImmediateResolve = "/immediate/resolve";
     }
 
@@ -493,18 +494,18 @@ public class ServiceApi {
     }
 
     public static class PackageAnalyzer {
-        public static final String Scheduler = "packAnalyzer/scheduler";
-        public static final String Queue = "packAnalyzer/queue";
-        public static final String Status = "packAnalyzer/status/{id}";
-        public static final String DailyReport = "packAnalyzer/dailyReport";
-        public static final String List = "packAnalyzer/list";
-        public static final String FindByField = "packAnalyzer/findByField";
-        public static final String FindBySql = "packAnalyzer/findBySql";
-        public static final String EsSaveData = "packAnalyzer/esSaveData";
-        public static final String QcEmpty = "packAnalyzer/qc/check/empty";
-        public static final String QcType = "packAnalyzer/qc/check/type";
-        public static final String QcFormat = "packAnalyzer/qc/check/format";
-        public static final String QcValue = "packAnalyzer/qc/check/value";
+        public static final String Scheduler = "/packAnalyzer/scheduler";
+        public static final String Queue = "/packAnalyzer/queue";
+        public static final String Status = "/packAnalyzer/status/{id}";
+        public static final String DailyReport = "/packAnalyzer/dailyReport";
+        public static final String List = "/packAnalyzer/list";
+        public static final String FindByField = "/packAnalyzer/findByField";
+        public static final String FindBySql = "/packAnalyzer/findBySql";
+        public static final String EsSaveData = "/packAnalyzer/esSaveData";
+        public static final String QcEmpty = "/packAnalyzer/qc/check/empty";
+        public static final String QcType = "/packAnalyzer/qc/check/type";
+        public static final String QcFormat = "/packAnalyzer/qc/check/format";
+        public static final String QcValue = "/packAnalyzer/qc/check/value";
     }
 
     public static class ArchiveRelation {
@@ -1458,6 +1459,8 @@ public class ServiceApi {
         public static final String FindById = "/elasticSearch/{id}";
         public static final String FindByField = "/elasticSearch/findByField";
         public static final String Page = "/elasticSearch/page";
+        public static final String FindBySql = "/elasticSearch/findBySql";
+        public static final String DateHistogram = "/elasticSearch/dateHistogram";
 
     }
 
@@ -1478,8 +1481,14 @@ public class ServiceApi {
         public static final String GetDropdownList = "/singleDisease/getDropdownList";
         public static final String GetSymptomDetailData = "/singleDisease/getSymptomDetailData";
         public static final String GetMedicineDetailData = "/singleDisease/getMedicineDetailData";
-
-
     }
+
+    /**
+     * 转发福州总部开放平台接口相关
+     */
+    public static class Fz {
+        public static final String OpenApi = "/fz/open/api";
+    }
+
 
 }

@@ -1,6 +1,5 @@
 package com.yihu.ehr.basic.report.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.basic.report.feign.PackMgrClient;
@@ -11,10 +10,9 @@ import com.yihu.ehr.basic.util.QcDatasetsParser;
 import com.yihu.ehr.basic.util.QcEventDataParser;
 import com.yihu.ehr.basic.util.QcMetadataParser;
 import com.yihu.ehr.basic.util.ResolveJsonFileUtil;
-import com.yihu.ehr.constants.ArchiveStatus;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.entity.report.*;
-import com.yihu.ehr.model.packs.MPackage;
+import com.yihu.ehr.model.packs.EsDetailsPackage;
 import com.yihu.ehr.model.report.MQcDailyReportDetail;
 import com.yihu.ehr.model.report.json.*;
 import com.yihu.ehr.util.datetime.DateUtil;
@@ -23,13 +21,10 @@ import com.yihu.hos.model.standard.MStdDataSet;
 import com.yihu.hos.model.standard.MStdMetaData;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.*;
 
 /**
@@ -39,23 +34,21 @@ import java.util.*;
 public class QcDailyReportResolveService {
 
     public final static String fileContainName = "datasets";
-    public final static String TempPath = System.getProperty("java.io.tmpdir") + File.separator;
     public static final String BEGIN_DATE = "begin_date";
+    public final static String TempPath = System.getProperty("java.io.tmpdir") + File.separator;
 
     @Autowired
     public ObjectMapper objectMapper;
     @Autowired
-    public JsonArchivesService jsonArchivesService;
+    private QcDailyReportService qcDailyReportService;
     @Autowired
-    QcDailyReportService qcDailyReportService;
+    private QcDailyReportDetailService qcDailyReportDetailService;
     @Autowired
-    QcDailyReportDetailService qcDailyReportDetailService;
+    private QcDailyReportDatasetsService qcDailyReportDatasetsService;
     @Autowired
-    QcDailyReportDatasetsService qcDailyReportDatasetsService;
+    private QcDailyReportDatasetService qcDailyReportDatasetService;
     @Autowired
-    QcDailyReportDatasetService qcDailyReportDatasetService;
-    @Autowired
-    QcDailyReportMetadataService qcDailyReportMetadataService;
+    private QcDailyReportMetadataService qcDailyReportMetadataService;
     @Autowired
     private RedisServiceClient redisServiceClient;
     @Autowired
@@ -71,64 +64,60 @@ public class QcDailyReportResolveService {
      * @param zipFile
      * @param password
      */
-    public String resolveFile(File zipFile, String password, String todir) {
+    public String resolveFile(File zipFile, String password, String todir) throws Exception {
         ResolveJsonFileUtil rjfu = new ResolveJsonFileUtil();
         String orgCode = "";
-        try {
-            File[] files = rjfu.unzip(zipFile, password, todir);
-            QcDailyDatasetsModel dataSetsModel = new QcDailyDatasetsModel();
-            List<QcDailyDatasetModel> qcDailyDatasetModelList = null;
-            List<QcDailyMetadataModel> metadataList = null;
-            Map<String, QcDailyReportDataset> datasetMap = null;
-            for (File file : files) {
-                if (file.getName().contains(fileContainName)) {
-                    QcDailyReportDatasets qcDailyReportDatasets = new QcDailyReportDatasets();
-                    //解析json文件
-                    dataSetsModel = generateDataSet(file);
-                    orgCode = dataSetsModel.getOrgCode();
-                    String parten = "yyyy-MM-dd hh:mm:ss";
-                    if (dataSetsModel.getCreateDate().contains("T")) {
-                        parten = "yyyy-MM-dd'T'HH:mm:ss";
+        File[] files = rjfu.unzip(zipFile, password, todir);
+        QcDailyDatasetsModel dataSetsModel = new QcDailyDatasetsModel();
+        List<QcDailyDatasetModel> qcDailyDatasetModelList = null;
+        List<QcDailyMetadataModel> metadataList = null;
+        Map<String, QcDailyReportDataset> datasetMap = null;
+        for (File file : files) {
+            if (file.getName().contains(fileContainName)) {
+                QcDailyReportDatasets qcDailyReportDatasets = new QcDailyReportDatasets();
+                //解析json文件
+                dataSetsModel = generateDataSet(file);
+                orgCode = dataSetsModel.getOrgCode();
+                String parten = "yyyy-MM-dd hh:mm:ss";
+                if (dataSetsModel.getCreateDate().contains("T")) {
+                    parten = "yyyy-MM-dd'T'HH:mm:ss";
+                }
+                qcDailyReportDatasets.setCreateDate(DateUtil.parseDate(dataSetsModel.getCreateDate(), parten));
+                qcDailyReportDatasets.setEventTime(DateUtil.parseDate(dataSetsModel.getEventTime(), parten));
+                qcDailyReportDatasets.setOrgCode(dataSetsModel.getOrgCode());
+                qcDailyReportDatasets.setInnerVersion(dataSetsModel.getInnerVersion());
+                qcDailyReportDatasets.setRealNum(dataSetsModel.getRealHospitalNum());
+                qcDailyReportDatasets.setTotalNum(dataSetsModel.getTotalHospitalNum());
+                qcDailyReportDatasets.setAddDate(new Date());
+                qcDailyReportDatasets = qcDailyReportDatasetsService.save(qcDailyReportDatasets);
+                if (qcDailyReportDatasets != null) {
+                    qcDailyDatasetModelList = dataSetsModel.getQcDailyDatasetModels();
+                    ListIterator<QcDailyDatasetModel> it = qcDailyDatasetModelList.listIterator();
+                    while (it.hasNext()) {
+                        QcDailyDatasetModel qcDailyDatasetModel = it.next();
+                        qcDailyDatasetModel.setReportId(qcDailyReportDatasets.getId());
                     }
-                    qcDailyReportDatasets.setCreateDate(DateUtil.parseDate(dataSetsModel.getCreateDate(), parten));
-                    qcDailyReportDatasets.setEventTime(DateUtil.parseDate(dataSetsModel.getEventTime(), parten));
-                    qcDailyReportDatasets.setOrgCode(dataSetsModel.getOrgCode());
-                    qcDailyReportDatasets.setInnerVersion(dataSetsModel.getInnerVersion());
-                    qcDailyReportDatasets.setRealNum(dataSetsModel.getRealHospitalNum());
-                    qcDailyReportDatasets.setTotalNum(dataSetsModel.getTotalHospitalNum());
-                    qcDailyReportDatasets.setAddDate(new Date());
-                    qcDailyReportDatasets = qcDailyReportDatasetsService.save(qcDailyReportDatasets);
-                    if (qcDailyReportDatasets != null) {
-                        qcDailyDatasetModelList = dataSetsModel.getQcDailyDatasetModels();
-                        ListIterator<QcDailyDatasetModel> it = qcDailyDatasetModelList.listIterator();
-                        while (it.hasNext()) {
-                            QcDailyDatasetModel qcDailyDatasetModel = it.next();
-                            qcDailyDatasetModel.setReportId(qcDailyReportDatasets.getId());
+                }
+                datasetMap = addDailyDatasetModelList(qcDailyDatasetModelList);
+                file.delete();
+            }
+        }
+        for (File file : files) {
+            if (!file.getName().contains(fileContainName)) {
+                String parentDirectory = file.getParent();
+                //解析json文件
+                metadataList = generateMetadata(file, parentDirectory);
+                if (metadataList != null && metadataList.size() > 0) {
+                    for (QcDailyMetadataModel qcDailyMetadataModel : metadataList) {
+                        if (datasetMap.containsKey(qcDailyMetadataModel.getDataset())) {
+                            qcDailyMetadataModel.setDatasetId(datasetMap.get(qcDailyMetadataModel.getDataset()).getReportId());
+                            qcDailyMetadataModel.setAcqFlag(datasetMap.get(qcDailyMetadataModel.getDataset()).getAcqFlag());
                         }
                     }
-                    datasetMap = addDailyDatasetModelList(qcDailyDatasetModelList);
+                    addDailyDatasetMetadataList(metadataList);
                     file.delete();
                 }
             }
-            for (File file : files) {
-                if (!file.getName().contains(fileContainName)) {
-                    String parentDirectory = file.getParent();
-                    //解析json文件
-                    metadataList = generateMetadata(file, parentDirectory);
-                    if (metadataList != null && metadataList.size() > 0) {
-                        for (QcDailyMetadataModel qcDailyMetadataModel : metadataList) {
-                            if (datasetMap.containsKey(qcDailyMetadataModel.getDataset())) {
-                                qcDailyMetadataModel.setDatasetId(datasetMap.get(qcDailyMetadataModel.getDataset()).getReportId());
-                                qcDailyMetadataModel.setAcqFlag(datasetMap.get(qcDailyMetadataModel.getDataset()).getAcqFlag());
-                            }
-                        }
-                        addDailyDatasetMetadataList(metadataList);
-                        file.delete();
-                    }
-                }
-            }
-        } catch (Exception e) {
-            e.getMessage();
         }
         return orgCode;
     }
@@ -298,7 +287,7 @@ public class QcDailyReportResolveService {
         return list;
     }
 
-    public void checkRealStorage(List<MQcDailyReportDetail> realList, String orgCode, Date createDate) throws JsonProcessingException, ParseException {
+    public void checkRealStorage(List<MQcDailyReportDetail> realList, String orgCode, Date createDate) throws Exception {
 
         //更新采集状态 及 入库状态
         for (MQcDailyReportDetail mQcDailyReportDetail : realList) {
@@ -312,10 +301,10 @@ public class QcDailyReportResolveService {
             if (list != null && list.size() > 0) {
                 QcDailyReportDetail qDailyReportDetail = list.get(0);
                 qDailyReportDetail.setAcqFlag(1);
-                JsonArchives jsonArchives = checkIsInStorage(eventNo, patientId, orgCode);
-                if (jsonArchives != null) {
-                    qDailyReportDetail.setStorageFlag(returnArchiveStatus(jsonArchives));
-                    qDailyReportDetail.setStorageTime(jsonArchives.getFinishDate());
+                EsDetailsPackage esDetailsPackage = checkIsInStorage(eventNo, patientId, orgCode);
+                if (esDetailsPackage != null) {
+                    qDailyReportDetail.setStorageFlag(esDetailsPackage.getArchive_status());
+                    qDailyReportDetail.setStorageTime(esDetailsPackage.getFinish_date());
                 }
                 qcDailyReportDetailService.save(qDailyReportDetail);
             } else {//额外采集 的 新增
@@ -329,10 +318,10 @@ public class QcDailyReportResolveService {
                 newqDailyReportDetail.setPatientId(patientId);
                 newqDailyReportDetail.setArchiveType(mQcDailyReportDetail.getArchiveType());
                 newqDailyReportDetail.setReportId(mQcDailyReportDetail.getReportId());
-                JsonArchives jsonArchives = checkIsInStorage(eventNo, patientId, orgCode);
-                if (jsonArchives != null) {
-                    newqDailyReportDetail.setStorageFlag(returnArchiveStatus(jsonArchives));
-                    newqDailyReportDetail.setStorageTime(jsonArchives.getFinishDate());
+                EsDetailsPackage esDetailsPackage = checkIsInStorage(eventNo, patientId, orgCode);
+                if (esDetailsPackage != null) {
+                    newqDailyReportDetail.setStorageFlag(esDetailsPackage.getArchive_status());
+                    newqDailyReportDetail.setStorageTime(esDetailsPackage.getFinish_date());
                 }
                 qcDailyReportDetailService.save(newqDailyReportDetail);
             }
@@ -341,44 +330,40 @@ public class QcDailyReportResolveService {
     }
 
     //判断是否入库
-    public JsonArchives checkIsInStorage(String eventNo, String patientId, String orgCode) throws ParseException {
-        //查找是否入库
-        StringBuffer str = new StringBuffer();
-        str.append("eventNo=").append(eventNo).append(";").
-                append("patientId=").append(patientId).append(";").
-                append("orgCode=").append(orgCode).append(";");
-        List<JsonArchives> list = jsonArchivesService.search(str.toString());
-        if (list.isEmpty()) {
-            return null;
-        } else {
-            JsonArchives jsonArchives = list.get(0);
-            return jsonArchives;
+    public EsDetailsPackage checkIsInStorage(String eventNo, String patientId, String orgCode) throws Exception {
+        List<Map<String, Object>> paramList = new ArrayList<>();
+        Map<String, Object> paramMap1 = new HashMap<>();
+        paramMap1.put("andOr", "and");
+        paramMap1.put("condition", "=");
+        paramMap1.put("field", "event_no");
+        paramMap1.put("value", eventNo);
+        paramList.add(paramMap1);
+        Map<String, Object> paramMap2 = new HashMap<>();
+        paramMap2.put("andOr", "and");
+        paramMap2.put("condition", "=");
+        paramMap2.put("field", "patient_id");
+        paramMap2.put("value", patientId);
+        paramList.add(paramMap2);
+        Map<String, Object> paramMap3 = new HashMap<>();
+        paramMap3.put("andOr", "and");
+        paramMap3.put("condition", "=");
+        paramMap3.put("field", "org_code");
+        paramMap3.put("value", orgCode);
+        paramList.add(paramMap3);
+        Collection<EsDetailsPackage> mPackages = packMgrClient.packageList(objectMapper.writeValueAsString(paramList), null, 1, 1);
+        EsDetailsPackage esDetailsPackage = null;
+        for (EsDetailsPackage temp : mPackages) {
+            esDetailsPackage = temp;
+            break;
         }
-    }
-
-    public int returnArchiveStatus(JsonArchives jsonArchives) {
-        if (jsonArchives != null) {
-            if (jsonArchives.getArchiveStatus() == JsonArchives.ArchiveStatus.Received) {
-                return 0;
-            } else if (jsonArchives.getArchiveStatus() == JsonArchives.ArchiveStatus.Acquired) {
-                return 1;
-            } else if (jsonArchives.getArchiveStatus() == JsonArchives.ArchiveStatus.Failed) {
-                return 2;
-            } else if (jsonArchives.getArchiveStatus() == JsonArchives.ArchiveStatus.Finished) {
-                return 3;
-            } else {
-                return 0;
-            }
-        } else {
-            return 0;
-        }
+        return esDetailsPackage;
     }
 
     public Envelop setQcBeginDate(String date) {
         return redisServiceClient.set(MicroServices.Basic, date, BEGIN_DATE, "");
     }
 
-    public void loadQcData() {
+    public void loadQcData() throws Exception {
         Envelop envelop = redisServiceClient.get(BEGIN_DATE, "");
         if (!envelop.isSuccessFlg()) {
             return; //
@@ -390,17 +375,28 @@ public class QcDailyReportResolveService {
         int page = 1;
         int pageSize = 1000;
         Map<String,List<Map<String,Object>>> map = new HashMap<String,List<Map<String,Object>>>();
-        Collection<MPackage> mPackages = packMgrClient.packageList("", "receiveDate>=" + beginDate + ";receiveDate<" + endDate, "+receiveDate", page, pageSize);
+        List<Map<String, Object>> paramList = new ArrayList<>();
+        Map<String, Object> paramMap1 = new HashMap<>();
+        paramMap1.put("andOr", "and");
+        paramMap1.put("condition", ">=");
+        paramMap1.put("field", "receive_date");
+        paramMap1.put("value", beginDate);
+        paramList.add(paramMap1);
+        Map<String, Object> paramMap2 = new HashMap<>();
+        paramMap2.put("andOr", "and");
+        paramMap2.put("condition", "<");
+        paramMap2.put("field", "receive_date");
+        paramMap2.put("value", beginDate);
+        paramList.add(paramMap2);
+        Collection<EsDetailsPackage> mPackages = packMgrClient.packageList(objectMapper.writeValueAsString(paramList), "receive_date asc", page, pageSize);
         while (!mPackages.isEmpty()) {
-            for (MPackage mPackage : mPackages) {
+            for (EsDetailsPackage mPackage : mPackages) {
                 try{
-                    ResponseEntity<String> entity = packResolveClient.fetch(mPackage.getId());
-                    if (entity.getStatusCode() != HttpStatus.OK) {
+                    String jsonData = packResolveClient.fetch(mPackage.get_id());
+                    if (StringUtils.isEmpty(jsonData)) {
                         continue;
                     }
-
-                    String body = entity.getBody();
-                    JsonNode jsonNode = objectMapper.readTree(body);
+                    JsonNode jsonNode = objectMapper.readTree(jsonData);
                     String patientId = jsonNode.get("patientId").asText();
                     String eventNo = jsonNode.get("eventNo").asText();
                     String innerVersion = jsonNode.get("cdaVersion").asText();
@@ -417,27 +413,23 @@ public class QcDailyReportResolveService {
                     patient.put("dataSets",dataSets);
                     List<Map<String,Object>> list = map.get(orgCode);
                     //根据orgCode分组
-                    if(list!=null){
+                    if (list!=null){
                         list.add(patient);
-                    }else{
+                    } else {
                         list = new ArrayList<Map<String,Object>>();
                         list.add(patient);
                         map.put(orgCode, list);
                     }
-                }catch (Exception e){
+                } catch (Exception e){
                     e.printStackTrace();
                     continue;
                 }
             }
-
-            page++;
-            mPackages = packMgrClient.packageList("", "receiveDate>=" + beginDate + ";receiveDate<" + endDate, "+receiveDate", page, pageSize);
+            page ++;
+            mPackages = packMgrClient.packageList(objectMapper.writeValueAsString(paramList), "receive_date asc", page, pageSize);
         }
-
         getData(map);
-
         this.setQcBeginDate(endDate);
-
         //TODO:需要发送1个消息，通知统计，不发消息直接统计也是可以。
     }
 
@@ -582,81 +574,73 @@ public class QcDailyReportResolveService {
         return list;
     }
 
-    private void loadQcDetailData(MPackage mPackage) {
-        try {
-            ResponseEntity<String> entity = packResolveClient.fetch(mPackage.getId());
-            if (entity.getStatusCode() != HttpStatus.OK) {
-                return;
-            }
+    private void loadQcDetailData (EsDetailsPackage esDetailsPackage) throws Exception {
+        String entity = packResolveClient.fetch(esDetailsPackage.get_id());
+        if (StringUtils.isEmpty(entity)) {
+            return;
+        }
+        JsonNode jsonNode = objectMapper.readTree(entity);
+        String patientId = jsonNode.get("patientId").asText();
+        String eventNo = jsonNode.get("eventNo").asText();
+        String orgCode = jsonNode.get("orgCode").asText();
+        String eventType = jsonNode.get("eventType").asText();
+        JsonNode dataSets = jsonNode.get("dataSets");
 
-            String body = entity.getBody();
-            JsonNode jsonNode = objectMapper.readTree(body);
-            String patientId = jsonNode.get("patientId").asText();
-            String eventNo = jsonNode.get("eventNo").asText();
-            String orgCode = jsonNode.get("orgCode").asText();
-            String eventType = jsonNode.get("eventType").asText();
-            JsonNode dataSets = jsonNode.get("dataSets");
+        List<QcDailyReport> dailyList = qcDailyReportService.getData(orgCode, esDetailsPackage.getReceive_date());
+        String dailyId = "";
+        if (dailyList != null && dailyList.size()>0){
+            dailyId = dailyList.get(0).getId();
+        } else {
+            QcDailyReport qcDailyReport = new QcDailyReport();
+            qcDailyReport.setOrgCode(orgCode);
+            qcDailyReport.setCreateDate(esDetailsPackage.getReceive_date());
+            qcDailyReport.setAddDate(new Date());
+            qcDailyReport.setRealHospitalNum(0);
+            qcDailyReport.setTotalHospitalNum(0);
+            qcDailyReport.setTotalOutpatientNum(0);
+            qcDailyReport.setRealOutpatientNum(0);
+            qcDailyReport = qcDailyReportService.save(qcDailyReport);
+            dailyId = qcDailyReport.getId();
+        }
+        QcDailyReportDetail qcDailyReportDetail = new QcDailyReportDetail();
+        qcDailyReportDetail.setReportId(dailyId);
+        qcDailyReportDetail.setPatientId(patientId);
+        qcDailyReportDetail.setEventNo(eventNo);
+        qcDailyReportDetail.setArchiveType(eventType.equals("Resident") ? "inpatient" : "outpatient");
+        qcDailyReportDetail.setEventTime(esDetailsPackage.getReceive_date());
+        qcDailyReportDetail.setAcqFlag(1);
+        qcDailyReportDetail.setAcqTime(esDetailsPackage.getReceive_date());
+        qcDailyReportDetail.setStorageFlag(esDetailsPackage.getArchive_status() == 3 ? 1 : 0);
+        qcDailyReportDetail.setStorageTime(esDetailsPackage.getFinish_date());
+        qcDailyReportDetail.setAddDate(new Date());
 
-            List<QcDailyReport> dailyList = qcDailyReportService.getData(orgCode, mPackage.getReceiveDate());
-            String dailyId = "";
-            if(dailyList!=null && dailyList.size()>0){
-                dailyId = dailyList.get(0).getId();
-            }else{
-                QcDailyReport qcDailyReport = new QcDailyReport();
-                qcDailyReport.setOrgCode(orgCode);
-                qcDailyReport.setCreateDate(mPackage.getReceiveDate());
-                qcDailyReport.setAddDate(new Date());
-                qcDailyReport.setRealHospitalNum(0);
-                qcDailyReport.setTotalHospitalNum(0);
-                qcDailyReport.setTotalOutpatientNum(0);
-                qcDailyReport.setRealOutpatientNum(0);
-                qcDailyReport = qcDailyReportService.save(qcDailyReport);
-                dailyId = qcDailyReport.getId();
-            }
-            QcDailyReportDetail qcDailyReportDetail = new QcDailyReportDetail();
-            qcDailyReportDetail.setReportId(dailyId);
-            qcDailyReportDetail.setPatientId(patientId);
-            qcDailyReportDetail.setEventNo(eventNo);
-            qcDailyReportDetail.setArchiveType(eventType.equals("Resident") ? "inpatient" : "outpatient");
-            qcDailyReportDetail.setEventTime(mPackage.getReceiveDate());
-            qcDailyReportDetail.setAcqFlag(1);
-            qcDailyReportDetail.setAcqTime(mPackage.getReceiveDate());
-            qcDailyReportDetail.setStorageFlag(mPackage.getArchiveStatus() == ArchiveStatus.Finished ? 1 : 0);
-            qcDailyReportDetail.setStorageTime(mPackage.getFinishDate());
-            qcDailyReportDetail.setAddDate(new Date());
+        qcDailyReportDetailService.save(qcDailyReportDetail);   //TODO:需要过滤重复？
 
-            qcDailyReportDetailService.save(qcDailyReportDetail);   //TODO:需要过滤重复？
-
-            String dataSetsId="";
-            List<QcDailyReportDatasets> datasetsList = qcDailyReportDatasetsService.getTodayData(orgCode, mPackage.getReceiveDate());
-            if(datasetsList!=null && datasetsList.size()>0){
-                dataSetsId = datasetsList.get(0).getId();
-            }else{
-                QcDailyReportDatasets qcDailyReportDatasets = new QcDailyReportDatasets();
-                qcDailyReportDatasets.setCreateDate(mPackage.getReceiveDate());
-                qcDailyReportDatasets.setOrgCode(orgCode);
-                qcDailyReportDatasets.setEventTime(mPackage.getReceiveDate());
-                qcDailyReportDatasets.setTotalNum(0);
-                qcDailyReportDatasets.setRealNum(0);
-                qcDailyReportDatasets.setAddDate(new Date());
-                qcDailyReportDatasets = qcDailyReportDatasetsService.save(qcDailyReportDatasets);
-                dataSetsId = qcDailyReportDatasets.getId();
-            }
-            Iterator<String> fieldNames = dataSets.fieldNames();
-            while (fieldNames.hasNext()) {
-                String dateSet = fieldNames.next();
-                QcDailyReportDataset qcDailyReportDataset = new QcDailyReportDataset();
-                qcDailyReportDataset.setDataset(dateSet);
-                qcDailyReportDataset.setAcqFlag(1);
-                qcDailyReportDataset.setReportId(dataSetsId);
-                qcDailyReportDataset.setAddDate(new Date());
-
-                qcDailyReportDatasetService.save(qcDailyReportDataset);   //TODO:需要过滤重复？
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        String dataSetsId = "";
+        List<QcDailyReportDatasets> datasetsList = qcDailyReportDatasetsService.getTodayData(orgCode, esDetailsPackage.getReceive_date());
+        if (datasetsList!=null && datasetsList.size()>0){
+            dataSetsId = datasetsList.get(0).getId();
+        } else {
+            QcDailyReportDatasets qcDailyReportDatasets = new QcDailyReportDatasets();
+            qcDailyReportDatasets.setCreateDate(esDetailsPackage.getReceive_date());
+            qcDailyReportDatasets.setOrgCode(orgCode);
+            qcDailyReportDatasets.setEventTime(esDetailsPackage.getReceive_date());
+            qcDailyReportDatasets.setTotalNum(0);
+            qcDailyReportDatasets.setRealNum(0);
+            qcDailyReportDatasets.setAddDate(new Date());
+            qcDailyReportDatasets = qcDailyReportDatasetsService.save(qcDailyReportDatasets);
+            dataSetsId = qcDailyReportDatasets.getId();
+        }
+        Iterator<String> fieldNames = dataSets.fieldNames();
+        while (fieldNames.hasNext()) {
+            String dateSet = fieldNames.next();
+            QcDailyReportDataset qcDailyReportDataset = new QcDailyReportDataset();
+            qcDailyReportDataset.setDataset(dateSet);
+            qcDailyReportDataset.setAcqFlag(1);
+            qcDailyReportDataset.setReportId(dataSetsId);
+            qcDailyReportDataset.setAddDate(new Date());
+            qcDailyReportDatasetService.save(qcDailyReportDataset);   //TODO:需要过滤重复？
         }
     }
-
 
 }

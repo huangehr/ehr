@@ -171,7 +171,7 @@ public class BaseRestEndPoint extends AbstractController {
             }
         }
 
-        return StringUtils.isEmpty(userAgent) ? "" : userAgent.split(" ").length>1?userAgent.split(" ")[1]:userAgent.split(" ")[0];
+        return StringUtils.isEmpty(userAgent) ? "" : userAgent.split(" ").length > 1 ? userAgent.split(" ")[1] : userAgent.split(" ")[0];
     }
 
     private String linkMap(Map<String, String> map) {
