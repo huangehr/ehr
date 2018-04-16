@@ -2,6 +2,7 @@ package com.yihu.ehr.basic.portal.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.yihu.ehr.basic.appointment.entity.Registration;
 import com.yihu.ehr.basic.org.model.OrgDeptDetail;
 import com.yihu.ehr.basic.org.service.OrgDeptDetailService;
 import com.yihu.ehr.basic.portal.model.PortalMessageTemplate;
@@ -13,7 +14,9 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.model.portal.MMessageRemind;
 import com.yihu.ehr.model.portal.MProtalOrderMessage;
+import com.yihu.ehr.model.portal.MRegistration;
 import com.yihu.ehr.model.redis.MRedisMqChannel;
+import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.query.common.model.DataList;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.rest.Envelop;
@@ -159,37 +162,37 @@ public class PortalMessageRemindEndPoint extends EnvelopRestEndPoint {
         Envelop envelop = new Envelop();
         List<MMessageRemind> messageRemindList = new ArrayList<>();
         //如果type为空的话，默认获取当前用户的所有消息。否则获取指定消息模板的消息。
-        DataList list = messageRemindService.listMessageRemindValue(appId,toUserId,typeId,type,page,size);
-        MMessageRemind  protalMessageRemind = null;
-        if(null != list && list.getSize()>0){
-                for(int i=0;i<list.getList().size();i++){
-                    Map<String,Object> dataMap = (Map<String, Object>) list.getList().get(i);
-                    protalMessageRemind = new MMessageRemind();
-                    if(null !=dataMap.get("content")){
-                        List<Map<String,String>> mapList = JSONArray.parseObject(dataMap.get("content").toString(),List.class);
-                        if(null != mapList && mapList.size()>0){
-                            for(Map<String,String> mapL : mapList){
-                                for (Map.Entry entry : mapL.entrySet()){
-                                    protalMessageRemind.setContent(entry.getValue().toString());
-                                }
-                            }
-                        }
-                    }else{
-                        protalMessageRemind.setContent("我的就诊信息");
-                    }
-                    protalMessageRemind.setReaded(Integer.valueOf(dataMap.get("readed").toString()));
-                    protalMessageRemind.setId(Long.parseLong(dataMap.get("id").toString()));
-                    if(null != dataMap.get("order_id")){
-                        protalMessageRemind.setOrder_id(dataMap.get("order_id").toString());
-                    }
-                    if(null != dataMap.get("order_info")){
-                        protalMessageRemind.setOrder_info(dataMap.get("order_info").toString());
-                        Map order = objectMapper.readValue(dataMap.get("order_info").toString(), Map.class);
-                        protalMessageRemind.setResult(order);
-                    }
-                    messageRemindList.add(protalMessageRemind);
-                }
-            }
+//        DataList list = messageRemindService.listMessageRemindValue(appId,toUserId,typeId,type,page,size);
+//        MMessageRemind  protalMessageRemind = null;
+//        if(null != list && list.getSize()>0){
+//                for(int i=0;i<list.getList().size();i++){
+//                    Map<String,Object> dataMap = (Map<String, Object>) list.getList().get(i);
+//                    protalMessageRemind = new MMessageRemind();
+//                    if(null !=dataMap.get("content")){
+//                        List<Map<String,String>> mapList = JSONArray.parseObject(dataMap.get("content").toString(),List.class);
+//                        if(null != mapList && mapList.size()>0){
+//                            for(Map<String,String> mapL : mapList){
+//                                for (Map.Entry entry : mapL.entrySet()){
+//                                    protalMessageRemind.setContent(entry.getValue().toString());
+//                                }
+//                            }
+//                        }
+//                    }else{
+//                        protalMessageRemind.setContent("我的就诊信息");
+//                    }
+//                    protalMessageRemind.setReaded(Integer.valueOf(dataMap.get("readed").toString()));
+//                    protalMessageRemind.setId(Long.parseLong(dataMap.get("id").toString()));
+//                    if(null != dataMap.get("order_id")){
+//                        protalMessageRemind.setOrder_id(dataMap.get("order_id").toString());
+//                    }
+//                    if(null != dataMap.get("order_info")){
+//                        protalMessageRemind.setOrder_info(dataMap.get("order_info").toString());
+//                        Map order = objectMapper.readValue(dataMap.get("order_info").toString(), Map.class);
+//                        protalMessageRemind.setResult(order);
+//                    }
+//                    messageRemindList.add(protalMessageRemind);
+//                }
+//            }
         envelop.setSuccessFlg(true);
         envelop.setDetailModelList(messageRemindList);
         envelop.setPageSize(size);
@@ -211,33 +214,81 @@ public class PortalMessageRemindEndPoint extends EnvelopRestEndPoint {
         MProtalOrderMessage mProtalOrderMessage=null;
         MMessageRemind mMessageRemind = null;
         //提供将挂号单详细内容
-        if(null != protalMessageRemind && StringUtils.isNotEmpty(protalMessageRemind.getOrder_info())){
-            //根据模板获取温馨提示语
-            PortalMessageTemplate template = portalMessageTemplateService.getMessageTemplate(protalMessageRemind.getMessage_template_id());
-            mProtalOrderMessage = objectMapper.readValue(protalMessageRemind.getOrder_info(), MProtalOrderMessage.class);
-            if(null != mProtalOrderMessage && mProtalOrderMessage.getResult().size()>0){
-                mMessageRemind = new MMessageRemind();
-                mMessageRemind.setContent(protalMessageRemind.getContent());
-                Map order= (Map)mProtalOrderMessage.getResult().get(0);
-                if(null != order && orderId.equals(order.get("orderId"))){
+//        if(null != protalMessageRemind && StringUtils.isNotEmpty(protalMessageRemind.getOrder_info())){
+//            //根据模板获取温馨提示语
+//            PortalMessageTemplate template = portalMessageTemplateService.getMessageTemplate(protalMessageRemind.getMessage_template_id());
+//            mProtalOrderMessage = objectMapper.readValue(protalMessageRemind.getOrder_info(), MProtalOrderMessage.class);
+//            if(null != mProtalOrderMessage && mProtalOrderMessage.getResult().size()>0){
+//                mMessageRemind = new MMessageRemind();
+//                mMessageRemind.setContent(protalMessageRemind.getContent());
+//                Map order= (Map)mProtalOrderMessage.getResult().get(0);
+//                if(null != order && orderId.equals(order.get("orderId"))){
+//
+//                    //订单详情
+//                    mMessageRemind.setResult(order);
+//                    mMessageRemind.setOrder_info(objectMapper.writeValueAsString(order));
+//                    //根据医院名称、科室名称查找科室位置
+//                    String orgName = order.get("hospitalName") == null ? "" : order.get("hospitalName").toString();
+//                    String deptName = order.get("deptName") == null ? "" : order.get("deptName").toString();
+//                    OrgDeptDetail orgDeptDetail = deptDetailService.searchByOrgNameAndDeptName(orgName,deptName);
+//                    String place = orgDeptDetail == null ? "" : orgDeptDetail.getPlace();
+//                    //科室位置
+//                    mMessageRemind.setDeptAdress(place);
+//                    //温馨提示
+//                    mMessageRemind.setNotice(template == null ? "" : template.getAfterContent());
+//                }
+//            }
+//        }
+        envelop.setSuccessFlg(true);
+        envelop.setObj(mMessageRemind);
+        return envelop;
+    }
 
-                    //订单详情
-                    mMessageRemind.setResult(order);
-                    mMessageRemind.setOrder_info(objectMapper.writeValueAsString(order));
-                    //根据医院名称、科室名称查找科室位置
-                    String orgName = order.get("hospitalName") == null ? "" : order.get("hospitalName").toString();
-                    String deptName = order.get("deptName") == null ? "" : order.get("deptName").toString();
-                    OrgDeptDetail orgDeptDetail = deptDetailService.searchByOrgNameAndDeptName(orgName,deptName);
-                    String place = orgDeptDetail == null ? "" : orgDeptDetail.getPlace();
-                    //科室位置
-                    mMessageRemind.setDeptAdress(place);
-                    //温馨提示
-                    mMessageRemind.setNotice(template == null ? "" : template.getAfterContent());
+
+    @RequestMapping(value = ServiceApi.MessageRemind.MessageRemindByNotifie, method = RequestMethod.GET)
+    @ApiOperation(value = "公众健康服务-列表-我的就诊", notes = "公众健康服务-消息列表-我的就诊")
+    public Envelop searchMessageRemindByNotifie(
+            @ApiParam(name = "type", value = "模板消息类型：101：挂号结果推送，102：退号结果推送，-101：订单操作推送，100满意度调查", defaultValue = "101")
+            @RequestParam(value = "type", required = false) String type,
+            @ApiParam(name = "appId", value = "应用id", defaultValue = "WYo0l73F8e")
+            @RequestParam(value = "appId", required = false) String appId,
+            @ApiParam(name = "toUserId", value = "当前用户id", defaultValue = "0dae00035ab8be56319e6d2e0f183443")
+            @RequestParam(value = "toUserId", required = false) String toUserId,
+            @ApiParam(name = "typeId", value = "消息类型，默认7为健康上饶app的消息", defaultValue = "7")
+            @RequestParam(value = "typeId", required = false) String typeId,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "3")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page,
+            @ApiParam(name = "notifie", value = "是否通知：0为通知，1为不再通知", defaultValue = "0")
+            @RequestParam(value = "notifie", required = false) String notifie) throws Exception {
+        Envelop envelop = new Envelop();
+        List<MMessageRemind> messageRemindList = new ArrayList<>();
+        //如果type为空的话，默认获取当前用户的所有消息。否则获取指定消息模板的消息。
+        DataList list = messageRemindService.listMessageRemindValue(appId,toUserId,typeId,type,page,size,notifie);
+        MMessageRemind  mMessageRemind = null;
+         new Registration();
+        if(null != list && list.getSize()>0){
+            for(int i=0;i<list.getList().size();i++){
+                Map<String,Object> dataMap = (Map<String, Object>) list.getList().get(i);
+                MRegistration newEntity = objectMapper.readValue(toJson(dataMap), MRegistration.class);
+                //根据订单号获取 消息userService.findByField("telephone", user.getTelephone())
+                List<ProtalMessageRemind> protalMessageR=  messageRemindService.findByField("order_id",newEntity.getOrder_id());
+                mMessageRemind =new MMessageRemind();
+                mMessageRemind.setmRegistration(convertToModel(newEntity, MRegistration.class));
+                if(null != protalMessageR && protalMessageR.size()>0){
+                mMessageRemind.setReaded(Integer.valueOf(protalMessageR.get(0).getReaded()));
+                mMessageRemind.setId(Long.parseLong(protalMessageR.get(0).getId().toString()));
+                mMessageRemind.setOrder_id(newEntity.getOrder_id());
+                mMessageRemind.setNotifie_flag(protalMessageR.get(0).getNotifie_flag());
                 }
+                messageRemindList.add(mMessageRemind);
             }
         }
         envelop.setSuccessFlg(true);
-        envelop.setObj(mMessageRemind);
+        envelop.setDetailModelList(messageRemindList);
+        envelop.setPageSize(size);
+        envelop.setCurrPage(page);
         return envelop;
     }
 }

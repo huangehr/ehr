@@ -38,10 +38,6 @@ public class MMessageRemind {
      */
     private String deptAdress;
     /**
-     * 保存 从消息推送过来的时间到当前时间 的订单信息
-     */
-    private String order_info;
-    /**
      * 预约挂号订单id
      */
     private String notice;
@@ -51,20 +47,12 @@ public class MMessageRemind {
     private String order_id;
     private String fromUserName;
     private String toUserName;
+    private MRegistration mRegistration;
     /**
-     * 结果集 JSON Array数组
-     *orderCreateTime	String	下单时间	格式：yyyy-mm-dd hh24:mi:ss
-     patientName	String	患者姓名
-     hospitalName	String	医院名称
-     deptName	String	科室名称
-     doctorName	String	医生姓名
-     state	Int  	订单状态	1:待付款  2:待就诊 11：预约中 22：退款中 99：已退号 -1：系统取消 3：已就诊
-     stateDesc	String	订单状态描述	待付款；待就诊；预约中；退款中；已退号；系统取消  ；已就诊
-     orderId	String	订单号
-     thirdPartyOrderId	String	第三方订单号
-     registerDate	String	就诊时间
+     * 我的就诊-是否通知：0为通知，1为不通知。我的档案：0未评价、1为已评价
      */
-    private Map result;
+    private String notifie_flag;
+
     public Long getId() {
         return id;
     }
@@ -177,14 +165,6 @@ public class MMessageRemind {
         this.deptAdress = deptAdress;
     }
 
-    public String getOrder_info() {
-        return order_info;
-    }
-
-    public void setOrder_info(String order_info) {
-        this.order_info = order_info;
-    }
-
     public String getOrder_id() {
         return order_id;
     }
@@ -217,134 +197,19 @@ public class MMessageRemind {
         this.toUserName = toUserName;
     }
 
-    public  class Order{
-        /**
-         * 下单时间	格式：yyyy-mm-dd hh24:mi:ss
-         */
-        private String orderCreateTime;
-        /**
-         * 患者姓名
-         */
-        private String patientName;
-        /**
-         * 医院名称
-         */
-        private String hospitalName;
-        /**
-         * 科室名称
-         */
-        private String deptName;
-        /**
-         * 医生姓名
-         */
-        private String doctorName;
-        /**
-         * 订单状态	1:待付款  2:待就诊 11：预约中 22：退款中 99：已退号 -1：系统取消 3：已就诊
-         */
-        private Integer state;
-        /**
-         * 订单状态描述	待付款；待就诊；预约中；退款中；已退号；系统取消  ；已就诊
-         */
-        private String stateDesc;
-        /**
-         * 订单号
-         */
-        private String orderId;
-        /**
-         * 第三方订单号
-         */
-        private String thirdPartyOrderId;
-        /**
-         * 就诊时间
-         */
-        private String registerDate	;
-
-        public String getOrderCreateTime() {
-            return orderCreateTime;
-        }
-
-        public void setOrderCreateTime(String orderCreateTime) {
-            this.orderCreateTime = orderCreateTime;
-        }
-
-        public String getPatientName() {
-            return patientName;
-        }
-
-        public void setPatientName(String patientName) {
-            this.patientName = patientName;
-        }
-
-        public String getHospitalName() {
-            return hospitalName;
-        }
-
-        public void setHospitalName(String hospitalName) {
-            this.hospitalName = hospitalName;
-        }
-
-        public String getDeptName() {
-            return deptName;
-        }
-
-        public void setDeptName(String deptName) {
-            this.deptName = deptName;
-        }
-
-        public String getDoctorName() {
-            return doctorName;
-        }
-
-        public void setDoctorName(String doctorName) {
-            this.doctorName = doctorName;
-        }
-
-        public Integer getState() {
-            return state;
-        }
-
-        public void setState(Integer state) {
-            this.state = state;
-        }
-
-        public String getStateDesc() {
-            return stateDesc;
-        }
-
-        public void setStateDesc(String stateDesc) {
-            this.stateDesc = stateDesc;
-        }
-
-        public String getOrderId() {
-            return orderId;
-        }
-
-        public void setOrderId(String orderId) {
-            this.orderId = orderId;
-        }
-
-        public String getThirdPartyOrderId() {
-            return thirdPartyOrderId;
-        }
-
-        public void setThirdPartyOrderId(String thirdPartyOrderId) {
-            this.thirdPartyOrderId = thirdPartyOrderId;
-        }
-
-        public String getRegisterDate() {
-            return registerDate;
-        }
-
-        public void setRegisterDate(String registerDate) {
-            this.registerDate = registerDate;
-        }
+    public MRegistration getmRegistration() {
+        return mRegistration;
     }
 
-    public Map getResult() {
-        return result;
+    public void setmRegistration(MRegistration mRegistration) {
+        this.mRegistration = mRegistration;
     }
 
-    public void setResult(Map result) {
-        this.result = result;
+    public String getNotifie_flag() {
+        return notifie_flag;
+    }
+
+    public void setNotifie_flag(String notifie_flag) {
+        this.notifie_flag = notifie_flag;
     }
 }
