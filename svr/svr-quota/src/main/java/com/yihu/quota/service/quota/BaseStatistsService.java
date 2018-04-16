@@ -351,7 +351,7 @@ public class BaseStatistsService {
             result.add(mapCategory);
             if(mapCategory.get("children") != null){
                 List<Map<String,Object>> childrenOrgHealthCategoryList = (List<Map<String, Object>>) mapCategory.get("children");
-                mapCategory.put("children",setResultAllDimenMap(quotaCode,childrenOrgHealthCategoryList,dimenListResult,dateType));
+                mapCategory.put("children",setResultAllDimenMap(quotaCode, childrenOrgHealthCategoryList, dimenListResult, dateType));
             }
         }
         return  result;
@@ -454,8 +454,8 @@ public class BaseStatistsService {
         List<Map<String, Object>> resultList = new ArrayList<>();
         for(Map<String, Object> map : dimenListResult){
             Map<String,Object> dataMap = new HashMap<>();
+            boolean quotaFlag = false;
             for(String key :map.keySet()){
-                dataMap.putAll(map);
                 //维度为特殊机构类型时
                 if(key.equals(orgHealthCategoryCode)){
                     dataMap.put(map.get(orgHealthCategoryCode).toString(),map.get(orgHealthCategoryCode));
@@ -470,8 +470,13 @@ public class BaseStatistsService {
                     Long time = new Long(Long.valueOf(map.get(key).toString()));
                     String quotaDate = format.format(time);
                     dataMap.put("quotaDate", quotaDate);
+                    quotaFlag = true;
                 }
             }
+            if(quotaFlag){
+                map.remove("quotaDate");
+            }
+            dataMap.putAll(map);
             resultList.add(dataMap);
         }
         return resultList;
