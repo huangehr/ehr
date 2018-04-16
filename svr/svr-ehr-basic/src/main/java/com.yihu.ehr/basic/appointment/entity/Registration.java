@@ -3,6 +3,8 @@ package com.yihu.ehr.basic.appointment.entity;
 import com.yihu.ehr.entity.BaseAssignedEntity;
 
 import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.util.Date;
 
 /**
@@ -11,6 +13,8 @@ import java.util.Date;
  * @author 张进军
  * @date 2018/4/16 19:18
  */
+@Entity
+@Table(name = "registration")
 public class Registration extends BaseAssignedEntity {
 
     public String orderId; // 订单号
