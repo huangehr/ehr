@@ -1,5 +1,6 @@
 package com.yihu.quota.job;
 
+import com.yihu.ehr.elasticsearch.ElasticSearchPool;
 import com.yihu.quota.dao.jpa.TjQuotaLogDao;
 import com.yihu.quota.etl.Contant;
 import com.yihu.quota.etl.extract.ExtractHelper;
@@ -61,6 +62,9 @@ public class EsQuotaJob implements Job {
     private ExtractHelper extractHelper;
     @Autowired
     ElasticsearchUtil elasticsearchUtil;
+    @Autowired
+    private ElasticSearchPool elasticSearchPool;
+
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
@@ -152,9 +156,9 @@ public class EsQuotaJob implements Job {
             RangeQueryBuilder rangeQueryEndTime = QueryBuilders.rangeQuery("quotaDate").lte(endTime);
             boolQueryBuilder.must(rangeQueryEndTime);
         }
-        Client client = esClientUtil.getClient(esConfig.getHost(), esConfig.getPort(), esConfig.getIndex(), esConfig.getType(), esConfig.getClusterName());
+        Client client = esClientUtil.getClient(esConfig.getHost(), esConfig.getPort(), esConfig.getClusterName());
         try {
-            elasticsearchUtil.queryDelete(client, boolQueryBuilder);
+            elasticsearchUtil.queryDelete(client, esConfig.getIndex() ,esConfig.getType(),boolQueryBuilder);
         } catch (Exception e) {
             e.getMessage();
         } finally {

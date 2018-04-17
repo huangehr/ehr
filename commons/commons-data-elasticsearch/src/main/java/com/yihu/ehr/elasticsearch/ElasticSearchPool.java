@@ -43,7 +43,6 @@ public class ElasticSearchPool {
             while (clientPool.size() < initSize) {
                 Settings settings = Settings.builder()
                         .put("cluster.name", elasticSearchConfig.getClusterName())
-                        .put("client.transport.sniff", true)
                         .build();
                 String[] nodeArr = elasticSearchConfig.getClusterNodes().split(",");
                 InetSocketTransportAddress[] socketArr = new InetSocketTransportAddress[nodeArr.length];
