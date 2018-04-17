@@ -770,6 +770,7 @@ public class ServiceApi {
         public static final String ChangePassword = "/users/changePassword";
         public static final String DistributeSecurityKey = "/users/distributeSecurityKey";
         public static final String GetSecurityKey = "/users/getSecurityKey";
+        public static final String changePasswordByTelephone = "/usersOfApp/users/changePasswordByTelephone";
 
     }
 
@@ -1303,6 +1304,14 @@ public class ServiceApi {
 
         public static final String GetArchiveCount = "/tj/getArchiveCount";
         public static final String GetArchiveManCount = "/tj/getArchiveManCount";
+
+
+
+        public static final String GetYearDropdownList = "/tj/getYearDropdownList";
+
+
+
+
 
     }
 

@@ -1,6 +1,7 @@
 package com.yihu.quota.etl.save.es;
 
 import com.yihu.quota.etl.model.EsConfig;
+import com.yihu.quota.etl.util.EsClientUtil;
 import com.yihu.quota.vo.SaveModel;
 import io.searchbox.client.JestClient;
 import io.searchbox.core.Bulk;
@@ -25,7 +26,7 @@ public class ElastricSearchSave {
 
     private Logger logger = LoggerFactory.getLogger(ElastricSearchSave.class);
     @Autowired
-    private ElasticFactory elasticFactory;
+    private EsClientUtil esClientUtil;
 
     private EsConfig esConfig;
 
@@ -35,7 +36,7 @@ public class ElastricSearchSave {
             //初始化参数
             esConfig = (EsConfig) JSONObject.toBean(JSONObject.fromObject(jsonConfig), EsConfig.class);
             //得到链接
-            JestClient jestClient = elasticFactory.getJestClient(esConfig.getHost(),esConfig.getPort());
+            JestClient jestClient = esClientUtil.getJestClient(esConfig.getHost(),esConfig.getPort());
 
             Bulk.Builder bulk = new Bulk.Builder().defaultIndex(esConfig.getIndex()).defaultType(esConfig.getType());
             for (SaveModel obj : smss) {
