@@ -5,7 +5,6 @@ import com.yihu.ehr.entity.BaseAssignedEntity;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import java.util.Date;
 
 /**
  * 挂号单
@@ -25,14 +24,14 @@ public class Registration extends BaseAssignedEntity {
     public String doctorName; // 医生姓名
     public Integer state; // 订单状态。1:待付款  2:待就诊 11：预约中 22：退款中 99：已退号 -1：系统取消 3：已就诊
     public String stateDesc; // 订单状态描述
-    public String visitClinicResult; // 到诊情况。0：确认中，1：已到诊，-1：爽约。（医院如果未提供到诊信息，该返回值将永远处于确认中）
+    public Integer visitClinicResult; // 到诊情况。0：确认中，1：已到诊，-1：爽约。（医院如果未提供到诊信息，该返回值将永远处于确认中）
     public String visitClinicResultDesc; // 到诊情况描述
     public String registerDate; // 就诊时间
     public Integer timeId; // 就诊午别。1：上午，2：下午，3：晚上
     public String timeIdDesc; // 就诊午别描述
     public String commendTime; // 就诊时间段
-    public String serialNo; // 就诊号数
-    public String originType; // 来源类型，1：PC，2：APP
+    public Integer serialNo; // 就诊号数
+    public Integer originType; // 来源类型，1：PC，2：APP
 
     @Column(name = "order_id")
     public String getOrderId() {
@@ -107,11 +106,11 @@ public class Registration extends BaseAssignedEntity {
     }
 
     @Column(name = "visit_clinic_result")
-    public String getVisitClinicResult() {
+    public Integer getVisitClinicResult() {
         return visitClinicResult;
     }
 
-    public void setVisitClinicResult(String visitClinicResult) {
+    public void setVisitClinicResult(Integer visitClinicResult) {
         this.visitClinicResult = visitClinicResult;
     }
 
@@ -161,20 +160,20 @@ public class Registration extends BaseAssignedEntity {
     }
 
     @Column(name = "serial_no")
-    public String getSerialNo() {
+    public Integer getSerialNo() {
         return serialNo;
     }
 
-    public void setSerialNo(String serialNo) {
+    public void setSerialNo(Integer serialNo) {
         this.serialNo = serialNo;
     }
 
     @Column(name = "origin_type")
-    public String getOriginType() {
+    public Integer getOriginType() {
         return originType;
     }
 
-    public void setOriginType(String originType) {
+    public void setOriginType(Integer originType) {
         this.originType = originType;
     }
 
