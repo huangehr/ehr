@@ -22,6 +22,8 @@ public class Registration extends BaseAssignedEntity {
     public String hospitalName; // 医院名称
     public String deptName; // 科室名称
     public String doctorName; // 医生姓名
+    public String lczcName; // 临床职称名称
+    public String photoUri; // 医生头像URL
     public Integer state; // 订单状态。1:待付款  2:待就诊 11：预约中 22：退款中 99：已退号 -1：系统取消 3：已就诊
     public String stateDesc; // 订单状态描述
     public Integer visitClinicResult; // 到诊情况。0：确认中，1：已到诊，-1：爽约。（医院如果未提供到诊信息，该返回值将永远处于确认中）
@@ -31,6 +33,7 @@ public class Registration extends BaseAssignedEntity {
     public String timeIdDesc; // 就诊午别描述
     public String commendTime; // 就诊时间段
     public Integer serialNo; // 就诊号数
+    public String invalidDate; // 退号截止时间（与预约截止时间相同）
     public Integer originType; // 来源类型，1：PC，2：APP
 
     @Column(name = "order_id")
@@ -85,6 +88,24 @@ public class Registration extends BaseAssignedEntity {
 
     public void setDoctorName(String doctorName) {
         this.doctorName = doctorName;
+    }
+
+    @Column(name = "lczc_name")
+    public String getLczcName() {
+        return lczcName;
+    }
+
+    public void setLczcName(String lczcName) {
+        this.lczcName = lczcName;
+    }
+
+    @Column(name = "photo_uri")
+    public String getPhotoUri() {
+        return photoUri;
+    }
+
+    public void setPhotoUri(String photoUri) {
+        this.photoUri = photoUri;
     }
 
     @Column(name = "state")
@@ -166,6 +187,15 @@ public class Registration extends BaseAssignedEntity {
 
     public void setSerialNo(Integer serialNo) {
         this.serialNo = serialNo;
+    }
+
+    @Column(name = "invalid_date")
+    public String getInvalidDate() {
+        return invalidDate;
+    }
+
+    public void setInvalidDate(String invalidDate) {
+        this.invalidDate = invalidDate;
     }
 
     @Column(name = "origin_type")
