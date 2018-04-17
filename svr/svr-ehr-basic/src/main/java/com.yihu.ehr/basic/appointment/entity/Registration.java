@@ -19,6 +19,8 @@ public class Registration extends BaseAssignedEntity {
     public String orderId; // 订单号
     public String orderCreateTime; // 下单时间
     public String patientName; // 患者姓名
+    public String idCard; // 患者证件号
+    public String phoneNo; // 患者手机号
     public String hospitalName; // 医院名称
     public String deptName; // 科室名称
     public String doctorName; // 医生姓名
@@ -61,6 +63,24 @@ public class Registration extends BaseAssignedEntity {
 
     public void setPatientName(String patientName) {
         this.patientName = patientName;
+    }
+
+    @Column(name = "id_card")
+    public String getIdCard() {
+        return idCard;
+    }
+
+    public void setIdCard(String idCard) {
+        this.idCard = idCard;
+    }
+
+    @Column(name = "phone_no")
+    public String getPhoneNo() {
+        return phoneNo;
+    }
+
+    public void setPhoneNo(String phoneNo) {
+        this.phoneNo = phoneNo;
     }
 
     @Column(name = "hospital_name")
