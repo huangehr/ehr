@@ -88,16 +88,17 @@ public class PortalMessageRemindService extends BaseJpaService<ProtalMessageRemi
         String date = DateUtil.getNowDate(DateUtil.DEFAULT_YMDHMSDATE_FORMAT);
         String notifieSql= "";
         if(StringUtils.isNotEmpty(notifie)){
-            notifieSql = " AND pm.notifie_flag = '"+ notifie +"' ";
+            notifieSql = " AND p.notifie_flag = '"+ notifie +"' ";
         }
         String sql ="";
         //我的就诊-列表，获取就诊时间前的数据
         if(type.equals("101")){
-            sql = "SELECT re.* FROM registration re JOIN portal_message_remind pm ON re.order_id = pm.order_id JOIN portal_message_template pt ON pm.message_template_id = pt.id " +
+            sql = "SELECT re.* FROM registration re JOIN portal_message_remind p ON re.order_id = p.order_id " +
+                    "JOIN portal_message_template pt ON p.message_template_id = pt.id " +
                   " where pt.type='"+type+"'"+" AND pt.classification='0'"+
-                    " AND pm.type_id='" +typeId+"'" +
-                    " AND pm.to_user_id='" +toUserId+"' " +" AND pm.app_id='" +appId+"' "+
-                    " AND re.register_date >  '"+ date +"' "+ notifieSql+" order by pm.create_date desc ";
+                    " AND p.type_id='" +typeId+"'" +
+                    " AND p.to_user_id='" +toUserId+"' " +" AND p.app_id='" +appId+"' "+
+                    " AND re.register_date >  '"+ date +"' "+ notifieSql+" order by p.create_date desc ";
         }else{
             //满意度调查，获取待评价消息
             sql = "select p.* from portal_message_remind p " +
@@ -118,8 +119,8 @@ public class PortalMessageRemindService extends BaseJpaService<ProtalMessageRemi
      * @return
      * @throws Exception
      */
-    public boolean updateMessageRemind(String field,Long protalMessageRemindId) throws Exception {
-        String  sql = "UPDATE portal_message_remind pm  SET  pm."+field+" ='1'  WHERE pm.id="+protalMessageRemindId;
+    public boolean updateMessageRemind(String field,String state,Long protalMessageRemindId) throws Exception {
+        String  sql = "UPDATE portal_message_remind pm  SET  pm."+field+"="+state +" WHERE pm.id="+protalMessageRemindId;
         jdbcTemplate.update(sql);
         return true;
     }
