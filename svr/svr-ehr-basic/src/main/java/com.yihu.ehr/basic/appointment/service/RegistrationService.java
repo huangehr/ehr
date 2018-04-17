@@ -20,17 +20,17 @@ public class RegistrationService extends BaseJpaService<Registration, Registrati
     @Autowired
     RegistrationDao registrationDao;
 
-    public Registration getById(Integer id) {
+    public Registration getById(String id) {
         return registrationDao.findOne(id);
     }
 
     @Transactional(readOnly = false)
-    public Registration save(Registration redisMqChannel) {
-        return registrationDao.save(redisMqChannel);
+    public Registration save(Registration registration) {
+        return registrationDao.save(registration);
     }
 
     @Transactional(readOnly = false)
-    public void delete(Integer id) {
+    public void delete(String id) {
         registrationDao.delete(id);
     }
 

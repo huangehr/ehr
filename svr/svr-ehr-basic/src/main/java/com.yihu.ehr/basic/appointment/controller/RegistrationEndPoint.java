@@ -33,7 +33,7 @@ public class RegistrationEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Registration.GetById, method = RequestMethod.GET)
     public Envelop getById(
             @ApiParam(name = "id", value = "主键", required = true)
-            @PathVariable(value = "id") Integer id) {
+            @PathVariable(value = "id") String id) {
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
         try {
@@ -127,6 +127,54 @@ public class RegistrationEndPoint extends EnvelopRestEndPoint {
         Envelop envelop = new Envelop();
         registrationService.delete(id);
         envelop.setSuccessFlg(true);
+        return envelop;
+    }
+
+    @ApiOperation("更新挂号单状态")
+    @RequestMapping(value = ServiceApi.Registration.UpdateState, method = RequestMethod.POST)
+    public Envelop updateState(
+            @ApiParam(value = "挂号单ID", required = true)
+            @RequestParam(value = "id") String id,
+            @ApiParam(value = "订单状态", required = true)
+            @RequestParam(value = "state") Integer state) {
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(false);
+        try {
+            Registration updateEntity = registrationService.getById(id);
+            updateEntity.setState(state);
+            updateEntity = registrationService.save(updateEntity);
+
+            envelop.setObj(updateEntity);
+            envelop.setSuccessFlg(true);
+            envelop.setErrorMsg("成功更新挂号单。");
+        } catch (Exception e) {
+            e.printStackTrace();
+            envelop.setErrorMsg("更新挂号单发生异常：" + e.getMessage());
+        }
+        return envelop;
+    }
+
+    @ApiOperation("更新挂号单到诊情况")
+    @RequestMapping(value = ServiceApi.Registration.UpdateVisitState, method = RequestMethod.POST)
+    public Envelop updateVisitState(
+            @ApiParam(value = "挂号单ID", required = true)
+            @RequestParam(value = "id") String id,
+            @ApiParam(value = "到诊情况", required = true)
+            @RequestParam(value = "visitClinicResult") Integer visitClinicResult) {
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(false);
+        try {
+            Registration updateEntity = registrationService.getById(id);
+            updateEntity.setVisitClinicResult(visitClinicResult);
+            updateEntity = registrationService.save(updateEntity);
+
+            envelop.setObj(updateEntity);
+            envelop.setSuccessFlg(true);
+            envelop.setErrorMsg("成功更新挂号单。");
+        } catch (Exception e) {
+            e.printStackTrace();
+            envelop.setErrorMsg("更新挂号单发生异常：" + e.getMessage());
+        }
         return envelop;
     }
 
