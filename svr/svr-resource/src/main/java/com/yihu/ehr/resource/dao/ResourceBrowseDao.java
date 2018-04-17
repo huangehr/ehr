@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -25,7 +26,7 @@ import java.util.Map;
  * Created by hzp on 2016/4/22.
  * 资源查询底层接口
  */
-@Service
+@Repository
 public class ResourceBrowseDao {
 
     private Integer defaultPage = 1;

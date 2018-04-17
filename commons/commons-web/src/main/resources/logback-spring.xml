@@ -72,9 +72,7 @@
     </appender>
 
     <logger name="com.yihu.ehr.exception.GlobalExceptionHandler" level="WARN" additivity="false">
-        <springProfile name="dev">
-            <appender-ref ref="console" />
-        </springProfile>
+        <appender-ref ref="console" />
         <appender-ref ref="ApiInfoFile" />
         <appender-ref ref="ApiWarnFile" />
         <appender-ref ref="ApiErrorFile" />

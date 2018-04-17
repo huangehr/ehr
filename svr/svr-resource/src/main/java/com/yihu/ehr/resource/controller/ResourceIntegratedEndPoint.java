@@ -15,6 +15,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,8 +50,8 @@ public class ResourceIntegratedEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "roleId") String roleId,
             @ApiParam(name = "filters", value = "过滤条件(name)")
             @RequestParam(value = "filters", required = false) String filters) throws Exception {
-        Envelop envelop = resourcesIntegratedService.getMetadataList(userResource, roleId, filters);
-        return envelop;
+        List list = resourcesIntegratedService.getMetadataList(userResource, roleId, filters);
+        return success(list);
     }
 
     @ApiOperation("综合查询档案数据检索")
@@ -70,7 +71,14 @@ public class ResourceIntegratedEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page", required = false) Integer page,
             @ApiParam(name = "size", value = "每页几行(>0)")
             @RequestParam(value = "size", required = false) Integer size) throws Exception{
-        return resourcesIntegratedService.searchMetadataData(resourcesCode, metaData, orgCode, areaCode, queryCondition, page, size);
+        Page<Map<String, Object>> result =  resourcesIntegratedService.searchMetadataData(resourcesCode, metaData, orgCode, areaCode, queryCondition, page, size);
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(true);
+        envelop.setCurrPage(result.getNumber());
+        envelop.setPageSize(result.getSize());
+        envelop.setTotalCount(new Long(result.getTotalElements()).intValue());
+        envelop.setDetailModelList(result.getContent());
+        return envelop;
     }
 
     @ApiOperation("综合查询指标统计列表树")
@@ -78,7 +86,8 @@ public class ResourceIntegratedEndPoint extends EnvelopRestEndPoint {
     public Envelop getQuotaList(
             @ApiParam(name = "filters", value = "过滤条件(name)", defaultValue = "")
             @RequestParam(value = "filters", required = false) String filters) throws Exception {
-        return resourcesIntegratedService.getQuotaList(filters);
+        List<Map<String, Object>> list = resourcesIntegratedService.getQuotaList(filters);
+        return success(list);
     }
 
     @ApiOperation("综合查询视图保存")

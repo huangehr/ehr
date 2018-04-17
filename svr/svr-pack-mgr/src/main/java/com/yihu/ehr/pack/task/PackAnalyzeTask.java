@@ -37,50 +37,17 @@ public class PackAnalyzeTask {
         if (size() > MAX_SIZE) {
             return;
         }
-        List<Map<String, Object>> filters = new ArrayList<>();
         //添加未分析的
-        Map<String, Object> temp = new HashMap<>();
-        temp.put("andOr", "and");
-        temp.put("condition", "=");
-        temp.put("field", "analyze_status");
-        temp.put("value", 0);
-        filters.add(temp);
-        addToQueue(filters);
-        filters.clear();
-        temp.clear();
+        addToQueue("analyze_status=0");
         //添加分析异常的
-        temp.put("andOr", "and");
-        temp.put("condition", "=");
-        temp.put("field", "analyze_status");
-        temp.put("value", 1);
-        filters.add(temp);
-        Map<String, Object> temp1 = new HashMap<>();
-        temp1.put("andOr", "and");
-        temp1.put("condition", "<");
-        temp1.put("field", "analyze_date");
         Date date = DateUtil.addDate(-3, new Date());
-        temp1.put("value",  DateUtil.toString(date) + " 00:00:00");
-        filters.add(temp1);
-        addToQueue(filters);
-        filters.clear();
-        temp.clear();
-        temp1.clear();
+        addToQueue("analyze_status=1;analyze_date<" + DateUtil.toString(date) + " 00:00:00");
         //添加分析错误的
-        temp.put("andOr", "and");
-        temp.put("condition", "=");
-        temp.put("field", "analyze_status");
-        temp.put("value", 2);
-        filters.add(temp);
-        temp1.put("andOr", "and");
-        temp1.put("condition", "<");
-        temp1.put("field", "analyze_fail_count");
-        temp1.put("value", 3);
-        filters.add(temp1);
-        addToQueue(filters);
+        addToQueue("analyze_status=2;analyze_fail_count<3");
     }
 
-    private void addToQueue( List<Map<String, Object>>  filters) throws Exception {
-        List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, filters, "receive_date asc", 1, 100);
+    private void addToQueue(String filters) throws Exception {
+        List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, filters, "+receive_date", 1, 100);
         for (Map<String, Object> pack : resultList) {
             String packStr = objectMapper.writeValueAsString(pack);
             EsSimplePackage esSimplePackage = objectMapper.readValue(packStr, EsSimplePackage.class);

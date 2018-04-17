@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
  * @created 2018-01-18
  */
 @Configuration
-public class FastdfsConfig {
+public class FastDfsConfig {
     @Value(value = "${fast-dfs.public-server}")
     private String publicServer;
 

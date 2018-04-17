@@ -87,7 +87,6 @@
 //        if (transportClient == null) {
 //            String[] hosts = tHost.split(",");
 //            Settings settings = Settings.settingsBuilder()
-//                    // .put("client.transport.sniff", true)//开启嗅探功能
 //                    .put("cluster.name", StringUtils.isEmpty(clusterName) ? "jkzl" : clusterName)//默认集群名字是jkzl
 //                    .build();
 //

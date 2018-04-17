@@ -64,7 +64,7 @@ public class PortalMessageRemindController extends BaseController {
         List<MessageRemindModel> portalMessageRemindModels = new ArrayList<>();
         for (MMessageRemind mPortalMessageRemind : mPortalMessageRemindList) {
             MessageRemindModel portalMessageRemindModel = convertToModel(mPortalMessageRemind, MessageRemindModel.class);
-            portalMessageRemindModel.setCreateDate(mPortalMessageRemind.getCreateDate() == null ? "" : DateTimeUtil.simpleDateTimeFormat(mPortalMessageRemind.getCreateDate()));
+            portalMessageRemindModel.setCreateDate(mPortalMessageRemind.getCreate_date() == null ? "" : DateTimeUtil.simpleDateTimeFormat(mPortalMessageRemind.getCreate_date()));
             if (org.apache.commons.lang.StringUtils.isNotEmpty(portalMessageRemindModel.getFromUserId()) ){
                 MUser mUser = userClient.getUser(portalMessageRemindModel.getFromUserId());
                 portalMessageRemindModel.setFromUserName(mUser == null ? "" : mUser.getRealName());
@@ -133,15 +133,15 @@ public class PortalMessageRemindController extends BaseController {
             List<MMessageRemind> messages = responseEntity.getBody();
             for (MMessageRemind message : messages) {
                 MessageRemindModel messageModel = convertToModel(message, MessageRemindModel.class);
-                if (StringUtils.isNotEmpty(message.getFromUserId()) ){
-                    MUser mUser = userClient.getUser(message.getFromUserId());
+                if (StringUtils.isNotEmpty(message.getFrom_user_id()) ){
+                    MUser mUser = userClient.getUser(message.getFrom_user_id());
                     messageModel.setFromUserName(mUser == null ? "" : mUser.getRealName());
                 }
-                if (StringUtils.isNotEmpty(message.getToUserId()) ){
-                    MUser mUser = userClient.getUser(message.getToUserId());
+                if (StringUtils.isNotEmpty(message.getTo_user_id()) ){
+                    MUser mUser = userClient.getUser(message.getTo_user_id());
                     messageModel.setToUserName(mUser == null ? "" : mUser.getRealName());
                 }
-                messageModel.setCreateDate(message.getCreateDate() == null ? "" : DateTimeUtil.simpleDateTimeFormat(message.getCreateDate()));
+                messageModel.setCreateDate(message.getCreate_date() == null ? "" : DateTimeUtil.simpleDateTimeFormat(message.getCreate_date()));
                 //获取类别字典
                 MConventionalDict dict = conventionalDictClient.getMessageRemindTypeList(String.valueOf(messageModel.getTypeId()));
                 messageModel.setTypeName(dict == null ? "" : dict.getValue());
@@ -165,7 +165,7 @@ public class PortalMessageRemindController extends BaseController {
             String errorMsg = "";
             MessageRemindModel messageModel = objectMapper.readValue(messageRemindJsonData, MessageRemindModel.class);
             MMessageRemind mMessage = convertToModel(messageModel, MMessageRemind.class);
-            if (mMessage.getAppId() == null) {
+            if (mMessage.getApp_id() == null) {
                 errorMsg += "应用ID不能为空！";
             }
             if (StringUtils.isEmpty(mMessage.getContent())) {
@@ -227,7 +227,7 @@ public class PortalMessageRemindController extends BaseController {
             return null;
         }
         MMessageRemind mMessageRemind = convertToModel(detailModel,MMessageRemind.class);
-        mMessageRemind.setCreateDate(DateTimeUtil.simpleDateTimeParse(detailModel.getCreateDate()));
+        mMessageRemind.setCreate_date(DateTimeUtil.simpleDateTimeParse(detailModel.getCreateDate()));
         return mMessageRemind;
     }
 
@@ -241,14 +241,13 @@ public class PortalMessageRemindController extends BaseController {
             if (mMessageRemind == null) {
                 return failed("提醒消息信息获取失败!");
             }else{
-                if (StringUtils.isNotEmpty(mMessageRemind.getToUserId()) ){
-                    MUser mUser = userClient.getUser(mMessageRemind.getToUserId());
+                if (StringUtils.isNotEmpty(mMessageRemind.getTo_user_id()) ){
+                    MUser mUser = userClient.getUser(mMessageRemind.getTo_user_id());
                     mMessageRemind.setToUserName(mUser == null ? "" : mUser.getRealName());
                 }
             }
-
             MessageRemindModel detailModel = convertToModel(mMessageRemind, MessageRemindModel.class);
-            detailModel.setCreateDate(mMessageRemind.getCreateDate() == null ? "" : DateTimeUtil.simpleDateTimeFormat(mMessageRemind.getCreateDate()));
+            detailModel.setCreateDate(mMessageRemind.getCreate_date() == null ? "" : DateTimeUtil.simpleDateTimeFormat(mMessageRemind.getCreate_date()));
             return success(detailModel);
         }
         catch (Exception ex){

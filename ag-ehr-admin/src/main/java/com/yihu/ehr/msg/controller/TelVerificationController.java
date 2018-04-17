@@ -105,10 +105,13 @@ public class TelVerificationController extends BaseController {
                     envelop.setSuccessFlg(true);
                     envelop.setErrorMsg("短信验证码发送成功！");
                 } else {
-                    envelop.setSuccessFlg(true);
+                    envelop.setSuccessFlg(false);
                     envelop.setErrorCode(resultCode);
                     envelop.setErrorMsg("短信验证码发送失败！");
                 }
+            }else{
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg("短信验证码发送失败！");
             }
         }
         return envelop;
@@ -124,7 +127,7 @@ public class TelVerificationController extends BaseController {
             @RequestParam(value = "appId", required = false) String appId,
             @ApiParam(name = "tel", value = "手机号码", defaultValue = "")
             @RequestParam(value = "tel", required = false) String tel,
-            @ApiParam(name = "verificationCode", value = "手机号码", defaultValue = "")
+            @ApiParam(name = "verificationCode", value = "手机验证码", defaultValue = "")
             @RequestParam(value = "verificationCode", required = false) String verificationCode) throws Exception {
         Envelop envelop = new Envelop();
         envelop = telVerificationClient.validationTelVerification(tel, appId, verificationCode);
