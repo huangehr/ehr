@@ -80,7 +80,7 @@ public class RegistrationEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Registration.Save, method = RequestMethod.POST)
     public Envelop add(
             @ApiParam(value = "挂号单JSON", required = true)
-            @RequestBody String entityJson) {
+            @RequestParam String entityJson) {
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
         try {
@@ -102,7 +102,7 @@ public class RegistrationEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Registration.Save, method = RequestMethod.PUT)
     public Envelop update(
             @ApiParam(value = "挂号单JSON", required = true)
-            @RequestBody String entityJson) {
+            @RequestParam String entityJson) {
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
         try {
