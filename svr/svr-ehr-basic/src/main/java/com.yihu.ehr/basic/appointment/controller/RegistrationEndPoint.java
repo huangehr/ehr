@@ -146,7 +146,7 @@ public class RegistrationEndPoint extends EnvelopRestEndPoint {
                 envelop.setSuccessFlg(true);
                 envelop.setErrorMsg("成功更新挂号单。");
             } else {
-                envelop.setErrorMsg("更新时获取福州总部挂号单详情失败：" + fzOrderInfoMap.get("Message"));
+                envelop.setErrorMsg("更新时获取福州总部挂号单详情" + fzOrderInfoMap.get("Message"));
             }
         } catch (Exception e) {
             e.printStackTrace();
