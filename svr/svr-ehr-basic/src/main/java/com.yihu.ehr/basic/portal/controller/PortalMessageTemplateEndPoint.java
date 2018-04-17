@@ -246,7 +246,7 @@ public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
             String str = toJson(mProtalOrderMessage.getResult().get(0));
             newEntity = objectMapper.readValue(str, Registration.class);
             newEntity.setId(UuidUtil.randomUUID());
-            newEntity.setOriginType("2");
+            newEntity.setOriginType(2);
             registrationService.save(newEntity);
         }
         ProtalMessageRemind protalMessageRemind = null;
