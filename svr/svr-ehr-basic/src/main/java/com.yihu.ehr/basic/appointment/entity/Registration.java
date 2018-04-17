@@ -18,9 +18,16 @@ public class Registration extends BaseAssignedEntity {
 
     public String orderId; // 订单号
     public String orderCreateTime; // 下单时间
+    public String userId; // 患者ID
     public String patientName; // 患者姓名
+    public Integer cardType; // 患者证件类型，默认身份证，1：中国大陆身份证
+    public String cardNo; // 患者证件号
+    public String phoneNo; // 患者手机号
+    public String hospitalId; // 医院ID
     public String hospitalName; // 医院名称
+    public String deptId; // 科室ID
     public String deptName; // 科室名称
+    public String doctorId; // 医生ID
     public String doctorName; // 医生姓名
     public String lczcName; // 临床职称名称
     public String photoUri; // 医生头像URL
@@ -54,6 +61,15 @@ public class Registration extends BaseAssignedEntity {
         this.orderCreateTime = orderCreateTime;
     }
 
+    @Column(name = "user_id")
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
     @Column(name = "patient_name")
     public String getPatientName() {
         return patientName;
@@ -61,6 +77,43 @@ public class Registration extends BaseAssignedEntity {
 
     public void setPatientName(String patientName) {
         this.patientName = patientName;
+    }
+
+    @Column(name = "card_type")
+    public Integer getCardType() {
+        return cardType;
+    }
+
+    public void setCardType(Integer cardType) {
+        this.cardType = cardType;
+    }
+
+    @Column(name = "card_no")
+    public String getCardNo() {
+        return cardNo;
+    }
+
+    public void setCardNo(String cardNo) {
+        this.cardNo = cardNo;
+    }
+
+
+    @Column(name = "phone_no")
+    public String getPhoneNo() {
+        return phoneNo;
+    }
+
+    public void setPhoneNo(String phoneNo) {
+        this.phoneNo = phoneNo;
+    }
+
+    @Column(name = "hospital_id")
+    public String getHospitalId() {
+        return hospitalId;
+    }
+
+    public void setHospitalId(String hospitalId) {
+        this.hospitalId = hospitalId;
     }
 
     @Column(name = "hospital_name")
@@ -72,6 +125,15 @@ public class Registration extends BaseAssignedEntity {
         this.hospitalName = hospitalName;
     }
 
+    @Column(name = "dept_id")
+    public String getDeptId() {
+        return deptId;
+    }
+
+    public void setDeptId(String deptId) {
+        this.deptId = deptId;
+    }
+
     @Column(name = "dept_name")
     public String getDeptName() {
         return deptName;
@@ -79,6 +141,15 @@ public class Registration extends BaseAssignedEntity {
 
     public void setDeptName(String deptName) {
         this.deptName = deptName;
+    }
+
+    @Column(name = "doctor_id")
+    public String getDoctorId() {
+        return doctorId;
+    }
+
+    public void setDoctorId(String doctorId) {
+        this.doctorId = doctorId;
     }
 
     @Column(name = "doctor_name")
