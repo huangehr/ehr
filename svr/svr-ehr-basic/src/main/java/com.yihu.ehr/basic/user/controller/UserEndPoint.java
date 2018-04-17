@@ -909,4 +909,25 @@ public class UserEndPoint extends EnvelopRestEndPoint {
         return envelop ;
     }
 
+    @RequestMapping(value = ServiceApi.Users.changePasswordByTelephone, method = RequestMethod.POST)
+    @ApiOperation(value = "手机号码-修改密码")
+    public Envelop changePasswordByTelephone(
+            @ApiParam(name = "telephone", value = "电话号码", required = true)
+            @RequestParam(value = "telephone") String telephone,
+            @ApiParam(name = "password", value = "password", required = true)
+            @RequestParam(value = "password") String password) {
+        Envelop envelop = new Envelop();
+        User user = userService.getUserByTel(telephone);
+        if (null == user) {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("电话号码不存在！");
+            return envelop;
+        }
+        user.setPassword(DigestUtils.md5Hex(password));
+        user = userService.save(user);
+        envelop.setSuccessFlg(true);
+        envelop.setObj(user);
+        return envelop;
+    }
+
 }
