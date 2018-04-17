@@ -252,10 +252,10 @@ public class ElasticsearchUtil {
      * 查询后 存在 删除
      * @param boolQueryBuilder
      */
-    public void queryDelete(Client client,BoolQueryBuilder boolQueryBuilder){
+    public void queryDelete(Client client,String index,String type,BoolQueryBuilder boolQueryBuilder){
         SearchResponse actionGet = null;
-        actionGet = client.prepareSearch(esConfigUtil.getIndex())
-                .setTypes(esConfigUtil.getType())
+        actionGet = client.prepareSearch(index)
+                .setTypes(type)
                 .setSize(10000)
                 .setQuery(boolQueryBuilder)
                 .execute().actionGet();
