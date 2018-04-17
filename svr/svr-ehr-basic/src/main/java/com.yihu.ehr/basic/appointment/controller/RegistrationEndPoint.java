@@ -2,6 +2,7 @@ package com.yihu.ehr.basic.appointment.controller;
 
 import com.yihu.ehr.basic.appointment.entity.Registration;
 import com.yihu.ehr.basic.appointment.service.RegistrationService;
+import com.yihu.ehr.basic.fzopen.service.OpenService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
@@ -13,7 +14,9 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 挂号单 接口
@@ -28,6 +31,8 @@ public class RegistrationEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     private RegistrationService registrationService;
+    @Autowired
+    private OpenService fzOpenService;
 
     @ApiOperation("根据ID获取挂号单")
     @RequestMapping(value = ServiceApi.Registration.GetById, method = RequestMethod.GET)
@@ -99,19 +104,50 @@ public class RegistrationEndPoint extends EnvelopRestEndPoint {
     }
 
     @ApiOperation("更新挂号单")
-    @RequestMapping(value = ServiceApi.Registration.Save, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Registration.Update, method = RequestMethod.POST)
     public Envelop update(
-            @ApiParam(value = "挂号单JSON", required = true)
-            @RequestParam String entityJson) {
+            @ApiParam(value = "医疗云挂号单ID", required = true)
+            @RequestParam String id,
+            @ApiParam(value = "医疗云患者ID", required = true)
+            @RequestParam String userId,
+            @ApiParam(value = "福州总部挂号单ID", required = true)
+            @RequestParam String orderId) {
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
         try {
-            Registration updateEntity = objectMapper.readValue(entityJson, Registration.class);
-            updateEntity = registrationService.save(updateEntity);
+            // 获取福州总部的挂号单详情
+            String fzOrderInfoUrl = "TradeMgmt/Open/getRegOrderInfo";
+            Map<String, Object> params = new HashMap<>();
+            params.put("thirdPartyUserId", userId);
+            params.put("thirdPartyOrderId", orderId);
+            String fzOrderInfoStr = fzOpenService.callFzOpenApi(fzOrderInfoUrl, params);
+            Map<String, Object> fzOrderInfoMap = objectMapper.readValue(fzOrderInfoStr, Map.class);
 
-            envelop.setObj(updateEntity);
-            envelop.setSuccessFlg(true);
-            envelop.setErrorMsg("成功更新挂号单。");
+            if ("10000".equals(fzOrderInfoMap.get("Code"))) {
+                fzOrderInfoMap.remove("Code");
+                fzOrderInfoMap.remove("Message");
+
+                Registration oldEntity = registrationService.getById(id);
+                oldEntity.setOrderId(fzOrderInfoMap.get("orderId").toString());
+                oldEntity.setOrderCreateTime(fzOrderInfoMap.get("orderCreateTime").toString());
+                oldEntity.setPatientName(fzOrderInfoMap.get("patientName").toString());
+                oldEntity.setHospitalName(fzOrderInfoMap.get("hospitalName").toString());
+                oldEntity.setDeptName(fzOrderInfoMap.get("deptName").toString());
+                oldEntity.setDoctorName(fzOrderInfoMap.get("doctorName").toString());
+                oldEntity.setState((Integer) fzOrderInfoMap.get("state"));
+                oldEntity.setStateDesc(fzOrderInfoMap.get("stateDesc").toString());
+                oldEntity.setVisitClinicResult((Integer) fzOrderInfoMap.get("visitClinicResult"));
+                oldEntity.setRegisterDate(fzOrderInfoMap.get("registerDate").toString());
+                oldEntity.setTimeId((Integer) fzOrderInfoMap.get("timeId"));
+                oldEntity.setCommendTime(fzOrderInfoMap.get("commendTime").toString());
+                oldEntity.setSerialNo((Integer) fzOrderInfoMap.get("serialNo"));
+                registrationService.save(oldEntity);
+
+                envelop.setSuccessFlg(true);
+                envelop.setErrorMsg("成功更新挂号单。");
+            } else {
+                envelop.setErrorMsg("更新时获取福州总部挂号单详情失败：" + fzOrderInfoMap.get("Message"));
+            }
         } catch (Exception e) {
             e.printStackTrace();
             envelop.setErrorMsg("更新挂号单发生异常：" + e.getMessage());
@@ -142,30 +178,6 @@ public class RegistrationEndPoint extends EnvelopRestEndPoint {
         try {
             Registration updateEntity = registrationService.getById(id);
             updateEntity.setState(state);
-            updateEntity = registrationService.save(updateEntity);
-
-            envelop.setObj(updateEntity);
-            envelop.setSuccessFlg(true);
-            envelop.setErrorMsg("成功更新挂号单。");
-        } catch (Exception e) {
-            e.printStackTrace();
-            envelop.setErrorMsg("更新挂号单发生异常：" + e.getMessage());
-        }
-        return envelop;
-    }
-
-    @ApiOperation("更新挂号单到诊情况")
-    @RequestMapping(value = ServiceApi.Registration.UpdateVisitState, method = RequestMethod.POST)
-    public Envelop updateVisitState(
-            @ApiParam(value = "挂号单ID", required = true)
-            @RequestParam(value = "id") String id,
-            @ApiParam(value = "到诊情况", required = true)
-            @RequestParam(value = "visitClinicResult") Integer visitClinicResult) {
-        Envelop envelop = new Envelop();
-        envelop.setSuccessFlg(false);
-        try {
-            Registration updateEntity = registrationService.getById(id);
-            updateEntity.setVisitClinicResult(visitClinicResult);
             updateEntity = registrationService.save(updateEntity);
 
             envelop.setObj(updateEntity);
