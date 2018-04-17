@@ -239,6 +239,7 @@ public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
         mH5Message.setThirdPartyUserId(thirdPartyUserId);
         mH5Message.setType(type);
         mH5Message.setTimestamp(timestamp);
+        LOG.info(String.format("收到H5挂号订单消息推送参数内容-%s", toJson(mH5Message)));
         //根据用户id，到总部获取订单列表
         MProtalOrderMessage mProtalOrderMessage = openServiceGetOrderInfo(thirdPartyUserId,timestamp);
         Registration newEntity = new Registration();
@@ -293,12 +294,14 @@ public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "根据用户id和时间戳获取挂号订单", notes = "根据用户id和时间戳获取挂号订单")
     private MProtalOrderMessage openServiceGetOrderInfo(String thirdPartyUserId, Long begIntime) throws  Exception{
         SimpleDateFormat format =  new SimpleDateFormat(DateUtil.DEFAULT_YMDHMSDATE_FORMAT);
-        String begin=format.format(new Date(begIntime));
+        long time = 60*1000;//30分钟
+        String afterDate = format.format(new Date(new Date(begIntime).getTime() + time));//1分钟后的时间
+        String beforeDate = format.format(new Date(new Date(begIntime) .getTime() - time));//1分钟前的时间
         String api="TradeMgmt/Open/queryRegOrderInfos";
         Map<String, Object> params=new HashMap<>();
         params.put("thirdPartyUserId",thirdPartyUserId);
-        params.put("begIntime", begin);
-        params.put("endTime",DateUtil.getNowDate(DateUtil.DEFAULT_YMDHMSDATE_FORMAT));
+        params.put("begIntime", beforeDate);
+        params.put("endTime",afterDate);
         params.put("pageIndex",1);
         params.put("pageSize",5);
        String res = openService.callFzOpenApi(api,params);
