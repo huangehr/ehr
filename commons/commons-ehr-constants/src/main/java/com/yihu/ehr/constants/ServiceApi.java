@@ -1497,6 +1497,18 @@ public class ServiceApi {
         public static final String GetMedicineDetailData = "/singleDisease/getMedicineDetailData";
     }
 
+    public static class SurveyAdminManage {
+        public static final String GetSurveyTemplateList="/admin/surveyTemplate/list";
+        public static final String GetSurveyTemplateOptionsList="/admin/surveyTemplate/options/list";
+        public static final String SaveLabelInfo ="/admin/surveyTemplate/saveLabelInfo";
+        public static final String SaveTemplate = "/admin/surveyTemplate/saveTemplate";
+    }
+
+    public static class Questionnaire {
+        public static final String GetAllQuestionsByTemplateCode = "/questionnaire/getAllQuestionsByTemplateCode";
+        public static final String SaveAnswer = "/questionnaire/saveAnswer";
+    }
+
     /**
      * 转发福州总部开放平台接口相关
      */
