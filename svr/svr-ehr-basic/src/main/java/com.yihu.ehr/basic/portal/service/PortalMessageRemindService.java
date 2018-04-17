@@ -81,6 +81,7 @@ public class PortalMessageRemindService extends BaseJpaService<ProtalMessageRemi
      * @param typeId
      * @param page
      * @param size
+     *  @param notifie 是否通知：0为通知，1为不再通知 ,满意度调查：0为未平价、1为已评价
      * @return
      */
     public DataList listMessageRemindValue(String appId, String toUserId, String typeId,String type,int page, int size,String notifie) throws Exception {
@@ -104,11 +105,23 @@ public class PortalMessageRemindService extends BaseJpaService<ProtalMessageRemi
                     "on p.message_template_id =pt.id " +
                     "where pt.type='"+type+"'"+" AND pt.classification='0'"+
                     "AND p.type_id='" +typeId+"'" +
-                    " AND p.to_user_id='" +toUserId+"' " +" AND p.app_id='" +appId+"' "+
+                    " AND p.to_user_id='" +toUserId+"' " +" AND p.app_id='" +appId+"' "+ notifieSql +
                      " order by p.create_date desc ";
         }
         DataList list= dbQuery.queryBySql(sql,page,size);
         return list;
+    }
+
+    /**
+     * 根据id修改已读状态
+     * @param protalMessageRemindId
+     * @return
+     * @throws Exception
+     */
+    public boolean updateMessageRemind(String field,Long protalMessageRemindId) throws Exception {
+        String  sql = "UPDATE portal_message_remind pm  SET  pm."+field+" ='1'  WHERE pm.id="+protalMessageRemindId;
+        jdbcTemplate.update(sql);
+        return true;
     }
 
 
