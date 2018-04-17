@@ -696,8 +696,10 @@ public class BaseStatistsService {
                 if(dictDatas != null ) {
                     for (SaveModel saveModel : dictDatas) {
                         String name = baseUtil.getFieldValueByName(dimension + "Name", saveModel);
-                        String val = baseUtil.getFieldValueByName(dimension,saveModel).toLowerCase();
-                        dimensionDicMap.put(val,name);
+                        String val = baseUtil.getFieldValueByName(dimension, saveModel);
+                        if(StringUtils.isNotEmpty(val) && StringUtils.isNotEmpty(name)){
+                            dimensionDicMap.put(val.toLowerCase(),name);
+                        }
                     }
                 }
             } else{
