@@ -1305,6 +1305,14 @@ public class ServiceApi {
         public static final String GetArchiveCount = "/tj/getArchiveCount";
         public static final String GetArchiveManCount = "/tj/getArchiveManCount";
 
+
+
+        public static final String GetYearDropdownList = "/tj/getYearDropdownList";
+
+
+
+
+
     }
 
     public static class StasticReport {

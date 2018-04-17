@@ -895,4 +895,58 @@ public class BaseStatistsService {
         Double costOfMedicalMonitor = costOfInPatient + costOfOutPatient;
         return nf.format(costOfMedicalMonitor);
     }
+
+
+    /**
+     * 数据查询
+     * @return
+     */
+    public Map<String, List<String>> getDataInfo(String sql ,String xdataName) {
+        List<Map<String, Object>> listData = parseIntegerValue(sql);
+        Map<String, List<String>> map = new HashMap<>();
+        List<String> xData = new ArrayList<>();
+        List<String> valueData = new ArrayList<>();
+        System.out.println("listData count " + listData.size());
+        if (null != listData  && listData.size() >0 && listData.get(0) !=null ) {
+            listData.forEach(one -> {
+                if(xdataName.contains("date_histogram")){
+                    if(xdataName.contains("year")){
+                        xData.add(one.get(xdataName).toString().substring(0,4) + "");
+                    }else if(xdataName.contains("month")){
+                        xData.add(one.get(xdataName).toString().substring(0,7) + "");
+                    }
+                }else {
+                    xData.add(one.get(xdataName) + "");
+                }
+                valueData.add(one.get("count") + "");
+            });
+            map.put("xData", xData);
+            map.put("valueData", valueData);
+        } else {
+            System.out.println("ssss" + listData.size());
+        }
+        return map;
+    }
+
+    /**
+     * 对查询结果key包含count、sum的value去掉小数点
+     * @param sql
+     * @return
+     */
+    public List<Map<String, Object>> parseIntegerValue(String sql) {
+        List<Map<String, Object>> listData = elasticsearchUtil.excuteDataModel(sql);
+        List<Map<String, Object>> handleData = new ArrayList<>();
+        listData.forEach(item -> {
+            Map<String, Object> myMap = new HashMap<>();
+            item.forEach((k,v) -> {
+                if (k.contains("COUNT") || k.contains("SUM") || k.contains("count")) {
+                    v = (int) Double.parseDouble(v + "");
+                }
+                myMap.put(k,v);
+            });
+            handleData.add(myMap);
+        });
+        return handleData;
+    }
+
 }
