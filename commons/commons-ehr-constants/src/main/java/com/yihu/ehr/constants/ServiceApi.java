@@ -820,6 +820,7 @@ public class ServiceApi {
         public static final String SearchRoleReportRelation = "/roles/role_report/search";
         public static final String SearchRoleReportRelationNoPage = "/roles/role_report/searchNoPage";
         public static final String SearchRoleReportRelationIsReportAccredited = "/roles/role_report/isReportAccredited";
+        public static final String ClientRole = "/roles/clientRole";
 
     }
 

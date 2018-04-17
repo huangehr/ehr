@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
+import com.yihu.ehr.model.resource.MRsColumnsModel;
 import com.yihu.ehr.profile.core.ResourceCore;
 import com.yihu.ehr.query.common.model.QueryCondition;
 import com.yihu.ehr.query.services.HbaseQuery;
@@ -63,7 +64,7 @@ public class ResourceBrowseService {
      * @return
      * @throws Exception
      */
-    public String getResourceMetadata(String resourcesCode, String roleId) throws Exception{
+    public List<MRsColumnsModel> getResourceMetadata(String resourcesCode, String roleId) throws Exception{
         RsResource rsResource = rsResourceDao.findByCode(resourcesCode);
         if (rsResource == null) {
             return null;
@@ -79,43 +80,37 @@ public class ResourceBrowseService {
         }
         List<DtoResourceMetadata> metadataList = getAccessMetadata(rsResource, roleId, correspondMap);
         //资源结构
-        List<String> columnName = new ArrayList<String>();
-        List<String> columnCode = new ArrayList<String>();
-        List<String> columnType = new ArrayList<String>();
-        List<String> columnDict = new ArrayList<String>();
+        List<MRsColumnsModel> mRsColumnsModels = new ArrayList<>();
         if (metadataList != null) {
             for (DtoResourceMetadata r : metadataList) {
+                MRsColumnsModel mRsColumnsModel = new MRsColumnsModel();
                 if (!isOtherVersion) {
-                    columnName.add(r.getName());
+                    mRsColumnsModel.setValue(r.getName());
                     if (!StringUtils.isEmpty(r.getDictCode())) {
-                        columnCode.add(r.getId() + "_VALUE");
+                        mRsColumnsModel.setCode(r.getId() + "_VALUE");
                     } else {
-                        columnCode.add(r.getId());
+                        mRsColumnsModel.setCode(r.getId());
                     }
-                    columnType.add(r.getColumnType());
-                    columnDict.add(r.getDictCode());
+                    mRsColumnsModel.setType(r.getColumnType());
+                    mRsColumnsModel.setDict(r.getDictCode());
                 } else {
                     String name = stdTransformClient.stdMetadataName(version, code, correspondMap.get(r.getId()));
                     if (!StringUtils.isEmpty(name)) {
-                        columnName.add(name);
+                        mRsColumnsModel.setValue(name);
                         if (!StringUtils.isEmpty(r.getDictCode())) {
-                            columnCode.add(r.getId() + "_VALUE");
+                            mRsColumnsModel.setCode(r.getId() + "_VALUE");
                         } else {
-                            columnCode.add(r.getId());
+                            mRsColumnsModel.setCode(r.getId());
                         }
-                        columnType.add(r.getColumnType());
-                        columnDict.add(r.getDictCode());
+                        mRsColumnsModel.setType(r.getColumnType());
+                        mRsColumnsModel.setDict(r.getDictCode());
                     }
                 }
+                mRsColumnsModels.add(mRsColumnsModel);
             }
         }
         //设置动态datagrid值
-        Map<String, Object> mapParam = new HashMap<String, Object>();
-        mapParam.put("colunmName", columnName);
-        mapParam.put("colunmCode", columnCode);
-        mapParam.put("colunmType", columnType);
-        mapParam.put("colunmDict", columnDict);
-        return objectMapper.writeValueAsString(mapParam);
+        return mRsColumnsModels;
     }
 
     /**

@@ -11,7 +11,8 @@ import java.util.List;
 /**
  * Created by yww on 2016/7/7.
  */
-public interface XRoleUserRepository extends PagingAndSortingRepository<RoleUser,Long> {
+public interface RoleUserDao extends PagingAndSortingRepository<RoleUser, Long> {
+
     @Query("select roleUser from RoleUser roleUser where roleUser.userId = :userId and roleUser.roleId = :roleId")
     RoleUser findRelation(@Param("userId") String userId,@Param("roleId") long roleId);
 

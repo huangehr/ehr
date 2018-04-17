@@ -1,4 +1,8 @@
-package com.yihu.ehr.oauth2.model;
+package com.yihu.ehr.model.user;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import java.util.Date;
 
 /**
  * Created by progr1mmer on 2018/4/4.
@@ -9,6 +13,7 @@ public class EhrUserSimple {
     private String loginCode;
     private String email;
     private String realName;
+    private Boolean activated;
     private String userType;
     private String telephone;
     private String gender;
@@ -16,6 +21,7 @@ public class EhrUserSimple {
     private String organization;
     private String imgRemotePath;
     private String imgLocalPath;
+    private Date lastLoginTime;
 
     //扩展字段
     private String user; //当前登陆凭证
@@ -23,6 +29,7 @@ public class EhrUserSimple {
     private String refreshToken;
     private String tokenType;
     private int expiresIn;
+    private String state;
 
     public String getId() {
         return id;
@@ -54,6 +61,14 @@ public class EhrUserSimple {
 
     public void setRealName(String realName) {
         this.realName = realName;
+    }
+
+    public Boolean getActivated() {
+        return activated;
+    }
+
+    public void setActivated(Boolean activated) {
+        this.activated = activated;
     }
 
     public String getUserType() {
@@ -112,6 +127,15 @@ public class EhrUserSimple {
         this.imgLocalPath = imgLocalPath;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    public Date getLastLoginTime() {
+        return lastLoginTime;
+    }
+
+    public void setLastLoginTime(Date lastLoginTime) {
+        this.lastLoginTime = lastLoginTime;
+    }
+
     public String getUser() {
         return user;
     }
@@ -150,5 +174,13 @@ public class EhrUserSimple {
 
     public void setExpiresIn(int expiresIn) {
         this.expiresIn = expiresIn;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
     }
 }

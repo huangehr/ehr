@@ -94,8 +94,7 @@ public class RsResourceIntegratedController extends BaseController {
             @ApiParam(name="queryCondition", value="搜索条件({})",defaultValue = "")
             @RequestParam(value="queryCondition", required = false) String queryCondition,
             @ApiParam(name = "userOrgList" ,value = "用户拥有机构权限" )
-            @RequestParam(value = "userOrgList" , required = false) List<String> userOrgList
-    ) throws IOException {
+            @RequestParam(value = "userOrgList" , required = false) List<String> userOrgList) throws IOException {
         Envelop envelop = new Envelop();
         String [] quotaIdArr = quotaIds.split(",");
         String [] quotaCodeArr = quotaCodes.split(",");
