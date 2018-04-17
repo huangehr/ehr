@@ -9,7 +9,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
  * @author 张进军
  * @date 2018/4/16 19:18
  */
-public interface RegistrationDao extends PagingAndSortingRepository<Registration, Integer> {
+public interface RegistrationDao extends PagingAndSortingRepository<Registration, String> {
 
 
 }
