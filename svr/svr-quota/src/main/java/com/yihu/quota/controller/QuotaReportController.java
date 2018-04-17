@@ -299,11 +299,15 @@ public class QuotaReportController extends BaseController {
                                 //第一种 ES库中有定义的维度 如org,slaveKey1
                                 //第二种 ES库中未定义的维度 如level，economic
                                 if (map.containsKey(dimensionName)) {
-                                    dataMap.put(map.get(dimensionName).toString(), map.get("result"));
-                                    xAxisMap.put(map.get(dimensionName).toString(), map.get(dimension).toString());
+                                    if(map.get(dimensionName) != null){
+                                        dataMap.put(map.get(dimensionName).toString(), map.get("result"));
+                                        xAxisMap.put(map.get(dimensionName).toString(), map.get(dimension).toString());
+                                    }
                                 } else {
-                                    dataMap.put(map.get(dimension).toString(), map.get("result"));
-                                    xAxisMap.put(map.get(dimension).toString(), map.get(dimension).toString());
+                                    if(map.get(dimension) != null){
+                                        dataMap.put(map.get(dimension).toString(), map.get("result"));
+                                        xAxisMap.put(map.get(dimension).toString(), map.get(dimension).toString());
+                                    }
                                 }
                             }
 
