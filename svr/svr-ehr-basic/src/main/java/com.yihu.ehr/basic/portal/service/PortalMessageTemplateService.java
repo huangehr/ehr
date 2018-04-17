@@ -125,7 +125,9 @@ public class PortalMessageTemplateService extends BaseJpaService<PortalMessageTe
         remind.setReceived_messages(JSON.toJSONString(mH5Message));
         remind.setOrder_id(mH5Message.getOrderId());
         SimpleDateFormat format =  new SimpleDateFormat(DateUtil.DEFAULT_YMDHMSDATE_FORMAT);
-        remind.setVisit_time(format.parse(newEntity.getRegisterDate()));
+        if(null != newEntity){
+            remind.setVisit_time(format.parse(newEntity.getRegisterDate()));
+        }
         ProtalMessageRemind protalMessageRemind =messageRemindRepository.save(remind);
         return protalMessageRemind;
     }

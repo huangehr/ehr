@@ -771,6 +771,7 @@ public class ServiceApi {
         public static final String DistributeSecurityKey = "/users/distributeSecurityKey";
         public static final String GetSecurityKey = "/users/getSecurityKey";
         public static final String changePasswordByTelephone = "/usersOfApp/users/changePasswordByTelephone";
+        public static final String changePasswordByOldPassword = "/users/changePasswordByOldPassword";
 
     }
 
