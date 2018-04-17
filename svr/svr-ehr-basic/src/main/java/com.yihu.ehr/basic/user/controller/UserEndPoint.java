@@ -930,4 +930,41 @@ public class UserEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
+    @RequestMapping(value = ServiceApi.Users.changePasswordByOldPassword, method = RequestMethod.POST)
+    @ApiOperation(value = "健康上饶-根据旧密码修改用户的密码", notes = "根据旧密码修改用户的密码信息")
+    public Envelop updatePasswordByOldPwd(
+            @ApiParam(name = "userId", value = "用户id", defaultValue = "")
+            @RequestParam(value = "userId", required = false) String userId,
+            @ApiParam(name = "passwordOld", value = "旧密码", defaultValue = "")
+            @RequestParam(value = "passwordOld", required = false) String passwordOld,
+            @ApiParam(name = "passwordNew", value = "新密码", defaultValue = "")
+            @RequestParam(value = "passwordNew", required = false) String passwordNew) throws Exception {
+        Envelop envelop = new Envelop();
+        //获取用户信息，根据用户ID
+        User user  = userService.getUser(userId);
+        if (user == null) {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("对不起，该用户不存在，请确认！");
+            return envelop;
+        }
+        //对旧密码进行MD5加密后，进行对比验证
+        String hashPassWordOld = DigestUtils.md5Hex(passwordOld);
+        if (org.apache.commons.lang3.StringUtils.equals(hashPassWordOld, user.getPassword().toString())) {
+            //当验证通过后，进行新密码的更新在微服务中会将该密码信息进行MD5加密
+            user.setPassword(DigestUtils.md5Hex(passwordNew));
+            user = userService.save(user);
+            if (null != user) {
+                envelop.setSuccessFlg(true);
+                envelop.setObj(user);
+            } else {
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg("密码修改失败，请联系管理员！");
+            }
+        } else {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("对不起，原密码不正确，请确认！");
+        }
+
+        return envelop;
+    }
 }
