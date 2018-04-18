@@ -108,6 +108,10 @@ public class EhrAccessTokenEndpoint extends AbstractEndpoint {
         }
         ClientDetails authenticatedClient = ehrJdbcClientDetailsService.loadClientByClientId(client_id);
         TokenRequest tokenRequest = oAuth2RequestFactory.createTokenRequest(param, authenticatedClient);
+        //校验 client_id 是否一致
+        if (!client_id.equals(tokenRequest.getClientId())) {
+            throw new InvalidClientException("Given client ID does not match authenticated client");
+        }
         if (authenticatedClient != null) {
             oAuth2RequestValidator.validateScope(tokenRequest, authenticatedClient);
         }
@@ -117,11 +121,6 @@ public class EhrAccessTokenEndpoint extends AbstractEndpoint {
         if (tokenRequest.getGrantType().equals("implicit")) {
             throw new InvalidGrantException("Implicit grant type not supported from token endpoint");
         }
-        //校验 client_id 是否一致
-        if (!client_id.equals(tokenRequest.getClientId())) {
-            throw new InvalidClientException("Given client ID does not match authenticated client");
-        }
-
         if (isAuthCodeRequest(parameters)) {
             // The scope was requested or determined during the authorization step
             if (!tokenRequest.getScope().isEmpty()) {

@@ -2,14 +2,17 @@ package com.yihu.ehr.oauth2.web;
 
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.model.user.EhrUserSimple;
+import com.yihu.ehr.oauth2.model.VerifyCode;
 import com.yihu.ehr.oauth2.oauth2.EhrOAuth2ExceptionTranslator;
 import com.yihu.ehr.oauth2.oauth2.EhrTokenGranter;
 import com.yihu.ehr.oauth2.oauth2.EhrUserDetailsService;
 import com.yihu.ehr.oauth2.oauth2.jdbc.EhrJdbcClientDetailsService;
 import com.yihu.ehr.oauth2.oauth2.redis.EhrRedisTokenStore;
+import com.yihu.ehr.oauth2.oauth2.redis.EhrRedisVerifyCodeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -54,6 +57,8 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
     private EhrRedisTokenStore ehrRedisTokenStore;
     @Autowired
     private EhrUserDetailsService ehrUserDetailsService;
+    @Autowired
+    private EhrRedisVerifyCodeService ehrRedisVerifyCodeService;
 
     @PostConstruct
     private void init() {
@@ -69,24 +74,29 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
             throw new InvalidRequestException("Missing clientId");
         }
         Map<String, String> param = new HashMap<>();
-        param.put("grant_type", DEFAULT_GRANT_TYPE);
+        if (StringUtils.isEmpty(parameters.get("verify_code"))) {
+            param.put("grant_type", DEFAULT_GRANT_TYPE);
+            param.put("password", parameters.get("password"));
+        } else {
+            param.put("grant_type", "verify_code");
+            param.put("verify_code", parameters.get("verify_code"));
+        }
         param.put("client_id", client_id);
         param.put("scope", scope);
         param.put("username", parameters.get("username"));
-        param.put("password", parameters.get("password"));
         ClientDetails authenticatedClient = ehrJdbcClientDetailsService.loadClientByClientId(client_id);
         TokenRequest tokenRequest = oAuth2RequestFactory.createTokenRequest(param, authenticatedClient);
+        //校验 client_id 是否一致
+        if (!client_id.equals(tokenRequest.getClientId())) {
+            throw new InvalidClientException("Given client ID does not match authenticated client");
+        }
         if (authenticatedClient != null) {
             oAuth2RequestValidator.validateScope(tokenRequest, authenticatedClient);
         }
         if (!StringUtils.hasText(tokenRequest.getGrantType())) {
             throw new InvalidRequestException("Missing grant type");
         }
-        //校验 client_id 是否一致
-        if (!client_id.equals(tokenRequest.getClientId())) {
-            throw new InvalidClientException("Given client ID does not match authenticated client");
-        }
-        OAuth2AccessToken token = getTokenGranter().grant(DEFAULT_GRANT_TYPE, tokenRequest);
+        OAuth2AccessToken token = getTokenGranter().grant(param.get("grant_type"), tokenRequest);
         /*如果是移动端登陆则移除之前的token，
         在网关处通过HTTP状态码告知前端是过期（401）还是账号在别处登陆（403），
         实现同一账号只能在一处登陆*/
@@ -107,6 +117,25 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
             ehrUserSimple.setState(parameters.get("state"));
         }
         return getResponse(ehrUserSimple);
+    }
+
+    @RequestMapping(value = ServiceApi.Authentication.VerifyCode, method = RequestMethod.POST)
+    public ResponseEntity<VerifyCode> verifyCode(@RequestParam Map<String, String> parameters) {
+        String client_id = parameters.get("client_id");
+        String username = parameters.get("username");
+        VerifyCode verifyCode = new VerifyCode();
+        verifyCode.setCode("DS2X");
+        verifyCode.setExpiresIn(600);
+        ehrRedisVerifyCodeService.store(client_id, username, "DS2X", 600000);
+        return new ResponseEntity<>(verifyCode, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = ServiceApi.Authentication.VerifyCodeExpire, method = RequestMethod.POST)
+    public ResponseEntity<Integer> verifyCodeExpire(@RequestParam Map<String, String> parameters) {
+        String client_id = parameters.get("client_id");
+        String username = parameters.get("username");
+        int expiresIn = ehrRedisVerifyCodeService.getExpireTime(client_id, username);
+        return new ResponseEntity<>(expiresIn, HttpStatus.OK);
     }
 
     @Override
