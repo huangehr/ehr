@@ -9,12 +9,18 @@ import com.yihu.ehr.oauth2.oauth2.EhrUserDetailsService;
 import com.yihu.ehr.oauth2.oauth2.jdbc.EhrJdbcClientDetailsService;
 import com.yihu.ehr.oauth2.oauth2.redis.EhrRedisTokenStore;
 import com.yihu.ehr.oauth2.oauth2.redis.EhrRedisVerifyCodeService;
+import com.yihu.ehr.util.datetime.DateUtil;
+import com.yihu.ehr.util.id.RandomUtil;
+import com.yihu.ehr.util.rest.Envelop;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
@@ -30,6 +36,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -124,18 +131,29 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
         String client_id = parameters.get("client_id");
         String username = parameters.get("username");
         VerifyCode verifyCode = new VerifyCode();
-        verifyCode.setCode("DS2X");
+        //手机短信验证码
+        RandomUtil randomUtil = new RandomUtil();
+        String random = randomUtil.getRandomString(6);
+        verifyCode.setCode(random);
         verifyCode.setExpiresIn(600);
-        ehrRedisVerifyCodeService.store(client_id, username, "DS2X", 600000);
+        verifyCode.setNextRequestTime(60);
+        //验证码有效期
+        ehrRedisVerifyCodeService.store(client_id, username, random, 600000);
+        //下次请求时间
+        ehrRedisVerifyCodeService.store(client_id, username+"nextrequesttime", random, 60000);
         return new ResponseEntity<>(verifyCode, HttpStatus.OK);
     }
 
     @RequestMapping(value = ServiceApi.Authentication.VerifyCodeExpire, method = RequestMethod.POST)
-    public ResponseEntity<Integer> verifyCodeExpire(@RequestParam Map<String, String> parameters) {
+    public ResponseEntity<VerifyCode> verifyCodeExpire(@RequestParam Map<String, String> parameters) {
         String client_id = parameters.get("client_id");
         String username = parameters.get("username");
+        VerifyCode verifyCode = new VerifyCode();
         int expiresIn = ehrRedisVerifyCodeService.getExpireTime(client_id, username);
-        return new ResponseEntity<>(expiresIn, HttpStatus.OK);
+        int nextRequestTime = ehrRedisVerifyCodeService.getExpireTime(client_id, username+"nextrequesttime");
+        verifyCode.setNextRequestTime(nextRequestTime);
+        verifyCode.setExpiresIn(expiresIn);
+        return new ResponseEntity<>(verifyCode, HttpStatus.OK);
     }
 
     @Override
@@ -175,11 +193,6 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
         headers.set("Cache-Control", "no-store");
         headers.set("Pragma", "no-cache");
         return new ResponseEntity<>(ehrUserSimple, headers, HttpStatus.OK);
-    }
-
-    @Override
-    protected WebResponseExceptionTranslator getExceptionTranslator() {
-        return ehrOAuth2ExceptionTranslator;
     }
 
 }
