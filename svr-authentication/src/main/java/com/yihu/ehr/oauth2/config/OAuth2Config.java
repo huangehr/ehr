@@ -3,6 +3,7 @@ package com.yihu.ehr.oauth2.config;
 import com.yihu.ehr.oauth2.oauth2.*;
 import com.yihu.ehr.oauth2.oauth2.jdbc.*;
 import com.yihu.ehr.oauth2.oauth2.redis.EhrRedisTokenStore;
+import com.yihu.ehr.oauth2.oauth2.redis.EhrRedisVerifyCodeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -98,7 +99,8 @@ public class OAuth2Config {
             AuthorizationCodeServices authorizationCodeService,
             ClientDetailsService clientDetailsService,
             EhrJdbcUserSecurityService ehrJDBCUserSecurityService,
-            EhrUserDetailsService ehrUserDetailsService) {
+            EhrUserDetailsService ehrUserDetailsService,
+            EhrRedisVerifyCodeService ehrRedisVerifyCodeService) {
         EhrTokenGranter tokenGranter = new EhrTokenGranter(
                 authenticationManager,
                 tokenServices,
@@ -106,7 +108,8 @@ public class OAuth2Config {
                 clientDetailsService,
                 new DefaultOAuth2RequestFactory(clientDetailsService),
                 ehrJDBCUserSecurityService,
-                ehrUserDetailsService);
+                ehrUserDetailsService,
+                ehrRedisVerifyCodeService);
         return tokenGranter;
     }
 
@@ -199,6 +202,11 @@ public class OAuth2Config {
     @Primary
     EhrJdbcUserSecurityService ehrJDBCUserSecurityService(DataSource dataSource) {
         return new EhrJdbcUserSecurityService(dataSource);
+    }
+
+    @Bean
+    EhrRedisVerifyCodeService ehrRedisVerifyCodeService(RedisTemplate<String, Serializable> redisTemplate) {
+        return new EhrRedisVerifyCodeService(redisTemplate);
     }
 
     //@Configuration
