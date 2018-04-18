@@ -109,9 +109,7 @@ public class RegistrationEndPoint extends EnvelopRestEndPoint {
             @ApiParam(value = "医疗云挂号单ID", required = true)
             @RequestParam String id,
             @ApiParam(value = "医疗云患者ID", required = true)
-            @RequestParam String userId,
-            @ApiParam(value = "福州总部挂号单ID", required = true)
-            @RequestParam String orderId) {
+            @RequestParam String userId) {
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
         try {
@@ -119,28 +117,36 @@ public class RegistrationEndPoint extends EnvelopRestEndPoint {
             String fzOrderInfoUrl = "TradeMgmt/Open/getRegOrderInfo";
             Map<String, Object> params = new HashMap<>();
             params.put("thirdPartyUserId", userId);
-            params.put("thirdPartyOrderId", orderId);
+            params.put("thirdPartyOrderId", id);
             String fzOrderInfoStr = fzOpenService.callFzOpenApi(fzOrderInfoUrl, params);
             Map<String, Object> fzOrderInfoMap = objectMapper.readValue(fzOrderInfoStr, Map.class);
 
             if ("10000".equals(fzOrderInfoMap.get("Code"))) {
-                fzOrderInfoMap.remove("Code");
-                fzOrderInfoMap.remove("Message");
-
                 Registration oldEntity = registrationService.getById(id);
                 oldEntity.setOrderId(fzOrderInfoMap.get("orderId").toString());
                 oldEntity.setOrderCreateTime(fzOrderInfoMap.get("orderCreateTime").toString());
-                oldEntity.setPatientName(fzOrderInfoMap.get("patientName").toString());
-                oldEntity.setHospitalName(fzOrderInfoMap.get("hospitalName").toString());
-                oldEntity.setDeptName(fzOrderInfoMap.get("deptName").toString());
-                oldEntity.setDoctorName(fzOrderInfoMap.get("doctorName").toString());
                 oldEntity.setState((Integer) fzOrderInfoMap.get("state"));
                 oldEntity.setStateDesc(fzOrderInfoMap.get("stateDesc").toString());
-                oldEntity.setVisitClinicResult((Integer) fzOrderInfoMap.get("visitClinicResult"));
-                oldEntity.setRegisterDate(fzOrderInfoMap.get("registerDate").toString());
-                oldEntity.setTimeId((Integer) fzOrderInfoMap.get("timeId"));
-                oldEntity.setCommendTime(fzOrderInfoMap.get("commendTime").toString());
-                oldEntity.setSerialNo((Integer) fzOrderInfoMap.get("serialNo"));
+                Object visitClinicResultObj = fzOrderInfoMap.get("visitClinicResult");
+                if (visitClinicResultObj != null) {
+                    Integer visitClinicResult = Integer.valueOf(visitClinicResultObj.toString());
+                    oldEntity.setVisitClinicResult(visitClinicResult);
+                    if (0 == visitClinicResult) {
+                        oldEntity.setVisitClinicResultDesc("确认中");
+                    } else if (1 == visitClinicResult) {
+                        oldEntity.setVisitClinicResultDesc("已到诊");
+                    } else if (-1 == visitClinicResult) {
+                        oldEntity.setVisitClinicResultDesc("爽约");
+                    }
+                }
+                Integer timeId = (Integer) fzOrderInfoMap.get("timeId");
+                if (1 == timeId) {
+                    oldEntity.setTimeIdDesc("上午");
+                } else if (2 == timeId) {
+                    oldEntity.setTimeIdDesc("下午");
+                } else if (3 == timeId) {
+                    oldEntity.setTimeIdDesc("晚上");
+                }
                 registrationService.save(oldEntity);
 
                 envelop.setSuccessFlg(true);
