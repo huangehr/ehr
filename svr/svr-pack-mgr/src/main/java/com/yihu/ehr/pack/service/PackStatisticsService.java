@@ -491,22 +491,11 @@ public class PackStatisticsService extends BaseJpaService {
         int total = 0;
         int inpatient_total = 0;
         int out_patient_total = 0;
-        List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
-        Map<String, Object> map = new HashMap<String, Object>();
-        map.put("andOr", "and");
-        map.put("condition", "=");
-        map.put("field", "event_date");
-        map.put("value", date);
-        list.add(map);
+        String filters = "event_date=" + date;
         if (StringUtils.isNotEmpty(orgCode)) {
-            map = new HashMap<>();
-            map.put("andOr", "and");
-            map.put("condition", "=");
-            map.put("field", "org_code");
-            map.put("value", orgCode);
-            list.add(map);
+            filters += ";org_code=" + orgCode;
         }
-        List<Map<String, Object>> res = elasticSearchUtil.list("qc", "daily_report", list);
+        List<Map<String, Object>> res = elasticSearchUtil.list("qc", "daily_report", filters);
         for (Map<String,Object> report : res){
             total += Integer.parseInt(report.get("HSI07_01_001").toString());
             inpatient_total += Integer.parseInt(report.get("HSI07_01_012").toString());

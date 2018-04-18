@@ -57,7 +57,7 @@ public class FastDFSConfig {
             ClientGlobal.g_charset = "ISO8859-1";
         }
 
-        String[] szTrackerServers = trackerServers.split(";");
+        String[] szTrackerServers = trackerServers.split(",");
         if (szTrackerServers == null) {
             throw new MyException("item \"tracker_server\" not found");
         } else {

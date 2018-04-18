@@ -79,7 +79,7 @@ public class DailyReportEndPoint extends EnvelopRestEndPoint {
     public Envelop list(
             @ApiParam(name = "filter", value = "过滤条件")
             @RequestParam(value = "filter", required = false) String filter) throws Exception {
-        List<Map<String, Object>> list = elasticSearchUtil.list(INDEX, TYPE, toEntity(filter, List.class));
+        List<Map<String, Object>> list = elasticSearchUtil.list(INDEX, TYPE, filter);
         return success(list);
     }
 

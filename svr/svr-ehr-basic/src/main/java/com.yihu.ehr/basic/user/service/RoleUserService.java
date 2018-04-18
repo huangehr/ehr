@@ -3,9 +3,12 @@ package com.yihu.ehr.basic.user.service;
 import com.yihu.ehr.basic.apps.dao.UserAppDao;
 import com.yihu.ehr.basic.user.entity.Roles;
 import com.yihu.ehr.query.BaseJpaService;
-import com.yihu.ehr.basic.user.dao.XRoleUserRepository;
+import com.yihu.ehr.basic.user.dao.RoleUserDao;
 import com.yihu.ehr.basic.user.dao.RolesDao;
 import com.yihu.ehr.basic.user.entity.RoleUser;
+import org.hibernate.FlushMode;
+import org.hibernate.Query;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -14,6 +17,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigInteger;
 import java.util.*;
 
 /**
@@ -21,9 +25,10 @@ import java.util.*;
  */
 @Transactional
 @Service
-public class RoleUserService extends BaseJpaService<RoleUser,XRoleUserRepository> {
+public class RoleUserService extends BaseJpaService<RoleUser,RoleUserDao> {
+
     @Autowired
-    private XRoleUserRepository roleUserRepository;
+    private RoleUserDao roleUserDao;
     @Autowired
     private RolesDao rolesRepository;
     @Autowired
@@ -33,11 +38,11 @@ public class RoleUserService extends BaseJpaService<RoleUser,XRoleUserRepository
 
     public Page<RoleUser> getRoleUserList(String sorts, int page, int size) {
         Pageable pageable = new PageRequest(page, size, parseSorts(sorts));
-        return roleUserRepository.findAll(pageable);
+        return roleUserDao.findAll(pageable);
     }
 
     public RoleUser findRelation(String userId,long roleId){
-        return roleUserRepository.findRelation(userId, roleId);
+        return roleUserDao.findRelation(userId, roleId);
     }
 
     public boolean batchDeleteRoleUserRelation(String userId,String roleIds) throws Exception{
@@ -75,7 +80,7 @@ public class RoleUserService extends BaseJpaService<RoleUser,XRoleUserRepository
             for(Map<String,Object> map:list){
                 String app_id = map.get("app_id").toString();
                 String app_name = map.get("app_name").toString();
-                String user_name = map.get("user_name").toString();
+                String user_name =  map.get("user_name")==null?"":map.get("user_name").toString();
                 String org_id = map.get("org_id")==null?"":map.get("org_id").toString();
                 String org_name = map.get("org_name")==null?"":map.get("org_name").toString();
 
@@ -94,7 +99,7 @@ public class RoleUserService extends BaseJpaService<RoleUser,XRoleUserRepository
     }
 
     public boolean batchUpdateRoleUsersRelation(String userId,String roleIds) {
-        roleUserRepository.deleteByUserId(userId);
+        roleUserDao.deleteByUserId(userId);
         userAppRepository.deleteByUserId(userId);
         String[] arr = roleIds.split(",");
         if(arr.length > 0) {
@@ -220,11 +225,11 @@ public class RoleUserService extends BaseJpaService<RoleUser,XRoleUserRepository
      */
     public String saveRoleUser(List<RoleUser> roleUserlist,String userId) {
         String id="";
-        roleUserRepository.deleteByUserId(userId);
+        roleUserDao.deleteByUserId(userId);
         userAppRepository.deleteByUserId(userId);
         if(roleUserlist.size()>0){
             for(RoleUser r:roleUserlist){
-                id=String.valueOf(roleUserRepository.save(r).getId()) ;
+                id=String.valueOf(roleUserDao.save(r).getId()) ;
                 Roles roles = rolesRepository.findOne(r.getRoleId());
                 String user_id = r.getUserId();
                 //应用角色添加人员
@@ -242,7 +247,7 @@ public class RoleUserService extends BaseJpaService<RoleUser,XRoleUserRepository
                 String sqlInsert = "insert into user_app (app_id,app_name,user_id,user_name,org_id,org_name,status) values ";
                 List<Map<String,Object>> listTemp = null;
                 List<Map<String,Object>> list = jdbcTemplate.queryForList(sql);
-                for(Map<String,Object> map:list){
+                for (Map<String,Object> map:list){
                     String app_id = map.get("app_id").toString();
                     String app_name = map.get("app_name").toString();
                     String user_name = map.get("user_name").toString();
@@ -259,5 +264,16 @@ public class RoleUserService extends BaseJpaService<RoleUser,XRoleUserRepository
             id = "1";
         }
         return id;
+    }
+
+    public List<Integer> userClientRole(String clientId, String userId) {
+        Session session = currentSession();
+        String sql = "SELECT role_id FROM role_user WHERE user_id = :userId" +
+                " AND role_id IN (SELECT id FROM roles WHERE type = '1' AND app_id = :appId)";
+        Query query = session.createSQLQuery(sql);
+        query.setFlushMode(FlushMode.COMMIT);
+        query.setString("userId", userId);
+        query.setString("appId", clientId);
+        return query.list();
     }
 }

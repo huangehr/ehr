@@ -147,7 +147,7 @@ public class DBQuery {
         String sqlCount = getParserSql().getCountSql(sql);
         List<Map<String,Object>> list = getDB().query(sqlPage);
         re.setList(list);
-        Integer count = (Integer)getDB().scalar(sqlCount);
+        long count = (long)getDB().scalar(sqlCount);
         re.setCount(count);
         return re;
     }

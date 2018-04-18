@@ -79,28 +79,28 @@ public class ElasticSearchUtil {
 
     public List<Map<String, Object>> findByField(String index, String type, String field, Object value) {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-        MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchPhraseQuery(field, value);
-        boolQueryBuilder.must(matchQueryBuilder);
+        TermQueryBuilder termQueryBuilder = QueryBuilders.termQuery(field, value);
+        boolQueryBuilder.must(termQueryBuilder);
         return elasticSearchClient.findByField(index, type, boolQueryBuilder);
     }
 
-    public List<Map<String, Object>> list(String index, String type, List<Map<String, Object>> filter) {
-        QueryBuilder boolQueryBuilder = getQueryBuilder(filter);
+    public List<Map<String, Object>> list(String index, String type, String filters) {
+        QueryBuilder boolQueryBuilder = getQueryBuilder(filters);
         return elasticSearchClient.findByField(index, type, boolQueryBuilder);
     }
 
-    public List<Map<String, Object>> page(String index, String type, List<Map<String, Object>> filter, int page, int size) {
-        return this.page(index, type, filter, null, page, size);
+    public List<Map<String, Object>> page(String index, String type, String filters, int page, int size) {
+        return this.page(index, type, filters, null, page, size);
     }
 
-    public List<Map<String, Object>> page(String index, String type, List<Map<String, Object>> filter, String sorts, int page, int size) {
-        QueryBuilder boolQueryBuilder = getQueryBuilder(filter);
+    public List<Map<String, Object>> page(String index, String type, String filters, String sorts, int page, int size) {
+        QueryBuilder boolQueryBuilder = getQueryBuilder(filters);
         List<SortBuilder> sortBuilderList = getSortBuilder(sorts);
         return elasticSearchClient.page(index, type, boolQueryBuilder, sortBuilderList, page, size);
     }
 
-    public long count(String index, String type, List<Map<String, Object>> filter) {
-        QueryBuilder boolQueryBuilder = getQueryBuilder(filter);
+    public long count(String index, String type, String filters) {
+        QueryBuilder boolQueryBuilder = getQueryBuilder(filters);
         return elasticSearchClient.count(index, type, boolQueryBuilder);
     }
 
@@ -124,20 +124,86 @@ public class ElasticSearchUtil {
         }
         String [] sortArr = sorts.split(";");
         for (String sort : sortArr) {
-            String [] temp = sort.split(" ");
-            if (temp.length == 2) {
-                SortBuilder sortBuilder = new FieldSortBuilder(temp[0].trim());
-                if ("desc".equalsIgnoreCase(temp[1].trim())) {
-                    sortBuilder.order(SortOrder.DESC);
-                } else if ("asc".equalsIgnoreCase(temp[1].trim())) {
-                    sortBuilder.order(SortOrder.ASC);
-                } else {
-                    sortBuilder.order(SortOrder.DESC);
-                }
-                sortBuilderList.add(sortBuilder);
+            String operator = sort.substring(0, 1);
+            SortBuilder sortBuilder = new FieldSortBuilder(sort.substring(1));
+            if ("-".equalsIgnoreCase(operator.trim())) {
+                sortBuilder.order(SortOrder.DESC);
+            } else if ("+".equalsIgnoreCase(operator.trim())) {
+                sortBuilder.order(SortOrder.ASC);
+            } else {
+                sortBuilder.order(SortOrder.DESC);
             }
+            sortBuilderList.add(sortBuilder);
         }
         return sortBuilderList;
+    }
+
+    private QueryBuilder getQueryBuilder(String filters) {
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        if (StringUtils.isEmpty(filters)) {
+            return boolQueryBuilder;
+        }
+        String [] filterArr = filters.split(";");
+        for (String filter : filterArr) {
+            if (filter.contains("?")) {
+                String [] condition = filter.split("\\?");
+                MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery(condition[0], condition[1]);
+                boolQueryBuilder.must(matchQueryBuilder);
+            } else if (filter.contains("<>")) {
+                String [] condition = filter.split("<>");
+                if (condition[1].contains(",")) {
+                    String [] inCondition = condition[1].split(",");
+                    TermsQueryBuilder termsQueryBuilder = QueryBuilders.termsQuery(condition[0], inCondition);
+                    boolQueryBuilder.mustNot(termsQueryBuilder);
+                } else {
+                    TermQueryBuilder termQueryBuilder = QueryBuilders.termQuery(condition[0], condition[1]);
+                    boolQueryBuilder.mustNot(termQueryBuilder);
+                }
+            } else if (filter.contains(">=")) {
+                String [] condition = filter.split(">=");
+                RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery(condition[0]);
+                if (condition[0].toLowerCase().endsWith("date")) {
+                    rangeQueryBuilder.format("yyyy-MM-dd HH:mm:ss");
+                }
+                rangeQueryBuilder.gte(condition[1]);
+                boolQueryBuilder.must(rangeQueryBuilder);
+            } else if (filter.contains(">")) {
+                String [] condition = filter.split(">");
+                RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery(condition[0]);
+                if (condition[0].toLowerCase().endsWith("date")) {
+                    rangeQueryBuilder.format("yyyy-MM-dd HH:mm:ss");
+                }
+                rangeQueryBuilder.gt(condition[1]);
+                boolQueryBuilder.must(rangeQueryBuilder);
+            } else if (filter.contains("<=")) {
+                String [] condition = filter.split("<=");
+                RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery(condition[0]);
+                if (condition[0].toLowerCase().endsWith("date")) {
+                    rangeQueryBuilder.format("yyyy-MM-dd HH:mm:ss");
+                }
+                rangeQueryBuilder.lte(condition[1]);
+                boolQueryBuilder.must(rangeQueryBuilder);
+            } else if (filter.contains("<")) {
+                String [] condition = filter.split("<");
+                RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery(condition[0]);
+                if (condition[0].toLowerCase().endsWith("date")) {
+                    rangeQueryBuilder.format("yyyy-MM-dd HH:mm:ss");
+                }
+                rangeQueryBuilder.lt(condition[1]);
+                boolQueryBuilder.must(rangeQueryBuilder);
+            } else if (filter.contains("=")) {
+                String [] condition = filter.split("=");
+                if (condition[1].contains(",")) {
+                    String [] inCondition = condition[1].split(",");
+                    TermsQueryBuilder termsQueryBuilder = QueryBuilders.termsQuery(condition[0], inCondition);
+                    boolQueryBuilder.must(termsQueryBuilder);
+                } else {
+                    TermQueryBuilder termQueryBuilder = QueryBuilders.termQuery(condition[0], condition[1]);
+                    boolQueryBuilder.must(termQueryBuilder);
+                }
+            }
+        }
+        return boolQueryBuilder;
     }
 
     private QueryBuilder getQueryBuilder(List<Map<String, Object>> filter) {

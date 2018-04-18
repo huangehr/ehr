@@ -65,8 +65,10 @@ public class PackageResourceJob implements InterruptableJob {
                 doResolve(pack, packageMgrClient);
             }
         } catch (Exception e) {
+            e.printStackTrace();
             if (pack != null) {
                 try {
+                    System.out.println(objectMapper.writeValueAsString(pack));
                     if (StringUtils.isBlank(e.getMessage())) {
                         packageMgrClient.reportStatus(pack.get_id(), ArchiveStatus.Failed, "Internal server error, please see task log for detail message.");
                         PackResolveLogger.error("Internal server error, please see task log for detail message.", e);
@@ -75,6 +77,7 @@ public class PackageResourceJob implements InterruptableJob {
                         PackResolveLogger.error(e.getMessage());
                     }
                 } catch (Exception e1) {
+                    e1.printStackTrace();
                     PackResolveLogger.error(e1.getMessage());
                 }
             } else {
@@ -89,7 +92,6 @@ public class PackageResourceJob implements InterruptableJob {
         IdentifyService identifyService = SpringContext.getService(IdentifyService.class);
         ResourceService resourceService = SpringContext.getService(ResourceService.class);
         ObjectMapper objectMapper = new ObjectMapper();
-        //long start = System.currentTimeMillis();
         StandardPackage standardPackage = resolveEngine.doResolve(pack, downloadTo(pack.getRemote_path()));
         ResourceBucket resourceBucket = packMill.grindingPackModel(standardPackage);
         identifyService.identify(resourceBucket, standardPackage);

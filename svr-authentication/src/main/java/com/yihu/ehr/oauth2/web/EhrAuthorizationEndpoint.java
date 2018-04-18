@@ -227,7 +227,7 @@ public class EhrAuthorizationEndpoint extends AbstractEndpoint {
         // parameters map will be stored without change in the AuthorizationRequest object once it is created.
         AuthorizationRequest authorizationRequest = getOAuth2RequestFactory().createAuthorizationRequest(parameters);
         Set<String> responseTypes = authorizationRequest.getResponseTypes();
-        if (!responseTypes.contains("token") && !responseTypes.contains("code")) {
+        if (!responseTypes.contains("token")) {
             sessionStatus.setComplete();
             throw new UnsupportedResponseTypeException("Unsupported response types: " + responseTypes);
         }
@@ -275,10 +275,6 @@ public class EhrAuthorizationEndpoint extends AbstractEndpoint {
             if (authorizationRequest.isApproved()) {
                 if (responseTypes.contains("token")) {
                     return getImplicitGrantResponse(authorizationRequest);
-                }
-                if (responseTypes.contains("code")) {
-                    return new ModelAndView(getAuthorizationCodeResponse(authorizationRequest,
-                            (Authentication) principal));
                 }
             }
             // Place auth request into the model so that it is stored in the session

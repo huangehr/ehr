@@ -192,13 +192,13 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
         identifyService.identify(resourceBucket, standardPackage);
         resourceService.save(resourceBucket, standardPackage);
         //回填入库状态
-        Map<String, String> map = new HashMap();
+       /* Map<String, String> map = new HashMap();
         map.put("profileId", standardPackage.getId());
         map.put("demographicId", standardPackage.getDemographicId());
         map.put("eventType", String.valueOf(standardPackage.getEventType().getType()));
         map.put("eventNo", standardPackage.getEventNo());
         map.put("eventDate", DateUtil.toStringLong(standardPackage.getEventDate()));
-        map.put("patientId", standardPackage.getPatientId());
+        map.put("patientId", standardPackage.getPatientId());*/
         //是否返回数据
         if (echo) {
             return standardPackage.toJson();

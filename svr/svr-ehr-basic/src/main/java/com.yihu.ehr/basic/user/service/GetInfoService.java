@@ -7,7 +7,7 @@ import com.yihu.ehr.basic.org.service.OrgMemberRelationService;
 import com.yihu.ehr.basic.org.service.OrgService;
 import com.yihu.ehr.basic.user.dao.RolesDao;
 import com.yihu.ehr.basic.user.dao.XUserRepository;
-import com.yihu.ehr.basic.user.dao.XRoleUserRepository;
+import com.yihu.ehr.basic.user.dao.RoleUserDao;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,7 +28,7 @@ public class GetInfoService {
     @Autowired
     private OrgService orgService;
     @Autowired
-    private XRoleUserRepository roleUserRepository;
+    private RoleUserDao roleUserRepository;
     @Autowired
     private RolesDao rolesRepository;
     @Autowired

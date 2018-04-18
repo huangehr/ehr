@@ -11,7 +11,6 @@ import com.yihu.ehr.model.packs.EsSimplePackage;
 import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.pack.feign.SecurityClient;
 import com.yihu.ehr.pack.entity.Package;
-import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.encrypt.RSA;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
@@ -24,7 +23,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -93,7 +91,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         String group = msg.get(FastDFSUtil.GROUP_NAME).asText();
         String remoteFile = msg.get(FastDFSUtil.REMOTE_FILE_NAME).asText();
         //将组与文件ID使用英文分号隔开, 提取的时候, 只需要将它们这个串拆开, 就可以得到组与文件ID
-        String remoteFilePath = String.join(Package.pathSeparator, new String[]{group, remoteFile});
+        String remoteFilePath = String.join(EsDetailsPackage.PATH_SEPARATOR, new String[]{group, remoteFile});
         //elasticSearch
         Date now = new Date();
         String nowStr = dateFormat.format(now);
@@ -117,6 +115,9 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         sourceMap.put("analyze_status", 0);
         sourceMap.put("analyze_fail_count", 0);
         sourceMap.put("analyze_date", null);
+        sourceMap.put("demographic_id", null);
+        sourceMap.put("re_upload_flg", null);
+        sourceMap.put("profile_id", null);
         //保存索引出错的时候，删除文件
         try {
             sourceMap = elasticSearchUtil.index(INDEX, TYPE, sourceMap);
@@ -124,9 +125,8 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             fastDFSUtil.delete(group, remoteFile);
             throw e;
         }
-        String _id = (String) sourceMap.get("_id");
         EsSimplePackage esSimplePackage = new EsSimplePackage();
-        esSimplePackage.set_id(_id);
+        esSimplePackage.set_id((sourceMap.get("_id").toString()));
         esSimplePackage.setPwd(password);
         esSimplePackage.setReceive_date(now);
         esSimplePackage.setRemote_path(remoteFilePath);
@@ -141,13 +141,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
     public boolean deletePackages(
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
             @RequestParam(value = "filters", required = false) String filters) throws Exception {
-        List<Map<String, Object>> filterMap;
-        if (!StringUtils.isEmpty(filters)) {
-            filterMap = objectMapper.readValue(filters, List.class);
-        } else {
-            filterMap = new ArrayList<>(0);
-        }
-        List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, filterMap, 1, 10000);
+        List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, filters, 1, 10000);
         for (Map<String, Object> temp : resultList) {
             String [] tokens =  String.valueOf(temp.get("remote_path")).split(":");
             fastDFSUtil.delete(tokens[0], tokens[1]);
@@ -186,7 +180,6 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         }
         Map<String, Object> updateSource = new HashMap<>();
         updateSource.put("resourced", 1);
-        updateSource.put("message", message);
         if (status == ArchiveStatus.Finished) {
             //入库成功
             Map<String, String> map = objectMapper.readValue(message, Map.class);
@@ -194,10 +187,15 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             updateSource.put("event_no", map.get("event_no"));
             updateSource.put("event_date", map.get("event_date"));
             updateSource.put("patient_id", map.get("patient_id"));
+            updateSource.put("demographic_id", map.get("demographic_id"));
+            updateSource.put("re_upload_flg", map.get("re_upload_flg"));
+            updateSource.put("profile_id", map.get("profile_id"));
             updateSource.put("finish_date", dateFormat.format(new Date()));
+            updateSource.put("message", "success");
         } else if (status == ArchiveStatus.Acquired) {
             //入库执行时间
             updateSource.put("parse_date", dateFormat.format(new Date()));
+            updateSource.put("message", message);
         } else {
             updateSource.put("finish_date", null);
             if (message.endsWith("do not deal with fail-tolerant.")) {
@@ -205,14 +203,35 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             } else {
                 if ((int)sourceMap.get("fail_count") < 3) {
                     int failCount = (int)sourceMap.get("fail_count");
-                    failCount ++;
-                    updateSource.put("fail_count", failCount);
+                    updateSource.put("fail_count", failCount + 1);
                 }
             }
+            updateSource.put("message", message);
         }
         updateSource.put("archive_status", status.ordinal());
         elasticSearchUtil.update(INDEX, TYPE, id, updateSource);
         return true;
+    }
+
+    @RequestMapping(value = ServiceApi.Packages.Update, method = RequestMethod.PUT)
+    @ApiOperation(value = "根据条件批量修改档案包状态", notes = "修改档案包状态")
+    public Integer update(
+            @ApiParam(name = "filters", value = "条件", required = true)
+            @RequestParam(value = "filters") String filters,
+            @ApiParam(name = "status", value = "状态", required = true)
+            @RequestParam(value = "status") ArchiveStatus status,
+            @ApiParam(name = "page", value = "消息", required = true)
+            @RequestParam(value = "page") Integer page,
+            @ApiParam(name = "size", value = "状态", required = true)
+            @RequestParam(value = "size") Integer size) throws Exception {
+        List<Map<String, Object>> sourceList = elasticSearchUtil.page(INDEX, TYPE, filters, page, size);
+        sourceList.forEach(item -> {
+            Map<String, Object> updateSource = new HashMap<>();
+            updateSource.put("archive_status", status.ordinal());
+            updateSource.put("fail_count", 0);
+            elasticSearchUtil.update(INDEX, TYPE, String.valueOf(item.get("_id")), updateSource);
+        });
+        return sourceList.size();
     }
 
     @RequestMapping(value = ServiceApi.PackageAnalyzer.Status, method = RequestMethod.PUT)
@@ -247,21 +266,15 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page") int page,
             @ApiParam(name = "size", value = "分页大小", required = true, defaultValue = "15")
             @RequestParam(value = "size") int size) throws Exception {
-        List<Map<String, Object>> filterMap;
-        if (!StringUtils.isEmpty(filters)) {
-            filterMap = objectMapper.readValue(filters, List.class);
-        } else {
-            filterMap = new ArrayList<>(0);
-        }
-        List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, filterMap, page, size);
-        int count = (int)elasticSearchUtil.count(INDEX, TYPE, filterMap);
+        List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, filters, page, size);
+        int count = (int)elasticSearchUtil.count(INDEX, TYPE, filters);
         Envelop envelop = getPageResult(resultList, count, page, size);
         return envelop;
     }
 
     @RequestMapping(value = ServiceApi.Packages.PackageSearch, method = RequestMethod.GET)
     @ApiOperation(value = "搜索档案包")
-    public Collection<EsDetailsPackage> search (
+    public List<EsDetailsPackage> search (
             @ApiParam(name = "filters", value = "过滤条件")
             @RequestParam(value = "filters", required = false) String filters,
             @ApiParam(name = "sorts", value = "排序")
@@ -270,21 +283,19 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page") int page,
             @ApiParam(name = "size", value = "分页大小", required = true, defaultValue = "15")
             @RequestParam(value = "size") int size) throws Exception {
-        List<Map<String, Object>> filterMap;
-        if (!StringUtils.isEmpty(filters)) {
-            filterMap = objectMapper.readValue(filters, List.class);
-        } else {
-            filterMap = new ArrayList<>(0);
+        List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, filters, sorts, page, size);
+        List<EsDetailsPackage> esDetailsPackages = new ArrayList<>();
+        for (Map<String, Object> temp : resultList) {
+            esDetailsPackages.add(objectMapper.readValue(objectMapper.writeValueAsString(temp), EsDetailsPackage.class));
         }
-        List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, filterMap, sorts, page, size);
-        return convertToModels(resultList, new ArrayList<EsDetailsPackage>(resultList.size()), EsDetailsPackage.class, null);
+        return esDetailsPackages;
     }
 
     @RequestMapping(value = ServiceApi.Packages.Package, method = RequestMethod.GET)
     @ApiOperation(value = "获取档案包", notes = "获取档案包的信息")
     public EsSimplePackage getPackage(
             @ApiParam(name = "id", value = "档案包编号")
-            @PathVariable(value = "id") String id) throws IOException {
+            @PathVariable(value = "id") String id) throws Exception {
         Map<String, Object> source = elasticSearchUtil.findById(INDEX, TYPE, id);
         if (source != null) {
             EsSimplePackage esSimplePackage = new EsSimplePackage();
@@ -292,6 +303,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             esSimplePackage.setPwd(String.valueOf(source.get("pwd")));
             esSimplePackage.setRemote_path(String.valueOf(source.get("remote_path")));
             esSimplePackage.setClient_id(String.valueOf(source.get("client_id")));
+            esSimplePackage.setReceive_date(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(String.valueOf(source.get("receive_date"))));
             return esSimplePackage;
         }
         return null;
@@ -357,18 +369,11 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "sorts", required = false) String sorts,
             @ApiParam(name = "count", value = "数量（不要超过10000）", required = true, defaultValue = "500")
             @RequestParam(value = "count") int count) throws Exception {
-        List<Map<String, Object>> filters = new ArrayList<>();
-        Map<String, Object> temp = new HashMap<>();
-        temp.put("andOr", "and");
-        temp.put("condition", "=");
-        temp.put("field", "archive_status");
-        temp.put("value", status.ordinal());
-        filters.add(temp);
         if (status == ArchiveStatus.Received || status == ArchiveStatus.Acquired) {
             if (redisTemplate.opsForList().size(RedisCollection.PackageList) > 0) {
                 return "添加失败，队列中存在消息！";
             } else {
-                List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, filters, sorts, 1, count);
+                List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, "archive_status=" + status.ordinal(), sorts, 1, count);
                 for (Map<String, Object> item : resultList) {
                     EsSimplePackage esSimplePackage = new EsSimplePackage();
                     esSimplePackage.set_id(String.valueOf(item.get("_id")));
@@ -379,7 +384,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
                 }
             }
         } else {
-            List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, filters, sorts, 1, count);
+            List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, "archive_status=" + status.ordinal(), sorts, 1, count);
             for (Map<String, Object> item : resultList) {
                 Map<String, Object> updateSource = new HashMap<>();
                 updateSource.put("archive_status", 0);

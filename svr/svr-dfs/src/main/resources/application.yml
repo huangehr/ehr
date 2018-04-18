@@ -20,8 +20,8 @@ spring:
     test-on-borrow: true
 
 fast-dfs:
-  connect-timeout: 2
-  network-timeout: 30
+  connect-timeout: 10
+  network-timeout: 60
   charset: ISO8859-1
   pool:
     init-size: 5
@@ -31,6 +31,7 @@ fast-dfs:
     tracker-http-port: 80
     anti-steal-token: no
     secret-key: FastDFS1234567890
+
   server:
     dict-code: FASTDFSWLDZ #外链地址系统字典拼音编码
   index:
