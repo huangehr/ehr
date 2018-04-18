@@ -16,6 +16,6 @@ public interface SurveyAnswersDao extends PagingAndSortingRepository<SurveyAnswe
     @Query("select  count(t.surveyCode) from SurveyAnswers t where t.content is not null and t.surveyCode=?1 and t.questionCode=?2 ")
     int findByRelationCode(String id, String questionId);
 
-    @Query("select  count(distinct t.patient) from SurveyAnswers t where t.content is not null and t.surveyCode=?1 and t.questionCode=?2 ")
+    @Query("select  count(distinct t.userId) from SurveyAnswers t where t.content is not null and t.surveyCode=?1 and t.questionCode=?2 ")
     int countByRelationCode(String surveyCode, String questionId);
 }

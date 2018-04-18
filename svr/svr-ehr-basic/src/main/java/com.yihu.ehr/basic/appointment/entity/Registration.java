@@ -42,6 +42,8 @@ public class Registration extends BaseAssignedEntity {
     public Integer serialNo; // 就诊号数
     public String invalidDate; // 退号截止时间（与预约截止时间相同）
     public Integer originType; // 来源类型，1：PC，2：APP
+    public Integer registerType; // 挂号方式，1：预约挂号，2：现场挂号
+    public String registerTypeDesc; // 挂号方式描述
 
     @Column(name = "order_id")
     public String getOrderId() {
@@ -278,4 +280,21 @@ public class Registration extends BaseAssignedEntity {
         this.originType = originType;
     }
 
+    @Column(name = "register_type")
+    public Integer getRegisterType() {
+        return registerType;
+    }
+
+    public void setRegisterType(Integer registerType) {
+        this.registerType = registerType;
+    }
+
+    @Column(name = "register_type_desc")
+    public String getRegisterTypeDesc() {
+        return registerTypeDesc;
+    }
+
+    public void setRegisterTypeDesc(String registerTypeDesc) {
+        this.registerTypeDesc = registerTypeDesc;
+    }
 }

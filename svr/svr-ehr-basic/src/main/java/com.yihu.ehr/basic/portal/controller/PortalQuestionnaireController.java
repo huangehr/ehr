@@ -50,7 +50,7 @@ public class PortalQuestionnaireController extends EnvelopRestEndPoint {
         try {
             JSONObject json = new JSONObject(jsonData);
             User loginUser = (User) request.getSession().getAttribute(SessionAttributeKeys.CurrentUser);
-            questionnaireService.saveAnswerAndLotto(json,loginUser.getId());
+            questionnaireService.saveAnswer(json,loginUser.getId());
             return Result.success("填写问卷完成！");
         } catch (Exception e) {
             e.printStackTrace();

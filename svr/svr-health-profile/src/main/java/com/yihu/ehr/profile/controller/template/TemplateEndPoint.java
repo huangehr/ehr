@@ -122,7 +122,7 @@ public class TemplateEndPoint extends BaseRestEndPoint {
     }
 
     @ApiOperation(value = "下载模板展示文件")
-    @RequestMapping(value = ServiceApi.ProfileTemplate.TemplateCtn, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.ProfileTemplate.TemplateCtn, method = RequestMethod.GET)
     public void getTemplateContent(
             @ApiParam(value = "模板ID")
             @PathVariable(value = "id") int id,
