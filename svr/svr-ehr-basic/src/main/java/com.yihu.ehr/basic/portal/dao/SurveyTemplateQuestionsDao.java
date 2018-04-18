@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -13,9 +14,9 @@ import java.util.List;
  */
 public interface SurveyTemplateQuestionsDao extends PagingAndSortingRepository<SurveyTemplateQuestions,Long>,JpaSpecificationExecutor<SurveyTemplateQuestions> {
 
-    @Query("update SurveyTemplateQuestion set del = 0 where templateCode=?1 and del = 1")
     @Modifying
-    void updateDelByTemplateCode(String templateCode);
+    @Query("update SurveyTemplateQuestions t set t.del = 0 where t.templateCode = :templateCode and t.del = 1")
+    void updateDelByTemplateCode(@Param("templateCode") String templateCode);
 
     @Modifying
     void deleteByTemplateCode(String templateCode);

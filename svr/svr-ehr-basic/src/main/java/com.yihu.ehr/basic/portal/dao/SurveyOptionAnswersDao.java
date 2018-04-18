@@ -13,9 +13,9 @@ public interface SurveyOptionAnswersDao extends PagingAndSortingRepository<Surve
     @Query("select  t.optionComment from SurveyOptionAnswers t where t.optionComment is not null and t.surveyCode =?1 and t.questionCode=?2 and t.optionsCode=?3 ")
     Page<String> findByRelationCode(String id, String questionId, String optionId, Pageable request);
 
-    @Query("select  count(t.patient) from SurveyOptionAnswers t where t.optionComment is not null and t.surveyCode =?1 and t.questionCode=?2 and t.optionsCode=?3 ")
+    @Query("select  count(t.userId) from SurveyOptionAnswers t where t.optionComment is not null and t.surveyCode =?1 and t.questionCode=?2 and t.optionsCode=?3 ")
     int findByRelationCode(String id, String questionId, String optionId);
 
-    @Query("select  count(distinct  t.patient) from SurveyOptionAnswers t where t.surveyCode =?1 and t.questionCode=?2 ")
+    @Query("select  count(distinct  t.userId) from SurveyOptionAnswers t where t.surveyCode =?1 and t.questionCode=?2 ")
     int countByRelationCode(String id, String questionId);
 }
