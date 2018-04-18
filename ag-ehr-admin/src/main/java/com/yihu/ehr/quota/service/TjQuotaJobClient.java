@@ -99,4 +99,16 @@ public interface TjQuotaJobClient {
             @RequestParam(value = "type") String type,
             @ApiParam(name = "sourceList", value = "值")
             @RequestParam(value = "sourceList" ) String sourceList);
+
+
+    @RequestMapping(value = ServiceApi.TJ.GetYearDropdownList, method = RequestMethod.GET)
+    @ApiOperation(value = "获取二维表查询年份下拉数据")
+    public Envelop getDropdownList(
+            @ApiParam(name = "type", value = "类型 1增量型报表 2 全量型报表")
+            @RequestParam(value = "type" ,required =  true ) int type,
+            @ApiParam(name = "index", value = "索引")
+            @RequestParam(value = "index" ,required =  true ) String index);
+
+
+
 }
