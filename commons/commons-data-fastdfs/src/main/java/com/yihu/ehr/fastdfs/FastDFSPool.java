@@ -2,6 +2,8 @@ package com.yihu.ehr.fastdfs;
 
 import org.csource.fastdfs.TrackerClient;
 import org.csource.fastdfs.TrackerServer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 
 import javax.annotation.PostConstruct;
@@ -14,6 +16,8 @@ import java.util.List;
  * Created by szx on 2015/9/19.
  */
 public class FastDFSPool {
+
+    private static final Logger logger = LoggerFactory.getLogger(FastDFSPool.class);
 
     @Value("${fast-dfs.pool.init-size}")
     private int initPoolSize;
@@ -28,9 +32,11 @@ public class FastDFSPool {
         }
         try {
             synchronized (trackerServerPool) {
+                logger.info("Init fastDfs pool");
                 while (trackerServerPool.size() < initPoolSize) {
                     TrackerClient tracker = new TrackerClient();
                     TrackerServer trackerServer = tracker.getConnection();
+                    logger.info("[Host:" + trackerServer.getInetSocketAddress().getAddress().getHostName() + "]");
                     trackerServerPool.add(trackerServer);
                 }
             }

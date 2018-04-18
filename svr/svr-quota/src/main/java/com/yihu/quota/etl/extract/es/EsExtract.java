@@ -471,7 +471,6 @@ public class EsExtract {
                 SearchResponse response = (SearchResponse) requestBuilder.get();
                 StringTerms stringTerms = (StringTerms) response.getAggregations().asList().get(0);
                 Iterator<Terms.Bucket> gradeBucketIt = stringTerms.getBuckets().iterator();
-                client.close();
                 //里面存放的数据 例  350200-5-2-2    主维度  细维度1  细维度2  值
                 Map<String,String> map = new HashMap<>();
                 //递归解析json
@@ -479,6 +478,8 @@ public class EsExtract {
                 compute(tjQuotaDimensionSlaves,returnList,one, map);
             } catch (Exception e) {
                 e.printStackTrace();
+            }finally {
+                client.close();
             }
         }
         return returnList;

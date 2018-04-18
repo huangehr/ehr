@@ -101,7 +101,6 @@ public class RsResourceEndPoint extends EnvelopRestEndPoint {
     public Envelop getResourceByCode(
             @ApiParam(name = "code", value = "编码" )
             @RequestParam(value = "code" ) String code) {
-        Envelop envelop = new Envelop();
         RsResource rsResource = rsResourceService.getResourceByCode(code);
         if (rsResource != null) {
             return success(rsResource);
@@ -123,7 +122,7 @@ public class RsResourceEndPoint extends EnvelopRestEndPoint {
         return success(resultList);
     }
 
-    @RequestMapping(value = ServiceApi.Resources.ResourcePage, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.ResourcePage, method = RequestMethod.POST)
     @ApiOperation("获取资源列表分页（政府服务平台）")
     public Envelop getResourcePage(
             @ApiParam(name = "userResource", value = "授权资源")

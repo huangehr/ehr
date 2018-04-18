@@ -2,6 +2,7 @@ package com.yihu.ehr.basic.appointment.controller;
 
 import com.yihu.ehr.basic.appointment.entity.Registration;
 import com.yihu.ehr.basic.appointment.service.RegistrationService;
+import com.yihu.ehr.basic.fzopen.service.OpenService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
@@ -13,7 +14,9 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 挂号单 接口
@@ -28,6 +31,8 @@ public class RegistrationEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     private RegistrationService registrationService;
+    @Autowired
+    private OpenService fzOpenService;
 
     @ApiOperation("根据ID获取挂号单")
     @RequestMapping(value = ServiceApi.Registration.GetById, method = RequestMethod.GET)
@@ -80,12 +85,15 @@ public class RegistrationEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Registration.Save, method = RequestMethod.POST)
     public Envelop add(
             @ApiParam(value = "挂号单JSON", required = true)
-            @RequestBody String entityJson) {
+            @RequestParam String entityJson) {
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
         try {
             Registration newEntity = objectMapper.readValue(entityJson, Registration.class);
             newEntity.setId(UuidUtil.randomUUID());
+            if ("1".equals(newEntity.getRegisterType())) {
+                newEntity.setRegisterTypeDesc("预约挂号");
+            }
             newEntity = registrationService.save(newEntity);
 
             envelop.setObj(newEntity);
@@ -99,19 +107,56 @@ public class RegistrationEndPoint extends EnvelopRestEndPoint {
     }
 
     @ApiOperation("更新挂号单")
-    @RequestMapping(value = ServiceApi.Registration.Save, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Registration.Update, method = RequestMethod.POST)
     public Envelop update(
-            @ApiParam(value = "挂号单JSON", required = true)
-            @RequestBody String entityJson) {
+            @ApiParam(value = "医疗云挂号单ID", required = true)
+            @RequestParam String id,
+            @ApiParam(value = "医疗云患者ID", required = true)
+            @RequestParam String userId) {
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
         try {
-            Registration updateEntity = objectMapper.readValue(entityJson, Registration.class);
-            updateEntity = registrationService.save(updateEntity);
+            // 获取福州总部的挂号单详情
+            String fzOrderInfoUrl = "TradeMgmt/Open/getRegOrderInfo";
+            Map<String, Object> params = new HashMap<>();
+            params.put("thirdPartyUserId", userId);
+            params.put("thirdPartyOrderId", id);
+            String fzOrderInfoStr = fzOpenService.callFzOpenApi(fzOrderInfoUrl, params);
+            Map<String, Object> fzOrderInfoMap = objectMapper.readValue(fzOrderInfoStr, Map.class);
 
-            envelop.setObj(updateEntity);
-            envelop.setSuccessFlg(true);
-            envelop.setErrorMsg("成功更新挂号单。");
+            if ("10000".equals(fzOrderInfoMap.get("Code"))) {
+                Registration oldEntity = registrationService.getById(id);
+                oldEntity.setOrderId(fzOrderInfoMap.get("orderId").toString());
+                oldEntity.setOrderCreateTime(fzOrderInfoMap.get("orderCreateTime").toString());
+                oldEntity.setState((Integer) fzOrderInfoMap.get("state"));
+                oldEntity.setStateDesc(fzOrderInfoMap.get("stateDesc").toString());
+                Object visitClinicResultObj = fzOrderInfoMap.get("visitClinicResult");
+                if (visitClinicResultObj != null) {
+                    Integer visitClinicResult = Integer.valueOf(visitClinicResultObj.toString());
+                    oldEntity.setVisitClinicResult(visitClinicResult);
+                    if (0 == visitClinicResult) {
+                        oldEntity.setVisitClinicResultDesc("确认中");
+                    } else if (1 == visitClinicResult) {
+                        oldEntity.setVisitClinicResultDesc("已到诊");
+                    } else if (-1 == visitClinicResult) {
+                        oldEntity.setVisitClinicResultDesc("爽约");
+                    }
+                }
+                Integer timeId = (Integer) fzOrderInfoMap.get("timeId");
+                if (1 == timeId) {
+                    oldEntity.setTimeIdDesc("上午");
+                } else if (2 == timeId) {
+                    oldEntity.setTimeIdDesc("下午");
+                } else if (3 == timeId) {
+                    oldEntity.setTimeIdDesc("晚上");
+                }
+                registrationService.save(oldEntity);
+
+                envelop.setSuccessFlg(true);
+                envelop.setErrorMsg("成功更新挂号单。");
+            } else {
+                envelop.setErrorMsg("更新时获取福州总部挂号单详情" + fzOrderInfoMap.get("Message"));
+            }
         } catch (Exception e) {
             e.printStackTrace();
             envelop.setErrorMsg("更新挂号单发生异常：" + e.getMessage());
@@ -142,30 +187,6 @@ public class RegistrationEndPoint extends EnvelopRestEndPoint {
         try {
             Registration updateEntity = registrationService.getById(id);
             updateEntity.setState(state);
-            updateEntity = registrationService.save(updateEntity);
-
-            envelop.setObj(updateEntity);
-            envelop.setSuccessFlg(true);
-            envelop.setErrorMsg("成功更新挂号单。");
-        } catch (Exception e) {
-            e.printStackTrace();
-            envelop.setErrorMsg("更新挂号单发生异常：" + e.getMessage());
-        }
-        return envelop;
-    }
-
-    @ApiOperation("更新挂号单到诊情况")
-    @RequestMapping(value = ServiceApi.Registration.UpdateVisitState, method = RequestMethod.POST)
-    public Envelop updateVisitState(
-            @ApiParam(value = "挂号单ID", required = true)
-            @RequestParam(value = "id") String id,
-            @ApiParam(value = "到诊情况", required = true)
-            @RequestParam(value = "visitClinicResult") Integer visitClinicResult) {
-        Envelop envelop = new Envelop();
-        envelop.setSuccessFlg(false);
-        try {
-            Registration updateEntity = registrationService.getById(id);
-            updateEntity.setVisitClinicResult(visitClinicResult);
             updateEntity = registrationService.save(updateEntity);
 
             envelop.setObj(updateEntity);

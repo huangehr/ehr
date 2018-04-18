@@ -425,7 +425,6 @@ public class EsResultExtract {
         }else {
             filter = filter + " and quotaCode='" + tjQuota.getCode().replaceAll("_","") + "' ";
         }
-        Client client = getEsClient();
         try {
             StringBuffer mysql = new StringBuffer("select ");
             mysql.append(aggsFields)
@@ -447,8 +446,6 @@ public class EsResultExtract {
             return  new ArrayList<>();
         }catch (Exception e){
             e.getMessage();
-        }finally {
-            client.close();
         }
         return null;
     }

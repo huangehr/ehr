@@ -16,6 +16,7 @@ import com.yihu.ehr.model.user.MRoleUser;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -171,13 +173,13 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
         pagedResponse(request, response, roleUserService.getCount(filters), page, size);
         return convertToModels(roleUserList, new ArrayList<>(roleUserList.size()), MRoleUser.class, fields);
     }
-    @RequestMapping(value = ServiceApi.Roles.RoleUsersNoPage,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Roles.RoleUsersNoPage, method = RequestMethod.GET)
     @ApiOperation(value = "查询角色组人员关系列表---不分页")
     public Collection<MRoleUser> searchRoleUserNoPaging(
             @ApiParam(name = "filters",value = "过滤条件，为空检索全部",defaultValue = "")
             @RequestParam(value = "filters",required = false) String filters) throws  Exception{
         List<RoleUser> roleUserList = roleUserService.search(filters);
-        return convertToModels(roleUserList,new ArrayList<MRoleUser>(roleUserList.size()),MRoleUser.class,"");
+        return convertToModels(roleUserList, new ArrayList<MRoleUser>(roleUserList.size()), MRoleUser.class,"");
     }
 
     @RequestMapping(value = ServiceApi.Roles.RoleOrg,method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -233,6 +235,21 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "filters",value = "过滤条件，为空检索全部",defaultValue = "")
             @RequestParam(value = "filters",required = false) String filters) throws  Exception{
         List<RoleOrg> roleOrgList = roleOrgService.search(filters);
-        return convertToModels(roleOrgList,new ArrayList<MRoleOrg>(roleOrgList.size()),MRoleOrg.class,"");
+        return convertToModels(roleOrgList, new ArrayList<MRoleOrg>(roleOrgList.size()), MRoleOrg.class,"");
+    }
+
+    @RequestMapping(value = ServiceApi.Roles.ClientRole, method = RequestMethod.GET)
+    @ApiOperation(value = "查询应用角色ID列表")
+    public List<String> clientRole(
+            @ApiParam(name = "clientId", value = "应用ID", required = true)
+            @RequestParam(value = "clientId") String clientId,
+            @ApiParam(name = "userId", value = "用户ID", required = true)
+            @RequestParam(value = "userId") String userId) throws  Exception{
+        List<Integer> list = roleUserService.userClientRole(clientId, userId);
+        List<String> roles = new ArrayList<>();
+        list.forEach(item -> {
+            roles.add(item.toString());
+        });
+        return roles;
     }
 }

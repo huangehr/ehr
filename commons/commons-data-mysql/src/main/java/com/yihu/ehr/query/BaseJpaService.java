@@ -224,4 +224,8 @@ public class BaseJpaService<T, R> {
         }
     }
 
+    public String getCode() {
+        return UUID.randomUUID().toString().replaceAll("-", "");
+    }
+
 }
