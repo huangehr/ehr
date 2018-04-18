@@ -12,7 +12,6 @@ import com.yihu.ehr.oauth2.oauth2.redis.EhrRedisVerifyCodeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,7 +39,6 @@ import java.util.Map;
 public class EhrAuthLoginEndpoint extends AbstractEndpoint {
 
     private static final Logger LOG = LoggerFactory.getLogger(EhrAuthLoginEndpoint.class);
-    private static final String DEFAULT_GRANT_TYPE = "password";
 
     private OAuth2RequestFactory oAuth2RequestFactory;
     private OAuth2RequestValidator oAuth2RequestValidator = new DefaultOAuth2RequestValidator();
@@ -75,7 +73,7 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
         }
         Map<String, String> param = new HashMap<>();
         if (StringUtils.isEmpty(parameters.get("verify_code"))) {
-            param.put("grant_type", DEFAULT_GRANT_TYPE);
+            param.put("grant_type", "password");
             param.put("password", parameters.get("password"));
         } else {
             param.put("grant_type", "verify_code");
@@ -103,11 +101,11 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
         if (request.getHeader("login-device") != null && request.getHeader("login-device").equals("mobile")) {
             ehrRedisTokenStore.removeAccessToken(token.getValue());
             ehrRedisTokenStore.removeRefreshToken(token.getRefreshToken().getValue());
-            token = getTokenGranter().grant(DEFAULT_GRANT_TYPE, tokenRequest);
+            token = getTokenGranter().grant(param.get("grant_type"), tokenRequest);
         }
         EhrUserSimple ehrUserSimple = ehrUserDetailsService.loadUserSimpleByUsername(parameters.get("username"));
         if (token == null) {
-            throw new UnsupportedGrantTypeException("Unsupported grant type: " + DEFAULT_GRANT_TYPE);
+            throw new UnsupportedGrantTypeException("Unsupported grant type: " + param.get("grant_type"));
         } else {
             ehrUserSimple.setAccessToken(token.getValue());
             ehrUserSimple.setTokenType(token.getTokenType());

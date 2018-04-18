@@ -36,8 +36,8 @@ public class EhrRedisVerifyCodeService {
         if (null == serializable) {
             return false;
         }
-        String _val = serializable.toString();
-        if (code.equalsIgnoreCase(_val)) {
+        String _code = serializable.toString();
+        if (code.equalsIgnoreCase(_code)) {
             return true;
         }
         return false;
