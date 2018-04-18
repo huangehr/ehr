@@ -1,8 +1,7 @@
 package com.yihu.ehr.oauth2.web;
 
 import com.yihu.ehr.constants.ServiceApi;
-import com.yihu.ehr.oauth2.model.EhrUserDetails;
-import com.yihu.ehr.oauth2.model.EhrUserSimple;
+import com.yihu.ehr.model.user.EhrUserSimple;
 import com.yihu.ehr.oauth2.oauth2.EhrOAuth2ExceptionTranslator;
 import com.yihu.ehr.oauth2.oauth2.EhrTokenGranter;
 import com.yihu.ehr.oauth2.oauth2.EhrUserDetailsService;
@@ -105,6 +104,7 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
             ehrUserSimple.setExpiresIn(token.getExpiresIn());
             ehrUserSimple.setRefreshToken(token.getRefreshToken().getValue());
             ehrUserSimple.setUser(parameters.get("username"));
+            ehrUserSimple.setState(parameters.get("state"));
         }
         return getResponse(ehrUserSimple);
     }

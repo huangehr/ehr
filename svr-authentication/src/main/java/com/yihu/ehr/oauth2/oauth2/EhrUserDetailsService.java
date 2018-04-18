@@ -1,7 +1,7 @@
 package com.yihu.ehr.oauth2.oauth2;
 
+import com.yihu.ehr.model.user.EhrUserSimple;
 import com.yihu.ehr.oauth2.model.EhrUserDetails;
-import com.yihu.ehr.oauth2.model.EhrUserSimple;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;

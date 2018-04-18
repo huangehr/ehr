@@ -29,12 +29,12 @@ spring:
     test-on-borrow: true
 
 fast-dfs:
-  connect-timeout: 10
+  connect-timeout: 20
   network-timeout: 60
   charset: ISO8859-1
   pool:
-    init-size: 5
-    max-size: 20
+    init-size: 15
+    max-size: 30
     wait-time: 500
   http:
     tracker-http-port: 80
@@ -43,8 +43,8 @@ fast-dfs:
 
 elasticsearch:
   pool:
-    init-size: 5
-    max-size: 20
+    init-size: 10
+    max-size: 30
 
 eip:
   tenant: jkzl

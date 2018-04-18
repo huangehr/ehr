@@ -26,11 +26,11 @@ spring:
       min-idle: 1 # Target for the minimum number of idle connections to maintain in the pool. This setting only has an effect if it is positive.
 
 fast-dfs:
-  connect-timeout: 10
+  connect-timeout: 20
   network-timeout: 60
   charset: ISO8859-1
   pool:
-    init-size: 5
+    init-size: 10
     max-size: 20
     wait-time: 500
   http:
@@ -47,8 +47,8 @@ hadoop:
 
 elasticsearch:
   pool:
-    init-size: 5
-    max-size: 10
+    init-size: 10
+    max-size: 20
 
 ehr:
   # 档案包数据提取器参数，从数据集中提取摘要、事件时间与身份标识

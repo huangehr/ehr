@@ -1,6 +1,5 @@
 package com.yihu.ehr.basic.user.entity;
 
-import org.springframework.boot.autoconfigure.web.ResourceProperties;
 
 import javax.persistence.*;
 
@@ -16,7 +15,7 @@ public class Roles {
     private String name;
     private String description;
     private String appId;
-    private String type;
+    private String type; //0 - 应用角色 1 - 用户角色
     private String orgCode;
 
     public Roles(){}

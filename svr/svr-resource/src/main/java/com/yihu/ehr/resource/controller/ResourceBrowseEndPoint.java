@@ -4,6 +4,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.model.resource.MCdaTransformDto;
+import com.yihu.ehr.model.resource.MRsColumnsModel;
 import com.yihu.ehr.resource.service.ResourceBrowseService;
 import com.yihu.ehr.resource.service.ResourcesTransformService;
 import com.yihu.ehr.util.rest.Envelop;
@@ -39,7 +40,7 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
 
     @ApiOperation("资源数据源结构")
     @RequestMapping(value = ServiceApi.Resources.ResourceViewMetadata, method = RequestMethod.GET)
-    public String getResourceMetadata(
+    public List<MRsColumnsModel> getResourceMetadata(
             @ApiParam(name = "resourcesCode", value = "资源编码")
             @RequestParam(value = "resourcesCode") String resourcesCode,
             @ApiParam(name = "roleId", value = "角色id")

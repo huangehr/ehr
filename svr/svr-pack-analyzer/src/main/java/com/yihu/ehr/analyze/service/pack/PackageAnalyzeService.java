@@ -57,16 +57,13 @@ public class PackageAnalyzeService {
                 zipPackage.unZip();
                 zipPackage.resolve();
                 zipPackage.save();
-
                 mgrClient.analyzeStatus(esSimplePackage.get_id(), 3);
-
                 //处理质控
                 packageQcService.qcHandle(zipPackage);
             }
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
-
             try {
                 mgrClient.analyzeStatus(esSimplePackage.get_id(), 2);
             } catch (Exception e1) {

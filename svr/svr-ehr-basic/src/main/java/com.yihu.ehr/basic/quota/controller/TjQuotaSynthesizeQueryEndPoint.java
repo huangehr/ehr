@@ -1,6 +1,5 @@
 package com.yihu.ehr.basic.quota.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.basic.quota.service.TjDimensionMainService;
 import com.yihu.ehr.basic.quota.service.TjDimensionSlaveService;
 import com.yihu.ehr.basic.quota.service.TjQuotaDimensionMainService;
@@ -18,6 +17,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.collections.map.HashedMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -37,16 +38,16 @@ import java.util.*;
 @Api(value = "TjQuotaSynthesizeQueryEndPoint", description = "指标统计综合表", tags = {"统计指标管理-指标统计综合表"})
 public class TjQuotaSynthesizeQueryEndPoint extends EnvelopRestEndPoint {
 
+    private static final Logger logger = LoggerFactory.getLogger(TjQuotaSynthesizeQueryEndPoint.class);
+
     @Autowired
-    ObjectMapper objectMapper;
+    private TjQuotaDimensionMainService tjQuotaDimensionMainService;
     @Autowired
-    TjQuotaDimensionMainService tjQuotaDimensionMainService;
+    private TjQuotaDimensionSlaveService tjQuotaDimensionSlaveService;
     @Autowired
-    TjQuotaDimensionSlaveService tjQuotaDimensionSlaveService;
+    private TjDimensionMainService tjDimensionMainService;
     @Autowired
-    TjDimensionMainService tjDimensionMainService;
-    @Autowired
-    TjDimensionSlaveService tjDimensionSlaveService;
+    private TjDimensionSlaveService tjDimensionSlaveService;
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
@@ -148,7 +149,7 @@ public class TjQuotaSynthesizeQueryEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "quotaCode", value = "指标code多个指标其中一个")
             @RequestParam(value = "quotaCode") String quotaCode,
             @ApiParam(name = "dimensions", value = "维度编码，多个维度用英文,分开")
-            @RequestParam(value = "dimensions") String dimensions) {
+            @RequestParam(value = "dimensions") String dimensions) throws Exception {
 
         List<TjQuotaDimensionMain> tjQuotaDimensionMains = null;
         List<TjQuotaDimensionSlave> tjQuotaDimensionSlaves = null;
@@ -156,24 +157,28 @@ public class TjQuotaSynthesizeQueryEndPoint extends EnvelopRestEndPoint {
 
         Map<String, Map<String, Object>> resultMap = new HashMap<String, Map<String, Object>>();
         tjQuotaDimensionMains = tjQuotaDimensionMainService.getTjQuotaDimensionMainByCode(quotaCode);
-        if(tjQuotaDimensionMains != null){
-            for(TjQuotaDimensionMain tjQuotaDimensionMain : tjQuotaDimensionMains){
-                for(int i=0 ;i < dimensionArr.length ; i++){
-                    if(dimensionArr[i].equals(tjQuotaDimensionMain.getMainCode())){
+        if (tjQuotaDimensionMains != null){
+            for (TjQuotaDimensionMain tjQuotaDimensionMain : tjQuotaDimensionMains){
+                for (int i=0 ;i < dimensionArr.length ; i++){
+                    if (dimensionArr[i].equals(tjQuotaDimensionMain.getMainCode())){
                         Map<String, Object> map = new HashedMap();
                         List<String> list = new ArrayList<String>();
                         TjDimensionMain tjDimensionMain = tjDimensionMainService.getTjDimensionMainByCode(tjQuotaDimensionMain.getMainCode());
                         //查询字典数据
                         List<SaveModel> dictData = jdbcTemplate.query(tjQuotaDimensionMain.getDictSql(), new BeanPropertyRowMapper(SaveModel.class));
-                        if(dictData != null ){
-                            for(SaveModel saveModel :dictData){
-                                String name = getFieldValueByName(tjQuotaDimensionMain.getMainCode()+"Name",saveModel).toString();
+                        if (dictData != null ){
+                            for (SaveModel saveModel : dictData){
+                                try {
+                                    String name = getFieldValueByName(tjQuotaDimensionMain.getMainCode() + "Name", saveModel).toString();
 //                                String val = getFieldValueByName(tjQuotaDimensionMain.getMainCode(),saveModel).toString();
-                                list.add(name);
+                                    list.add(name);
+                                } catch (Exception e) {
+                                    logger.error(e.getMessage());
+                                }
                             }
-                            map.put("key",tjQuotaDimensionMain.getMainCode()+"Name");
-                            map.put("name",tjDimensionMain.getName());
-                            map.put("value",list);
+                            map.put("key", tjQuotaDimensionMain.getMainCode() + "Name");
+                            map.put("name", tjDimensionMain.getName());
+                            map.put("value", list);
                             resultMap.put(tjQuotaDimensionMain.getMainCode(), map);
                         }
                     }
@@ -182,7 +187,7 @@ public class TjQuotaSynthesizeQueryEndPoint extends EnvelopRestEndPoint {
         }
 
         tjQuotaDimensionSlaves = tjQuotaDimensionSlaveService.getTjQuotaDimensionSlaveByCode(quotaCode);
-        if(tjQuotaDimensionSlaves != null && tjQuotaDimensionSlaves.size() > 0){
+        if (tjQuotaDimensionSlaves != null && tjQuotaDimensionSlaves.size() > 0){
             for(int i=0 ;i < dimensionArr.length ; i++){
                 String slave = "slaveKey1,slaveKey2,slaveKey3";
                 if( slave.contains(dimensionArr[i]) ){
@@ -214,16 +219,12 @@ public class TjQuotaSynthesizeQueryEndPoint extends EnvelopRestEndPoint {
     /**
      * 根据属性名获取属性值
      * */
-    private Object getFieldValueByName(String fieldName, Object o) {
-        try {
-            String firstLetter = fieldName.substring(0, 1).toUpperCase();
-            String getter = "get" + firstLetter + fieldName.substring(1);
-            Method method = o.getClass().getMethod(getter, new Class[] {});
-            Object value = method.invoke(o, new Object[] {});
-            return value;
-        } catch (Exception e) {
-            return null;
-        }
+    private Object getFieldValueByName(String fieldName, Object o) throws Exception {
+        String firstLetter = fieldName.substring(0, 1).toUpperCase();
+        String getter = "get" + firstLetter + fieldName.substring(1);
+        Method method = o.getClass().getMethod(getter, new Class[] {});
+        Object value = method.invoke(o, new Object[] {});
+        return value;
     }
 
 

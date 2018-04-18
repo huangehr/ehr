@@ -217,7 +217,7 @@ public class RsResourceService extends BaseJpaService<RsResource, RsResourceDao>
 
     public List<RsResource> getResourcePage(String userResource, String userId, int page, int size) throws IOException{
         Session session = currentSession();
-        if(page <= 0 ) {
+        if (page <= 0 ) {
             page = 1;
         }
         List<String> rsList = objectMapper.readValue(userResource, List.class);
