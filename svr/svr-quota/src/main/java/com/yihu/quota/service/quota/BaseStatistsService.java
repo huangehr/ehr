@@ -330,9 +330,8 @@ public class BaseStatistsService {
             String code = mapCategory.get("code").toString();
             for(Map<String, Object> dimenMap : dimenListResult){
                 if(dimenMap.get(code) != null){
-                    //
+                    //补充所有信息
                     mapCategory.putAll(dimenMap);
-
                     if(dimenMap.containsKey(code)){
                         mapCategory.put(code,dimenMap.get(code));
                         mapCategory.put("result",dimenMap.get("result")!=null ? dimenMap.get("result"):dimenMap.get(code));
