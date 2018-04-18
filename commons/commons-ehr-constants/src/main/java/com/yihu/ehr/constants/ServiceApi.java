@@ -1532,5 +1532,13 @@ public class ServiceApi {
         public static final String UpdateVisitState = "/appointment/registration/updateVisitState";
     }
 
+    /**
+     * 组合福州总部的预约挂号接口为我方需要的数据结构
+     */
+    public static class FzCombination {
+        public static final String FindHospitalList = "/appointment/combination/findHospitalList";
+        public static final String FindDoctorList = "/appointment/combination/findDoctorList";
+    }
+
 
 }
