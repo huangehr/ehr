@@ -3,6 +3,9 @@ package com.yihu.quota.etl.util;
 
 
 import com.yihu.quota.etl.extract.es.EsExtract;
+import io.searchbox.client.JestClient;
+import io.searchbox.client.JestClientFactory;
+import io.searchbox.client.config.HttpClientConfig;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
@@ -12,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -28,68 +32,35 @@ import java.util.concurrent.ConcurrentHashMap;
 public class EsClientUtil {
     private Logger logger = LoggerFactory.getLogger(EsExtract.class);
 
-    @Autowired
-    EsConfigUtil esConfigUtil;
-    private Settings setting;
-    private Map<String, Client> clientMap = new ConcurrentHashMap<String, Client>();
-    private Map<String, Integer> ips = new HashMap<String, Integer>(); // hostname port
-    private int port = 9300;
-    private String clusterName = "elasticsearch";//jkzl
-
-    public static final EsClientUtil getInstance() {
-        return ClientHolder.INSTANCE;
-    }
-
-    private static class ClientHolder {
-        private static final EsClientUtil INSTANCE = new EsClientUtil();
-    }
-
     /**
-     * 添加新的client
-     * @param ip
-     * @param port
-     * @param clusterName
-     */
-    public Client getClient(String ip,int port,String index,String type,String clusterName){
-        ips.put(ip, 9300);
-        setting = Settings.settingsBuilder()
-                .put("client.transport.sniff",true)
-                .put("cluster.name",clusterName).build();
-        addClient(setting, getAllAddress(ips));
-        esConfigUtil.getConfig(ip,port,index,type,clusterName);
-        return getClient(clusterName);
-    }
-
-
-
-    /**
-     * 获得所有的地址端口
+     * @param host "localhost"
+     * @param port 9200
      * @return
      */
-    public List<InetSocketTransportAddress> getAllAddress(Map<String, Integer> ips) {
-        List<InetSocketTransportAddress> addressList = new ArrayList<InetSocketTransportAddress>();
-        String ipStr = "";
+    public JestClient getJestClient(String host, Integer port) {
+        String hostAddress="http://"+host+":"+port;
+        JestClientFactory factory = new JestClientFactory();
+        factory.setHttpClientConfig(new HttpClientConfig
+                .Builder(hostAddress)
+                .multiThreaded(true)
+                .discoveryEnabled(true)
+                .readTimeout(30000)//30秒
+                .build());
+        return factory.getObject();
+    }
+
+    public Client getClient(String host, Integer port,String clusterName) {
         try {
-            for (String ip : ips.keySet()) {
-                ipStr = ip;
-                addressList.add(new InetSocketTransportAddress(InetAddress.getByName(ip), ips.get(ip)));
-            }
-        } catch (UnknownHostException e) {
-            ips.remove(ipStr);
+            Settings settings = Settings.settingsBuilder()
+                    .put("cluster.name", StringUtils.isEmpty(clusterName)?"elasticsearch":clusterName)
+                    .build();
+            Client client = TransportClient.builder().settings(settings).build()
+                    .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(host), port));
+            return client;
+        } catch (Exception e) {
             e.printStackTrace();
-            logger.info("elasticSearch 无法识别的IP");
         }
-        return addressList;
+        return null;
     }
 
-    public Client getClient(String clusterName) {
-        return clientMap.get(clusterName);
-    }
-
-    public void addClient(Settings setting, List<InetSocketTransportAddress> transportAddress) {
-        Client client = TransportClient.builder().settings(setting).build()
-                .addTransportAddresses(transportAddress
-                        .toArray(new InetSocketTransportAddress[transportAddress.size()]));
-        clientMap.put(setting.get("cluster.name"), client);
-    }
 }

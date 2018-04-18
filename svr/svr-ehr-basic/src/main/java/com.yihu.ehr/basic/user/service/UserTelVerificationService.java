@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * 用户手机验证管理接口实现类.
  *
@@ -29,12 +31,13 @@ public class UserTelVerificationService extends BaseJpaService<UserTelVerificati
      * @param appId
      */
     public UserTelVerification getTelVerification(String telNo, String appId) {
-        UserTelVerification telVerification = xUserTelVerificationRepository.findByTelNoAndAppId(telNo,appId);
-        if(telVerification == null){
-            return null;
-        }
-        else{
+        List<UserTelVerification> telVerificationList = xUserTelVerificationRepository.findByTelNoAndAppId(telNo,appId);
+        UserTelVerification telVerification = null;
+        if(null != telVerificationList && telVerificationList.size()>0 ){
+            telVerification = telVerificationList.get(0);
             return telVerification;
+        }else{
+            return null;
         }
     }
 
@@ -54,25 +57,24 @@ public class UserTelVerificationService extends BaseJpaService<UserTelVerificati
 
     /**
      * 验证手机验证码的有效性
-     * @param telNo
-     * @param verificationCode
-     * @param appId
+     * @param telNo  电话号码
+     * @param verificationCode  验证码
+     * @param appId 应用id
      */
     public Boolean telValidation(String telNo, String verificationCode, String appId) {
-        UserTelVerification telVerification = xUserTelVerificationRepository.findByTelNoAndAppId(telNo, appId);
-        if (telVerification == null) {
-            return null;
-        } else {
+        List<UserTelVerification> telVerificationList = xUserTelVerificationRepository.ListUserTelVerificationByTelNoAndAppId(telNo, appId,verificationCode);
+        UserTelVerification telVerification = null;
+        if (telVerificationList != null && telVerificationList.size()>0) {
+            telVerification = telVerificationList.get(0);
             //当验证码不存在的情况下返回验证失败。
             if (telVerification.getVerificationCode().isEmpty()) {
                 return false;
             }
-
             //验证码有有效性验证
             if (telVerification.getEffectivePeriod() != null) {
                 int validationResult = telVerification.getEffectivePeriod().compareTo(DateUtil.getSysDate());
                 //验证码未超期且验证通过，则返回成功
-                if (validationResult > 0 && verificationCode.equals(telVerification.getVerificationCode().toString())) {
+                if (validationResult > 0 && (verificationCode.toLowerCase()).equals(telVerification.getVerificationCode().toString().toLowerCase())) {
                     return true;
                 } else {
                     return false;
@@ -80,6 +82,8 @@ public class UserTelVerificationService extends BaseJpaService<UserTelVerificati
             }
             //验证码为空，返回验证失败。
             return false;
+        } else {
+            return null;
         }
     }
 

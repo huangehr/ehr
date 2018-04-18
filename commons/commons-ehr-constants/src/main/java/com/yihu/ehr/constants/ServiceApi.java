@@ -570,6 +570,10 @@ public class ServiceApi {
         public static final String MessageRemindCount = "/messageRemindCount";
         public static final String MessageRemindAdmin = "/messageRemind/admin/{messageRemind_id}";
         public static final String MessageRemindReaded = "/messageRemind/readed/{remindId}";
+        public static final String MessageRemindByType = "/MessageRemindByType";
+        public static final String MessageReminInfodByType = "/MessageRemindInfoInfoByType";
+        public static final String MessageRemindByNotifie = "/MessageRemindByNotifie";
+        public static final String UpdateMessageRemindByNotifie = "/UpdateMessageRemindByNotifie";
     }
 
     public static class Portal {
@@ -767,6 +771,8 @@ public class ServiceApi {
         public static final String ChangePassword = "/users/changePassword";
         public static final String DistributeSecurityKey = "/users/distributeSecurityKey";
         public static final String GetSecurityKey = "/users/getSecurityKey";
+        public static final String changePasswordByTelephone = "/usersOfApp/users/changePasswordByTelephone";
+        public static final String changePasswordByOldPassword = "/users/changePasswordByOldPassword";
 
     }
 
@@ -1302,6 +1308,14 @@ public class ServiceApi {
         public static final String GetArchiveCount = "/tj/getArchiveCount";
         public static final String GetArchiveManCount = "/tj/getArchiveManCount";
 
+
+
+        public static final String GetYearDropdownList = "/tj/getYearDropdownList";
+
+
+
+
+
     }
 
     public static class StasticReport {
@@ -1485,11 +1499,37 @@ public class ServiceApi {
         public static final String GetMedicineDetailData = "/singleDisease/getMedicineDetailData";
     }
 
+    public static class SurveyAdminManage {
+        public static final String GetSurveyTemplateList="/admin/surveyTemplate/list";
+        public static final String GetSurveyTemplateOptionsList="/admin/surveyTemplate/options/list";
+        public static final String SaveLabelInfo ="/admin/surveyTemplate/saveLabelInfo";
+        public static final String SaveTemplate = "/admin/surveyTemplate/saveTemplate";
+    }
+
+    public static class Questionnaire {
+        public static final String GetAllQuestionsByTemplateCode = "/questionnaire/getAllQuestionsByTemplateCode";
+        public static final String SaveAnswer = "/questionnaire/saveAnswer";
+    }
+
     /**
      * 转发福州总部开放平台接口相关
      */
     public static class Fz {
         public static final String OpenApi = "/fz/open/api";
+    }
+
+    /**
+     * 预约-挂号单
+     */
+    public static class Registration {
+        public static final String Prefix = "/appointment/registration/";
+        public static final String GetById = "/appointment/registration/{id}";
+        public static final String Search = "/appointment/registration/search";
+        public static final String Save = "/appointment/registration/save";
+        public static final String Update = "/appointment/registration/update";
+        public static final String Delete = "/appointment/registration/delete";
+        public static final String UpdateState = "/appointment/registration/updateState";
+        public static final String UpdateVisitState = "/appointment/registration/updateVisitState";
     }
 
 

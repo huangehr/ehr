@@ -1,20 +1,23 @@
 package com.yihu.ehr.basic.portal.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.yihu.ehr.basic.appointment.entity.Registration;
+import com.yihu.ehr.basic.appointment.service.RegistrationService;
+import com.yihu.ehr.basic.fzopen.service.OpenService;
 import com.yihu.ehr.basic.portal.model.PortalMessageTemplate;
 import com.yihu.ehr.basic.portal.model.ProtalMessageRemind;
+import com.yihu.ehr.model.portal.MProtalOrderMessage;
 import com.yihu.ehr.basic.portal.service.PortalMessageRemindService;
 import com.yihu.ehr.basic.portal.service.PortalMessageTemplateService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.exception.ApiException;
-import com.yihu.ehr.model.portal.MFzH5Message;
 import com.yihu.ehr.model.portal.MH5Message;
 import com.yihu.ehr.model.portal.MMessageTemplate;
 import com.yihu.ehr.model.portal.MMyMessage;
 import com.yihu.ehr.util.datetime.DateUtil;
-import com.yihu.ehr.util.rest.Envelop;
+import com.yihu.ehr.util.id.UuidUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -30,10 +33,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * @author <a href="mailto:yhy23456@163.com">huiyang.yu</a>
@@ -47,6 +48,11 @@ public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
     private PortalMessageTemplateService messageTemplateService;
 
     private PortalMessageRemindService messageRemindService;
+
+    @Autowired
+    private OpenService openService;
+    @Autowired
+    private RegistrationService registrationService;
 
     /**
      * 秘钥
@@ -171,10 +177,10 @@ public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
      * @return
      */
     private MMyMessage convertToMMyMessage(ProtalMessageRemind protalMessageRemind) {
-        if (protalMessageRemind.getMessageTemplateId() == null) {
+        if (protalMessageRemind.getMessage_template_id() == null) {
             throw new ApiException("模板ID不存在");
         }
-        PortalMessageTemplate template = messageTemplateService.getMessageTemplate(protalMessageRemind.getMessageTemplateId());
+        PortalMessageTemplate template = messageTemplateService.getMessageTemplate(protalMessageRemind.getMessage_template_id());
         if (template == null) {
             throw new ApiException("模板对象不存在");
         }
@@ -185,48 +191,6 @@ public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
         mMyMessage.setContentJsons(JSON.parseArray(protalMessageRemind.getContent(), MMyMessage.ContentJson.class));
         mMyMessage.setClassification(template.getClassification());
         return mMyMessage;
-    }
-    //TODO 待完全确认后，可以删除
-    @RequestMapping(value = "/messageTemplate/messageOrderPushOld", method = RequestMethod.POST)
-    @ApiOperation(value = "旧接口-接收H5挂号订单消息推送", notes = "接收H5挂号订单消息推送")
-    public String messageOrderPushOld(
-            @ApiParam(name = "jsonData", value = "消息模型")
-            @RequestParam(value = "jsonData", required = false) String jsonData) throws Exception {
-        LOG.info(String.format("收到H5挂号订单消息推送start---%s", jsonData));
-        MH5Message message = toEntity(jsonData, MH5Message.class);
-        ProtalMessageRemind protalMessageRemind = null;
-        Map<String, Object> retMap =new HashMap<>();
-        if(message.getData() != null){
-            long messageTemplateId = 1;
-            //TODO 改成，通过type获取messageTemplateId。
-            if (message.getType() == 101) {
-                //挂号推送
-                messageTemplateId = 3;
-            } else if (message.getType() == 102) {
-                //退号结果推送,目前先不推送
-                messageTemplateId = 2;
-            }
-            protalMessageRemind = messageTemplateService.saveH5MessagePush(message, messageTemplateId);
-            if (protalMessageRemind != null){
-                //成功
-                retMap.put("status","0");
-                retMap.put("statusInfo",null);
-                retMap.put("t", System.currentTimeMillis());
-            } else{
-                //失败
-                retMap.put("status","1");
-                retMap.put("statusInfo","消息解析失败");
-                retMap.put("t", System.currentTimeMillis());
-                LOG.info("消息解析失败");
-            }
-        } else{
-            //失败
-            retMap.put("status","1");
-            retMap.put("statusInfo","data消息缺失！");
-            retMap.put("t", System.currentTimeMillis());
-            LOG.info("data消息缺失！");
-        }
-        return toJson(retMap);
     }
 
     @RequestMapping(value = ServiceApi.MessageTemplate.MessageOrderPush, method = RequestMethod.POST)
@@ -275,8 +239,17 @@ public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
         mH5Message.setThirdPartyUserId(thirdPartyUserId);
         mH5Message.setType(type);
         mH5Message.setTimestamp(timestamp);
+        //根据用户id，到总部获取订单列表
+        MProtalOrderMessage mProtalOrderMessage = openServiceGetOrderInfo(thirdPartyUserId,timestamp);
+        Registration newEntity = new Registration();
+        if(null != mProtalOrderMessage && mProtalOrderMessage.getTotal()>0){
+            String str = toJson(mProtalOrderMessage.getResult().get(0));
+            newEntity = objectMapper.readValue(str, Registration.class);
+            newEntity.setId(UuidUtil.randomUUID());
+            newEntity.setOriginType(2);
+            registrationService.save(newEntity);
+        }
         ProtalMessageRemind protalMessageRemind = null;
-
         if(StringUtils.isNotEmpty(data)){
             List<PortalMessageTemplate> messageTemplateList = messageTemplateService.getMessageTemplate(String.valueOf(isSuccess),String.valueOf(type),"0");
             long messageTemplateId = 1;
@@ -288,7 +261,7 @@ public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
                 retMap.put("t", System.currentTimeMillis());
                 LOG.info("消息模板不存在！");
             }
-            protalMessageRemind = messageTemplateService.saveH5MessagePush(mH5Message, messageTemplateId);
+            protalMessageRemind = messageTemplateService.saveH5MessagePush(newEntity,mH5Message, messageTemplateId);
             if (protalMessageRemind != null){
                 //成功
                 retMap.put("status","0");
@@ -309,6 +282,28 @@ public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
             LOG.error("data消息缺失！");
         }
         return toJson(retMap);
+    }
+
+    /**
+     * 调总部接口，询挂号单列表
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "MessageOrderPush", method = RequestMethod.POST)
+    @ApiOperation(value = "根据用户id和时间戳获取挂号订单", notes = "根据用户id和时间戳获取挂号订单")
+    private MProtalOrderMessage openServiceGetOrderInfo(String thirdPartyUserId, Long begIntime) throws  Exception{
+        SimpleDateFormat format =  new SimpleDateFormat(DateUtil.DEFAULT_YMDHMSDATE_FORMAT);
+        String begin=format.format(new Date(begIntime));
+        String api="TradeMgmt/Open/queryRegOrderInfos";
+        Map<String, Object> params=new HashMap<>();
+        params.put("thirdPartyUserId",thirdPartyUserId);
+        params.put("begIntime", begin);
+        params.put("endTime",DateUtil.getNowDate(DateUtil.DEFAULT_YMDHMSDATE_FORMAT));
+        params.put("pageIndex",1);
+        params.put("pageSize",5);
+       String res = openService.callFzOpenApi(api,params);
+        MProtalOrderMessage mProtalOrderMessage =  objectMapper.readValue(res,MProtalOrderMessage.class);
+        return mProtalOrderMessage;
     }
 
 

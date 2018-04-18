@@ -101,9 +101,9 @@ public class EsQuotaPercentJob implements Job {
                     RangeQueryBuilder rangeQueryEndTime = QueryBuilders.rangeQuery("quotaDate").lte(endTime);
                     boolQueryBuilder.must(rangeQueryEndTime);
                 }
-                Client client = esClientUtil.getClient(esConfig.getHost(), esConfig.getPort(),esConfig.getIndex(),esConfig.getType(), esConfig.getClusterName());
+                Client client = esClientUtil.getClient(esConfig.getHost(), esConfig.getPort(), esConfig.getClusterName());
                 try {
-                    elasticsearchUtil.queryDelete(client,boolQueryBuilder);
+                    elasticsearchUtil.queryDelete(client,esConfig.getIndex(),esConfig.getType(),boolQueryBuilder);
                 }catch (Exception e){
                     e.getMessage();
                 }finally {

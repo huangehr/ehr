@@ -12,6 +12,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -81,6 +82,7 @@ public class LogsEndPoint extends EnvelopRestEndPoint {
             cr.andOperator(criterias);
         }
         query.addCriteria(cr);
+        query.with(new Sort(Sort.Direction.DESC, "time"));
         query.limit(end - begin).skip(begin);//分页数据
         List<CloudBusinessLog> logsModelList =  mongoTemplate.find(query, CloudBusinessLog.class);
 
@@ -150,9 +152,10 @@ public class LogsEndPoint extends EnvelopRestEndPoint {
             cr.andOperator(criterias);
         }
         query.addCriteria(cr);
+        query.with(new Sort(Sort.Direction.DESC, "time"));
         query.limit(end - begin).skip(begin);//分页数据
         List<CloudOperatorLog> logsModelList =  mongoTemplate.find(query, CloudOperatorLog.class);
-        long totalCount = mongoTemplate.count(query, CloudBusinessLog.class);
+        long totalCount = mongoTemplate.count(query, CloudOperatorLog.class);
         ListResult listResult = new ListResult();
         if(logsModelList.size() > 0) {
             listResult.setDetailModelList(logsModelList);
@@ -233,7 +236,7 @@ public class LogsEndPoint extends EnvelopRestEndPoint {
         }
         query.addCriteria(cr);
         List<CloudOperatorLog> logsModelList =  mongoTemplate.find(query, CloudOperatorLog.class);
-        long totalCount = mongoTemplate.count(query, CloudBusinessLog.class);
+        long totalCount = mongoTemplate.count(query, CloudOperatorLog.class);
         ListResult listResult = new ListResult();
         if(logsModelList.size() > 0) {
             listResult.setDetailModelList(logsModelList);
@@ -301,8 +304,9 @@ public class LogsEndPoint extends EnvelopRestEndPoint {
                 criterias[i] = criteriaList.get(i);
             }
             cr.andOperator(criterias);
+            query.addCriteria(cr);
         }
-        query.addCriteria(cr);
+        query.with(new Sort(Sort.Direction.DESC, "time"));
         query.limit(end - begin).skip(begin);//分页数据
         List<CloudBusinessLog> logsModelList =  mongoTemplate.find(query, CloudBusinessLog.class);
 
@@ -378,11 +382,12 @@ public class LogsEndPoint extends EnvelopRestEndPoint {
             cr.andOperator(criterias);
         }
         query.addCriteria(cr);
+        query.with(new Sort(Sort.Direction.DESC, "time"));
         query.limit(end - begin).skip(begin);//分页数据
         List<CloudOperatorLog> logsModelList =  mongoTemplate.find(query, CloudOperatorLog.class);
         System.out.println(mongoTemplate.getDb().getName() + "---" + mongoTemplate.getDb().getMongo().toString() );
         System.out.println("wangguan 网关查询结果=" + logsModelList.size());
-        long totalCount = mongoTemplate.count(query, CloudBusinessLog.class);
+        long totalCount = mongoTemplate.count(query, CloudOperatorLog.class);
         ListResult listResult = new ListResult();
         if(logsModelList.size() > 0) {
             listResult.setDetailModelList(logsModelList);
@@ -429,7 +434,7 @@ public class LogsEndPoint extends EnvelopRestEndPoint {
                 cr.andOperator(criterias);
             }
             query.addCriteria(cr);
-            successCount = mongoTemplate.count(query, CloudBusinessLog.class);
+            successCount = mongoTemplate.count(query, CloudOperatorLog.class);
             resultMap.put("count",successCount);
         }else if(responseFlag == 2){
             Criteria crCaller = new Criteria().where("responseFlag").ne("200");
@@ -442,7 +447,7 @@ public class LogsEndPoint extends EnvelopRestEndPoint {
                 cr.andOperator(criterias);
             }
             query.addCriteria(cr);
-            failCount = mongoTemplate.count(query, CloudBusinessLog.class);
+            failCount = mongoTemplate.count(query, CloudOperatorLog.class);
             resultMap.put("count",failCount);
         }
         if(failCount != 0 || successCount != 0){

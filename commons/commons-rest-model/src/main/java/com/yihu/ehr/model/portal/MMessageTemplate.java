@@ -29,6 +29,16 @@ public class MMessageTemplate {
      * 主体之后内容
      */
     private String afterContent;
+    /**
+     * 总部推送类型 ，101：挂号结果推送，102：退号结果推送，-101：订单操作推送，100：满意度调查
+     */
+    private String type;
+    /**
+     * 状态：0生效，1失效
+     */
+    private String state;
+
+
 
     public Long getId() {
         return id;
@@ -76,5 +86,21 @@ public class MMessageTemplate {
 
     public void setAfterContent(String afterContent) {
         this.afterContent = afterContent;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
     }
 }
