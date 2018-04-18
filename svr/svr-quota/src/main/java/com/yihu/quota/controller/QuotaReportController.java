@@ -77,6 +77,7 @@ public class QuotaReportController extends BaseController {
         String sql = "select count(1) from "+ index +" group by date_histogram(field='quotaDate','interval'='year') order by quotaDate desc";
         map = baseStatistsService.getDataInfo(sql, "date_histogram(field=quotaDate,interval=year)");
         if (null != map && map.size() > 0) {
+            Collections.sort(map.get("xData"), Collections.reverseOrder());
             if(type == 1){
                 envelop.setObj(map.get("xData"));
             }else {

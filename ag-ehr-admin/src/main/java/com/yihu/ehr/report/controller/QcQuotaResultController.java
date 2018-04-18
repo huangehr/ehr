@@ -8,6 +8,7 @@ import com.yihu.ehr.entity.report.QcQuotaResult;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
+import com.yihu.ehr.quota.service.TjQuotaJobClient;
 import com.yihu.ehr.report.service.QcQuotaResultClient;
 import com.yihu.ehr.util.FeignExceptionUtils;
 import com.yihu.ehr.util.rest.Envelop;
@@ -35,8 +36,9 @@ import java.util.Map;
 public class QcQuotaResultController extends ExtendController<QcQuotaResult> {
 
     @Autowired
-    QcQuotaResultClient qcQuotaResultClient;
-
+    private  QcQuotaResultClient qcQuotaResultClient;
+    @Autowired
+    private TjQuotaJobClient tjQuotaJobClient;
 
     @RequestMapping(value = ServiceApi.Report.GetQcQuotaResultList, method = RequestMethod.GET)
     @ApiOperation(value = "数据统计指标结果列表")
@@ -215,7 +217,7 @@ public class QcQuotaResultController extends ExtendController<QcQuotaResult> {
             @RequestParam(value = "startTime") String startTime,
             @ApiParam(name = "endTime", value = "结束日期", defaultValue = "")
             @RequestParam(value = "endTime") String endTime) throws Exception {
-        ListResult  listResult =qcQuotaResultClient.queryQcQuotaByLocation(location,quotaId,startTime,endTime);
+        ListResult  listResult = qcQuotaResultClient.queryQcQuotaByLocation(location,quotaId,startTime,endTime);
         if(listResult.getTotalCount() != 0){
             List<Map<String,Object>> list = listResult.getDetailModelList();
             return getResult(list, listResult.getTotalCount(), listResult.getCurrPage(), listResult.getPageSize());
@@ -223,6 +225,16 @@ public class QcQuotaResultController extends ExtendController<QcQuotaResult> {
             Envelop envelop = new Envelop();
             return envelop;
         }
+    }
+
+    @RequestMapping(value = ServiceApi.TJ.GetYearDropdownList, method = RequestMethod.GET)
+    @ApiOperation(value = "获取二维表查询年份下拉数据")
+    public Envelop getDropdownList(
+            @ApiParam(name = "type", value = "类型 1增量型报表 2 全量型报表")
+            @RequestParam(value = "type" ,required =  true ) int type,
+            @ApiParam(name = "index", value = "索引")
+            @RequestParam(value = "index" ,required =  true ) String index) throws Exception {
+        return tjQuotaJobClient.getDropdownList(type,index);
     }
 
 }
