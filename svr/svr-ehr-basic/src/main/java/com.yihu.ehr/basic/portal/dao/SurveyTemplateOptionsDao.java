@@ -13,7 +13,7 @@ import java.util.List;
  */
 public interface SurveyTemplateOptionsDao extends PagingAndSortingRepository<SurveyTemplateOptions,Long>,JpaSpecificationExecutor<SurveyTemplateOptions> {
 
-    @Query("update SurveyTemplateOption set del = 0 where templateCode=?1 and del = 1")
+    @Query("update SurveyTemplateOptions set del = 0 where templateCode=?1 and del = 1")
     @Modifying
     void updateDelByTemplateCode(String templateCode);
 

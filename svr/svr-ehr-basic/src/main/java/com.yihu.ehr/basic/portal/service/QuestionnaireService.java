@@ -108,7 +108,7 @@ public class QuestionnaireService extends BaseJpaService {
 		return  json;
 	}
 
-	public void saveAnswerAndLotto(JSONObject jsonData, String userId) throws Exception {
+	public void saveAnswer(JSONObject jsonData, String userId) throws Exception {
 		System.out.println("********jsonData********* " + jsonData);
 
 		//解析json保存各种答案
