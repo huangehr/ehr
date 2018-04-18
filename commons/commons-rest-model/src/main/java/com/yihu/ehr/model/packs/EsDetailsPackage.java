@@ -10,6 +10,9 @@ import java.util.Date;
  * Created by progr1mmer on 2018/4/11.
  */
 public class EsDetailsPackage implements Serializable {
+
+    public final static String PATH_SEPARATOR = ":";
+
     private String _id;
     private String pwd; //密码
     private String remote_path; //fastDfs文件地址
@@ -30,6 +33,9 @@ public class EsDetailsPackage implements Serializable {
     private Integer analyze_status; //质控分析状态
     private Integer analyze_fail_count; //质控分析失败次数
     private Date analyze_date; //质控分析时间
+    private String demographic_id; //身份证号码
+    private String re_upload_flg; //重传标志
+    private String profile_id; //档案ID
 
     public String get_id() {
         return _id;
@@ -194,5 +200,29 @@ public class EsDetailsPackage implements Serializable {
 
     public void setAnalyze_date(Date analyze_date) {
         this.analyze_date = analyze_date;
+    }
+
+    public String getDemographic_id() {
+        return demographic_id;
+    }
+
+    public void setDemographic_id(String demographic_id) {
+        this.demographic_id = demographic_id;
+    }
+
+    public String getRe_upload_flg() {
+        return re_upload_flg;
+    }
+
+    public void setRe_upload_flg(String re_upload_flg) {
+        this.re_upload_flg = re_upload_flg;
+    }
+
+    public String getProfile_id() {
+        return profile_id;
+    }
+
+    public void setProfile_id(String profile_id) {
+        this.profile_id = profile_id;
     }
 }
