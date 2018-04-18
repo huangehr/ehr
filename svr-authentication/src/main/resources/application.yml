@@ -39,6 +39,12 @@ spring:
     #host: 192.168.72.128
     port: 6379
     password: redis!@456
+#福州总部网关参数配置
+fz-gateway:
+  url: http://service.yihu.com:8085/WSGW/rest
+  clientId: 9000401
+  clientVersion: 1.0
+  handlerId: 50871
 
 ---
 spring:
@@ -52,6 +58,12 @@ spring:
     #host: 192.168.72.128
     port: 6379
     password: redis!@456
+#福州总部网关参数配置
+fz-gateway:
+  url: http://service.yihu.com:8085/WSGW/rest
+  clientId: 9000401
+  clientVersion: 1.0
+  handlerId: 50871
 
 ---
 spring:
@@ -64,6 +76,12 @@ spring:
     host: 11.1.2.22 # Redis server host.
     port: 6390
     password: Kb6wKDQP1W4
+#福州总部网关参数配置
+fz-gateway:
+  url: http://service.yihu.com:8085/WSGW/rest
+  clientId: 9000401
+  clientVersion: 1.0
+  handlerId: 50871
 
 ---
 spring:
@@ -76,6 +94,12 @@ spring:
     host: 10.176.97.5
     port: 6390
     password: q4YaQemf
+#福州总部网关参数配置
+fz-gateway:
+  url: http://service.yihu.com:8080/WSGW/rest
+  clientId: 9000401
+  clientVersion: 1.0
+  handlerId: 50871
 
 
 ---
@@ -89,6 +113,12 @@ spring:
     host: 100.100.1.161
     port: 6390
     password: q4YaQemf
+#福州总部网关参数配置
+fz-gateway:
+  url: http://service.yihu.com:8080/WSGW/rest
+  clientId: 9000401
+  clientVersion: 1.0
+  handlerId: 50871
 
 ---
 spring:
@@ -101,3 +131,9 @@ spring:
     host: 192.168.50.82
     port: 6379
     password: q4YaQemf
+#福州总部网关参数配置
+fz-gateway:
+  url: http://service.yihu.com:8080/WSGW/rest
+  clientId: 9000401
+  clientVersion: 1.0
+  handlerId: 50871

@@ -164,12 +164,14 @@ public class PortalMessageRemindEndPoint extends EnvelopRestEndPoint {
         PortalMessageTemplate template = portalMessageTemplateService.getMessageTemplate(protalMessageRemind.getMessage_template_id());
         //根据订单号获取 订单详情
         List<Registration> registrationList=  registrationService.findByField("orderId",orderId);
+        List<MRegistration> mRegistrationlList = (List<MRegistration>) convertToModels(registrationList, new ArrayList<MRegistration>(), MRegistration.class, "");
         MMessageRemind mMessageRemind = new MMessageRemind();
         //提供将挂号单详细内容
-       for(Registration registration : registrationList){
+       if(null != mRegistrationlList && mRegistrationlList.size()>0){
+            MRegistration mregistration =mRegistrationlList.get(0);
            //根据医院名称、科室名称查找科室位置
-           String orgName = registration.getHospitalName() == null ? "" : registration.getHospitalName();
-           String deptName = registration.getDeptName() == null ? "" : registration.getDeptName();
+           String orgName = mregistration.getHospitalName() == null ? "" : mregistration.getHospitalName();
+           String deptName = mregistration.getDeptName() == null ? "" : mregistration.getDeptName();
            OrgDeptDetail orgDeptDetail = null;
            if(StringUtils.isNotEmpty(orgName)&&StringUtils.isNotEmpty(deptName)){
                orgDeptDetail = deptDetailService.searchByOrgNameAndDeptName(orgName,deptName);
@@ -178,7 +180,8 @@ public class PortalMessageRemindEndPoint extends EnvelopRestEndPoint {
            }
            //温馨提示
            mMessageRemind.setNotice(template == null?"":template.getAfterContent());
-           envelop.setObj(registration);
+           mMessageRemind.setmRegistration(mregistration);
+           envelop.setObj(mMessageRemind);
        }
         envelop.setSuccessFlg(true);
         return envelop;
@@ -214,13 +217,13 @@ public class PortalMessageRemindEndPoint extends EnvelopRestEndPoint {
                     Map<String,Object> dataMap = (Map<String, Object>) list.getList().get(i);
                     MRegistration newEntity = objectMapper.readValue(toJson(dataMap), MRegistration.class);
                     //根据订单号获取 消息
-                    List<ProtalMessageRemind> protalMessageR=  messageRemindService.findByField("order_id",newEntity.getOrder_id());
+                    List<ProtalMessageRemind> protalMessageR=  messageRemindService.findByField("order_id",newEntity.getOrderId());
                     mMessageRemind =new MMessageRemind();
                     mMessageRemind.setmRegistration(convertToModel(newEntity, MRegistration.class));
                     if(null != protalMessageR && protalMessageR.size()>0){
                     mMessageRemind.setReaded(Integer.valueOf(protalMessageR.get(0).getReaded()));
                     mMessageRemind.setId(Long.parseLong(protalMessageR.get(0).getId().toString()));
-                    mMessageRemind.setOrder_id(newEntity.getOrder_id());
+                    mMessageRemind.setOrder_id(newEntity.getOrderId());
                     mMessageRemind.setNotifie_flag(protalMessageR.get(0).getNotifie_flag());
                     }
                     messageRemindList.add(mMessageRemind);

@@ -1,6 +1,7 @@
 package com.yihu.ehr.oauth2.web;
 
 import com.yihu.ehr.constants.ServiceApi;
+import com.yihu.ehr.model.app.MApp;
 import com.yihu.ehr.model.user.EhrUserSimple;
 import com.yihu.ehr.oauth2.model.VerifyCode;
 import com.yihu.ehr.oauth2.oauth2.EhrOAuth2ExceptionTranslator;
@@ -10,6 +11,7 @@ import com.yihu.ehr.oauth2.oauth2.jdbc.EhrJdbcClientDetailsService;
 import com.yihu.ehr.oauth2.oauth2.redis.EhrRedisTokenStore;
 import com.yihu.ehr.oauth2.oauth2.redis.EhrRedisVerifyCodeService;
 import com.yihu.ehr.util.datetime.DateUtil;
+import com.yihu.ehr.util.fzgateway.FzGatewayUtil;
 import com.yihu.ehr.util.id.RandomUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.ApiOperation;
@@ -17,6 +19,7 @@ import io.swagger.annotations.ApiParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -38,6 +41,7 @@ import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -66,6 +70,15 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
     private EhrUserDetailsService ehrUserDetailsService;
     @Autowired
     private EhrRedisVerifyCodeService ehrRedisVerifyCodeService;
+    @Value("${fz-gateway.url}")
+    private String fzGatewayUrl;
+    @Value("${fz-gateway.clientId}")
+    private String fzClientId;
+    @Value("${fz-gateway.clientVersion}")
+    private String fzClientVersion;
+    @Value("${fz-gateway.handlerId}")
+    private String fzHandlerId;
+
 
     @PostConstruct
     private void init() {
@@ -139,8 +152,21 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
         verifyCode.setNextRequestTime(60);
         //验证码有效期
         ehrRedisVerifyCodeService.store(client_id, username, random, 600000);
-        //下次请求时间
-        ehrRedisVerifyCodeService.store(client_id, username+"nextrequesttime", random, 60000);
+//        //下次请求时间
+//        ehrRedisVerifyCodeService.store(client_id, username+"nextrequesttime", random, 60000);
+        //发送短信
+        String api = "MsgGW.Sms.send";
+        String content = "您好，短信验证码为:【" + random + "】，请在10分钟内验证！";
+        Map<String, String> apiParamMap = new HashMap<>();
+        //手机号码
+        apiParamMap.put("mobile", username);
+        //业务标签
+        apiParamMap.put("handlerId", fzHandlerId);
+        //短信内容
+        apiParamMap.put("content", content);
+        //渠道号
+        apiParamMap.put("clientId", fzClientId);
+       String re = FzGatewayUtil.httpPost(fzGatewayUrl,fzClientId,fzClientVersion,api,apiParamMap, 1);
         return new ResponseEntity<>(verifyCode, HttpStatus.OK);
     }
 
@@ -150,7 +176,8 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
         String username = parameters.get("username");
         VerifyCode verifyCode = new VerifyCode();
         int expiresIn = ehrRedisVerifyCodeService.getExpireTime(client_id, username);
-        int nextRequestTime = ehrRedisVerifyCodeService.getExpireTime(client_id, username+"nextrequesttime");
+        int nextRequestTime = 0;
+        nextRequestTime= 60+(expiresIn - 600 )>0 ? 60+(expiresIn - 600 ):0;
         verifyCode.setNextRequestTime(nextRequestTime);
         verifyCode.setExpiresIn(expiresIn);
         return new ResponseEntity<>(verifyCode, HttpStatus.OK);
@@ -194,5 +221,6 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
         headers.set("Pragma", "no-cache");
         return new ResponseEntity<>(ehrUserSimple, headers, HttpStatus.OK);
     }
+
 
 }

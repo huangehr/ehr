@@ -93,7 +93,8 @@ public class PortalMessageRemindService extends BaseJpaService<ProtalMessageRemi
         String sql ="";
         //我的就诊-列表，获取就诊时间前的数据
         if(type.equals("101")){
-            sql = "SELECT re.* FROM registration re JOIN portal_message_remind p ON re.order_id = p.order_id " +
+            sql = "SELECT re.order_id AS orderId,re.order_create_time AS orderCreateTime,re.patient_name AS patientName,re.hospital_name AS hospitalName,re.dept_name AS deptName,re.doctor_name AS doctorName,re.state AS state,re.state_desc AS stateDesc,re.register_date AS registerDate,re.visit_clinic_result AS visitClinicResult,re.visit_clinic_result_desc AS visitClinicResultDesc,re.time_id AS timeId,re.time_id_desc AS timeIdDesc,re.invalid_date AS invalidDate,re.create_date AS createDate,re.register_type AS registerType,re.register_type_desc AS registerTypeDesc,re.serial_no  AS serialNo  " +
+                    "FROM registration re JOIN portal_message_remind p ON re.order_id = p.order_id " +
                     "JOIN portal_message_template pt ON p.message_template_id = pt.id " +
                   " where pt.type='"+type+"'"+" AND pt.classification='0'"+
                     " AND p.type_id='" +typeId+"'" +
