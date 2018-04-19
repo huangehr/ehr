@@ -88,6 +88,9 @@ zuul:
     jkzl-server:
       path: /jkzl/**
       url: http://ssotest.yihu.cn/OpenPlatform/cgiBin/1.0/
+    fastdfs-server:
+      path: /file/**
+      url: http://172.19.103.52:80/
 
 ---
 spring:
@@ -106,6 +109,9 @@ zuul:
     jkzl-server:
       path: /jkzl/**
       url: http://ssotest.yihu.cn/OpenPlatform/cgiBin/1.0/
+    fastdfs-server:
+      path: /file/**
+      url: http://172.19.103.52:80/
 
 ---
 spring:
@@ -123,6 +129,9 @@ zuul:
     jkzl-server:
       path: /jkzl/**
       url: http://ssotest.yihu.cn/OpenPlatform/cgiBin/1.0/
+    fastdfs-server:
+      path: /file/**
+      url: http://11.1.2.9:80/
 
 ---
 spring:
@@ -141,6 +150,9 @@ zuul:
     jkzl-server:
       path: /jkzl/**
       url: http://ssotest.yihu.cn/OpenPlatform/cgiBin/1.0/
+    fastdfs-server:
+      path: /file/**
+      url: http://10.176.97.5:8888/
 
 ---
 spring:
@@ -159,6 +171,9 @@ zuul:
     jkzl-server:
       path: /jkzl/**
       url: http://ssotest.yihu.cn/OpenPlatform/cgiBin/1.0/
+    fastdfs-server:
+      path: /file/**
+      url: http://100.100.1.157:8888/
 
 ---
 spring:
@@ -177,3 +192,6 @@ zuul:
     jkzl-server:
       path: /jkzl/**
       url: http://ssotest.yihu.cn/OpenPlatform/cgiBin/1.0/
+    fastdfs-server:
+      path: /file/**
+      url: http://192.168.50.37:8888/
