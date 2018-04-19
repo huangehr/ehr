@@ -11,7 +11,6 @@ import com.yihu.ehr.dfs.fastdfs.service.SystemDictService;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.entity.dict.SystemDict;
 import com.yihu.ehr.entity.dict.SystemDictEntry;
-import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
@@ -23,16 +22,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -396,25 +391,21 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
      */
     @RequestMapping(value = ServiceApi.FastDFS.DownloadByPath, method = RequestMethod.GET)
     @ApiOperation(value = "下载文件(byPath)")
-    public void downloadByPath(
+    public Envelop downloadByPath(
             @ApiParam(name = "path", value = "文件路径", required = true)
-            @RequestParam(value = "path") String path,
-            HttpServletResponse response) throws Exception {
+            @RequestParam(value = "path") String path) throws Exception {
+        //String s = java.net.URLDecoder.decode(storagePath, "UTF-8");
         if (path.split(":").length < 2) {
-            throw new ApiException(HttpStatus.BAD_REQUEST, "参数有误");
+            return failed("参数有误");
         }
         String groupName = path.split(":")[0];
         String remoteFileName = path.split(":")[1];
-        response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
-        response.setHeader("Content-Type", MediaType.APPLICATION_OCTET_STREAM_VALUE);
-        response.setHeader("Content-Disposition", "attachment; filename=" + remoteFileName);
         byte[] bytes = fastDFSService.download(groupName, remoteFileName);
-        OutputStream os = response.getOutputStream();
-        BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(os);
-        bufferedOutputStream.write(bytes);
-        bufferedOutputStream.flush();
-        bufferedOutputStream.close();
-        os.close();
+        String fileStream = new String(Base64.getEncoder().encode(bytes));
+        if (!StringUtils.isEmpty(fileStream)) {
+            return success(fileStream);
+        }
+        return failed("FileStream Is Empty");
     }
 
     /**

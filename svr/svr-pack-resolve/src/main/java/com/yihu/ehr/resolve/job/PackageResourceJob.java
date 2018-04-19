@@ -65,10 +65,8 @@ public class PackageResourceJob implements InterruptableJob {
                 doResolve(pack, packageMgrClient);
             }
         } catch (Exception e) {
-            e.printStackTrace(); //临时代码
             if (pack != null) {
                 try {
-                    PackResolveLogger.error(objectMapper.writeValueAsString(pack)); //临时代码
                     if (StringUtils.isNotBlank(e.getMessage())) {
                         packageMgrClient.reportStatus(pack.get_id(), ArchiveStatus.Failed, e.getMessage());
                         PackResolveLogger.error(e.getMessage());
@@ -77,7 +75,6 @@ public class PackageResourceJob implements InterruptableJob {
                         PackResolveLogger.error("Internal server error, please see task log for detail message.", e);
                     }
                 } catch (Exception e1) {
-                    e1.printStackTrace(); //临时代码
                     PackResolveLogger.error("Execute feign fail cause by:" + e1.getMessage());
                 }
             } else {
