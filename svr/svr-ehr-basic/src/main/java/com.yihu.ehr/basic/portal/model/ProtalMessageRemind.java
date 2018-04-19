@@ -37,7 +37,7 @@ public class ProtalMessageRemind {
     /**
      * 就诊时间
      */
-    private Date visitTime;
+    private String visitTime;
     /**
      * 健康之路-预约挂号订单号
      */
@@ -151,12 +151,11 @@ public class ProtalMessageRemind {
         this.receivedMessages = receivedMessages;
     }
     @Column(name = "visit_time", nullable = true, insertable = true, updatable = true)
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    public Date getVisitTime() {
+    public String getVisitTime() {
         return visitTime;
     }
 
-    public void setVisitTime(Date visitTime) {
+    public void setVisitTime(String visitTime) {
         this.visitTime = visitTime;
     }
     @Column(name = "order_id", nullable = true, insertable = true, updatable = true)

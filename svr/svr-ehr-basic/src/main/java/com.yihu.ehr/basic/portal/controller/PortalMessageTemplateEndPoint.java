@@ -206,30 +206,30 @@ public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.MessageTemplate.MessageOrderPush, method = RequestMethod.POST)
     @ApiOperation(value = "接收H5挂号订单消息推送", notes = "接收H5挂号订单消息推送")
     public String messageOrderPush(
-            @ApiParam(name = "sign", value = "根据分配给第三方的秘钥对参数进行的签名")
+            @ApiParam(name = "sign", value = "根据分配给第三方的秘钥对参数进行的签名",defaultValue = "2DD189BF620529952A21D565ADDBE6880084E413")
             @RequestParam(value = "sign", required = false) String sign,
-            @ApiParam(name = "timestamp", value = "时间戳")
+            @ApiParam(name = "timestamp", value = "时间戳",defaultValue = "1524139460051")
             @RequestParam(value = "timestamp", required = false) Long timestamp,
-            @ApiParam(name = "appId", value = "渠道ID")
+            @ApiParam(name = "appId", value = "渠道ID",defaultValue = "9000401")
             @RequestParam(value = "appId", required = false) String appId,
             @ApiParam(name = "agencyAbb", value = "定值yihuwang",defaultValue = "yihuwang")
             @RequestParam(value = "agencyAbb", required = false) String agencyAbb,
-            @ApiParam(name = "orderId", value = "健康之路订单号")
+            @ApiParam(name = "orderId", value = "健康之路订单号",defaultValue = "60790942665210")
             @RequestParam(value = "orderId", required = false) String orderId,
             @ApiParam(name = "type", value = "推送类型",defaultValue = "101")
             @RequestParam(value = "type", required = false) Integer type,
             @ApiParam(name = "isSuccess", value = "是否成功",defaultValue = "0")
             @RequestParam(value = "isSuccess", required = false) Integer isSuccess,
-            @ApiParam(name = "thirdPartyOrderId", value = "第三方订单ID")
+            @ApiParam(name = "thirdPartyOrderId", value = "第三方订单ID",defaultValue = "yihuwang")
             @RequestParam(value = "thirdPartyOrderId", required = false) String thirdPartyOrderId,
-            @ApiParam(name = "thirdPartyUserId", value = "第三方用户ID")
+            @ApiParam(name = "thirdPartyUserId", value = "第三方用户ID",defaultValue = "0dae00035ab8be56319e6d2e0f183443")
             @RequestParam(value = "thirdPartyUserId", required = false) String thirdPartyUserId,
             @ApiParam(name = "data", value = "消息string(json)")
             @RequestParam(value = "data", required = false) String data
             ) throws Exception {
         LOG.info(String.format("收到H5挂号订单消息推送-%s", data));
         Map<String, Object> retMap =new HashMap<>();
-        Map<String,String> messMap = toEntity(data, Map.class);
+        Map<String,String> messMap =objectMapper.readValue(data, Map.class);
         MH5Message mH5Message = new MH5Message();
         mH5Message.setAgencyAbb(agencyAbb);
         mH5Message.setAppId(appId);
@@ -252,9 +252,10 @@ public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
         LOG.info(String.format("收到H5挂号订单消息推送参数内容-%s", toJson(mH5Message)));
         //根据用户id，到总部获取订单列表
         MProtalOrderMessage mProtalOrderMessage = openServiceGetOrderInfo(thirdPartyUserId,timestamp);
-        Registration newEntity = new Registration();
+        Registration newEntity = null;
         if(null != mProtalOrderMessage && mProtalOrderMessage.getTotal()>0){
             String str = toJson(mProtalOrderMessage.getResult().get(0));
+            newEntity = new Registration();
             newEntity = objectMapper.readValue(str, Registration.class);
             newEntity.setId(UuidUtil.randomUUID());
             newEntity.setOriginType(2);//app端订单
@@ -318,6 +319,7 @@ public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
         params.put("pageSize",5);
        String res = openService.callFzOpenApi(api,params);
         MProtalOrderMessage mProtalOrderMessage =  objectMapper.readValue(res,MProtalOrderMessage.class);
+        LOG.info(String.format("-----MProtalOrderMessage-----%s", toJson(mProtalOrderMessage)));
         return mProtalOrderMessage;
     }
 

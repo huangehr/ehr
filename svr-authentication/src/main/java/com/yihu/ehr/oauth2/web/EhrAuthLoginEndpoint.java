@@ -1,5 +1,6 @@
 package com.yihu.ehr.oauth2.web;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.model.app.MApp;
 import com.yihu.ehr.model.user.EhrUserSimple;
@@ -12,6 +13,7 @@ import com.yihu.ehr.oauth2.oauth2.redis.EhrRedisTokenStore;
 import com.yihu.ehr.oauth2.oauth2.redis.EhrRedisVerifyCodeService;
 import com.yihu.ehr.util.fzgateway.FzGatewayUtil;
 import com.yihu.ehr.util.id.RandomUtil;
+import com.yihu.ehr.util.rest.Envelop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,6 +72,8 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
     private String fzClientVersion;
     @Value("${fz-gateway.handlerId}")
     private String fzHandlerId;
+    @Autowired
+    protected ObjectMapper objectMapper;
 
 
     @PostConstruct
@@ -132,18 +136,14 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
     }
 
     @RequestMapping(value = ServiceApi.Authentication.VerifyCode, method = RequestMethod.POST)
-    public ResponseEntity<VerifyCode> verifyCode(@RequestParam Map<String, String> parameters) {
+    public Envelop verifyCode(@RequestParam Map<String, String> parameters) throws  Exception{
+        Envelop envelop =new Envelop();
         String client_id = parameters.get("client_id");
         String username = parameters.get("username");
         VerifyCode verifyCode = new VerifyCode();
         //手机短信验证码
         RandomUtil randomUtil = new RandomUtil();
         String random = randomUtil.getRandomString(6);
-        verifyCode.setCode(random);
-        verifyCode.setExpiresIn(600);
-        verifyCode.setNextRequestTime(60);
-        //验证码有效期
-        ehrRedisVerifyCodeService.store(client_id, username, random, 600000);
         //发送短信
         String api = "MsgGW.Sms.send";
         String content = "您好，短信验证码为:【" + random + "】，请在10分钟内验证！";
@@ -156,8 +156,32 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
         apiParamMap.put("content", content);
         //渠道号
         apiParamMap.put("clientId", fzClientId);
-       String re = FzGatewayUtil.httpPost(fzGatewayUrl,fzClientId,fzClientVersion,api,apiParamMap, 1);
-        return new ResponseEntity<>(verifyCode, HttpStatus.OK);
+        String resultStr = FzGatewayUtil.httpPost(fzGatewayUrl,fzClientId,fzClientVersion,api,apiParamMap, 1);
+        if (resultStr != null) {
+            Map<String, Object> resultMap = objectMapper.readValue(resultStr, Map.class);
+            Integer resultCode = 0;
+            if (null != resultMap.get("Code") && !"".equals(resultMap.get("Code"))) {
+                resultCode = Integer.valueOf(resultMap.get("Code").toString());
+            }
+            if (resultCode == 10000) {
+                verifyCode.setCode(random);
+                verifyCode.setExpiresIn(600);
+                verifyCode.setNextRequestTime(60);
+                //验证码有效期
+                ehrRedisVerifyCodeService.store(client_id, username, random, 600000);
+                envelop.setSuccessFlg(true);
+                envelop.setObj(verifyCode);
+                envelop.setErrorMsg("短信验证码发送成功！");
+            } else {
+                envelop.setSuccessFlg(false);
+                envelop.setErrorCode(resultCode);
+                envelop.setErrorMsg("短信验证码发送失败！");
+            }
+        }else{
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("短信验证码发送失败！");
+        }
+        return envelop;
     }
 
     @RequestMapping(value = ServiceApi.Authentication.VerifyCodeExpire, method = RequestMethod.POST)

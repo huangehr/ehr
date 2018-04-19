@@ -8,7 +8,6 @@ import com.yihu.ehr.basic.portal.model.PortalMessageTemplate;
 import com.yihu.ehr.basic.portal.model.ProtalMessageRemind;
 import com.yihu.ehr.model.portal.*;
 import com.yihu.ehr.query.BaseJpaService;
-import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.reflection.MethodUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -100,9 +99,9 @@ public class PortalMessageTemplateService extends BaseJpaService<PortalMessageTe
         List<MTemplateContent> mTemplateContents = JSON.parseArray(template.getContent(), MTemplateContent.class);
         List<Map<String, String>> list = new ArrayList<>();
         for (MTemplateContent content : mTemplateContents) {
-            String value = String.valueOf(MethodUtil.invokeGet(newEntity, content.getCode()));
-            if (value.equals("null")) {
-                value = "";
+            String value="";
+            if(null != newEntity){
+                value = String.valueOf(MethodUtil.invokeGet(newEntity, content.getCode()))==null?"":String.valueOf(MethodUtil.invokeGet(newEntity, content.getCode()));
             }
             Map<String, String> maps = new LinkedHashMap<>();
             maps.put("code", content.getCode());
@@ -125,10 +124,9 @@ public class PortalMessageTemplateService extends BaseJpaService<PortalMessageTe
         remind.setReceivedMessages(JSON.toJSONString(mH5Message));
         remind.setOrderId(mH5Message.getOrderId());
         remind.setPortalMessagerTemplateType(mH5Message.getPortalMessagerTemplateType());
-        SimpleDateFormat format =  new SimpleDateFormat(DateUtil.DEFAULT_YMDHMSDATE_FORMAT);
         remind.setNotifieFlag("0");
         if(null != newEntity){
-            remind.setVisitTime(format.parse(newEntity.getRegisterDate()));
+            remind.setVisitTime(newEntity.getRegisterDate());
         }
         ProtalMessageRemind protalMessageRemind =messageRemindRepository.save(remind);
         return protalMessageRemind;

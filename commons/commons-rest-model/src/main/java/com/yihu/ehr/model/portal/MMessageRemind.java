@@ -32,7 +32,7 @@ public class MMessageRemind {
     /**
      * 就诊时间
      */
-    private Date visitTime;
+    private String visitTime;
     /**
      * 就诊部门地址
      */
@@ -148,12 +148,11 @@ public class MMessageRemind {
     public void setReceivedMessages(String receivedMessages) {
         this.receivedMessages = receivedMessages;
     }
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    public Date getVisitTime() {
+    public String getVisitTime() {
         return visitTime;
     }
 
-    public void setVisitTime(Date visitTime) {
+    public void setVisitTime(String visitTime) {
         this.visitTime = visitTime;
     }
 
