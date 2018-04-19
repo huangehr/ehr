@@ -398,6 +398,12 @@ public class ServiceApi {
         public static final String AppAuthClient = "/app/authClient";
         public static final String SimpleUpdate = "/app/simpleUpdate";
 
+        //--------------- 医生工作平台 ---------------
+        public static final String GetAppsRelationByUserIdAndParentAppId ="/app/appsRelationByUserIdAndParentAppId";
+
+        //--------------- 总支撑平台 ---------------
+        public static final String SaveAppsRelation ="/app/saveAppsRelation";
+
     }
 
     public static class AppApi {
@@ -1502,6 +1508,9 @@ public class ServiceApi {
         public static final String GetMedicineDetailData = "/singleDisease/getMedicineDetailData";
     }
 
+    /**
+     * 后台配置问卷/满意度问题和选项
+     */
     public static class SurveyAdminManage {
         public static final String GetSurveyTemplateList="/admin/surveyTemplate/list";
         public static final String GetSurveyTemplateOptionsList="/admin/surveyTemplate/options/list";
@@ -1509,6 +1518,9 @@ public class ServiceApi {
         public static final String SaveTemplate = "/admin/surveyTemplate/saveTemplate";
     }
 
+    /**
+     * 居民填写满意度
+     */
     public static class Questionnaire {
         public static final String GetAllQuestionsByTemplateCode = "/questionnaire/getAllQuestionsByTemplateCode";
         public static final String SaveAnswer = "/questionnaire/saveAnswer";
@@ -1543,5 +1555,10 @@ public class ServiceApi {
         public static final String FindDoctorList = "/appointment/combination/findDoctorList";
     }
 
-
+    /**
+     * 账号申诉
+     */
+    public static class AccountRepresentation{
+        public static final String SaveAccontRepresenetation ="/account/save";
+    }
 }
