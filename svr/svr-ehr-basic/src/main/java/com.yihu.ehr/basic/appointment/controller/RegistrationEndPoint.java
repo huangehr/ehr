@@ -91,7 +91,7 @@ public class RegistrationEndPoint extends EnvelopRestEndPoint {
         try {
             Registration newEntity = objectMapper.readValue(entityJson, Registration.class);
             newEntity.setId(UuidUtil.randomUUID());
-            if ("1".equals(newEntity.getRegisterType())) {
+            if (1 == newEntity.getRegisterType()) {
                 newEntity.setRegisterTypeDesc("预约挂号");
             }
             newEntity = registrationService.save(newEntity);
@@ -124,7 +124,7 @@ public class RegistrationEndPoint extends EnvelopRestEndPoint {
             String fzOrderInfoStr = fzOpenService.callFzOpenApi(fzOrderInfoUrl, params);
             Map<String, Object> fzOrderInfoMap = objectMapper.readValue(fzOrderInfoStr, Map.class);
 
-            if ("10000".equals(fzOrderInfoMap.get("Code"))) {
+            if ("10000".equals(fzOrderInfoMap.get("Code").toString())) {
                 Registration oldEntity = registrationService.getById(id);
                 oldEntity.setOrderId(fzOrderInfoMap.get("orderId").toString());
                 oldEntity.setOrderCreateTime(fzOrderInfoMap.get("orderCreateTime").toString());

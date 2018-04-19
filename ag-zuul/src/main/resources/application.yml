@@ -128,7 +128,7 @@ zuul:
   routes:
     jkzl-server:
       path: /jkzl/**
-      url: http://ssotest.yihu.cn/OpenPlatform/cgiBin/1.0/
+      url: https://api.yihu.com/OpenPlatform/cgiBin/1.0/
     fastdfs-server:
       path: /file/**
       url: http://11.1.2.9:80/
@@ -149,7 +149,7 @@ zuul:
     # 福州总部开放平台接口相关
     jkzl-server:
       path: /jkzl/**
-      url: http://ssotest.yihu.cn/OpenPlatform/cgiBin/1.0/
+      url: https://api.yihu.com/OpenPlatform/cgiBin/1.0/
     fastdfs-server:
       path: /file/**
       url: http://10.176.97.5:8888/
@@ -170,7 +170,7 @@ zuul:
     # 福州总部开放平台接口相关
     jkzl-server:
       path: /jkzl/**
-      url: http://ssotest.yihu.cn/OpenPlatform/cgiBin/1.0/
+      url: https://api.yihu.com/OpenPlatform/cgiBin/1.0/
     fastdfs-server:
       path: /file/**
       url: http://100.100.1.157:8888/
@@ -191,7 +191,7 @@ zuul:
     # 福州总部开放平台接口相关
     jkzl-server:
       path: /jkzl/**
-      url: http://ssotest.yihu.cn/OpenPlatform/cgiBin/1.0/
+      url: https://api.yihu.com/OpenPlatform/cgiBin/1.0/
     fastdfs-server:
       path: /file/**
       url: http://192.168.50.37:8888/
