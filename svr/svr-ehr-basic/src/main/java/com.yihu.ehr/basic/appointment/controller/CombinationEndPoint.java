@@ -76,7 +76,7 @@ public class CombinationEndPoint {
             Map<String, Object> params = new HashMap<>();
             List<Map<String, Object>> doctorList = new ArrayList<>();
 
-            // 获取一页数量的医生
+            // 获取一页数量有排班的医生，及其详情、排班列表
             params.clear();
             params.put("pageIndex", pageIndex);
             params.put("pageSize", pageSize);
@@ -85,8 +85,6 @@ public class CombinationEndPoint {
             if (StringUtils.isNotEmpty(registerDate)) {
                 params.put("registerDate", registerDate);
             }
-
-            // 获取一页数量有排班的医生
             Map<String, Integer> flagMap = new HashMap<>();
             flagMap.put("lastPageIndex", lastPageIndex);
             flagMap.put("lastPageNo", lastPageNo);

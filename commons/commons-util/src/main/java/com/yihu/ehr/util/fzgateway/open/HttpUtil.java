@@ -1,4 +1,4 @@
-package com.yihu.ehr.basic.fzopen.utils;
+package com.yihu.ehr.util.fzgateway.open;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;

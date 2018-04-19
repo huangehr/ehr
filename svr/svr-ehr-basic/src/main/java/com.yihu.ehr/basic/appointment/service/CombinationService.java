@@ -53,7 +53,12 @@ public class CombinationService {
         Map<String, Object> tParams = new HashMap<>();
 
         tParams.clear();
-        tParams.put("pageIndex", pageIndex);
+        // 判断上次那页医生数据是否用完，没用完则接着那页开始查询。
+        if (originLastPageNo < pageSize) {
+            tParams.put("pageIndex", lastPageIndex);
+        } else {
+            tParams.put("pageIndex", pageIndex);
+        }
         tParams.put("pageSize", pageSize);
         tParams.put("hospitalId", hospitalId);
         tParams.put("hosDeptId", hosDeptId);
@@ -80,7 +85,6 @@ public class CombinationService {
                 }
                 doctor = resDoctorList.get(i);
             }
-
             lastPageNo++;
 
             // 获取医生的排班
@@ -124,13 +128,15 @@ public class CombinationService {
             }
         }
 
-        // 递归补满一页医生
-        lastPageIndex = pageIndex;
-        flagMap.put("lastPageIndex", lastPageIndex);
         flagMap.put("lastPageNo", lastPageNo);
-        if (doctorList.size() < pageSize) {
-            params.put("pageIndex", lastPageIndex + 1);
+        // 当医生数据充足，并且之前存在没有排班的医生，则递归补满一页医生
+        if (resDocListSize == pageSize && doctorList.size() < pageSize) {
+            lastPageIndex = lastPageIndex + 1;
+            flagMap.put("lastPageIndex", lastPageIndex);
+            params.put("pageIndex", lastPageIndex);
             getOnePageDoctorList(doctorList, flagMap, params);
+        } else {
+            flagMap.put("lastPageIndex", pageIndex);
         }
 
         return doctorList;

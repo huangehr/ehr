@@ -6,7 +6,7 @@
 
 // ------------------------------------------------------------------------
 
-package com.yihu.ehr.basic.fzopen.utils.aes;
+package com.yihu.ehr.util.fzgateway.open.aes;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
