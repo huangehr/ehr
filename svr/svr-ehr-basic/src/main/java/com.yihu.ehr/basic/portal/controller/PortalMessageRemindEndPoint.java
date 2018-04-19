@@ -14,6 +14,7 @@ import com.yihu.ehr.basic.portal.service.PortalMessageTemplateService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.model.packs.EsDetailsPackage;
 import com.yihu.ehr.model.portal.MMessageRemind;
 import com.yihu.ehr.model.portal.MProtalOrderMessage;
 import com.yihu.ehr.model.portal.MRegistration;
@@ -78,6 +79,9 @@ public class PortalMessageRemindEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page", required = false) int page,
             HttpServletRequest request,
             HttpServletResponse response) throws ParseException {
+        if(org.apache.commons.lang3.StringUtils.isEmpty(sorts)){
+            sorts="-createDate";
+        }
         List<ProtalMessageRemind> messageRemindList = messageRemindService.search(fields, filters, sorts, page, size);
         pagedResponse(request, response, messageRemindService.getCount(filters), page, size);
         return (List<MMessageRemind>) convertToModels(messageRemindList, new ArrayList<MMessageRemind>(messageRemindList.size()), MMessageRemind.class, fields);
@@ -274,4 +278,24 @@ public class PortalMessageRemindEndPoint extends EnvelopRestEndPoint {
         objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
         return objectMapper.writeValueAsString(obj);
     }
+
+//
+//    @RequestMapping(value = ServiceApi.Packages.PackageSearch, method = RequestMethod.GET)
+//    @ApiOperation(value = "搜索档案包")
+//    public List<EsDetailsPackage> search (
+//            @ApiParam(name = "filters", value = "过滤条件")
+//            @RequestParam(value = "filters", required = false) String filters,
+//            @ApiParam(name = "sorts", value = "排序")
+//            @RequestParam(value = "sorts", required = false) String sorts,
+//            @ApiParam(name = "page", value = "页码", required = true, defaultValue = "1")
+//            @RequestParam(value = "page") int page,
+//            @ApiParam(name = "size", value = "分页大小", required = true, defaultValue = "15")
+//            @RequestParam(value = "size") int size) throws Exception {
+//        List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, filters, sorts, page, size);
+//        List<EsDetailsPackage> esDetailsPackages = new ArrayList<>();
+//        for (Map<String, Object> temp : resultList) {
+//            esDetailsPackages.add(objectMapper.readValue(objectMapper.writeValueAsString(temp), EsDetailsPackage.class));
+//        }
+//        return esDetailsPackages;
+//    }
 }

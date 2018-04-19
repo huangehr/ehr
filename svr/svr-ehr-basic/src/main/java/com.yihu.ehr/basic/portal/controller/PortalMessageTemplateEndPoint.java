@@ -151,6 +151,9 @@ public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
             HttpServletRequest request,
             HttpServletResponse response) throws ParseException, IOException {
         List<MMyMessage> mMyMessageList = new ArrayList<>();
+        if(StringUtils.isEmpty(sorts)){
+            sorts="-createDate";
+        }
         List<ProtalMessageRemind> messageRemindList = messageRemindService.search(fields, filters, sorts, page, size);
         pagedResponse(request, response, messageRemindService.getCount(filters), page, size);
         for (ProtalMessageRemind protalMessageRemind : messageRemindList) {
