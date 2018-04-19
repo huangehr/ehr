@@ -156,7 +156,7 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
         apiParamMap.put("content", content);
         //渠道号
         apiParamMap.put("clientId", fzClientId);
-       String re = FzGatewayUtil.httpPost(fzGatewayUrl,fzClientId,fzClientVersion,api,apiParamMap, 1);
+        String re = FzGatewayUtil.httpPost(fzGatewayUrl, fzClientId, fzClientVersion, api, apiParamMap, 1);
         return new ResponseEntity<>(verifyCode, HttpStatus.OK);
     }
 
@@ -166,8 +166,7 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
         String username = parameters.get("username");
         VerifyCode verifyCode = new VerifyCode();
         int expiresIn = ehrRedisVerifyCodeService.getExpireTime(client_id, username);
-        int nextRequestTime = 0;
-        nextRequestTime= 60+(expiresIn - 600 )>0 ? 60+(expiresIn - 600 ):0;
+        int nextRequestTime = 60 + (expiresIn - 600 ) > 0 ? 60 + (expiresIn - 600 ) : 0;
         verifyCode.setNextRequestTime(nextRequestTime);
         verifyCode.setExpiresIn(expiresIn);
         return new ResponseEntity<>(verifyCode, HttpStatus.OK);
