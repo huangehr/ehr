@@ -18,6 +18,7 @@ import com.yihu.ehr.model.portal.MMessageTemplate;
 import com.yihu.ehr.model.portal.MMyMessage;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.id.UuidUtil;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -137,7 +138,7 @@ public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.MessageTemplate.MyMessageList, method = RequestMethod.GET)
     @ApiOperation(value = "获取我的消息列表", notes = "获取我的消息列表")
-    public List<MMyMessage> searchMyMessageList(
+    public Envelop searchMyMessageList(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
@@ -150,6 +151,7 @@ public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page", required = false) int page,
             HttpServletRequest request,
             HttpServletResponse response) throws ParseException, IOException {
+        Envelop envelop = new Envelop();
         List<MMyMessage> mMyMessageList = new ArrayList<>();
         if(StringUtils.isEmpty(sorts)){
             sorts="-createDate";
@@ -160,7 +162,12 @@ public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
             MMyMessage mMyMessage = convertToMMyMessage(protalMessageRemind);
             mMyMessageList.add(mMyMessage);
         }
-        return mMyMessageList;
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(messageRemindList);
+        envelop.setPageSize(size);
+        envelop.setCurrPage(page);
+        envelop.setTotalCount((int)messageRemindService.getCount(filters));
+        return envelop;
     }
 
     @RequestMapping(value = ServiceApi.MessageTemplate.MyMessage, method = RequestMethod.GET)
