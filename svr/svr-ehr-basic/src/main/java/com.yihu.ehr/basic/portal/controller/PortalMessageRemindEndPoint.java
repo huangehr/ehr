@@ -80,7 +80,6 @@ public class PortalMessageRemindEndPoint extends EnvelopRestEndPoint {
             HttpServletResponse response) throws ParseException {
         List<ProtalMessageRemind> messageRemindList = messageRemindService.search(fields, filters, sorts, page, size);
         pagedResponse(request, response, messageRemindService.getCount(filters), page, size);
-
         return (List<MMessageRemind>) convertToModels(messageRemindList, new ArrayList<MMessageRemind>(messageRemindList.size()), MMessageRemind.class, fields);
     }
 
@@ -90,7 +89,7 @@ public class PortalMessageRemindEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "messageRemind_json_data", value = "", defaultValue = "")
             @RequestBody String messageRemindJsonData) throws Exception {
         ProtalMessageRemind messageRemind = toEntity(messageRemindJsonData, ProtalMessageRemind.class);
-        messageRemind.setCreate_date(new Date());
+        messageRemind.setCreateDate(new Date());
         messageRemindService.save(messageRemind);
         return convertToModel(messageRemind, MMessageRemind.class);
     }
@@ -161,7 +160,7 @@ public class PortalMessageRemindEndPoint extends EnvelopRestEndPoint {
         messageRemindService.updateMessageRemind("notifie_flag","1",protalMessageRemindId);
         //如果type为空的话，默认获取当前用户的所有消息。否则获取指定消息模板的消息。
         ProtalMessageRemind  protalMessageRemind = messageRemindService.getMessageRemind(protalMessageRemindId);
-        PortalMessageTemplate template = portalMessageTemplateService.getMessageTemplate(protalMessageRemind.getMessage_template_id());
+        PortalMessageTemplate template = portalMessageTemplateService.getMessageTemplate(protalMessageRemind.getMessageTemplateId());
         //根据订单号获取 订单详情
         List<Registration> registrationList=  registrationService.findByField("orderId",orderId);
         List<MRegistration> mRegistrationlList = (List<MRegistration>) convertToModels(registrationList, new ArrayList<MRegistration>(), MRegistration.class, "");
@@ -217,14 +216,14 @@ public class PortalMessageRemindEndPoint extends EnvelopRestEndPoint {
                     Map<String,Object> dataMap = (Map<String, Object>) list.getList().get(i);
                     MRegistration newEntity = objectMapper.readValue(toJson(dataMap), MRegistration.class);
                     //根据订单号获取 消息
-                    List<ProtalMessageRemind> protalMessageR=  messageRemindService.findByField("order_id",newEntity.getOrderId());
+                    List<ProtalMessageRemind> protalMessageR=  messageRemindService.findByField("orderId",newEntity.getOrderId());
                     mMessageRemind =new MMessageRemind();
                     mMessageRemind.setmRegistration(convertToModel(newEntity, MRegistration.class));
                     if(null != protalMessageR && protalMessageR.size()>0){
                     mMessageRemind.setReaded(Integer.valueOf(protalMessageR.get(0).getReaded()));
                     mMessageRemind.setId(Long.parseLong(protalMessageR.get(0).getId().toString()));
-                    mMessageRemind.setOrder_id(newEntity.getOrderId());
-                    mMessageRemind.setNotifie_flag(protalMessageR.get(0).getNotifie_flag());
+                    mMessageRemind.setOrderId(newEntity.getOrderId());
+                    mMessageRemind.setNotifieFlag(protalMessageR.get(0).getNotifieFlag());
                     }
                     messageRemindList.add(mMessageRemind);
                 }
@@ -240,19 +239,33 @@ public class PortalMessageRemindEndPoint extends EnvelopRestEndPoint {
         envelop.setDetailModelList(messageRemindList);
         envelop.setPageSize(size);
         envelop.setCurrPage(page);
+        envelop.setTotalPage((int)list.getPage());
+        envelop.setTotalCount((int)list.getCount());
         return envelop;
     }
 
     @RequestMapping(value = ServiceApi.MessageRemind.UpdateMessageRemindByNotifie, method = RequestMethod.GET)
     @ApiOperation(value = "更新-我的就诊通知状态", notes = "更新-我的就诊通知状态")
     public Envelop UpdateMessageRemindByNotifie(
+            @ApiParam(name = "appId", value = "应用id", defaultValue = "WYo0l73F8e")
+            @RequestParam(value = "appId", required = false) String appId,
+            @ApiParam(name = "toUserId", value = "当前用户id", defaultValue = "0dae00035ab8be56319e6d2e0f183443")
+            @RequestParam(value = "toUserId", required = false) String toUserId,
+            @ApiParam(name = "typeId", value = "消息类型，默认7为健康上饶app的消息", defaultValue = "7")
+            @RequestParam(value = "typeId", required = false) String typeId,
             @ApiParam(name = "protalMessageRemindId", value = "消息id")
             @RequestParam(value = "protalMessageRemindId", required = false) Long protalMessageRemindId,
             @ApiParam(name = "notifie", value = "是否通知：0为通知，1为不再通知", defaultValue = "0")
             @RequestParam(value = "notifie", required = false) String notifie) throws Exception {
         Envelop envelop = new Envelop();
-        messageRemindService.updateMessageRemind("notifie_flag",notifie,protalMessageRemindId);
-        envelop.setSuccessFlg(true);
+        DataList list = messageRemindService.listMessageRemindValue(appId,toUserId,typeId,"",1,10,"0");
+        if(null != list && null !=list.getList() && list.getList().size()<5){
+            messageRemindService.updateMessageRemind("notifie_flag",notifie,protalMessageRemindId);
+            envelop.setSuccessFlg(true);
+        }else{
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("对不起，首页消息只能提醒5条！");
+        }
         return envelop;
     }
 

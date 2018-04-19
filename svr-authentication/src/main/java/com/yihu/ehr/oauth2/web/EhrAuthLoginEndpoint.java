@@ -152,8 +152,6 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
         verifyCode.setNextRequestTime(60);
         //验证码有效期
         ehrRedisVerifyCodeService.store(client_id, username, random, 600000);
-//        //下次请求时间
-//        ehrRedisVerifyCodeService.store(client_id, username+"nextrequesttime", random, 60000);
         //发送短信
         String api = "MsgGW.Sms.send";
         String content = "您好，短信验证码为:【" + random + "】，请在10分钟内验证！";

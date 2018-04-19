@@ -73,17 +73,17 @@ public class PortalMessageTemplateService extends BaseJpaService<PortalMessageTe
         }
         String contentJson = JSON.toJSONString(list);
         ProtalMessageRemind remind = new ProtalMessageRemind();
-        remind.setApp_id("WYo0l73F8e");
-        remind.setApp_name("EHR");
-        remind.setFrom_user_id("system");
-        remind.setTo_user_id(fzGatewayClient.getEhrUserId(mFzH5Message.getUserId()));
-        remind.setType_id("7");//固定值
+        remind.setAppId("WYo0l73F8e");
+        remind.setAppName("EHR");
+        remind.setFromUserId("system");
+        remind.setToUserId(fzGatewayClient.getEhrUserId(mFzH5Message.getUserId()));
+        remind.setTypeId("7");//固定值
         remind.setContent(contentJson);
-        remind.setWork_uri("");
+        remind.setWorkUri("");
         remind.setReaded(0);
-        remind.setCreate_date(new Date(System.currentTimeMillis()));
-        remind.setMessage_template_id(template.getId());
-        remind.setReceived_messages(JSON.toJSONString(mFzH5Message));
+        remind.setCreateDate(new Date(System.currentTimeMillis()));
+        remind.setMessageTemplateId(template.getId());
+        remind.setReceivedMessages(JSON.toJSONString(mFzH5Message));
         ProtalMessageRemind protalMessageRemind =messageRemindRepository.save(remind);
         return protalMessageRemind;
     }
@@ -112,21 +112,23 @@ public class PortalMessageTemplateService extends BaseJpaService<PortalMessageTe
         }
         String contentJson = JSON.toJSONString(list);
         ProtalMessageRemind remind = new ProtalMessageRemind();
-        remind.setApp_id(clientId);
-        remind.setApp_name("健康上饶App");
-        remind.setFrom_user_id("system");
-        remind.setTo_user_id(mH5Message.getThirdPartyUserId());
-        remind.setType_id("7");//健康上饶App消息固定值
+        remind.setAppId(clientId);
+        remind.setAppName("健康上饶App");
+        remind.setFromUserId("system");
+        remind.setToUserId(mH5Message.getThirdPartyUserId());
+        remind.setTypeId("7");//健康上饶App消息固定值
         remind.setContent(contentJson);
-        remind.setWork_uri("");
+        remind.setWorkUri("");
         remind.setReaded(0);
-        remind.setCreate_date(new Date(System.currentTimeMillis()));
-        remind.setMessage_template_id(template.getId());
-        remind.setReceived_messages(JSON.toJSONString(mH5Message));
-        remind.setOrder_id(mH5Message.getOrderId());
+        remind.setCreateDate(new Date(System.currentTimeMillis()));
+        remind.setMessageTemplateId(template.getId());
+        remind.setReceivedMessages(JSON.toJSONString(mH5Message));
+        remind.setOrderId(mH5Message.getOrderId());
+        remind.setPortalMessagerTemplateType(mH5Message.getPortalMessagerTemplateType());
         SimpleDateFormat format =  new SimpleDateFormat(DateUtil.DEFAULT_YMDHMSDATE_FORMAT);
+        remind.setNotifieFlag("0");
         if(null != newEntity){
-            remind.setVisit_time(format.parse(newEntity.getRegisterDate()));
+            remind.setVisitTime(format.parse(newEntity.getRegisterDate()));
         }
         ProtalMessageRemind protalMessageRemind =messageRemindRepository.save(remind);
         return protalMessageRemind;

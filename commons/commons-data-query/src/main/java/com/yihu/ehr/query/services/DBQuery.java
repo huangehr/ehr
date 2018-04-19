@@ -148,7 +148,10 @@ public class DBQuery {
         List<Map<String,Object>> list = getDB().query(sqlPage);
         re.setList(list);
         long count = (long)getDB().scalar(sqlCount);
+        int intCount = (int)count;
+        int totalPages = intCount%size == 0 ? intCount/size : (intCount/size)+1;
         re.setCount(count);
+        re.setPage(totalPages);
         return re;
     }
 }

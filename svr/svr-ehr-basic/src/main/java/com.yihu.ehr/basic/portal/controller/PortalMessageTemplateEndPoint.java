@@ -177,10 +177,10 @@ public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
      * @return
      */
     private MMyMessage convertToMMyMessage(ProtalMessageRemind protalMessageRemind) {
-        if (protalMessageRemind.getMessage_template_id() == null) {
+        if (protalMessageRemind.getMessageTemplateId() == null) {
             throw new ApiException("模板ID不存在");
         }
-        PortalMessageTemplate template = messageTemplateService.getMessageTemplate(protalMessageRemind.getMessage_template_id());
+        PortalMessageTemplate template = messageTemplateService.getMessageTemplate(protalMessageRemind.getMessageTemplateId());
         if (template == null) {
             throw new ApiException("模板对象不存在");
         }
@@ -247,7 +247,8 @@ public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
             String str = toJson(mProtalOrderMessage.getResult().get(0));
             newEntity = objectMapper.readValue(str, Registration.class);
             newEntity.setId(UuidUtil.randomUUID());
-            newEntity.setOriginType(2);
+            newEntity.setOriginType(2);//app端订单
+            newEntity.setRegisterType(1);//预约挂号
             registrationService.save(newEntity);
         }
         ProtalMessageRemind protalMessageRemind = null;
@@ -256,6 +257,7 @@ public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
             long messageTemplateId = 1;
             if(null != messageTemplateList && messageTemplateList.size()>0){
                 messageTemplateId = messageTemplateList.get(0).getId();
+                mH5Message.setPortalMessagerTemplateType(messageTemplateList.get(0).getType());
             }else{
                 retMap.put("status","1");
                 retMap.put("statusInfo","消息模板不存在！");
@@ -294,7 +296,7 @@ public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "根据用户id和时间戳获取挂号订单", notes = "根据用户id和时间戳获取挂号订单")
     private MProtalOrderMessage openServiceGetOrderInfo(String thirdPartyUserId, Long begIntime) throws  Exception{
         SimpleDateFormat format =  new SimpleDateFormat(DateUtil.DEFAULT_YMDHMSDATE_FORMAT);
-        long time = 60*1000;//30分钟
+        long time = 60*1000;//
         String afterDate = format.format(new Date(new Date(begIntime).getTime() + time));//1分钟后的时间
         String beforeDate = format.format(new Date(new Date(begIntime) .getTime() - time));//1分钟前的时间
         String api="TradeMgmt/Open/queryRegOrderInfos";
