@@ -9,23 +9,18 @@ import com.yihu.ehr.basic.portal.model.SurveyTemplateQuestions;
 import com.yihu.ehr.basic.report.feign.RedisServiceClient;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.redis.client.RedisClient;
-import io.searchbox.client.JestClient;
-import io.searchbox.core.Bulk;
-import io.searchbox.core.BulkResult;
-import io.searchbox.core.Delete;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.*;
 
 /**
@@ -50,10 +45,10 @@ public class QuestionnaireService extends BaseJpaService {
 	@Autowired
 	private SurveyAnswersDao surveyAnswersDao;
 	@Autowired
-	private RedisServiceClient redisServiceClient;
+	private PortalMessageRemindService portalMessageRemindService;
 
-	@Autowired
-	private RedisClient redisClient;
+	@Resource
+	private RedisTemplate<String,Object> redisTemplate;
 
 
 	/**
@@ -62,18 +57,18 @@ public class QuestionnaireService extends BaseJpaService {
 	 * @return
 	 * @throws Exception
 	 */
-	public JSONObject getAllQuestions(String surveyTemplateCode)throws Exception{
-		JSONObject json = new JSONObject();
+	public Map<String,Object> getAllQuestions(String surveyTemplateCode)throws Exception{
+		Map<String,Object> resultMap = new HashedMap();
         List<SurveyTemplateQuestions> questionList =null;
         List<SurveyTemplateOptions> optionsList = null;
         //从redis获取题目和选项
-        String resultQeustionJson = redisClient.get("questionnaire:quetion:code:"+surveyTemplateCode);
-        if(StringUtils.isNotBlank(resultQeustionJson)){
-            questionList = (List<SurveyTemplateQuestions>)net.sf.json.JSONArray.toCollection(net.sf.json.JSONArray.fromObject(resultQeustionJson),SurveyTemplateQuestions.class);
+		Object questionObj = redisTemplate.opsForValue().get("questionnaire:quetion:code:"+surveyTemplateCode);
+        if(questionObj != null){
+            questionList = (List<SurveyTemplateQuestions>)net.sf.json.JSONArray.toCollection(net.sf.json.JSONArray.fromObject(questionObj.toString()),SurveyTemplateQuestions.class);
         }
-        String resultOptinoJson = redisClient.get("questionnaire:option:code:"+surveyTemplateCode);
-        if (StringUtils.isNotBlank(resultOptinoJson)){
-            optionsList = (List<SurveyTemplateOptions>) net.sf.json.JSONArray.toCollection(net.sf.json.JSONArray.fromObject(resultOptinoJson),SurveyTemplateOptions.class);
+		Object optionObj = redisTemplate.opsForValue().get("questionnaire:option:code:"+surveyTemplateCode);
+        if (optionObj != null){
+            optionsList = (List<SurveyTemplateOptions>) net.sf.json.JSONArray.toCollection(net.sf.json.JSONArray.fromObject(optionObj.toString()),SurveyTemplateOptions.class);
         }
         //如果redis没有则从数据库抽取
         if (questionList==null || optionsList==null){
@@ -83,36 +78,48 @@ public class QuestionnaireService extends BaseJpaService {
 			//将题目数据存储到redis
 			if (questionList!=null){
 				String questionJson = net.sf.json.JSONArray.fromObject(questionList).toString();
-				redisClient.set("questionnaire:quetion:code:" + surveyTemplateCode, questionJson);
+				redisTemplate.opsForValue().set("questionnaire:quetion:code:" + surveyTemplateCode, questionJson);
 			}
             //将选项数据存储到redis
 			if (optionsList!=null){
 				String optionJson = net.sf.json.JSONArray.fromObject(optionsList).toString();
-				redisClient.set("questionnaire:option:code:" + surveyTemplateCode, optionJson);
+				redisTemplate.opsForValue().set("questionnaire:option:code:" + surveyTemplateCode, optionJson);
 			}
         }
 
+		List<Map<String,Object>> resultList = new ArrayList<>();
         for (SurveyTemplateQuestions surveyTemplateQuestions : questionList){
             Map<String,Object> map = new HashMap<>();
+			List<Map<String,Object>> optionList = new ArrayList<>();
 			String qusCode = surveyTemplateQuestions.getCode();
-			List<SurveyTemplateOptions>  resultOptionList = new ArrayList<>();
 			for (SurveyTemplateOptions option : optionsList){
 				if (option.getQuestionCode().equals(qusCode)){
-					resultOptionList.add(option);
+					Map<String,Object> optianMap = new HashMap<>();
+					optianMap.put("id",option.getId());
+					optianMap.put("sort",option.getSort());
+					optianMap.put("code",option.getCode());
+					optianMap.put("content",option.getContent());
+					optionList.add(optianMap);
 				}
 			}
-			map.put("question",surveyTemplateQuestions);
-			map.put("option",resultOptionList);
-			json.put(surveyTemplateQuestions.getSort()+"",map);
+			map.put("qstCode",qusCode);
+			map.put("title",surveyTemplateQuestions.getTitle());
+			map.put("type",surveyTemplateQuestions.getQuestionType());
+			map.put("sort",surveyTemplateQuestions.getSort());
+			map.put("options",optionList);
+			resultList.add(map);
 		}
-		return  json;
+		resultMap.put("questions",resultList);
+		return  resultMap;
 	}
 
-	public void saveAnswer(JSONObject jsonData, String userId) throws Exception {
+	public boolean saveAnswer(JSONObject jsonData) throws Exception {
 		System.out.println("********jsonData********* " + jsonData);
 
 		//解析json保存各种答案
-		String surveyCode = jsonData.get("surveyCode").toString();
+		String surveyCode = String.valueOf(jsonData.get("surveyCode"));
+		String userId = String.valueOf(jsonData.get("userId"));
+		String messageId = String.valueOf(jsonData.get("messageId"));
 		Date createTime = new Date();
 		//获取一维数组
 		JSONArray questions = jsonData.getJSONArray("questions");
@@ -123,10 +130,10 @@ public class QuestionnaireService extends BaseJpaService {
 			int type = Integer.parseInt(question.get("type").toString());
 			if (type != 2) {
 				if (question.has("options")) {
+					//JSONArray options = question.getJSONArray("options");
 					//获取每道题的所有选项
-					JSONArray options = question.getJSONArray("options");
-					for (int j = 0; j < options.length(); j++) {
-						JSONObject option = new JSONObject(options.get(j).toString());
+					/*for (int j = 0; j < optionJson.size(); j++) {
+						JSONObject option = new JSONObject(optionJson.get(j).toString());
 						String code = getCode();
 						String optionCode = option.get("optionCode").toString();
 						String comment = null;
@@ -140,7 +147,21 @@ public class QuestionnaireService extends BaseJpaService {
 						surveyOptionAnswersDao.save(optionAnswer);
 						//选择题修改统计表数量
 						surveyStatisticsDao.modifyAmount(surveyCode, qstCode, optionCode);
+					}*/
+					JSONObject option = question.getJSONObject("options");
+					String code = getCode();
+					String optionCode = option.get("code").toString();
+					String comment = null;
+					int haveComment = 0;
+					if (option.has("comment")) {
+						comment = option.get("comment").toString();
+						haveComment = 1;
 					}
+					//保存到选择题答案表
+					SurveyOptionAnswers optionAnswer = new SurveyOptionAnswers(code, surveyCode, qstCode, optionCode, comment, type, createTime,userId);
+					surveyOptionAnswersDao.save(optionAnswer);
+					//选择题修改统计表数量
+					surveyStatisticsDao.modifyAmount(surveyCode, qstCode, optionCode);
 				}
 
 			}else {
@@ -155,5 +176,7 @@ public class QuestionnaireService extends BaseJpaService {
 				}
 			}
 		}
+		//评价完更改就诊信息评价状态
+		return portalMessageRemindService.updateMessageRemind("notifie_flag","1",Long.valueOf(messageId));
 	}
 }
