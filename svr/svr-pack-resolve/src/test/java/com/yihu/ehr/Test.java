@@ -25,6 +25,11 @@ public class Test {
         System.out.println(sortArr[0].split(" ")[1].trim());
 
         System.out.println(IPInfoUtils.isInnerIP("223.84.134.42"));
+
+
+        String s = "+receive_date";
+        System.out.println(s.substring(0, 1));
+        System.out.println(s.substring(1));
     }
 
 
