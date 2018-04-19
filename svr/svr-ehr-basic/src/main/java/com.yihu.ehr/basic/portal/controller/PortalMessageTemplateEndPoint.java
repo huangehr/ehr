@@ -163,7 +163,7 @@ public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
             mMyMessageList.add(mMyMessage);
         }
         envelop.setSuccessFlg(true);
-        envelop.setDetailModelList(messageRemindList);
+        envelop.setDetailModelList(mMyMessageList);
         envelop.setPageSize(size);
         envelop.setCurrPage(page);
         envelop.setTotalCount((int)messageRemindService.getCount(filters));
