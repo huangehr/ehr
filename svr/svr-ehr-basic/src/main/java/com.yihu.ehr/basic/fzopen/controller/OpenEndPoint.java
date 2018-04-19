@@ -10,7 +10,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -45,11 +44,9 @@ public class OpenEndPoint extends EnvelopRestEndPoint {
         envelop.setSuccessFlg(false);
         try {
             Map<String, Object> params = objectMapper.readValue(paramsJson, Map.class);
-            String result = openService.callFzOpenApi(apiUrl, params);
-            if (!StringUtils.isEmpty(result)) {
-                envelop.setObj(objectMapper.readValue(result, Map.class));
-                envelop.setSuccessFlg(true);
-            }
+            Map<String, Object> result = objectMapper.readValue(openService.callFzOpenApi(apiUrl, params), Map.class);
+            envelop.setObj(result);
+            envelop.setSuccessFlg(true);
         } catch (Exception e) {
             e.printStackTrace();
             envelop.setErrorMsg(e.getMessage());
