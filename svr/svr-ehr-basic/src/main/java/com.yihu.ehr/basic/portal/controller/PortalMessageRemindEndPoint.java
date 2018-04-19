@@ -18,6 +18,7 @@ import com.yihu.ehr.model.packs.EsDetailsPackage;
 import com.yihu.ehr.model.portal.MMessageRemind;
 import com.yihu.ehr.model.portal.MProtalOrderMessage;
 import com.yihu.ehr.model.portal.MRegistration;
+import com.yihu.ehr.model.redis.MRedisCacheCategory;
 import com.yihu.ehr.model.redis.MRedisMqChannel;
 import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.query.common.model.DataList;
@@ -166,26 +167,29 @@ public class PortalMessageRemindEndPoint extends EnvelopRestEndPoint {
         ProtalMessageRemind  protalMessageRemind = messageRemindService.getMessageRemind(protalMessageRemindId);
         PortalMessageTemplate template = portalMessageTemplateService.getMessageTemplate(protalMessageRemind.getMessageTemplateId());
         //根据订单号获取 订单详情
-        List<Registration> registrationList=  registrationService.findByField("orderId",orderId);
-        List<MRegistration> mRegistrationlList = (List<MRegistration>) convertToModels(registrationList, new ArrayList<MRegistration>(), MRegistration.class, "");
-        MMessageRemind mMessageRemind = new MMessageRemind();
-        //提供将挂号单详细内容
-       if(null != mRegistrationlList && mRegistrationlList.size()>0){
-            MRegistration mregistration =mRegistrationlList.get(0);
-           //根据医院名称、科室名称查找科室位置
-           String orgName = mregistration.getHospitalName() == null ? "" : mregistration.getHospitalName();
-           String deptName = mregistration.getDeptName() == null ? "" : mregistration.getDeptName();
-           OrgDeptDetail orgDeptDetail = null;
-           if(StringUtils.isNotEmpty(orgName)&&StringUtils.isNotEmpty(deptName)){
-               orgDeptDetail = deptDetailService.searchByOrgNameAndDeptName(orgName,deptName);
-               //科室位置
-               mMessageRemind.setDeptAdress(orgDeptDetail == null?"":orgDeptDetail.getPlace());
-           }
-           //温馨提示
-           mMessageRemind.setNotice(template == null?"":template.getAfterContent());
-           mMessageRemind.setmRegistration(mregistration);
-           envelop.setObj(mMessageRemind);
-       }
+        List<Registration> registrationList= null;
+        if(StringUtils.isNotEmpty(orderId)){
+            registrationList = registrationService.findByField("orderId",orderId);
+            List<MRegistration> mRegistrationlList = (List<MRegistration>) convertToModels(registrationList, new ArrayList<MRegistration>(), MRegistration.class, "");
+            MMessageRemind mMessageRemind = convertToModel(protalMessageRemind, MMessageRemind.class);
+            //提供将挂号单详细内容
+            if(null != mRegistrationlList && mRegistrationlList.size()>0){
+                MRegistration mregistration =mRegistrationlList.get(0);
+                //根据医院名称、科室名称查找科室位置
+                String orgName = mregistration.getHospitalName() == null ? "" : mregistration.getHospitalName();
+                String deptName = mregistration.getDeptName() == null ? "" : mregistration.getDeptName();
+                OrgDeptDetail orgDeptDetail = null;
+                if(StringUtils.isNotEmpty(orgName)&&StringUtils.isNotEmpty(deptName)){
+                    orgDeptDetail = deptDetailService.searchByOrgNameAndDeptName(orgName,deptName);
+                    //科室位置
+                    mMessageRemind.setDeptAdress(orgDeptDetail == null?"":orgDeptDetail.getPlace());
+                }
+                //温馨提示
+                mMessageRemind.setNotice(template == null?"":template.getAfterContent());
+                mMessageRemind.setmRegistration(mregistration);
+                envelop.setObj(mMessageRemind);
+            }
+        }
         envelop.setSuccessFlg(true);
         return envelop;
     }
