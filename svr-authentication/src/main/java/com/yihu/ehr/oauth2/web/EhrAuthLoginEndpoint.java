@@ -10,20 +10,14 @@ import com.yihu.ehr.oauth2.oauth2.EhrUserDetailsService;
 import com.yihu.ehr.oauth2.oauth2.jdbc.EhrJdbcClientDetailsService;
 import com.yihu.ehr.oauth2.oauth2.redis.EhrRedisTokenStore;
 import com.yihu.ehr.oauth2.oauth2.redis.EhrRedisVerifyCodeService;
-import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.fzgateway.FzGatewayUtil;
 import com.yihu.ehr.util.id.RandomUtil;
-import com.yihu.ehr.util.rest.Envelop;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
@@ -39,9 +33,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -220,5 +212,9 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
         return new ResponseEntity<>(ehrUserSimple, headers, HttpStatus.OK);
     }
 
+    @Override
+    protected WebResponseExceptionTranslator getExceptionTranslator() {
+        return ehrOAuth2ExceptionTranslator;
+    }
 
 }
