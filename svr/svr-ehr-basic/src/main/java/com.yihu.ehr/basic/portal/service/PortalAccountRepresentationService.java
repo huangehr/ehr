@@ -21,8 +21,8 @@ public class PortalAccountRepresentationService extends BaseJpaService<PortalAcc
     @Autowired
     private PortalAccountRepresentationDao portalAccountRepresentationDao;
 
-    public boolean saveAccountRepresentation(String type,String content,String photo1,String photo2,String photo3,String createName,String idCard,String mobile){
-        PortalAccountRepresentation portalAccountRepresentation = new PortalAccountRepresentation(getCode(),0,createName,mobile,idCard,Integer.valueOf(type),content,photo1,photo2,photo3,new Date(),null,createName,null,null,null);
+    public boolean saveAccountRepresentation(String type,String content,String photo,String createName,String idCard,String mobile){
+        PortalAccountRepresentation portalAccountRepresentation = new PortalAccountRepresentation(getCode(),0,createName,mobile,idCard,Integer.valueOf(type),content,photo,new Date(),null,createName,null,null,null);
         PortalAccountRepresentation result = portalAccountRepresentationDao.save(portalAccountRepresentation);
         if (result!=null){
             return true;

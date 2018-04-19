@@ -1560,5 +1560,8 @@ public class ServiceApi {
      */
     public static class AccountRepresentation{
         public static final String SaveAccontRepresenetation ="/account/save";
+        public static final String GetRandomImageCode ="/account/getRandomImageCode";
+        public static final String CheckRandomImageCode ="/account/checkRandomImageCode";
+
     }
 }

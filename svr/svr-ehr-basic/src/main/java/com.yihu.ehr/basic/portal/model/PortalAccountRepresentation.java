@@ -27,9 +27,7 @@ public class PortalAccountRepresentation implements Serializable {
 	private String eIdcard;//身份证
 	private Integer type;//申述类型1手机号码变更 2重置密码 3其他
 	private String typeContent;//问题说明
-	private String photo1;//图片1
-	private String photo2;//图片2
-	private String photo3;//图片3
+	private String photo;//图片，多个逗号隔开
 	@CreatedDate
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+08:00")
 	@Column(name = "create_time", nullable = false, length = 0,updatable = false)
@@ -62,7 +60,7 @@ public class PortalAccountRepresentation implements Serializable {
 	public PortalAccountRepresentation() {
 	}
 
-	public PortalAccountRepresentation(String code, Integer status ,String eName, String eMobile, String eIdcard, Integer type, String typeContent, String photo1, String photo2, String photo3, Date createTime, String createUser, String createUserName, Date updateTime, String updateUser, String updateUserName) {
+	public PortalAccountRepresentation(String code, Integer status ,String eName, String eMobile, String eIdcard, Integer type, String typeContent, String photo1, Date createTime, String createUser, String createUserName, Date updateTime, String updateUser, String updateUserName) {
 		this.code = code;
 		this.status = status;
 		this.eName = eName;
@@ -70,9 +68,7 @@ public class PortalAccountRepresentation implements Serializable {
 		this.eIdcard = eIdcard;
 		this.type = type;
 		this.typeContent = typeContent;
-		this.photo1 = photo1;
-		this.photo2 = photo2;
-		this.photo3 = photo3;
+		this.photo = photo;
 		this.createTime = createTime;
 		this.createUser = createUser;
 		this.createUserName = createUserName;
@@ -152,31 +148,13 @@ public class PortalAccountRepresentation implements Serializable {
 		this.typeContent = typeContent;
 	}
 
-	@Column(name = "photo_1", length = 200)
-	public String getPhoto1() {
-		return photo1;
+	@Column(name = "photo", length = 800)
+	public String getPhoto() {
+		return photo;
 	}
 
-	public void setPhoto1(String photo1) {
-		this.photo1 = photo1;
-	}
-
-	@Column(name = "photo_2", length = 200)
-	public String getPhoto2() {
-		return photo2;
-	}
-
-	public void setPhoto2(String photo2) {
-		this.photo2 = photo2;
-	}
-
-	@Column(name = "photo_3", length = 200)
-	public String getPhoto3() {
-		return photo3;
-	}
-
-	public void setPhoto3(String photo3) {
-		this.photo3 = photo3;
+	public void setPhoto(String photo1) {
+		this.photo = photo;
 	}
 
 	public Date getCreateTime() {
