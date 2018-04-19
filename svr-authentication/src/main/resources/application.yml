@@ -99,7 +99,7 @@ fz-gateway:
   url: http://service.yihu.com:8080/WSGW/rest
   clientId: 9000401
   clientVersion: 1.0
-  handlerId: 50871
+  handlerId: 50641
 
 
 ---
@@ -118,7 +118,7 @@ fz-gateway:
   url: http://service.yihu.com:8080/WSGW/rest
   clientId: 9000401
   clientVersion: 1.0
-  handlerId: 50871
+  handlerId: 50641
 
 ---
 spring:
@@ -136,4 +136,4 @@ fz-gateway:
   url: http://service.yihu.com:8080/WSGW/rest
   clientId: 9000401
   clientVersion: 1.0
-  handlerId: 50871
+  handlerId: 50641
