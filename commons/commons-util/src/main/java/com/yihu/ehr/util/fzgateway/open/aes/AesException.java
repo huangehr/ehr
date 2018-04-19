@@ -1,4 +1,4 @@
-package com.yihu.ehr.basic.fzopen.utils.aes;
+package com.yihu.ehr.util.fzgateway.open.aes;
 
 @SuppressWarnings("serial")
 public class AesException extends Exception {

@@ -10,6 +10,17 @@ spring:
     min-idle: 8
     validation-query: SELECT 1
     test-on-borrow: true
+  redis:
+    database: 0 # Database index used by the connection factory.
+    timeout: 0 # Connection timeout in milliseconds.
+      #sentinel:
+      #  master: # Name of Redis server.
+      #  nodes: # Comma-separated list of host:port pairs.
+    pool:
+      max-active: 8 # Max number of connections that can be allocated by the pool at a given time. Use a negative value for no limit.
+      max-idle: 8 # Max number of "idle" connections in the pool. Use a negative value to indicate an unlimited number of idle connections.
+      max-wait: -1 # Maximum amount of time (in milliseconds) a connection allocation should block before throwing an exception when the pool is exhausted. Use a negative value to block indefinitely.
+      min-idle: 1 # Target for the minimum number of idle connections to maintain in the pool. This setting only has an effect if it is positive.
 fast-dfs:
   connect-timeout: 10
   network-timeout: 60
@@ -28,6 +39,7 @@ eip:
 jksr-app:
   orgcode: PDY026797
 
+
 ---
 spring:
   profiles: dev
@@ -35,6 +47,10 @@ spring:
     url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: chenweishan
     password: chenweishan
+  redis:
+    host: 172.19.103.47 # Redis server host.
+    port: 6379
+    password: redis!@456
   ldap:
     host: 172.19.103.87
     port: 389
@@ -84,6 +100,10 @@ spring:
     url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: weifuwu
     password: weifuwu
+  redis:
+    host: 172.19.103.47 # Redis server host.
+    port: 6379
+    password: redis!@456
   ldap:
     host: 172.19.103.87
     port: 389
@@ -126,6 +146,7 @@ hadoop:
   user:
     name: root
 
+
 ---
 spring:
   profiles: prod_fz
@@ -133,6 +154,11 @@ spring:
     url: jdbc:mysql://11.1.2.5:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: healthcloud
     password: GP8Qz4qU
+  redis:
+    host: 11.1.2.22 # Redis server host.
+    port: 6390
+    # Login password of the redis server.
+    password: Kb6wKDQP1W4
   data:
     mongodb:
       host: 11.1.2.19
@@ -156,7 +182,7 @@ es:
   tHost: 172.19.103.68:9300
   clusterName: jkzl
 h5:
-  secret: KU5XTORDKZI3O86YAT3ABCNJW2XTL1DJYF3GKU3ICXL
+  secret: 9U6PBF2JM3PE1IHRJ7GEITMJHNMEHOFZQ2XUCKD9TO2
   appId: 9000401
   clientId: WYo0l73F8e
 #福州总部网关参数配置
@@ -164,7 +190,7 @@ fz-gateway:
   url: http://service.yihu.com:8080/WSGW/rest
   clientId: 9000401
   clientVersion: 1.0
-  secret: KU5XTORDKZI3O86YAT3ABCNJW2XTL1DJYF3GKU3ICXL
+  secret: 9U6PBF2JM3PE1IHRJ7GEITMJHNMEHOFZQ2XUCKD9TO2
 hadoop:
   user:
     name: root
@@ -176,6 +202,10 @@ spring:
     url: jdbc:mysql://10.176.97.9:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: healthcloud
     password: GP8Qz4qU
+  redis:
+    host: 10.176.97.5 # Redis server host.
+    port: 6390
+    password: q4YaQemf
   data:
     mongodb:
       host: 10.176.97.9
@@ -199,7 +229,7 @@ es:
   tHost: 10.176.97.7:9300
   clusterName: jkzl
 h5:
-  secret: KU5XTORDKZI3O86YAT3ABCNJW2XTL1DJYF3GKU3ICXL
+  secret: 9U6PBF2JM3PE1IHRJ7GEITMJHNMEHOFZQ2XUCKD9TO2
   appId: 9000401
   clientId: WYo0l73F8e
 #福州总部网关参数配置
@@ -207,10 +237,11 @@ fz-gateway:
   url: http://service.yihu.com:8080/WSGW/rest
   clientId: 9000401
   clientVersion: 1.0
-  secret: KU5XTORDKZI3O86YAT3ABCNJW2XTL1DJYF3GKU3ICXL
+  secret: 9U6PBF2JM3PE1IHRJ7GEITMJHNMEHOFZQ2XUCKD9TO2
 hadoop:
   user:
     name: root
+
 
 ---
 spring:
@@ -219,6 +250,10 @@ spring:
     url: jdbc:mysql://100.100.1.159:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: healthcloud
     password: GP8Qz4qU
+  redis:
+    host: 100.100.1.161 # Redis server host.
+    port: 6390
+    password: q4YaQemf
   data:
     mongodb:
       host: 100.100.1.157
@@ -242,7 +277,7 @@ es:
   tHost: 100.100.1.158:9300
   clusterName: jkzl
 h5:
-  secret: KU5XTORDKZI3O86YAT3ABCNJW2XTL1DJYF3GKU3ICXL
+  secret: 9U6PBF2JM3PE1IHRJ7GEITMJHNMEHOFZQ2XUCKD9TO2
   appId: 9000401
   clientId: WYo0l73F8e
 #福州总部网关参数配置
@@ -250,10 +285,11 @@ fz-gateway:
   url: http://service.yihu.com:8080/WSGW/rest
   clientId: 9000401
   clientVersion: 1.0
-  secret: KU5XTORDKZI3O86YAT3ABCNJW2XTL1DJYF3GKU3ICXL
+  secret: 9U6PBF2JM3PE1IHRJ7GEITMJHNMEHOFZQ2XUCKD9TO2
 hadoop:
   user:
     name: root
+
 
 ---
 spring:
@@ -262,6 +298,10 @@ spring:
     url: jdbc:mysql://192.168.40.34:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: healthcloud
     password: GP8Qz4qU
+  redis:
+    host: 192.168.50.82 # Redis server host.
+    port: 6379
+    password: q4YaQemf
   data:
     mongodb:
       host: 192.168.50.26
@@ -285,7 +325,7 @@ es:
   tHost: 172.10.10.2:9300
   clusterName: jkzl
 h5:
-  secret: KU5XTORDKZI3O86YAT3ABCNJW2XTL1DJYF3GKU3ICXL
+  secret: 9U6PBF2JM3PE1IHRJ7GEITMJHNMEHOFZQ2XUCKD9TO2
   appId: 9000401
   clientId: WYo0l73F8e
 #福州总部网关参数配置
@@ -293,7 +333,7 @@ fz-gateway:
   url: http://service.yihu.com:8080/WSGW/rest
   clientId: 9000401
   clientVersion: 1.0
-  secret: KU5XTORDKZI3O86YAT3ABCNJW2XTL1DJYF3GKU3ICXL
+  secret: 9U6PBF2JM3PE1IHRJ7GEITMJHNMEHOFZQ2XUCKD9TO2
 hadoop:
   user:
     name: root

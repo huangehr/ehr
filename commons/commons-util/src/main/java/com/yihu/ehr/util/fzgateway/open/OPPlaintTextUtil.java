@@ -1,4 +1,4 @@
-package com.yihu.ehr.basic.fzopen.utils;
+package com.yihu.ehr.util.fzgateway.open;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;

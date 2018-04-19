@@ -14,6 +14,7 @@ import com.yihu.ehr.basic.user.entity.RoleReportRelation;
 import com.yihu.ehr.basic.user.entity.Roles;
 import com.yihu.ehr.entity.oauth2.OauthClientDetails;
 import com.yihu.ehr.query.BaseJpaService;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.SQLQuery;
 import org.hibernate.transform.Transformers;
@@ -22,11 +23,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 /**
@@ -236,4 +239,9 @@ public class AppService extends BaseJpaService<App, AppDao> {
         return newApp;
     }
 
+    public List<Map<String,Object>> getAppByParentIdAndUserId(String userId, String parentAppId)throws Exception{
+        String Sql ="SELECT a.*,r.type FROM user_app a LEFT JOIN apps_relation r ON a.app_id = r.app_id WHERE a.user_id='"+userId+"' AND r.parent_app_id='"+parentAppId+"' AND a.status=0 AND a.show_flag=1 ";
+       List<Map<String,Object>> resultList =  jdbcTemplate.queryForList(Sql);
+        return resultList;
+    }
 }

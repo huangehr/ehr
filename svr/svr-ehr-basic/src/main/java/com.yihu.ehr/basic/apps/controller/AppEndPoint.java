@@ -1,7 +1,9 @@
 package com.yihu.ehr.basic.apps.controller;
 
 import com.yihu.ehr.basic.apps.model.App;
+import com.yihu.ehr.basic.apps.model.AppsRelation;
 import com.yihu.ehr.basic.apps.service.AppService;
+import com.yihu.ehr.basic.apps.service.AppsRelationService;
 import com.yihu.ehr.basic.apps.service.OauthClientDetailsService;
 import com.yihu.ehr.basic.dict.service.SystemDictEntryService;
 import com.yihu.ehr.basic.user.entity.RoleAppRelation;
@@ -50,6 +52,8 @@ public class AppEndPoint extends EnvelopRestEndPoint {
     private RolesService roleAppRelation;
     @Autowired
     private SystemDictEntryService systemDictEntryService;
+    @Autowired
+    private AppsRelationService appsRelationService;
 
     @RequestMapping(value = ServiceApi.Apps.Apps, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建App")
@@ -314,6 +318,40 @@ public class AppEndPoint extends EnvelopRestEndPoint {
         App app2 = appService.save(app1);
         return success(app2);
     }
+
+
+    /**
+     * 医生工作平台--显示应用列表
+     * @param userId
+     * @param parentAppId
+     * @return
+     * @throws Exception
+     * create by zhangdan on 2018/04/19
+     */
+    @RequestMapping(value =  ServiceApi.Apps.GetAppsRelationByUserIdAndParentAppId, method = RequestMethod.POST)
+    @ApiOperation(value = "医生工作平台个人平台应用列表")
+    public Envelop getAppsRelationByUserID(
+            @ApiParam(name = "userId", value = "用户id", required = true)
+            @RequestParam(value = "userId") String userId,
+            @ApiParam(name = "parentAppId", value = "医生工作平台应用id", required = true)
+            @RequestParam(value = "parentAppId") String parentAppId)throws Exception {
+        if (StringUtils.isEmpty(userId)){
+            return failed("请先登录!");
+        }
+        List<Map<String,Object>> list = appService.getAppByParentIdAndUserId(userId, parentAppId);
+        return success(list);
+    }
+
+    @RequestMapping(value =  ServiceApi.Apps.GetAppsRelationByUserIdAndParentAppId, method = RequestMethod.POST)
+    @ApiOperation(value = "支撑平台配置应用之间的关系")
+    public Envelop getAppsRelationByUserID(
+            @ApiParam(name = "jsonData", value = "新增应用关系json字符串", required = true)
+            @RequestBody String jsonData)throws Exception {
+        AppsRelation appsRelation = toEntity(jsonData, AppsRelation.class);
+        AppsRelation relation = appsRelationService.save(appsRelation);
+        return success(relation);
+    }
+
 
 
 }

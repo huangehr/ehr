@@ -1,4 +1,4 @@
-package com.yihu.ehr.basic.fzopen.utils.aes;
+package com.yihu.ehr.util.fzgateway.open.aes;
 
 import java.util.ArrayList;
 

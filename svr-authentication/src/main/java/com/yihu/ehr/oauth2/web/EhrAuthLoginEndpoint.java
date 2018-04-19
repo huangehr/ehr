@@ -190,8 +190,7 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
         String username = parameters.get("username");
         VerifyCode verifyCode = new VerifyCode();
         int expiresIn = ehrRedisVerifyCodeService.getExpireTime(client_id, username);
-        int nextRequestTime = 0;
-        nextRequestTime= 60+(expiresIn - 600 )>0 ? 60+(expiresIn - 600 ):0;
+        int nextRequestTime = 60 + (expiresIn - 600 ) > 0 ? 60 + (expiresIn - 600 ) : 0;
         verifyCode.setNextRequestTime(nextRequestTime);
         verifyCode.setExpiresIn(expiresIn);
         return new ResponseEntity<>(verifyCode, HttpStatus.OK);

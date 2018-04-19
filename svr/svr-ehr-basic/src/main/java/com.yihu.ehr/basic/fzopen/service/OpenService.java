@@ -1,7 +1,7 @@
 package com.yihu.ehr.basic.fzopen.service;
 
-import com.yihu.ehr.basic.fzopen.utils.OPUtil;
 import com.yihu.ehr.constants.MicroServices;
+import com.yihu.ehr.util.fzgateway.open.OPUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.ServiceInstance;
@@ -38,13 +38,10 @@ public class OpenService {
      * @throws Exception
      */
     public String callFzOpenApi(String apiUrl, Map<String, Object> params) throws Exception {
-        String result = null;
         ServiceInstance agZuulServiceInstance = discoveryClient.getInstances(MicroServices.AgZuul).get(0);
-        if (agZuulServiceInstance != null) {
-            // URL前缀与 ag-zuul 配置文件中的 zuul.routes.jkzl-server.path 前缀一致。
-            String url = agZuulServiceInstance.getUri() + "/jkzl/" + apiUrl;
-            result = OPUtil.callApi(fzAppId, fzSecret, url, params);
-        }
+        // URL前缀与 ag-zuul 配置文件中的 zuul.routes.jkzl-server.path 前缀一致。
+        String url = agZuulServiceInstance.getUri() + "/jkzl/" + apiUrl;
+        String result = OPUtil.callApi(fzAppId, fzSecret, url, params);
         return result;
     }
 

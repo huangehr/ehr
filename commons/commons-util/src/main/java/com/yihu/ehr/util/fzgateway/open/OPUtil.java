@@ -1,7 +1,7 @@
-package com.yihu.ehr.basic.fzopen.utils;
+package com.yihu.ehr.util.fzgateway.open;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.basic.fzopen.utils.aes.MsgCrypt;
+import com.yihu.ehr.util.fzgateway.open.aes.MsgCrypt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
