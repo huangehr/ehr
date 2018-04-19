@@ -14,9 +14,11 @@ import com.yihu.ehr.basic.portal.service.PortalMessageTemplateService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.model.packs.EsDetailsPackage;
 import com.yihu.ehr.model.portal.MMessageRemind;
 import com.yihu.ehr.model.portal.MProtalOrderMessage;
 import com.yihu.ehr.model.portal.MRegistration;
+import com.yihu.ehr.model.redis.MRedisCacheCategory;
 import com.yihu.ehr.model.redis.MRedisMqChannel;
 import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.query.common.model.DataList;
@@ -78,9 +80,11 @@ public class PortalMessageRemindEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page", required = false) int page,
             HttpServletRequest request,
             HttpServletResponse response) throws ParseException {
+        if(org.apache.commons.lang3.StringUtils.isEmpty(sorts)){
+            sorts="-createDate";
+        }
         List<ProtalMessageRemind> messageRemindList = messageRemindService.search(fields, filters, sorts, page, size);
         pagedResponse(request, response, messageRemindService.getCount(filters), page, size);
-
         return (List<MMessageRemind>) convertToModels(messageRemindList, new ArrayList<MMessageRemind>(messageRemindList.size()), MMessageRemind.class, fields);
     }
 
@@ -90,7 +94,7 @@ public class PortalMessageRemindEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "messageRemind_json_data", value = "", defaultValue = "")
             @RequestBody String messageRemindJsonData) throws Exception {
         ProtalMessageRemind messageRemind = toEntity(messageRemindJsonData, ProtalMessageRemind.class);
-        messageRemind.setCreate_date(new Date());
+        messageRemind.setCreateDate(new Date());
         messageRemindService.save(messageRemind);
         return convertToModel(messageRemind, MMessageRemind.class);
     }
@@ -161,25 +165,31 @@ public class PortalMessageRemindEndPoint extends EnvelopRestEndPoint {
         messageRemindService.updateMessageRemind("notifie_flag","1",protalMessageRemindId);
         //如果type为空的话，默认获取当前用户的所有消息。否则获取指定消息模板的消息。
         ProtalMessageRemind  protalMessageRemind = messageRemindService.getMessageRemind(protalMessageRemindId);
-        PortalMessageTemplate template = portalMessageTemplateService.getMessageTemplate(protalMessageRemind.getMessage_template_id());
+        PortalMessageTemplate template = portalMessageTemplateService.getMessageTemplate(protalMessageRemind.getMessageTemplateId());
         //根据订单号获取 订单详情
-        List<Registration> registrationList=  registrationService.findByField("orderId",orderId);
-        MMessageRemind mMessageRemind = new MMessageRemind();
-        //提供将挂号单详细内容
-       for(Registration registration : registrationList){
-           //根据医院名称、科室名称查找科室位置
-           String orgName = registration.getHospitalName() == null ? "" : registration.getHospitalName();
-           String deptName = registration.getDeptName() == null ? "" : registration.getDeptName();
-           OrgDeptDetail orgDeptDetail = null;
-           if(StringUtils.isNotEmpty(orgName)&&StringUtils.isNotEmpty(deptName)){
-               orgDeptDetail = deptDetailService.searchByOrgNameAndDeptName(orgName,deptName);
-               //科室位置
-               mMessageRemind.setDeptAdress(orgDeptDetail == null?"":orgDeptDetail.getPlace());
-           }
-           //温馨提示
-           mMessageRemind.setNotice(template == null?"":template.getAfterContent());
-           envelop.setObj(registration);
-       }
+        List<Registration> registrationList= null;
+        if(StringUtils.isNotEmpty(orderId)){
+            registrationList = registrationService.findByField("orderId",orderId);
+            List<MRegistration> mRegistrationlList = (List<MRegistration>) convertToModels(registrationList, new ArrayList<MRegistration>(), MRegistration.class, "");
+            MMessageRemind mMessageRemind = convertToModel(protalMessageRemind, MMessageRemind.class);
+            //提供将挂号单详细内容
+            if(null != mRegistrationlList && mRegistrationlList.size()>0){
+                MRegistration mregistration =mRegistrationlList.get(0);
+                //根据医院名称、科室名称查找科室位置
+                String orgName = mregistration.getHospitalName() == null ? "" : mregistration.getHospitalName();
+                String deptName = mregistration.getDeptName() == null ? "" : mregistration.getDeptName();
+                OrgDeptDetail orgDeptDetail = null;
+                if(StringUtils.isNotEmpty(orgName)&&StringUtils.isNotEmpty(deptName)){
+                    orgDeptDetail = deptDetailService.searchByOrgNameAndDeptName(orgName,deptName);
+                    //科室位置
+                    mMessageRemind.setDeptAdress(orgDeptDetail == null?"":orgDeptDetail.getPlace());
+                }
+                //温馨提示
+                mMessageRemind.setNotice(template == null?"":template.getAfterContent());
+                mMessageRemind.setmRegistration(mregistration);
+                envelop.setObj(mMessageRemind);
+            }
+        }
         envelop.setSuccessFlg(true);
         return envelop;
     }
@@ -214,14 +224,14 @@ public class PortalMessageRemindEndPoint extends EnvelopRestEndPoint {
                     Map<String,Object> dataMap = (Map<String, Object>) list.getList().get(i);
                     MRegistration newEntity = objectMapper.readValue(toJson(dataMap), MRegistration.class);
                     //根据订单号获取 消息
-                    List<ProtalMessageRemind> protalMessageR=  messageRemindService.findByField("order_id",newEntity.getOrder_id());
+                    List<ProtalMessageRemind> protalMessageR=  messageRemindService.findByField("orderId",newEntity.getOrderId());
                     mMessageRemind =new MMessageRemind();
                     mMessageRemind.setmRegistration(convertToModel(newEntity, MRegistration.class));
                     if(null != protalMessageR && protalMessageR.size()>0){
                     mMessageRemind.setReaded(Integer.valueOf(protalMessageR.get(0).getReaded()));
                     mMessageRemind.setId(Long.parseLong(protalMessageR.get(0).getId().toString()));
-                    mMessageRemind.setOrder_id(newEntity.getOrder_id());
-                    mMessageRemind.setNotifie_flag(protalMessageR.get(0).getNotifie_flag());
+                    mMessageRemind.setOrderId(newEntity.getOrderId());
+                    mMessageRemind.setNotifieFlag(protalMessageR.get(0).getNotifieFlag());
                     }
                     messageRemindList.add(mMessageRemind);
                 }
@@ -237,19 +247,33 @@ public class PortalMessageRemindEndPoint extends EnvelopRestEndPoint {
         envelop.setDetailModelList(messageRemindList);
         envelop.setPageSize(size);
         envelop.setCurrPage(page);
+        envelop.setTotalPage((int)list.getPage());
+        envelop.setTotalCount((int)list.getCount());
         return envelop;
     }
 
     @RequestMapping(value = ServiceApi.MessageRemind.UpdateMessageRemindByNotifie, method = RequestMethod.GET)
     @ApiOperation(value = "更新-我的就诊通知状态", notes = "更新-我的就诊通知状态")
     public Envelop UpdateMessageRemindByNotifie(
+            @ApiParam(name = "appId", value = "应用id", defaultValue = "WYo0l73F8e")
+            @RequestParam(value = "appId", required = false) String appId,
+            @ApiParam(name = "toUserId", value = "当前用户id", defaultValue = "0dae00035ab8be56319e6d2e0f183443")
+            @RequestParam(value = "toUserId", required = false) String toUserId,
+            @ApiParam(name = "typeId", value = "消息类型，默认7为健康上饶app的消息", defaultValue = "7")
+            @RequestParam(value = "typeId", required = false) String typeId,
             @ApiParam(name = "protalMessageRemindId", value = "消息id")
             @RequestParam(value = "protalMessageRemindId", required = false) Long protalMessageRemindId,
             @ApiParam(name = "notifie", value = "是否通知：0为通知，1为不再通知", defaultValue = "0")
             @RequestParam(value = "notifie", required = false) String notifie) throws Exception {
         Envelop envelop = new Envelop();
-        messageRemindService.updateMessageRemind("notifie_flag",notifie,protalMessageRemindId);
-        envelop.setSuccessFlg(true);
+        DataList list = messageRemindService.listMessageRemindValue(appId,toUserId,typeId,"",1,10,"0");
+        if(null != list && null !=list.getList() && list.getList().size()<5){
+            messageRemindService.updateMessageRemind("notifie_flag",notifie,protalMessageRemindId);
+            envelop.setSuccessFlg(true);
+        }else{
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("对不起，首页消息只能提醒5条！");
+        }
         return envelop;
     }
 
@@ -258,4 +282,24 @@ public class PortalMessageRemindEndPoint extends EnvelopRestEndPoint {
         objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
         return objectMapper.writeValueAsString(obj);
     }
+
+//
+//    @RequestMapping(value = ServiceApi.Packages.PackageSearch, method = RequestMethod.GET)
+//    @ApiOperation(value = "搜索档案包")
+//    public List<EsDetailsPackage> search (
+//            @ApiParam(name = "filters", value = "过滤条件")
+//            @RequestParam(value = "filters", required = false) String filters,
+//            @ApiParam(name = "sorts", value = "排序")
+//            @RequestParam(value = "sorts", required = false) String sorts,
+//            @ApiParam(name = "page", value = "页码", required = true, defaultValue = "1")
+//            @RequestParam(value = "page") int page,
+//            @ApiParam(name = "size", value = "分页大小", required = true, defaultValue = "15")
+//            @RequestParam(value = "size") int size) throws Exception {
+//        List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, filters, sorts, page, size);
+//        List<EsDetailsPackage> esDetailsPackages = new ArrayList<>();
+//        for (Map<String, Object> temp : resultList) {
+//            esDetailsPackages.add(objectMapper.readValue(objectMapper.writeValueAsString(temp), EsDetailsPackage.class));
+//        }
+//        return esDetailsPackages;
+//    }
 }

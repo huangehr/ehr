@@ -334,12 +334,12 @@ public class EhrTokenGranter implements TokenGranter {
             String client_id = parameters.get("client_id");
             String username = parameters.get("username");
             String verify_code = parameters.get("verify_code");
+
             if (!ehrRedisVerifyCodeService.verification(client_id, username, verify_code)){
                 throw new InvalidGrantException("Invalid verify_code");
             }
             Authentication userAuth = new UsernamePasswordAuthenticationToken(username, verify_code, getGrantedAuthorities(username));
             ((AbstractAuthenticationToken) userAuth).setDetails(parameters);
-            //((AbstractAuthenticationToken) userAuth).setAuthenticated(true);
             OAuth2Request storedOAuth2Request = getRequestFactory().createOAuth2Request(client, tokenRequest);
             return new OAuth2Authentication(storedOAuth2Request, userAuth);
         }

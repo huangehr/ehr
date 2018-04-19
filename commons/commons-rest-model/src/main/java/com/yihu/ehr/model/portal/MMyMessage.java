@@ -54,6 +54,22 @@ public class MMyMessage {
      * 消息分类
      */
     private String classification;
+    /**
+     * 就诊时间
+     */
+    private Date visitTime;
+    /**
+     * 健康之路-预约挂号订单号
+     */
+    private String orderId;
+    /**
+     * 我的就诊-是否通知：0为通知，1为不通知。我的档案：0未评价、1为已评价
+     */
+    private String notifieFlag;
+    /**
+     * 总部推送消息类型 ，101：挂号结果推送，102：退号结果推送，-101：订单操作推送，100：满意度调查
+     */
+    private String portalMessagerTemplateType;
 
 
     public Long getId() {
@@ -176,6 +192,38 @@ public class MMyMessage {
 
     public void setClassification(String classification) {
         this.classification = classification;
+    }
+
+    public Date getVisitTime() {
+        return visitTime;
+    }
+
+    public void setVisitTime(Date visitTime) {
+        this.visitTime = visitTime;
+    }
+
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
+    }
+
+    public String getNotifieFlag() {
+        return notifieFlag;
+    }
+
+    public void setNotifieFlag(String notifieFlag) {
+        this.notifieFlag = notifieFlag;
+    }
+
+    public String getPortalMessagerTemplateType() {
+        return portalMessagerTemplateType;
+    }
+
+    public void setPortalMessagerTemplateType(String portalMessagerTemplateType) {
+        this.portalMessagerTemplateType = portalMessagerTemplateType;
     }
 
     public static class ContentJson {
