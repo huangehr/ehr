@@ -1457,7 +1457,9 @@ public class ServiceApi {
 
     public static class FastDFS {
         public static final String Upload = "/fastDfs/upload";
+        public static final String OpenUpload = "/open/fastDfs/upload";
         public static final String OldUpload = "/fastDfs/oldUpload";
+        public static final String OpenOldUpload = "/open/fastDfs/oldUpload";
         public static final String DeleteById = "/fastDfs/deleteById";
         public static final String DeleteByPath = "/fastDfs/deleteByPath";
         public static final String DeleteByObjectId = "/fastDfs/deleteByObjectId";
