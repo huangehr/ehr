@@ -122,11 +122,13 @@ public class PortalMessageTemplateService extends BaseJpaService<PortalMessageTe
         remind.setCreateDate(new Date(System.currentTimeMillis()));
         remind.setMessageTemplateId(template.getId());
         remind.setReceivedMessages(JSON.toJSONString(mH5Message));
-        remind.setOrderId(mH5Message.getOrderId());
         remind.setPortalMessagerTemplateType(mH5Message.getPortalMessagerTemplateType());
         remind.setNotifieFlag("0");
         if(null != newEntity){
             remind.setVisitTime(newEntity.getRegisterDate());
+            remind.setOrderId(newEntity.getId());
+        }else{
+            remind.setOrderId(mH5Message.getOrderId());
         }
         ProtalMessageRemind protalMessageRemind =messageRemindRepository.save(remind);
         return protalMessageRemind;
