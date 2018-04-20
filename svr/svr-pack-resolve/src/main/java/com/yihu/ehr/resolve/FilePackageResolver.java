@@ -13,7 +13,7 @@ import com.yihu.ehr.resolve.model.stage1.CdaDocument;
 import com.yihu.ehr.resolve.model.stage1.FilePackage;
 import com.yihu.ehr.resolve.model.stage1.OriginFile;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
-import com.yihu.ehr.resolve.service.resource.stage1.*;
+import com.yihu.ehr.resolve.service.resource.stage1.PackModelFactory;
 import com.yihu.ehr.resolve.service.resource.stage2.RedisService;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.log.LogService;
@@ -150,7 +150,11 @@ public class FilePackageResolver extends PackageResolver {
                 OriginFile originFile = new OriginFile();
                 originFile.setMime(mine_type);
                 originFile.setExpireDate(expireDate);
-                originFile.setUrlScope(UrlScope.valueOf(Integer.parseInt(url_scope)));
+                if("public".equalsIgnoreCase(url_scope)){
+                    originFile.setUrlScope(UrlScope.valueOf(0));
+                }else if("private".equalsIgnoreCase(url_scope)){
+                    originFile.setUrlScope(UrlScope.valueOf(1));
+                }
                 originFile.setEmrId(emr_id);
                 originFile.setEmrName(emr_name);
                 if(!StringUtils.isBlank(note))
