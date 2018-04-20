@@ -74,7 +74,7 @@ public class AgZuulFilter extends ZuulFilter {
             return this.forbidden(ctx, HttpStatus.FORBIDDEN.value(), "invalid token");
         }
         if (oAuth2AccessToken.isExpired()) {
-            return this.forbidden(ctx, HttpStatus.UNAUTHORIZED.value(), "expired token"); //返回401 需要重新获取 token
+            return this.forbidden(ctx, HttpStatus.PAYMENT_REQUIRED.value(), "expired token"); //返回402 登陆过期
         }
         //OAuth2Authentication oAuth2Authentication = tokenStore.readAuthentication(accessToken);
         return null;
