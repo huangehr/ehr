@@ -41,11 +41,20 @@ public class ElasticSearchClient {
     @Autowired
     private ElasticSearchPool elasticSearchPool;
 
-    public void mapping(String index, String type, XContentBuilder xContentBuilder) {
+    public void mapping(String index, String type, XContentBuilder xContentBuilder, Map<String, Object> setting) {
         TransportClient transportClient = elasticSearchPool.getClient();
         try {
             CreateIndexRequestBuilder createIndexRequestBuilder = transportClient.admin().indices().prepareCreate(index);
             createIndexRequestBuilder.addMapping(type, xContentBuilder);
+            /*Map<String, Object> settingSource = new HashMap<>();
+            settingSource.put("index.translog.flush_threshold_size", "1g");
+            settingSource.put("index.translog.flush_threshold_ops", "100000");
+            settingSource.put("index.translog.durability", "async");
+            settingSource.put("index.number_of_replicas", 1);
+            settingSource.put("index.number_of_shards", 3);*/
+            if (setting != null && !setting.isEmpty()) {
+                createIndexRequestBuilder.setSettings(setting);
+            }
             createIndexRequestBuilder.get();
         } finally {
             elasticSearchPool.releaseClient(transportClient);

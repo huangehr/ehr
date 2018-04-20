@@ -36,10 +36,13 @@ public class ElasticSearchEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "index") String index,
             @ApiParam(name = "type", value = "索引类型", required = true)
             @RequestParam(value = "type") String type,
-            @ApiParam(name = "source", value = "Json串值", required = true)
-            @RequestParam(value = "source") String source) throws Exception {
-        Map<String, Map<String, String>> Mapping = objectMapper.readValue(source, Map.class);
-        elasticSearchUtil.mapping(index, type, Mapping);
+            @ApiParam(name = "source", value = "Json串值{\"field\":{\"type\":\"string\",\"index\":\"not_analyzed\"}}", required = true)
+            @RequestParam(value = "source") String source,
+            @ApiParam(name = "setting", value = "Json串值{\"key\":\"value\"}")
+            @RequestParam(value = "setting", required = false) String setting) throws Exception {
+        Map<String, Map<String, String>> _mapping = objectMapper.readValue(source, Map.class);
+        Map<String, Object> _setting = objectMapper.readValue(setting, Map.class);
+        elasticSearchUtil.mapping(index, type, _mapping, _setting);
         return success(true);
     }
 
