@@ -431,7 +431,7 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
     }
 
     //创建用户与机构的关联
-    private void orgMemberRelationInfo(List<MOrgDeptJson> orgDeptJsonList, User user, Doctors doctor) {
+    private void orgMemberRelationInfo(List<MOrgDeptJson> orgDeptJsonList, User user, Doctors doctor) throws Exception{
         if (null != orgDeptJsonList && orgDeptJsonList.size() > 0) {
             String[] orgIds = new String[orgDeptJsonList.size()];
             for (int i=0; i<orgDeptJsonList.size(); i++) {
