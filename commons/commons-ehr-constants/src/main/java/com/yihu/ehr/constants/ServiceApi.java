@@ -400,6 +400,7 @@ public class ServiceApi {
 
         //--------------- 医生工作平台 ---------------
         public static final String GetAppsRelationByUserIdAndParentAppId ="/app/appsRelationByUserIdAndParentAppId";
+        public static final String GetAppsRelationByUserJson ="/app/getAppsRelationByUserJson";
 
         //--------------- 总支撑平台 ---------------
         public static final String SaveAppsRelation ="/app/saveAppsRelation";

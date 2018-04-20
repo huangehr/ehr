@@ -342,7 +342,7 @@ public class AppEndPoint extends EnvelopRestEndPoint {
         return success(list);
     }
 
-    @RequestMapping(value =  ServiceApi.Apps.GetAppsRelationByUserIdAndParentAppId, method = RequestMethod.POST)
+    @RequestMapping(value =  ServiceApi.Apps.GetAppsRelationByUserJson, method = RequestMethod.POST)
     @ApiOperation(value = "支撑平台配置应用之间的关系")
     public Envelop getAppsRelationByUserID(
             @ApiParam(name = "jsonData", value = "新增应用关系json字符串", required = true)
