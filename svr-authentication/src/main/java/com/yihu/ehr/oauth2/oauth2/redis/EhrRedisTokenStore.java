@@ -99,12 +99,14 @@ public class EhrRedisTokenStore implements TokenStore {
             conn.close();
         }
         OAuth2AccessToken accessToken = deserializeAccessToken(bytes);
-        if (accessToken != null
-                && !key.equals(authenticationKeyGenerator.extractKey(readAuthentication(accessToken.getValue())))) {
-            // Keep the stores consistent (maybe the same user is
-            // represented by this authentication but the details have
-            // changed)
-            storeAccessToken(accessToken, authentication);
+        if (accessToken != null) {
+            OAuth2Authentication oAuth2Authentication = readAuthentication(accessToken.getValue());
+            if (oAuth2Authentication == null || !key.equals(authenticationKeyGenerator.extractKey(authentication))) {
+                // Keep the stores consistent (maybe the same user is
+                // represented by this authentication but the details have
+                // changed)
+                storeAccessToken(accessToken, authentication);
+            }
         }
         return accessToken;
     }
