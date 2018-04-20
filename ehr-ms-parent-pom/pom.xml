@@ -15,6 +15,9 @@
     <description>EHR micro service parent pom</description>
 
     <modules>
+        <module>../ag-admin</module>
+        <module>../ag-cloud</module>
+        <module>../ag-zuul</module>
         <module>../svr-configuration</module>
         <module>../svr-discovery</module>
         <module>../svr/svr-dfs</module>
@@ -24,16 +27,13 @@
         <module>../svr/svr-pack-analyzer</module>
         <module>../svr/svr-resource</module>
         <module>../svr/svr-standard</module>
-        <module>../svr/svr-ehr-basic</module>
+        <module>../svr/svr-basic</module>
         <module>../svr-authentication</module>
-        <module>../ag-ehr-admin</module>
-        <module>../ag-ehr-cloud</module>
         <!--<module>../ag-portal-cloud</module>-->
         <module>../svr/svr-redis</module>
         <module>../svr/svr-redis-memory</module>
         <module>../svr/svr-quota</module>
         <module>../svr/svr-log-collection</module>
-        <module>../ag-zuul</module>
     </modules>
 
     <build>

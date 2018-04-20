@@ -19,9 +19,9 @@ zuul:
     svr-dfs:
       path: /dfs/**
       serviceId: svr-dfs
-    svr-ehr-basic:
+    svr-basic:
       path: /basic/**
-      serviceId: svr-ehr-basic
+      serviceId: svr-basic
     svr-quota:
       path: /quota/**
       serviceId: svr-quota
