@@ -72,7 +72,7 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
     @Value("${fz-gateway.handlerId}")
     private String fzHandlerId;
     @Autowired
-    protected ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
 
 
     @PostConstruct
