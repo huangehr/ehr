@@ -62,7 +62,8 @@ public class AgZuulFilter extends ZuulFilter {
                 || url.contains("/usersOfApp")
                 || url.contains("/users/h5/handshake")
                 || url.contains("/appVersion/getAppVersion")
-                || url.contains("/messageTemplate/messageOrderPush")) {
+                || url.contains("/messageTemplate/messageOrderPush")
+                || url.contains("/account/")) {
             return null;
         }
         String accessToken = this.extractToken(request);
