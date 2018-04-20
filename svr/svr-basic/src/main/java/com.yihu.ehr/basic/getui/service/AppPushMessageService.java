@@ -1,4 +1,4 @@
-package com.yihu.ehr.basic.getui;
+package com.yihu.ehr.basic.getui.service;
 
 import com.gexin.rp.sdk.base.IPushResult;
 import com.gexin.rp.sdk.base.impl.AppMessage;
@@ -11,9 +11,7 @@ import com.gexin.rp.sdk.template.LinkTemplate;
 import com.gexin.rp.sdk.template.NotificationTemplate;
 import com.gexin.rp.sdk.template.TransmissionTemplate;
 import com.gexin.rp.sdk.template.style.Style0;
-import com.yihu.ehr.basic.apps.model.UserApp;
-import com.yihu.ehr.basic.apps.service.UserAppService;
-import org.apache.commons.lang3.time.DateFormatUtils;
+import com.yihu.ehr.basic.getui.ConstantUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +32,7 @@ public class AppPushMessageService {
     Logger logger = LoggerFactory.getLogger(AppPushMessageService.class);
 
     @Autowired
-    private UserAppService userAppService;
+    private GeTuiClientService geTuiClientService;
 
     /**
      * 向单个用户推送消息
@@ -46,14 +44,10 @@ public class AppPushMessageService {
         if(StringUtils.isEmpty(userId) || StringUtils.isEmpty(title) || StringUtils.isEmpty(message)){
             return "params[userId|title|message] must have a value !";
         }
-        List<String> userIds = new ArrayList<>();
-        userIds.add(userId);
-        String clientId = "";
-        List<UserApp> userApps = userAppService.findListByUserIds(userIds);
-        if(CollectionUtils.isEmpty(userApps)){
+        String clientId = geTuiClientService.getClientIdByUserId(userId);
+        if(StringUtils.isEmpty(clientId)){
             return "this user is no such clientId:"+ userId;
         }
-        clientId = userApps.get(0).getAppId();
         IGtPush iGetPush = new IGtPush(ConstantUtil.appKey,ConstantUtil.masterSecret);
 
         //获取推送模板
@@ -90,27 +84,20 @@ public class AppPushMessageService {
      * @param title
      * @param message
      */
-    public String pushMessageToList(List<String> userIds,String title,String message){
-        if(CollectionUtils.isEmpty(userIds) || StringUtils.isEmpty(title) || StringUtils.isEmpty(message)){
+    public String pushMessageToList(String userIds,String title,String message){
+        if(StringUtils.isEmpty(userIds) || StringUtils.isEmpty(title) || StringUtils.isEmpty(message)){
             return "params[userId|title|message] must have a value !";
         }
         IGtPush iGtPush = new IGtPush(ConstantUtil.appKey,ConstantUtil.masterSecret);
-        List<UserApp> userApps = new ArrayList<>();
-        userApps = userAppService.findListByUserIds(userIds);
-        Set<String> clientIdSet = new HashSet<>();
-        userApps.forEach(
-                one -> {
-                    clientIdSet.add(one.getAppId());
-                }
-        );
 
+        List<String> clientIdList = geTuiClientService.getListClientIdByUserId(userIds);
         NotificationTemplate notificationTemplate = getNotificationTemplate(title,message);
         ListMessage listMessage = new ListMessage();
         listMessage.setData(notificationTemplate);
         listMessage.setOffline(true);
         listMessage.setOfflineExpireTime(24 * 1000 * 3600);
         List targets = new ArrayList();
-        clientIdSet.forEach(
+        clientIdList.forEach(
                 one -> {
                     Target target = new Target();
                     target.setAppId(ConstantUtil.appId);
@@ -118,7 +105,6 @@ public class AppPushMessageService {
                     targets.add(target);
                 }
         );
-
         String taskId = iGtPush.getContentId(listMessage);
         IPushResult pushResult = null;
         try {
@@ -179,24 +165,22 @@ public class AppPushMessageService {
 
     /**
      * 打开网页
-     * @param userId
+     * @param userIds
      * @param title
      * @param message
      * @param targetUrl
      * @return
      */
-    public String pushMessageToSingleLink(String userId,String title,String message,String targetUrl){
-        if(StringUtils.isEmpty(userId) || StringUtils.isEmpty(title) || StringUtils.isEmpty(message)){
+    public String pushMessageToSingleLink(String userIds,String title,String message,String targetUrl){
+        if(StringUtils.isEmpty(userIds) || StringUtils.isEmpty(title) || StringUtils.isEmpty(message)){
             return "params[userId|title|message] must have a value !";
         }
-        List<String> userIds = new ArrayList<>();
-        userIds.add(userId);
         String clientId = "";
-        List<UserApp> userApps = userAppService.findListByUserIds(userIds);
-        if(CollectionUtils.isEmpty(userApps)){
-            return "this user is no such clientId:"+ userId;
+        List<String> clientIdList = geTuiClientService.getListClientIdByUserId(userIds);
+        if(CollectionUtils.isEmpty(clientIdList)){
+            return "this user is no such clientId:"+ userIds;
         }
-        clientId = userApps.get(0).getAppId();
+        clientId = clientIdList.get(0);
         IGtPush iGetPush = new IGtPush(ConstantUtil.appKey,ConstantUtil.masterSecret);
 
         //获取推送模板
@@ -229,23 +213,21 @@ public class AppPushMessageService {
 
     /**
      * 透传消息
-     * @param userId
+     * @param userIds
      * @param title
      * @param message
      * @return
      */
-    public String pushMessageTransimssion(String userId,String title,String message){
-        if(StringUtils.isEmpty(userId) || StringUtils.isEmpty(title) || StringUtils.isEmpty(message)){
+    public String pushMessageTransimssion(String userIds,String title,String message){
+        if(StringUtils.isEmpty(userIds) || StringUtils.isEmpty(title) || StringUtils.isEmpty(message)){
             return "params[userId|title|message] must have a value !";
         }
-        List<String> userIds = new ArrayList<>();
-        userIds.add(userId);
         String clientId = "";
-        List<UserApp> userApps = userAppService.findListByUserIds(userIds);
-        if(CollectionUtils.isEmpty(userApps)){
-            return "this user is no such clientId:"+ userId;
+        List<String> clientIdList = geTuiClientService.getListClientIdByUserId(userIds);
+        if(CollectionUtils.isEmpty(clientIdList)){
+            return "this user is no such clientId:"+ userIds;
         }
-        clientId = userApps.get(0).getAppId();
+        clientId = clientIdList.get(0);
         IGtPush iGetPush = new IGtPush(ConstantUtil.appKey,ConstantUtil.masterSecret);
 
         //获取推送模板

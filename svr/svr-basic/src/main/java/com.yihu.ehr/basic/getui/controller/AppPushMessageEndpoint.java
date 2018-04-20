@@ -1,5 +1,6 @@
-package com.yihu.ehr.basic.getui;
+package com.yihu.ehr.basic.getui.controller;
 
+import com.yihu.ehr.basic.getui.service.AppPushMessageService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
@@ -47,7 +48,7 @@ public class AppPushMessageEndpoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.AppPushMessage.list, method = RequestMethod.POST)
     public Envelop pushList(
             @ApiParam(name = "userIds", value = "用户id列表", required = true)
-            @RequestParam(value = "userIds") List<String> userIds,
+            @RequestParam(value = "userIds") String userIds,
             @ApiParam(name = "title", value = "消息标题", required = true)
             @RequestParam(value = "title") String title,
             @ApiParam(name = "message", value = "消息内容", required = true)
