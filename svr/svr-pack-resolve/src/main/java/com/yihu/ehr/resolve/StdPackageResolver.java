@@ -119,11 +119,18 @@ public class StdPackageResolver extends PackageResolver {
                 }
 
                 //门诊或住院诊断
-                if (standardPackage.getDiagnosisList() == null || standardPackage.getDiagnosisList().size() <= 0 ) {
+                if (standardPackage.getDiagnosisList() == null
+                        || standardPackage.getDiagnosisList().size() <= 0
+                        || standardPackage.getDiagnosisNameList() == null
+                        || standardPackage.getDiagnosisNameList().size() <= 0) {
                     Map<String, Object> properties = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.Diagnosis);
-                    List<String> diagnosisList = (List<String>) properties.get(MasterResourceFamily.BasicColumns.Diagnosis);
+                    Set<String> diagnosisList = (Set<String>) properties.get(MasterResourceFamily.BasicColumns.Diagnosis);
+                    Set<String> diagnosisNameList = (Set<String>) properties.get(MasterResourceFamily.BasicColumns.DiagnosisName);
                     if (diagnosisList.size() > 0) {
                         standardPackage.setDiagnosisList(diagnosisList);
+                    }
+                    if (diagnosisNameList.size() > 0) {
+                        standardPackage.setDiagnosisNameList(diagnosisNameList);
                     }
                 }
             }

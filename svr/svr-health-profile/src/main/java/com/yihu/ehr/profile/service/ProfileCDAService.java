@@ -4,7 +4,6 @@ package com.yihu.ehr.profile.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.model.resource.MCdaTransformDto;
 import com.yihu.ehr.profile.feign.CDADocumentClient;
-import com.yihu.ehr.profile.feign.RedisServiceClient;
 import com.yihu.ehr.profile.feign.ResourceClient;
 import com.yihu.ehr.profile.feign.XStdRedisServiceClient;
 import com.yihu.ehr.profile.model.ArchiveTemplate;
@@ -30,8 +29,6 @@ public class ProfileCDAService {
 
     @Autowired
     private ResourceClient resource;
-    @Autowired
-    private RedisServiceClient redisServiceClient;
     @Autowired
     private XStdRedisServiceClient stdRedisServiceClient;
     @Autowired

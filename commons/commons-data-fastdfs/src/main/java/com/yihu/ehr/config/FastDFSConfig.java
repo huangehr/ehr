@@ -1,6 +1,6 @@
 package com.yihu.ehr.config;
 
-import com.yihu.ehr.fastdfs.FastDFSClientPool;
+import com.yihu.ehr.fastdfs.FastDFSPool;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import org.csource.common.MyException;
 import org.csource.fastdfs.ClientGlobal;
@@ -57,7 +57,7 @@ public class FastDFSConfig {
             ClientGlobal.g_charset = "ISO8859-1";
         }
 
-        String[] szTrackerServers = trackerServers.split(";");
+        String[] szTrackerServers = trackerServers.split(",");
         if (szTrackerServers == null) {
             throw new MyException("item \"tracker_server\" not found");
         } else {
@@ -82,8 +82,8 @@ public class FastDFSConfig {
     }
 
     @Bean
-    public FastDFSClientPool fastDFSClientPool() {
-        return new FastDFSClientPool();
+    public FastDFSPool fastDFSClientPool() {
+        return new FastDFSPool();
     }
 
     @Bean

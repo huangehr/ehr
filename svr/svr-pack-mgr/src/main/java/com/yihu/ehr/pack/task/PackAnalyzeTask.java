@@ -2,9 +2,8 @@ package com.yihu.ehr.pack.task;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.RedisCollection;
-import com.yihu.ehr.model.packs.MPackage;
-import com.yihu.ehr.pack.service.Package;
-import com.yihu.ehr.pack.service.PackageService;
+import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
+import com.yihu.ehr.model.packs.EsSimplePackage;
 import com.yihu.ehr.util.datetime.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -13,16 +12,19 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Component
 public class PackAnalyzeTask {
-    private static final Long MaxSize = 20000L;
+
+    private static final String INDEX = "json_archives";
+    private static final String TYPE = "info";
+    private static final Long MAX_SIZE = 20000L;
+
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
-    private PackageService packageService;
+    private ElasticSearchUtil elasticSearchUtil;
     @Autowired
     private RedisTemplate<String, Serializable> redisTemplate;
 
@@ -31,51 +33,46 @@ public class PackAnalyzeTask {
      * 限流，避免过多占用内存，这部分非主业务流程。
      */
     @Scheduled(cron = "0 0/10 * * * ?")
-    public void delayPushTask() {
-        try {
-            if (size() > MaxSize) {
-                return;
-            }
-
-            addToQueue("analyzeStatus=0");  //添加未分析的
-            Date date = DateUtil.addDate(-3, new Date());
-            addToQueue("analyzeStatus=1;analyzeDate<" + DateUtil.toString(date));  //添加分析异常的
-            addToQueue("analyzeStatus=2;analyzeFailCount<3");   //添加分析错误的
-        } catch (Exception e) {
-            e.printStackTrace();
+    public void delayPushTask() throws Exception {
+        if (size() > MAX_SIZE) {
+            return;
         }
+        //添加未分析的
+        addToQueue("analyze_status=0");
+        //添加分析异常的
+        Date date = DateUtil.addDate(-3, new Date());
+        addToQueue("analyze_status=1;analyze_date<" + DateUtil.toString(date) + " 00:00:00");
+        //添加分析错误的
+        addToQueue("analyze_status=2;analyze_fail_count<3");
+    }
+
+    private void addToQueue(String filters) throws Exception {
+        List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, filters, "+receive_date", 1, 100);
+        for (Map<String, Object> pack : resultList) {
+            String packStr = objectMapper.writeValueAsString(pack);
+            EsSimplePackage esSimplePackage = objectMapper.readValue(packStr, EsSimplePackage.class);
+            String packString = objectMapper.writeValueAsString(esSimplePackage);
+            push(packString);
+            savePack(esSimplePackage);
+        }
+    }
+
+    private void push(String pack) {
+        if (size() > MAX_SIZE) {
+            return;
+        }
+        redisTemplate.opsForList().leftPush(RedisCollection.AnalyzeQueue, pack);
     }
 
     @Async
-    public void savePack(Package pack) {
-        pack = packageService.getPackage(pack.getId());
-
-        pack.setAnalyzeStatus(1);
-        pack.setAnalyzeDate(new Date());
-        packageService.save(pack);
-    }
-
-    private void addToQueue(String filter) throws Exception {
-        List<Package> packageList = packageService.search(null, filter, "+receiveDate", 1, 1000);
-        for (Package pack : packageList) {
-            String packStr = objectMapper.writeValueAsString(pack);
-            MPackage mPackage = objectMapper.readValue(packStr, MPackage.class);
-            String packString = objectMapper.writeValueAsString(mPackage);
-            push(packString);
-
-            savePack(pack);
-        }
+    public void savePack(EsSimplePackage pack) {
+        Map<String, Object> updateSource = new HashMap<>();
+        updateSource.put("analyze_status", 1);
+        updateSource.put("analyze_date", DateUtil.toStringLong(new Date()));
+        elasticSearchUtil.update(INDEX, TYPE, pack.get_id(), updateSource);
     }
 
     private Long size() {
         return redisTemplate.opsForList().size(RedisCollection.AnalyzeQueue);
-    }
-
-    private void push(String pack) {
-        if (size() > MaxSize) {
-            return;
-        }
-
-        redisTemplate.opsForList().leftPush(RedisCollection.AnalyzeQueue, pack);
     }
 }

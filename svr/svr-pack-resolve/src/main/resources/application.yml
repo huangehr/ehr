@@ -24,17 +24,13 @@ spring:
       max-idle: 8 # Max number of "idle" connections in the pool. Use a negative value to indicate an unlimited number of idle connections.
       max-wait: -1 # Maximum amount of time (in milliseconds) a connection allocation should block before throwing an exception when the pool is exhausted. Use a negative value to block indefinitely.
       min-idle: 1 # Target for the minimum number of idle connections to maintain in the pool. This setting only has an effect if it is positive.
-  # SOLR (SolrProperties)
-  data:
-    solr:
-      repositories.enabled: true # Enable Solr repositories.
 
 fast-dfs:
-  connect-timeout: 2
-  network-timeout: 30
+  connect-timeout: 20
+  network-timeout: 60
   charset: ISO8859-1
   pool:
-    init-size: 5
+    init-size: 10
     max-size: 20
     wait-time: 500
   http:
@@ -48,6 +44,11 @@ hadoop:
     zookeeper.znode.parent: /hbase-unsecure
   user:
     name: root
+
+elasticsearch:
+  pool:
+    init-size: 10
+    max-size: 20
 
 ehr:
   # 档案包数据提取器参数，从数据集中提取摘要、事件时间与身份标识
@@ -79,10 +80,14 @@ ehr:
         - HDSC02_17 #住院-诊断记录 v1.0
         - HDSD00_69 #住院-诊断记录 v1.3
         - HDSB05_84 #体检-诊断记录 v1.3
-      meta-data:
-        - HDSD00_01_550 #门诊-疾病临床诊断在特定分类体系中的代码 v1.0(住院代码相同) & v1.3
+      code-meta-data:
+        - HDSD00_01_550 #门诊-疾病临床诊断在特定分类体系中的代码 v1.0 & v1.3
         - HDSD00_69_002 #住院-疾病临床诊断在特定分类体系中的代码 v1.3
         - JDSB05_84_003 #体检-疾病临床诊断在特定分类体系中的代码 v1.3
+      name-meta-data:
+        - HDSD00_01_549 #门诊-疾病临床诊断在特定分类体系中的名称 v1.0 & v1.3
+        - HDSD00_69_001 #住院-疾病临床诊断在特定分类体系中的名称 v1.3
+        - JDSB05_84_004 #体检-疾病临床诊断在特定分类体系中的名称 v1.3
     #身份提取参数，从人口学提取
     identity:
       data-sets:
@@ -139,20 +144,15 @@ spring:
     host: 172.19.103.47 # Redis server host.
     port: 6379
     password: redis!@456
-  data:
-    solr:
-      zk-host: node1.hde.h3c.com,node2.hde.h3c.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
-  metrics:
-    export:
-      statsd:
-        host: 172.19.103.73
-        port: 8125
 fast-dfs:
   tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52:80
 hadoop:
   hbase-properties:
     hbase.zookeeper.quorum: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com
+elasticsearch:
+  cluster-name: elasticsearch
+  cluster-nodes: 172.19.103.9:9300
 
 ---
 spring:
@@ -165,20 +165,15 @@ spring:
     host: 172.19.103.47 # Redis server host.
     port: 6379
     password: redis!@456
-  data:
-    solr:
-      zk-host: node1.hde.h3c.com,node2.hde.h3c.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
-  metrics:
-    export:
-      statsd:
-        host: 172.19.103.73
-        port: 8125
 fast-dfs:
   tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52:80
 hadoop:
   hbase-properties:
     hbase.zookeeper.quorum: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com
+elasticsearch:
+  cluster-name: elasticsearch
+  cluster-nodes: 172.19.103.9:9300
 
 ---
 spring:
@@ -191,21 +186,15 @@ spring:
     host: 11.1.2.22 # Redis server host.
     port: 6390
     password: Kb6wKDQP1W4
-  data:
-    solr:
-      zk-host: node1.ehr.h3c.com,node2.ehr.h3c.com,node3.ehr.h3c.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
-  metrics:
-    export:
-      statsd:
-        host: localhost
-        port: 8125
 fast-dfs:
   tracker-server: 11.1.2.9:22122
   public-server: http://11.1.2.9:80
-
 hadoop:
   hbase-properties:
     hbase.zookeeper.quorum: node1.ehr.h3c.com,node2.ehr.h3c.com,node3.ehr.h3c.com
+elasticsearch:
+  cluster-name: elasticsearch
+  cluster-nodes: 11.1.2.7:9300
 
 ---
 spring:
@@ -218,16 +207,6 @@ spring:
     host: 10.176.97.5 # Redis server host.
     port: 6390
     password: q4YaQemf
-  data:
-    solr:
-      #host: http://172.19.103.10:8983/solr # Solr host. Ignored if "zk-host" is set.
-      #zk-host: node1,node2,node3:2181/solr # ZooKeeper host address in the form HOST:PORT.
-      zk-host: node1.hde.jkzlehr.com,node2.hde.jkzlehr.com,node3.hde.jkzlehr.com:2181/solr
-  metrics:
-    export:
-      statsd:
-        host: localhost
-        port: 8125
 fast-dfs:
   tracker-server: 10.176.97.5:22122
   public-server: http://10.176.97.5:8888
@@ -235,6 +214,9 @@ hadoop:
   hbase-properties:
     #- hbase.zookeeper.quorum: node2.jkzl.com,node3.jkzl.com,node1.jkzl.com
     hbase.zookeeper.quorum: node1,node2,node3
+elasticsearch:
+  cluster-name: elasticsearch
+  cluster-nodes: 10.176.97.7:9300
 
 ---
 spring:
@@ -247,16 +229,6 @@ spring:
     host: 100.100.1.161 # Redis server host.
     port: 6390
     password: q4YaQemf
-  data:
-    solr:
-      #host: http://172.19.103.10:8983/solr # Solr host. Ignored if "zk-host" is set.
-      #zk-host: node1,node2,node3:2181/solr # ZooKeeper host address in the form HOST:PORT.
-      zk-host: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com,node4.hde.h3c.com:2181/solr
-  metrics:
-    export:
-      statsd:
-        host: localhost
-        port: 8125
 fast-dfs:
   tracker-server: 100.100.1.157:22122
   public-server: http://100.100.1.157:8888
@@ -264,6 +236,9 @@ hadoop:
   hbase-properties:
     #- hbase.zookeeper.quorum: node2.jkzl.com,node3.jkzl.com,node1.jkzl.com
     hbase.zookeeper.quorum: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com,node4.hde.h3c.com
+elasticsearch:
+  cluster-name: elasticsearch
+  cluster-nodes: 100.100.1.158:9300
 
 ---
 spring:
@@ -276,15 +251,6 @@ spring:
     host: 192.168.50.82 # Redis server host.
     port: 6379
     password: q4YaQemf
-  data:
-    solr:
-      #host: http://172.19.103.10:8983/solr # Solr host. Ignored if "zk-host" is set.
-      zk-host: node1.jkzl.com,node2.jkzl.com,node4.jkzl.com:2181/solr
-  metrics:
-    export:
-      statsd:
-        host: localhost
-        port: 8125
 fast-dfs:
   tracker-server: 192.168.50.116:22122,192.168.50.119:22122
   public-server: http://192.168.50.37:8888
@@ -292,3 +258,6 @@ hadoop:
   hbase-properties:
     #- hbase.zookeeper.quorum: node2.jkzl.com,node3.jkzl.com,node1.jkzl.com
     hbase.zookeeper.quorum: node1.jkzl.com,node2.jkzl.com,node4.jkzl.com
+elasticsearch:
+  cluster-name: elasticsearch
+  cluster-nodes: 172.10.10.2:9300

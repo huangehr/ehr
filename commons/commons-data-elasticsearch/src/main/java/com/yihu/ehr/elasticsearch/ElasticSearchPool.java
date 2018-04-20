@@ -1,5 +1,7 @@
 package com.yihu.ehr.elasticsearch;
 
+import com.alibaba.druid.pool.DruidDataSource;
+import com.alibaba.druid.pool.ElasticSearchDruidDataSourceFactory;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
@@ -15,6 +17,7 @@ import javax.annotation.PreDestroy;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Created by progr1mmer on 2018/1/4.
@@ -28,7 +31,6 @@ public class ElasticSearchPool {
     @Value("${elasticsearch.pool.max-size}")
     private int maxSize;
     private List<TransportClient> clientPool;
-
     @Autowired
     private ElasticSearchConfig elasticSearchConfig;
 
@@ -39,21 +41,28 @@ public class ElasticSearchPool {
         }
         synchronized (clientPool) {
             while (clientPool.size() < initSize) {
-                Settings settings = Settings.builder()
-                        .put("cluster.name", elasticSearchConfig.getClusterName())
-                        .put("client.transport.sniff", true)
-                        .build();
-                String[] nodeArr = elasticSearchConfig.getClusterNodes().split(",");
-                InetSocketTransportAddress[] socketArr = new InetSocketTransportAddress[nodeArr.length];
-                for (int i = 0; i < socketArr.length; i++) {
-                    if (!StringUtils.isEmpty(nodeArr[i])) {
-                        String[] nodeInfo = nodeArr[i].split(":");
-                        socketArr[i] = new InetSocketTransportAddress(new InetSocketAddress(nodeInfo[0], new Integer(nodeInfo[1])));
+                try{
+                    Settings settings = Settings.builder()
+                            .put("cluster.name", elasticSearchConfig.getClusterName())
+                            .put("client.transport.sniff", true)
+                            .build();
+                    String[] nodeArr = elasticSearchConfig.getClusterNodes().split(",");
+                    InetSocketTransportAddress[] socketArr = new InetSocketTransportAddress[nodeArr.length];
+                    for (int i = 0; i < socketArr.length; i++) {
+                        if (!StringUtils.isEmpty(nodeArr[i])) {
+                            String[] nodeInfo = nodeArr[i].split(":");
+                            socketArr[i] = new InetSocketTransportAddress(new InetSocketAddress(nodeInfo[0], new Integer(nodeInfo[1])));
+                        }
                     }
+                    TransportClient transportClient = TransportClient.builder().settings(settings).build().addTransportAddresses(socketArr);
+                    clientPool.add(transportClient);
+                }catch (Exception e){
+                    System.out.println("探测集群节点异常！");
                 }
-                TransportClient transportClient = TransportClient.builder().settings(settings).build().addTransportAddresses(socketArr);
-                clientPool.add(transportClient);
             }
+        }
+        if (clientPool.isEmpty()) {
+            throw new RuntimeException("ElasticSearch连接池初始化失败，请检查相关配置");
         }
     }
 
@@ -67,12 +76,12 @@ public class ElasticSearchPool {
     }
 
     public synchronized TransportClient getClient() {
-        int last_index = clientPool.size() - 1;
-        TransportClient transportClient = clientPool.get(last_index);
-        clientPool.remove(last_index);
         if (clientPool.isEmpty()) {
             init();
         }
+        int last_index = clientPool.size() - 1;
+        TransportClient transportClient = clientPool.get(last_index);
+        clientPool.remove(last_index);
         return transportClient;
     }
 
@@ -84,6 +93,15 @@ public class ElasticSearchPool {
         } else {
             clientPool.add(transportClient);
         }
+    }
+
+    public DruidDataSource getDruidDataSource() throws Exception {
+        Properties properties = new Properties();
+        properties.put("url", "jdbc:elasticsearch://" + elasticSearchConfig.getClusterNodes() + "/");
+        DruidDataSource druidDataSource = (DruidDataSource) ElasticSearchDruidDataSourceFactory
+                .createDataSource(properties);
+        druidDataSource.setInitialSize(1);
+        return druidDataSource;
     }
 
 }

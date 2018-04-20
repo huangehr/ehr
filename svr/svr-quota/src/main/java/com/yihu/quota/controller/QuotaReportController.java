@@ -62,10 +62,41 @@ public class QuotaReportController extends BaseController {
     private OrgHealthCategoryStatisticsService orgHealthCategoryStatisticsService;
     @Autowired
     private BaseStatistsService baseStatistsService;
-    @Autowired
-    private SingleDiseaseService singleDiseaseService;
 
     public static String orgHealthCategoryCode = "orgHealthCategoryCode";
+
+    @RequestMapping(value = ServiceApi.TJ.GetYearDropdownList, method = RequestMethod.GET)
+    @ApiOperation(value = "获取二维表查询年份下拉数据")
+    public Envelop getDropdownList(
+            @ApiParam(name = "type", value = "类型 1增量型报表 2 全量型报表")
+            @RequestParam(value = "type" ,required =  true ) int type,
+            @ApiParam(name = "index", value = "索引")
+            @RequestParam(value = "index" ,required =  true ) String index) throws Exception {
+        Envelop envelop = new Envelop();
+        Map<String, List<String>> map = null;
+        String sql = "select count(1) from "+ index +" group by date_histogram(field='quotaDate','interval'='year') order by quotaDate desc";
+        map = baseStatistsService.getDataInfo(sql, "date_histogram(field=quotaDate,interval=year)");
+        if (null != map && map.size() > 0) {
+            Collections.sort(map.get("xData"), Collections.reverseOrder());
+            if(type == 1){
+                envelop.setObj(map.get("xData"));
+            }else {
+                Map<String,String> resultMap = new HashMap<>();
+                for(String key : map.get("xData")){
+                    String filter = "quotaDate >= '" + key + "-01-01'" + " and quotaDate <= '" + key +"-12-31'";
+                    sql = "select count(1) from "+ index +" where " + filter + " group by date_histogram(field='quotaDate','interval'='month') order by quotaDate desc";
+                    System.out.println(sql);
+                    Map<String, List<String>>  monthMap = baseStatistsService.getDataInfo(sql, "date_histogram(field=quotaDate,interval=month)");
+                    if(monthMap != null && monthMap.size() > 0){
+                        resultMap.put(key,monthMap.get("xData").get(0).toString());
+                    }
+                }
+                envelop.setObj(resultMap);
+            }
+        }
+        envelop.setSuccessFlg(true);
+        return  envelop;
+    }
 
     /**
      * 获取指标统计结果
@@ -262,15 +293,22 @@ public class QuotaReportController extends BaseController {
                     if (resultListMap != null && resultListMap.size() > 0) {
                         for (Map<String, Object> map : resultListMap) {
                             if (map != null && map.size() > 0) {
+                                if (map.containsKey("quotaName")) {
+                                    map.put("quotaName",tjQuota.getName());
+                                }
                                 listMap.add(map);
                                 //第一种 ES库中有定义的维度 如org,slaveKey1
                                 //第二种 ES库中未定义的维度 如level，economic
                                 if (map.containsKey(dimensionName)) {
-                                    dataMap.put(map.get(dimensionName).toString(), map.get("result"));
-                                    xAxisMap.put(map.get(dimensionName).toString(), map.get(dimension).toString());
+                                    if(map.get(dimensionName) != null){
+                                        dataMap.put(map.get(dimensionName).toString(), map.get("result"));
+                                        xAxisMap.put(map.get(dimensionName).toString(), map.get(dimension).toString());
+                                    }
                                 } else {
-                                    dataMap.put(map.get(dimension).toString(), map.get("result"));
-                                    xAxisMap.put(map.get(dimension).toString(), map.get(dimension).toString());
+                                    if(map.get(dimension) != null){
+                                        dataMap.put(map.get(dimension).toString(), map.get("result"));
+                                        xAxisMap.put(map.get(dimension).toString(), map.get(dimension).toString());
+                                    }
                                 }
                             }
 

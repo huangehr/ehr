@@ -252,10 +252,10 @@ public class ElasticsearchUtil {
      * 查询后 存在 删除
      * @param boolQueryBuilder
      */
-    public void queryDelete(Client client,BoolQueryBuilder boolQueryBuilder){
+    public void queryDelete(Client client,String index,String type,BoolQueryBuilder boolQueryBuilder){
         SearchResponse actionGet = null;
-        actionGet = client.prepareSearch(esConfigUtil.getIndex())
-                .setTypes(esConfigUtil.getType())
+        actionGet = client.prepareSearch(index)
+                .setTypes(type)
                 .setSize(10000)
                 .setQuery(boolQueryBuilder)
                 .execute().actionGet();
@@ -337,7 +337,6 @@ public class ElasticsearchUtil {
                 requestBuilder = action.explain();
             } else {
                 //封装成自己的Select对象
-//                Client client = elasticSearchPool.getClient();
                 queryAction = new DefaultQueryAction(client, select);
                 requestBuilder = queryAction.explain();
             }
@@ -365,10 +364,11 @@ public class ElasticsearchUtil {
                 }
             });
         } catch (Exception e) {
-            elasticSearchPool.releaseClient(client);
             e.printStackTrace();
+        }finally {
+//            System.out.println("ES client 连接回收 或关闭 ");
+            elasticSearchPool.releaseClient(client);
         }
-        elasticSearchPool.releaseClient(client);
         return returnModels;
     }
 
@@ -391,7 +391,6 @@ public class ElasticsearchUtil {
                 requestBuilder = action.explain();
             } else {
                 //封装成自己的Select对象
-//                Client client = elasticSearchPool.getClient();
                 queryAction = new DefaultQueryAction(client, select);
                 requestBuilder = queryAction.explain();
             }
@@ -400,13 +399,13 @@ public class ElasticsearchUtil {
             if(hits != null){
                 return hits.totalHits();
             }
-            elasticSearchPool.releaseClient(client);
             return 0;
         } catch (Exception e) {
-            elasticSearchPool.releaseClient(client);
             e.printStackTrace();
-            return 0;
+        }finally {
+            elasticSearchPool.releaseClient(client);
         }
+        return 0;
     }
 
 }

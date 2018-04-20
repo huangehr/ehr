@@ -1,16 +1,23 @@
 package com.yihu.ehr.oauth2.web;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ServiceApi;
-import com.yihu.ehr.oauth2.model.EhrUserDetails;
-import com.yihu.ehr.oauth2.model.EhrUserSimple;
+import com.yihu.ehr.model.app.MApp;
+import com.yihu.ehr.model.user.EhrUserSimple;
+import com.yihu.ehr.oauth2.model.VerifyCode;
 import com.yihu.ehr.oauth2.oauth2.EhrOAuth2ExceptionTranslator;
 import com.yihu.ehr.oauth2.oauth2.EhrTokenGranter;
 import com.yihu.ehr.oauth2.oauth2.EhrUserDetailsService;
 import com.yihu.ehr.oauth2.oauth2.jdbc.EhrJdbcClientDetailsService;
 import com.yihu.ehr.oauth2.oauth2.redis.EhrRedisTokenStore;
+import com.yihu.ehr.oauth2.oauth2.redis.EhrRedisVerifyCodeService;
+import com.yihu.ehr.util.fzgateway.FzGatewayUtil;
+import com.yihu.ehr.util.id.RandomUtil;
+import com.yihu.ehr.util.rest.Envelop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,6 +62,19 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
     private EhrRedisTokenStore ehrRedisTokenStore;
     @Autowired
     private EhrUserDetailsService ehrUserDetailsService;
+    @Autowired
+    private EhrRedisVerifyCodeService ehrRedisVerifyCodeService;
+    @Value("${fz-gateway.url}")
+    private String fzGatewayUrl;
+    @Value("${fz-gateway.clientId}")
+    private String fzClientId;
+    @Value("${fz-gateway.clientVersion}")
+    private String fzClientVersion;
+    @Value("${fz-gateway.handlerId}")
+    private String fzHandlerId;
+    @Autowired
+    protected ObjectMapper objectMapper;
+
 
     @PostConstruct
     private void init() {
@@ -70,24 +90,29 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
             throw new InvalidRequestException("Missing clientId");
         }
         Map<String, String> param = new HashMap<>();
-        param.put("grant_type", DEFAULT_GRANT_TYPE);
+        if (StringUtils.isEmpty(parameters.get("verify_code"))) {
+            param.put("grant_type", DEFAULT_GRANT_TYPE);
+            param.put("password", parameters.get("password"));
+        } else {
+            param.put("grant_type", "verify_code");
+            param.put("verify_code", parameters.get("verify_code"));
+        }
         param.put("client_id", client_id);
         param.put("scope", scope);
         param.put("username", parameters.get("username"));
-        param.put("password", parameters.get("password"));
         ClientDetails authenticatedClient = ehrJdbcClientDetailsService.loadClientByClientId(client_id);
         TokenRequest tokenRequest = oAuth2RequestFactory.createTokenRequest(param, authenticatedClient);
+        //校验 client_id 是否一致
+        if (!client_id.equals(tokenRequest.getClientId())) {
+            throw new InvalidClientException("Given client ID does not match authenticated client");
+        }
         if (authenticatedClient != null) {
             oAuth2RequestValidator.validateScope(tokenRequest, authenticatedClient);
         }
         if (!StringUtils.hasText(tokenRequest.getGrantType())) {
             throw new InvalidRequestException("Missing grant type");
         }
-        //校验 client_id 是否一致
-        if (!client_id.equals(tokenRequest.getClientId())) {
-            throw new InvalidClientException("Given client ID does not match authenticated client");
-        }
-        OAuth2AccessToken token = getTokenGranter().grant(DEFAULT_GRANT_TYPE, tokenRequest);
+        OAuth2AccessToken token = getTokenGranter().grant(param.get("grant_type"), tokenRequest);
         /*如果是移动端登陆则移除之前的token，
         在网关处通过HTTP状态码告知前端是过期（401）还是账号在别处登陆（403），
         实现同一账号只能在一处登陆*/
@@ -105,8 +130,70 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
             ehrUserSimple.setExpiresIn(token.getExpiresIn());
             ehrUserSimple.setRefreshToken(token.getRefreshToken().getValue());
             ehrUserSimple.setUser(parameters.get("username"));
+            ehrUserSimple.setState(parameters.get("state"));
         }
         return getResponse(ehrUserSimple);
+    }
+
+    @RequestMapping(value = ServiceApi.Authentication.VerifyCode, method = RequestMethod.POST)
+    public Envelop verifyCode(@RequestParam Map<String, String> parameters) throws  Exception{
+        Envelop envelop =new Envelop();
+        String client_id = parameters.get("client_id");
+        String username = parameters.get("username");
+        VerifyCode verifyCode = new VerifyCode();
+        //手机短信验证码
+        RandomUtil randomUtil = new RandomUtil();
+        String random = randomUtil.getRandomString(6);
+        //发送短信
+        String api = "MsgGW.Sms.send";
+        String content = "您好，短信验证码为:【" + random + "】，请在10分钟内验证！";
+        Map<String, String> apiParamMap = new HashMap<>();
+        //手机号码
+        apiParamMap.put("mobile", username);
+        //业务标签
+        apiParamMap.put("handlerId", fzHandlerId);
+        //短信内容
+        apiParamMap.put("content", content);
+        //渠道号
+        apiParamMap.put("clientId", fzClientId);
+        String resultStr = FzGatewayUtil.httpPost(fzGatewayUrl,fzClientId,fzClientVersion,api,apiParamMap, 1);
+        if (resultStr != null) {
+            Map<String, Object> resultMap = objectMapper.readValue(resultStr, Map.class);
+            Integer resultCode = 0;
+            if (null != resultMap.get("Code") && !"".equals(resultMap.get("Code"))) {
+                resultCode = Integer.valueOf(resultMap.get("Code").toString());
+            }
+            if (resultCode == 10000) {
+                verifyCode.setCode(random);
+                verifyCode.setExpiresIn(600);
+                verifyCode.setNextRequestTime(60);
+                //验证码有效期
+                ehrRedisVerifyCodeService.store(client_id, username, random, 600000);
+                envelop.setSuccessFlg(true);
+                envelop.setObj(verifyCode);
+                envelop.setErrorMsg("短信验证码发送成功！");
+            } else {
+                envelop.setSuccessFlg(false);
+                envelop.setErrorCode(resultCode);
+                envelop.setErrorMsg("短信验证码发送失败！");
+            }
+        }else{
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("短信验证码发送失败！");
+        }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.Authentication.VerifyCodeExpire, method = RequestMethod.POST)
+    public ResponseEntity<VerifyCode> verifyCodeExpire(@RequestParam Map<String, String> parameters) {
+        String client_id = parameters.get("client_id");
+        String username = parameters.get("username");
+        VerifyCode verifyCode = new VerifyCode();
+        int expiresIn = ehrRedisVerifyCodeService.getExpireTime(client_id, username);
+        int nextRequestTime = 60 + (expiresIn - 600 ) > 0 ? 60 + (expiresIn - 600 ) : 0;
+        verifyCode.setNextRequestTime(nextRequestTime);
+        verifyCode.setExpiresIn(expiresIn);
+        return new ResponseEntity<>(verifyCode, HttpStatus.OK);
     }
 
     @Override

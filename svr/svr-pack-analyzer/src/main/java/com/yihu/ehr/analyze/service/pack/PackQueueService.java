@@ -2,6 +2,7 @@ package com.yihu.ehr.analyze.service.pack;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.RedisCollection;
+import com.yihu.ehr.model.packs.EsSimplePackage;
 import com.yihu.ehr.model.packs.MPackage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -17,11 +18,11 @@ public class PackQueueService {
     @Autowired
     private RedisTemplate<String, Serializable> redisTemplate;
 
-    public MPackage pop() throws IOException {
+    public EsSimplePackage pop() throws IOException {
         Serializable serializable = redisTemplate.opsForList().rightPop(RedisCollection.AnalyzeQueue);
-        if(serializable != null) {
+        if (serializable != null) {
             String packStr = serializable.toString();
-            return objectMapper.readValue(packStr, MPackage.class);
+            return objectMapper.readValue(packStr, EsSimplePackage.class);
         }
         return null;
     }

@@ -3,7 +3,9 @@ package com.yihu.ehr.pack.service;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.constants.ArchiveStatus;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
-import com.yihu.ehr.pack.dao.XDatasetPackageRepository;
+import com.yihu.ehr.pack.dao.DatasetPackageRepository;
+import com.yihu.ehr.pack.entity.DatasetPackage;
+import com.yihu.ehr.pack.entity.Package;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.util.id.BizObject;
 import com.yihu.ehr.util.id.ObjectId;
@@ -34,13 +36,13 @@ import java.util.Map;
  */
 @Service
 @Transactional
-public class DatasetPackageService extends BaseJpaService<DatasetPackage, XDatasetPackageRepository> {
+public class DatasetPackageService extends BaseJpaService<DatasetPackage, DatasetPackageRepository> {
     @Value("${deploy.region}")
     private Short adminRegion;
     @Autowired
     private FastDFSUtil fastDFSUtil;
     @Autowired
-    private XDatasetPackageRepository datasetPackageRepository;
+    private DatasetPackageRepository datasetPackageRepository;
 
 
     public DatasetPackage receiveDatasets(InputStream is, String pwd, String md5, String orgCode, String clientId) {
@@ -147,7 +149,7 @@ public class DatasetPackageService extends BaseJpaService<DatasetPackage, XDatas
         getRepo().delete(id);
     }
     
-    private XDatasetPackageRepository getRepo(){
-        return (XDatasetPackageRepository)getRepository();
+    private DatasetPackageRepository getRepo(){
+        return (DatasetPackageRepository)getRepository();
     }
 }

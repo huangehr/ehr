@@ -398,6 +398,13 @@ public class ServiceApi {
         public static final String AppAuthClient = "/app/authClient";
         public static final String SimpleUpdate = "/app/simpleUpdate";
 
+        //--------------- 医生工作平台 ---------------
+        public static final String GetAppsRelationByUserIdAndParentAppId ="/app/appsRelationByUserIdAndParentAppId";
+        public static final String GetAppsRelationByUserJson ="/app/getAppsRelationByUserJson";
+
+        //--------------- 总支撑平台 ---------------
+        public static final String SaveAppsRelation ="/app/saveAppsRelation";
+
     }
 
     public static class AppApi {
@@ -462,16 +469,18 @@ public class ServiceApi {
         public static final String Package = "/packages/{id}";
         public static final String PackageResolve = "/packages/resolve";
         public static final String PackageSearch = "/packages/search";
-        public static final String PackageDownloads = "/packages/{id}/downloads";
+        public static final String PackageDownload = "/packages/download/{id}";
         public static final String ResolveMessage = "/message/resolve";
         public static final String MessageTimer = "/message/timer";
         public static final String LegacyPackages = "/json_package";
         public static final String Prescription = "/prescription"; //处方笺维护
         public static final String ArchiveRelation = "/archiveRelation"; //档案关联
-        public static final String ResolveQueue = "/packages/resolveQueue";
+        public static final String AddResolveQueue = "/packages/addResolveQueue";
         public static final String QueueSize = "/packages/queueSize";
-        public static final String PackageCrypto = "/PackageCrypto";
+        public static final String PackageCrypto = "/packages/crypto";
+        public static final String Fetch = "/packages/fetch/{id}";
         public static final String ImmediateResolve = "/immediate/resolve";
+        public static final String Update = "/packages/update";
     }
 
     //非病人维度
@@ -493,18 +502,18 @@ public class ServiceApi {
     }
 
     public static class PackageAnalyzer {
-        public static final String Scheduler = "packAnalyzer/scheduler";
-        public static final String Queue = "packAnalyzer/queue";
-        public static final String Status = "packAnalyzer/status/{id}";
-        public static final String DailyReport = "packAnalyzer/dailyReport";
-        public static final String List = "packAnalyzer/list";
-        public static final String FindByField = "packAnalyzer/findByField";
-        public static final String FindBySql = "packAnalyzer/findBySql";
-        public static final String EsSaveData = "packAnalyzer/esSaveData";
-        public static final String QcEmpty = "packAnalyzer/qc/check/empty";
-        public static final String QcType = "packAnalyzer/qc/check/type";
-        public static final String QcFormat = "packAnalyzer/qc/check/format";
-        public static final String QcValue = "packAnalyzer/qc/check/value";
+        public static final String Scheduler = "/packAnalyzer/scheduler";
+        public static final String Queue = "/packAnalyzer/queue";
+        public static final String Status = "/packAnalyzer/status/{id}";
+        public static final String DailyReport = "/packAnalyzer/dailyReport";
+        public static final String List = "/packAnalyzer/list";
+        public static final String FindByField = "/packAnalyzer/findByField";
+        public static final String FindBySql = "/packAnalyzer/findBySql";
+        public static final String EsSaveData = "/packAnalyzer/esSaveData";
+        public static final String QcEmpty = "/packAnalyzer/qc/check/empty";
+        public static final String QcType = "/packAnalyzer/qc/check/type";
+        public static final String QcFormat = "/packAnalyzer/qc/check/format";
+        public static final String QcValue = "/packAnalyzer/qc/check/value";
     }
 
     public static class ArchiveRelation {
@@ -560,6 +569,8 @@ public class ServiceApi {
         public static final String AccessToken = "/oauth/accessToken";
         public static final String ValidToken = "/oauth/validToken";
         public static final String Login = "/oauth/login";
+        public static final String VerifyCode = "/oauth/verifyCode";
+        public static final String VerifyCodeExpire = "/oauth/verifyCodeExpire";
     }
 
     public static class MessageRemind {
@@ -568,6 +579,11 @@ public class ServiceApi {
         public static final String MessageRemindCount = "/messageRemindCount";
         public static final String MessageRemindAdmin = "/messageRemind/admin/{messageRemind_id}";
         public static final String MessageRemindReaded = "/messageRemind/readed/{remindId}";
+        public static final String MessageRemindByType = "/MessageRemindByType";
+        public static final String MessageReminInfodByType = "/MessageRemindInfoInfoByType";
+        public static final String MessageRemindByNotifie = "/MessageRemindByNotifie";
+        public static final String UpdateMessageRemindByNotifie = "/UpdateMessageRemindByNotifie";
+        public static final String MessageRemindSatisfactionSurvey = "/MessageRemind/SatisfactionSurvey";
     }
 
     public static class Portal {
@@ -765,6 +781,8 @@ public class ServiceApi {
         public static final String ChangePassword = "/users/changePassword";
         public static final String DistributeSecurityKey = "/users/distributeSecurityKey";
         public static final String GetSecurityKey = "/users/getSecurityKey";
+        public static final String changePasswordByTelephone = "/usersOfApp/users/changePasswordByTelephone";
+        public static final String changePasswordByOldPassword = "/users/changePasswordByOldPassword";
 
     }
 
@@ -819,6 +837,7 @@ public class ServiceApi {
         public static final String SearchRoleReportRelation = "/roles/role_report/search";
         public static final String SearchRoleReportRelationNoPage = "/roles/role_report/searchNoPage";
         public static final String SearchRoleReportRelationIsReportAccredited = "/roles/role_report/isReportAccredited";
+        public static final String ClientRole = "/roles/clientRole";
 
     }
 
@@ -1299,6 +1318,14 @@ public class ServiceApi {
         public static final String GetArchiveCount = "/tj/getArchiveCount";
         public static final String GetArchiveManCount = "/tj/getArchiveManCount";
 
+
+
+        public static final String GetYearDropdownList = "/tj/getYearDropdownList";
+
+
+
+
+
     }
 
     public static class StasticReport {
@@ -1431,7 +1458,9 @@ public class ServiceApi {
 
     public static class FastDFS {
         public static final String Upload = "/fastDfs/upload";
+        public static final String OpenUpload = "/open/fastDfs/upload";
         public static final String OldUpload = "/fastDfs/oldUpload";
+        public static final String OpenOldUpload = "/open/fastDfs/oldUpload";
         public static final String DeleteById = "/fastDfs/deleteById";
         public static final String DeleteByPath = "/fastDfs/deleteByPath";
         public static final String DeleteByObjectId = "/fastDfs/deleteByObjectId";
@@ -1458,6 +1487,8 @@ public class ServiceApi {
         public static final String FindById = "/elasticSearch/{id}";
         public static final String FindByField = "/elasticSearch/findByField";
         public static final String Page = "/elasticSearch/page";
+        public static final String FindBySql = "/elasticSearch/findBySql";
+        public static final String DateHistogram = "/elasticSearch/dateHistogram";
 
     }
 
@@ -1481,10 +1512,28 @@ public class ServiceApi {
     }
 
     /**
+     * 后台配置问卷/满意度问题和选项
+     */
+    public static class SurveyAdminManage {
+        public static final String GetSurveyTemplateList="/admin/surveyTemplate/list";
+        public static final String GetSurveyTemplateOptionsList="/admin/surveyTemplate/options/list";
+        public static final String SaveLabelInfo ="/admin/surveyTemplate/saveLabelInfo";
+        public static final String SaveTemplate = "/admin/surveyTemplate/saveTemplate";
+    }
+
+    /**
+     * 居民填写满意度
+     */
+    public static class Questionnaire {
+        public static final String GetAllQuestionsByTemplateCode = "/questionnaire/getAllQuestionsByTemplateCode";
+        public static final String SaveAnswer = "/questionnaire/saveAnswer";
+    }
+
+    /**
      * 转发福州总部开放平台接口相关
      */
     public static class Fz {
-        public static final String Open = "/fz/open";
+        public static final String OpenApi = "/fz/open/api";
     }
 
     /**
@@ -1495,5 +1544,36 @@ public class ServiceApi {
         public static final String list = "/AppPushMessage/list";
         public static final String app = "/AppPushMessage/app";
         public static final String tarns = "/AppPushMessage/tarnsmission";
+    }
+    /**
+     * 预约-挂号单
+     */
+    public static class Registration {
+        public static final String Prefix = "/appointment/registration/";
+        public static final String GetById = "/appointment/registration/{id}";
+        public static final String Search = "/appointment/registration/search";
+        public static final String Save = "/appointment/registration/save";
+        public static final String Update = "/appointment/registration/update";
+        public static final String Delete = "/appointment/registration/delete";
+        public static final String UpdateState = "/appointment/registration/updateState";
+        public static final String UpdateVisitState = "/appointment/registration/updateVisitState";
+    }
+
+    /**
+     * 组合福州总部的预约挂号接口为我方需要的数据结构
+     */
+    public static class FzCombination {
+        public static final String FindHospitalList = "/appointment/combination/findHospitalList";
+        public static final String FindDoctorList = "/appointment/combination/findDoctorList";
+    }
+
+    /**
+     * 账号申诉
+     */
+    public static class AccountRepresentation{
+        public static final String SaveAccontRepresenetation ="/account/save";
+        public static final String GetRandomImageCode ="/account/getRandomImageCode";
+        public static final String CheckRandomImageCode ="/account/checkRandomImageCode";
+
     }
 }

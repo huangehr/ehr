@@ -7,6 +7,7 @@ import com.yihu.ehr.analyze.service.pack.DataElementRecord;
 import com.yihu.ehr.analyze.service.pack.DataSetRecord;
 import com.yihu.ehr.analyze.service.pack.ZipPackage;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
+import com.yihu.ehr.model.packs.EsSimplePackage;
 import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.profile.util.DataSetUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
@@ -48,7 +49,7 @@ public class PackageQcService {
      * @param zipPackage 档案包
      */
     public void sendQcMsg(ZipPackage zipPackage) {
-        MPackage mPackage = zipPackage.getmPackage();
+        EsSimplePackage esSimplePackage = zipPackage.getEsSimplePackage();
         Map<String, DataSetRecord> dataSets = zipPackage.getDataSets();
         dataSets.forEach((key, dataSetRecord) -> {
             Map<String, DataElementRecord> records = dataSetRecord.getRecords();
@@ -69,7 +70,7 @@ public class PackageQcService {
                     msgNode.put("eventNo", dataSetRecord.getEventNo());
                     String eventTime = DateUtil.toString(dataSetRecord.getEventTime(), DateUtil.DEFAULT_YMDHMSDATE_FORMAT);
                     msgNode.put("eventTime", eventTime);
-                    String receiveTime = DateUtil.toString(mPackage.getReceiveDate(), DateUtil.DEFAULT_YMDHMSDATE_FORMAT);
+                    String receiveTime = DateUtil.toString(esSimplePackage.getReceive_date(), DateUtil.DEFAULT_YMDHMSDATE_FORMAT);
                     msgNode.put("receiveTime", receiveTime);
 
                     redisServiceClient.sendMessage("svr-pack-analyzer", channel, msgNode.toString());
@@ -84,7 +85,7 @@ public class PackageQcService {
      * @param zipPackage
      */
     public void qcReceive(ZipPackage zipPackage) {
-        MPackage mPackage = zipPackage.getmPackage();
+        EsSimplePackage esSimplePackage = zipPackage.getEsSimplePackage();
         Map<String, DataSetRecord> dataSets = zipPackage.getDataSets();
         final int[] i = {0};
         dataSets.forEach((key, dataSetRecord) -> {
@@ -102,8 +103,8 @@ public class PackageQcService {
                 map.put("eventTime", dataSetRecord.getEventTime());
                 //注意，此处的EventType可能不准确，包中未提供
                 map.put("eventType", dataSetRecord.getEventType());
-                map.put("receiveTime", mPackage.getReceiveDate());
-                map.put("packId", mPackage.getId());
+                map.put("receiveTime", esSimplePackage.getReceive_date());
+                map.put("packId", esSimplePackage.get_id());
                 try {
                     elasticSearchUtil.index("qc", "receive_data_pack", map);
                 } catch (ParseException e) {
@@ -117,8 +118,8 @@ public class PackageQcService {
             map.put("orgCode", dataSetRecord.getOrgCode());
             map.put("dataSet", dataSetRecord.getCode());
             map.put("dataSetRow", size);
-            map.put("receiveTime", mPackage.getReceiveDate());
-            map.put("packId", mPackage.getId());
+            map.put("receiveTime", esSimplePackage.getReceive_date());
+            map.put("packId", esSimplePackage.get_id());
             try {
                 elasticSearchUtil.index("qc", "receive_data_set", map);
             } catch (ParseException e) {

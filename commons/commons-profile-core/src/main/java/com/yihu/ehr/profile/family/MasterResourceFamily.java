@@ -24,7 +24,9 @@ public class MasterResourceFamily extends ResourceFamily {
         public static final String CreateDate = "create_date";
         public static final String ClientId = "client_id";
         public static final String Diagnosis = "diagnosis";
+        public static final String DiagnosisName = "diagnosis_name";
         public static final String HealthProblem = "health_problem";
+        public static final String HealthProblemName = "health_problem_name";
     }
 
     /**

@@ -288,7 +288,6 @@ public class BaseStatistsService {
         for(int i=0 ; i < orgHealthCategoryList.size() ; i++ ){
             Map<String,Object> mapCategory = orgHealthCategoryList.get(i);
             String code = mapCategory.get("code").toString();
-            mapCategory.put("firstColumn",mapCategory.get("text"));
             for(Map<String, Object> dimenMap : dimenListResult){
                 if(dimenMap.get(code) != null){
 //                    mapCategory.putAll(dimenMap);
@@ -306,6 +305,7 @@ public class BaseStatistsService {
                     mapCategory.put(quotaCode,0);
                 }
             }
+            mapCategory.put("firstColumn",mapCategory.get("text"));
             result.add(mapCategory);
             if(mapCategory.get("children") != null){
                 List<Map<String,Object>> childrenOrgHealthCategoryList = (List<Map<String, Object>>) mapCategory.get("children");
@@ -328,12 +328,10 @@ public class BaseStatistsService {
         for(int i=0 ; i < orgHealthCategoryList.size() ; i++ ){
             Map<String,Object> mapCategory = orgHealthCategoryList.get(i);
             String code = mapCategory.get("code").toString();
-            mapCategory.put("firstColumn",mapCategory.get("text"));
             for(Map<String, Object> dimenMap : dimenListResult){
                 if(dimenMap.get(code) != null){
-                    //
+                    //补充所有信息
                     mapCategory.putAll(dimenMap);
-
                     if(dimenMap.containsKey(code)){
                         mapCategory.put(code,dimenMap.get(code));
                         mapCategory.put("result",dimenMap.get("result")!=null ? dimenMap.get("result"):dimenMap.get(code));
@@ -348,10 +346,11 @@ public class BaseStatistsService {
                     mapCategory.put(quotaCode,0);
                 }
             }
+            mapCategory.put("firstColumn",mapCategory.get("text"));
             result.add(mapCategory);
             if(mapCategory.get("children") != null){
                 List<Map<String,Object>> childrenOrgHealthCategoryList = (List<Map<String, Object>>) mapCategory.get("children");
-                mapCategory.put("children",setResult(quotaCode,childrenOrgHealthCategoryList,dimenListResult,dateType));
+                mapCategory.put("children",setResultAllDimenMap(quotaCode, childrenOrgHealthCategoryList, dimenListResult, dateType));
             }
         }
         return  result;
@@ -454,8 +453,8 @@ public class BaseStatistsService {
         List<Map<String, Object>> resultList = new ArrayList<>();
         for(Map<String, Object> map : dimenListResult){
             Map<String,Object> dataMap = new HashMap<>();
+            boolean quotaFlag = false;
             for(String key :map.keySet()){
-                dataMap.putAll(map);
                 //维度为特殊机构类型时
                 if(key.equals(orgHealthCategoryCode)){
                     dataMap.put(map.get(orgHealthCategoryCode).toString(),map.get(orgHealthCategoryCode));
@@ -470,8 +469,13 @@ public class BaseStatistsService {
                     Long time = new Long(Long.valueOf(map.get(key).toString()));
                     String quotaDate = format.format(time);
                     dataMap.put("quotaDate", quotaDate);
+                    quotaFlag = true;
                 }
             }
+            if(quotaFlag){
+                map.remove("quotaDate");
+            }
+            dataMap.putAll(map);
             resultList.add(dataMap);
         }
         return resultList;
@@ -691,8 +695,10 @@ public class BaseStatistsService {
                 if(dictDatas != null ) {
                     for (SaveModel saveModel : dictDatas) {
                         String name = baseUtil.getFieldValueByName(dimension + "Name", saveModel);
-                        String val = baseUtil.getFieldValueByName(dimension,saveModel).toLowerCase();
-                        dimensionDicMap.put(val,name);
+                        String val = baseUtil.getFieldValueByName(dimension, saveModel);
+                        if(StringUtils.isNotEmpty(val) && StringUtils.isNotEmpty(name)){
+                            dimensionDicMap.put(val.toLowerCase(),name);
+                        }
                     }
                 }
             } else{
@@ -890,4 +896,58 @@ public class BaseStatistsService {
         Double costOfMedicalMonitor = costOfInPatient + costOfOutPatient;
         return nf.format(costOfMedicalMonitor);
     }
+
+
+    /**
+     * 数据查询
+     * @return
+     */
+    public Map<String, List<String>> getDataInfo(String sql ,String xdataName) {
+        List<Map<String, Object>> listData = parseIntegerValue(sql);
+        Map<String, List<String>> map = new HashMap<>();
+        List<String> xData = new ArrayList<>();
+        List<String> valueData = new ArrayList<>();
+        System.out.println("listData count " + listData.size());
+        if (null != listData  && listData.size() >0 && listData.get(0) !=null ) {
+            listData.forEach(one -> {
+                if(xdataName.contains("date_histogram")){
+                    if(xdataName.contains("year")){
+                        xData.add(one.get(xdataName).toString().substring(0,4) + "");
+                    }else if(xdataName.contains("month")){
+                        xData.add(one.get(xdataName).toString().substring(0,7) + "");
+                    }
+                }else {
+                    xData.add(one.get(xdataName) + "");
+                }
+                valueData.add(one.get("count") + "");
+            });
+            map.put("xData", xData);
+            map.put("valueData", valueData);
+        } else {
+            System.out.println("ssss" + listData.size());
+        }
+        return map;
+    }
+
+    /**
+     * 对查询结果key包含count、sum的value去掉小数点
+     * @param sql
+     * @return
+     */
+    public List<Map<String, Object>> parseIntegerValue(String sql) {
+        List<Map<String, Object>> listData = elasticsearchUtil.excuteDataModel(sql);
+        List<Map<String, Object>> handleData = new ArrayList<>();
+        listData.forEach(item -> {
+            Map<String, Object> myMap = new HashMap<>();
+            item.forEach((k,v) -> {
+                if (k.contains("COUNT") || k.contains("SUM") || k.contains("count")) {
+                    v = (int) Double.parseDouble(v + "");
+                }
+                myMap.put(k,v);
+            });
+            handleData.add(myMap);
+        });
+        return handleData;
+    }
+
 }

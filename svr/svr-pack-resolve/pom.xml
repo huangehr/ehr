@@ -117,5 +117,9 @@
             <artifactId>commons-entity</artifactId>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.yihu.ehr</groupId>
+            <artifactId>commons-data-elasticsearch</artifactId>
+        </dependency>
     </dependencies>
 </project>

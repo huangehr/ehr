@@ -3,18 +3,19 @@ package com.yihu.ehr.dfs.es.controller;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
-import com.yihu.ehr.dfs.es.service.ElasticSearchService;
+import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
+import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
+import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.sql.ResultSet;
+import java.util.*;
 
 /**
  * EndPoint - Es搜索服务
@@ -26,7 +27,7 @@ import java.util.Map;
 public class ElasticSearchEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
-    private ElasticSearchService elasticSearchService;
+    private ElasticSearchUtil elasticSearchUtil;
 
     @RequestMapping(value = ServiceApi.ElasticSearch.Mapping, method = RequestMethod.POST)
     @ApiOperation(value = "建立映射")
@@ -38,7 +39,7 @@ public class ElasticSearchEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "source", value = "Json串值", required = true)
             @RequestParam(value = "source") String source) throws Exception {
         Map<String, Map<String, String>> Mapping = objectMapper.readValue(source, Map.class);
-        elasticSearchService.mapping(index, type, Mapping);
+        elasticSearchUtil.mapping(index, type, Mapping);
         return success(true);
     }
 
@@ -53,7 +54,7 @@ public class ElasticSearchEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "source") String source) throws Exception {
         Map<String, Object> result;
         Map<String, Object> sourceMap = objectMapper.readValue(source, Map.class);
-        result = elasticSearchService.index(index, type, sourceMap);
+        result = elasticSearchUtil.index(index, type, sourceMap);
         return success(result);
     }
 
@@ -66,7 +67,7 @@ public class ElasticSearchEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "type") String type,
             @ApiParam(name = "id", value = "id(多个id值以,分隔)", required = true)
             @RequestParam(value = "id") String id) {
-        elasticSearchService.delete(index, type, id.split(","));
+        elasticSearchUtil.delete(index, type, id.split(","));
         return success(true);
     }
 
@@ -81,7 +82,7 @@ public class ElasticSearchEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "field") String field,
             @ApiParam(name = "value", value = "字段值", required = true)
             @RequestParam(value = "value") String value) {
-        elasticSearchService.deleteByField(index, type, field, value);
+        elasticSearchUtil.deleteByField(index, type, field, value);
         return success(true);
     }
 
@@ -97,7 +98,7 @@ public class ElasticSearchEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "source", value = "值", required = true)
             @RequestParam(value = "source") String source) throws Exception {
         Map<String, Object> sourceMap = objectMapper.readValue(source, Map.class);
-        Map<String, Object> result = elasticSearchService.update(index, type, id, sourceMap);
+        Map<String, Object> result = elasticSearchUtil.update(index, type, id, sourceMap);
         if (result != null) {
             return success(result);
         }
@@ -113,7 +114,7 @@ public class ElasticSearchEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "type") String type,
             @ApiParam(name = "id", value = "id", required = true)
             @PathVariable(value = "id") String id) {
-        Map<String, Object> result = elasticSearchService.findById(index, type, id);
+        Map<String, Object> result = elasticSearchUtil.findById(index, type, id);
         return success(result);
     }
 
@@ -128,7 +129,7 @@ public class ElasticSearchEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "field") String field,
             @ApiParam(name = "value", value = "字段值", required = true)
             @RequestParam(value = "value") Object value) {
-        List<Map<String, Object>> resultList = elasticSearchService.findByField(index, type, field, value);
+        List<Map<String, Object>> resultList = elasticSearchUtil.findByField(index, type, field, value);
         return success(resultList);
     }
 
@@ -145,16 +146,20 @@ public class ElasticSearchEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page") int page,
             @ApiParam(name = "size", value = "分页大小", required = true, defaultValue = "15")
             @RequestParam(value = "size") int size) throws Exception {
-        List<Map<String, Object>> filterMap;
-        if (!StringUtils.isEmpty(filter)) {
-            filterMap = objectMapper.readValue(filter, List.class);
-        } else {
-            filterMap = new ArrayList<>(0);
-        }
-        List<Map<String, Object>> resultList = elasticSearchService.page(index, type, filterMap, page, size);
-        int count = (int)elasticSearchService.count(index, type, filterMap);
+        List<Map<String, Object>> resultList = elasticSearchUtil.page(index, type, filter, page, size);
+        int count = (int)elasticSearchUtil.count(index, type, filter);
         Envelop envelop = getPageResult(resultList, count, page, size);
         return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.ElasticSearch.FindBySql, method = RequestMethod.GET)
+    @ApiOperation(value = "获取结果集")
+    public List<Map<String, Object>> findBySql (
+            @ApiParam(name = "fields", value = "字段", required = true)
+            @RequestParam(value = "fields") String fields,
+            @ApiParam(name = "sql", value = "SQL", required = true)
+            @RequestParam(value = "sql") String sql) throws Exception {
+        return elasticSearchUtil.findBySql(Arrays.asList(fields.split(",")), sql);
     }
 
 }

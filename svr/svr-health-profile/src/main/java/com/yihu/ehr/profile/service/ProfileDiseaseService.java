@@ -1,6 +1,5 @@
 package com.yihu.ehr.profile.service;
 
-import com.yihu.ehr.profile.feign.RedisServiceClient;
 import com.yihu.ehr.profile.feign.ResourceClient;
 import com.yihu.ehr.util.rest.Envelop;
 import org.apache.commons.collections.map.HashedMap;
@@ -21,7 +20,7 @@ public class ProfileDiseaseService {
     @Autowired
     private ResourceClient resource; //资源服务
     @Autowired
-    private RedisServiceClient redisServiceClient;
+    private RedisService redisService;
 
     /**
      * 根据时间获取病龄
@@ -84,7 +83,7 @@ public class ProfileDiseaseService {
             for (String healthProblemCode : hpMap.keySet()) {
                 Map<String, Object> obj = new HashedMap();
                 obj.put("healthProblemCode", healthProblemCode);
-                obj.put("healthProblemName", redisServiceClient.getHealthProblemRedis(healthProblemCode));
+                obj.put("healthProblemName", redisService.getHealthProblem(healthProblemCode));
                 int visitTimes = 0;
                 int hospitalizationTimes = 0;
                 List<Map<String, Object>> profileList = hpMap.get(healthProblemCode);

@@ -36,8 +36,8 @@ spring:
     test-on-borrow: true
 
 fast-dfs:
-  connect-timeout: 2
-  network-timeout: 30
+  connect-timeout: 10
+  network-timeout: 60
   charset: ISO8859-1
   pool:
     init-size: 5
@@ -47,6 +47,11 @@ fast-dfs:
     tracker-http-port: 80
     anti-steal-token: no
     secret-key: FastDFS1234567890
+
+elasticsearch:
+  pool:
+    init-size: 1
+    max-size: 5
 
 eip:
   tenant: jkzl
@@ -71,6 +76,9 @@ hadoop:
 fast-dfs:
   tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52:80
+elasticsearch:
+  cluster-name: elasticsearch
+  cluster-nodes: 172.19.103.9:9300
 
 ---
 spring:
@@ -86,10 +94,13 @@ spring:
       zk-host: node1.hde.h3c.com,node2.hde.h3c.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
 hadoop:
   hbase-properties:
-    - hbase.zookeeper.quorum: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com
+    hbase.zookeeper.quorum: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com
 fast-dfs:
   tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52:80
+elasticsearch:
+  cluster-name: elasticsearch
+  cluster-nodes: 172.19.103.9:9300
 
 ---
 spring:
@@ -109,10 +120,12 @@ spring:
 hadoop:
   hbase-properties:
     hbase.zookeeper.quorum: node1.ehr.h3c.com,node2.ehr.h3c.com,node3.ehr.h3c.com
-
 fast-dfs:
   tracker-server: 11.1.2.9:22122
   public-server: http://11.1.2.9:80
+elasticsearch:
+  cluster-name: elasticsearch
+  cluster-nodes: 11.1.2.7:9300
 
 ---
 spring:
@@ -135,6 +148,9 @@ hadoop:
 fast-dfs:
   tracker-server: 10.176.97.5:22122
   public-server: http://10.176.97.5:8888
+elasticsearch:
+  cluster-name: elasticsearch
+  cluster-nodes: 10.176.97.7:9300
 
 ---
 spring:
@@ -157,6 +173,9 @@ hadoop:
 fast-dfs:
   tracker-server: 100.100.1.157:22122
   public-server: http://100.100.1.157:8888
+elasticsearch:
+  cluster-name: elasticsearch
+  cluster-nodes: 100.100.1.158:9300
 
 ---
 spring:
@@ -179,3 +198,6 @@ hadoop:
 fast-dfs:
   tracker-server: 192.168.50.116:22122,192.168.50.119:22122
   public-server: http://192.168.50.37:8888
+elasticsearch:
+  cluster-name: elasticsearch
+  cluster-nodes: 172.10.10.2:9300

@@ -20,8 +20,8 @@ spring:
     test-on-borrow: true
 
 fast-dfs:
-  connect-timeout: 2
-  network-timeout: 30
+  connect-timeout: 10
+  network-timeout: 60
   charset: ISO8859-1
   pool:
     init-size: 5
@@ -31,6 +31,7 @@ fast-dfs:
     tracker-http-port: 80
     anti-steal-token: no
     secret-key: FastDFS1234567890
+
   server:
     dict-code: FASTDFSWLDZ #外链地址系统字典拼音编码
   index:
@@ -65,7 +66,7 @@ spring:
     password: weifuwu
 elasticsearch:
   cluster-name: elasticsearch
-  cluster-nodes: 172.17.110.17:9300
+  cluster-nodes: 172.19.103.9:9300
 fast-dfs:
   tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52:80
@@ -79,7 +80,7 @@ spring:
     password: GP8Qz4qU
 elasticsearch:
   cluster-name: elasticsearch
-  cluster-nodes: 172.17.110.17:9300
+  cluster-nodes: 11.1.2.7:9300
 fast-dfs:
   tracker-server: 11.1.2.9:22122
   public-server: http://11.1.2.9:80
@@ -93,7 +94,7 @@ spring:
     password: GP8Qz4qU
 elasticsearch:
   cluster-name: elasticsearch
-  cluster-nodes: 172.17.110.17:9300
+  cluster-nodes: 10.176.97.7:9300
 fast-dfs:
   tracker-server: 10.176.97.5:22122
   public-server: http://10.176.97.5:8888
