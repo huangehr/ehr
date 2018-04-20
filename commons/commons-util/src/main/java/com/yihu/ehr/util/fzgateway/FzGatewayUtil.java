@@ -28,7 +28,9 @@ public class FzGatewayUtil {
      * @return 响应参数
      */
     public static String httpPost(String gatewayUrl, String clientId, String clientVersion,
-                                  String api, Map apiParams, int apiVersion) throws Exception {
+                                  String api, Map apiParams, int apiVersion) {
+        String result = null;
+
         Map<String, String> authInfoMap = new HashMap<>();
         authInfoMap.put("ClientId", clientId);
         authInfoMap.put("ClientVersion", clientVersion);
@@ -36,15 +38,20 @@ public class FzGatewayUtil {
         authInfoMap.put("SessionKey", "");
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, Object> params = new HashMap<>();
-        params.put("AuthInfo", objectMapper.writeValueAsString(authInfoMap));
-        params.put("SequenceNo", DateUtil.getNowDate().toString());
-        params.put("Api", api);
-        params.put("Param", objectMapper.writeValueAsString(apiParams));
-        params.put("ParamType", 0);
-        params.put("OutType", 0);
-        params.put("V", apiVersion);
-        HttpResponse result = HttpUtils.doPost(gatewayUrl, params);
-        return result.getContent();
+        try {
+            params.put("AuthInfo", objectMapper.writeValueAsString(authInfoMap));
+            params.put("SequenceNo", DateUtil.getNowDate().toString());
+            params.put("Api", api);
+            params.put("Param", objectMapper.writeValueAsString(apiParams));
+            params.put("ParamType", 0);
+            params.put("OutType", 0);
+            params.put("V", apiVersion);
+            HttpResponse httpResponse = HttpUtils.doPost(gatewayUrl, params);
+            result = httpResponse.getContent();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 
 }
