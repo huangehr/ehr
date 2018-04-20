@@ -34,10 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -144,8 +141,9 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
         FileCopyUtils.copy(file.getInputStream(), stream);
         stream.close();
         EsSimplePackage pack = new EsSimplePackage();
-        pack.setPwd(password);
         pack.set_id(packageId);
+        pack.setPwd(password);
+        pack.setReceive_date(new Date());
         pack.setClient_id(clientId);
         StandardPackage standardPackage = packageResolveService.doResolve(pack, zipFile);
         standardPackage.setClientId(clientId);
