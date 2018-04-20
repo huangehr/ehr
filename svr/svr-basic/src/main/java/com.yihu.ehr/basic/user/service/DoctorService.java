@@ -363,7 +363,7 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
      * @param deptName 部门名称
      * @return 总部的科室医生信息
      */
-    public Map<String, Object> syncDoctor(Doctors doctor, String orgId, String deptName) {
+    public Map<String, Object> syncDoctor(Doctors doctor, String orgId, String deptName) throws  Exception{
         String api = "baseinfo.DoctorInfoApi.addDoctorFromMedicalCloud";
         int apiVersion = 1;
         Map<String, Object> params = new HashMap<>();

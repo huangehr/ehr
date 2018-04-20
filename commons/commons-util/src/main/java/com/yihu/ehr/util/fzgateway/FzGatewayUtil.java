@@ -2,7 +2,8 @@ package com.yihu.ehr.util.fzgateway;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.util.datetime.DateUtil;
-import com.yihu.ehr.util.http.HttpClientUtil;
+import com.yihu.ehr.util.http.HttpResponse;
+import com.yihu.ehr.util.http.HttpUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,15 +29,15 @@ public class FzGatewayUtil {
      */
     public static String httpPost(String gatewayUrl, String clientId, String clientVersion,
                                   String api, Map apiParams, int apiVersion) {
+        String result = null;
+
         Map<String, String> authInfoMap = new HashMap<>();
         authInfoMap.put("ClientId", clientId);
         authInfoMap.put("ClientVersion", clientVersion);
         authInfoMap.put("Sign", "");
         authInfoMap.put("SessionKey", "");
-
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, Object> params = new HashMap<>();
-        String result = null;
         try {
             params.put("AuthInfo", objectMapper.writeValueAsString(authInfoMap));
             params.put("SequenceNo", DateUtil.getNowDate().toString());
@@ -45,11 +46,11 @@ public class FzGatewayUtil {
             params.put("ParamType", 0);
             params.put("OutType", 0);
             params.put("V", apiVersion);
-            result = HttpClientUtil.doPost(gatewayUrl, params);
+            HttpResponse httpResponse = HttpUtils.doPost(gatewayUrl, params);
+            result = httpResponse.getContent();
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return result;
     }
 

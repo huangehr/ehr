@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -85,7 +86,7 @@ public class PortalMessageRemindService extends BaseJpaService<ProtalMessageRemi
      * @return
      */
     public DataList listMessageRemindValue(String appId, String toUserId, String typeId,String type,int page, int size,String notifie) throws Exception {
-        String date = DateUtil.getNowDate(DateUtil.DEFAULT_YMDHMSDATE_FORMAT);
+        String date = DateUtil.getNowDate(DateUtil.DEFAULT_DATE_YMD_FORMAT);
         String notifieSql= "";
         if(StringUtils.isNotEmpty(notifie)){
             notifieSql = " AND p.notifie_flag = '"+ notifie +"' ";
@@ -99,7 +100,7 @@ public class PortalMessageRemindService extends BaseJpaService<ProtalMessageRemi
                   " where  pt.state='0' and pt.type='"+type+"'"+" AND pt.classification='0'"+
                     " AND p.type_id='" +typeId+"'" +
                     " AND p.to_user_id='" +toUserId+"' " +" AND p.app_id='" +appId+"' " +" AND re.state='2'"+
-                    " AND re.register_date >  '"+ date +"' "+ notifieSql+" order by p.create_date desc ";
+                    " AND re.register_date >= '"+ date +"' "+ notifieSql+" order by p.create_date desc ";
         }else if(StringUtils.isNotEmpty(type )&& type.equals("100")){
             //满意度调查，获取待评价消息
             sql = "select p.id AS id, p.app_id AS appId, p.app_name AS appName, p.from_user_id AS fromUserId, p.type_id AS typeId, p.content AS content, p.work_uri AS workUri, p.readed AS readed, p.create_date AS createDate, p.to_user_id AS toUserId, p.message_template_id AS messageTemplateId, p.received_messages AS receivedMessages, p.order_id AS orderId, p.visit_time AS visitTime, p.notifie_flag AS notifieFlag, p.portal_messager_template_type AS  portalMessagerTemplateType " +
