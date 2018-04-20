@@ -1,8 +1,8 @@
 package com.yihu.ehr.oauth2.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.ServiceApi;
-import com.yihu.ehr.model.app.MApp;
 import com.yihu.ehr.model.user.EhrUserSimple;
 import com.yihu.ehr.oauth2.model.VerifyCode;
 import com.yihu.ehr.oauth2.oauth2.EhrOAuth2ExceptionTranslator;
@@ -45,7 +45,6 @@ import java.util.Map;
 public class EhrAuthLoginEndpoint extends AbstractEndpoint {
 
     private static final Logger LOG = LoggerFactory.getLogger(EhrAuthLoginEndpoint.class);
-    private static final String DEFAULT_GRANT_TYPE = "password";
 
     private OAuth2RequestFactory oAuth2RequestFactory;
     private OAuth2RequestValidator oAuth2RequestValidator = new DefaultOAuth2RequestValidator();
@@ -73,7 +72,7 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
     @Value("${fz-gateway.handlerId}")
     private String fzHandlerId;
     @Autowired
-    protected ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
 
 
     @PostConstruct
@@ -91,7 +90,7 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
         }
         Map<String, String> param = new HashMap<>();
         if (StringUtils.isEmpty(parameters.get("verify_code"))) {
-            param.put("grant_type", DEFAULT_GRANT_TYPE);
+            param.put("grant_type", "password");
             param.put("password", parameters.get("password"));
         } else {
             param.put("grant_type", "verify_code");
@@ -119,25 +118,24 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
         if (request.getHeader("login-device") != null && request.getHeader("login-device").equals("mobile")) {
             ehrRedisTokenStore.removeAccessToken(token.getValue());
             ehrRedisTokenStore.removeRefreshToken(token.getRefreshToken().getValue());
-            token = getTokenGranter().grant(DEFAULT_GRANT_TYPE, tokenRequest);
+            token = getTokenGranter().grant(param.get("grant_type"), tokenRequest);
         }
-        EhrUserSimple ehrUserSimple = ehrUserDetailsService.loadUserSimpleByUsername(parameters.get("username"));
+        EhrUserSimple ehrUserSimple = ehrUserDetailsService.loadUserSimpleByUsername(param.get("username"));
         if (token == null) {
-            throw new UnsupportedGrantTypeException("Unsupported grant type: " + DEFAULT_GRANT_TYPE);
+            throw new UnsupportedGrantTypeException("Unsupported grant type: " + param.get("grant_type"));
         } else {
             ehrUserSimple.setAccessToken(token.getValue());
             ehrUserSimple.setTokenType(token.getTokenType());
             ehrUserSimple.setExpiresIn(token.getExpiresIn());
             ehrUserSimple.setRefreshToken(token.getRefreshToken().getValue());
-            ehrUserSimple.setUser(parameters.get("username"));
+            ehrUserSimple.setUser(param.get("username"));
             ehrUserSimple.setState(parameters.get("state"));
         }
         return getResponse(ehrUserSimple);
     }
 
     @RequestMapping(value = ServiceApi.Authentication.VerifyCode, method = RequestMethod.POST)
-    public Envelop verifyCode(@RequestParam Map<String, String> parameters) throws  Exception{
-        Envelop envelop =new Envelop();
+    public ResponseEntity<Envelop> verifyCode(@RequestParam Map<String, String> parameters) throws  Exception{
         String client_id = parameters.get("client_id");
         String username = parameters.get("username");
         VerifyCode verifyCode = new VerifyCode();
@@ -156,9 +154,10 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
         apiParamMap.put("content", content);
         //渠道号
         apiParamMap.put("clientId", fzClientId);
-        String resultStr = FzGatewayUtil.httpPost(fzGatewayUrl,fzClientId,fzClientVersion,api,apiParamMap, 1);
-        if (resultStr != null) {
-            Map<String, Object> resultMap = objectMapper.readValue(resultStr, Map.class);
+        String result = FzGatewayUtil.httpPost(fzGatewayUrl,fzClientId,fzClientVersion,api,apiParamMap, 1);
+        Envelop envelop = new Envelop();
+        if (!StringUtils.isEmpty(result)) {
+            Map<String, Object> resultMap = objectMapper.readValue(result, Map.class);
             Integer resultCode = 0;
             if (null != resultMap.get("Code") && !"".equals(resultMap.get("Code"))) {
                 resultCode = Integer.valueOf(resultMap.get("Code").toString());
@@ -171,17 +170,20 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
                 ehrRedisVerifyCodeService.store(client_id, username, random, 600000);
                 envelop.setSuccessFlg(true);
                 envelop.setObj(verifyCode);
-                envelop.setErrorMsg("短信验证码发送成功！");
             } else {
                 envelop.setSuccessFlg(false);
                 envelop.setErrorCode(resultCode);
                 envelop.setErrorMsg("短信验证码发送失败！");
             }
-        }else{
+        } else {
             envelop.setSuccessFlg(false);
+            envelop.setErrorCode(ErrorCode.REQUEST_NOT_COMPLETED.value());
             envelop.setErrorMsg("短信验证码发送失败！");
         }
-        return envelop;
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Cache-Control", "no-store");
+        headers.set("Pragma", "no-cache");
+        return new ResponseEntity<>(envelop, headers, HttpStatus.OK);
     }
 
     @RequestMapping(value = ServiceApi.Authentication.VerifyCodeExpire, method = RequestMethod.POST)
@@ -193,7 +195,10 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
         int nextRequestTime = 60 + (expiresIn - 600 ) > 0 ? 60 + (expiresIn - 600 ) : 0;
         verifyCode.setNextRequestTime(nextRequestTime);
         verifyCode.setExpiresIn(expiresIn);
-        return new ResponseEntity<>(verifyCode, HttpStatus.OK);
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Cache-Control", "no-store");
+        headers.set("Pragma", "no-cache");
+        return new ResponseEntity<>(verifyCode, headers, HttpStatus.OK);
     }
 
     @Override
