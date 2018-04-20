@@ -1,5 +1,5 @@
 server:
-  port: ${ag-ehr-cloud.server.port}
+  port: ${ag-cloud.server.port}
 #  ssl:
 #    key-store-password: 123456
 #    key-password: 123456
