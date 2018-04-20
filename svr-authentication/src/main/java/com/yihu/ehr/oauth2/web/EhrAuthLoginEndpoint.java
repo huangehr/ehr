@@ -1,6 +1,7 @@
 package com.yihu.ehr.oauth2.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.model.user.EhrUserSimple;
 import com.yihu.ehr.oauth2.model.VerifyCode;
@@ -71,7 +72,7 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
     @Value("${fz-gateway.handlerId}")
     private String fzHandlerId;
     @Autowired
-    protected ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
 
 
     @PostConstruct
@@ -153,10 +154,10 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
         apiParamMap.put("content", content);
         //渠道号
         apiParamMap.put("clientId", fzClientId);
-        String resultStr = FzGatewayUtil.httpPost(fzGatewayUrl,fzClientId,fzClientVersion,api,apiParamMap, 1);
+        String result = FzGatewayUtil.httpPost(fzGatewayUrl,fzClientId,fzClientVersion,api,apiParamMap, 1);
         Envelop envelop = new Envelop();
-        if (resultStr != null) {
-            Map<String, Object> resultMap = objectMapper.readValue(resultStr, Map.class);
+        if (!StringUtils.isEmpty(result)) {
+            Map<String, Object> resultMap = objectMapper.readValue(result, Map.class);
             Integer resultCode = 0;
             if (null != resultMap.get("Code") && !"".equals(resultMap.get("Code"))) {
                 resultCode = Integer.valueOf(resultMap.get("Code").toString());
@@ -172,9 +173,11 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
             } else {
                 envelop.setSuccessFlg(false);
                 envelop.setErrorCode(resultCode);
+                envelop.setErrorMsg("短信验证码发送失败！");
             }
         } else {
             envelop.setSuccessFlg(false);
+            envelop.setErrorCode(ErrorCode.REQUEST_NOT_COMPLETED.value());
             envelop.setErrorMsg("短信验证码发送失败！");
         }
         HttpHeaders headers = new HttpHeaders();
