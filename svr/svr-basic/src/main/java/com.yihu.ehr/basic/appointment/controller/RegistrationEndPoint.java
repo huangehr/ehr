@@ -187,6 +187,21 @@ public class RegistrationEndPoint extends EnvelopRestEndPoint {
         try {
             Registration updateEntity = registrationService.getById(id);
             updateEntity.setState(state);
+            if (state == 1) {
+                updateEntity.setStateDesc("待付款");
+            } else if (state == 2) {
+                updateEntity.setStateDesc("待就诊");
+            } else if (state == 11) {
+                updateEntity.setStateDesc("预约中");
+            } else if (state == 22) {
+                updateEntity.setStateDesc("退款中");
+            } else if (state == 99) {
+                updateEntity.setStateDesc("已退号");
+            } else if (state == -1) {
+                updateEntity.setStateDesc("系统取消");
+            } else if (state == 3) {
+                updateEntity.setStateDesc("已就诊");
+            }
             updateEntity = registrationService.save(updateEntity);
 
             envelop.setObj(updateEntity);
