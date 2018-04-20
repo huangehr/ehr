@@ -65,23 +65,20 @@ public class PackageResourceJob implements InterruptableJob {
                 doResolve(pack, packageMgrClient);
             }
         } catch (Exception e) {
-            e.printStackTrace();
             if (pack != null) {
                 try {
-                    System.out.println(objectMapper.writeValueAsString(pack));
-                    if (StringUtils.isBlank(e.getMessage())) {
-                        packageMgrClient.reportStatus(pack.get_id(), ArchiveStatus.Failed, "Internal server error, please see task log for detail message.");
-                        PackResolveLogger.error("Internal server error, please see task log for detail message.", e);
-                    } else {
+                    if (StringUtils.isNotBlank(e.getMessage())) {
                         packageMgrClient.reportStatus(pack.get_id(), ArchiveStatus.Failed, e.getMessage());
                         PackResolveLogger.error(e.getMessage());
+                    } else {
+                        packageMgrClient.reportStatus(pack.get_id(), ArchiveStatus.Failed, "Internal server error, please see task log for detail message.");
+                        PackResolveLogger.error("Internal server error, please see task log for detail message.", e);
                     }
                 } catch (Exception e1) {
-                    e1.printStackTrace();
-                    PackResolveLogger.error(e1.getMessage());
+                    PackResolveLogger.error("Execute feign fail cause by:" + e1.getMessage());
                 }
             } else {
-                PackResolveLogger.error(e.getMessage());
+                PackResolveLogger.error("Empty pack cause by:" + e.getMessage());
             }
         }
     }

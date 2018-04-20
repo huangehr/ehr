@@ -1,28 +1,33 @@
-package com.yihu.ehr.model.portal;
+package com.yihu.ehr.basic.portal.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.yihu.ehr.model.portal.MRegistration;
+import org.hibernate.annotations.GenericGenerator;
 
+import javax.persistence.*;
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 /**
+ * 消息提醒
+ *
  * @author HZY
  * @vsrsion 1.0
- * Created at 2017/2/21.
+ * Created at 2017/2/20.
  */
-public class MMessageRemind {
+@Entity
+@Table(name = "portal_message_remind", schema = "", catalog = "healtharchive")
+public class ProtalMessageRemind {
 
     private Long id;
     private String appId;
     private String appName;
     private String fromUserId;
-    private String toUserId;
     private String typeId;
     private String content;
     private String workUri;
     private Integer readed;
     private Date createDate;
+    private String toUserId;
     private Long messageTemplateId;
     /**
      * 推送过来的消息
@@ -34,25 +39,21 @@ public class MMessageRemind {
      */
     private String visitTime;
     /**
-     * 就诊部门地址
-     */
-    private String deptAdress;
-    /**
-     * 温馨提示
-     */
-    private String notice;
-    /**
-     * 预约挂号订单id
+     * 健康之路-预约挂号订单号
      */
     private String orderId;
-    private String fromUserName;
-    private String toUserName;
-    private MRegistration mRegistration;
-    private String portalMessagerTemplateType;
     /**
      * 我的就诊-是否通知：0为通知，1为不通知。我的档案：0未评价、1为已评价
      */
     private String notifieFlag;
+    /**
+     * 总部推送消息类型 ，101：挂号结果推送，102：退号结果推送，-101：订单操作推送，100：满意度调查
+     */
+    private String portalMessagerTemplateType;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id", unique = true, nullable = false)
     public Long getId() {
         return id;
     }
@@ -60,7 +61,7 @@ public class MMessageRemind {
     public void setId(Long id) {
         this.id = id;
     }
-
+    @Column(name = "app_id", nullable = true, insertable = true, updatable = true)
     public String getAppId() {
         return appId;
     }
@@ -68,7 +69,7 @@ public class MMessageRemind {
     public void setAppId(String appId) {
         this.appId = appId;
     }
-
+    @Column(name = "app_name", nullable = true, insertable = true, updatable = true)
     public String getAppName() {
         return appName;
     }
@@ -76,7 +77,7 @@ public class MMessageRemind {
     public void setAppName(String appName) {
         this.appName = appName;
     }
-
+    @Column(name = "from_user_id", nullable = true, insertable = true, updatable = true)
     public String getFromUserId() {
         return fromUserId;
     }
@@ -84,15 +85,7 @@ public class MMessageRemind {
     public void setFromUserId(String fromUserId) {
         this.fromUserId = fromUserId;
     }
-
-    public String getToUserId() {
-        return toUserId;
-    }
-
-    public void setToUserId(String toUserId) {
-        this.toUserId = toUserId;
-    }
-
+    @Column(name = "type_id", nullable = true, insertable = true, updatable = true)
     public String getTypeId() {
         return typeId;
     }
@@ -100,7 +93,7 @@ public class MMessageRemind {
     public void setTypeId(String typeId) {
         this.typeId = typeId;
     }
-
+    @Column(name = "content", nullable = true, insertable = true, updatable = true)
     public String getContent() {
         return content;
     }
@@ -108,7 +101,7 @@ public class MMessageRemind {
     public void setContent(String content) {
         this.content = content;
     }
-
+    @Column(name = "work_uri", nullable = true, insertable = true, updatable = true)
     public String getWorkUri() {
         return workUri;
     }
@@ -116,7 +109,7 @@ public class MMessageRemind {
     public void setWorkUri(String workUri) {
         this.workUri = workUri;
     }
-
+    @Column(name = "readed", nullable = true, insertable = true, updatable = true)
     public Integer getReaded() {
         return readed;
     }
@@ -124,7 +117,8 @@ public class MMessageRemind {
     public void setReaded(Integer readed) {
         this.readed = readed;
     }
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @Column(name = "create_date", nullable = true, insertable = true, updatable = true)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getCreateDate() {
         return createDate;
     }
@@ -132,7 +126,15 @@ public class MMessageRemind {
     public void setCreateDate(Date createDate) {
         this.createDate = createDate;
     }
+    @Column(name = "to_user_id", nullable = true, insertable = true, updatable = true)
+    public String getToUserId() {
+        return toUserId;
+    }
 
+    public void setToUserId(String toUserId) {
+        this.toUserId = toUserId;
+    }
+    @Column(name = "message_template_id", nullable = true, insertable = true, updatable = true)
     public Long getMessageTemplateId() {
         return messageTemplateId;
     }
@@ -140,7 +142,7 @@ public class MMessageRemind {
     public void setMessageTemplateId(Long messageTemplateId) {
         this.messageTemplateId = messageTemplateId;
     }
-
+    @Column(name = "received_messages", nullable = true, insertable = true, updatable = true)
     public String getReceivedMessages() {
         return receivedMessages;
     }
@@ -148,6 +150,7 @@ public class MMessageRemind {
     public void setReceivedMessages(String receivedMessages) {
         this.receivedMessages = receivedMessages;
     }
+    @Column(name = "visit_time", nullable = true, insertable = true, updatable = true)
     public String getVisitTime() {
         return visitTime;
     }
@@ -155,23 +158,7 @@ public class MMessageRemind {
     public void setVisitTime(String visitTime) {
         this.visitTime = visitTime;
     }
-
-    public String getDeptAdress() {
-        return deptAdress;
-    }
-
-    public void setDeptAdress(String deptAdress) {
-        this.deptAdress = deptAdress;
-    }
-
-    public String getNotice() {
-        return notice;
-    }
-
-    public void setNotice(String notice) {
-        this.notice = notice;
-    }
-
+    @Column(name = "order_id", nullable = true, insertable = true, updatable = true)
     public String getOrderId() {
         return orderId;
     }
@@ -179,31 +166,15 @@ public class MMessageRemind {
     public void setOrderId(String orderId) {
         this.orderId = orderId;
     }
-
-    public String getFromUserName() {
-        return fromUserName;
+    @Column(name = "notifie_flag", nullable = true, insertable = true, updatable = true)
+    public String getNotifieFlag() {
+        return notifieFlag;
     }
 
-    public void setFromUserName(String fromUserName) {
-        this.fromUserName = fromUserName;
+    public void setNotifieFlag(String notifieFlag) {
+        this.notifieFlag = notifieFlag;
     }
-
-    public String getToUserName() {
-        return toUserName;
-    }
-
-    public void setToUserName(String toUserName) {
-        this.toUserName = toUserName;
-    }
-
-    public MRegistration getmRegistration() {
-        return mRegistration;
-    }
-
-    public void setmRegistration(MRegistration mRegistration) {
-        this.mRegistration = mRegistration;
-    }
-
+    @Column(name = "portal_messager_template_type", nullable = true, insertable = true, updatable = true)
     public String getPortalMessagerTemplateType() {
         return portalMessagerTemplateType;
     }
@@ -212,11 +183,4 @@ public class MMessageRemind {
         this.portalMessagerTemplateType = portalMessagerTemplateType;
     }
 
-    public String getNotifieFlag() {
-        return notifieFlag;
-    }
-
-    public void setNotifieFlag(String notifieFlag) {
-        this.notifieFlag = notifieFlag;
-    }
 }
