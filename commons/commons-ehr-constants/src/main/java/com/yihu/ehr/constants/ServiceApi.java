@@ -1487,5 +1487,13 @@ public class ServiceApi {
         public static final String Open = "/fz/open";
     }
 
-
+    /**
+     * APP消息推送接口
+     */
+    public static class AppPushMessage {
+        public static final String single = "/AppPushMessage/single";
+        public static final String list = "/AppPushMessage/list";
+        public static final String app = "/AppPushMessage/app";
+        public static final String tarns = "/AppPushMessage/tarnsmission";
+    }
 }
