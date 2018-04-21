@@ -53,7 +53,7 @@ public class ElasticSearchClient {
             //settingSource.put("index.translog.durability", "async"); //异步更新
             //settingSource.put("index.refresh_interval", "30s"); //刷新间隔
             //settingSource.put("index.number_of_replicas", 1); //副本数
-            //settingSource.put("index.number_of_shards", 3); //
+            //settingSource.put("index.number_of_shards", 3); //分片数
             //createIndexRequestBuilder.setSettings(settingSource);
             if (setting != null && !setting.isEmpty()) {
                 createIndexRequestBuilder.setSettings(setting);

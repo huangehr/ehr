@@ -1,10 +1,9 @@
-package com.yihu.ehr.basic.patient.controller;
+package com.yihu.ehr.resolve.controller;
 
-import com.yihu.ehr.basic.patient.service.ArchiveRelationService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
-import com.yihu.ehr.entity.patient.ArchiveRelation;
+import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -16,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * EndPoint - 档案关联
@@ -23,17 +23,18 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "AmbulanceEndPoint", description = "档案关联", tags = {"档案识别-档案关联"})
+@Api(value = "ArchiveRelationEndPoint", description = "档案关联", tags = {"档案解析服务-档案识别关联信息"})
 public class ArchiveRelationEndPoint extends EnvelopRestEndPoint {
 
+    private static final String INDEX = "archive_relation";
+    private static final String TYPE = "info";
+
     @Autowired
-    private ArchiveRelationService archiveRelationService;
+    private ElasticSearchUtil elasticSearchUtil;
 
     @RequestMapping(value = ServiceApi.ArchiveRelation.Crud, method = RequestMethod.GET)
     @ApiOperation(value = "获取档案关联列表")
     public Envelop list(
-            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段")
-            @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
             @RequestParam(value = "filters", required = false) String filters,
             @ApiParam(name = "sorts", value = "排序，规则参见说明文档")
@@ -42,8 +43,8 @@ public class ArchiveRelationEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page") int page,
             @ApiParam(name = "size", value = "页码", required = true, defaultValue = "15")
             @RequestParam(value = "size") int size) throws Exception {
-        List<ArchiveRelation> archiveRelationList = archiveRelationService.search(fields, filters, sorts, page, size);
-        int count = (int)archiveRelationService.getCount(filters);
+        List<Map<String, Object>> archiveRelationList  = elasticSearchUtil.page(INDEX, TYPE, filters, sorts, page, size);
+        int count = (int)elasticSearchUtil.count(INDEX, TYPE, filters);
         Envelop envelop = getPageResult(archiveRelationList, count, page, size);
         return envelop;
     }
