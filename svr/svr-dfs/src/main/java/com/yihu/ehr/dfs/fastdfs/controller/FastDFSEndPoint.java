@@ -287,7 +287,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
         // 删除文件
         fastDFSService.delete(groupName, remoteFileName);
         // 删除索引
-        elasticSearchUtil.delete(indexName, indexType, id.split(","));
+        elasticSearchUtil.delete(indexName, indexType, id);
         return success(true);
     }
 
@@ -313,9 +313,9 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
         for (Map<String, Object> resultMap : resultList) {
             String id = resultMap.get("_id").toString();
             ids.append(id + ",");
-            // 删除索引
-            elasticSearchUtil.delete(indexName, indexType, ids.toString().split(","));
         }
+        // 删除索引
+        elasticSearchUtil.bulkDelete(indexName, indexType, ids.toString().split(","));
         return success(true);
     }
 
@@ -342,7 +342,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
             fastDFSService.delete(groupName, remoteFileName);
         }
         // 删除索引
-        elasticSearchUtil.delete(indexName, indexType, ids.toString().split(","));
+        elasticSearchUtil.bulkDelete(indexName, indexType, ids.toString().split(","));
         return success(true);
     }
 
@@ -391,7 +391,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
         source.put("modifyDate", nowStr);
         Map<String, Object> resultMap = elasticSearchUtil.update(indexName, indexType, _id, source);
         String newPath = groupName.substring(1, groupName.length() - 1) + "/" + remoteFileName.substring(1, remoteFileName.length() - 1);
-        if(null == publicServer || publicServer.isEmpty()) {
+        if (null == publicServer || publicServer.isEmpty()) {
             publicServer = getPublicUrl().getDetailModelList();
         }
         String publicUrl = publicServer.get((int)(Math.random() * publicServer.size()));
@@ -580,16 +580,6 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
         for (Map<String, Object> resultMap : resultList) {
             String storagePath = resultMap.get("path").toString();
             String path = storagePath.replaceAll(":", "/");
-            /**
-            try {
-                storagePath = URLEncoder.encode(storagePath,"ISO8859-1");
-            }catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-                envelop.setSuccessFlg(false);
-                envelop.setErrorMsg(e.getMessage());
-                return envelop;
-            }
-            */
             fileStrList.add(path);
         }
         return success(fileStrList);
@@ -641,7 +631,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
             Page<SystemDictEntry> page =  systemDictEntryService.findByDictId(systemDict.getId(), 0, 100);
             if (page != null) {
                 List<SystemDictEntry> systemDictEntryList = page.getContent();
-                publicServer = new ArrayList<String>(systemDictEntryList.size());
+                publicServer = new ArrayList<>(systemDictEntryList.size());
                 for (SystemDictEntry dictEntry : systemDictEntryList) {
                     publicServer.add(String.valueOf(dictEntry.getValue()));
                 }

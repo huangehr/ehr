@@ -3,6 +3,7 @@ package com.yihu.ehr.elasticsearch;
 import com.alibaba.druid.pool.*;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequestBuilder;
+import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexResponse;
@@ -46,12 +47,14 @@ public class ElasticSearchClient {
         try {
             CreateIndexRequestBuilder createIndexRequestBuilder = transportClient.admin().indices().prepareCreate(index);
             createIndexRequestBuilder.addMapping(type, xContentBuilder);
-            /*Map<String, Object> settingSource = new HashMap<>();
-            settingSource.put("index.translog.flush_threshold_size", "1g");
-            settingSource.put("index.translog.flush_threshold_ops", "100000");
-            settingSource.put("index.translog.durability", "async");
-            settingSource.put("index.number_of_replicas", 1);
-            settingSource.put("index.number_of_shards", 3);*/
+            //Map<String, Object> settingSource = new HashMap<>();
+            //settingSource.put("index.translog.flush_threshold_size", "1g"); //log文件大小
+            //settingSource.put("index.translog.flush_threshold_ops", "100000"); //flush触发次数
+            //settingSource.put("index.translog.durability", "async"); //异步更新
+            //settingSource.put("index.refresh_interval", "30s"); //刷新间隔
+            //settingSource.put("index.number_of_replicas", 1); //副本数
+            //settingSource.put("index.number_of_shards", 3); //
+            //createIndexRequestBuilder.setSettings(settingSource);
             if (setting != null && !setting.isEmpty()) {
                 createIndexRequestBuilder.setSettings(setting);
             }
@@ -89,12 +92,23 @@ public class ElasticSearchClient {
         }
     }
 
-    public void delete(String index, String type, String [] idArr) {
+    public void delete(String index, String type, String id) {
         TransportClient transportClient = elasticSearchPool.getClient();
         try {
+            transportClient.prepareDelete(index, type, id).get();
+        } finally {
+            elasticSearchPool.releaseClient(transportClient);
+        }
+    }
+
+    public void bulkDelete(String index, String type, String [] idArr) {
+        TransportClient transportClient = elasticSearchPool.getClient();
+        try {
+            BulkRequestBuilder bulkRequestBuilder = transportClient.prepareBulk();
             for (String id : idArr) {
-                transportClient.prepareDelete(index, type, id).get();
+                bulkRequestBuilder.add(transportClient.prepareDelete(index, type, id));
             }
+            bulkRequestBuilder.get();
         } finally {
             elasticSearchPool.releaseClient(transportClient);
         }
@@ -105,6 +119,20 @@ public class ElasticSearchClient {
         try {
             transportClient.prepareUpdate(index, type, id).setDoc(source).get();
             return findById(index, type, id);
+        } finally {
+            elasticSearchPool.releaseClient(transportClient);
+        }
+    }
+
+    public void bulkUpdate (String index, String type, List<Map<String, Object>> source) throws DocumentMissingException {
+        TransportClient transportClient = elasticSearchPool.getClient();
+        try {
+            BulkRequestBuilder bulkRequestBuilder = transportClient.prepareBulk();
+            source.forEach(item -> {
+                String _id = (String)item.remove("_id");
+                bulkRequestBuilder.add(transportClient.prepareUpdate(index, type, _id).setDoc(item));
+            });
+            bulkRequestBuilder.get();
         } finally {
             elasticSearchPool.releaseClient(transportClient);
         }
