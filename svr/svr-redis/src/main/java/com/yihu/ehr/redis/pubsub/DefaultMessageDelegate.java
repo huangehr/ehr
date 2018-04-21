@@ -50,6 +50,10 @@ public class DefaultMessageDelegate implements MessageDelegate {
 
             List<RedisMqSubscriber> subscriberList = redisMqSubscriberService.findByChannel(channel);
             if (subscriberList.size() == 0) {
+                logger.info("\n--- Redis发布订阅消费的消息 ---\nchannel: " + channel
+                        + ", messageLogId: " + messageLogId
+                        + ", message: " + messageContent);
+
                 // 消息队列没有订阅者的场合，
                 RedisMqMessageLog redisMqMessageLog = redisMqMessageLogService.getById(messageLogId);
                 redisMqMessageLog.setStatus("1");
