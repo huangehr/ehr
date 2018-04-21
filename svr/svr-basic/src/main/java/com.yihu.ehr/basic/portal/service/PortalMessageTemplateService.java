@@ -103,6 +103,9 @@ public class PortalMessageTemplateService extends BaseJpaService<PortalMessageTe
             if(null != newEntity){
                 value = String.valueOf(MethodUtil.invokeGet(newEntity, content.getCode()))==null?"":String.valueOf(MethodUtil.invokeGet(newEntity, content.getCode()));
             }
+            if (value.equals("null")) {
+                value = "";
+            }
             Map<String, String> maps = new LinkedHashMap<>();
             maps.put("code", content.getCode());
             maps.put("name", content.getName());
