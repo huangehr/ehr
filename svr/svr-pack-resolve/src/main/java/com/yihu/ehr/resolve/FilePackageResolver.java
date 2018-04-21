@@ -16,6 +16,7 @@ import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.resolve.service.resource.stage1.PackModelFactory;
 import com.yihu.ehr.resolve.service.resource.stage2.RedisService;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
+import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.log.LogService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,69 +53,70 @@ public class FilePackageResolver extends PackageResolver {
     public void resolve(StandardPackage profile, File root) throws Exception {
         FilePackage filePackModel = (FilePackage) profile;
 
-        File metaFile = new File(root.getAbsolutePath() + File.separator + "documents.json");
-        parseFile(filePackModel, metaFile);
+        File documents = new File(root.getAbsolutePath() + File.separator + "documents.json");
+        parseFile(filePackModel, documents);
     }
 
-    private void parseFile(FilePackage profile, File metaFile) throws Exception {
-        JsonNode root = objectMapper.readTree(metaFile);
+    private void parseFile(FilePackage profile, File documents) throws Exception {
+        JsonNode root = objectMapper.readTree(documents);
 
-        String demographicId = root.get("demographic_id") == null ? null : root.get("demographic_id").asText();
-        String patientId = root.get("patient_id").asText();
-        String eventNo = root.get("event_no").asText();
-        int eventType = root.get("event_type").asInt();
-        String orgCode = root.get("org_code").asText();
-        String eventDate = root.get("event_time").asText();
-        String createDate = root.get("create_date") == null ? null : root.get("create_date").asText();
-        String cdaVersion = root.get("inner_version").asText();
-        //if (cdaVersion.equals("000000000000")) throw new LegacyPackageException("Package is collected via cda version 00000000000, ignored.");
-
+        String demographicId = root.get("demographic_id") == null ? "" : root.get("demographic_id").asText();
+        String patientId = root.get("patient_id") == null ? "" : root.get("patient_id").asText();
+        String eventNo = root.get("event_no") == null ? "" : root.get("event_no").asText();
+        int eventType = root.get("event_type") == null ? -1 : root.get("event_type").asInt();
+        String orgCode = root.get("org_code") == null ? "" : root.get("org_code").asText();
+        String eventDate = root.get("event_time") == null ? "" : root.get("event_time").asText();
+        String createDate = root.get("create_date") == null ? "" : root.get("create_date").asText();
+        String cdaVersion = root.get("inner_version") == null ? "" : root.get("inner_version").asText();
+        /*if (cdaVersion.equals("000000000000")) {
+            throw new LegacyPackageException("Package is collected via cda version 00000000000, ignored.");
+        }*/
         profile.setDemographicId(demographicId);
         profile.setPatientId(patientId);
         profile.setEventNo(eventNo);
-        profile.setEventType(EventType.create(eventType));
+        if (eventType != -1) {
+            profile.setEventType(EventType.create(eventType));
+        }
         profile.setOrgCode(orgCode);
+        profile.setEventDate(DateUtil.strToDate(eventDate));
+        profile.setCreateDate(DateUtil.strToDate(createDate));
         profile.setCdaVersion(cdaVersion);
-        profile.setCreateDate(DateTimeUtil.simpleDateParse(createDate));
-        profile.setEventDate(DateTimeUtil.simpleDateParse(eventDate));
 
         parseDataSets(profile, (ObjectNode) root.get("data_sets"));
-        parseFiles(profile, (ArrayNode) root.get("files"), metaFile.getParent() + File.separator + PackModelFactory.DocumentFolder);
+        parseFiles(profile, (ArrayNode) root.get("files"), documents.getParent() + File.separator + PackModelFactory.DocumentFolder);
     }
 
     private void parseDataSets(FilePackage profile, ObjectNode dataSets) {
-        if (dataSets == null) return;
-
+        if (dataSets == null) {
+            return;
+        }
         Iterator<Map.Entry<String, JsonNode>> iterator = dataSets.fields();
         while (iterator.hasNext()) {
             Map.Entry<String, JsonNode> item = iterator.next();
             String dataSetCode = item.getKey();
-            ArrayNode records = (ArrayNode) item.getValue();
-
             PackageDataSet dataSet = new PackageDataSet();
-            dataSet.setCode(dataSetCode);
             dataSet.setPatientId(profile.getPatientId());
             dataSet.setEventNo(profile.getEventNo());
-            dataSet.setOrgCode(profile.getOrgCode());
             dataSet.setCdaVersion(profile.getCdaVersion());
-
+            dataSet.setCode(dataSetCode);
+            dataSet.setOrgCode(profile.getOrgCode());
+            dataSet.setEventTime(profile.getEventDate());
+            dataSet.setCreateTime(profile.getCreateDate());
+            ArrayNode records = (ArrayNode) item.getValue();
             for (int i = 0; i < records.size(); ++i) {
                 MetaDataRecord record = new MetaDataRecord();
-
                 ObjectNode jsonRecord = (ObjectNode) records.get(i);
                 Iterator<Map.Entry<String, JsonNode>> filedIterator = jsonRecord.fields();
                 while (filedIterator.hasNext()) {
                     Map.Entry<String, JsonNode> field = filedIterator.next();
                     //String metaData = translateMetaDataCode(profile.getCdaVersion(), dataSetCode, field.getKey());
-                    String value = field.getValue().asText();
+                    String value = field.getValue().asText().equals("null") ? "" : field.getValue().asText();
                     if (field.getKey() != null) {
                         record.putMetaData(field.getKey(), value);
                     }
                 }
-
                 dataSet.addRecord(Integer.toString(i), record);
             }
-
             profile.insertDataSet(dataSetCode, dataSet);
         }
     }
