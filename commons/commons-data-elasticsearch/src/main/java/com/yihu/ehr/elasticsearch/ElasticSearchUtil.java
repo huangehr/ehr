@@ -52,6 +52,12 @@ public class ElasticSearchUtil {
         return elasticSearchClient.index(index, type, source);
     }
 
+    public void bulkIndex (String index, String type, List<Map<String, Object>> source) throws ParseException{
+        if (source.size() > 0) {
+            elasticSearchClient.bulkIndex(index, type, source);
+        }
+    }
+
     public void delete (String index, String type, String id) {
         elasticSearchClient.delete(index, type, id);
     }
@@ -73,9 +79,7 @@ public class ElasticSearchUtil {
     }
 
     public Map<String, Object> update(String index, String type, String id, Map<String, Object> source) throws DocumentMissingException {
-        if (source.containsKey("_id")) {
-            source.remove("_id");
-        }
+        source.remove("_id");
         return elasticSearchClient.update(index, type, id, source);
     }
 
