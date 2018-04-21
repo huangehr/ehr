@@ -115,7 +115,7 @@ public class BaseStatistsService {
      * @throws Exception
      */
     public List<Map<String, Object>>  divisionQuota(String molecular, String denominator, String dimension,
-                                                    String molecularFilter,String denominatorFilters,String operation,String operationValue,String dateType) throws Exception {
+        String molecularFilter,String denominatorFilters,String operation,String operationValue,String dateType) throws Exception {
         List<Map<String, Object>> moleList = getQuotaResultList(molecular,dimension,molecularFilter,dateType);
         List<Map<String, Object>> denoList =  getQuotaResultList(denominator,dimension,denominatorFilters,dateType);
         dimension = StringUtils.isNotEmpty(dateType)? (StringUtils.isNotEmpty(dimension)? dimension +";"+dateType : dateType):dimension;
@@ -132,8 +132,8 @@ public class BaseStatistsService {
      * @return
      * @throws Exception
      */
-    public List<Map<String, Object>>  divisionQuotaDenoConstant(String molecular, String dimension,String filters,
-                                                                String operation,String operationValue,String dateType,String constValue, String district) throws Exception {
+    public List<Map<String, Object>> divisionQuotaDenoConstant(String molecular, String dimension,String filters,
+        String operation,String operationValue,String dateType,String constValue, String district) throws Exception {
         Double denominatorVal = 0.0;
         List<Map<String, Object>> moleList = getQuotaResultList(molecular,dimension,filters,dateType);
         // 获取分母的数值

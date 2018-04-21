@@ -1,39 +1,50 @@
 package com.yihu.ehr.basic.portal.controller;
 
+import com.yihu.ehr.basic.dict.service.SystemDictEntryService;
+import com.yihu.ehr.basic.dict.service.SystemDictService;
 import com.yihu.ehr.basic.portal.service.SurveyTemplateService;
 import com.yihu.ehr.basic.user.entity.User;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.SessionAttributeKeys;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.entity.dict.SystemDict;
+import com.yihu.ehr.entity.dict.SystemDictEntry;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.Result;
 import com.yihu.ehr.model.portal.MSurveyTemplate;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
- * Created by zhangdan on 2018/4/13.
+ * Created by zhangdan on 2018/4/13.。
  */
-@Controller
+@RestController
 @RequestMapping(ApiVersion.Version1_0)
 @Api(value = "survey", description = "问卷/满意度调查后台配置问题和答案", tags = {"云门户-问卷调查后台配置"})
 public class PortalSurveyTemplateAdminController extends EnvelopRestEndPoint {
     @Autowired
     SurveyTemplateService surveyTemplateService;
+
+    @Autowired
+    private SystemDictService dictService;
+
+    @Autowired
+    private SystemDictEntryService systemDictEntryService;
+
     /*//---问卷模板管理列表---
     @RequestMapping(value = "initial", method = RequestMethod.GET)
     public String initTeamList(){
@@ -50,7 +61,6 @@ public class PortalSurveyTemplateAdminController extends EnvelopRestEndPoint {
 
 
     @RequestMapping(value = ServiceApi.SurveyAdminManage.GetSurveyTemplateList, method = RequestMethod.GET)
-    @ResponseBody
     @ApiOperation(value = "获取所有问卷模板列表", notes = "管理界面展示所有的模板问卷")
     public ListResult list(
             @ApiParam(name = "title", value = "标题",defaultValue = "")
@@ -70,10 +80,10 @@ public class PortalSurveyTemplateAdminController extends EnvelopRestEndPoint {
         if(labelCode!=null&&labelCode!=0){
             filters.append(" and t.code in(select relation_code from  portal_survey_label_info w where w.use_type=0 and w.label=:labelCode)");
         }
-        List<MSurveyTemplate> res = surveyTemplateService.queryList(page,rows,title,labelCode,filters.toString());
-        if(res != null){
-            listResult.setDetailModelList(res);
-            listResult.setTotalCount((int)surveyTemplateService.getCount(filters.toString()));
+        Map<String,Object> map = surveyTemplateService.queryList(page,rows,title,labelCode,filters.toString());
+        if(map != null){
+            listResult.setDetailModelList((List<MSurveyTemplate>)map.get("data"));
+            listResult.setTotalCount((int)map.get("count"));
             listResult.setCode(200);
             listResult.setCurrPage(page);
             listResult.setPageSize(rows);
@@ -87,7 +97,6 @@ public class PortalSurveyTemplateAdminController extends EnvelopRestEndPoint {
 
 
     @RequestMapping(value = ServiceApi.SurveyAdminManage.GetSurveyTemplateOptionsList, method = RequestMethod.GET)
-    @ResponseBody
     @ApiOperation(value = "获取所有问题选项列表", notes = "管理界面展示所有的问题的选项")
     public ListResult listOption(
             @ApiParam(name = "q", value = "标题",defaultValue = "")
@@ -108,7 +117,8 @@ public class PortalSurveyTemplateAdminController extends EnvelopRestEndPoint {
         if(labelCode!=null&&labelCode!=0){
             filters.append(" and t.code in(select relation_code from  portal_survey_label_info w where w.use_type=0 and w.label=:labelCode)");
         }
-        List<MSurveyTemplate> res = surveyTemplateService.queryList(page,rows,title,labelCode,filters.toString());
+        Map<String,Object> map = surveyTemplateService.queryList(page,rows,title,labelCode,filters.toString());
+        List<MSurveyTemplate> res = (List<MSurveyTemplate>)map.get("data");
 
         for (MSurveyTemplate m : res){
             MSurveyTemplate mSurveyTemplate = new MSurveyTemplate();
@@ -116,9 +126,9 @@ public class PortalSurveyTemplateAdminController extends EnvelopRestEndPoint {
             mSurveyTemplate.setText(m.getTitle());
             list.add(mSurveyTemplate);
         }
-        if(list != null){
-            listResult.setDetailModelList(res);
-            listResult.setTotalCount((int)surveyTemplateService.getCount(filters.toString()));
+        if (map!=null){
+            listResult.setDetailModelList(list);
+            listResult.setTotalCount((int)map.get("count"));
             listResult.setCode(200);
             listResult.setCurrPage(page);
             listResult.setPageSize(rows);
@@ -127,10 +137,31 @@ public class PortalSurveyTemplateAdminController extends EnvelopRestEndPoint {
             listResult.setMessage("查询无数据");
             listResult.setTotalCount(0);
         }
+
         return listResult;
 
     }
 
+
+    @RequestMapping(value = ServiceApi.SurveyAdminManage.GetTemplateLabel, method = RequestMethod.POST)
+    @ApiOperation(value = "获取问卷类型", notes = "获取所有问卷类型")
+    public Envelop getTemplateLabel( @ApiParam(name = "phoneticCode", value = "拼音编码", required = true)
+                                         @PathVariable(value = "phoneticCode") String phoneticCode){
+        SystemDict dict = dictService.findByPhoneticCode(phoneticCode);
+        if (dict ==null){
+            return  success("没有问卷类型");
+        }
+        Envelop envelop = new Envelop();
+        int page = 0;
+        int size = 1000;
+        //ListResult re = new ListResult(page, size);
+        Page<SystemDictEntry> page1 = systemDictEntryService.findByDictId(dict.getId(), page,size);
+        if(page1 != null) {
+            envelop.setDetailModelList(page1.getContent());
+            envelop.setSuccessFlg(true);
+        }
+        return envelop;
+    }
 
 
     //---新增问卷模板---
@@ -151,50 +182,30 @@ public class PortalSurveyTemplateAdminController extends EnvelopRestEndPoint {
 */
     //---保存标签---
     @RequestMapping(value = ServiceApi.SurveyAdminManage.SaveLabelInfo, method = RequestMethod.POST)
-    @ResponseBody
     @ApiOperation(value = "保存标签", notes = "保存标签")
-    public Result editLabel(@ApiParam(name = "模板id", value = "模板id",defaultValue = "0")
-                                @RequestParam(value = "templateId", required = true) long templateId,
-                            @ApiParam(name = "标签JSON", value = "标签JSON",defaultValue = "")
-                            @RequestParam(value = "jsonData", required = true) String jsonData){
-        try {
-            surveyTemplateService.saveLabel(templateId,jsonData);
-            return Result.success("保存成功！");
-        }catch (Exception e){
-            return Result.error("保存失败！");
-        }
+    public Result editLabel(@ApiParam(name = "模板id", value = "模板id",defaultValue = "0") @RequestParam(value = "templateId", required = true) long templateId,
+                            @ApiParam(name = "标签JSON", value = "标签JSON",defaultValue = "") @RequestParam(value = "jsonData", required = true) String jsonData)throws Exception{
+        surveyTemplateService.saveLabel(templateId,jsonData);
+        return Result.success("保存成功！");
     }
 
     @RequestMapping(value = ServiceApi.SurveyAdminManage.SaveTemplate, method = RequestMethod.POST)
-    @ResponseBody
     @ApiOperation(value = "保存问卷模板", notes = "保存问卷模板")
-    public Result saveTemplate(@ApiParam(name = "jsonData", value = "新增json",defaultValue = "")
-                                   @RequestParam(value = "jsonData", required = true) String jsonData,
-                               HttpServletRequest request){
-        User loginUser = (User) request.getSession().getAttribute(SessionAttributeKeys.CurrentUser);
-        try {
-            surveyTemplateService.saveOrUpdate(jsonData,loginUser.getId());
-            return Result.success("保存成功");
-        }catch (Exception e){
-            e.printStackTrace();
-            return Result.error("保存失败");
-        }
+    public Result saveTemplate(@ApiParam(name = "jsonData", value = "新增json",defaultValue = "") @RequestParam(value = "jsonData", required = true) String jsonData,
+                               @ApiParam(name = "userId", value = "用户id",defaultValue = "") @RequestParam(value = "userId", required = false) String userId,
+                               HttpServletRequest request)throws Exception{
+        surveyTemplateService.saveOrUpdate(jsonData,userId);
+        return Result.success("保存成功");
     }
 
 
     @RequestMapping(value = "template", method = RequestMethod.GET)
     @ResponseBody
-    public Result getTemplate(@ApiParam(name = "id", value = "模板id",defaultValue = "0")
-                              @RequestParam(value = "id", required = true) long id,
-                              @ApiParam(name = "question", value = "是否加载问题",defaultValue = "0")
-                              @RequestParam(value = "question", required = false) long question,
-                              HttpServletRequest request){
-        try {
-            JSONObject surveyTemplate =  surveyTemplateService.getTemplate(id,question);
-            return Result.success("获取成功",surveyTemplate);
-        }catch (Exception e){
-            return Result.error("获取失败");
-        }
+    public Envelop getTemplate(@ApiParam(name = "id", value = "模板id",defaultValue = "0") @RequestParam(value = "id", required = true) long id,
+                              @ApiParam(name = "question", value = "是否加载问题",defaultValue = "0") @RequestParam(value = "question", required = false) long question,
+                              HttpServletRequest request)throws Exception{
+        Map<String,Object> map =  surveyTemplateService.getTemplate(id,question);
+        return success(map);
     }
 
     /*@RequestMapping(value = "template/title", method = RequestMethod.GET)
@@ -211,13 +222,8 @@ public class PortalSurveyTemplateAdminController extends EnvelopRestEndPoint {
 
     @RequestMapping(value = "delete", method = RequestMethod.POST)
     @ResponseBody
-    public Result delete(@ApiParam(name = "模板ID", value = "模板ID",defaultValue = "0")
-                              @RequestParam(value = "templateId", required = true) Long templateId){
-        try {
-           surveyTemplateService.deleteTemplate(templateId);
-            return Result.success("问卷模板删除成功！");
-        }catch (Exception e){
-            return Result.error("问卷模板删除失败！");
-        }
+    public Result delete(@ApiParam(name = "模板ID", value = "模板ID",defaultValue = "0") @RequestParam(value = "templateId", required = true) Long templateId)throws Exception{
+        surveyTemplateService.deleteTemplate(templateId);
+        return Result.success("问卷模板删除成功！");
     }
 }

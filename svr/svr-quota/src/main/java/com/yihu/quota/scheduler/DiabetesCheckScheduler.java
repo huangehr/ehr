@@ -60,7 +60,7 @@ public class DiabetesCheckScheduler {
 	@Scheduled(cron = "0 59 21 * * ?")
 	public void validatorIdentityScheduler(){
 		try {
-			String q2 = "EHR_000394:*糖耐量*2H血糖* OR EHR_000394:*糖耐量*空腹血糖* OR EHR_000394:*葡萄糖耐量试验*";
+			String q2 = "EHR_000394:*糖耐量*2H血糖* OR EHR_000394:*糖耐量*空腹血糖* OR EHR_000394:*空腹葡萄糖* OR EHR_000394:*葡萄糖耐量试验*";//子项目中文名称
 			String fq = ""; // 过滤条件
 			String keyEventDate = "event_date";
 			String keyArea = "EHR_001225";
@@ -83,7 +83,7 @@ public class DiabetesCheckScheduler {
 			objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
 			BasesicUtil basesicUtil = new BasesicUtil();
-			String initializeDate = "2018-04-10";// job初始化时间
+			String initializeDate = "2018-04-20";// job初始化时间
 			String executeStartDate = "2015-06-01";
 			Date now = new Date();
 			String nowDate = DateUtil.formatDate(now,DateUtil.DEFAULT_DATE_YMD_FORMAT);
@@ -112,7 +112,7 @@ public class DiabetesCheckScheduler {
 					startDate = DateUtil.formatDate(sDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
 					Date eDate = DateUtils.addDays(DateUtil.parseDate(startDate, DateUtil.DEFAULT_DATE_YMD_FORMAT), 15);
 					endDate = DateUtil.formatDate(eDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
-					if(basesicUtil.compareDate("2017-05-01",startDate) != 1){//结束时间
+					if(basesicUtil.compareDate("2018-05-01",startDate) != 1){//结束时间
 						flag = false;
 					}
 					System.out.println("startDate=" + startDate);
@@ -220,7 +220,7 @@ public class DiabetesCheckScheduler {
 							if(submap.get(keyChineseName) != null){
 								// "糖耐量(空腹血糖)" "葡萄糖耐量试验"
 								String val = submap.get(keyChineseName).toString();
-								fast = (val.contains("糖耐量") && val.contains("空腹血糖"))||val.equals("葡萄糖耐量试验") ;
+								fast = (val.contains("糖耐量") && val.contains("空腹血糖"))||val.equals("葡萄糖耐量试验")||val.equals("空腹葡萄糖")  ;
 							}
 							if(fast){
 								//7.8mmol/l 以下 2：7.8-11.1mmol/l  3:11.1 以上
@@ -342,7 +342,7 @@ public class DiabetesCheckScheduler {
 	private List<String> selectSubRowKey(String core ,String q,String fq,long count) throws Exception {
 		List<String> data = new ArrayList<>();
 		/***** Solr查询 ********/
-		SolrDocumentList solrList = solrUtil.query(core, q , fq, null, 1,count);
+		SolrDocumentList solrList = solrUtil.query(core, q , fq, null, 0,count);
 		if(solrList!=null && solrList.getNumFound()>0){
 			for (SolrDocument doc : solrList){
 				String rowkey = String.valueOf(doc.getFieldValue("rowkey"));

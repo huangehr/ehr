@@ -240,7 +240,12 @@ public class AppService extends BaseJpaService<App, AppDao> {
     }
 
     public List<Map<String,Object>> getAppByParentIdAndUserId(String userId, String parentAppId)throws Exception{
-        String Sql ="SELECT a.*,r.type FROM user_app a LEFT JOIN apps_relation r ON a.app_id = r.app_id WHERE a.user_id='"+userId+"' AND r.parent_app_id='"+parentAppId+"' AND a.status=0 AND a.show_flag=1 ";
+        String Sql ="SELECT s.*,r.type " +
+                    " FROM user_app a " +
+                    " LEFT JOIN apps_relation r ON a.app_id = r.app_id " +
+                    " LEFT JOIN apps s ON a.app_id = s.id"+
+                    " WHERE a.user_id='"+userId+"' AND r.parent_app_id='"+parentAppId+
+                    "' AND a.status=0 AND a.show_flag=1 ";
        List<Map<String,Object>> resultList =  jdbcTemplate.queryForList(Sql);
         return resultList;
     }

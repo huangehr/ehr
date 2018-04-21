@@ -14,6 +14,7 @@ import com.yihu.ehr.entity.dict.SystemDict;
 import com.yihu.ehr.entity.dict.SystemDictEntry;
 import com.yihu.ehr.model.portal.MSurveyTemplate;
 import com.yihu.ehr.query.BaseJpaService;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Query;
 import org.json.JSONArray;
@@ -24,10 +25,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created by zhangdan on 2018/4/17.
@@ -62,10 +60,12 @@ public class SurveyTemplateService extends BaseJpaService<SurveyTemplate,Long> {
     @Transactional
     public void saveOrUpdate(String jsonData,String loginUserId){
         JSONArray array = new JSONArray(jsonData);
+
         List<SurveyTemplate> surveyTemplates = new ArrayList<>();
         List<SurveyTemplateQuestions> surveyTemplateQuestions = new ArrayList<>();
         List<SurveyTemplateOptions> surveyTemplateOptions = new ArrayList<>();
         List<SurveyLabelInfo> surveyLabelInfos = new ArrayList<>();
+
         for(Object object:array){
             JSONObject jsonObject = (JSONObject)object;
             ClazzReflect clazzReflect = new ClazzReflect();
@@ -141,7 +141,8 @@ public class SurveyTemplateService extends BaseJpaService<SurveyTemplate,Long> {
     }
 
 
-    public List<MSurveyTemplate> queryList(int page, int pageSize, String title, Integer labelCode,String filters) {
+    public Map<String,Object> queryList(int page, int pageSize, String title, Integer labelCode, String filters) {
+        Map<String,Object> map = new HashedMap();
         if (page <= 0) {
             page = 1;
         }
@@ -161,6 +162,7 @@ public class SurveyTemplateService extends BaseJpaService<SurveyTemplate,Long> {
             queryList.setInteger("labelCode", labelCode);
         }
         int count = Integer.parseInt(queryCount.list().get(0).toString());
+        map.put("count",count);
         queryList.setFirstResult(pageSize * (page - 1));
         queryList.setMaxResults(pageSize);
         List<SurveyTemplate> list = queryList.list();
@@ -189,7 +191,8 @@ public class SurveyTemplateService extends BaseJpaService<SurveyTemplate,Long> {
             mSurveyTemplate.setLabelName(StringUtils.join(labelName.toArray(),","));
             array.add(mSurveyTemplate);
         }
-        return array;
+        map.put("data",array);
+        return map;
     }
 
     /**
@@ -198,15 +201,24 @@ public class SurveyTemplateService extends BaseJpaService<SurveyTemplate,Long> {
      * @param loadQuestion 是否加载问题 是1 否0
      * @return
      */
-    public JSONObject getTemplate(Long id,Long loadQuestion){
+    public Map<String,Object> getTemplate(Long id,Long loadQuestion){
         SurveyTemplate surveyTemplate = this.surveyTemplateDao.findOne(id);
         if (surveyTemplate==null){ throw new  RuntimeException("模板不存在！");}
-        JSONObject surveyTemplateJson = new JSONObject(surveyTemplate);
-        if(loadQuestion==1L){
+        Map<String,Object> map = new HashedMap();
+        map.put("surveyTemplate",surveyTemplate);
+        List<Map<String,Object>> questionsList = new ArrayList<>();
+        if(loadQuestion==1L) {
             List<SurveyTemplateQuestions> surveyTemplateQuestions = this.surveyTemplateQuestionService.findByTemplateCode(surveyTemplate.getCode());
-            JSONArray questions = new JSONArray(surveyTemplateQuestions);
-
-
+            for (SurveyTemplateQuestions question : surveyTemplateQuestions) {
+                Map<String, Object> questionMap = new HashMap<>();
+                List<SurveyTemplateOptions> surveyTemplateOptions = this.surveyTemplateOptionService.findByTemplateCodeAndDelAndQuestionCode(surveyTemplate.getCode(), question.getCode());
+                questionMap.put("question", question);
+                questionMap.put("optipon", surveyTemplateOptions);
+                questionsList.add(questionMap);
+            }
+        }
+        map.put("questions",questionsList);
+            /*JSONArray questions = new JSONArray(surveyTemplateQuestions);
             for(Object question : questions){
                 JSONObject questionObj = (JSONObject)question;
                 List<SurveyTemplateOptions> surveyTemplateOptions = this.surveyTemplateOptionService.findByTemplateCodeAndDelAndQuestionCode(surveyTemplate.getCode(),questionObj.getString("code"));
@@ -214,11 +226,15 @@ public class SurveyTemplateService extends BaseJpaService<SurveyTemplate,Long> {
                 questionObj.put("options",options);
             }
             surveyTemplateJson.put("questions",questions);
-        }
-        List<SurveyLabelInfo> surveyLabelInfos = surveyLabelInfoService.findByUseTypeAndRelationCode(USE_BY_TEMPLATE,surveyTemplate.getCode());
-        JSONArray labels = new JSONArray(surveyLabelInfos);
-        surveyTemplateJson.put("labels",labels);
-        return surveyTemplateJson;
+            map.put("questions",questions);
+        }*/
+            List<SurveyLabelInfo> surveyLabelInfos = surveyLabelInfoService.findByUseTypeAndRelationCode(USE_BY_TEMPLATE, surveyTemplate.getCode());
+/*        JSONArray labels = new JSONArray(surveyLabelInfos);
+        surveyTemplateJson.put("labels",labels)*/
+            ;
+            map.put("labels", surveyLabelInfos);
+            return map;
+
     }
 
     @Transactional
