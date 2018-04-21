@@ -55,6 +55,7 @@ public class AgZuulFilter extends ZuulFilter {
         RequestContext ctx = RequestContext.getCurrentContext();
         HttpServletRequest request = ctx.getRequest();
         String url = request.getRequestURI();
+        //内部微服务有不需要认证的地址请在URL上追加/open/来进行过滤，如/api/v1.0/open/**，不要在此继续追加！！！
         if (url.contains("/authentication/")
                 || url.contains("/jkzl/")
                 || url.contains("/file/")
@@ -62,7 +63,8 @@ public class AgZuulFilter extends ZuulFilter {
                 || url.contains("/usersOfApp")
                 || url.contains("/users/h5/handshake")
                 || url.contains("/appVersion/getAppVersion")
-                || url.contains("/messageTemplate/messageOrderPush")) {
+                || url.contains("/messageTemplate/messageOrderPush")
+                || url.contains("/account/")) {
             return null;
         }
         String accessToken = this.extractToken(request);

@@ -1522,6 +1522,18 @@ public class ServiceApi {
         public static final String GetSurveyTemplateOptionsList="/admin/surveyTemplate/options/list";
         public static final String SaveLabelInfo ="/admin/surveyTemplate/saveLabelInfo";
         public static final String SaveTemplate = "/admin/surveyTemplate/saveTemplate";
+        public static final String GetTemplateLabel = "/admin/surveyTemplate/getTemplateLabel/{phoneticCode}";
+
+        public static final String GetSurveyQuestionList = "/admin/surveyQuestion/list";
+        public static final String SaveSurveyQuestion = "/admin/surveyQuestion/save";
+        public static final String GetQuestionById="/admin/surveyQuestion/getById";
+        public static final String GetQuestionsByIds ="/admin/surveyQuestion/getByIds";
+        public static final String DelQuestion ="/admin/surveyQuestion/delQuestion";
+        public static final String DelQuestions = "/admin/surveyQuestion/delQuestions";
+        public static final String updateQuestion = "/admin/surveyQuestion/update";
+
+
+
     }
 
     /**

@@ -1,5 +1,7 @@
 package com.yihu.ehr.resolve.job;
 
+import com.yihu.ehr.constants.ServiceApi;
+import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.hbase.HBaseAdmin;
 import com.yihu.ehr.resolve.util.PackResolveLogger;
 import org.quartz.*;
@@ -42,6 +44,8 @@ public class HealthCheckTask {
     private DiscoveryClient discoveryClient;
     @Autowired
     private HBaseAdmin hBaseAdmin;
+    @Autowired
+    private ElasticSearchUtil elasticSearchUtil;
 
     @PostConstruct
     private void init() {
@@ -68,13 +72,30 @@ public class HealthCheckTask {
     private void startTask() {
         PackResolveLogger.info("Health Check: " + new Date());
         GroupMatcher groupMatcher = GroupMatcher.groupEquals("PackResolve");
-        //检查集群信息
+        //检查hbase集群信息
         try {
             hBaseAdmin.isTableExists("HealthProfile");
         } catch (Exception e) {
             try {
                 Set<JobKey> jobKeySet = scheduler.getJobKeys(groupMatcher);
-                if(jobKeySet != null) {
+                if (jobKeySet != null) {
+                    for (JobKey jobKey : jobKeySet) {
+                        scheduler.deleteJob(jobKey);
+                    }
+                }
+            } catch (SchedulerException se) {
+                PackResolveLogger.error(se.getMessage());
+            }
+            PackResolveLogger.error(e.getMessage());
+            return;
+        }
+        //检查Es集群
+        try {
+            elasticSearchUtil.findByField("archive_relation", "info", "sn", "sn_for_check");
+        } catch (Exception e) {
+            try {
+                Set<JobKey> jobKeySet = scheduler.getJobKeys(groupMatcher);
+                if (jobKeySet != null) {
                     for (JobKey jobKey : jobKeySet) {
                         scheduler.deleteJob(jobKey);
                     }
