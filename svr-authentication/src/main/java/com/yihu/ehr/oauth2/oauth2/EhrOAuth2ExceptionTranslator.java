@@ -64,7 +64,7 @@ public class EhrOAuth2ExceptionTranslator implements WebResponseExceptionTransla
 
     private ResponseEntity<OAuth2Exception> handleOAuth2Exception(OAuth2Exception e) throws IOException {
 
-        int status = HttpStatus.UNAUTHORIZED.value();
+        int status = e.getHttpErrorCode();
         HttpHeaders headers = new HttpHeaders();
         headers.set("Cache-Control", "no-store");
         headers.set("Pragma", "no-cache");
@@ -72,7 +72,7 @@ public class EhrOAuth2ExceptionTranslator implements WebResponseExceptionTransla
             headers.set("WWW-Authenticate", String.format("%s %s", OAuth2AccessToken.BEARER_TYPE, e.getSummary()));
         }
 
-        ResponseEntity<OAuth2Exception> response = new ResponseEntity<OAuth2Exception>(e, headers,
+        ResponseEntity<OAuth2Exception> response = new ResponseEntity<>(e, headers,
                 HttpStatus.valueOf(status));
 
         return response;
