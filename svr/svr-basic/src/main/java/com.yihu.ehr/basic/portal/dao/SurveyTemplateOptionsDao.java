@@ -19,6 +19,7 @@ public interface SurveyTemplateOptionsDao extends PagingAndSortingRepository<Sur
 
     void deleteByTemplateCode(String templateCode);
 
+    @Query("select t from  SurveyTemplateOptions t where t.templateCode = ?1 and t.del = ?2 and t.questionCode=?3 ")
     List<SurveyTemplateOptions>  findByTemplateCodeAndDelAndQuestionCode(String templateCode, String del, String questionCode);
 
     @Query("select t from  SurveyTemplateOptions t where t.templateCode = ?1 and t.del = 1 ")

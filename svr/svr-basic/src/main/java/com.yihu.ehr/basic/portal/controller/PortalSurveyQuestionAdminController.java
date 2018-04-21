@@ -4,6 +4,7 @@ import com.yihu.ehr.basic.portal.model.SurveyQuestion;
 import com.yihu.ehr.basic.portal.service.SurveyQuestionOptionService;
 import com.yihu.ehr.basic.portal.service.SurveyQuestionService;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.Result;
@@ -75,7 +76,7 @@ public class PortalSurveyQuestionAdminController extends EnvelopRestEndPoint {
         return "questionnaire/question/see_question";
     }*/
 
-    @RequestMapping(value = "list", method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.SurveyAdminManage.GetSurveyTemplateList, method = RequestMethod.POST)
     @ResponseBody
     @ApiOperation(value = "问题列表数据")
     public Envelop searchQuestionList(
@@ -103,7 +104,7 @@ public class PortalSurveyQuestionAdminController extends EnvelopRestEndPoint {
         return "survey/question/addQuestion";
     }*/
 
-    @RequestMapping(value = "addQuestions", method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.SurveyAdminManage.SaveSurveyQuestion, method = RequestMethod.POST)
     @ResponseBody
     @ApiOperation(value = "新增问题（可批量新增）")
     public Result addQuestions(@ApiParam(name = "jsonData", value = "新增json",defaultValue = "")
@@ -118,7 +119,7 @@ public class PortalSurveyQuestionAdminController extends EnvelopRestEndPoint {
         }
     }
 
-    @RequestMapping(value = "getQuestion", method = RequestMethod.GET)
+    @RequestMapping(value =ServiceApi.SurveyAdminManage.GetQuestionById, method = RequestMethod.GET)
     @ResponseBody
     @ApiOperation(value = "根据id获取单个问题")
     public Result getQuestion(@ApiParam(name = "id", value = "问题id",defaultValue = "1")
@@ -140,10 +141,10 @@ public class PortalSurveyQuestionAdminController extends EnvelopRestEndPoint {
     }
 
 
-    @RequestMapping(value = "getQuestions", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.SurveyAdminManage.GetQuestionsByIds, method = RequestMethod.GET)
     @ResponseBody
-    @ApiOperation(value = "根据id获取单个问题")
-    public Result getQuestion(@ApiParam(name = "id", value = "问题id",defaultValue = "1")
+    @ApiOperation(value = "根据ids获取多个问题")
+    public Result getQuestion(@ApiParam(name = "ids", value = "问题ids",defaultValue = "1")
                               @RequestParam(value = "ids", required = true) String  ids) {
         try {
             JSONArray questions = surveyQuestionService.findByIds(ids);
@@ -154,7 +155,7 @@ public class PortalSurveyQuestionAdminController extends EnvelopRestEndPoint {
         }
     }
 
-    @RequestMapping(value = "delQuestion", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.SurveyAdminManage.DelQuestion, method = RequestMethod.GET)
     @ResponseBody
     @ApiOperation(value = "根据id删除单个问题")
     public Result delQuestion(@ApiParam(name = "id", value = "问题id",defaultValue = "1")
@@ -168,7 +169,7 @@ public class PortalSurveyQuestionAdminController extends EnvelopRestEndPoint {
         }
     }
 
-    @RequestMapping(value = "delQuestions", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.SurveyAdminManage.DelQuestions, method = RequestMethod.GET)
     @ResponseBody
     @ApiOperation(value = "批量删除")
     public Result delQuestions(@ApiParam(name = "ids", value = "问题ids",defaultValue = "1;2;3")
@@ -185,7 +186,7 @@ public class PortalSurveyQuestionAdminController extends EnvelopRestEndPoint {
         }
     }
 
-    @RequestMapping(value = "updQuestion", method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.SurveyAdminManage.updateQuestion, method = RequestMethod.POST)
     @ResponseBody
     @ApiOperation(value = "更新问题")
     public Result updQuestion(@ApiParam(name = "questionData", value = "问题json",defaultValue = "{}")
