@@ -35,12 +35,12 @@ public class FzGatewayController extends BaseController {
 
     /**
      * 获取健康上饶的用户id
-     *
+     *TODO 总部更换接口，不需要再去获取第三方用户id
      * @param userId
      * @return
      */
     @GetMapping(ServiceApi.GateWay.FzGateway)
-    public String getEhrUserId(@RequestParam(value = "userId",required = true) String userId) throws IOException {
+    public String getEhrUserId(@RequestParam(value = "userId",required = true) String userId) throws Exception {
         String api = "UserMgmt.UserAccount.getAccLoginInfo";
         Map<String, Object> apiParamMap = new HashMap<>();
         apiParamMap.put("Userid", userId);//医院类型

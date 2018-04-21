@@ -134,6 +134,23 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
         return getResponse(ehrUserSimple);
     }
 
+    @RequestMapping(value = ServiceApi.Authentication.Logout, method = RequestMethod.POST)
+    public ResponseEntity<String> logout(@RequestParam Map<String, String> parameters, HttpServletRequest request) {
+        String token = request.getHeader("token");
+        if (null == token) {
+            token = parameters.get("token");
+        }
+        OAuth2AccessToken oAuth2AccessToken = ehrRedisTokenStore.readAccessToken(token);
+        if (oAuth2AccessToken != null) {
+            ehrRedisTokenStore.removeAccessToken(oAuth2AccessToken.getValue());
+            ehrRedisTokenStore.removeRefreshToken(oAuth2AccessToken.getRefreshToken().getValue());
+        }
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Cache-Control", "no-store");
+        headers.set("Pragma", "no-cache");
+        return new ResponseEntity<>("Logout", headers, HttpStatus.OK);
+    }
+
     @RequestMapping(value = ServiceApi.Authentication.VerifyCode, method = RequestMethod.POST)
     public ResponseEntity<Envelop> verifyCode(@RequestParam Map<String, String> parameters) throws  Exception{
         String client_id = parameters.get("client_id");

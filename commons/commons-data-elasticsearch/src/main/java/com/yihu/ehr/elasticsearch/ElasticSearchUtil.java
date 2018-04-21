@@ -30,7 +30,7 @@ public class ElasticSearchUtil {
     @Autowired
     private ElasticSearchClient elasticSearchClient;
 
-    public void mapping(String index, String type, Map<String, Map<String, String>> source) throws IOException{
+    public void mapping(String index, String type, Map<String, Map<String, String>> source, Map<String, Object> setting) throws IOException{
         XContentBuilder xContentBuilder = XContentFactory.jsonBuilder().startObject().startObject("properties");
         for (String field : source.keySet()) {
             xContentBuilder.startObject(field);
@@ -41,7 +41,7 @@ public class ElasticSearchUtil {
             xContentBuilder.endObject();
         }
         xContentBuilder.endObject().endObject();
-        elasticSearchClient.mapping(index, type, xContentBuilder);
+        elasticSearchClient.mapping(index, type, xContentBuilder, setting);
     }
 
     public void remove(String index){

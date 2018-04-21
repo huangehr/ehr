@@ -280,8 +280,10 @@ public class AppEndPoint extends EnvelopRestEndPoint {
         oauthClientDetails.setScope("read");
         oauthClientDetails.setAuthorizedGrantTypes("authorization_code,refresh_token,password,implicit");
         oauthClientDetails.setWebServerRedirectUri(app.getUrl());
+        oauthClientDetails.setAuthorities(null);
         oauthClientDetails.setAccessTokenValidity(null);
         oauthClientDetails.setAccessTokenValidity(null);
+        oauthClientDetails.setAdditionalInformation(null);
         oauthClientDetails.setAutoApprove("true");
         //验证基础角色
         Roles basicRole = roleAppRelation.retrieve(roleId);
