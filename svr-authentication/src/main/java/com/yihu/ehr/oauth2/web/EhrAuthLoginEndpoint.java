@@ -187,6 +187,14 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
                 ehrRedisVerifyCodeService.store(client_id, username, random, 600000);
                 envelop.setSuccessFlg(true);
                 envelop.setObj(verifyCode);
+            }else if(resultCode == -201){
+                envelop.setSuccessFlg(false);
+                envelop.setErrorCode(resultCode);
+                envelop.setErrorMsg("短信已达每天限制的次数（10次）！");
+            }else if(resultCode == -200){
+                envelop.setSuccessFlg(false);
+                envelop.setErrorCode(resultCode);
+                envelop.setErrorMsg("短信发送频率太快（不能低于60s）！");
             } else {
                 envelop.setSuccessFlg(false);
                 envelop.setErrorCode(resultCode);
