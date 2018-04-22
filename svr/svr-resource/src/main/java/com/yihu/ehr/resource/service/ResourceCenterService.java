@@ -98,13 +98,13 @@ public class ResourceCenterService extends BaseJpaService {
     public List getOrgAreaNameGroupByClazz(String clazz, int currentCityId) {
         Session session = currentSession();
         String sql;
-        if(StringUtils.isEmpty(clazz)) {
+        if (StringUtils.isEmpty(clazz)) {
             sql = "SELECT a.name, COUNT(1) " +
                     "FROM organizations o " +
                     "LEFT JOIN address_dict a ON o.administrative_division = a.id WHERE org_type = 'Hospital' " +
                     "AND o.administrative_division IN (SELECT id FROM address_dict WHERE pid = :pid) " +
                     "GROUP BY o.administrative_division, a.name";
-        }else {
+        } else {
             sql = "SELECT a.name, COUNT(1) " +
                     "FROM organizations o " +
                     "LEFT JOIN address_dict a ON o.administrative_division = a.id " +
@@ -115,7 +115,7 @@ public class ResourceCenterService extends BaseJpaService {
         Query query = session.createSQLQuery(sql);
         query.setFlushMode(FlushMode.COMMIT);
         query.setInteger("pid", currentCityId);
-        if(!StringUtils.isEmpty(clazz)) {
+        if (!StringUtils.isEmpty(clazz)) {
             query.setString("clazz", clazz);
         }
         return query.list();
@@ -124,14 +124,14 @@ public class ResourceCenterService extends BaseJpaService {
     public List getMedicalAreaCountGroupByRole(String roleType, int currentCityId) {
         Session session = currentSession();
         String sql;
-        if("Doctor".equals(roleType)) {
+        if ("Doctor".equals(roleType)) {
             sql = "SELECT o.administrative_division, COUNT(1) " +
                     "FROM doctors d " +
                     "LEFT JOIN organizations o ON o.org_code = d.org_code " +
                     "WHERE d.role_type IN ('10', '11') " +
                     "AND o.administrative_division IN (SELECT id FROM address_dict WHERE pid = :pid) " +
                     "GROUP BY d.org_code, o.administrative_division";
-        }else {
+        } else {
             sql = "SELECT o.administrative_division, COUNT(1) " +
                     "FROM doctors d " +
                     "LEFT JOIN organizations o ON o.org_code = d.org_code " +
@@ -148,12 +148,12 @@ public class ResourceCenterService extends BaseJpaService {
     public BigInteger getMedicalCountByRoleType(String roleType, int currentCityId) {
         Session session = currentSession();
         String sql;
-        if("Doctor".equals(roleType)) {
+        if ("Doctor".equals(roleType)) {
             sql = "SELECT COUNT(1) FROM doctors d " +
                     "LEFT JOIN organizations o ON o.org_code = d.org_code " +
                     "WHERE d.role_type IN ('10', '11') " +
                     "AND o.administrative_division IN (SELECT id FROM address_dict WHERE pid = :pid)";
-        }else {
+        } else {
             sql = "SELECT COUNT(1) FROM doctors d " +
                     "LEFT JOIN organizations o ON o.org_code = d.org_code " +
                     "WHERE role_type = '8' " +

@@ -144,9 +144,9 @@ public class EhrTokenGranter implements TokenGranter {
 
             OAuth2Request pendingOAuth2Request = storedAuth.getOAuth2Request();
             String oauthUri;
-            if(pendingOAuth2Request.getRedirectUri().indexOf("?") != -1) {
+            if (pendingOAuth2Request.getRedirectUri().indexOf("?") != -1) {
                 oauthUri = pendingOAuth2Request.getRedirectUri().substring(0, pendingOAuth2Request.getRedirectUri().indexOf("?"));
-            }else {
+            } else {
                 oauthUri = pendingOAuth2Request.getRedirectUri();
             }
             // https://jira.springsource.org/browse/SECOAUTH-333
@@ -177,10 +177,10 @@ public class EhrTokenGranter implements TokenGranter {
             // Make a new stored request with the combined parameters
             OAuth2Request finalStoredOAuth2Request = pendingOAuth2Request.createOAuth2Request(combinedParameters);
 
-            //弃用当前方法，再次通过pk获取当前请求的用户信息
-            //Authentication userAuth = storedAuth.getUserAuthentication();
+            Authentication userAuth = storedAuth.getUserAuthentication();
 
-            String pk = combinedParameters.get("pk");
+            //再次通过pk获取当前请求的用户信息
+            /*String pk = combinedParameters.get("pk");
             String keyId = ehrJDBCUserSecurityService.getDefaultKeyIdSelectStatement(pk);
             String userId = ehrJDBCUserSecurityService.getDefaultUserIdByKeyIdSelectStatement(keyId);
             String userName = ehrJDBCUserSecurityService.getDefaultUserNameByUserId(userId);
@@ -188,8 +188,9 @@ public class EhrTokenGranter implements TokenGranter {
             if (StringUtils.isEmpty(keyId) || StringUtils.isEmpty(userId) || StringUtils.isEmpty(userName)) {
                 throw new InsufficientAuthenticationException("Illegal pk");
             }
-            UsernamePasswordAuthenticationToken userToken = new UsernamePasswordAuthenticationToken(userDetails.getUsername(), userDetails.getPassword(), userDetails.getAuthorities());
-            return new OAuth2Authentication(finalStoredOAuth2Request, userToken);
+            UsernamePasswordAuthenticationToken userToken = new UsernamePasswordAuthenticationToken(userDetails.getUsername(), userDetails.getPassword(), userDetails.getAuthorities());*/
+
+            return new OAuth2Authentication(finalStoredOAuth2Request, userAuth);
         }
     }
 

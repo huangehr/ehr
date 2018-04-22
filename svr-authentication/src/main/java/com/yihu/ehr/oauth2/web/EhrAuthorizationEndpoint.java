@@ -153,16 +153,15 @@ public class EhrAuthorizationEndpoint extends AbstractEndpoint {
                     String userId = ehrJDBCUserSecurityService.getDefaultUserIdByKeyIdSelectStatement(keyId);
                     userName = ehrJDBCUserSecurityService.getDefaultUserNameByUserId(userId);
                     UserDetails userDetails = ehrUserDetailsService.loadUserByUsername(userName);
-                    if(StringUtils.isEmpty(keyId) || StringUtils.isEmpty(userId) || StringUtils.isEmpty(userName)) {
+                    if (StringUtils.isEmpty(keyId) || StringUtils.isEmpty(userId) || StringUtils.isEmpty(userName)) {
                         throw new InsufficientAuthenticationException("Illegal pk");
                     }
-                    UsernamePasswordAuthenticationToken userToken = new UsernamePasswordAuthenticationToken(userDetails.getUsername(), userDetails.getPassword(), userDetails.getAuthorities());
+                    UsernamePasswordAuthenticationToken userAuth = new UsernamePasswordAuthenticationToken(userDetails.getUsername(), userDetails.getPassword(), userDetails.getAuthorities());
                     SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
-                    securityContext.setAuthentication(userToken);
-                    //SecurityContextHolder.setContext(securityContext);
+                    securityContext.setAuthentication(userAuth);
                     SecurityContextHolderStrategy securityContextHolderStrategy = SecurityContextHolder.getContextHolderStrategy();
                     securityContextHolderStrategy.setContext(securityContext);
-                    principal = userToken;
+                    principal = userAuth;
                 } else {
                     throw new InsufficientAuthenticationException("A pk must be present.");
                 }
@@ -206,9 +205,8 @@ public class EhrAuthorizationEndpoint extends AbstractEndpoint {
                 return getUserApprovalPageResponse(model, authorizationRequest, (Authentication) principal);
             }
         } catch (RuntimeException e) {
-            throw e;
-        } finally {
             sessionStatus.setComplete();
+            throw e;
         }
     }
 
@@ -221,7 +219,7 @@ public class EhrAuthorizationEndpoint extends AbstractEndpoint {
      * @return
      */
     @RequestMapping(value = "/oauth/sso")
-    public ModelAndView sso(Map<String, Object> model, SessionStatus sessionStatus, Principal principal, @RequestParam Map<String, String> parameters){
+    public ModelAndView sso (Map<String, Object> model, SessionStatus sessionStatus, Principal principal, @RequestParam Map<String, String> parameters){
         // Pull out the authorization request first, using the OAuth2RequestFactory. All further logic should
         // query off of the authorization request instead of referring back to the parameters map. The contents of the
         // parameters map will be stored without change in the AuthorizationRequest object once it is created.
@@ -240,14 +238,15 @@ public class EhrAuthorizationEndpoint extends AbstractEndpoint {
                 if (parameters.containsKey("user")) {
                     String userName = parameters.get("user");
                     UserDetails userDetails = ehrUserDetailsService.loadUserByUsername(userName);
-                    UsernamePasswordAuthenticationToken userToken = new UsernamePasswordAuthenticationToken(userDetails.getUsername(), userDetails.getPassword(), userDetails.getAuthorities());
+                    UsernamePasswordAuthenticationToken userAuth = new UsernamePasswordAuthenticationToken(userDetails.getUsername(), userDetails.getPassword(), userDetails.getAuthorities());
                     SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
-                    securityContext.setAuthentication(userToken);
-                    SecurityContextHolder.setContext(securityContext);
-                    principal = userToken;
+                    securityContext.setAuthentication(userAuth);
+                    SecurityContextHolderStrategy securityContextHolderStrategy = SecurityContextHolder.getContextHolderStrategy();
+                    securityContextHolderStrategy.setContext(securityContext);
+                    principal = userAuth;
                 } else {
                     throw new InsufficientAuthenticationException(
-                            "User must be authenticated with Spring Security before authorization can be completed.");
+                            "User must be provided.");
                 }
             }
             ClientDetails client = getClientDetailsService().loadClientByClientId(authorizationRequest.getClientId());
@@ -283,9 +282,8 @@ public class EhrAuthorizationEndpoint extends AbstractEndpoint {
             model.put("authorizationRequest", authorizationRequest);
             return getUserApprovalPageResponse(model, authorizationRequest, (Authentication) principal);
         } catch (RuntimeException e) {
-            throw e;
-        } finally {
             sessionStatus.setComplete();
+            throw e;
         }
     }
 
@@ -564,26 +562,14 @@ public class EhrAuthorizationEndpoint extends AbstractEndpoint {
         return this.ehrTokenGranter;
     }
 
+    @Override
+    protected WebResponseExceptionTranslator getExceptionTranslator() {
+        return ehrOAuth2ExceptionTranslator;
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<OAuth2Exception> handleException(Exception e) throws Exception {
         LOG.warn("Handling error: " + e.getClass().getSimpleName() + ", " + e.getMessage());
         return getExceptionTranslator().translate(e);
-    }
-
-    @ExceptionHandler(ClientRegistrationException.class)
-    public ResponseEntity<OAuth2Exception> handleClientRegistrationException(Exception e) throws Exception {
-        LOG.warn("Handling error: " + e.getClass().getSimpleName() + ", " + e.getMessage());
-        return getExceptionTranslator().translate(new BadClientCredentialsException());
-    }
-
-    @ExceptionHandler(OAuth2Exception.class)
-    public ResponseEntity<OAuth2Exception> handleException(OAuth2Exception e) throws Exception {
-        LOG.warn("Handling error: " + e.getClass().getSimpleName() + ", " + e.getMessage());
-        return getExceptionTranslator().translate(e);
-    }
-
-    @Override
-    protected WebResponseExceptionTranslator getExceptionTranslator() {
-        return ehrOAuth2ExceptionTranslator;
     }
 }
