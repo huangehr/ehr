@@ -113,21 +113,23 @@ public class CombinationService {
                     }
                 }
 
-                // 赋值医生排班
-                doctor.put("schedulingList", freeSchedulingList);
-                // 获取医生详情
-                tParams.clear();
-                tParams.put("doctorSn", doctor.get("doctorSn"));
-                Map<String, Object> docResMap = objectMapper.readValue(
-                        openService.callFzOpenApi(docInfoApi, tParams), Map.class);
-                if (!"10000".equals(docResMap.get("Code").toString())) {
-                    throw new ApiException("获取总部医生详情时，" + docResMap.get("Message").toString());
-                }
-                docResMap.remove("Code");
-                docResMap.remove("Message");
-                doctor.putAll(docResMap);
+                if (freeSchedulingList.size() != 0) {
+                    // 赋值医生排班
+                    doctor.put("schedulingList", freeSchedulingList);
+                    // 获取医生详情
+                    tParams.clear();
+                    tParams.put("doctorSn", doctor.get("doctorSn"));
+                    Map<String, Object> docResMap = objectMapper.readValue(
+                            openService.callFzOpenApi(docInfoApi, tParams), Map.class);
+                    if (!"10000".equals(docResMap.get("Code").toString())) {
+                        throw new ApiException("获取总部医生详情时，" + docResMap.get("Message").toString());
+                    }
+                    docResMap.remove("Code");
+                    docResMap.remove("Message");
+                    doctor.putAll(docResMap);
 
-                doctorList.add(doctor);
+                    doctorList.add(doctor);
+                }
             }
 
             // 当医生数据不足，或收集满当前分页条数的医生数量，则停止收集。
