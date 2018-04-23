@@ -569,6 +569,7 @@ public class ServiceApi {
         public static final String AccessToken = "/oauth/accessToken";
         public static final String ValidToken = "/oauth/validToken";
         public static final String Login = "/oauth/login";
+        public static final String Logout = "/oauth/logout";
         public static final String VerifyCode = "/oauth/verifyCode";
         public static final String VerifyCodeExpire = "/oauth/verifyCodeExpire";
     }
@@ -774,6 +775,8 @@ public class ServiceApi {
         public static final String InitializeSystemUser = "/users/initialize";
         public static final String UsersByTel = "/users/tel";
         public static final String H5Handshake = "/users/h5/handshake";
+        public static final String UsersOfAppPhoneExistence = "/usersOfApp/user/onePhone/existence";
+
 
         public static final String Save = "/users/save";
         public static final String Update = "/users/update";
@@ -1519,6 +1522,18 @@ public class ServiceApi {
         public static final String GetSurveyTemplateOptionsList="/admin/surveyTemplate/options/list";
         public static final String SaveLabelInfo ="/admin/surveyTemplate/saveLabelInfo";
         public static final String SaveTemplate = "/admin/surveyTemplate/saveTemplate";
+        public static final String GetTemplateLabel = "/admin/surveyTemplate/getTemplateLabel/{phoneticCode}";
+
+        public static final String GetSurveyQuestionList = "/admin/surveyQuestion/list";
+        public static final String SaveSurveyQuestion = "/admin/surveyQuestion/save";
+        public static final String GetQuestionById="/admin/surveyQuestion/getById";
+        public static final String GetQuestionsByIds ="/admin/surveyQuestion/getByIds";
+        public static final String DelQuestion ="/admin/surveyQuestion/delQuestion";
+        public static final String DelQuestions = "/admin/surveyQuestion/delQuestions";
+        public static final String updateQuestion = "/admin/surveyQuestion/update";
+
+
+
     }
 
     /**

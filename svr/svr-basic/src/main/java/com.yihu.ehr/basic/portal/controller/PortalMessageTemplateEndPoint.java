@@ -255,11 +255,20 @@ public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
         Registration newEntity = null;
         if(null != mProtalOrderMessage && mProtalOrderMessage.getTotal()>0){
             String str = toJson(mProtalOrderMessage.getResult().get(0));
-            newEntity = new Registration();
-            newEntity = objectMapper.readValue(str, Registration.class);
-            newEntity.setId(UuidUtil.randomUUID());
-            newEntity.setOriginType(2);//app端订单
-            newEntity.setRegisterType(1);//预约挂号
+           List<Registration>  registrationList= registrationService.findByField("orderId", orderId);
+           if(null != registrationList && registrationList.size()>0){
+               Registration  updateNewEntity = objectMapper.readValue(str, Registration.class);
+               newEntity = registrationList.get(0);
+               newEntity.setState(updateNewEntity.getState());
+               newEntity.setStateDesc(updateNewEntity.getStateDesc());
+               newEntity.setModifyDate(new Date(System.currentTimeMillis()));
+           }else{
+               newEntity = objectMapper.readValue(str, Registration.class);
+               newEntity.setId(UuidUtil.randomUUID());
+               newEntity.setOriginType(2);//app端订单
+               newEntity.setRegisterType(1);//预约挂号
+               newEntity.setRegisterTypeDesc("预约挂号");
+           }
             registrationService.save(newEntity);
         }
         ProtalMessageRemind protalMessageRemind = null;

@@ -36,6 +36,7 @@ public class EsDetailsPackage implements Serializable {
     private String demographic_id; //身份证号码
     private String re_upload_flg; //重传标志
     private String profile_id; //档案ID
+    private Integer pack_type; //1Standard 2File 3Link 4DataSet
 
     public String get_id() {
         return _id;
@@ -224,5 +225,13 @@ public class EsDetailsPackage implements Serializable {
 
     public void setProfile_id(String profile_id) {
         this.profile_id = profile_id;
+    }
+
+    public Integer getPack_type() {
+        return pack_type;
+    }
+
+    public void setPack_type(Integer pack_type) {
+        this.pack_type = pack_type;
     }
 }

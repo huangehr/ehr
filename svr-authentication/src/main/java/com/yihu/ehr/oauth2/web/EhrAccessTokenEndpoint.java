@@ -134,20 +134,21 @@ public class EhrAccessTokenEndpoint extends AbstractEndpoint {
             tokenRequest.setScope(OAuth2Utils.parseParameterList(parameters.get(OAuth2Utils.SCOPE)));
         }
 
-        AccessToken accessToken = new AccessToken();
-        OAuth2AccessToken token = getTokenGranter().grant(grant_type, tokenRequest);
-        if (token == null) {
+        OAuth2AccessToken oAuth2AccessToken = getTokenGranter().grant(grant_type, tokenRequest);
+        if (oAuth2AccessToken == null) {
             throw new UnsupportedGrantTypeException("Unsupported grant type: " + grant_type);
         } else {
-            accessToken.setAccessToken(token.getValue());
-            accessToken.setTokenType(token.getTokenType());
-            accessToken.setExpiresIn(token.getExpiresIn());
-            accessToken.setRefreshToken(token.getRefreshToken().getValue());
+            AccessToken accessToken = new AccessToken();
+            OAuth2Authentication authentication = ehrTokenServices.loadAuthentication(oAuth2AccessToken.getValue());
+            accessToken.setAccessToken(oAuth2AccessToken.getValue());
+            accessToken.setTokenType(oAuth2AccessToken.getTokenType());
+            accessToken.setExpiresIn(oAuth2AccessToken.getExpiresIn());
+            accessToken.setRefreshToken(oAuth2AccessToken.getRefreshToken().getValue());
+            accessToken.setUser(authentication.getName());
             accessToken.setState(parameters.get("state"));
-            accessToken.setUser(parameters.get("username"));
-            putVerificationApi(tokenRequest, token);
+            putVerificationApi(tokenRequest, authentication);
+            return getResponse(accessToken);
         }
-        return getResponse(accessToken);
     }
 
     @RequestMapping(value = ServiceApi.Authentication.ValidToken, method = RequestMethod.POST)
@@ -166,7 +167,7 @@ public class EhrAccessTokenEndpoint extends AbstractEndpoint {
         if (auth2AccessToken == null) {
             throw new InvalidTokenException("Invalid accessToken");
         } else {
-            if (!auth2AccessToken.getValue().equals(accessToken) || auth2AccessToken.isExpired()) {
+            if (auth2AccessToken.isExpired()) {
                 throw new InvalidTokenException("Expired accessToken");
             } else {
                 //判断ClientId
@@ -174,22 +175,21 @@ public class EhrAccessTokenEndpoint extends AbstractEndpoint {
                 String authenticationClientId = authentication.getOAuth2Request().getClientId();
                 if (authenticationClientId != null && authenticationClientId.equals(clientId)) {
                     AccessToken accessToken1 = new AccessToken();
-                    UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = (UsernamePasswordAuthenticationToken) authentication.getUserAuthentication();
                     if (StringUtils.isEmpty(api)) {
                         accessToken1.setAccessToken(auth2AccessToken.getValue());
                         accessToken1.setTokenType(auth2AccessToken.getTokenType());
                         accessToken1.setExpiresIn(auth2AccessToken.getExpiresIn());
                         accessToken1.setRefreshToken(auth2AccessToken.getRefreshToken().getValue());
-                        accessToken1.setUser(usernamePasswordAuthenticationToken.getName());
+                        accessToken1.setUser(authentication.getName());
                         accessToken1.setState(parameters.get("state"));
                         return getResponse(accessToken1);
                     } else {
-                        if (ehrRedisApiAccessValidator.verificationApi(clientId, usernamePasswordAuthenticationToken.getName(), api)){
+                        if (ehrRedisApiAccessValidator.verificationApi(clientId, authentication.getName(), api)){
                             accessToken1.setAccessToken(auth2AccessToken.getValue());
                             accessToken1.setTokenType(auth2AccessToken.getTokenType());
                             accessToken1.setExpiresIn(auth2AccessToken.getExpiresIn());
                             accessToken1.setRefreshToken(auth2AccessToken.getRefreshToken().getValue());
-                            accessToken1.setUser(usernamePasswordAuthenticationToken.getName());
+                            accessToken1.setUser(authentication.getName());
                             accessToken1.setState(parameters.get("state"));
                             return getResponse(accessToken1);
                         } else {
@@ -203,12 +203,9 @@ public class EhrAccessTokenEndpoint extends AbstractEndpoint {
         }
     }
 
-    private void putVerificationApi(TokenRequest tokenRequest, OAuth2AccessToken token) {
-        OAuth2Authentication authentication = ehrTokenServices.loadAuthentication(token.getValue());
+    private void putVerificationApi(TokenRequest tokenRequest, OAuth2Authentication authentication) {
         String clientId = tokenRequest.getClientId();
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = (UsernamePasswordAuthenticationToken)authentication.getUserAuthentication();
-        String userName = usernamePasswordAuthenticationToken.getName();
-        ehrRedisApiAccessValidator.putVerificationApi(clientId, userName);
+        ehrRedisApiAccessValidator.putVerificationApi(clientId, authentication.getName());
     }
 
     /**
@@ -232,24 +229,6 @@ public class EhrAccessTokenEndpoint extends AbstractEndpoint {
     @Override
     protected TokenGranter getTokenGranter() {
         return this.ehrTokenGranter;
-    }
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<OAuth2Exception> handleException(Exception e) throws Exception {
-        LOG.warn("Handling error: " + e.getClass().getSimpleName() + ", " + e.getMessage());
-        return getExceptionTranslator().translate(e);
-    }
-
-    @ExceptionHandler(ClientRegistrationException.class)
-    public ResponseEntity<OAuth2Exception> handleClientRegistrationException(Exception e) throws Exception {
-        LOG.warn("Handling error: " + e.getClass().getSimpleName() + ", " + e.getMessage());
-        return getExceptionTranslator().translate(new BadClientCredentialsException());
-    }
-
-    @ExceptionHandler(OAuth2Exception.class)
-    public ResponseEntity<OAuth2Exception> handleException(OAuth2Exception e) throws Exception {
-        LOG.warn("Handling error: " + e.getClass().getSimpleName() + ", " + e.getMessage());
-        return getExceptionTranslator().translate(e);
     }
 
     private ResponseEntity<AccessToken> getResponse(AccessToken accessToken) {
@@ -290,5 +269,11 @@ public class EhrAccessTokenEndpoint extends AbstractEndpoint {
         if (this.authenticationManager == null) {
             this.authenticationManager = (AuthenticationManager) applicationContext.getBean("authenticationManager");
         }
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<OAuth2Exception> handleException(Exception e) throws Exception {
+        LOG.warn("Handling error: " + e.getClass().getSimpleName() + ", " + e.getMessage());
+        return getExceptionTranslator().translate(e);
     }
 }

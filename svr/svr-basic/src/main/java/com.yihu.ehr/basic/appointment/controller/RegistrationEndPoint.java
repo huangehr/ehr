@@ -45,10 +45,9 @@ public class RegistrationEndPoint extends EnvelopRestEndPoint {
             Registration registration = registrationService.getById(id);
             envelop.setObj(registration);
             envelop.setSuccessFlg(true);
-            envelop.setErrorMsg("成功获取挂号单。");
         } catch (Exception e) {
             e.printStackTrace();
-            envelop.setErrorMsg("获取挂号单发生异常：" + e.getMessage());
+            envelop.setErrorMsg(e.getMessage());
         }
         return envelop;
     }
@@ -71,12 +70,16 @@ public class RegistrationEndPoint extends EnvelopRestEndPoint {
         try {
             List<Registration> list = registrationService.search(fields, filters, sorts, page, size);
             int count = (int) registrationService.getCount(filters);
+
+            // 根据就诊日期判断，更新过期的还没结束的挂号单为已就诊状态。
+            // 这是折中的办法，为了解决，成功预约、取消预约之外，没有触发点更新挂号单状态的问题。
+            registrationService.updateStateByRegisterDate(list);
+
             envelop = getPageResult(list, count, page, size);
             envelop.setSuccessFlg(true);
-            envelop.setErrorMsg("成功获取挂号单列表。");
         } catch (Exception e) {
             e.printStackTrace();
-            envelop.setErrorMsg("获取挂号单发生异常：" + e.getMessage());
+            envelop.setErrorMsg(e.getMessage());
         }
         return envelop;
     }
@@ -98,15 +101,14 @@ public class RegistrationEndPoint extends EnvelopRestEndPoint {
 
             envelop.setObj(newEntity);
             envelop.setSuccessFlg(true);
-            envelop.setErrorMsg("成功新增挂号单。");
         } catch (Exception e) {
             e.printStackTrace();
-            envelop.setErrorMsg("新增挂号单发生异常：" + e.getMessage());
+            envelop.setErrorMsg(e.getMessage());
         }
         return envelop;
     }
 
-    @ApiOperation("更新挂号单")
+    @ApiOperation("更新福州总部挂号单到医疗云对应挂号单")
     @RequestMapping(value = ServiceApi.Registration.Update, method = RequestMethod.POST)
     public Envelop update(
             @ApiParam(value = "医疗云挂号单ID", required = true)
@@ -153,13 +155,12 @@ public class RegistrationEndPoint extends EnvelopRestEndPoint {
                 registrationService.save(oldEntity);
 
                 envelop.setSuccessFlg(true);
-                envelop.setErrorMsg("成功更新挂号单。");
             } else {
                 envelop.setErrorMsg("更新时获取福州总部挂号单详情" + fzOrderInfoMap.get("Message"));
             }
         } catch (Exception e) {
             e.printStackTrace();
-            envelop.setErrorMsg("更新挂号单发生异常：" + e.getMessage());
+            envelop.setErrorMsg(e.getMessage());
         }
         return envelop;
     }
@@ -187,14 +188,28 @@ public class RegistrationEndPoint extends EnvelopRestEndPoint {
         try {
             Registration updateEntity = registrationService.getById(id);
             updateEntity.setState(state);
+            if (state == 1) {
+                updateEntity.setStateDesc("待付款");
+            } else if (state == 2) {
+                updateEntity.setStateDesc("待就诊");
+            } else if (state == 11) {
+                updateEntity.setStateDesc("预约中");
+            } else if (state == 22) {
+                updateEntity.setStateDesc("退款中");
+            } else if (state == 99) {
+                updateEntity.setStateDesc("已退号");
+            } else if (state == -1) {
+                updateEntity.setStateDesc("系统取消");
+            } else if (state == 3) {
+                updateEntity.setStateDesc("已就诊");
+            }
             updateEntity = registrationService.save(updateEntity);
 
             envelop.setObj(updateEntity);
             envelop.setSuccessFlg(true);
-            envelop.setErrorMsg("成功更新挂号单。");
         } catch (Exception e) {
             e.printStackTrace();
-            envelop.setErrorMsg("更新挂号单发生异常：" + e.getMessage());
+            envelop.setErrorMsg(e.getMessage());
         }
         return envelop;
     }

@@ -1,9 +1,10 @@
 package com.yihu.ehr.oauth2.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.ServiceApi;
-import com.yihu.ehr.model.app.MApp;
 import com.yihu.ehr.model.user.EhrUserSimple;
+import com.yihu.ehr.oauth2.model.Oauth2Failed;
 import com.yihu.ehr.oauth2.model.VerifyCode;
 import com.yihu.ehr.oauth2.oauth2.EhrOAuth2ExceptionTranslator;
 import com.yihu.ehr.oauth2.oauth2.EhrTokenGranter;
@@ -22,6 +23,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.common.exceptions.*;
 import org.springframework.security.oauth2.provider.*;
@@ -35,6 +37,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,7 +48,6 @@ import java.util.Map;
 public class EhrAuthLoginEndpoint extends AbstractEndpoint {
 
     private static final Logger LOG = LoggerFactory.getLogger(EhrAuthLoginEndpoint.class);
-    private static final String DEFAULT_GRANT_TYPE = "password";
 
     private OAuth2RequestFactory oAuth2RequestFactory;
     private OAuth2RequestValidator oAuth2RequestValidator = new DefaultOAuth2RequestValidator();
@@ -73,7 +75,7 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
     @Value("${fz-gateway.handlerId}")
     private String fzHandlerId;
     @Autowired
-    protected ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
 
 
     @PostConstruct
@@ -91,7 +93,7 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
         }
         Map<String, String> param = new HashMap<>();
         if (StringUtils.isEmpty(parameters.get("verify_code"))) {
-            param.put("grant_type", DEFAULT_GRANT_TYPE);
+            param.put("grant_type", "password");
             param.put("password", parameters.get("password"));
         } else {
             param.put("grant_type", "verify_code");
@@ -100,6 +102,7 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
         param.put("client_id", client_id);
         param.put("scope", scope);
         param.put("username", parameters.get("username"));
+        EhrUserSimple ehrUserSimple = ehrUserDetailsService.loadUserSimpleByUsername(param.get("username"));
         ClientDetails authenticatedClient = ehrJdbcClientDetailsService.loadClientByClientId(client_id);
         TokenRequest tokenRequest = oAuth2RequestFactory.createTokenRequest(param, authenticatedClient);
         //校验 client_id 是否一致
@@ -119,25 +122,40 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
         if (request.getHeader("login-device") != null && request.getHeader("login-device").equals("mobile")) {
             ehrRedisTokenStore.removeAccessToken(token.getValue());
             ehrRedisTokenStore.removeRefreshToken(token.getRefreshToken().getValue());
-            token = getTokenGranter().grant(DEFAULT_GRANT_TYPE, tokenRequest);
+            token = getTokenGranter().grant(param.get("grant_type"), tokenRequest);
         }
-        EhrUserSimple ehrUserSimple = ehrUserDetailsService.loadUserSimpleByUsername(parameters.get("username"));
         if (token == null) {
-            throw new UnsupportedGrantTypeException("Unsupported grant type: " + DEFAULT_GRANT_TYPE);
+            throw new UnsupportedGrantTypeException("Unsupported grant type: " + param.get("grant_type"));
         } else {
             ehrUserSimple.setAccessToken(token.getValue());
             ehrUserSimple.setTokenType(token.getTokenType());
             ehrUserSimple.setExpiresIn(token.getExpiresIn());
             ehrUserSimple.setRefreshToken(token.getRefreshToken().getValue());
-            ehrUserSimple.setUser(parameters.get("username"));
+            ehrUserSimple.setUser(param.get("username"));
             ehrUserSimple.setState(parameters.get("state"));
         }
         return getResponse(ehrUserSimple);
     }
 
+    @RequestMapping(value = ServiceApi.Authentication.Logout, method = RequestMethod.POST)
+    public ResponseEntity<String> logout(@RequestParam Map<String, String> parameters, HttpServletRequest request) {
+        String token = request.getHeader("token");
+        if (null == token) {
+            token = parameters.get("token");
+        }
+        OAuth2AccessToken oAuth2AccessToken = ehrRedisTokenStore.readAccessToken(token);
+        if (oAuth2AccessToken != null) {
+            ehrRedisTokenStore.removeAccessToken(oAuth2AccessToken.getValue());
+            ehrRedisTokenStore.removeRefreshToken(oAuth2AccessToken.getRefreshToken().getValue());
+        }
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Cache-Control", "no-store");
+        headers.set("Pragma", "no-cache");
+        return new ResponseEntity<>("Logout", headers, HttpStatus.OK);
+    }
+
     @RequestMapping(value = ServiceApi.Authentication.VerifyCode, method = RequestMethod.POST)
-    public Envelop verifyCode(@RequestParam Map<String, String> parameters) throws  Exception{
-        Envelop envelop =new Envelop();
+    public ResponseEntity<Envelop> verifyCode(@RequestParam Map<String, String> parameters) throws  Exception{
         String client_id = parameters.get("client_id");
         String username = parameters.get("username");
         VerifyCode verifyCode = new VerifyCode();
@@ -156,9 +174,10 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
         apiParamMap.put("content", content);
         //渠道号
         apiParamMap.put("clientId", fzClientId);
-        String resultStr = FzGatewayUtil.httpPost(fzGatewayUrl,fzClientId,fzClientVersion,api,apiParamMap, 1);
-        if (resultStr != null) {
-            Map<String, Object> resultMap = objectMapper.readValue(resultStr, Map.class);
+        String result = FzGatewayUtil.httpPost(fzGatewayUrl,fzClientId,fzClientVersion,api,apiParamMap, 1);
+        Envelop envelop = new Envelop();
+        if (!StringUtils.isEmpty(result)) {
+            Map<String, Object> resultMap = objectMapper.readValue(result, Map.class);
             Integer resultCode = 0;
             if (null != resultMap.get("Code") && !"".equals(resultMap.get("Code"))) {
                 resultCode = Integer.valueOf(resultMap.get("Code").toString());
@@ -171,17 +190,28 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
                 ehrRedisVerifyCodeService.store(client_id, username, random, 600000);
                 envelop.setSuccessFlg(true);
                 envelop.setObj(verifyCode);
-                envelop.setErrorMsg("短信验证码发送成功！");
+            }else if(resultCode == -201){
+                envelop.setSuccessFlg(false);
+                envelop.setErrorCode(resultCode);
+                envelop.setErrorMsg("短信已达每天限制的次数（10次）！");
+            }else if(resultCode == -200){
+                envelop.setSuccessFlg(false);
+                envelop.setErrorCode(resultCode);
+                envelop.setErrorMsg("短信发送频率太快（不能低于60s）！");
             } else {
                 envelop.setSuccessFlg(false);
                 envelop.setErrorCode(resultCode);
                 envelop.setErrorMsg("短信验证码发送失败！");
             }
-        }else{
+        } else {
             envelop.setSuccessFlg(false);
+            envelop.setErrorCode(ErrorCode.REQUEST_NOT_COMPLETED.value());
             envelop.setErrorMsg("短信验证码发送失败！");
         }
-        return envelop;
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Cache-Control", "no-store");
+        headers.set("Pragma", "no-cache");
+        return new ResponseEntity<>(envelop, headers, HttpStatus.OK);
     }
 
     @RequestMapping(value = ServiceApi.Authentication.VerifyCodeExpire, method = RequestMethod.POST)
@@ -193,30 +223,15 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
         int nextRequestTime = 60 + (expiresIn - 600 ) > 0 ? 60 + (expiresIn - 600 ) : 0;
         verifyCode.setNextRequestTime(nextRequestTime);
         verifyCode.setExpiresIn(expiresIn);
-        return new ResponseEntity<>(verifyCode, HttpStatus.OK);
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Cache-Control", "no-store");
+        headers.set("Pragma", "no-cache");
+        return new ResponseEntity<>(verifyCode, headers, HttpStatus.OK);
     }
 
     @Override
     protected TokenGranter getTokenGranter() {
         return this.ehrTokenGranter;
-    }
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<OAuth2Exception> handleException(Exception e) throws Exception {
-        LOG.warn("Handling error: " + e.getClass().getSimpleName() + ", " + e.getMessage());
-        return getExceptionTranslator().translate(e);
-    }
-
-    @ExceptionHandler(ClientRegistrationException.class)
-    public ResponseEntity<OAuth2Exception> handleClientRegistrationException(Exception e) throws Exception {
-        LOG.warn("Handling error: " + e.getClass().getSimpleName() + ", " + e.getMessage());
-        return getExceptionTranslator().translate(new BadClientCredentialsException());
-    }
-
-    @ExceptionHandler(OAuth2Exception.class)
-    public ResponseEntity<OAuth2Exception> handleException(OAuth2Exception e) throws Exception {
-        LOG.warn("Handling error: " + e.getClass().getSimpleName() + ", " + e.getMessage());
-        return getExceptionTranslator().translate(e);
     }
 
     @Override
@@ -238,6 +253,48 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
     @Override
     protected WebResponseExceptionTranslator getExceptionTranslator() {
         return ehrOAuth2ExceptionTranslator;
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Oauth2Failed> handleException(Exception e) throws Exception {
+        if (e instanceof UsernameNotFoundException) {
+            return handleOAuth2Exception(new Oauth2Failed(HttpStatus.UNAUTHORIZED.value(), "用户未注册!"));
+        } else if (e instanceof NoSuchClientException) {
+            return handleOAuth2Exception(new Oauth2Failed(HttpStatus.UNAUTHORIZED.value(), "应用未注册!"));
+        } else if (e instanceof InvalidGrantException) {
+            if (e.getMessage().equals("Invalid verify_code")) {
+                return handleOAuth2Exception(new Oauth2Failed(HttpStatus.UNAUTHORIZED.value(), "验证码有误!"));
+            }
+            return handleOAuth2Exception(new Oauth2Failed(HttpStatus.UNAUTHORIZED.value(), "密码有误!"));
+        }
+        e.printStackTrace();
+        return handleSystemException(new Oauth2Failed(HttpStatus.INTERNAL_SERVER_ERROR.value(), "系统繁忙!"));
+    }
+
+    private ResponseEntity<Oauth2Failed> handleOAuth2Exception(Oauth2Failed authenticationFailed) throws IOException {
+
+        int status = authenticationFailed.getErrorCode();
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Cache-Control", "no-store");
+        headers.set("Pragma", "no-cache");
+        if (status == HttpStatus.UNAUTHORIZED.value()) {
+            headers.set("WWW-Authenticate", String.format("%s %s", OAuth2AccessToken.BEARER_TYPE, authenticationFailed.getErrorMsg()));
+        }
+        ResponseEntity<Oauth2Failed> response = new ResponseEntity<>(authenticationFailed, headers,
+                HttpStatus.valueOf(status));
+
+        return response;
+
+    }
+
+    private ResponseEntity<Oauth2Failed> handleSystemException(Oauth2Failed authenticationFailed) throws IOException {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Cache-Control", "no-store");
+        headers.set("Pragma", "no-cache");
+        ResponseEntity<Oauth2Failed> response = new ResponseEntity<>(authenticationFailed, headers,
+                HttpStatus.valueOf(authenticationFailed.getErrorCode()));
+        return response;
+
     }
 
 }

@@ -249,10 +249,12 @@ public class ReportOption {
 
     public List<Object> getList(List<Map<String, Object>> dataList,String keyName){
         List<Object> returnList = new ArrayList<>();
-        for (Map<String, Object> objectMap : dataList) {
-            for(String key:objectMap.keySet()){
-                returnList.add(objectMap.get(keyName));
-                break;
+        if(dataList != null){
+            for (Map<String, Object> objectMap : dataList) {
+                for(String key:objectMap.keySet()){
+                    returnList.add(objectMap.get(keyName));
+                    break;
+                }
             }
         }
         return  returnList;

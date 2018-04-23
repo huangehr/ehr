@@ -10,13 +10,14 @@ import com.yihu.ehr.model.packs.EsDetailsPackage;
 import com.yihu.ehr.model.packs.EsSimplePackage;
 import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.pack.feign.SecurityClient;
-import com.yihu.ehr.pack.entity.Package;
 import com.yihu.ehr.util.encrypt.RSA;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -29,7 +30,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -45,6 +45,8 @@ import java.util.*;
 @RequestMapping(ApiVersion.Version1_0)
 @Api(value = "PackageEndPoint", description = "档案包", tags = {"档案包服务-档案包"})
 public class PackageEndPoint extends EnvelopRestEndPoint {
+
+    private static final Logger logger = LoggerFactory.getLogger(PackageEndPoint.class);
 
     private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static final String INDEX = "json_archives";
@@ -75,7 +77,6 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "md5", value = "档案包MD5")
             @RequestParam(value = "md5", required = false) String md5,
             HttpServletRequest request) throws Exception {
-
         MKey key = securityClient.getOrgKey(orgCode);
         if (key == null || key.getPrivateKey() == null) {
             throw new ApiException(HttpStatus.FORBIDDEN, ErrorCode.FORBIDDEN, "Invalid private key, maybe you miss the organization code?");
@@ -94,30 +95,31 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         String remoteFilePath = String.join(EsDetailsPackage.PATH_SEPARATOR, new String[]{group, remoteFile});
         //elasticSearch
         Date now = new Date();
-        String nowStr = dateFormat.format(now);
+        String _now = dateFormat.format(now);
         Map<String, Object> sourceMap = new HashMap<>();
         sourceMap.put("pwd", password);
         sourceMap.put("remote_path", remoteFilePath);
-        sourceMap.put("receive_date", nowStr);
-        sourceMap.put("parse_date", null);
-        sourceMap.put("finish_date", null);
+        sourceMap.put("receive_date", _now);
+        //sourceMap.put("parse_date", null);
+        //sourceMap.put("finish_date", null);
         sourceMap.put("archive_status", 0);
-        sourceMap.put("message", null);
+        //sourceMap.put("message", null);
         sourceMap.put("org_code", orgCode);
         sourceMap.put("client_id", getClientId(request));
         sourceMap.put("resourced", 0);
         sourceMap.put("md5_value", md5);
-        sourceMap.put("event_type", null);
-        sourceMap.put("event_no", null);
-        sourceMap.put("event_date", null);
-        sourceMap.put("patient_id", null);
+        //sourceMap.put("event_type", null);
+        //sourceMap.put("event_no", null);
+        //sourceMap.put("event_date", null);
+        //sourceMap.put("patient_id", null);
         sourceMap.put("fail_count", 0);
         sourceMap.put("analyze_status", 0);
         sourceMap.put("analyze_fail_count", 0);
-        sourceMap.put("analyze_date", null);
-        sourceMap.put("demographic_id", null);
-        sourceMap.put("re_upload_flg", null);
-        sourceMap.put("profile_id", null);
+        //sourceMap.put("analyze_date", null);
+        //sourceMap.put("demographic_id", null);
+        //sourceMap.put("re_upload_flg", null);
+        //sourceMap.put("profile_id", null);
+        sourceMap.put("pack_type", 1);
         //保存索引出错的时候，删除文件
         try {
             sourceMap = elasticSearchUtil.index(INDEX, TYPE, sourceMap);
@@ -133,19 +135,28 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         esSimplePackage.setClient_id(getClientId(request));
         redisTemplate.opsForList().leftPush(RedisCollection.PackageList, objectMapper.writeValueAsString(esSimplePackage));
         return true;
-        //messageBuffer.putMessage(convertToModel(aPackage, MPackage.class));
     }
 
     @RequestMapping(value = ServiceApi.Packages.Packages, method = RequestMethod.DELETE)
     @ApiOperation(value = "批量删除档案包", notes = "每次删除一万条记录")
     public boolean deletePackages(
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
-            @RequestParam(value = "filters", required = false) String filters) throws Exception {
-        List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, filters, 1, 10000);
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "count", value = "删除数量", required = true, defaultValue = "10000")
+            @RequestParam(value = "count") Integer count) throws Exception {
+        if (count > 10000) {
+            count = 10000;
+        }
+        List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, filters, 1, count);
+        List<String> idList = new ArrayList<>();
         for (Map<String, Object> temp : resultList) {
             String [] tokens =  String.valueOf(temp.get("remote_path")).split(":");
             fastDFSUtil.delete(tokens[0], tokens[1]);
-            elasticSearchUtil.delete(INDEX, TYPE, new String[]{String.valueOf(temp.get("_id"))});
+            idList.add(String.valueOf(temp.get("_id")));
+        }
+        if (idList.size() > 0) {
+            String [] _id = new String[idList.size()];
+            elasticSearchUtil.bulkDelete(INDEX, TYPE, idList.toArray(_id));
         }
         return true;
     }
@@ -161,7 +172,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         }
         String [] tokens =  String.valueOf(source.get("remote_path")).split(":");
         fastDFSUtil.delete(tokens[0], tokens[1]);
-        elasticSearchUtil.delete(INDEX, TYPE, new String[]{id});
+        elasticSearchUtil.delete(INDEX, TYPE, id);
         return true;
     }
 
@@ -225,12 +236,15 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "size", value = "状态", required = true)
             @RequestParam(value = "size") Integer size) throws Exception {
         List<Map<String, Object>> sourceList = elasticSearchUtil.page(INDEX, TYPE, filters, page, size);
+        List<Map<String, Object>> updateSourceList = new ArrayList<>(sourceList.size());
         sourceList.forEach(item -> {
             Map<String, Object> updateSource = new HashMap<>();
+            updateSource.put("_id", item.get("_id"));
             updateSource.put("archive_status", status.ordinal());
             updateSource.put("fail_count", 0);
-            elasticSearchUtil.update(INDEX, TYPE, String.valueOf(item.get("_id")), updateSource);
+            updateSourceList.add(updateSource);
         });
+        elasticSearchUtil.bulkUpdate(INDEX, TYPE, updateSourceList);
         return sourceList.size();
     }
 
@@ -343,7 +357,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             response.flushBuffer();
             return new ResponseEntity(HttpStatus.OK);
         }
-        return new ResponseEntity(HttpStatus.NOT_FOUND);
+        return null;
     }
 
     @RequestMapping(value = ServiceApi.Packages.PackageCrypto, method = RequestMethod.POST)
@@ -385,10 +399,12 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             }
         } else {
             List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, "archive_status=" + status.ordinal(), sorts, 1, count);
+            List<Map<String, Object>> updateSourceList = new ArrayList<>(resultList.size());
             for (Map<String, Object> item : resultList) {
                 Map<String, Object> updateSource = new HashMap<>();
                 updateSource.put("archive_status", 0);
-                elasticSearchUtil.update(INDEX, TYPE, String.valueOf(item.get("_id")), updateSource);
+                updateSource.put("_id", item.get("_id"));
+                updateSourceList.add(updateSource);
                 EsSimplePackage esSimplePackage = new EsSimplePackage();
                 esSimplePackage.set_id(String.valueOf(item.get("_id")));
                 esSimplePackage.setPwd(String.valueOf(item.get("pwd")));
@@ -396,6 +412,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
                 esSimplePackage.setClient_id(String.valueOf(item.get("client_id")));
                 redisTemplate.opsForList().leftPush(RedisCollection.PackageList, objectMapper.writeValueAsString(esSimplePackage));
             }
+            elasticSearchUtil.bulkUpdate(INDEX, TYPE, updateSourceList);
         }
         return "操作成功！";
     }
