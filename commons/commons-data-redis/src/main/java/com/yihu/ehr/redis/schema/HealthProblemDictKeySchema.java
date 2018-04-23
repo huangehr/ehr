@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 public class HealthProblemDictKeySchema extends KeySchema {
 
     public HealthProblemDictKeySchema(){
-        super.table="HealthProblemDict";
-        super.column="HpName";
+        super.table = "HealthProblemDict";
+        super.column = "HpName";
     }
 }

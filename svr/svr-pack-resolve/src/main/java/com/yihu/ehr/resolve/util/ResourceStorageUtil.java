@@ -39,6 +39,7 @@ public class ResourceStorageUtil {
             map.put(MasterResourceFamily.BasicColumns.DiagnosisName, resourceBucket.getDiagnosisName());
             map.put(MasterResourceFamily.BasicColumns.HealthProblem, resourceBucket.getHealthProblem());
             map.put(MasterResourceFamily.BasicColumns.HealthProblemName, resourceBucket.getHealthProblemName());
+            map.put(MasterResourceFamily.BasicColumns.ChronicInfo, resourceBucket.getChronicInfo());
             map.put(MasterResourceFamily.BasicColumns.EventNo, resourceBucket.getEventNo());
             map.put(MasterResourceFamily.BasicColumns.EventDate, DateTimeUtil.utcDateTimeFormat(resourceBucket.getEventDate()));
             map.put(MasterResourceFamily.BasicColumns.EventType, StringUtils.isEmpty(resourceBucket.getEventType()) ? "" : Integer.toString(resourceBucket.getEventType().ordinal()));

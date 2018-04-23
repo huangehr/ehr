@@ -481,6 +481,7 @@ public class ServiceApi {
         public static final String Fetch = "/packages/fetch/{id}";
         public static final String ImmediateResolve = "/immediate/resolve";
         public static final String Update = "/packages/update";
+        public static final String Migrate = "/packages/migrate";
     }
 
     //非病人维度
@@ -994,6 +995,7 @@ public class ServiceApi {
         public static final String InitHealthProblem = "/redis/init/healthProblem";
         public static final String InitIcd10HpR = "/redis/init/icd10HpR";
         public static final String InitIcd10 = "/redis/init/icd10";
+        public static final String InitIcd10ChronicInfo = "/redis/init/icd10ChronicInfo";
         public static final String InitIndicatorsDict = "/redis/init/indicatorsDict";
         public static final String InitOrgName = "/redis/init/orgName";
         public static final String InitOrgArea = "/redis/init/orgArea";
@@ -1018,6 +1020,7 @@ public class ServiceApi {
         public static final String HealthProblem = "/redis/healthProblem";
         public static final String Icd10HpR = "/redis/icd10HpRelation";
         public static final String Icd10Name = "/redis/icd10Name";
+        public static final String Icd10ChronicInfo = "/redis/icd10ChronicInfo";
         public static final String Icd10HpCode = "/redis/icd10HpCode";
         public static final String IndicatorsDict = "/redis/indicatorsDict";
         public static final String OrgName = "/redis/orgName";

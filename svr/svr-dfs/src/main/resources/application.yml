@@ -1,9 +1,6 @@
 server:
   port: ${svr-dfs.server.port}
 
-management:
-  port: ${server.port}
-
 info:
   app:
     name: svr-dfs
@@ -31,7 +28,6 @@ fast-dfs:
     tracker-http-port: 80
     anti-steal-token: no
     secret-key: FastDFS1234567890
-
   server:
     dict-code: FASTDFSWLDZ #外链地址系统字典拼音编码
   index:
@@ -103,9 +99,9 @@ fast-dfs:
 spring:
   profiles: prod_fzzy
   datasource:
-      url: jdbc:mysql:///100.100.1.159:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-      username: healthcloud
-      password: GP8Qz4qU
+    url: jdbc:mysql:///100.100.1.159:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: healthcloud
+    password: GP8Qz4qU
 elasticsearch:
   cluster-name: elasticsearch
   cluster-nodes: 100.100.1.158:9300
@@ -117,7 +113,7 @@ fast-dfs:
 spring:
   profiles: prod_srformal
   datasource:
-    url: jdbc:mysql:///192.168.40.34:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    url: jdbc:mysql://192.168.210.3:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: healthcloud
     password: GP8Qz4qU
 elasticsearch:

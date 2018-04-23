@@ -16,14 +16,14 @@ public class KeySchema {
 
     @Autowired
     protected RedisClient redisClient;
-    protected String table="table";
-    protected String column="column";
+    protected String table = "table";
+    protected String column = "column";
     protected String keySchema = "%1:%2:%3";
 
     /**
      * 获取key
      */
-    public String makeKey(String table,String key,String column){
+    public String makeKey(String table, String key, String column) {
         return new StringBuilderEx(keySchema)
                 .arg(table)
                 .arg(key)
@@ -34,21 +34,21 @@ public class KeySchema {
     /**
      * 获取单条缓存
      */
-    public  <T> T get(String key){
-        return redisClient.get(makeKey(table,key,column));
+    public  <T> T get(String key) {
+        return redisClient.get(makeKey(table, key, column));
     }
 
     /**
      * 保存单条缓存
      */
     public void set(String key, Serializable val){
-        redisClient.set(makeKey(table,key,column),val);
+        redisClient.set(makeKey(table, key, column), val);
     }
 
     /**
      * 删除单条缓存
      */
-    public void delete(String key){
+    public void delete(String key) {
         redisClient.delete(makeKey(table,key,column));
     }
 
@@ -56,7 +56,7 @@ public class KeySchema {
      * 删除所有缓存
      */
     public void deleteAll(){
-        redisClient.delete(makeKey(table,"*",column));
+        redisClient.delete(makeKey(table,"*", column));
     }
 
     /**

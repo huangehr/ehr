@@ -51,7 +51,7 @@ public class PackAnalyzeTask {
         addToQueue("analyze_status=2;analyze_fail_count<3;receive_date<" + fHours , updateSourceList);
         //添加分析异常的
         String date = DateUtil.toString(DateUtil.addDate(-3, new Date())) + " 00:00:00";
-        addToQueue("analyze_status=1;analyze_date<" + date + " 00:00:00", updateSourceList);
+        addToQueue("analyze_status=1;analyze_date<" + date, updateSourceList);
         savePack(updateSourceList);
     }
 

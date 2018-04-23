@@ -36,7 +36,6 @@ public class RedisClient {
             byte[] key_ = key.getBytes();
             byte[] value_ = SerializationUtils.serialize(value);
             connection.set(key_, value_);
-
             return true;
         });
     }
@@ -55,9 +54,6 @@ public class RedisClient {
             return true;
         });
     }
-
-
-
 
     /**
      * 批量设置key-value值。

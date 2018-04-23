@@ -5,7 +5,7 @@ import com.yihu.ehr.constants.ArchiveStatus;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.pack.dao.DatasetPackageRepository;
 import com.yihu.ehr.pack.entity.DatasetPackage;
-import com.yihu.ehr.pack.entity.Package;
+import com.yihu.ehr.pack.entity.JsonArchives;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.util.id.BizObject;
 import com.yihu.ehr.util.id.ObjectId;
@@ -92,7 +92,7 @@ public class DatasetPackageService extends BaseJpaService<DatasetPackage, Datase
             String remoteFile = msg.get(FastDFSUtil.REMOTE_FILE_NAME).asText();
 
             // 将组与文件ID使用英文分号隔开, 提取的时候, 只需要将它们这个串拆开, 就可以得到组与文件ID
-            String remoteFilePath = String.join(Package.pathSeparator, new String[]{group, remoteFile});
+            String remoteFilePath = String.join(JsonArchives.pathSeparator, new String[]{group, remoteFile});
 
             Map<String, String> metaData = new HashMap<>();
             metaData.put("id", objectId.toString());
@@ -138,7 +138,7 @@ public class DatasetPackageService extends BaseJpaService<DatasetPackage, Datase
 
     public String downloadTo(String remotePath, String localPath) {
         try {
-            String[] meta = remotePath.split(Package.pathSeparator);
+            String[] meta = remotePath.split(JsonArchives.pathSeparator);
             return fastDFSUtil.download(meta[0], meta[1], localPath);
         } catch (Exception ex) {
             throw new RuntimeException("fastDFS - " + ex.getMessage());

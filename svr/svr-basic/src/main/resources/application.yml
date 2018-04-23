@@ -39,6 +39,12 @@ eip:
 jksr-app:
   orgcode: PDY026797
 
+hadoop:
+  hbase-properties:
+    hbase.zookeeper.property.clientPort: 2181
+    zookeeper.znode.parent: /hbase-unsecure
+  user:
+    name: root
 
 ---
 spring:
@@ -47,16 +53,18 @@ spring:
     url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: chenweishan
     password: chenweishan
-  redis:
-    host: 172.19.103.47 # Redis server host.
-    port: 6379
-    password: redis!@456
+  # -- unknown use --
   ldap:
     host: 172.19.103.87
     port: 389
     bindDn: cn=admin,dc=ehr,dc=jkzl
     password: jkzl
     root: dc=ehr,dc=jkzl
+  # -- unknown use --
+  redis:
+    host: 172.19.103.47 # Redis server host.
+    port: 6379
+    password: redis!@456
   data:
     mongodb:
       host: 192.168.1.220
@@ -89,9 +97,6 @@ fz-gateway:
   clientId: 9000401
   clientVersion: 1.0
   secret: KU5XTORDKZI3O86YAT3ABCNJW2XTL1DJYF3GKU3ICXL
-hadoop:
-  user:
-    name: root
 
 ---
 spring:
@@ -100,16 +105,18 @@ spring:
     url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: weifuwu
     password: weifuwu
+  # -- unknown use --
+  ldap:
+      host: 172.19.103.87
+      port: 389
+      bindDn: cn=admin,dc=ehr,dc=jkzl
+      password: jkzl
+      root: dc=ehr,dc=jkzl
+  # -- unknown use --
   redis:
     host: 172.19.103.47 # Redis server host.
     port: 6379
     password: redis!@456
-  ldap:
-    host: 172.19.103.87
-    port: 389
-    bindDn: cn=admin,dc=ehr,dc=jkzl
-    password: jkzl
-    root: dc=ehr,dc=jkzl
   data:
     mongodb:
       host: 192.168.1.220
@@ -142,10 +149,6 @@ fz-gateway:
   clientId: 9000401
   clientVersion: 1.0
   secret: KU5XTORDKZI3O86YAT3ABCNJW2XTL1DJYF3GKU3ICXL
-hadoop:
-  user:
-    name: root
-
 
 ---
 spring:
@@ -154,6 +157,14 @@ spring:
     url: jdbc:mysql://11.1.2.5:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: healthcloud
     password: GP8Qz4qU
+  # -- unknown use --
+  ldap:
+    host: 172.19.103.87
+    port: 389
+    bindDn: cn=admin,dc=ehr,dc=jkzl
+    password: jkzl
+    root: dc=ehr,dc=jkzl
+  # -- unknown use --
   redis:
     host: 11.1.2.22 # Redis server host.
     port: 6390
@@ -191,9 +202,6 @@ fz-gateway:
   clientId: 9000401
   clientVersion: 1.0
   secret: 9U6PBF2JM3PE1IHRJ7GEITMJHNMEHOFZQ2XUCKD9TO2
-hadoop:
-  user:
-    name: root
 
 ---
 spring:
@@ -202,6 +210,14 @@ spring:
     url: jdbc:mysql://10.176.97.9:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: healthcloud
     password: GP8Qz4qU
+  # -- unknown use --
+  ldap:
+    host: 172.19.103.87
+    port: 389
+    bindDn: cn=admin,dc=ehr,dc=jkzl
+    password: jkzl
+    root: dc=ehr,dc=jkzl
+  # -- unknown use --
   redis:
     host: 10.176.97.5 # Redis server host.
     port: 6390
@@ -238,10 +254,6 @@ fz-gateway:
   clientId: 9000401
   clientVersion: 1.0
   secret: 9U6PBF2JM3PE1IHRJ7GEITMJHNMEHOFZQ2XUCKD9TO2
-hadoop:
-  user:
-    name: root
-
 
 ---
 spring:
@@ -250,6 +262,14 @@ spring:
     url: jdbc:mysql://100.100.1.159:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: healthcloud
     password: GP8Qz4qU
+  # -- unknown use --
+  ldap:
+    host: 172.19.103.87
+    port: 389
+    bindDn: cn=admin,dc=ehr,dc=jkzl
+    password: jkzl
+    root: dc=ehr,dc=jkzl
+  # -- unknown use --
   redis:
     host: 100.100.1.161 # Redis server host.
     port: 6390
@@ -286,18 +306,22 @@ fz-gateway:
   clientId: 9000401
   clientVersion: 1.0
   secret: 9U6PBF2JM3PE1IHRJ7GEITMJHNMEHOFZQ2XUCKD9TO2
-hadoop:
-  user:
-    name: root
-
 
 ---
 spring:
   profiles: prod_srformal
   datasource:
-    url: jdbc:mysql://192.168.40.34:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    url: jdbc:mysql://192.168.210.3:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: healthcloud
     password: GP8Qz4qU
+  # -- unknown use --
+  ldap:
+    host: 192.168.210.3
+    port: 389
+    bindDn: cn=admin,dc=ehr,dc=jkzl
+    password: jkzl
+    root: dc=ehr,dc=jkzl
+  # -- unknown use --
   redis:
     host: 192.168.50.82 # Redis server host.
     port: 6379
@@ -334,6 +358,3 @@ fz-gateway:
   clientId: 9000401
   clientVersion: 1.0
   secret: 9U6PBF2JM3PE1IHRJ7GEITMJHNMEHOFZQ2XUCKD9TO2
-hadoop:
-  user:
-    name: root

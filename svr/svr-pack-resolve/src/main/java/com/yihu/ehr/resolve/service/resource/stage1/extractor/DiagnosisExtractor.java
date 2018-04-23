@@ -37,9 +37,9 @@ public class DiagnosisExtractor extends KeyDataExtractor {
                 MetaDataRecord record = dataSet.getRecord(rowKey);
                 //获取门诊或住院诊断代码
                 for (String metaDataCode : codeMetaData) {
-                    String value = record.getMetaData(metaDataCode);
-                    if (!StringUtils.isEmpty(value)) {
-                        diagnosis.add(value);
+                    String icd10Code = record.getMetaData(metaDataCode);
+                    if (!StringUtils.isEmpty(icd10Code)) {
+                        diagnosis.add(icd10Code);
                     }
                 }
                 //获取门诊或住院诊断名称

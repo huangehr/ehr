@@ -21,24 +21,6 @@ spring:
     hibernate.dialect: org.hibernate.dialect.MySQL5Dialect
     show-sql: false
 
----
-spring:
-  profiles: test
-  datasource:
-    url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: weifuwu
-    password: weifuwu
-
-
-service-gateway:
-  username: user
-  password: eureka
-  url: http://192.168.1.221:10000/api/v1.0/admin
-
-kafka:
-  broker:
-    address: node1.hde.h3c.com:6667
-
 
 ---
 spring:
@@ -57,25 +39,23 @@ kafka:
   broker:
     address: node1.hde.h3c.com:6667
 
-
-
 ---
 spring:
-  profiles: prod
+  profiles: test
   datasource:
-    url: jdbc:mysql://172.19.103.77/wlyy?useUnicode=true&characterEncoding=utf-8&autoReconnect=true&useSSL=false
-    username: root
-    password: 123456
+    url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: weifuwu
+    password: weifuwu
+
 
 service-gateway:
   username: user
   password: eureka
-  url: http://192.168.135.31:10000/api/v1.0/admin
+  url: http://192.168.1.221:10000/api/v1.0/admin
 
 kafka:
   broker:
     address: node1.hde.h3c.com:6667
-
 
 ---
 spring:
@@ -93,7 +73,6 @@ service-gateway:
 kafka:
   broker:
     address: 11.1.2.21:6667
-
 
 ---
 spring:
