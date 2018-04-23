@@ -56,7 +56,7 @@ public class RedisEndPoint extends EnvelopRestEndPoint {
     }
 
     @ApiOperation("通过ICD10编码获取ICD10慢病信息")
-    @RequestMapping(value = ServiceApi.Redis.InitIcd10ChronicInfo, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Redis.Icd10ChronicInfo, method = RequestMethod.GET)
     public String cacheIcd10ChronicInfo(
             @ApiParam(value = "key", required = true)
             @RequestParam(value = "key") String key) throws Exception {
