@@ -52,6 +52,24 @@ public class RegistrationEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
+    @ApiOperation("根据orderId获取挂号单")
+    @RequestMapping(value = ServiceApi.Registration.GetByOrderId, method = RequestMethod.GET)
+    public Envelop getByOrderId(
+            @ApiParam(name = "orderId", value = "福州总部挂号单Id", required = true)
+            @PathVariable(value = "orderId") String orderId) {
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(false);
+        try {
+            Registration registration = registrationService.getByOrderId(orderId);
+            envelop.setObj(registration);
+            envelop.setSuccessFlg(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return envelop;
+    }
+
     @ApiOperation(value = "根据条件获取挂号单")
     @RequestMapping(value = ServiceApi.Registration.Search, method = RequestMethod.GET)
     public Envelop search(

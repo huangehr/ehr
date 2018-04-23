@@ -28,6 +28,10 @@ public class RegistrationService extends BaseJpaService<Registration, Registrati
         return registrationDao.findOne(id);
     }
 
+    public Registration getByOrderId(String orderId) {
+        return registrationDao.getByOrderId(orderId);
+    }
+
     @Transactional(readOnly = false)
     public Registration save(Registration registration) {
         return registrationDao.save(registration);
