@@ -27,4 +27,7 @@ public interface UserAppDao extends JpaRepository<UserApp, String> {
 
     @Query("select userApp from UserApp userApp where userApp.appId = :appId " )
     List<UserApp> findByAppId(@Param("appId") String appId);
+
+    @Query("select userApp from UserApp userApp where userApp.userId in (:userIds) " )
+    List<UserApp> findByuserId(@Param("userIds") List<String> userIds);
 }
