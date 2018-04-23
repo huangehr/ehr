@@ -30,7 +30,7 @@ public class ElasticSearchUtil {
     @Autowired
     private ElasticSearchClient elasticSearchClient;
 
-    public void mapping(String index, String type, Map<String, Map<String, String>> source, Map<String, Object> setting) throws IOException{
+    public void mapping (String index, String type, Map<String, Map<String, String>> source, Map<String, Object> setting) throws IOException{
         XContentBuilder xContentBuilder = XContentFactory.jsonBuilder().startObject().startObject("properties");
         for (String field : source.keySet()) {
             xContentBuilder.startObject(field);
@@ -44,33 +44,49 @@ public class ElasticSearchUtil {
         elasticSearchClient.mapping(index, type, xContentBuilder, setting);
     }
 
-    public void remove(String index){
+    public void remove (String index){
         elasticSearchClient.remove(index);
     }
 
-    public Map<String, Object> index(String index, String type, Map<String, Object> source) throws ParseException{
+    public Map<String, Object> index (String index, String type, Map<String, Object> source) throws ParseException{
         return elasticSearchClient.index(index, type, source);
     }
 
-    public void delete(String index, String type, String [] idArr) {
-        elasticSearchClient.delete(index, type, idArr);
+    public void bulkIndex (String index, String type, List<Map<String, Object>> source) throws ParseException{
+        if (source.size() > 0) {
+            elasticSearchClient.bulkIndex(index, type, source);
+        }
+    }
+
+    public void delete (String index, String type, String id) {
+        elasticSearchClient.delete(index, type, id);
+    }
+
+    public void bulkDelete (String index, String type, String [] idArr) {
+        if (idArr.length > 0) {
+            elasticSearchClient.bulkDelete(index, type, idArr);
+        }
     }
 
     public void deleteByField(String index, String type, String field, Object value) {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-        MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchPhraseQuery(field, value);
-        boolQueryBuilder.must(matchQueryBuilder);
+        TermsQueryBuilder termsQueryBuilder = QueryBuilders.termsQuery(field, value);
+        boolQueryBuilder.must(termsQueryBuilder);
         List<String> idList = elasticSearchClient.getIds(index, type, boolQueryBuilder);
         String [] idArr = new String[idList.size()];
         idArr = idList.toArray(idArr);
-        elasticSearchClient.delete(index, type, idArr);
+        elasticSearchClient.bulkDelete(index, type, idArr);
     }
 
     public Map<String, Object> update(String index, String type, String id, Map<String, Object> source) throws DocumentMissingException {
-        if (source.containsKey("_id")) {
-            source.remove("_id");
-        }
+        source.remove("_id");
         return elasticSearchClient.update(index, type, id, source);
+    }
+
+    public void bulkUpdate(String index, String type, List<Map<String, Object>> source) throws DocumentMissingException {
+        if (source.size() > 0) {
+            elasticSearchClient.bulkUpdate(index, type, source);
+        }
     }
 
     public Map<String, Object> findById(String index, String type, String id) {

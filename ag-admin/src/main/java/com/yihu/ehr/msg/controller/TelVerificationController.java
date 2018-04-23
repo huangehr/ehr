@@ -104,10 +104,18 @@ public class TelVerificationController extends BaseController {
                 if (resultCode == 10000) {
                     envelop.setSuccessFlg(true);
                     envelop.setErrorMsg("短信验证码发送成功！");
-                } else {
+                } else if(resultCode == -201){
                     envelop.setSuccessFlg(false);
                     envelop.setErrorCode(resultCode);
-                    envelop.setErrorMsg("短信验证码发送失败！");
+                    envelop.setErrorMsg("短信已达每天限制的次数（10次）！");
+                }else if(resultCode == -200){
+                    envelop.setSuccessFlg(false);
+                    envelop.setErrorCode(resultCode);
+                    envelop.setErrorMsg("短信发送频率太快（不能低于60s）！");
+                }else{
+                    envelop.setSuccessFlg(false);
+                    envelop.setErrorCode(resultCode);
+                    envelop.setErrorMsg("短信发送失败！");
                 }
             }else{
                 envelop.setSuccessFlg(false);

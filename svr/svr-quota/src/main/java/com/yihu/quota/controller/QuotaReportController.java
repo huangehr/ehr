@@ -791,4 +791,141 @@ public class QuotaReportController extends BaseController {
         map.put("costOfMedicalMonitor", costOfMedicalMonitor);
         return map;
     }
+
+    @ApiOperation(value = "首页费用组成")
+    @RequestMapping(value = ServiceApi.TJ.GetCostComposeReports, method = RequestMethod.GET)
+    public MChartInfoModel getCostComposeReports(
+            @ApiParam(name = "quotaIdStr", value = "指标ID,多个用,拼接", required = true)
+            @RequestParam(value = "quotaIdStr" , required = true) String quotaIdStr,
+            @ApiParam(name = "charType", value = "图表类型用", defaultValue = "1")
+            @RequestParam(value = "charType", required = true) String charType,
+            @ApiParam(name = "filter", value = "过滤", defaultValue = "")
+            @RequestParam(value = "filter", required = false) String filter,
+            @ApiParam(name = "dimension", value = "维度字段", defaultValue = "quotaDate")
+            @RequestParam(value = "dimension", required = false) String dimension,
+            @ApiParam(name = "title", value = "视图名称", defaultValue = "")
+            @RequestParam(value = "title", required = false) String title
+    ) {
+        List<String> quotaIds = Arrays.asList(quotaIdStr.split(","));
+        MChartInfoModel chartInfoModel = new MChartInfoModel();
+        String dimensionName = dimension + "Name";
+        if ("quotaName".equals(dimension)) {
+            dimensionName = "quotaName";
+        }
+        try {
+            Option option = null;
+            List<String> lineNames = new ArrayList<>();
+            Map<String, Map<String, Object>> lineData = new LinkedHashMap<>();
+            Map<String, String> xAxisMap = new LinkedHashMap<>();
+            Integer i = 0;
+            List<Map<String, Object>> listMap = new ArrayList<>();
+
+            for (String quotaId : quotaIds) {
+                Map<String, Object> dataMap = new LinkedHashMap<>();
+                TjQuota tjQuota = quotaService.findOne(Integer.valueOf(quotaId));
+                if (tjQuota != null) {
+                    List<Map<String, Object>> resultListMap = baseStatistsService.getSimpleQuotaReport(tjQuota.getCode(), filter, dimension,true);
+                    if (resultListMap != null && resultListMap.size() > 0) {
+                        for (Map<String, Object> map : resultListMap) {
+                            if (map != null && map.size() > 0) {
+                                if (map.containsKey("quotaName")) {
+                                    map.put("quotaName",tjQuota.getName());
+                                }
+                                //第一种 ES库中有定义的维度 如org,slaveKey1
+                                //第二种 ES库中未定义的维度 如level，economic
+                                if (map.containsKey(dimensionName)) {
+                                    if(map.get(dimensionName) != null){
+                                        dataMap.put(map.get(dimensionName).toString(), map.get("result"));
+                                        xAxisMap.put(map.get(dimensionName).toString(), map.get(dimension).toString());
+                                    }
+                                } else {
+                                    if(map.get(dimension) != null){
+                                        dataMap.put(map.get(dimension).toString(), map.get("result"));
+                                        xAxisMap.put(map.get(dimension).toString(), map.get(dimension).toString());
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+                }
+                lineData.put("" + i, dataMap);
+                lineNames.add(tjQuota.getName());
+                i++;
+            }
+            Set<String> hashSet = new HashSet<>(lineNames);
+            Map<String, Object> newMap = new HashMap<>();
+            for (Map<String, Object> data : lineData.values()) {
+                for (Map.Entry<String, Object> lastMap : data.entrySet()) {
+                    if (newMap.containsKey(lastMap.getKey())) {
+                        double v = Double.parseDouble(newMap.get(lastMap.getKey()) + "") + Double.parseDouble(lastMap.getValue() + "");
+                        newMap.put(lastMap.getKey() + "", v);
+                    } else {
+                        newMap.put(lastMap.getKey(), lastMap.getValue());
+                    }
+                    hashSet.add(lastMap.getKey());
+                }
+            }
+            lineNames.clear();
+            lineNames.addAll(hashSet);
+            lineData.clear();
+            for (int j = 0; j < lineNames.size(); j++) {
+                String name = lineNames.get(j);
+                Map<String, Object> tempMap = new HashMap<>();
+                tempMap.put(name, newMap.get(name));
+                lineData.put("" + j, tempMap);
+                Map<String, Object> listMapCon = new HashMap<>();
+                listMapCon.put("quotaName", name);
+                listMapCon.put("result", newMap.get(name));
+                listMap.add(listMapCon);
+            }
+
+
+            ReportOption reportOption = new ReportOption();
+            if (charType.equals("common")) {
+                charType = "1";
+            } else if (charType.equals("twoDimensional")) {
+                return null;
+            }
+            List<String> charTypes = Arrays.asList(charType);
+            int type = Integer.valueOf(charType);
+            if (type == ReportOption.bar) {
+                return null;    // 尚未拓展
+            } else if (type == ReportOption.line) {
+                return null;    // 尚未拓展
+            } else if (type == ReportOption.pie) {
+                List<Map<String, Object>> datalist = new ArrayList<>();
+                for (Map<String, Object> resultMap : listMap) {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("NAME", resultMap.get(dimensionName));
+                    map.put("TOTAL", resultMap.get("result"));
+                    if(resultMap.get(dimensionName) != null){
+                        map.put("NAME",resultMap.get(dimensionName));
+                    }else {
+                        //非 指标中配置的维度 关联出来的字段
+                        if(dimensionName.equals("levelName")){
+                            if(resultMap.get(dimension).equals("1")){
+                                map.put("NAME","一级医院");
+                            }else  if(resultMap.get(dimension).equals("2")){
+                                map.put("NAME","二级医院");
+                            }else  if(resultMap.get(dimension).equals("3")){
+                                map.put("NAME","三级医院");
+                            }
+                        }
+                    }
+                    map.put("TOTAL",resultMap.get("result"));
+                    datalist.add(map);
+                }
+                option = reportOption.getPieEchartOption(title, "", "", datalist, lineNames.get(0), null);
+            }
+            chartInfoModel.setOption(option.toString());
+            chartInfoModel.setTitle(title);
+            chartInfoModel.setxAxisMap(xAxisMap);
+            return chartInfoModel;
+        } catch (Exception e) {
+            error(e);
+            invalidUserException(e, -1, "查询失败:" + e.getMessage());
+            return null;
+        }
+    }
 }

@@ -55,6 +55,8 @@ elasticsearch:
 
 eip:
   tenant: jkzl
+h5:
+  clientId: WYo0l73F8e
 
 ---
 spring:

@@ -389,23 +389,29 @@ public class UserController extends BaseController {
                 return failed(errorMsg);
             }
             MUser mUser = userClient.getUser(detailModel.getId());
-            if (!mUser.getLoginCode().equals(detailModel.getLoginCode())
-                    && userClient.isUserNameExists(detailModel.getLoginCode())) {
-                return failed("账户已存在!");
+            if(mUser.getLoginCode() != null){
+                if (!mUser.getLoginCode().equals(detailModel.getLoginCode())
+                        && userClient.isUserNameExists(detailModel.getLoginCode())) {
+                    return failed("账户已存在!");
+                }
             }
-
-            if (mUser.getIdCardNo() != null && !mUser.getIdCardNo().equals(detailModel.getIdCardNo())
-                    && userClient.isIdCardExists(detailModel.getIdCardNo())) {
-                return failed("身份证号已存在!");
+            if(mUser.getIdCardNo() != null){
+                if (mUser.getIdCardNo() != null && !mUser.getIdCardNo().equals(detailModel.getIdCardNo())
+                        && userClient.isIdCardExists(detailModel.getIdCardNo())) {
+                    return failed("身份证号已存在!");
+                }
             }
-
-            if (!mUser.getEmail().equals(detailModel.getEmail())
-                    && userClient.isEmailExists(detailModel.getEmail())) {
-                return failed("邮箱已存在!");
+            if(mUser.getEmail() != null){
+                if (!mUser.getEmail().equals(detailModel.getEmail())
+                        && userClient.isEmailExists(detailModel.getEmail())) {
+                    return failed("邮箱已存在!");
+                }
             }
-            if (!mUser.getTelephone().equals(detailModel.getTelephone())
-                    && userClient.isTelephoneExists(detailModel.getTelephone())) {
-                return failed("电话号码已存在!");
+            if(mUser.getTelephone() != null){
+                if (!mUser.getTelephone().equals(detailModel.getTelephone())
+                        && userClient.isTelephoneExists(detailModel.getTelephone())) {
+                    return failed("电话号码已存在!");
+                }
             }
            /* if (userClient.isTelephoneExists(detailModel.getSecondPhone())) {
                 return failed("备用号码已存在!");

@@ -152,7 +152,7 @@ public class Zipper {
      */
     public File unzipFile(File zipFile, String unzipDirectory, String pwd) throws Exception {
         ZipFile zFile = new ZipFile(zipFile);
-        zFile.setFileNameCharset("GBK");
+        zFile.setFileNameCharset("UTF-8");//乱码问题
         if (!zFile.isValidZipFile()) {
             throw new ZipException("无效的压缩文件.");
         }
