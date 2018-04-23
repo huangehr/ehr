@@ -1572,6 +1572,7 @@ public class ServiceApi {
         public static final String Prefix = "/appointment/registration/";
 
         public static final String GetById = "/appointment/registration/{id}";
+        public static final String GetByOrderId = "/appointment/registration/orderId/{orderId}";
         public static final String Search = "/appointment/registration/search";
         public static final String Save = "/appointment/registration/save";
         public static final String Update = "/appointment/registration/update";
