@@ -60,7 +60,7 @@ public class Doctors {
     }
 
 
-    @Column(name = "userId",  nullable = false)
+    @Column(name = "userId",  nullable = true)
     public String getUserId() {
         return userId;
     }

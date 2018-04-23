@@ -5,6 +5,7 @@ import com.yihu.ehr.basic.org.dao.OrganizationRepository;
 import com.yihu.ehr.basic.org.model.OrgDept;
 import com.yihu.ehr.basic.org.model.Organization;
 import com.yihu.ehr.entity.address.Address;
+import com.yihu.ehr.model.org.MOrgDeptJson;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.util.id.BizObject;
 import com.yihu.ehr.util.id.ObjectId;
@@ -323,5 +324,17 @@ public class OrgService extends BaseJpaService<Organization, OrganizationReposit
         SQLQuery sqlQuery = currentSession().createSQLQuery(sql);
         sqlQuery.setParameterList("orgIds", orgIds);
         return sqlQuery.list();
+    }
+
+    public List<String> getOrgList(List<MOrgDeptJson> orgDeptJsonList) {
+        List<Long> orgId = new ArrayList<>();
+        for (MOrgDeptJson org : orgDeptJsonList) {
+            orgId.add(Long.parseLong(org.getOrgId()));
+        }
+        if (orgId.size() > 0) {
+            List<String> orgList = organizationRepository.findOrgListById(orgId);
+            return orgList;
+        }
+        return null;
     }
 }

@@ -886,7 +886,7 @@ public class UserEndPoint extends EnvelopRestEndPoint {
         }
         user = userService.saveUser(user);
         // orgcode卫计委机构编码-PDY026797 添加居民的时候 默认 加到卫计委-居民角色中
-        List<Roles> rolesList = rolesService.findByCodeAndAppIdAndOrgCode(orgcode,appId,"Patient");
+        List<Roles> rolesList = rolesService.findByCodeAndAppIdAndOrgCode(Arrays.asList(new String[]{orgcode}),appId,"Patient");
         //在org_member_relation 表里追加关联关系
         if(null != rolesList && rolesList.size()>0){
             roleUserService.batchCreateRoleUsersRelation(userId,String.valueOf(rolesList.get(0).getId()));
