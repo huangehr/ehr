@@ -49,6 +49,7 @@ public class PackMillService {
         if (stdPack.getDiagnosisList() != null && stdPack.getDiagnosisList().size() > 0) {
             Set<String> healthProblemList = new HashSet<>();
             Set<String> healthProblemNameList = new HashSet<>();
+            Set<String> chronicInfoList = new HashSet<>();
             for (String diagnosis : stdPack.getDiagnosisList()) {
                 String healthProblem = redisService.getHpCodeByIcd10(diagnosis);//通过ICD10获取健康问题
                 if (!StringUtils.isEmpty(healthProblem)) {
@@ -59,11 +60,19 @@ public class PackMillService {
                         healthProblemNameList.add(hpName);
                     }
                 }
+                String chronicInfo = redisService.getChronicInfo(diagnosis); //ICD10慢病信息
+                if (chronicInfo != null) {
+                    chronicInfoList.add(chronicInfo);
+                }
             }
             resourceBucket.setDiagnosis(StringUtils.join(stdPack.getDiagnosisList().toArray(),";"));//ICD10
             resourceBucket.setDiagnosisName(StringUtils.join(stdPack.getDiagnosisNameList().toArray(),";"));//ICD10名称
             resourceBucket.setHealthProblem(StringUtils.join(healthProblemList.toArray(),";"));//健康问题
             resourceBucket.setHealthProblemName(StringUtils.join(healthProblemNameList.toArray(),";"));//健康问题名称
+            if (chronicInfoList.size() > 0) { //ICD10慢病信息
+                stdPack.setChronicInfoList(chronicInfoList);
+                resourceBucket.setChronicInfo(StringUtils.join(chronicInfoList.toArray(),";"));
+            }
         }
 
         //获取数据集的集合

@@ -25,44 +25,42 @@ public class RedisEndPoint extends EnvelopRestEndPoint {
 
     @ApiOperation("通过AddressDict ID获取地址")
     @RequestMapping(value = ServiceApi.Redis.Address, method = RequestMethod.GET)
-    public String getAddress(@ApiParam(value = "key", defaultValue = "")
-                             @RequestParam("key") String key) {
+    public String getAddress(
+            @ApiParam(value = "key", required = true)
+            @RequestParam(value = "key") String key) {
         return redisService.getAddress(key);
     }
 
     @ApiOperation("通过HP编码取健康问题名称")
     @RequestMapping(value = ServiceApi.Redis.HealthProblem, method = RequestMethod.GET)
-    public String getHealthProblem(@ApiParam(value = "key", defaultValue = "")
-                                   @RequestParam("key") String key) {
+    public String getHealthProblem(
+            @ApiParam(value = "key", required = true)
+            @RequestParam(value = "key") String key) {
         return redisService.getHealthProblem(key);
-    }
-
-    @ApiOperation("通过ICD10编码获取对应的HP健康问题编码和名称组合值")
-    @RequestMapping(value = ServiceApi.Redis.Icd10HpR, method = RequestMethod.GET)
-    public String getIcd10HpRelation(@ApiParam(value = "key", defaultValue = "")
-                                     @RequestParam("key") String key) {
-        return redisService.getIcd10HpRelation(key);
     }
 
     @ApiOperation("通过ICD10编码获取ICD10名称")
     @RequestMapping(value = ServiceApi.Redis.Icd10Name, method = RequestMethod.GET)
-    public String getIcd10Name(@ApiParam(value = "key", defaultValue = "")
-                               @RequestParam("key") String key) {
+    public String getIcd10Name(
+            @ApiParam(value = "key", required = true)
+            @RequestParam(value = "key") String key) {
         return redisService.getIcd10Name(key);
     }
 
     @ApiOperation("通过ICD10编码获取HP健康问题编码")
     @RequestMapping(value = ServiceApi.Redis.Icd10HpCode, method = RequestMethod.GET)
-    public String getHpCodeByIcd10(@ApiParam(value = "key", defaultValue = "")
-                                   @RequestParam("key") String key) {
+    public String getHpCodeByIcd10(
+            @ApiParam(value = "key", required = true)
+            @RequestParam(value = "key") String key) {
         return redisService.getHpCodeByIcd10(key);
     }
 
-    @ApiOperation("通过指标编码获取指标相关数据")
-    @RequestMapping(value = ServiceApi.Redis.IndicatorsDict, method = RequestMethod.GET)
-    public String getIndicators(@ApiParam(value = "key", defaultValue = "")
-                                @RequestParam("key") String key) {
-        return redisService.getIndicators(key);
+    @ApiOperation("通过ICD10编码获取ICD10慢病信息")
+    @RequestMapping(value = ServiceApi.Redis.InitIcd10ChronicInfo, method = RequestMethod.GET)
+    public String cacheIcd10ChronicInfo(
+            @ApiParam(value = "key", required = true)
+            @RequestParam(value = "key") String key) throws Exception {
+        return redisService.getChronicInfo(key);
     }
 
     @ApiOperation("通过机构编码获取机构名称")
@@ -88,7 +86,6 @@ public class RedisEndPoint extends EnvelopRestEndPoint {
 
     @ApiOperation("通过机构编码获取机构SAAS机构权限范围")
     @RequestMapping(value = ServiceApi.Redis.OrgSaasOrg, method = RequestMethod.GET)
-    @ResponseBody
     public String getOrgSaasOrg(@ApiParam(value = "key", defaultValue = "")
                                 @RequestParam("key") String key) {
         return redisService.getOrgSaasOrg(key);
@@ -97,7 +94,6 @@ public class RedisEndPoint extends EnvelopRestEndPoint {
     //------------------------------------ 资源化相关 START -------------------------------------------------------
     @ApiOperation("通过StdDataSet版本、标准数据元字典编码和标准数据元字典项编码获取资源化字典映射(rs_adapter_dictionary)")
     @RequestMapping(value = ServiceApi.Redis.RsAdapterDict, method = RequestMethod.GET)
-    @ResponseBody
     public String getRsAdapterDict(@ApiParam(value = "cdaVersion", defaultValue = "")
                                    @RequestParam("cdaVersion") String cdaVersion,
                                    @ApiParam(value = "srcDictCode", defaultValue = "")
@@ -109,7 +105,6 @@ public class RedisEndPoint extends EnvelopRestEndPoint {
 
     @ApiOperation("通过StdDataSet版本、编码和标准数据元内部编码获取资源化数据元ID(rs_adapter_metadata)")
     @RequestMapping(value = ServiceApi.Redis.RsAdapterMetadata, method = RequestMethod.GET)
-    @ResponseBody
     public String getRsAdapterMetaData(@ApiParam(value = "cdaVersion", defaultValue = "")
                                        @RequestParam("cdaVersion") String cdaVersion,
                                        @ApiParam(value = "srcDataSetCode", defaultValue = "")
@@ -121,7 +116,6 @@ public class RedisEndPoint extends EnvelopRestEndPoint {
 
     @ApiOperation("通过资源化数据元ID获取标准数据元字典编码")
     @RequestMapping(value = ServiceApi.Redis.RsMetadata, method = RequestMethod.GET)
-    @ResponseBody
     public String getRsMetaData(@ApiParam(value = "key", defaultValue = "")
                                 @RequestParam("key") String key) {
         return redisService.getRsMetaData(key);
@@ -131,7 +125,6 @@ public class RedisEndPoint extends EnvelopRestEndPoint {
     //------------------------------------ 标准相关 START -------------------------------------------------------
     @ApiOperation("通过version值获取版本名")
     @RequestMapping(value = ServiceApi.Redis.StdVersion, method = RequestMethod.GET)
-    @ResponseBody
     public String getStdVersion(@ApiParam(value = "key", defaultValue = "59083976eebd")
                                 @RequestParam("key") String key) {
         return redisService.getStdVersion(key);
@@ -139,7 +132,6 @@ public class RedisEndPoint extends EnvelopRestEndPoint {
 
     @ApiOperation("通过StdDataSet版本和id获取标准数据集编码")
     @RequestMapping(value = ServiceApi.Redis.StdDataSetCode, method = RequestMethod.GET)
-    @ResponseBody
     public String getDataSetCode(@ApiParam(value = "version", defaultValue = "")
                                  @RequestParam("version") String version,
                                  @ApiParam(value = "id", defaultValue = "")
@@ -262,6 +254,20 @@ public class RedisEndPoint extends EnvelopRestEndPoint {
         return redisService.isDictCodeExist(version, dictId, entryCode);
     }
     //------------------------------------ 标准相关 END -------------------------------------------------------
+
+    @ApiOperation("通过指标编码获取指标相关数据")
+    @RequestMapping(value = ServiceApi.Redis.IndicatorsDict, method = RequestMethod.GET)
+    public String getIndicators(@ApiParam(value = "key", defaultValue = "")
+                                @RequestParam("key") String key) {
+        return redisService.getIndicators(key);
+    }
+
+    @ApiOperation("通过ICD10编码获取对应的HP健康问题编码和名称组合值")
+    @RequestMapping(value = ServiceApi.Redis.Icd10HpR, method = RequestMethod.GET)
+    public String getIcd10HpRelation(@ApiParam(value = "key", defaultValue = "")
+                                     @RequestParam("key") String key) {
+        return redisService.getIcd10HpRelation(key);
+    }
 
 
 }

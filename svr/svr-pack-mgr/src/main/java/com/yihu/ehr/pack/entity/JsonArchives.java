@@ -18,11 +18,10 @@ import java.util.Date;
  * @author Sand
  * @created 2015.07.09 15:08
  */
-/*@Entity
+@Entity
 @Table(name = "json_archives")
-@Access(value = AccessType.PROPERTY)*/
-@Deprecated
-public class Package {
+@Access(value = AccessType.PROPERTY)
+public class JsonArchives {
     public final static String pathSeparator = ":";     // 使用冒号作为路径分隔符，与Linux一致
 
     private String id;

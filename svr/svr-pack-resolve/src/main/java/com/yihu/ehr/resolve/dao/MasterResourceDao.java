@@ -41,7 +41,7 @@ public class MasterResourceDao {
                 bundle.addValues(rowKey, MasterResourceFamily.Data, originResult);
                 hbaseDao.save(ResourceCore.MasterTable, bundle);
                 Map<String, String> basicResult = hbaseDao.get(ResourceCore.MasterTable, rowKey, MasterResourceFamily.Basic);
-                if(basicResult.get("event_type") != null) {
+                if (basicResult.get("event_type") != null) {
                     EventType eventType = EventType.create(basicResult.get("event_type"));
                     standardPackage.setEventType(eventType);
                 }

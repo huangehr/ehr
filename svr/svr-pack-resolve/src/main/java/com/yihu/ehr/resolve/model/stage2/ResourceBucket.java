@@ -55,6 +55,8 @@ public class ResourceBucket {
     private String healthProblem;
     //健康问题名称，分号分隔
     private String healthProblemName;
+    //慢病信息
+    private String chronicInfo;
     //重传标识
     private boolean reUploadFlg;
     //身份识别标志
@@ -238,6 +240,14 @@ public class ResourceBucket {
 
     public void setHealthProblemName(String healthProblemName) {
         this.healthProblemName = healthProblemName;
+    }
+
+    public String getChronicInfo() {
+        return chronicInfo;
+    }
+
+    public void setChronicInfo(String chronicInfo) {
+        this.chronicInfo = chronicInfo;
     }
 
     public boolean isReUploadFlg() {

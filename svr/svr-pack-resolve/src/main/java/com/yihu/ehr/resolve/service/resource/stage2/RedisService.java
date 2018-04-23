@@ -48,6 +48,15 @@ public class RedisService {
     }
 
     /**
+     * 获取ICD10慢病信息
+     * @param key
+     * @return
+     */
+    public String getChronicInfo(String key) {
+        return icd10KeySchema.getChronicInfo(key);
+    }
+
+    /**
      *获取机构名称redis
      * @return
      */

@@ -27,6 +27,7 @@ public class MasterResourceFamily extends ResourceFamily {
         public static final String DiagnosisName = "diagnosis_name";
         public static final String HealthProblem = "health_problem";
         public static final String HealthProblemName = "health_problem_name";
+        public static final String ChronicInfo = "chronic_info";
     }
 
     /**
