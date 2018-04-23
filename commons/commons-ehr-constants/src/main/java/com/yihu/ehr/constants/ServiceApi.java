@@ -1552,10 +1552,24 @@ public class ServiceApi {
     }
 
     /**
+     * APP消息推送接口
+     */
+    public static class AppPushMessage {
+        public static final String single = "/AppPushMessage/single";
+        public static final String list = "/AppPushMessage/list";
+        public static final String app = "/AppPushMessage/app";
+        public static final String tarns = "/AppPushMessage/tarnsmission";
+        public static final String findClientId = "/AppPushMessage/findClientId";
+        public static final String findClientIdList = "/AppPushMessage/findClientIdList";
+        public static final String updateClientId = "/AppPushMessage/updateClientId";
+
+    }
+    /**
      * 预约-挂号单
      */
     public static class Registration {
         public static final String Prefix = "/appointment/registration/";
+
         public static final String GetById = "/appointment/registration/{id}";
         public static final String Search = "/appointment/registration/search";
         public static final String Save = "/appointment/registration/save";
