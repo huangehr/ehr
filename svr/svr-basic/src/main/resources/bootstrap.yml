@@ -1,6 +1,6 @@
 spring:
   application:
-    name: svr-basic-lith
+    name: svr-basic
 
 ---
 spring:

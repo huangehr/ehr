@@ -2,8 +2,10 @@ package com.yihu.ehr;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.model.packs.MPackage;
+import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.http.IPInfoUtils;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,6 +32,8 @@ public class Test {
         String s = "+receive_date";
         System.out.println(s.substring(0, 1));
         System.out.println(s.substring(1));
+
+        System.out.println(DateUtil.toString(DateUtil.addDate(-3, new Date())) + " 00:00:00");
     }
 
 

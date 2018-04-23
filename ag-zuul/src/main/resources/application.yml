@@ -1,9 +1,6 @@
 server:
   port: ${ag-zuul.server.port}
 
-management:
-  port: ${server.port}
-
 info:
   app:
     name: Ag-Zuul
