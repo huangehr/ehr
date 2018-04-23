@@ -617,6 +617,7 @@ public class ServiceApi {
     public static class PortalFeedback {
         public static final String PortalFeedback = "/portalFeedback";
         public static final String PortalFeedbackAdmin = "/portalFeedback/admin/{portalFeedback_id}";
+        public static final String PortalFeedBackByUserId="/protalFeedback/findByUserId";
     }
 
     public static class PortalLogin {
@@ -786,6 +787,7 @@ public class ServiceApi {
         public static final String GetSecurityKey = "/users/getSecurityKey";
         public static final String changePasswordByTelephone = "/usersOfApp/users/changePasswordByTelephone";
         public static final String changePasswordByOldPassword = "/users/changePasswordByOldPassword";
+        public static final String updateUserTelePhone = "/users/updateTelephone";
 
     }
 
