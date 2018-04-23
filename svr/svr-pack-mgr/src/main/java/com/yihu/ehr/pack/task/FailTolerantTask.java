@@ -50,6 +50,7 @@ public class FailTolerantTask {
         //将解析状态为失败且错误次数小于三次的档案包重新加入解析队列
         List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, "archive_status=2;fail_count<3", "+receive_date", 1, 100);
         List<Map<String, Object>> updateSourceList = new ArrayList<>(resultList.size());
+        List<String> esSimplePackageList = new ArrayList<>();
         for (Map<String, Object> pack : resultList) {
             Map<String, Object> updateSource = new HashMap<>();
             updateSource.put("_id", pack.get("_id"));
@@ -57,7 +58,7 @@ public class FailTolerantTask {
             updateSourceList.add(updateSource);
             String packStr = objectMapper.writeValueAsString(pack);
             EsSimplePackage esSimplePackage = objectMapper.readValue(packStr, EsSimplePackage.class);
-            redisTemplate.opsForList().leftPush(RedisCollection.PackageList, objectMapper.writeValueAsString(esSimplePackage));
+            esSimplePackageList.add(objectMapper.writeValueAsString(esSimplePackage));
         }
         //将解析状态为正在解析但解析开始时间超过当前时间一定范围内的档案包重新加入解析队列
         Date past = DateUtils.addDays(new Date(), -1);
@@ -70,8 +71,9 @@ public class FailTolerantTask {
             updateSourceList.add(updateSource);
             String packStr = objectMapper.writeValueAsString(pack);
             EsSimplePackage esSimplePackage = objectMapper.readValue(packStr, EsSimplePackage.class);
-            redisTemplate.opsForList().leftPush(RedisCollection.PackageList, objectMapper.writeValueAsString(esSimplePackage));
+            esSimplePackageList.add(objectMapper.writeValueAsString(esSimplePackage));
         }
         elasticSearchUtil.bulkUpdate(INDEX, TYPE, updateSourceList);
+        esSimplePackageList.forEach(item -> redisTemplate.opsForList().leftPush(RedisCollection.PackageList, item));
     }
 }

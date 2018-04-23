@@ -224,7 +224,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             updateSource.put("message", message);
         }
         updateSource.put("archive_status", status.ordinal());
-        elasticSearchUtil.update(INDEX, TYPE, id, updateSource);
+        elasticSearchUtil.voidUpdate(INDEX, TYPE, id, updateSource);
         return true;
     }
 
