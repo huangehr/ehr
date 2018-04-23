@@ -83,6 +83,11 @@ public class ElasticSearchUtil {
         return elasticSearchClient.update(index, type, id, source);
     }
 
+    public void voidUpdate (String index, String type, String id, Map<String, Object> source) throws DocumentMissingException {
+        source.remove("_id");
+        elasticSearchClient.voidUpdate(index, type, id, source);
+    }
+
     public void bulkUpdate(String index, String type, List<Map<String, Object>> source) throws DocumentMissingException {
         if (source.size() > 0) {
             elasticSearchClient.bulkUpdate(index, type, source);
