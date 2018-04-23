@@ -8,6 +8,7 @@ import com.yihu.ehr.basic.portal.model.SurveyQuestion;
 import com.yihu.ehr.basic.portal.model.SurveyQuestionOption;
 import com.yihu.ehr.basic.util.MapUtill;
 import com.yihu.ehr.query.BaseJpaService;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -172,39 +173,17 @@ public class SurveyQuestionService extends BaseJpaService<SurveyQuestion,Long> {
      * @return
      * @throws Exception
      */
-    public JSONObject getQuestion(SurveyQuestion question) throws Exception{
-        JSONObject json = new JSONObject();
-
-        json.put("id",question.getId());
-        json.put("code",question.getCode());
-        json.put("comment",question.getComment());
-        json.put("createTime",question.getCreateTime());
-        json.put("isRequired",question.getIsRequired());
-        json.put("maxNum",question.getMaxNum());
-        json.put("minNum",question.getMinNum());
-        json.put("questionType",question.getQuestionType());
-        json.put("title",question.getTitle());
-        json.put("updateTime",question.getUpdateTime());
+    public Map<String,Object> getQuestion(SurveyQuestion question) throws Exception{
+        Map<String,Object> map = new HashedMap();
+        map.put("question",question);
         if(question.getQuestionType()!=2){
             //选择题查找选项
             List<SurveyQuestionOption> surveyQuestionOptionList = surveyQuestionOptionDao.findByQuestionCode(question.getCode());
-            JSONArray jsonArray = new JSONArray();
-            for (SurveyQuestionOption option:surveyQuestionOptionList){
-                JSONObject js = new JSONObject();
-                js.put("id",option.getId());
-                js.put("isRequired",option.getIsRequired());
-                js.put("code",option.getCode());
-                js.put("content",option.getContent());
-                js.put("haveComment",option.getHaveComment());
-                js.put("sort",option.getSort());
-                jsonArray.put(js);
-            }
-            json.put("options",jsonArray);
+            map.put("options",surveyQuestionOptionList);
         }else{
-            json.put("options","");
+            map.put("options","");
         }
-
-        return json;
+        return map;
     }
 
     /**

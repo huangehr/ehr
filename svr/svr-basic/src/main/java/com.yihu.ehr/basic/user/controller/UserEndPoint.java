@@ -967,4 +967,32 @@ public class UserEndPoint extends EnvelopRestEndPoint {
 
         return envelop;
     }
+
+    @RequestMapping(value = ServiceApi.Users.updateUserTelePhone, method = RequestMethod.POST)
+    @ApiOperation(value = "更换手机号码", notes = "更换手机号码")
+    public Envelop updateUserTelePhone(
+            @ApiParam(name = "userId", value = "用户id", defaultValue = "")
+            @RequestParam(value = "userId", required = false) String userId,
+            @ApiParam(name = "telePhoneNew", value = "新手机号码", defaultValue = "")
+            @RequestParam(value = "telePhoneNew") String telePhoneNew) throws Exception {
+        Envelop envelop = new Envelop();
+        //获取用户信息，根据用户ID
+        User user  = userService.getUser(userId);
+        if (user == null) {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("对不起，该用户不存在，请确认！");
+            return envelop;
+        }
+        user.setTelephone(telePhoneNew);
+        user = userService.save(user);
+        if (null != user) {
+            envelop.setSuccessFlg(true);
+            envelop.setObj(user);
+        } else {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("更换手机号码失败，请联系管理员！");
+        }
+        return envelop;
+    }
+
 }
