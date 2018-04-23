@@ -618,6 +618,7 @@ public class ServiceApi {
     public static class PortalFeedback {
         public static final String PortalFeedback = "/portalFeedback";
         public static final String PortalFeedbackAdmin = "/portalFeedback/admin/{portalFeedback_id}";
+        public static final String PortalFeedBackByUserId="/protalFeedback/findByUserId";
     }
 
     public static class PortalLogin {
@@ -787,6 +788,7 @@ public class ServiceApi {
         public static final String GetSecurityKey = "/users/getSecurityKey";
         public static final String changePasswordByTelephone = "/usersOfApp/users/changePasswordByTelephone";
         public static final String changePasswordByOldPassword = "/users/changePasswordByOldPassword";
+        public static final String updateUserTelePhone = "/users/updateTelephone";
 
     }
 
@@ -1303,6 +1305,7 @@ public class ServiceApi {
         public static final String GetQuotaTotalCount = "tj/getQuotaTotalCount";
         public static final String GetQuotaGroupBy = "tj/getQuotaGroupBy";
         public static final String GetQuotaReportTwoDimensionalTable = "/tj/getQuotaReportTwoDimensionalTable";
+        public static final String GetCostComposeReports = "/tj/getCostComposeReports";
 
 
         public static final String TjQuotaChart = "/tj/tjQuotaChart";

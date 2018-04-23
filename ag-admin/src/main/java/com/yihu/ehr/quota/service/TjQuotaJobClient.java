@@ -109,6 +109,13 @@ public interface TjQuotaJobClient {
             @ApiParam(name = "index", value = "索引")
             @RequestParam(value = "index" ,required =  true ) String index);
 
-
+    @ApiOperation(value = "首页费用组成")
+    @RequestMapping(value = ServiceApi.TJ.GetCostComposeReports, method = RequestMethod.GET)
+    MChartInfoModel getCostComposeReports(
+            @RequestParam(value = "quotaIdStr" , required = true) String quotaIdStr,
+            @RequestParam(value = "charType", required = true) String charType,
+            @RequestParam(value = "filter", required = false) String filter,
+            @RequestParam(value = "dimension", required = false) String dimension,
+            @RequestParam(value = "title", required = false) String title);
 
 }

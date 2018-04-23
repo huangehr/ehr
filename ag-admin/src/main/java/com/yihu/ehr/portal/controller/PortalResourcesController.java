@@ -60,7 +60,7 @@ public class PortalResourcesController extends BaseController {
         if(!StringUtils.isEmpty(endTime)){
             filters += "uploadTime<"+changeToUtc(endTime)+";";
         }
-        String sorts = "+uploadTime";
+        String sorts = "-uploadTime";
         ResponseEntity<List<MPortalResources>> responseEntity = portalResourcesClient.searchPortalResources(null, filters, sorts, size, page);
         List<MPortalResources> mPortalResourcesList = responseEntity.getBody();
         List<PortalResourcesModel> portalResourcesModels = new ArrayList<>();

@@ -53,12 +53,14 @@ public class OrgDeptImportService extends BaseJpaService<OrgDept,OrgDeptReposito
             String parentDeptId = map .get("parentDeptId").toString();
             Integer parentId = orgDeptService.getParentIdByCode(parentDeptId);
             String orgId = orgService.getOrgIdByOrgCode(map .get("orgCode").toString());
+            int sortNo = orgDeptService.searchParentIdOfMaxSortNo(parentId) + i;
             OrgDept newOrgDept = new OrgDept();
             newOrgDept.setParentDeptId(parentId);
             newOrgDept.setOrgId(orgId);
             newOrgDept.setCode(map .get("code").toString());
             newOrgDept.setName(map .get("name").toString());
             newOrgDept.setDelFlag(0);
+            newOrgDept.setSortNo(sortNo);
             OrgDept save = orgDeptService.save(newOrgDept);
 
             Organization org = orgService.getOrg(map.get("orgCode").toString());
@@ -94,6 +96,7 @@ public class OrgDeptImportService extends BaseJpaService<OrgDept,OrgDeptReposito
                 orgDeptDetail.setDisplayStatus(0);
                 orgDeptDetail.setInsertTime(new Timestamp(new Date().getTime()));
                 orgDeptDetail.setUpdateTime(new Timestamp(new Date().getTime()));
+                orgDeptDetail.setSortNo(sortNo);
                 orgDeptDetailService.save(orgDeptDetail);
             }
         }

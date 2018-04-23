@@ -9,8 +9,11 @@ import com.yihu.ehr.basic.org.service.OrgMemberRelationService;
 import com.yihu.ehr.basic.org.service.OrgService;
 import com.yihu.ehr.basic.patient.service.DemographicService;
 import com.yihu.ehr.basic.user.entity.Doctors;
+import com.yihu.ehr.basic.user.entity.Roles;
 import com.yihu.ehr.basic.user.entity.User;
 import com.yihu.ehr.basic.user.service.DoctorService;
+import com.yihu.ehr.basic.user.service.RoleUserService;
+import com.yihu.ehr.basic.user.service.RolesService;
 import com.yihu.ehr.basic.user.service.UserService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
@@ -67,6 +70,10 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
     private DemographicService demographicService;
     @Autowired
     private OrgService orgService;
+    @Autowired
+    private RolesService rolesService;
+    @Autowired
+    private RoleUserService roleUserService;
 
     @RequestMapping(value = ServiceApi.Doctors.Doctors, method = RequestMethod.GET)
     @ApiOperation(value = "获取医生列表", notes = "根据查询条件获取医生列表在前端表格展示")
@@ -180,6 +187,25 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
 
         //创建用户与机构关系
         orgMemberRelationInfo(orgDeptJsonList, user, d);
+
+        // 根据机构获取医生角色id,保存到role_users表中,appId是健康上饶APP对应的id:WYo0l73F8e
+        List<String> orgList = orgService.getOrgList(orgDeptJsonList);
+        if (null != orgList && orgList.size() > 0) {
+            List<Roles> rolesList = rolesService.findByCodeAndAppIdAndOrgCode(orgList,"WYo0l73F8e","Doctor");
+            if (null != rolesList && rolesList.size() > 0) {
+                roleUserService.batchCreateRoleUsersRelation(user.getId(),String.valueOf(rolesList.get(0).getId()));
+            } else {
+                // 不存在 则往角色表中插入该应用的医生角色
+                Roles roles = new Roles();
+                roles.setCode("Doctor");
+                roles.setName("医生");
+                roles.setAppId("WYo0l73F8e");
+                roles.setType("1");
+                roles.setOrgCode(orgList.get(0));
+                roles = rolesService.save(roles);
+                roleUserService.batchCreateRoleUsersRelation(user.getId(), String.valueOf(roles.getId()));
+            }
+        }
 
         return convertToModel(doctor, MDoctor.class);
     }
