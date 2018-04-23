@@ -25,6 +25,6 @@ public interface RolesDao extends PagingAndSortingRepository<Roles, Long> {
     void deleteByAppId(String appId);
 
 
-    @Query("SELECT roles FROM Roles roles WHERE roles.code = :code AND roles.appId = :appId AND roles.orgCode = :orgCode")
-    List<Roles> findByCodeAndAppIdAndOrgCode(@Param("orgCode") String orgCode,@Param("code") String code, @Param("appId") String appId);
+    @Query("SELECT roles FROM Roles roles WHERE roles.code = :code AND roles.appId = :appId AND roles.orgCode in (:orgCode)")
+    List<Roles> findByCodeAndAppIdAndOrgCode(@Param("orgCode") List<String> orgCode,@Param("code") String code, @Param("appId") String appId);
 }

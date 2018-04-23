@@ -539,4 +539,61 @@ public class RsResourceController extends BaseController {
         }
         return filter;
     }
+
+    @ApiOperation(value = "首页费用组成")
+    @RequestMapping(value = ServiceApi.TJ.GetCostComposeReports, method = RequestMethod.GET)
+    public Envelop getCostComposeReports(
+            @ApiParam(name = "resourceIds", value = "资源ID", defaultValue = "")
+            @RequestParam(value = "resourceIds") String resourceIds,
+            @ApiParam(name = "quotaFilter" ,value = "指标过滤条件 如：town=361002 and quotaDate >= '2018-01-01' and quotaDate <= '2018-12-31'" , defaultValue = "" )
+            @RequestParam(value = "quotaFilter" , required = false) String quotaFilter,
+            @ApiParam(name = "userOrgList" ,value = "用户拥有机构权限", defaultValue = "null" )
+            @RequestParam(value = "userOrgList" , required = false) List<String> userOrgList,
+            @ApiParam(name = "dimension", value = "维度字段", defaultValue = "quotaDate")
+            @RequestParam(value = "dimension", required = false) String dimension) throws Exception {
+        //-----------------用户数据权限 start
+        String org = "";
+        if( userOrgList != null ){
+            if( !(userOrgList.size()==1 && (userOrgList.get(0).equals("null") || userOrgList.get(0).equals("[]")) ) ) {
+                org = StringUtils.strip(String.join(",", userOrgList), "[]");
+                String [] orgs = org.split(",");
+                for(int i = 0;i < orgs.length; i++){
+                    if(i==0){
+                        org = " org = '" + orgs[i] + "' ";
+                    }else {
+                        org = org + " or "  +   " org = '" + orgs[i]  + "' ";
+                    }
+                }
+            }
+        }
+        String filter = quotaFilter;
+        //-----------------用户数据权限 end
+        Envelop envelop = new Envelop();
+        MChartInfoModel chartInfoModel = new MChartInfoModel();;
+        envelop.setObj(chartInfoModel);
+        envelop.setSuccessFlg(false);
+        String[] resourceId = resourceIds.split(";");
+        String quotaIdStr  = "";
+        for (int i = 0; i < resourceId.length; i++) {
+            Envelop resourceResult =  resourcesClient.getResourceById(resourceId[i]);
+            if(!resourceResult.isSuccessFlg()){
+                envelop.setErrorMsg("视图不存在，请确认！");
+                return envelop;
+            }
+            RsResourcesModel rsResourcesModel = toEntity(toJson(resourceResult.getObj()), RsResourcesModel.class);
+            List<ResourceQuotaModel> list = resourceQuotaClient.getByResourceId(rsResourcesModel.getId());
+            if(list != null && list.size() > 0) {
+                for (ResourceQuotaModel m : list) {
+                    quotaIdStr += m.getQuotaId() + ",";
+                }
+            }
+        }
+        chartInfoModel = tjQuotaJobClient.getCostComposeReports(quotaIdStr, "3", filter, dimension, "费用组成");
+        chartInfoModel.setResourceId(resourceIds);
+        chartInfoModel.setFirstDimension(dimension);
+        envelop.setObj(chartInfoModel);
+        envelop.setSuccessFlg(true);
+
+        return envelop;
+    }
 }
