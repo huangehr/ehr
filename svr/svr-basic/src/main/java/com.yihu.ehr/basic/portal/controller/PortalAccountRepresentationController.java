@@ -30,7 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "account", description = "账号相关业务", tags = {"医生工作平台-账号申诉"})
+@Api(value = "account", description = "账号相关业务", tags = {"医生工作平台-账号相关业务"})
 public class PortalAccountRepresentationController extends EnvelopRestEndPoint {
 
     @Autowired
@@ -61,6 +61,7 @@ public class PortalAccountRepresentationController extends EnvelopRestEndPoint {
     @PostMapping(value = ServiceApi.AccountRepresentation.GetRandomImageCode)
     @ApiOperation(value = "修改密码时生成图形验证码",notes = "修改密码时生成图形验证码")
     public Result getImageCode (HttpServletRequest request, HttpServletResponse response)throws Exception{
+        request.getSession().removeAttribute(RandomValidateCode.RANDOMCODEKEY);
         RandomValidateCode randomValidateCode = new RandomValidateCode();
         randomValidateCode.getRandcode(request,response);
         return Result.success("生成成功！");
@@ -74,7 +75,8 @@ public class PortalAccountRepresentationController extends EnvelopRestEndPoint {
             return Result.error("请输入验证码！");
         }
         String codeRescource = String.valueOf(request.getSession().getAttribute(RandomValidateCode.RANDOMCODEKEY));
-        if (code.toLowerCase().equals(code.toLowerCase())){
+        if (code.toLowerCase().equals(codeRescource.toLowerCase())){
+            request.getSession().removeAttribute(RandomValidateCode.RANDOMCODEKEY);
             return Result.success("验证码正确！");
         }else {
             return Result.error("验证码错误！");

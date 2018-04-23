@@ -967,4 +967,13 @@ public class UserEndPoint extends EnvelopRestEndPoint {
 
         return envelop;
     }
+
+    @RequestMapping(value = ServiceApi.Users.UsersOfAppPhoneExistence, method = RequestMethod.GET)
+    @ApiOperation("根据过滤条件判断是否存在")
+    public boolean UsersOfAppPhoneExistence(
+            @ApiParam(name = "filters", value = "filters", defaultValue = "")
+            @RequestParam(value = "filters") String filters) throws Exception {
+        List<User> user = userService.search("", filters, "", 1, 1);
+        return user != null && user.size() > 0;
+    }
 }

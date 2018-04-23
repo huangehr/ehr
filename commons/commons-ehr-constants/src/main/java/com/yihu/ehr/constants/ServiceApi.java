@@ -775,6 +775,8 @@ public class ServiceApi {
         public static final String InitializeSystemUser = "/users/initialize";
         public static final String UsersByTel = "/users/tel";
         public static final String H5Handshake = "/users/h5/handshake";
+        public static final String UsersOfAppPhoneExistence = "/usersOfApp/user/onePhone/existence";
+
 
         public static final String Save = "/users/save";
         public static final String Update = "/users/update";
@@ -1521,6 +1523,18 @@ public class ServiceApi {
         public static final String GetSurveyTemplateOptionsList="/admin/surveyTemplate/options/list";
         public static final String SaveLabelInfo ="/admin/surveyTemplate/saveLabelInfo";
         public static final String SaveTemplate = "/admin/surveyTemplate/saveTemplate";
+        public static final String GetTemplateLabel = "/admin/surveyTemplate/getTemplateLabel/{phoneticCode}";
+
+        public static final String GetSurveyQuestionList = "/admin/surveyQuestion/list";
+        public static final String SaveSurveyQuestion = "/admin/surveyQuestion/save";
+        public static final String GetQuestionById="/admin/surveyQuestion/getById";
+        public static final String GetQuestionsByIds ="/admin/surveyQuestion/getByIds";
+        public static final String DelQuestion ="/admin/surveyQuestion/delQuestion";
+        public static final String DelQuestions = "/admin/surveyQuestion/delQuestions";
+        public static final String updateQuestion = "/admin/surveyQuestion/update";
+
+
+
     }
 
     /**
@@ -1539,10 +1553,24 @@ public class ServiceApi {
     }
 
     /**
+     * APP消息推送接口
+     */
+    public static class AppPushMessage {
+        public static final String single = "/AppPushMessage/single";
+        public static final String list = "/AppPushMessage/list";
+        public static final String app = "/AppPushMessage/app";
+        public static final String tarns = "/AppPushMessage/tarnsmission";
+        public static final String findClientId = "/AppPushMessage/findClientId";
+        public static final String findClientIdList = "/AppPushMessage/findClientIdList";
+        public static final String updateClientId = "/AppPushMessage/updateClientId";
+
+    }
+    /**
      * 预约-挂号单
      */
     public static class Registration {
         public static final String Prefix = "/appointment/registration/";
+
         public static final String GetById = "/appointment/registration/{id}";
         public static final String Search = "/appointment/registration/search";
         public static final String Save = "/appointment/registration/save";

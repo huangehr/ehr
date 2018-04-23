@@ -35,11 +35,11 @@ public class ResourcesTransformService extends BaseJpaService {
      * @param version String 适配版本
      * @return
      */
-    public List<Map<String,Object>> displayCodeConvert(List<Map<String, Object>> resource,String version, String dataset) {
+    public List<Map<String,Object>> displayCodeConvert(List<Map<String, Object>> resource,String version, String dataset,boolean withRowkey) {
         //返回资源
         List<Map<String, Object>> returnRs =  new ArrayList<Map<String, Object>>();
         for (Map<String, Object> map : resource) {
-            returnRs.add(displayCodeConvert(map, version, dataset));
+            returnRs.add(displayCodeConvert(map, version, dataset,withRowkey));
         }
         return returnRs;
     }
@@ -49,7 +49,7 @@ public class ResourcesTransformService extends BaseJpaService {
      * @param version String 适配版本
      * @return
      */
-    public Map<String, Object> displayCodeConvert(Map<String, Object> resource, String version, String dataset) {
+    public Map<String, Object> displayCodeConvert(Map<String, Object> resource, String version, String dataset,boolean withRowkey) {
         //返回资源
         Map<String,Object> returnMap =  new HashMap<>();
         //适配方案
@@ -72,6 +72,10 @@ public class ResourcesTransformService extends BaseJpaService {
                 if (resource.containsKey(metadataId + "_VALUE")) {
                     returnMap.put(srcMetadataCode + "_VALUE", resource.get(metadataId + "_VALUE"));
                 }
+            }
+            //将rowkey放入数据
+            if(withRowkey){
+                returnMap.put("rowkey",resource.get("rowkey"));
             }
             /*if (metadataList.size() > 0) {
                 //数据元Map,便于对应查找
