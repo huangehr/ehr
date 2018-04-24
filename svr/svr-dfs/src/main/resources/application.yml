@@ -1,9 +1,6 @@
 server:
   port: ${svr-dfs.server.port}
 
-management:
-  port: ${server.port}
-
 info:
   app:
     name: svr-dfs
@@ -20,8 +17,8 @@ spring:
     test-on-borrow: true
 
 fast-dfs:
-  connect-timeout: 2
-  network-timeout: 30
+  connect-timeout: 10
+  network-timeout: 60
   charset: ISO8859-1
   pool:
     init-size: 5
@@ -65,7 +62,7 @@ spring:
     password: weifuwu
 elasticsearch:
   cluster-name: elasticsearch
-  cluster-nodes: 172.17.110.17:9300
+  cluster-nodes: 172.19.103.9:9300
 fast-dfs:
   tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52:80
@@ -79,7 +76,7 @@ spring:
     password: GP8Qz4qU
 elasticsearch:
   cluster-name: elasticsearch
-  cluster-nodes: 172.17.110.17:9300
+  cluster-nodes: 11.1.2.7:9300
 fast-dfs:
   tracker-server: 11.1.2.9:22122
   public-server: http://11.1.2.9:80
@@ -93,7 +90,7 @@ spring:
     password: GP8Qz4qU
 elasticsearch:
   cluster-name: elasticsearch
-  cluster-nodes: 172.17.110.17:9300
+  cluster-nodes: 10.176.97.7:9300
 fast-dfs:
   tracker-server: 10.176.97.5:22122
   public-server: http://10.176.97.5:8888
@@ -102,12 +99,26 @@ fast-dfs:
 spring:
   profiles: prod_fzzy
   datasource:
-      url: jdbc:mysql:///100.100.1.159:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-      username: healthcloud
-      password: GP8Qz4qU
+    url: jdbc:mysql:///100.100.1.159:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: healthcloud
+    password: GP8Qz4qU
 elasticsearch:
   cluster-name: elasticsearch
   cluster-nodes: 100.100.1.158:9300
 fast-dfs:
   tracker-server: 100.100.1.157:22122
   public-server: http://100.100.1.157:8888
+
+---
+spring:
+  profiles: prod_srformal
+  datasource:
+    url: jdbc:mysql://192.168.210.3:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: healthcloud
+    password: GP8Qz4qU
+elasticsearch:
+  cluster-name: elasticsearch
+  cluster-nodes: 172.10.10.2:9300
+fast-dfs:
+  tracker-server: 192.168.50.116:22122,192.168.50.119:22122
+  public-server: http://192.168.50.37:8888

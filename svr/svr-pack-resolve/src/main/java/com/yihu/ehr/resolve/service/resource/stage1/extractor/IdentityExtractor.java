@@ -44,7 +44,7 @@ public class IdentityExtractor extends KeyDataExtractor {
             for (String key : dataSet.getRecordKeys()) {
                 MetaDataRecord record = dataSet.getRecord(key);
                 //获取身份证号码
-                if(StringUtils.isEmpty(demographicId)) {
+                if (StringUtils.isEmpty(demographicId)) {
                     String val = record.getMetaData(IdCardType);
                     if (StringUtils.isEmpty(val)) {
                         // default as identity card no
@@ -56,7 +56,7 @@ public class IdentityExtractor extends KeyDataExtractor {
                     }
                 }
                 //获取姓名
-                if(StringUtils.isEmpty(patientName)) {
+                if (StringUtils.isEmpty(patientName)) {
                     String val = record.getMetaData(PatientName);
                     if (val != null) {
                         patientName = val;

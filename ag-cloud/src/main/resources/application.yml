@@ -1,0 +1,32 @@
+server:
+  port: ${ag-cloud.server.port}
+#  ssl:
+#    key-store-password: 123456
+#    key-password: 123456
+
+eip:
+  tenant: jkzl
+
+---
+spring:
+  profiles: dev
+
+---
+spring:
+  profiles: test
+
+---
+spring:
+  profiles: prod_fz
+
+---
+spring:
+  profiles: prod_sr
+
+---
+spring:
+  profiles: prod_fzzy
+
+---
+spring:
+  profiles: prod_srformal

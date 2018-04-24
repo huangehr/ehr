@@ -14,16 +14,6 @@ spring:
 
 ---
 spring:
-  profiles: alpha
-  cloud:
-    config:
-      username: user
-      password: configuration
-      uri: http://172.19.103.11:1221
-      label: dev
-
----
-spring:
   profiles: test
   cloud:
     config:
@@ -31,15 +21,6 @@ spring:
       password: configuration
       uri: http://172.19.103.73:1221
       label: dev
----
-spring:
-  profiles: prod
-  cloud:
-    config:
-      username: user
-      password: configuration
-      uri: http://11.1.2.21:1221
-      label: master
 
 ---
 spring:
@@ -69,4 +50,14 @@ spring:
       username: user
       password: configuration
       uri: http://100.100.1.162:1221
+      label: master
+
+---
+spring:
+  profiles: prod_srformal
+  cloud:
+    config:
+      username: user
+      password: configuration
+      uri: http://192.168.200.61:1221
       label: master

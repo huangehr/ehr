@@ -1,5 +1,6 @@
 package com.yihu.quota.job;
 
+import com.yihu.ehr.elasticsearch.ElasticSearchPool;
 import com.yihu.quota.dao.jpa.TjQuotaLogDao;
 import com.yihu.quota.etl.Contant;
 import com.yihu.quota.etl.extract.ExtractHelper;
@@ -7,7 +8,6 @@ import com.yihu.quota.etl.model.EsConfig;
 import com.yihu.quota.etl.save.SaveHelper;
 import com.yihu.quota.etl.util.ElasticsearchUtil;
 import com.yihu.quota.etl.util.EsClientUtil;
-import com.yihu.quota.etl.util.EsConfigUtil;
 import com.yihu.quota.model.jpa.TjQuotaLog;
 import com.yihu.quota.util.SpringUtil;
 import com.yihu.quota.vo.QuotaVo;
@@ -56,11 +56,12 @@ public class EsQuotaJob implements Job {
     @Autowired
     private EsClientUtil esClientUtil;
     @Autowired
-    EsConfigUtil esConfigUtil;
-    @Autowired
     private ExtractHelper extractHelper;
     @Autowired
     ElasticsearchUtil elasticsearchUtil;
+    @Autowired
+    private ElasticSearchPool elasticSearchPool;
+
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
@@ -135,9 +136,15 @@ public class EsQuotaJob implements Job {
 
     private void deleteRecord() throws Exception {
         EsConfig esConfig = extractHelper.getEsConfig(quotaVo.getCode());
+        EsConfig sourceEsConfig = extractHelper.getDataSourceEsConfig(quotaVo.getCode());
+
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         QueryStringQueryBuilder termQueryQuotaCode = QueryBuilders.queryStringQuery("quotaCode:" + quotaVo.getCode().replaceAll("_", ""));
         boolQueryBuilder.must(termQueryQuotaCode);
+        if(sourceEsConfig.getFullQuery() !=null && sourceEsConfig.getFullQuery().equals("true")){
+            startTime = LocalDate.now().toString();
+            endTime = LocalDate.now().toString();
+        }
         if (!StringUtils.isEmpty(startTime)) {
             RangeQueryBuilder rangeQueryStartTime = QueryBuilders.rangeQuery("quotaDate").gte(startTime);
             boolQueryBuilder.must(rangeQueryStartTime);
@@ -146,9 +153,9 @@ public class EsQuotaJob implements Job {
             RangeQueryBuilder rangeQueryEndTime = QueryBuilders.rangeQuery("quotaDate").lte(endTime);
             boolQueryBuilder.must(rangeQueryEndTime);
         }
-        Client client = esClientUtil.getClient(esConfig.getHost(), esConfig.getPort(), esConfig.getIndex(), esConfig.getType(), esConfig.getClusterName());
+        Client client = esClientUtil.getClient(esConfig.getHost(), 9300, esConfig.getClusterName());
         try {
-            elasticsearchUtil.queryDelete(client, boolQueryBuilder);
+            elasticsearchUtil.queryDelete(client, esConfig.getIndex() ,esConfig.getType(),boolQueryBuilder);
         } catch (Exception e) {
             e.getMessage();
         } finally {

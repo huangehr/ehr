@@ -1,0 +1,47 @@
+package com.yihu.ehr.basic.apps.service;
+
+import com.yihu.ehr.basic.apps.dao.AppApiParameterDao;
+import com.yihu.ehr.basic.apps.model.AppApiParameter;
+import com.yihu.ehr.query.BaseJpaService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * @author linz
+ * @version 1.0
+ * @created 2016年7月7日21:04:41
+ */
+@Service
+@Transactional
+public class AppApiParameterService extends BaseJpaService<AppApiParameter, AppApiParameterDao> {
+
+    @Autowired
+    private AppApiParameterDao appApiParameterRepository;
+    public AppApiParameterService() {
+
+    }
+
+    public Page<AppApiParameter> getAppApiParameterList(String sorts, int page, int size){
+        AppApiParameterDao repo = (AppApiParameterDao)getJpaRepository();
+        Pageable pageable = new PageRequest(page, size, parseSorts(sorts));
+        return repo.findAll(pageable);
+    }
+
+    public AppApiParameter createAppApiParameter(AppApiParameter appApiParameter) {
+        appApiParameterRepository.save(appApiParameter);
+        return appApiParameter;
+    }
+
+    public AppApiParameter updateAppApiParameter(AppApiParameter appApiParameter){
+        appApiParameterRepository.save(appApiParameter);
+        return appApiParameter;
+    }
+
+    public void  deleteAppApiParameter(Integer id){
+        appApiParameterRepository.delete(id);
+    }
+}

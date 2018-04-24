@@ -47,6 +47,10 @@ public class ApiException extends RuntimeException {
         this(HttpStatus.OK, errorCode, message);
     }
 
+    public ApiException(HttpStatus httpStatus, String message){
+        this(httpStatus, ErrorCode.REQUEST_NOT_COMPLETED, message, null);
+    }
+
     public ApiException(HttpStatus httpStatus, ErrorCode errorCode, String message){
         this(httpStatus, errorCode, message, null);
     }

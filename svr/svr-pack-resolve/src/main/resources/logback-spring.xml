@@ -69,9 +69,7 @@
     </appender>
 
     <logger name="com.yihu.ehr.exception.GlobalExceptionHandler" level="WARN" additivity="false">
-        <springProfile name="dev">
-            <appender-ref ref="console" />
-        </springProfile>
+		<appender-ref ref="console" />
         <appender-ref ref="ApiInfoFile" />
         <appender-ref ref="ApiWarnFile" />
         <appender-ref ref="ApiErrorFile" />
@@ -126,7 +124,7 @@
 		</filter>
 	</appender>
 
-	<logger name="com.yihu.ehr.resolve.util.PackResolveLogger" level="INFO" additivity="false">
+	<logger name="com.yihu.ehr.resolve.util.PackResolveLogger" level="WARN" additivity="false">
 		<appender-ref ref="TaskInfoFile" />
 		<appender-ref ref="TaskWarnFile" />
 		<appender-ref ref="TaskErrorFile" />

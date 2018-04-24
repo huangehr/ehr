@@ -64,11 +64,6 @@
         </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
-            <artifactId>commons-data-solr</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-data-hbase</artifactId>
             <scope>compile</scope>
         </dependency>
@@ -121,6 +116,10 @@
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-entity</artifactId>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.yihu.ehr</groupId>
+            <artifactId>commons-data-elasticsearch</artifactId>
         </dependency>
     </dependencies>
 </project>

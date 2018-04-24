@@ -3,10 +3,10 @@ package com.yihu.ehr.resolve.service.resource.stage2;
 
 import com.yihu.ehr.resolve.dao.FileResourceDao;
 import com.yihu.ehr.resolve.dao.MasterResourceDao;
-import com.yihu.ehr.resolve.dao.ArchiveRelationDao;
 import com.yihu.ehr.resolve.dao.SubResourceDao;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.resolve.model.stage2.ResourceBucket;
+import com.yihu.ehr.resolve.service.profile.ArchiveRelationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,19 +28,25 @@ public class ResourceService {
     @Autowired
     private FileResourceDao fileResRepo;
     @Autowired
-    private ArchiveRelationDao archiveRelationDao;
+    private ArchiveRelationService archiveRelationService;
+    @Autowired
+    private PatientService patientService;
 
     public void save(ResourceBucket resourceBucket, StandardPackage standardPackage) throws Exception {
-        // 资源主表
+        //资源主表
         masterResRepo.saveOrUpdate(resourceBucket, standardPackage);
 
-        // 资源子表
+        //资源子表
         subResRepo.saveOrUpdate(resourceBucket);
 
-        // 存储文件记录
+        //存储文件记录
         fileResRepo.save(resourceBucket);
 
         //保存MYSQL关联记录
-        archiveRelationDao.relation(resourceBucket);
+        archiveRelationService.relation(resourceBucket);
+
+        //保存居民信息记录
+        patientService.checkPatient(resourceBucket);
     }
+
 }

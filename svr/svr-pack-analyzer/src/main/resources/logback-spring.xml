@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true">
+
+	<springProperty scope="context" name="appName" source="spring.application.name"/>
+
+	<property name="log_home" value="/ehr-logs/${appName}" />
+
+	<conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter" />
+	<conversionRule conversionWord="wex" converterClass="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter" />
+	<conversionRule conversionWord="wEx" converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter" />
+
+	<!-- 彩色日志格式 -->
+	<property name="CONSOLE_LOG_PATTERN" value="${CONSOLE_LOG_PATTERN:-%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr([${appName}]){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}" />
+	<!-- 文件日志格式 -->
+	<property name="FILE_LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss} [${appName}] %-5level --- [%thread] - %logger{36}: %msg%n" />
+
+	<!-- Standard output -->
+	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>${CONSOLE_LOG_PATTERN}</pattern>
+			<charset class="java.nio.charset.Charset">UTF-8</charset>
+		</encoder>
+	</appender>
+
+    <!-- Api Log Start -->
+    <appender name="ApiInfoFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${log_home}/api/info/%d{yyyy-MM-dd}.log</fileNamePattern>
+        </rollingPolicy>
+        <encoder>
+			<pattern>${FILE_LOG_PATTERN}</pattern>
+            <charset class="java.nio.charset.Charset">UTF-8</charset>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <appender name="ApiWarnFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${log_home}/api/warn/%d{yyyy-MM-dd}.log</fileNamePattern>
+        </rollingPolicy>
+        <encoder>
+			<pattern>${FILE_LOG_PATTERN}</pattern>
+            <charset class="java.nio.charset.Charset">UTF-8</charset>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>WARN</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <appender name="ApiErrorFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${log_home}/api/error/%d{yyyy-MM-dd}.log</fileNamePattern>
+        </rollingPolicy>
+        <encoder>
+			<pattern>${FILE_LOG_PATTERN}</pattern>
+            <charset class="java.nio.charset.Charset">UTF-8</charset>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <logger name="com.yihu.ehr.exception.GlobalExceptionHandler" level="WARN" additivity="false">
+        <appender-ref ref="console" />
+        <appender-ref ref="ApiInfoFile" />
+        <appender-ref ref="ApiWarnFile" />
+        <appender-ref ref="ApiErrorFile" />
+    </logger>
+    <!-- Api Log End -->
+
+    <!-- 如果微服务纳入全局异常处理，请勿修改以上代码，有新的日志处理请在以下追加！！！ -->
+
+	<!-- 开发环境配置 -->
+	<springProfile name="dev">
+		<root level="INFO">
+			<appender-ref ref="console"/>
+		</root>
+	</springProfile>
+
+	<!-- 测试环境配置 -->
+	<springProfile name="test">
+		<root level="WARN">
+			<appender-ref ref="console"/>
+		</root>
+	</springProfile>
+
+    <!-- 上饶过渡环境配置 -->
+    <springProfile name="prod_sr">
+        <root level="WARN">
+            <appender-ref ref="console"/>
+        </root>
+    </springProfile>
+
+    <!-- 上饶正式环境配置 -->
+    <springProfile name="prod_srformal">
+        <root level="WARN">
+            <appender-ref ref="console"/>
+        </root>
+    </springProfile>
+
+</configuration>

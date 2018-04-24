@@ -1,6 +1,6 @@
 package com.yihu.ehr.resource.dao;
 
-import com.yihu.ehr.resource.model.RsAppResource;
+import com.yihu.ehr.entity.resource.RsAppResource;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;

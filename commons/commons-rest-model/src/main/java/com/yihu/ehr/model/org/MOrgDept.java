@@ -16,6 +16,7 @@ public class MOrgDept implements Serializable {
     private String name;
     private Integer delFlag;
     private Integer sortNo;
+    private Integer jkzlHosDeptId;
 
     private MOrgDeptDetail deptDetail;
 
@@ -81,5 +82,13 @@ public class MOrgDept implements Serializable {
 
     public void setSortNo(Integer sortNo) {
         this.sortNo = sortNo;
+    }
+
+    public Integer getJkzlHosDeptId() {
+        return jkzlHosDeptId;
+    }
+
+    public void setJkzlHosDeptId(Integer jkzlHosDeptId) {
+        this.jkzlHosDeptId = jkzlHosDeptId;
     }
 }

@@ -8,9 +8,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
-import org.springframework.security.authentication.encoding.PasswordEncoder;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -55,12 +53,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .antMatchers("/configuration/**")
                     .antMatchers("/webjars/springfox-swagger-ui/**")
                     //swagger-ui界面---end
+                    .antMatchers("/oauth/sso")
+                    .antMatchers("/oauth/login")
+                    .antMatchers("/oauth/logout")
+                    .antMatchers("/oauth/authorize")
                     .antMatchers("/oauth/accessToken")
-                    .antMatchers("/oauth/refreshToken")
                     .antMatchers("/oauth/validToken")
                     .antMatchers("/oauth/confirm_access")
-                    .antMatchers("/oauth/sso")
-                    .antMatchers("/oauth/authorize");
+                    .antMatchers("/oauth/verifyCode")
+                    .antMatchers("/oauth/verifyCodeExpire");
         }
 
         @Override

@@ -56,9 +56,15 @@ public class StandardPackage {
     //应用代码
     private String clientId;
     //ICD10诊断列表
-    private List<String> diagnosisList;
+    private Set<String> diagnosisList;
+    //ICD10诊断名称列表
+    private Set<String> diagnosisNameList;
+    //ICD10慢病信息
+    private Set<String> chronicInfoList;
     //重传标识
     private boolean reUploadFlg;
+    //身份识别标志
+    private boolean identifyFlag;
     //数据集合
     protected Map<String, PackageDataSet> dataSets = new TreeMap<>();
 
@@ -261,15 +267,47 @@ public class StandardPackage {
         this.reUploadFlg = reUploadFlg;
     }
 
+    public boolean isIdentifyFlag() {
+        return identifyFlag;
+    }
+
+    public void setIdentifyFlag(boolean identifyFlag) {
+        this.identifyFlag = identifyFlag;
+    }
+
     /**
      * ICD10诊断列表
      * @return
      */
-    public List<String> getDiagnosisList() {
+    public Set<String> getDiagnosisList() {
         return diagnosisList;
     }
-    public void setDiagnosisList(List<String> diagnosisList) {
+    public void setDiagnosisList(Set<String> diagnosisList) {
         this.diagnosisList = diagnosisList;
+    }
+
+    /**
+     * ICD10诊断名称列表
+     * @return
+     */
+    public Set<String> getDiagnosisNameList() {
+        return diagnosisNameList;
+    }
+
+    public void setDiagnosisNameList(Set<String> diagnosisNameList) {
+        this.diagnosisNameList = diagnosisNameList;
+    }
+
+    /**
+     * ICD10慢病信息
+     * @return
+     */
+    public Set<String> getChronicInfoList() {
+        return chronicInfoList;
+    }
+
+    public void setChronicInfoList(Set<String> chronicInfoList) {
+        this.chronicInfoList = chronicInfoList;
     }
 
     /**
@@ -318,7 +356,9 @@ public class StandardPackage {
         root.put("cardType", this.getCardType());
         root.put("patientName", this.getPatientName());
         root.put("diagnosis", StringUtils.join(this.getDiagnosisList(),";"));
+        root.put("diagnosisName", StringUtils.join(this.getDiagnosisNameList(),";"));
         root.put("reUploadFlg", this.isReUploadFlg());
+        root.put("identifyFlag", this.isIdentifyFlag());
         ObjectNode dataSetsNode = root.putObject("dataSets");
         for (String dataSetCode : dataSets.keySet()) {
             PackageDataSet dataSet = dataSets.get(dataSetCode);

@@ -9,16 +9,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
-import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
-import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
+import org.springframework.security.oauth2.provider.token.TokenStore;
+import org.springframework.security.oauth2.provider.token.store.redis.RedisTokenStore;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.sql.DataSource;
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by progr1mmer on 2017/12/27
@@ -27,14 +26,14 @@ import java.util.concurrent.TimeUnit;
 public class AgZuulFilter extends ZuulFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(AgZuulFilter.class);
-    private static final String ACCESS_TOKEN_PARAMETER = "accessToken";
+    private static final String ACCESS_TOKEN_PARAMETER = "token";
 
     @Autowired
     private ObjectMapper objectMapper;
+    //@Autowired
+    //private DataSource dataSource;
     @Autowired
-    private DataSource dataSource;
-    @Autowired
-    private DefaultTokenServices defaultTokenServices;
+    private TokenStore tokenStore;
 
     @Override
     public String filterType() {
@@ -56,24 +55,30 @@ public class AgZuulFilter extends ZuulFilter {
         RequestContext ctx = RequestContext.getCurrentContext();
         HttpServletRequest request = ctx.getRequest();
         String url = request.getRequestURI();
-        if (url.startsWith("/authentication/")
-                || url.startsWith("/jkzl/")
+        //内部微服务有不需要认证的地址请在URL上追加/open/来进行过滤，如/api/v1.0/open/**，不要在此继续追加！！！
+        if (url.contains("/authentication/")
+                || url.contains("/jkzl/")
+                || url.contains("/file/")
+                || url.contains("/open/")
+                || url.contains("/usersOfApp")
                 || url.contains("/users/h5/handshake")
-                || url.contains("/appVersion/getAppVersion")) {
+                || url.contains("/appVersion/getAppVersion")
+                || url.contains("/messageTemplate/messageOrderPush")
+                || url.contains("/account/")) {
             return null;
         }
         String accessToken = this.extractToken(request);
         if (null == accessToken) {
-            return this.forbidden(ctx, HttpStatus.FORBIDDEN.value(), "accessToken can not be null");
+            return this.forbidden(ctx, HttpStatus.FORBIDDEN.value(), "token can not be null");
         }
-        OAuth2AccessToken oAuth2AccessToken = defaultTokenServices.readAccessToken(accessToken);
+        OAuth2AccessToken oAuth2AccessToken = tokenStore.readAccessToken(accessToken);
         if (null == oAuth2AccessToken) {
-            return this.forbidden(ctx, HttpStatus.FORBIDDEN.value(), "invalid accessToken");
+            return this.forbidden(ctx, HttpStatus.FORBIDDEN.value(), "invalid token");
         }
         if (oAuth2AccessToken.isExpired()) {
-            return this.forbidden(ctx, HttpStatus.UNAUTHORIZED.value(), "expired accessToken"); //返回401 需要重新获取 token
+            return this.forbidden(ctx, HttpStatus.PAYMENT_REQUIRED.value(), "expired token"); //返回402 登陆过期
         }
-        //OAuth2Authentication oAuth2Authentication = defaultTokenServices.loadAuthentication(accessToken);
+        //OAuth2Authentication oAuth2Authentication = tokenStore.readAuthentication(accessToken);
         return null;
     }
 
@@ -102,19 +107,13 @@ public class AgZuulFilter extends ZuulFilter {
 
     @Bean
     @Primary
-    public JdbcTokenStore tokenStore() {
-        return new JdbcTokenStore(dataSource);
+    public RedisTokenStore redisTokenStore(JedisConnectionFactory jedisConnectionFactory) {
+        return new RedisTokenStore(jedisConnectionFactory);
     }
 
-    @Bean
+    /*@Bean
     @Primary
-    public DefaultTokenServices tokenService() {
-        DefaultTokenServices tokenServices = new DefaultTokenServices();
-        tokenServices.setTokenStore(tokenStore());
-        //tokenServices.setClientDetailsService(clientDetails());
-        //tokenServices.setTokenEnhancer(endpoints.getTokenEnhancer());
-        tokenServices.setSupportRefreshToken(true);
-        tokenServices.setAccessTokenValiditySeconds((int) TimeUnit.DAYS.toSeconds(30)); // 30天
-        return tokenServices;
-    }
+    public JdbcTokenStore tokenStore() {
+        return new JdbcTokenStore(dataSource);
+    }*/
 }

@@ -5,13 +5,13 @@ import java.io.Serializable;
 /**
  * Created by hzp on 2017/4/27.
  */
-public class AccessToken implements Serializable{
+public class AccessToken implements Serializable {
     private String accessToken;
     private String refreshToken;
     private String tokenType;
     private String user;
-    private String userId;
     private int expiresIn;
+    private String state;
 
     public String getTokenType() {
         return tokenType;
@@ -53,11 +53,11 @@ public class AccessToken implements Serializable{
         this.user = user;
     }
 
-    public String getUserId() {
-        return userId;
+    public String getState() {
+        return state;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setState(String state) {
+        this.state = state;
     }
 }

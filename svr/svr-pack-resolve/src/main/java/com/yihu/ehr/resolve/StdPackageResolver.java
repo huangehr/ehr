@@ -8,7 +8,6 @@ import com.yihu.ehr.profile.util.PackageDataSet;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.resolve.service.resource.stage1.PackModelFactory;
 import com.yihu.ehr.resolve.service.resource.stage1.extractor.KeyDataExtractor;
-import com.yihu.ehr.util.datetime.DateUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -30,7 +29,7 @@ public class StdPackageResolver extends PackageResolver {
     }
 
     @Override
-    public void resolve(StandardPackage standardPackage, File root) throws IOException, Exception {
+    public void resolve(StandardPackage standardPackage, File root) throws Exception {
         //解析标准数据
         File standardFolder = new File(root.getAbsolutePath() + File.separator + PackModelFactory.StandardFolder);
         parseFiles(standardPackage, standardFolder.listFiles(), false);
@@ -52,15 +51,15 @@ public class StdPackageResolver extends PackageResolver {
     private void parseFiles(StandardPackage standardPackage, File[] files, boolean origin) throws Exception, IOException {
         List<PackageDataSet> packageDataSetList = new ArrayList<>(files.length);
         //新增补传判断---------------Start---------------
-        for(File file : files) {
+        for (File file : files) {
             PackageDataSet dataSet = generateDataSet(file, origin);
             packageDataSetList.add(dataSet);
             if (dataSet.isReUploadFlg()){
                 standardPackage.setReUploadFlg(true);
             }
         }
-        if(standardPackage.isReUploadFlg()) {
-            for(PackageDataSet dataSet : packageDataSetList) {
+        if (standardPackage.isReUploadFlg()) {
+            for (PackageDataSet dataSet : packageDataSetList) {
                 String dataSetCode = origin ? DataSetUtil.originDataSetCode(dataSet.getCode()) : dataSet.getCode();
                 dataSet.setCode(dataSetCode);
                 standardPackage.setEventDate(dataSet.getEventTime());
@@ -85,10 +84,10 @@ public class StdPackageResolver extends PackageResolver {
                     Map<String, Object> properties = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.CardInfo);
                     String cardId = (String) properties.get(MasterResourceFamily.BasicColumns.CardId);
                     String cardType = (String) properties.get(MasterResourceFamily.BasicColumns.CardType);
-                    if(!StringUtils.isEmpty(cardId)) {
+                    if (!StringUtils.isEmpty(cardId)) {
                         standardPackage.setCardId(cardId);
                     }
-                    if(!StringUtils.isEmpty(cardType)) {
+                    if (!StringUtils.isEmpty(cardType)) {
                         standardPackage.setCardType(cardType);
                     }
                 }
@@ -99,9 +98,9 @@ public class StdPackageResolver extends PackageResolver {
                     String demographicId = (String) properties.get(MasterResourceFamily.BasicColumns.DemographicId);
                     String patientName = (String) properties.get(MasterResourceFamily.BasicColumns.PatientName);
                     if (!StringUtils.isEmpty(demographicId)) {
-                        standardPackage.setDemographicId(demographicId);
+                        standardPackage.setDemographicId(demographicId.trim());
                     }
-                    if(!StringUtils.isEmpty(patientName)) {
+                    if (!StringUtils.isEmpty(patientName)) {
                         standardPackage.setPatientName(patientName);
                     }
                 }
@@ -111,20 +110,27 @@ public class StdPackageResolver extends PackageResolver {
                     Map<String, Object> properties = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.EventInfo);
                     Date eventDate = (Date) properties.get(MasterResourceFamily.BasicColumns.EventDate);
                     EventType eventType = (EventType) properties.get(MasterResourceFamily.BasicColumns.EventType);
-                    if(eventDate != null) {
+                    if (eventDate != null) {
                         standardPackage.setEventDate(eventDate);
                     }
-                    if(eventType != null) {
+                    if (eventType != null) {
                         standardPackage.setEventType(eventType);
                     }
                 }
 
                 //门诊或住院诊断
-                if(standardPackage.getDiagnosisList() == null || standardPackage.getDiagnosisList().size() <= 0 ) {
+                if (standardPackage.getDiagnosisList() == null
+                        || standardPackage.getDiagnosisList().size() <= 0
+                        || standardPackage.getDiagnosisNameList() == null
+                        || standardPackage.getDiagnosisNameList().size() <= 0) {
                     Map<String, Object> properties = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.Diagnosis);
-                    List<String> diagnosisList = (List<String>) properties.get(MasterResourceFamily.BasicColumns.Diagnosis);
-                    if (diagnosisList != null && diagnosisList.size() > 0) {
+                    Set<String> diagnosisList = (Set<String>) properties.get(MasterResourceFamily.BasicColumns.Diagnosis);
+                    Set<String> diagnosisNameList = (Set<String>) properties.get(MasterResourceFamily.BasicColumns.DiagnosisName);
+                    if (diagnosisList.size() > 0) {
                         standardPackage.setDiagnosisList(diagnosisList);
+                    }
+                    if (diagnosisNameList.size() > 0) {
+                        standardPackage.setDiagnosisNameList(diagnosisNameList);
                     }
                 }
             }
@@ -134,9 +140,6 @@ public class StdPackageResolver extends PackageResolver {
             standardPackage.setCdaVersion(dataSet.getCdaVersion());
             standardPackage.setCreateDate(dataSet.getCreateTime());
             standardPackage.insertDataSet(dataSetCode, dataSet);
-        }
-        if (StringUtils.isEmpty(standardPackage.getDemographicId())) {
-            standardPackage.setDemographicId(UUID.randomUUID().toString());
         }
     }
 

@@ -12,6 +12,8 @@ public class ServiceApi {
 
     public static class GateWay {
         public static final String admin = "/admin";
+
+        public static final String FzGateway = "/admin/gateway/fz";
     }
 
     public static class Adaptions {
@@ -269,7 +271,7 @@ public class ServiceApi {
 
         public static final String StatisticsGetDoctorsGroupByTown = "/resources/statistics/getDoctorsGroupByTown";
 
-        //资源中心首页
+        //资源中心 - 统计相关
         public static final String GetPatientArchiveCount = "/resource/center/getPatientArchiveCount";
         public static final String GetMedicalResourcesCount = "/resource/center/getMedicalResourcesCount";
         public static final String GetHealthArchiveCount = "/resource/center/getHealthArchiveCount";
@@ -290,6 +292,12 @@ public class ServiceApi {
         public static final String GetElectronicMedicalDeptDistributed = "/resource/center/getElectronicMedicalDeptDistributed";
         public static final String GetElectronicMedicalAcquisitionSituation = "/resource/center/getElectronicMedicalAcquisitionSituation";
 
+        //资源中心 - 大数据展示相关
+        public static final String Achievements = "/resource/center/achievements";
+        public static final String Visualization = "/resource/center/visualization";
+        public static final String DataAnalysis = "/resource/center/dataAnalysis";
+        public static final String HierarchicalManagement = "/resource/center/hierarchicalManagement";
+
     }
 
     /**
@@ -297,13 +305,15 @@ public class ServiceApi {
      */
     public static class Profiles {
         public static final String ProfileInfo = "/profile/baseInfo"; //基本信息
-        public static final String PastHistory = "/profile/pastHistory"; //既往史
+        public static final String ProfileHistory = "/profile/profileHistory"; //既往史 - pc档案浏览器
+        public static final String PastHistory = "/profile/pastHistory"; //既往史 - mobile居民端
         public static final String PersonHistory = "/profile/personHistory"; //个人史
         public static final String AllergensHistory = "/profile/allergensHistory"; //过敏史
         public static final String FamilyHistory = "/profile/familyHistory"; //家族史
         public static final String HealthProblem = "/profile/healthProblem"; //主要健康问题
         public static final String HealthProblemSub = "/profile/healthProblemSub"; //主要健康问题诊断情况
         public static final String MedicalEvents = "/profile/medicalEvents"; //门诊/住院事件(时间轴)
+        public static final String RecentMedicalEvents = "/profile/recentMedicalEvents"; //最近就诊记录
         public static final String CDAClass = "/profile/cdaClass"; //cda分类
         public static final String CDAData = "/profile/cdaData"; //cda数据
         public static final String MedicationRecords = "/profile/medicationRecords"; //患者用药清单
@@ -360,7 +370,6 @@ public class ServiceApi {
     public static class Families {
         public static final String Families = "/families";
         public static final String Family = "/families/{id}";
-
         public static final String FamiliesMembers = "/families/members";
         public static final String FamilyMembers = "/families/{families_id}/members";
         public static final String FamilyMember = "/families/{families_id}/members/{id_card_no}";
@@ -389,6 +398,13 @@ public class ServiceApi {
         public static final String AppAuthClient = "/app/authClient";
         public static final String SimpleUpdate = "/app/simpleUpdate";
 
+        //--------------- 医生工作平台 ---------------
+        public static final String GetAppsRelationByUserIdAndParentAppId ="/app/appsRelationByUserIdAndParentAppId";
+        public static final String GetAppsRelationByUserJson ="/app/getAppsRelationByUserJson";
+
+        //--------------- 总支撑平台 ---------------
+        public static final String SaveAppsRelation ="/app/saveAppsRelation";
+
     }
 
     public static class AppApi {
@@ -402,7 +418,8 @@ public class ServiceApi {
         public static final String Update = "/appApi/update";
         public static final String Page = "/appApi/page";
         public static final String AuthList = "/appApi/authList";
-
+        public static final String AuthApi = "/appApi/authApi";
+        public static final String CheckName = "/appApi/checkName";
     }
 
     public static class AppApiCategory {
@@ -452,16 +469,19 @@ public class ServiceApi {
         public static final String Package = "/packages/{id}";
         public static final String PackageResolve = "/packages/resolve";
         public static final String PackageSearch = "/packages/search";
-        public static final String PackageDownloads = "/packages/{id}/downloads";
+        public static final String PackageDownload = "/packages/download/{id}";
         public static final String ResolveMessage = "/message/resolve";
         public static final String MessageTimer = "/message/timer";
         public static final String LegacyPackages = "/json_package";
         public static final String Prescription = "/prescription"; //处方笺维护
         public static final String ArchiveRelation = "/archiveRelation"; //档案关联
-        public static final String ResolveQueue = "/packages/resolveQueue";
+        public static final String AddResolveQueue = "/packages/addResolveQueue";
         public static final String QueueSize = "/packages/queueSize";
-        public static final String PackageCrypto = "/PackageCrypto";
+        public static final String PackageCrypto = "/packages/crypto";
+        public static final String Fetch = "/packages/fetch/{id}";
         public static final String ImmediateResolve = "/immediate/resolve";
+        public static final String Update = "/packages/update";
+        public static final String Migrate = "/packages/migrate";
     }
 
     //非病人维度
@@ -483,20 +503,23 @@ public class ServiceApi {
     }
 
     public static class PackageAnalyzer {
-        public static final String Scheduler = "packAnalyzer/scheduler";
-        public static final String Queue = "packAnalyzer/queue";
-        public static final String Status = "packAnalyzer/status/{id}";
-        public static final String DailyReport = "packAnalyzer/dailyReport";
-        public static final String List = "packAnalyzer/list";
-        public static final String FindByField = "packAnalyzer/findByField";
-        public static final String FindBySql = "packAnalyzer/findBySql";
-        public static final String EsSaveData = "packAnalyzer/esSaveData";
-        public static final String QcEmpty = "packAnalyzer/qc/check/empty";
-        public static final String QcType = "packAnalyzer/qc/check/type";
-        public static final String QcFormat = "packAnalyzer/qc/check/format";
-        public static final String QcValue = "packAnalyzer/qc/check/value";
+        public static final String Scheduler = "/packAnalyzer/scheduler";
+        public static final String Queue = "/packAnalyzer/queue";
+        public static final String Status = "/packAnalyzer/status/{id}";
+        public static final String DailyReport = "/packAnalyzer/dailyReport";
+        public static final String List = "/packAnalyzer/list";
+        public static final String FindByField = "/packAnalyzer/findByField";
+        public static final String FindBySql = "/packAnalyzer/findBySql";
+        public static final String EsSaveData = "/packAnalyzer/esSaveData";
+        public static final String QcEmpty = "/packAnalyzer/qc/check/empty";
+        public static final String QcType = "/packAnalyzer/qc/check/type";
+        public static final String QcFormat = "/packAnalyzer/qc/check/format";
+        public static final String QcValue = "/packAnalyzer/qc/check/value";
     }
 
+    public static class ArchiveRelation {
+        public static final String Crud = "/archiveRelation";
+    }
 
     public static class Patients {
         public static final String GetUserCards = "/getUserCards";// 就诊卡列表
@@ -546,7 +569,10 @@ public class ServiceApi {
     public static class Authentication {
         public static final String AccessToken = "/oauth/accessToken";
         public static final String ValidToken = "/oauth/validToken";
-        public static final String RefreshToken = "/oauth/refreshToken";
+        public static final String Login = "/oauth/login";
+        public static final String Logout = "/oauth/logout";
+        public static final String VerifyCode = "/oauth/verifyCode";
+        public static final String VerifyCodeExpire = "/oauth/verifyCodeExpire";
     }
 
     public static class MessageRemind {
@@ -555,6 +581,11 @@ public class ServiceApi {
         public static final String MessageRemindCount = "/messageRemindCount";
         public static final String MessageRemindAdmin = "/messageRemind/admin/{messageRemind_id}";
         public static final String MessageRemindReaded = "/messageRemind/readed/{remindId}";
+        public static final String MessageRemindByType = "/MessageRemindByType";
+        public static final String MessageReminInfodByType = "/MessageRemindInfoInfoByType";
+        public static final String MessageRemindByNotifie = "/MessageRemindByNotifie";
+        public static final String UpdateMessageRemindByNotifie = "/UpdateMessageRemindByNotifie";
+        public static final String MessageRemindSatisfactionSurvey = "/MessageRemind/SatisfactionSurvey";
     }
 
     public static class Portal {
@@ -587,6 +618,7 @@ public class ServiceApi {
     public static class PortalFeedback {
         public static final String PortalFeedback = "/portalFeedback";
         public static final String PortalFeedbackAdmin = "/portalFeedback/admin/{portalFeedback_id}";
+        public static final String PortalFeedBackByUserId="/protalFeedback/findByUserId";
     }
 
     public static class PortalLogin {
@@ -723,6 +755,7 @@ public class ServiceApi {
 
     public static class Users {
         public static final String Users = "/users";
+        public static final String UsersOfApp = "/usersOfApp";
         public static final String User = "/users/{user_name}";
         public static final String UserExistence = "/users/{user_name}/existence";
         public static final String UserVerification = "/users/verification";
@@ -744,6 +777,8 @@ public class ServiceApi {
         public static final String InitializeSystemUser = "/users/initialize";
         public static final String UsersByTel = "/users/tel";
         public static final String H5Handshake = "/users/h5/handshake";
+        public static final String UsersOfAppPhoneExistence = "/usersOfApp/user/onePhone/existence";
+
 
         public static final String Save = "/users/save";
         public static final String Update = "/users/update";
@@ -751,6 +786,9 @@ public class ServiceApi {
         public static final String ChangePassword = "/users/changePassword";
         public static final String DistributeSecurityKey = "/users/distributeSecurityKey";
         public static final String GetSecurityKey = "/users/getSecurityKey";
+        public static final String changePasswordByTelephone = "/usersOfApp/users/changePasswordByTelephone";
+        public static final String changePasswordByOldPassword = "/users/changePasswordByOldPassword";
+        public static final String updateUserTelePhone = "/users/updateTelephone";
 
     }
 
@@ -768,6 +806,7 @@ public class ServiceApi {
         public static final String RoleBatchAdd = "/roles/roleBatchAdd";
         public static final String RoleFindByField = "/roles/findByField";
         public static final String RoleFindByUserId = "/roles/findByUserId";
+        public static final String RoleFindByUserIdAndAppId = "/roles/findByUserIdAndAppId";
 
         public static final String RoleUser = "/roles/role_user";
         public static final String RoleUserByUserId = "/roles/role_user/{user_id}";
@@ -804,6 +843,7 @@ public class ServiceApi {
         public static final String SearchRoleReportRelation = "/roles/role_report/search";
         public static final String SearchRoleReportRelationNoPage = "/roles/role_report/searchNoPage";
         public static final String SearchRoleReportRelationIsReportAccredited = "/roles/role_report/isReportAccredited";
+        public static final String ClientRole = "/roles/clientRole";
 
     }
 
@@ -955,6 +995,7 @@ public class ServiceApi {
         public static final String InitHealthProblem = "/redis/init/healthProblem";
         public static final String InitIcd10HpR = "/redis/init/icd10HpR";
         public static final String InitIcd10 = "/redis/init/icd10";
+        public static final String InitIcd10ChronicInfo = "/redis/init/icd10ChronicInfo";
         public static final String InitIndicatorsDict = "/redis/init/indicatorsDict";
         public static final String InitOrgName = "/redis/init/orgName";
         public static final String InitOrgArea = "/redis/init/orgArea";
@@ -979,6 +1020,7 @@ public class ServiceApi {
         public static final String HealthProblem = "/redis/healthProblem";
         public static final String Icd10HpR = "/redis/icd10HpRelation";
         public static final String Icd10Name = "/redis/icd10Name";
+        public static final String Icd10ChronicInfo = "/redis/icd10ChronicInfo";
         public static final String Icd10HpCode = "/redis/icd10HpCode";
         public static final String IndicatorsDict = "/redis/indicatorsDict";
         public static final String OrgName = "/redis/orgName";
@@ -1173,7 +1215,6 @@ public class ServiceApi {
 
     public static class TJ {
 
-
         public static final String GetTjDimensionMainList = "/tj/getTjDimensionMainList";
         public static final String TjDimensionMain = "/tj/tjDimensionMain";
         public static final String TjDimensionMainId = "/tj/tjDimensionMainId/{id}";
@@ -1264,6 +1305,7 @@ public class ServiceApi {
         public static final String GetQuotaTotalCount = "tj/getQuotaTotalCount";
         public static final String GetQuotaGroupBy = "tj/getQuotaGroupBy";
         public static final String GetQuotaReportTwoDimensionalTable = "/tj/getQuotaReportTwoDimensionalTable";
+        public static final String GetCostComposeReports = "/tj/getCostComposeReports";
 
 
         public static final String TjQuotaChart = "/tj/tjQuotaChart";
@@ -1273,14 +1315,25 @@ public class ServiceApi {
 
         public static final String getQuotaCategoryByName = "/quotaCategory/getQuotaCategoryByName";
 
-        public static final String GetHeatMapByQuotaCode = "/tj/getHeatMapByQuotaCode";
+        public static final String GetHeatMap = "/tj/getHeatMap";
         public static final String GetNumberOfDiabetes = "/tj/getNumberOfDiabetes";
         public static final String GetPieData = "/tj/getPieData";
         public static final String GetLineData = "/tj/getLineData";
         public static final String GetBarData = "/tj/getBarData";
+        public static final String GetDiseaseTypeAnalysisInfo = "/tj/getDiseaseTypeAnalysisInfo";
+        public static final String GetSexAnalysisInfo = "/tj/getSexAnalysisInfo";
+        public static final String GetAgeAnalysisInfo = "/tj/getAgeAnalysisInfo";
 
         public static final String GetArchiveCount = "/tj/getArchiveCount";
         public static final String GetArchiveManCount = "/tj/getArchiveManCount";
+
+
+
+        public static final String GetYearDropdownList = "/tj/getYearDropdownList";
+
+
+
+
 
     }
 
@@ -1357,11 +1410,20 @@ public class ServiceApi {
         public static final String GetRescue = "/statistics/rescue";
 
         //政府服务平台-门诊仪表盘-end
-
     }
 
+    /**
+     * 系统字典
+     */
     public static class SystemDict {
         public static final String getDictEntryByDictId = "/systemDict/getDictEntryByDictId/{dictId}";
+        public static final String Crud = "/dictionaries";
+        public static final String FindById = "/dictionaries/{id}";
+        public static final String FindByPhoneticCode = "/dictionary/{phoneticCode}";
+        public static final String DeleteById = "/dictionaries/{id}";
+        public static final String CheckName = "/dictionaries/existence";
+        public static final String CheckCode = "/dictionaries/checkCode";
+
     }
 
     /**
@@ -1405,7 +1467,9 @@ public class ServiceApi {
 
     public static class FastDFS {
         public static final String Upload = "/fastDfs/upload";
+        public static final String OpenUpload = "/open/fastDfs/upload";
         public static final String OldUpload = "/fastDfs/oldUpload";
+        public static final String OpenOldUpload = "/open/fastDfs/oldUpload";
         public static final String DeleteById = "/fastDfs/deleteById";
         public static final String DeleteByPath = "/fastDfs/deleteByPath";
         public static final String DeleteByObjectId = "/fastDfs/deleteByObjectId";
@@ -1432,6 +1496,8 @@ public class ServiceApi {
         public static final String FindById = "/elasticSearch/{id}";
         public static final String FindByField = "/elasticSearch/findByField";
         public static final String Page = "/elasticSearch/page";
+        public static final String FindBySql = "/elasticSearch/findBySql";
+        public static final String DateHistogram = "/elasticSearch/dateHistogram";
 
     }
 
@@ -1445,5 +1511,96 @@ public class ServiceApi {
         public static final String MessageTemplate = "/messageTemplate";
         public static final String MyMessageList = "/messageTemplate/MyMessageList";
         public static final String MyMessage = "/messageTemplate/MyMessage/admin/{messageId}";
+        public static final String MessageOrderPush = "/messageTemplate/messageOrderPush";
+    }
+
+    public static class SingleDisease {
+        public static final String GetDropdownList = "/singleDisease/getDropdownList";
+        public static final String GetSymptomDetailData = "/singleDisease/getSymptomDetailData";
+        public static final String GetMedicineDetailData = "/singleDisease/getMedicineDetailData";
+    }
+
+    /**
+     * 后台配置问卷/满意度问题和选项
+     */
+    public static class SurveyAdminManage {
+        public static final String GetSurveyTemplateList="/admin/surveyTemplate/list";
+        public static final String GetSurveyTemplateOptionsList="/admin/surveyTemplate/options/list";
+        public static final String SaveLabelInfo ="/admin/surveyTemplate/saveLabelInfo";
+        public static final String SaveTemplate = "/admin/surveyTemplate/saveTemplate";
+        public static final String GetTemplateLabel = "/admin/surveyTemplate/getTemplateLabel/{phoneticCode}";
+
+        public static final String GetSurveyQuestionList = "/admin/surveyQuestion/list";
+        public static final String SaveSurveyQuestion = "/admin/surveyQuestion/save";
+        public static final String GetQuestionById="/admin/surveyQuestion/getById";
+        public static final String GetQuestionsByIds ="/admin/surveyQuestion/getByIds";
+        public static final String DelQuestion ="/admin/surveyQuestion/delQuestion";
+        public static final String DelQuestions = "/admin/surveyQuestion/delQuestions";
+        public static final String updateQuestion = "/admin/surveyQuestion/update";
+
+
+
+    }
+
+    /**
+     * 居民填写满意度
+     */
+    public static class Questionnaire {
+        public static final String GetAllQuestionsByTemplateCode = "/questionnaire/getAllQuestionsByTemplateCode";
+        public static final String SaveAnswer = "/questionnaire/saveAnswer";
+    }
+
+    /**
+     * 转发福州总部开放平台接口相关
+     */
+    public static class Fz {
+        public static final String OpenApi = "/fz/open/api";
+    }
+
+    /**
+     * APP消息推送接口
+     */
+    public static class AppPushMessage {
+        public static final String single = "/AppPushMessage/single";
+        public static final String list = "/AppPushMessage/list";
+        public static final String app = "/AppPushMessage/app";
+        public static final String tarns = "/AppPushMessage/tarnsmission";
+        public static final String findClientId = "/AppPushMessage/findClientId";
+        public static final String findClientIdList = "/AppPushMessage/findClientIdList";
+        public static final String updateClientId = "/AppPushMessage/updateClientId";
+
+    }
+    /**
+     * 预约-挂号单
+     */
+    public static class Registration {
+        public static final String Prefix = "/appointment/registration/";
+
+        public static final String GetById = "/appointment/registration/{id}";
+        public static final String GetByOrderId = "/appointment/registration/orderId/{orderId}";
+        public static final String Search = "/appointment/registration/search";
+        public static final String Save = "/appointment/registration/save";
+        public static final String Update = "/appointment/registration/update";
+        public static final String Delete = "/appointment/registration/delete";
+        public static final String UpdateState = "/appointment/registration/updateState";
+        public static final String UpdateVisitState = "/appointment/registration/updateVisitState";
+    }
+
+    /**
+     * 组合福州总部的预约挂号接口为我方需要的数据结构
+     */
+    public static class FzCombination {
+        public static final String FindHospitalList = "/appointment/combination/findHospitalList";
+        public static final String FindDoctorList = "/appointment/combination/findDoctorList";
+    }
+
+    /**
+     * 账号申诉
+     */
+    public static class AccountRepresentation{
+        public static final String SaveAccontRepresenetation ="/account/save";
+        public static final String GetRandomImageCode ="/account/getRandomImageCode";
+        public static final String CheckRandomImageCode ="/account/checkRandomImageCode";
+
     }
 }

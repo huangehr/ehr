@@ -31,7 +31,7 @@ public class HealthArchiveScheduler {
     @Autowired
     private HealthArchiveSchedulerService healthArchiveSchedulerService;
 
-    @Scheduled(cron = "44 40 03 * * ?")
+    @Scheduled(cron = "44 20 01 * * ?")
     public void validatorIdentityScheduler() throws Exception{
 
         String q =  ""; // 查询条件
@@ -81,7 +81,7 @@ public class HealthArchiveScheduler {
             long count = solrUtil.count(ResourceCore.MasterTable, q, fq);
             List<String> rowKeyList = healthArchiveSchedulerService.selectSubRowKey(ResourceCore.MasterTable, q, fq, count);
             if(rowKeyList != null && rowKeyList.size() > 0){
-                List<Map<String,Object>> hbaseDataList = healthArchiveSchedulerService.selectHbaseData(rowKeyList);
+                List<Map<String,Object>> hbaseDataList = healthArchiveSchedulerService.selectHbaseData(ResourceCore.MasterTable, rowKeyList);
                 if( hbaseDataList != null && hbaseDataList.size() > 0 ) {
                     for(Map<String,Object> map : hbaseDataList) {
                         // 档案信息 > 姓名等

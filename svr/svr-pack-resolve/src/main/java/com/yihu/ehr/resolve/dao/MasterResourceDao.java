@@ -33,7 +33,7 @@ public class MasterResourceDao {
         TableBundle bundle = new TableBundle();
         if (resBucket.isReUploadFlg()) { //补传处理
             Map<String, String> originResult = hbaseDao.get(ResourceCore.MasterTable, rowKey, MasterResourceFamily.Data);
-            if(!originResult.isEmpty()) {
+            if (!originResult.isEmpty()) {
                 MasterRecord masterRecord = resBucket.getMasterRecord();
                 Map<String, String> supplement = masterRecord.getDataGroup();
                 originResult.putAll(supplement);
@@ -41,27 +41,20 @@ public class MasterResourceDao {
                 bundle.addValues(rowKey, MasterResourceFamily.Data, originResult);
                 hbaseDao.save(ResourceCore.MasterTable, bundle);
                 Map<String, String> basicResult = hbaseDao.get(ResourceCore.MasterTable, rowKey, MasterResourceFamily.Basic);
-                if(basicResult.get("event_type") != null) {
+                if (basicResult.get("event_type") != null) {
                     EventType eventType = EventType.create(basicResult.get("event_type"));
                     standardPackage.setEventType(eventType);
                 }
                 standardPackage.setDemographicId(basicResult.get("demographic_id"));
                 resBucket.setDemographicId(basicResult.get("demographic_id"));
-            }else {
+            } else {
                 throw new RuntimeException("Please upload the complete package(" + rowKey + ") first !");
             }
         } else {
             // delete legacy data if they are exist
-            /**
-            String legacyRowKeys[] = hbaseDao.findRowKeys(ResourceCore.MasterTable, "^" + rowKey);
-            if (legacyRowKeys != null && legacyRowKeys.length > 0) {
-                bundle.addRows(legacyRowKeys);
-                hbaseDao.delete(ResourceCore.MasterTable, bundle);
-            }
-            */
             //主表直接GET
             String legacy = hbaseDao.get(ResourceCore.MasterTable, rowKey);
-            if(StringUtils.isNotEmpty(legacy)) {
+            if (StringUtils.isNotEmpty(legacy)) {
                 hbaseDao.delete(ResourceCore.MasterTable, rowKey);
             }
             // now save the data to hbase

@@ -2,12 +2,10 @@ package com.yihu.quota.service.singledisease;
 
 import com.yihu.quota.etl.extract.es.EsExtract;
 import com.yihu.quota.etl.util.ElasticsearchUtil;
-import com.yihu.quota.vo.DictModel;
 import org.apache.commons.lang.StringUtils;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -25,17 +23,23 @@ public class SingleDiseaseService {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    public static final String HEALTHPROBLEM = "1"; // ½¡¿µÎÊÌâ
-    public static final String AGE = "2"; // ÄêÁä¶Î·Ö²¼
-    public static final String SEX = "3"; // ĞÔ±ğ
+    private static final Logger log = LoggerFactory.getLogger(SingleDiseaseService.class);
+
+    public static final String HEALTH_PROBLEM = "1"; // å¥åº·é—®é¢˜
+    public static final String AGE = "2"; // å¹´é¾„æ®µåˆ†å¸ƒ
+    public static final String SEX = "3"; // æ€§åˆ«
     /**
-     * ÈÈÁ¦Í¼Êı¾İ
+     * çƒ­åŠ›å›¾æ•°æ®
      * @return
      * @throws Exception
      */
-    public List<Map<String,String>>  getHeatMap() throws Exception {
+    public List<Map<String,String>>  getHeatMap(String condition) throws Exception {
         List<Map<String,String>> list = new ArrayList<>();
-        String sql = "select addressLngLat from single_disease_personal_index where addressLngLat is not null ";
+        String sql = "select addressLngLat from singleDiseasePersonal where addressLngLat is not null";
+        if (!StringUtils.isEmpty(condition) && !condition.contains("undefined")) {
+            sql += " and " + condition;
+        }
+        log.info("sql = " + sql);
         List<Map<String, Object>> listData = parseIntegerValue(sql);
         Map<String, Object> map = new HashMap<>();
         if (null != listData && listData.size() > 0 && listData.get(0).size() > 0) {
@@ -57,19 +61,25 @@ public class SingleDiseaseService {
     }
 
     /**
-     * »ñÈ¡ÌÇÄò²¡»¼ÕßÊı
+     * è·å–ç³–å°¿ç—…æ‚£è€…æ•°
      * @return
      * @throws Exception
      */
-    public List<Map<String, Object>> getNumberOfDiabetes() throws Exception {
-        String sql = "select town, count(*) from single_disease_personal_index where town is not null group by town";
-        List<Map<String, Object>> list = parseIntegerValue(sql);
+    public List<Map<String, Object>> getNumberOfDiabetes(String condition) throws Exception {
+        StringBuffer sql = new StringBuffer();
+        sql.append("select town, count(*) from singleDiseasePersonal where town is not null");
+        if (!StringUtils.isEmpty(condition)&& !condition.contains("undefined")) {
+            sql.append(" and " + condition);
+        }
+        sql.append(" group by town");
+        log.info("sql = " + sql.toString());
+        List<Map<String, Object>> list = parseIntegerValue(sql.toString());
         List<Map<String, Object>> dataList = fillNoDataColumn(list);
         return dataList;
     }
 
     /**
-     * ²¹È«¸£Öİ¸÷¸öÇøÏØµÄ»¼²¡ÈËÊı
+     * è¡¥å…¨ç¦å·å„ä¸ªåŒºå¿çš„æ‚£ç—…äººæ•°
      * @param dataList
      * @return
      */
@@ -104,18 +114,24 @@ public class SingleDiseaseService {
     }
 
     /**
-     * ĞÂÔö»¼ÕßÄêÇ÷ÊÆ
+     * æ–°å¢æ‚£è€…å¹´è¶‹åŠ¿
      * @return
      */
-    public Map<String, List<String>> getLineDataInfo() {
-        String sql = "select eventDate, count(*) from single_disease_personal_index group by date_histogram(field='eventDate','interval'='year')";
-        List<Map<String, Object>> listData = parseIntegerValue(sql);
+    public Map<String, List<String>> getLineDataInfo(String condition) {
+        StringBuffer sql = new StringBuffer();
+        sql.append("select eventDate, count(*) from singleDiseasePersonal");
+        if (!StringUtils.isEmpty(condition)&& !condition.contains("undefined")) {
+            sql.append(" where " + condition);
+        }
+        sql.append(" group by date_histogram(field='eventDate','interval'='year')");
+        log.info("sql = " + sql.toString());
+        List<Map<String, Object>> listData = parseIntegerValue(sql.toString());
         Map<String, List<String>> map = new HashMap<>();
         List<String> xData = new ArrayList<>();
         List<String> valueData = new ArrayList<>();
-        if (null != listData && listData.get(0).size() > 0) {
+        if (null != listData && listData.size() > 0 && listData.get(0).size() > 0) {
             listData.forEach(one -> {
-                // "date_histogram(field=eventDate,interval=year)":"2015-01-01 00:00:00",ÒòÎªÊÇ»ñÈ¡Äê·İ£¬ËùÒÔ½ØÈ¡Ç°4Î»
+                // "date_histogram(field=eventDate,interval=year)":"2015-01-01 00:00:00",å› ä¸ºæ˜¯è·å–å¹´ä»½ï¼Œæ‰€ä»¥æˆªå–å‰4ä½
                 xData.add((one.get("date_histogram(field=eventDate,interval=year)") + "").substring(0,4));
                 valueData.add(one.get("COUNT(*)") + "");
             });
@@ -126,34 +142,42 @@ public class SingleDiseaseService {
     }
 
     /**
-     * »ñÈ¡±ı×´Í¼Êı¾İ
-     * @param type ½¡¿µ×´¿ö¡¢ÄêÁä¶Î¡¢ĞÔ±ğ
-     * @param code ×Öµäcode
+     * è·å–é¥¼çŠ¶å›¾æ•°æ®
+     * @param type å¥åº·çŠ¶å†µã€å¹´é¾„æ®µã€æ€§åˆ«
      * @return
      */
-    public Map<String, Object> getPieDataInfo(String type, String code) {
+    public Map<String, Object> getPieDataInfo(String type, String condition) {
         Map<String, Object> map = new HashMap<>();
-        if (HEALTHPROBLEM.equals(type)) {
-            map = getHealthProInfo(code);
+        if(condition.contains("undefined")){
+            condition = "";
+        }
+        if (HEALTH_PROBLEM.equals(type)) {
+            map = getHealthProInfo(condition);
         } else if (AGE.equals(type)) {
-            map = getAgeInfo();
+            map = getAgeInfo(condition);
         } else if (SEX.equals(type)) {
-            map = getGenderInfo();
+            map = getGenderInfo(condition);
         }
         return map;
     }
 
     /**
-     * »ñÈ¡½¡¿µ×´¿ö
+     * è·å–å¥åº·çŠ¶å†µ
      * @return
      */
-    public Map<String, Object> getHealthProInfo(String code) {
-        String sql = "select diseaseTypeName,count(*) from single_disease_personal_index group by diseaseTypeName";
-        List<Map<String, Object>> listData = parseIntegerValue(sql);
+    public Map<String, Object> getHealthProInfo(String condition) {
+        StringBuffer sql = new StringBuffer();
+        sql.append("select diseaseTypeName,count(*) from singleDiseasePersonal");
+        if (!StringUtils.isEmpty(condition)) {
+            sql.append(" where " + condition);
+        }
+        sql.append(" group by diseaseTypeName");
+        log.info("sql = " + sql.toString());
+        List<Map<String, Object>> listData = parseIntegerValue(sql.toString());
         Map<String, Object> map = new HashMap<>();
         List<String> legendData = new ArrayList<>();
         List<Map<String, Object>> seriesData = new ArrayList<>();
-        if (null != listData && listData.get(0).size() > 0) {
+        if (null != listData && listData.size() > 0 && listData.get(0).size() > 0) {
             listData.forEach(one -> {
                 Map<String, Object> myMap = new HashMap<>();
                 legendData.add(one.get("diseaseTypeName") + "");
@@ -168,46 +192,37 @@ public class SingleDiseaseService {
     }
 
     /**
-     * »ñÈ¡È«ÊĞ×ÜÈË¿ÚÊı
-     * @param healthMap
-     * @param code
+     * è·å–å¹´é¾„æ®µæ•°æ®
      * @return
      */
-    public Map<String, Object> getHealthCountInfo(Map<String, Object> healthMap, String code) {
-        String sql = "select code, value as name from system_dict_entries where dict_id = 158 and code = ?";
-        List<DictModel> dictDatas = jdbcTemplate.query(sql, new BeanPropertyRowMapper(DictModel.class), code);
-
-        healthMap.put("name", "½¡¿µÈËÈº");
-        healthMap.put("value", null != dictDatas && dictDatas.size() > 0 ? dictDatas.get(0).getName() : "0");
-        return healthMap;
-    }
-
-    /**
-     * »ñÈ¡ÄêÁä¶ÎÊı¾İ
-     * @return
-     */
-    public Map<String, Object> getAgeInfo() {
+    public Map<String, Object> getAgeInfo(String condition) {
+        StringBuffer sql = new StringBuffer();
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR) + 1;
         /*
-        * ÄêÁä¶Î·ÖÎª0-6¡¢7-17¡¢18-40¡¢41-65¡¢65ÒÔÉÏ
-        * Ê×ÏÈ»ñÈ¡µ±Ç°Äê·İ£¬ÓÉÓÚES²éÑ¯ÊÇ×ó°üº¬£¬ÓÒ²»°ü£¬ËùÒÔµ±Ç°Äê·İĞèÒª+1
-        * ÏÂÃæÎª¹¹ÔìÄêÁä¶ÎµÄËãÊ½£¬ÆäÖĞyear-151ÏŞ¶¨ÁË·¶Î§ÊÇ66-150Ëê ¼´66ÒÔÉÏ£¬ÆäËûÀàËÆ
+        * å¹´é¾„æ®µåˆ†ä¸º0-6ã€7-17ã€18-40ã€41-65ã€65ä»¥ä¸Š
+        * é¦–å…ˆè·å–å½“å‰å¹´ä»½ï¼Œç”±äºESæŸ¥è¯¢æ˜¯å·¦åŒ…å«ï¼Œå³ä¸åŒ…ï¼Œæ‰€ä»¥å½“å‰å¹´ä»½éœ€è¦+1
+        * ä¸‹é¢ä¸ºæ„é€ å¹´é¾„æ®µçš„ç®—å¼ï¼Œå…¶ä¸­year-151é™å®šäº†èŒƒå›´æ˜¯66-150å² å³66ä»¥ä¸Šï¼Œå…¶ä»–ç±»ä¼¼
         * */
         String range = "range(birthYear," + (year - 151) + "," + (year - 66) + "," + (year - 41) + "," + (year - 18) + "," + (year - 7) + "," + year + ")";
-        String sql = "select count(*) from single_disease_personal_index where birthYear <> 0  group by " + range;
-        List<Map<String, Object>> listData = parseIntegerValue(sql);
+        sql.append("select count(*) from singleDiseasePersonal where birthYear <> 0");
+        if (!StringUtils.isEmpty(condition)) {
+            sql.append(" and " + condition);
+        }
+        sql.append(" group by " + range);
+        log.info("sql = " + sql.toString());
+        List<Map<String, Object>> listData = parseIntegerValue(sql.toString());
         Map<String, Object> map = new HashMap<>();
         List<String> legendData = new ArrayList<>();
         List<Map<String, Object>> seriesData = new ArrayList<>();
-        if (null != listData && listData.get(0).size() > 0) {
+        if (null != listData && listData.size() > 0 && listData.get(0).size() > 0) {
             listData.forEach(one -> {
                 String rangeName = one.get(range) + "";
-                // rangeName£º"1978.0-2001.0"
+                // rangeNameï¼š"1978.0-2001.0"
                 int first = (int) Double.parseDouble(rangeName.split("-")[0]);
                 int last = (int) Double.parseDouble(rangeName.split("-")[1]);
                 Integer result = last - first;
-                // ×ª³ÉÏàÓ¦µÄÄêÁä¶Î
+                // è½¬æˆç›¸åº”çš„å¹´é¾„æ®µ
                 String keyName = exchangeInfo(result);
                 Map<String, Object> myMap = new HashMap<>();
                 legendData.add(keyName);
@@ -225,19 +240,19 @@ public class SingleDiseaseService {
         String keyName = "";
         switch (result) {
             case 85:
-                keyName = "66ËêÒÔÉÏ";
+                keyName = "66å²ä»¥ä¸Š";
                 break;
             case 25:
-                keyName = "41-65Ëê";
+                keyName = "41-65å²";
                 break;
             case 23:
-                keyName = "18-40Ëê";
+                keyName = "18-40å²";
                 break;
             case 11:
-                keyName = "7-17Ëê";
+                keyName = "7-17å²";
                 break;
             case 7:
-                keyName = "0-6Ëê";
+                keyName = "0-6å²";
                 break;
             default:
                 break;
@@ -246,16 +261,22 @@ public class SingleDiseaseService {
     }
 
     /**
-     * »ñÈ¡ĞÔ±ğÊı¾İ
+     * è·å–æ€§åˆ«æ•°æ®
      * @return
      */
-    public Map<String, Object> getGenderInfo() {
-        String sql = "select sexName, count(*) from single_disease_personal_index group by sexName";
-        List<Map<String, Object>> listData = parseIntegerValue(sql);
+    public Map<String, Object> getGenderInfo(String condition) {
+        StringBuffer sql = new StringBuffer();
+        sql.append("select sexName, count(*) from singleDiseasePersonal");
+        if (!StringUtils.isEmpty(condition)) {
+            sql.append(" where " + condition);
+        }
+        sql.append(" group by sexName");
+        log.info("sql = " + sql.toString());
+        List<Map<String, Object>> listData = parseIntegerValue(sql.toString());
         Map<String, Object> map = new HashMap<>();
         List<String> legendData = new ArrayList<>();
         List<Map<String, Object>> seriesData = new ArrayList<>();
-        if (null != listData && listData.get(0).size() > 0) {
+        if (null != listData && listData.size() > 0 && listData.get(0).size() > 0) {
             listData.forEach(one -> {
                 Map<String, Object> myMap = new HashMap<>();
                 legendData.add(one.get("sexName") + "");
@@ -270,16 +291,22 @@ public class SingleDiseaseService {
     }
 
     /**
-     * »ñÈ¡²¢·¢Ö¢Êı¾İ
+     * è·å–å¹¶å‘ç—‡æ•°æ®
      * @return
      */
-    public Map<String, List<String>> getSymptomDataInfo() {
-        String sql = "select symptomName, count(*) from single_disease_check_index where checkCode = 'CH001' group by symptomName";
-        List<Map<String, Object>> listData = parseIntegerValue(sql);
+    public Map<String, List<String>> getSymptomDataInfo(String condition) {
+        StringBuffer sql = new StringBuffer();
+        sql.append("select symptomName, count(*) from singleDiseaseCheck where checkCode = 'CH001'");
+        if (!StringUtils.isEmpty(condition)) {
+            sql.append(" and " + condition);
+        }
+        sql.append(" group by symptomName");
+        log.info("sql = " + sql.toString());
+        List<Map<String, Object>> listData = parseIntegerValue(sql.toString());
         Map<String, List<String>> map = new HashMap<>();
         List<String> xData = new ArrayList<>();
         List<String> valueData = new ArrayList<>();
-        if (null != listData && listData.get(0).size() > 0) {
+        if (null != listData && listData.size() > 0 && listData.get(0).size() > 0) {
             listData.forEach(one -> {
                 xData.add(one.get("symptomName") + "");
                 valueData.add(one.get("COUNT(*)") + "");
@@ -291,16 +318,22 @@ public class SingleDiseaseService {
     }
 
     /**
-     * ÓÃÒ©»¼ÕßÊı·Ö²¼
+     * ç”¨è¯æ‚£è€…æ•°åˆ†å¸ƒ
      * @return
      */
-    public Map<String, List<String>> getMedicineDataInfo() {
-        String sql = "select medicineName, count(*) from single_disease_check_index where checkCode = 'CH004' group by medicineName";
-        List<Map<String, Object>> listData = parseIntegerValue(sql);
+    public Map<String, List<String>> getMedicineDataInfo(String condition) {
+        StringBuffer sql = new StringBuffer();
+        sql.append("select medicineName, count(*) from singleDiseaseCheck where checkCode = 'CH004'");
+        if (!StringUtils.isEmpty(condition)) {
+            sql.append(" and " + condition);
+        }
+        sql.append(" group by medicineName");
+        log.info("sql = " + sql.toString());
+        List<Map<String, Object>> listData = parseIntegerValue(sql.toString());
         Map<String, List<String>> map = new HashMap<>();
         List<String> xData = new ArrayList<>();
         List<String> valueData = new ArrayList<>();
-        if (null != listData && listData.get(0).size() > 0) {
+        if (null != listData && listData.size() > 0 && listData.get(0).size() > 0) {
             listData.forEach(one -> {
                 xData.add(one.get("medicineName") + "");
                 valueData.add(one.get("COUNT(*)") + "");
@@ -312,18 +345,26 @@ public class SingleDiseaseService {
     }
 
     /**
-     *  ¿Õ¸¹ÑªÌÇÍ³¼Æ
+     *  ç©ºè…¹è¡€ç³–ç»Ÿè®¡
      * @return
      */
-    public Map<String, List<String>> getFastingBloodGlucoseDataInfo() {
-        String sql = "select fastingBloodGlucoseCode, count(*) from single_disease_check_index where checkCode = 'CH002' group by fastingBloodGlucoseCode";
-        List<Map<String, Object>> list = parseIntegerValue(sql);
+    public Map<String, List<String>> getFastingBloodGlucoseDataInfo(String condition) {
+        StringBuffer sql = new StringBuffer();
+        sql.append("select fastingBloodGlucoseCode, count(*) from singleDiseaseCheck where checkCode = 'CH002'");
+        if (!StringUtils.isEmpty(condition) && !condition.contains("undefined")) {
+            //å…ˆæŠŠè¿‡æ»¤æ¡ä»¶å¿½ç•¥æ€§åˆ«çš„è¿‡æ»¤
+            condition = changeCondition(condition);
+            sql.append(" and " + condition);
+        }
+        sql.append(" group by fastingBloodGlucoseCode");
+        log.info("sql = " + sql.toString());
+        List<Map<String, Object>> list = parseIntegerValue(sql.toString());
         Map<String, List<String>> map = new HashMap<>();
         List<String> xData = new LinkedList<>();
-        // »ñÈ¡ºá×ø±ê
+        // è·å–æ¨ªåæ ‡
         xData.add("4.4~6.1mmol/L");
         xData.add("6.1~7mmol/L");
-        xData.add("7.0mmol/LÒÔÉÏ");
+        xData.add("7.0mmol/Lä»¥ä¸Š");
         Map<String,String> resultDataMap = new HashMap<>();
 //        if (null != list && list.get(0).size() > 0) {
 //            list.forEach(one -> {
@@ -337,22 +378,22 @@ public class SingleDiseaseService {
 //            });
 //
 //            for(int i =1;i<4 ;i++){
-//                if( !resultDataMap.containsKey(i + "-" + "ÄĞĞÔ")) {
-//                    resultDataMap.put(i + "-" + "ÄĞĞÔ","0");
+//                if( !resultDataMap.containsKey(i + "-" + "ç”·æ€§")) {
+//                    resultDataMap.put(i + "-" + "ç”·æ€§","0");
 //                }
-//                if( !resultDataMap.containsKey(i + "-" + "Å®ĞÔ")) {
-//                    resultDataMap.put(i + "-" + "Å®ĞÔ","0");
+//                if( !resultDataMap.containsKey(i + "-" + "å¥³æ€§")) {
+//                    resultDataMap.put(i + "-" + "å¥³æ€§","0");
 //                }
 //            }
 //
-//            List<String> valueData1 = new LinkedList<>();    // ´æ·ÅµÚÒ»¸öÊı¾İÔ´ ÄĞÉú
-//            List<String> valueData2 = new LinkedList<>();    // ´æ·ÅµÚ¶ş¸öÊı¾İÔ´ Å®Éú
+//            List<String> valueData1 = new LinkedList<>();    // å­˜æ”¾ç¬¬ä¸€ä¸ªæ•°æ®æº ç”·ç”Ÿ
+//            List<String> valueData2 = new LinkedList<>();    // å­˜æ”¾ç¬¬äºŒä¸ªæ•°æ®æº å¥³ç”Ÿ
 //            map.put("xData", xData);
 //            for(String key : resultDataMap.keySet()){
-//                if(key.contains("ÄĞĞÔ")){
+//                if(key.contains("ç”·æ€§")){
 //                    valueData1.add(resultDataMap.get(key)+"");
 //                }
-//                if(key.contains("Å®ĞÔ")){
+//                if(key.contains("å¥³æ€§")){
 //                    valueData2.add(resultDataMap.get(key)+"");
 //                }
 //            }
@@ -360,9 +401,9 @@ public class SingleDiseaseService {
 //            map.put("valueData2", valueData2);
 //        }
 
-        //ÎŞĞÔ±ğÊä³ö
+        //æ— æ€§åˆ«è¾“å‡º
         List<String> valueData = new ArrayList<>();
-        if (null != list && list.get(0).size() > 0) {
+        if (null != list && list.size() > 0 && list.get(0).size() > 0) {
             list.forEach(one -> {
                 valueData.add(one.get("COUNT(*)") + "");
             });
@@ -373,18 +414,26 @@ public class SingleDiseaseService {
     }
 
     /**
-     * ÌÇÄÍÁ¿Í³¼Æ
+     * ç³–è€é‡ç»Ÿè®¡
      * @return
      */
-    public Map<String, List<String>> getSugarToleranceDataInfo() {
-        String sql = "select sugarToleranceCode, count(*) from single_disease_check_index where checkCode = 'CH003' group by sugarToleranceCode";
-        List<Map<String, Object>> list = parseIntegerValue(sql);
+    public Map<String, List<String>> getSugarToleranceDataInfo(String condition) {
+        StringBuffer sql = new StringBuffer();
+        sql.append("select sugarToleranceCode, count(*) from singleDiseaseCheck where checkCode = 'CH003'");
+        if (!StringUtils.isEmpty(condition) && !condition.contains("undefined")) {
+            //å…ˆæŠŠè¿‡æ»¤æ¡ä»¶å¿½ç•¥æ€§åˆ«çš„è¿‡æ»¤
+            condition = changeCondition(condition);
+            sql.append(" and " + condition);
+        }
+        sql.append(" group by sugarToleranceCode");
+        log.info("sql = " + sql.toString());
+        List<Map<String, Object>> list = parseIntegerValue(sql.toString());
         Map<String, List<String>> map = new HashMap<>();
         List<String> xData = new LinkedList<>();
-        // »ñÈ¡ºá×ø±ê
-        xData.add("7.8 mmol/LÒÔÏÂ");
+        // è·å–æ¨ªåæ ‡
+        xData.add("7.8 mmol/Lä»¥ä¸‹");
         xData.add("7.8~11.1 mmol/L");
-        xData.add("11.1 mmol/LÒÔÉÏ");
+        xData.add("11.1 mmol/Lä»¥ä¸Š");
 //        Map<String,String> resultDataMap = new HashMap<>();
 //        if (null != list && list.get(0).size() > 0) {
 //            list.forEach(one -> {
@@ -397,22 +446,22 @@ public class SingleDiseaseService {
 //            });
 //
 //            for(int i =1;i<4 ;i++){
-//                if( !resultDataMap.containsKey(i + "-" + "ÄĞĞÔ")) {
-//                    resultDataMap.put(i + "-" + "ÄĞĞÔ","0");
+//                if( !resultDataMap.containsKey(i + "-" + "ç”·æ€§")) {
+//                    resultDataMap.put(i + "-" + "ç”·æ€§","0");
 //                }
-//                if( !resultDataMap.containsKey(i + "-" + "Å®ĞÔ")) {
-//                    resultDataMap.put(i + "-" + "Å®ĞÔ","0");
+//                if( !resultDataMap.containsKey(i + "-" + "å¥³æ€§")) {
+//                    resultDataMap.put(i + "-" + "å¥³æ€§","0");
 //                }
 //            }
 //
-//            List<String> valueData1 = new LinkedList<>();    // ´æ·ÅµÚÒ»¸öÊı¾İÔ´ ÄĞÉú
-//            List<String> valueData2 = new LinkedList<>();    // ´æ·ÅµÚ¶ş¸öÊı¾İÔ´ Å®Éú
+//            List<String> valueData1 = new LinkedList<>();    // å­˜æ”¾ç¬¬ä¸€ä¸ªæ•°æ®æº ç”·ç”Ÿ
+//            List<String> valueData2 = new LinkedList<>();    // å­˜æ”¾ç¬¬äºŒä¸ªæ•°æ®æº å¥³ç”Ÿ
 //            map.put("xData", xData);
 //            for(String key : resultDataMap.keySet()){
-//                if(key.contains("ÄĞĞÔ")){
+//                if(key.contains("ç”·æ€§")){
 //                    valueData1.add(resultDataMap.get(key)+"");
 //                }
-//                if(key.contains("Å®ĞÔ")){
+//                if(key.contains("å¥³æ€§")){
 //                    valueData2.add(resultDataMap.get(key)+"");
 //                }
 //            }
@@ -420,9 +469,9 @@ public class SingleDiseaseService {
 //            map.put("valueData2", valueData2);
 //        }
 
-        //ÎŞĞÔ±ğÊä³ö
+        //æ— æ€§åˆ«è¾“å‡º
         List<String> valueData = new ArrayList<>();
-        if (null != list && list.get(0).size() > 0) {
+        if (null != list && list.size() > 0 && list.get(0).size() > 0) {
             list.forEach(one -> {
                 valueData.add(one.get("COUNT(*)") + "");
             });
@@ -433,7 +482,7 @@ public class SingleDiseaseService {
     }
 
     /**
-     * ¶Ô²éÑ¯½á¹ûkey°üº¬count¡¢sumµÄvalueÈ¥µôĞ¡Êıµã
+     * å¯¹æŸ¥è¯¢ç»“æœkeyåŒ…å«countã€sumçš„valueå»æ‰å°æ•°ç‚¹
      * @param sql
      * @return
      */
@@ -453,4 +502,403 @@ public class SingleDiseaseService {
         return handleData;
     }
 
+    /**
+     * é‡‡é›†å‡ºæ¥çš„ç©ºè…¹è¡€ç³–å’Œç³–è€é‡ç”¨æˆ·çš„æ€§åˆ«åŸºæœ¬éƒ½æ˜¯æœªçŸ¥ï¼ˆçŠ¶æ€ä¸º0ï¼‰ï¼Œæ‰€ä»¥å…ˆå¿½ç•¥æ€§åˆ«çš„è¿‡æ»¤
+     * @param condition
+     * @return
+     */
+    private String changeCondition(String condition) {
+        StringBuffer buffer = new StringBuffer();
+        String[] ands = condition.split("and");
+        for (String and : ands) {
+            if (!and.contains("sex")) {
+                buffer.append(and.trim() + " and ");
+            }
+        }
+        String newCondition = buffer.toString();
+        return newCondition.substring(0, newCondition.length() - 4).trim();
+    }
+
+    /**
+     * è·å–ç³–å°¿ç—…ç±»å‹åˆ†æ
+     * @param type
+     * @param filter
+     * @return
+     */
+    public Map<String, List<String>> getDiseaseTypeAnalysisInfo(String type, String filter) {
+        String sql = "";
+        if ("1".equals(type)) {
+            sql = "select count(*) from singleDiseasePersonal group by diseaseTypeName,date_histogram(field='eventDate','interval'='year') order by eventDate,diseaseType";
+        } else {
+            if(filter.isEmpty()){
+                sql = "select count(*) from singleDiseasePersonal group by diseaseTypeName,date_histogram(field='eventDate','interval'='month')";
+            }else {
+                sql = "select count(*) from singleDiseasePersonal  where " + filter + " group by diseaseTypeName,date_histogram(field='eventDate','interval'='month')";
+            }
+        }
+        log.info("sql = " + sql);
+        List<Map<String, Object>> listData = parseIntegerValue(sql);
+        Map<String, List<String>> map = new HashMap<>();
+        List<String> xData = new ArrayList<>();
+        List<String> valueData = new ArrayList<>();
+        Set<String> hashSet = new TreeSet<>();
+        Map<String, String> value = new HashMap<>();
+        if (null != listData && listData.size() > 0 && listData.get(0).size() > 0) {
+            if ("1".equals(type)) {
+                listData.forEach(one -> {
+                    hashSet.add((one.get("date_histogram(field=eventDate,interval=year)") + "").substring(0,4));
+                    value.put((one.get("date_histogram(field=eventDate,interval=year)") + "").substring(0,4) + "-"+ one.get("diseaseTypeName"), one.get("COUNT(*)") + "");
+                });
+            } else {
+                hashSet.clear();
+                hashSet.addAll(getMonthInfo());
+                listData.forEach(one -> {
+                    value.put((one.get("date_histogram(field=eventDate,interval=month)") + "").substring(5,7) + "-"+ one.get("diseaseTypeName"), one.get("COUNT(*)") + "");
+                });
+            }
+        }
+        List<String> name = new ArrayList<>();
+        name.add("Iå‹ç³–å°¿ç—…");
+        name.add("IIå‹ç³–å°¿ç—…");
+        name.add("å¦Šå¨ ç³–å°¿ç—…");
+        name.add("å…¶ä»–ç³–å°¿ç—…");
+        if (hashSet.size() > 0 && value.size() > 0) {
+            for (String year : hashSet) {
+                for (int i = 1; i <= 4; i++) {
+                    if (!value.containsKey(year + "-Iå‹ç³–å°¿ç—…")) {
+                        value.put(year + "-Iå‹ç³–å°¿ç—…", "0");
+                    }
+                    if (!value.containsKey(year + "-IIå‹ç³–å°¿ç—…")) {
+                        value.put(year + "-IIå‹ç³–å°¿ç—…", "0");
+                    }
+                    if (!value.containsKey(year + "-å¦Šå¨ ç³–å°¿ç—…")) {
+                        value.put(year + "-å¦Šå¨ ç³–å°¿ç—…", "0");
+                    }
+                    if (!value.containsKey(year + "-å…¶ä»–ç³–å°¿ç—…")) {
+                        value.put(year + "-å…¶ä»–ç³–å°¿ç—…", "0");
+                    }
+                }
+
+            }
+            List<String> list1 = new ArrayList<>(); // Iå‹ç³–å°¿ç—…
+            List<String> list2 = new ArrayList<>(); // IIå‹ç³–å°¿ç—…
+            List<String> list3 = new ArrayList<>(); // å¦Šå¨ ç³–å°¿ç—…
+            List<String> list4 = new ArrayList<>(); // å…¶ä»–ç³–å°¿ç—…
+            for (String year : hashSet) {
+                for (String key : value.keySet()) {
+                    if (key.equals(year + "-Iå‹ç³–å°¿ç—…")) {
+                        list1.add(value.get(year + "-Iå‹ç³–å°¿ç—…"));
+                    }
+                    if (key.equals(year + "-IIå‹ç³–å°¿ç—…")) {
+                        list2.add(value.get(year + "-IIå‹ç³–å°¿ç—…"));
+                    }
+                    if (key.equals(year + "-å¦Šå¨ ç³–å°¿ç—…")) {
+                        list3.add(value.get(year + "-å¦Šå¨ ç³–å°¿ç—…"));
+                    }
+                    if (key.equals(year + "-å…¶ä»–ç³–å°¿ç—…")) {
+                        list4.add(value.get(year + "-å…¶ä»–ç³–å°¿ç—…"));
+                    }
+                }
+            }
+            xData.clear();
+            xData.addAll(hashSet);
+            map.put("name", name);
+            map.put("xName", xData);
+            map.put("type1", list1);
+            map.put("type2", list2);
+            map.put("type3", list3);
+            map.put("type4", list4);
+        }
+        return map;
+    }
+
+    /**
+     * æ€§åˆ«åˆ†æ
+     * @param type
+     * @param filter
+     * @return
+     */
+    public Map<String, List<String>> getSexAnalysisInfo(String type, String filter) {
+        String sql = "";
+        if ("1".equals(type)) {
+            sql = "select count(*) from singleDiseasePersonal group by sexName,date_histogram(field='eventDate','interval'='year')";
+        } else {
+            if(filter.isEmpty()){
+                sql = "select count(*) from singleDiseasePersonal group by sexName,date_histogram(field='eventDate','interval'='month')";
+            }else {
+                sql = "select count(*) from singleDiseasePersonal where " + filter + "group by sexName,date_histogram(field='eventDate','interval'='month')";
+            }
+        }
+        log.info("sql = " + sql);
+        List<Map<String, Object>> listData = parseIntegerValue(sql);
+        Map<String, List<String>> map = new HashMap<>();
+        List<String> xData = new ArrayList<>();
+        Set<String> hashSet = new TreeSet<>();
+        Map<String, String> value = new HashMap<>();
+        if (null != listData && listData.size() > 0 && listData.get(0).size() > 0) {
+            if ("1".equals(type)) {
+                listData.forEach(one -> {
+                    hashSet.add((one.get("date_histogram(field=eventDate,interval=year)") + "").substring(0,4));
+                    value.put((one.get("date_histogram(field=eventDate,interval=year)") + "").substring(0,4) + "-"+ one.get("sexName"), one.get("COUNT(*)") + "");
+                });
+            } else {
+                hashSet.clear();
+                hashSet.addAll(getMonthInfo());
+                listData.forEach(one -> {
+                    value.put((one.get("date_histogram(field=eventDate,interval=month)") + "").substring(5,7) + "-"+ one.get("sexName"), one.get("COUNT(*)") + "");
+                });
+            }
+        }
+        List<String> name = new ArrayList<>();
+        name.add("å¥³æ€§");
+        name.add("ç”·æ€§");
+        name.add("æœªçŸ¥");
+        if (hashSet.size() > 0 && value.size() > 0) {
+            for (String year : hashSet) {
+                for (int i = 1; i <= 3; i++) {
+                    if (!value.containsKey(year + "-å¥³æ€§")) {
+                        value.put(year + "-å¥³æ€§", "0");
+                    }
+                    if (!value.containsKey(year + "-ç”·æ€§")) {
+                        value.put(year + "-ç”·æ€§", "0");
+                    }
+                    if (!value.containsKey(year + "-æœªçŸ¥")) {
+                        value.put(year + "-æœªçŸ¥", "0");
+                    }
+                }
+
+            }
+            List<String> list1 = new ArrayList<>(); // å¥³æ€§
+            List<String> list2 = new ArrayList<>(); // ç”·æ€§
+            List<String> list3 = new ArrayList<>(); // æœªçŸ¥
+            for (String year : hashSet) {
+                for (String key : value.keySet()) {
+                    if (key.equals(year + "-å¥³æ€§")) {
+                        list1.add(value.get(year + "-å¥³æ€§"));
+                    }
+                    if (key.equals(year + "-ç”·æ€§")) {
+                        list2.add(value.get(year + "-ç”·æ€§"));
+                    }
+                    if (key.equals(year + "-æœªçŸ¥")) {
+                        list3.add(value.get(year + "-æœªçŸ¥"));
+                    }
+                }
+            }
+            xData.clear();
+            xData.addAll(hashSet);
+            map.put("name", name);
+            map.put("xName", xData);
+            map.put("type1", list1);
+            map.put("type2", list2);
+            map.put("type3", list3);
+        }
+        return map;
+    }
+
+    /**
+     * å¹´é¾„æ®µåˆ†æ
+     * @param type
+     * @param filter
+     * @return
+     */
+    public Map<String, List<String>> getAgeAnalysisInfo(String type, String filter) {
+        String sql = "";
+        Calendar calendar = Calendar.getInstance();
+        int years = calendar.get(Calendar.YEAR) + 1;
+        /*
+        * å¹´é¾„æ®µåˆ†ä¸º0-6ã€7-17ã€18-40ã€41-65ã€65ä»¥ä¸Š
+        * é¦–å…ˆè·å–å½“å‰å¹´ä»½ï¼Œç”±äºESæŸ¥è¯¢æ˜¯å·¦åŒ…å«ï¼Œå³ä¸åŒ…ï¼Œæ‰€ä»¥å½“å‰å¹´ä»½éœ€è¦+1
+        * ä¸‹é¢ä¸ºæ„é€ å¹´é¾„æ®µçš„ç®—å¼ï¼Œå…¶ä¸­year-151é™å®šäº†èŒƒå›´æ˜¯66-150å² å³66ä»¥ä¸Šï¼Œå…¶ä»–ç±»ä¼¼
+        * */
+        String range = "range(birthYear," + (years - 151) + "," + (years - 66) + "," + (years - 41) + "," + (years - 18) + "," + (years - 7) + "," + years + ")";
+        if ("1".equals(type)) {
+            sql = "select count(birthYear) from singleDiseasePersonal group by " + range + ",date_histogram(field='eventDate','interval'='year')";
+        } else {
+            if(filter.isEmpty()){
+                sql = "select count(birthYear) from singleDiseasePersonal group by " + range + ",date_histogram(field='eventDate','interval'='month')";
+            }else {
+                sql = "select count(birthYear) from singleDiseasePersonal where " + filter + " group by " + range + ",date_histogram(field='eventDate','interval'='month')";
+            }
+        }
+        log.info("sql = " + sql);
+        List<Map<String, Object>> listData = parseIntegerValue(sql);
+        Map<String, List<String>> map = new HashMap<>();
+        List<String> xData = new ArrayList<>();
+        Set<String> hashSet = new TreeSet<>();
+        Map<String, String> value = new HashMap<>();
+        if (null != listData && listData.size() > 0 && listData.get(0).size() > 0) {
+            if ("1".equals(type)) {
+                listData.forEach(one -> {
+                    String rangeName = one.get(range) + "";
+                    // rangeNameï¼š"1978.0-2001.0"
+                    int first = (int) Double.parseDouble(rangeName.split("-")[0]);
+                    int last = (int) Double.parseDouble(rangeName.split("-")[1]);
+                    Integer result = last - first;
+                    // è½¬æˆç›¸åº”çš„å¹´é¾„æ®µ
+                    String keyName = exchangeInfo(result);
+                    hashSet.add((one.get("date_histogram(field=eventDate,interval=year)") + "").substring(0,4));
+                    value.put((one.get("date_histogram(field=eventDate,interval=year)") + "").substring(0,4) + "-"+ keyName, one.get("COUNT(birthYear)") + "");
+                });
+            } else {
+                hashSet.clear();
+                hashSet.addAll(getMonthInfo());
+                listData.forEach(one -> {
+                    String rangeName = one.get(range) + "";
+                    // rangeNameï¼š"1978.0-2001.0"
+                    int first = (int) Double.parseDouble(rangeName.split("-")[0]);
+                    int last = (int) Double.parseDouble(rangeName.split("-")[1]);
+                    Integer result = last - first;
+                    // è½¬æˆç›¸åº”çš„å¹´é¾„æ®µ
+                    String keyName = exchangeInfo(result);
+                    String strDate = one.get("date_histogram(field=eventDate,interval=month)") + "";
+                    System.out.println("age rturn data = "+ strDate);
+                    if(StringUtils.isNotEmpty(strDate) && strDate.length() > 7){
+                        value.put(strDate.substring(5, 7) + "-"+ keyName, one.get("COUNT(birthYear)") + "");
+                    }
+                });
+            }
+        }
+        List<String> name = new ArrayList<>();
+        name.add("0-6å²");
+        name.add("7-17å²");
+        name.add("18-40å²");
+        name.add("41-65å²");
+        name.add("66å²ä»¥ä¸Š");
+        if (hashSet.size() > 0 && value.size() > 0) {
+            for (String year : hashSet) {
+                for (int i = 1; i <= 5; i++) {
+                    if (!value.containsKey(year + "-0-6å²")) {
+                        value.put(year + "-0-6å²", "0");
+                    }
+                    if (!value.containsKey(year + "-7-17å²")) {
+                        value.put(year + "-7-17å²", "0");
+                    }
+                    if (!value.containsKey(year + "-18-40å²")) {
+                        value.put(year + "-18-40å²", "0");
+                    }
+                    if (!value.containsKey(year + "-41-65å²")) {
+                        value.put(year + "-41-65å²", "0");
+                    }
+                    if (!value.containsKey(year + "-66å²ä»¥ä¸Š")) {
+                        value.put(year + "-66å²ä»¥ä¸Š", "0");
+                    }
+                }
+
+            }
+            List<String> list1 = new ArrayList<>(); // 0-6å²
+            List<String> list2 = new ArrayList<>(); // 7-17å²
+            List<String> list3 = new ArrayList<>(); // 18-40å²
+            List<String> list4 = new ArrayList<>(); // 41-65å²
+            List<String> list5 = new ArrayList<>(); // 66å²ä»¥ä¸Š
+            for (String year : hashSet) {
+                for (String key : value.keySet()) {
+                    if (key.equals(year + "-0-6å²")) {
+                        list1.add(value.get(year + "-0-6å²"));
+                    }
+                    if (key.equals(year + "-7-17å²")) {
+                        list2.add(value.get(year + "-7-17å²"));
+                    }
+                    if (key.equals(year + "-18-40å²")) {
+                        list3.add(value.get(year + "-18-40å²"));
+                    }
+                    if (key.equals(year + "-41-65å²")) {
+                        list4.add(value.get(year + "-41-65å²"));
+                    }
+                    if (key.equals(year + "-66å²ä»¥ä¸Š")) {
+                        list5.add(value.get(year + "-66å²ä»¥ä¸Š"));
+                    }
+                }
+            }
+            xData.clear();
+            xData.addAll(hashSet);
+            map.put("name", name);
+            map.put("xName", xData);
+            map.put("type1", list1);
+            map.put("type2", list2);
+            map.put("type3", list3);
+            map.put("type4", list4);
+            map.put("type5", list5);
+        }
+        return map;
+    }
+
+    /**
+     *
+     * @param i
+     * @param type 1ç³–å°¿ç—…ç±»å‹ 2æ€§åˆ« 3å¹´é¾„
+     * @return
+     */
+    public String getNameByIdType(int i, String type) {
+        String result = "";
+        if ("1".equals(type)) {
+            switch (i) {
+                case 1:
+                    result = "Iå‹ç³–å°¿ç—…";
+                    break;
+                case 2:
+                    result = "IIå‹ç³–å°¿ç—…";
+                    break;
+                case 3:
+                    result = "å¦Šå¨ ç³–å°¿ç—…";
+                    break;
+                case 4:
+                    result = "å…¶ä»–ç³–å°¿ç—…";
+                    break;
+                default:
+                    break;
+            }
+        } else if ("2".equals(type)) {
+            switch (i) {
+                case 1:
+                    result = "å¥³æ€§";
+                    break;
+                case 2:
+                    result = "ç”·æ€§";
+                    break;
+                case 3:
+                    result = "æœªçŸ¥";
+                    break;
+                default:
+                    break;
+            }
+        } else if ("3".equals(type)) {
+            switch (i) {
+                case 1:
+                    result = "0-6å²";
+                    break;
+                case 2:
+                    result = "7-17å²";
+                    break;
+                case 3:
+                    result = "18-40å²";
+                    break;
+                case 4:
+                    result = "41-65å²";
+                    break;
+                case 5:
+                    result = "66å²ä»¥ä¸Š";
+                    break;
+                default:
+                    break;
+            }
+        }
+        return result;
+    }
+
+    public Set<String> getMonthInfo() {
+        Set<String> hashSet = new TreeSet<>();
+        hashSet.add("01");
+        hashSet.add("02");
+        hashSet.add("03");
+        hashSet.add("04");
+        hashSet.add("05");
+        hashSet.add("06");
+        hashSet.add("07");
+        hashSet.add("08");
+        hashSet.add("09");
+        hashSet.add("10");
+        hashSet.add("11");
+        hashSet.add("12");
+        return hashSet;
+    }
 }

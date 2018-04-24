@@ -5,13 +5,13 @@ import com.yihu.ehr.constants.ArchiveStatus;
 import com.yihu.ehr.constants.RedisCollection;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.lang.SpringContext;
-import com.yihu.ehr.model.packs.MPackage;
+import com.yihu.ehr.model.packs.EsSimplePackage;
 import com.yihu.ehr.resolve.feign.PackageMgrClient;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.resolve.model.stage2.ResourceBucket;
 import com.yihu.ehr.resolve.service.resource.stage1.PackageResolveService;
+import com.yihu.ehr.resolve.service.resource.stage2.IdentifyService;
 import com.yihu.ehr.resolve.service.resource.stage2.PackMillService;
-import com.yihu.ehr.resolve.service.resource.stage2.PatientService;
 import com.yihu.ehr.resolve.service.resource.stage2.ResourceService;
 import com.yihu.ehr.resolve.util.PackResolveLogger;
 import com.yihu.ehr.util.datetime.DateUtil;
@@ -53,56 +53,56 @@ public class PackageResourceJob implements InterruptableJob {
         RedisTemplate<String, Serializable> redisTemplate = SpringContext.getService("redisTemplate");
         ObjectMapper objectMapper = SpringContext.getService(ObjectMapper.class);
         Serializable serializable = redisTemplate.opsForList().rightPop(RedisCollection.PackageList);
-        MPackage pack = null;
+        EsSimplePackage pack = null;
         try {
-            if(serializable != null) {
+            if (serializable != null) {
                 String packStr = serializable.toString();
-                pack = objectMapper.readValue(packStr, MPackage.class);
+                pack = objectMapper.readValue(packStr, EsSimplePackage.class);
             }
             if (pack != null) {
-                packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Acquired, "正在入库中");
-                PackResolveLogger.info("开始入库:" + pack.getId() + ", Timestamp:" + new Date());
+                packageMgrClient.reportStatus(pack.get_id(), ArchiveStatus.Acquired, "正在入库中");
+                PackResolveLogger.info("开始入库:" + pack.get_id() + ", Timestamp:" + new Date());
                 doResolve(pack, packageMgrClient);
             }
         } catch (Exception e) {
             if (pack != null) {
                 try {
-                    if (StringUtils.isBlank(e.getMessage())) {
-                        packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Failed, "Internal server error, please see task log for detail message.");
-                        PackResolveLogger.error("Internal server error, please see task log for detail message.", e);
-                    } else {
-                        packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Failed, e.getMessage());
+                    if (StringUtils.isNotBlank(e.getMessage())) {
+                        packageMgrClient.reportStatus(pack.get_id(), ArchiveStatus.Failed, e.getMessage());
                         PackResolveLogger.error(e.getMessage());
+                    } else {
+                        packageMgrClient.reportStatus(pack.get_id(), ArchiveStatus.Failed, "Internal server error, please see task log for detail message.");
+                        PackResolveLogger.error("Internal server error, please see task log for detail message.", e);
                     }
                 } catch (Exception e1) {
-                    PackResolveLogger.error(e1.getMessage());
+                    PackResolveLogger.error("Execute feign fail cause by:" + e1.getMessage());
                 }
+            } else {
+                PackResolveLogger.error("Empty pack cause by:" + e.getMessage());
             }
         }
     }
 
-    private void doResolve(MPackage pack, PackageMgrClient packageMgrClient) throws Exception {
+    private void doResolve(EsSimplePackage pack, PackageMgrClient packageMgrClient) throws Exception {
         PackageResolveService resolveEngine = SpringContext.getService(PackageResolveService.class);
-        PatientService patientService = SpringContext.getService(PatientService.class);
         PackMillService packMill = SpringContext.getService(PackMillService.class);
+        IdentifyService identifyService = SpringContext.getService(IdentifyService.class);
         ResourceService resourceService = SpringContext.getService(ResourceService.class);
         ObjectMapper objectMapper = new ObjectMapper();
-        //long start = System.currentTimeMillis();
-        StandardPackage standardPackage = resolveEngine.doResolve(pack, downloadTo(pack.getRemotePath()));
+        StandardPackage standardPackage = resolveEngine.doResolve(pack, downloadTo(pack.getRemote_path()));
         ResourceBucket resourceBucket = packMill.grindingPackModel(standardPackage);
+        identifyService.identify(resourceBucket, standardPackage);
         resourceService.save(resourceBucket, standardPackage);
-        //居民信息注册
-        patientService.checkPatient(resourceBucket, pack.getId());
         //回填入库状态
-        Map<String,String> map = new HashMap();
-        map.put("profileId", standardPackage.getId());
-        map.put("demographicId", standardPackage.getDemographicId());
-        map.put("eventType", standardPackage.getEventType() == null? "":String.valueOf(standardPackage.getEventType().getType()));
-        map.put("eventNo", standardPackage.getEventNo());
-        map.put("eventDate", DateUtil.toStringLong(standardPackage.getEventDate()));
-        map.put("patientId", standardPackage.getPatientId());
-        map.put("reUploadFlg", String.valueOf(standardPackage.isReUploadFlg()));
-        packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Finished, objectMapper.writeValueAsString(map));
+        Map<String, Object> map = new HashMap();
+        map.put("profile_id", standardPackage.getId());
+        map.put("demographic_id", standardPackage.getDemographicId());
+        map.put("event_type", standardPackage.getEventType() == null ? null : standardPackage.getEventType().getType());
+        map.put("event_no", standardPackage.getEventNo());
+        map.put("event_date", DateUtil.toStringLong(standardPackage.getEventDate()));
+        map.put("patient_id", standardPackage.getPatientId());
+        map.put("re_upload_flg", String.valueOf(standardPackage.isReUploadFlg()));
+        packageMgrClient.reportStatus(pack.get_id(), ArchiveStatus.Finished, objectMapper.writeValueAsString(map));
     }
 
     private String downloadTo(String filePath) throws Exception {

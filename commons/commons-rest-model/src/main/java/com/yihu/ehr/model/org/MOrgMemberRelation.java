@@ -23,6 +23,10 @@ public class MOrgMemberRelation implements Serializable {
     private String parentUserName;
     private String remark;
     private Integer status;
+    private String jkzlDoctorUid; // 总部的医生uid
+    private String jkzlUserId; // 总部的医生userid
+    private String jkzlDoctorSn; // 总部的坐诊sn
+    private String jkzlHosDeptId; // 总部的科室Id
 
     public int getId() {
         return id;
@@ -134,5 +138,37 @@ public class MOrgMemberRelation implements Serializable {
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    public String getJkzlDoctorUid() {
+        return jkzlDoctorUid;
+    }
+
+    public void setJkzlDoctorUid(String jkzlDoctorUid) {
+        this.jkzlDoctorUid = jkzlDoctorUid;
+    }
+
+    public String getJkzlUserId() {
+        return jkzlUserId;
+    }
+
+    public void setJkzlUserId(String jkzlUserId) {
+        this.jkzlUserId = jkzlUserId;
+    }
+
+    public String getJkzlDoctorSn() {
+        return jkzlDoctorSn;
+    }
+
+    public void setJkzlDoctorSn(String jkzlDoctorSn) {
+        this.jkzlDoctorSn = jkzlDoctorSn;
+    }
+
+    public String getJkzlHosDeptId() {
+        return jkzlHosDeptId;
+    }
+
+    public void setJkzlHosDeptId(String jkzlHosDeptId) {
+        this.jkzlHosDeptId = jkzlHosDeptId;
     }
 }

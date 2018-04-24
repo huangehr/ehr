@@ -52,7 +52,7 @@ public class EhrRedisApiAccessValidator {
             long expire = tomorrow.getTime() - today.getTime();
             for (String api : appApiList) {
                 String key = clientId + "$" + userName + "$" + api;
-                if(null == redisTemplate.opsForValue().get(key)) {
+                if (null == redisTemplate.opsForValue().get(key)) {
                     redisTemplate.opsForValue().set(key, 200);
                     redisTemplate.expire(key, expire, TimeUnit.MILLISECONDS);
                 }
@@ -65,12 +65,12 @@ public class EhrRedisApiAccessValidator {
         Serializable serializable = redisTemplate.opsForValue().get(key);
         if(serializable != null) {
             int count = new Integer(serializable.toString());
-            if(count > 0 ) {
+            if (count > 0 ) {
                 long expire = redisTemplate.getExpire(key);
                 redisTemplate.opsForValue().set(key, --count);
                 redisTemplate.expire(key, expire, TimeUnit.SECONDS);
                 return true;
-            }else {
+            } else {
                 return false;
             }
         }

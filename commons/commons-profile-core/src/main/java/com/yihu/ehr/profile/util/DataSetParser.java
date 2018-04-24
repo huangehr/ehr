@@ -46,19 +46,19 @@ public class DataSetParser {
 
         //验证档案基础数据的完整性，当其中某字段为空的情况下直接提示档案包信息缺失。
         StringBuilder errorMsg = new StringBuilder();
-        if(StringUtils.isEmpty(code)){
+        if (StringUtils.isEmpty(code)){
             errorMsg.append("dataSetCode is null;");
         }
-        if(StringUtils.isEmpty(patientId)){
+        if (StringUtils.isEmpty(patientId)){
             errorMsg.append("patientId is null;");
         }
-        if(StringUtils.isEmpty(eventNo) && !"HDSA00_01".equals(code)){
+        if (StringUtils.isEmpty(eventNo) && !"HDSA00_01".equals(code)){
             errorMsg.append("eventNo is null;");
         }
-        if(StringUtils.isEmpty(orgCode)){
+        if (StringUtils.isEmpty(orgCode)){
             errorMsg.append("orgCode is null;");
         }
-        if(!StringUtils.isEmpty(errorMsg.toString())){
+        if (!StringUtils.isEmpty(errorMsg.toString())){
             throw new RuntimeException(errorMsg.toString());
         }
 

@@ -62,10 +62,41 @@ public class QuotaReportController extends BaseController {
     private OrgHealthCategoryStatisticsService orgHealthCategoryStatisticsService;
     @Autowired
     private BaseStatistsService baseStatistsService;
-    @Autowired
-    private SingleDiseaseService singleDiseaseService;
 
     public static String orgHealthCategoryCode = "orgHealthCategoryCode";
+
+    @RequestMapping(value = ServiceApi.TJ.GetYearDropdownList, method = RequestMethod.GET)
+    @ApiOperation(value = "获取二维表查询年份下拉数据")
+    public Envelop getDropdownList(
+            @ApiParam(name = "type", value = "类型 1增量型报表 2 全量型报表")
+            @RequestParam(value = "type" ,required =  true ) int type,
+            @ApiParam(name = "index", value = "索引")
+            @RequestParam(value = "index" ,required =  true ) String index) throws Exception {
+        Envelop envelop = new Envelop();
+        Map<String, List<String>> map = null;
+        String sql = "select count(1) from "+ index +" group by date_histogram(field='quotaDate','interval'='year') order by quotaDate desc";
+        map = baseStatistsService.getDataInfo(sql, "date_histogram(field=quotaDate,interval=year)");
+        if (null != map && map.size() > 0) {
+            Collections.sort(map.get("xData"), Collections.reverseOrder());
+            if(type == 1){
+                envelop.setObj(map.get("xData"));
+            }else {
+                Map<String,String> resultMap = new HashMap<>();
+                for(String key : map.get("xData")){
+                    String filter = "quotaDate >= '" + key + "-01-01'" + " and quotaDate <= '" + key +"-12-31'";
+                    sql = "select count(1) from "+ index +" where " + filter + " group by date_histogram(field='quotaDate','interval'='month') order by quotaDate desc";
+                    System.out.println(sql);
+                    Map<String, List<String>>  monthMap = baseStatistsService.getDataInfo(sql, "date_histogram(field=quotaDate,interval=month)");
+                    if(monthMap != null && monthMap.size() > 0){
+                        resultMap.put(key,monthMap.get("xData").get(0).toString());
+                    }
+                }
+                envelop.setObj(resultMap);
+            }
+        }
+        envelop.setSuccessFlg(true);
+        return  envelop;
+    }
 
     /**
      * 获取指标统计结果
@@ -132,17 +163,21 @@ public class QuotaReportController extends BaseController {
             for (Map<String, Object> vMap : quotaViewResult.get(maxQuotaCode)) {
                 vMap.put(maxQuotaCode, vMap.get("result")==null ? 0 : nf.format(Double.valueOf(vMap.get("result").toString())));
                 for (String viewQuotaCode : otherQuotaViewResult.keySet()) {
-                    for (Map<String, Object> quotaResultMap : otherQuotaViewResult.get(viewQuotaCode)) {
-                        if (quotaResultMap.get(dimension) != null) {
-                            if (vMap.get(dimension).toString().trim().equals(quotaResultMap.get(dimension).toString().trim())) {
-                                vMap.put(viewQuotaCode, quotaResultMap.get("result")==null ? 0 : nf.format(Double.valueOf(quotaResultMap.get("result").toString())));
-                                break;
+                    if(otherQuotaViewResult != null && otherQuotaViewResult.get(viewQuotaCode) != null && otherQuotaViewResult.get(viewQuotaCode).size()>0 ){
+                        for (Map<String, Object> quotaResultMap : otherQuotaViewResult.get(viewQuotaCode)) {
+                            if (quotaResultMap.get(dimension) != null) {
+                                if (vMap.get(dimension).toString().trim().equals(quotaResultMap.get(dimension).toString().trim())) {
+                                    vMap.put(viewQuotaCode, quotaResultMap.get("result")==null ? 0 : nf.format(Double.valueOf(quotaResultMap.get("result").toString())));
+                                    break;
+                                } else {
+                                    vMap.put(viewQuotaCode, 0);
+                                }
                             } else {
                                 vMap.put(viewQuotaCode, 0);
                             }
-                        } else {
-                            vMap.put(viewQuotaCode, 0);
                         }
+                    }else {
+                        vMap.put(viewQuotaCode, 0);
                     }
                 }
             }
@@ -150,12 +185,40 @@ public class QuotaReportController extends BaseController {
 
             if(dimension.equals(orgHealthCategoryCode)){//如果是特殊机构类型树状机构需要转成树状结构
                 List<Map<String, Object>> orgHealthCategoryList = orgHealthCategoryStatisticsService.getOrgHealthCategoryTreeByPid(-1);
-                dataList = baseStatistsService.setResult(maxQuotaCode, orgHealthCategoryList, resultList, null);
+                dataList = baseStatistsService.setResultAllDimenMap(maxQuotaCode, orgHealthCategoryList, resultList, null);
             }else {
                 dataList = resultList;
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+        for(Map<String, Object> map : dataList){
+            if(map.get("firstColumn") == null || map.get("firstColumn").toString().equals("null") || StringUtils.isEmpty(map.get("firstColumn").toString())){
+                if(map.get("level")!= null && StringUtils.isNotEmpty(map.get("level").toString())){
+                    String level = map.get("level").toString();
+                    if (level.equals("1")){
+                        level = "一级";
+                    }else if (level.equals("2")){
+                        level = "二级";
+                    }else if (level.equals("3")){
+                        level = "三级";
+                    }else {
+                        level = "未指定";
+                    }
+                    map.put("firstColumn",level);
+                }
+                if(map.get("economic")!= null && StringUtils.isNotEmpty(map.get("economic").toString())){
+                    String economic = map.get("economic").toString();
+                    if (economic.equals("1021")){
+                        economic = "公立";
+                    }else if (economic.equals("1022")){
+                        economic = "非公立";
+                    }else {
+                        economic = "其他";
+                    }
+                    map.put("firstColumn",economic);
+                }
+            }
         }
         //计算合计
         if(dataList != null && dataList.size() > 0){
@@ -182,9 +245,11 @@ public class QuotaReportController extends BaseController {
      */
     private double calculateSum( double sum,String code,List<Map<String, Object>> dataList){
         for(Map<String, Object> map : dataList){
-            sum += Double.valueOf(map.get(code).toString());
-            if(map.containsKey("children")){
-                calculateSum(sum,code,(List<Map<String, Object>>) map.get("children"));
+            if(map.get(code) != null){
+                sum += Double.valueOf(map.get(code).toString());
+                if(map.containsKey("children")){
+                    calculateSum(sum,code,(List<Map<String, Object>>) map.get("children"));
+                }
             }
         }
         return sum;
@@ -228,15 +293,22 @@ public class QuotaReportController extends BaseController {
                     if (resultListMap != null && resultListMap.size() > 0) {
                         for (Map<String, Object> map : resultListMap) {
                             if (map != null && map.size() > 0) {
+                                if (map.containsKey("quotaName")) {
+                                    map.put("quotaName",tjQuota.getName());
+                                }
                                 listMap.add(map);
                                 //第一种 ES库中有定义的维度 如org,slaveKey1
                                 //第二种 ES库中未定义的维度 如level，economic
                                 if (map.containsKey(dimensionName)) {
-                                    dataMap.put(map.get(dimensionName).toString(), map.get("result"));
-                                    xAxisMap.put(map.get(dimensionName).toString(), map.get(dimension).toString());
+                                    if(map.get(dimensionName) != null){
+                                        dataMap.put(map.get(dimensionName).toString(), map.get("result"));
+                                        xAxisMap.put(map.get(dimensionName).toString(), map.get(dimension).toString());
+                                    }
                                 } else {
-                                    dataMap.put(map.get(dimension).toString(), map.get("result"));
-                                    xAxisMap.put(map.get(dimension).toString(), map.get(dimension).toString());
+                                    if(map.get(dimension) != null){
+                                        dataMap.put(map.get(dimension).toString(), map.get("result"));
+                                        xAxisMap.put(map.get(dimension).toString(), map.get(dimension).toString());
+                                    }
                                 }
                             }
 
@@ -285,6 +357,8 @@ public class QuotaReportController extends BaseController {
             for (String typeStr : charTypes) {
                 if (typeStr.equals("common")) {
                     typeStr = "1";
+                } else if (typeStr.equals("twoDimensional")) { // 这个需要与前端商榷  访问2次（二维表类型）
+                    return null;
                 }
                 int type = Integer.valueOf(typeStr);
                 if (type == ReportOption.bar) {
@@ -679,102 +753,6 @@ public class QuotaReportController extends BaseController {
         return dimensionDicMap;
     }
 
-    @RequestMapping(value = ServiceApi.TJ.GetHeatMapByQuotaCode, method = RequestMethod.GET)
-    @ApiOperation(value = "热力图")
-    public Envelop getHeatMap() throws Exception {
-        Envelop envelop = new Envelop();
-        List<Map<String,String>>  heatMapPoint = singleDiseaseService.getHeatMap();
-        envelop.setSuccessFlg(true);
-        if (null != heatMapPoint && heatMapPoint.size() > 0) {
-            envelop.setDetailModelList(heatMapPoint);
-        }
-        return envelop;
-    }
-
-    @RequestMapping(value = ServiceApi.TJ.GetNumberOfDiabetes, method = RequestMethod.GET)
-    @ApiOperation(value = "糖尿病患者数")
-    public Envelop getNumberOfDiabetes() throws Exception {
-        Envelop envelop = new Envelop();
-        List<Map<String, Object>> numberOfDiabetes = singleDiseaseService.getNumberOfDiabetes();
-        envelop.setSuccessFlg(true);
-        envelop.setDetailModelList(numberOfDiabetes);
-        return envelop;
-    }
-
-    @RequestMapping(value = ServiceApi.TJ.GetPieData, method = RequestMethod.GET)
-    @ApiOperation(value = "获取饼图数据")
-    public Envelop getPieData(
-            @ApiParam(name = "type", value = "类型")
-            @RequestParam(value = "type") String type,
-            @ApiParam(name = "code", value = "字典编码")
-            @RequestParam(value = "code") String code) throws Exception {
-        Envelop envelop = new Envelop();
-        Map<String, Object> pieDataInfo = singleDiseaseService.getPieDataInfo(type, code);
-        envelop.setSuccessFlg(true);
-        if (null != pieDataInfo && pieDataInfo.size() > 0) {
-            envelop.setObj(pieDataInfo.get("legendData"));
-            ArrayList<Map<String, Object>> seriesData = (ArrayList<Map<String, Object>>) pieDataInfo.get("seriesData");
-            envelop.setDetailModelList(seriesData);
-        }
-        return envelop;
-    }
-
-    @RequestMapping(value = ServiceApi.TJ.GetLineData, method = RequestMethod.GET)
-    @ApiOperation(value = "获取折线图数据")
-    public Envelop getLineData() throws Exception {
-        Envelop envelop = new Envelop();
-        Map<String, List<String>> map = singleDiseaseService.getLineDataInfo();
-        envelop.setSuccessFlg(true);
-        if (null != map && map.size() > 0) {
-            envelop.setDetailModelList(map.get("valueData"));
-            envelop.setObj(map.get("xData"));
-        }
-        return envelop;
-    }
-
-    @RequestMapping(value = ServiceApi.TJ.GetBarData, method = RequestMethod.GET)
-    @ApiOperation(value = "获取柱状图数据")
-    public Envelop getBarData(
-            @ApiParam(name = "type", value = "类型 1并发症 2用药患者数 3空腹血糖统计 4糖耐量")
-            @RequestParam(value = "type") String type) throws Exception {
-        Envelop envelop = new Envelop();
-        Map<String, List<String>> map = null;
-        if ("1".equals(type) || "2".equals(type)) {
-            if ("1".equals(type)) {
-                map = singleDiseaseService.getSymptomDataInfo();
-            } else {
-                map = singleDiseaseService.getMedicineDataInfo();
-            }
-            if (null != map && map.size() > 0) {
-                envelop.setDetailModelList(map.get("valueData"));
-                envelop.setObj(map.get("xData"));
-            }
-        } else if ("3".equals(type) || "4".equals(type)){
-            if ("3".equals(type)) {
-                map = singleDiseaseService.getFastingBloodGlucoseDataInfo();
-            } else {
-                map = singleDiseaseService.getSugarToleranceDataInfo();
-            }
-//            if (null != map && map.size() > 0) {
-//                List<Map<String, Object>> list = new ArrayList<>();
-//                Map<String, Object> myMap = new HashMap<>();
-//                myMap.put("男", map.get("valueData1"));
-//                myMap.put("女", map.get("valueData2"));
-//                list.add(myMap);
-//                envelop.setDetailModelList(list);
-//                envelop.setObj(map.get("xData"));
-//            }
-
-            if (null != map && map.size() > 0) {
-                envelop.setDetailModelList(map.get("valueData"));
-                envelop.setObj(map.get("xData"));
-            }
-        }
-        envelop.setSuccessFlg(true);
-
-        return envelop;
-    }
-
     private Integer getNum(Map<String, Object> dataMap) {
         Integer num = 0;
         for (String key : dataMap.keySet()) {
@@ -782,5 +760,172 @@ public class QuotaReportController extends BaseController {
             num += result;
         }
         return num;
+    }
+    @RequestMapping(value = "/tj/getCostAndNumOfOutPatient", method = RequestMethod.GET)
+    @ApiOperation(value = "门急诊费用、人次")
+    public Map<String, String> getCostOfOutPatient() {
+        Map<String, String> map = new HashMap<>();
+        String costOfOutPatient = baseStatistsService.getCostOfOutPatient();
+        String numOfOutPatient = baseStatistsService.getNumOfOutPatient();
+        map.put("costOfOutPatient", costOfOutPatient);
+        map.put("numOfOutPatient", numOfOutPatient);
+        return map;
+    }
+
+    @RequestMapping(value = "/tj/getCostAndNumOfInPatient", method = RequestMethod.GET)
+    @ApiOperation(value = "入院费用、人次")
+    public Map<String, String> getNumOfOutPatient() {
+        Map<String, String> map = new HashMap<>();
+        String costOfInPatient = baseStatistsService.getCostOfInPatient();
+        String numOfInPatient = baseStatistsService.getNumOfInPatient();
+        map.put("costOfInPatient", costOfInPatient);
+        map.put("numOfInPatient", numOfInPatient);
+        return map;
+    }
+
+    @RequestMapping(value = "/tj/getMedicalMonitorInfo", method = RequestMethod.GET)
+    @ApiOperation(value = "医改监测信息")
+    public Map<String, String> getMedicalMonitorInfo() {
+        Map<String, String> map = new HashMap<>();
+        String costOfMedicalMonitor = baseStatistsService.getCostOfMedicalMonitor();
+        map.put("costOfMedicalMonitor", costOfMedicalMonitor);
+        return map;
+    }
+
+    @ApiOperation(value = "首页费用组成")
+    @RequestMapping(value = ServiceApi.TJ.GetCostComposeReports, method = RequestMethod.GET)
+    public MChartInfoModel getCostComposeReports(
+            @ApiParam(name = "quotaIdStr", value = "指标ID,多个用,拼接", required = true)
+            @RequestParam(value = "quotaIdStr" , required = true) String quotaIdStr,
+            @ApiParam(name = "charType", value = "图表类型用", defaultValue = "1")
+            @RequestParam(value = "charType", required = true) String charType,
+            @ApiParam(name = "filter", value = "过滤", defaultValue = "")
+            @RequestParam(value = "filter", required = false) String filter,
+            @ApiParam(name = "dimension", value = "维度字段", defaultValue = "quotaDate")
+            @RequestParam(value = "dimension", required = false) String dimension,
+            @ApiParam(name = "title", value = "视图名称", defaultValue = "")
+            @RequestParam(value = "title", required = false) String title
+    ) {
+        List<String> quotaIds = Arrays.asList(quotaIdStr.split(","));
+        MChartInfoModel chartInfoModel = new MChartInfoModel();
+        String dimensionName = dimension + "Name";
+        if ("quotaName".equals(dimension)) {
+            dimensionName = "quotaName";
+        }
+        try {
+            Option option = null;
+            List<String> lineNames = new ArrayList<>();
+            Map<String, Map<String, Object>> lineData = new LinkedHashMap<>();
+            Map<String, String> xAxisMap = new LinkedHashMap<>();
+            Integer i = 0;
+            List<Map<String, Object>> listMap = new ArrayList<>();
+
+            for (String quotaId : quotaIds) {
+                Map<String, Object> dataMap = new LinkedHashMap<>();
+                TjQuota tjQuota = quotaService.findOne(Integer.valueOf(quotaId));
+                if (tjQuota != null) {
+                    List<Map<String, Object>> resultListMap = baseStatistsService.getSimpleQuotaReport(tjQuota.getCode(), filter, dimension,true);
+                    if (resultListMap != null && resultListMap.size() > 0) {
+                        for (Map<String, Object> map : resultListMap) {
+                            if (map != null && map.size() > 0) {
+                                if (map.containsKey("quotaName")) {
+                                    map.put("quotaName",tjQuota.getName());
+                                }
+                                //第一种 ES库中有定义的维度 如org,slaveKey1
+                                //第二种 ES库中未定义的维度 如level，economic
+                                if (map.containsKey(dimensionName)) {
+                                    if(map.get(dimensionName) != null){
+                                        dataMap.put(map.get(dimensionName).toString(), map.get("result"));
+                                        xAxisMap.put(map.get(dimensionName).toString(), map.get(dimension).toString());
+                                    }
+                                } else {
+                                    if(map.get(dimension) != null){
+                                        dataMap.put(map.get(dimension).toString(), map.get("result"));
+                                        xAxisMap.put(map.get(dimension).toString(), map.get(dimension).toString());
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+                }
+                lineData.put("" + i, dataMap);
+                lineNames.add(tjQuota.getName());
+                i++;
+            }
+            Set<String> hashSet = new HashSet<>(lineNames);
+            Map<String, Object> newMap = new HashMap<>();
+            for (Map<String, Object> data : lineData.values()) {
+                for (Map.Entry<String, Object> lastMap : data.entrySet()) {
+                    if (newMap.containsKey(lastMap.getKey())) {
+                        double v = Double.parseDouble(newMap.get(lastMap.getKey()) + "") + Double.parseDouble(lastMap.getValue() + "");
+                        newMap.put(lastMap.getKey() + "", v);
+                    } else {
+                        newMap.put(lastMap.getKey(), lastMap.getValue());
+                    }
+                    hashSet.add(lastMap.getKey());
+                }
+            }
+            lineNames.clear();
+            lineNames.addAll(hashSet);
+            lineData.clear();
+            for (int j = 0; j < lineNames.size(); j++) {
+                String name = lineNames.get(j);
+                Map<String, Object> tempMap = new HashMap<>();
+                tempMap.put(name, newMap.get(name));
+                lineData.put("" + j, tempMap);
+                Map<String, Object> listMapCon = new HashMap<>();
+                listMapCon.put("quotaName", name);
+                listMapCon.put("result", newMap.get(name));
+                listMap.add(listMapCon);
+            }
+
+
+            ReportOption reportOption = new ReportOption();
+            if (charType.equals("common")) {
+                charType = "1";
+            } else if (charType.equals("twoDimensional")) {
+                return null;
+            }
+            List<String> charTypes = Arrays.asList(charType);
+            int type = Integer.valueOf(charType);
+            if (type == ReportOption.bar) {
+                return null;    // 尚未拓展
+            } else if (type == ReportOption.line) {
+                return null;    // 尚未拓展
+            } else if (type == ReportOption.pie) {
+                List<Map<String, Object>> datalist = new ArrayList<>();
+                for (Map<String, Object> resultMap : listMap) {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("NAME", resultMap.get(dimensionName));
+                    map.put("TOTAL", resultMap.get("result"));
+                    if(resultMap.get(dimensionName) != null){
+                        map.put("NAME",resultMap.get(dimensionName));
+                    }else {
+                        //非 指标中配置的维度 关联出来的字段
+                        if(dimensionName.equals("levelName")){
+                            if(resultMap.get(dimension).equals("1")){
+                                map.put("NAME","一级医院");
+                            }else  if(resultMap.get(dimension).equals("2")){
+                                map.put("NAME","二级医院");
+                            }else  if(resultMap.get(dimension).equals("3")){
+                                map.put("NAME","三级医院");
+                            }
+                        }
+                    }
+                    map.put("TOTAL",resultMap.get("result"));
+                    datalist.add(map);
+                }
+                option = reportOption.getPieEchartOption(title, "", "", datalist, lineNames.get(0), null);
+            }
+            chartInfoModel.setOption(option.toString());
+            chartInfoModel.setTitle(title);
+            chartInfoModel.setxAxisMap(xAxisMap);
+            return chartInfoModel;
+        } catch (Exception e) {
+            error(e);
+            invalidUserException(e, -1, "查询失败:" + e.getMessage());
+            return null;
+        }
     }
 }

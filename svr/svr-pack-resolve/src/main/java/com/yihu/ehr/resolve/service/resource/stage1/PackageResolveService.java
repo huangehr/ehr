@@ -1,6 +1,8 @@
 package com.yihu.ehr.resolve.service.resource.stage1;
 
 import com.yihu.ehr.constants.ProfileType;
+import com.yihu.ehr.model.packs.EsDetailsPackage;
+import com.yihu.ehr.model.packs.EsSimplePackage;
 import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.resolve.*;
 import com.yihu.ehr.resolve.model.stage1.DataSetPackage;
@@ -56,12 +58,12 @@ public class PackageResolveService {
      * 5. 解析完的数据存入HBase，并将JSON文档的状态标记为 Finished。
      * 6. 以上步骤有任何一个失败的，将文档标记为 Failed 状态，即无法决定该JSON档案的去向，需要人为干预。
      */
-    public StandardPackage doResolve(MPackage pack, String zipFile) throws Exception {
+    public StandardPackage doResolve(EsSimplePackage pack, String zipFile) throws Exception {
         File root = null;
         try {
-            root = new Zipper().unzipFile(new File(zipFile), TempPath + pack.getId(), pack.getPwd());
+            root = new Zipper().unzipFile(new File(zipFile), TempPath + pack.get_id(), pack.getPwd());
             if (root == null || !root.isDirectory() || root.list().length == 0) {
-                throw new RuntimeException("Invalid package file " + pack.getId() + ", do not deal with fail-tolerant.");
+                throw new RuntimeException("Invalid package file " + pack.get_id() + ", do not deal with fail-tolerant.");
             }
             //根据压缩包获取标准档案包
             StandardPackage standardPackage = PackModelFactory.createPackModel(root);
@@ -84,7 +86,7 @@ public class PackageResolveService {
                     break;
             }
             packageResolver.resolve(standardPackage, root);
-            standardPackage.setClientId(pack.getClientId());
+            standardPackage.setClientId(pack.getClient_id());
             standardPackage.regularRowKey();
             //profile.determineEventType();
             return standardPackage;

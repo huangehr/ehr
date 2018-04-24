@@ -1,9 +1,9 @@
 package com.yihu.ehr.profile.service;
 
-import com.yihu.hos.model.standard.MCDADocument;
 import com.yihu.ehr.profile.dao.ArchiveTemplateDao;
 import com.yihu.ehr.profile.feign.CDADocumentClient;
 import com.yihu.ehr.profile.model.ArchiveTemplate;
+import com.yihu.ehr.profile.model.MCDADocument;
 import com.yihu.ehr.query.BaseJpaService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;

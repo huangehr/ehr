@@ -3,7 +3,9 @@ package com.yihu.ehr.pack.service;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.constants.ArchiveStatus;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
-import com.yihu.ehr.pack.dao.XDatasetPackageRepository;
+import com.yihu.ehr.pack.dao.DatasetPackageRepository;
+import com.yihu.ehr.pack.entity.DatasetPackage;
+import com.yihu.ehr.pack.entity.JsonArchives;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.util.id.BizObject;
 import com.yihu.ehr.util.id.ObjectId;
@@ -34,13 +36,13 @@ import java.util.Map;
  */
 @Service
 @Transactional
-public class DatasetPackageService extends BaseJpaService<DatasetPackage, XDatasetPackageRepository> {
+public class DatasetPackageService extends BaseJpaService<DatasetPackage, DatasetPackageRepository> {
     @Value("${deploy.region}")
     private Short adminRegion;
     @Autowired
     private FastDFSUtil fastDFSUtil;
     @Autowired
-    private XDatasetPackageRepository datasetPackageRepository;
+    private DatasetPackageRepository datasetPackageRepository;
 
 
     public DatasetPackage receiveDatasets(InputStream is, String pwd, String md5, String orgCode, String clientId) {
@@ -90,7 +92,7 @@ public class DatasetPackageService extends BaseJpaService<DatasetPackage, XDatas
             String remoteFile = msg.get(FastDFSUtil.REMOTE_FILE_NAME).asText();
 
             // 将组与文件ID使用英文分号隔开, 提取的时候, 只需要将它们这个串拆开, 就可以得到组与文件ID
-            String remoteFilePath = String.join(Package.pathSeparator, new String[]{group, remoteFile});
+            String remoteFilePath = String.join(JsonArchives.pathSeparator, new String[]{group, remoteFile});
 
             Map<String, String> metaData = new HashMap<>();
             metaData.put("id", objectId.toString());
@@ -136,7 +138,7 @@ public class DatasetPackageService extends BaseJpaService<DatasetPackage, XDatas
 
     public String downloadTo(String remotePath, String localPath) {
         try {
-            String[] meta = remotePath.split(Package.pathSeparator);
+            String[] meta = remotePath.split(JsonArchives.pathSeparator);
             return fastDFSUtil.download(meta[0], meta[1], localPath);
         } catch (Exception ex) {
             throw new RuntimeException("fastDFS - " + ex.getMessage());
@@ -147,7 +149,7 @@ public class DatasetPackageService extends BaseJpaService<DatasetPackage, XDatas
         getRepo().delete(id);
     }
     
-    private XDatasetPackageRepository getRepo(){
-        return (XDatasetPackageRepository)getRepository();
+    private DatasetPackageRepository getRepo(){
+        return (DatasetPackageRepository)getRepository();
     }
 }

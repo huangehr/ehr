@@ -1,24 +1,22 @@
 package com.yihu.quota.controller;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.query.common.model.SolrGroupEntity;
-import com.yihu.ehr.solr.SolrUtil;
+import com.yihu.ehr.elasticsearch.ElasticSearchClient;
+import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.quota.etl.model.EsConfig;
 import com.yihu.quota.etl.util.ElasticsearchUtil;
 import com.yihu.quota.etl.util.EsClientUtil;
-import com.yihu.quota.etl.util.EsConfigUtil;
-import com.yihu.quota.service.quota.StatisticsService;
+import com.yihu.quota.vo.PersonalInfoModel;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.solr.client.solrj.response.FacetField;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.TermQueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -42,23 +40,21 @@ public class ElasticSearchController extends BaseController {
     private ElasticsearchUtil elasticsearchUtil;
     @Autowired
     private EsClientUtil esClientUtil;
-    @Autowired
-    private EsConfigUtil esConfigUtil;
 
-    private static String host = "172.17.110.17";
-    private static int port = 9300;
-    private static String index = "quota_index";
-    private static String clusterName = "elasticsearch";
-    private static String type = "quota";
+    private static String HOST = "172.17.110.17";
+    private static int PORT = 9300;
+    private static String INDEX = "quota_index";
+    private static String CLUSTERNAME = "elasticsearch";
+    private static String TYPE = "quota";
 
 
     public EsConfig config(){
         EsConfig esConfig = new EsConfig();
-        esConfig.setHost(host);
-        esConfig.setPort(port);
-        esConfig.setClusterName(clusterName);
-        esConfig.setIndex(index);
-        esConfig.setType(type);
+        esConfig.setHost(HOST);
+        esConfig.setPort(PORT);
+        esConfig.setClusterName(CLUSTERNAME);
+        esConfig.setIndex(INDEX);
+        esConfig.setType(TYPE);
         return esConfig;
     }
 
@@ -72,13 +68,13 @@ public class ElasticSearchController extends BaseController {
         try {
             /***** elasticsearch 保存 ********/
             EsConfig esConfig = config();
-            esConfig.setIndex(index);
-            esConfig.setType(type);
+            esConfig.setIndex(INDEX);
+            esConfig.setType(TYPE);
             esConfig.setHost("172.17.110.17");
             esConfig.setPort(9300);
             esConfig.setClusterName("elasticsearch");
-            Client client = esClientUtil.getClient(esConfig.getHost(), esConfig.getPort(),esConfig.getIndex(),esConfig.getType(), esConfig.getClusterName());
-            f = elasticsearchUtil.save(client,jsonString);
+            Client client = esClientUtil.getClient(esConfig.getHost(), esConfig.getPort(), esConfig.getClusterName());
+            f = elasticsearchUtil.save(client,esConfig.getIndex(),esConfig.getType(),jsonString);
             client.close();
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -105,7 +101,7 @@ public class ElasticSearchController extends BaseController {
             esConfig.setHost("172.19.103.9");
             esConfig.setPort(9300);
             esConfig.setClusterName("elasticsearch");
-            Client client = esClientUtil.getClient(esConfig.getHost(), esConfig.getPort(),esConfig.getIndex(),esConfig.getType(), esConfig.getClusterName());
+            Client client = esClientUtil.getClient(esConfig.getHost(), esConfig.getPort(), esConfig.getClusterName());
             if( !file.isEmpty()){
                 FileInputStream fis = null;
                 InputStreamReader isr = null;
@@ -121,7 +117,7 @@ public class ElasticSearchController extends BaseController {
                         jsonString = str;
                         System.out.println(jsonString);// 打印
                         //添加到es库
-                        f = elasticsearchUtil.save(client,jsonString);
+                        f = elasticsearchUtil.save(client,esConfig.getIndex(),esConfig.getType(),jsonString);
                     }
                 } catch (FileNotFoundException e) {
                     System.out.println("找不到指定文件");
@@ -164,8 +160,8 @@ public class ElasticSearchController extends BaseController {
             esConfig.setHost("172.17.110.17");
             esConfig.setPort(9300);
             esConfig.setClusterName("elasticsearch");
-            Client client = esClientUtil.getClient(esConfig.getHost(), esConfig.getPort(),esConfig.getIndex(),esConfig.getType(), esConfig.getClusterName());
-            List<Map<String, Object>> list = elasticsearchUtil.queryList(client, null, null, 10000);
+            Client client = esClientUtil.getClient(esConfig.getHost(), esConfig.getPort(), esConfig.getClusterName());
+            List<Map<String, Object>> list = elasticsearchUtil.queryList(client,esConfig.getIndex(),esConfig.getType(), null, null, 10000);
             byte[] buff = new byte[]{};
             StringBuffer docmBuff = new StringBuffer();
             for(Map<String, Object> map:list){
@@ -208,17 +204,17 @@ public class ElasticSearchController extends BaseController {
         List<Map<String, Object>> list = null;
         try {
             EsConfig esConfig = config();
-            esConfig.setIndex(index);
-            esConfig.setType(type);
+            esConfig.setIndex(INDEX);
+            esConfig.setType(TYPE);
             esConfig.setHost("172.17.110.17");
             esConfig.setPort(9300);
             esConfig.setClusterName("elasticsearch");
-            Client client = esClientUtil.getClient(esConfig.getHost(), esConfig.getPort(),esConfig.getIndex(),esConfig.getType(), esConfig.getClusterName());
+            Client client = esClientUtil.getClient(esConfig.getHost(), esConfig.getPort(), esConfig.getClusterName());
             BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
             TermQueryBuilder termQueryQuotaCode = QueryBuilders.termQuery(term, value);
             boolQueryBuilder.must(termQueryQuotaCode);
 
-            list = elasticsearchUtil.queryList(client, boolQueryBuilder, null, 200);
+            list = elasticsearchUtil.queryList(client,esConfig.getIndex(),esConfig.getType(), boolQueryBuilder, null, 200);
             client.close();
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -244,7 +240,7 @@ public class ElasticSearchController extends BaseController {
             esConfig.setHost("172.19.103.9");
             esConfig.setPort(9300);
             esConfig.setClusterName("elasticsearch");
-            Client client = esClientUtil.getClient(esConfig.getHost(), esConfig.getPort(),esConfig.getIndex(),esConfig.getType(), esConfig.getClusterName());
+            Client client = esClientUtil.getClient(esConfig.getHost(), esConfig.getPort(), esConfig.getClusterName());
             InputStream fis = null;
             InputStreamReader isr = null;
             BufferedReader br = null; //用于包装InputStreamReader,提高处理性能。因为BufferedReader有缓冲的，而InputStreamReader没有。
@@ -260,7 +256,7 @@ public class ElasticSearchController extends BaseController {
                     jsonString = str;
                     System.out.println(jsonString);// 打印
                     //添加到es库
-                    f = elasticsearchUtil.save(client,jsonString);
+                    f = elasticsearchUtil.save(client,index,type,jsonString);
                 }
             } catch (FileNotFoundException e) {
                 System.out.println("找不到指定文件");
@@ -281,5 +277,54 @@ public class ElasticSearchController extends BaseController {
             ex.printStackTrace();
         }
         return  f;
+    }
+
+    @Autowired
+    private ElasticsearchUtil searchUtil;
+    @Autowired
+    private ElasticSearchUtil elasticSearchUtil;
+    @Autowired
+    private ElasticSearchClient elasticSearchClient;
+
+    @RequestMapping(value = "/elasticSearch/testQueryElasticSearch", method = RequestMethod.POST)
+    @ApiOperation("测试查询数据")
+    public void addElasticSearch(
+            @ApiParam(name = "data", value = "参数")
+            @RequestParam(value = "data") String data
+    ){
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        String index = "singleDiseasePersonal";
+        String type = "personal_info";
+        int i =0;
+        while(i<2){
+            PersonalInfoModel personalInfo = new PersonalInfoModel();
+            personalInfo.setDisease("HP0047");
+            personalInfo.setDiseaseName("糖尿病");
+            personalInfo.setDemographicId(data);
+            try {
+                String sql = "SELECT count(demographicId) FROM singleDiseasePersonal where demographicId ="+data+" group by demographicId ";
+                long count2 = searchUtil.getCountBySql(sql);
+                System.out.println("结果条数 count2="+count2);
+
+//                List<Map<String, Object>> relist = elasticSearchUtil.findByField(index, type, "demographicId", data);
+//                List<Map<String, Object>> filter = new ArrayList<>();
+//                Map<String,Object> paramMap = new HashMap<>();
+//                paramMap.put("demographicId",data);
+//                filter.add(paramMap);
+//               long count = elasticSearchUtil.count(index, type,filter);
+//                System.out.println("结果条数 count="+count);
+//                System.out.println("结果条数="+ relist.size());
+//                if(relist== null || relist.size() ==0){
+                if(count2 == 0){
+                    Map<String, Object> source = new HashMap<>();
+                    String jsonPer = objectMapper.writeValueAsString(personalInfo);
+                    source = objectMapper.readValue(jsonPer, Map.class);
+                    elasticSearchClient.index(index,type, source);
+                }
+                i++;
+            }catch (Exception e){
+                e.getMessage();
+            }
+        }
     }
 }

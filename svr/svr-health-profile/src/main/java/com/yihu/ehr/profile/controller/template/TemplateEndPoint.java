@@ -17,6 +17,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -121,24 +122,35 @@ public class TemplateEndPoint extends BaseRestEndPoint {
     }
 
     @ApiOperation(value = "下载模板展示文件")
-    @RequestMapping(value = ServiceApi.ProfileTemplate.TemplateCtn, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.ProfileTemplate.TemplateCtn, method = RequestMethod.GET)
     public void getTemplateContent(
             @ApiParam(value = "模板ID")
             @PathVariable(value = "id") int id,
             @ApiParam(value = "true表示PC端，false表示移动端")
-            @RequestParam(value = "pc", defaultValue = "true") boolean pc,
-            HttpServletResponse response) throws Exception {
+            @RequestParam(value = "pc", defaultValue = "true") boolean pc, HttpServletResponse response) throws Exception {
+        response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
         ArchiveTemplate template = templateService.getTemplate(id);
         if (template == null) {
-            throw new ApiException(ErrorCode.NOT_FOUND, "Template not found");
+            throw new ApiException(HttpStatus.NO_CONTENT, ErrorCode.NO_CONTENT, "Template not found");
         }
-        if (StringUtils.isEmpty(template.getPcTplURL())) {
-            throw new ApiException(ErrorCode.NOT_FOUND, "Template content is empty.");
+        if (pc && StringUtils.isEmpty(template.getPcTplURL())) {
+            throw new ApiException(HttpStatus.NO_CONTENT, ErrorCode.NO_CONTENT, "Template content is empty.");
+        }
+        if (!pc && StringUtils.isEmpty(template.getMobileTplURL())) {
+            throw new ApiException(HttpStatus.NO_CONTENT, ErrorCode.NO_CONTENT, "Template content is empty.");
         }
         IOUtils.copy(new ByteArrayInputStream(template.getContent(pc)), response.getOutputStream());
-
-        response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
-        response.setHeader("Content-Disposition", "attachment; filename=" + template.getTitle() + ".html");
+        String extension = ".file";
+        if (pc) {
+            if (template.getPcTplURL().split("\\.").length == 2) {
+                extension = template.getPcTplURL().split("\\.")[1];
+            }
+        } else {
+            if (template.getMobileTplURL().split("\\.").length == 2) {
+                extension = template.getMobileTplURL().split("\\.")[1];
+            }
+        }
+        response.setHeader("Content-Disposition", "attachment; filename=" + template.getTitle() + "." + extension);
         response.flushBuffer();
     }
 

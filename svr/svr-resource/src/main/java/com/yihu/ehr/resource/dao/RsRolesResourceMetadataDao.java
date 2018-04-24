@@ -1,6 +1,5 @@
 package com.yihu.ehr.resource.dao;
 
-import com.yihu.ehr.resource.model.RsAppResourceMetadata;
 import com.yihu.ehr.resource.model.RsRolesResourceMetadata;
 import org.springframework.data.repository.PagingAndSortingRepository;
 

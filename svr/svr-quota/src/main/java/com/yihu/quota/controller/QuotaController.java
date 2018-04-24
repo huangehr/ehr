@@ -6,6 +6,7 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.quota.etl.model.EsConfig;
 import com.yihu.quota.model.jpa.TjQuota;
+import com.yihu.quota.model.jpa.save.TjQuotaDataSave;
 import com.yihu.quota.model.jpa.source.TjQuotaDataSource;
 import com.yihu.quota.model.rest.HospitalComposeModel;
 import com.yihu.quota.model.rest.QuotaReport;
@@ -13,6 +14,7 @@ import com.yihu.quota.model.rest.ResultModel;
 import com.yihu.quota.service.orgHealthCategory.OrgHealthCategoryStatisticsService;
 import com.yihu.quota.service.quota.BaseStatistsService;
 import com.yihu.quota.service.quota.QuotaService;
+import com.yihu.quota.service.save.TjDataSaveService;
 import com.yihu.quota.service.source.TjDataSourceService;
 import com.yihu.quota.vo.OrgHealthCategoryShowModel;
 import com.yihu.quota.vo.SaveModel;
@@ -53,6 +55,8 @@ public class QuotaController extends BaseController {
     private TjDataSourceService dataSourceService;
     @Autowired
     private BaseStatistsService baseStatistsService;
+    @Autowired
+    private TjDataSaveService dataSaveService;
 
     /**
      * 查询结果
@@ -135,10 +139,23 @@ public class QuotaController extends BaseController {
             List<Map<String, Object>>  resultList = new ArrayList<>();
             String configFilter = esConfig.getFilter();
             if(StringUtils.isNotEmpty(configFilter) && quotaDataSource.getSourceCode().equals("1")){//数据源为ES库
-                if(StringUtils.isNotEmpty(filters)){
-                    filters += " and " + configFilter;
+                TjQuotaDataSave quotaDataSave = dataSaveService.findByQuota(code);
+                if(quotaDataSave != null && StringUtils.isNotEmpty(quotaDataSave.getConfigJson())){
+                    JSONObject objSave = new JSONObject().fromObject(quotaDataSave.getConfigJson());
+                    EsConfig esConfigSave = (EsConfig) JSONObject.toBean(objSave,EsConfig.class);
+                    if(StringUtils.isEmpty(esConfig.getIndex()) || esConfig.getIndex().equals(esConfigSave.getIndex()) ){
+                        if(StringUtils.isNotEmpty(filters)){
+                            filters += " and " + configFilter;
+                        }else {
+                            filters = configFilter;
+                        }
+                    }
                 }else {
-                    filters = configFilter;
+                    if(StringUtils.isNotEmpty(filters)){
+                        filters += " and " + configFilter;
+                    }else {
+                        filters = configFilter;
+                    }
                 }
             }
             String molecularFilter = filters;

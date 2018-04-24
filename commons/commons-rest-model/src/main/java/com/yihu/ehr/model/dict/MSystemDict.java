@@ -10,11 +10,12 @@ import java.util.Date;
  * @created 2016.02.02 19:21
  */
 public class MSystemDict {
-    long id;
-    String name;
-    String reference;
-    String authorId;
-    String phoneticCode;
+    private long id;
+    private String name;
+    private String reference;
+    private String authorId;
+    private String phoneticCode;
+    private String code;
     Date createDate;
 
     public long getId() {
@@ -64,5 +65,13 @@ public class MSystemDict {
 
     public void setCreateDate(Date createDate) {
         this.createDate = createDate;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 }

@@ -1,7 +1,9 @@
 package com.yihu.ehr.elasticsearch;
 
+import com.alibaba.druid.pool.*;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequestBuilder;
+import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexResponse;
@@ -14,14 +16,20 @@ import org.elasticsearch.index.engine.DocumentMissingException;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramBuilder;
+import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
+import org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
+import org.elasticsearch.search.sort.SortBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.*;
 
 /**
  * Client - Es搜索服务
@@ -34,11 +42,22 @@ public class ElasticSearchClient {
     @Autowired
     private ElasticSearchPool elasticSearchPool;
 
-    public void mapping(String index, String type, XContentBuilder xContentBuilder) {
+    public void mapping(String index, String type, XContentBuilder xContentBuilder, Map<String, Object> setting) {
         TransportClient transportClient = elasticSearchPool.getClient();
         try {
             CreateIndexRequestBuilder createIndexRequestBuilder = transportClient.admin().indices().prepareCreate(index);
             createIndexRequestBuilder.addMapping(type, xContentBuilder);
+            //Map<String, Object> settingSource = new HashMap<>();
+            //settingSource.put("index.translog.flush_threshold_size", "1g"); //log文件大小
+            //settingSource.put("index.translog.flush_threshold_ops", "100000"); //flush触发次数
+            //settingSource.put("index.translog.durability", "async"); //异步更新
+            //settingSource.put("index.refresh_interval", "30s"); //刷新间隔
+            //settingSource.put("index.number_of_replicas", 1); //副本数
+            //settingSource.put("index.number_of_shards", 3); //分片数
+            //createIndexRequestBuilder.setSettings(settingSource);
+            if (setting != null && !setting.isEmpty()) {
+                createIndexRequestBuilder.setSettings(setting);
+            }
             createIndexRequestBuilder.get();
         } finally {
             elasticSearchPool.releaseClient(transportClient);
@@ -55,29 +74,64 @@ public class ElasticSearchClient {
         }
     }
 
-    public Map<String, Object> index(String index, String type, Map<String, Object> source) {
+    public Map<String, Object> index (String index, String type, Map<String, Object> source) {
         TransportClient transportClient = elasticSearchPool.getClient();
         try {
-            IndexResponse response = transportClient.prepareIndex(index, type).setSource(source).get();
-            source.put("_id", response.getId());
+            String _id = (String) source.remove("_id");
+            if (StringUtils.isEmpty(_id)) {
+                IndexResponse response = transportClient.prepareIndex(index, type).setSource(source).get();
+                source.put("_id", response.getId());
+            } else {
+                IndexResponse response = transportClient.prepareIndex(index, type, _id).setSource(source).get();
+                source.put("_id", response.getId());
+            }
             return source;
         } finally {
             elasticSearchPool.releaseClient(transportClient);
         }
     }
 
-    public void delete(String index, String type, String [] idArr) {
+    public void bulkIndex (String index, String type, List<Map<String, Object>> source) {
         TransportClient transportClient = elasticSearchPool.getClient();
         try {
-            for (String id : idArr) {
-                transportClient.prepareDelete(index, type, id).get();
-            }
+            BulkRequestBuilder bulkRequestBuilder = transportClient.prepareBulk();
+            source.forEach(item -> {
+                String _id = (String) item.remove("_id");
+                if (StringUtils.isEmpty(_id)) {
+                    bulkRequestBuilder.add(transportClient.prepareIndex(index, type).setSource(item));
+                } else {
+                    bulkRequestBuilder.add(transportClient.prepareIndex(index, type, _id).setSource(item));
+                }
+            });
+            bulkRequestBuilder.get();
         } finally {
             elasticSearchPool.releaseClient(transportClient);
         }
     }
 
-    public Map<String, Object> update(String index, String type, String id, Map<String, Object> source) throws DocumentMissingException {
+    public void delete(String index, String type, String id) {
+        TransportClient transportClient = elasticSearchPool.getClient();
+        try {
+            transportClient.prepareDelete(index, type, id).get();
+        } finally {
+            elasticSearchPool.releaseClient(transportClient);
+        }
+    }
+
+    public void bulkDelete(String index, String type, String [] idArr) {
+        TransportClient transportClient = elasticSearchPool.getClient();
+        try {
+            BulkRequestBuilder bulkRequestBuilder = transportClient.prepareBulk();
+            for (String id : idArr) {
+                bulkRequestBuilder.add(transportClient.prepareDelete(index, type, id));
+            }
+            bulkRequestBuilder.get();
+        } finally {
+            elasticSearchPool.releaseClient(transportClient);
+        }
+    }
+
+    public Map<String, Object> update (String index, String type, String id, Map<String, Object> source) throws DocumentMissingException {
         TransportClient transportClient = elasticSearchPool.getClient();
         try {
             transportClient.prepareUpdate(index, type, id).setDoc(source).get();
@@ -87,13 +141,38 @@ public class ElasticSearchClient {
         }
     }
 
-    public Map<String, Object> findById(String index, String type, String id) {
+    public void voidUpdate (String index, String type, String id, Map<String, Object> source) throws DocumentMissingException {
+        TransportClient transportClient = elasticSearchPool.getClient();
+        try {
+            transportClient.prepareUpdate(index, type, id).setDoc(source).get();
+        } finally {
+            elasticSearchPool.releaseClient(transportClient);
+        }
+    }
+
+    public void bulkUpdate (String index, String type, List<Map<String, Object>> source) throws DocumentMissingException {
+        TransportClient transportClient = elasticSearchPool.getClient();
+        try {
+            BulkRequestBuilder bulkRequestBuilder = transportClient.prepareBulk();
+            source.forEach(item -> {
+                String _id = (String)item.remove("_id");
+                if (!StringUtils.isEmpty(_id)) {
+                    bulkRequestBuilder.add(transportClient.prepareUpdate(index, type, _id).setDoc(item));
+                }
+            });
+            bulkRequestBuilder.get();
+        } finally {
+            elasticSearchPool.releaseClient(transportClient);
+        }
+    }
+
+    public Map<String, Object> findById (String index, String type, String id) {
         TransportClient transportClient = elasticSearchPool.getClient();
         try {
             GetRequest getRequest = new GetRequest(index, type, id);
             GetResponse response = transportClient.get(getRequest).actionGet();
             Map<String, Object> source = response.getSource();
-            if(source != null) {
+            if (source != null) {
                 source.put("_id", response.getId());
             }
             return source;
@@ -124,10 +203,11 @@ public class ElasticSearchClient {
         }
     }
 
-    public List<Map<String, Object>> page(String index, String type, QueryBuilder queryBuilder, int page, int size){
+    public List<Map<String, Object>> page(String index, String type, QueryBuilder queryBuilder, List<SortBuilder> sortBuilders, int page, int size){
         TransportClient transportClient = elasticSearchPool.getClient();
         try {
             SearchRequestBuilder builder = transportClient.prepareSearch(index);
+            sortBuilders.forEach(item -> builder.addSort(item));
             builder.setTypes(type);
             builder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
             builder.setQuery(queryBuilder);
@@ -147,7 +227,7 @@ public class ElasticSearchClient {
         }
     }
 
-    public List<String> getIds(String index, String type, QueryBuilder queryBuilder){
+    public List<String> getIds (String index, String type, QueryBuilder queryBuilder){
         TransportClient transportClient = elasticSearchPool.getClient();
         try {
             SearchRequestBuilder builder = transportClient.prepareSearch(index);
@@ -168,7 +248,7 @@ public class ElasticSearchClient {
         }
     }
 
-    public long count(String index, String type, QueryBuilder queryBuilder){
+    public long count (String index, String type, QueryBuilder queryBuilder){
         TransportClient transportClient = elasticSearchPool.getClient();
         try {
             SearchRequestBuilder builder = transportClient.prepareSearch(index);
@@ -177,6 +257,100 @@ public class ElasticSearchClient {
             builder.setQuery(queryBuilder);
             builder.setExplain(true);
             return builder.get().getHits().totalHits();
+        } finally {
+            elasticSearchPool.releaseClient(transportClient);
+        }
+    }
+
+    public List<Map<String, Object>> findBySql (List<String> fields, String sql) throws Exception {
+        List<Map<String, Object>> list = new ArrayList<>();
+        DruidDataSource druidDataSource = null;
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+        try {
+            druidDataSource = elasticSearchPool.getDruidDataSource();
+            connection = druidDataSource.getConnection();
+            preparedStatement = connection.prepareStatement(sql);
+            resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                Map<String, Object> rowData = new HashMap<>();
+                for (String field : fields) {
+                    rowData.put(field, resultSet.getObject(field));
+                }
+                list.add(rowData);
+            }
+            return list;
+        } finally {
+            if (resultSet != null) {
+                resultSet.close();
+            }
+            if (preparedStatement != null) {
+                preparedStatement.close();
+            }
+            if (connection != null) {
+                connection.close();
+            }
+            if (druidDataSource != null) {
+                druidDataSource.close();
+            }
+        }
+    }
+
+    public ResultSet findBySql (String sql) throws Exception {
+        DruidDataSource druidDataSource = null;
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+        try {
+            druidDataSource = elasticSearchPool.getDruidDataSource();
+            connection = druidDataSource.getConnection();
+            preparedStatement = connection.prepareStatement(sql);
+            resultSet = preparedStatement.executeQuery();
+            return resultSet;
+        } finally {
+            if (resultSet != null) {
+                resultSet.close();
+            }
+            if (preparedStatement != null) {
+                preparedStatement.close();
+            }
+            if (connection != null) {
+                connection.close();
+            }
+            if (druidDataSource != null) {
+                druidDataSource.close();
+            }
+        }
+    }
+
+    public List<Map<String, Long>> dateHistogram (String index, String type, QueryBuilder queryBuilder, Date start, Date end, String field, DateHistogramInterval interval, String format) {
+        TransportClient transportClient = elasticSearchPool.getClient();
+        try {
+            List<Map<String, Long>> resultList = new ArrayList<>();
+            SearchRequestBuilder builder = transportClient.prepareSearch(index);
+            builder.setTypes(type);
+            builder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
+            builder.setQuery(queryBuilder);
+            DateHistogramBuilder dateHistogramBuilder = new DateHistogramBuilder(index + "-" + field);
+            dateHistogramBuilder.field(field);
+            dateHistogramBuilder.interval(interval);
+            if (!StringUtils.isEmpty(format)) {
+                dateHistogramBuilder.format(format);
+            }
+            dateHistogramBuilder.minDocCount(0);
+            dateHistogramBuilder.extendedBounds(start.getTime(), end.getTime());
+            builder.addAggregation(dateHistogramBuilder);
+            builder.setSize(0);
+            builder.setExplain(true);
+            SearchResponse response = builder.get();
+            Histogram histogram = response.getAggregations().get(index + "-" + field);
+            histogram.getBuckets().forEach(item -> {
+                Map<String, Long> temp = new HashMap<>();
+                temp.put(item.getKeyAsString(), item.getDocCount());
+                resultList.add(temp);
+            });
+            return resultList;
         } finally {
             elasticSearchPool.releaseClient(transportClient);
         }

@@ -6,8 +6,8 @@ import com.yihu.ehr.entity.quota.TjQuotaCategory;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.resource.dao.*;
 import com.yihu.ehr.resource.model.*;
-import com.yihu.ehr.util.rest.Envelop;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
@@ -224,8 +224,7 @@ public class ResourceIntegratedService extends BaseJpaService {
      * @return
      */
     @Transactional(readOnly = true)
-    public Envelop getMetadataList(String userResource, String roleId, String filters) throws Exception{
-        Envelop envelop = new Envelop();
+    public List<Object> getMetadataList(String userResource, String roleId, String filters) throws Exception{
         List<Object> resultList = new ArrayList<>();
         Map<String, Object> baseMap = new HashMap<String, Object>();
         List<Map<String, String>> baseList = new ArrayList<Map<String, String>>();
@@ -339,9 +338,7 @@ public class ResourceIntegratedService extends BaseJpaService {
             }
             resultList.add(finalList);
         }
-        envelop.setSuccessFlg(true);
-        envelop.setDetailModelList(resultList);
-        return envelop;
+        return resultList;
     }
 
     /**
@@ -349,7 +346,7 @@ public class ResourceIntegratedService extends BaseJpaService {
      * @return
      */
     @Transactional(readOnly = true)
-    public Envelop searchMetadataData(String resourcesCode, String metaData, String orgCode, String areaCode, String queryCondition, Integer page, Integer size) throws Exception{
+    public Page<Map<String, Object>> searchMetadataData(String resourcesCode, String metaData, String orgCode, String areaCode, String queryCondition, Integer page, Integer size) throws Exception{
         Pattern pattern = Pattern.compile("\\[.+?\\]");
         if (resourcesCode != null) {
             Matcher rcMatcher = pattern.matcher(resourcesCode);
@@ -386,12 +383,9 @@ public class ResourceIntegratedService extends BaseJpaService {
      * @return
      */
     @Transactional(readOnly = true)
-    public Envelop getQuotaList(String filters) {
-        Envelop envelop = new Envelop();
+    public List<Map<String, Object>> getQuotaList(String filters) {
         List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
-        /**
-         * 获取最上级目录
-         */
+        //获取最上级目录
         List<TjQuotaCategory> parentList = findQuotaCategoryList(0, filters);
         if (parentList != null) {
             for (TjQuotaCategory quotaCategory : parentList) {
@@ -405,9 +399,7 @@ public class ResourceIntegratedService extends BaseJpaService {
                 }
             }
         }
-        envelop.setSuccessFlg(true);
-        envelop.setDetailModelList(resultList);
-        return envelop;
+        return resultList;
     }
 
     public RsResource profileCompleteSave(RsResource rsResource, List<RsResourceMetadata> metadataList, RsResourceDefaultQuery resourceDefaultQuery) {

@@ -18,6 +18,7 @@ public class MRsReport implements Serializable {
     private String remark; // 备注
     private String templatePath; // 报表模版路径
     private String showType;    // 报表展示类型  1、图表  2、二维表
+    private String position;    // 报表中视图和位置的关系 json串
 
     private String reportCategory; // 报表分类名称
     private String statusName; //
@@ -110,5 +111,13 @@ public class MRsReport implements Serializable {
 
     public void setFlag(boolean flag) {
         this.flag = flag;
+    }
+
+    public String getPosition() {
+        return position;
+    }
+
+    public void setPosition(String position) {
+        this.position = position;
     }
 }

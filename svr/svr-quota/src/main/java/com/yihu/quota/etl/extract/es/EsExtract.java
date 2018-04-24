@@ -5,19 +5,17 @@ import com.alibaba.druid.sql.ast.expr.SQLQueryExpr;
 import com.alibaba.druid.sql.parser.ParserException;
 import com.alibaba.druid.sql.parser.SQLExprParser;
 import com.alibaba.druid.sql.parser.Token;
-import com.yihu.ehr.elasticsearch.ElasticSearchPool;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.quota.etl.Contant;
 import com.yihu.quota.etl.extract.ExtractUtil;
 import com.yihu.quota.etl.model.EsConfig;
-import com.yihu.quota.etl.save.es.ElasticFactory;
 import com.yihu.quota.etl.util.ElasticsearchUtil;
+import com.yihu.quota.etl.util.EsClientUtil;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionMain;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionSlave;
 import com.yihu.quota.service.orgHealthCategory.OrgHealthCategoryStatisticsService;
 import com.yihu.quota.service.quota.BaseStatistsService;
-import com.yihu.quota.service.quota.QuotaService;
 import com.yihu.quota.vo.DictModel;
 import com.yihu.quota.vo.QuotaVo;
 import com.yihu.quota.vo.SaveModel;
@@ -58,11 +56,9 @@ import java.util.*;
 public class EsExtract {
     private Logger logger = LoggerFactory.getLogger(EsExtract.class);
     @Autowired
-    private ElasticFactory elasticFactory;
+    private EsClientUtil esClientUtil;
     @Autowired
     private JdbcTemplate jdbcTemplate;
-    @Autowired
-    private QuotaService quotaService;
     @Autowired
     private ExtractUtil extractUtil;
     @Autowired
@@ -445,7 +441,7 @@ public class EsExtract {
         //初始化es链接
         esConfig = (EsConfig) JSONObject.toBean(JSONObject.fromObject(esConfig), EsConfig.class);
         //初始化链接
-        Client client = elasticFactory.getClient(esConfig.getHost(), esConfig.getPort(), null);
+        Client client = esClientUtil.getClient(esConfig.getHost(), esConfig.getPort(), null);
         for (Map.Entry<String, TjQuotaDimensionMain> one : sqls.entrySet()) {
             logger.info("excute sql:" + one.getKey());
             try {
@@ -475,7 +471,6 @@ public class EsExtract {
                 SearchResponse response = (SearchResponse) requestBuilder.get();
                 StringTerms stringTerms = (StringTerms) response.getAggregations().asList().get(0);
                 Iterator<Terms.Bucket> gradeBucketIt = stringTerms.getBuckets().iterator();
-                client.close();
                 //里面存放的数据 例  350200-5-2-2    主维度  细维度1  细维度2  值
                 Map<String,String> map = new HashMap<>();
                 //递归解析json
@@ -483,6 +478,8 @@ public class EsExtract {
                 compute(tjQuotaDimensionSlaves,returnList,one, map);
             } catch (Exception e) {
                 e.printStackTrace();
+            }finally {
+                client.close();
             }
         }
         return returnList;

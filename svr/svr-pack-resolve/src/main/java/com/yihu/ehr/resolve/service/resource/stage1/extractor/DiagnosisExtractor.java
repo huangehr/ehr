@@ -8,9 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 门诊/住院诊断抽取器。
@@ -21,28 +19,40 @@ import java.util.Map;
 @Component
 @ConfigurationProperties(prefix = "ehr.pack-extractor.diagnosis")
 public class DiagnosisExtractor extends KeyDataExtractor {
-    // 界定数据集
+    //界定数据集
     private List<String> dataSets = new ArrayList<String>();
-    // 数据元
-    private List<String> metaData = new ArrayList<>();
+    //诊断代码数据元
+    private List<String> codeMetaData = new ArrayList<>();
+    //诊断名称数据元
+    private List<String> nameMetaData = new ArrayList<>();
+
 
     @Override
-    public Map<String,Object> extract(PackageDataSet dataSet) throws Exception {
+    public Map<String, Object> extract(PackageDataSet dataSet) throws Exception {
         Map<String,Object> properties = new HashedMap();
-        List<String> diagnosisList = new ArrayList<>();
+        Set<String> diagnosis = new HashSet<>();
+        Set<String> diagnosisName = new HashSet<>();
         if (dataSets.contains(dataSet.getCode())) {
             for (String rowKey : dataSet.getRecordKeys()) {
                 MetaDataRecord record = dataSet.getRecord(rowKey);
-                //获取门诊或住院诊断
-                for (String metaDataCode : metaData) {
+                //获取门诊或住院诊断代码
+                for (String metaDataCode : codeMetaData) {
+                    String icd10Code = record.getMetaData(metaDataCode);
+                    if (!StringUtils.isEmpty(icd10Code)) {
+                        diagnosis.add(icd10Code);
+                    }
+                }
+                //获取门诊或住院诊断名称
+                for (String metaDataCode : nameMetaData) {
                     String value = record.getMetaData(metaDataCode);
-                    if (!StringUtils.isEmpty(value) && !diagnosisList.contains(value)) {
-                        diagnosisList.add(value);
+                    if (!StringUtils.isEmpty(value)) {
+                        diagnosisName.add(value);
                     }
                 }
             }
         }
-        properties.put(MasterResourceFamily.BasicColumns.Diagnosis, diagnosisList);
+        properties.put(MasterResourceFamily.BasicColumns.Diagnosis, diagnosis);
+        properties.put(MasterResourceFamily.BasicColumns.DiagnosisName, diagnosisName);
         return properties;
     }
 
@@ -50,7 +60,11 @@ public class DiagnosisExtractor extends KeyDataExtractor {
         return this.dataSets;
     }
 
-    public List<String> getMetaData() {
-        return this.metaData;
+    public List<String> getCodeMetaData() {
+        return codeMetaData;
+    }
+
+    public List<String> getNameMetaData() {
+        return nameMetaData;
     }
 }

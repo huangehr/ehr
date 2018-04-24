@@ -5,6 +5,7 @@ import com.yihu.ehr.constants.ProfileType;
 import com.yihu.ehr.resolve.model.stage1.CdaDocument;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -48,10 +49,18 @@ public class ResourceBucket {
     private String patientName;
     //ICD10诊断，分号分隔
     private String diagnosis;
+    //ICD10诊断名称, 分号分隔
+    private String diagnosisName;
     //健康问题，分号分隔
     private String healthProblem;
+    //健康问题名称，分号分隔
+    private String healthProblemName;
+    //慢病信息
+    private String chronicInfo;
     //重传标识
     private boolean reUploadFlg;
+    //身份识别标志
+    private boolean identifyFlag;
     // 主记录
     protected MasterRecord masterRecord;
     //子记录
@@ -209,6 +218,14 @@ public class ResourceBucket {
         this.diagnosis = diagnosis;
     }
 
+    public String getDiagnosisName() {
+        return diagnosisName;
+    }
+
+    public void setDiagnosisName(String diagnosisName) {
+        this.diagnosisName = diagnosisName;
+    }
+
     public String getHealthProblem() {
         return healthProblem;
     }
@@ -217,11 +234,35 @@ public class ResourceBucket {
         this.healthProblem = healthProblem;
     }
 
+    public String getHealthProblemName() {
+        return healthProblemName;
+    }
+
+    public void setHealthProblemName(String healthProblemName) {
+        this.healthProblemName = healthProblemName;
+    }
+
+    public String getChronicInfo() {
+        return chronicInfo;
+    }
+
+    public void setChronicInfo(String chronicInfo) {
+        this.chronicInfo = chronicInfo;
+    }
+
     public boolean isReUploadFlg() {
         return reUploadFlg;
     }
 
     public void setReUploadFlg(boolean reUploadFlg) {
         this.reUploadFlg = reUploadFlg;
+    }
+
+    public boolean isIdentifyFlag() {
+        return identifyFlag;
+    }
+
+    public void setIdentifyFlag(boolean identifyFlag) {
+        this.identifyFlag = identifyFlag;
     }
 }

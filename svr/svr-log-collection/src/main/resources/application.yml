@@ -21,31 +21,6 @@ spring:
     hibernate.dialect: org.hibernate.dialect.MySQL5Dialect
     show-sql: false
 
----
-spring:
-  profiles: test
-  datasource:
-    url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: weifuwu
-    password: weifuwu
-
-
-service-gateway:
-  username: user
-  password: eureka
-  url: http://192.168.1.221:10000/api/v1.0/admin
-
-kafka:
-  broker:
-    address: node1.hde.h3c.com:6667
-
-es:
-  index: wlyy_quota_test
-  type: wlyy_quota_test
-  host:  http://172.19.103.68:9200
-  tHost: 172.19.103.68:9300
-  clusterName: jkzl
-
 
 ---
 spring:
@@ -64,38 +39,23 @@ kafka:
   broker:
     address: node1.hde.h3c.com:6667
 
-es:
-  index: wlyy_quota_test
-  type: wlyy_quota_test
-  host:  http://172.19.103.68:9200
-  tHost: 172.19.103.68:9300
-  clusterName: jkzl
-
-
 ---
 spring:
-  profiles: prod
+  profiles: test
   datasource:
-    url: jdbc:mysql://172.19.103.77/wlyy?useUnicode=true&characterEncoding=utf-8&autoReconnect=true&useSSL=false
-    username: root
-    password: 123456
+    url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: weifuwu
+    password: weifuwu
+
 
 service-gateway:
   username: user
   password: eureka
-  url: http://192.168.135.31:10000/api/v1.0/admin
+  url: http://192.168.1.221:10000/api/v1.0/admin
 
 kafka:
   broker:
     address: node1.hde.h3c.com:6667
-
-es:
-  index: wlyy_quota_test
-  type: wlyy_quota_test
-  host:  http://172.19.103.68:9200
-  tHost: 172.19.103.68:9300
-  clusterName: jkzl
-
 
 ---
 spring:
@@ -113,13 +73,6 @@ service-gateway:
 kafka:
   broker:
     address: 11.1.2.21:6667
-es:
-  index: wlyy_quota
-  type: wlyy_quota
-  host:  http://11.1.2.3:9200
-  tHost: 11.1.2.3:9300
-  clusterName: jkzl
-
 
 ---
 spring:
@@ -133,16 +86,17 @@ service-gateway:
   username: user
   password: eureka
   url: http://10.176.97.10:10000/api/v1.0/admin
-
+  data:
+    mongodb:
+      host: 10.176.97.9
+      port: 29000
+      username: jkzlehr
+      password: GMLBq1LG
+      authenticationDatabase: admin
+      database: ehr
 kafka:
   broker:
     address: 10.176.97.7:6667
-es:
-  index: wlyy_quota
-  type: wlyy_quota
-  host:  http://10.176.97.7:9200
-  tHost: 10.176.97.7:9300
-  clusterName: jkzl
 
 
 ---
@@ -175,4 +129,34 @@ es:
   type: wlyy_quota
   host:  http://100.100.1.158:9300
   tHost: 100.100.1.158:9300
+  clusterName: jkzl
+
+---
+spring:
+  profiles: prod_srformal
+  datasource:
+    url: jdbc:mysql://192.168.40.34:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: healthcloud
+    password: GP8Qz4qU
+
+service-gateway:
+  username: user
+  password: eureka
+  url: http://192.168.220.84:10000/api/v1.0/admin
+  data:
+    mongodb:
+      host: 192.168.50.26
+      port: 20000
+      username: jkzlehr
+      password: GMLBq1LG
+      authenticationDatabase: admin
+      database: ehr
+kafka:
+  broker:
+    address: 172.10.10.2:6667,172.10.10.5:6667
+es:
+  index: wlyy_quota
+  type: wlyy_quota
+  host:  http://172.10.10.2:9200
+  tHost: 172.10.10.2:9300
   clusterName: jkzl

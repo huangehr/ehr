@@ -3,7 +3,7 @@ package com.yihu.ehr.resource.controller;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
-import com.yihu.ehr.resource.model.ReportCategoryAppRelation;
+import com.yihu.ehr.entity.report.ReportCategoryAppRelation;
 import com.yihu.ehr.resource.service.RsReportCategoryAppService;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;

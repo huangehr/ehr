@@ -39,9 +39,17 @@ public class ProfilePatientEndPoint extends EnvelopRestEndPoint{
         return patientInfoBaseService.getPatientInfo(demographic_id, version);
     }
 
-    @ApiOperation("既往史")
-    @RequestMapping(value = ServiceApi.Profiles.PastHistory, method = RequestMethod.GET)
+    @ApiOperation("既往史 - pc档案浏览器")
+    @RequestMapping(value = ServiceApi.Profiles.ProfileHistory, method = RequestMethod.GET)
     public List<Map<String, Object>> profileHistory(
+            @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362321200108017313")
+            @RequestParam(value = "demographic_id") String demographic_id) {
+        return patientInfoBaseService.profileHistory(demographic_id);
+    }
+
+    @ApiOperation("既往史 - mobile居民端")
+    @RequestMapping(value = ServiceApi.Profiles.PastHistory, method = RequestMethod.GET)
+    public List<Map<String, Object>> pastHistory(
             @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362321200108017313")
             @RequestParam(value = "demographic_id") String demographic_id) {
         return patientInfoBaseService.pastHistory(demographic_id);

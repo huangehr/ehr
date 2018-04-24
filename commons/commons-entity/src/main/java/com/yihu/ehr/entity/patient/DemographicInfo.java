@@ -155,7 +155,7 @@ public class DemographicInfo {
     }
 
 
-    @Column(name = "Pic_path",  nullable = true)
+    @Column(name = "pic_path",  nullable = true)
     public String getPicPath() {
         return picPath;
     }
