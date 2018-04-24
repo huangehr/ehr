@@ -104,25 +104,14 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         sourceMap.put("pwd", password);
         sourceMap.put("remote_path", remoteFilePath);
         sourceMap.put("receive_date", _now);
-        //sourceMap.put("parse_date", null);
-        //sourceMap.put("finish_date", null);
         sourceMap.put("archive_status", 0);
-        //sourceMap.put("message", null);
         sourceMap.put("org_code", orgCode);
         sourceMap.put("client_id", getClientId(request));
         sourceMap.put("resourced", 0);
         sourceMap.put("md5_value", md5);
-        //sourceMap.put("event_type", null);
-        //sourceMap.put("event_no", null);
-        //sourceMap.put("event_date", null);
-        //sourceMap.put("patient_id", null);
         sourceMap.put("fail_count", 0);
         sourceMap.put("analyze_status", 0);
         sourceMap.put("analyze_fail_count", 0);
-        //sourceMap.put("analyze_date", null);
-        //sourceMap.put("demographic_id", null);
-        //sourceMap.put("re_upload_flg", null);
-        //sourceMap.put("profile_id", null);
         sourceMap.put("pack_type", 1);
         //保存索引出错的时候，删除文件
         try {
@@ -208,10 +197,11 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             updateSource.put("finish_date", dateFormat.format(new Date()));
             updateSource.put("message", "success");
         } else if (status == ArchiveStatus.Acquired) {
-            //入库执行时间
+            //开始入库
             updateSource.put("parse_date", dateFormat.format(new Date()));
             updateSource.put("message", message);
         } else {
+            //入库失败
             updateSource.put("finish_date", null);
             if (message.endsWith("do not deal with fail-tolerant.")) {
                 updateSource.put("fail_count", 3);
