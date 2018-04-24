@@ -178,11 +178,10 @@ public class PortalMessageRemindEndPoint extends EnvelopRestEndPoint {
                 //根据医院名称、科室名称查找科室位置
                 String orgName = mregistration.getHospitalName() == null ? "" : mregistration.getHospitalName();
                 String deptName = mregistration.getDeptName() == null ? "" : mregistration.getDeptName();
-                OrgDeptDetail orgDeptDetail = null;
                 if(StringUtils.isNotEmpty(orgName)&&StringUtils.isNotEmpty(deptName)){
-                    orgDeptDetail = deptDetailService.searchByOrgNameAndDeptName(orgName,deptName);
+                   String orgDeptDetailPlace = deptDetailService.searchByOrgNameAndDeptName(orgName,deptName);
                     //科室位置
-                    mMessageRemind.setDeptAdress(orgDeptDetail == null?"":orgDeptDetail.getPlace());
+                    mMessageRemind.setDeptAdress(orgDeptDetailPlace == null?"":orgDeptDetailPlace);
                 }
                 //温馨提示
                 mMessageRemind.setNotice(template == null?"":template.getAfterContent());

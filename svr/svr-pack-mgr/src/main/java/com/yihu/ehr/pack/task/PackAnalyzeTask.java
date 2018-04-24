@@ -40,7 +40,7 @@ public class PackAnalyzeTask {
      */
     @Scheduled(cron = "45 0/10 * * * ?")
     public void delayPushTask() throws Exception {
-        if (size() > MAX_SIZE) {
+        if (size() >= MAX_SIZE) {
             return;
         }
         List<Map<String, Object>> updateSourceList = new ArrayList<>();
