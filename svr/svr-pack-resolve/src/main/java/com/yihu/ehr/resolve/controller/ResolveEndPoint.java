@@ -2,6 +2,7 @@ package com.yihu.ehr.resolve.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ArchiveStatus;
+import com.yihu.ehr.constants.ProfileType;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
@@ -83,12 +84,17 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
             }
             String zipFile = downloadTo(pack.getRemote_path());
             StandardPackage standardPackage = packageResolveService.doResolve(pack, zipFile);
-            ResourceBucket resourceBucket = packMillService.grindingPackModel(standardPackage);
-            identifyService.identify(resourceBucket, standardPackage);
-            resourceService.save(resourceBucket, standardPackage);
-            //回填入库状态
             Map<String, Object> map = new HashMap();
-            map.put("profile_id", standardPackage.getId());
+
+            //非病人维度不做此处理
+            if (!ProfileType.DataSet.equals(standardPackage.getProfileType())){
+                ResourceBucket resourceBucket = packMillService.grindingPackModel(standardPackage);
+                identifyService.identify(resourceBucket, standardPackage);
+                resourceService.save(resourceBucket, standardPackage);
+                map.put("profile_id", standardPackage.getId());
+            }
+
+            //回填入库状态
             map.put("demographic_id", standardPackage.getDemographicId());
             //map.put("event_type", standardPackage.getEventType() == null ? null : standardPackage.getEventType().getType());
             //map.put("event_no", standardPackage.getEventNo());

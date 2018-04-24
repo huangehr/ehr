@@ -11,11 +11,12 @@ import com.yihu.ehr.profile.util.DataSetUtil;
 import com.yihu.ehr.profile.util.MetaDataRecord;
 import com.yihu.ehr.profile.util.PackageDataSet;
 import com.yihu.ehr.resolve.config.EventIndexConfig;
+import com.yihu.ehr.resolve.dao.DataSetPackageDao;
 import com.yihu.ehr.resolve.model.stage1.DataSetPackage;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
-import com.yihu.ehr.resolve.util.PackResolveLogger;
 import com.yihu.ehr.resolve.service.resource.stage1.PackModelFactory;
 import com.yihu.ehr.resolve.service.resource.stage1.extractor.KeyDataExtractor;
+import com.yihu.ehr.resolve.util.PackResolveLogger;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,10 @@ public class DataSetPackageResolver extends PackageResolver {
 
     @Autowired
     private EventIndexConfig eventIndex;
+
+    @Autowired
+    private DataSetPackageDao dataSetPackageDao;
+
 
     @Override
     public List<StandardPackage> resolveDataSets(File root, String clinetId) throws Exception {
@@ -152,6 +157,7 @@ public class DataSetPackageResolver extends PackageResolver {
      * @throws IOException
      * @throws ParseException
      */
+
     private void parseFiles(DataSetPackage profile, File[] files) throws IOException, ParseException {
         List<String> sqlList = new ArrayList<>();
 
@@ -217,15 +223,18 @@ public class DataSetPackageResolver extends PackageResolver {
                     sql.append(" UPDATE " + tableName + " SET ");
                 }
                 for (JsonNode column : columnsNode) {
-                    String fieldName = column.get("column").asText();
-                    String fieldValue = rowNode.get(fieldName).asText();
+                    if (rowNode == null){
+                        System.out.println("/////////");
+                    }
+                    String fieldName = column.get("column")== null ? "": column.get("column").asText();
+                    String fieldValue = rowNode.get(fieldName)== null ? "" : rowNode.get(fieldName).asText();
 
                     // 判断表字段是否存在。
                     String fieldSql = "SELECT f.column_type AS column_type FROM std_meta_data_" + version + " f  " +
                             "LEFT JOIN std_data_set_" + version + " t ON t.id = f.dataset_id " +
                             "WHERE t.code = '" + tableName + "' AND f.column_name = '" + fieldName + "'";
                     if (jdbcTemplate.queryForList(fieldSql).size() == 0) {
-                        throw new RuntimeException("标准中不存在该表字段，version: " + version + ", table: " + tableName + ", field: " + fieldName);
+                        throw new RuntimeException("标准中不存在该表字段的字段类型，version: " + version + ", table: " + tableName + ", field: " + fieldName);
                     }
 
                     // 判断字段类型
@@ -258,6 +267,7 @@ public class DataSetPackageResolver extends PackageResolver {
             profile.setCreateDate(DateTimeUtil.utcDateTimeParse(createTime));
         }
         profile.setSqlList(sqlList);
+        dataSetPackageDao.saveDataset(profile);//执行sql操作
     }
 
     /**
