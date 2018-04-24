@@ -793,7 +793,8 @@ public class ServiceApi {
     }
 
     public static class TelVerification {
-        public static final String TelVerification = "/verification";
+        public static final String TelVerificationMsgSendMsg = "/usersOfApp/msg/sendMsg";
+        public static final String TelVerificationMsgValidate = "/usersOfApp/msg/validate";
     }
 
     public static class Roles {

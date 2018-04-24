@@ -9,7 +9,7 @@ import java.util.Random;
 public class RandomUtil {
     public String getRandomString(int length) {
 
-        String str = "abcdefghigklmnopkrstuvwxyzABCDEFGHIGKLMNOPQRSTUVWXYZ0123456789";
+        String str = "0123456789";
         StringBuffer buffer = new StringBuffer();
 
         Random random = new Random();
