@@ -59,8 +59,6 @@ public class StandardPackage {
     private Set<String> diagnosisList;
     //ICD10诊断名称列表
     private Set<String> diagnosisNameList;
-    //ICD10慢病信息
-    private Set<String> chronicInfoList;
     //重传标识
     private boolean reUploadFlg;
     //身份识别标志
@@ -296,18 +294,6 @@ public class StandardPackage {
 
     public void setDiagnosisNameList(Set<String> diagnosisNameList) {
         this.diagnosisNameList = diagnosisNameList;
-    }
-
-    /**
-     * ICD10慢病信息
-     * @return
-     */
-    public Set<String> getChronicInfoList() {
-        return chronicInfoList;
-    }
-
-    public void setChronicInfoList(Set<String> chronicInfoList) {
-        this.chronicInfoList = chronicInfoList;
     }
 
     /**
