@@ -166,10 +166,10 @@ public class PortalMessageRemindEndPoint extends EnvelopRestEndPoint {
         //如果type为空的话，默认获取当前用户的所有消息。否则获取指定消息模板的消息。
         ProtalMessageRemind  protalMessageRemind = messageRemindService.getMessageRemind(protalMessageRemindId);
         PortalMessageTemplate template = portalMessageTemplateService.getMessageTemplate(protalMessageRemind.getMessageTemplateId());
-        //根据订单号获取 订单详情
+        //根据第三方订单号获取 订单详情
         List<Registration> registrationList= null;
         if(StringUtils.isNotEmpty(orderId)){
-            registrationList = registrationService.findByField("orderId",orderId);
+            registrationList = registrationService.findByField("id",orderId);
             List<MRegistration> mRegistrationlList = (List<MRegistration>) convertToModels(registrationList, new ArrayList<MRegistration>(), MRegistration.class, "");
             MMessageRemind mMessageRemind = convertToModel(protalMessageRemind, MMessageRemind.class);
             //提供将挂号单详细内容
@@ -283,23 +283,4 @@ public class PortalMessageRemindEndPoint extends EnvelopRestEndPoint {
         return objectMapper.writeValueAsString(obj);
     }
 
-//
-//    @RequestMapping(value = ServiceApi.Packages.PackageSearch, method = RequestMethod.GET)
-//    @ApiOperation(value = "搜索档案包")
-//    public List<EsDetailsPackage> search (
-//            @ApiParam(name = "filters", value = "过滤条件")
-//            @RequestParam(value = "filters", required = false) String filters,
-//            @ApiParam(name = "sorts", value = "排序")
-//            @RequestParam(value = "sorts", required = false) String sorts,
-//            @ApiParam(name = "page", value = "页码", required = true, defaultValue = "1")
-//            @RequestParam(value = "page") int page,
-//            @ApiParam(name = "size", value = "分页大小", required = true, defaultValue = "15")
-//            @RequestParam(value = "size") int size) throws Exception {
-//        List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, filters, sorts, page, size);
-//        List<EsDetailsPackage> esDetailsPackages = new ArrayList<>();
-//        for (Map<String, Object> temp : resultList) {
-//            esDetailsPackages.add(objectMapper.readValue(objectMapper.writeValueAsString(temp), EsDetailsPackage.class));
-//        }
-//        return esDetailsPackages;
-//    }
 }
