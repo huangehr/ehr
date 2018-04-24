@@ -481,6 +481,7 @@ public class ServiceApi {
         public static final String Fetch = "/packages/fetch/{id}";
         public static final String ImmediateResolve = "/immediate/resolve";
         public static final String Update = "/packages/update";
+        public static final String Migrate = "/packages/migrate";
     }
 
     //非病人维度
@@ -617,6 +618,7 @@ public class ServiceApi {
     public static class PortalFeedback {
         public static final String PortalFeedback = "/portalFeedback";
         public static final String PortalFeedbackAdmin = "/portalFeedback/admin/{portalFeedback_id}";
+        public static final String PortalFeedBackByUserId="/protalFeedback/findByUserId";
     }
 
     public static class PortalLogin {
@@ -786,6 +788,7 @@ public class ServiceApi {
         public static final String GetSecurityKey = "/users/getSecurityKey";
         public static final String changePasswordByTelephone = "/usersOfApp/users/changePasswordByTelephone";
         public static final String changePasswordByOldPassword = "/users/changePasswordByOldPassword";
+        public static final String updateUserTelePhone = "/users/updateTelephone";
 
     }
 
@@ -992,6 +995,7 @@ public class ServiceApi {
         public static final String InitHealthProblem = "/redis/init/healthProblem";
         public static final String InitIcd10HpR = "/redis/init/icd10HpR";
         public static final String InitIcd10 = "/redis/init/icd10";
+        public static final String InitIcd10ChronicInfo = "/redis/init/icd10ChronicInfo";
         public static final String InitIndicatorsDict = "/redis/init/indicatorsDict";
         public static final String InitOrgName = "/redis/init/orgName";
         public static final String InitOrgArea = "/redis/init/orgArea";
@@ -1016,6 +1020,7 @@ public class ServiceApi {
         public static final String HealthProblem = "/redis/healthProblem";
         public static final String Icd10HpR = "/redis/icd10HpRelation";
         public static final String Icd10Name = "/redis/icd10Name";
+        public static final String Icd10ChronicInfo = "/redis/icd10ChronicInfo";
         public static final String Icd10HpCode = "/redis/icd10HpCode";
         public static final String IndicatorsDict = "/redis/indicatorsDict";
         public static final String OrgName = "/redis/orgName";
@@ -1572,6 +1577,7 @@ public class ServiceApi {
         public static final String Prefix = "/appointment/registration/";
 
         public static final String GetById = "/appointment/registration/{id}";
+        public static final String GetByOrderId = "/appointment/registration/orderId/{orderId}";
         public static final String Search = "/appointment/registration/search";
         public static final String Save = "/appointment/registration/save";
         public static final String Update = "/appointment/registration/update";

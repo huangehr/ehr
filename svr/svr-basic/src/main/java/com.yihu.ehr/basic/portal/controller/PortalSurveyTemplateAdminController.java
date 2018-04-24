@@ -68,9 +68,9 @@ public class PortalSurveyTemplateAdminController extends EnvelopRestEndPoint {
             @ApiParam(name = "label", value = "标签信息",defaultValue = "0")
             @RequestParam(value = "label", required = false) Integer labelCode,
             @ApiParam(name = "page",value = "第几页",defaultValue = "1")
-            @RequestParam(value = "page",required = true) int page,
+            @RequestParam(value = "page",required = true) String page,
             @ApiParam(name = "rows",value = "页面大小",defaultValue = "2")
-            @RequestParam(value = "rows",required = true) int rows)throws Exception {
+            @RequestParam(value = "rows",required = true) String rows)throws Exception {
         ListResult listResult = new ListResult();
         StringBuffer filters = new StringBuffer();
         filters.append(" and t.del =1 ");
@@ -80,13 +80,13 @@ public class PortalSurveyTemplateAdminController extends EnvelopRestEndPoint {
         if(labelCode!=null&&labelCode!=0){
             filters.append(" and t.code in(select relation_code from  portal_survey_label_info w where w.use_type=0 and w.label=:labelCode)");
         }
-        Map<String,Object> map = surveyTemplateService.queryList(page,rows,title,labelCode,filters.toString());
+        Map<String,Object> map = surveyTemplateService.queryList(Integer.valueOf(page),Integer.valueOf(rows),title,labelCode,filters.toString());
         if(map != null){
             listResult.setDetailModelList((List<MSurveyTemplate>)map.get("data"));
             listResult.setTotalCount((int)map.get("count"));
             listResult.setCode(200);
-            listResult.setCurrPage(page);
-            listResult.setPageSize(rows);
+            listResult.setCurrPage(Integer.valueOf(page));
+            listResult.setPageSize(Integer.valueOf(rows));
         }else{
             listResult.setCode(200);
             listResult.setMessage("查询无数据");
@@ -199,12 +199,12 @@ public class PortalSurveyTemplateAdminController extends EnvelopRestEndPoint {
     }
 
 
-    @RequestMapping(value = "template", method = RequestMethod.GET)
+    @RequestMapping(value = "/template", method = RequestMethod.GET)
     @ResponseBody
-    public Envelop getTemplate(@ApiParam(name = "id", value = "模板id",defaultValue = "0") @RequestParam(value = "id", required = true) long id,
-                              @ApiParam(name = "question", value = "是否加载问题",defaultValue = "0") @RequestParam(value = "question", required = false) long question,
+    public Envelop getTemplate(@ApiParam(name = "id", value = "模板id",defaultValue = "0") @RequestParam(value = "id", required = true) String id,
+                              @ApiParam(name = "question", value = "是否加载问题",defaultValue = "0") @RequestParam(value = "question", required = false) String question,
                               HttpServletRequest request)throws Exception{
-        Map<String,Object> map =  surveyTemplateService.getTemplate(id,question);
+        Map<String,Object> map =  surveyTemplateService.getTemplate(Long.valueOf(id),Long.valueOf(question));
         return success(map);
     }
 
@@ -220,10 +220,10 @@ public class PortalSurveyTemplateAdminController extends EnvelopRestEndPoint {
         }
     }*/
 
-    @RequestMapping(value = "delete", method = RequestMethod.POST)
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
     @ResponseBody
-    public Result delete(@ApiParam(name = "模板ID", value = "模板ID",defaultValue = "0") @RequestParam(value = "templateId", required = true) Long templateId)throws Exception{
-        surveyTemplateService.deleteTemplate(templateId);
+    public Result delete(@ApiParam(name = "模板ID", value = "模板ID",defaultValue = "0") @RequestParam(value = "templateId", required = true) String templateId)throws Exception{
+        surveyTemplateService.deleteTemplate(Long.valueOf(templateId));
         return Result.success("问卷模板删除成功！");
     }
 }

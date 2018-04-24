@@ -1,15 +1,13 @@
 server:
   port: ${ag-admin.server.port}
 
-management:
-  port: ${server.port}
-
 info:
   app:
     name: AgAdminService
     description: EHR platform json app service.
     version: 1.0.0
   component: Zuul Server
+
 eip:
   tenant: jkzl
 
@@ -37,7 +35,6 @@ zuul:
     svr-authentication:
       path: /authentication/**
       serviceId: svr-authentication
-    #档案包相关
     svr-health-profile:
       path: /profile/**
       serviceId: svr-health-profile
@@ -60,6 +57,7 @@ service-gateway:
   handlerId: 50871
   clientId: 9000401
   clientVersion: 1.0
+
 ---
 spring:
   profiles: test
@@ -69,9 +67,7 @@ service-gateway:
   handlerId: 50871
   clientId: 9000401
   clientVersion: 1.0
----
-spring:
-  profiles: prod
+
 ---
 spring:
   profiles: prod_fz
@@ -81,6 +77,7 @@ service-gateway:
   handlerId: 50641
   clientId: 9000401
   clientVersion: 1.0
+
 ---
 spring:
   profiles: prod_sr
@@ -90,6 +87,7 @@ service-gateway:
   handlerId: 50641
   clientId: 9000401
   clientVersion: 1.0
+
 ---
 spring:
   profiles: prod_fzzy

@@ -79,7 +79,6 @@ public class PackageAnalyzeService {
     public void esSaveData (String index, String type, String dataList) throws Exception {
         List<Map<String, Object>> list = objectMapper.readValue(dataList, List.class);
         elasticSearchUtil.bulkIndex(index, type, list);
-
     }
 
     @PostConstruct

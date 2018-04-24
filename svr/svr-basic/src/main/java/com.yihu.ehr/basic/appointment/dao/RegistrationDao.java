@@ -2,6 +2,7 @@ package com.yihu.ehr.basic.appointment.dao;
 
 import com.yihu.ehr.basic.appointment.entity.Registration;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 
 /**
  * 挂号单 DAO
@@ -11,5 +12,6 @@ import org.springframework.data.repository.PagingAndSortingRepository;
  */
 public interface RegistrationDao extends PagingAndSortingRepository<Registration, String> {
 
+    Registration getByOrderId(@Param("orderId") String orderId);
 
 }
