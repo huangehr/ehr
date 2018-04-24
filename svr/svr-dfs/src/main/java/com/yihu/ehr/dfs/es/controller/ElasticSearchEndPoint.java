@@ -4,17 +4,13 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
-import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.lang.StringUtils;
-import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.ResultSet;
 import java.util.*;
 
 /**
@@ -36,10 +32,16 @@ public class ElasticSearchEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "index") String index,
             @ApiParam(name = "type", value = "索引类型", required = true)
             @RequestParam(value = "type") String type,
-            @ApiParam(name = "source", value = "Json串值", required = true)
-            @RequestParam(value = "source") String source) throws Exception {
-        Map<String, Map<String, String>> Mapping = objectMapper.readValue(source, Map.class);
-        elasticSearchUtil.mapping(index, type, Mapping);
+            @ApiParam(name = "source", value = "Json串值{\"field\":{\"type\":\"string\",\"index\":\"not_analyzed\"}}", required = true)
+            @RequestParam(value = "source") String source,
+            @ApiParam(name = "setting", value = "Json串值{\"key\":\"value\"}")
+            @RequestParam(value = "setting", required = false) String setting) throws Exception {
+        Map<String, Map<String, String>> _mapping = objectMapper.readValue(source, Map.class);
+        Map<String, Object> _setting = new HashMap<>();
+        if (setting != null) {
+            _setting = objectMapper.readValue(setting, Map.class);
+        }
+        elasticSearchUtil.mapping(index, type, _mapping, _setting);
         return success(true);
     }
 
@@ -67,7 +69,7 @@ public class ElasticSearchEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "type") String type,
             @ApiParam(name = "id", value = "id(多个id值以,分隔)", required = true)
             @RequestParam(value = "id") String id) {
-        elasticSearchUtil.delete(index, type, id.split(","));
+        elasticSearchUtil.bulkDelete(index, type, id.split(","));
         return success(true);
     }
 

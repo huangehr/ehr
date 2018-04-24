@@ -3,6 +3,7 @@ package com.yihu.ehr.elasticsearch;
 import com.alibaba.druid.pool.*;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequestBuilder;
+import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexResponse;
@@ -41,11 +42,22 @@ public class ElasticSearchClient {
     @Autowired
     private ElasticSearchPool elasticSearchPool;
 
-    public void mapping(String index, String type, XContentBuilder xContentBuilder) {
+    public void mapping(String index, String type, XContentBuilder xContentBuilder, Map<String, Object> setting) {
         TransportClient transportClient = elasticSearchPool.getClient();
         try {
             CreateIndexRequestBuilder createIndexRequestBuilder = transportClient.admin().indices().prepareCreate(index);
             createIndexRequestBuilder.addMapping(type, xContentBuilder);
+            //Map<String, Object> settingSource = new HashMap<>();
+            //settingSource.put("index.translog.flush_threshold_size", "1g"); //log文件大小
+            //settingSource.put("index.translog.flush_threshold_ops", "100000"); //flush触发次数
+            //settingSource.put("index.translog.durability", "async"); //异步更新
+            //settingSource.put("index.refresh_interval", "30s"); //刷新间隔
+            //settingSource.put("index.number_of_replicas", 1); //副本数
+            //settingSource.put("index.number_of_shards", 3); //分片数
+            //createIndexRequestBuilder.setSettings(settingSource);
+            if (setting != null && !setting.isEmpty()) {
+                createIndexRequestBuilder.setSettings(setting);
+            }
             createIndexRequestBuilder.get();
         } finally {
             elasticSearchPool.releaseClient(transportClient);
@@ -62,15 +74,14 @@ public class ElasticSearchClient {
         }
     }
 
-    public Map<String, Object> index(String index, String type, Map<String, Object> source) {
+    public Map<String, Object> index (String index, String type, Map<String, Object> source) {
         TransportClient transportClient = elasticSearchPool.getClient();
         try {
-            if (StringUtils.isEmpty(source.get("_id"))) {
+            String _id = (String) source.remove("_id");
+            if (StringUtils.isEmpty(_id)) {
                 IndexResponse response = transportClient.prepareIndex(index, type).setSource(source).get();
                 source.put("_id", response.getId());
             } else {
-                String _id = String.valueOf(source.get("_id"));
-                source.remove("_id");
                 IndexResponse response = transportClient.prepareIndex(index, type, _id).setSource(source).get();
                 source.put("_id", response.getId());
             }
@@ -80,18 +91,47 @@ public class ElasticSearchClient {
         }
     }
 
-    public void delete(String index, String type, String [] idArr) {
+    public void bulkIndex (String index, String type, List<Map<String, Object>> source) {
         TransportClient transportClient = elasticSearchPool.getClient();
         try {
-            for (String id : idArr) {
-                transportClient.prepareDelete(index, type, id).get();
-            }
+            BulkRequestBuilder bulkRequestBuilder = transportClient.prepareBulk();
+            source.forEach(item -> {
+                String _id = (String) item.remove("_id");
+                if (StringUtils.isEmpty(_id)) {
+                    bulkRequestBuilder.add(transportClient.prepareIndex(index, type).setSource(item));
+                } else {
+                    bulkRequestBuilder.add(transportClient.prepareIndex(index, type, _id).setSource(item));
+                }
+            });
+            bulkRequestBuilder.get();
         } finally {
             elasticSearchPool.releaseClient(transportClient);
         }
     }
 
-    public Map<String, Object> update(String index, String type, String id, Map<String, Object> source) throws DocumentMissingException {
+    public void delete(String index, String type, String id) {
+        TransportClient transportClient = elasticSearchPool.getClient();
+        try {
+            transportClient.prepareDelete(index, type, id).get();
+        } finally {
+            elasticSearchPool.releaseClient(transportClient);
+        }
+    }
+
+    public void bulkDelete(String index, String type, String [] idArr) {
+        TransportClient transportClient = elasticSearchPool.getClient();
+        try {
+            BulkRequestBuilder bulkRequestBuilder = transportClient.prepareBulk();
+            for (String id : idArr) {
+                bulkRequestBuilder.add(transportClient.prepareDelete(index, type, id));
+            }
+            bulkRequestBuilder.get();
+        } finally {
+            elasticSearchPool.releaseClient(transportClient);
+        }
+    }
+
+    public Map<String, Object> update (String index, String type, String id, Map<String, Object> source) throws DocumentMissingException {
         TransportClient transportClient = elasticSearchPool.getClient();
         try {
             transportClient.prepareUpdate(index, type, id).setDoc(source).get();
@@ -101,7 +141,32 @@ public class ElasticSearchClient {
         }
     }
 
-    public Map<String, Object> findById(String index, String type, String id) {
+    public void voidUpdate (String index, String type, String id, Map<String, Object> source) throws DocumentMissingException {
+        TransportClient transportClient = elasticSearchPool.getClient();
+        try {
+            transportClient.prepareUpdate(index, type, id).setDoc(source).get();
+        } finally {
+            elasticSearchPool.releaseClient(transportClient);
+        }
+    }
+
+    public void bulkUpdate (String index, String type, List<Map<String, Object>> source) throws DocumentMissingException {
+        TransportClient transportClient = elasticSearchPool.getClient();
+        try {
+            BulkRequestBuilder bulkRequestBuilder = transportClient.prepareBulk();
+            source.forEach(item -> {
+                String _id = (String)item.remove("_id");
+                if (!StringUtils.isEmpty(_id)) {
+                    bulkRequestBuilder.add(transportClient.prepareUpdate(index, type, _id).setDoc(item));
+                }
+            });
+            bulkRequestBuilder.get();
+        } finally {
+            elasticSearchPool.releaseClient(transportClient);
+        }
+    }
+
+    public Map<String, Object> findById (String index, String type, String id) {
         TransportClient transportClient = elasticSearchPool.getClient();
         try {
             GetRequest getRequest = new GetRequest(index, type, id);
@@ -162,7 +227,7 @@ public class ElasticSearchClient {
         }
     }
 
-    public List<String> getIds(String index, String type, QueryBuilder queryBuilder){
+    public List<String> getIds (String index, String type, QueryBuilder queryBuilder){
         TransportClient transportClient = elasticSearchPool.getClient();
         try {
             SearchRequestBuilder builder = transportClient.prepareSearch(index);
@@ -183,7 +248,7 @@ public class ElasticSearchClient {
         }
     }
 
-    public long count(String index, String type, QueryBuilder queryBuilder){
+    public long count (String index, String type, QueryBuilder queryBuilder){
         TransportClient transportClient = elasticSearchPool.getClient();
         try {
             SearchRequestBuilder builder = transportClient.prepareSearch(index);
@@ -197,7 +262,7 @@ public class ElasticSearchClient {
         }
     }
 
-    public List<Map<String, Object>> findBySql(List<String> fields, String sql) throws Exception {
+    public List<Map<String, Object>> findBySql (List<String> fields, String sql) throws Exception {
         List<Map<String, Object>> list = new ArrayList<>();
         DruidDataSource druidDataSource = null;
         Connection connection = null;
@@ -232,7 +297,7 @@ public class ElasticSearchClient {
         }
     }
 
-    public ResultSet findBySql(String sql) throws Exception {
+    public ResultSet findBySql (String sql) throws Exception {
         DruidDataSource druidDataSource = null;
         Connection connection = null;
         PreparedStatement preparedStatement = null;

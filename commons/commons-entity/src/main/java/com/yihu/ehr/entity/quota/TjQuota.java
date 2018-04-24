@@ -83,7 +83,7 @@ public class TjQuota implements Serializable {
         this.execType = execType;
     }
 
-    @Column(name = "exec_time", nullable = false)
+    @Column(name = "exec_time", nullable = true)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getExecTime() {
         return execTime;

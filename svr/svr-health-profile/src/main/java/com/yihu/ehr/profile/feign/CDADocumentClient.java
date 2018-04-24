@@ -45,7 +45,7 @@ public interface CDADocumentClient {
             @RequestParam(value = "document_Id") String cdaDocumentId);
 
     @RequestMapping(value = ServiceApi.Standards.DocumentDataSetList, method = RequestMethod.GET)
-    Map<String,List<MCdaDataSet>> getCDADataSetByCDAIdList(
+    Map<String, List<MCdaDataSet>> getCDADataSetByCDAIdList(
             @RequestParam(value = "version") String version,
             @RequestParam(value = "document_Id") String[] cdaDocumentId);
 }

@@ -59,7 +59,7 @@ public class StdPackageResolver extends PackageResolver {
             }
         }
         if (standardPackage.isReUploadFlg()) {
-            for(PackageDataSet dataSet : packageDataSetList) {
+            for (PackageDataSet dataSet : packageDataSetList) {
                 String dataSetCode = origin ? DataSetUtil.originDataSetCode(dataSet.getCode()) : dataSet.getCode();
                 dataSet.setCode(dataSetCode);
                 standardPackage.setEventDate(dataSet.getEventTime());

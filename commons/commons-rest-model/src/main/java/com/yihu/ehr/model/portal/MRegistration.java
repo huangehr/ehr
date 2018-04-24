@@ -9,69 +9,153 @@ import java.io.Serializable;
  */
 public class MRegistration implements Serializable {
 
-    public String order_id; // 订单号
-    public String order_create_time; // 下单时间
-    public String patient_name; // 患者姓名
-    public String hospital_name; // 医院名称
-    public String dept_name; // 科室名称
-    public String doctor_name; // 医生姓名
+    public String orderId; // 订单号
+    public String orderCreateTime; // 下单时间
+    public String userId; // 患者ID
+    public String patientName; // 患者姓名
+    public Integer cardType; // 患者证件类型，默认身份证，1：中国大陆身份证
+    public String cardNo; // 患者证件号
+    public String phoneNo; // 患者手机号
+    public String hospitalId; // 医院ID
+    public String hospitalName; // 医院名称
+    public String deptId; // 科室ID
+    public String deptName; // 科室名称
+    public String doctorId; // 医生ID
+    public String doctorName; // 医生姓名
+    public String lczcName; // 临床职称名称
+    public String photoUri; // 医生头像URL
     public Integer state; // 订单状态。1:待付款  2:待就诊 11：预约中 22：退款中 99：已退号 -1：系统取消 3：已就诊
-    public String state_desc; // 订单状态描述
-    public String visit_clinic_result; // 到诊情况。0：确认中，1：已到诊，-1：爽约。（医院如果未提供到诊信息，该返回值将永远处于确认中）
-    public String visit_clinic_result_desc; // 到诊情况描述
-    public String register_date; // 就诊时间
-    public Integer time_id; // 就诊午别。1：上午，2：下午，3：晚上
-    public String time_id_desc; // 就诊午别描述
-    public String commend_time; // 就诊时间段
-    public String serial_no; // 就诊号数
-    public String origin_type; // 来源类型，1：PC，2：APP
+    public String stateDesc; // 订单状态描述
+    public Integer visitClinicResult; // 到诊情况。0：确认中，1：已到诊，-1：爽约。（医院如果未提供到诊信息，该返回值将永远处于确认中）
+    public String visitClinicResultDesc; // 到诊情况描述
+    public String registerDate; // 就诊时间
+    public Integer timeId; // 就诊午别。1：上午，2：下午，3：晚上
+    public String timeIdDesc; // 就诊午别描述
+    public String commendTime; // 就诊时间段
+    public Integer serialNo; // 就诊号数
+    public String invalidDate; // 退号截止时间（与预约截止时间相同）
+    public Integer originType; // 来源类型，1：PC，2：APP
+    public Integer registerType; // 挂号方式，1：预约挂号，2：现场挂号
+    public String registerTypeDesc; // 挂号方式描述
 
-    public String getOrder_id() {
-        return order_id;
+    public String getOrderId() {
+        return orderId;
     }
 
-    public void setOrder_id(String order_id) {
-        this.order_id = order_id;
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
     }
 
-    public String getOrder_create_time() {
-        return order_create_time;
+    public String getOrderCreateTime() {
+        return orderCreateTime;
     }
 
-    public void setOrder_create_time(String order_create_time) {
-        this.order_create_time = order_create_time;
+    public void setOrderCreateTime(String orderCreateTime) {
+        this.orderCreateTime = orderCreateTime;
     }
 
-    public String getPatient_name() {
-        return patient_name;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setPatient_name(String patient_name) {
-        this.patient_name = patient_name;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
-    public String getHospital_name() {
-        return hospital_name;
+    public String getPatientName() {
+        return patientName;
     }
 
-    public void setHospital_name(String hospital_name) {
-        this.hospital_name = hospital_name;
+    public void setPatientName(String patientName) {
+        this.patientName = patientName;
     }
 
-    public String getDept_name() {
-        return dept_name;
+    public Integer getCardType() {
+        return cardType;
     }
 
-    public void setDept_name(String dept_name) {
-        this.dept_name = dept_name;
+    public void setCardType(Integer cardType) {
+        this.cardType = cardType;
     }
 
-    public String getDoctor_name() {
-        return doctor_name;
+    public String getCardNo() {
+        return cardNo;
     }
 
-    public void setDoctor_name(String doctor_name) {
-        this.doctor_name = doctor_name;
+    public void setCardNo(String cardNo) {
+        this.cardNo = cardNo;
+    }
+
+    public String getPhoneNo() {
+        return phoneNo;
+    }
+
+    public void setPhoneNo(String phoneNo) {
+        this.phoneNo = phoneNo;
+    }
+
+    public String getHospitalId() {
+        return hospitalId;
+    }
+
+    public void setHospitalId(String hospitalId) {
+        this.hospitalId = hospitalId;
+    }
+
+    public String getHospitalName() {
+        return hospitalName;
+    }
+
+    public void setHospitalName(String hospitalName) {
+        this.hospitalName = hospitalName;
+    }
+
+    public String getDeptId() {
+        return deptId;
+    }
+
+    public void setDeptId(String deptId) {
+        this.deptId = deptId;
+    }
+
+    public String getDeptName() {
+        return deptName;
+    }
+
+    public void setDeptName(String deptName) {
+        this.deptName = deptName;
+    }
+
+    public String getDoctorId() {
+        return doctorId;
+    }
+
+    public void setDoctorId(String doctorId) {
+        this.doctorId = doctorId;
+    }
+
+    public String getDoctorName() {
+        return doctorName;
+    }
+
+    public void setDoctorName(String doctorName) {
+        this.doctorName = doctorName;
+    }
+
+    public String getLczcName() {
+        return lczcName;
+    }
+
+    public void setLczcName(String lczcName) {
+        this.lczcName = lczcName;
+    }
+
+    public String getPhotoUri() {
+        return photoUri;
+    }
+
+    public void setPhotoUri(String photoUri) {
+        this.photoUri = photoUri;
     }
 
     public Integer getState() {
@@ -82,75 +166,99 @@ public class MRegistration implements Serializable {
         this.state = state;
     }
 
-    public String getState_desc() {
-        return state_desc;
+    public String getStateDesc() {
+        return stateDesc;
     }
 
-    public void setState_desc(String state_desc) {
-        this.state_desc = state_desc;
+    public void setStateDesc(String stateDesc) {
+        this.stateDesc = stateDesc;
     }
 
-    public String getVisit_clinic_result() {
-        return visit_clinic_result;
+    public Integer getVisitClinicResult() {
+        return visitClinicResult;
     }
 
-    public void setVisit_clinic_result(String visit_clinic_result) {
-        this.visit_clinic_result = visit_clinic_result;
+    public void setVisitClinicResult(Integer visitClinicResult) {
+        this.visitClinicResult = visitClinicResult;
     }
 
-    public String getVisit_clinic_result_desc() {
-        return visit_clinic_result_desc;
+    public String getVisitClinicResultDesc() {
+        return visitClinicResultDesc;
     }
 
-    public void setVisit_clinic_result_desc(String visit_clinic_result_desc) {
-        this.visit_clinic_result_desc = visit_clinic_result_desc;
+    public void setVisitClinicResultDesc(String visitClinicResultDesc) {
+        this.visitClinicResultDesc = visitClinicResultDesc;
     }
 
-    public String getRegister_date() {
-        return register_date;
+    public String getRegisterDate() {
+        return registerDate;
     }
 
-    public void setRegister_date(String register_date) {
-        this.register_date = register_date;
+    public void setRegisterDate(String registerDate) {
+        this.registerDate = registerDate;
     }
 
-    public Integer getTime_id() {
-        return time_id;
+    public Integer getTimeId() {
+        return timeId;
     }
 
-    public void setTime_id(Integer time_id) {
-        this.time_id = time_id;
+    public void setTimeId(Integer timeId) {
+        this.timeId = timeId;
     }
 
-    public String getTime_id_desc() {
-        return time_id_desc;
+    public String getTimeIdDesc() {
+        return timeIdDesc;
     }
 
-    public void setTime_id_desc(String time_id_desc) {
-        this.time_id_desc = time_id_desc;
+    public void setTimeIdDesc(String timeIdDesc) {
+        this.timeIdDesc = timeIdDesc;
     }
 
-    public String getCommend_time() {
-        return commend_time;
+    public String getCommendTime() {
+        return commendTime;
     }
 
-    public void setCommend_time(String commend_time) {
-        this.commend_time = commend_time;
+    public void setCommendTime(String commendTime) {
+        this.commendTime = commendTime;
     }
 
-    public String getSerial_no() {
-        return serial_no;
+    public Integer getSerialNo() {
+        return serialNo;
     }
 
-    public void setSerial_no(String serial_no) {
-        this.serial_no = serial_no;
+    public void setSerialNo(Integer serialNo) {
+        this.serialNo = serialNo;
     }
 
-    public String getOrigin_type() {
-        return origin_type;
+    public String getInvalidDate() {
+        return invalidDate;
     }
 
-    public void setOrigin_type(String origin_type) {
-        this.origin_type = origin_type;
+    public void setInvalidDate(String invalidDate) {
+        this.invalidDate = invalidDate;
+    }
+
+    public Integer getOriginType() {
+        return originType;
+    }
+
+    public void setOriginType(Integer originType) {
+        this.originType = originType;
+    }
+
+    public Integer getRegisterType() {
+        return registerType;
+    }
+
+    public void setRegisterType(Integer registerType) {
+        this.registerType = registerType;
+    }
+
+    public String getRegisterTypeDesc() {
+        return registerTypeDesc;
+    }
+
+    public void setRegisterTypeDesc(String registerTypeDesc) {
+        this.registerTypeDesc = registerTypeDesc;
     }
 }

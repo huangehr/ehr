@@ -5,8 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.elasticsearch.ElasticSearchPool;
 import com.yihu.quota.etl.model.EsConfig;
 import com.yihu.quota.etl.util.ElasticsearchUtil;
-import com.yihu.quota.etl.util.EsClientUtil;
-import com.yihu.quota.etl.util.EsConfigUtil;
 import com.yihu.quota.model.jpa.TjQuota;
 import com.yihu.quota.model.jpa.save.TjDataSave;
 import com.yihu.quota.model.jpa.save.TjQuotaDataSave;
@@ -56,10 +54,6 @@ public class EsResultExtract {
     ElasticsearchUtil elasticsearchUtil;
     @Autowired
     ElasticSearchPool elasticSearchPool;
-    @Autowired
-    EsConfigUtil esConfigUtil;
-    @Autowired
-    EsClientUtil esClientUtil;
     @Autowired
     private TjDataSaveService tjDataSaveService;
     @Autowired
@@ -143,20 +137,20 @@ public class EsResultExtract {
         return esConfig;
     }
 
-    public Client getEsClient(){
-        esConfigUtil.getConfig(esConfig.getHost(), esConfig.getPort(),esConfig.getIndex(),esConfig.getType(), esConfig.getClusterName());
-        return elasticSearchPool.getClient();
-    }
+//    public Client getEsClient(){
+//       esConfigUtil.getConfig(esConfig.getHost(), esConfig.getPort(),esConfig.getIndex(),esConfig.getType(), esConfig.getClusterName());
+//        return elasticSearchPool.getClient();
+//    }
 
     public List<Map<String, Object>> queryResultPage(TjQuota tjQuota ,String filters,int pageNo,int pageSize) throws Exception {
         pageNo = (pageNo-1)*pageSize;
         initialize(tjQuota,filters);
         BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
         getBoolQueryBuilder(boolQueryBuilder);
-        Client  client = getEsClient();
+        Client  client = elasticSearchPool.getClient();
         List<Map<String, Object>> restltList = null;
         try {
-            restltList =  elasticsearchUtil.queryPageList(client,boolQueryBuilder,pageNo,pageSize,"quotaDate");
+            restltList =  elasticsearchUtil.queryPageList(client,esConfig.getIndex(),esConfig.getType(),boolQueryBuilder,pageNo,pageSize,"quotaDate");
         }catch (Exception e){
             e.getMessage();
         }finally {
@@ -169,10 +163,10 @@ public class EsResultExtract {
         initialize(tjQuota,filters);
         BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
         getBoolQueryBuilder(boolQueryBuilder);
-        Client  client = getEsClient();
+        Client  client = elasticSearchPool.getClient();
         int count  = 0;
         try {
-            count  = (int)elasticsearchUtil.getTotalCount(client,boolQueryBuilder);
+            count  = (int)elasticsearchUtil.getTotalCount(client,esConfig.getIndex(),esConfig.getType(),boolQueryBuilder);
         }catch (Exception e){
             e.getMessage();
         }finally {
@@ -186,10 +180,10 @@ public class EsResultExtract {
         initialize(tjQuota,filters);
         BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
         getBoolQueryBuilder(boolQueryBuilder);
-        Client  client = getEsClient();
+        Client  client = elasticSearchPool.getClient();
         List<Map<String, Object>> list = null;
         try {
-           list = elasticsearchUtil.queryList(client,boolQueryBuilder, "quotaDate",size);
+           list = elasticsearchUtil.queryList(client,esConfig.getIndex(),esConfig.getType(),boolQueryBuilder, "quotaDate",size);
         }catch (Exception e){
             e.getMessage();
         }finally {
@@ -326,10 +320,10 @@ public class EsResultExtract {
         initialize(tjQuota,filters);
         BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
         getBoolQueryBuilder(boolQueryBuilder);
-        Client client = getEsClient();
+        Client client = elasticSearchPool.getClient();
         List<Map<String, Object>> list = null;
         try {
-            list = elasticsearchUtil.searcherByGroup(client, boolQueryBuilder, aggsField, "result");
+            list = elasticsearchUtil.searcherByGroup(client,esConfig.getIndex(),esConfig.getType(), boolQueryBuilder, aggsField, "result");
         }catch (Exception e){
             e.getMessage();
         }finally {
@@ -346,7 +340,7 @@ public class EsResultExtract {
         }else {
             filter = filter + " and quotaCode='" + tjQuota.getCode().replaceAll("_","") + "' ";
         }
-        Client client = getEsClient();
+        Client client = elasticSearchPool.getClient();
         Map<String, Integer> map = null;
         try {
             map = elasticsearchUtil.searcherSumByGroupBySql(client, esConfig.getIndex(), aggsFields, filter, sumField,orderFild,order);;
@@ -380,7 +374,7 @@ public class EsResultExtract {
         if(StringUtils.isNotEmpty(aggsFields)){
             aggsFields += ",";
         }
-        Client client = getEsClient();
+        Client client = elasticSearchPool.getClient();
         try {
             //SELECT sum(result) FROM medical_service_index group by town,date_histogram(field='quotaDate','interval'='year')
             StringBuffer mysql = new StringBuffer("SELECT ")
@@ -425,7 +419,6 @@ public class EsResultExtract {
         }else {
             filter = filter + " and quotaCode='" + tjQuota.getCode().replaceAll("_","") + "' ";
         }
-        Client client = getEsClient();
         try {
             StringBuffer mysql = new StringBuffer("select ");
             mysql.append(aggsFields)
@@ -447,8 +440,6 @@ public class EsResultExtract {
             return  new ArrayList<>();
         }catch (Exception e){
             e.getMessage();
-        }finally {
-            client.close();
         }
         return null;
     }

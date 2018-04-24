@@ -398,6 +398,13 @@ public class ServiceApi {
         public static final String AppAuthClient = "/app/authClient";
         public static final String SimpleUpdate = "/app/simpleUpdate";
 
+        //--------------- 医生工作平台 ---------------
+        public static final String GetAppsRelationByUserIdAndParentAppId ="/app/appsRelationByUserIdAndParentAppId";
+        public static final String GetAppsRelationByUserJson ="/app/getAppsRelationByUserJson";
+
+        //--------------- 总支撑平台 ---------------
+        public static final String SaveAppsRelation ="/app/saveAppsRelation";
+
     }
 
     public static class AppApi {
@@ -473,6 +480,8 @@ public class ServiceApi {
         public static final String PackageCrypto = "/packages/crypto";
         public static final String Fetch = "/packages/fetch/{id}";
         public static final String ImmediateResolve = "/immediate/resolve";
+        public static final String Update = "/packages/update";
+        public static final String Migrate = "/packages/migrate";
     }
 
     //非病人维度
@@ -561,6 +570,9 @@ public class ServiceApi {
         public static final String AccessToken = "/oauth/accessToken";
         public static final String ValidToken = "/oauth/validToken";
         public static final String Login = "/oauth/login";
+        public static final String Logout = "/oauth/logout";
+        public static final String VerifyCode = "/oauth/verifyCode";
+        public static final String VerifyCodeExpire = "/oauth/verifyCodeExpire";
     }
 
     public static class MessageRemind {
@@ -573,6 +585,7 @@ public class ServiceApi {
         public static final String MessageReminInfodByType = "/MessageRemindInfoInfoByType";
         public static final String MessageRemindByNotifie = "/MessageRemindByNotifie";
         public static final String UpdateMessageRemindByNotifie = "/UpdateMessageRemindByNotifie";
+        public static final String MessageRemindSatisfactionSurvey = "/MessageRemind/SatisfactionSurvey";
     }
 
     public static class Portal {
@@ -605,6 +618,7 @@ public class ServiceApi {
     public static class PortalFeedback {
         public static final String PortalFeedback = "/portalFeedback";
         public static final String PortalFeedbackAdmin = "/portalFeedback/admin/{portalFeedback_id}";
+        public static final String PortalFeedBackByUserId="/protalFeedback/findByUserId";
     }
 
     public static class PortalLogin {
@@ -763,6 +777,8 @@ public class ServiceApi {
         public static final String InitializeSystemUser = "/users/initialize";
         public static final String UsersByTel = "/users/tel";
         public static final String H5Handshake = "/users/h5/handshake";
+        public static final String UsersOfAppPhoneExistence = "/usersOfApp/user/onePhone/existence";
+
 
         public static final String Save = "/users/save";
         public static final String Update = "/users/update";
@@ -772,11 +788,13 @@ public class ServiceApi {
         public static final String GetSecurityKey = "/users/getSecurityKey";
         public static final String changePasswordByTelephone = "/usersOfApp/users/changePasswordByTelephone";
         public static final String changePasswordByOldPassword = "/users/changePasswordByOldPassword";
+        public static final String updateUserTelePhone = "/users/updateTelephone";
 
     }
 
     public static class TelVerification {
-        public static final String TelVerification = "/verification";
+        public static final String TelVerificationMsgSendMsg = "/usersOfApp/msg/sendMsg";
+        public static final String TelVerificationMsgValidate = "/usersOfApp/msg/validate";
     }
 
     public static class Roles {
@@ -826,6 +844,7 @@ public class ServiceApi {
         public static final String SearchRoleReportRelation = "/roles/role_report/search";
         public static final String SearchRoleReportRelationNoPage = "/roles/role_report/searchNoPage";
         public static final String SearchRoleReportRelationIsReportAccredited = "/roles/role_report/isReportAccredited";
+        public static final String ClientRole = "/roles/clientRole";
 
     }
 
@@ -977,6 +996,7 @@ public class ServiceApi {
         public static final String InitHealthProblem = "/redis/init/healthProblem";
         public static final String InitIcd10HpR = "/redis/init/icd10HpR";
         public static final String InitIcd10 = "/redis/init/icd10";
+        public static final String InitIcd10ChronicInfo = "/redis/init/icd10ChronicInfo";
         public static final String InitIndicatorsDict = "/redis/init/indicatorsDict";
         public static final String InitOrgName = "/redis/init/orgName";
         public static final String InitOrgArea = "/redis/init/orgArea";
@@ -1001,6 +1021,7 @@ public class ServiceApi {
         public static final String HealthProblem = "/redis/healthProblem";
         public static final String Icd10HpR = "/redis/icd10HpRelation";
         public static final String Icd10Name = "/redis/icd10Name";
+        public static final String Icd10ChronicInfo = "/redis/icd10ChronicInfo";
         public static final String Icd10HpCode = "/redis/icd10HpCode";
         public static final String IndicatorsDict = "/redis/indicatorsDict";
         public static final String OrgName = "/redis/orgName";
@@ -1285,6 +1306,7 @@ public class ServiceApi {
         public static final String GetQuotaTotalCount = "tj/getQuotaTotalCount";
         public static final String GetQuotaGroupBy = "tj/getQuotaGroupBy";
         public static final String GetQuotaReportTwoDimensionalTable = "/tj/getQuotaReportTwoDimensionalTable";
+        public static final String GetCostComposeReports = "/tj/getCostComposeReports";
 
 
         public static final String TjQuotaChart = "/tj/tjQuotaChart";
@@ -1446,7 +1468,9 @@ public class ServiceApi {
 
     public static class FastDFS {
         public static final String Upload = "/fastDfs/upload";
+        public static final String OpenUpload = "/open/fastDfs/upload";
         public static final String OldUpload = "/fastDfs/oldUpload";
+        public static final String OpenOldUpload = "/open/fastDfs/oldUpload";
         public static final String DeleteById = "/fastDfs/deleteById";
         public static final String DeleteByPath = "/fastDfs/deleteByPath";
         public static final String DeleteByObjectId = "/fastDfs/deleteByObjectId";
@@ -1498,6 +1522,36 @@ public class ServiceApi {
     }
 
     /**
+     * 后台配置问卷/满意度问题和选项
+     */
+    public static class SurveyAdminManage {
+        public static final String GetSurveyTemplateList="/admin/surveyTemplate/list";
+        public static final String GetSurveyTemplateOptionsList="/admin/surveyTemplate/options/list";
+        public static final String SaveLabelInfo ="/admin/surveyTemplate/saveLabelInfo";
+        public static final String SaveTemplate = "/admin/surveyTemplate/saveTemplate";
+        public static final String GetTemplateLabel = "/admin/surveyTemplate/getTemplateLabel/{phoneticCode}";
+
+        public static final String GetSurveyQuestionList = "/admin/surveyQuestion/list";
+        public static final String SaveSurveyQuestion = "/admin/surveyQuestion/save";
+        public static final String GetQuestionById="/admin/surveyQuestion/getById";
+        public static final String GetQuestionsByIds ="/admin/surveyQuestion/getByIds";
+        public static final String DelQuestion ="/admin/surveyQuestion/delQuestion";
+        public static final String DelQuestions = "/admin/surveyQuestion/delQuestions";
+        public static final String updateQuestion = "/admin/surveyQuestion/update";
+
+
+
+    }
+
+    /**
+     * 居民填写满意度
+     */
+    public static class Questionnaire {
+        public static final String GetAllQuestionsByTemplateCode = "/questionnaire/getAllQuestionsByTemplateCode";
+        public static final String SaveAnswer = "/questionnaire/saveAnswer";
+    }
+
+    /**
      * 转发福州总部开放平台接口相关
      */
     public static class Fz {
@@ -1505,17 +1559,49 @@ public class ServiceApi {
     }
 
     /**
+     * APP消息推送接口
+     */
+    public static class AppPushMessage {
+        public static final String single = "/AppPushMessage/single";
+        public static final String list = "/AppPushMessage/list";
+        public static final String app = "/AppPushMessage/app";
+        public static final String tarns = "/AppPushMessage/tarnsmission";
+        public static final String findClientId = "/AppPushMessage/findClientId";
+        public static final String findClientIdList = "/AppPushMessage/findClientIdList";
+        public static final String updateClientId = "/AppPushMessage/updateClientId";
+
+    }
+    /**
      * 预约-挂号单
      */
     public static class Registration {
         public static final String Prefix = "/appointment/registration/";
+
         public static final String GetById = "/appointment/registration/{id}";
+        public static final String GetByOrderId = "/appointment/registration/orderId/{orderId}";
         public static final String Search = "/appointment/registration/search";
         public static final String Save = "/appointment/registration/save";
+        public static final String Update = "/appointment/registration/update";
         public static final String Delete = "/appointment/registration/delete";
         public static final String UpdateState = "/appointment/registration/updateState";
         public static final String UpdateVisitState = "/appointment/registration/updateVisitState";
     }
 
+    /**
+     * 组合福州总部的预约挂号接口为我方需要的数据结构
+     */
+    public static class FzCombination {
+        public static final String FindHospitalList = "/appointment/combination/findHospitalList";
+        public static final String FindDoctorList = "/appointment/combination/findDoctorList";
+    }
 
+    /**
+     * 账号申诉
+     */
+    public static class AccountRepresentation{
+        public static final String SaveAccontRepresenetation ="/account/save";
+        public static final String GetRandomImageCode ="/account/getRandomImageCode";
+        public static final String CheckRandomImageCode ="/account/checkRandomImageCode";
+
+    }
 }

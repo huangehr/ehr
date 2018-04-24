@@ -19,6 +19,7 @@ import com.yihu.ehr.resolve.service.resource.stage1.PackageResolveService;
 import com.yihu.ehr.resolve.service.resource.stage2.IdentifyService;
 import com.yihu.ehr.resolve.service.resource.stage2.PackMillService;
 import com.yihu.ehr.resolve.service.resource.stage2.ResourceService;
+import com.yihu.ehr.util.datetime.DateUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -34,10 +35,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -96,10 +94,10 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
 
             //回填入库状态
             map.put("demographic_id", standardPackage.getDemographicId());
-            //map.put("event_type", standardPackage.getEventType() == null ? null : standardPackage.getEventType().getType());
-            //map.put("event_no", standardPackage.getEventNo());
-            //map.put("event_date", DateUtil.toStringLong(standardPackage.getEventDate()));
-            //map.put("patient_id", standardPackage.getPatientId());
+            map.put("event_type", standardPackage.getEventType() == null ? null : standardPackage.getEventType().getType());
+            map.put("event_no", standardPackage.getEventNo());
+            map.put("event_date", DateUtil.toStringLong(standardPackage.getEventDate()));
+            map.put("patient_id", standardPackage.getPatientId());
             map.put("re_upload_flg", String.valueOf(standardPackage.isReUploadFlg()));
             packageMgrClient.reportStatus(packId, ArchiveStatus.Finished, objectMapper.writeValueAsString(map));
             //是否返回数据
@@ -149,8 +147,9 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
         FileCopyUtils.copy(file.getInputStream(), stream);
         stream.close();
         EsSimplePackage pack = new EsSimplePackage();
-        pack.setPwd(password);
         pack.set_id(packageId);
+        pack.setPwd(password);
+        pack.setReceive_date(new Date());
         pack.setClient_id(clientId);
         StandardPackage standardPackage = packageResolveService.doResolve(pack, zipFile);
         standardPackage.setClientId(clientId);
@@ -257,10 +256,10 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
             Map<String, String> map = new HashMap();
             map.put("profileId", standardPackages.get(0).getId());
             map.put("demographicId", standardPackages.get(0).getDemographicId());
-            //map.put("eventType", standardPackages.get(0).getEventType() == null ? "" : String.valueOf(standardPackages.get(0).getEventType().getType()));
-            //map.put("eventNo", standardPackages.get(0).getEventNo());
-            //map.put("eventDate", DateUtil.toStringLong(standardPackages.get(0).getEventDate()));
-            //map.put("patientId", standardPackages.get(0).getPatientId());
+            map.put("eventType", standardPackages.get(0).getEventType() == null ? "" : String.valueOf(standardPackages.get(0).getEventType().getType()));
+            map.put("eventNo", standardPackages.get(0).getEventNo());
+            map.put("eventDate", DateUtil.toStringLong(standardPackages.get(0).getEventDate()));
+            map.put("patientId", standardPackages.get(0).getPatientId());
             map.put("reUploadFlg", String.valueOf(standardPackages.get(0).isReUploadFlg()));
             datasetPackageMgrClient.reportStatus(packId, ArchiveStatus.Finished, objectMapper.writeValueAsString(map));
             if (echo) {

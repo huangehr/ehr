@@ -38,39 +38,42 @@ public class FailTolerantTask {
 
     @Scheduled(cron = "0 0/1 * * * ?")
     public void delayPushTask() throws Exception {
+        List<String> esSimplePackageList = new ArrayList<>(1200);
         //当解析队列为空，将数据库中状态为缓存状态的档案包加入解析队列
         if (redisTemplate.opsForList().size(RedisCollection.PackageList) <= 0) {
             List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, "archive_status=0", "+receive_date", 1, 1000);
             for (Map<String, Object> pack : resultList) {
                 String packStr = objectMapper.writeValueAsString(pack);
                 EsSimplePackage esSimplePackage = objectMapper.readValue(packStr, EsSimplePackage.class);
-                redisTemplate.opsForList().leftPush(RedisCollection.PackageList, objectMapper.writeValueAsString(esSimplePackage));
+                esSimplePackageList.add(objectMapper.writeValueAsString(esSimplePackage));
             }
         }
-    }
-
-    @Scheduled(cron = "30 0/1 * * * ?")
-    public void exceptionTask() throws Exception{
         //将解析状态为失败且错误次数小于三次的档案包重新加入解析队列
         List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, "archive_status=2;fail_count<3", "+receive_date", 1, 100);
+        List<Map<String, Object>> updateSourceList = new ArrayList<>(resultList.size());
         for (Map<String, Object> pack : resultList) {
+            Map<String, Object> updateSource = new HashMap<>();
+            updateSource.put("_id", pack.get("_id"));
+            updateSource.put("archive_status", 0);
+            updateSourceList.add(updateSource);
             String packStr = objectMapper.writeValueAsString(pack);
             EsSimplePackage esSimplePackage = objectMapper.readValue(packStr, EsSimplePackage.class);
-            Map<String, Object> updateSource = new HashMap<>();
-            updateSource.put("archive_status", 0);
-            elasticSearchUtil.update(INDEX, TYPE, esSimplePackage.get_id(), updateSource);
-            redisTemplate.opsForList().leftPush(RedisCollection.PackageList, objectMapper.writeValueAsString(esSimplePackage));
+            esSimplePackageList.add(objectMapper.writeValueAsString(esSimplePackage));
         }
+        //将解析状态为正在解析但解析开始时间超过当前时间一定范围内的档案包重新加入解析队列
         Date past = DateUtils.addDays(new Date(), -1);
         String pastStr = dateFormat.format(past) + " 00:00:00";
         resultList = elasticSearchUtil.page(INDEX, TYPE, "archive_status=1;parse_date<" + pastStr, "+receive_date", 1, 100);
         for (Map<String, Object> pack : resultList) {
+            Map<String, Object> updateSource = new HashMap<>();
+            updateSource.put("_id", pack.get("_id"));
+            updateSource.put("archive_status", 0);
+            updateSourceList.add(updateSource);
             String packStr = objectMapper.writeValueAsString(pack);
             EsSimplePackage esSimplePackage = objectMapper.readValue(packStr, EsSimplePackage.class);
-            Map<String, Object> updateSource = new HashMap<>();
-            updateSource.put("archive_status", 0);
-            elasticSearchUtil.update(INDEX, TYPE, esSimplePackage.get_id(), updateSource);
-            redisTemplate.opsForList().leftPush(RedisCollection.PackageList, objectMapper.writeValueAsString(esSimplePackage));
+            esSimplePackageList.add(objectMapper.writeValueAsString(esSimplePackage));
         }
+        elasticSearchUtil.bulkUpdate(INDEX, TYPE, updateSourceList);
+        esSimplePackageList.forEach(item -> redisTemplate.opsForList().leftPush(RedisCollection.PackageList, item));
     }
 }

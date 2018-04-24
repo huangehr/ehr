@@ -53,6 +53,11 @@ public class MH5Message {
      * 第三方用户Id
      */
     private String thirdPartyUserId;
+    /**
+     * 消息模板类型
+     */
+    private String portalMessagerTemplateType;
+
 
     public String getAgencyAbb() {
         return agencyAbb;
@@ -139,5 +144,13 @@ public class MH5Message {
 
     public void setIsSuccess(int isSuccess) {
         this.isSuccess = isSuccess;
+    }
+
+    public String getPortalMessagerTemplateType() {
+        return portalMessagerTemplateType;
+    }
+
+    public void setPortalMessagerTemplateType(String portalMessagerTemplateType) {
+        this.portalMessagerTemplateType = portalMessagerTemplateType;
     }
 }

@@ -115,7 +115,7 @@ public class BaseStatistsService {
      * @throws Exception
      */
     public List<Map<String, Object>>  divisionQuota(String molecular, String denominator, String dimension,
-                                                    String molecularFilter,String denominatorFilters,String operation,String operationValue,String dateType) throws Exception {
+        String molecularFilter,String denominatorFilters,String operation,String operationValue,String dateType) throws Exception {
         List<Map<String, Object>> moleList = getQuotaResultList(molecular,dimension,molecularFilter,dateType);
         List<Map<String, Object>> denoList =  getQuotaResultList(denominator,dimension,denominatorFilters,dateType);
         dimension = StringUtils.isNotEmpty(dateType)? (StringUtils.isNotEmpty(dimension)? dimension +";"+dateType : dateType):dimension;
@@ -132,8 +132,8 @@ public class BaseStatistsService {
      * @return
      * @throws Exception
      */
-    public List<Map<String, Object>>  divisionQuotaDenoConstant(String molecular, String dimension,String filters,
-                                                                String operation,String operationValue,String dateType,String constValue, String district) throws Exception {
+    public List<Map<String, Object>> divisionQuotaDenoConstant(String molecular, String dimension,String filters,
+        String operation,String operationValue,String dateType,String constValue, String district) throws Exception {
         Double denominatorVal = 0.0;
         List<Map<String, Object>> moleList = getQuotaResultList(molecular,dimension,filters,dateType);
         // 获取分母的数值
@@ -288,7 +288,6 @@ public class BaseStatistsService {
         for(int i=0 ; i < orgHealthCategoryList.size() ; i++ ){
             Map<String,Object> mapCategory = orgHealthCategoryList.get(i);
             String code = mapCategory.get("code").toString();
-            mapCategory.put("firstColumn",mapCategory.get("text"));
             for(Map<String, Object> dimenMap : dimenListResult){
                 if(dimenMap.get(code) != null){
 //                    mapCategory.putAll(dimenMap);
@@ -306,6 +305,7 @@ public class BaseStatistsService {
                     mapCategory.put(quotaCode,0);
                 }
             }
+            mapCategory.put("firstColumn",mapCategory.get("text"));
             result.add(mapCategory);
             if(mapCategory.get("children") != null){
                 List<Map<String,Object>> childrenOrgHealthCategoryList = (List<Map<String, Object>>) mapCategory.get("children");
@@ -328,12 +328,10 @@ public class BaseStatistsService {
         for(int i=0 ; i < orgHealthCategoryList.size() ; i++ ){
             Map<String,Object> mapCategory = orgHealthCategoryList.get(i);
             String code = mapCategory.get("code").toString();
-            mapCategory.put("firstColumn",mapCategory.get("text"));
             for(Map<String, Object> dimenMap : dimenListResult){
                 if(dimenMap.get(code) != null){
-                    //
+                    //补充所有信息
                     mapCategory.putAll(dimenMap);
-
                     if(dimenMap.containsKey(code)){
                         mapCategory.put(code,dimenMap.get(code));
                         mapCategory.put("result",dimenMap.get("result")!=null ? dimenMap.get("result"):dimenMap.get(code));
@@ -348,6 +346,7 @@ public class BaseStatistsService {
                     mapCategory.put(quotaCode,0);
                 }
             }
+            mapCategory.put("firstColumn",mapCategory.get("text"));
             result.add(mapCategory);
             if(mapCategory.get("children") != null){
                 List<Map<String,Object>> childrenOrgHealthCategoryList = (List<Map<String, Object>>) mapCategory.get("children");

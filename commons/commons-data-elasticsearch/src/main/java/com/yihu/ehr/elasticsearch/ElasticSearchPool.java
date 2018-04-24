@@ -41,19 +41,24 @@ public class ElasticSearchPool {
         }
         synchronized (clientPool) {
             while (clientPool.size() < initSize) {
-                Settings settings = Settings.builder()
-                        .put("cluster.name", elasticSearchConfig.getClusterName())
-                        .build();
-                String[] nodeArr = elasticSearchConfig.getClusterNodes().split(",");
-                InetSocketTransportAddress[] socketArr = new InetSocketTransportAddress[nodeArr.length];
-                for (int i = 0; i < socketArr.length; i++) {
-                    if (!StringUtils.isEmpty(nodeArr[i])) {
-                        String[] nodeInfo = nodeArr[i].split(":");
-                        socketArr[i] = new InetSocketTransportAddress(new InetSocketAddress(nodeInfo[0], new Integer(nodeInfo[1])));
+                try{
+                    Settings settings = Settings.builder()
+                            .put("cluster.name", elasticSearchConfig.getClusterName())
+                            .put("client.transport.sniff", true)
+                            .build();
+                    String[] nodeArr = elasticSearchConfig.getClusterNodes().split(",");
+                    InetSocketTransportAddress[] socketArr = new InetSocketTransportAddress[nodeArr.length];
+                    for (int i = 0; i < socketArr.length; i++) {
+                        if (!StringUtils.isEmpty(nodeArr[i])) {
+                            String[] nodeInfo = nodeArr[i].split(":");
+                            socketArr[i] = new InetSocketTransportAddress(new InetSocketAddress(nodeInfo[0], new Integer(nodeInfo[1])));
+                        }
                     }
+                    TransportClient transportClient = TransportClient.builder().settings(settings).build().addTransportAddresses(socketArr);
+                    clientPool.add(transportClient);
+                }catch (Exception e){
+                    System.out.println("探测集群节点异常！");
                 }
-                TransportClient transportClient = TransportClient.builder().settings(settings).build().addTransportAddresses(socketArr);
-                clientPool.add(transportClient);
             }
         }
         if (clientPool.isEmpty()) {

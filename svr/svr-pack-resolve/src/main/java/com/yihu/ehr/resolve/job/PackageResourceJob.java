@@ -33,6 +33,7 @@ import java.util.Map;
  * @created 2016.03.28 11:30
  */
 @Component
+@DisallowConcurrentExecution
 public class PackageResourceJob implements InterruptableJob {
 
     private final static String LocalTempPath = System.getProperty("java.io.tmpdir") + java.io.File.separator;
@@ -60,25 +61,25 @@ public class PackageResourceJob implements InterruptableJob {
                 pack = objectMapper.readValue(packStr, EsSimplePackage.class);
             }
             if (pack != null) {
-                packageMgrClient.reportStatus(pack.get_id(), ArchiveStatus.Acquired, "正在入库中");
                 PackResolveLogger.info("开始入库:" + pack.get_id() + ", Timestamp:" + new Date());
+                packageMgrClient.reportStatus(pack.get_id(), ArchiveStatus.Acquired, "正在入库中");
                 doResolve(pack, packageMgrClient);
             }
         } catch (Exception e) {
             if (pack != null) {
                 try {
-                    if (StringUtils.isBlank(e.getMessage())) {
-                        packageMgrClient.reportStatus(pack.get_id(), ArchiveStatus.Failed, "Internal server error, please see task log for detail message.");
-                        PackResolveLogger.error("Internal server error, please see task log for detail message.", e);
-                    } else {
+                    if (StringUtils.isNotBlank(e.getMessage())) {
                         packageMgrClient.reportStatus(pack.get_id(), ArchiveStatus.Failed, e.getMessage());
                         PackResolveLogger.error(e.getMessage());
+                    } else {
+                        packageMgrClient.reportStatus(pack.get_id(), ArchiveStatus.Failed, "Internal server error, please see task log for detail message.");
+                        PackResolveLogger.error("Internal server error, please see task log for detail message.", e);
                     }
                 } catch (Exception e1) {
-                    PackResolveLogger.error(e1.getMessage());
+                    PackResolveLogger.error("Execute feign fail cause by:" + e1.getMessage());
                 }
             } else {
-                PackResolveLogger.error(e.getMessage());
+                PackResolveLogger.error("Empty pack cause by:" + e.getMessage());
             }
         }
     }
@@ -89,7 +90,6 @@ public class PackageResourceJob implements InterruptableJob {
         IdentifyService identifyService = SpringContext.getService(IdentifyService.class);
         ResourceService resourceService = SpringContext.getService(ResourceService.class);
         ObjectMapper objectMapper = new ObjectMapper();
-        //long start = System.currentTimeMillis();
         StandardPackage standardPackage = resolveEngine.doResolve(pack, downloadTo(pack.getRemote_path()));
         ResourceBucket resourceBucket = packMill.grindingPackModel(standardPackage);
         identifyService.identify(resourceBucket, standardPackage);
@@ -98,10 +98,10 @@ public class PackageResourceJob implements InterruptableJob {
         Map<String, Object> map = new HashMap();
         map.put("profile_id", standardPackage.getId());
         map.put("demographic_id", standardPackage.getDemographicId());
-        //map.put("event_type", standardPackage.getEventType() == null ? null : standardPackage.getEventType().getType());
-        //map.put("event_no", standardPackage.getEventNo());
-        //map.put("event_date", DateUtil.toStringLong(standardPackage.getEventDate()));
-        //map.put("patient_id", standardPackage.getPatientId());
+        map.put("event_type", standardPackage.getEventType() == null ? null : standardPackage.getEventType().getType());
+        map.put("event_no", standardPackage.getEventNo());
+        map.put("event_date", DateUtil.toStringLong(standardPackage.getEventDate()));
+        map.put("patient_id", standardPackage.getPatientId());
         map.put("re_upload_flg", String.valueOf(standardPackage.isReUploadFlg()));
         packageMgrClient.reportStatus(pack.get_id(), ArchiveStatus.Finished, objectMapper.writeValueAsString(map));
     }

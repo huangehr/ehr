@@ -1,8 +1,11 @@
 package com.yihu.ehr.oauth2.oauth2;
 
 import com.yihu.ehr.oauth2.oauth2.jdbc.EhrJdbcUserSecurityService;
+import com.yihu.ehr.oauth2.oauth2.redis.EhrRedisVerifyCodeService;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
@@ -20,9 +23,7 @@ import org.springframework.security.oauth2.provider.token.AuthorizationServerTok
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Token授权器，根据请求创建Token给客户端。
@@ -39,7 +40,8 @@ public class EhrTokenGranter implements TokenGranter {
                            ClientDetailsService clientDetailsService,
                            OAuth2RequestFactory requestFactory,
                            EhrJdbcUserSecurityService ehrJDBCUserSecurityService,
-                           EhrUserDetailsService ehrUserDetailsService) {
+                           EhrUserDetailsService ehrUserDetailsService,
+                           EhrRedisVerifyCodeService ehrRedisVerifyCodeService) {
 
         tokenGranters.put(EhrAuthorizationCodeGranter.GRANT_TYPE,
                 new EhrAuthorizationCodeGranter(
@@ -72,6 +74,15 @@ public class EhrTokenGranter implements TokenGranter {
                         clientDetailsService,
                         requestFactory
                 ));
+
+        tokenGranters.put(EhrVerifyCodeTokenGranter.GRANT_TYPE,
+                new EhrVerifyCodeTokenGranter(
+                        authenticationManager,
+                        tokenServices,
+                        clientDetailsService,
+                        requestFactory,
+                        ehrRedisVerifyCodeService
+                ));
     }
 
     public OAuth2AccessToken grant(String grantType, TokenRequest tokenRequest) {
@@ -90,8 +101,8 @@ public class EhrTokenGranter implements TokenGranter {
 
         private final AuthorizationCodeServices authorizationCodeServices;
         // Ehr Properties
-        private EhrJdbcUserSecurityService ehrJDBCUserSecurityService;
-        private EhrUserDetailsService ehrUserDetailsService;
+        private final EhrJdbcUserSecurityService ehrJDBCUserSecurityService;
+        private final EhrUserDetailsService ehrUserDetailsService;
 
         public EhrAuthorizationCodeGranter(AuthorizationServerTokenServices tokenServices,
                                            AuthorizationCodeServices authorizationCodeServices,
@@ -99,18 +110,20 @@ public class EhrTokenGranter implements TokenGranter {
                                            OAuth2RequestFactory requestFactory,
                                            EhrJdbcUserSecurityService ehrJDBCUserSecurityService,
                                            EhrUserDetailsService ehrUserDetailsService) {
-            this(tokenServices, authorizationCodeServices, clientDetailsService, requestFactory, GRANT_TYPE);
-            this.ehrUserDetailsService = ehrUserDetailsService;
-            this.ehrJDBCUserSecurityService = ehrJDBCUserSecurityService;
+            this(tokenServices, authorizationCodeServices, clientDetailsService, requestFactory, GRANT_TYPE, ehrJDBCUserSecurityService, ehrUserDetailsService);
         }
 
         protected EhrAuthorizationCodeGranter(AuthorizationServerTokenServices tokenServices,
                                               AuthorizationCodeServices authorizationCodeServices,
                                               ClientDetailsService clientDetailsService,
                                               OAuth2RequestFactory requestFactory,
-                                              String grantType) {
+                                              String grantType,
+                                              EhrJdbcUserSecurityService ehrJDBCUserSecurityService,
+                                              EhrUserDetailsService ehrUserDetailsService) {
             super(tokenServices, clientDetailsService, requestFactory, grantType);
             this.authorizationCodeServices = authorizationCodeServices;
+            this.ehrUserDetailsService = ehrUserDetailsService;
+            this.ehrJDBCUserSecurityService = ehrJDBCUserSecurityService;
         }
 
         @Override
@@ -131,9 +144,9 @@ public class EhrTokenGranter implements TokenGranter {
 
             OAuth2Request pendingOAuth2Request = storedAuth.getOAuth2Request();
             String oauthUri;
-            if(pendingOAuth2Request.getRedirectUri().indexOf("?") != -1) {
+            if (pendingOAuth2Request.getRedirectUri().indexOf("?") != -1) {
                 oauthUri = pendingOAuth2Request.getRedirectUri().substring(0, pendingOAuth2Request.getRedirectUri().indexOf("?"));
-            }else {
+            } else {
                 oauthUri = pendingOAuth2Request.getRedirectUri();
             }
             // https://jira.springsource.org/browse/SECOAUTH-333
@@ -164,10 +177,10 @@ public class EhrTokenGranter implements TokenGranter {
             // Make a new stored request with the combined parameters
             OAuth2Request finalStoredOAuth2Request = pendingOAuth2Request.createOAuth2Request(combinedParameters);
 
-            //弃用当前方法，再次通过pk获取当前请求的用户信息
-            //Authentication userAuth = storedAuth.getUserAuthentication();
+            Authentication userAuth = storedAuth.getUserAuthentication();
 
-            String pk = combinedParameters.get("pk");
+            //再次通过pk获取当前请求的用户信息
+            /*String pk = combinedParameters.get("pk");
             String keyId = ehrJDBCUserSecurityService.getDefaultKeyIdSelectStatement(pk);
             String userId = ehrJDBCUserSecurityService.getDefaultUserIdByKeyIdSelectStatement(keyId);
             String userName = ehrJDBCUserSecurityService.getDefaultUserNameByUserId(userId);
@@ -175,11 +188,15 @@ public class EhrTokenGranter implements TokenGranter {
             if (StringUtils.isEmpty(keyId) || StringUtils.isEmpty(userId) || StringUtils.isEmpty(userName)) {
                 throw new InsufficientAuthenticationException("Illegal pk");
             }
-            UsernamePasswordAuthenticationToken userToken = new UsernamePasswordAuthenticationToken(userDetails.getUsername(), userDetails.getPassword(), userDetails.getAuthorities());
-            return new OAuth2Authentication(finalStoredOAuth2Request, userToken);
+            UsernamePasswordAuthenticationToken userToken = new UsernamePasswordAuthenticationToken(userDetails.getUsername(), userDetails.getPassword(), userDetails.getAuthorities());*/
+
+            return new OAuth2Authentication(finalStoredOAuth2Request, userAuth);
         }
     }
 
+    /**
+     * password模式Token授权器。
+     */
     public static class EhrResourceOwnerPasswordTokenGranter extends AbstractTokenGranter {
         private static final String GRANT_TYPE = "password";
 
@@ -279,6 +296,59 @@ public class EhrTokenGranter implements TokenGranter {
 
         @SuppressWarnings("deprecation")
         public void setImplicitGrantService(ImplicitGrantService service) {
+        }
+    }
+
+    /**
+     * verify_code模式Token授权器。
+     */
+    public static class EhrVerifyCodeTokenGranter extends AbstractTokenGranter {
+        private static final String GRANT_TYPE = "verify_code";
+
+        private final AuthenticationManager authenticationManager;
+        // Ehr Properties
+        private final EhrRedisVerifyCodeService ehrRedisVerifyCodeService;
+
+        public EhrVerifyCodeTokenGranter(AuthenticationManager authenticationManager,
+                                         AuthorizationServerTokenServices tokenServices,
+                                         ClientDetailsService clientDetailsService,
+                                         OAuth2RequestFactory requestFactory,
+                                         EhrRedisVerifyCodeService ehrRedisVerifyCodeService) {
+            this(authenticationManager, tokenServices, clientDetailsService, requestFactory, GRANT_TYPE, ehrRedisVerifyCodeService);
+        }
+
+        protected EhrVerifyCodeTokenGranter(AuthenticationManager authenticationManager,
+                                            AuthorizationServerTokenServices tokenServices,
+                                            ClientDetailsService clientDetailsService,
+                                            OAuth2RequestFactory requestFactory,
+                                            String grantType,
+                                            EhrRedisVerifyCodeService ehrRedisVerifyCodeService) {
+            super(tokenServices, clientDetailsService, requestFactory, grantType);
+            this.authenticationManager = authenticationManager;
+            this.ehrRedisVerifyCodeService = ehrRedisVerifyCodeService;
+        }
+
+        @Override
+        protected OAuth2Authentication getOAuth2Authentication(ClientDetails client, TokenRequest tokenRequest) {
+
+            Map<String, String> parameters = new LinkedHashMap<String, String>(tokenRequest.getRequestParameters());
+            String client_id = parameters.get("client_id");
+            String username = parameters.get("username");
+            String verify_code = parameters.get("verify_code");
+
+            if (!ehrRedisVerifyCodeService.verification(client_id, username, verify_code)){
+                throw new InvalidGrantException("Invalid verify_code");
+            }
+            Authentication userAuth = new UsernamePasswordAuthenticationToken(username, verify_code, getGrantedAuthorities(username));
+            ((AbstractAuthenticationToken) userAuth).setDetails(parameters);
+            OAuth2Request storedOAuth2Request = getRequestFactory().createOAuth2Request(client, tokenRequest);
+            return new OAuth2Authentication(storedOAuth2Request, userAuth);
+        }
+
+        private Collection<? extends GrantedAuthority> getGrantedAuthorities(String username) {
+            Collection<GrantedAuthority> authorities = new ArrayList<>(1);
+            authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+            return authorities;
         }
     }
 }

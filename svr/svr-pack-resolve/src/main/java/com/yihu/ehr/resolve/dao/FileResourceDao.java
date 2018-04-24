@@ -25,13 +25,13 @@ public class FileResourceDao {
     private HBaseDao hbaseDao;
 
     public void save(ResourceBucket resBucket) throws Exception {
-        if (resBucket.getProfileType() == ProfileType.File && !resBucket.isReUploadFlg()){
+        if (resBucket.getProfileType() == ProfileType.File){
             TableBundle bundle = new TableBundle();
             Map<String, CdaDocument> cdaDocuments = resBucket.getCdaDocuments();
             for(String rowkey : cdaDocuments.keySet()) {
                 bundle.addRows(rowkey);
             }
-            hbaseDao.delete(ResourceCore.FileTable,bundle);
+            hbaseDao.delete(ResourceCore.FileTable, bundle);
             for (String rowkey : cdaDocuments.keySet()){
                 CdaDocument cdaDocument = cdaDocuments.get(rowkey);
                 bundle.addValues(rowkey, FileFamily.Basic, FileTableUtil.getBasicFamilyCellMap(resBucket));

@@ -84,6 +84,7 @@ public class RedisMqChannelService extends BaseJpaService<RedisMqChannel, RedisM
      * @param message        消息
      * @return Envelop
      */
+    @Transactional(readOnly = false)
     public Envelop sendMessage(String publisherAppId, String channel, String message) {
         Envelop envelop = new Envelop();
 
@@ -105,15 +106,17 @@ public class RedisMqChannelService extends BaseJpaService<RedisMqChannel, RedisM
 
             // 记录消息
             RedisMqMessageLog redisMqMessageLog = MessageCommonBiz.newMessageLog(channel, publisherAppId, message);
-            redisMqMessageLogDao.save(redisMqMessageLog);
+            redisMqMessageLog = redisMqMessageLogDao.save(redisMqMessageLog);
 
-            // 发布消息
-            Map<String, Object> messageMap = new HashMap<>();
-            messageMap.put("messageLogId", redisMqMessageLog.getId());
-            messageMap.put("messageContent", message);
-            redisTemplate.convertAndSend(channel, objectMapper.writeValueAsString(messageMap));
+            if (redisMqMessageLog != null) {
+                // 发布消息
+                Map<String, Object> messageMap = new HashMap<>();
+                messageMap.put("messageLogId", redisMqMessageLog.getId());
+                messageMap.put("messageContent", message);
+                redisTemplate.convertAndSend(channel, objectMapper.writeValueAsString(messageMap));
 
-            envelop.setSuccessFlg(true);
+                envelop.setSuccessFlg(true);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             envelop.setSuccessFlg(false);

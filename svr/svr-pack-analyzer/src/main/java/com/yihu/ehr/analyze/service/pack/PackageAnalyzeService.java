@@ -57,16 +57,13 @@ public class PackageAnalyzeService {
                 zipPackage.unZip();
                 zipPackage.resolve();
                 zipPackage.save();
-
                 mgrClient.analyzeStatus(esSimplePackage.get_id(), 3);
-
                 //处理质控
                 packageQcService.qcHandle(zipPackage);
             }
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
-
             try {
                 mgrClient.analyzeStatus(esSimplePackage.get_id(), 2);
             } catch (Exception e1) {
@@ -79,17 +76,9 @@ public class PackageAnalyzeService {
         }
     }
 
-    public Envelop esSaveData(String index, String type, String dataList) {
-        Envelop envelop = new Envelop();
-        try {
-            List<Map<String, Object>> list = objectMapper.readValue(dataList, List.class);
-            for (Map<String, Object> map : list) {
-                elasticSearchUtil.index(index, type, map);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return envelop;
+    public void esSaveData (String index, String type, String dataList) throws Exception {
+        List<Map<String, Object>> list = objectMapper.readValue(dataList, List.class);
+        elasticSearchUtil.bulkIndex(index, type, list);
     }
 
     @PostConstruct

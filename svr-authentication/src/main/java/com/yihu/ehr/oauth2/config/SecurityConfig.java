@@ -55,10 +55,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     //swagger-ui界面---end
                     .antMatchers("/oauth/sso")
                     .antMatchers("/oauth/login")
+                    .antMatchers("/oauth/logout")
                     .antMatchers("/oauth/authorize")
                     .antMatchers("/oauth/accessToken")
                     .antMatchers("/oauth/validToken")
-                    .antMatchers("/oauth/confirm_access");
+                    .antMatchers("/oauth/confirm_access")
+                    .antMatchers("/oauth/verifyCode")
+                    .antMatchers("/oauth/verifyCodeExpire");
         }
 
         @Override

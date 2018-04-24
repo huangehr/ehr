@@ -117,6 +117,62 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
     }
 
     /**
+     * 文件上传 - 返回相关索引信息,以及HttpUrl下载连接 开放接口
+     * @param file
+     * @param creator
+     * @param objectId
+     * @return
+     */
+    @RequestMapping(value = ServiceApi.FastDFS.OpenUpload, method = RequestMethod.POST)
+    @ApiOperation(value = "文件上传", notes = "返回相关索引信息,以及HttpUrl下载连接")
+    public Envelop openUpload(
+            @ApiParam(name = "file", value = "文件", required = true)
+            @RequestPart(value = "file") MultipartFile file,
+            @ApiParam(name = "creator", value = "创建者", required = true)
+            @RequestParam(value = "creator") String creator,
+            @ApiParam(name = "objectId", value = "创建者标识", required = true, defaultValue = "EHR")
+            @RequestParam(value = "objectId") String objectId) throws Exception {
+        ObjectNode objectNode;
+        //上传
+        objectNode = fastDFSService.upload(file);
+        String groupName = objectNode.get(FastDFSUtil.GROUP_NAME).toString();
+        String remoteFileName = objectNode.get(FastDFSUtil.REMOTE_FILE_NAME).toString();
+        //保存索引到ES库中
+        Map<String, String> paramMap = new HashMap<String, String>();
+        paramMap.put("fileName", file.getOriginalFilename());
+        paramMap.put("creator", creator);
+        paramMap.put("objectId", objectId);
+        Map<String, Object> source = getIndexSource(objectNode, paramMap);
+        Map<String, Object> newSource;
+        try {
+            newSource = elasticSearchUtil.index(indexName, indexType, source);
+        } catch (Exception e) {
+            try {
+                fastDFSService.delete(groupName, remoteFileName);
+            } catch (Exception e1) {
+                throw e1;
+            }
+            throw e;
+        }
+        String path = groupName.substring(1, groupName.length() - 1) + "/" + remoteFileName.substring(1, remoteFileName.length() - 1);
+        if (null == publicServer || publicServer.isEmpty()) {
+            try {
+                publicServer = getPublicUrl().getDetailModelList();
+                if (null != publicServer && !publicServer.isEmpty()) {
+                    String publicUrl = publicServer.get((int) (Math.random() * publicServer.size()));
+                    newSource.put("httpUrl", publicUrl + "/" + path);
+                }
+            } catch (Exception e) {
+                LoggerFactory.getLogger(FastDFSEndPoint.class).error(e.getMessage());
+            }
+        } else {
+            String publicUrl = publicServer.get((int)(Math.random() * publicServer.size()));
+            newSource.put("httpUrl", publicUrl + "/" + path);
+        }
+        return success(newSource);
+    }
+
+    /**
      * 文件上传 - 返回相关索引信息,以及HttpUrl下载连接(兼容旧接口)
      * @param jsonData
      * @return
@@ -125,6 +181,53 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.FastDFS.OldUpload, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "文件上传", notes = "返回相关索引信息,以及HttpUrl下载连接(兼容旧接口)")
     public Envelop upload(
+            @ApiParam(name = "jsonData", value = "文件资源", required = true)
+            @RequestBody String jsonData) throws Exception {
+        Map<String, String> paramMap = toEntity(jsonData, Map.class);
+        ObjectNode objectNode;
+        objectNode = fastDFSService.upload(paramMap);
+        String groupName = objectNode.get(FastDFSUtil.GROUP_NAME).toString();
+        String remoteFileName = objectNode.get(FastDFSUtil.REMOTE_FILE_NAME).toString();
+        //保存索引到ES库中
+        Map<String, Object> source = getIndexSource(objectNode, paramMap);
+        Map<String, Object> newSource;
+        try {
+            newSource = elasticSearchUtil.index(indexName, indexType, source);
+        } catch (Exception e) {
+            try {
+                fastDFSService.delete(groupName, remoteFileName);
+            }catch (Exception e1) {
+                throw e1;
+            }
+            throw e;
+        }
+        String path = groupName.substring(1, groupName.length() - 1) + "/" + remoteFileName.substring(1, remoteFileName.length() - 1);
+        if (null == publicServer || publicServer.isEmpty()) {
+            try {
+                publicServer = getPublicUrl().getDetailModelList();
+                if (null != publicServer && !publicServer.isEmpty()) {
+                    String publicUrl = publicServer.get((int) (Math.random() * publicServer.size()));
+                    newSource.put("httpUrl", publicUrl + "/" + path);
+                }
+            } catch (Exception e) {
+                LoggerFactory.getLogger(FastDFSEndPoint.class).error(e.getMessage());
+            }
+        } else {
+            String publicUrl = publicServer.get((int)(Math.random() * publicServer.size()));
+            newSource.put("httpUrl", publicUrl + "/" + path);
+        }
+        return success(newSource);
+    }
+
+    /**
+     * 文件上传 - 返回相关索引信息,以及HttpUrl下载连接(兼容旧接口) 开放接口
+     * @param jsonData
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = ServiceApi.FastDFS.OpenOldUpload, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "文件上传", notes = "返回相关索引信息,以及HttpUrl下载连接(兼容旧接口)")
+    public Envelop openUpload(
             @ApiParam(name = "jsonData", value = "文件资源", required = true)
             @RequestBody String jsonData) throws Exception {
         Map<String, String> paramMap = toEntity(jsonData, Map.class);
@@ -184,7 +287,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
         // 删除文件
         fastDFSService.delete(groupName, remoteFileName);
         // 删除索引
-        elasticSearchUtil.delete(indexName, indexType, id.split(","));
+        elasticSearchUtil.delete(indexName, indexType, id);
         return success(true);
     }
 
@@ -210,9 +313,9 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
         for (Map<String, Object> resultMap : resultList) {
             String id = resultMap.get("_id").toString();
             ids.append(id + ",");
-            // 删除索引
-            elasticSearchUtil.delete(indexName, indexType, ids.toString().split(","));
         }
+        // 删除索引
+        elasticSearchUtil.bulkDelete(indexName, indexType, ids.toString().split(","));
         return success(true);
     }
 
@@ -239,7 +342,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
             fastDFSService.delete(groupName, remoteFileName);
         }
         // 删除索引
-        elasticSearchUtil.delete(indexName, indexType, ids.toString().split(","));
+        elasticSearchUtil.bulkDelete(indexName, indexType, ids.toString().split(","));
         return success(true);
     }
 
@@ -288,7 +391,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
         source.put("modifyDate", nowStr);
         Map<String, Object> resultMap = elasticSearchUtil.update(indexName, indexType, _id, source);
         String newPath = groupName.substring(1, groupName.length() - 1) + "/" + remoteFileName.substring(1, remoteFileName.length() - 1);
-        if(null == publicServer || publicServer.isEmpty()) {
+        if (null == publicServer || publicServer.isEmpty()) {
             publicServer = getPublicUrl().getDetailModelList();
         }
         String publicUrl = publicServer.get((int)(Math.random() * publicServer.size()));
@@ -477,16 +580,6 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
         for (Map<String, Object> resultMap : resultList) {
             String storagePath = resultMap.get("path").toString();
             String path = storagePath.replaceAll(":", "/");
-            /**
-            try {
-                storagePath = URLEncoder.encode(storagePath,"ISO8859-1");
-            }catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-                envelop.setSuccessFlg(false);
-                envelop.setErrorMsg(e.getMessage());
-                return envelop;
-            }
-            */
             fileStrList.add(path);
         }
         return success(fileStrList);
@@ -538,7 +631,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
             Page<SystemDictEntry> page =  systemDictEntryService.findByDictId(systemDict.getId(), 0, 100);
             if (page != null) {
                 List<SystemDictEntry> systemDictEntryList = page.getContent();
-                publicServer = new ArrayList<String>(systemDictEntryList.size());
+                publicServer = new ArrayList<>(systemDictEntryList.size());
                 for (SystemDictEntry dictEntry : systemDictEntryList) {
                     publicServer.add(String.valueOf(dictEntry.getValue()));
                 }

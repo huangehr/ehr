@@ -16,7 +16,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -91,9 +90,9 @@ public class ResourceIntegratedEndPoint extends EnvelopRestEndPoint {
     }
 
     @ApiOperation("综合查询视图保存")
-    @RequestMapping(value = ServiceApi.Resources.IntResourceUpdate, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Resources.IntResourceUpdate, method = RequestMethod.POST)
     public Envelop updateResource (
-            @ApiParam(name="dataJson",value="JSON对象参数({\"resource\":\"objStr\",\"(metadatas)(quotas)\":\"[objStr]\",\"queryCondition\":\"([])({})\"})")
+            @ApiParam(name="dataJson",value="JSON对象参数({\"resource\":\"objStr\",\"(metadatas)(quotas)\":\"[objStr]\",\"queryCondition\":\"([])({})\"})", required = true)
             @RequestBody String dataJson) throws IOException {
         RsResource newResources = null;
         Map<String, Object> paraMap = objectMapper.readValue(dataJson, Map.class);
@@ -171,10 +170,10 @@ public class ResourceIntegratedEndPoint extends EnvelopRestEndPoint {
     }
 
     @ApiOperation("综合查询搜索条件更新")
-    @RequestMapping(value = ServiceApi.Resources.IntResourceQueryUpdate, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Resources.IntResourceQueryUpdate, method = RequestMethod.PUT)
     public Envelop customizeUpdate(
-            @ApiParam(name="dataJson",value="JSON对象参数({\"resourceId\":\"resourceId\",\"queryCondition\":\"([])({})\"})")
-            @RequestBody String dataJson) throws  Exception {
+            @ApiParam(name="dataJson",value="JSON对象参数({\"resourceId\":\"resourceId\",\"queryCondition\":\"([])({})\"})", required = true)
+            @RequestParam(value = "dataJson") String dataJson) throws  Exception {
         Map<String, Object> paraMap = objectMapper.readValue(dataJson, Map.class);
         if (!paraMap.containsKey("resourceId") || !paraMap.containsKey("queryCondition")) {
             return failed("参数不完整，缺少resourceId或者queryCondition");

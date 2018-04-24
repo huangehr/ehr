@@ -50,7 +50,7 @@ public class ElasticsearchUtil {
     @Autowired
     ObjectMapper objectMapper;
     @Autowired
-    private EsConfigUtil esConfigUtil;
+    private EsClientUtil esClientUtil;
     @Autowired
     private ElasticSearchPool elasticSearchPool;
 
@@ -62,12 +62,12 @@ public class ElasticsearchUtil {
      * @param sortName 排序字段名称
      * @return
      */
-    public List<Map<String, Object>> queryPageList( Client client,BoolQueryBuilder boolQueryBuilder,
+    public List<Map<String, Object>> queryPageList( Client client,String index,String type,BoolQueryBuilder boolQueryBuilder,
                                                    int pageNo,int pageSize,String sortName){
         SearchResponse actionGet = null;
         SortBuilder dealSorter = SortBuilders.fieldSort(sortName).order(SortOrder.DESC);
-        actionGet = client.prepareSearch(esConfigUtil.getIndex())
-                .setTypes(esConfigUtil.getType())
+        actionGet = client.prepareSearch(index)
+                .setTypes(type)
                 .setQuery(boolQueryBuilder)
                 .setFrom(pageNo - 1).setSize(pageSize).addSort(dealSorter)//从0开始算
                 .execute().actionGet();
@@ -83,10 +83,10 @@ public class ElasticsearchUtil {
      * @param boolQueryBuilder  查询参数 build
      * @return
      */
-    public long getTotalCount(Client client,BoolQueryBuilder boolQueryBuilder){
+    public long getTotalCount(Client client,String index,String type,BoolQueryBuilder boolQueryBuilder){
         SearchResponse actionGet = null;
-        actionGet = client.prepareSearch(esConfigUtil.getIndex())
-                .setTypes(esConfigUtil.getType())
+        actionGet = client.prepareSearch(index)
+                .setTypes(type)
                 .setQuery(boolQueryBuilder)
                 .execute().actionGet();
         SearchHits hits = actionGet.getHits();
@@ -101,7 +101,7 @@ public class ElasticsearchUtil {
      * @param sortName 排序字段名称
      * @return
      */
-    public List<Map<String, Object>> queryList(Client client,BoolQueryBuilder boolQueryBuilder,String sortName,int size){
+    public List<Map<String, Object>> queryList(Client client,String index,String type,BoolQueryBuilder boolQueryBuilder,String sortName,int size){
         SearchResponse actionGet = null;
         SortBuilder dealSorter = null;
         if(sortName != null){
@@ -109,8 +109,8 @@ public class ElasticsearchUtil {
         }else{
             dealSorter = SortBuilders.fieldSort("_id").order(SortOrder.DESC);
         }
-        actionGet = client.prepareSearch(esConfigUtil.getIndex())
-                .setTypes(esConfigUtil.getType())
+        actionGet = client.prepareSearch(index)
+                .setTypes(type)
                 .setSize(size)
                 .setQuery(boolQueryBuilder)
                 .addSort(dealSorter)
@@ -134,12 +134,12 @@ public class ElasticsearchUtil {
      * @param sumField 要求和的字段  只支持一个字段
      * @return
      */
-    public List<Map<String, Object>> searcherByGroup(Client client,BoolQueryBuilder queryBuilder, String aggsField , String sumField) {
+    public List<Map<String, Object>> searcherByGroup(Client client,String index,String type,BoolQueryBuilder queryBuilder, String aggsField , String sumField) {
 
         List<Map<String, Object>> list = new ArrayList<>();
         SearchRequestBuilder searchRequestBuilder =
-                client.prepareSearch(esConfigUtil.getIndex())
-                .setTypes(esConfigUtil.getType())
+                client.prepareSearch(index)
+                .setTypes(type)
                 .setQuery(queryBuilder);
 
         //创建TermsBuilder对象，使用term查询，设置该分组的名称为 name_count，并根据aggsField字段进行分组
@@ -235,17 +235,12 @@ public class ElasticsearchUtil {
      * @return
      * @throws JsonProcessingException
      */
-    public boolean save(Client client,String source) throws JsonProcessingException {
+    public boolean save(Client client,String index,String type,String source) throws JsonProcessingException {
         IndexResponse indexResponse = client
-                .prepareIndex(esConfigUtil.getIndex(), esConfigUtil.getType(), null)
+                .prepareIndex(index, type, null)
                 .setSource(source).get();
         boolean result =  indexResponse.isCreated();
         return result;
-    }
-
-    public void deleteById(Client client ,String id){
-        DeleteRequestBuilder drBuilder = client.prepareDelete(esConfigUtil.getIndex(), esConfigUtil.getType(), id);
-        drBuilder.execute().actionGet();
     }
 
     /**
@@ -263,7 +258,7 @@ public class ElasticsearchUtil {
         List<Map<String, Object>> matchRsult = new LinkedList<Map<String, Object>>();
         for (SearchHit hit : hits.getHits()){
             matchRsult.add(hit.getSource());
-            DeleteRequestBuilder drBuilder = client.prepareDelete(esConfigUtil.getIndex(), esConfigUtil.getType(), hit.getId());
+            DeleteRequestBuilder drBuilder = client.prepareDelete(index, type, hit.getId());
             drBuilder.execute().actionGet();
         }
     }
@@ -337,7 +332,6 @@ public class ElasticsearchUtil {
                 requestBuilder = action.explain();
             } else {
                 //封装成自己的Select对象
-//                Client client = elasticSearchPool.getClient();
                 queryAction = new DefaultQueryAction(client, select);
                 requestBuilder = queryAction.explain();
             }
@@ -365,10 +359,11 @@ public class ElasticsearchUtil {
                 }
             });
         } catch (Exception e) {
-            elasticSearchPool.releaseClient(client);
             e.printStackTrace();
+        }finally {
+//            System.out.println("ES client 连接回收 或关闭 ");
+            elasticSearchPool.releaseClient(client);
         }
-        elasticSearchPool.releaseClient(client);
         return returnModels;
     }
 
@@ -391,7 +386,6 @@ public class ElasticsearchUtil {
                 requestBuilder = action.explain();
             } else {
                 //封装成自己的Select对象
-//                Client client = elasticSearchPool.getClient();
                 queryAction = new DefaultQueryAction(client, select);
                 requestBuilder = queryAction.explain();
             }
@@ -400,13 +394,13 @@ public class ElasticsearchUtil {
             if(hits != null){
                 return hits.totalHits();
             }
-            elasticSearchPool.releaseClient(client);
             return 0;
         } catch (Exception e) {
-            elasticSearchPool.releaseClient(client);
             e.printStackTrace();
-            return 0;
+        }finally {
+            elasticSearchPool.releaseClient(client);
         }
+        return 0;
     }
 
 }
