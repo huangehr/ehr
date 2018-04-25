@@ -573,6 +573,7 @@ public class ServiceApi {
         public static final String Logout = "/oauth/logout";
         public static final String VerifyCode = "/oauth/verifyCode";
         public static final String VerifyCodeExpire = "/oauth/verifyCodeExpire";
+        public static final String VerifyCodeValidate = "/oauth/verifyCodeValidate";
     }
 
     public static class MessageRemind {
@@ -778,6 +779,7 @@ public class ServiceApi {
         public static final String UsersByTel = "/users/tel";
         public static final String H5Handshake = "/users/h5/handshake";
         public static final String UsersOfAppPhoneExistence = "/usersOfApp/user/onePhone/existence";
+        public static final String GetUserOfUsersOfApp = "/usersOfApp/users/{user_name}";
 
 
         public static final String Save = "/users/save";
