@@ -42,7 +42,7 @@ public class ResourceService {
         //存储文件记录
         fileResRepo.save(resourceBucket);
 
-        //保存MYSQL关联记录
+        //保存ES关联记录
         archiveRelationService.relation(resourceBucket);
 
         //保存居民信息记录

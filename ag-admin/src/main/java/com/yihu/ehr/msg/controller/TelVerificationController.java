@@ -76,53 +76,7 @@ public class TelVerificationController extends BaseController {
         }
         //1.2生成随机6位验证码，并存储验证信息
         Envelop result = telVerificationClient.createTelVerification(tel, appId);
-        if (result.isSuccessFlg() && null != result.getObj()) {
-            String code = "";
-            if (null != ((LinkedHashMap) result.getObj()).get("verificationCode")) {
-                code = ((LinkedHashMap) result.getObj()).get("verificationCode").toString();
-            }
-            String api = "MsgGW.Sms.send";
-            String content = "您好，短信验证码为:【" + code + "】，请在10分钟内验证！";
-            String resultStr;
-            Map<String, String> apiParamMap = new HashMap<>();
-            //手机号码
-            apiParamMap.put("mobile", tel);
-            //业务标签
-            apiParamMap.put("handlerId", handlerId);
-            //短信内容
-            apiParamMap.put("content", content);
-            //渠道号
-            apiParamMap.put("clientId", clientId);
-            //健康之路医疗基础信息接入参数AuthInfo
-            resultStr = FzGatewayUtil.httpPost(gatewayUrl, clientId, clientVersion, api, apiParamMap, 1);
-            if (resultStr != null) {
-                Map<String, Object> resultMap = objectMapper.readValue(resultStr, Map.class);
-                Integer resultCode = 0;
-                if (null != resultMap.get("Code") && !"".equals(resultMap.get("Code"))) {
-                    resultCode = Integer.valueOf(resultMap.get("Code").toString());
-                }
-                if (resultCode == 10000) {
-                    envelop.setSuccessFlg(true);
-                    envelop.setErrorMsg("短信验证码发送成功！");
-                } else if(resultCode == -201){
-                    envelop.setSuccessFlg(false);
-                    envelop.setErrorCode(resultCode);
-                    envelop.setErrorMsg("短信已达每天限制的次数（10次）！");
-                }else if(resultCode == -200){
-                    envelop.setSuccessFlg(false);
-                    envelop.setErrorCode(resultCode);
-                    envelop.setErrorMsg("短信发送频率太快（不能低于60s）！");
-                }else{
-                    envelop.setSuccessFlg(false);
-                    envelop.setErrorCode(resultCode);
-                    envelop.setErrorMsg("短信发送失败！");
-                }
-            }else{
-                envelop.setSuccessFlg(false);
-                envelop.setErrorMsg("短信验证码发送失败！");
-            }
-        }
-        return envelop;
+        return result;
     }
 
     /*
