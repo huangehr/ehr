@@ -156,8 +156,17 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
 
     @RequestMapping(value = ServiceApi.Authentication.VerifyCode, method = RequestMethod.POST)
     public ResponseEntity<Envelop> verifyCode(@RequestParam Map<String, String> parameters) throws  Exception{
+        Envelop envelop = new Envelop();
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Cache-Control", "no-store");
+        headers.set("Pragma", "no-cache");
         String client_id = parameters.get("client_id");
         String username = parameters.get("username");
+        if(StringUtils.isEmpty(username)){
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("手机号码【username】不能为空！");
+            return new ResponseEntity<>(envelop, headers, HttpStatus.OK);
+        }
         VerifyCode verifyCode = new VerifyCode();
         //手机短信验证码
         RandomUtil randomUtil = new RandomUtil();
@@ -175,7 +184,6 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
         //渠道号
         apiParamMap.put("clientId", fzClientId);
         String result = FzGatewayUtil.httpPost(fzGatewayUrl,fzClientId,fzClientVersion,api,apiParamMap, 1);
-        Envelop envelop = new Envelop();
         if (!StringUtils.isEmpty(result)) {
             Map<String, Object> resultMap = objectMapper.readValue(result, Map.class);
             Integer resultCode = 0;
@@ -208,9 +216,7 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
             envelop.setErrorCode(ErrorCode.REQUEST_NOT_COMPLETED.value());
             envelop.setErrorMsg("短信验证码发送失败！");
         }
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Cache-Control", "no-store");
-        headers.set("Pragma", "no-cache");
+
         return new ResponseEntity<>(envelop, headers, HttpStatus.OK);
     }
 
@@ -312,7 +318,6 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
             return new ResponseEntity<>(envelop, headers, HttpStatus.OK);
         }
         Object verifyCF = ehrRedisVerifyCodeService.getVerifyCodeValidate(client_id, username);
-
         if(verifyCode.equals(verifyCF.toString())){
             envelop.setSuccessFlg(true);
         }else{
