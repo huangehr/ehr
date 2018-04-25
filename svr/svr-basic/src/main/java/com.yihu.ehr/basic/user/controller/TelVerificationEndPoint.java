@@ -52,8 +52,8 @@ public class TelVerificationEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.TelVerification.TelVerificationMsgSendMsg, method = RequestMethod.POST)
     @ApiOperation(value = "创建手机验证信息", notes = "创建手机验证信息")
     public Envelop createTelVerification(
-            @ApiParam(name = "telNo", value = "", defaultValue = "")
-            @RequestParam(value = "telNo", required = false) String telNo,
+            @ApiParam(name = "tel", value = "", defaultValue = "")
+            @RequestParam(value = "tel", required = false) String tel,
             @ApiParam(name = "appId", value = "", defaultValue = "")
             @RequestParam(value = "appId", required = false) String appId) throws Exception {
         Envelop envelop = new Envelop();
@@ -71,7 +71,7 @@ public class TelVerificationEndPoint extends EnvelopRestEndPoint {
         Date effectivePeriod = new Date(currentDate.getTime() + 600000);
         UserTelVerification userTelVerification = new UserTelVerification();
         userTelVerification.setAppId(appId);
-        userTelVerification.setTelNo(telNo);
+        userTelVerification.setTelNo(tel);
         userTelVerification.setEffectivePeriod(effectivePeriod);
         userTelVerification.setVerificationCode(random);
         userTelVerification = userTelVerificationService.save(userTelVerification);
@@ -82,7 +82,7 @@ public class TelVerificationEndPoint extends EnvelopRestEndPoint {
             Map<String, String> apiParamMap = new HashMap<>();
             //发送短信
             //手机号码
-            apiParamMap.put("mobile", telNo);
+            apiParamMap.put("mobile", tel);
             //业务标签
             apiParamMap.put("handlerId", fzHandlerId);
             //短信内容
@@ -126,15 +126,15 @@ public class TelVerificationEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.TelVerification.TelVerificationMsgValidate, method = RequestMethod.GET)
     @ApiOperation(value = "验证手机验证信息", notes = "验证手机验证信息")
     public Envelop validationTelVerification(
-            @ApiParam(name = "telNo", value = "", defaultValue = "")
-            @RequestParam(value = "telNo", required = false) String telNo,
+            @ApiParam(name = "tel", value = "", defaultValue = "")
+            @RequestParam(value = "tel", required = false) String tel,
             @ApiParam(name = "appId", value = "", defaultValue = "")
             @RequestParam(value = "appId", required = false) String appId,
             @ApiParam(name = "verificationCode", value = "", defaultValue = "")
             @RequestParam(value = "verificationCode", required = false) String verificationCode) throws Exception {
 
         Envelop envelop = new Envelop();
-        Boolean result = userTelVerificationService.telValidation(telNo,verificationCode,appId);
+        Boolean result = userTelVerificationService.telValidation(tel,verificationCode,appId);
         if(result == null){
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("对不起，查不到匹配的验证码信息，请确认！");

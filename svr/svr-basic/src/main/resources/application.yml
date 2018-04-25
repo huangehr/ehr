@@ -108,11 +108,11 @@ spring:
     password: weifuwu
   # -- unknown use --
   ldap:
-      host: 172.19.103.87
-      port: 389
-      bindDn: cn=admin,dc=ehr,dc=jkzl
-      password: jkzl
-      root: dc=ehr,dc=jkzl
+    host: 172.19.103.87
+    port: 389
+    bindDn: cn=admin,dc=ehr,dc=jkzl
+    password: jkzl
+    root: dc=ehr,dc=jkzl
   # -- unknown use --
   redis:
     host: 172.19.103.47 # Redis server host.
