@@ -31,7 +31,7 @@ public class ProfileDiseaseService {
         SimpleDateFormat sd = new SimpleDateFormat("yyyyMM");
         String eventDataYear=eventData.toString().substring(0, 7).substring(0,4);
         String eventDataMonth=eventData.toString().substring(0, 7).substring(5,7);
-        String ageOfDisease = "";
+        String ageOfDisease;
         if (Integer.parseInt(sd.format(new Date()).substring(4, 6)) - Integer.parseInt(eventDataMonth)<0){
             Integer year = Integer.parseInt(sd.format(new Date()).substring(0, 4)) - Integer.parseInt(eventDataYear)-1;
             Integer month = Integer.parseInt(sd.format(new Date()).substring(4, 6))+12- Integer.parseInt(eventDataMonth);
@@ -52,41 +52,50 @@ public class ProfileDiseaseService {
         return ageOfDisease;
     }
 
-    /*
-     * @根据患者住院门诊记录做健康问题统计
+    /**
+     * 根据患者住院门诊记录做健康问题统计
+     * @param demographicId
+     * @return
      */
-    public List<Map<String, Object>> getHealthProblem(String demographicId) {
+    public List<Map<String, Object>> getHealthProblem (String demographicId) {
         List<Map<String, Object>> result = new ArrayList<>();
         //获取门诊住院记录
         Envelop envelop = resource.getMasterData("{\"q\":\"demographic_id:" + demographicId + "\"}", 1, 500, null);
+        List<Map<String, Object>> eventList = envelop.getDetailModelList();
         Map<String, List<Map<String, Object>>> hpMap = new HashedMap();
-        if (envelop.getDetailModelList() != null && envelop.getDetailModelList().size() > 0) {
-            List<Map<String, Object>> eventList = envelop.getDetailModelList();
+        if (eventList.size() > 0) {
             //进行降序
             Collections.sort(eventList, new ProfileDiseaseService.EventDateComparatorDesc());
-            for (Map<String, Object> event : eventList) {
-                if (event.containsKey(BasisConstant.healthProblem)) {
-                    String healthProblem = event.get(BasisConstant.healthProblem).toString();
-                    if (!StringUtils.isEmpty(healthProblem)) {
-                        String[] hps = healthProblem.split(";");
-                        for (String hp : hps) {
-                            List<Map<String, Object>> profileList = new ArrayList<>();
-                            if (hpMap.containsKey(hp)) {
-                                profileList = hpMap.get(hp);
+            eventList.forEach(item -> {
+                if (item.containsKey(BasisConstant.diagnosis)) {
+                    String diagnosis = (String) item.get(BasisConstant.diagnosis);
+                    String [] _diagnosis = diagnosis.split(";");
+                    for (String code : _diagnosis) {
+                        String chronicInfo = redisService.getChronicInfo(code);
+                        if (!StringUtils.isEmpty(chronicInfo)) {
+                            String [] _chronicInfo = chronicInfo.split("-");
+                            if (!"0".equals(_chronicInfo[1])) {
+                                String healthProblem = redisService.getHealthProblem(code);
+                                for (String hpCode : healthProblem.split(";")) {
+                                    List<Map<String, Object>> profileList = new ArrayList<>();
+                                    if (hpMap.containsKey(hpCode)) {
+                                        profileList = hpMap.get(code);
+                                    }
+                                    profileList.add(item);
+                                    hpMap.put(hpCode, profileList);
+                                }
                             }
-                            profileList.add(event);
-                            hpMap.put(hp, profileList);
                         }
                     }
                 }
-            }
-            for (String healthProblemCode : hpMap.keySet()) {
+            });
+            for (String hpCode : hpMap.keySet()) {
                 Map<String, Object> obj = new HashedMap();
-                obj.put("healthProblemCode", healthProblemCode);
-                obj.put("healthProblemName", redisService.getHealthProblem(healthProblemCode));
+                obj.put("healthProblemCode", hpCode);
+                obj.put("healthProblemName", redisService.getHealthProblem(hpCode));
                 int visitTimes = 0;
                 int hospitalizationTimes = 0;
-                List<Map<String, Object>> profileList = hpMap.get(healthProblemCode);
+                List<Map<String, Object>> profileList = hpMap.get(hpCode);
                 for (int i = 0; i < profileList.size(); i++) {
                     Map<String, Object> profile = profileList.get(i);
                     //事件类型
@@ -94,10 +103,10 @@ public class ProfileDiseaseService {
                     String recentEvent = "";
                     if ("0".equals(eventType)) {
                         recentEvent = "门诊";
-                        visitTimes++;
+                        visitTimes ++;
                     } else if ("1".equals(eventType)) {
                         recentEvent = "住院";
-                        hospitalizationTimes++;
+                        hospitalizationTimes ++;
                     } else if ("2".equals(eventType)) {
                         recentEvent = "体检";
                     }

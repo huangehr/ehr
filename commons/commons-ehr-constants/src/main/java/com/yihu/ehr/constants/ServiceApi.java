@@ -1593,8 +1593,8 @@ public class ServiceApi {
      * 组合福州总部的预约挂号接口为我方需要的数据结构
      */
     public static class FzCombination {
-        public static final String FindHospitalList = "/appointment/combination/findHospitalList";
-        public static final String FindDoctorList = "/appointment/combination/findDoctorList";
+        public static final String FindHospitalList = "/open/appointment/combination/findHospitalList";
+        public static final String FindDoctorList = "/open/appointment/combination/findDoctorList";
     }
 
     /**
