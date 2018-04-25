@@ -155,17 +155,34 @@ public class ProfileCDAService {
         String cdaVersion = String.valueOf(event.get("cda_version"));
         Map<String, Object> result = new HashMap<>();
         Map<String, Object> dataMap = new HashMap<>();
+        Map<String, List<MCdaDataSet>> CDADataSetMap = cdaService.getCDADataSetByCDAIdList(cdaVersion, cdaDocumentIdList);
         if (!transform) {
-            for (String cdaId : cdaDocumentIdList) {
+            for (String cdaId : CDADataSetMap.keySet()) {
+                List<MCdaDataSet> CDADataSet = CDADataSetMap.get(cdaId);
                 Map<String, Object> tempMap = new HashMap<>();
-                //主表数据
-                List<Map<String, Object>> masterList = new ArrayList<>();
-                masterList.add(event);
-                tempMap.put("master", masterList);
+                List<String> multipleDataset = new ArrayList<>();
+                if (CDADataSet != null && CDADataSet.size() > 0) {
+                    CDADataSet.forEach(item -> {
+                        String dataSetCode = item.getDataSetCode();
+                        if (item.getMultiRecord().equals("0")) {
+                            //主表数据
+                            if (tempMap.containsKey(dataSetCode)) {
+                                List<Map<String, Object>> tempList = (List<Map<String, Object>>) tempMap.get(dataSetCode);
+                                tempList.add(resourcesTransformService.stdMerge(event, dataSetCode, cdaVersion));
+                            } else {
+                                List<Map<String, Object>> tempList = new ArrayList<>();
+                                tempList.add(resourcesTransformService.stdMerge(event, dataSetCode, cdaVersion));
+                                tempMap.put(dataSetCode, tempList);
+                            }
+                        } else {
+                            multipleDataset.add(dataSetCode);
+                        }
+                    });
+                }
                 //细表数据
                 String profileId = String.valueOf(event.get("rowkey"));
                 String subQ = "{\"q\":\"profile_id:" + profileId + "\"}";
-                Envelop subData = resource.getSubData(subQ, 1, 500, null);
+                Envelop subData = resource.getSubData(subQ, 1, 2000, null);
                 List<Map<String, Object>> subList = subData.getDetailModelList();
                 subList.forEach(item -> {
                     item.put("org_area", event.get("org_area"));
@@ -181,10 +198,14 @@ public class ProfileCDAService {
                         tempMap.put(dataSetCode, tempList);
                     }
                 });
+                multipleDataset.forEach(item -> {
+                    if (!tempMap.containsKey(item)) {
+                        tempMap.put(item, new ArrayList<>());
+                    }
+                });
                 dataMap.put(cdaId, tempMap);
             }
         } else {
-            Map<String, List<MCdaDataSet>> CDADataSetMap = cdaService.getCDADataSetByCDAIdList(cdaVersion, cdaDocumentIdList);
             for (String cdaId : CDADataSetMap.keySet()) {
                 List<MCdaDataSet> CDADataSet = CDADataSetMap.get(cdaId);
                 Map<String, Object> tempMap = new HashMap<>();
