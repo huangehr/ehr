@@ -18,6 +18,39 @@ import java.util.Map;
 @Service
 public class ResourcesTransformService extends BaseJpaService {
 
+    public Map<String, Object> stdMerge (Map<String, Object> resource, String dataset, String version) {
+        Map<String, Object> returnRs =  new HashMap<>();
+        String sql = "SELECT\n" +
+                "\tram.metadata_id,\n" +
+                "\tram.src_metadata_code\n" +
+                "FROM\n" +
+                "\trs_adapter_metadata ram\n" +
+                "LEFT JOIN rs_adapter_scheme ras ON ram.scheme_id = ras.id\n" +
+                "WHERE\n" +
+                "\tras.adapter_version = :version\n" +
+                "AND ram.src_dataset_code = :dataset";
+        Session session = currentSession();
+        Query query = session.createSQLQuery(sql);
+        query.setString("version", version);
+        query.setString("dataset", dataset);
+        query.setFlushMode(FlushMode.COMMIT);
+        List<Object []> metadataList = query.list();
+        metadataList.forEach(item -> {
+            String metadataId = (String) item[0];
+            if (resource.containsKey(metadataId)) {
+                returnRs.put(metadataId, resource.get(metadataId));
+            }
+            //同时返回字典值
+            if (resource.containsKey(metadataId + "_VALUE")) {
+                returnRs.put(metadataId + "_VALUE", resource.get(metadataId + "_VALUE"));
+            }
+            returnRs.put("org_area", resource.get("org_area"));
+            returnRs.put("org_name", resource.get("org_name"));
+            returnRs.put("event_date", resource.get("event_date"));
+        });
+        return returnRs;
+    }
+
 
     public Map<String, Object> stdTransform (Map<String, Object> resource, String dataset, String version) {
         Map<String, Object> returnRs =  new HashMap<>();
