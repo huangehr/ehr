@@ -97,6 +97,7 @@ fz-gateway:
   clientId: 9000401
   clientVersion: 1.0
   secret: KU5XTORDKZI3O86YAT3ABCNJW2XTL1DJYF3GKU3ICXL
+  handlerId: 50871
 
 ---
 spring:
@@ -149,6 +150,7 @@ fz-gateway:
   clientId: 9000401
   clientVersion: 1.0
   secret: KU5XTORDKZI3O86YAT3ABCNJW2XTL1DJYF3GKU3ICXL
+  handlerId: 50871
 
 ---
 spring:
@@ -202,6 +204,7 @@ fz-gateway:
   clientId: 9000401
   clientVersion: 1.0
   secret: 9U6PBF2JM3PE1IHRJ7GEITMJHNMEHOFZQ2XUCKD9TO2
+  handlerId: 50871
 
 ---
 spring:
@@ -254,6 +257,7 @@ fz-gateway:
   clientId: 9000401
   clientVersion: 1.0
   secret: 9U6PBF2JM3PE1IHRJ7GEITMJHNMEHOFZQ2XUCKD9TO2
+  handlerId: 50871
 
 ---
 spring:
@@ -306,6 +310,7 @@ fz-gateway:
   clientId: 9000401
   clientVersion: 1.0
   secret: 9U6PBF2JM3PE1IHRJ7GEITMJHNMEHOFZQ2XUCKD9TO2
+  handlerId: 50871
 
 ---
 spring:
@@ -358,3 +363,4 @@ fz-gateway:
   clientId: 9000401
   clientVersion: 1.0
   secret: 9U6PBF2JM3PE1IHRJ7GEITMJHNMEHOFZQ2XUCKD9TO2
+  handlerId: 50871

@@ -60,6 +60,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .antMatchers("/oauth/accessToken")
                     .antMatchers("/oauth/validToken")
                     .antMatchers("/oauth/confirm_access")
+                    .antMatchers("/oauth/verifyCodeValidate")
                     .antMatchers("/oauth/verifyCode")
                     .antMatchers("/oauth/verifyCodeExpire");
         }
