@@ -36,16 +36,16 @@ public class FailTolerantTask {
     @Autowired
     private RedisTemplate<String, Serializable> redisTemplate;
 
-    @Scheduled(cron = "0 0/1 * * * ?")
+    @Scheduled(fixedDelay = 30000)
     public void delayPushTask() throws Exception {
-        List<String> esSimplePackageList = new ArrayList<>(1200);
+        List<String> esSimplePackageList = new ArrayList<>(200);
         //当解析队列为空，将数据库中状态为缓存状态的档案包加入解析队列
         if (redisTemplate.opsForList().size(RedisCollection.PackageList) <= 0) {
             List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, "archive_status=0", "+receive_date", 1, 1000);
             for (Map<String, Object> pack : resultList) {
                 String packStr = objectMapper.writeValueAsString(pack);
                 EsSimplePackage esSimplePackage = objectMapper.readValue(packStr, EsSimplePackage.class);
-                esSimplePackageList.add(objectMapper.writeValueAsString(esSimplePackage));
+                redisTemplate.opsForList().leftPush(RedisCollection.PackageList, objectMapper.writeValueAsString(esSimplePackage));
             }
         }
         //将解析状态为失败且错误次数小于三次的档案包重新加入解析队列
