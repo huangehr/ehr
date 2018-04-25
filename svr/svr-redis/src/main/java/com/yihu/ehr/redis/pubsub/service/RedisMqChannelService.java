@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.redis.pubsub.MessageCommonBiz;
 import com.yihu.ehr.redis.pubsub.dao.RedisMqChannelDao;
-import com.yihu.ehr.redis.pubsub.dao.RedisMqMessageLogDao;
 import com.yihu.ehr.redis.pubsub.dao.RedisMqPublisherDao;
 import com.yihu.ehr.redis.pubsub.entity.RedisMqChannel;
 import com.yihu.ehr.redis.pubsub.entity.RedisMqMessageLog;
@@ -26,7 +25,6 @@ import java.util.Map;
  * @date 2017/11/10 11:45
  */
 @Service
-@Transactional
 public class RedisMqChannelService extends BaseJpaService<RedisMqChannel, RedisMqChannelDao> {
 
     @Autowired
@@ -34,7 +32,7 @@ public class RedisMqChannelService extends BaseJpaService<RedisMqChannel, RedisM
     @Autowired
     RedisMqPublisherDao redisMqPublisherDao;
     @Autowired
-    RedisMqMessageLogDao redisMqMessageLogDao;
+    RedisMqMessageLogService redisMqMessageLogService;
     @Resource
     RedisTemplate<String, Object> redisTemplate;
     @Autowired
@@ -84,7 +82,6 @@ public class RedisMqChannelService extends BaseJpaService<RedisMqChannel, RedisM
      * @param message        消息
      * @return Envelop
      */
-    @Transactional(readOnly = false)
     public Envelop sendMessage(String publisherAppId, String channel, String message) {
         Envelop envelop = new Envelop();
 
@@ -106,17 +103,15 @@ public class RedisMqChannelService extends BaseJpaService<RedisMqChannel, RedisM
 
             // 记录消息
             RedisMqMessageLog redisMqMessageLog = MessageCommonBiz.newMessageLog(channel, publisherAppId, message);
-            redisMqMessageLog = redisMqMessageLogDao.save(redisMqMessageLog);
+            redisMqMessageLogService.save(redisMqMessageLog);
 
-            if (redisMqMessageLog != null) {
-                // 发布消息
-                Map<String, Object> messageMap = new HashMap<>();
-                messageMap.put("messageLogId", redisMqMessageLog.getId());
-                messageMap.put("messageContent", message);
-                redisTemplate.convertAndSend(channel, objectMapper.writeValueAsString(messageMap));
+            // 发布消息
+            Map<String, Object> messageMap = new HashMap<>();
+            messageMap.put("messageLogId", redisMqMessageLog.getId());
+            messageMap.put("messageContent", message);
+            redisTemplate.convertAndSend(channel, objectMapper.writeValueAsString(messageMap));
 
-                envelop.setSuccessFlg(true);
-            }
+            envelop.setSuccessFlg(true);
         } catch (Exception e) {
             e.printStackTrace();
             envelop.setSuccessFlg(false);
