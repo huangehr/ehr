@@ -144,7 +144,7 @@ public class ElasticSearchClient {
     public void voidUpdate (String index, String type, String id, Map<String, Object> source) throws DocumentMissingException {
         TransportClient transportClient = elasticSearchPool.getClient();
         try {
-            transportClient.prepareUpdate(index, type, id).setDoc(source).get();
+            transportClient.prepareUpdate(index, type, id).setDoc(source).setRetryOnConflict(5).get();
         } finally {
             elasticSearchPool.releaseClient(transportClient);
         }
@@ -284,7 +284,7 @@ public class ElasticSearchClient {
         } catch (Exception e) {
            e.printStackTrace();
            return new ArrayList<>();
-        }finally {
+        } finally {
             if (resultSet != null) {
                 resultSet.close();
             }
