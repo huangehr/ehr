@@ -20,7 +20,7 @@ public class Doctors {
     private String sex; // 性别(1男，2女)
     private String photo; // 医生头像
     private String skill; // 医生专长
-    private String workPortal; // 医生专长
+    private String workPortal; // 医生门户首页
     private String email; // 邮箱
     private String phone; // 联系电话
     private String secondPhone; // 备用电话

@@ -750,6 +750,7 @@ public class ServiceApi {
         public static final String DoctorEmailExistence = "/doctor/email/existence";
         public static final String DoctorsIdCardNoExistence = "/doctors/{doctor_idCardNo}/CardNoExist";
         public static final String DoctoridCardNoExistence = "/doctor/idCardNo/existence";
+        public static final String DoctorOnlyUpdateD = "/doctors/updateOnlyDoctor";
 
 
     }
@@ -1532,6 +1533,9 @@ public class ServiceApi {
         public static final String SaveLabelInfo ="/admin/surveyTemplate/saveLabelInfo";
         public static final String SaveTemplate = "/admin/surveyTemplate/saveTemplate";
         public static final String GetTemplateLabel = "/admin/surveyTemplate/getTemplateLabel/{phoneticCode}";
+        public static final String GetTemplateById = "/admin/surveyTemplate/getTemplateById";
+        public static final String DelTemplate = "/admin/surveyTemplate/delTemplate";
+
 
         public static final String GetSurveyQuestionList = "/admin/surveyQuestion/list";
         public static final String SaveSurveyQuestion = "/admin/surveyQuestion/save";
