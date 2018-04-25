@@ -1387,8 +1387,6 @@ public class ServiceApi {
             public static final String IsUniqueName = "/org/healthCategory/isUniqueName";
         }
 
-
-
     }
 
     public static class GetInfo {
