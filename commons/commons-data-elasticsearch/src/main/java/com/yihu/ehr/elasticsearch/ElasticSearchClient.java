@@ -281,7 +281,10 @@ public class ElasticSearchClient {
                 list.add(rowData);
             }
             return list;
-        } finally {
+        } catch (Exception e) {
+           e.printStackTrace();
+           return new ArrayList<>();
+        }finally {
             if (resultSet != null) {
                 resultSet.close();
             }
