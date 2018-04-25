@@ -779,7 +779,7 @@ public class ServiceApi {
         public static final String UsersByTel = "/users/tel";
         public static final String H5Handshake = "/users/h5/handshake";
         public static final String UsersOfAppPhoneExistence = "/usersOfApp/user/onePhone/existence";
-        public static final String GetUserOfUsersOfApp = "/usersOfApp/users/{user_name}";
+        public static final String GetUserOfUsersOfApp = "/usersOfApp/users/getUserOfUsersOfApp";
 
 
         public static final String Save = "/users/save";
