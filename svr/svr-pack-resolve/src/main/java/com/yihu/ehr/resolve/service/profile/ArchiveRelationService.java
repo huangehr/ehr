@@ -70,8 +70,8 @@ public class ArchiveRelationService {
             relation.setSn(prefix + "" + new Date().getTime());
             relation.setRelation_date(new Date());
             relation.setCreate_date(new Date());
-            relation.setApply_id(null);
-            relation.setCard_id(null);
+            //relation.setApply_id(null);
+            //relation.setCard_id(null);
             if (resourceBucket.isIdentifyFlag()) {
                 relation.setIdentify_flag(1);
             } else {
