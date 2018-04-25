@@ -1004,4 +1004,22 @@ public class UserEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
+    @RequestMapping(value = ServiceApi.Users.GetUserOfUsersOfApp, method = RequestMethod.GET)
+    @ApiOperation(value = "公众健康服务-根据用户身份证号码或者电话号码，获取用户")
+    public Envelop getUserOfUsersOfApp(
+            @ApiParam(name = "userName", value = "身份证号码或者电话号码", defaultValue = "")
+            @RequestParam(value = "userName") String userName) {
+        Envelop envelop = new Envelop();
+        List<User> userList = userService.getUserForLogin(userName);
+        if(null != userList && userList.size()>0){
+            User user = userList.get(0);
+            envelop.setSuccessFlg(true);
+            envelop.setObj(user);
+        }else{
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("用户不存在！");
+        }
+        return  envelop;
+    }
+
 }
