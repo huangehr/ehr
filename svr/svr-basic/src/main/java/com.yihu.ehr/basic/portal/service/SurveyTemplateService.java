@@ -57,7 +57,7 @@ public class SurveyTemplateService extends BaseJpaService<SurveyTemplate,Long> {
     @Autowired
     UserService userService;
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void saveOrUpdate(String jsonData,String loginUserId){
         JSONArray array = new JSONArray(jsonData);
 
@@ -73,7 +73,7 @@ public class SurveyTemplateService extends BaseJpaService<SurveyTemplate,Long> {
             if(!jsonObject.isNull("id")&& StringUtils.isNotBlank(jsonObject.getString("id"))){
                 surveyTemplate = this.findById(jsonObject.getLong("id"));
             }else{
-                surveyTemplate.setCode(UUID.randomUUID().toString().replaceAll("-", ""));
+                surveyTemplate.setCode(getCode());
                 surveyTemplate.setCreater(loginUserId+"");
                 surveyTemplate.setCreateTime(new Date());
                 surveyTemplate.setDel("1");
@@ -118,9 +118,11 @@ public class SurveyTemplateService extends BaseJpaService<SurveyTemplate,Long> {
                 for(Object labelObj:labelsArray){
                     JSONObject labelJson = (JSONObject)labelObj;
                     SurveyLabelInfo surveyLabelInfo = new SurveyLabelInfo();
+                    /*surveyLabelInfo.setLabel(Integer.valueOf(String.valueOf(labelJson.get("label"))));
+                    surveyLabelInfo.setUseType(Integer.valueOf(String.valueOf(labelJson.get("userType"))));*/
                     clazzReflect.formatToClazz(surveyLabelInfo,labelJson);
                     surveyLabelInfo.setRelationCode(surveyTemplate.getCode());
-                    surveyLabelInfo.setCode(UUID.randomUUID().toString().replaceAll("-", ""));
+                    surveyLabelInfo.setCode(getCode());
                     surveyLabelInfos.add(surveyLabelInfo);
                 }
             }
