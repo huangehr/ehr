@@ -154,6 +154,7 @@ public class PortalFeedbackEndPoint extends EnvelopRestEndPoint {
         envelop.setSuccessFlg(true);
         envelop.setTotalCount((int)portalFeedbackService.getCount(filters));
         envelop.setCurrPage(page);
+        envelop.setPageSize(size);
         return envelop;
     }
 
