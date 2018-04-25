@@ -1,11 +1,19 @@
 package com.yihu.ehr.profile.service;
 
-
-/**
- * 档案基础常量
- * @author hzp 2016-05-26
- */
 public class BasisConstant {
+
+    //主表字段
+    public static String rowkey = "rowkey";//主表主键
+    public static String demographicId = "demographic_id";//身份证号
+    public static String profileId = "profile_id";//细表外键profile_id
+    public static String healthProblem = "health_problem";//健康问题;分隔
+    public static String eventDate = "event_date";//事件时间
+    public static String eventType = "event_type";//事件类型
+    public static String orgCode = "org_code";//医院代码
+    public static String orgName = "org_name";//医院名称
+    public static String diagnosis = "diagnosis";//诊断代码
+
+
 
     /********** 资源代码 ******************/
     public static String patientInfo = "RS_PATIENT_INFO";//患者基本信息资源
@@ -41,16 +49,6 @@ public class BasisConstant {
 
     public static String healthIndicators = "RS_HEALTH_INDICATORS"; //健康指标
 
-    /********** 数据元 *******************/
-    public static String rowkey = "rowkey";//主表主键
-    public static String demographicId = "demographic_id";//身份证号
-    public static String profileId = "profile_id";//细表外键profile_id
-    public static String healthProblem = "health_problem";//健康问题;分隔
-    public static String eventDate = "event_date";//事件时间
-    public static String eventType = "event_type";//事件类型
-    public static String orgCode = "org_code";//医院代码
-    public static String orgName = "org_name";//医院名称
-
     public static String mzzd = "EHR_000109";//门诊诊断代码
     public static String zyzd = "EHR_000293";//住院诊断代码
     public static String cfbh = "EHR_000086";//处方编号
@@ -63,14 +61,11 @@ public class BasisConstant {
     public static String zymc = "EHR_000131";//中药名称
     public static String zysl = "EHR_000139";//中药数量
 
-
-
     public static String jyzb = "EHR_000392";//检验指标
     public static String jysj = "EHR_000384";//检验时间
 
     public static String mzfysj="EHR_000054";//门诊费用时间
     public static String zyfysj="EHR_000183";//门诊费用时间
-
 
     //处方签模板标识
     public static String xycd = "HSDC01.04"; //西药CDA_CODE

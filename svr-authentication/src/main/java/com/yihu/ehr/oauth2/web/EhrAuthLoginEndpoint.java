@@ -297,4 +297,29 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
 
     }
 
+    @RequestMapping(value = ServiceApi.Authentication.VerifyCodeValidate, method = RequestMethod.POST)
+    public ResponseEntity<Envelop> verifyCodeValidate(@RequestParam Map<String, String> parameters) throws  Exception{
+        Envelop envelop = new Envelop();
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Cache-Control", "no-store");
+        headers.set("Pragma", "no-cache");
+        String client_id = parameters.get("client_id");
+        String username = parameters.get("username");
+        String verifyCode = parameters.get("verify_code");
+        if(StringUtils.isEmpty(verifyCode)){
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("验证码不能为空！");
+            return new ResponseEntity<>(envelop, headers, HttpStatus.OK);
+        }
+        Object verifyCF = ehrRedisVerifyCodeService.getVerifyCodeValidate(client_id, username);
+
+        if(verifyCode.equals(verifyCF.toString())){
+            envelop.setSuccessFlg(true);
+        }else{
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("请输入正确的验证码！");
+        }
+        return new ResponseEntity<>(envelop, headers, HttpStatus.OK);
+    }
+
 }
