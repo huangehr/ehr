@@ -8,6 +8,7 @@ import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.portal.MPortalFeedback;
 import com.yihu.ehr.util.datetime.DateUtil;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -125,6 +126,35 @@ public class PortalFeedbackEndPoint extends EnvelopRestEndPoint {
             listResult.setTotalCount(0);
         }
         return listResult;
+    }
+
+    @RequestMapping(value = ServiceApi.PortalFeedback.pagePortalFeedback, method = RequestMethod.GET)
+    @ApiOperation(value = "公众健康服务--获取意见反馈列表", notes = "公众健康服务--根据查询条件分页获取意见反馈列表")
+    public Envelop pagePortalFeedback(
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "-submitDate")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page,
+            HttpServletRequest request,
+            HttpServletResponse response) throws ParseException {
+        Envelop  envelop = new Envelop();
+        if(StringUtils.isEmpty(sorts)){
+            sorts = "-submitDate";
+        }
+        List<PortalFeedback> portalFeedbackList = portalFeedbackService.search(fields, filters, sorts, page, size);
+        pagedResponse(request, response, portalFeedbackService.getCount(filters), page, size);
+        List<MPortalFeedback> list = (List<MPortalFeedback>) convertToModels(portalFeedbackList, new ArrayList<MPortalFeedback>(portalFeedbackList.size()), MPortalFeedback.class, fields);
+        envelop.setDetailModelList(list);
+        envelop.setSuccessFlg(true);
+        envelop.setTotalCount((int)portalFeedbackService.getCount(filters));
+        envelop.setCurrPage(page);
+        return envelop;
     }
 
 }

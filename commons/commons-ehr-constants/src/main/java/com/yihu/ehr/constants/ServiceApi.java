@@ -620,6 +620,7 @@ public class ServiceApi {
         public static final String PortalFeedback = "/portalFeedback";
         public static final String PortalFeedbackAdmin = "/portalFeedback/admin/{portalFeedback_id}";
         public static final String PortalFeedBackByUserId="/protalFeedback/findByUserId";
+        public static final String pagePortalFeedback = "/pagePortalFeedback";
     }
 
     public static class PortalLogin {
