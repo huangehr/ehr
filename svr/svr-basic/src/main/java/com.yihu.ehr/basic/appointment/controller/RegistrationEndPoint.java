@@ -3,6 +3,8 @@ package com.yihu.ehr.basic.appointment.controller;
 import com.yihu.ehr.basic.appointment.entity.Registration;
 import com.yihu.ehr.basic.appointment.service.RegistrationService;
 import com.yihu.ehr.basic.fzopen.service.OpenService;
+import com.yihu.ehr.basic.portal.model.ProtalMessageRemind;
+import com.yihu.ehr.basic.portal.service.PortalMessageRemindService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
@@ -33,6 +35,8 @@ public class RegistrationEndPoint extends EnvelopRestEndPoint {
     private RegistrationService registrationService;
     @Autowired
     private OpenService fzOpenService;
+    @Autowired
+    private PortalMessageRemindService messageRemindService;
 
     @ApiOperation("根据ID获取挂号单")
     @RequestMapping(value = ServiceApi.Registration.GetById, method = RequestMethod.GET)
@@ -225,6 +229,32 @@ public class RegistrationEndPoint extends EnvelopRestEndPoint {
 
             envelop.setObj(updateEntity);
             envelop.setSuccessFlg(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return envelop;
+    }
+
+    @ApiOperation("判断挂号是否成功")
+    @RequestMapping(value = ServiceApi.Registration.IsSuccessfullyRegister, method = RequestMethod.GET)
+    public Envelop isSuccessfullyRegister(
+            @ApiParam(value = "挂号单ID", required = true)
+            @RequestParam(value = "id") String id) {
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(false);
+        try {
+            Registration registration = registrationService.getById(id);
+            ProtalMessageRemind messageRemind = messageRemindService.getByOrderId(id);
+            Map<String, Object> message = objectMapper.readValue(messageRemind.getReceivedMessages(), Map.class);
+            Map<String, Object> dataNode = (Map<String, Object>) message.get("data");
+            if (registration.getState() == -1) {
+                // 系统取消状态，表示挂号失败。
+                envelop.setErrorMsg(dataNode.get("failMsg").toString());
+            } else {
+                envelop.setErrorMsg(dataNode.get("smsContent").toString());
+                envelop.setSuccessFlg(true);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             envelop.setErrorMsg(e.getMessage());

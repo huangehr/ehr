@@ -1578,7 +1578,6 @@ public class ServiceApi {
      */
     public static class Registration {
         public static final String Prefix = "/appointment/registration/";
-
         public static final String GetById = "/appointment/registration/{id}";
         public static final String GetByOrderId = "/appointment/registration/orderId/{orderId}";
         public static final String Search = "/appointment/registration/search";
@@ -1586,7 +1585,7 @@ public class ServiceApi {
         public static final String Update = "/appointment/registration/update";
         public static final String Delete = "/appointment/registration/delete";
         public static final String UpdateState = "/appointment/registration/updateState";
-        public static final String UpdateVisitState = "/appointment/registration/updateVisitState";
+        public static final String IsSuccessfullyRegister = "/appointment/registration/isSuccessfullyRegister";
     }
 
     /**
