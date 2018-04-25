@@ -162,7 +162,7 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
         headers.set("Pragma", "no-cache");
         String client_id = parameters.get("client_id");
         String username = parameters.get("username");
-        if(StringUtils.isEmpty(username)){
+        if (StringUtils.isEmpty(username)){
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("手机号码【username】不能为空！");
             return new ResponseEntity<>(envelop, headers, HttpStatus.OK);
@@ -198,11 +198,11 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
                 ehrRedisVerifyCodeService.store(client_id, username, random, 600000);
                 envelop.setSuccessFlg(true);
                 envelop.setObj(verifyCode);
-            }else if(resultCode == -201){
+            } else if(resultCode == -201){
                 envelop.setSuccessFlg(false);
                 envelop.setErrorCode(resultCode);
                 envelop.setErrorMsg("短信已达每天限制的次数（10次）！");
-            }else if(resultCode == -200){
+            } else if(resultCode == -200){
                 envelop.setSuccessFlg(false);
                 envelop.setErrorCode(resultCode);
                 envelop.setErrorMsg("短信发送频率太快（不能低于60s）！");
@@ -216,7 +216,6 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
             envelop.setErrorCode(ErrorCode.REQUEST_NOT_COMPLETED.value());
             envelop.setErrorMsg("短信验证码发送失败！");
         }
-
         return new ResponseEntity<>(envelop, headers, HttpStatus.OK);
     }
 
@@ -234,6 +233,31 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
         headers.set("Pragma", "no-cache");
         return new ResponseEntity<>(verifyCode, headers, HttpStatus.OK);
     }
+
+    @RequestMapping(value = ServiceApi.Authentication.VerifyCodeValidate, method = RequestMethod.POST)
+    public ResponseEntity<Envelop> verifyCodeValidate(@RequestParam Map<String, String> parameters) throws  Exception{
+        Envelop envelop = new Envelop();
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Cache-Control", "no-store");
+        headers.set("Pragma", "no-cache");
+        String client_id = parameters.get("client_id");
+        String username = parameters.get("username");
+        String verifyCode = parameters.get("verify_code");
+        if (StringUtils.isEmpty(verifyCode)){
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("验证码不能为空！");
+            return new ResponseEntity<>(envelop, headers, HttpStatus.OK);
+        }
+        boolean _verify = ehrRedisVerifyCodeService.verification(client_id, username, verifyCode);
+        if (_verify){
+            envelop.setSuccessFlg(true);
+        } else {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("请输入正确的验证码！");
+        }
+        return new ResponseEntity<>(envelop, headers, HttpStatus.OK);
+    }
+
 
     @Override
     protected TokenGranter getTokenGranter() {
@@ -301,30 +325,6 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
                 HttpStatus.valueOf(authenticationFailed.getErrorCode()));
         return response;
 
-    }
-
-    @RequestMapping(value = ServiceApi.Authentication.VerifyCodeValidate, method = RequestMethod.POST)
-    public ResponseEntity<Envelop> verifyCodeValidate(@RequestParam Map<String, String> parameters) throws  Exception{
-        Envelop envelop = new Envelop();
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Cache-Control", "no-store");
-        headers.set("Pragma", "no-cache");
-        String client_id = parameters.get("client_id");
-        String username = parameters.get("username");
-        String verifyCode = parameters.get("verify_code");
-        if(StringUtils.isEmpty(verifyCode)){
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("验证码不能为空！");
-            return new ResponseEntity<>(envelop, headers, HttpStatus.OK);
-        }
-        Object verifyCF = ehrRedisVerifyCodeService.getVerifyCodeValidate(client_id, username);
-        if(verifyCode.equals(verifyCF.toString())){
-            envelop.setSuccessFlg(true);
-        }else{
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("请输入正确的验证码！");
-        }
-        return new ResponseEntity<>(envelop, headers, HttpStatus.OK);
     }
 
 }
