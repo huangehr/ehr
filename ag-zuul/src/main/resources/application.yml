@@ -9,6 +9,7 @@ info:
 
 zuul:
   ignored-services: '*'
+  sensitive-headers:
   routes:
     svr-dfs:
       path: /dfs/**
