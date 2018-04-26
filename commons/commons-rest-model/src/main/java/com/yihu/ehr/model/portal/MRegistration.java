@@ -37,6 +37,7 @@ public class MRegistration implements Serializable {
     public Integer originType; // 来源类型，1：PC，2：APP
     public Integer registerType; // 挂号方式，1：预约挂号，2：现场挂号
     public String registerTypeDesc; // 挂号方式描述
+    public String id; // 第三方订单号
 
     public String getOrderId() {
         return orderId;
@@ -260,5 +261,13 @@ public class MRegistration implements Serializable {
 
     public void setRegisterTypeDesc(String registerTypeDesc) {
         this.registerTypeDesc = registerTypeDesc;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

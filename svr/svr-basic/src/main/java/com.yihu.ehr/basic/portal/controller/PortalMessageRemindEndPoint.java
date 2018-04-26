@@ -223,7 +223,7 @@ public class PortalMessageRemindEndPoint extends EnvelopRestEndPoint {
                     Map<String,Object> dataMap = (Map<String, Object>) list.getList().get(i);
                     MRegistration newEntity = objectMapper.readValue(toJson(dataMap), MRegistration.class);
                     //根据订单号获取 消息
-                    List<ProtalMessageRemind> protalMessageR=  messageRemindService.findByField("orderId",newEntity.getOrderId());
+                    List<ProtalMessageRemind> protalMessageR=  messageRemindService.findByField("orderId",newEntity.getId());
                     mMessageRemind =new MMessageRemind();
                     mMessageRemind.setmRegistration(convertToModel(newEntity, MRegistration.class));
                     if(null != protalMessageR && protalMessageR.size()>0){
@@ -231,6 +231,7 @@ public class PortalMessageRemindEndPoint extends EnvelopRestEndPoint {
                     mMessageRemind.setId(Long.parseLong(protalMessageR.get(0).getId().toString()));
                     mMessageRemind.setOrderId(newEntity.getOrderId());
                     mMessageRemind.setNotifieFlag(protalMessageR.get(0).getNotifieFlag());
+                    mMessageRemind.setPortalMessagerTemplateType(protalMessageR.get(0).getPortalMessagerTemplateType());
                     }
                     messageRemindList.add(mMessageRemind);
                 }

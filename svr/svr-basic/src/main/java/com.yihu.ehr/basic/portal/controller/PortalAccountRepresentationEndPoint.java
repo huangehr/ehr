@@ -1,31 +1,21 @@
 package com.yihu.ehr.basic.portal.controller;
 
-import com.yihu.ehr.basic.portal.model.PortalAccountRepresentation;
 import com.yihu.ehr.basic.portal.service.PortalAccountRepresentationService;
-import com.yihu.ehr.basic.util.CaptchaUtil;
 import com.yihu.ehr.basic.util.IdcardValidator;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.model.common.Result;
 import com.yihu.ehr.util.http.RandomValidateCode;
-import com.yihu.ehr.util.rest.Envelop;
-import com.yihu.ehr.util.validate.IdCardValidator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.catalina.servlet4preview.http.HttpServletRequest;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileOutputStream;
 
 /**
  * Created by zhangdan on 2018/4/19.
@@ -34,7 +24,7 @@ import java.io.FileOutputStream;
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
 @Api(value = "account", description = "账号相关业务", tags = {"医生工作平台-账号相关业务"})
-public class PortalAccountRepresentationController extends EnvelopRestEndPoint {
+public class PortalAccountRepresentationEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     private PortalAccountRepresentationService portalAccountRepresentationService;

@@ -45,8 +45,8 @@ public class PortalMessageRemindService extends BaseJpaService<ProtalMessageRemi
      * @param orderId 医疗云挂号单ID
      * @return
      */
-    public ProtalMessageRemind getByOrderId(String orderId) {
-        return messageRemindRepository.getByOrderId(orderId);
+    public List<ProtalMessageRemind> getByOrderId(String orderId) {
+        return messageRemindRepository.getByOrderIdOrderByCreateDateDesc(orderId);
     }
 
     /**
@@ -98,13 +98,10 @@ public class PortalMessageRemindService extends BaseJpaService<ProtalMessageRemi
         String sql ="";
         //我的就诊-列表，获取就诊时间前的数据
         if(StringUtils.isNotEmpty(type) && type.equals("101")){
-            sql = "SELECT re.order_id AS orderId,re.order_create_time AS orderCreateTime,re.patient_name AS patientName,re.hospital_name AS hospitalName,re.dept_name AS deptName,re.doctor_name AS doctorName,re.state AS state,re.state_desc AS stateDesc,re.register_date AS registerDate,re.visit_clinic_result AS visitClinicResult,re.visit_clinic_result_desc AS visitClinicResultDesc,re.time_id AS timeId,re.time_id_desc AS timeIdDesc,re.invalid_date AS invalidDate,re.create_date AS createDate,re.register_type AS registerType,re.register_type_desc AS registerTypeDesc,re.serial_no  AS serialNo  " +
-                    "FROM registration re JOIN portal_message_remind p ON re.order_id = p.order_id " +
-                    "JOIN portal_message_template pt ON p.message_template_id = pt.id " +
-                  " where  pt.state='0' and pt.type='"+type+"'"+" AND pt.classification='0'"+
-                    " AND p.type_id='" +typeId+"'" +
-                    " AND p.to_user_id='" +toUserId+"' " +" AND p.app_id='" +appId+"' " +" AND re.state='2'"+
-                    " AND re.register_date >= '"+ date +"' "+ notifieSql+" order by p.create_date desc ";
+            sql = "SELECT re.id AS id, re.order_id AS orderId,re.order_create_time AS orderCreateTime,re.patient_name AS patientName,re.hospital_name AS hospitalName,re.dept_name AS deptName,re.doctor_name AS doctorName,re.state AS state,re.state_desc AS stateDesc,re.register_date AS registerDate,re.visit_clinic_result AS visitClinicResult,re.visit_clinic_result_desc AS visitClinicResultDesc,re.time_id AS timeId,re.time_id_desc AS timeIdDesc,re.invalid_date AS invalidDate,re.create_date AS createDate,re.register_type AS registerType,re.register_type_desc AS registerTypeDesc,re.serial_no  AS serialNo  " +
+                    "FROM registration re  " +
+                  " where   re.user_id='" +toUserId+"' " +" AND re.state='2'"+
+                    " AND re.register_date >= '"+ date +"' "+" order by re.register_date desc ";
         }else if(StringUtils.isNotEmpty(type )&& type.equals("100")){
             //满意度调查，获取待评价消息
             sql = "select p.id AS id, p.app_id AS appId, p.app_name AS appName, p.from_user_id AS fromUserId, p.type_id AS typeId, p.content AS content, p.work_uri AS workUri, p.readed AS readed, p.create_date AS createDate, p.to_user_id AS toUserId, p.message_template_id AS messageTemplateId, p.received_messages AS receivedMessages, p.order_id AS orderId, p.visit_time AS visitTime, p.notifie_flag AS notifieFlag, p.portal_messager_template_type AS  portalMessagerTemplateType " +
