@@ -77,7 +77,9 @@ public class RsResourceStatisticsController extends ExtendController {
             @ApiParam(name = "resourceId", value = "资源ID", defaultValue = "")
             @RequestParam(value = "resourceId") String resourceId,
             @ApiParam(name = "filters", value = "检索条件 多个条件用 and 拼接 如：town=361002 and org=10000001 ", defaultValue = "")
-            @RequestParam(value = "filters", required = false) String filters){
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "top", value = "获取前几条数据")
+            @RequestParam(value = "top", required = false) String top){
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
         Envelop resourceResult =  resourcesClient.getResourceById(resourceId);
@@ -94,7 +96,7 @@ public class RsResourceStatisticsController extends ExtendController {
             }
         }
         RsResourcesModel rsResourcesModel = objectMapper.convertValue(resourceResult.getObj(), RsResourcesModel.class);
-        List<Map<String, Object>> resultList = rsResourceStatisticsClient.getQuotaReportTwoDimensionalTable(quotaCodeStr, filters, rsResourcesModel.getDimension());
+        List<Map<String, Object>> resultList = rsResourceStatisticsClient.getQuotaReportTwoDimensionalTable(quotaCodeStr, filters, rsResourcesModel.getDimension(), top);
         envelop.setObj(resultList);
         envelop.setSuccessFlg(true);
         return  envelop;
