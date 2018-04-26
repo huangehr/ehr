@@ -1,12 +1,26 @@
 package com.yihu.ehr.analyze.service.pack;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.elasticsearch.ElasticSearchPool;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
+import org.elasticsearch.action.search.SearchRequestBuilder;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.search.SearchType;
+import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.search.aggregations.AggregationBuilder;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramBuilder;
+import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
+import org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
+import org.elasticsearch.search.aggregations.bucket.terms.LongTerms;
+import org.elasticsearch.search.aggregations.metrics.cardinality.CardinalityBuilder;
+import org.elasticsearch.search.aggregations.metrics.cardinality.InternalCardinality;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -32,6 +46,8 @@ public class PackStatisticsService extends BaseJpaService {
     @Autowired
     private ElasticSearchUtil elasticSearchUtil;
 
+    @Autowired
+    private ElasticSearchPool elasticSearchPool;
     /**
      * getRecieveOrgCount 根据接收日期统计各个医院的数据解析情况
      *
@@ -148,95 +164,85 @@ public class PackStatisticsService extends BaseJpaService {
      * @param date
      * @return
      */
-    public List<Map<String,Object>> getArchivesInc(String date,String orgCode) {
-        Date begin = DateUtil.parseDate(date, DateUtil.DEFAULT_DATE_YMD_FORMAT);
-        Date end = DateUtil.addDate(1, begin);
-        StringBuffer sql = new StringBuffer();
-        sql.append(" SELECT");
-        sql.append(" 	sum(");
-        sql.append(" 		CASE");
-        sql.append(" 		WHEN event_type = 1 THEN");
-        sql.append(" 			1");
-        sql.append(" 		ELSE");
-        sql.append(" 			0");
-        sql.append(" 		END");
-        sql.append(" 	) inpatient_total,");
-        sql.append(" 	sum(");
-        sql.append(" 		CASE");
-        sql.append(" 		WHEN event_type = 0 THEN");
-        sql.append(" 			1");
-        sql.append(" 		ELSE");
-        sql.append(" 			0");
-        sql.append(" 		END");
-        sql.append(" 	) oupatient_total,");
-        sql.append(" 	inpatient_inc,");
-        sql.append(" 	oupatient_inc,");
-        sql.append(" 	ed");
-        sql.append(" FROM");
-        sql.append(" 	(");
-        sql.append(" 		SELECT DISTINCT");
-        sql.append(" 			t2.org_code,");
-        sql.append(" 			t2.patient_id,");
-        sql.append(" 			t2.event_no,");
-        sql.append(" 			t2.event_type,");
-        sql.append(" 			t3.ed,");
-        sql.append(" 			t3.inpatient_inc,");
-        sql.append(" 			t3.oupatient_inc");
-        sql.append(" 		FROM");
-        sql.append(" 			json_archives t2,");
-        sql.append(" 			(");
-        sql.append(" 				SELECT");
-        sql.append(" 					sum(");
-        sql.append(" 						CASE");
-        sql.append(" 						WHEN event_type = 1 THEN");
-        sql.append(" 							1");
-        sql.append(" 						ELSE");
-        sql.append(" 							0");
-        sql.append(" 						END");
-        sql.append(" 					) inpatient_inc,");
-        sql.append(" 					sum(");
-        sql.append(" 						CASE");
-        sql.append(" 						WHEN event_type = 0 THEN");
-        sql.append(" 							1");
-        sql.append(" 						ELSE");
-        sql.append(" 							0");
-        sql.append(" 						END");
-        sql.append(" 					) oupatient_inc,");
-        sql.append(" 					ed");
-        sql.append(" 				FROM");
-        sql.append(" 					(");
-        sql.append(" 						SELECT DISTINCT");
-        sql.append(" 							org_code,");
-        sql.append(" 							patient_id,");
-        sql.append(" 							event_no,");
-        sql.append(" 							event_type,");
-        sql.append(" 							DATE(t.event_date) ed");
-        sql.append(" 						FROM");
-        sql.append(" 							json_archives t");
-        sql.append(" 						WHERE");
-        sql.append(" 							t.receive_date >= '" + DateUtil.toString(begin) +"'");
-        sql.append(" 						AND t.receive_date < '" + DateUtil.toString(end) +"'");
-        if(StringUtils.isNotEmpty(orgCode)&&!"null".equals(orgCode)){
-            sql.append(" AND t.org_code='"+orgCode+"'");
+    public List<Map<String,Object>> getArchivesInc(String date,String orgCode) throws Exception{
+        List<Map<String, Object>> list = getIncCount(date, orgCode);
+        if(!list.isEmpty()){
+            for(Map<String, Object> map : list){
+                if(map.get("inpatient_inc")==null){
+                    map.put("inpatient_inc",0);
+                }
+                if(map.get("oupatient_inc")==null){
+                    map.put("oupatient_inc",0);
+                }
+                map.putAll(getPatientCount(map.get("ed").toString(),orgCode));
+            }
         }
-        sql.append(" 					) t1");
-        sql.append(" 				GROUP BY");
-        sql.append(" 					ed");
-        sql.append(" 			) t3");
-        sql.append(" 		WHERE");
-        sql.append(" 			DATE(t2.event_date) = t3.ed ");
-        if(StringUtils.isNotEmpty(orgCode)&&!"null".equals(orgCode)){
-            sql.append(" AND t2.org_code='"+orgCode+"'");
-        }
-        sql.append(" 	) t4");
-        sql.append(" GROUP BY");
-        sql.append(" 	inpatient_inc,");
-        sql.append(" 	oupatient_inc,");
-        sql.append(" 	ed");
-        sql.append(" 	order by ed");
-        return jdbcTemplate.queryForList(sql.toString());
+        return list;
     }
 
+
+    public List<Map<String, Object>> getIncCount(String date,String orgCode) throws Exception{
+        List<Map<String, Object>> list = new ArrayList<>();
+        Map<String, Object> map = new HashMap<>();
+        map.put("andOr", "and");
+        map.put("condition", ">=");
+        map.put("field", "receive_date");
+        map.put("value", ""+date+" 00:00:00");
+        list.add(map);
+        map = new HashMap<>();
+        map.put("andOr", "and");
+        map.put("condition", "<");
+        map.put("field", "receive_date");
+        map.put("value", ""+date+" 23:59:59");
+        if(StringUtils.isNotEmpty(orgCode)&&!"null".equals(orgCode)){
+            map = new HashMap<>();
+            map.put("andOr", "and");
+            map.put("condition", "=");
+            map.put("field", "org_code");
+            map.put("value", orgCode);
+        }
+        list.add(map);
+        TransportClient transportClient = elasticSearchPool.getClient();
+        try {
+            List<Map<String, Object>> resultList = new ArrayList<>();
+            SearchRequestBuilder builder = transportClient.prepareSearch("json_archives");
+            builder.setTypes("info");
+            builder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
+            builder.setQuery(elasticSearchUtil.getQueryBuilder(list));
+            DateHistogramBuilder dateHistogramBuilder = new DateHistogramBuilder("date");
+            dateHistogramBuilder.field("event_date");
+            dateHistogramBuilder.interval(DateHistogramInterval.DAY);
+            dateHistogramBuilder.format("yyyy-MM-dd");
+            dateHistogramBuilder.minDocCount(0);
+            AggregationBuilder terms = AggregationBuilders.terms("terms").field("event_type");
+            CardinalityBuilder cardinality = AggregationBuilders.cardinality("cardinality").field("event_no");
+            terms.subAggregation(cardinality);
+            dateHistogramBuilder.subAggregation(terms);
+            builder.addAggregation(dateHistogramBuilder);
+            builder.setSize(0);
+            builder.setExplain(true);
+            SearchResponse response = builder.get();
+            Histogram histogram = response.getAggregations().get("date");
+            histogram.getBuckets().forEach(item1 -> {
+                Map<String, Object> temp = new HashMap<>();
+                temp.put("ed", item1.getKeyAsString());
+                LongTerms term = item1.getAggregations().get("terms");
+                term.getBuckets().forEach(item2 -> {
+                    InternalCardinality internalCard = item2.getAggregations().get("cardinality");
+                    System.out.println(internalCard.getProperty("value"));
+                    if((Long)item2.getKey()==0){
+                        temp.put("inpatient_inc",internalCard.getProperty("value"));
+                    }else{
+                        temp.put("oupatient_inc",internalCard.getProperty("value"));
+                    }
+                });
+                resultList.add(temp);
+            });
+            return resultList;
+        } finally {
+            elasticSearchPool.releaseClient(transportClient);
+        }
+    }
     /**
      * 完整性分析
      * @param startDate
@@ -476,8 +482,7 @@ public class PackStatisticsService extends BaseJpaService {
                 map.put("value", orgCode);
                 list.add(map);
             }
-            String filter = objectMapper.writeValueAsString(list);
-            List<Map<String, Object>> res = elasticSearchUtil.list("qc","daily_report",filter);
+            List<Map<String, Object>> res = elasticSearchUtil.list("qc","daily_report",list);
             if(res!=null && res.size()>0){
                 for(Map<String,Object> report : res){
                     total+=Integer.parseInt(report.get("HSI07_01_001").toString());
