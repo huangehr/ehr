@@ -68,7 +68,6 @@ public class RandomValidateCode  {
         session.removeAttribute(RANDOMCODEKEY);
         session.setAttribute(RANDOMCODEKEY, randomString);
         System.out.println(randomString);
-        System.out.println("sessionId----"+session.getId());
         response.addCookie(new Cookie(RANDOMCODEKEY,randomString));
         g.dispose();
         try {

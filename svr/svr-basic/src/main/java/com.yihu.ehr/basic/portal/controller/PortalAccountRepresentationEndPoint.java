@@ -82,7 +82,6 @@ public class PortalAccountRepresentationEndPoint extends EnvelopRestEndPoint {
         if (StringUtils.isEmpty(code)){
             return Result.error("请输入验证码！");
         }
-        System.out.println("检验sessionId----"+request.getSession().getId());
         String codeRescource = String.valueOf(request.getSession().getAttribute(RandomValidateCode.RANDOMCODEKEY));
         if (code.toLowerCase().equals(codeRescource.toLowerCase())){
             request.getSession().removeAttribute(RandomValidateCode.RANDOMCODEKEY);
