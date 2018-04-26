@@ -320,6 +320,8 @@ public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
                     msg = mH5Message.getData().get("failMsg").toString();
                 }
                 appPushMessageService.pushMessageToSingle(thirdPartyUserId,title,msg,"");
+                appPushMessageService.pushMessageTransimssion(thirdPartyUserId,title,msg);
+
             } else{
                 //失败
                 retMap.put("status","1");
