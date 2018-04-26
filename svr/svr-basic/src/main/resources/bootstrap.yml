@@ -1,6 +1,6 @@
 spring:
   application:
-    name: svr-basic-zd
+    name: svr-basic
 
 ---
 spring:
