@@ -269,6 +269,7 @@ public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
                newEntity.setModifyDate(new Date(System.currentTimeMillis()));
                registrationService.save(newEntity);
            } else {
+               //app端使用总部挂号系统，本地不存在订单，需要根据第三方用户id和创建订单时间去获取订单，在本地保存订单信息。
                MProtalOrderMessage mProtalOrderMessage = openServiceGetOrderInfo(thirdPartyUserId,timestamp);
                if(null != mProtalOrderMessage && mProtalOrderMessage.getTotal()>0) {
                    String str = toJson(mProtalOrderMessage.getResult().get(0));
