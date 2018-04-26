@@ -112,7 +112,7 @@ public class PortalAccountRepresentationEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "修改密码", notes = "根基传入的用户id和新的密码修改用户的密码")
     public boolean changePassWord(
             @ApiParam(name = "user_id", value = "user_id", defaultValue = "")
-            @PathVariable(value = "user_id") String userId,
+            @RequestParam(value = "user_id") String userId,
             @ApiParam(name = "password", value = "密码", defaultValue = "")
             @RequestParam(value = "password") String password) throws Exception {
         String hashPassWord = DigestUtils.md5Hex(password);
