@@ -19,6 +19,6 @@ public interface PortalMessageRemindRepository extends PagingAndSortingRepositor
     @Query(value = "select p.* from portal_message_remind p order by p.create_date desc limit 10 ",nativeQuery = true)
     List<ProtalMessageRemind> getMessageRemindTop10();
 
-    ProtalMessageRemind getByOrderId(@Param("orderId") String orderId);
+    List<ProtalMessageRemind> getByOrderIdOrderByCreateDateDesc(@Param("orderId") String orderId);
 
 }

@@ -245,15 +245,17 @@ public class RegistrationEndPoint extends EnvelopRestEndPoint {
         envelop.setSuccessFlg(false);
         try {
             Registration registration = registrationService.getById(id);
-            ProtalMessageRemind messageRemind = messageRemindService.getByOrderId(id);
-            Map<String, Object> message = objectMapper.readValue(messageRemind.getReceivedMessages(), Map.class);
-            Map<String, Object> dataNode = (Map<String, Object>) message.get("data");
-            if (registration.getState() == -1) {
-                // 系统取消状态，表示挂号失败。
-                envelop.setErrorMsg(dataNode.get("failMsg").toString());
-            } else {
-                envelop.setErrorMsg(dataNode.get("smsContent").toString());
-                envelop.setSuccessFlg(true);
+            ProtalMessageRemind messageRemind = messageRemindService.getByOrderId(id).get(0);
+            if (messageRemind != null) {
+                Map<String, Object> message = objectMapper.readValue(messageRemind.getReceivedMessages(), Map.class);
+                Map<String, Object> dataNode = (Map<String, Object>) message.get("data");
+                if (registration.getState() == -1) {
+                    // 系统取消状态，表示挂号失败。
+                    envelop.setErrorMsg(dataNode.get("failMsg").toString());
+                } else {
+                    envelop.setErrorMsg(dataNode.get("smsContent").toString());
+                    envelop.setSuccessFlg(true);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
