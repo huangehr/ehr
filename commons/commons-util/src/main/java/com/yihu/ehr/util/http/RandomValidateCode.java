@@ -4,6 +4,7 @@ package com.yihu.ehr.util.http;
  * Created by progr1mmer on 2018/2/5.
  */
 import javax.imageio.ImageIO;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -67,6 +68,8 @@ public class RandomValidateCode  {
         session.removeAttribute(RANDOMCODEKEY);
         session.setAttribute(RANDOMCODEKEY, randomString);
         System.out.println(randomString);
+        System.out.println("sessionId----"+session.getId());
+        response.addCookie(new Cookie(RANDOMCODEKEY,randomString));
         g.dispose();
         try {
             ImageIO.write(image, "JPEG", response.getOutputStream());//将内存中的图片通过流动形式输出到客户端
