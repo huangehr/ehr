@@ -5,9 +5,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Date;
 import java.util.List;
-
-import static com.yihu.ehr.constants.ServiceApi.Resources.Param;
 
 /**
  * @author HZY
@@ -19,6 +18,7 @@ public interface PortalMessageRemindRepository extends PagingAndSortingRepositor
     @Query(value = "select p.* from portal_message_remind p order by p.create_date desc limit 10 ",nativeQuery = true)
     List<ProtalMessageRemind> getMessageRemindTop10();
 
-    List<ProtalMessageRemind> getByOrderIdOrderByCreateDateDesc(@Param("orderId") String orderId);
+    @Query(value = "SELECT * FROM portal_message_remind WHERE order_id = :orderId AND create_date >= :recentDate ORDER BY create_date DESC limit 1 ", nativeQuery = true)
+    List<ProtalMessageRemind> getRecentOneByOrderId(@Param("orderId") String orderId, @Param("recentDate") Date recentDate);
 
 }
