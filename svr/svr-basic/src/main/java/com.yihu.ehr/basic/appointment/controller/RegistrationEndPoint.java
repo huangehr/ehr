@@ -16,6 +16,7 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -244,12 +245,21 @@ public class RegistrationEndPoint extends EnvelopRestEndPoint {
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
         try {
-            // 延迟一秒，以便调用总部创建预约接口之后，处理总部推送过来的消息，确保挂号单数据同步了。
-            Thread.sleep(1);
-
             Registration registration = registrationService.getById(id);
-            List<ProtalMessageRemind> messageRemindList = messageRemindService.getByOrderId(id);
-            if (messageRemindList.size() > 0 ) {
+
+            long startTime = System.currentTimeMillis();
+            // 轮询获取总部推送过来的最新挂号消息
+            List<ProtalMessageRemind> messageRemindList = new ArrayList<>();
+            while (messageRemindList.size() == 0) {
+                messageRemindList = messageRemindService.getRecentOneByOrderId(id, registration.getModifyDate());
+                // 当超过一定时间结束轮询
+                if ((System.currentTimeMillis() - startTime) > 300000) {
+                    envelop.setErrorMsg("已经过了5分钟，没有获取到预约挂号成功与否的推送消息，请稍后查看就诊历史记录。");
+                    break;
+                }
+            }
+
+            if (messageRemindList.size() > 0) {
                 Map<String, Object> message = objectMapper.readValue(messageRemindList.get(0).getReceivedMessages(), Map.class);
                 Map<String, Object> dataNode = (Map<String, Object>) message.get("data");
                 if (registration.getState() == -1) {

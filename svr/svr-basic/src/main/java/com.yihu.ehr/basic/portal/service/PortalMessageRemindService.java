@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -41,12 +42,12 @@ public class PortalMessageRemindService extends BaseJpaService<ProtalMessageRemi
     }
 
     /**
-     * 根据挂号单ID获取消息内容
+     * 根据挂号单ID获取最近的消息内容
      * @param orderId 医疗云挂号单ID
      * @return
      */
-    public List<ProtalMessageRemind> getByOrderId(String orderId) {
-        return messageRemindRepository.getByOrderIdOrderByCreateDateDesc(orderId);
+    public List<ProtalMessageRemind> getRecentOneByOrderId(String orderId, Date recentDate) {
+        return messageRemindRepository.getRecentOneByOrderId(orderId, recentDate);
     }
 
     /**
