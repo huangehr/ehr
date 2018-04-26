@@ -1,6 +1,5 @@
 package com.yihu.ehr.basic.user.controller;
 
-import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.yihu.ehr.basic.org.model.OrgDept;
 import com.yihu.ehr.basic.org.model.OrgMemberRelation;
@@ -16,7 +15,6 @@ import com.yihu.ehr.basic.user.service.DoctorService;
 import com.yihu.ehr.basic.user.service.RoleUserService;
 import com.yihu.ehr.basic.user.service.RolesService;
 import com.yihu.ehr.basic.user.service.UserService;
-import com.yihu.ehr.basic.util.MapUtill;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
@@ -43,10 +41,11 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.text.ParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 2017-02-04 add  by hzp
@@ -142,36 +141,46 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
         doctor.setDeptName(orgDept.getName());
         Doctors d= doctorService.save(doctor);
 
-        //创建账户
-        User user =new User();
-        user.setId(getObjectId(BizObject.User));
-        user.setCreateDate(new Date());
-        String defaultPassword="";
-        if(!StringUtils.isEmpty(doctor.getIdCardNo())&&doctor.getIdCardNo().length()>9){
-            defaultPassword=doctor.getIdCardNo().substring(doctor.getIdCardNo().length()-8);
-            user.setPassword(DigestUtils.md5Hex(defaultPassword));
-        }else{
-            user.setPassword(DigestUtils.md5Hex(default_password));
+        String idCardNo = d.getIdCardNo();
+        User user = null;
+        if(!StringUtils.isEmpty(idCardNo)){
+            //通过身份证 判断居民是否存在
+            user = userManager.getUserByIdCardNo(idCardNo);
         }
-        if(StringUtils.isEmpty(d.getRoleType())){
-            user.setUserType("5");
+        String defaultPassword ="";
+        if(user == null){
+            user =new User();
+            user.setId(getObjectId(BizObject.User));
+            user.setCreateDate(new Date());
+            if(!StringUtils.isEmpty(doctor.getIdCardNo())&&doctor.getIdCardNo().length()>9){
+                defaultPassword=doctor.getIdCardNo().substring(doctor.getIdCardNo().length()-8);
+                user.setPassword(DigestUtils.md5Hex(defaultPassword));
+            }else{
+                user.setPassword(DigestUtils.md5Hex(default_password));
+            }
+            if(StringUtils.isEmpty(d.getRoleType())){
+                user.setUserType("5");
+            }else{
+                user.setUserType(d.getRoleType());
+            }
+            user.setIdCardNo(d.getIdCardNo());
+            user.setDoctorId(d.getId().toString());
+            user.setEmail(d.getEmail());
+            user.setGender(d.getSex());
+            user.setTelephone(d.getPhone());
+            user.setLoginCode(d.getIdCardNo());
+            user.setRealName(d.getName());
+            user.setProvinceId(0);
+            user.setCityId(0);
+            user.setAreaId(0);
+            user.setActivated(true);
+            user.setImgRemotePath(d.getPhoto());
+            user = userManager.saveUser(user);
         }else{
-          user.setUserType(d.getRoleType());
+            //todo 是否修改user信息
+            //......
+            defaultPassword = user.getPassword();
         }
-        user.setIdCardNo(d.getIdCardNo());
-        user.setDoctorId(d.getId().toString());
-        user.setEmail(d.getEmail());
-        user.setGender(d.getSex());
-        user.setTelephone(d.getPhone());
-        user.setLoginCode(d.getIdCardNo());
-        user.setRealName(d.getName());
-        user.setProvinceId(0);
-        user.setCityId(0);
-        user.setAreaId(0);
-        user.setActivated(true);
-        user.setImgRemotePath(d.getPhoto());
-        user = userManager.saveUser(user);
-
         //创建居民
         DemographicInfo demographicInfo =new DemographicInfo();
         if(!StringUtils.isEmpty(doctor.getIdCardNo())&&doctor.getIdCardNo().length()>9){
