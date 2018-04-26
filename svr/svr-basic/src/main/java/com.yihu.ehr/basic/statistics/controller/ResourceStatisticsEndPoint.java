@@ -36,6 +36,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
+@Deprecated
 @Api(value = "ResourceStatistics", description = "资源中心首页报表", tags = {"资源中心首页报表-入口"})
 public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
 

@@ -244,16 +244,21 @@ public class RegistrationEndPoint extends EnvelopRestEndPoint {
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
         try {
+            // 延迟一秒，以便调用总部创建预约接口之后，处理总部推送过来的消息，确保挂号单数据同步了。
+            Thread.sleep(1);
+
             Registration registration = registrationService.getById(id);
-            ProtalMessageRemind messageRemind = messageRemindService.getByOrderId(id);
-            Map<String, Object> message = objectMapper.readValue(messageRemind.getReceivedMessages(), Map.class);
-            Map<String, Object> dataNode = (Map<String, Object>) message.get("data");
-            if (registration.getState() == -1) {
-                // 系统取消状态，表示挂号失败。
-                envelop.setErrorMsg(dataNode.get("failMsg").toString());
-            } else {
-                envelop.setErrorMsg(dataNode.get("smsContent").toString());
-                envelop.setSuccessFlg(true);
+            List<ProtalMessageRemind> messageRemindList = messageRemindService.getByOrderId(id);
+            if (messageRemindList.size() > 0 ) {
+                Map<String, Object> message = objectMapper.readValue(messageRemindList.get(0).getReceivedMessages(), Map.class);
+                Map<String, Object> dataNode = (Map<String, Object>) message.get("data");
+                if (registration.getState() == -1) {
+                    // 系统取消状态，表示挂号失败。
+                    envelop.setErrorMsg(dataNode.get("failMsg").toString());
+                } else {
+                    envelop.setErrorMsg(dataNode.get("smsContent").toString());
+                    envelop.setSuccessFlg(true);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();

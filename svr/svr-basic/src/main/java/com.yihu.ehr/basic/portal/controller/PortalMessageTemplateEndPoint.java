@@ -227,7 +227,6 @@ public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "data", value = "消息string(json)")
             @RequestParam(value = "data", required = false) String data
             ) throws Exception {
-        LOG.info(String.format("收到H5挂号订单消息推送-%s", data));
         Map<String, Object> retMap =new HashMap<>();
         Map<String,String> messMap =objectMapper.readValue(data, Map.class);
         MH5Message mH5Message = new MH5Message();
@@ -249,28 +248,40 @@ public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
         mH5Message.setThirdPartyUserId(thirdPartyUserId);
         mH5Message.setType(type);
         mH5Message.setTimestamp(timestamp);
-        LOG.info(String.format("收到H5挂号订单消息推送参数内容-%s", toJson(mH5Message)));
         //根据用户id，到总部获取订单列表
-        MProtalOrderMessage mProtalOrderMessage = openServiceGetOrderInfo(thirdPartyUserId,timestamp);
         Registration newEntity = null;
-        if(null != mProtalOrderMessage && mProtalOrderMessage.getTotal()>0){
-            String str = toJson(mProtalOrderMessage.getResult().get(0));
-           List<Registration>  registrationList= registrationService.findByField("orderId", orderId);
+        List<Registration> registrationList= registrationService.findByField("orderId", orderId);
            if(null != registrationList && registrationList.size()>0){
-               Registration  updateNewEntity = objectMapper.readValue(str, Registration.class);
                newEntity = registrationList.get(0);
-               newEntity.setState(updateNewEntity.getState());
-               newEntity.setStateDesc(updateNewEntity.getStateDesc());
+               if(type==101 && isSuccess==0 ){
+                   //  type=101  isSuccesss=0 挂号成功   2:待就诊
+                   newEntity.setState(2);
+                   newEntity.setStateDesc("待就诊");
+               }else if(type==102 && isSuccess==0 ){
+                   //  type=102  isSuccesss=0 退号成功--- 99：已退号
+                   newEntity.setState(99);
+                   newEntity.setStateDesc("已退号");
+               }else{
+                   //  type=101  isSuccesss=1 挂号失败--- -1：系统取消
+                   newEntity.setState(-1);
+                   newEntity.setStateDesc("系统取消");
+               }
                newEntity.setModifyDate(new Date(System.currentTimeMillis()));
-           }else{
-               newEntity = objectMapper.readValue(str, Registration.class);
-               newEntity.setId(UuidUtil.randomUUID());
-               newEntity.setOriginType(2);//app端订单
-               newEntity.setRegisterType(1);//预约挂号
-               newEntity.setRegisterTypeDesc("预约挂号");
+               registrationService.save(newEntity);
+           } else {
+               //app端使用总部挂号系统，本地不存在订单，需要根据第三方用户id和创建订单时间去获取订单，在本地保存订单信息。
+               MProtalOrderMessage mProtalOrderMessage = openServiceGetOrderInfo(thirdPartyUserId,timestamp);
+               if(null != mProtalOrderMessage && mProtalOrderMessage.getTotal()>0) {
+                   String str = toJson(mProtalOrderMessage.getResult().get(0));
+                   newEntity = objectMapper.readValue(str, Registration.class);
+                   newEntity.setId(UuidUtil.randomUUID());
+                   newEntity.setOriginType(2);//app端订单
+                   newEntity.setRegisterType(1);//预约挂号
+                   newEntity.setRegisterTypeDesc("预约挂号");
+                   newEntity.setUserId(thirdPartyUserId);
+                   registrationService.save(newEntity);
+               }
            }
-            registrationService.save(newEntity);
-        }
         ProtalMessageRemind protalMessageRemind = null;
         if(StringUtils.isNotEmpty(data)){
             List<PortalMessageTemplate> messageTemplateList = messageTemplateService.getMessageTemplate(String.valueOf(isSuccess),String.valueOf(type),"0");
@@ -282,7 +293,6 @@ public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
                 retMap.put("status","1");
                 retMap.put("statusInfo","消息模板不存在！");
                 retMap.put("t", System.currentTimeMillis());
-                LOG.info("消息模板不存在！");
             }
             protalMessageRemind = messageTemplateService.saveH5MessagePush(newEntity,mH5Message, messageTemplateId);
             if (protalMessageRemind != null){
@@ -295,14 +305,12 @@ public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
                 retMap.put("status","1");
                 retMap.put("statusInfo","消息解析失败");
                 retMap.put("t", System.currentTimeMillis());
-                LOG.error("消息解析失败");
             }
         } else{
             //失败
             retMap.put("status","1");
             retMap.put("statusInfo","data消息缺失！");
             retMap.put("t", System.currentTimeMillis());
-            LOG.error("data消息缺失！");
         }
         return toJson(retMap);
     }
@@ -328,7 +336,6 @@ public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
         params.put("pageSize",5);
        String res = openService.callFzOpenApi(api,params);
         MProtalOrderMessage mProtalOrderMessage =  objectMapper.readValue(res,MProtalOrderMessage.class);
-        LOG.info(String.format("-----MProtalOrderMessage-----%s", toJson(mProtalOrderMessage)));
         return mProtalOrderMessage;
     }
 
