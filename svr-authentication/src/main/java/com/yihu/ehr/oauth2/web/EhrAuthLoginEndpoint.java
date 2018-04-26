@@ -183,7 +183,7 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
         apiParamMap.put("content", content);
         //渠道号
         apiParamMap.put("clientId", fzClientId);
-        String result = FzGatewayUtil.httpPost(fzGatewayUrl,fzClientId,fzClientVersion,api,apiParamMap, 1);
+        String result = FzGatewayUtil.httpPost(fzGatewayUrl, fzClientId, fzClientVersion, api, apiParamMap, 1);
         if (!StringUtils.isEmpty(result)) {
             Map<String, Object> resultMap = objectMapper.readValue(result, Map.class);
             Integer resultCode = 0;

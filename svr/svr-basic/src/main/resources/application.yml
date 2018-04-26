@@ -93,7 +93,7 @@ h5:
   clientId: WYo0l73F8e
 #福州总部网关参数配置
 fz-gateway:
-  url: http://service.yihu.com:8085/WSGW/rest
+  url: http://172.19.103.73:10001/fzGateway/WSGW/rest
   clientId: 9000401
   clientVersion: 1.0
   secret: KU5XTORDKZI3O86YAT3ABCNJW2XTL1DJYF3GKU3ICXL
