@@ -25,6 +25,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.util.Map;
+
 /**
  * Created by zhangdan on 2018/4/17.
  */
@@ -68,15 +70,16 @@ public class PortalSurveyQuestionAdminController extends EnvelopRestEndPoint {
     @RequestMapping(value =ServiceApi.SurveyAdminManage.GetQuestionById, method = RequestMethod.GET)
     @ResponseBody
     @ApiOperation(value = "根据id获取单个问题")
-    public Result getQuestion(@ApiParam(name = "id", value = "问题id",defaultValue = "1")
+    public Envelop getQuestion(@ApiParam(name = "id", value = "问题id",defaultValue = "1")
                                @RequestParam(value = "id", required = true) String id)throws Exception {
         SurveyQuestion question = surveyQuestionService.findById(Long.valueOf(id));
         if(question == null){
-            return Result.error(-1, "获取问题Id不存在");
+            return failed( "获取问题Id不存在");
         }else if("0".equals(question.getDel())){
-            return Result.error(-1, "该问题已被删除");
+            return failed( "该问题已被删除");
         }else{
-            return Result.success("获取成功",surveyQuestionService.getQuestion(question));
+            Map<String,Object> map = surveyQuestionService.getQuestion(question);
+            return success(map);
         }
     }
 

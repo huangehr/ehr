@@ -1,5 +1,6 @@
 package com.yihu.ehr.basic.user.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.yihu.ehr.basic.org.model.OrgDept;
 import com.yihu.ehr.basic.org.model.OrgMemberRelation;
@@ -15,6 +16,7 @@ import com.yihu.ehr.basic.user.service.DoctorService;
 import com.yihu.ehr.basic.user.service.RoleUserService;
 import com.yihu.ehr.basic.user.service.RolesService;
 import com.yihu.ehr.basic.user.service.UserService;
+import com.yihu.ehr.basic.util.MapUtill;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
@@ -24,6 +26,7 @@ import com.yihu.ehr.model.user.MDoctor;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.id.BizObject;
 import com.yihu.ehr.util.phonics.PinyinUtil;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -40,11 +43,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 2017-02-04 add  by hzp
@@ -503,4 +505,61 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
             }
         }
     }
+
+    @RequestMapping(value = ServiceApi.Doctors.DoctorOnlyUpdateD, method = RequestMethod.POST)
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    @ApiOperation(value = "更新医生信息，只更新医生表信息", notes = "只更新医生表信息")
+    public Envelop updateDoctor(
+            @ApiParam(name = "id", value = "", defaultValue = "")
+            @RequestParam(value = "id",required = true) Long id,
+            @ApiParam(name = "name", value = "", defaultValue = "")
+            @RequestParam(value = "photo",required = false) String photo,
+            @ApiParam(name = "skill", value = "", defaultValue = "")
+            @RequestParam(value = "skill",required = false) String skill,
+            @ApiParam(name = "officeTel", value = "", defaultValue = "")
+            @RequestParam(value = "officeTel",required = false) String officeTel,
+            @ApiParam(name = "workPortal", value = "", defaultValue = "")
+            @RequestParam(value = "workPortal",required = false) String workPortal) throws Exception {
+        Doctors doctors = doctorService.getDoctor(id);
+        if (!StringUtils.isEmpty(photo)){
+            doctors.setPhoto(photo);
+        }
+        if (!StringUtils.isEmpty(skill)){
+            doctors.setSkill(skill);
+        }
+        if (!StringUtils.isEmpty(officeTel)){
+            doctors.setOfficeTel(officeTel);
+        }
+        if (!StringUtils.isEmpty(workPortal)){
+            doctors.setWorkPortal(workPortal);
+        }
+        doctors.setUpdateTime(new Date());
+        doctorService.save(doctors);
+        //更改用户表里的头像
+        User user = userManager.getUserByIdCardNo(doctors.getIdCardNo());
+        if (!StringUtils.isEmpty(user)) {
+            user.setImgRemotePath(doctors.getPhoto());
+            userManager.save(user);
+        }
+        return success(convertToModel(doctors, MDoctor.class));
+    }
+
+
+    /*@RequestMapping(value = ServiceApi.Doctors.DoctorOnlyUpdateD, method = RequestMethod.POST)
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    @ApiOperation(value = "更新医生信息，只更新医生表信息", notes = "只更新医生表信息")
+    public Envelop updateDoctor(
+            @ApiParam(name = "doctor_json_data", value = "", defaultValue = "")
+            @RequestParam(value = "doctor_json_data",required = true) String doctor_json_data) throws Exception {
+        Doctors doctors = toEntity(doctor_json_data,Doctors.class);
+        doctors.setUpdateTime(new Date());
+        doctorService.save(doctors);
+        //更改用户表里的头像
+        User user = userManager.getUserByIdCardNo(doctors.getIdCardNo());
+        if (!StringUtils.isEmpty(user)) {
+            user.setImgRemotePath(doctors.getPhoto());
+            userManager.save(user);
+        }
+        return success(convertToModel(doctors, MDoctor.class));
+    }*/
 }

@@ -3,21 +3,16 @@ package com.yihu.ehr.basic.portal.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.basic.portal.dao.PortalMessageRemindRepository;
 import com.yihu.ehr.basic.portal.model.ProtalMessageRemind;
-import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.query.common.model.DataList;
 import com.yihu.ehr.query.services.DBQuery;
-import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 提醒消息接口实现类.
@@ -43,6 +38,15 @@ public class PortalMessageRemindService extends BaseJpaService<ProtalMessageRemi
     public ProtalMessageRemind getMessageRemind(Long messageRemindId) {
         ProtalMessageRemind messageRemind = messageRemindRepository.findOne(messageRemindId);
         return messageRemind;
+    }
+
+    /**
+     * 根据挂号单ID获取消息内容
+     * @param orderId 医疗云挂号单ID
+     * @return
+     */
+    public ProtalMessageRemind getByOrderId(String orderId) {
+        return messageRemindRepository.getByOrderId(orderId);
     }
 
     /**
