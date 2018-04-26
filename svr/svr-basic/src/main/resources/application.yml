@@ -135,7 +135,7 @@ h5:
   clientId: WYo0l73F8e
 #福州总部网关参数配置
 fz-gateway:
-  url: http://service.yihu.com:8085/WSGW/rest
+  url: http://172.19.103.73:10001/fzGateway/WSGW/rest
   clientId: 9000401
   clientVersion: 1.0
   secret: KU5XTORDKZI3O86YAT3ABCNJW2XTL1DJYF3GKU3ICXL
@@ -187,7 +187,7 @@ h5:
   clientId: WYo0l73F8e
 #福州总部网关参数配置
 fz-gateway:
-  url: http://service.yihu.com:8080/WSGW/rest
+  url: http://11.1.2.13:10001/fzGateway/WSGW/rest
   clientId: 9000401
   clientVersion: 1.0
   secret: 9U6PBF2JM3PE1IHRJ7GEITMJHNMEHOFZQ2XUCKD9TO2
@@ -238,11 +238,11 @@ h5:
   clientId: WYo0l73F8e
 #福州总部网关参数配置
 fz-gateway:
-  url: http://service.yihu.com:8080/WSGW/rest
+  url: http://10.176.97.10:10001/fzGateway/WSGW/rest
   clientId: 9000401
   clientVersion: 1.0
   secret: 9U6PBF2JM3PE1IHRJ7GEITMJHNMEHOFZQ2XUCKD9TO2
-  handlerId: 50871
+  handlerId: 50641
 
 ---
 spring:
@@ -289,11 +289,11 @@ h5:
   clientId: WYo0l73F8e
 #福州总部网关参数配置
 fz-gateway:
-  url: http://service.yihu.com:8080/WSGW/rest
+  url: http://100.100.1.162:10001/fzGateway/WSGW/rest
   clientId: 9000401
   clientVersion: 1.0
   secret: 9U6PBF2JM3PE1IHRJ7GEITMJHNMEHOFZQ2XUCKD9TO2
-  handlerId: 50871
+  handlerId: 50641
 
 ---
 spring:
@@ -340,8 +340,8 @@ h5:
   clientId: WYo0l73F8e
 #福州总部网关参数配置
 fz-gateway:
-  url: http://service.yihu.com:8080/WSGW/rest
+  url: http://192.168.220.84:10001/fzGateway/WSGW/rest
   clientId: 9000401
   clientVersion: 1.0
   secret: 9U6PBF2JM3PE1IHRJ7GEITMJHNMEHOFZQ2XUCKD9TO2
-  handlerId: 50871
+  handlerId: 50641
