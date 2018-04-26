@@ -1,9 +1,11 @@
 package com.yihu.ehr.resolve.dao;
 
 import com.yihu.ehr.constants.EventType;
+import com.yihu.ehr.constants.ProfileType;
 import com.yihu.ehr.hbase.HBaseDao;
 import com.yihu.ehr.hbase.TableBundle;
 import com.yihu.ehr.profile.core.ResourceCore;
+import com.yihu.ehr.profile.family.FileResourceFamily;
 import com.yihu.ehr.profile.family.MasterResourceFamily;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.resolve.model.stage2.MasterRecord;
@@ -29,21 +31,30 @@ public class MasterResourceDao {
     private HBaseDao hbaseDao;
 
     public void saveOrUpdate(ResourceBucket resBucket, StandardPackage standardPackage) throws Exception {
+        String tableName = ResourceCore.MasterTable;
+        String dataColumn = MasterResourceFamily.Data;
+        String basicColumn = MasterResourceFamily.Basic;
+        if (resBucket.getProfileType() == ProfileType.File){
+            tableName = ResourceCore.FileMasterTable;
+            dataColumn = FileResourceFamily.Data;
+            basicColumn = FileResourceFamily.Basic;
+        }
+
         String rowKey = resBucket.getId();
         TableBundle bundle = new TableBundle();
         if (resBucket.isReUploadFlg()) { //补传处理
-            Map<String, String> originResult = hbaseDao.get(ResourceCore.MasterTable, rowKey, MasterResourceFamily.Data);
-            if (!originResult.isEmpty()) {
-                MasterRecord masterRecord = resBucket.getMasterRecord();
-                Map<String, String> supplement = masterRecord.getDataGroup();
-                originResult.putAll(supplement);
-                //hbaseDao.deleteFamily(ResourceCore.MasterTable, rowKey, MasterResourceFamily.Data);
-                bundle.addValues(rowKey, MasterResourceFamily.Data, originResult);
-                hbaseDao.save(ResourceCore.MasterTable, bundle);
-                Map<String, String> basicResult = hbaseDao.get(ResourceCore.MasterTable, rowKey, MasterResourceFamily.Basic);
-                if(basicResult.get("event_type") != null) {
-                    EventType eventType = EventType.create(basicResult.get("event_type"));
-                    standardPackage.setEventType(eventType);
+            Map<String, String> originResult = hbaseDao.get(tableName, rowKey, dataColumn);
+                    if (!originResult.isEmpty()) {
+                        MasterRecord masterRecord = resBucket.getMasterRecord();
+                        Map<String, String> supplement = masterRecord.getDataGroup();
+                        originResult.putAll(supplement);
+                        //hbaseDao.deleteFamily(ResourceCore.MasterTable, rowKey, dataColumn);
+                        bundle.addValues(rowKey, dataColumn, originResult);
+                        hbaseDao.save(tableName, bundle);
+                        Map<String, String> basicResult = hbaseDao.get(tableName, rowKey, basicColumn);
+                        if(basicResult.get("event_type") != null) {
+                            EventType eventType = EventType.create(basicResult.get("event_type"));
+                            standardPackage.setEventType(eventType);
                 }
                 standardPackage.setDemographicId(basicResult.get("demographic_id"));
                 resBucket.setDemographicId(basicResult.get("demographic_id"));
@@ -53,23 +64,23 @@ public class MasterResourceDao {
         } else {
             // delete legacy data if they are exist
             //主表直接GET
-            String legacy = hbaseDao.get(ResourceCore.MasterTable, rowKey);
+            String legacy = hbaseDao.get(tableName, rowKey);
             if (StringUtils.isNotEmpty(legacy)) {
-                hbaseDao.delete(ResourceCore.MasterTable, rowKey);
+                hbaseDao.delete(tableName, rowKey);
             }
             // now save the data to hbase
             bundle.clear();
             bundle.addValues(
                     rowKey,
-                    MasterResourceFamily.Basic,
-                    ResourceStorageUtil.getMasterResCells(MasterResourceFamily.Basic, resBucket)
+                    basicColumn,
+                    ResourceStorageUtil.getMasterResCells(basicColumn, resBucket)
             );
             bundle.addValues(
                     rowKey,
-                    MasterResourceFamily.Data,
-                    ResourceStorageUtil.getMasterResCells(MasterResourceFamily.Data, resBucket)
+                    dataColumn,
+                    ResourceStorageUtil.getMasterResCells(dataColumn, resBucket)
             );
-            hbaseDao.save(ResourceCore.MasterTable, bundle);
+            hbaseDao.save(tableName, bundle);
         }
     }
 }
