@@ -25,7 +25,7 @@ zuul:
       serivceId: svr-redis
     svr-resource:
       path: /resource/**
-      serviceId: svr-resource-chenyx
+      serviceId: svr-resource
     svr-standard:
       path: /standard/**
       serviceId: svr-standard
