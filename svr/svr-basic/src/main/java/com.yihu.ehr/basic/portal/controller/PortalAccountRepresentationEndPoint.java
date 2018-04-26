@@ -13,6 +13,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.catalina.servlet4preview.http.HttpServletRequest;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -36,6 +37,9 @@ public class PortalAccountRepresentationEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private UserService userService;
 
     @PostMapping(value = ServiceApi.AccountRepresentation.SaveAccontRepresenetation)
     @ApiOperation(value = "保存新增账号申诉",notes = "保存新增账号申诉")
@@ -104,4 +108,15 @@ public class PortalAccountRepresentationEndPoint extends EnvelopRestEndPoint {
         }
     }
 
+    @RequestMapping(value = ServiceApi.AccountRepresentation.ChangePassWord, method = RequestMethod.PUT)
+    @ApiOperation(value = "修改密码", notes = "根基传入的用户id和新的密码修改用户的密码")
+    public boolean changePassWord(
+            @ApiParam(name = "user_id", value = "user_id", defaultValue = "")
+            @PathVariable(value = "user_id") String userId,
+            @ApiParam(name = "password", value = "密码", defaultValue = "")
+            @RequestParam(value = "password") String password) throws Exception {
+        String hashPassWord = DigestUtils.md5Hex(password);
+        userService.changePassWord(userId, hashPassWord);
+        return true;
+    }
 }
