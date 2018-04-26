@@ -249,27 +249,39 @@ public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
         mH5Message.setType(type);
         mH5Message.setTimestamp(timestamp);
         //根据用户id，到总部获取订单列表
-        MProtalOrderMessage mProtalOrderMessage = openServiceGetOrderInfo(thirdPartyUserId,timestamp);
         Registration newEntity = null;
-        if(null != mProtalOrderMessage && mProtalOrderMessage.getTotal()>0){
-            String str = toJson(mProtalOrderMessage.getResult().get(0));
-           List<Registration> registrationList= registrationService.findByField("orderId", orderId);
+        List<Registration> registrationList= registrationService.findByField("orderId", orderId);
            if(null != registrationList && registrationList.size()>0){
-               Registration updateNewEntity = objectMapper.readValue(str, Registration.class);
                newEntity = registrationList.get(0);
-               newEntity.setState(updateNewEntity.getState());
-               newEntity.setStateDesc(updateNewEntity.getStateDesc());
+               if(type==101 && isSuccess==0 ){
+                   //  type=101  isSuccesss=0 挂号成功   2:待就诊
+                   newEntity.setState(2);
+                   newEntity.setStateDesc("待就诊");
+               }else if(type==102 && isSuccess==0 ){
+                   //  type=102  isSuccesss=0 退号成功--- 99：已退号
+                   newEntity.setState(99);
+                   newEntity.setStateDesc("已退号");
+               }else{
+                   //  type=101  isSuccesss=1 挂号失败--- -1：系统取消
+                   newEntity.setState(-1);
+                   newEntity.setStateDesc("系统取消");
+               }
                newEntity.setModifyDate(new Date(System.currentTimeMillis()));
+               registrationService.save(newEntity);
            } else {
-               newEntity = objectMapper.readValue(str, Registration.class);
-               newEntity.setId(UuidUtil.randomUUID());
-               newEntity.setOriginType(2);//app端订单
-               newEntity.setRegisterType(1);//预约挂号
-               newEntity.setRegisterTypeDesc("预约挂号");
-               newEntity.setUserId(thirdPartyUserId);
+               //app端使用总部挂号系统，本地不存在订单，需要根据第三方用户id和创建订单时间去获取订单，在本地保存订单信息。
+               MProtalOrderMessage mProtalOrderMessage = openServiceGetOrderInfo(thirdPartyUserId,timestamp);
+               if(null != mProtalOrderMessage && mProtalOrderMessage.getTotal()>0) {
+                   String str = toJson(mProtalOrderMessage.getResult().get(0));
+                   newEntity = objectMapper.readValue(str, Registration.class);
+                   newEntity.setId(UuidUtil.randomUUID());
+                   newEntity.setOriginType(2);//app端订单
+                   newEntity.setRegisterType(1);//预约挂号
+                   newEntity.setRegisterTypeDesc("预约挂号");
+                   newEntity.setUserId(thirdPartyUserId);
+                   registrationService.save(newEntity);
+               }
            }
-            registrationService.save(newEntity);
-        }
         ProtalMessageRemind protalMessageRemind = null;
         if(StringUtils.isNotEmpty(data)){
             List<PortalMessageTemplate> messageTemplateList = messageTemplateService.getMessageTemplate(String.valueOf(isSuccess),String.valueOf(type),"0");
