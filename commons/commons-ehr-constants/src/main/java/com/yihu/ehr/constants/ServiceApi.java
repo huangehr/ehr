@@ -399,8 +399,8 @@ public class ServiceApi {
         public static final String SimpleUpdate = "/app/simpleUpdate";
 
         //--------------- 医生工作平台 ---------------
-        public static final String GetAppsRelationByUserIdAndParentAppId ="/app/appsRelationByUserIdAndParentAppId";
-        public static final String GetAppsRelationByUserJson ="/app/getAppsRelationByUserJson";
+        public static final String GetAppsRelationByUserIdAndParentAppId ="/app/getAppsByUserId";
+        public static final String GetAppsRelationByUserJson ="/app/getAppsByUserJson";
 
         //--------------- 总支撑平台 ---------------
         public static final String SaveAppsRelation ="/app/saveAppsRelation";
@@ -1603,12 +1603,13 @@ public class ServiceApi {
     }
 
     /**
-     * 账号申诉
+     * 账号相关
      */
     public static class AccountRepresentation{
         public static final String SaveAccontRepresenetation ="/account/save";
         public static final String GetRandomImageCode ="/account/getRandomImageCode";
         public static final String CheckRandomImageCode ="/account/checkRandomImageCode";
+        public static final String findUserByPhoneOrName = "/account/findUserByPhoneOrName";
 
     }
 }
