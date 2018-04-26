@@ -50,7 +50,7 @@ spring:
     port: 6379
     password: redis!@456
 fz-gateway:
-  url: http://service.yihu.com:8085/WSGW/rest
+  url: http://172.19.103.73:10001/fzGateway/WSGW/rest
   clientId: 9000401
   clientVersion: 1.0
   handlerId: 50871
@@ -67,7 +67,7 @@ spring:
     port: 6390
     password: Kb6wKDQP1W4
 fz-gateway:
-  url: http://service.yihu.com:8085/WSGW/rest
+  url: http://11.1.2.13:10001/fzGateway/WSGW/rest
   clientId: 9000401
   clientVersion: 1.0
   handlerId: 50871
@@ -84,7 +84,7 @@ spring:
     port: 6390
     password: q4YaQemf
 fz-gateway:
-  url: http://service.yihu.com:8080/WSGW/rest
+  url: http://10.176.97.10:10001/fzGateway/WSGW/rest
   clientId: 9000401
   clientVersion: 1.0
   handlerId: 50641
@@ -101,7 +101,7 @@ spring:
     port: 6390
     password: q4YaQemf
 fz-gateway:
-  url: http://service.yihu.com:8080/WSGW/rest
+  url: http://100.100.1.162:10001/fzGateway/WSGW/rest
   clientId: 9000401
   clientVersion: 1.0
   handlerId: 50641
@@ -118,7 +118,7 @@ spring:
     port: 6379
     password: q4YaQemf
 fz-gateway:
-  url: http://service.yihu.com:8080/WSGW/rest
+  url: http://192.168.220.84:10001/fzGateway/WSGW/rest
   clientId: 9000401
   clientVersion: 1.0
   handlerId: 50641

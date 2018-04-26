@@ -191,7 +191,6 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
                 resultCode = Integer.valueOf(resultMap.get("Code").toString());
             }
             if (resultCode == 10000) {
-                verifyCode.setCode(random);
                 verifyCode.setExpiresIn(600);
                 verifyCode.setNextRequestTime(60);
                 //验证码有效期
