@@ -242,7 +242,7 @@ fz-gateway:
   clientId: 9000401
   clientVersion: 1.0
   secret: 9U6PBF2JM3PE1IHRJ7GEITMJHNMEHOFZQ2XUCKD9TO2
-  handlerId: 50871
+  handlerId: 50641
 
 ---
 spring:
@@ -293,7 +293,7 @@ fz-gateway:
   clientId: 9000401
   clientVersion: 1.0
   secret: 9U6PBF2JM3PE1IHRJ7GEITMJHNMEHOFZQ2XUCKD9TO2
-  handlerId: 50871
+  handlerId: 50641
 
 ---
 spring:
@@ -344,4 +344,4 @@ fz-gateway:
   clientId: 9000401
   clientVersion: 1.0
   secret: 9U6PBF2JM3PE1IHRJ7GEITMJHNMEHOFZQ2XUCKD9TO2
-  handlerId: 50871
+  handlerId: 50641
