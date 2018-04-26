@@ -254,4 +254,4 @@ hadoop:
     hbase.zookeeper.quorum: node1.jkzl.com,node2.jkzl.com,node4.jkzl.com
 elasticsearch:
   cluster-name: elasticsearch
-  cluster-nodes: 172.10.10.2:9300,172.10.10.5:9300
+  cluster-nodes: 172.10.10.5:9300
