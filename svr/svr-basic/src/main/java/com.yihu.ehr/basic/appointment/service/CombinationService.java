@@ -105,7 +105,7 @@ public class CombinationService {
             List<Map<String, Object>> schedulingList = (ArrayList) schedulingResMap.get("Result");
 
             if (schedulingResMap.size() > 0) {
-                // 测试环境，过滤掉需代缴挂号费的排班。正式环境去掉这段代码
+                // 过滤掉需代缴挂号费的排班
                 List<Map<String, Object>> freeSchedulingList = new ArrayList<>();
                 for (int j = 0, jSize = schedulingList.size(); j < jSize; j++) {
                     if ((int) schedulingList.get(j).get("ghfeeWay") == 0) {
@@ -169,7 +169,10 @@ public class CombinationService {
         List<Map<String, Object>> schList = (ArrayList) schedulingResMap.get("Result");
         Set<String> doctorSnSet = new HashSet<>();
         schList.forEach(item -> {
-            doctorSnSet.add(item.get("doctorSn").toString());
+            // 过滤掉需代缴挂号费的排班
+            if ((int) item.get("ghfeeWay") == 0) {
+                doctorSnSet.add(item.get("doctorSn").toString());
+            }
         });
         count += doctorSnSet.size();
 

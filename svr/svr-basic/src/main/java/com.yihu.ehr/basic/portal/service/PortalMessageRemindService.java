@@ -45,8 +45,8 @@ public class PortalMessageRemindService extends BaseJpaService<ProtalMessageRemi
      * @param orderId 医疗云挂号单ID
      * @return
      */
-    public ProtalMessageRemind getByOrderId(String orderId) {
-        return messageRemindRepository.getByOrderId(orderId);
+    public List<ProtalMessageRemind> getByOrderId(String orderId) {
+        return messageRemindRepository.getByOrderIdOrderByCreateDateDesc(orderId);
     }
 
     /**
