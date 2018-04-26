@@ -884,14 +884,14 @@ public class UserEndPoint extends EnvelopRestEndPoint {
             envelop.setErrorMsg("电话号码已存在");
             return envelop;
         }
-        user = userService.saveUser(user);
         // orgcode卫计委机构编码-PDY026797 添加居民的时候 默认 加到卫计委-居民角色中
         List<Roles> rolesList = rolesService.findByCodeAndAppIdAndOrgCode(Arrays.asList(new String[]{orgcode}),appId,"Patient");
         //在org_member_relation 表里追加关联关系
         if(null != rolesList && rolesList.size()>0){
+            user = userService.saveUser(user);
             roleUserService.batchCreateRoleUsersRelation(userId,String.valueOf(rolesList.get(0).getId()));
         }else{
-            envelop.setErrorMsg("角色不存在！");
+            envelop.setErrorMsg("居民角色不存在！");
             return envelop;
         }
         // 根据身份证号码查找居民，若不存在则创建居民。
