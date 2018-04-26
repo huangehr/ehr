@@ -245,9 +245,9 @@ public class RegistrationEndPoint extends EnvelopRestEndPoint {
         envelop.setSuccessFlg(false);
         try {
             Registration registration = registrationService.getById(id);
-            ProtalMessageRemind messageRemind = messageRemindService.getByOrderId(id).get(0);
-            if (messageRemind != null) {
-                Map<String, Object> message = objectMapper.readValue(messageRemind.getReceivedMessages(), Map.class);
+            List<ProtalMessageRemind> messageRemindList = messageRemindService.getByOrderId(id);
+            if (messageRemindList.size() > 0 ) {
+                Map<String, Object> message = objectMapper.readValue(messageRemindList.get(0).getReceivedMessages(), Map.class);
                 Map<String, Object> dataNode = (Map<String, Object>) message.get("data");
                 if (registration.getState() == -1) {
                     // 系统取消状态，表示挂号失败。
