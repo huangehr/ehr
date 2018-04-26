@@ -1610,6 +1610,6 @@ public class ServiceApi {
         public static final String GetRandomImageCode ="/account/getRandomImageCode";
         public static final String CheckRandomImageCode ="/account/checkRandomImageCode";
         public static final String findUserByPhoneOrName = "/account/findUserByPhoneOrName";
-
+        public static final String ChangePassWord = "/account/changePassWord";
     }
 }
