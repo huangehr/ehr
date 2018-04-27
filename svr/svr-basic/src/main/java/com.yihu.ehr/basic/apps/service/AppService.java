@@ -239,7 +239,7 @@ public class AppService extends BaseJpaService<App, AppDao> {
         return newApp;
     }
 
-    public List<App> getAppByParentIdAndUserId(String userId)throws Exception{
+    public List<Map<String,Object>> getAppByParentIdAndUserId(String userId)throws Exception{
         /*String Sql ="SELECT s.*,r.type " +
                     " FROM user_app a " +
                     " LEFT JOIN apps_relation r ON a.app_id = r.app_id " +
@@ -250,7 +250,7 @@ public class AppService extends BaseJpaService<App, AppDao> {
         String sql ="SELECT a.* FROM role_user ru LEFT JOIN roles r ON ru.role_id = r.id LEFT JOIN apps a ON r.app_id = a.id WHERE ru.user_id='"+userId+"' and r.name='医生' and a.release_flag=1";
 
 
-        List<App> resultList =  jdbcTemplate.queryForList(sql,App.class);
+        List<Map<String,Object>> resultList =  jdbcTemplate.queryForList(sql);
         return resultList;
     }
 }
