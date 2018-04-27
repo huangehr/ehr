@@ -1,21 +1,27 @@
 package com.yihu.ehr.basic.portal.controller;
 
 import com.yihu.ehr.basic.portal.service.PortalAccountRepresentationService;
+import com.yihu.ehr.basic.user.service.UserService;
 import com.yihu.ehr.basic.util.IdcardValidator;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.model.common.Result;
 import com.yihu.ehr.util.http.RandomValidateCode;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.catalina.servlet4preview.http.HttpServletRequest;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by zhangdan on 2018/4/19.
@@ -28,6 +34,12 @@ public class PortalAccountRepresentationEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     private PortalAccountRepresentationService portalAccountRepresentationService;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private UserService userService;
 
     @PostMapping(value = ServiceApi.AccountRepresentation.SaveAccontRepresenetation)
     @ApiOperation(value = "保存新增账号申诉",notes = "保存新增账号申诉")
@@ -81,5 +93,30 @@ public class PortalAccountRepresentationEndPoint extends EnvelopRestEndPoint {
         }else {
             return Result.error("验证码错误！");
         }
+    }
+
+    @PostMapping(value = ServiceApi.AccountRepresentation.findUserByPhoneOrName)
+    @ApiOperation(value = "根据手机号或者用户查询用户",notes = "找回密码时验证")
+    public Envelop findUserByPhoneOrName(@ApiParam(name = "keyWord",value = "手机号码或者用户名")@RequestParam(value = "keyWord",defaultValue = "")String keyWord){
+        String sql = "SELECT id,login_code,telephone FROM users WHERE login_code ='"+keyWord+"' or telephone = '"+keyWord+"'";
+        //Map<String,Object> map = jdbcTemplate.queryForMap(sql);
+        List<Map<String,Object>> list = jdbcTemplate.queryForList(sql);
+        if (list!=null && list.size()>0){
+            return success(list.get(0));
+        }else {
+            return failed("查询没有该用户");
+        }
+    }
+
+    @RequestMapping(value = ServiceApi.AccountRepresentation.ChangePassWord, method = RequestMethod.PUT)
+    @ApiOperation(value = "修改密码", notes = "根基传入的用户id和新的密码修改用户的密码")
+    public boolean changePassWord(
+            @ApiParam(name = "user_id", value = "user_id", defaultValue = "")
+            @RequestParam(value = "user_id") String userId,
+            @ApiParam(name = "password", value = "密码", defaultValue = "")
+            @RequestParam(value = "password") String password) throws Exception {
+        String hashPassWord = DigestUtils.md5Hex(password);
+        userService.changePassWord(userId, hashPassWord);
+        return true;
     }
 }

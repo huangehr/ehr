@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.yihu.ehr.basic.appointment.entity.Registration;
 import com.yihu.ehr.basic.appointment.service.RegistrationService;
 import com.yihu.ehr.basic.fzopen.service.OpenService;
+import com.yihu.ehr.basic.getui.service.AppPushMessageService;
 import com.yihu.ehr.basic.portal.model.PortalMessageTemplate;
 import com.yihu.ehr.basic.portal.model.ProtalMessageRemind;
 import com.yihu.ehr.model.portal.MProtalOrderMessage;
@@ -54,6 +55,8 @@ public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
     private OpenService openService;
     @Autowired
     private RegistrationService registrationService;
+    @Autowired
+    private AppPushMessageService appPushMessageService;
 
     /**
      * 秘钥
@@ -300,6 +303,25 @@ public class PortalMessageTemplateEndPoint extends EnvelopRestEndPoint {
                 retMap.put("status","0");
                 retMap.put("statusInfo",null);
                 retMap.put("t", System.currentTimeMillis());
+                //app推送
+                String title="";
+                String msg="";
+                if(type==101 && isSuccess==0 ){
+                    //  type=101  isSuccesss=0 挂号成功   2:待就诊
+                    title = "挂号成功";
+                    msg = mH5Message.getData().get("smsContent").toString();
+                }else if(type==102 && isSuccess==0 ){
+                    //  type=102  isSuccesss=0 退号成功--- 99：已退号
+                    title = "退号成功";
+                    msg = mH5Message.getData().get("smsContent").toString();
+                }else{
+                    //  type=101  isSuccesss=1 挂号失败--- -1：系统取消
+                    title = "挂号失败";
+                    msg = mH5Message.getData().get("failMsg").toString();
+                }
+                appPushMessageService.pushMessageToSingle(thirdPartyUserId,title,msg,"");
+                appPushMessageService.pushMessageTransimssion(thirdPartyUserId,title,msg);
+
             } else{
                 //失败
                 retMap.put("status","1");

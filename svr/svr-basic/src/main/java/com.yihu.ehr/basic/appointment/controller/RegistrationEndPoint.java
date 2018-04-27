@@ -16,6 +16,7 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -245,9 +246,21 @@ public class RegistrationEndPoint extends EnvelopRestEndPoint {
         envelop.setSuccessFlg(false);
         try {
             Registration registration = registrationService.getById(id);
-            ProtalMessageRemind messageRemind = messageRemindService.getByOrderId(id).get(0);
-            if (messageRemind != null) {
-                Map<String, Object> message = objectMapper.readValue(messageRemind.getReceivedMessages(), Map.class);
+
+            long startTime = System.currentTimeMillis();
+            // 轮询获取总部推送过来的最新挂号消息
+            List<ProtalMessageRemind> messageRemindList = new ArrayList<>();
+            while (messageRemindList.size() == 0) {
+                messageRemindList = messageRemindService.getRecentOneByOrderId(id, registration.getModifyDate());
+                // 当超过一定时间结束轮询
+                if ((System.currentTimeMillis() - startTime) > 300000) {
+                    envelop.setErrorMsg("已经过了5分钟，没有获取到预约挂号成功与否的推送消息，请稍后查看就诊历史记录。");
+                    break;
+                }
+            }
+
+            if (messageRemindList.size() > 0) {
+                Map<String, Object> message = objectMapper.readValue(messageRemindList.get(0).getReceivedMessages(), Map.class);
                 Map<String, Object> dataNode = (Map<String, Object>) message.get("data");
                 if (registration.getState() == -1) {
                     // 系统取消状态，表示挂号失败。
