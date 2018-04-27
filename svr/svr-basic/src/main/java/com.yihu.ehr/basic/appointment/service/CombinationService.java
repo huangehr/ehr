@@ -44,7 +44,6 @@ public class CombinationService {
                                                           Map<String, Object> params) throws Exception {
         int lastPageIndex = (int) flagMap.get("lastPageIndex");
         int lastPageNo = (int) flagMap.get("lastPageNo");
-        int pageIndex = (int) params.get("pageIndex");
         int pageSize = (int) params.get("pageSize");
         String hospitalId = params.get("hospitalId").toString();
         String hosDeptId = params.get("hosDeptId").toString();
