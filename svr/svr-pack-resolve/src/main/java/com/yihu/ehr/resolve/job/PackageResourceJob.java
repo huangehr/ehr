@@ -33,6 +33,7 @@ import java.util.Map;
  * @created 2016.03.28 11:30
  */
 @Component
+@DisallowConcurrentExecution
 public class PackageResourceJob implements InterruptableJob {
 
     private final static String LocalTempPath = System.getProperty("java.io.tmpdir") + java.io.File.separator;
@@ -60,8 +61,8 @@ public class PackageResourceJob implements InterruptableJob {
                 pack = objectMapper.readValue(packStr, EsSimplePackage.class);
             }
             if (pack != null) {
-                packageMgrClient.reportStatus(pack.get_id(), ArchiveStatus.Acquired, "正在入库中");
                 PackResolveLogger.info("开始入库:" + pack.get_id() + ", Timestamp:" + new Date());
+                packageMgrClient.reportStatus(pack.get_id(), ArchiveStatus.Acquired, "正在入库中");
                 doResolve(pack, packageMgrClient);
             }
         } catch (Exception e) {

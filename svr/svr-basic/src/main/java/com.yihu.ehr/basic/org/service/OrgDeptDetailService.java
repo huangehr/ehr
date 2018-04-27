@@ -2,19 +2,13 @@ package com.yihu.ehr.basic.org.service;
 
 import com.yihu.ehr.basic.org.dao.OrgDeptDetailRepository;
 import com.yihu.ehr.basic.org.model.OrgDeptDetail;
-import com.yihu.ehr.entity.quota.TjQuotaDimensionSlave;
 import com.yihu.ehr.query.BaseJpaService;
 import org.hibernate.SQLQuery;
 import org.hibernate.service.spi.ServiceException;
-import org.hibernate.transform.Transformers;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -40,18 +34,18 @@ public class OrgDeptDetailService extends BaseJpaService<OrgDeptDetail, OrgDeptD
         }
     }
 
-    public OrgDeptDetail searchByOrgNameAndDeptName(String orgName,String deptName){
-        OrgDeptDetail orgDeptDetail = null;
+    public String searchByOrgNameAndDeptName(String orgName,String deptName){
+        String orgDeptDetailPlace = "";
         String sql = "select odd.* from org_dept_detail odd JOIN org_dept od on odd.dept_id=od.id JOIN organizations o on od.org_id =o.id where o.full_name=:orgName AND  od.name =:deptName";
         SQLQuery query = currentSession().createSQLQuery(sql);
         query.setParameter("orgName", orgName);
         query.setParameter("deptName", deptName);
-        query.setResultTransformer(Transformers.aliasToBean(OrgDeptDetail.class));
-        List<OrgDeptDetail> list  = query.list();
+        List<Object> list  = query.list();
         if(null != list && list.size()>0){
-            orgDeptDetail = list.get(0);
+            Object[] obj = (Object[]) list.get(0);
+            orgDeptDetailPlace = obj[11] == null ? "":obj[11].toString();
         }
-        return  orgDeptDetail;
+        return  orgDeptDetailPlace;
     }
 
 }

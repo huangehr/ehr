@@ -2,6 +2,7 @@ package com.yihu.ehr.basic.portal.controller;
 
 import com.yihu.ehr.basic.portal.model.PortalAccountRepresentation;
 import com.yihu.ehr.basic.portal.service.PortalAccountRepresentationService;
+import com.yihu.ehr.basic.util.CaptchaUtil;
 import com.yihu.ehr.basic.util.IdcardValidator;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
@@ -17,12 +18,14 @@ import org.apache.catalina.servlet4preview.http.HttpServletRequest;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileOutputStream;
 
 /**
  * Created by zhangdan on 2018/4/19.
@@ -58,13 +61,20 @@ public class PortalAccountRepresentationController extends EnvelopRestEndPoint {
         }
     }
 
-    @PostMapping(value = ServiceApi.AccountRepresentation.GetRandomImageCode)
+    @GetMapping(value = ServiceApi.AccountRepresentation.GetRandomImageCode)
     @ApiOperation(value = "修改密码时生成图形验证码",notes = "修改密码时生成图形验证码")
-    public Result getImageCode (HttpServletRequest request, HttpServletResponse response)throws Exception{
-        request.getSession().removeAttribute(RandomValidateCode.RANDOMCODEKEY);
-        RandomValidateCode randomValidateCode = new RandomValidateCode();
-        randomValidateCode.getRandcode(request,response);
-        return Result.success("生成成功！");
+    public void getImageCode (HttpServletRequest request, HttpServletResponse response)throws Exception{
+        try {
+            response.setContentType("image/jpeg");//设置相应类型,告诉浏览器输出的内容为图片
+            response.setHeader("Pragma", "No-cache");//设置响应头信息，告诉浏览器不要缓存此内容
+            response.setHeader("Cache-Control", "no-cache");
+            response.setDateHeader("Expire", 0);
+            RandomValidateCode randomValidateCode = new RandomValidateCode();
+            randomValidateCode.getRandcode(request, response);//输出验证码图片方法
+        } catch (Exception e) {
+            logger.error("获取验证码失败>>>>   ", e);
+        }
+
     }
 
     @PostMapping(value = ServiceApi.AccountRepresentation.CheckRandomImageCode)
