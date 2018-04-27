@@ -78,7 +78,7 @@ public class TelVerificationEndPoint extends EnvelopRestEndPoint {
         if (null != userTelVerification) {
             String code = random;
             String api = "MsgGW.Sms.send";
-            String content = "您好，短信验证码为:【" + code + "】，请在10分钟内验证！";
+            String content = "尊敬的用户：欢迎使用健康上饶，您的验证码为:【" + code + "】,有效期n分钟，请尽快完成注册。若非本人操作，请忽略。";
             Map<String, String> apiParamMap = new HashMap<>();
             //发送短信
             //手机号码
