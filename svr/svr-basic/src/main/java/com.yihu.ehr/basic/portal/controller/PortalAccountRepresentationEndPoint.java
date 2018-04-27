@@ -98,7 +98,7 @@ public class PortalAccountRepresentationEndPoint extends EnvelopRestEndPoint {
     @PostMapping(value = ServiceApi.AccountRepresentation.findUserByPhoneOrName)
     @ApiOperation(value = "根据手机号或者用户查询用户",notes = "找回密码时验证")
     public Envelop findUserByPhoneOrName(@ApiParam(name = "keyWord",value = "手机号码或者用户名")@RequestParam(value = "keyWord",defaultValue = "")String keyWord){
-        String sql = "SELECT id,login_code,telephone FROM users WHERE login_code ='"+keyWord+"' or telephone = '"+keyWord+"'";
+        String sql = "SELECT * FROM users WHERE login_code ='"+keyWord+"' or telephone = '"+keyWord+"'";
         //Map<String,Object> map = jdbcTemplate.queryForMap(sql);
         List<Map<String,Object>> list = jdbcTemplate.queryForList(sql);
         if (list!=null && list.size()>0){
