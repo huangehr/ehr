@@ -337,7 +337,7 @@ public class AppEndPoint extends EnvelopRestEndPoint {
         if (StringUtils.isEmpty(userId)){
             return failed("请先登录!");
         }
-        List<App> list = appService.getAppByParentIdAndUserId(userId);
+        List<Map<String,Object>> list = appService.getAppByParentIdAndUserId(userId);
         return success(list);
     }
 
