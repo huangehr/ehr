@@ -13,6 +13,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.catalina.servlet4preview.http.HttpServletRequest;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -36,6 +37,9 @@ public class PortalAccountRepresentationEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private UserService userService;
 
     @PostMapping(value = ServiceApi.AccountRepresentation.SaveAccontRepresenetation)
     @ApiOperation(value = "保存新增账号申诉",notes = "保存新增账号申诉")
@@ -94,7 +98,7 @@ public class PortalAccountRepresentationEndPoint extends EnvelopRestEndPoint {
     @PostMapping(value = ServiceApi.AccountRepresentation.findUserByPhoneOrName)
     @ApiOperation(value = "根据手机号或者用户查询用户",notes = "找回密码时验证")
     public Envelop findUserByPhoneOrName(@ApiParam(name = "keyWord",value = "手机号码或者用户名")@RequestParam(value = "keyWord",defaultValue = "")String keyWord){
-        String sql = "SELECT id,login_code,telephone FROM users WHERE login_code ='"+keyWord+"' or telephone = '"+keyWord+"'";
+        String sql = "SELECT * FROM users WHERE login_code ='"+keyWord+"' or telephone = '"+keyWord+"'";
         //Map<String,Object> map = jdbcTemplate.queryForMap(sql);
         List<Map<String,Object>> list = jdbcTemplate.queryForList(sql);
         if (list!=null && list.size()>0){
@@ -104,4 +108,15 @@ public class PortalAccountRepresentationEndPoint extends EnvelopRestEndPoint {
         }
     }
 
+    @RequestMapping(value = ServiceApi.AccountRepresentation.ChangePassWord, method = RequestMethod.PUT)
+    @ApiOperation(value = "修改密码", notes = "根基传入的用户id和新的密码修改用户的密码")
+    public boolean changePassWord(
+            @ApiParam(name = "user_id", value = "user_id", defaultValue = "")
+            @RequestParam(value = "user_id") String userId,
+            @ApiParam(name = "password", value = "密码", defaultValue = "")
+            @RequestParam(value = "password") String password) throws Exception {
+        String hashPassWord = DigestUtils.md5Hex(password);
+        userService.changePassWord(userId, hashPassWord);
+        return true;
+    }
 }
