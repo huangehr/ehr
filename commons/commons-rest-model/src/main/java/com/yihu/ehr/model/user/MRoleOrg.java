@@ -1,9 +1,11 @@
 package com.yihu.ehr.model.user;
 
+import java.io.Serializable;
+
 /**
  * Created by janseny 2017年10月18日
  */
-public class MRoleOrg {
+public class MRoleOrg implements Serializable{
     private long id;
     private long roleId;
     private String orgCode;

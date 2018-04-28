@@ -118,7 +118,7 @@ spring:
     password: GP8Qz4qU
 elasticsearch:
   cluster-name: elasticsearch
-  cluster-nodes: 172.10.10.2:9300
+  cluster-nodes: 172.10.10.5:9300
 fast-dfs:
   tracker-server: 192.168.50.116:22122,192.168.50.119:22122
   public-server: http://192.168.50.37:8888

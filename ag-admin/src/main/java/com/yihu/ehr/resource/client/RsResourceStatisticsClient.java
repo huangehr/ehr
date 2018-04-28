@@ -50,7 +50,9 @@ public interface RsResourceStatisticsClient {
             @ApiParam(name = "filter", value = "过滤", defaultValue = "")
             @RequestParam(value = "filter", required = false) String filter,
             @ApiParam(name = "dimension", value = "维度字段", defaultValue = "quotaDate")
-            @RequestParam(value = "dimension", required = false) String dimension);
+            @RequestParam(value = "dimension", required = false) String dimension,
+            @ApiParam(name = "top", value = "获取前几条数据")
+            @RequestParam(value = "top", required = false) String top);
 
     @RequestMapping(value = ServiceApi.TJ.GetArchiveCount, method = RequestMethod.GET)
     @ApiOperation(value = "获取档案总数")

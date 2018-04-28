@@ -2,10 +2,14 @@ package com.yihu.ehr.basic.org.controller;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.basic.address.service.AddressDictService;
+import com.yihu.ehr.basic.org.model.Organization;
 import com.yihu.ehr.basic.org.service.OrgSaasService;
+import com.yihu.ehr.basic.org.service.OrgService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.entity.address.AddressDict;
 import com.yihu.ehr.entity.organizations.OrgSaas;
 import com.yihu.ehr.model.common.ListResult;
 import io.swagger.annotations.Api;
@@ -16,7 +20,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -28,8 +35,10 @@ public class OrgSaasEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     private OrgSaasService orgSaasService;
-    @ApiParam
-    private ObjectMapper objectMapper;
+    @Autowired
+    private AddressDictService addressDictService;
+    @Autowired
+    private OrgService orgService;
 
     /**
      * 根据机构获取saas机构数据
@@ -52,6 +61,7 @@ public class OrgSaasEndPoint extends EnvelopRestEndPoint {
         result.setCode(200);
         return result;
     }
+
     /**
      * 机构授权检查并保存
      * @return
@@ -90,15 +100,42 @@ public class OrgSaasEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Org.getUserOrgSaasByUserOrgCode, method = RequestMethod.GET)
     @ApiOperation(value = "根据用户的机构id，获取Saas化的机构或者区域id")
     public List<String> getUserOrgSaasByUserOrgCode(
-            @ApiParam(name = "userOrgCode", value = "用户所在机构", defaultValue = "")
+            @ApiParam(name = "userOrgCode", value = "用户所在机构")
             @RequestParam(value = "userOrgCode", required = false)  List<String> userOrgCode,
-            @ApiParam(name = "type", value = "saas类型", defaultValue = "")
-            @RequestParam(value = "type", required = false) String type,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception  {
-        List<String> OrgSaasList = orgSaasService.getOrgSaasCodeByorgCode(userOrgCode,type);
+            @ApiParam(name = "type", value = "saas类型")
+            @RequestParam(value = "type", required = false) String type) throws Exception  {
+        List<String> OrgSaasList = orgSaasService.getOrgSaasCodeByorgCode(userOrgCode, type);
         return OrgSaasList;
     }
 
+    // ----------------------------- 用户登陆根据地区获取层级机构权限 ------------------------------------
+    @RequestMapping(value = ServiceApi.Org.childOrgSaasByAreaCode, method = RequestMethod.POST)
+    @ApiOperation(value = "根据地区获取层级机构权限")
+    public List<String> childOrgSaasByAreaCode (
+            @ApiParam(name = "area", value = "地区列表", required = true)
+            @RequestParam(value = "area") String area) throws Exception  {
+        String [] areaArr = area.split(",");
+        List<String> orgSaas = new ArrayList<>();
+        for (String _area : areaArr) {
+            AddressDict addressDict = addressDictService.findById(_area);
+            String province = "";
+            String city = "";
+            String district = "";
+            if (addressDict.getLevel() == 1){
+                province =  addressDict.getName();
+            } else if (addressDict.getLevel() == 2){
+                city =  addressDict.getName();
+            } else if (addressDict.getLevel() == 3){
+                district =  addressDict.getName();
+            }
+            List<Organization> orgList = orgService.searchByAddress(province, city, district);
+            orgList.forEach(item -> {
+                if (!orgSaas.contains(item)) {
+                    orgSaas.add(item.getOrgCode());
+                }
+            });
+        }
+        return orgSaas;
+    }
 
 }

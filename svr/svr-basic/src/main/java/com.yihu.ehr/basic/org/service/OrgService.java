@@ -97,12 +97,12 @@ public class OrgService extends BaseJpaService<Organization, OrganizationReposit
     }
 
     public List<Organization> searchByAddress(String province, String city,String district) {
-        List<String> geographyIds = addressService.search(province,city,district);
-        if(geographyIds !=null && geographyIds.size() > 0 ){
+        List<String> geographyIds = addressService.search(province, city, district);
+        if (geographyIds != null && geographyIds.size() > 0 ){
             List<Organization> orgs = organizationRepository.searchByAddress(geographyIds);
             return orgs;
-        }else {
-            return null;
+        } else {
+            return new ArrayList<>();
         }
     }
 
