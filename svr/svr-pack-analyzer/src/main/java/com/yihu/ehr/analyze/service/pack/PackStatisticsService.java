@@ -19,6 +19,7 @@ import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramBuild
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
 import org.elasticsearch.search.aggregations.bucket.terms.LongTerms;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.metrics.cardinality.CardinalityBuilder;
 import org.elasticsearch.search.aggregations.metrics.cardinality.InternalCardinality;
 import org.hibernate.Session;
@@ -55,6 +56,7 @@ public class PackStatisticsService extends BaseJpaService {
      * @return
      */
     public List<Map<String, Object>> getRecieveOrgCount(String dateStr) throws Exception{
+        long starttime = System.currentTimeMillis();
         Session session = currentSession();
         String sql1 = "SELECT org_code, COUNT(org_code) FROM json_archives WHERE (archive_status = 0 OR archive_status = 1) AND receive_date BETWEEN '" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59' GROUP BY org_code";
         ResultSet resultSet1 = elasticSearchUtil.findBySql(sql1);
@@ -132,6 +134,8 @@ public class PackStatisticsService extends BaseJpaService {
                 dataList.add(dataArr);
             }
         }
+        long endtime = System.currentTimeMillis();
+        System.out.println("各个医院的数据解析情况查询耗时：" + (endtime - starttime) + "ms");
         return dataList;
     }
 
@@ -160,12 +164,14 @@ public class PackStatisticsService extends BaseJpaService {
     }
 
     /**
-     * 获取某天数据新增情况
+     * 业务分析
      * @param date
      * @return
      */
     public List<Map<String,Object>> getArchivesInc(String date,String orgCode) throws Exception{
+        long starttime = System.currentTimeMillis();
         List<Map<String, Object>> list = getIncCount(date, orgCode);
+        System.out.println("业务分析日期："+list.size());
         if(!list.isEmpty()){
             for(Map<String, Object> map : list){
                 if(map.get("inpatient_inc")==null){
@@ -177,11 +183,14 @@ public class PackStatisticsService extends BaseJpaService {
                 map.putAll(getPatientCount(map.get("ed").toString(),orgCode));
             }
         }
+        long endtime = System.currentTimeMillis();
+        System.out.println("业务分析查询耗时：" + (endtime - starttime) + "ms");
         return list;
     }
 
 
     public List<Map<String, Object>> getIncCount(String date,String orgCode) throws Exception{
+        long starttime = System.currentTimeMillis();
         List<Map<String, Object>> list = new ArrayList<>();
         Map<String, Object> map = new HashMap<>();
         map.put("andOr", "and");
@@ -229,15 +238,16 @@ public class PackStatisticsService extends BaseJpaService {
                 LongTerms term = item1.getAggregations().get("terms");
                 term.getBuckets().forEach(item2 -> {
                     InternalCardinality internalCard = item2.getAggregations().get("cardinality");
-                    System.out.println(internalCard.getProperty("value"));
                     if((Long)item2.getKey()==0){
-                        temp.put("inpatient_inc",internalCard.getProperty("value"));
-                    }else{
                         temp.put("oupatient_inc",internalCard.getProperty("value"));
+                    } else if((Long) item2.getKey() == 1){
+                        temp.put("inpatient_inc",internalCard.getProperty("value"));
                     }
                 });
                 resultList.add(temp);
             });
+            long endtime = System.currentTimeMillis();
+            System.out.println("业务分析获取数据查询耗时：" + (endtime - starttime) + "ms");
             return resultList;
         } finally {
             elasticSearchPool.releaseClient(transportClient);
@@ -369,7 +379,7 @@ public class PackStatisticsService extends BaseJpaService {
         envelop.setDetailModelList(res);
         envelop.setSuccessFlg(true);
         long endtime = System.currentTimeMillis();
-        System.out.println("查询耗时：" + (endtime - starttime) + "ms");
+        System.out.println("完整性查询耗时：" + (endtime - starttime) + "ms");
         return envelop;
     }
     /**
@@ -379,56 +389,65 @@ public class PackStatisticsService extends BaseJpaService {
      * @return
      */
     public Map<String,Object> getPatientCount(String dateStr, String orgCode) throws Exception{
-        List<String> fields = new ArrayList<String>();
-        fields.add("patient_id");
-        fields.add("event_no");
-        String sql1 ="";
-        String sql2 ="";
-        String sql3 ="";
-        if(StringUtils.isNotEmpty(orgCode)){
-            sql1 = "SELECT COUNT(event_no) FROM json_archives WHERE event_type=1 AND org_code='"+orgCode+"' AND event_date BETWEEN" +
-                    " '" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59' GROUP BY patient_id,event_no";
-
-            sql2 = "SELECT COUNT(event_no) FROM json_archives WHERE event_type=0 AND org_code='"+orgCode+"' AND event_date BETWEEN " +
-                    "'" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59' GROUP BY patient_id,event_no";
-
-            sql3 = "SELECT COUNT(event_no) FROM json_archives WHERE org_code='"+orgCode+"' AND event_date BETWEEN " +
-                    "'" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59' GROUP BY patient_id,event_no";
-        }else{
-            sql1 = "SELECT COUNT(event_no) FROM json_archives WHERE event_type=1 AND event_date " +
-                    "BETWEEN '" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59' GROUP BY patient_id,event_no";
-
-            sql2 = "SELECT COUNT(event_no) FROM json_archives WHERE event_type=0 AND event_date " +
-                    "BETWEEN '" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59' GROUP BY patient_id,event_no";
-
-            sql3 = "SELECT COUNT(event_no) FROM json_archives WHERE event_date " +
-                    "BETWEEN '" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59' GROUP BY patient_id,event_no";
+        long starttime = System.currentTimeMillis();
+        List<Map<String, Object>> list = new ArrayList<>();
+        Map<String, Object> map = new HashMap<>();
+        map.put("andOr", "and");
+        map.put("condition", ">=");
+        map.put("field", "event_date");
+        map.put("value", ""+dateStr+" 00:00:00");
+        list.add(map);
+        map = new HashMap<>();
+        map.put("andOr", "and");
+        map.put("condition", "<");
+        map.put("field", "event_date");
+        map.put("value", ""+dateStr+" 23:59:59");
+        if(StringUtils.isNotEmpty(orgCode)&&!"null".equals(orgCode)){
+            map = new HashMap<>();
+            map.put("andOr", "and");
+            map.put("condition", "=");
+            map.put("field", "org_code");
+            map.put("value", orgCode);
         }
-        ResultSet resultSet1 = elasticSearchUtil.findBySql(sql1);
-        ResultSet resultSet2 = elasticSearchUtil.findBySql(sql2);
-        ResultSet resultSet3 = elasticSearchUtil.findBySql(sql3);
-        resultSet1.next();
-        resultSet2.next();
-        resultSet3.next();
-        Map<String,Object> map = new HashMap<String,Object>();
-        try{
-            map.put("inpatient_total",new Double(resultSet1.getObject("COUNT(event_no)").toString()).intValue());
-        }catch (Exception e){
-            map.put("inpatient_total",0);
+        list.add(map);
+        TransportClient transportClient = elasticSearchPool.getClient();
+        try {
+            SearchRequestBuilder builder = transportClient.prepareSearch("json_archives");
+            builder.setTypes("info");
+            builder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
+            builder.setQuery(elasticSearchUtil.getQueryBuilder(list));
+            AggregationBuilder terms = AggregationBuilders.terms("terms").field("event_type");
+            CardinalityBuilder cardinality = AggregationBuilders.cardinality("cardinality").field("event_no");
+            terms.subAggregation(cardinality);
+            builder.addAggregation(terms);
+            builder.setSize(0);
+            builder.setExplain(true);
+            SearchResponse response = builder.get();
+            Map<String, Object> temp = new HashMap<>();
+            LongTerms term = response.getAggregations().get("terms");
+            int total = 0;
+            for (Terms.Bucket item : term.getBuckets()) {
+                InternalCardinality internalCard = item.getAggregations().get("cardinality");
+                if ((Long) item.getKey() == 0) {
+                    temp.put("oupatient_total", new Double(internalCard.getProperty("value").toString()).intValue());
+                } else if((Long) item.getKey() == 1){
+                    temp.put("inpatient_total", new Double(internalCard.getProperty("value").toString()).intValue());
+                }
+                total = total + new Double(internalCard.getProperty("value").toString()).intValue();
+            }
+            if(temp.get("inpatient_total")==null){
+                temp.put("inpatient_total",0);
+            }
+            if(temp.get("oupatient_total")==null){
+                temp.put("oupatient_total",0);
+            }
+            temp.put("total",total);
+            long endtime = System.currentTimeMillis();
+            System.out.println("平台就诊人数 去重复：" + (endtime - starttime) + "ms");
+            return temp;
+        } finally {
+            elasticSearchPool.releaseClient(transportClient);
         }
-
-        try{
-            map.put("oupatient_total",new Double(resultSet2.getObject("COUNT(event_no)").toString()).intValue());
-        }catch (Exception e){
-            map.put("oupatient_total",0);
-        }
-
-        try{
-            map.put("total",new Double(resultSet3.getObject("COUNT(event_no)").toString()).intValue());
-        }catch (Exception e){
-            map.put("total",0);
-        }
-        return map;
     }
 
 
@@ -439,6 +458,7 @@ public class PackStatisticsService extends BaseJpaService {
      * @return
      */
     public Map<String,Object> getPatientNum(String dateStr, String orgCode) throws Exception{
+        long starttime = System.currentTimeMillis();
         String sql1 ="";
         String sql2 ="";
         String sql3 ="";
@@ -472,15 +492,18 @@ public class PackStatisticsService extends BaseJpaService {
         map.put("inpatient_total",new Double(resultSet1.getObject("COUNT(*)").toString()).intValue());
         map.put("oupatient_total", new Double(resultSet2.getObject("COUNT(*)").toString()).intValue());
         map.put("total",new Double(resultSet3.getObject("COUNT(*)").toString()).intValue());
+        long endtime = System.currentTimeMillis();
+        System.out.println("平台就诊人数查询耗时：" + (endtime - starttime) + "ms");
         return map;
     }
     /**
-     * 从ES获取数据
+     * 从质控包获取数据
      * @param date
      * @param orgCode
      * @return
      */
     public Map<String,Object> getPatientCountEs(String date, String orgCode) {
+        long starttime = System.currentTimeMillis();
         Map<String,Object> resMap = new HashMap<String,Object>();
         int total=0;
         int inpatient_total=0;
@@ -512,6 +535,8 @@ public class PackStatisticsService extends BaseJpaService {
             resMap.put("total",total);
             resMap.put("inpatient_total",inpatient_total);
             resMap.put("oupatient_total",oupatient_total);
+            long endtime = System.currentTimeMillis();
+            System.out.println("从质控包获取数据查询耗时：" + (endtime - starttime) + "ms");
             return resMap;
         }catch (Exception e){
             e.printStackTrace();
@@ -531,6 +556,7 @@ public class PackStatisticsService extends BaseJpaService {
      * @return
      */
     public Envelop getArchivesTime(String startDate, String endDate, String orgCode) throws Exception{
+        long starttime = System.currentTimeMillis();
         Envelop envelop = new Envelop();
         Date start = DateUtil.formatCharDateYMD(startDate);
         Date end = DateUtil.formatCharDateYMD(endDate);
@@ -603,61 +629,90 @@ public class PackStatisticsService extends BaseJpaService {
         envelop.setObj(resMap);
         envelop.setDetailModelList(res);
         envelop.setSuccessFlg(true);
+        long endtime = System.currentTimeMillis();
+        System.out.println("及时性查询耗时：" + (endtime - starttime) + "ms");
         return envelop;
     }
 
     /**
-     * 获取一段时间内数据解析情况
+     * 及时性获取数据
      * @param date
      * @param orgCode
      * @return
      */
     public Map<String,Object> getPatientCountTime(String date, String orgCode) throws Exception{
+        long starttime = System.currentTimeMillis();
         Date begin = DateUtil.parseDate(date, DateUtil.DEFAULT_DATE_YMD_FORMAT);
         Date end = DateUtil.addDate(2, begin);
         Date end1 = DateUtil.addDate(2, begin);
         Date end2 = DateUtil.addDate(7, begin);
+        List<Map<String, Object>> list1 = new ArrayList<>();
+        List<Map<String, Object>> list2 = new ArrayList<>();
+        Map<String, Object> map = new HashMap<>();
+        map.put("andOr", "and");
+        map.put("condition", ">=");
+        map.put("field", "event_date");
+        map.put("value", ""+DateUtil.toString(begin)+" 00:00:00");
+        list1.add(map);
+        list2.add(map);
+        map = new HashMap<>();
+        map.put("andOr", "and");
+        map.put("condition", "<");
+        map.put("field", "event_date");
+        map.put("value", ""+DateUtil.toString(end)+" 23:59:59");
+        list1.add(map);
+        list2.add(map);
+        map = new HashMap<>();
+        map.put("andOr", "and");
+        map.put("condition", ">=");
+        map.put("field", "receive_date");
+        map.put("value", ""+DateUtil.toString(begin)+" 00:00:00");
+        list1.add(map);
+        list2.add(map);
 
-        List<String> fields = new ArrayList<String>();
-        fields.add("patient_id");
-        fields.add("event_no");
-        String sql1 ="";
-        String sql2 ="";
-        if(StringUtils.isNotEmpty(orgCode)){
-            sql1 = "SELECT patient_id,event_no FROM json_archives WHERE event_type=1 AND org_code='"+orgCode+"' AND event_date BETWEEN" +
-                    " '" + DateUtil.toString(begin) + " 00:00:00' AND '" +  DateUtil.toString(end) + " 00:00:00' AND receive_date BETWEEN"+
-                    " '" + DateUtil.toString(begin) + " 00:00:00' AND '" +  DateUtil.toString(end2) + " 00:00:00' GROUP BY patient_id,event_no";
+        map = new HashMap<>();
+        map.put("andOr", "and");
+        map.put("condition", "<");
+        map.put("field", "receive_date");
+        map.put("value", ""+DateUtil.toString(end2)+" 00:00:00");
+        list1.add(map);
 
-            sql2 = "SELECT patient_id,event_no FROM json_archives WHERE event_type=0 AND org_code='"+orgCode+"' AND event_date BETWEEN " +
-                    " '" + DateUtil.toString(begin) + " 00:00:00' AND '" +  DateUtil.toString(end) + " 00:00:00' AND receive_date BETWEEN"+
-                    " '" + DateUtil.toString(begin) + " 00:00:00' AND '" +  DateUtil.toString(end1) + " 00:00:00' GROUP BY patient_id,event_no";
-        }else{
-            sql1 = "SELECT patient_id,event_no FROM json_archives WHERE event_type=1  AND event_date BETWEEN" +
-                    " '" + DateUtil.toString(begin) + " 00:00:00' AND '" +  DateUtil.toString(end) + " 00:00:00' AND receive_date BETWEEN"+
-                    " '" + DateUtil.toString(begin) + " 00:00:00' AND '" +  DateUtil.toString(end2) + " 00:00:00' GROUP BY patient_id,event_no";
+        map = new HashMap<>();
+        map.put("andOr", "and");
+        map.put("condition", "<");
+        map.put("field", "receive_date");
+        map.put("value", ""+DateUtil.toString(end1)+" 00:00:00");
+        list2.add(map);
 
-            sql2 = "SELECT patient_id,event_no FROM json_archives WHERE event_type=0  AND event_date BETWEEN " +
-                    " '" + DateUtil.toString(begin) + " 00:00:00' AND '" +  DateUtil.toString(end) + " 00:00:00' AND receive_date BETWEEN"+
-                    " '" + DateUtil.toString(begin) + " 00:00:00' AND '" +  DateUtil.toString(end1) + " 00:00:00' GROUP BY patient_id,event_no";
+        map = new HashMap<>();
+        map.put("andOr", "and");
+        map.put("condition", "=");
+        map.put("field", "event_type");
+        map.put("value", "1");
+        list1.add(map);
+
+        map = new HashMap<>();
+        map.put("andOr", "and");
+        map.put("condition", "=");
+        map.put("field", "event_type");
+        map.put("value", "0");
+        list2.add(map);
+        if(StringUtils.isNotEmpty(orgCode)&&!"null".equals(orgCode)){
+            map = new HashMap<>();
+            map.put("andOr", "and");
+            map.put("condition", "=");
+            map.put("field", "org_code");
+            map.put("value", orgCode);
+            list1.add(map);
+            list2.add(map);
         }
 
-        ResultSet resultSet1 = elasticSearchUtil.findBySql(sql1);
-        ResultSet resultSet2 = elasticSearchUtil.findBySql(sql2);
-        resultSet1.next();
-        resultSet2.next();
-        Map<String,Object> map = new HashMap<String,Object>();
-        try{
-            map.put("inpatient_total",new Double(resultSet1.getObject("COUNT(event_no)").toString()).intValue());
-        }catch (Exception e){
-            map.put("inpatient_total",0);
-        }
-
-        try{
-            map.put("oupatient_total",new Double(resultSet2.getObject("COUNT(event_no)").toString()).intValue());
-        }catch (Exception e){
-            map.put("oupatient_total",0);
-        }
-        return map;
+        Map<String,Object> temp = new HashMap<String,Object>();
+        temp.put("inpatient_total",elasticSearchUtil.cardinality("json_archives","info",list1,"event_no"));
+        temp.put("oupatient_total",elasticSearchUtil.cardinality("json_archives","info",list2,"event_no"));
+        long endtime = System.currentTimeMillis();
+        System.out.println("及时性数据查询耗时：" + (endtime - starttime) + "ms");
+        return temp;
     }
 
     /**
