@@ -53,7 +53,7 @@ public class HealthArchiveScheduler {
 
 
         BasesicUtil basesicUtil = new BasesicUtil();
-        String initializeDate = "2018-03-15";
+        String initializeDate = "2018-05-03";
         String initializeDate2 = healthArchiveSchedulerService.getDictValue("3");
         initializeDate = StringUtils.isNotEmpty(initializeDate2) ? initializeDate2 : initializeDate;
         Date now = new Date();
