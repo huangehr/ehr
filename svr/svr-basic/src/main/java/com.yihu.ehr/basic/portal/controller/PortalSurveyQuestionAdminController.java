@@ -25,6 +25,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.util.Map;
+
 /**
  * Created by zhangdan on 2018/4/17.
  */
@@ -38,45 +40,7 @@ public class PortalSurveyQuestionAdminController extends EnvelopRestEndPoint {
     @Autowired
     private SurveyQuestionOptionService surveyQuestionOptionService;
 
-    /*//---问题管理列表---
-    @RequestMapping(value = "initial", method = RequestMethod.GET)
-    @ApiIgnore
-    @ApiOperation(value = "问题管理列表")
-    public String initQuestionList(){
-        return "questionnaire/question/question_list";
-    }
-
-    //页面跳转（新增问题页面）
-    @RequestMapping(value ="infoInit",method = RequestMethod.GET)
-    @ApiIgnore
-    @ApiOperation(value = "页面跳转（新增问题页面）")
-    public String infoInit(String id,String mode){
-        request.setAttribute("id",id);
-        request.setAttribute("mode",mode);
-        return "questionnaire/question/question_add";
-    }
-
-    //页面跳转（编辑问题页面）
-    @RequestMapping(value ="editQuestion",method = RequestMethod.GET)
-    @ApiIgnore
-    @ApiOperation(value = "页面跳转（编辑问题页面）")
-    public String editQuestion(String id,String mode){
-        request.setAttribute("id",id);
-        request.setAttribute("mode",mode);
-        return "questionnaire/question/question_edit";
-    }
-
-    //跳转到问题查看页
-    @RequestMapping(value = "seeQuestion", method = RequestMethod.GET)
-    @ApiIgnore
-    @ApiOperation(value = "跳转到问题查看页")
-    public String seeQuestion(String id,String type) {
-        request.setAttribute("id",id);
-        request.setAttribute("type",type);
-        return "questionnaire/question/see_question";
-    }*/
-
-    @RequestMapping(value = ServiceApi.SurveyAdminManage.GetSurveyTemplateList, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.SurveyAdminManage.GetSurveyQuestionList, method = RequestMethod.POST)
     @ResponseBody
     @ApiOperation(value = "问题列表数据")
     public Envelop searchQuestionList(
@@ -92,51 +56,30 @@ public class PortalSurveyQuestionAdminController extends EnvelopRestEndPoint {
         return success(res);
     }
 
-    /**
-     * 问题新增页面
-     * @param
-     * @return
-     *//*
-    @RequestMapping(value = "addQuestionInitial", method = RequestMethod.GET)
-    @ApiIgnore
-    @ApiOperation(value = "问题列表数据")
-    public String addQuestionInitial(Model model) {
-        return "survey/question/addQuestion";
-    }*/
 
     @RequestMapping(value = ServiceApi.SurveyAdminManage.SaveSurveyQuestion, method = RequestMethod.POST)
     @ResponseBody
     @ApiOperation(value = "新增问题（可批量新增）")
     public Result addQuestions(@ApiParam(name = "jsonData", value = "新增json",defaultValue = "")
-                                @RequestParam(value = "jsonData", required = true) String jsonData) {
-        try {
-            System.out.println("jsonData:"+jsonData);
-            surveyQuestionService.saveOrUpdateQuestion(jsonData);
-            return Result.success("新增成功！");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Result.error(-1, "新增失败！");
-        }
+                                @RequestParam(value = "jsonData", required = true) String jsonData)throws Exception {
+        System.out.println("jsonData:"+jsonData);
+        surveyQuestionService.saveOrUpdateQuestion(jsonData);
+        return Result.success("新增成功！");
     }
 
     @RequestMapping(value =ServiceApi.SurveyAdminManage.GetQuestionById, method = RequestMethod.GET)
     @ResponseBody
     @ApiOperation(value = "根据id获取单个问题")
-    public Result getQuestion(@ApiParam(name = "id", value = "问题id",defaultValue = "1")
-                               @RequestParam(value = "id", required = true) Long id) {
-        try {
-            SurveyQuestion question = surveyQuestionService.findById(id);
-            if(question == null){
-                return Result.error(-1, "获取问题Id不存在");
-            }else if("0".equals(question.getDel())){
-                return Result.error(-1, "该问题已被删除");
-            }else{
-                JSONObject json = surveyQuestionService.getQuestion(question);
-                return Result.success("获取成功",json);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Result.error(-1, "获取失败！");
+    public Envelop getQuestion(@ApiParam(name = "id", value = "问题id",defaultValue = "1")
+                               @RequestParam(value = "id", required = true) String id)throws Exception {
+        SurveyQuestion question = surveyQuestionService.findById(Long.valueOf(id));
+        if(question == null){
+            return failed( "获取问题Id不存在");
+        }else if("0".equals(question.getDel())){
+            return failed( "该问题已被删除");
+        }else{
+            Map<String,Object> map = surveyQuestionService.getQuestion(question);
+            return success(map);
         }
     }
 
@@ -144,49 +87,34 @@ public class PortalSurveyQuestionAdminController extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.SurveyAdminManage.GetQuestionsByIds, method = RequestMethod.GET)
     @ResponseBody
     @ApiOperation(value = "根据ids获取多个问题")
-    public Result getQuestion(@ApiParam(name = "ids", value = "问题ids",defaultValue = "1")
-                              @RequestParam(value = "ids", required = true) String  ids) {
-        try {
-            JSONArray questions = surveyQuestionService.findByIds(ids);
-             return Result.success("获取成功",questions);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Result.error(-1, "获取失败！");
-        }
+    public Result getQuestions(@ApiParam(name = "ids", value = "问题ids",defaultValue = "1")
+                              @RequestParam(value = "ids", required = true) String  ids)throws Exception {
+        JSONArray questions = surveyQuestionService.findByIds(ids);
+        return Result.success("获取成功",questions);
     }
 
     @RequestMapping(value = ServiceApi.SurveyAdminManage.DelQuestion, method = RequestMethod.GET)
     @ResponseBody
     @ApiOperation(value = "根据id删除单个问题")
     public Result delQuestion(@ApiParam(name = "id", value = "问题id",defaultValue = "1")
-                              @RequestParam(value = "id", required = true) Long id) {
-        try {
-            surveyQuestionService.delQuestion(id);
-            return Result.success("删除成功");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Result.error(-1, "删除失败！");
-        }
+                              @RequestParam(value = "id", required = true) String id)throws Exception {
+        surveyQuestionService.delQuestion(Long.valueOf(id));
+        return Result.success("删除成功");
     }
 
     @RequestMapping(value = ServiceApi.SurveyAdminManage.DelQuestions, method = RequestMethod.GET)
     @ResponseBody
     @ApiOperation(value = "批量删除")
     public Result delQuestions(@ApiParam(name = "ids", value = "问题ids",defaultValue = "1;2;3")
-                              @RequestParam(value = "ids", required = true) String ids) {
-        try {
-            if(StringUtils.isEmpty(ids)){
-                return Result.error(-1, "删除问题ids不能为空！");
-            }
-            surveyQuestionService.delQuestions(ids);
-            return Result.success("删除成功");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Result.error(-1, "删除失败！");
+                              @RequestParam(value = "ids", required = true) String ids)throws Exception {
+        if(StringUtils.isEmpty(ids)){
+            return Result.error(-1, "删除问题ids不能为空！");
         }
+        surveyQuestionService.delQuestions(ids);
+        return Result.success("删除成功");
     }
 
-    @RequestMapping(value = ServiceApi.SurveyAdminManage.updateQuestion, method = RequestMethod.POST)
+    /*@RequestMapping(value = ServiceApi.SurveyAdminManage.updateQuestion, method = RequestMethod.POST)
     @ResponseBody
     @ApiOperation(value = "更新问题")
     public Result updQuestion(@ApiParam(name = "questionData", value = "问题json",defaultValue = "{}")
@@ -198,8 +126,7 @@ public class PortalSurveyQuestionAdminController extends EnvelopRestEndPoint {
             e.printStackTrace();
             return Result.error(-1, "更新失败！");
         }
-    }
-
+    }*/
 
 
 }

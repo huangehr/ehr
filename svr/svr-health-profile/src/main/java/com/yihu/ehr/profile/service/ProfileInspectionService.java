@@ -20,6 +20,8 @@ public class ProfileInspectionService {
 
     @Autowired
     private ResourceClient resource; //资源服务
+    @Autowired
+    private RedisService redisService;
 
     public List inspectionRecords(String demographicId, String filter, String date, String searchParam) throws Exception {
         List<Map<String, Object>> resultList = new ArrayList<>();
@@ -30,42 +32,44 @@ public class ProfileInspectionService {
         if (masterEnvelop.isSuccessFlg()) {
             List<Map<String, Object>> masterList = masterEnvelop.getDetailModelList();
             //循环获取结果集
-            for (Map<String, Object> masterMap : masterList) {
+            for (Map<String, Object> temp : masterList) {
                 Map<String, Object> resultMap = new HashMap<>();
-                resultMap.put("profileId", masterMap.get("rowkey"));
-                resultMap.put("orgCode", masterMap.get("org_code"));
-                resultMap.put("orgName", masterMap.get("org_name"));
-                resultMap.put("demographicId", masterMap.get("demographic_id"));
-                resultMap.put("cdaVersion", masterMap.get("cda_version"));
-                resultMap.put("eventDate", masterMap.get("event_date"));
-                resultMap.put("profileType", masterMap.get("profile_type"));
-                resultMap.put("eventType", masterMap.get("event_type"));
-                resultMap.put("eventNo", masterMap.get("event_no"));
+                resultMap.put("profileId", temp.get("rowkey"));
+                resultMap.put("orgCode", temp.get("org_code"));
+                resultMap.put("orgName", temp.get("org_name"));
+                resultMap.put("demographicId", temp.get("demographic_id"));
+                resultMap.put("cdaVersion", temp.get("cda_version"));
+                resultMap.put("eventDate", temp.get("event_date"));
+                resultMap.put("profileType", temp.get("profile_type"));
+                resultMap.put("eventType", temp.get("event_type"));
+                resultMap.put("eventNo", temp.get("event_no"));
                 //追加诊断名称 start
-                String subQ = "{\"q\":\"profile_id:" + masterMap.get("rowkey") + "\"}";
-                Envelop subEnvelop = resource.getSubData(subQ, 1, 500, null);
-                List<Map<String, Object>> subEventList = subEnvelop.getDetailModelList();
                 String healthProblemName = "";
-                //根据诊断名称或根据字典值进行取值
-                for (Map<String ,Object> temp2 : subEventList) {
-                    String diagnosis = "";
-                    if (!StringUtils.isEmpty(temp2.get("EHR_000112")) || !StringUtils.isEmpty(temp2.get("EHR_000109_VALUE"))) {
-                        diagnosis = temp2.get("EHR_000112") != null ? (String) temp2.get("EHR_000112") : (String) temp2.get("EHR_000109_VALUE");
+                if (!StringUtils.isEmpty(temp.get("health_problem_name"))) {
+                    healthProblemName = ((String) temp.get("health_problem_name")).replaceAll(";", "、");
+                } else if (!StringUtils.isEmpty(temp.get("health_problem"))) {
+                    String [] _hpCode = ((String) temp.get("health_problem")).split(";");
+                    for (String code : _hpCode) {
+                        String name = redisService.getHealthProblem(code);
+                        if (!StringUtils.isEmpty(name)) {
+                            healthProblemName += name + "、";
+                        }
                     }
-                    if (StringUtils.isEmpty(diagnosis) && (!StringUtils.isEmpty(temp2.get("EHR_000295")) || !StringUtils.isEmpty(temp2.get("EHR_000293_VALUE")))) {
-                        diagnosis = temp2.get("EHR_000295") != null ? (String) temp2.get("EHR_000295") : (String) temp2.get("EHR_000293_VALUE");
-                    }
-                    if (StringUtils.isEmpty(diagnosis) && (!StringUtils.isEmpty(temp2.get("EHR_000820")) || !StringUtils.isEmpty(temp2.get("EHR_000819_VALUE")))) {
-                        diagnosis = temp2.get("EHR_000820") != null ? (String) temp2.get("EHR_000820") : (String) temp2.get("EHR_000819_VALUE");
-                    }
-                    if (!StringUtils.isEmpty(diagnosis)) {
-                        healthProblemName += diagnosis + "、";
+                } else if (!StringUtils.isEmpty(temp.get("diagnosis_name"))) {
+                    healthProblemName = ((String) temp.get("diagnosis_name")).replaceAll(";", "、");
+                } else if (!StringUtils.isEmpty(temp.get("diagnosis"))) {
+                    String [] diagnosisCode = ((String) temp.get("diagnosis")).split(";");
+                    for (String code : diagnosisCode) {
+                        String name = redisService.getIcd10Name(code);
+                        if (!StringUtils.isEmpty(name)) {
+                            healthProblemName += name + "、";
+                        }
                     }
                 }
                 resultMap.put("healthProblemName", healthProblemName);
                 //追加诊断名称 end
                 if (!StringUtils.isEmpty(searchParam)) {
-                    String orgName = (String) masterMap.get("org_name");
+                    String orgName = (String) temp.get("org_name");
                     if (orgName.contains(searchParam) || healthProblemName.contains(searchParam)) {
                         resultList.add(resultMap);
                     }

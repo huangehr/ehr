@@ -44,7 +44,6 @@ public class PackMillService {
         if (!StringUtils.isBlank(orgArea)) {
             resourceBucket.setOrgArea(orgArea);
         }
-
         //门诊/住院诊断、健康问题
         if (stdPack.getDiagnosisList() != null && stdPack.getDiagnosisList().size() > 0) {
             Set<String> healthProblemList = new HashSet<>();
@@ -52,8 +51,8 @@ public class PackMillService {
             for (String diagnosis : stdPack.getDiagnosisList()) {
                 String healthProblem = redisService.getHpCodeByIcd10(diagnosis);//通过ICD10获取健康问题
                 if (!StringUtils.isEmpty(healthProblem)) {
-                    String[] hpCodeList = healthProblem.split(";");
-                    for (String hpCode : hpCodeList) {
+                    String[] hpCodeArr = healthProblem.split(";");
+                    for (String hpCode : hpCodeArr) {
                         String hpName = redisService.getHealthProblem(hpCode);
                         healthProblemList.add(hpCode);
                         healthProblemNameList.add(hpName);

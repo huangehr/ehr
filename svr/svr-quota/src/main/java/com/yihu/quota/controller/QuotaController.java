@@ -119,7 +119,9 @@ public class QuotaController extends BaseController {
             @ApiParam(name = "filters", value = "检索条件", defaultValue = "")
             @RequestParam(value = "filters", required = false) String filters,
             @ApiParam(name = "dimension", value = "需要统计不同维度字段多个维度用;隔开", defaultValue = "quotaDate")
-            @RequestParam(value = "dimension", required = false) String dimension
+            @RequestParam(value = "dimension", required = false) String dimension,
+            @ApiParam(name = "top", value = "获取前几条数据")
+            @RequestParam(value = "top", required = false) String top
     ) {
 
         Envelop envelop = new Envelop();
@@ -164,21 +166,21 @@ public class QuotaController extends BaseController {
 
             if(tjQuota.getResultGetType().equals("1")){
                 //普通指标直接查询
-                resultList = baseStatistsService.getQuotaResultList(code, dimension,filters,dateType);
+                resultList = baseStatistsService.getQuotaResultList(code, dimension,filters,dateType, top);
             }else {
                 if( (StringUtils.isNotEmpty(esConfig.getMolecular())) && StringUtils.isNotEmpty(esConfig.getDenominator())){//除法
                     //除法指标查询输出结果
                     molecularFilter = baseStatistsService.handleFilter(esConfig.getMolecularFilter(), molecularFilter);
                     denominatorFilter = baseStatistsService.handleFilter(esConfig.getDenominatorFilter(), denominatorFilter);
                     if (StringUtils.isNotEmpty(esConfig.getConstValue())) {
-                        resultList = baseStatistsService.divisionQuotaDenoConstant(esConfig.getMolecular(), dimension, filters, esConfig.getPercentOperation(), esConfig.getPercentOperationValue(), dateType, esConfig.getConstValue(), esConfig.getDistrict());
+                        resultList = baseStatistsService.divisionQuotaDenoConstant(esConfig.getMolecular(), dimension, filters, esConfig.getPercentOperation(), esConfig.getPercentOperationValue(), dateType, esConfig.getConstValue(), esConfig.getDistrict(), top);
                     } else {
-                        resultList =  baseStatistsService.divisionQuota(esConfig.getMolecular(), esConfig.getDenominator(), dimension, molecularFilter, denominatorFilter, esConfig.getPercentOperation(), esConfig.getPercentOperationValue(),dateType);
+                        resultList =  baseStatistsService.divisionQuota(esConfig.getMolecular(), esConfig.getDenominator(), dimension, molecularFilter, denominatorFilter, esConfig.getPercentOperation(), esConfig.getPercentOperationValue(),dateType, top);
                     }
                 }else {
                     if(StringUtils.isNotEmpty(esConfig.getSuperiorBaseQuotaCode())){
                         //通过基础指标 抽取查询
-                        resultList = baseStatistsService.getQuotaResultList(esConfig.getSuperiorBaseQuotaCode(), dimension,filters,dateType);
+                        resultList = baseStatistsService.getQuotaResultList(esConfig.getSuperiorBaseQuotaCode(), dimension,filters,dateType, top);
                     }
                 }
             }
@@ -225,14 +227,16 @@ public class QuotaController extends BaseController {
             @ApiParam(name = "filters", value = "检索条件 多个条件用 and 拼接 如：town=361002 and org=10000001 ", defaultValue = "")
             @RequestParam(value = "filters", required = false) String filters,
             @ApiParam(name = "dimension", value = "需要统计不同维度字段", defaultValue = "")
-            @RequestParam(value = "dimension", required = true) String dimension
+            @RequestParam(value = "dimension", required = true) String dimension,
+            @ApiParam(name = "top", value = "获取前几条数据")
+            @RequestParam(value = "top", required = false) String top
     ) {
         Envelop envelop = new Envelop();
         try {
             if(filters!=null){
                 filters = URLDecoder.decode(filters, "UTF-8");
             }
-            List<Map<String, Object>> result =  baseStatistsService.getSimpleQuotaReport(code,filters,dimension,true);
+            List<Map<String, Object>> result =  baseStatistsService.getSimpleQuotaReport(code,filters,dimension,true, top);
             envelop.setObj(result);
             envelop.setSuccessFlg(true);
             return envelop;

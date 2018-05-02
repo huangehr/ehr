@@ -166,10 +166,10 @@ public class PortalMessageRemindEndPoint extends EnvelopRestEndPoint {
         //如果type为空的话，默认获取当前用户的所有消息。否则获取指定消息模板的消息。
         ProtalMessageRemind  protalMessageRemind = messageRemindService.getMessageRemind(protalMessageRemindId);
         PortalMessageTemplate template = portalMessageTemplateService.getMessageTemplate(protalMessageRemind.getMessageTemplateId());
-        //根据订单号获取 订单详情
+        //根据第三方订单号获取 订单详情
         List<Registration> registrationList= null;
         if(StringUtils.isNotEmpty(orderId)){
-            registrationList = registrationService.findByField("orderId",orderId);
+            registrationList = registrationService.findByField("id",orderId);
             List<MRegistration> mRegistrationlList = (List<MRegistration>) convertToModels(registrationList, new ArrayList<MRegistration>(), MRegistration.class, "");
             MMessageRemind mMessageRemind = convertToModel(protalMessageRemind, MMessageRemind.class);
             //提供将挂号单详细内容
@@ -178,11 +178,10 @@ public class PortalMessageRemindEndPoint extends EnvelopRestEndPoint {
                 //根据医院名称、科室名称查找科室位置
                 String orgName = mregistration.getHospitalName() == null ? "" : mregistration.getHospitalName();
                 String deptName = mregistration.getDeptName() == null ? "" : mregistration.getDeptName();
-                OrgDeptDetail orgDeptDetail = null;
                 if(StringUtils.isNotEmpty(orgName)&&StringUtils.isNotEmpty(deptName)){
-                    orgDeptDetail = deptDetailService.searchByOrgNameAndDeptName(orgName,deptName);
+                   String orgDeptDetailPlace = deptDetailService.searchByOrgNameAndDeptName(orgName,deptName);
                     //科室位置
-                    mMessageRemind.setDeptAdress(orgDeptDetail == null?"":orgDeptDetail.getPlace());
+                    mMessageRemind.setDeptAdress(orgDeptDetailPlace == null?"":orgDeptDetailPlace);
                 }
                 //温馨提示
                 mMessageRemind.setNotice(template == null?"":template.getAfterContent());
@@ -224,7 +223,7 @@ public class PortalMessageRemindEndPoint extends EnvelopRestEndPoint {
                     Map<String,Object> dataMap = (Map<String, Object>) list.getList().get(i);
                     MRegistration newEntity = objectMapper.readValue(toJson(dataMap), MRegistration.class);
                     //根据订单号获取 消息
-                    List<ProtalMessageRemind> protalMessageR=  messageRemindService.findByField("orderId",newEntity.getOrderId());
+                    List<ProtalMessageRemind> protalMessageR=  messageRemindService.findByField("orderId",newEntity.getId());
                     mMessageRemind =new MMessageRemind();
                     mMessageRemind.setmRegistration(convertToModel(newEntity, MRegistration.class));
                     if(null != protalMessageR && protalMessageR.size()>0){
@@ -232,6 +231,7 @@ public class PortalMessageRemindEndPoint extends EnvelopRestEndPoint {
                     mMessageRemind.setId(Long.parseLong(protalMessageR.get(0).getId().toString()));
                     mMessageRemind.setOrderId(newEntity.getOrderId());
                     mMessageRemind.setNotifieFlag(protalMessageR.get(0).getNotifieFlag());
+                    mMessageRemind.setPortalMessagerTemplateType(protalMessageR.get(0).getPortalMessagerTemplateType());
                     }
                     messageRemindList.add(mMessageRemind);
                 }
@@ -283,23 +283,4 @@ public class PortalMessageRemindEndPoint extends EnvelopRestEndPoint {
         return objectMapper.writeValueAsString(obj);
     }
 
-//
-//    @RequestMapping(value = ServiceApi.Packages.PackageSearch, method = RequestMethod.GET)
-//    @ApiOperation(value = "搜索档案包")
-//    public List<EsDetailsPackage> search (
-//            @ApiParam(name = "filters", value = "过滤条件")
-//            @RequestParam(value = "filters", required = false) String filters,
-//            @ApiParam(name = "sorts", value = "排序")
-//            @RequestParam(value = "sorts", required = false) String sorts,
-//            @ApiParam(name = "page", value = "页码", required = true, defaultValue = "1")
-//            @RequestParam(value = "page") int page,
-//            @ApiParam(name = "size", value = "分页大小", required = true, defaultValue = "15")
-//            @RequestParam(value = "size") int size) throws Exception {
-//        List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, filters, sorts, page, size);
-//        List<EsDetailsPackage> esDetailsPackages = new ArrayList<>();
-//        for (Map<String, Object> temp : resultList) {
-//            esDetailsPackages.add(objectMapper.readValue(objectMapper.writeValueAsString(temp), EsDetailsPackage.class));
-//        }
-//        return esDetailsPackages;
-//    }
 }

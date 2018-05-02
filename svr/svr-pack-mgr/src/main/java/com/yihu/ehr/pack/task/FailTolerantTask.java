@@ -16,7 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
-* 档案包解析容错处理任务
+ * 档案包解析容错处理任务
  * 1. 当解析队列为空，将数据库中状态为缓存状态的档案包加入解析队列
  * 2. 将解析状态为失败且错误次数小于三次的档案包重新加入解析队列
  * 3. 将解析状态为正在解析但解析开始时间超过当前时间一定范围内的档案包重新加入解析队列
@@ -36,8 +36,9 @@ public class FailTolerantTask {
     @Autowired
     private RedisTemplate<String, Serializable> redisTemplate;
 
-    @Scheduled(cron = "0 0/1 * * * ?")
+    @Scheduled(fixedDelay = 30000)
     public void delayPushTask() throws Exception {
+        List<String> esSimplePackageList = new ArrayList<>(200);
         //当解析队列为空，将数据库中状态为缓存状态的档案包加入解析队列
         if (redisTemplate.opsForList().size(RedisCollection.PackageList) <= 0) {
             List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, "archive_status=0", "+receive_date", 1, 1000);
@@ -57,7 +58,7 @@ public class FailTolerantTask {
             updateSourceList.add(updateSource);
             String packStr = objectMapper.writeValueAsString(pack);
             EsSimplePackage esSimplePackage = objectMapper.readValue(packStr, EsSimplePackage.class);
-            redisTemplate.opsForList().leftPush(RedisCollection.PackageList, objectMapper.writeValueAsString(esSimplePackage));
+            esSimplePackageList.add(objectMapper.writeValueAsString(esSimplePackage));
         }
         //将解析状态为正在解析但解析开始时间超过当前时间一定范围内的档案包重新加入解析队列
         Date past = DateUtils.addDays(new Date(), -1);
@@ -70,8 +71,9 @@ public class FailTolerantTask {
             updateSourceList.add(updateSource);
             String packStr = objectMapper.writeValueAsString(pack);
             EsSimplePackage esSimplePackage = objectMapper.readValue(packStr, EsSimplePackage.class);
-            redisTemplate.opsForList().leftPush(RedisCollection.PackageList, objectMapper.writeValueAsString(esSimplePackage));
+            esSimplePackageList.add(objectMapper.writeValueAsString(esSimplePackage));
         }
         elasticSearchUtil.bulkUpdate(INDEX, TYPE, updateSourceList);
+        esSimplePackageList.forEach(item -> redisTemplate.opsForList().leftPush(RedisCollection.PackageList, item));
     }
 }

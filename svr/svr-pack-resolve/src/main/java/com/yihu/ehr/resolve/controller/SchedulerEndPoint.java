@@ -65,10 +65,10 @@ public class SchedulerEndPoint extends EnvelopRestEndPoint {
     public ResponseEntity<Integer> addJob(
             @ApiParam(name = "count", value = "任务数量（不要超过系统设定值）", required = true, defaultValue = "4")
             @RequestParam(value = "count") int count,
-            @ApiParam(name = "cronExp", value = "触发器CRON表达式", required = true, defaultValue = "0/4 * * * * ?")
+            @ApiParam(name = "cronExp", value = "触发器CRON表达式", required = true, defaultValue = "0/1 * * * * ?")
             @RequestParam(value = "cronExp") String cronExp) {
         try {
-            if(count > jobMaxSize) {
+            if (count > jobMaxSize) {
                 count = jobMaxSize;
             }
             GroupMatcher groupMatcher = GroupMatcher.groupEquals("PackResolve");

@@ -3,6 +3,8 @@ package com.yihu.ehr.basic.appointment.controller;
 import com.yihu.ehr.basic.appointment.entity.Registration;
 import com.yihu.ehr.basic.appointment.service.RegistrationService;
 import com.yihu.ehr.basic.fzopen.service.OpenService;
+import com.yihu.ehr.basic.portal.model.ProtalMessageRemind;
+import com.yihu.ehr.basic.portal.service.PortalMessageRemindService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
@@ -14,6 +16,7 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +36,8 @@ public class RegistrationEndPoint extends EnvelopRestEndPoint {
     private RegistrationService registrationService;
     @Autowired
     private OpenService fzOpenService;
+    @Autowired
+    private PortalMessageRemindService messageRemindService;
 
     @ApiOperation("根据ID获取挂号单")
     @RequestMapping(value = ServiceApi.Registration.GetById, method = RequestMethod.GET)
@@ -43,6 +48,24 @@ public class RegistrationEndPoint extends EnvelopRestEndPoint {
         envelop.setSuccessFlg(false);
         try {
             Registration registration = registrationService.getById(id);
+            envelop.setObj(registration);
+            envelop.setSuccessFlg(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return envelop;
+    }
+
+    @ApiOperation("根据orderId获取挂号单")
+    @RequestMapping(value = ServiceApi.Registration.GetByOrderId, method = RequestMethod.GET)
+    public Envelop getByOrderId(
+            @ApiParam(name = "orderId", value = "福州总部挂号单Id", required = true)
+            @PathVariable(value = "orderId") String orderId) {
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(false);
+        try {
+            Registration registration = registrationService.getByOrderId(orderId);
             envelop.setObj(registration);
             envelop.setSuccessFlg(true);
         } catch (Exception e) {
@@ -207,6 +230,46 @@ public class RegistrationEndPoint extends EnvelopRestEndPoint {
 
             envelop.setObj(updateEntity);
             envelop.setSuccessFlg(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return envelop;
+    }
+
+    @ApiOperation("判断挂号是否成功")
+    @RequestMapping(value = ServiceApi.Registration.IsSuccessfullyRegister, method = RequestMethod.GET)
+    public Envelop isSuccessfullyRegister(
+            @ApiParam(value = "挂号单ID", required = true)
+            @RequestParam(value = "id") String id) {
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(false);
+        try {
+            Registration registration = registrationService.getById(id);
+
+            long startTime = System.currentTimeMillis();
+            // 轮询获取总部推送过来的最新挂号消息
+            List<ProtalMessageRemind> messageRemindList = new ArrayList<>();
+            while (messageRemindList.size() == 0) {
+                messageRemindList = messageRemindService.getRecentOneByOrderId(id, registration.getModifyDate());
+                // 当超过一定时间结束轮询
+                if ((System.currentTimeMillis() - startTime) > 300000) {
+                    envelop.setErrorMsg("已经过了5分钟，没有获取到预约挂号成功与否的推送消息，请稍后查看就诊历史记录。");
+                    break;
+                }
+            }
+
+            if (messageRemindList.size() > 0) {
+                Map<String, Object> message = objectMapper.readValue(messageRemindList.get(0).getReceivedMessages(), Map.class);
+                Map<String, Object> dataNode = (Map<String, Object>) message.get("data");
+                if (registration.getState() == -1) {
+                    // 系统取消状态，表示挂号失败。
+                    envelop.setErrorMsg(dataNode.get("failMsg").toString());
+                } else {
+                    envelop.setErrorMsg(dataNode.get("smsContent").toString());
+                    envelop.setSuccessFlg(true);
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
             envelop.setErrorMsg(e.getMessage());

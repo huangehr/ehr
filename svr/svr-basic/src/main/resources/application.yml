@@ -26,7 +26,7 @@ fast-dfs:
   network-timeout: 60
   charset: ISO8859-1
   pool:
-    init-size: 5
+    init-size: 1
     max-size: 20
     wait-time: 500
   http:
@@ -39,7 +39,6 @@ eip:
 jksr-app:
   orgcode: PDY026797
 
-
 ---
 spring:
   profiles: dev
@@ -47,16 +46,18 @@ spring:
     url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: chenweishan
     password: chenweishan
-  redis:
-    host: 172.19.103.47 # Redis server host.
-    port: 6379
-    password: redis!@456
+  # -- unknown use --
   ldap:
     host: 172.19.103.87
     port: 389
     bindDn: cn=admin,dc=ehr,dc=jkzl
     password: jkzl
     root: dc=ehr,dc=jkzl
+  # -- unknown use --
+  redis:
+    host: 172.19.103.47 # Redis server host.
+    port: 6379
+    password: redis!@456
   data:
     mongodb:
       host: 192.168.1.220
@@ -65,8 +66,6 @@ spring:
       password: admin
       authenticationDatabase: admin
       database: ehr
-    solr:
-      zk-host: node1.hde.h3c.com,node2.hde.h3c.com:2181/solr
   elasticsearch:
     jest:
       uris: http://172.19.103.68:9200
@@ -85,13 +84,11 @@ h5:
   clientId: WYo0l73F8e
 #福州总部网关参数配置
 fz-gateway:
-  url: http://service.yihu.com:8085/WSGW/rest
+  url: http://172.19.103.73:10001/fzGateway/WSGW/rest
   clientId: 9000401
   clientVersion: 1.0
   secret: KU5XTORDKZI3O86YAT3ABCNJW2XTL1DJYF3GKU3ICXL
-hadoop:
-  user:
-    name: root
+  handlerId: 50871
 
 ---
 spring:
@@ -100,16 +97,18 @@ spring:
     url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: weifuwu
     password: weifuwu
-  redis:
-    host: 172.19.103.47 # Redis server host.
-    port: 6379
-    password: redis!@456
+  # -- unknown use --
   ldap:
     host: 172.19.103.87
     port: 389
     bindDn: cn=admin,dc=ehr,dc=jkzl
     password: jkzl
     root: dc=ehr,dc=jkzl
+  # -- unknown use --
+  redis:
+    host: 172.19.103.47 # Redis server host.
+    port: 6379
+    password: redis!@456
   data:
     mongodb:
       host: 192.168.1.220
@@ -118,8 +117,6 @@ spring:
       password: admin
       authenticationDatabase: admin
       database: ehr
-    solr:
-      zk-host: node1.hde.h3c.com,node2.hde.h3c.com:2181/solr
   elasticsearch:
     jest:
       uris: http://172.19.103.68:9200
@@ -138,14 +135,11 @@ h5:
   clientId: WYo0l73F8e
 #福州总部网关参数配置
 fz-gateway:
-  url: http://service.yihu.com:8085/WSGW/rest
+  url: http://172.19.103.73:10001/fzGateway/WSGW/rest
   clientId: 9000401
   clientVersion: 1.0
   secret: KU5XTORDKZI3O86YAT3ABCNJW2XTL1DJYF3GKU3ICXL
-hadoop:
-  user:
-    name: root
-
+  handlerId: 50871
 
 ---
 spring:
@@ -154,6 +148,14 @@ spring:
     url: jdbc:mysql://11.1.2.5:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: healthcloud
     password: GP8Qz4qU
+  # -- unknown use --
+  ldap:
+    host: 172.19.103.87
+    port: 389
+    bindDn: cn=admin,dc=ehr,dc=jkzl
+    password: jkzl
+    root: dc=ehr,dc=jkzl
+  # -- unknown use --
   redis:
     host: 11.1.2.22 # Redis server host.
     port: 6390
@@ -167,8 +169,6 @@ spring:
       password: GMLBq1LG
       authenticationDatabase: admin
       database: ehr
-    solr:
-      zk-host: node1.hde.h3c.com,node2.hde.h3c.com:2181/solr
   elasticsearch:
     jest:
       uris: http://172.19.103.68:9200
@@ -187,13 +187,11 @@ h5:
   clientId: WYo0l73F8e
 #福州总部网关参数配置
 fz-gateway:
-  url: http://service.yihu.com:8080/WSGW/rest
+  url: http://11.1.2.13:10001/fzGateway/WSGW/rest
   clientId: 9000401
   clientVersion: 1.0
   secret: 9U6PBF2JM3PE1IHRJ7GEITMJHNMEHOFZQ2XUCKD9TO2
-hadoop:
-  user:
-    name: root
+  handlerId: 50871
 
 ---
 spring:
@@ -202,6 +200,14 @@ spring:
     url: jdbc:mysql://10.176.97.9:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: healthcloud
     password: GP8Qz4qU
+  # -- unknown use --
+  ldap:
+    host: 172.19.103.87
+    port: 389
+    bindDn: cn=admin,dc=ehr,dc=jkzl
+    password: jkzl
+    root: dc=ehr,dc=jkzl
+  # -- unknown use --
   redis:
     host: 10.176.97.5 # Redis server host.
     port: 6390
@@ -214,8 +220,6 @@ spring:
       password: GMLBq1LG
       authenticationDatabase: admin
       database: ehr
-    solr:
-      zk-host: node1.hde.h3c.com,node2.hde.h3c.com:2181/solr
   elasticsearch:
     jest:
       uris: http://10.176.97.7:9200
@@ -234,14 +238,11 @@ h5:
   clientId: WYo0l73F8e
 #福州总部网关参数配置
 fz-gateway:
-  url: http://service.yihu.com:8080/WSGW/rest
+  url: http://10.176.97.10:10001/fzGateway/WSGW/rest
   clientId: 9000401
   clientVersion: 1.0
   secret: 9U6PBF2JM3PE1IHRJ7GEITMJHNMEHOFZQ2XUCKD9TO2
-hadoop:
-  user:
-    name: root
-
+  handlerId: 50641
 
 ---
 spring:
@@ -250,6 +251,14 @@ spring:
     url: jdbc:mysql://100.100.1.159:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: healthcloud
     password: GP8Qz4qU
+  # -- unknown use --
+  ldap:
+    host: 172.19.103.87
+    port: 389
+    bindDn: cn=admin,dc=ehr,dc=jkzl
+    password: jkzl
+    root: dc=ehr,dc=jkzl
+  # -- unknown use --
   redis:
     host: 100.100.1.161 # Redis server host.
     port: 6390
@@ -262,8 +271,6 @@ spring:
       password: GMLBq1LG
       authenticationDatabase: admin
       database: ehr
-    solr:
-      zk-host: node1.hde.h3c.com,node2.hde.h3c.com:2181/solr
   elasticsearch:
     jest:
       uris: http://100.100.1.158:9200
@@ -282,22 +289,27 @@ h5:
   clientId: WYo0l73F8e
 #福州总部网关参数配置
 fz-gateway:
-  url: http://service.yihu.com:8080/WSGW/rest
+  url: http://100.100.1.162:10001/fzGateway/WSGW/rest
   clientId: 9000401
   clientVersion: 1.0
   secret: 9U6PBF2JM3PE1IHRJ7GEITMJHNMEHOFZQ2XUCKD9TO2
-hadoop:
-  user:
-    name: root
-
+  handlerId: 50641
 
 ---
 spring:
   profiles: prod_srformal
   datasource:
-    url: jdbc:mysql://192.168.40.34:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    url: jdbc:mysql://192.168.210.3:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: healthcloud
     password: GP8Qz4qU
+  # -- unknown use --
+  ldap:
+    host: 192.168.210.3
+    port: 389
+    bindDn: cn=admin,dc=ehr,dc=jkzl
+    password: jkzl
+    root: dc=ehr,dc=jkzl
+  # -- unknown use --
   redis:
     host: 192.168.50.82 # Redis server host.
     port: 6379
@@ -310,8 +322,6 @@ spring:
       password: GMLBq1LG
       authenticationDatabase: admin
       database: ehr
-    solr:
-      zk-host: node1.hde.h3c.com,node2.hde.h3c.com:2181/solr
   elasticsearch:
     jest:
       uris: http://172.10.10.2:9200
@@ -330,10 +340,8 @@ h5:
   clientId: WYo0l73F8e
 #福州总部网关参数配置
 fz-gateway:
-  url: http://service.yihu.com:8080/WSGW/rest
+  url: http://192.168.220.84:10001/fzGateway/WSGW/rest
   clientId: 9000401
   clientVersion: 1.0
   secret: 9U6PBF2JM3PE1IHRJ7GEITMJHNMEHOFZQ2XUCKD9TO2
-hadoop:
-  user:
-    name: root
+  handlerId: 50641

@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 
 /**
@@ -27,28 +28,95 @@ public class RedisInitEndPoint extends EnvelopRestEndPoint {
 
     @ApiOperation("清除Redis缓存")
     @RequestMapping(value = ServiceApi.Redis.Delete, method = RequestMethod.POST)
+    @ApiIgnore
     public String deleteRedis(
             @ApiParam(name = "key", value = "机构编码、ICD10编码、健康问题编码等")
             @RequestParam(value = "key") String key) throws Exception {
         redis.delete(key);
-        return "Redis缓存清除成功！";
+        return "缓存清除成功！";
     }
 
     @ApiOperation("Redis缓存行政地址")
     @RequestMapping(value = ServiceApi.Redis.InitAddress, method = RequestMethod.POST)
     public String cacheAddressDict() throws Exception {
         redisInitService.cacheAddressDict();
-        return "Redis缓存行政地址完成！";
+        return "缓存行政地址完成！";
     }
 
     @ApiOperation("Redis缓存HP健康问题名称")
     @RequestMapping(value = ServiceApi.Redis.InitHealthProblem, method = RequestMethod.POST)
-    public String cacheHpName() throws Exception {
-        redisInitService.cacheHpName();
-        return "Redis缓存HP健康问题名称！";
+    public int cacheHpName() throws Exception {
+        return redisInitService.cacheHpName();
     }
 
-    @ApiOperation("Redis缓存ICD10对应HP健康问题的编码和名称组合值")
+    @ApiOperation("Redis缓存ICD10名称和对应HP健康问题编码")
+    @RequestMapping(value = ServiceApi.Redis.InitIcd10, method = RequestMethod.POST)
+    public int cacheIcd10() throws Exception {
+        return redisInitService.cacheIcd10();
+    }
+
+    @ApiOperation("缓存ICD10慢病信息")
+    @RequestMapping(value = ServiceApi.Redis.InitIcd10ChronicInfo, method = RequestMethod.POST)
+    public int cacheIcd10ChronicInfo() throws Exception {
+        return redisInitService.cacheIcd10ChronicInfo();
+    }
+
+    @ApiOperation("Redis缓存机构名称")
+    @RequestMapping(value = ServiceApi.Redis.InitOrgName, method = RequestMethod.POST)
+    public int cacheOrgName() throws Exception {
+        return redisInitService.cacheOrgName();
+    }
+
+    @ApiOperation("Redis缓存机构区域")
+    @RequestMapping(value = ServiceApi.Redis.InitOrgArea, method = RequestMethod.POST)
+    public int cacheOrgArea() throws Exception {
+        return redisInitService.cacheOrgArea();
+    }
+
+    @ApiOperation("Redis缓存机构Saas区域")
+    @RequestMapping(value = ServiceApi.Redis.InitOrgSaasArea, method = RequestMethod.POST)
+    public int cacheOrgSaasArea() throws Exception {
+        return redisInitService.cacheOrgSaasArea();
+    }
+
+    @ApiOperation("Redis缓存机构Saas机构")
+    @RequestMapping(value = ServiceApi.Redis.InitOrgSaasOrg, method = RequestMethod.POST)
+    public int cacheOrgSaasOrg() throws Exception {
+        return redisInitService.cacheOrgSaasOrg();
+    }
+
+    @RequestMapping(value= ServiceApi.Redis.InitRsAdapterDict, method = RequestMethod.POST)
+    @ApiOperation("Redis缓存适配数据字典数据")
+    public int cacheAdapterDict(
+            @ApiParam(name = "id", value = "rs_adapter_scheme.id")
+            @PathVariable(value = "id") String id) throws Exception {
+        return redisInitService.cacheAdapterDict(id);
+    }
+
+    @RequestMapping(value= ServiceApi.Redis.InitRsAdapterMeta, method = RequestMethod.POST)
+    @ApiOperation("Redis缓存适配数据元数据")
+    public int cacheAdapterMetadata(
+            @ApiParam(name = "id", value = "rs_adapter_scheme.id")
+            @PathVariable(value = "id") String id) throws Exception {
+       return redisInitService.cacheAdapterMetadata(id);
+    }
+
+    @RequestMapping(value= ServiceApi.Redis.InitRsMetadata, method = RequestMethod.POST)
+    @ApiOperation("Redis缓存资源化数据元字典（dict_code不为空）")
+    public int cacheMetadata() throws Exception {
+        return redisInitService.cacheMetadata();
+    }
+
+    //TODO ------------------- 未知用途 --------------------------
+
+    @ApiOperation("Redis缓存指标(-1)")
+    @RequestMapping(value = ServiceApi.Redis.InitIndicatorsDict, method = RequestMethod.POST)
+    public String cacheIndicatorsDict() throws Exception {
+        redisInitService.cacheIndicatorsDict();
+        return "Redis缓存指标完成！";
+    }
+
+    @ApiOperation("Redis缓存ICD10对应HP健康问题的编码和名称组合值(-1)")
     @RequestMapping(value = ServiceApi.Redis.InitIcd10HpR, method = RequestMethod.POST)
     public String cacheIcd10HpRelation(
             @ApiParam(name = "force", value = "强制清除再缓存", defaultValue = "true")
@@ -57,71 +125,5 @@ public class RedisInitEndPoint extends EnvelopRestEndPoint {
         return "Redis缓存ICD10对应HP健康问题的编码和名称组合值！";
     }
 
-    @ApiOperation("Redis缓存ICD10名称和对应HP健康问题编码")
-    @RequestMapping(value = ServiceApi.Redis.InitIcd10, method = RequestMethod.POST)
-    public String cacheIcd10() throws Exception {
-        redisInitService.cacheIcd10();
-        return "Redis缓存ICD10名称和对应HP健康问题编码！";
-    }
-
-    @ApiOperation("Redis缓存指标")
-    @RequestMapping(value = ServiceApi.Redis.InitIndicatorsDict, method = RequestMethod.POST)
-    public String cacheIndicatorsDict() throws Exception {
-        redisInitService.cacheIndicatorsDict();
-        return "Redis缓存指标完成！";
-    }
-
-    @ApiOperation("Redis缓存机构名称")
-    @RequestMapping(value = ServiceApi.Redis.InitOrgName, method = RequestMethod.POST)
-    public String cacheOrgName() throws Exception {
-        redisInitService.cacheOrgName();
-        return "Redis缓存机构名称完成！";
-    }
-
-    @ApiOperation("Redis缓存机构区域")
-    @RequestMapping(value = ServiceApi.Redis.InitOrgArea, method = RequestMethod.POST)
-    public String cacheOrgArea() throws Exception {
-        redisInitService.cacheOrgArea();
-        return "Redis缓存机构区域完成！";
-    }
-
-    @ApiOperation("Redis缓存机构Saas区域")
-    @RequestMapping(value = ServiceApi.Redis.InitOrgSaasArea, method = RequestMethod.POST)
-    public String cacheOrgSaasArea() throws Exception {
-        redisInitService.cacheOrgSaasArea();
-        return "Redis缓存机构Saas区域完成！";
-    }
-
-    @ApiOperation("Redis缓存机构Saas机构")
-    @RequestMapping(value = ServiceApi.Redis.InitOrgSaasOrg, method = RequestMethod.POST)
-    public String cacheOrgSaasOrg() throws Exception {
-        redisInitService.cacheOrgSaasOrg();
-        return "Redis缓存机构Saas机构完成！";
-    }
-
-    @RequestMapping(value= ServiceApi.Redis.InitRsAdapterDict, method = RequestMethod.POST)
-    @ApiOperation("Redis缓存适配数据字典数据")
-    public String cacheAdapterDict(
-            @ApiParam(name="id",value="rs_adapter_scheme.id")
-            @PathVariable(value = "id") String id) throws Exception {
-        redisInitService.cacheAdapterDict(id);
-        return "Redis缓存适配数据字典数据完成";
-    }
-
-    @RequestMapping(value= ServiceApi.Redis.InitRsAdapterMeta, method = RequestMethod.POST)
-    @ApiOperation("Redis缓存适配数据元数据")
-    public String cacheAdapterMetadata(
-            @ApiParam(name="id",value="rs_adapter_scheme.id")
-            @PathVariable(value = "id") String id) throws Exception {
-       redisInitService.cacheAdapterMetadata(id);
-       return "Redis缓存适配数据元数据完成";
-    }
-
-    @RequestMapping(value= ServiceApi.Redis.InitRsMetadata, method = RequestMethod.POST)
-    @ApiOperation("Redis缓存资源化数据元字典（dict_code不为空）")
-    public String cacheMetadata() throws Exception {
-        redisInitService.cacheMetadata();
-        return "Redis缓存资源化数据元字典完成";
-    }
 
 }

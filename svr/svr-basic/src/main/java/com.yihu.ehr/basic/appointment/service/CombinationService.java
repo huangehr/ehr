@@ -105,7 +105,7 @@ public class CombinationService {
             List<Map<String, Object>> schedulingList = (ArrayList) schedulingResMap.get("Result");
 
             if (schedulingResMap.size() > 0) {
-                // 测试环境，过滤掉需代缴挂号费的排班。正式环境去掉这段代码
+                // 过滤掉需代缴挂号费的排班
                 List<Map<String, Object>> freeSchedulingList = new ArrayList<>();
                 for (int j = 0, jSize = schedulingList.size(); j < jSize; j++) {
                     if ((int) schedulingList.get(j).get("ghfeeWay") == 0) {
@@ -113,21 +113,23 @@ public class CombinationService {
                     }
                 }
 
-                // 赋值医生排班
-                doctor.put("schedulingList", freeSchedulingList);
-                // 获取医生详情
-                tParams.clear();
-                tParams.put("doctorSn", doctor.get("doctorSn"));
-                Map<String, Object> docResMap = objectMapper.readValue(
-                        openService.callFzOpenApi(docInfoApi, tParams), Map.class);
-                if (!"10000".equals(docResMap.get("Code").toString())) {
-                    throw new ApiException("获取总部医生详情时，" + docResMap.get("Message").toString());
-                }
-                docResMap.remove("Code");
-                docResMap.remove("Message");
-                doctor.putAll(docResMap);
+                if (freeSchedulingList.size() != 0) {
+                    // 赋值医生排班
+                    doctor.put("schedulingList", freeSchedulingList);
+                    // 获取医生详情
+                    tParams.clear();
+                    tParams.put("doctorSn", doctor.get("doctorSn"));
+                    Map<String, Object> docResMap = objectMapper.readValue(
+                            openService.callFzOpenApi(docInfoApi, tParams), Map.class);
+                    if (!"10000".equals(docResMap.get("Code").toString())) {
+                        throw new ApiException("获取总部医生详情时，" + docResMap.get("Message").toString());
+                    }
+                    docResMap.remove("Code");
+                    docResMap.remove("Message");
+                    doctor.putAll(docResMap);
 
-                doctorList.add(doctor);
+                    doctorList.add(doctor);
+                }
             }
 
             // 当医生数据不足，或收集满当前分页条数的医生数量，则停止收集。
@@ -167,7 +169,10 @@ public class CombinationService {
         List<Map<String, Object>> schList = (ArrayList) schedulingResMap.get("Result");
         Set<String> doctorSnSet = new HashSet<>();
         schList.forEach(item -> {
-            doctorSnSet.add(item.get("doctorSn").toString());
+            // 过滤掉需代缴挂号费的排班
+            if ((int) item.get("ghfeeWay") == 0) {
+                doctorSnSet.add(item.get("doctorSn").toString());
+            }
         });
         count += doctorSnSet.size();
 

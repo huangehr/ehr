@@ -46,21 +46,17 @@ public class SurveyTask {
 
     @Scheduled(cron = "0 0 7 * * ?")
     private void startTask() throws  Exception{
-        System.out.println("--------------开始-------------------");
         //检索条件
         String date = DateUtil.getNowDate(DateUtil.DEFAULT_DATE_YMD_FORMAT);
         String queryParams = "create_date:["+date+"T00:00:00Z  TO "+date+ "T23:59:59Z"+"] AND event_type: \"0\"";
 //        String queryParams = "create_date:[2018-01-29T10:00:00Z  TO 2018-01-29T23:59:59Z"+"] AND event_type: \"0\" AND  demographic_id: \"362321199203110529\"";
-        //获取消息总条数 门诊 时间 create_date:"2018-01-29T22:52:08Z" AND event_type: "0"
-        // "demographic_id": "362321199203110529",
-        int t=0;
         int count = (int)(solrUtil.count("HealthProfile", queryParams));
         int size = 1000;
         int totalPages = count%size == 0 ? count/size : (count/size)+1;
         ProtalMessageRemind messageRemind = null;
         for(int i=0; i<totalPages ;i++){
             //查找档案
-            Page<Map<String, Object>> result = resourceBrowseService.getEhrCenter(queryParams, totalPages, size);
+            Page<Map<String, Object>> result = resourceBrowseService.getEhrCenter(queryParams, i, size);
             List list = result.getContent();
             List<Map<String, String>> contentList = new ArrayList<>();
             Registration newEntity = null;
@@ -125,7 +121,6 @@ public class SurveyTask {
                         messageRemind.setToUserId(userId);
                         messageRemind.setContent(contentJson);
                         messageRemindService.save(messageRemind);
-                        t++;
                     }
 
                 }

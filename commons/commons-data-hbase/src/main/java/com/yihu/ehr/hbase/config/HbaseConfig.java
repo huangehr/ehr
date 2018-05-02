@@ -25,7 +25,7 @@ public class HbaseConfig{
         return this.hbaseProperties;
     }
 
-    @Value("${hadoop.user.name}")
+    @Value("${hadoop.user.name:hadoop}")
     private String user;
 
     @Bean

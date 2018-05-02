@@ -1,15 +1,13 @@
 server:
   port: ${ag-admin.server.port}
 
-management:
-  port: ${server.port}
-
 info:
   app:
     name: AgAdminService
     description: EHR platform json app service.
     version: 1.0.0
   component: Zuul Server
+
 eip:
   tenant: jkzl
 
@@ -37,7 +35,6 @@ zuul:
     svr-authentication:
       path: /authentication/**
       serviceId: svr-authentication
-    #档案包相关
     svr-health-profile:
       path: /profile/**
       serviceId: svr-health-profile
@@ -60,6 +57,12 @@ service-gateway:
   handlerId: 50871
   clientId: 9000401
   clientVersion: 1.0
+zuul:
+  routes:
+    fastdfs-server:
+      path: /file/**
+      url: http://172.19.103.52:80/
+
 ---
 spring:
   profiles: test
@@ -69,9 +72,12 @@ service-gateway:
   handlerId: 50871
   clientId: 9000401
   clientVersion: 1.0
----
-spring:
-  profiles: prod
+zuul:
+  routes:
+    fastdfs-server:
+      path: /file/**
+      url: http://172.19.103.52:80/
+
 ---
 spring:
   profiles: prod_fz
@@ -81,6 +87,12 @@ service-gateway:
   handlerId: 50641
   clientId: 9000401
   clientVersion: 1.0
+zuul:
+  routes:
+    fastdfs-server:
+      path: /file/**
+      url: http://11.1.2.9:80/
+
 ---
 spring:
   profiles: prod_sr
@@ -90,6 +102,12 @@ service-gateway:
   handlerId: 50641
   clientId: 9000401
   clientVersion: 1.0
+zuul:
+  routes:
+    fastdfs-server:
+      path: /file/**
+      url: http://10.176.97.5:8888/
+
 ---
 spring:
   profiles: prod_fzzy
@@ -99,6 +117,11 @@ service-gateway:
   handlerId: 50641
   clientId: 9000401
   clientVersion: 1.0
+zuul:
+  routes:
+    fastdfs-server:
+      path: /file/**
+      url: http://100.100.1.157:8888/
 
 ---
 spring:
@@ -109,3 +132,8 @@ service-gateway:
   handlerId: 50641
   clientId: 9000401
   clientVersion: 1.0
+zuul:
+  routes:
+    fastdfs-server:
+      path: /file/**
+      url: http://192.168.50.37:8888/

@@ -884,14 +884,14 @@ public class UserEndPoint extends EnvelopRestEndPoint {
             envelop.setErrorMsg("电话号码已存在");
             return envelop;
         }
-        user = userService.saveUser(user);
         // orgcode卫计委机构编码-PDY026797 添加居民的时候 默认 加到卫计委-居民角色中
         List<Roles> rolesList = rolesService.findByCodeAndAppIdAndOrgCode(Arrays.asList(new String[]{orgcode}),appId,"Patient");
         //在org_member_relation 表里追加关联关系
         if(null != rolesList && rolesList.size()>0){
+            user = userService.saveUser(user);
             roleUserService.batchCreateRoleUsersRelation(userId,String.valueOf(rolesList.get(0).getId()));
         }else{
-            envelop.setErrorMsg("角色不存在！");
+            envelop.setErrorMsg("居民角色不存在！");
             return envelop;
         }
         // 根据身份证号码查找居民，若不存在则创建居民。
@@ -976,4 +976,50 @@ public class UserEndPoint extends EnvelopRestEndPoint {
         List<User> user = userService.search("", filters, "", 1, 1);
         return user != null && user.size() > 0;
     }
+
+    @RequestMapping(value = ServiceApi.Users.updateUserTelePhone, method = RequestMethod.POST)
+    @ApiOperation(value = "更换手机号码", notes = "更换手机号码")
+    public Envelop updateUserTelePhone(
+            @ApiParam(name = "userId", value = "用户id", defaultValue = "")
+            @RequestParam(value = "userId", required = false) String userId,
+            @ApiParam(name = "telePhoneNew", value = "新手机号码", defaultValue = "")
+            @RequestParam(value = "telePhoneNew") String telePhoneNew) throws Exception {
+        Envelop envelop = new Envelop();
+        //获取用户信息，根据用户ID
+        User user  = userService.getUser(userId);
+        if (user == null) {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("对不起，该用户不存在，请确认！");
+            return envelop;
+        }
+        user.setTelephone(telePhoneNew);
+        user = userService.save(user);
+        if (null != user) {
+            envelop.setSuccessFlg(true);
+            envelop.setObj(user);
+        } else {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("更换手机号码失败，请联系管理员！");
+        }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.Users.GetUserOfUsersOfApp, method = RequestMethod.GET)
+    @ApiOperation(value = "公众健康服务-根据用户身份证号码或者电话号码，获取用户")
+    public Envelop getUserOfUsersOfApp(
+            @ApiParam(name = "userName", value = "身份证号码或者电话号码", defaultValue = "")
+            @RequestParam(value = "userName") String userName) {
+        Envelop envelop = new Envelop();
+        List<User> userList = userService.getUserForLogin(userName);
+        if(null != userList && userList.size()>0){
+            User user = userList.get(0);
+            envelop.setSuccessFlg(true);
+            envelop.setObj(user);
+        }else{
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("用户不存在！");
+        }
+        return  envelop;
+    }
+
 }

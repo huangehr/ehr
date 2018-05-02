@@ -40,22 +40,24 @@ public class PackAnalyzeTask {
      */
     @Scheduled(cron = "45 0/10 * * * ?")
     public void delayPushTask() throws Exception {
-        if (size() > MAX_SIZE) {
+        if (size() >= MAX_SIZE) {
             return;
         }
         List<Map<String, Object>> updateSourceList = new ArrayList<>();
+        List<String> esSimplePackageList = new ArrayList<>();
         String fHours = dateFormat.format(DateUtils.addHours(new Date(), -5));
         //添加未分析的
-        addToQueue("analyze_status=0;receive_date<" + fHours, updateSourceList);
+        addToQueue("analyze_status=0;receive_date<" + fHours, updateSourceList, esSimplePackageList);
         //添加分析错误的
-        addToQueue("analyze_status=2;analyze_fail_count<3;receive_date<" + fHours , updateSourceList);
+        addToQueue("analyze_status=2;analyze_fail_count<3;receive_date<" + fHours , updateSourceList, esSimplePackageList);
         //添加分析异常的
         String date = DateUtil.toString(DateUtil.addDate(-3, new Date())) + " 00:00:00";
-        addToQueue("analyze_status=1;analyze_date<" + date + " 00:00:00", updateSourceList);
-        savePack(updateSourceList);
+        addToQueue("analyze_status=1;analyze_date<" + date, updateSourceList, esSimplePackageList);
+        savePack(updateSourceList); //更新
+        esSimplePackageList.forEach(item -> push(item)); //推送消息
     }
 
-    private void addToQueue(String filters, List<Map<String, Object>> updateSourceList) throws Exception {
+    private void addToQueue(String filters, List<Map<String, Object>> updateSourceList, List<String> pushList) throws Exception {
         List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, filters, "+receive_date", 1, 100);
         for (Map<String, Object> pack : resultList) {
             Map<String, Object> updateSource = new HashMap<>();
@@ -65,7 +67,7 @@ public class PackAnalyzeTask {
             updateSourceList.add(updateSource);
             String packStr = objectMapper.writeValueAsString(pack);
             EsSimplePackage esSimplePackage = objectMapper.readValue(packStr, EsSimplePackage.class);
-            push(objectMapper.writeValueAsString(esSimplePackage));
+            pushList.add(objectMapper.writeValueAsString(esSimplePackage));
         }
     }
 

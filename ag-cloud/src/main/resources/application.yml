@@ -4,10 +4,9 @@ server:
 #    key-store-password: 123456
 #    key-password: 123456
 
-management:
-  port: ${server.port}
 eip:
   tenant: jkzl
+
 ---
 spring:
   profiles: dev
@@ -15,12 +14,15 @@ spring:
 ---
 spring:
   profiles: test
+
 ---
 spring:
   profiles: prod_fz
+
 ---
 spring:
   profiles: prod_sr
+
 ---
 spring:
   profiles: prod_fzzy

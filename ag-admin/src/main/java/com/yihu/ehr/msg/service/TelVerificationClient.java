@@ -21,19 +21,19 @@ import springfox.documentation.annotations.ApiIgnore;
 @ApiIgnore
 public interface TelVerificationClient {
 
-    @RequestMapping(value = ServiceApi.TelVerification.TelVerification, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.TelVerification.TelVerificationMsgSendMsg, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建手机验证信息", notes = "创建手机验证信息")
     Envelop createTelVerification(
             @ApiParam(name = "telNo", value = "", defaultValue = "")
-            @RequestParam(value = "telNo", required = false) String telNo,
+            @RequestParam(value = "telNo", required = false) String tel,
             @ApiParam(name = "appId", value = "", defaultValue = "")
             @RequestParam(value = "appId", required = false) String appId) throws Exception ;
 
-    @RequestMapping(value = ServiceApi.TelVerification.TelVerification, method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.TelVerification.TelVerificationMsgValidate, method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "验证手机验证信息", notes = "验证手机验证信息")
     Envelop validationTelVerification(
             @ApiParam(name = "telNo", value = "", defaultValue = "")
-            @RequestParam(value = "telNo", required = false) String telNo,
+            @RequestParam(value = "telNo", required = false) String tel,
             @ApiParam(name = "appId", value = "", defaultValue = "")
             @RequestParam(value = "appId", required = false) String appId,
             @ApiParam(name = "verificationCode", value = "", defaultValue = "")

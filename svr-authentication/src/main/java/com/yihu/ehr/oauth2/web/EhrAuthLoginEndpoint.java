@@ -156,15 +156,24 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
 
     @RequestMapping(value = ServiceApi.Authentication.VerifyCode, method = RequestMethod.POST)
     public ResponseEntity<Envelop> verifyCode(@RequestParam Map<String, String> parameters) throws  Exception{
+        Envelop envelop = new Envelop();
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Cache-Control", "no-store");
+        headers.set("Pragma", "no-cache");
         String client_id = parameters.get("client_id");
         String username = parameters.get("username");
+        if (StringUtils.isEmpty(username)){
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("手机号码【username】不能为空！");
+            return new ResponseEntity<>(envelop, headers, HttpStatus.OK);
+        }
         VerifyCode verifyCode = new VerifyCode();
         //手机短信验证码
         RandomUtil randomUtil = new RandomUtil();
         String random = randomUtil.getRandomString(6);
         //发送短信
         String api = "MsgGW.Sms.send";
-        String content = "您好，短信验证码为:【" + random + "】，请在10分钟内验证！";
+        String content = "尊敬的用户：欢迎使用健康上饶，您的验证码为:【" + random + "】,有效期n分钟，请尽快完成注册。若非本人操作，请忽略。";
         Map<String, String> apiParamMap = new HashMap<>();
         //手机号码
         apiParamMap.put("mobile", username);
@@ -174,8 +183,7 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
         apiParamMap.put("content", content);
         //渠道号
         apiParamMap.put("clientId", fzClientId);
-        String result = FzGatewayUtil.httpPost(fzGatewayUrl,fzClientId,fzClientVersion,api,apiParamMap, 1);
-        Envelop envelop = new Envelop();
+        String result = FzGatewayUtil.httpPost(fzGatewayUrl, fzClientId, fzClientVersion, api, apiParamMap, 1);
         if (!StringUtils.isEmpty(result)) {
             Map<String, Object> resultMap = objectMapper.readValue(result, Map.class);
             Integer resultCode = 0;
@@ -183,18 +191,17 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
                 resultCode = Integer.valueOf(resultMap.get("Code").toString());
             }
             if (resultCode == 10000) {
-                verifyCode.setCode(random);
                 verifyCode.setExpiresIn(600);
                 verifyCode.setNextRequestTime(60);
                 //验证码有效期
                 ehrRedisVerifyCodeService.store(client_id, username, random, 600000);
                 envelop.setSuccessFlg(true);
                 envelop.setObj(verifyCode);
-            }else if(resultCode == -201){
+            } else if(resultCode == -201){
                 envelop.setSuccessFlg(false);
                 envelop.setErrorCode(resultCode);
                 envelop.setErrorMsg("短信已达每天限制的次数（10次）！");
-            }else if(resultCode == -200){
+            } else if(resultCode == -200){
                 envelop.setSuccessFlg(false);
                 envelop.setErrorCode(resultCode);
                 envelop.setErrorMsg("短信发送频率太快（不能低于60s）！");
@@ -208,9 +215,6 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
             envelop.setErrorCode(ErrorCode.REQUEST_NOT_COMPLETED.value());
             envelop.setErrorMsg("短信验证码发送失败！");
         }
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Cache-Control", "no-store");
-        headers.set("Pragma", "no-cache");
         return new ResponseEntity<>(envelop, headers, HttpStatus.OK);
     }
 
@@ -228,6 +232,31 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
         headers.set("Pragma", "no-cache");
         return new ResponseEntity<>(verifyCode, headers, HttpStatus.OK);
     }
+
+    @RequestMapping(value = ServiceApi.Authentication.VerifyCodeValidate, method = RequestMethod.POST)
+    public ResponseEntity<Envelop> verifyCodeValidate(@RequestParam Map<String, String> parameters) throws  Exception{
+        Envelop envelop = new Envelop();
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Cache-Control", "no-store");
+        headers.set("Pragma", "no-cache");
+        String client_id = parameters.get("client_id");
+        String username = parameters.get("username");
+        String verifyCode = parameters.get("verify_code");
+        if (StringUtils.isEmpty(verifyCode)){
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("验证码不能为空！");
+            return new ResponseEntity<>(envelop, headers, HttpStatus.OK);
+        }
+        boolean _verify = ehrRedisVerifyCodeService.verification(client_id, username, verifyCode);
+        if (_verify){
+            envelop.setSuccessFlg(true);
+        } else {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("请输入正确的验证码！");
+        }
+        return new ResponseEntity<>(envelop, headers, HttpStatus.OK);
+    }
+
 
     @Override
     protected TokenGranter getTokenGranter() {

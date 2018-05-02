@@ -24,6 +24,7 @@ import com.yihu.ehr.model.user.MDoctor;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.id.BizObject;
 import com.yihu.ehr.util.phonics.PinyinUtil;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -140,36 +141,46 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
         doctor.setDeptName(orgDept.getName());
         Doctors d= doctorService.save(doctor);
 
-        //创建账户
-        User user =new User();
-        user.setId(getObjectId(BizObject.User));
-        user.setCreateDate(new Date());
-        String defaultPassword="";
-        if(!StringUtils.isEmpty(doctor.getIdCardNo())&&doctor.getIdCardNo().length()>9){
-            defaultPassword=doctor.getIdCardNo().substring(doctor.getIdCardNo().length()-8);
-            user.setPassword(DigestUtils.md5Hex(defaultPassword));
-        }else{
-            user.setPassword(DigestUtils.md5Hex(default_password));
+        String idCardNo = d.getIdCardNo();
+        User user = null;
+        if(!StringUtils.isEmpty(idCardNo)){
+            //通过身份证 判断居民是否存在
+            user = userManager.getUserByIdCardNo(idCardNo);
         }
-        if(StringUtils.isEmpty(d.getRoleType())){
-            user.setUserType("5");
+        String defaultPassword ="";
+        if(user == null){
+            user =new User();
+            user.setId(getObjectId(BizObject.User));
+            user.setCreateDate(new Date());
+            if(!StringUtils.isEmpty(doctor.getIdCardNo())&&doctor.getIdCardNo().length()>9){
+                defaultPassword=doctor.getIdCardNo().substring(doctor.getIdCardNo().length()-8);
+                user.setPassword(DigestUtils.md5Hex(defaultPassword));
+            }else{
+                user.setPassword(DigestUtils.md5Hex(default_password));
+            }
+            if(StringUtils.isEmpty(d.getRoleType())){
+                user.setUserType("5");
+            }else{
+                user.setUserType(d.getRoleType());
+            }
+            user.setIdCardNo(d.getIdCardNo());
+            user.setDoctorId(d.getId().toString());
+            user.setEmail(d.getEmail());
+            user.setGender(d.getSex());
+            user.setTelephone(d.getPhone());
+            user.setLoginCode(d.getIdCardNo());
+            user.setRealName(d.getName());
+            user.setProvinceId(0);
+            user.setCityId(0);
+            user.setAreaId(0);
+            user.setActivated(true);
+            user.setImgRemotePath(d.getPhoto());
+            user = userManager.saveUser(user);
         }else{
-          user.setUserType(d.getRoleType());
+            //todo 是否修改user信息
+            //......
+            defaultPassword = user.getPassword();
         }
-        user.setIdCardNo(d.getIdCardNo());
-        user.setDoctorId(d.getId().toString());
-        user.setEmail(d.getEmail());
-        user.setGender(d.getSex());
-        user.setTelephone(d.getPhone());
-        user.setLoginCode(d.getIdCardNo());
-        user.setRealName(d.getName());
-        user.setProvinceId(0);
-        user.setCityId(0);
-        user.setAreaId(0);
-        user.setActivated(true);
-        user.setImgRemotePath(d.getPhoto());
-        user = userManager.saveUser(user);
-
         //创建居民
         DemographicInfo demographicInfo =new DemographicInfo();
         if(!StringUtils.isEmpty(doctor.getIdCardNo())&&doctor.getIdCardNo().length()>9){
@@ -503,4 +514,61 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
             }
         }
     }
+
+    @RequestMapping(value = ServiceApi.Doctors.DoctorOnlyUpdateD, method = RequestMethod.POST)
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    @ApiOperation(value = "更新医生信息，只更新医生表信息", notes = "只更新医生表信息")
+    public Envelop updateDoctor(
+            @ApiParam(name = "id", value = "", defaultValue = "")
+            @RequestParam(value = "id",required = true) Long id,
+            @ApiParam(name = "name", value = "", defaultValue = "")
+            @RequestParam(value = "photo",required = false) String photo,
+            @ApiParam(name = "skill", value = "", defaultValue = "")
+            @RequestParam(value = "skill",required = false) String skill,
+            @ApiParam(name = "officeTel", value = "", defaultValue = "")
+            @RequestParam(value = "officeTel",required = false) String officeTel,
+            @ApiParam(name = "workPortal", value = "", defaultValue = "")
+            @RequestParam(value = "workPortal",required = false) String workPortal) throws Exception {
+        Doctors doctors = doctorService.getDoctor(id);
+        if (!StringUtils.isEmpty(photo)){
+            doctors.setPhoto(photo);
+        }
+        if (!StringUtils.isEmpty(skill)){
+            doctors.setSkill(skill);
+        }
+        if (!StringUtils.isEmpty(officeTel)){
+            doctors.setOfficeTel(officeTel);
+        }
+        if (!StringUtils.isEmpty(workPortal)){
+            doctors.setWorkPortal(workPortal);
+        }
+        doctors.setUpdateTime(new Date());
+        doctorService.save(doctors);
+        //更改用户表里的头像
+        User user = userManager.getUserByIdCardNo(doctors.getIdCardNo());
+        if (!StringUtils.isEmpty(user)) {
+            user.setImgRemotePath(doctors.getPhoto());
+            userManager.save(user);
+        }
+        return success(convertToModel(doctors, MDoctor.class));
+    }
+
+
+    /*@RequestMapping(value = ServiceApi.Doctors.DoctorOnlyUpdateD, method = RequestMethod.POST)
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    @ApiOperation(value = "更新医生信息，只更新医生表信息", notes = "只更新医生表信息")
+    public Envelop updateDoctor(
+            @ApiParam(name = "doctor_json_data", value = "", defaultValue = "")
+            @RequestParam(value = "doctor_json_data",required = true) String doctor_json_data) throws Exception {
+        Doctors doctors = toEntity(doctor_json_data,Doctors.class);
+        doctors.setUpdateTime(new Date());
+        doctorService.save(doctors);
+        //更改用户表里的头像
+        User user = userManager.getUserByIdCardNo(doctors.getIdCardNo());
+        if (!StringUtils.isEmpty(user)) {
+            user.setImgRemotePath(doctors.getPhoto());
+            userManager.save(user);
+        }
+        return success(convertToModel(doctors, MDoctor.class));
+    }*/
 }

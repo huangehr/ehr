@@ -24,8 +24,6 @@ public class RedisService {
     @Autowired
     private Icd10KeySchema icd10KeySchema;
     @Autowired
-    private IndicatorsDictKeySchema indicatorsDictKeySchema;
-    @Autowired
     private OrgKeySchema orgKeySchema;
     @Autowired
     private RsAdapterDictKeySchema rsAdapterDictKeySchema;
@@ -39,6 +37,9 @@ public class RedisService {
     private StdDataSetKeySchema stdDataSetKeySchema;
     @Autowired
     private StdMetaDataKeySchema stdMetaDataKeySchema;
+
+    @Autowired
+    private IndicatorsDictKeySchema indicatorsDictKeySchema;
 
     /**
      * 获取地址redis
@@ -82,12 +83,10 @@ public class RedisService {
     }
 
     /**
-     * 获取指标 redis
-     *
-     * @return
+     * 获取ICD10慢病信息 redis
      */
-    public String getIndicators(String key) {
-        return indicatorsDictKeySchema.get(key);
+    public String getChronicInfo(String key) {
+        return icd10KeySchema.getChronicInfo(key);
     }
 
     /**
@@ -271,4 +270,13 @@ public class RedisService {
         return stdMetaDataKeySchema.isDictValueExist(version, dictId, entryValue);
     }
     //------------------------------------ 标准相关 END -------------------------------------------------------
+
+    /**
+     * 获取指标 redis
+     *
+     * @return
+     */
+    public String getIndicators(String key) {
+        return indicatorsDictKeySchema.get(key);
+    }
 }
