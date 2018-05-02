@@ -251,6 +251,7 @@ public class PackStatisticsService extends BaseJpaService {
      * @return
      */
     public Envelop getArchivesFull(String startDate, String endDate, String orgCode) throws Exception{
+        long starttime = System.currentTimeMillis();
         Envelop envelop = new Envelop();
         Date start = DateUtil.formatCharDateYMD(startDate);
         Date end = DateUtil.formatCharDateYMD(endDate);
@@ -367,6 +368,8 @@ public class PackStatisticsService extends BaseJpaService {
         envelop.setObj(resMap);
         envelop.setDetailModelList(res);
         envelop.setSuccessFlg(true);
+        long endtime = System.currentTimeMillis();
+        System.out.println("查询耗时：" + (endtime - starttime) + "ms");
         return envelop;
     }
     /**
@@ -383,32 +386,48 @@ public class PackStatisticsService extends BaseJpaService {
         String sql2 ="";
         String sql3 ="";
         if(StringUtils.isNotEmpty(orgCode)){
-            sql1 = "SELECT patient_id,event_no FROM json_archives WHERE event_type=1 AND org_code='"+orgCode+"' AND event_date BETWEEN" +
+            sql1 = "SELECT COUNT(event_no) FROM json_archives WHERE event_type=1 AND org_code='"+orgCode+"' AND event_date BETWEEN" +
                     " '" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59' GROUP BY patient_id,event_no";
 
-            sql2 = "SELECT patient_id,event_no FROM json_archives WHERE event_type=0 AND org_code='"+orgCode+"' AND event_date BETWEEN " +
+            sql2 = "SELECT COUNT(event_no) FROM json_archives WHERE event_type=0 AND org_code='"+orgCode+"' AND event_date BETWEEN " +
                     "'" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59' GROUP BY patient_id,event_no";
 
-            sql3 = "SELECT patient_id,event_no FROM json_archives WHERE org_code='"+orgCode+"' AND event_date BETWEEN " +
+            sql3 = "SELECT COUNT(event_no) FROM json_archives WHERE org_code='"+orgCode+"' AND event_date BETWEEN " +
                     "'" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59' GROUP BY patient_id,event_no";
         }else{
-            sql1 = "SELECT patient_id,event_no FROM json_archives WHERE event_type=1 AND event_date " +
+            sql1 = "SELECT COUNT(event_no) FROM json_archives WHERE event_type=1 AND event_date " +
                     "BETWEEN '" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59' GROUP BY patient_id,event_no";
 
-            sql2 = "SELECT patient_id,event_no FROM json_archives WHERE event_type=0 AND event_date " +
+            sql2 = "SELECT COUNT(event_no) FROM json_archives WHERE event_type=0 AND event_date " +
                     "BETWEEN '" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59' GROUP BY patient_id,event_no";
 
-            sql3 = "SELECT patient_id,event_no FROM json_archives WHERE event_date " +
+            sql3 = "SELECT COUNT(event_no) FROM json_archives WHERE event_date " +
                     "BETWEEN '" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59' GROUP BY patient_id,event_no";
         }
+        ResultSet resultSet1 = elasticSearchUtil.findBySql(sql1);
+        ResultSet resultSet2 = elasticSearchUtil.findBySql(sql2);
+        ResultSet resultSet3 = elasticSearchUtil.findBySql(sql3);
+        resultSet1.next();
+        resultSet2.next();
+        resultSet3.next();
+        Map<String,Object> map = new HashMap<String,Object>();
+        try{
+            map.put("inpatient_total",new Double(resultSet1.getObject("COUNT(event_no)").toString()).intValue());
+        }catch (Exception e){
+            map.put("inpatient_total",0);
+        }
 
-        List<Map<String,Object>> list1 = elasticSearchUtil.findBySql(fields,sql1);
-        List<Map<String,Object>> list2 = elasticSearchUtil.findBySql(fields,sql2);
-        List<Map<String,Object>> list3= elasticSearchUtil.findBySql(fields,sql3);
-        Map<String,Object> map = new HashMap<>();
-        map.put("inpatient_total",list1.size());
-        map.put("oupatient_total",list2.size());
-        map.put("total",list3.size());
+        try{
+            map.put("oupatient_total",new Double(resultSet2.getObject("COUNT(event_no)").toString()).intValue());
+        }catch (Exception e){
+            map.put("oupatient_total",0);
+        }
+
+        try{
+            map.put("total",new Double(resultSet3.getObject("COUNT(event_no)").toString()).intValue());
+        }catch (Exception e){
+            map.put("total",0);
+        }
         return map;
     }
 
@@ -622,11 +641,22 @@ public class PackStatisticsService extends BaseJpaService {
                     " '" + DateUtil.toString(begin) + " 00:00:00' AND '" +  DateUtil.toString(end1) + " 00:00:00' GROUP BY patient_id,event_no";
         }
 
-        List<Map<String,Object>> list1 = elasticSearchUtil.findBySql(fields,sql1);
-        List<Map<String,Object>> list2 = elasticSearchUtil.findBySql(fields,sql2);
-        Map<String,Object> map = new HashMap<>();
-        map.put("inpatient_total",list1.size());
-        map.put("oupatient_total",list2.size());
+        ResultSet resultSet1 = elasticSearchUtil.findBySql(sql1);
+        ResultSet resultSet2 = elasticSearchUtil.findBySql(sql2);
+        resultSet1.next();
+        resultSet2.next();
+        Map<String,Object> map = new HashMap<String,Object>();
+        try{
+            map.put("inpatient_total",new Double(resultSet1.getObject("COUNT(event_no)").toString()).intValue());
+        }catch (Exception e){
+            map.put("inpatient_total",0);
+        }
+
+        try{
+            map.put("oupatient_total",new Double(resultSet2.getObject("COUNT(event_no)").toString()).intValue());
+        }catch (Exception e){
+            map.put("oupatient_total",0);
+        }
         return map;
     }
 
