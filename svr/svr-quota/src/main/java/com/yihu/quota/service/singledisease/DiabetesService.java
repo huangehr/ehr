@@ -1,4 +1,4 @@
-package com.yihu.quota.scheduler;
+package com.yihu.quota.service.singledisease;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,21 +27,22 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 /**
- * 糖尿病单病种  并发症分析 数据统计
+ * 糖尿病单病种 分析 数据统计
  */
-@Component
-public class DiabetesSymptomScheduler {
+@Service
+public class DiabetesService {
 
-	private static final Logger log = LoggerFactory.getLogger(DiabetesSymptomScheduler.class);
+	private static final Logger log = LoggerFactory.getLogger(DiabetesService.class);
 
 	@Autowired
 	private SolrUtil solrUtil;
+	@Autowired
+	private ExtractUtil extractUtil;
 	@Autowired
 	private ElasticSearchUtil elasticSearchUtil;
 	@Autowired
@@ -54,33 +55,34 @@ public class DiabetesSymptomScheduler {
 	private ObjectMapper objectMapper;
 
 
-	/**
-	 * 首先要有一个初始化过程
-	 * 每天2点 执行一次
-	 * @throws Exception
-	 */
-	@Scheduled(cron = "0 56 21 * * ?")
-	public void validatorIdentityScheduler(){
+	public void validatorIdentity(){
 		try {
-			String q2 = "EHR_000112:*糖尿病*并发症* OR EHR_000295:*糖尿病*并发症*"; //门诊和住院 诊断名称
+//			String q =  null; // 查询条件 health_problem:HP0047  HP0047 为糖尿病
+			String q2 = "EHR_000295:*糖尿病* OR EHR_000112:*糖尿病*";
+//			String keyDiseaseNameH = "EHR_000295";//诊断名字（住院） *糖尿病*
+//			String keyDiseaseNameZ = "EHR_000112";//诊断名字（门诊）*糖尿病*
 			String fq = ""; // 过滤条件
 			String keyEventDate = "event_date";
-			String keyArea = "EHR_001225";
+			String keyArea = "EHR_001225";  //行政区划代码
 			String keyAreaName = "EHR_001225_VALUE";
 			String keyPatientName = "patient_name";
 			String keyDemographicId = "demographic_id";//身份证
 			String keyCardId = "card_id	";
+//			String keyHealthProblem = "health_problem";
 			String keySex = "EHR_000019";//性别
 			String keySexValue = "EHR_000019_VALUE";
 			String keyAge = "EHR_000007";//出生日期 年龄
 			String keyAddress = "EHR_001211"; //地址
+//			String keyDiseaseType = "EHR_003810";//EHR_003810 诊断代码
 			String keyDiseaseSymptom = "EHR_000112";//并发症  诊断名称(门诊)
 			String keyDiseaseSymptom2 = "EHR_000295";//并发症  诊断名称（住院）
 			String keysugarToleranceName = "EHR_000392";//  检验-项目结果 - 报告子项的LOINC编码  14995-5 糖耐量值  14771-0 空腹血糖
 			String keysugarToleranceVal = "EHR_000387";//检验-项目结果 -  结果值  糖耐量值
 			String keyChineseName = "EHR_000394";//子项目中文名称
+//			String keyEnglishName = "EHR_000393";//子项目英文名称
 			String keyWestMedicine= "EHR_000100";  //西药
 			String keyChineseMedicine= "EHR_000131";//中药
+
 			objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
 			BasesicUtil basesicUtil = new BasesicUtil();
@@ -91,98 +93,97 @@ public class DiabetesSymptomScheduler {
 			boolean flag = true;
 			String startDate = "2015-01-01";
 			String endDate = "2015-02-01";
+			List<String> rowKeyList = new ArrayList<>() ;
 			while(flag){
-				//  当前时间大于初始化时间，就所有数据初始化，每个月递增查询，当前时间小于于初始时间每天抽取
-				if(basesicUtil.compareDate(initializeDate,nowDate) == -1){
-					Date exeStartDate = DateUtil.parseDate(initializeDate, DateUtil.DEFAULT_DATE_YMD_FORMAT);
-					Calendar calendar = Calendar.getInstance();
-					calendar.setTime(exeStartDate);
-					int day1 = calendar.get(Calendar.DAY_OF_YEAR);
-					Calendar endCalendar = Calendar.getInstance();
-					endCalendar.setTime(now);
-					int day2 = endCalendar.get(Calendar.DAY_OF_YEAR);
-					int num = day2 - day1;
-					//总院那边是一天采集24天的数据，所以初始化完后，每天采集15天的数据
-					Date executeStartDate = DateUtils.addDays(DateUtil.parseDate(executeInitDate, DateUtil.DEFAULT_DATE_YMD_FORMAT), 15*(num-1));
-					Date executeEndDate = DateUtils.addDays(DateUtil.parseDate(executeInitDate, DateUtil.DEFAULT_DATE_YMD_FORMAT), 15*num);
-					startDate = DateUtil.formatDate(executeStartDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
-					endDate = DateUtil.formatDate(executeEndDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
-					fq = "event_date:[" + startDate + "T00:00:00Z TO  " + endDate + "T23:59:59Z]";
+				fq = "event_date:[" + startDate + "T00:00:00Z TO  " + endDate + "T00:00:00Z]";
+				Date sDate = DateUtils.addDays(DateUtil.parseDate(startDate, DateUtil.DEFAULT_DATE_YMD_FORMAT), 15);
+				startDate = DateUtil.formatDate(sDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
+				Date eDate = DateUtils.addDays(DateUtil.parseDate(startDate, DateUtil.DEFAULT_DATE_YMD_FORMAT), 15);
+				endDate = DateUtil.formatDate(eDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
+				if(basesicUtil.compareDate("2017-05-01",startDate) != 1){//结束时间
 					flag = false;
-				}else{
-					fq = "event_date:[" + startDate + "T00:00:00Z TO  " + endDate + "T00:00:00Z]";
-					Date sDate = DateUtils.addDays(DateUtil.parseDate(startDate, DateUtil.DEFAULT_DATE_YMD_FORMAT), 15);
-					startDate = DateUtil.formatDate(sDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
-					Date eDate = DateUtils.addDays(DateUtil.parseDate(startDate, DateUtil.DEFAULT_DATE_YMD_FORMAT), 15);
-					endDate = DateUtil.formatDate(eDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
-					if(basesicUtil.compareDate("2017-05-01",startDate) != 1){//结束时间
-						flag = false;
-					}
 				}
+				System.out.println("startDate=" + startDate);
+				log.error("startDate=" + startDate);
+				rowKeyList.clear();
 				//找出糖尿病的就诊档案
-				//event_date:[2015-06-01T00:00:00Z TO  2015-07-01T00:00:00Z]
-				System.out.println("bingfazheng 开始查询 并发症bingfazheng solr, fq = " + fq);
 				List<String> subRrowKeyList = new ArrayList<>() ; //细表rowkey
 				subRrowKeyList = selectSubRowKey(ResourceCore.SubTable, q2, fq, 10000);
-				System.out.println("bingfazheng 并发症查询结果条数 bingfazheng count ："+subRrowKeyList.size());
+				System.out.println(" persional 个人开始查询 persional solr, fq = " + fq);
+				System.out.println(" persional 查询结果条数 persional count ：" + subRrowKeyList.size());
+				log.error("persional 查询结果条数 persional count ：" + subRrowKeyList.size());
 				if(subRrowKeyList != null && subRrowKeyList.size() > 0){
 					//糖尿病数据 Start
 					for(String subRowkey:subRrowKeyList){//循环糖尿病 找到主表就诊人信息
+						String mainRowkey = subRowkey.substring(0, subRowkey.indexOf("$"));
 						//查询此次就诊记录的相关数据 保存到检测记录中
 						String name = "";
 						String demographicId = "";
 						String cardId = "";
 						Integer sex = 0;
 						String sexName = "";
-						String diseaseType = "";
-						String diseaseTypeName = "";
-						String birthday = "";
-						int birthYear = 0;
-						Date eventDate = null;
-						Map<String,Object> subMap = hbaseDao.getResultMap(ResourceCore.SubTable, subRowkey);
-						if(subMap !=null){
-							String diseaseName = "";
-							if(subMap.get(keyDiseaseSymptom) != null){
-								diseaseName = subMap.get(keyDiseaseSymptom).toString();
-							}else if(subMap.get(keyDiseaseSymptom2) != null ){
-								diseaseName = subMap.get(keyDiseaseSymptom2).toString();
-							}
-							if(StringUtils.isNotEmpty(diseaseName)){
-								if(diseaseName.contains("1型")){
-									diseaseType = "1";
-									diseaseTypeName = "I型糖尿病";
-								}else if(diseaseName.contains("2型")){
-									diseaseType = "2";
-									diseaseTypeName = "II型糖尿病";
-								}else if(diseaseName.contains("妊娠")){
-									diseaseType = "3";
-									diseaseTypeName = "妊娠糖尿病";
-								}else{
-									diseaseType = "4";
-									diseaseTypeName = "其他糖尿病";
+						if( !rowKeyList.contains(mainRowkey) ){
+							rowKeyList.add(mainRowkey);
+							PersonalInfoModel personalInfo = new PersonalInfoModel();
+							personalInfo.setCreateTime(DateUtils.addHours(new Date(),8));
+							Map<String,Object> subMap = hbaseDao.getResultMap(ResourceCore.SubTable, subRowkey);
+							if(subMap !=null){
+								String diseaseName = "";
+								if(subMap.get(keyDiseaseSymptom) != null){
+									diseaseName = subMap.get(keyDiseaseSymptom).toString();
+								}else if(subMap.get(keyDiseaseSymptom2) != null ){
+									diseaseName = subMap.get(keyDiseaseSymptom2).toString();
+								}
+								if(StringUtils.isNotEmpty(diseaseName)){
+									if(diseaseName.contains("1型")){
+										personalInfo.setDiseaseType("1");
+										personalInfo.setDiseaseTypeName("I型糖尿病");
+									}else if(diseaseName.contains("2型")){
+										personalInfo.setDiseaseType("2");
+										personalInfo.setDiseaseTypeName("II型糖尿病");
+									}else if(diseaseName.contains("妊娠")){
+										personalInfo.setDiseaseType("3");
+										personalInfo.setDiseaseTypeName("妊娠糖尿病");
+									}else{
+										personalInfo.setDiseaseType("4");
+										personalInfo.setDiseaseTypeName("其他糖尿病");
+									}
 								}
 							}
-						}
 
-						String mainRowkey = subRowkey.substring(0, subRowkey.indexOf("$"));
-						Map<String,Object> map = hbaseDao.getResultMap(ResourceCore.MasterTable, mainRowkey);
-						if(map !=null){
-							if(map.get(keyEventDate) != null){
-								eventDate = DateUtil.formatCharDate(map.get(keyEventDate).toString(), DateUtil.DATE_WORLD_FORMAT);
-								eventDate = DateUtils.addHours(eventDate, 8);
-							}
-							if(map.get(keyAge) != null){
-								birthday= map.get(keyAge).toString().substring(0, 10);
-								birthYear = Integer.valueOf(map.get(keyAge).toString().substring(0, 4));
-							}
-							if(map.get(keyDemographicId) != null){
-								demographicId = map.get(keyDemographicId).toString();
-							}
-							if(map.get(keyCardId) != null){
-								cardId = map.get(keyCardId).toString();
-							}
-							if(map.get(keySex) != null) {
-								if(StringUtils.isNotEmpty(map.get(keySex).toString())){
+							Map<String,Object> map = hbaseDao.getResultMap(ResourceCore.MasterTable, mainRowkey);
+							if(map!=null){
+								//个人信息 > 姓名，身份证，就诊卡号，性别，出生日期，出生年份，区县，常住地址，常住地址经纬度，疾病名称，疾病code
+								String mapContent = objectMapper.writeValueAsString(map);
+								personalInfo.setRowKey(mainRowkey+"【" + mapContent +"】");
+								if(map.get(keyEventDate) != null){
+									Date eventDate = DateUtil.formatCharDate(map.get(keyEventDate).toString(), DateUtil.DATE_WORLD_FORMAT);
+									personalInfo.setEventDate(DateUtils.addHours(eventDate,8));
+								}else {
+									personalInfo.setEventDate(null);
+								}
+								if(map.get(keyArea) != null){
+									personalInfo.setTown(map.get(keyArea).toString());
+									personalInfo.setTownName(map.get(keyAreaName).toString());
+								}else {
+									personalInfo.setTown("twon无数据");
+								}
+								if(map.get(keyPatientName) != null){
+									personalInfo.setName(map.get(keyPatientName).toString());
+								}else {
+									personalInfo.setName("name无数据");
+								}
+								if(map.get(keyDemographicId) != null){
+									personalInfo.setDemographicId(map.get(keyDemographicId).toString());
+								}else {
+									personalInfo.setDemographicId("demographicId无数据");
+								}
+								if(map.get(keyCardId) != null){
+									personalInfo.setCardId(map.get(keyCardId).toString());
+								}else {
+									personalInfo.setCardId("cardId无数据");
+								}
+								if(map.get(keySex) != null){
 									if(map.get(keySex).toString().contains("男")){
 										sex =1;
 										sexName ="男";
@@ -197,46 +198,35 @@ public class DiabetesSymptomScheduler {
 									sex =0;
 									sexName ="未知";
 								}
-							}else {
-								sex =0;
-								sexName ="未知";
-							}
-							if(map.get(keyPatientName) != null){
-								name = map.get(keyPatientName).toString();
-							}
-						}
-
-						CheckInfoModel baseCheckInfo = new CheckInfoModel();
-						baseCheckInfo.setName(name);
-						baseCheckInfo.setDemographicId(demographicId);
-						baseCheckInfo.setCardId(cardId);
-						baseCheckInfo.setSex(sex);
-						baseCheckInfo.setSexName(sexName);
-						baseCheckInfo.setBirthday(birthday);
-						baseCheckInfo.setBirthYear(birthYear);
-						baseCheckInfo.setDiseaseType(diseaseType);
-						baseCheckInfo.setDiseaseTypeName(diseaseTypeName);
-						baseCheckInfo.setEventDate(eventDate);
-						Map<String,Object> submap = hbaseDao.getResultMap(ResourceCore.SubTable, subRowkey);
-						if(submap !=null){
-							//检查信息 姓名,身份证，就诊卡号,并发症，空腹血糖值，葡萄糖耐量值，用药名称，检查信息code （CH001 并发症,CH002 空腹血糖,CH003 葡萄糖耐量,CH004 用药名称）
-							if(submap.get(keyDiseaseSymptom) != null && submap.get(keyDiseaseSymptom).toString().contains("并发症")){
-//								CheckInfoModel checkInfo = setCheckInfoModel(baseCheckInfo);
-								baseCheckInfo.setCreateTime(DateUtils.addHours(new Date(),8));
-								baseCheckInfo.setCheckCode("CH001");
-								baseCheckInfo.setSymptomName(submap.get(keyDiseaseSymptom).toString());
-								saveCheckInfo(baseCheckInfo);
-							}
-							if(submap.get(keyDiseaseSymptom2) != null && submap.get(keyDiseaseSymptom2).toString().contains("并发症")){
-//								CheckInfoModel checkInfo = setCheckInfoModel(baseCheckInfo);
-								baseCheckInfo.setCreateTime(DateUtils.addHours(new Date(),8));
-								baseCheckInfo.setCheckCode("CH001");
-								baseCheckInfo.setSymptomName(submap.get(keyDiseaseSymptom2).toString());
-								saveCheckInfo(baseCheckInfo);
+								personalInfo.setSex(sex);
+								personalInfo.setSexName(sexName);
+								if(map.get(keyAge) != null){
+									personalInfo.setBirthday( map.get(keyAge).toString().substring(0, 10));
+									int year = Integer.valueOf(map.get(keyAge).toString().substring(0, 4));
+									personalInfo.setBirthYear(year);
+								}else {
+									personalInfo.setBirthday("birthDay无数据");
+								}
+								if(map.get(keyAddress) != null){
+									String address = map.get(keyAddress).toString();
+									personalInfo.setAddress(address);
+									try {
+										Map<String, String> json = LatitudeUtils.getGeocoderLatitude(address);
+										personalInfo.setAddressLngLat(json.get("lng")+";" + json.get("lat"));
+									}catch (Exception e){
+										System.out.println("没有外网无法解析常住地址！");
+									}
+								}else {
+									personalInfo.setAddress("address无数据");
+								}
+								personalInfo.setDisease("HP0047");
+								personalInfo.setDiseaseName("糖尿病");
+								//个人信息记录end
+								savePersonal(personalInfo);
 							}
 						}
 					}
-					//糖尿病数据并发症 end
+					//糖尿病数据 Start
 				}
 
 			}
@@ -259,31 +249,6 @@ public class DiabetesSymptomScheduler {
 				}
 			}else if(personalInfo.getCardId() != null){
 				List<Map<String, Object>> relist = elasticSearchUtil.findByField(index,type, "cardId",personalInfo.getCardId());
-				if( !(relist != null && relist.size() >0)){
-					elasticSearchClient.index(index,type, source);
-				}
-			}else {
-				elasticSearchClient.index(index,type, source);
-			}
-		}catch (Exception e){
-			e.getMessage();
-		}
-	}
-
-	public void saveCheckInfo(CheckInfoModel checkInfo){
-		try{
-			String index = "singleDiseaseCheck";
-			String type = "check_info";
-			Map<String, Object> source = new HashMap<>();
-			String jsonCheck = objectMapper.writeValueAsString(checkInfo);
-			source = objectMapper.readValue(jsonCheck,Map.class);
-			if(checkInfo.getCheckCode().equals("CH001") && StringUtils.isNotEmpty(checkInfo.getDemographicId()) ){
-				List<Map<String, Object>> relist = elasticSearchUtil.findByField(index,type, "demographicId",checkInfo.getDemographicId());
-				if( !(relist != null && relist.size() >0)){
-					elasticSearchClient.index(index,type, source);
-				}
-			}else if(checkInfo.getCheckCode().equals("CH001") && StringUtils.isNotEmpty(checkInfo.getCardId()) ){
-				List<Map<String, Object>> relist = elasticSearchUtil.findByField(index,type, "cardId",checkInfo.getCardId());
 				if( !(relist != null && relist.size() >0)){
 					elasticSearchClient.index(index,type, source);
 				}

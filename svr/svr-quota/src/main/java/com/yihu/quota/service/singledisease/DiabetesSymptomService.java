@@ -1,4 +1,4 @@
-package com.yihu.quota.scheduler;
+package com.yihu.quota.service.singledisease;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,9 +8,7 @@ import com.yihu.ehr.hbase.HBaseDao;
 import com.yihu.ehr.profile.core.ResourceCore;
 import com.yihu.ehr.solr.SolrUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
-import com.yihu.quota.etl.extract.ExtractUtil;
 import com.yihu.quota.util.BasesicUtil;
-import com.yihu.quota.util.LatitudeUtils;
 import com.yihu.quota.vo.CheckInfoModel;
 import com.yihu.quota.vo.DictModel;
 import com.yihu.quota.vo.PersonalInfoModel;
@@ -27,18 +25,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 /**
  * 糖尿病单病种  并发症分析 数据统计
  */
-@Component
-public class DiabetesSymptomScheduler {
+@Service
+public class DiabetesSymptomService {
 
-	private static final Logger log = LoggerFactory.getLogger(DiabetesSymptomScheduler.class);
+	private static final Logger log = LoggerFactory.getLogger(DiabetesSymptomService.class);
 
 	@Autowired
 	private SolrUtil solrUtil;
@@ -54,13 +51,7 @@ public class DiabetesSymptomScheduler {
 	private ObjectMapper objectMapper;
 
 
-	/**
-	 * 首先要有一个初始化过程
-	 * 每天2点 执行一次
-	 * @throws Exception
-	 */
-	@Scheduled(cron = "0 56 21 * * ?")
-	public void validatorIdentityScheduler(){
+	public void validatorIdentity(){
 		try {
 			String q2 = "EHR_000112:*糖尿病*并发症* OR EHR_000295:*糖尿病*并发症*"; //门诊和住院 诊断名称
 			String fq = ""; // 过滤条件
@@ -92,39 +83,22 @@ public class DiabetesSymptomScheduler {
 			String startDate = "2015-01-01";
 			String endDate = "2015-02-01";
 			while(flag){
-				//  当前时间大于初始化时间，就所有数据初始化，每个月递增查询，当前时间小于于初始时间每天抽取
-				if(basesicUtil.compareDate(initializeDate,nowDate) == -1){
-					Date exeStartDate = DateUtil.parseDate(initializeDate, DateUtil.DEFAULT_DATE_YMD_FORMAT);
-					Calendar calendar = Calendar.getInstance();
-					calendar.setTime(exeStartDate);
-					int day1 = calendar.get(Calendar.DAY_OF_YEAR);
-					Calendar endCalendar = Calendar.getInstance();
-					endCalendar.setTime(now);
-					int day2 = endCalendar.get(Calendar.DAY_OF_YEAR);
-					int num = day2 - day1;
-					//总院那边是一天采集24天的数据，所以初始化完后，每天采集15天的数据
-					Date executeStartDate = DateUtils.addDays(DateUtil.parseDate(executeInitDate, DateUtil.DEFAULT_DATE_YMD_FORMAT), 15*(num-1));
-					Date executeEndDate = DateUtils.addDays(DateUtil.parseDate(executeInitDate, DateUtil.DEFAULT_DATE_YMD_FORMAT), 15*num);
-					startDate = DateUtil.formatDate(executeStartDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
-					endDate = DateUtil.formatDate(executeEndDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
-					fq = "event_date:[" + startDate + "T00:00:00Z TO  " + endDate + "T23:59:59Z]";
+				fq = "event_date:[" + startDate + "T00:00:00Z TO  " + endDate + "T00:00:00Z]";
+				Date sDate = DateUtils.addDays(DateUtil.parseDate(startDate, DateUtil.DEFAULT_DATE_YMD_FORMAT), 15);
+				startDate = DateUtil.formatDate(sDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
+				Date eDate = DateUtils.addDays(DateUtil.parseDate(startDate, DateUtil.DEFAULT_DATE_YMD_FORMAT), 15);
+				endDate = DateUtil.formatDate(eDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
+				if(basesicUtil.compareDate("2017-05-01",startDate) != 1){//结束时间
 					flag = false;
-				}else{
-					fq = "event_date:[" + startDate + "T00:00:00Z TO  " + endDate + "T00:00:00Z]";
-					Date sDate = DateUtils.addDays(DateUtil.parseDate(startDate, DateUtil.DEFAULT_DATE_YMD_FORMAT), 15);
-					startDate = DateUtil.formatDate(sDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
-					Date eDate = DateUtils.addDays(DateUtil.parseDate(startDate, DateUtil.DEFAULT_DATE_YMD_FORMAT), 15);
-					endDate = DateUtil.formatDate(eDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
-					if(basesicUtil.compareDate("2017-05-01",startDate) != 1){//结束时间
-						flag = false;
-					}
 				}
 				//找出糖尿病的就诊档案
 				//event_date:[2015-06-01T00:00:00Z TO  2015-07-01T00:00:00Z]
 				System.out.println("bingfazheng 开始查询 并发症bingfazheng solr, fq = " + fq);
+				log.error("bingfazheng 开始查询 并发症bingfazheng solr, fq = " + fq);
 				List<String> subRrowKeyList = new ArrayList<>() ; //细表rowkey
 				subRrowKeyList = selectSubRowKey(ResourceCore.SubTable, q2, fq, 10000);
 				System.out.println("bingfazheng 并发症查询结果条数 bingfazheng count ："+subRrowKeyList.size());
+				log.error("bingfazheng 并发症查询结果条数 bingfazheng count ："+subRrowKeyList.size());
 				if(subRrowKeyList != null && subRrowKeyList.size() > 0){
 					//糖尿病数据 Start
 					for(String subRowkey:subRrowKeyList){//循环糖尿病 找到主表就诊人信息
@@ -174,12 +148,18 @@ public class DiabetesSymptomScheduler {
 							if(map.get(keyAge) != null){
 								birthday= map.get(keyAge).toString().substring(0, 10);
 								birthYear = Integer.valueOf(map.get(keyAge).toString().substring(0, 4));
+							}else {
+								birthday = "birthday 无数据";
 							}
 							if(map.get(keyDemographicId) != null){
 								demographicId = map.get(keyDemographicId).toString();
+							}else {
+								demographicId = "demographicId 无数据";
 							}
 							if(map.get(keyCardId) != null){
 								cardId = map.get(keyCardId).toString();
+							}else {
+								cardId = "cardId无数据";
 							}
 							if(map.get(keySex) != null) {
 								if(StringUtils.isNotEmpty(map.get(keySex).toString())){
@@ -203,10 +183,14 @@ public class DiabetesSymptomScheduler {
 							}
 							if(map.get(keyPatientName) != null){
 								name = map.get(keyPatientName).toString();
+							}else {
+								name = "name无数据";
 							}
 						}
 
 						CheckInfoModel baseCheckInfo = new CheckInfoModel();
+						String mapContent = objectMapper.writeValueAsString(map);
+						baseCheckInfo.setRowKey(mainRowkey+"【" + mapContent +"】");
 						baseCheckInfo.setName(name);
 						baseCheckInfo.setDemographicId(demographicId);
 						baseCheckInfo.setCardId(cardId);

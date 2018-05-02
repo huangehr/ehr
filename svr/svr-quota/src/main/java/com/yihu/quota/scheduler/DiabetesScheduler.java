@@ -107,7 +107,7 @@ public class DiabetesScheduler {
 
 			BasesicUtil basesicUtil = new BasesicUtil();
 			String initializeDate = "2018-04-10";// job初始化时间
-			String executeStartDate = "2015-06-01";
+			String executeInitDate = "2015-06-01";
 			Date now = new Date();
 			String nowDate = DateUtil.formatDate(now,DateUtil.DEFAULT_DATE_YMD_FORMAT);
 			boolean flag = true;
@@ -131,9 +131,11 @@ public class DiabetesScheduler {
 					int day2 = endCalendar.get(Calendar.DAY_OF_YEAR);
 					int num = day2 - day1;
 					//总院那边是一天采集24天的数据，所以初始化完后，每天采集15天的数据
-					Date executeEndDate = DateUtils.addDays(DateUtil.parseDate(executeStartDate, DateUtil.DEFAULT_DATE_YMD_FORMAT), 15*num);
+					Date executeStartDate = DateUtils.addDays(DateUtil.parseDate(executeInitDate, DateUtil.DEFAULT_DATE_YMD_FORMAT), 15*(num-1));
+					Date executeEndDate = DateUtils.addDays(DateUtil.parseDate(executeInitDate, DateUtil.DEFAULT_DATE_YMD_FORMAT), 15*num);
+					startDate = DateUtil.formatDate(executeStartDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
 					endDate = DateUtil.formatDate(executeEndDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
-					fq = "event_date:[" + executeStartDate + "T00:00:00Z TO  " + endDate + "T23:59:59Z]";
+					fq = "event_date:[" + startDate + "T00:00:00Z TO  " + endDate + "T23:59:59Z]";
 					flag = false;
 				}else{
 					fq = "event_date:[" + startDate + "T00:00:00Z TO  " + endDate + "T00:00:00Z]";
