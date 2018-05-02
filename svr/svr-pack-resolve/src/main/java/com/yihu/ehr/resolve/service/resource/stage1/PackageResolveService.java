@@ -1,7 +1,6 @@
 package com.yihu.ehr.resolve.service.resource.stage1;
 
 import com.yihu.ehr.constants.ProfileType;
-import com.yihu.ehr.model.packs.EsDetailsPackage;
 import com.yihu.ehr.model.packs.EsSimplePackage;
 import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.resolve.*;
