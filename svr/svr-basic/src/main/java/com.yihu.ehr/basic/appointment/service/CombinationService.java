@@ -191,7 +191,7 @@ public class CombinationService {
             }
             List<Map<String, Object>> schedulingList = (ArrayList) schedulingResMap.get("Result");
 
-            if (schedulingResMap.size() > 0) {
+            if (schedulingList.size() > 0) {
                 // 过滤掉需代缴挂号费的排班
                 List<Map<String, Object>> freeSchedulingList = new ArrayList<>();
                 for (int j = 0, jSize = schedulingList.size(); j < jSize; j++) {
