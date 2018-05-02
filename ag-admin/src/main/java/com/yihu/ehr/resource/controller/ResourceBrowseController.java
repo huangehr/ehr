@@ -160,7 +160,9 @@ public class ResourceBrowseController extends BaseController {
             @ApiParam(name = "page", value = "第几页")
             @RequestParam(value = "page", required = false) Integer page,
             @ApiParam(name = "size", value = "每页几行")
-            @RequestParam(value = "size", required = false) Integer size) throws Exception {
+            @RequestParam(value = "size", required = false) Integer size,
+            @ApiParam(name = "top", value = "获取前几条数据")
+            @RequestParam(value = "top", required = false) String top) throws Exception {
         Envelop envelop = resourcesClient.getResourceByCode(resourcesCode);
         RsResourcesModel rsResourcesModel = objectMapper.convertValue(envelop.getObj(), RsResourcesModel.class);
         if (!rsResourcesModel.getRsInterface().equals("getQuotaData")){//接口 来自接口统计
@@ -173,7 +175,7 @@ public class ResourceBrowseController extends BaseController {
                     quotaCodeStr = quotaCodeStr + resourceQuotaModel.getQuotaCode() + ",";
                 }
             }
-            List<Map<String, Object>> resultList = rsResourceStatisticsClient.getQuotaReportTwoDimensionalTable(quotaCodeStr, null, rsResourcesModel.getDimension());
+            List<Map<String, Object>> resultList = rsResourceStatisticsClient.getQuotaReportTwoDimensionalTable(quotaCodeStr, null, rsResourcesModel.getDimension(), top);
             envelop.setDetailModelList(resultList);
             envelop.setSuccessFlg(true);
             return  envelop;

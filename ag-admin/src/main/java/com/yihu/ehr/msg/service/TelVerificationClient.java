@@ -25,7 +25,7 @@ public interface TelVerificationClient {
     @ApiOperation(value = "创建手机验证信息", notes = "创建手机验证信息")
     Envelop createTelVerification(
             @ApiParam(name = "telNo", value = "", defaultValue = "")
-            @RequestParam(value = "telNo", required = false) String telNo,
+            @RequestParam(value = "telNo", required = false) String tel,
             @ApiParam(name = "appId", value = "", defaultValue = "")
             @RequestParam(value = "appId", required = false) String appId) throws Exception ;
 
@@ -33,7 +33,7 @@ public interface TelVerificationClient {
     @ApiOperation(value = "验证手机验证信息", notes = "验证手机验证信息")
     Envelop validationTelVerification(
             @ApiParam(name = "telNo", value = "", defaultValue = "")
-            @RequestParam(value = "telNo", required = false) String telNo,
+            @RequestParam(value = "telNo", required = false) String tel,
             @ApiParam(name = "appId", value = "", defaultValue = "")
             @RequestParam(value = "appId", required = false) String appId,
             @ApiParam(name = "verificationCode", value = "", defaultValue = "")

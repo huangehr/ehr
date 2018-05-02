@@ -43,13 +43,4 @@ public class EhrRedisVerifyCodeService {
         return false;
     }
 
-    public Object getVerifyCodeValidate (String client_id, String username) {
-        String key = client_id + ":" + username + KEY_SUFFIX;
-        Object Obj = redisTemplate.opsForValue().get(key);
-        if(null != Obj){
-            return  Obj;
-        }
-        return  "";
-    }
-
 }

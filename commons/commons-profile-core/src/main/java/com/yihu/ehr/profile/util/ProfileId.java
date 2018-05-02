@@ -41,14 +41,15 @@ public final class ProfileId implements Comparable<ProfileId>, Serializable {
     private final String patientId;
     private final String eventNo;
     private final long timestamp;
+    private final int profileType;     //1结构化档案，2文件档案，3链接档案，4数据集档案   5即时档案
 
     /**
      * 创建一个新的ID对象.
      *
      * @return 新创建的ID对象.
      */
-    public static ProfileId get(final String orgId, final String eventNo, final Date timestamp) {
-        return new ProfileId(orgId, eventNo, timestamp);
+    public static ProfileId get(final String orgId, final String eventNo, final Date timestamp,final int profileType) {
+        return new ProfileId(orgId, eventNo, timestamp,profileType);
     }
 
     /**
@@ -56,24 +57,26 @@ public final class ProfileId implements Comparable<ProfileId>, Serializable {
      *
      * @return 新创建的ID对象.
      */
-    public static ProfileId get(final String orgId,  final String patientId, final String eventNo) {
-        return new ProfileId(orgId, patientId, eventNo);
+    public static ProfileId get(final String orgId,  final String patientId, final String eventNo,final int profileType) {
+        return new ProfileId(orgId, patientId, eventNo,profileType);
     }
 
     //档案维度，有时间
-    public ProfileId(final String orgCode, final String eventNo, final Date timestamp) {
+    public ProfileId(final String orgCode, final String eventNo, final Date timestamp,final int profileType) {
         this.orgCode = orgCode;
         this.patientId = "";
         this.eventNo = eventNo;
         this.timestamp = timestamp.getTime();
+        this.profileType = profileType;
     }
 
     //非档案维度的，没有时间
-    public ProfileId(final String orgCode, final String patientId, final String eventNo) {
+    public ProfileId(final String orgCode, final String patientId, final String eventNo,final int profileType) {
         this.orgCode = orgCode;
         this.patientId = patientId;
         this.eventNo = eventNo;
         this.timestamp = 0;
+        this.profileType = profileType;
     }
 
     /**
@@ -89,7 +92,7 @@ public final class ProfileId implements Comparable<ProfileId>, Serializable {
         }
 
         Matcher matcher = Pattern.matcher(id);
-        return matcher.matches() && matcher.groupCount() == 3;
+        return matcher.matches() && (matcher.groupCount() == 3 || matcher.groupCount() == 4);
     }
 
     /**
@@ -99,10 +102,15 @@ public final class ProfileId implements Comparable<ProfileId>, Serializable {
      */
     public ProfileId(final String id) {
         Matcher matcher = Pattern.matcher(id);
-        if(matcher.find() && matcher.groupCount() == 3){
+        if(matcher.find() && (matcher.groupCount() == 3 || matcher.groupCount() == 4)){
             orgCode = matcher.group(1);
             eventNo = matcher.group(2);
             timestamp = Long.parseLong(matcher.group(3));
+            if(matcher.groupCount() == 3){
+                profileType = 1;
+            }else{
+                profileType = Integer.parseInt(matcher.group(4));
+            }
         } else {
             throw new IllegalArgumentException("无效ID");
         }
@@ -139,6 +147,10 @@ public final class ProfileId implements Comparable<ProfileId>, Serializable {
             return false;
         }
 
+        if (profileType != objectId.profileType) {
+            return false;
+        }
+
         return true;
     }
 
@@ -158,20 +170,25 @@ public final class ProfileId implements Comparable<ProfileId>, Serializable {
 
     @Override
     public String toString() {
+        String str = "";
         if (timestamp==0){
-            return new StringBuilderEx("%1_%2_%3")
+            str = new StringBuilderEx("%1_%2_%3")
                     .arg(orgCode)
                     .arg(patientId)
                     .arg(eventNo)
                     .toString();
         }else {
-            return new StringBuilderEx("%1_%2_%3")
+            str = new StringBuilderEx("%1_%2_%3")
                     .arg(orgCode)
                     .arg(eventNo)
                     .arg(timestamp)
                     .toString();
         }
-
+        if(profileType == 1){
+            return str;
+        }else{
+            return str+"_"+profileType;
+        }
     }
 }
 

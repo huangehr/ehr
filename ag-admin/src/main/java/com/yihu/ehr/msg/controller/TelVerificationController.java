@@ -7,7 +7,6 @@ import com.yihu.ehr.model.app.MApp;
 import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.msg.service.TelVerificationClient;
 import com.yihu.ehr.users.service.UserClient;
-import com.yihu.ehr.util.fzgateway.FzGatewayUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -21,10 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * Created by yeshijie on 2017/2/14.

@@ -325,7 +325,6 @@ public class AppEndPoint extends EnvelopRestEndPoint {
     /**
      * 医生工作平台--显示应用列表
      * @param userId
-     * @param parentAppId
      * @return
      * @throws Exception
      * create by zhangdan on 2018/04/19
@@ -334,19 +333,17 @@ public class AppEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "医生工作平台个人平台应用列表")
     public Envelop getAppsRelationByUserID(
             @ApiParam(name = "userId", value = "用户id", required = true)
-            @RequestParam(value = "userId") String userId,
-            @ApiParam(name = "parentAppId", value = "医生工作平台应用id", required = true)
-            @RequestParam(value = "parentAppId") String parentAppId)throws Exception {
+            @RequestParam(value = "userId") String userId)throws Exception {
         if (StringUtils.isEmpty(userId)){
             return failed("请先登录!");
         }
-        List<Map<String,Object>> list = appService.getAppByParentIdAndUserId(userId, parentAppId);
+        List<Map<String,Object>> list = appService.getAppByParentIdAndUserId(userId);
         return success(list);
     }
 
     @RequestMapping(value =  ServiceApi.Apps.GetAppsRelationByUserJson, method = RequestMethod.POST)
     @ApiOperation(value = "支撑平台配置应用之间的关系")
-    public Envelop getAppsRelationByUserID(
+    public Envelop getAppsByUserJson(
             @ApiParam(name = "jsonData", value = "新增应用关系json字符串", required = true)
             @RequestBody String jsonData)throws Exception {
         AppsRelation appsRelation = toEntity(jsonData, AppsRelation.class);

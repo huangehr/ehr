@@ -16,9 +16,12 @@ import org.elasticsearch.index.engine.DocumentMissingException;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramBuilder;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
+import org.elasticsearch.search.aggregations.metrics.cardinality.CardinalityBuilder;
+import org.elasticsearch.search.aggregations.metrics.cardinality.InternalCardinality;
 import org.elasticsearch.search.sort.SortBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -359,4 +362,31 @@ public class ElasticSearchClient {
         }
     }
 
+    /**
+     * 查询去重数量
+     * @param index
+     * @param type
+     * @param queryBuilder
+     * @param filed
+     * @return
+     */
+    public int cardinality (String index, String type, QueryBuilder queryBuilder, String  filed) {
+        TransportClient transportClient = elasticSearchPool.getClient();
+        try {
+            List<Map<String, Long>> resultList = new ArrayList<>();
+            SearchRequestBuilder builder = transportClient.prepareSearch(index);
+            builder.setTypes(type);
+            builder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
+            builder.setQuery(queryBuilder);
+            CardinalityBuilder cardinality = AggregationBuilders.cardinality("cardinality").field(filed);
+            builder.addAggregation(cardinality);
+            builder.setSize(0);
+            builder.setExplain(true);
+            SearchResponse response = builder.get();
+            InternalCardinality internalCard = response.getAggregations().get("cardinality");
+            return new Double(internalCard.getProperty("value").toString()).intValue();
+        } finally {
+            elasticSearchPool.releaseClient(transportClient);
+        }
+    }
 }

@@ -399,8 +399,8 @@ public class ServiceApi {
         public static final String SimpleUpdate = "/app/simpleUpdate";
 
         //--------------- 医生工作平台 ---------------
-        public static final String GetAppsRelationByUserIdAndParentAppId ="/app/appsRelationByUserIdAndParentAppId";
-        public static final String GetAppsRelationByUserJson ="/app/getAppsRelationByUserJson";
+        public static final String GetAppsRelationByUserIdAndParentAppId ="/app/getAppsByUserId";
+        public static final String GetAppsRelationByUserJson ="/app/getAppsByUserJson";
 
         //--------------- 总支撑平台 ---------------
         public static final String SaveAppsRelation ="/app/saveAppsRelation";
@@ -620,6 +620,7 @@ public class ServiceApi {
         public static final String PortalFeedback = "/portalFeedback";
         public static final String PortalFeedbackAdmin = "/portalFeedback/admin/{portalFeedback_id}";
         public static final String PortalFeedBackByUserId="/protalFeedback/findByUserId";
+        public static final String pagePortalFeedback = "/pagePortalFeedback";
     }
 
     public static class PortalLogin {
@@ -780,7 +781,7 @@ public class ServiceApi {
         public static final String UsersByTel = "/users/tel";
         public static final String H5Handshake = "/users/h5/handshake";
         public static final String UsersOfAppPhoneExistence = "/usersOfApp/user/onePhone/existence";
-        public static final String GetUserOfUsersOfApp = "/usersOfApp/users/{user_name}";
+        public static final String GetUserOfUsersOfApp = "/usersOfApp/users/getUserOfUsersOfApp";
 
 
         public static final String Save = "/users/save";
@@ -1372,6 +1373,7 @@ public class ServiceApi {
         public static final String GetOrgDeptsDate = "/org/getOrgDeptsDate";
         public static final String GetOrgDeptInfoList = "/org/userId/getOrgDeptInfoList";
         public static final String getseaOrgsByOrgCode = "/organizations/seaOrgsByOrgCode";
+        public static final String childOrgSaasByAreaCode = "/org/childOrgSaasByAreaCode";
 
         // 卫生机构类别
         public static class HealthCategory {
@@ -1582,7 +1584,6 @@ public class ServiceApi {
      */
     public static class Registration {
         public static final String Prefix = "/appointment/registration/";
-
         public static final String GetById = "/appointment/registration/{id}";
         public static final String GetByOrderId = "/appointment/registration/orderId/{orderId}";
         public static final String Search = "/appointment/registration/search";
@@ -1590,7 +1591,7 @@ public class ServiceApi {
         public static final String Update = "/appointment/registration/update";
         public static final String Delete = "/appointment/registration/delete";
         public static final String UpdateState = "/appointment/registration/updateState";
-        public static final String UpdateVisitState = "/appointment/registration/updateVisitState";
+        public static final String IsSuccessfullyRegister = "/appointment/registration/isSuccessfullyRegister";
     }
 
     /**
@@ -1602,12 +1603,13 @@ public class ServiceApi {
     }
 
     /**
-     * 账号申诉
+     * 账号相关
      */
     public static class AccountRepresentation{
         public static final String SaveAccontRepresenetation ="/account/save";
         public static final String GetRandomImageCode ="/account/getRandomImageCode";
         public static final String CheckRandomImageCode ="/account/checkRandomImageCode";
-
+        public static final String findUserByPhoneOrName = "/account/findUserByPhoneOrName";
+        public static final String ChangePassWord = "/account/changePassWord";
     }
 }
