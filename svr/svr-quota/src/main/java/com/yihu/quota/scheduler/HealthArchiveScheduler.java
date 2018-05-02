@@ -9,6 +9,7 @@ import com.yihu.quota.service.scheduler.HealthArchiveSchedulerService;
 import com.yihu.quota.util.BasesicUtil;
 import com.yihu.quota.vo.HealthArchiveInfoModel;
 import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +54,8 @@ public class HealthArchiveScheduler {
 
         BasesicUtil basesicUtil = new BasesicUtil();
         String initializeDate = "2018-03-15";
+        String initializeDate2 = healthArchiveSchedulerService.getDictValue("3");
+        initializeDate = StringUtils.isNotEmpty(initializeDate2) ? initializeDate2 : initializeDate;
         Date now = new Date();
         String nowDate = DateUtil.formatDate(now,DateUtil.DEFAULT_DATE_YMD_FORMAT);
         boolean flag = true;
