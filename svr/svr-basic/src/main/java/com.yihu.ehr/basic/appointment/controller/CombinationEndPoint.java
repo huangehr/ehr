@@ -100,6 +100,7 @@ public class CombinationEndPoint {
                 params.put("pageSize", 100);
                 params.put("hospitalId", hospitalId);
                 params.put("hosDeptId", hosDeptId);
+                params.put("registerDate", registerDate);
                 result.put("total", combinationService.getTotalDoctors(params));
             } else {
                 result.put("total", total);
