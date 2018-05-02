@@ -86,15 +86,13 @@ public class DiabetesMedicineScheduler {
 
 			BasesicUtil basesicUtil = new BasesicUtil();
 			String initializeDate = "2018-04-10";// job初始化时间
-			String executeStartDate = "2015-06-01";
+			String executeInitDate = "2015-06-01";
 			Date now = new Date();
 			String nowDate = DateUtil.formatDate(now,DateUtil.DEFAULT_DATE_YMD_FORMAT);
 			boolean flag = true;
 			String startDate = "2015-01-01";
 			String endDate = "2015-02-01";
-			List<String> rowKeyList = new ArrayList<>() ;
 			while(flag){
-				rowKeyList.clear();
 				//  当前时间大于初始化时间，就所有数据初始化，每个月递增查询，当前时间小于于初始时间每天抽取
 				if(basesicUtil.compareDate(initializeDate,nowDate) == -1){
 					Date exeStartDate = DateUtil.parseDate(initializeDate, DateUtil.DEFAULT_DATE_YMD_FORMAT);
@@ -106,9 +104,11 @@ public class DiabetesMedicineScheduler {
 					int day2 = endCalendar.get(Calendar.DAY_OF_YEAR);
 					int num = day2 - day1;
 					//总院那边是一天采集24天的数据，所以初始化完后，每天采集15天的数据
-					Date executeEndDate = DateUtils.addDays(DateUtil.parseDate(executeStartDate, DateUtil.DEFAULT_DATE_YMD_FORMAT), 15*num);
+					Date executeStartDate = DateUtils.addDays(DateUtil.parseDate(executeInitDate, DateUtil.DEFAULT_DATE_YMD_FORMAT), 15*(num-1));
+					Date executeEndDate = DateUtils.addDays(DateUtil.parseDate(executeInitDate, DateUtil.DEFAULT_DATE_YMD_FORMAT), 15*num);
+					startDate = DateUtil.formatDate(executeStartDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
 					endDate = DateUtil.formatDate(executeEndDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
-					fq = "event_date:[" + executeStartDate + "T00:00:00Z TO  " + endDate + "T23:59:59Z]";
+					fq = "event_date:[" + startDate + "T00:00:00Z TO  " + endDate + "T23:59:59Z]";
 					flag = false;
 				}else{
 					fq = "event_date:[" + startDate + "T00:00:00Z TO  " + endDate + "T00:00:00Z]";
@@ -171,8 +171,6 @@ public class DiabetesMedicineScheduler {
 							}
 						}
 
-						if(!rowKeyList.contains(mainRowkey)){
-							rowKeyList.add(mainRowkey);
 							Map<String,Object> map = hbaseDao.getResultMap(ResourceCore.MasterTable, mainRowkey);
 							if(map !=null){
 								if(map.get(keyEventDate) != null){
@@ -254,8 +252,6 @@ public class DiabetesMedicineScheduler {
 								}
 							}
 							//细表解析保存 end
-						}
-
 					}
 					//糖尿病数据 Start
 				}

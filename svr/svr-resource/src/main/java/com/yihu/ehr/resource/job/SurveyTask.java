@@ -56,7 +56,7 @@ public class SurveyTask {
         ProtalMessageRemind messageRemind = null;
         for(int i=0; i<totalPages ;i++){
             //查找档案
-            Page<Map<String, Object>> result = resourceBrowseService.getEhrCenter(queryParams, totalPages, size);
+            Page<Map<String, Object>> result = resourceBrowseService.getEhrCenter(queryParams, i, size);
             List list = result.getContent();
             List<Map<String, String>> contentList = new ArrayList<>();
             Registration newEntity = null;

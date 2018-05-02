@@ -195,7 +195,7 @@ public class EsExtract {
                 dimensionMap.put("quotaDate","quotaDate");
 
                 List<Map<String, Object>> orgTypeResultList = new ArrayList<>();
-                List<Map<String, Object>> mapList = baseStatistsService.getOrgHealthCategoryQuotaResultList(esConfig.getSuperiorBaseQuotaCode(),dimension,filter);
+                List<Map<String, Object>> mapList = baseStatistsService.getOrgHealthCategoryQuotaResultList(esConfig.getSuperiorBaseQuotaCode(),dimension,filter, "");
                 if(mapList != null && mapList.size() > 0){
                     for(Map<String,Object> map : mapList){
                         String dictSql = "SELECT org_code as orgCode,hos_type_id as hosTypeId from organizations where org_code=";

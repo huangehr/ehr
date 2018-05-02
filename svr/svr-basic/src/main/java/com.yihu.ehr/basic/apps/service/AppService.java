@@ -239,14 +239,18 @@ public class AppService extends BaseJpaService<App, AppDao> {
         return newApp;
     }
 
-    public List<Map<String,Object>> getAppByParentIdAndUserId(String userId, String parentAppId)throws Exception{
-        String Sql ="SELECT s.*,r.type " +
+    public List<Map<String,Object>> getAppByParentIdAndUserId(String userId)throws Exception{
+        /*String Sql ="SELECT s.*,r.type " +
                     " FROM user_app a " +
                     " LEFT JOIN apps_relation r ON a.app_id = r.app_id " +
                     " LEFT JOIN apps s ON a.app_id = s.id"+
                     " WHERE a.user_id='"+userId+"' AND r.parent_app_id='"+parentAppId+
-                    "' AND a.status=0 AND a.show_flag=1 ";
-       List<Map<String,Object>> resultList =  jdbcTemplate.queryForList(Sql);
+                    "' AND a.status=0 AND a.show_flag=1 ";*/
+
+        String sql ="SELECT a.* FROM role_user ru LEFT JOIN roles r ON ru.role_id = r.id LEFT JOIN apps a ON r.app_id = a.id WHERE ru.user_id='"+userId+"' and r.name='医生' and a.release_flag=1";
+
+
+        List<Map<String,Object>> resultList =  jdbcTemplate.queryForList(sql);
         return resultList;
     }
 }

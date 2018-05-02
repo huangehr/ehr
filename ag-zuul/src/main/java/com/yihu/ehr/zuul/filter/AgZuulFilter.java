@@ -60,6 +60,7 @@ public class AgZuulFilter extends ZuulFilter {
                 || url.contains("/jkzl/")
                 || url.contains("/file/")
                 || url.contains("/open/")
+                || url.contains("/fzGateway/")
                 || url.contains("/usersOfApp")
                 || url.contains("/users/h5/handshake")
                 || url.contains("/appVersion/getAppVersion")

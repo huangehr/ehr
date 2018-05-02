@@ -60,6 +60,11 @@ service-gateway:
   handlerId: 50871
   clientId: 9000401
   clientVersion: 1.0
+zuul:
+  routes:
+    fastdfs-server:
+      path: /file/**
+      url: http://172.19.103.52:80/
 
 ---
 spring:
@@ -70,6 +75,11 @@ service-gateway:
   handlerId: 50871
   clientId: 9000401
   clientVersion: 1.0
+zuul:
+  routes:
+    fastdfs-server:
+      path: /file/**
+      url: http://172.19.103.52:80/
 
 ---
 spring:
@@ -80,6 +90,11 @@ service-gateway:
   handlerId: 50641
   clientId: 9000401
   clientVersion: 1.0
+zuul:
+  routes:
+    fastdfs-server:
+      path: /file/**
+      url: http://11.1.2.9:80/
 
 ---
 spring:
@@ -90,6 +105,11 @@ service-gateway:
   handlerId: 50641
   clientId: 9000401
   clientVersion: 1.0
+zuul:
+  routes:
+    fastdfs-server:
+      path: /file/**
+      url: http://10.176.97.5:8888/
 
 ---
 spring:
@@ -100,6 +120,11 @@ service-gateway:
   handlerId: 50641
   clientId: 9000401
   clientVersion: 1.0
+zuul:
+  routes:
+    fastdfs-server:
+      path: /file/**
+      url: http://100.100.1.157:8888/
 
 ---
 spring:
@@ -110,3 +135,8 @@ service-gateway:
   handlerId: 50641
   clientId: 9000401
   clientVersion: 1.0
+zuul:
+  routes:
+    fastdfs-server:
+      path: /file/**
+      url: http://192.168.50.37:8888/

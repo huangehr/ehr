@@ -80,8 +80,6 @@ public class AddressDictEndPoint extends EnvelopRestEndPoint {
        return geographyDictService.getAllAddressDict();
     }
 
-
-
     @RequestMapping(value = ServiceApi.Geography.AddressDictByFields, method = RequestMethod.GET)
     @ApiOperation(value = "根据地址中文名 查询地址编号")
     Collection<MGeographyDict> getAddressDict(
@@ -120,4 +118,6 @@ public class AddressDictEndPoint extends EnvelopRestEndPoint {
         List<AddressDict> addressDictList = geographyDictService.getAddrDictByname(name);
         return convertToModels(addressDictList,new ArrayList<>(addressDictList.size()), MGeographyDict.class,"");
     }
+
+
 }

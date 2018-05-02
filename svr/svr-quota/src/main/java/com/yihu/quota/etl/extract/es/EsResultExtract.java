@@ -412,7 +412,7 @@ public class EsResultExtract {
      * @return
      * @throws Exception
      */
-    public  List<Map<String, Object>>  searcherSumGroup(TjQuota tjQuota , String aggsFields ,String filter, String sumField,String orderFild,String order) throws Exception {
+    public  List<Map<String, Object>>  searcherSumGroup(TjQuota tjQuota , String aggsFields ,String filter, String sumField,String orderFild,String order, String top) throws Exception {
         initialize(tjQuota,null);
         if(StringUtils.isEmpty(filter)){
             filter =  " quotaCode='" + tjQuota.getCode().replaceAll("_", "") + "' ";
@@ -427,9 +427,17 @@ public class EsResultExtract {
                     .append(" where quotaDate is not null and ").append(filter)
                     .append(" group by ").append(aggsFields);
             if(StringUtils.isNotEmpty(orderFild) && StringUtils.isNotEmpty(order)){
-                mysql.append(" order by ").append(orderFild).append(" ").append(order);
+                if (StringUtils.isNotEmpty(top)) {
+                    mysql.append(" order by sum(").append(sumField).append(") desc");
+                } else {
+                    mysql.append(" order by ").append(orderFild).append(" ").append(order);
+                }
             }
-            mysql.append(" limit 10000 ");
+            if (StringUtils.isNotEmpty(top)) {
+                mysql.append(" limit ").append(top);
+            } else {
+                mysql.append(" limit 10000 ");
+            }
             System.out.println("查询分组 mysql= " + mysql.toString());
             List<Map<String, Object>> listMap = elasticsearchUtil.excuteDataModel(mysql.toString());
             if(listMap != null &&  listMap.size() > 0){

@@ -305,7 +305,9 @@ public class RsResourceController extends BaseController {
             @ApiParam(name = "userOrgList" ,value = "用户拥有机构权限", defaultValue = "null" )
             @RequestParam(value = "userOrgList" , required = false) List<String> userOrgList,
             @ApiParam(name = "dimension", value = "维度字段", defaultValue = "quotaDate")
-            @RequestParam(value = "dimension", required = false) String dimension) throws IOException {
+            @RequestParam(value = "dimension", required = false) String dimension,
+            @ApiParam(name = "top", value = "获取前几条数据")
+            @RequestParam(value = "top", required = false) String top) throws IOException {
 
         //-----------------用户数据权限 start
         String org = "";
@@ -424,7 +426,7 @@ public class RsResourceController extends BaseController {
                         }else {
                             dimension =  firstDimension;
                         }
-                        chartInfoModel = tjQuotaJobClient.getMoreQuotaGraphicReportPreviews(quotaIdstr, chart, filter, dimension , mRsResources.getName());
+                        chartInfoModel = tjQuotaJobClient.getMoreQuotaGraphicReportPreviews(quotaIdstr, chart, filter, dimension , mRsResources.getName(), top);
                     }
                     chartInfoModel.setResourceId(resourceId);
                     chartInfoModel.setDimensionMap(dimensionMap);
@@ -550,7 +552,9 @@ public class RsResourceController extends BaseController {
             @ApiParam(name = "userOrgList" ,value = "用户拥有机构权限", defaultValue = "null" )
             @RequestParam(value = "userOrgList" , required = false) List<String> userOrgList,
             @ApiParam(name = "dimension", value = "维度字段", defaultValue = "quotaDate")
-            @RequestParam(value = "dimension", required = false) String dimension) throws Exception {
+            @RequestParam(value = "dimension", required = false) String dimension,
+            @ApiParam(name = "top", value = "获取前几条数据")
+            @RequestParam(value = "top", required = false) String top) throws Exception {
         //-----------------用户数据权限 start
         String org = "";
         if( userOrgList != null ){
@@ -588,7 +592,7 @@ public class RsResourceController extends BaseController {
                 }
             }
         }
-        chartInfoModel = tjQuotaJobClient.getCostComposeReports(quotaIdStr, "3", filter, dimension, "费用组成");
+        chartInfoModel = tjQuotaJobClient.getCostComposeReports(quotaIdStr, "3", filter, dimension, "费用组成", top);
         chartInfoModel.setResourceId(resourceIds);
         chartInfoModel.setFirstDimension(dimension);
         envelop.setObj(chartInfoModel);

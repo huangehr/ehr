@@ -143,6 +143,19 @@ public class ElasticSearchUtil {
         return elasticSearchClient.dateHistogram(index, type, boolQueryBuilder, start, end, field, interval, format);
     }
 
+    /**
+     * 查询去重数量
+     * @param index
+     * @param type
+     * @param filter
+     * @param filed
+     * @return
+     */
+    public int cardinality(String index, String type, List<Map<String, Object>> filter,String filed){
+        QueryBuilder boolQueryBuilder = getQueryBuilder(filter);
+        return elasticSearchClient.cardinality(index, type, boolQueryBuilder, filed);
+    }
+
     private List<SortBuilder> getSortBuilder(String sorts) {
         List<SortBuilder> sortBuilderList = new ArrayList<>();
         if (StringUtils.isEmpty(sorts)) {
