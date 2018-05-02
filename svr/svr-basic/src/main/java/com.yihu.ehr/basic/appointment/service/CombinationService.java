@@ -44,7 +44,6 @@ public class CombinationService {
                                                           Map<String, Object> params) throws Exception {
         int lastPageIndex = (int) flagMap.get("lastPageIndex");
         int lastPageNo = (int) flagMap.get("lastPageNo");
-        int pageIndex = (int) params.get("pageIndex");
         int pageSize = (int) params.get("pageSize");
         String hospitalId = params.get("hospitalId").toString();
         String hosDeptId = params.get("hosDeptId").toString();
@@ -54,10 +53,11 @@ public class CombinationService {
 
         tParams.clear();
         // 判断上次那页医生数据是否用完，没用完则接着那页开始查询。
-        if (originLastPageNo < pageSize) {
+        if (originLastPageNo != 0 && originLastPageNo < pageSize) {
             tParams.put("pageIndex", lastPageIndex);
         } else {
-            tParams.put("pageIndex", pageIndex);
+            lastPageIndex++;
+            tParams.put("pageIndex", lastPageIndex);
         }
         tParams.put("pageSize", pageSize);
         tParams.put("hospitalId", hospitalId);
@@ -68,6 +68,7 @@ public class CombinationService {
             throw new ApiException("获取总部医生列表时，" + doctorsResMap.get("Message").toString());
         }
         List<Map<String, Object>> resDoctorList = ((ArrayList) doctorsResMap.get("Result"));
+        int doctorTotal = (int) doctorsResMap.get("Total");
 
         int resDocListSize = resDoctorList.size();
         if (resDocListSize == 0) {
@@ -104,7 +105,7 @@ public class CombinationService {
             }
             List<Map<String, Object>> schedulingList = (ArrayList) schedulingResMap.get("Result");
 
-            if (schedulingResMap.size() > 0) {
+            if (schedulingList.size() > 0) {
                 // 过滤掉需代缴挂号费的排班
                 List<Map<String, Object>> freeSchedulingList = new ArrayList<>();
                 for (int j = 0, jSize = schedulingList.size(); j < jSize; j++) {
@@ -139,45 +140,73 @@ public class CombinationService {
         }
 
         flagMap.put("lastPageNo", lastPageNo);
+        flagMap.put("lastPageIndex", lastPageIndex);
         // 当医生数据充足，并且之前存在没有排班的医生，则递归补满一页医生
-        if (resDocListSize == pageSize && doctorList.size() < pageSize) {
-            lastPageIndex = lastPageIndex + 1;
-            flagMap.put("lastPageIndex", lastPageIndex);
-            params.put("pageIndex", lastPageIndex);
+        if (pageSize * lastPageIndex < doctorTotal && doctorList.size() < pageSize) {
             getOnePageDoctorList(doctorList, flagMap, params);
-        } else {
-            flagMap.put("lastPageIndex", pageIndex);
         }
 
         return doctorList;
     }
 
     /**
-     * 从排班列表中，去重获取有排班的医生总数
+     * 从医生列表中，获取有排班的医生总数
      */
     public Integer getTotalDoctors(Map<String, Object> params) throws Exception {
+        Map<String, Object> tParams = new HashMap<>();
         Integer count = 0;
         Integer pageIndex = (Integer) params.get("pageIndex");
         Integer pageSize = (Integer) params.get("pageSize");
+        String hospitalId = params.get("hospitalId").toString();
+        String hosDeptId = params.get("hosDeptId").toString();
+        Object registerDate = params.get("registerDate");
 
-        Map<String, Object> schedulingResMap = objectMapper.readValue(
-                openService.callFzOpenApi(schedulingApi, params), Map.class);
-        if (!"10000".equals(schedulingResMap.get("Code").toString())) {
-            throw new ApiException("获取总部排班列表时，" + schedulingResMap.get("Message").toString());
+        tParams.clear();
+        tParams.put("pageIndex", pageIndex);
+        tParams.put("pageSize", pageSize);
+        tParams.put("hospitalId", hospitalId);
+        tParams.put("hosDeptId", hosDeptId);
+        Map<String, Object> doctorsResMap = objectMapper.readValue(
+                openService.callFzOpenApi(doctorListApi, tParams), Map.class);
+        if (!"10000".equals(doctorsResMap.get("Code").toString())) {
+            throw new ApiException("获取总部医生列表时，" + doctorsResMap.get("Message").toString());
+        }
+        List<Map<String, Object>> resDoctorList = ((ArrayList) doctorsResMap.get("Result"));
+
+        for (Map<String, Object> doctor : resDoctorList) {
+            // 获取医生的排班
+            tParams.clear();
+            tParams.put("pageIndex", 1);
+            tParams.put("pageSize", 100);
+            tParams.put("hospitalId", hospitalId);
+            tParams.put("hosDeptId", hosDeptId);
+            tParams.put("doctorSn", doctor.get("doctorSn"));
+            if (registerDate != null) {
+                tParams.put("registerDate", registerDate);
+            }
+            Map<String, Object> schedulingResMap = objectMapper.readValue(
+                    openService.callFzOpenApi(schedulingApi, tParams), Map.class);
+            if (!"10000".equals(schedulingResMap.get("Code").toString())) {
+                throw new ApiException("获取总部排班列表时，" + schedulingResMap.get("Message").toString());
+            }
+            List<Map<String, Object>> schedulingList = (ArrayList) schedulingResMap.get("Result");
+
+            if (schedulingList.size() > 0) {
+                // 过滤掉需代缴挂号费的排班
+                List<Map<String, Object>> freeSchedulingList = new ArrayList<>();
+                for (int j = 0, jSize = schedulingList.size(); j < jSize; j++) {
+                    if ((int) schedulingList.get(j).get("ghfeeWay") == 0) {
+                        freeSchedulingList.add(schedulingList.get(j));
+                    }
+                }
+                if (freeSchedulingList.size() != 0) {
+                    count++;
+                }
+            }
         }
 
-        List<Map<String, Object>> schList = (ArrayList) schedulingResMap.get("Result");
-        Set<String> doctorSnSet = new HashSet<>();
-        schList.forEach(item -> {
-            // 过滤掉需代缴挂号费的排班
-            if ((int) item.get("ghfeeWay") == 0) {
-                doctorSnSet.add(item.get("doctorSn").toString());
-            }
-        });
-        count += doctorSnSet.size();
-
         // 递归获取
-        if (schList.size() == pageSize) {
+        if (resDoctorList.size() == pageSize) {
             params.put("pageIndex", pageIndex + 1);
             count += getTotalDoctors(params);
         }
