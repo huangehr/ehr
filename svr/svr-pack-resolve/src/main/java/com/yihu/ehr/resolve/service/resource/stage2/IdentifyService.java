@@ -36,7 +36,7 @@ public class IdentifyService {
         if (StringUtils.isEmpty(standardPackage.getDemographicId()) || !pattern.matcher(standardPackage.getDemographicId()).find()) {
             boolean recognition = false;
             if (!StringUtils.isEmpty(standardPackage.getCardId())) {
-                List<String> idCardNos = archiveRelationService.findByCardNo(standardPackage.getCardId());
+                List<String> idCardNos = archiveRelationService.findIdCardNoByCardNo(standardPackage.getCardId());
                 if (!idCardNos.isEmpty()) {
                     recognition = true;
                     demographicId = idCardNos.get(0);

@@ -18,18 +18,6 @@ public class RedisService {
     private HealthProblemDictKeySchema healthProblemDictKeySchema;
     @Autowired
     private Icd10KeySchema icd10KeySchema;
-    @Autowired
-    private OrgKeySchema orgKeySchema;
-    @Autowired
-    private RsAdapterDictKeySchema rsAdapterDictKeySchema;
-    @Autowired
-    private RsAdapterMetaKeySchema rsAdapterMetaKeySchema;
-    @Autowired
-    private RsMetadataKeySchema rsMetadataKeySchema;
-    @Autowired
-    private StdDataSetKeySchema stdDataSetKeySchema;
-    @Autowired
-    private StdMetaDataKeySchema stdMetaDataKeySchema;
 
     /**
      * 获取健康问题redis
@@ -38,6 +26,13 @@ public class RedisService {
      */
     public String getHealthProblem(String key) {
         return healthProblemDictKeySchema.get(key);
+    }
+
+    /**
+     *获取ICD10对应健康问题 redis
+     */
+    public String getHpCodeByIcd10(String key) {
+        return icd10KeySchema.getHpCode(key);
     }
 
     /**

@@ -30,15 +30,12 @@ public class ThridPrescriptionService extends BaseJpaService<ArchiveTemplate, Ar
     private FastDFSConfig FastDFSConfig;
 
     @Autowired
-    ProfileCDAService cdaService;
+    private ArchiveTemplateService tempService;
 
     @Autowired
-    ArchiveTemplateService tempService;
+    private ProfileCDAService profileCDAService;
 
-    @Autowired
-    ProfileCDAService profileCDAService;
-
-    Map<String, String> usageMap;
+    private Map<String, String> usageMap;
 
     public ThridPrescriptionService() {
         usageMap = new HashMap<>();
@@ -109,15 +106,15 @@ public class ThridPrescriptionService extends BaseJpaService<ArchiveTemplate, Ar
      */
     public String transformImage(String profileId, String orgCode, String cdaVersion, String cdaCode, String type, int width, int height) throws Exception {
         //获取CDA模板信息
-        ArchiveTemplate temp = tempService.getPresriptionTemplate(orgCode, cdaVersion, cdaCode);
+        List<ArchiveTemplate> temp = tempService.findByCdaVersionAndAndCdaCode(cdaVersion, cdaCode);
 
-        if (temp == null) {
+        if (temp.isEmpty()) {
             LogService.getLogger("prescription").error("CDA template not existed");
             throw new Exception("找不到对应CDA模板信息");
         }
 
         //获取CDA数据
-        Map<String, Object> model = profileCDAService.getCDAData(profileId, temp.getCdaDocumentId(), true);
+        Map<String, Object> model = profileCDAService.getCDAData(profileId, temp.get(0).getCdaDocumentId(), true);
 
         return CDAToImage(model, type, width, height);
     }

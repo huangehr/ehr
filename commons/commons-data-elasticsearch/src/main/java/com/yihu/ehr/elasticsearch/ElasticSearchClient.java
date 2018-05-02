@@ -327,10 +327,9 @@ public class ElasticSearchClient {
         }
     }
 
-    public List<Map<String, Long>> dateHistogram (String index, String type, QueryBuilder queryBuilder, Date start, Date end, String field, DateHistogramInterval interval, String format) {
+    public Map<String, Long> dateHistogram (String index, String type, QueryBuilder queryBuilder, Date start, Date end, String field, DateHistogramInterval interval, String format) {
         TransportClient transportClient = elasticSearchPool.getClient();
         try {
-            List<Map<String, Long>> resultList = new ArrayList<>();
             SearchRequestBuilder builder = transportClient.prepareSearch(index);
             builder.setTypes(type);
             builder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
@@ -348,12 +347,9 @@ public class ElasticSearchClient {
             builder.setExplain(true);
             SearchResponse response = builder.get();
             Histogram histogram = response.getAggregations().get(index + "-" + field);
-            histogram.getBuckets().forEach(item -> {
-                Map<String, Long> temp = new HashMap<>();
-                temp.put(item.getKeyAsString(), item.getDocCount());
-                resultList.add(temp);
-            });
-            return resultList;
+            Map<String, Long> temp = new HashMap<>();
+            histogram.getBuckets().forEach(item -> temp.put(item.getKeyAsString(), item.getDocCount()));
+            return temp;
         } finally {
             elasticSearchPool.releaseClient(transportClient);
         }

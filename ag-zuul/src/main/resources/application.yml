@@ -43,6 +43,9 @@ zuul:
     svr-pack-resolv:
       path: /pack-resolve/**
       serviceId: svr-pack-resolve
+    hos-admin:
+      path: /hos-admin/**
+      serviceId: hos-admin
 
 spring:
   redis:

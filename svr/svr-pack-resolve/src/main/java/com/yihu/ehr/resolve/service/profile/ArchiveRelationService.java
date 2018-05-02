@@ -81,12 +81,12 @@ public class ArchiveRelationService {
         }
     }
 
-    public List<String> findByCardNo(String cardNo){
+    public List<String> findIdCardNoByCardNo(String cardNo){
         List<String> result = new ArrayList<>();
         List<Map<String, Object>> data = elasticSearchUtil.findByField(INDEX, TYPE, "card_no", cardNo);
         data.forEach(item -> {
-            if (!StringUtils.isEmpty(item.get("card_no"))) {
-                result.add(String.valueOf(item.get("card_no")));
+            if (!StringUtils.isEmpty(item.get("id_card_no"))) {
+                result.add(String.valueOf(item.get("id_card_no")));
             }
         });
         return result;
