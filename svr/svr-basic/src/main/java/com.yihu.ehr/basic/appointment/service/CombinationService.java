@@ -150,7 +150,7 @@ public class CombinationService {
     }
 
     /**
-     * 从排班列表中，去重获取有排班的医生总数
+     * 从医生列表中，获取有排班的医生总数
      */
     public Integer getTotalDoctors(Map<String, Object> params) throws Exception {
         Map<String, Object> tParams = new HashMap<>();
