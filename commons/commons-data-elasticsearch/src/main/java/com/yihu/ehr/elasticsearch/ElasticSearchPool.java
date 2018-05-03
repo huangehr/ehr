@@ -84,7 +84,7 @@ public class ElasticSearchPool {
         if (clientPool.isEmpty()) {
             init();
         }
-        logger.info("ElasticSearch Pool Size " + clientPool.size());
+        //logger.info("ElasticSearch Pool Size " + clientPool.size());
         int last_index = clientPool.size() - 1;
         return clientPool.remove(last_index);
     }
