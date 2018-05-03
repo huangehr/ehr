@@ -113,8 +113,12 @@ public class DiabetesCheckService {
 						String birthday = "";
 						int birthYear = 0;
 						Date eventDate = null;
+						String subEventDate = "";
 						Map<String,Object> subMap = hbaseDao.getResultMap(ResourceCore.SubTable, subRowkey);
 						if(subMap !=null){
+							if(subMap.get(keyEventDate) != null){
+								subEventDate = subMap.get(keyEventDate).toString();
+							}
 							String diseaseName = "";
 							if(subMap.get(keyDiseaseSymptom) != null){
 								diseaseName = subMap.get(keyDiseaseSymptom).toString();
@@ -170,7 +174,17 @@ public class DiabetesCheckService {
 										sexName ="女";
 									}else {
 										sex = Integer.valueOf(map.get(keySex).toString());
-										sexName = map.get(keySexValue).toString();
+										if(sex == 1){
+											sexName ="男";
+										}else  if(sex == 2){
+											sexName ="女";
+										}else {
+											if(map.get(keySexValue) != null){
+												sexName = map.get(keySexValue).toString();
+											}else {
+												sexName ="未知";
+											}
+										}
 									}
 								}else {
 									sex =0;
@@ -189,7 +203,7 @@ public class DiabetesCheckService {
 
 						CheckInfoModel baseCheckInfo = new CheckInfoModel();
 						String mapContent = objectMapper.writeValueAsString(map);
-						baseCheckInfo.setRowKey(mainRowkey+"【" + mapContent +"】");
+						baseCheckInfo.setRowKey(mainRowkey + "=subEventDate" + subEventDate +"【" + mapContent +"】");
 						baseCheckInfo.setName(name);
 						baseCheckInfo.setDemographicId(demographicId);
 						baseCheckInfo.setCardId(cardId);
