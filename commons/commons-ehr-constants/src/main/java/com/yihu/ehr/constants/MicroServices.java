@@ -35,7 +35,7 @@ public class MicroServices {
 
     public static final String ESB = "svr-esb";
 
-    public static final String HealthProfile = "svr-health-profile-sxy";
+    public static final String HealthProfile = "svr-health-profile";
 
     public static final String PackageResolve = "svr-pack-resolve";
 

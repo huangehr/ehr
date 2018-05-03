@@ -51,7 +51,7 @@ public class ElasticSearchPool {
                 while (clientPool.size() < initSize) {
                     Settings settings = Settings.builder()
                             .put("cluster.name", elasticSearchConfig.getClusterName())
-                            .put("client.transport.sniff", true)
+                            //.put("client.transport.sniff", true)
                             .build();
                     String[] nodeArr = elasticSearchConfig.getClusterNodes().split(",");
                     InetSocketTransportAddress[] socketArr = new InetSocketTransportAddress[nodeArr.length];
@@ -84,6 +84,7 @@ public class ElasticSearchPool {
         if (clientPool.isEmpty()) {
             init();
         }
+        logger.info("ElasticSearch Pool Size " + clientPool.size());
         int last_index = clientPool.size() - 1;
         return clientPool.remove(last_index);
     }
