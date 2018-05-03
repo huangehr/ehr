@@ -30,13 +30,13 @@ public class ElasticSearchPool {
 
     private static final Logger logger = LoggerFactory.getLogger(ElasticSearchPool.class);
 
+    @Autowired
+    private ElasticSearchConfig elasticSearchConfig;
     @Value("${elasticsearch.pool.init-size:1}")
     private int initSize;
     @Value("${elasticsearch.pool.max-size:5}")
     private int maxSize;
     private List<TransportClient> clientPool;
-    @Autowired
-    private ElasticSearchConfig elasticSearchConfig;
 
     @PostConstruct
     private void init() {
