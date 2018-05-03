@@ -135,7 +135,9 @@ public class QuotaReportController extends BaseController {
             @ApiParam(name = "filter", value = "过滤", defaultValue = "")
             @RequestParam(value = "filter", required = false) String filter,
             @ApiParam(name = "dimension", value = "维度字段", defaultValue = "quotaDate")
-            @RequestParam(value = "dimension", required = false) String dimension
+            @RequestParam(value = "dimension", required = false) String dimension,
+            @ApiParam(name = "top", value = "获取前几条数据")
+            @RequestParam(value = "top", required = false) String top
     ) {
         NumberFormat nf = NumberFormat.getInstance();
         nf.setGroupingUsed(false);
@@ -146,7 +148,7 @@ public class QuotaReportController extends BaseController {
         int num = 0;
         try {
             for (String code : quotaCodes) {
-                List<Map<String, Object>> quotaResult = baseStatistsService.getSimpleQuotaReport(code, filter, dimension,false);
+                List<Map<String, Object>> quotaResult = baseStatistsService.getSimpleQuotaReport(code, filter, dimension,false, top);
                 if (quotaResult.size() >= num) {
                     num = quotaResult.size();
                     maxQuotaCode = code;
@@ -267,7 +269,9 @@ public class QuotaReportController extends BaseController {
             @ApiParam(name = "dimension", value = "维度字段", defaultValue = "quotaDate")
             @RequestParam(value = "dimension", required = false) String dimension,
             @ApiParam(name = "title", value = "视图名称", defaultValue = "")
-            @RequestParam(value = "title", required = false) String title
+            @RequestParam(value = "title", required = false) String title,
+            @ApiParam(name = "top", value = "获取前几条数据")
+            @RequestParam(value = "top", required = false) String top
     ) {
         List<String> quotaIds = Arrays.asList(quotaIdStr.split(","));
         List<String> charTypes = Arrays.asList(charstr.split(","));
@@ -289,7 +293,7 @@ public class QuotaReportController extends BaseController {
                 Map<String, Object> dataMap = new LinkedHashMap<>();
                 TjQuota tjQuota = quotaService.findOne(Integer.valueOf(quotaId));
                 if (tjQuota != null) {
-                    List<Map<String, Object>> resultListMap = baseStatistsService.getSimpleQuotaReport(tjQuota.getCode(), filter, dimension,true);
+                    List<Map<String, Object>> resultListMap = baseStatistsService.getSimpleQuotaReport(tjQuota.getCode(), filter, dimension,true, top);
                     if (resultListMap != null && resultListMap.size() > 0) {
                         for (Map<String, Object> map : resultListMap) {
                             if (map != null && map.size() > 0) {
@@ -804,7 +808,9 @@ public class QuotaReportController extends BaseController {
             @ApiParam(name = "dimension", value = "维度字段", defaultValue = "quotaDate")
             @RequestParam(value = "dimension", required = false) String dimension,
             @ApiParam(name = "title", value = "视图名称", defaultValue = "")
-            @RequestParam(value = "title", required = false) String title
+            @RequestParam(value = "title", required = false) String title,
+            @ApiParam(name = "top", value = "获取前几条数据")
+            @RequestParam(value = "top", required = false) String top
     ) {
         List<String> quotaIds = Arrays.asList(quotaIdStr.split(","));
         MChartInfoModel chartInfoModel = new MChartInfoModel();
@@ -824,7 +830,7 @@ public class QuotaReportController extends BaseController {
                 Map<String, Object> dataMap = new LinkedHashMap<>();
                 TjQuota tjQuota = quotaService.findOne(Integer.valueOf(quotaId));
                 if (tjQuota != null) {
-                    List<Map<String, Object>> resultListMap = baseStatistsService.getSimpleQuotaReport(tjQuota.getCode(), filter, dimension,true);
+                    List<Map<String, Object>> resultListMap = baseStatistsService.getSimpleQuotaReport(tjQuota.getCode(), filter, dimension,true, top);
                     if (resultListMap != null && resultListMap.size() > 0) {
                         for (Map<String, Object> map : resultListMap) {
                             if (map != null && map.size() > 0) {

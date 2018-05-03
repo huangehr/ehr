@@ -89,7 +89,10 @@ public class StandardPackage {
             if (eventDate == null) {
                 throw new IllegalArgumentException("Build profile id failed, unable to get event date.");
             }
-            this.profileId = ProfileId.get(orgCode, eventNo, eventDate);
+            if(profileType == null ){
+                throw new IllegalArgumentException("Build profileType id failed, profileType is empty.");
+            }
+            this.profileId = ProfileId.get(orgCode, eventNo, eventDate,profileType.getType());
         }
         return profileId.toString();
     }
@@ -366,7 +369,7 @@ public class StandardPackage {
     }
 
     //非档案类型 rowKey获取
-    public String getNonArchiveProfileId(String dataSetCode) {
+    public String getNonArchiveProfileId(String dataSetCode,int type) {
         if (profileId == null) {
             if (StringUtils.isEmpty(orgCode)) {
                 throw new IllegalArgumentException("Build profile id failed, organization code is empty.");
@@ -380,14 +383,14 @@ public class StandardPackage {
                 throw new IllegalArgumentException("Build profile id failed, patientId is empty.\"");
             }
 
-            this.profileId = ProfileId.get(orgCode, patientId, eventNo);
+            this.profileId = ProfileId.get(orgCode, patientId, eventNo,type);
         }
 
         return profileId.toString();
     }
 
     //非档案类型rowKey更新
-    public void regularNonArchiveRowKey() {
+    public void regularNonArchiveRowKey(int type) {
         for (String dataSetCode : dataSets.keySet()) {
             PackageDataSet dataSet = dataSets.get(dataSetCode);
 
@@ -395,7 +398,7 @@ public class StandardPackage {
             String sortFormat = dataSet.getRecordCount() > 10 ? "%s$%03d" : "%s$%1d";
             String[] rowKeys = dataSet.getRecordKeys().toArray(new String[dataSet.getRecordCount()]);
             for (String rowKey : rowKeys) {
-                dataSet.updateRecordKey(rowKey, String.format(sortFormat, getNonArchiveProfileId(dataSetCode), rowIndex++));
+                dataSet.updateRecordKey(rowKey, String.format(sortFormat, getNonArchiveProfileId(dataSetCode,type), rowIndex++));
             }
         }
     }

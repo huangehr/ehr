@@ -78,12 +78,12 @@ public class BaseStatistsService {
      * @return
      * @throws Exception
      */
-    public List<Map<String, Object>> getQuotaResultList(String code,String dimension,String filter,String dateType) throws Exception {
+    public List<Map<String, Object>> getQuotaResultList(String code,String dimension,String filter,String dateType, String top) throws Exception {
         List<Map<String, Object>> dimenListResult = new ArrayList<>();
         if(StringUtils.isNotEmpty(dateType)){
             dimenListResult = getTimeAggregationResult(code, dimension, filter, dateType);
         }else {
-            dimenListResult = getAggregationResult(code, dimension, filter);
+            dimenListResult = getAggregationResult(code, dimension, filter, top);
         }
         return dimenListResult;
     }
@@ -97,8 +97,8 @@ public class BaseStatistsService {
      * @return
      * @throws Exception
      */
-    public List<Map<String, Object>> getOrgHealthCategoryQuotaResultList(String code,String dimension,String filter) throws Exception {
-        List<Map<String, Object>> dimenListResult = getOrgHealthCategoryAggregationResult(code, dimension, filter);
+    public List<Map<String, Object>> getOrgHealthCategoryQuotaResultList(String code,String dimension,String filter, String top) throws Exception {
+        List<Map<String, Object>> dimenListResult = getOrgHealthCategoryAggregationResult(code, dimension, filter, top);
         return dimenListResult;
     }
 
@@ -115,9 +115,9 @@ public class BaseStatistsService {
      * @throws Exception
      */
     public List<Map<String, Object>>  divisionQuota(String molecular, String denominator, String dimension,
-        String molecularFilter,String denominatorFilters,String operation,String operationValue,String dateType) throws Exception {
-        List<Map<String, Object>> moleList = getQuotaResultList(molecular,dimension,molecularFilter,dateType);
-        List<Map<String, Object>> denoList =  getQuotaResultList(denominator,dimension,denominatorFilters,dateType);
+        String molecularFilter,String denominatorFilters,String operation,String operationValue,String dateType, String top) throws Exception {
+        List<Map<String, Object>> moleList = getQuotaResultList(molecular,dimension,molecularFilter,dateType, top);
+        List<Map<String, Object>> denoList =  getQuotaResultList(denominator,dimension,denominatorFilters,dateType, top);
         dimension = StringUtils.isNotEmpty(dateType)? (StringUtils.isNotEmpty(dimension)? dimension +";"+dateType : dateType):dimension;
        return division(dimension,moleList,denoList,Integer.valueOf(operation),Integer.valueOf(operationValue));
     }
@@ -133,9 +133,9 @@ public class BaseStatistsService {
      * @throws Exception
      */
     public List<Map<String, Object>> divisionQuotaDenoConstant(String molecular, String dimension,String filters,
-        String operation,String operationValue,String dateType,String constValue, String district) throws Exception {
+        String operation,String operationValue,String dateType,String constValue, String district, String top) throws Exception {
         Double denominatorVal = 0.0;
-        List<Map<String, Object>> moleList = getQuotaResultList(molecular,dimension,filters,dateType);
+        List<Map<String, Object>> moleList = getQuotaResultList(molecular,dimension,filters,dateType, top);
         // 获取分母的数值
         if ("1".equals(constValue)) {
             Long sumValue = tjQuotaGovProvisionDao.getSumByDistrict(district);
@@ -259,13 +259,13 @@ public class BaseStatistsService {
      * @param isTrunTree 是否转为机构类型树状机构
      * @throws Exception
      */
-    public List<Map<String, Object>>  getOrgHealthCategory(String code,String filters,String dateType,boolean isTrunTree) throws Exception {
+    public List<Map<String, Object>>  getOrgHealthCategory(String code,String filters,String dateType,boolean isTrunTree, String top) throws Exception {
 
         List<Map<String, Object>> dimenListResult = new ArrayList<>();
         if(dateType != null && (dateType.contains("year") || dateType.contains("month") || dateType.contains("day"))){
             dimenListResult = getTimeAggregationResult(code,orgHealthCategoryCode,filters,dateType);//dimension 维度为 year,month,day
         }else {
-            dimenListResult = getAggregationResult(code, orgHealthCategoryCode, filters);
+            dimenListResult = getAggregationResult(code, orgHealthCategoryCode, filters, top);
         }
         if(isTrunTree){
             List<Map<String, Object>> orgHealthCategoryList = orgHealthCategoryStatisticsService.getOrgHealthCategoryTreeByPid(-1);
@@ -437,7 +437,7 @@ public class BaseStatistsService {
      * @param filter
      * @throws Exception
      */
-    public  List<Map<String, Object>> getOrgHealthCategoryAggregationResult(String code,String dimension, String filter) throws Exception {
+    public  List<Map<String, Object>> getOrgHealthCategoryAggregationResult(String code,String dimension, String filter, String top) throws Exception {
         TjQuota tjQuota= quotaDao.findByCode(code);
         String groupDimension = "";
         if(dimension.contains(";")){
@@ -449,7 +449,7 @@ public class BaseStatistsService {
         }else {
             groupDimension = dimension;
         }
-        List<Map<String, Object>>  dimenListResult = esResultExtract.searcherSumGroup(tjQuota, groupDimension, filter, "result", "", "");
+        List<Map<String, Object>>  dimenListResult = esResultExtract.searcherSumGroup(tjQuota, groupDimension, filter, "result", "", "", top);
         List<Map<String, Object>> resultList = new ArrayList<>();
         for(Map<String, Object> map : dimenListResult){
             Map<String,Object> dataMap = new HashMap<>();
@@ -489,12 +489,12 @@ public class BaseStatistsService {
      * @param filter
      * @throws Exception
      */
-    public  List<Map<String, Object>> getAggregationResult(String code,String dimension, String filter) throws Exception {
+    public  List<Map<String, Object>> getAggregationResult(String code,String dimension, String filter, String top) throws Exception {
         TjQuota tjQuota= quotaDao.findByCode(code);
         Map<String,String>  dimensionDicMap = getDimensionDicMap(code,dimension);
         List<String> dimenList = getDimenList(dimension);
         String groupDimension = joinDimen(dimension);
-        List<Map<String, Object>>  dimenListResult = esResultExtract.searcherSumGroup(tjQuota, groupDimension, filter, "result", groupDimension, "asc");
+        List<Map<String, Object>>  dimenListResult = esResultExtract.searcherSumGroup(tjQuota, groupDimension, filter, "result", groupDimension, "asc", top);
 
         List<Map<String, Object>> resultList = new ArrayList<>();
         for(Map<String, Object> map : dimenListResult){
@@ -522,7 +522,10 @@ public class BaseStatistsService {
             }
             resultList.add(dataMap);
         }
-        return noDataDimenDictionary(resultList,dimension,filter);
+        if (StringUtils.isEmpty(top)) {
+            return noDataDimenDictionary(resultList,dimension,filter);
+        }
+        return resultList;
     }
 
     /**
@@ -722,7 +725,7 @@ public class BaseStatistsService {
      * @return
      * @throws Exception
      */
-    public List<Map<String, Object>>  getSimpleQuotaReport(String code,String filters,String dimension,boolean isTrunTree) throws Exception {
+    public List<Map<String, Object>>  getSimpleQuotaReport(String code,String filters,String dimension,boolean isTrunTree, String top) throws Exception {
         String dateType = "";
         //指标的展示维度，由视图中决定
         if(dimension.trim().equals("year")){
@@ -764,18 +767,18 @@ public class BaseStatistsService {
         String denominatorFilter = filters;
         if( (StringUtils.isNotEmpty(esConfig.getEspecialType())) && esConfig.getEspecialType().equals(orgHealthCategory)){
             //特殊机构类型查询输出结果  只有查询条件没有维度 默认是 机构类型维度
-             result = getOrgHealthCategory(code,filters,dateType,isTrunTree);
+             result = getOrgHealthCategory(code,filters,dateType,isTrunTree, top);
         }else if( (StringUtils.isNotEmpty(esConfig.getMolecular())) && StringUtils.isNotEmpty(esConfig.getDenominator())){//除法
             //除法指标查询输出结果
             molecularFilter = handleFilter(esConfig.getMolecularFilter(), molecularFilter);
             denominatorFilter = handleFilter(esConfig.getDenominatorFilter(), denominatorFilter);
-            result =  divisionQuota(esConfig.getMolecular(), esConfig.getDenominator(), dimension, molecularFilter, denominatorFilter, esConfig.getPercentOperation(), esConfig.getPercentOperationValue(),dateType);
+            result =  divisionQuota(esConfig.getMolecular(), esConfig.getDenominator(), dimension, molecularFilter, denominatorFilter, esConfig.getPercentOperation(), esConfig.getPercentOperationValue(),dateType, top);
         }else if(StringUtils.isNotEmpty(esConfig.getSuperiorBaseQuotaCode())) {
             //二次统计 指标查询
-            result = getQuotaResultList(esConfig.getSuperiorBaseQuotaCode(), dimension,filters,dateType);
+            result = getQuotaResultList(esConfig.getSuperiorBaseQuotaCode(), dimension,filters,dateType, top);
         }else {
             //普通基础指标查询
-            result = getQuotaResultList(code, dimension,filters,dateType);
+            result = getQuotaResultList(code, dimension,filters,dateType, top);
         }
         return result;
     }

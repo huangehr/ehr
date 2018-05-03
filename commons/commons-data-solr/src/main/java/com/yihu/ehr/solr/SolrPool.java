@@ -21,7 +21,7 @@ import javax.annotation.PreDestroy;
 @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class SolrPool {
 
-    @Value("${spring.data.solr.zk-host}")
+    @Value("${spring.data.solr.zk-host:localhost:2181}")
     private String zkHost;
 
     private MulticoreSolrClientFactory factory;

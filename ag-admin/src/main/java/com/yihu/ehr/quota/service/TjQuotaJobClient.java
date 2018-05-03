@@ -62,7 +62,9 @@ public interface TjQuotaJobClient {
             @ApiParam(name = "dimension", value = "维度字段", defaultValue = "quotaDate")
             @RequestParam(value = "dimension", required = false) String dimension,
             @ApiParam(name = "title", value = "视图名称", defaultValue = "")
-            @RequestParam(value = "title", required = false) String title);
+            @RequestParam(value = "title", required = false) String title,
+            @ApiParam(name = "top", value = "获取前几条数据")
+            @RequestParam(value = "top", required = false) String top);
 
     @ApiOperation(value = "获取指标统计结果echart radar雷达图表")
     @RequestMapping(value = ServiceApi.TJ.GetQuotaRadarGraphicReportPreviews, method = RequestMethod.GET)
@@ -116,6 +118,7 @@ public interface TjQuotaJobClient {
             @RequestParam(value = "charType", required = true) String charType,
             @RequestParam(value = "filter", required = false) String filter,
             @RequestParam(value = "dimension", required = false) String dimension,
-            @RequestParam(value = "title", required = false) String title);
+            @RequestParam(value = "title", required = false) String title,
+            @RequestParam(value = "top", required = false) String top);
 
 }

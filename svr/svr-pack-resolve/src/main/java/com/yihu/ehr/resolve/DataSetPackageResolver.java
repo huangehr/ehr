@@ -124,7 +124,8 @@ public class DataSetPackageResolver extends PackageResolver {
                 standardPackage.setCreateDate(dataSet.getCreateTime());
                 standardPackage.insertDataSet(dataSetCode, dataSet);
                 standardPackage.setClientId(clientId);
-                standardPackage.regularNonArchiveRowKey();//rowkey设置
+                int type = standardPackage.getProfileType().getType();
+                standardPackage.regularNonArchiveRowKey(type);//rowkey设置
                 standardPackageList.add(standardPackage);
             }
         }

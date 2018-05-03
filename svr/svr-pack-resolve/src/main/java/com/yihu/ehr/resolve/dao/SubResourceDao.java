@@ -1,8 +1,10 @@
 package com.yihu.ehr.resolve.dao;
 
+import com.yihu.ehr.constants.ProfileType;
 import com.yihu.ehr.hbase.HBaseDao;
 import com.yihu.ehr.hbase.TableBundle;
 import com.yihu.ehr.profile.core.ResourceCore;
+import com.yihu.ehr.profile.family.FileSubResourceFamily;
 import com.yihu.ehr.profile.family.SubResourceFamily;
 import com.yihu.ehr.resolve.model.stage2.ResourceBucket;
 import com.yihu.ehr.resolve.model.stage2.SubRecord;
@@ -28,6 +30,15 @@ public class SubResourceDao {
     private HBaseDao hbaseDao;
 
     public void saveOrUpdate(ResourceBucket resBucket) throws Exception {
+        String tableName = ResourceCore.SubTable;
+        String basicColumn = SubResourceFamily.Basic;
+        String dataColumn = SubResourceFamily.Data;
+        if (resBucket.getProfileType() == ProfileType.File){
+            tableName = ResourceCore.FileSubTable;
+            basicColumn = FileSubResourceFamily.Basic;
+            dataColumn = FileSubResourceFamily.Data;
+        }
+        
         String rowKey = resBucket.getId();
         TableBundle bundle = new TableBundle();
         if (resBucket.isReUploadFlg()) { //补传处理
@@ -39,27 +50,27 @@ public class SubResourceDao {
                     legacyRowKeys[i] = subRecordList.get(i).getRowkey();
                 }
                 bundle.addRows(legacyRowKeys);
-                hbaseDao.delete(ResourceCore.SubTable, bundle);
+                hbaseDao.delete(tableName, bundle);
                 bundle.clear();
                 //保存
                 for (SubRecord record : subRecordList) {
                     bundle.addValues(
                             record.getRowkey(),
-                            SubResourceFamily.Basic,
-                            ResourceStorageUtil.getSubResCells(SubResourceFamily.Basic, record, resBucket));
+                            basicColumn,
+                            ResourceStorageUtil.getSubResCells(basicColumn, record, resBucket));
                     bundle.addValues(
                             record.getRowkey(),
-                            SubResourceFamily.Data,
-                            ResourceStorageUtil.getSubResCells(SubResourceFamily.Data, record, resBucket));
+                            dataColumn,
+                            ResourceStorageUtil.getSubResCells(dataColumn, record, resBucket));
                 }
-                hbaseDao.save(ResourceCore.SubTable, bundle);
+                hbaseDao.save(tableName, bundle);
             }
         } else {
             // delete legacy data if they are exist
-            String legacyRowKeys[] = hbaseDao.findRowKeys(ResourceCore.SubTable, rowKey, rowKey.substring(0, rowKey.length() - 1) + "1", "^" + rowKey);
+            String legacyRowKeys[] = hbaseDao.findRowKeys(tableName, rowKey, rowKey.substring(0, rowKey.length() - 1) + "1", "^" + rowKey);
             if (legacyRowKeys != null && legacyRowKeys.length > 0) {
                 bundle.addRows(legacyRowKeys);
-                hbaseDao.delete(ResourceCore.SubTable, bundle);
+                hbaseDao.delete(tableName, bundle);
             }
             bundle.clear();
             // now save the data to hbase
@@ -67,14 +78,14 @@ public class SubResourceDao {
             for (SubRecord record : subRecords.getRecords()) {
                 bundle.addValues(
                         record.getRowkey(),
-                        SubResourceFamily.Basic,
-                        ResourceStorageUtil.getSubResCells(SubResourceFamily.Basic, record, resBucket));
+                        basicColumn,
+                        ResourceStorageUtil.getSubResCells(basicColumn, record, resBucket));
                 bundle.addValues(
                         record.getRowkey(),
-                        SubResourceFamily.Data,
-                        ResourceStorageUtil.getSubResCells(SubResourceFamily.Data, record, resBucket));
+                        dataColumn,
+                        ResourceStorageUtil.getSubResCells(dataColumn, record, resBucket));
             }
-            hbaseDao.save(ResourceCore.SubTable, bundle);
+            hbaseDao.save(tableName, bundle);
         }
     }
 

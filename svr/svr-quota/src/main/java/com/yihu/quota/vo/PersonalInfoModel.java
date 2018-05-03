@@ -29,6 +29,7 @@ public class PersonalInfoModel {
     private String diseaseName;
     private String diseaseType;//疾病类型 1 I型糖尿病  2 II型糖尿病 3 妊娠糖尿病 4 其他糖尿病
     private String diseaseTypeName;
+    private String rowKey;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssZ")// 2017-06-24T11:51:30+080
     private Date eventDate;
@@ -178,5 +179,13 @@ public class PersonalInfoModel {
 
     public void setDiseaseTypeName(String diseaseTypeName) {
         this.diseaseTypeName = diseaseTypeName;
+    }
+
+    public String getRowKey() {
+        return rowKey;
+    }
+
+    public void setRowKey(String rowKey) {
+        this.rowKey = rowKey;
     }
 }

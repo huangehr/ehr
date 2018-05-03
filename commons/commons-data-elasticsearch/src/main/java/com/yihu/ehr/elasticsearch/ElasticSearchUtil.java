@@ -110,6 +110,11 @@ public class ElasticSearchUtil {
         return elasticSearchClient.findByField(index, type, boolQueryBuilder);
     }
 
+    public List<Map<String, Object>> list(String index, String type, List<Map<String, Object>> filters) {
+        QueryBuilder boolQueryBuilder = getQueryBuilder(filters);
+        return elasticSearchClient.findByField(index, type, boolQueryBuilder);
+    }
+
     public List<Map<String, Object>> page(String index, String type, String filters, int page, int size) {
         return this.page(index, type, filters, null, page, size);
     }
@@ -133,11 +138,23 @@ public class ElasticSearchUtil {
         return elasticSearchClient.findBySql(sql);
     }
 
-    public List<Map<String, Long>> dateHistogram(String index, String type,  List<Map<String, Object>> filter, Date start, Date end, String field, DateHistogramInterval interval, String format) {
+    public List<Map<String, Long>> dateHistogram(String index, String type, List<Map<String, Object>> filter, Date start, Date end, String field, DateHistogramInterval interval, String format) {
         QueryBuilder boolQueryBuilder = getQueryBuilder(filter);
         return elasticSearchClient.dateHistogram(index, type, boolQueryBuilder, start, end, field, interval, format);
     }
 
+    /**
+     * 查询去重数量
+     * @param index
+     * @param type
+     * @param filter
+     * @param filed
+     * @return
+     */
+    public int cardinality(String index, String type, List<Map<String, Object>> filter,String filed){
+        QueryBuilder boolQueryBuilder = getQueryBuilder(filter);
+        return elasticSearchClient.cardinality(index, type, boolQueryBuilder, filed);
+    }
     private List<SortBuilder> getSortBuilder(String sorts) {
         List<SortBuilder> sortBuilderList = new ArrayList<>();
         if (StringUtils.isEmpty(sorts)) {
@@ -159,7 +176,7 @@ public class ElasticSearchUtil {
         return sortBuilderList;
     }
 
-    private QueryBuilder getQueryBuilder(String filters) {
+    public QueryBuilder getQueryBuilder(String filters) {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         if (StringUtils.isEmpty(filters)) {
             return boolQueryBuilder;
@@ -227,7 +244,7 @@ public class ElasticSearchUtil {
         return boolQueryBuilder;
     }
 
-    private QueryBuilder getQueryBuilder(List<Map<String, Object>> filter) {
+    public QueryBuilder getQueryBuilder(List<Map<String, Object>> filter) {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         for (Map<String, Object> param : filter) {
             String andOr = String.valueOf(param.get("andOr"));
