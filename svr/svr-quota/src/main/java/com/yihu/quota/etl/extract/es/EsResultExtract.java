@@ -151,10 +151,10 @@ public class EsResultExtract {
         TransportClient client = elasticSearchPool.getClient();
         List<Map<String, Object>> restltList = null;
         try {
-            restltList =  elasticsearchUtil.queryPageList(client,esConfig.getIndex(),esConfig.getType(),boolQueryBuilder,pageNo,pageSize,"quotaDate");
-        }catch (Exception e){
+            restltList =  elasticsearchUtil.queryPageList(client, esConfig.getIndex(), esConfig.getType(), boolQueryBuilder, pageNo, pageSize,"quotaDate");
+        } catch (Exception e){
             e.getMessage();
-        }finally {
+        } finally {
             elasticSearchPool.releaseClient(client);
         }
         return restltList;
@@ -325,9 +325,9 @@ public class EsResultExtract {
         List<Map<String, Object>> list = null;
         try {
             list = elasticsearchUtil.searcherByGroup(client,esConfig.getIndex(),esConfig.getType(), boolQueryBuilder, aggsField, "result");
-        }catch (Exception e){
+        } catch (Exception e){
             e.getMessage();
-        }finally {
+        } finally {
             elasticSearchPool.releaseClient(client);
         }
         return  list;
@@ -345,9 +345,9 @@ public class EsResultExtract {
         Map<String, Integer> map = null;
         try {
             map = elasticsearchUtil.searcherSumByGroupBySql(client, esConfig.getIndex(), aggsFields, filter, sumField,orderFild,order);;
-        }catch (Exception e){
+        } catch (Exception e){
             e.getMessage();
-        }finally {
+        } finally {
             elasticSearchPool.releaseClient(client);
         }
         return map;
@@ -393,9 +393,9 @@ public class EsResultExtract {
                 }
             }
             return  new ArrayList<>();
-        }catch (Exception e){
+        } catch (Exception e){
             e.getMessage();
-        }finally {
+        } finally {
             elasticSearchPool.releaseClient(client);
         }
         return null;

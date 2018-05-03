@@ -62,8 +62,8 @@ public class ElasticsearchUtil {
      * @param sortName 排序字段名称
      * @return
      */
-    public List<Map<String, Object>> queryPageList( Client client,String index,String type,BoolQueryBuilder boolQueryBuilder,
-                                                   int pageNo,int pageSize,String sortName){
+    public List<Map<String, Object>> queryPageList(Client client, String index, String type, BoolQueryBuilder boolQueryBuilder,
+                                                   int pageNo, int pageSize, String sortName){
         SearchResponse actionGet = null;
         SortBuilder dealSorter = SortBuilders.fieldSort(sortName).order(SortOrder.DESC);
         actionGet = client.prepareSearch(index)
@@ -134,7 +134,7 @@ public class ElasticsearchUtil {
      * @param sumField 要求和的字段  只支持一个字段
      * @return
      */
-    public List<Map<String, Object>> searcherByGroup(Client client,String index,String type,BoolQueryBuilder queryBuilder, String aggsField , String sumField) {
+    public List<Map<String, Object>> searcherByGroup(Client client, String index, String type, BoolQueryBuilder queryBuilder, String aggsField , String sumField) {
 
         List<Map<String, Object>> list = new ArrayList<>();
         SearchRequestBuilder searchRequestBuilder =
@@ -175,7 +175,7 @@ public class ElasticsearchUtil {
      * @param order 排序 asc,desc
      * @return
      */
-    public Map<String, Integer> searcherSumByGroupBySql(Client client,String index, String aggsFields ,String filter , String sumField,String orderFild,String order) {
+    public Map<String, Integer> searcherSumByGroupBySql(Client client,String index, String aggsFields ,String filter , String sumField,String orderFild,String order) throws Exception {
         Map<String,Integer> map = new LinkedHashMap<>();
 
 //       String mysql1 = "select org ,sum(result) from quota where quotaCode='depart_treat_count' group by org  ";id=16
@@ -185,45 +185,39 @@ public class ElasticsearchUtil {
              .append(" from ").append(index)
              .append(" where ").append(filter)
              .append(" group by ").append(aggsFields);
-            if(StringUtils.isNotEmpty(orderFild) && StringUtils.isNotEmpty(order)){
-                mysql.append(" order by ").append(orderFild).append(" ").append(order);
-            }
-        try {
-            System.out.println("查询分组 mysql= " + mysql.toString());
-            SQLExprParser parser = new ElasticSqlExprParser(mysql.toString());
-            SQLExpr expr = parser.expr();
-            if (parser.getLexer().token() != Token.EOF) {
-                throw new ParserException("illegal sql expr : " + mysql);
-            }
-            SQLQueryExpr queryExpr = (SQLQueryExpr) expr;
-            //通过抽象语法树，封装成自定义的Select，包含了select、from、where group、limit等
-            Select select = null;
-            select = new SqlParser().parseSelect(queryExpr);
-
-            AggregationQueryAction action = null;
-            DefaultQueryAction queryAction = null;
-            SqlElasticSearchRequestBuilder requestBuilder = null;
-            if (select.isAgg) {
-                //包含计算的的排序分组的
-                action = new AggregationQueryAction(client, select);
-                requestBuilder = action.explain();
-            } else {
-                //封装成自己的Select对象
-                queryAction = new DefaultQueryAction(client, select);
-                requestBuilder = queryAction.explain();
-            }
-            //之后就是对ES的操作
-            SearchResponse response = (SearchResponse) requestBuilder.get();
-            StringTerms stringTerms = (StringTerms) response.getAggregations().asList().get(0);
-            Iterator<Terms.Bucket> gradeBucketIt = stringTerms.getBuckets().iterator();
-            client.close();
-            //里面存放的数据 例  350200-5-2-2    主维度  细维度1  细维度2  值
-            //递归解析json
-            expainJson(gradeBucketIt, map, null);
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (StringUtils.isNotEmpty(orderFild) && StringUtils.isNotEmpty(order)){
+            mysql.append(" order by ").append(orderFild).append(" ").append(order);
         }
+        System.out.println("查询分组 mysql= " + mysql.toString());
+        SQLExprParser parser = new ElasticSqlExprParser(mysql.toString());
+        SQLExpr expr = parser.expr();
+        if (parser.getLexer().token() != Token.EOF) {
+            throw new ParserException("illegal sql expr : " + mysql);
+        }
+        SQLQueryExpr queryExpr = (SQLQueryExpr) expr;
+        //通过抽象语法树，封装成自定义的Select，包含了select、from、where group、limit等
+        Select select = null;
+        select = new SqlParser().parseSelect(queryExpr);
+
+        AggregationQueryAction action = null;
+        DefaultQueryAction queryAction = null;
+        SqlElasticSearchRequestBuilder requestBuilder = null;
+        if (select.isAgg) {
+            //包含计算的的排序分组的
+            action = new AggregationQueryAction(client, select);
+            requestBuilder = action.explain();
+        } else {
+            //封装成自己的Select对象
+            queryAction = new DefaultQueryAction(client, select);
+            requestBuilder = queryAction.explain();
+        }
+        //之后就是对ES的操作
+        SearchResponse response = (SearchResponse) requestBuilder.get();
+        StringTerms stringTerms = (StringTerms) response.getAggregations().asList().get(0);
+        Iterator<Terms.Bucket> gradeBucketIt = stringTerms.getBuckets().iterator();
+        //里面存放的数据 例  350200-5-2-2    主维度  细维度1  细维度2  值
+        //递归解析json
+        expainJson(gradeBucketIt, map, null);
         return map;
     }
 
@@ -360,8 +354,7 @@ public class ElasticsearchUtil {
             });
         } catch (Exception e) {
             e.printStackTrace();
-        }finally {
-//            System.out.println("ES client 连接回收 或关闭 ");
+        } finally {
             elasticSearchPool.releaseClient(client);
         }
         return returnModels;
@@ -397,7 +390,7 @@ public class ElasticsearchUtil {
             return 0;
         } catch (Exception e) {
             e.printStackTrace();
-        }finally {
+        } finally {
             elasticSearchPool.releaseClient(client);
         }
         return 0;
