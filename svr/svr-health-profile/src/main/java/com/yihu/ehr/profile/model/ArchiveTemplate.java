@@ -1,6 +1,5 @@
 package com.yihu.ehr.profile.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.entity.BaseIdentityEntity;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
@@ -9,7 +8,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.*;
 import java.io.InputStream;
-import java.util.Date;
 
 /**
  * @author Sand
@@ -26,7 +24,8 @@ public class ArchiveTemplate extends BaseIdentityEntity {
     public enum Type {
         clinic, //门诊
         resident, //住院
-        medicalExam //体检
+        medicalExam, //体检
+        universal //通用
     }
 
     private String title;

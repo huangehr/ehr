@@ -9,7 +9,6 @@ import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.profile.model.ArchiveTemplate;
 import com.yihu.ehr.profile.service.ArchiveTemplateService;
 import com.yihu.ehr.util.compress.Zipper;
-import com.yihu.ehr.controller.BaseRestEndPoint;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -50,7 +49,7 @@ public class TemplateEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "model", value = "健康档案模板")
             @RequestParam(value = "model") String model) throws Exception {
         ArchiveTemplate template = toEntity(model, ArchiveTemplate.class);
-        String filters = "cdaVersion="+ template.getCdaVersion() + ";cdaDocumentId=" + template.getCdaDocumentId();
+        String filters = "cdaVersion=" + template.getCdaVersion() + ";cdaDocumentId=" + template.getCdaDocumentId();
         if (templateService.search(filters).size() > 0) {
             return failed("该类型模版已存在！");
         }
@@ -80,13 +79,13 @@ public class TemplateEndPoint extends EnvelopRestEndPoint {
             return failed("更新模板不存在！");
         }
         ArchiveTemplate _tpl = toEntity(model, ArchiveTemplate.class);
-        if ("copy".equals(mode)
-                || !tpl.getCdaVersion().equals(_tpl.getCdaVersion())
-                || !tpl.getCdaDocumentId().equals(_tpl.getCdaDocumentId())) {
-            String filters = "cdaVersion="+ _tpl.getCdaVersion() + ";cdaDocumentId=" + _tpl.getCdaDocumentId();
+        if (!tpl.getCdaVersion().equals(_tpl.getCdaVersion()) || !tpl.getCdaDocumentId().equals(_tpl.getCdaDocumentId())) {
+            String filters = "cdaVersion=" + _tpl.getCdaVersion() + ";cdaDocumentId=" + _tpl.getCdaDocumentId();
             if (templateService.search(filters).size() > 0) {
                 return failed("该类型模版已存在！");
             }
+        }
+        if ("copy".equals(mode)) {
             _tpl.setId(0);
             templateService.save(_tpl);
             return success(true);

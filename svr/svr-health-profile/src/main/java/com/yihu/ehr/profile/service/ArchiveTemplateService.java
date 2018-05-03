@@ -40,10 +40,6 @@ public class ArchiveTemplateService extends BaseJpaService<ArchiveTemplate, Arch
         return template;
     }
 
-    public List<ArchiveTemplate> findByTypeAndCdaVersion(ArchiveTemplate.Type type, String cdaVersion) {
-        return templateDao.findByTypeAndCdaVersion(type, cdaVersion);
-    }
-
     public boolean isExistName(String version, String title) {
         return templateDao.findByTitleAndCdaVersion(version, title).size() > 0;
     }

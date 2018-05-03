@@ -14,8 +14,6 @@ import java.util.List;
  */
 public interface ArchiveTemplateDao extends PagingAndSortingRepository<ArchiveTemplate, Integer> {
 
-    List<ArchiveTemplate> findByTypeAndCdaVersion (ArchiveTemplate.Type type, String cdaVersion);
-
     List<ArchiveTemplate> findByTitleAndCdaVersion (String title, String cdaVersion);
 
     List<ArchiveTemplate> findByCdaVersionAndAndCdaCode (String version, String code);

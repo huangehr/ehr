@@ -52,10 +52,10 @@ public class ProfileCDAService {
                 List<ArchiveTemplate> list;
                 if (StringUtils.isEmpty(templateName)) {
                     //pc接口
-                    list = archiveTemplateService.findByTypeAndCdaVersion(ArchiveTemplate.Type.values()[new Integer(eventType)], cdaVersion);
+                    list = archiveTemplateService.search("type=universal," + ArchiveTemplate.Type.values()[new Integer(eventType)] + ";cdaVersion=" + cdaVersion);
                 } else {
                     //mobile接口
-                    list = archiveTemplateService.search("type=" + eventType + ";cdaVersion=" + cdaVersion + ";title?" + templateName);
+                    list = archiveTemplateService.search("type=universal," + ArchiveTemplate.Type.values()[new Integer(eventType)] + ";cdaVersion=" + cdaVersion + ";title?" + templateName);
                 }
                 //遍历模板
                 list.forEach(item -> {
