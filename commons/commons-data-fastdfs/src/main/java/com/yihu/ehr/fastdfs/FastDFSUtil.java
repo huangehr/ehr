@@ -6,10 +6,10 @@ import org.csource.common.MyException;
 import org.csource.common.NameValuePair;
 import org.csource.fastdfs.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.InetSocketAddress;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,6 +34,8 @@ public class FastDFSUtil {
     
     @Autowired
     private FastDFSPool pool;
+    @Value(value = "${fast-dfs.public-server:http://120.0.0.1:8080}")
+    private String publicServer;
 
     /**
      * 以输入流的方式上传文件
@@ -70,49 +72,37 @@ public class FastDFSUtil {
      * 以输入流的方式上传文件
      */
     public ObjectNode upload(InputStream in, String fileExtension, NameValuePair[] fileMetaData) throws IOException, MyException, NoSuchAlgorithmException{
-        TrackerServer trackerServer = pool.getTrackerServer();
-        StorageClient client = new StorageClient(trackerServer, null);
+        StorageClient client = pool.getStorageClient();
         try {
             ObjectNode message = new ObjectMapper().createObjectNode();
             byte fileBuffer[] = new byte[in.available()];
             int len = 0;
-            int temp = 0;                             //所有读取的内容都使用temp接收
+            int temp;                             //所有读取的内容都使用temp接收
             while ((temp = in.read()) != -1) {            //当没有读取完时，继续读取
                 fileBuffer[len] = (byte) temp;
-                len++;
+                len ++;
             }
             in.close();
             message.put(FILE_SIZE, fileBuffer.length);
             String[] results = client.upload_file(fileBuffer, fileExtension, fileMetaData);
             if (results != null) {
-                String fileId;
-                int ts;
-                String token;
-                String fileURl;
-                InetSocketAddress socketAddress;
                 String groupName = results[0];
                 String remoteFile = results[1];
                 message.put(GROUP_NAME, groupName);
                 message.put(REMOTE_FILE_NAME, remoteFile);
-                fileId = groupName + StorageClient1.SPLIT_GROUP_NAME_AND_FILENAME_SEPERATOR + remoteFile;
+                String fileId = groupName + StorageClient1.SPLIT_GROUP_NAME_AND_FILENAME_SEPERATOR + remoteFile;
                 message.put(FILE_ID, fileId);
-                socketAddress = trackerServer.getInetSocketAddress();
-                fileURl = "http://" + socketAddress.getAddress().getHostAddress();
-                if (ClientGlobal.g_tracker_http_port != 80) {
-                    fileURl += ":" + ClientGlobal.g_tracker_http_port;
-                }
-                fileURl += "/" + fileId;
+                String fileURl = publicServer += "/" + fileId;
                 if (ClientGlobal.g_anti_steal_token) {
-                    ts = (int) (System.currentTimeMillis() / 1000);
-                    token = ProtoCommon.getToken(fileId, ts, ClientGlobal.g_secret_key);
+                    int ts = (int) (System.currentTimeMillis() / 1000);
+                    String token = ProtoCommon.getToken(fileId, ts, ClientGlobal.g_secret_key);
                     fileURl += "?token=" + token + "&ts=" + ts;
                 }
                 message.put(FILE_URL, fileURl);
             }
             return message;
         } finally {
-            pool.releaseTrackerServer(trackerServer);
-            client = null;
+            pool.releaseStorageClient(client);
         }
     }
 
@@ -120,41 +110,29 @@ public class FastDFSUtil {
      * 上传文件，从文件
      */
     public ObjectNode upload(String group_name, String master_filename, String prefix_name, byte[] file_buff, String file_ext_name, NameValuePair[] meta_list) throws IOException, MyException, NoSuchAlgorithmException{
-        TrackerServer trackerServer = pool.getTrackerServer();
-        StorageClient client = new StorageClient(trackerServer, null);
+        StorageClient client = pool.getStorageClient();
         try {
             ObjectNode message = new ObjectMapper().createObjectNode();
             String [] results = client.upload_file(group_name, master_filename, prefix_name, file_buff, file_ext_name, meta_list);
             message.put(FILE_SIZE, file_buff.length);
             if (results != null) {
-                String fileId;
-                int ts;
-                String token;
-                String fileURl;
-                InetSocketAddress socketAddress;
                 String groupName = results[0];
                 String remoteFile = results[1];
                 message.put(GROUP_NAME, groupName);
                 message.put(REMOTE_FILE_NAME, remoteFile);
-                fileId = groupName + StorageClient1.SPLIT_GROUP_NAME_AND_FILENAME_SEPERATOR + remoteFile;
+                String fileId = groupName + StorageClient1.SPLIT_GROUP_NAME_AND_FILENAME_SEPERATOR + remoteFile;
                 message.put(FILE_ID, fileId);
-                socketAddress = trackerServer.getInetSocketAddress();
-                fileURl = "http://" + socketAddress.getAddress().getHostAddress();
-                if (ClientGlobal.g_tracker_http_port != 80) {
-                    fileURl += ":" + ClientGlobal.g_tracker_http_port;
-                }
-                fileURl += "/" + fileId;
+                String fileURl = publicServer += "/" + fileId;
                 if (ClientGlobal.g_anti_steal_token) {
-                    ts = (int) (System.currentTimeMillis() / 1000);
-                    token = ProtoCommon.getToken(fileId, ts, ClientGlobal.g_secret_key);
+                    int ts = (int) (System.currentTimeMillis() / 1000);
+                    String token = ProtoCommon.getToken(fileId, ts, ClientGlobal.g_secret_key);
                     fileURl += "?token=" + token + "&ts=" + ts;
                 }
                 message.put(FILE_URL, fileURl);
             }
             return message;
         } finally {
-            pool.releaseTrackerServer(trackerServer);
-            client = null;
+            pool.releaseStorageClient(client);
         }
     }
 
@@ -182,15 +160,14 @@ public class FastDFSUtil {
      * @throws Exception
      */
     public ObjectNode upload(String fileName, String description) throws IOException, MyException, NoSuchAlgorithmException {
-        TrackerServer trackerServer = pool.getTrackerServer();
-        StorageClient client = new StorageClient(trackerServer, null);
+        StorageClient client = pool.getStorageClient();
         try {
             NameValuePair[] fileMetaData;
             fileMetaData = new NameValuePair[1];
             fileMetaData[0] = new NameValuePair("description", description == null ? "" : description);
             // ObjectMapper objectMapper = SpringContext.getService(ObjectMapper.class);
             ObjectNode message = new ObjectMapper().createObjectNode();
-            String fileExtension = "";
+            String fileExtension;
             if (fileName.contains(".")) {
                 fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1);
             } else {
@@ -198,36 +175,25 @@ public class FastDFSUtil {
             }
             String[] results = client.upload_file(fileName, fileExtension, fileMetaData);
             if (results != null) {
-                String fileId;
-                int ts;
-                String token;
-                String fileUrl;
-                InetSocketAddress inetSockAddr;
                 String groupName = results[0];
                 String remoteFileName = results[1];
                 message.put(GROUP_NAME, groupName);
                 message.put(REMOTE_FILE_NAME, remoteFileName);
-                fileId = groupName + StorageClient1.SPLIT_GROUP_NAME_AND_FILENAME_SEPERATOR + remoteFileName;
+                String fileId = groupName + StorageClient1.SPLIT_GROUP_NAME_AND_FILENAME_SEPERATOR + remoteFileName;
                 message.put(FILE_ID, fileId);
-                inetSockAddr = trackerServer.getInetSocketAddress();
-                fileUrl = "http://" + inetSockAddr.getAddress().getHostAddress();
-                if (ClientGlobal.g_tracker_http_port != 80) {
-                    fileUrl += ":" + ClientGlobal.g_tracker_http_port;
-                }
-                fileUrl += "/" + fileId;
+                String fileURl = publicServer += "/" + fileId;
                 if (ClientGlobal.g_anti_steal_token) {
-                    ts = (int) (System.currentTimeMillis() / 1000);
-                    token = ProtoCommon.getToken(fileId, ts, ClientGlobal.g_secret_key);
-                    fileUrl += "?token=" + token + "&ts=" + ts;
+                    int ts = (int) (System.currentTimeMillis() / 1000);
+                    String token = ProtoCommon.getToken(fileId, ts, ClientGlobal.g_secret_key);
+                    fileURl += "?token=" + token + "&ts=" + ts;
                 }
-                message.put(FILE_URL, fileUrl);
+                message.put(FILE_URL, fileURl);
                 return message;
             } else {
                 return null;
             }
         } finally {
-            pool.releaseTrackerServer(trackerServer);
-            client = null;
+            pool.releaseStorageClient(client);
         }
     }
 
@@ -239,35 +205,29 @@ public class FastDFSUtil {
     }
     */
     public int modify(String groupName, String remoteFilename, NameValuePair[] metaList, byte opFlag) throws IOException , MyException{
-        TrackerServer trackerServer = pool.getTrackerServer();
-        StorageClient client = new StorageClient(trackerServer, null);
+        StorageClient client = pool.getStorageClient();
         try {
             return client.set_metadata(groupName, remoteFilename, metaList, opFlag);
         } finally {
-            pool.releaseTrackerServer(trackerServer);
-            client = null;
+            pool.releaseStorageClient(client);
         }
     }
 
     public FileInfo getFileInfo(String groupName, String remoteFileName) throws IOException, MyException{
-        TrackerServer trackerServer = pool.getTrackerServer();
-        StorageClient client = new StorageClient(trackerServer, null);
+        StorageClient client = pool.getStorageClient();
         try {
             return client.get_file_info(groupName, remoteFileName);
         } finally {
-            pool.releaseTrackerServer(trackerServer);
-            client = null;
+            pool.releaseStorageClient(client);
         }
     }
 
     public NameValuePair[] getMetadata(String groupName, String remoteFileName) throws IOException, MyException{
-        TrackerServer trackerServer = pool.getTrackerServer();
-        StorageClient client = new StorageClient(trackerServer, null);
+        StorageClient client = pool.getStorageClient();
         try {
             return client.get_metadata(groupName, remoteFileName);
         } finally {
-            pool.releaseTrackerServer(trackerServer);
-            client = null;
+            pool.releaseStorageClient(client);
         }
     }
 
@@ -280,13 +240,11 @@ public class FastDFSUtil {
      * @throws Exception
      */
     public byte[] download(String groupName, String remoteFileName) throws IOException, MyException {
-        TrackerServer trackerServer = pool.getTrackerServer();
-        StorageClient client = new StorageClient(trackerServer, null);
+        StorageClient client = pool.getStorageClient();
         try {
             return client.download_file(groupName, remoteFileName);
         } finally {
-            pool.releaseTrackerServer(trackerServer);
-            client = null;
+            pool.releaseStorageClient(client);
         }
     }
 
@@ -299,15 +257,13 @@ public class FastDFSUtil {
      * @return 是否下载成功
      */
     public String download(String groupName, String remoteFileName, String localPath) throws IOException, MyException {
-        TrackerServer trackerServer = pool.getTrackerServer();
-        StorageClient client = new StorageClient(trackerServer, null);
+        StorageClient client = pool.getStorageClient();
         try {
             String localFileName = localPath + remoteFileName.replaceAll("/", "_");
             client.download_file(groupName, remoteFileName, 0, 0, localFileName);
             return localFileName;
         } finally {
-            pool.releaseTrackerServer(trackerServer);
-            client = null;
+            pool.releaseStorageClient(client);
         }
     }
 
@@ -318,13 +274,11 @@ public class FastDFSUtil {
      * @param remoteFileName
      */
     public void delete(String groupName, String remoteFileName) throws IOException, MyException {
-        TrackerServer trackerServer = pool.getTrackerServer();
-        StorageClient client = new StorageClient(trackerServer, null);
+        StorageClient client = pool.getStorageClient();
         try {
             client.delete_file(groupName, remoteFileName);
         } finally {
-            pool.releaseTrackerServer(trackerServer);
-            client = null;
+            pool.releaseStorageClient(client);
         }
     }
 

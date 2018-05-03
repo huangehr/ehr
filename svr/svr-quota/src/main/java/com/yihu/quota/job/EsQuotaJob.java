@@ -61,7 +61,6 @@ public class EsQuotaJob implements Job {
     ElasticsearchUtil elasticsearchUtil;
     @Autowired
     private ElasticSearchPool elasticSearchPool;
-
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
@@ -153,14 +152,25 @@ public class EsQuotaJob implements Job {
             RangeQueryBuilder rangeQueryEndTime = QueryBuilders.rangeQuery("quotaDate").lte(endTime);
             boolQueryBuilder.must(rangeQueryEndTime);
         }
-        Client client = esClientUtil.getClient(esConfig.getHost(), 9300, esConfig.getClusterName());
-        try {
-            elasticsearchUtil.queryDelete(client, esConfig.getIndex() ,esConfig.getType(),boolQueryBuilder);
-        } catch (Exception e) {
-            e.getMessage();
-        } finally {
-            client.close();
+        boolean flag = true ;
+        while (flag){
+            Client talClient = esClientUtil.getClient(esConfig.getHost(), 9300, esConfig.getClusterName());
+            Client client = esClientUtil.getClient(esConfig.getHost(), 9300, esConfig.getClusterName());
+            try {
+                long count = elasticsearchUtil.getTotalCount(talClient, esConfig.getIndex() ,esConfig.getType(), boolQueryBuilder);
+                if(count != 0){
+                    elasticsearchUtil.queryDelete(client, esConfig.getIndex() ,esConfig.getType(),boolQueryBuilder);
+                }else {
+                    flag = false ;
+                }
+            } catch (Exception e) {
+                e.getMessage();
+            } finally {
+                talClient.close();
+                client.close();
+            }
         }
+
     }
 
     /**

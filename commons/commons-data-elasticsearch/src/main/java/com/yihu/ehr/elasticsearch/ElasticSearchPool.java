@@ -5,6 +5,8 @@ import com.alibaba.druid.pool.ElasticSearchDruidDataSourceFactory;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -26,13 +28,15 @@ import java.util.Properties;
 @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class ElasticSearchPool {
 
-    @Value("${elasticsearch.pool.init-size}")
-    private int initSize;
-    @Value("${elasticsearch.pool.max-size}")
-    private int maxSize;
-    private List<TransportClient> clientPool;
+    private static final Logger logger = LoggerFactory.getLogger(ElasticSearchPool.class);
+
     @Autowired
     private ElasticSearchConfig elasticSearchConfig;
+    @Value("${elasticsearch.pool.init-size:1}")
+    private int initSize;
+    @Value("${elasticsearch.pool.max-size:5}")
+    private int maxSize;
+    private List<TransportClient> clientPool;
 
     @PostConstruct
     private void init() {
@@ -40,11 +44,14 @@ public class ElasticSearchPool {
             clientPool = new ArrayList<>();
         }
         synchronized (clientPool) {
-            while (clientPool.size() < initSize) {
-                try{
+            try {
+                if (initSize < 1) {
+                    initSize = 1;
+                }
+                while (clientPool.size() < initSize) {
                     Settings settings = Settings.builder()
                             .put("cluster.name", elasticSearchConfig.getClusterName())
-                            .put("client.transport.sniff", true)
+                            .put("client.transport.sniff", false)
                             .build();
                     String[] nodeArr = elasticSearchConfig.getClusterNodes().split(",");
                     InetSocketTransportAddress[] socketArr = new InetSocketTransportAddress[nodeArr.length];
@@ -56,19 +63,17 @@ public class ElasticSearchPool {
                     }
                     TransportClient transportClient = TransportClient.builder().settings(settings).build().addTransportAddresses(socketArr);
                     clientPool.add(transportClient);
-                }catch (Exception e){
-                    System.out.println("探测集群节点异常！");
                 }
+                logger.info("[Init ElasticSearch Pool Size " + initSize + "]");
+            } catch (Exception e){
+                logger.error("[" + e.getMessage() + "]");
             }
-        }
-        if (clientPool.isEmpty()) {
-            throw new RuntimeException("ElasticSearch连接池初始化失败，请检查相关配置");
         }
     }
 
     @PreDestroy
     private void destroy(){
-        if (null != clientPool) {
+        if (clientPool != null) {
             for (TransportClient transportClient : clientPool) {
                 transportClient.close();
             }
@@ -79,19 +84,18 @@ public class ElasticSearchPool {
         if (clientPool.isEmpty()) {
             init();
         }
+        //logger.info("ElasticSearch Pool Size " + clientPool.size());
         int last_index = clientPool.size() - 1;
-        TransportClient transportClient = clientPool.get(last_index);
-        clientPool.remove(last_index);
-        return transportClient;
+        return clientPool.remove(last_index);
     }
 
     public synchronized void releaseClient(TransportClient transportClient) {
-        if (clientPool.size() > maxSize) {
-            if (null != transportClient) {
+        if (transportClient != null) {
+            if (clientPool.size() > maxSize) {
                 transportClient.close();
+            } else {
+                clientPool.add(0, transportClient);
             }
-        } else {
-            clientPool.add(transportClient);
         }
     }
 

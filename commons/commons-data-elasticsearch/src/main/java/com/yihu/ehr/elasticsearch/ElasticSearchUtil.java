@@ -138,7 +138,7 @@ public class ElasticSearchUtil {
         return elasticSearchClient.findBySql(sql);
     }
 
-    public List<Map<String, Long>> dateHistogram(String index, String type, List<Map<String, Object>> filter, Date start, Date end, String field, DateHistogramInterval interval, String format) {
+    public Map<String, Long> dateHistogram(String index, String type, List<Map<String, Object>> filter, Date start, Date end, String field, DateHistogramInterval interval, String format) {
         QueryBuilder boolQueryBuilder = getQueryBuilder(filter);
         return elasticSearchClient.dateHistogram(index, type, boolQueryBuilder, start, end, field, interval, format);
     }
@@ -155,6 +155,7 @@ public class ElasticSearchUtil {
         QueryBuilder boolQueryBuilder = getQueryBuilder(filter);
         return elasticSearchClient.cardinality(index, type, boolQueryBuilder, filed);
     }
+
     private List<SortBuilder> getSortBuilder(String sorts) {
         List<SortBuilder> sortBuilderList = new ArrayList<>();
         if (StringUtils.isEmpty(sorts)) {

@@ -1,16 +1,13 @@
 package com.yihu.ehr.profile.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.yihu.ehr.entity.BaseIdentityEntity;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.lang.SpringContext;
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.io.InputStream;
-import java.io.Serializable;
-import java.util.Date;
 
 /**
  * @author Sand
@@ -20,30 +17,25 @@ import java.util.Date;
 @Entity
 @Table(name = "archive_template")
 @Access(value = AccessType.PROPERTY)
-public class ArchiveTemplate {
+public class ArchiveTemplate extends BaseIdentityEntity {
 
-    private Integer id;
+    public final static String UrlSeparator = ";";
+
+    public enum Type {
+        clinic, //门诊
+        resident, //住院
+        medicalExam, //体检
+        universal //通用
+    }
+
     private String title;
     private String cdaVersion;
     private String cdaDocumentId;
-    private String organizationCode;
-    private String pcTplURL;
-    private String mobileTplURL;
+    private String cdaDocumentName;
+    private String pcUrl;
+    private String mobileUrl;
     private String cdaCode;
-    private Date createTime = new Date();
-
-    final static String UrlSeparator = ";";
-
-    @Id
-    @GeneratedValue(generator = "Generator")
-    @GenericGenerator(name = "Generator", strategy = "identity")
-    @Column(name = "id", unique = true, nullable = false)
-    public Integer getId() {
-        return id;
-    }
-    public void setId(Integer id) {
-        this.id = id;
-    }
+    private Type type;
 
     @Column(name = "title")
     public String getTitle() {
@@ -69,37 +61,31 @@ public class ArchiveTemplate {
         this.cdaDocumentId = cdaDocumentId;
     }
 
-    @Column(name = "pc_template")
-    public String getPcTplURL() {
-        return pcTplURL;
-    }
-    public void setPcTplURL(String url) {
-        pcTplURL = url;
+    @Column(name = "cda_document_name")
+    public String getCdaDocumentName() {
+        return cdaDocumentName;
     }
 
-    @Column(name = "mobile_template")
-    public String getMobileTplURL() {
-        return mobileTplURL;
-    }
-    public void setMobileTplURL(String mobileTplURL) {
-        this.mobileTplURL = mobileTplURL;
+    public void setCdaDocumentName(String cdaDocumentName) {
+        this.cdaDocumentName = cdaDocumentName;
     }
 
-    @Column(name = "create_time")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    public Date getCreateTime() {
-        return createTime;
-    }
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
+    @Column(name = "pc_url")
+    public String getPcUrl() {
+        return pcUrl;
     }
 
-    @Column(name = "org_code")
-    public String getOrganizationCode() {
-        return organizationCode;
+    public void setPcUrl(String pcUrl) {
+        this.pcUrl = pcUrl;
     }
-    public void setOrganizationCode(String organizationCode) {
-        this.organizationCode = organizationCode;
+
+    @Column(name = "mobile_url")
+    public String getMobileUrl() {
+        return mobileUrl;
+    }
+
+    public void setMobileUrl(String mobileUrl) {
+        this.mobileUrl = mobileUrl;
     }
 
     @Column(name = "cda_code")
@@ -110,20 +96,27 @@ public class ArchiveTemplate {
         this.cdaCode = cdaCode;
     }
 
+    @Column(name = "type")
+    public Type getType() {
+        return type;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
+    }
+
     /**
      * 读取模板内容。
      *
      * @return
      */
     public byte[] getContent(boolean pc) throws Exception {
-        String url = pc ? pcTplURL : mobileTplURL;
+        String url = pc ? pcUrl : mobileUrl;
         if (StringUtils.isEmpty(url)) {
             return null;
         }
-
         String[] tokens = url.split(UrlSeparator);
         byte[] bytes = fastDFSUtil().download(tokens[0], tokens[1]);
-
         return bytes;
     }
 
@@ -133,16 +126,25 @@ public class ArchiveTemplate {
      * @param fileStream
      * @throws Exception
      */
-    public void setContent(boolean pc, InputStream fileStream) throws Exception {
-        ObjectNode objectNode = fastDFSUtil().upload(fileStream, "html", "健康档案展示模板");
-        String group = objectNode.get(FastDFSUtil.GROUP_NAME).asText();
-        String remoteFile = objectNode.get(FastDFSUtil.REMOTE_FILE_NAME).asText();
-
-        String url = group + UrlSeparator + remoteFile;
+    public void setContent (boolean pc, InputStream fileStream) throws Exception {
         if (pc){
-            pcTplURL = url;
+            if (StringUtils.isNotEmpty(pcUrl)) {
+                fastDFSUtil().delete(pcUrl.split(UrlSeparator)[0], pcUrl.split(UrlSeparator)[1]);
+            }
+            ObjectNode objectNode = fastDFSUtil().upload(fileStream, "html", "健康档案展示模板");
+            String group = objectNode.get(FastDFSUtil.GROUP_NAME).asText();
+            String remoteFile = objectNode.get(FastDFSUtil.REMOTE_FILE_NAME).asText();
+            String url = group + UrlSeparator + remoteFile;
+            pcUrl = url;
         } else {
-            mobileTplURL = url;
+            if (StringUtils.isNotEmpty(mobileUrl)) {
+                fastDFSUtil().delete(mobileUrl.split(UrlSeparator)[0], mobileUrl.split(UrlSeparator)[1]);
+            }
+            ObjectNode objectNode = fastDFSUtil().upload(fileStream, "html", "健康档案展示模板");
+            String group = objectNode.get(FastDFSUtil.GROUP_NAME).asText();
+            String remoteFile = objectNode.get(FastDFSUtil.REMOTE_FILE_NAME).asText();
+            String url = group + UrlSeparator + remoteFile;
+            mobileUrl = url;
         }
     }
 
