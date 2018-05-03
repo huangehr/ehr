@@ -63,7 +63,7 @@ public class CombinationService {
         tParams.put("hospitalId", hospitalId);
         tParams.put("hosDeptId", hosDeptId);
         Map<String, Object> doctorsResMap = objectMapper.readValue(
-                openService.callFzOpenApi(doctorListApi, params), Map.class);
+                openService.callFzOpenApi(doctorListApi, tParams), Map.class);
         if (!"10000".equals(doctorsResMap.get("Code").toString())) {
             throw new ApiException("获取总部医生列表时，" + doctorsResMap.get("Message").toString());
         }
@@ -79,7 +79,10 @@ public class CombinationService {
             // 判断上次那页医生数据是否用完，没用完则接着那页未用的接着遍历。
             Map<String, Object> doctor = null;
             if (originLastPageNo != 0 && originLastPageNo < pageSize) {
-                doctor = resDoctorList.get(originLastPageNo + 1);
+                if (lastPageNo == resDocListSize) {
+                    break;
+                }
+                doctor = resDoctorList.get(lastPageNo);
             } else {
                 if (i == 0) {
                     lastPageNo = 0;
