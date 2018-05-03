@@ -37,7 +37,7 @@ fast-dfs:
   network-timeout: 60
   charset: ISO8859-1
   pool:
-    init-size: 1
+    init-size: 5
     max-size: 20
     wait-time: 500
   http:

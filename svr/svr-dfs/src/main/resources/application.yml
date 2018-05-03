@@ -36,8 +36,8 @@ fast-dfs:
 
 elasticsearch:
   pool:
-    init-size: 5
-    max-size: 10
+    init-size: 2
+    max-size: 5
 
 ---
 spring:
