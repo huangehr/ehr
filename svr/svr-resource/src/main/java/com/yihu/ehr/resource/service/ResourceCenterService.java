@@ -214,12 +214,12 @@ public class ResourceCenterService extends BaseJpaService {
     }
 
     public Map<String, Long> getJsonArchiveReceiveDateGroup(Date start, Date end) {
-        Map<String, Long> esData = elasticSearchUtil.dateHistogram("json_archives", "info", new ArrayList<>(0), start, end , "receive_date", DateHistogramInterval.days(1),"yyyy-MM-dd");
+        Map<String, Long> esData = elasticSearchUtil.dateHistogram("json_archives", "info", null, start, end , "receive_date", DateHistogramInterval.days(1),"yyyy-MM-dd");
         return esData;
     }
 
     public Map<String, Long> getJsonArchiveFinishDateGroup(Date start, Date end) {
-        Map<String, Long> esData = elasticSearchUtil.dateHistogram("json_archives", "info", new ArrayList<>(0), start, end , "finish_date", DateHistogramInterval.days(1),"yyyy-MM-dd");
+        Map<String, Long> esData = elasticSearchUtil.dateHistogram("json_archives", "info", null, start, end , "finish_date", DateHistogramInterval.days(1),"yyyy-MM-dd");
         return esData;
     }
 
