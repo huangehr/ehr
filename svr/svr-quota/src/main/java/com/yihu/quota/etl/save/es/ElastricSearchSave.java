@@ -32,27 +32,56 @@ public class ElastricSearchSave {
 
     public Boolean save(List<SaveModel> smss, String jsonConfig) {
         BulkResult br = null;
+        boolean isSuccessed = false;
         try {
             //初始化参数
             esConfig = (EsConfig) JSONObject.toBean(JSONObject.fromObject(jsonConfig), EsConfig.class);
-            //得到链接
-            JestClient jestClient = esClientUtil.getJestClient(esConfig.getHost(),esConfig.getPort());
-
-            Bulk.Builder bulk = new Bulk.Builder().defaultIndex(esConfig.getIndex()).defaultType(esConfig.getType());
-            for (SaveModel obj : smss) {
-                obj.setCreateTime( new Date());
-                Index index = new Index.Builder(obj).build();
-                bulk.addAction(index);
+            if(smss.size() > 10000){
+                int count  = smss.size()/10000;
+                int remainder = smss.size()%10000;
+                if(remainder != 0){
+                    count ++;
+                }
+                for(int i = 1;i<= count ;i++){
+                    List<SaveModel> newList = null;
+                    if(i == count){
+                        newList = smss.subList(10000*(i-1),smss.size() -1);
+                    }else {
+                        newList = smss.subList(10000*(i-1),10000*i);
+                    }
+                    //得到链接
+                    JestClient jestClient = esClientUtil.getJestClient(esConfig.getHost(),esConfig.getPort());
+                    Bulk.Builder bulk = new Bulk.Builder().defaultIndex(esConfig.getIndex()).defaultType(esConfig.getType());
+                    for (SaveModel obj : newList) {
+                        obj.setCreateTime( new Date());
+                        Index index = new Index.Builder(obj).build();
+                        bulk.addAction(index);
+                    }
+                    br = jestClient.execute(bulk.build());
+                    //关闭链接
+                    jestClient.shutdownClient();
+                    isSuccessed = br.isSucceeded();
+                }
+            }else{
+                //得到链接
+                JestClient jestClient = esClientUtil.getJestClient(esConfig.getHost(),esConfig.getPort());
+                Bulk.Builder bulk = new Bulk.Builder().defaultIndex(esConfig.getIndex()).defaultType(esConfig.getType());
+                for (SaveModel obj : smss) {
+                    obj.setCreateTime( new Date());
+                    Index index = new Index.Builder(obj).build();
+                    bulk.addAction(index);
+                }
+                br = jestClient.execute(bulk.build());
+                //关闭链接
+                jestClient.shutdownClient();
+                isSuccessed = br.isSucceeded();
             }
-            br = jestClient.execute(bulk.build());
-            //关闭链接
-            jestClient.shutdownClient();
-            return br.isSucceeded();
+            return isSuccessed;
         } catch (Exception e) {
-            logger.error(" save es error ：" + br.getErrorMessage());
-            logger.error(" save error ：" + e.getMessage());
+            throw new RuntimeException("ES 保存数据异常");
         }
-        return null;
     }
+
+
 
 }
