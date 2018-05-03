@@ -369,7 +369,6 @@ public class ElasticSearchClient {
     public int cardinality (String index, String type, QueryBuilder queryBuilder, String  filed) {
         TransportClient transportClient = elasticSearchPool.getClient();
         try {
-            List<Map<String, Long>> resultList = new ArrayList<>();
             SearchRequestBuilder builder = transportClient.prepareSearch(index);
             builder.setTypes(type);
             builder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
