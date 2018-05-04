@@ -30,7 +30,7 @@ public class PackStatisticsService extends BaseJpaService {
      * 统计最近七天采集总数 -> getCollectTocalCount
      * @return
      */
-    public List<Map<String, Long>> get7DaysTotalCount() {
+    public Map<String, Long> get7DaysTotalCount() {
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
@@ -38,7 +38,7 @@ public class PackStatisticsService extends BaseJpaService {
         calendar.set(Calendar.MILLISECOND, 0);
         Date now = DateUtils.addDays(calendar.getTime(), 1);
         Date before = DateUtils.addDays(now, -6);
-        List<Map<String, Long>> esData = elasticSearchUtil.dateHistogram("json_archives", "info", new ArrayList<>(0), before, now , "receive_date", DateHistogramInterval.days(1),"yyyy-MM-dd");
+        Map<String, Long> esData = elasticSearchUtil.dateHistogram("json_archives", "info", new ArrayList<>(0), before, now , "receive_date", DateHistogramInterval.days(1),"yyyy-MM-dd");
         return esData;
     }
 
@@ -122,7 +122,7 @@ public class PackStatisticsService extends BaseJpaService {
      * @param event_type
      * @return
      */
-    public List<Map<String, Long>> get7DaysTotalCountByEventType(int event_type) {
+    public Map<String, Long> get7DaysTotalCountByEventType(int event_type) {
         Map<String, Object> filterMap = new HashMap<>();
         filterMap.put("andOr", "and");
         filterMap.put("condition", "=");
@@ -137,7 +137,7 @@ public class PackStatisticsService extends BaseJpaService {
         calendar.set(Calendar.MILLISECOND, 0);
         Date now = DateUtils.addDays(calendar.getTime(), 1);
         Date before = DateUtils.addDays(now, -6);
-        List<Map<String, Long>> esData = elasticSearchUtil.dateHistogram("json_archives", "info", filterList, before, now , "receive_date", DateHistogramInterval.days(1),"yyyy-MM-dd");
+        Map<String, Long> esData = elasticSearchUtil.dateHistogram("json_archives", "info", filterList, before, now , "receive_date", DateHistogramInterval.days(1),"yyyy-MM-dd");
         return esData;
     }
 
