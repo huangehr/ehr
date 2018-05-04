@@ -100,6 +100,7 @@ public class CombinationEndPoint {
                 params.put("pageSize", 100);
                 params.put("hospitalId", hospitalId);
                 params.put("hosDeptId", hosDeptId);
+                params.put("registerDate", registerDate);
                 result.put("total", combinationService.getTotalDoctors(params));
             } else {
                 result.put("total", total);
@@ -160,8 +161,8 @@ public class CombinationEndPoint {
             //region  正式线测试用
             List<Map<String, Object>> allHosList = new ArrayList<>();
             // 获取上饶医院
-            hosParams.put("provinceCode", "360000");
-            hosParams.put("cityCode", "361100");
+//            hosParams.put("provinceCode", "360000");
+//            hosParams.put("cityCode", "361100");
             Map<String, Object> hosResMapSr = objectMapper.readValue(openService.callFzOpenApi(hosApi, hosParams), Map.class);
             if (!"10000".equals(hosResMapSr.get("Code").toString())) {
                 envelop.setErrorMsg("获取福州总部医院列表，" + hosResMapSr.get("Message").toString());

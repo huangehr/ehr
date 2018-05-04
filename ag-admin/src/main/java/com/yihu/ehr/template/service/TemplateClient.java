@@ -4,6 +4,7 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.profile.MTemplate;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.MediaType;
@@ -33,7 +34,7 @@ public interface TemplateClient {
 
     @ApiOperation(value = "获取模板列表", response = MTemplate.class, responseContainer = "List")
     @RequestMapping(value = ServiceApi.ProfileTemplate.Templates, produces = MediaType.APPLICATION_JSON_UTF8_VALUE, method = RequestMethod.GET)
-    ResponseEntity<Collection<MTemplate>> getTemplates(
+    Envelop getTemplates(
             @RequestParam(value = "fields", required = false) String fields,
             @RequestParam(value = "filters", required = false) String filters,
             @RequestParam(value = "sorts", required = false) String sorts,

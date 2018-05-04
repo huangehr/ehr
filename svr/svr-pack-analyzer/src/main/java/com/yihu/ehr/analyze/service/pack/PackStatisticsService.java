@@ -1,6 +1,5 @@
 package com.yihu.ehr.analyze.service.pack;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.elasticsearch.ElasticSearchPool;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.query.BaseJpaService;
@@ -8,7 +7,6 @@ import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.time.DateUtils;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
@@ -24,7 +22,6 @@ import org.elasticsearch.search.aggregations.metrics.cardinality.CardinalityBuil
 import org.elasticsearch.search.aggregations.metrics.cardinality.InternalCardinality;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.sql.ResultSet;
@@ -38,17 +35,12 @@ import java.util.*;
  */
 @Service
 public class PackStatisticsService extends BaseJpaService {
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    protected ObjectMapper objectMapper;
 
     @Autowired
     private ElasticSearchUtil elasticSearchUtil;
-
     @Autowired
     private ElasticSearchPool elasticSearchPool;
+
     /**
      * getRecieveOrgCount 根据接收日期统计各个医院的数据解析情况
      *
@@ -189,35 +181,21 @@ public class PackStatisticsService extends BaseJpaService {
     }
 
 
-    public List<Map<String, Object>> getIncCount(String date,String orgCode) throws Exception{
+    public List<Map<String, Object>> getIncCount(String date, String orgCode) throws Exception{
         long starttime = System.currentTimeMillis();
-        List<Map<String, Object>> list = new ArrayList<>();
-        Map<String, Object> map = new HashMap<>();
-        map.put("andOr", "and");
-        map.put("condition", ">=");
-        map.put("field", "receive_date");
-        map.put("value", ""+date+" 00:00:00");
-        list.add(map);
-        map = new HashMap<>();
-        map.put("andOr", "and");
-        map.put("condition", "<");
-        map.put("field", "receive_date");
-        map.put("value", ""+date+" 23:59:59");
-        if(StringUtils.isNotEmpty(orgCode)&&!"null".equals(orgCode)){
-            map = new HashMap<>();
-            map.put("andOr", "and");
-            map.put("condition", "=");
-            map.put("field", "org_code");
-            map.put("value", orgCode);
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("receive_date>=" + date + " 00:00:00;");
+        stringBuilder.append("receive_date<" + date + " 23:59:59;");
+        if (StringUtils.isNotEmpty(orgCode) && !"null".equals(orgCode)){
+            stringBuilder.append("org_code=" + orgCode);
         }
-        list.add(map);
         TransportClient transportClient = elasticSearchPool.getClient();
         try {
             List<Map<String, Object>> resultList = new ArrayList<>();
             SearchRequestBuilder builder = transportClient.prepareSearch("json_archives");
             builder.setTypes("info");
             builder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
-            builder.setQuery(elasticSearchUtil.getQueryBuilder(list));
+            builder.setQuery(elasticSearchUtil.getQueryBuilder(stringBuilder.toString()));
             DateHistogramBuilder dateHistogramBuilder = new DateHistogramBuilder("date");
             dateHistogramBuilder.field("event_date");
             dateHistogramBuilder.interval(DateHistogramInterval.DAY);
@@ -390,32 +368,18 @@ public class PackStatisticsService extends BaseJpaService {
      */
     public Map<String,Object> getPatientCount(String dateStr, String orgCode) throws Exception{
         long starttime = System.currentTimeMillis();
-        List<Map<String, Object>> list = new ArrayList<>();
-        Map<String, Object> map = new HashMap<>();
-        map.put("andOr", "and");
-        map.put("condition", ">=");
-        map.put("field", "event_date");
-        map.put("value", ""+dateStr+" 00:00:00");
-        list.add(map);
-        map = new HashMap<>();
-        map.put("andOr", "and");
-        map.put("condition", "<");
-        map.put("field", "event_date");
-        map.put("value", ""+dateStr+" 23:59:59");
-        if(StringUtils.isNotEmpty(orgCode)&&!"null".equals(orgCode)){
-            map = new HashMap<>();
-            map.put("andOr", "and");
-            map.put("condition", "=");
-            map.put("field", "org_code");
-            map.put("value", orgCode);
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("event_date>=" + dateStr + " 00:00:00;");
+        stringBuilder.append("event_date<" + dateStr + " 23:59:59;");
+        if (StringUtils.isNotEmpty(orgCode) && !"null".equals(orgCode)){
+            stringBuilder.append("org_code=" + orgCode);
         }
-        list.add(map);
         TransportClient transportClient = elasticSearchPool.getClient();
         try {
             SearchRequestBuilder builder = transportClient.prepareSearch("json_archives");
             builder.setTypes("info");
             builder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
-            builder.setQuery(elasticSearchUtil.getQueryBuilder(list));
+            builder.setQuery(elasticSearchUtil.getQueryBuilder(stringBuilder.toString()));
             AggregationBuilder terms = AggregationBuilders.terms("terms").field("event_type");
             CardinalityBuilder cardinality = AggregationBuilders.cardinality("cardinality").field("event_no");
             terms.subAggregation(cardinality);
@@ -509,22 +473,12 @@ public class PackStatisticsService extends BaseJpaService {
         int inpatient_total=0;
         int oupatient_total=0;
         try {
-            List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
-            Map<String, Object> map = new HashMap<String, Object>();
-            map.put("andOr", "and");
-            map.put("condition", "=");
-            map.put("field", "event_date");
-            map.put("value", date);
-            list.add(map);
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("event_date=" + date + ";");
             if (StringUtils.isNotEmpty(orgCode)) {
-                map = new HashMap<String, Object>();
-                map.put("andOr", "and");
-                map.put("condition", "=");
-                map.put("field", "org_code");
-                map.put("value", orgCode);
-                list.add(map);
+                stringBuilder.append("org_code=" + orgCode);
             }
-            List<Map<String, Object>> res = elasticSearchUtil.list("qc","daily_report",list);
+            List<Map<String, Object>> res = elasticSearchUtil.list("qc","daily_report", stringBuilder.toString());
             if(res!=null && res.size()>0){
                 for(Map<String,Object> report : res){
                     total+=Integer.parseInt(report.get("HSI07_01_001").toString());
@@ -646,70 +600,25 @@ public class PackStatisticsService extends BaseJpaService {
         Date end = DateUtil.addDate(2, begin);
         Date end1 = DateUtil.addDate(2, begin);
         Date end2 = DateUtil.addDate(7, begin);
-        List<Map<String, Object>> list1 = new ArrayList<>();
-        List<Map<String, Object>> list2 = new ArrayList<>();
-        Map<String, Object> map = new HashMap<>();
-        map.put("andOr", "and");
-        map.put("condition", ">=");
-        map.put("field", "event_date");
-        map.put("value", ""+DateUtil.toString(begin)+" 00:00:00");
-        list1.add(map);
-        list2.add(map);
-        map = new HashMap<>();
-        map.put("andOr", "and");
-        map.put("condition", "<");
-        map.put("field", "event_date");
-        map.put("value", ""+DateUtil.toString(end)+" 23:59:59");
-        list1.add(map);
-        list2.add(map);
-        map = new HashMap<>();
-        map.put("andOr", "and");
-        map.put("condition", ">=");
-        map.put("field", "receive_date");
-        map.put("value", ""+DateUtil.toString(begin)+" 00:00:00");
-        list1.add(map);
-        list2.add(map);
-
-        map = new HashMap<>();
-        map.put("andOr", "and");
-        map.put("condition", "<");
-        map.put("field", "receive_date");
-        map.put("value", ""+DateUtil.toString(end2)+" 00:00:00");
-        list1.add(map);
-
-        map = new HashMap<>();
-        map.put("andOr", "and");
-        map.put("condition", "<");
-        map.put("field", "receive_date");
-        map.put("value", ""+DateUtil.toString(end1)+" 00:00:00");
-        list2.add(map);
-
-        map = new HashMap<>();
-        map.put("andOr", "and");
-        map.put("condition", "=");
-        map.put("field", "event_type");
-        map.put("value", "1");
-        list1.add(map);
-
-        map = new HashMap<>();
-        map.put("andOr", "and");
-        map.put("condition", "=");
-        map.put("field", "event_type");
-        map.put("value", "0");
-        list2.add(map);
-        if(StringUtils.isNotEmpty(orgCode)&&!"null".equals(orgCode)){
-            map = new HashMap<>();
-            map.put("andOr", "and");
-            map.put("condition", "=");
-            map.put("field", "org_code");
-            map.put("value", orgCode);
-            list1.add(map);
-            list2.add(map);
+        StringBuilder stringBuilder1 = new StringBuilder();
+        StringBuilder stringBuilder2 = new StringBuilder();
+        stringBuilder1.append("event_date>=" + DateUtil.toString(begin) + " 00:00:00;");
+        stringBuilder2.append("event_date>=" + DateUtil.toString(begin) + " 00:00:00;");
+        stringBuilder1.append("event_date<" + DateUtil.toString(end)+" 23:59:59;");
+        stringBuilder2.append("event_date<" + DateUtil.toString(end)+" 23:59:59;");
+        stringBuilder1.append("receive_date>=" + DateUtil.toString(begin) + " 00:00:00;");
+        stringBuilder2.append("receive_date>=" + DateUtil.toString(begin) + " 00:00:00;");
+        stringBuilder1.append("receive_date<" + DateUtil.toString(end2)+" 00:00:00;");
+        stringBuilder2.append("receive_date<" + DateUtil.toString(end1)+" 00:00:00;");
+        stringBuilder1.append("event_type=1;");
+        stringBuilder2.append("event_type=0;");
+        if (StringUtils.isNotEmpty(orgCode) && !"null".equals(orgCode)){
+            stringBuilder1.append("org_code=" + orgCode);
+            stringBuilder2.append("org_code=" + orgCode);
         }
-
         Map<String,Object> temp = new HashMap<String,Object>();
-        temp.put("inpatient_total",elasticSearchUtil.cardinality("json_archives","info",list1,"event_no"));
-        temp.put("oupatient_total",elasticSearchUtil.cardinality("json_archives","info",list2,"event_no"));
+        temp.put("inpatient_total",elasticSearchUtil.cardinality("json_archives","info", stringBuilder1.toString(),"event_no"));
+        temp.put("oupatient_total",elasticSearchUtil.cardinality("json_archives","info", stringBuilder2.toString(),"event_no"));
         long endtime = System.currentTimeMillis();
         System.out.println("及时性数据查询耗时：" + (endtime - starttime) + "ms");
         return temp;

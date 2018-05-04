@@ -12,6 +12,7 @@ import com.yihu.quota.service.save.TjDataSaveService;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.aggregations.bucket.terms.DoubleTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.LongTerms;
@@ -147,14 +148,14 @@ public class EsResultExtract {
         initialize(tjQuota,filters);
         BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
         getBoolQueryBuilder(boolQueryBuilder);
-        Client  client = elasticSearchPool.getClient();
+        TransportClient client = elasticSearchPool.getClient();
         List<Map<String, Object>> restltList = null;
         try {
-            restltList =  elasticsearchUtil.queryPageList(client,esConfig.getIndex(),esConfig.getType(),boolQueryBuilder,pageNo,pageSize,"quotaDate");
-        }catch (Exception e){
+            restltList =  elasticsearchUtil.queryPageList(client, esConfig.getIndex(), esConfig.getType(), boolQueryBuilder, pageNo, pageSize,"quotaDate");
+        } catch (Exception e){
             e.getMessage();
-        }finally {
-            client.close();
+        } finally {
+            elasticSearchPool.releaseClient(client);
         }
         return restltList;
     }
@@ -163,14 +164,14 @@ public class EsResultExtract {
         initialize(tjQuota,filters);
         BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
         getBoolQueryBuilder(boolQueryBuilder);
-        Client  client = elasticSearchPool.getClient();
+        TransportClient  client = elasticSearchPool.getClient();
         int count  = 0;
         try {
             count  = (int)elasticsearchUtil.getTotalCount(client,esConfig.getIndex(),esConfig.getType(),boolQueryBuilder);
         }catch (Exception e){
             e.getMessage();
         }finally {
-            client.close();
+            elasticSearchPool.releaseClient(client);
         }
         return count;
 
@@ -180,14 +181,14 @@ public class EsResultExtract {
         initialize(tjQuota,filters);
         BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
         getBoolQueryBuilder(boolQueryBuilder);
-        Client  client = elasticSearchPool.getClient();
+        TransportClient  client = elasticSearchPool.getClient();
         List<Map<String, Object>> list = null;
         try {
            list = elasticsearchUtil.queryList(client,esConfig.getIndex(),esConfig.getType(),boolQueryBuilder, "quotaDate",size);
         }catch (Exception e){
             e.getMessage();
         }finally {
-            client.close();
+            elasticSearchPool.releaseClient(client);
         }
         return  list;
     }
@@ -320,14 +321,14 @@ public class EsResultExtract {
         initialize(tjQuota,filters);
         BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
         getBoolQueryBuilder(boolQueryBuilder);
-        Client client = elasticSearchPool.getClient();
+        TransportClient client = elasticSearchPool.getClient();
         List<Map<String, Object>> list = null;
         try {
             list = elasticsearchUtil.searcherByGroup(client,esConfig.getIndex(),esConfig.getType(), boolQueryBuilder, aggsField, "result");
-        }catch (Exception e){
+        } catch (Exception e){
             e.getMessage();
-        }finally {
-            client.close();
+        } finally {
+            elasticSearchPool.releaseClient(client);
         }
         return  list;
     }
@@ -340,14 +341,14 @@ public class EsResultExtract {
         }else {
             filter = filter + " and quotaCode='" + tjQuota.getCode().replaceAll("_","") + "' ";
         }
-        Client client = elasticSearchPool.getClient();
+        TransportClient client = elasticSearchPool.getClient();
         Map<String, Integer> map = null;
         try {
             map = elasticsearchUtil.searcherSumByGroupBySql(client, esConfig.getIndex(), aggsFields, filter, sumField,orderFild,order);;
-        }catch (Exception e){
+        } catch (Exception e){
             e.getMessage();
-        }finally {
-            client.close();
+        } finally {
+            elasticSearchPool.releaseClient(client);
         }
         return map;
     }
@@ -374,7 +375,7 @@ public class EsResultExtract {
         if(StringUtils.isNotEmpty(aggsFields)){
             aggsFields += ",";
         }
-        Client client = elasticSearchPool.getClient();
+        TransportClient client = elasticSearchPool.getClient();
         try {
             //SELECT sum(result) FROM medical_service_index group by town,date_histogram(field='quotaDate','interval'='year')
             StringBuffer mysql = new StringBuffer("SELECT ")
@@ -392,10 +393,10 @@ public class EsResultExtract {
                 }
             }
             return  new ArrayList<>();
-        }catch (Exception e){
+        } catch (Exception e){
             e.getMessage();
-        }finally {
-            client.close();
+        } finally {
+            elasticSearchPool.releaseClient(client);
         }
         return null;
     }

@@ -43,7 +43,7 @@ public class EsClientUtil {
         factory.setHttpClientConfig(new HttpClientConfig
                 .Builder(hostAddress)
                 .multiThreaded(true)
-                .discoveryEnabled(true)
+                //.discoveryEnabled(true)
                 .readTimeout(30000)//30秒
                 .build());
         return factory.getObject();
@@ -53,6 +53,7 @@ public class EsClientUtil {
         try {
             Settings settings = Settings.settingsBuilder()
                     .put("cluster.name", StringUtils.isEmpty(clusterName)?"elasticsearch":clusterName)
+                    .put("client.transport.sniff", false)
                     .build();
             Client client = TransportClient.builder().settings(settings).build()
                     .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(host), port));

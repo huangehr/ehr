@@ -1,80 +1,61 @@
 package com.yihu.ehr.fastdfs;
 
+import org.csource.fastdfs.StorageClient;
 import org.csource.fastdfs.TrackerClient;
 import org.csource.fastdfs.TrackerServer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by szx on 2015/9/19.
  */
 public class FastDFSPool {
 
-    private static final Logger logger = LoggerFactory.getLogger(FastDFSPool.class);
-
-    @Value("${fast-dfs.pool.init-size}")
+    @Value("${fast-dfs.pool.init-size:1}")
     private int initPoolSize;
-    @Value("${fast-dfs.pool.max-size}")
+    @Value("${fast-dfs.pool.max-size:5}")
     private int maxPoolSize;
-    private List<TrackerServer> trackerServerPool;
-
-    @PostConstruct
-    private void init() {
-        if (null == trackerServerPool) {
-            trackerServerPool = new ArrayList<>();
-        }
-        try {
-            synchronized (trackerServerPool) {
-                logger.info("Init fastDfs pool");
-                while (trackerServerPool.size() < initPoolSize) {
-                    TrackerClient tracker = new TrackerClient();
-                    TrackerServer trackerServer = tracker.getConnection();
-                    logger.info("[Host:" + trackerServer.getInetSocketAddress().getAddress().getHostName() + "]");
-                    trackerServerPool.add(trackerServer);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (trackerServerPool.isEmpty()) {
-            throw new RuntimeException("FastDFS连接池初始化失败，请检查相关配置");
-        }
-    }
+    private Map<Integer, TrackerServer> trackerServerMap = new HashMap<>();
+    private List<StorageClient> storageClientPool = new ArrayList<>();
 
     @PreDestroy
-    private void destroy() throws IOException{
-        for (TrackerServer trackerServer : trackerServerPool) {
-            if (trackerServer != null) {
-                trackerServer.close();
+    private void destroy() throws IOException {
+        if (trackerServerMap != null) {
+            for (int key : trackerServerMap.keySet()) {
+                TrackerServer trackerServer = trackerServerMap.get(key);
+                if (trackerServer != null) {
+                    trackerServer.close();
+                }
             }
         }
     }
 
-    public synchronized TrackerServer getTrackerServer() throws IOException {
-        if (trackerServerPool.isEmpty()) {
-            init();
+    public synchronized StorageClient getStorageClient() throws IOException {
+        if (storageClientPool.isEmpty()) {
+            TrackerClient tracker = new TrackerClient();
+            TrackerServer trackerServer = tracker.getConnection();
+            StorageClient storageClient = new StorageClient(trackerServer, null);
+            trackerServerMap.put(storageClient.hashCode(), trackerServer);
+            return storageClient;
         }
-        int last_index = trackerServerPool.size() - 1;
-        TrackerServer trackerServer = trackerServerPool.get(last_index);
-        trackerServerPool.remove(last_index);
-        return trackerServer;
+        int last_index = storageClientPool.size() - 1;
+        return storageClientPool.remove(last_index);
+
     }
 
-    public synchronized void releaseTrackerServer(TrackerServer trackerServer) throws IOException {
-        if (trackerServerPool.size() > maxPoolSize) {
-            if (trackerServer != null) {
-                trackerServer.close();
+    public synchronized void releaseStorageClient(StorageClient storageClient) throws IOException {
+        if (storageClient != null) {
+            if (storageClientPool.size() > maxPoolSize) {
+                TrackerServer trackerServer = trackerServerMap.remove(storageClient.hashCode());
+                if (trackerServer != null) {
+                    trackerServer.close();
+                }
+            } else {
+                storageClientPool.add(0, storageClient);
             }
-        } else {
-            trackerServerPool.add(trackerServer);
         }
     }
-
 }

@@ -3,6 +3,7 @@ package com.yihu.ehr.profile.dao;
 import com.yihu.ehr.profile.model.ArchiveTemplate;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -13,14 +14,10 @@ import java.util.List;
  */
 public interface ArchiveTemplateDao extends PagingAndSortingRepository<ArchiveTemplate, Integer> {
 
-    ArchiveTemplate findByOrganizationCodeAndCdaDocumentIdAndCdaVersion(String orgCode, String cdaDocumentId, String cdaVersion);
+    List<ArchiveTemplate> findByTitleAndCdaVersion (String title, String cdaVersion);
 
-    List<ArchiveTemplate> findByOrganizationCodeAndCdaVersion(String orgCode, String cdaVersion);
+    List<ArchiveTemplate> findByCdaVersionAndAndCdaCode (String version, String code);
 
-    ArchiveTemplate findByOrganizationCodeAndCdaVersionAndCdaDocumentId(String orgCode, String cdaVersion, String cdaDocumentId);
+    List<ArchiveTemplate> findByCdaDocumentId(List<String> docIds);
 
-    @Query("SELECT count(e) FROM ArchiveTemplate e WHERE e.title = ?1 AND e.cdaVersion = ?2 AND e.organizationCode = ?3")
-    int countByTitleAndCdaVersionAndOrgCode(String title, String cdaVersion, String orgCode);
-
-    ArchiveTemplate findByOrganizationCodeAndCdaVersionAndCdaCode(String orgCode, String cdaVersion, String cdaCode);
 }

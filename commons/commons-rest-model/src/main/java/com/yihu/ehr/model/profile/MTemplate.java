@@ -2,6 +2,7 @@ package com.yihu.ehr.model.profile;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -9,32 +10,69 @@ import java.util.Date;
  * @version 1.0
  * @created 2016.04.11 11:09
  */
-public class MTemplate {
-    private int id;
+public class MTemplate implements Serializable {
+
+    public enum Type {
+        clinic, //门诊
+        resident, //住院
+        medicalExam, //体检
+        universal //通用
+    }
+
+    private Integer id;
+    private Date createDate;
+    private String creator;
+    private Date modifyDate;
+    private String modifier;
     private String title;
     private String cdaVersion;
     private String cdaDocumentId;
-    private String organizationCode;
-    private String pcTplURL;
-    private String mobileTplURL;
-    private String cdaType;
-    private Date createTime = new Date();
+    private String cdaDocumentName;
+    private String pcUrl;
+    private String mobileUrl;
     private String cdaCode;
+    private Type type;
 
-    public String getCdaCode() {
-        return cdaCode;
-    }
-
-    public void setCdaCode(String cdaCode) {
-        this.cdaCode = cdaCode;
-    }
-
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
+    }
+
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    public Date getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
+
+    public String getCreator() {
+        return creator;
+    }
+
+    public void setCreator(String creator) {
+        this.creator = creator;
+    }
+
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    public Date getModifyDate() {
+        return modifyDate;
+    }
+
+    public void setModifyDate(Date modifyDate) {
+        this.modifyDate = modifyDate;
+    }
+
+    public String getModifier() {
+        return modifier;
+    }
+
+    public void setModifier(String modifier) {
+        this.modifier = modifier;
     }
 
     public String getTitle() {
@@ -61,44 +99,43 @@ public class MTemplate {
         this.cdaDocumentId = cdaDocumentId;
     }
 
-    public String getOrganizationCode() {
-        return organizationCode;
+    public String getCdaDocumentName() {
+        return cdaDocumentName;
     }
 
-    public void setOrganizationCode(String organizationCode) {
-        this.organizationCode = organizationCode;
+    public void setCdaDocumentName(String cdaDocumentName) {
+        this.cdaDocumentName = cdaDocumentName;
     }
 
-    public String getPcTplURL() {
-        return pcTplURL;
+    public String getPcUrl() {
+        return pcUrl;
     }
 
-    public void setPcTplURL(String pcTplURL) {
-        this.pcTplURL = pcTplURL;
+    public void setPcUrl(String pcUrl) {
+        this.pcUrl = pcUrl;
     }
 
-    public String getCdaType() {
-        return cdaType;
+    public String getMobileUrl() {
+        return mobileUrl;
     }
 
-    public void setCdaType(String cdaType) {
-        this.cdaType = cdaType;
+    public void setMobileUrl(String mobileUrl) {
+        this.mobileUrl = mobileUrl;
     }
 
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    public Date getCreateTime() {
-        return createTime;
+    public String getCdaCode() {
+        return cdaCode;
     }
 
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
+    public void setCdaCode(String cdaCode) {
+        this.cdaCode = cdaCode;
     }
 
-    public String getMobileTplURL() {
-        return mobileTplURL;
+    public Type getType() {
+        return type;
     }
 
-    public void setMobileTplURL(String mobileTplURL) {
-        this.mobileTplURL = mobileTplURL;
+    public void setType(Type type) {
+        this.type = type;
     }
 }

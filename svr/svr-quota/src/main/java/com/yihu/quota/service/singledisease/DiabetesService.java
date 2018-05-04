@@ -112,9 +112,12 @@ public class DiabetesService {
 				System.out.println(" persional 个人开始查询 persional solr, fq = " + fq);
 				System.out.println(" persional 查询结果条数 persional count ：" + subRrowKeyList.size());
 				log.error("persional 查询结果条数 persional count ：" + subRrowKeyList.size());
+				int i = 0;
 				if(subRrowKeyList != null && subRrowKeyList.size() > 0){
 					//糖尿病数据 Start
 					for(String subRowkey:subRrowKeyList){//循环糖尿病 找到主表就诊人信息
+						i++;
+						log.error("第= " + i + " 个");
 						String mainRowkey = subRowkey.substring(0, subRowkey.indexOf("$"));
 						//查询此次就诊记录的相关数据 保存到检测记录中
 						String name = "";
@@ -151,11 +154,13 @@ public class DiabetesService {
 								}
 							}
 
+							log.error("sub = " + i + " 个");
 							Map<String,Object> map = hbaseDao.getResultMap(ResourceCore.MasterTable, mainRowkey);
 							if(map!=null){
 								//个人信息 > 姓名，身份证，就诊卡号，性别，出生日期，出生年份，区县，常住地址，常住地址经纬度，疾病名称，疾病code
 								String mapContent = objectMapper.writeValueAsString(map);
 								personalInfo.setRowKey(mainRowkey+"【" + mapContent +"】");
+								log.error("MasterTable = " + i + " 个" + mapContent);
 								if(map.get(keyEventDate) != null){
 									Date eventDate = DateUtil.formatCharDate(map.get(keyEventDate).toString(), DateUtil.DATE_WORLD_FORMAT);
 									personalInfo.setEventDate(DateUtils.addHours(eventDate,8));
@@ -164,9 +169,14 @@ public class DiabetesService {
 								}
 								if(map.get(keyArea) != null){
 									personalInfo.setTown(map.get(keyArea).toString());
-									personalInfo.setTownName(map.get(keyAreaName).toString());
 								}else {
 									personalInfo.setTown("twon无数据");
+								}
+								log.error("town = " + i + " 个" );
+								if(map.get(keyAreaName) != null){
+									personalInfo.setTownName(map.get(keyAreaName).toString());
+								}else {
+									personalInfo.setTownName("twonName无数据");
 								}
 								if(map.get(keyPatientName) != null){
 									personalInfo.setName(map.get(keyPatientName).toString());
@@ -183,6 +193,7 @@ public class DiabetesService {
 								}else {
 									personalInfo.setCardId("cardId无数据");
 								}
+								log.error("sex = " + i + " 个" );
 								if(map.get(keySex) != null){
 									if(map.get(keySex).toString().contains("男")){
 										sex =1;
@@ -192,7 +203,17 @@ public class DiabetesService {
 										sexName ="女";
 									}else {
 										sex = Integer.valueOf(map.get(keySex).toString());
-										sexName = map.get(keySexValue).toString();
+										if(sex == 1){
+											sexName ="男";
+										}else  if(sex == 2){
+											sexName ="女";
+										}else {
+											if(map.get(keySexValue) != null){
+												sexName = map.get(keySexValue).toString();
+											}else {
+												sexName ="未知";
+											}
+										}
 									}
 								}else {
 									sex =0;
@@ -200,22 +221,25 @@ public class DiabetesService {
 								}
 								personalInfo.setSex(sex);
 								personalInfo.setSexName(sexName);
+								log.error("age = " + i + " 个" );
 								if(map.get(keyAge) != null){
-									personalInfo.setBirthday( map.get(keyAge).toString().substring(0, 10));
-									int year = Integer.valueOf(map.get(keyAge).toString().substring(0, 4));
-									personalInfo.setBirthYear(year);
+									if(map.get(keyAge).toString().length() >10){
+										personalInfo.setBirthday( map.get(keyAge).toString().substring(0, 10));
+										int year = Integer.valueOf(map.get(keyAge).toString().substring(0, 4));
+										personalInfo.setBirthYear(year);
+									}
 								}else {
 									personalInfo.setBirthday("birthDay无数据");
 								}
 								if(map.get(keyAddress) != null){
 									String address = map.get(keyAddress).toString();
 									personalInfo.setAddress(address);
-									try {
-										Map<String, String> json = LatitudeUtils.getGeocoderLatitude(address);
-										personalInfo.setAddressLngLat(json.get("lng")+";" + json.get("lat"));
-									}catch (Exception e){
-										System.out.println("没有外网无法解析常住地址！");
-									}
+//									try {
+//										Map<String, String> json = LatitudeUtils.getGeocoderLatitude(address);
+//										personalInfo.setAddressLngLat(json.get("lng")+";" + json.get("lat"));
+//									}catch (Exception e){
+//										System.out.println("没有外网无法解析常住地址！");
+//									}
 								}else {
 									personalInfo.setAddress("address无数据");
 								}
@@ -241,6 +265,7 @@ public class DiabetesService {
 			String type = "personal_info";
 			Map<String, Object> source = new HashMap<>();
 			String jsonPer = objectMapper.writeValueAsString(personalInfo);
+			log.error("开始保存数据" + jsonPer);
 			source = objectMapper.readValue(jsonPer, Map.class);
 			if(personalInfo.getDemographicId() != null){
 				List<Map<String, Object>> relist = elasticSearchUtil.findByField(index, type, "demographicId", personalInfo.getDemographicId());

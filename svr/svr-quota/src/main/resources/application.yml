@@ -157,4 +157,4 @@ spring:
       uris: http://172.10.10.2:9200
 elasticsearch:
   cluster-name: elasticsearch
-  cluster-nodes: 172.10.10.5:9300
+  cluster-nodes: 172.10.10.2:9300

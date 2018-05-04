@@ -92,8 +92,8 @@ public class ResourceIntegratedEndPoint extends EnvelopRestEndPoint {
     @ApiOperation("综合查询视图保存")
     @RequestMapping(value = ServiceApi.Resources.IntResourceUpdate, method = RequestMethod.POST)
     public Envelop updateResource (
-            @ApiParam(name="dataJson",value="JSON对象参数({\"resource\":\"objStr\",\"(metadatas)(quotas)\":\"[objStr]\",\"queryCondition\":\"([])({})\"})", required = true)
-            @RequestBody String dataJson) throws IOException {
+            @ApiParam(name="dataJson",value = "JSON对象参数({\"resource\":\"objStr\",\"(metadatas)(quotas)\":\"[objStr]\",\"queryCondition\":\"([])({})\"})", required = true)
+            @RequestParam(value = "dataJson") String dataJson) throws IOException {
         RsResource newResources = null;
         Map<String, Object> paraMap = objectMapper.readValue(dataJson, Map.class);
         if (!paraMap.containsKey("resource")) {
