@@ -56,7 +56,7 @@ public class ArchiveRelationService {
             relation.set_id(resourceBucket.getId());
             ProfileType profileType = resourceBucket.getProfileType();
             if(profileType != null){
-                relation.setProfileType(2);
+                relation.setProfileType(profileType.getType());
             }
             relation.setName(resourceBucket.getPatientName());
             relation.setOrg_code(resourceBucket.getOrgCode());

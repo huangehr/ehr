@@ -7,6 +7,7 @@ import org.csource.common.NameValuePair;
 import org.csource.fastdfs.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
@@ -77,7 +78,9 @@ public class FastDFSUtil {
             byte fileBuffer[] = new byte[in.available()];
             int len = 0;
             int temp = 0;                             //所有读取的内容都使用temp接收
-            while ((temp = in.read()) != -1) {            //当没有读取完时，继续读取
+            long t1=System.currentTimeMillis();
+            BufferedInputStream bin = new BufferedInputStream(in);
+            while ((temp = bin.read()) != -1) {            //当没有读取完时，继续读取
                 fileBuffer[len] = (byte) temp;
                 len++;
             }

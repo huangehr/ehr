@@ -35,7 +35,7 @@ public class LinkPackageResolver extends PackageResolver {
     public void resolve(StandardPackage profile, File root) throws IOException, ParseException {
         LinkPackage linkPackModel = (LinkPackage) profile;
 
-        File indexFile = new File(root.getAbsolutePath() + File.pathSeparator + "index/patient_index.json");
+        File indexFile = new File(root.getAbsolutePath() + File.separator  + "index"+ File.separator+"patient_index.json");
         parseFile(linkPackModel, indexFile);
     }
 
@@ -47,7 +47,7 @@ public class LinkPackageResolver extends PackageResolver {
         String orgCode = jsonNode.get("org_code").asText();
         String version = jsonNode.get("inner_version").asText();
         String eventDate = jsonNode.get("event_time").asText();
-        String expireDate = jsonNode.get("expiry_date").asText();
+        String expireDate = jsonNode.get("expire_date").asText();
         //if (version.equals("000000000000")) throw new LegacyPackageException("Package is collected via cda version 00000000000, ignored.");
 
         profile.setPatientId(patientId);
@@ -65,7 +65,12 @@ public class LinkPackageResolver extends PackageResolver {
             String url = dataSetNode.get(dataSetCode).asText();
 
             LinkPackageDataSet dataSet = new LinkPackageDataSet();
+            dataSet.setOrgCode(orgCode);
+            dataSet.setPatientId(patientId);
+            dataSet.setEventNo(eventNo);
+            dataSet.setCode(dataSetCode);
             dataSet.setUrl(url);
+            dataSet.setCdaVersion(version);
 
             profile.insertDataSet(dataSetCode, dataSet);
         }
@@ -93,7 +98,11 @@ public class LinkPackageResolver extends PackageResolver {
 
                 linkPackageDataSet.addRecord(Integer.toString(linkPackageDataSet.getRecordCount()), record);
             }
-
+            linkPackageDataSet.setOrgCode(orgCode);
+            linkPackageDataSet.setPatientId(patientId);
+            linkPackageDataSet.setEventNo(eventNo);
+            linkPackageDataSet.setCdaVersion(version);
+            linkPackageDataSet.setCode(dataSetCode);
             profile.insertDataSet(dataSetCode, linkPackageDataSet);
         }
     }

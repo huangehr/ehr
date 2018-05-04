@@ -23,7 +23,7 @@ public class PackModelFactory {
     public final static String OriginFolder = "origin";
     public final static String DocumentFolder = "documents";
     public final static String DocumentsFile = "documents.json";
-    public final static String LinkFile = "link.json";
+    public final static String LinkFile = "index";
 
     /**
      * 读取档案包目录结构判断档案类型。
