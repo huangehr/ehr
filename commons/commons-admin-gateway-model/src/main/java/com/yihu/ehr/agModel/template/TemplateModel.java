@@ -16,7 +16,8 @@ public class TemplateModel implements Serializable {
     public enum Type {
         clinic, //门诊
         resident, //住院
-        medicalExam //体检
+        medicalExam, //体检
+        universal //通用
     }
 
     private Integer id;
