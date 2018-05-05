@@ -43,7 +43,6 @@ public class FastDFSPool {
         }
         int last_index = storageClientPool.size() - 1;
         return storageClientPool.remove(last_index);
-
     }
 
     public synchronized void releaseStorageClient(StorageClient storageClient) throws IOException {
