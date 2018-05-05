@@ -90,15 +90,14 @@ public class ElasticSearchPool {
             init();
         }
         int last_index = clientPool.size() - 1;
-        TransportClient transportClient= clientPool.remove(last_index);
-
-        if(transportClient!=null){
-            try{
+        TransportClient transportClient = clientPool.remove(last_index);
+        if (transportClient != null){
+            try {
                 //update by cws 20180504
                 //判断是否有用，能否取到服务器的信息
                 transportClient.listedNodes();
-            }catch (Exception e){
-                if( e instanceof NoNodeAvailableException){
+            } catch (Exception e){
+                if (e instanceof NoNodeAvailableException){
                     //判断是否报以上错误，或是即为取不到服务
                     //则重新返回一个新的链接。
                     return getTransportClient();
