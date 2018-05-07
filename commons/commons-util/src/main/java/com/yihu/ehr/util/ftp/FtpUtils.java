@@ -34,6 +34,14 @@ public class FtpUtils {
     private FTPClient ftpClient = new FTPClient();
     private FileOutputStream fos = null;
 
+    public FTPClient getFtpClient() {
+        return ftpClient;
+    }
+
+    public void setFtpClient(FTPClient ftpClient) {
+        this.ftpClient = ftpClient;
+    }
+
     public FtpUtils(String username, String password, String ftpHostName, int port) {
         this.username = username;
         this.password = password;

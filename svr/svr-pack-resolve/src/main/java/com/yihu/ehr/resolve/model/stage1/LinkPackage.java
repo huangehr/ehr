@@ -18,6 +18,7 @@ import java.util.List;
 @Table(ResourceCore.MasterTable)
 public class LinkPackage extends StandardPackage {
     public Date expireDate;
+    private List<LinkFile> linkFiles = new ArrayList<>();
 
     public LinkPackage(){
         setProfileType(ProfileType.Link);
@@ -31,7 +32,6 @@ public class LinkPackage extends StandardPackage {
         this.expireDate = expireDate;
     }
 
-    private List<LinkFile> linkFiles = new ArrayList<>();
 
     public List<LinkFile> getLinkFiles() {
         return linkFiles;

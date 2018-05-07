@@ -38,7 +38,13 @@ public class FileResourceDao {
             }
             hbaseDao.save(ResourceCore.FileTable, bundle);
         } else if (resBucket.getProfileType() == ProfileType.Link){
-            //todo cyx
+            TableBundle bundle = new TableBundle();
+            String rowKey = resBucket.getId();
+            bundle.addRows(rowKey);
+            hbaseDao.delete(ResourceCore.FileTable, bundle);
+            bundle.addValues(rowKey, FileFamily.Basic, FileTableUtil.getBasicFamilyCellMap(resBucket));
+            bundle.addValues(rowKey, FileFamily.Data, FileTableUtil.getFileFamilyCellMap(resBucket));
+            hbaseDao.save(ResourceCore.FileTable, bundle);
         }
     }
 

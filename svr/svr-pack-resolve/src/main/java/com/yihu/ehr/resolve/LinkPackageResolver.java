@@ -11,7 +11,10 @@ import com.yihu.ehr.resolve.model.stage1.LinkPackageDataSet;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.ftp.FtpUtils;
+import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPFile;
 import org.csource.common.MyException;
+import org.csource.common.NameValuePair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -95,18 +98,14 @@ public class LinkPackageResolver extends PackageResolver {
         }
 
         //--------------增加ftp影像文件解析
-        // dataset节点，存储数据集URL
         JsonNode filesNode = jsonNode.get("files");
         if(filesNode != null){
             List<LinkFile> linkFiles = profile.getLinkFiles();
 
             ArrayNode arrayNode = (ArrayNode) filesNode;
-            //todo cyx 测试数据
-            username = "ceshicyx";
-            password="ceshi123456";
-
             FtpUtils ftpUtils = new FtpUtils(username, password, address, port);
             ftpUtils.connect();
+            FTPClient ftpClient = ftpUtils.getFtpClient();
             for (int i = 0; i < arrayNode.size(); ++i){
                 JsonNode fileNode = arrayNode.get(i);
                 String fileName = fileNode.get("file").asText();
@@ -118,11 +117,20 @@ public class LinkPackageResolver extends PackageResolver {
                 }
                 String url = fileNode.get("url").asText();
                 String path = url.substring(5);//将url前面的ftp:/截取掉,剩下的path为文件的完整路径(包含文件名)
+
+                FTPFile[] ftpFiles = ftpClient.listFiles(path);
+                if(ftpFiles==null || ftpFiles.length==0){
+                    throw new RuntimeException("ftp上找不到该文件:"+path);
+                }
                 InputStream inputStream = ftpUtils.getInputStream(path);
-                ObjectNode msg = fastDFSUtil.upload(inputStream, fileExtension, "File from link profile package.");
+                long fileSize = ftpFiles[0].getSize();
+                NameValuePair[] fileMetaData = new NameValuePair[1];
+                fileMetaData[0] = new NameValuePair("description", "File from link profile package.");
+                ObjectNode msg = fastDFSUtil.uploadBySocket(inputStream, fileExtension, (int)fileSize,fileMetaData);
                 LinkFile linkFile = new LinkFile();
                 linkFile.setFileExtension(fileExtension);
                 linkFile.setOriginName(fileName);
+
                 String fastdfsUrl = msg.get(FastDFSUtil.GROUP_NAME).asText() + "/" + msg.get(FastDFSUtil.REMOTE_FILE_NAME).asText();
                 linkFile.setUrl(fastdfsUrl);
                 linkFiles.add(linkFile);
@@ -131,8 +139,6 @@ public class LinkPackageResolver extends PackageResolver {
             }
             ftpUtils.connect();
         }
-
-
         //----------------------ftp影像文件解析end----
 
         // summary节点可能不存在

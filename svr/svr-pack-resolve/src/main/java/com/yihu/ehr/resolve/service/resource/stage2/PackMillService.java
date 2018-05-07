@@ -5,6 +5,7 @@ import com.yihu.ehr.profile.util.DataSetUtil;
 import com.yihu.ehr.profile.util.MetaDataRecord;
 import com.yihu.ehr.profile.util.PackageDataSet;
 import com.yihu.ehr.resolve.model.stage1.FilePackage;
+import com.yihu.ehr.resolve.model.stage1.LinkPackage;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.resolve.model.stage2.*;
 import com.yihu.ehr.resolve.util.PackResolveLogger;
@@ -130,8 +131,8 @@ public class PackMillService {
         if (stdPack.getProfileType() == ProfileType.File){
             resourceBucket.setCdaDocuments(((FilePackage) stdPack).getCdaDocuments());
         }else if(stdPack.getProfileType() == ProfileType.Link){
-            //todo cyx 放入文件信息
-            //resourceBucket.setCdaDocuments((LinkPackage)stdPack.get)
+            LinkPackage linkPackage = (LinkPackage)stdPack;
+            resourceBucket.setLinkFiles(linkPackage.getLinkFiles());
         }
         return resourceBucket;
     }
