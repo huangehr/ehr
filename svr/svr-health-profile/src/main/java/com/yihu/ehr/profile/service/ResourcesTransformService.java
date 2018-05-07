@@ -44,10 +44,10 @@ public class ResourcesTransformService extends BaseJpaService {
             if (resource.containsKey(metadataId + "_VALUE")) {
                 returnRs.put(metadataId + "_VALUE", resource.get(metadataId + "_VALUE"));
             }
-            returnRs.put("org_area", resource.get("org_area"));
-            returnRs.put("org_name", resource.get("org_name"));
-            returnRs.put("event_date", resource.get("event_date"));
         });
+        returnRs.put("org_area", resource.get("org_area"));
+        returnRs.put("org_name", resource.get("org_name"));
+        returnRs.put("event_date", resource.get("event_date"));
         return returnRs;
     }
 
@@ -79,10 +79,10 @@ public class ResourcesTransformService extends BaseJpaService {
             if (resource.containsKey(metadataId + "_VALUE")) {
                 returnRs.put(srcMetadataCode + "_VALUE", resource.get(metadataId + "_VALUE"));
             }
-            returnRs.put("org_area", resource.get("org_area"));
-            returnRs.put("org_name", resource.get("org_name"));
-            returnRs.put("event_date", resource.get("event_date"));
         });
+        returnRs.put("org_area", resource.get("org_area"));
+        returnRs.put("org_name", resource.get("org_name"));
+        returnRs.put("event_date", resource.get("event_date"));
         return returnRs;
     }
 }

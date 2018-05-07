@@ -176,9 +176,7 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "size", value = "每页几条")
             @RequestParam(value = "size", required = false) Integer size,
             @ApiParam(name = "version", value = "版本号")
-            @RequestParam(value = "version", required = false) String version,
-            @ApiParam(name = "withRowkey", value = "转换成标准时,是否携带rowkey  0,不携带  1,携带(默认不携带)")
-            @RequestParam(value = "withRowkey", required = false) String withRowkey) throws Exception {
+            @RequestParam(value = "version", required = false) String version) throws Exception {
         Page<Map<String, Object>> result = resourceBrowseService.getResultData(resourcesCode, roleId , orgCode, areaCode, queryParams, page, size);
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(true);
@@ -186,11 +184,7 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
         envelop.setPageSize(result.getSize());
         envelop.setTotalCount(new Long(result.getTotalElements()).intValue());
         if (version != null && version.length() > 0) {
-            if("1".equals(withRowkey)){
-                envelop.setDetailModelList(resourcesTransformService.displayCodeConvert(result.getContent(), version,null,true));
-            }else{
-                envelop.setDetailModelList(resourcesTransformService.displayCodeConvert(result.getContent(), version,null,false));
-            }
+            envelop.setDetailModelList(resourcesTransformService.displayCodeConvert(result.getContent(), version,null));
         } else {
             envelop.setDetailModelList(result.getContent());
         }
@@ -261,7 +255,7 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
         envelop.setPageSize(result.getSize());
         envelop.setTotalCount(new Long(result.getTotalElements()).intValue());
         if (version != null && version.length() > 0) {
-            envelop.setDetailModelList(resourcesTransformService.displayCodeConvert(result.getContent(), version,null,false));
+            envelop.setDetailModelList(resourcesTransformService.displayCodeConvert(result.getContent(), version,null));
         } else {
             envelop.setDetailModelList(result.getContent());
         }
@@ -286,7 +280,7 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
         envelop.setPageSize(result.getSize());
         envelop.setTotalCount(new Long(result.getTotalElements()).intValue());
         if (version != null && version.length() > 0) {
-            envelop.setDetailModelList(resourcesTransformService.displayCodeConvert(result.getContent(), version,null,false));
+            envelop.setDetailModelList(resourcesTransformService.displayCodeConvert(result.getContent(), version,null));
         } else {
             envelop.setDetailModelList(result.getContent());
         }
@@ -324,7 +318,7 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
                 //String q = "{\"q\":\"profile_id:" + profileId + "\"}";
                 Page<Map<String, Object>> page = resourceBrowseService.getEhrCenterSub(q, 1, 500);
                 if (cdaVersion != null && cdaVersion.length() > 0) {
-                    data.put(dataSet, resourcesTransformService.displayCodeConvert(page.getContent(), cdaVersion, dataSet,false));
+                    data.put(dataSet, resourcesTransformService.displayCodeConvert(page.getContent(), cdaVersion, dataSet));
                 } else {
                     data.put(dataSet, page.getContent());
                 }

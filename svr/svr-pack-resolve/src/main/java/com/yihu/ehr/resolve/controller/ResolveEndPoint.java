@@ -8,11 +8,9 @@ import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.packs.EsDetailsPackage;
 import com.yihu.ehr.model.packs.EsSimplePackage;
-import com.yihu.ehr.model.packs.MPackage;
-import com.yihu.ehr.resolve.dao.DataSetPackageDao;
-import com.yihu.ehr.resolve.feign.DataSetPackageMgrClient;
+import com.yihu.ehr.profile.exception.IllegalJsonDataException;
+import com.yihu.ehr.profile.exception.IllegalJsonFileException;
 import com.yihu.ehr.resolve.feign.PackageMgrClient;
-import com.yihu.ehr.resolve.model.stage1.DataSetPackage;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.resolve.model.stage2.ResourceBucket;
 import com.yihu.ehr.resolve.service.resource.stage1.PackageResolveService;
@@ -23,6 +21,7 @@ import com.yihu.ehr.util.datetime.DateUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -52,10 +51,6 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
     private PackageResolveService packageResolveService;
     @Autowired
     private PackageMgrClient packageMgrClient;
-    @Autowired
-    private DataSetPackageMgrClient datasetPackageMgrClient;
-    @Autowired
-    private DataSetPackageDao dataSetPackageDao;
     @Autowired
     private IdentifyService identifyService;
 
@@ -89,17 +84,17 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
                 ResourceBucket resourceBucket = packMillService.grindingPackModel(standardPackage);
                 identifyService.identify(resourceBucket, standardPackage);
                 resourceService.save(resourceBucket, standardPackage);
-                map.put("profile_id", standardPackage.getId());
             }
 
             //回填入库状态
+            map.put("profile_id", standardPackage.getId());
             map.put("demographic_id", standardPackage.getDemographicId());
             map.put("event_type", standardPackage.getEventType() == null ? null : standardPackage.getEventType().getType());
             map.put("event_no", standardPackage.getEventNo());
             map.put("event_date", DateUtil.toStringLong(standardPackage.getEventDate()));
             map.put("patient_id", standardPackage.getPatientId());
             map.put("re_upload_flg", String.valueOf(standardPackage.isReUploadFlg()));
-            packageMgrClient.reportStatus(packId, ArchiveStatus.Finished, objectMapper.writeValueAsString(map));
+            packageMgrClient.reportStatus(packId, ArchiveStatus.Finished, 0, objectMapper.writeValueAsString(map));
             //是否返回数据
             if (echo) {
                 return standardPackage.toJson();
@@ -109,10 +104,20 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
                 return objectMapper.writeValueAsString(resultMap);
             }
         } catch (Exception e) {
+            int errorType = -1;
+            if (e instanceof ZipException) {
+                errorType = 1;
+            }
+            if (e instanceof IllegalJsonFileException) {
+                errorType = 2;
+            }
+            if (e instanceof IllegalJsonDataException) {
+                errorType = 3;
+            }
             if (StringUtils.isBlank(e.getMessage())) {
-                packageMgrClient.reportStatus(packId, ArchiveStatus.Failed, "Internal Server Error");
+                packageMgrClient.reportStatus(packId, ArchiveStatus.Failed, errorType, "Internal Server Error");
             } else {
-                packageMgrClient.reportStatus(packId, ArchiveStatus.Failed, e.getMessage());
+                packageMgrClient.reportStatus(packId, ArchiveStatus.Failed, errorType, e.getMessage());
             }
             throw e;
         }
@@ -178,7 +183,6 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
         return packModel.toJson();
     }
 
-
     @ApiOperation(value = "即时交互档案解析入库", notes = "即时交互档案解析入库", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @RequestMapping(value = ServiceApi.Packages.ImmediateResolve, method = RequestMethod.PUT)
     public String immediateResolve(
@@ -217,118 +221,6 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
     private String downloadTo(String filePath) throws Exception {
         String[] tokens = filePath.split(":");
         return fastDFSUtil.download(tokens[0], tokens[1], System.getProperty("java.io.tmpdir") + java.io.File.separator);
-    }
-
-
-    // --------------------------------------  未对接 ------------------------------------
-
-    //new add by HZY in 2017/06/29
-    @ApiOperation(value = "健康档案-（非病人维度-数据集包入库）", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @RequestMapping(value = ServiceApi.Packages.PackageResolve + 2, method = RequestMethod.PUT)
-    public List<String> resolveDataSetPackage(
-            @ApiParam(name = "id", value = "档案包ID", required = true)
-            @RequestParam(value = "id") String packageId,
-            @ApiParam(name = "clientId", value = "模拟应用ID")
-            @RequestParam(value = "clientId", required = false) String clientId,
-            @ApiParam(name = "echo", value = "返回档案数据", required = true, defaultValue = "true")
-            @RequestParam(value = "echo") boolean echo) throws Throwable {
-        String packString = datasetPackageMgrClient.acquireDatasetPackage(packageId);
-        List<String> returnJson = new ArrayList<>();
-        if (StringUtils.isEmpty(packString)) {
-            returnJson.add("无可用档案包！");
-            return returnJson;
-        }
-        MPackage pack = objectMapper.readValue(packString, MPackage.class);  //已修改包状态为1 正在入库库
-        String packId = pack.getId();
-        try {
-            if (StringUtils.isEmpty(pack.getClientId())) pack.setClientId(clientId);
-            String zipFile = downloadTo(pack.getRemotePath());
-            List<StandardPackage> standardPackages = packageResolveService.doResolveNonArchive(pack, zipFile);
-            for (StandardPackage standardPackage : standardPackages) {
-                ResourceBucket resourceBucket = packMillService.grindingPackModel(standardPackage);
-                identifyService.identify(resourceBucket, standardPackage);
-                resourceService.save(resourceBucket, standardPackage);
-                String json = standardPackage.toJson();
-                returnJson.add(json);
-            }
-            //居民信息注册
-            //回填入库状态
-            Map<String, String> map = new HashMap();
-            map.put("profileId", standardPackages.get(0).getId());
-            map.put("demographicId", standardPackages.get(0).getDemographicId());
-            map.put("eventType", standardPackages.get(0).getEventType() == null ? "" : String.valueOf(standardPackages.get(0).getEventType().getType()));
-            map.put("eventNo", standardPackages.get(0).getEventNo());
-            map.put("eventDate", DateUtil.toStringLong(standardPackages.get(0).getEventDate()));
-            map.put("patientId", standardPackages.get(0).getPatientId());
-            map.put("reUploadFlg", String.valueOf(standardPackages.get(0).isReUploadFlg()));
-            datasetPackageMgrClient.reportStatus(packId, ArchiveStatus.Finished, objectMapper.writeValueAsString(map));
-            if (echo) {
-                return returnJson;
-            } else {
-                returnJson = new ArrayList<>();
-                returnJson.add("档案包入库成功！");
-                return returnJson;
-            }
-        } catch (Exception e) {
-            List<String> resultList = new ArrayList<String>();
-            if (StringUtils.isBlank(e.getMessage())) {
-                packageMgrClient.reportStatus(packId, ArchiveStatus.Failed, "Internal Server Error");
-                resultList.add("Internal Server Error");
-                return resultList;
-            } else {
-                packageMgrClient.reportStatus(packId, ArchiveStatus.Failed, e.getMessage());
-                resultList.add(e.getMessage());
-                return resultList;
-            }
-        }
-    }
-
-    @ApiOperation(value = "数据集档案包入库", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @RequestMapping(value = ServiceApi.DatasetPackages.PackageResolve, method = RequestMethod.PUT)
-    public String resolveDataSet(
-            @ApiParam(name = "id", value = "包ID", required = true)
-            @RequestParam(value = "id") String packageId,
-            @ApiParam(name = "clientId", value = "模拟应用ID")
-            @RequestParam(value = "clientId", required = false) String clientId,
-            @ApiParam(name = "echo", value = "返回档案数据", required = true)
-            @RequestParam(value = "echo") boolean echo) throws Exception {
-        String packStr = datasetPackageMgrClient.acquireDatasetPackage(packageId);
-        if (StringUtils.isEmpty(packStr)) {
-            Map<String, String> resultMap = new HashMap<String, String>();
-            resultMap.put("msg", "无可用数据集档案包！");
-            return objectMapper.writeValueAsString(resultMap);
-        }
-        MPackage pack = objectMapper.readValue(packStr, MPackage.class);
-        String packId = pack.getId();
-        try {
-            if (StringUtils.isEmpty(pack.getClientId())) {
-                pack.setClientId(clientId);
-            }
-            String zipFile = downloadTo(pack.getRemotePath());
-            DataSetPackage datasetPackage = packageResolveService.doResolveDataset(pack, zipFile);
-            dataSetPackageDao.saveDataset(datasetPackage);
-            // 回写入库状态
-            Map<String, String> map = new HashMap<>();
-            map.put("eventType", null);
-            map.put("eventNo", null);
-            map.put("eventDate", null);
-            map.put("patientId", null);
-            datasetPackageMgrClient.reportStatus(packId, ArchiveStatus.Finished, objectMapper.writeValueAsString(map));
-            if (echo) {
-                return datasetPackage.toJson();
-            } else {
-                Map<String, String> resultMap = new HashMap<String, String>();
-                resultMap.put("msg", "数据集档案包入库成功！");
-                return objectMapper.writeValueAsString(resultMap);
-            }
-        } catch (Exception e) {
-            if (StringUtils.isBlank(e.getMessage())) {
-                packageMgrClient.reportStatus(packId, ArchiveStatus.Failed, "Internal Server Error");
-            } else {
-                packageMgrClient.reportStatus(packId, ArchiveStatus.Failed, e.getMessage());
-            }
-            throw e;
-        }
     }
 
 }

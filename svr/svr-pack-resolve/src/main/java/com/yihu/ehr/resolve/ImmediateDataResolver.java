@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.EventType;
 import com.yihu.ehr.profile.family.MasterResourceFamily;
 import com.yihu.ehr.profile.util.PackageDataSet;
+import com.yihu.ehr.profile.exception.IllegalJsonDataException;
+import com.yihu.ehr.profile.exception.IllegalJsonFileException;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.resolve.service.resource.stage1.DataSetParserWithTranslator;
 import com.yihu.ehr.resolve.service.resource.stage1.extractor.ExtractorChain;
@@ -35,7 +37,7 @@ public class ImmediateDataResolver {
     @Autowired
     protected ExtractorChain extractorChain;
 
-    public void resolve(StandardPackage standardPackage, String data) throws IOException, Exception {
+    public void resolve(StandardPackage standardPackage, String data) throws Exception {
         //解析标准数据
         parseData(standardPackage, data);
     }
@@ -48,17 +50,17 @@ public class ImmediateDataResolver {
      * @throws Exception
      * @throws IOException
      */
-    private void parseData(StandardPackage standardPackage, String data) throws Exception, IOException {
+    private void parseData(StandardPackage standardPackage, String data) throws Exception {
         //解析数据集数据
         JsonNode dataNode = objectMapper.readValue(data, JsonNode.class);
         if (dataNode.isNull()) {
-            throw new IOException("Invalid json file when generate data set");
+            throw new IllegalJsonFileException("Invalid json file when generate data set");
         }
 
         JsonNode eventTypeNode = dataNode.get("event_type");
 
         if (eventTypeNode == null){
-            throw new IOException("Not event_type in json data when generate data set");
+            throw new IllegalJsonDataException("Not event_type in json data when generate data set");
         }
 
         int eventType = dataNode.get("event_type").asInt();
@@ -72,7 +74,6 @@ public class ImmediateDataResolver {
                 }
             }
         }
-
 
         if (standardPackage.isReUploadFlg()) {
             for (PackageDataSet dataSet : packageDataSetList) {
@@ -159,7 +160,7 @@ public class ImmediateDataResolver {
     private List<PackageDataSet> generateDataSet(JsonNode jsonNode) throws IOException {
 
         if (jsonNode.isNull()) {
-            throw new IOException("Invalid json file when generate data set");
+            throw new IllegalJsonFileException("Invalid json file when generate data set");
         }
         List<PackageDataSet> dataSet = dataSetResolverWithTranslator.parseStructuredImmediateJson(jsonNode);
         return dataSet;

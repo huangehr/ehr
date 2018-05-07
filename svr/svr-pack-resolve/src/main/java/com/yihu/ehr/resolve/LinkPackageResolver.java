@@ -2,27 +2,15 @@ package com.yihu.ehr.resolve;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.profile.util.MetaDataRecord;
-import com.yihu.ehr.resolve.model.stage1.LinkFile;
 import com.yihu.ehr.resolve.model.stage1.LinkPackage;
 import com.yihu.ehr.resolve.model.stage1.LinkPackageDataSet;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.util.datetime.DateUtil;
-import com.yihu.ehr.util.ftp.FtpUtils;
-import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPFile;
-import org.csource.common.MyException;
-import org.csource.common.NameValuePair;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.Iterator;
 import java.util.List;
@@ -171,21 +159,5 @@ public class LinkPackageResolver extends PackageResolver {
             linkPackageDataSet.setCode(dataSetCode);
             profile.insertDataSet(dataSetCode, linkPackageDataSet);
         }
-    }
-
-    public static void main(String[] args) throws IOException {
-        //FtpUtils ftpUtils = new FtpUtils("ceshicyx", "ceshi123456", "172.19.103.58", 21);
-        //ftpUtils.connect();//
-        //InputStream inputStream = ftpUtils.getInputStream("/aa.txt");
-        //ftpUtils.closeConnect();
-        String url = "ftp://41872607-9/1/testcyx/testcyx-eventno/a02.jpg" ;
-        String fileName = "a02.jpg";
-
-        String path = url.substring(5);//该path包含文件名
-        System.out.println(path);
-        path = path.substring(0,path.length()-fileName.length()-1);
-        System.out.println(path);
-
-
     }
 }

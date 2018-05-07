@@ -32,6 +32,7 @@ public interface PackageMgrClient {
     boolean reportStatus(
             @PathVariable(value = "id") String id,
             @RequestParam(value = "status") ArchiveStatus status,
+            @RequestParam(value = "errorTye") int errorTye,
             @RequestBody String message);
 
     @RequestMapping(value = ServiceApi.Packages.Package, method = RequestMethod.GET)
