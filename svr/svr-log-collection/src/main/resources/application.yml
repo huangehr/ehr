@@ -157,6 +157,6 @@ kafka:
 es:
   index: wlyy_quota
   type: wlyy_quota
-  host:  http://172.10.10.2:9200
-  tHost: 172.10.10.2:9300
+  host:  http://172.10.10.5:9200
+  tHost: 172.10.10.5:9300
   clusterName: jkzl
