@@ -25,9 +25,8 @@ public class MessageCommonBiz {
         redisMqMessageLog.setChannel(channel);
         redisMqMessageLog.setPublisherAppId(publisherAppId);
         redisMqMessageLog.setMessage(message);
-        redisMqMessageLog.setStatus("0");
-        redisMqMessageLog.setIsRealConsumed("0");
-        redisMqMessageLog.setConsumedNum(0);
+        redisMqMessageLog.setStatus(0);
+        redisMqMessageLog.setFailedNum(0);
         return redisMqMessageLog;
     }
 

@@ -8,7 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 /**
- * redis消息记录 Entity
+ * 消费失败的消息记录 Entity
  *
  * @author 张进军
  * @date 2017/11/10 11:14
@@ -20,9 +20,8 @@ public class RedisMqMessageLog extends BaseAssignedEntity {
     public String message; // 消息
     public String channel; // 消息队列编码
     public String publisherAppId; // 发布者应用ID
-    public String status; // 消息状态，0：未消费，1：已消费
-    public String isRealConsumed; // 是否真实被订阅消费，0：否，1：是
-    public Integer consumedNum; // 真实消费的次数
+    public Integer status; // 消费状态，1：已消费，未消费
+    public Integer failedNum; // 订阅失败次数
 
     @Column(name = "message")
     public String getMessage() {
@@ -52,29 +51,21 @@ public class RedisMqMessageLog extends BaseAssignedEntity {
     }
 
     @Column(name = "status")
-    public String getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 
-    @Column(name = "is_real_consumed")
-    public String getIsRealConsumed() {
-        return isRealConsumed;
+
+    @Column(name = "failed_num")
+    public Integer getFailedNum() {
+        return failedNum;
     }
 
-    public void setIsRealConsumed(String isRealConsumed) {
-        this.isRealConsumed = isRealConsumed;
-    }
-
-    @Column(name = "consumed_num")
-    public Integer getConsumedNum() {
-        return consumedNum;
-    }
-
-    public void setConsumedNum(Integer consumedNum) {
-        this.consumedNum = consumedNum;
+    public void setFailedNum(Integer failedNum) {
+        this.failedNum = failedNum;
     }
 }

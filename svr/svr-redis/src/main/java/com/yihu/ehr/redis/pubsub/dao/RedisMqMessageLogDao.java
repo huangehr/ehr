@@ -14,6 +14,6 @@ import java.util.List;
  */
 public interface RedisMqMessageLogDao extends PagingAndSortingRepository<RedisMqMessageLog, String> {
 
-    List<RedisMqMessageLog> findByChannelAndStatus(@Param("channel") String channel, @Param("status") String status);
+    List<RedisMqMessageLog> findByChannel(@Param("channel") String channel);
 
 }

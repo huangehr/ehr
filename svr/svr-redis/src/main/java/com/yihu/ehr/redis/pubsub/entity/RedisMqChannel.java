@@ -2,9 +2,10 @@ package com.yihu.ehr.redis.pubsub.entity;
 
 
 import com.yihu.ehr.entity.BaseIdentityEntity;
-import org.hibernate.annotations.Formula;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
 /**
  * redis消息队列 Entity
@@ -20,12 +21,10 @@ public class RedisMqChannel extends BaseIdentityEntity {
     public String channelName; // 消息队列名称
     public String messageTemplate; // 消息模版
     public String remark; // 备注
-
-    // 临时属性
-    public String enqueuedNum; // 入列数
-    public String dequeuedNum; // 出列数
-    public String subscriberNum; // 订阅者数
-    public String publisherNum; // 发布者数
+    public Integer enqueuedNum; // 入列数
+    public Integer dequeuedNum; // 出列数
+    public Integer subscriberNum; // 订阅者数
+    public Integer publisherNum; // 发布者数
 
     @Column(name = "channel")
     public String getChannel() {
@@ -63,39 +62,39 @@ public class RedisMqChannel extends BaseIdentityEntity {
         this.remark = remark;
     }
 
-    @Formula("( SELECT COUNT(1) FROM redis_mq_message_log ml WHERE ml.status = 0 AND ml.channel = channel )")
-    public String getEnqueuedNum() {
+    @Column(name = "enqueued_num")
+    public Integer getEnqueuedNum() {
         return enqueuedNum;
     }
 
-    public void setEnqueuedNum(String enqueuedNum) {
+    public void setEnqueuedNum(Integer enqueuedNum) {
         this.enqueuedNum = enqueuedNum;
     }
 
-    @Formula("( SELECT COUNT(1) FROM redis_mq_message_log ml WHERE ml.status = 1 AND ml.channel = channel )")
-    public String getDequeuedNum() {
+    @Column(name = "dequeued_num")
+    public Integer getDequeuedNum() {
         return dequeuedNum;
     }
 
-    public void setDequeuedNum(String dequeuedNum) {
+    public void setDequeuedNum(Integer dequeuedNum) {
         this.dequeuedNum = dequeuedNum;
     }
 
-    @Formula("( SELECT COUNT(1) FROM redis_mq_subscriber s WHERE s.channel = channel )")
-    public String getSubscriberNum() {
+    @Column(name = "subscriber_num")
+    public Integer getSubscriberNum() {
         return subscriberNum;
     }
 
-    public void setSubscriberNum(String subscriberNum) {
+    public void setSubscriberNum(Integer subscriberNum) {
         this.subscriberNum = subscriberNum;
     }
 
-    @Formula("( SELECT COUNT(1) FROM redis_mq_publisher mp WHERE mp.channel = channel )")
-    public String getPublisherNum() {
+    @Column(name = "publisher_num")
+    public Integer getPublisherNum() {
         return publisherNum;
     }
 
-    public void setPublisherNum(String publisherNum) {
+    public void setPublisherNum(Integer publisherNum) {
         this.publisherNum = publisherNum;
     }
 }
