@@ -29,7 +29,7 @@ hadoop:
   hbase-properties:
     hbase.zookeeper.property.clientPort: 2181
     zookeeper.znode.parent: /hbase-unsecure
-    hbase.zookeeper.quorum: node1,node2,node3
+    hbase.zookeeper.quorum: node1.jkzl.com,node2.jkzl.com,node4.jkzl.com
   user:
     name: root
 
@@ -154,7 +154,7 @@ spring:
       zk-host: node1.jkzl.com,node2.jkzl.com,node4.jkzl.com:2181/solr
   elasticsearch:
     jest:
-      uris: http://172.10.10.2:9200
+      uris: http://172.10.10.5:9200
 elasticsearch:
   cluster-name: elasticsearch
-  cluster-nodes: 172.10.10.2:9300
+  cluster-nodes: 172.10.10.5:9300

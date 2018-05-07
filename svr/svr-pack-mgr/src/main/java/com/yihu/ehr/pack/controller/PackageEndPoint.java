@@ -229,7 +229,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             updateSource.put("analyze_fail_count", 0); //避免手动修改状态后无法解析
         }
         updateSource.put("analyze_status", status);
-        elasticSearchUtil.update(INDEX, TYPE, id, updateSource);
+        elasticSearchUtil.voidUpdate(INDEX, TYPE, id, updateSource);
         return true;
     }
 
