@@ -1,4 +1,4 @@
-package com.yihu.ehr.resolve.exception;
+package com.yihu.ehr.profile.exception;
 
 import java.io.IOException;
 

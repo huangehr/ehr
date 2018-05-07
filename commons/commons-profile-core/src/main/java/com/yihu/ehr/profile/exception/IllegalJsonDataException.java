@@ -1,4 +1,4 @@
-package com.yihu.ehr.resolve.exception;
+package com.yihu.ehr.profile.exception;
 
 /**
  * Created by progr1mmer on 2018/5/5.

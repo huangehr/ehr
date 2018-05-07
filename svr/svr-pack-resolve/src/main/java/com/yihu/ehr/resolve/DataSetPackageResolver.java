@@ -12,8 +12,8 @@ import com.yihu.ehr.profile.util.MetaDataRecord;
 import com.yihu.ehr.profile.util.PackageDataSet;
 import com.yihu.ehr.resolve.config.EventIndexConfig;
 import com.yihu.ehr.resolve.dao.DataSetPackageDao;
-import com.yihu.ehr.resolve.exception.IllegalJsonDataException;
-import com.yihu.ehr.resolve.exception.IllegalJsonFileException;
+import com.yihu.ehr.profile.exception.IllegalJsonDataException;
+import com.yihu.ehr.profile.exception.IllegalJsonFileException;
 import com.yihu.ehr.resolve.model.stage1.DataSetPackage;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.resolve.service.resource.stage1.PackModelFactory;
@@ -45,13 +45,6 @@ public class DataSetPackageResolver extends PackageResolver {
     private EventIndexConfig eventIndex;
     @Autowired
     private DataSetPackageDao dataSetPackageDao;
-
-
-    @Override
-    public List<StandardPackage> resolveDataSets(File root, String clinetId) throws Exception {
-        File originFolder = new File(root.getAbsolutePath());
-        return this.parseDataSetFiles(clinetId, originFolder.listFiles(),false);
-    }
 
     @Override
     public void resolve(StandardPackage profile, File root) throws Exception {
@@ -281,12 +274,14 @@ public class DataSetPackageResolver extends PackageResolver {
      */
     public List<PackageDataSet> parseNonArchiveJsonDataSet(JsonNode root) {
         List<PackageDataSet> packageDataSetList = new ArrayList<>();
-        PackageDataSet dataSet = null;
+        PackageDataSet dataSet;
         JsonNode head = root.get("head");//文件内容头信息
         JsonNode data = root.get("data");//文件内容主体信息
 
         String version = head.get("version").asText();
-        if (version.equals("000000000000")) throw new LegacyPackageException("Package is collected via cda version 00000000000, ignored.");
+        if (version.equals("000000000000")) {
+            throw new LegacyPackageException("Package is collected via cda version 00000000000, ignored.");
+        }
 
         String dataSetCode = head.get("target").asText();
         String createTime = head.get("createTime").isNull() ? "" : head.get("createTime").asText();
@@ -337,7 +332,7 @@ public class DataSetPackageResolver extends PackageResolver {
                     if (metaData.equals("_id")) continue;//源表主键字段名
                     String value = item.getValue().asText().equals("null") ? "" : item.getValue().asText();
                     record.putMetaData(metaData, value);
-                    if (pkList!=null && pkList.contains(metaData)){
+                    if (pkList != null && pkList.contains(metaData)){
                         pkBuffer.append(value).append("_");
                     }
                 }

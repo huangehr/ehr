@@ -5,7 +5,7 @@ import com.yihu.ehr.constants.EventType;
 import com.yihu.ehr.profile.family.MasterResourceFamily;
 import com.yihu.ehr.profile.util.DataSetUtil;
 import com.yihu.ehr.profile.util.PackageDataSet;
-import com.yihu.ehr.resolve.exception.IllegalJsonFileException;
+import com.yihu.ehr.profile.exception.IllegalJsonFileException;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.resolve.service.resource.stage1.PackModelFactory;
 import com.yihu.ehr.resolve.service.resource.stage1.extractor.KeyDataExtractor;
@@ -23,11 +23,6 @@ import java.util.*;
  */
 @Component
 public class StdPackageResolver extends PackageResolver {
-
-    @Override
-    public List<StandardPackage> resolveDataSets(File root, String clientId) throws Exception {
-        return null;
-    }
 
     @Override
     public void resolve(StandardPackage standardPackage, File root) throws Exception {

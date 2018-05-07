@@ -11,7 +11,7 @@ import com.yihu.ehr.profile.core.ResourceCore;
 import com.yihu.ehr.profile.family.MasterResourceFamily;
 import com.yihu.ehr.profile.util.PackageDataSet;
 import com.yihu.ehr.profile.util.ProfileId;
-import com.yihu.ehr.resolve.exception.IllegalJsonDataException;
+import com.yihu.ehr.profile.exception.IllegalJsonDataException;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import org.apache.commons.lang3.StringUtils;
 
@@ -93,14 +93,14 @@ public class StandardPackage {
             if (profileType == null ){
                 throw new IllegalJsonDataException("Build profileType id failed, profileType is empty.");
             }
-            this.profileId = ProfileId.get(orgCode, eventNo, eventDate,profileType.getType());
+            this.profileId = ProfileId.get(orgCode, eventNo, eventDate, profileType.getType());
         }
         return profileId.toString();
     }
+
     public void setId(String id) {
         this.profileId = new ProfileId(id);
     }
-
 
     /**
      * 1结构化档案，2文件档案，3链接档案，4数据集档案

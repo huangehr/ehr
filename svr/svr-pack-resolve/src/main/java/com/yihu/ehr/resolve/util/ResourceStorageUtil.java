@@ -58,12 +58,11 @@ public class ResourceStorageUtil {
         Map<String, String> map = new HashMap<String, String>();
         if (family.equals(SubResourceFamily.Basic)){
             map.put(SubResourceFamily.BasicColumns.ProfileId, subRecord.getProfileId());
-            //增加主表信息 start
-            map.put(MasterResourceFamily.BasicColumns.OrgCode, resourceBucket.getOrgCode());
-            map.put(MasterResourceFamily.BasicColumns.OrgArea, resourceBucket.getOrgArea());
-            map.put(MasterResourceFamily.BasicColumns.EventType, StringUtils.isEmpty(resourceBucket.getEventType())?"":Integer.toString(resourceBucket.getEventType().ordinal()));
-            map.put(MasterResourceFamily.BasicColumns.EventDate, DateTimeUtil.utcDateTimeFormat(resourceBucket.getEventDate()));
-            //增加主表信息 end
+            map.put(SubResourceFamily.BasicColumns.OrgCode, resourceBucket.getOrgCode());
+            map.put(SubResourceFamily.BasicColumns.OrgArea, resourceBucket.getOrgArea());
+            map.put(SubResourceFamily.BasicColumns.EventType, StringUtils.isEmpty(resourceBucket.getEventType())?"":Integer.toString(resourceBucket.getEventType().ordinal()));
+            map.put(SubResourceFamily.BasicColumns.EventNo, resourceBucket.getEventNo());
+            map.put(SubResourceFamily.BasicColumns.EventDate, DateTimeUtil.utcDateTimeFormat(resourceBucket.getEventDate()));
         } else if (family.equals(SubResourceFamily.Data)){
             map = subRecord.getDataGroup();
         }

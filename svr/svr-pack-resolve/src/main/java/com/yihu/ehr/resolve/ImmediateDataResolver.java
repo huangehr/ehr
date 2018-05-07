@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.EventType;
 import com.yihu.ehr.profile.family.MasterResourceFamily;
 import com.yihu.ehr.profile.util.PackageDataSet;
-import com.yihu.ehr.resolve.exception.IllegalJsonDataException;
-import com.yihu.ehr.resolve.exception.IllegalJsonFileException;
+import com.yihu.ehr.profile.exception.IllegalJsonDataException;
+import com.yihu.ehr.profile.exception.IllegalJsonFileException;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.resolve.service.resource.stage1.DataSetParserWithTranslator;
 import com.yihu.ehr.resolve.service.resource.stage1.extractor.ExtractorChain;
@@ -74,7 +74,6 @@ public class ImmediateDataResolver {
                 }
             }
         }
-
 
         if (standardPackage.isReUploadFlg()) {
             for (PackageDataSet dataSet : packageDataSetList) {

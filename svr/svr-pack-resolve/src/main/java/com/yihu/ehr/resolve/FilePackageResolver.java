@@ -6,9 +6,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.constants.EventType;
 import com.yihu.ehr.constants.UrlScope;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
+import com.yihu.ehr.profile.exception.IllegalJsonDataException;
 import com.yihu.ehr.profile.util.MetaDataRecord;
 import com.yihu.ehr.profile.util.PackageDataSet;
-import com.yihu.ehr.profile.util.QualifierTranslator;
 import com.yihu.ehr.resolve.model.stage1.CdaDocument;
 import com.yihu.ehr.resolve.model.stage1.FilePackage;
 import com.yihu.ehr.resolve.model.stage1.OriginFile;
@@ -17,7 +17,6 @@ import com.yihu.ehr.resolve.service.resource.stage1.PackModelFactory;
 import com.yihu.ehr.resolve.service.resource.stage2.RedisService;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
-import com.yihu.ehr.util.log.LogService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -25,7 +24,6 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -39,15 +37,7 @@ import java.util.Map;
 public class FilePackageResolver extends PackageResolver {
 
     @Autowired
-    private RedisService redisService;
-    @Autowired
     private FastDFSUtil fastDFSUtil;
-
-
-    @Override
-    public List<StandardPackage> resolveDataSets(File root, String clinetId) throws Exception {
-        return null;
-    }
 
     @Override
     public void resolve(StandardPackage profile, File root) throws Exception {
@@ -68,9 +58,20 @@ public class FilePackageResolver extends PackageResolver {
         String eventDate = root.get("event_time") == null ? "" : root.get("event_time").asText();
         String createDate = root.get("create_date") == null ? "" : root.get("create_date").asText();
         String cdaVersion = root.get("inner_version") == null ? "" : root.get("inner_version").asText();
-        /*if (cdaVersion.equals("000000000000")) {
-            throw new LegacyPackageException("Package is collected via cda version 00000000000, ignored.");
-        }*/
+        //验证档案基础数据的完整性，当其中某字段为空的情况下直接提示档案包信息缺失。
+        StringBuilder errorMsg = new StringBuilder();
+        if (StringUtils.isEmpty(patientId)){
+            errorMsg.append("patientId is null;");
+        }
+        if (StringUtils.isEmpty(eventNo)){
+            errorMsg.append("eventNo is null;");
+        }
+        if (StringUtils.isEmpty(orgCode)){
+            errorMsg.append("orgCode is null;");
+        }
+        if (!StringUtils.isEmpty(errorMsg.toString())){
+            throw new IllegalJsonDataException(errorMsg.toString());
+        }
         profile.setDemographicId(demographicId);
         profile.setPatientId(patientId);
         profile.setEventNo(eventNo);
@@ -135,7 +136,6 @@ public class FilePackageResolver extends PackageResolver {
             if (cdaDocument == null) {
                 cdaDocument = new CdaDocument();
                 cdaDocument.setId(cdaDocumentId);
-
                 profile.getCdaDocuments().put(cdaDocumentId, cdaDocument);
             }
 
@@ -152,18 +152,16 @@ public class FilePackageResolver extends PackageResolver {
                 OriginFile originFile = new OriginFile();
                 originFile.setMime(mine_type);
                 originFile.setExpireDate(expireDate);
-                if("public".equalsIgnoreCase(url_scope)){
+                if ("public".equalsIgnoreCase(url_scope)){
                     originFile.setUrlScope(UrlScope.valueOf(0));
-                }else if("private".equalsIgnoreCase(url_scope)){
+                } else if ("private".equalsIgnoreCase(url_scope)){
                     originFile.setUrlScope(UrlScope.valueOf(1));
                 }
                 originFile.setEmrId(emr_id);
                 originFile.setEmrName(emr_name);
-                if(!StringUtils.isBlank(note))
-                {
+                if (!StringUtils.isBlank(note)) {
                     originFile.setNote(note);
                 }
-
                 if (file.get("name") != null) {
                     String fileList[] = file.get("name").asText().split(";");
                     for (String fileName : fileList) {
@@ -177,7 +175,6 @@ public class FilePackageResolver extends PackageResolver {
                         }
                     }
                 }
-
                 for (String fileUrl : url.split(",")) {
                     originFile.addUrl(fileUrl, fileUrl);
                 }
@@ -186,24 +183,7 @@ public class FilePackageResolver extends PackageResolver {
         }
     }
 
-    protected String translateMetaDataCode(String cdaVersion,
-                                           String dataSetCode,
-                                           String metaData) {
-        String metaDataType = redisService.getMetaDataType(cdaVersion, dataSetCode, metaData);
-        if (StringUtils.isEmpty(metaDataType)) {
-            String msg = "Meta data %1 in data set %2 is not found in version %3. FORGET cache standards or it's INVALID?"
-                    .replace("%1", metaData)
-                    .replace("%2", dataSetCode)
-                    .replace("%3", cdaVersion);
-
-            LogService.getLogger().error(msg);
-            return null;
-        }
-
-        return QualifierTranslator.hBaseQualifier(metaData, metaDataType);
-    }
-
-    protected String saveFile(String fileName) throws Exception {
+    private String saveFile(String fileName) throws Exception {
         ObjectNode objectNode = fastDFSUtil.upload(fileName, "File from unstructured profile package.");
 
         return objectNode.get(FastDFSUtil.GROUP_NAME).asText() + "/" + objectNode.get(FastDFSUtil.REMOTE_FILE_NAME).asText();
