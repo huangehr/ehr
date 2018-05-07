@@ -117,7 +117,7 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
         }
         OAuth2AccessToken token = getTokenGranter().grant(param.get("grant_type"), tokenRequest);
         /*如果是移动端登陆则移除之前的token，
-        在网关处通过HTTP状态码告知前端是过期（401）还是账号在别处登陆（403），
+        在网关处通过HTTP状态码告知前端是过期（402）还是账号在别处登陆（403），
         实现同一账号只能在一处登陆*/
         if (request.getHeader("login-device") != null && request.getHeader("login-device").equals("mobile")) {
             ehrRedisTokenStore.removeAccessToken(token.getValue());
