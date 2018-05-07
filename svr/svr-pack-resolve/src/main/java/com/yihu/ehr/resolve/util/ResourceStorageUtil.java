@@ -60,7 +60,7 @@ public class ResourceStorageUtil {
             map.put(SubResourceFamily.BasicColumns.ProfileId, subRecord.getProfileId());
             map.put(SubResourceFamily.BasicColumns.OrgCode, resourceBucket.getOrgCode());
             map.put(SubResourceFamily.BasicColumns.OrgArea, resourceBucket.getOrgArea());
-            map.put(SubResourceFamily.BasicColumns.EventType, StringUtils.isEmpty(resourceBucket.getEventType())?"":Integer.toString(resourceBucket.getEventType().ordinal()));
+            map.put(SubResourceFamily.BasicColumns.EventType, StringUtils.isEmpty(resourceBucket.getEventType()) ? "" : Integer.toString(resourceBucket.getEventType().ordinal()));
             map.put(SubResourceFamily.BasicColumns.EventNo, resourceBucket.getEventNo());
             map.put(SubResourceFamily.BasicColumns.EventDate, DateTimeUtil.utcDateTimeFormat(resourceBucket.getEventDate()));
         } else if (family.equals(SubResourceFamily.Data)){

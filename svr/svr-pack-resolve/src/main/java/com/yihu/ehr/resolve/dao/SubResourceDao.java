@@ -4,7 +4,6 @@ import com.yihu.ehr.constants.ProfileType;
 import com.yihu.ehr.hbase.HBaseDao;
 import com.yihu.ehr.hbase.TableBundle;
 import com.yihu.ehr.profile.core.ResourceCore;
-import com.yihu.ehr.profile.family.FileSubResourceFamily;
 import com.yihu.ehr.profile.family.SubResourceFamily;
 import com.yihu.ehr.resolve.model.stage2.ResourceBucket;
 import com.yihu.ehr.resolve.model.stage2.SubRecord;
