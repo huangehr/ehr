@@ -7,7 +7,6 @@ import com.yihu.ehr.resolve.service.resource.stage1.extractor.ExtractorChain;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
-import java.util.List;
 
 /**
  * 包解析器。

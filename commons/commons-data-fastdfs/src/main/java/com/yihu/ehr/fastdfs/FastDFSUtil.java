@@ -31,7 +31,7 @@ public class FastDFSUtil {
     public final static String FILE_ID = "fileId";
     public final static String FILE_URL = "fileUrl";
     public final static String FILE_SIZE = "fileSize";
-    
+
     @Autowired
     private FastDFSPool pool;
     @Value(value = "${fast-dfs.public-server:http://120.0.0.1:8080}")
@@ -76,6 +76,44 @@ public class FastDFSUtil {
         try {
             ObjectNode message = new ObjectMapper().createObjectNode();
             byte fileBuffer[] = new byte[in.available()];
+            int len = 0;
+            int temp;                             //所有读取的内容都使用temp接收
+            while ((temp = in.read()) != -1) {            //当没有读取完时，继续读取
+                fileBuffer[len] = (byte) temp;
+                len ++;
+            }
+            in.close();
+            message.put(FILE_SIZE, fileBuffer.length);
+            String[] results = client.upload_file(fileBuffer, fileExtension, fileMetaData);
+            if (results != null) {
+                String groupName = results[0];
+                String remoteFile = results[1];
+                message.put(GROUP_NAME, groupName);
+                message.put(REMOTE_FILE_NAME, remoteFile);
+                String fileId = groupName + StorageClient1.SPLIT_GROUP_NAME_AND_FILENAME_SEPERATOR + remoteFile;
+                message.put(FILE_ID, fileId);
+                String fileURl = publicServer += "/" + fileId;
+                if (ClientGlobal.g_anti_steal_token) {
+                    int ts = (int) (System.currentTimeMillis() / 1000);
+                    String token = ProtoCommon.getToken(fileId, ts, ClientGlobal.g_secret_key);
+                    fileURl += "?token=" + token + "&ts=" + ts;
+                }
+                message.put(FILE_URL, fileURl);
+            }
+            return message;
+        } finally {
+            pool.releaseStorageClient(client);
+        }
+    }
+
+    /**
+     * 以输入流的方式上传文件
+     */
+    public ObjectNode uploadBySocket(InputStream in, String fileExtension,int fileSize, NameValuePair[] fileMetaData) throws IOException, MyException, NoSuchAlgorithmException{
+        StorageClient client = pool.getStorageClient();
+        try {
+            ObjectNode message = new ObjectMapper().createObjectNode();
+            byte fileBuffer[] = new byte[fileSize];
             int len = 0;
             int temp;                             //所有读取的内容都使用temp接收
             while ((temp = in.read()) != -1) {            //当没有读取完时，继续读取
@@ -198,12 +236,12 @@ public class FastDFSUtil {
     }
 
     /**
-    public int modify(String groupName, String appendFileName, long offset, byte [] fileBuff) throws IOException , MyException{
-        StorageClient client = clientPool.getStorageClient();
-        int size = client.modify_file(groupName, appendFileName, offset, fileBuff);
-        return size;
-    }
-    */
+     public int modify(String groupName, String appendFileName, long offset, byte [] fileBuff) throws IOException , MyException{
+     StorageClient client = clientPool.getStorageClient();
+     int size = client.modify_file(groupName, appendFileName, offset, fileBuff);
+     return size;
+     }
+     */
     public int modify(String groupName, String remoteFilename, NameValuePair[] metaList, byte opFlag) throws IOException , MyException{
         StorageClient client = pool.getStorageClient();
         try {

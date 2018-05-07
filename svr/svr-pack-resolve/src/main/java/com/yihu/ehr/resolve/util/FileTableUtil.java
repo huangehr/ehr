@@ -6,11 +6,13 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.profile.family.FileFamily;
 import com.yihu.ehr.resolve.model.stage1.CdaDocument;
+import com.yihu.ehr.resolve.model.stage1.LinkFile;
 import com.yihu.ehr.resolve.model.stage1.OriginFile;
 import com.yihu.ehr.resolve.model.stage2.ResourceBucket;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -53,6 +55,25 @@ public class FileTableUtil {
         map.put(FileFamily.ResourceColumns.CdaDocumentName, cdaDocument.getName());
         map.put(FileFamily.ResourceColumns.FileList, root.toString());
 
+        return map;
+    }
+
+    public static Map<String, String> getFileFamilyCellMap(ResourceBucket profile){
+        Map<String, String> map = new HashMap<>();
+        if(profile == null){
+            return map;
+        }
+        List<LinkFile> linkFiles = profile.getLinkFiles();
+        ArrayNode root = ((ObjectMapper) SpringContext.getService(ObjectMapper.class)).createArrayNode();
+        for(LinkFile linkFile:linkFiles){
+            ObjectNode subNode = root.addObject();
+            subNode.put("url",linkFile.getUrl());
+            subNode.put("originName",linkFile.getOriginName());
+            subNode.put("fileExtension",linkFile.getFileExtension());
+            subNode.put("fileSize",linkFile.getFileSize());
+            root.add(subNode);
+        }
+        map.put(FileFamily.ResourceColumns.FileList, root.toString());
         return map;
     }
 }
