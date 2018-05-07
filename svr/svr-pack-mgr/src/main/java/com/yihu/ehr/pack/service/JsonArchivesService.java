@@ -22,7 +22,7 @@ import java.util.Map;
  * 临时数据处理
  * Created by progr1mmer on 2018/4/23.
  */
-@Service
+//@Service
 public class JsonArchivesService extends BaseJpaService<JsonArchives, JsonArchivesDao> {
 
     private static final Integer SINGLE_SIZE = 2000;
