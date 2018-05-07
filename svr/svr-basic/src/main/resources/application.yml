@@ -38,6 +38,7 @@ eip:
   #健康上饶app-卫计委机构编码--用于居民注册设置默认权限
 jksr-app:
   orgcode: PDY026797
+  registerRoleClientId: WYo0l73F8e,HPnz4GXfYA #用于创建这些应用的默认角色(健康上饶app，公众健康服务)
 
 ---
 spring:
