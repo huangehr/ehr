@@ -84,10 +84,10 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
                 ResourceBucket resourceBucket = packMillService.grindingPackModel(standardPackage);
                 identifyService.identify(resourceBucket, standardPackage);
                 resourceService.save(resourceBucket, standardPackage);
-                map.put("profile_id", standardPackage.getId());
             }
 
             //回填入库状态
+            map.put("profile_id", standardPackage.getId());
             map.put("demographic_id", standardPackage.getDemographicId());
             map.put("event_type", standardPackage.getEventType() == null ? null : standardPackage.getEventType().getType());
             map.put("event_no", standardPackage.getEventNo());
