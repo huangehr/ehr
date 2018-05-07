@@ -41,7 +41,7 @@ public class ResourceTransformEndPoint {
 
         JavaType javaType = objectMapper.getTypeFactory().constructParametricType(List.class, Map.class);
         List<Map<String, Object>> list = objectMapper.readValue(resource, javaType);
-        return resourcesTransformService.displayCodeConvert(list, version,dataset,false);
+        return resourcesTransformService.displayCodeConvert(list, version,dataset);
     }
 
     @ApiOperation("EHR内部标准转国家标准（单条记录）")
@@ -56,7 +56,7 @@ public class ResourceTransformEndPoint {
 
         Map<String, Object> map = objectMapper.readValue(resource, Map.class);
 
-        return resourcesTransformService.displayCodeConvert(map,version,dataset,false);
+        return resourcesTransformService.displayCodeConvert(map,version,dataset);
     }
 
 
