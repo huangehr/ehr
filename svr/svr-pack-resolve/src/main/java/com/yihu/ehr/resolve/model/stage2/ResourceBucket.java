@@ -3,11 +3,9 @@ package com.yihu.ehr.resolve.model.stage2;
 import com.yihu.ehr.constants.EventType;
 import com.yihu.ehr.constants.ProfileType;
 import com.yihu.ehr.resolve.model.stage1.CdaDocument;
+import com.yihu.ehr.resolve.model.stage1.LinkFile;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * 健康档案资源化临时存储工具。此阶段也是存在于内存中，资源化之后会存入hbase。
@@ -63,6 +61,8 @@ public class ResourceBucket {
     protected MasterRecord masterRecord;
     //子记录
     protected SubRecords subRecords;
+
+    private List<LinkFile> linkFiles = new ArrayList<>();
 
     // CDA文档列表，Key为HBase rowkey
     private Map<String, CdaDocument> cdaDocuments = new TreeMap<>();
@@ -254,5 +254,21 @@ public class ResourceBucket {
 
     public void setIdentifyFlag(boolean identifyFlag) {
         this.identifyFlag = identifyFlag;
+    }
+
+    public void setMasterRecord(MasterRecord masterRecord) {
+        this.masterRecord = masterRecord;
+    }
+
+    public void setSubRecords(SubRecords subRecords) {
+        this.subRecords = subRecords;
+    }
+
+    public List<LinkFile> getLinkFiles() {
+        return linkFiles;
+    }
+
+    public void setLinkFiles(List<LinkFile> linkFiles) {
+        this.linkFiles = linkFiles;
     }
 }

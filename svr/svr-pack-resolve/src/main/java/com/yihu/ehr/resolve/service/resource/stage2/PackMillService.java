@@ -7,6 +7,7 @@ import com.yihu.ehr.profile.util.PackageDataSet;
 import com.yihu.ehr.profile.exception.IllegalJsonDataException;
 import com.yihu.ehr.profile.exception.ResolveException;
 import com.yihu.ehr.resolve.model.stage1.FilePackage;
+import com.yihu.ehr.resolve.model.stage1.LinkPackage;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.resolve.model.stage2.*;
 import com.yihu.ehr.resolve.util.PackResolveLogger;
@@ -15,7 +16,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * 档案包压碎机，将档案数据包压碎成资源点。
@@ -129,6 +132,9 @@ public class PackMillService {
         // files that unable to get structured data, store as they are
         if (stdPack.getProfileType() == ProfileType.File){
             resourceBucket.setCdaDocuments(((FilePackage) stdPack).getCdaDocuments());
+        }else if(stdPack.getProfileType() == ProfileType.Link){
+            LinkPackage linkPackage = (LinkPackage)stdPack;
+            resourceBucket.setLinkFiles(linkPackage.getLinkFiles());
         }
         return resourceBucket;
     }
