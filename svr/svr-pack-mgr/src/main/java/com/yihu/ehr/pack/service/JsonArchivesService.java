@@ -28,7 +28,7 @@ import java.util.Map;
 @Service
 public class JsonArchivesService extends BaseJpaService<JsonArchives, JsonArchivesDao> {
 
-    private static final Integer SINGLE_SIZE = 1000;
+    private static final Integer SINGLE_SIZE = 2000;
     private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private boolean isRun = false;
