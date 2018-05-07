@@ -7,6 +7,7 @@ import com.yihu.ehr.hbase.TableBundle;
 import com.yihu.ehr.profile.core.ResourceCore;
 import com.yihu.ehr.profile.family.FileResourceFamily;
 import com.yihu.ehr.profile.family.MasterResourceFamily;
+import com.yihu.ehr.resolve.exception.IllegalJsonFileException;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.resolve.model.stage2.MasterRecord;
 import com.yihu.ehr.resolve.model.stage2.ResourceBucket;
@@ -59,7 +60,7 @@ public class MasterResourceDao {
                 standardPackage.setDemographicId(basicResult.get("demographic_id"));
                 resBucket.setDemographicId(basicResult.get("demographic_id"));
             } else {
-                throw new RuntimeException("Please upload the complete package(" + rowKey + ") first !");
+                throw new IllegalJsonFileException("Please upload the complete package(" + rowKey + ") first !");
             }
         } else {
             // delete legacy data if they are exist

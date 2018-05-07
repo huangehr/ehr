@@ -11,6 +11,7 @@ import com.yihu.ehr.profile.core.ResourceCore;
 import com.yihu.ehr.profile.family.MasterResourceFamily;
 import com.yihu.ehr.profile.util.PackageDataSet;
 import com.yihu.ehr.profile.util.ProfileId;
+import com.yihu.ehr.resolve.exception.IllegalJsonDataException;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import org.apache.commons.lang3.StringUtils;
 
@@ -81,16 +82,16 @@ public class StandardPackage {
     public String getId() {
         if (profileId == null) {
             if (StringUtils.isEmpty(orgCode)) {
-                throw new IllegalArgumentException("Build profile id failed, organization code is empty.");
+                throw new IllegalJsonDataException("Build profile id failed, organization code is empty.");
             }
             if (StringUtils.isEmpty(eventNo)) {
-                throw new IllegalArgumentException("Build profile id failed, eventNo is empty.");
+                throw new IllegalJsonDataException("Build profile id failed, eventNo is empty.");
             }
             if (eventDate == null) {
-                throw new IllegalArgumentException("Build profile id failed, unable to get event date.");
+                throw new IllegalJsonDataException("Build profile id failed, unable to get event date.");
             }
-            if(profileType == null ){
-                throw new IllegalArgumentException("Build profileType id failed, profileType is empty.");
+            if (profileType == null ){
+                throw new IllegalJsonDataException("Build profileType id failed, profileType is empty.");
             }
             this.profileId = ProfileId.get(orgCode, eventNo, eventDate,profileType.getType());
         }
@@ -372,15 +373,15 @@ public class StandardPackage {
     public String getNonArchiveProfileId(String dataSetCode,int type) {
         if (profileId == null) {
             if (StringUtils.isEmpty(orgCode)) {
-                throw new IllegalArgumentException("Build profile id failed, organization code is empty.");
+                throw new IllegalJsonDataException("Build profile id failed, organization code is empty.");
             }
 
             if (StringUtils.isEmpty(eventNo) && !"HDSA00_01".equals(dataSetCode)) {
-                throw new IllegalArgumentException("Build profile id failed, eventNo is empty.");
+                throw new IllegalJsonDataException("Build profile id failed, eventNo is empty.");
             }
 
             if (StringUtils.isEmpty(patientId) ) {
-                throw new IllegalArgumentException("Build profile id failed, patientId is empty.\"");
+                throw new IllegalJsonDataException("Build profile id failed, patientId is empty.\"");
             }
 
             this.profileId = ProfileId.get(orgCode, patientId, eventNo,type);

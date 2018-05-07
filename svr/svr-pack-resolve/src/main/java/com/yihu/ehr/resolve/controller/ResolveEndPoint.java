@@ -10,6 +10,8 @@ import com.yihu.ehr.model.packs.EsDetailsPackage;
 import com.yihu.ehr.model.packs.EsSimplePackage;
 import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.resolve.dao.DataSetPackageDao;
+import com.yihu.ehr.resolve.exception.IllegalJsonDataException;
+import com.yihu.ehr.resolve.exception.IllegalJsonFileException;
 import com.yihu.ehr.resolve.feign.DataSetPackageMgrClient;
 import com.yihu.ehr.resolve.feign.PackageMgrClient;
 import com.yihu.ehr.resolve.model.stage1.DataSetPackage;
@@ -23,6 +25,7 @@ import com.yihu.ehr.util.datetime.DateUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -35,6 +38,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.*;
 
 @RestController
@@ -99,7 +103,7 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
             map.put("event_date", DateUtil.toStringLong(standardPackage.getEventDate()));
             map.put("patient_id", standardPackage.getPatientId());
             map.put("re_upload_flg", String.valueOf(standardPackage.isReUploadFlg()));
-            packageMgrClient.reportStatus(packId, ArchiveStatus.Finished, objectMapper.writeValueAsString(map));
+            packageMgrClient.reportStatus(packId, ArchiveStatus.Finished, 0, objectMapper.writeValueAsString(map));
             //是否返回数据
             if (echo) {
                 return standardPackage.toJson();
@@ -109,10 +113,20 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
                 return objectMapper.writeValueAsString(resultMap);
             }
         } catch (Exception e) {
+            int errorType = -1;
+            if (e instanceof ZipException) {
+                errorType = 1;
+            }
+            if (e instanceof IllegalJsonFileException) {
+                errorType = 2;
+            }
+            if (e instanceof IllegalJsonDataException) {
+                errorType = 3;
+            }
             if (StringUtils.isBlank(e.getMessage())) {
-                packageMgrClient.reportStatus(packId, ArchiveStatus.Failed, "Internal Server Error");
+                packageMgrClient.reportStatus(packId, ArchiveStatus.Failed, errorType, "Internal Server Error");
             } else {
-                packageMgrClient.reportStatus(packId, ArchiveStatus.Failed, e.getMessage());
+                packageMgrClient.reportStatus(packId, ArchiveStatus.Failed, errorType, e.getMessage());
             }
             throw e;
         }
@@ -218,8 +232,7 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
         String[] tokens = filePath.split(":");
         return fastDFSUtil.download(tokens[0], tokens[1], System.getProperty("java.io.tmpdir") + java.io.File.separator);
     }
-
-
+    
     // --------------------------------------  未对接 ------------------------------------
 
     //new add by HZY in 2017/06/29
@@ -272,11 +285,11 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
         } catch (Exception e) {
             List<String> resultList = new ArrayList<String>();
             if (StringUtils.isBlank(e.getMessage())) {
-                packageMgrClient.reportStatus(packId, ArchiveStatus.Failed, "Internal Server Error");
+                datasetPackageMgrClient.reportStatus(packId, ArchiveStatus.Failed, "Internal Server Error");
                 resultList.add("Internal Server Error");
                 return resultList;
             } else {
-                packageMgrClient.reportStatus(packId, ArchiveStatus.Failed, e.getMessage());
+                datasetPackageMgrClient.reportStatus(packId, ArchiveStatus.Failed, e.getMessage());
                 resultList.add(e.getMessage());
                 return resultList;
             }
@@ -323,9 +336,9 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
             }
         } catch (Exception e) {
             if (StringUtils.isBlank(e.getMessage())) {
-                packageMgrClient.reportStatus(packId, ArchiveStatus.Failed, "Internal Server Error");
+                datasetPackageMgrClient.reportStatus(packId, ArchiveStatus.Failed, "Internal Server Error");
             } else {
-                packageMgrClient.reportStatus(packId, ArchiveStatus.Failed, e.getMessage());
+                datasetPackageMgrClient.reportStatus(packId, ArchiveStatus.Failed, e.getMessage());
             }
             throw e;
         }

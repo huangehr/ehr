@@ -4,6 +4,8 @@ import com.yihu.ehr.constants.ProfileType;
 import com.yihu.ehr.profile.util.DataSetUtil;
 import com.yihu.ehr.profile.util.MetaDataRecord;
 import com.yihu.ehr.profile.util.PackageDataSet;
+import com.yihu.ehr.resolve.exception.IllegalJsonDataException;
+import com.yihu.ehr.resolve.exception.ResolveException;
 import com.yihu.ehr.resolve.model.stage1.FilePackage;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.resolve.model.stage2.*;
@@ -75,7 +77,7 @@ public class PackMillService {
             }
             Boolean isMultiRecord = redisService.getDataSetMultiRecord(srcDataSet.getCdaVersion(), srcDataSet.getCode());
             if (null == isMultiRecord) {
-                throw new RuntimeException("IsMultiRecord can not be null.");
+                throw new ResolveException("IsMultiRecord can not be null.");
             }
             Set<String> keys = srcDataSet.getRecordKeys();
             if (!isMultiRecord){
@@ -163,7 +165,7 @@ public class PackMillService {
      * @param value 原值
      * @throws Exception
      */
-    protected  void dictTransform(ResourceRecord dataRecord, String cdaVersion, String metadataId, String value) throws Exception {
+    protected void dictTransform(ResourceRecord dataRecord, String cdaVersion, String metadataId, String value) throws Exception {
         //查询对应内部EHR字段是否有对应字典
         String dictCode = getMetadataDict(metadataId);
         //内部EHR数据元字典不为空情况
@@ -178,8 +180,8 @@ public class PackMillService {
                             .append(value)
                             .append(" for std version ")
                             .append(cdaVersion)
-                            .append(", do not deal with fail-tolerant.");
-                    throw new RuntimeException(error.toString());
+                            .append(".");
+                    throw new IllegalJsonDataException(error.toString());
                 }
                 dataRecord.addResource(metadataId, value);
             } else {

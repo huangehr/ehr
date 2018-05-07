@@ -6,6 +6,8 @@ import com.yihu.ehr.constants.RedisCollection;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.model.packs.EsSimplePackage;
+import com.yihu.ehr.resolve.exception.IllegalJsonDataException;
+import com.yihu.ehr.resolve.exception.IllegalJsonFileException;
 import com.yihu.ehr.resolve.feign.PackageMgrClient;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.resolve.model.stage2.ResourceBucket;
@@ -15,6 +17,7 @@ import com.yihu.ehr.resolve.service.resource.stage2.PackMillService;
 import com.yihu.ehr.resolve.service.resource.stage2.ResourceService;
 import com.yihu.ehr.resolve.util.PackResolveLogger;
 import com.yihu.ehr.util.datetime.DateUtil;
+import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.*;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -62,17 +65,27 @@ public class PackageResourceJob implements InterruptableJob {
             }
             if (pack != null) {
                 PackResolveLogger.info("开始入库:" + pack.get_id() + ", Timestamp:" + new Date());
-                packageMgrClient.reportStatus(pack.get_id(), ArchiveStatus.Acquired, "正在入库中");
+                packageMgrClient.reportStatus(pack.get_id(), ArchiveStatus.Acquired, 0, "正在入库中");
                 doResolve(pack, packageMgrClient);
             }
         } catch (Exception e) {
+            int errorType = -1;
+            if (e instanceof ZipException) {
+                errorType = 1;
+            }
+            if (e instanceof IllegalJsonFileException) {
+                errorType = 2;
+            }
+            if (e instanceof IllegalJsonDataException) {
+                errorType = 3;
+            }
             if (pack != null) {
                 try {
                     if (StringUtils.isNotBlank(e.getMessage())) {
-                        packageMgrClient.reportStatus(pack.get_id(), ArchiveStatus.Failed, e.getMessage());
+                        packageMgrClient.reportStatus(pack.get_id(), ArchiveStatus.Failed, errorType, e.getMessage());
                         PackResolveLogger.error(e.getMessage());
                     } else {
-                        packageMgrClient.reportStatus(pack.get_id(), ArchiveStatus.Failed, "Internal server error, please see task log for detail message.");
+                        packageMgrClient.reportStatus(pack.get_id(), ArchiveStatus.Failed, errorType, "Internal server error, please see task log for detail message.");
                         PackResolveLogger.error("Internal server error, please see task log for detail message.", e);
                     }
                 } catch (Exception e1) {
@@ -103,7 +116,7 @@ public class PackageResourceJob implements InterruptableJob {
         map.put("event_date", DateUtil.toStringLong(standardPackage.getEventDate()));
         map.put("patient_id", standardPackage.getPatientId());
         map.put("re_upload_flg", String.valueOf(standardPackage.isReUploadFlg()));
-        packageMgrClient.reportStatus(pack.get_id(), ArchiveStatus.Finished, objectMapper.writeValueAsString(map));
+        packageMgrClient.reportStatus(pack.get_id(), ArchiveStatus.Finished, 0, objectMapper.writeValueAsString(map));
     }
 
     private String downloadTo(String filePath) throws Exception {

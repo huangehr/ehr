@@ -12,6 +12,8 @@ import com.yihu.ehr.profile.util.MetaDataRecord;
 import com.yihu.ehr.profile.util.PackageDataSet;
 import com.yihu.ehr.resolve.config.EventIndexConfig;
 import com.yihu.ehr.resolve.dao.DataSetPackageDao;
+import com.yihu.ehr.resolve.exception.IllegalJsonDataException;
+import com.yihu.ehr.resolve.exception.IllegalJsonFileException;
 import com.yihu.ehr.resolve.model.stage1.DataSetPackage;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.resolve.service.resource.stage1.PackModelFactory;
@@ -39,10 +41,8 @@ public class DataSetPackageResolver extends PackageResolver {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
-
     @Autowired
     private EventIndexConfig eventIndex;
-
     @Autowired
     private DataSetPackageDao dataSetPackageDao;
 
@@ -64,7 +64,7 @@ public class DataSetPackageResolver extends PackageResolver {
      */
     private List<StandardPackage> parseDataSetFiles(String clientId, File[] files, boolean origin) throws Exception {
         List<StandardPackage> standardPackageList = new ArrayList<>();
-        StandardPackage standardPackage = null;
+        StandardPackage standardPackage;
         for (File file : files) {
             List<PackageDataSet> packageDataSets = generateDataSet(file, origin);
             for (PackageDataSet dataSet : packageDataSets) {
@@ -108,7 +108,7 @@ public class DataSetPackageResolver extends PackageResolver {
                     }
 
                     //门诊或住院诊断
-                    if(standardPackage.getDiagnosisList() == null || standardPackage.getDiagnosisList().size() <= 0 ) {
+                    if (standardPackage.getDiagnosisList() == null || standardPackage.getDiagnosisList().size() <= 0 ) {
                         Map<String, Object> properties = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.Diagnosis);
                         Set<String> diagnosisList = (Set<String>) properties.get(MasterResourceFamily.BasicColumns.Diagnosis);
                         if (diagnosisList != null && diagnosisList.size() > 0) {
@@ -144,7 +144,7 @@ public class DataSetPackageResolver extends PackageResolver {
     private List<PackageDataSet> generateDataSet(File jsonFile, boolean isOrigin) throws IOException {
         JsonNode jsonNode = objectMapper.readTree(jsonFile);
         if (jsonNode.isNull()) {
-            throw new IOException("Invalid json file when generate data set");
+            throw new IllegalJsonFileException("Invalid json file when generate data set");
         }
 
         List<PackageDataSet> dataSets = parseNonArchiveJsonDataSet(jsonNode);
@@ -183,12 +183,12 @@ public class DataSetPackageResolver extends PackageResolver {
             // 判断标准版本是否存在。
             String isExistVersionSql = "SELECT 1 FROM std_cda_versions WHERE version = '" + version + "'";
             if (jdbcTemplate.queryForList(isExistVersionSql).size() == 0) {
-                throw new RuntimeException("标准版本号不存在，version: " + version);
+                throw new IllegalJsonDataException("标准版本号不存在，version: " + version);
             }
             // 判断表是否存在。
             String isExistTableSql = "SELECT 1 FROM std_data_set_" + version + " WHERE code = '" + tableName + "'";
             if (jdbcTemplate.queryForList(isExistTableSql).size() == 0) {
-                throw new RuntimeException("标准中不存在该表，version: " + version + ", table: " + tableName);
+                throw new IllegalJsonDataException("标准中不存在该表，version: " + version + ", table: " + tableName);
             }
 
             // 拼接 insert/update 语句，后续批量执行保存数据。
@@ -235,7 +235,7 @@ public class DataSetPackageResolver extends PackageResolver {
                             "LEFT JOIN std_data_set_" + version + " t ON t.id = f.dataset_id " +
                             "WHERE t.code = '" + tableName + "' AND f.column_name = '" + fieldName + "'";
                     if (jdbcTemplate.queryForList(fieldSql).size() == 0) {
-                        throw new RuntimeException("标准中不存在该表字段的字段类型，version: " + version + ", table: " + tableName + ", field: " + fieldName);
+                        throw new IllegalJsonDataException("标准中不存在该表字段的字段类型，version: " + version + ", table: " + tableName + ", field: " + fieldName);
                     }
 
                     // 判断字段类型
@@ -345,9 +345,9 @@ public class DataSetPackageResolver extends PackageResolver {
                 dataSet.addRecord(Integer.toString(i), record);
                 packageDataSetList.add(dataSet);
             } catch (NullPointerException e) {
-                throw new RuntimeException("Null pointer occurs while generate data set, package cda version: " + version);
+                throw new IllegalJsonDataException("Null pointer occurs while generate data set, package cda version: " + version);
             } catch (ParseException e) {
-                throw new RuntimeException("Invalid date time format, do not deal with fail-tolerant.");
+                throw new IllegalJsonDataException("Invalid date time format, do not deal with fail-tolerant.");
             }
         }
         return packageDataSetList;

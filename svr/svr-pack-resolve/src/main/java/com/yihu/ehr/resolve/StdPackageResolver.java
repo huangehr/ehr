@@ -5,6 +5,7 @@ import com.yihu.ehr.constants.EventType;
 import com.yihu.ehr.profile.family.MasterResourceFamily;
 import com.yihu.ehr.profile.util.DataSetUtil;
 import com.yihu.ehr.profile.util.PackageDataSet;
+import com.yihu.ehr.resolve.exception.IllegalJsonFileException;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.resolve.service.resource.stage1.PackModelFactory;
 import com.yihu.ehr.resolve.service.resource.stage1.extractor.KeyDataExtractor;
@@ -48,7 +49,7 @@ public class StdPackageResolver extends PackageResolver {
      * @throws Exception
      * @throws IOException
      */
-    private void parseFiles(StandardPackage standardPackage, File[] files, boolean origin) throws Exception, IOException {
+    private void parseFiles(StandardPackage standardPackage, File[] files, boolean origin) throws Exception {
         List<PackageDataSet> packageDataSetList = new ArrayList<>(files.length);
         //新增补传判断---------------Start---------------
         for (File file : files) {
@@ -153,7 +154,7 @@ public class StdPackageResolver extends PackageResolver {
     private PackageDataSet generateDataSet(File jsonFile, boolean isOrigin) throws IOException {
         JsonNode jsonNode = objectMapper.readTree(jsonFile);
         if (jsonNode.isNull()) {
-            throw new IOException("Invalid json file when generate data set");
+            throw new IllegalJsonFileException("Invalid json file when generate data set");
         }
         PackageDataSet dataSet = dataSetResolverWithTranslator.parseStructuredJsonDataSet(jsonNode, isOrigin);
         return dataSet;

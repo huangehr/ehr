@@ -8,6 +8,7 @@ import com.yihu.ehr.resolve.model.stage1.DataSetPackage;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.util.compress.Zipper;
 import com.yihu.ehr.util.log.LogService;
+import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -62,7 +63,7 @@ public class PackageResolveService {
         try {
             root = new Zipper().unzipFile(new File(zipFile), TempPath + pack.get_id(), pack.getPwd());
             if (root == null || !root.isDirectory() || root.list().length == 0) {
-                throw new RuntimeException("Invalid package file " + pack.get_id() + ", do not deal with fail-tolerant.");
+                throw new ZipException("Invalid package file.");
             }
             //根据压缩包获取标准档案包
             StandardPackage standardPackage = PackModelFactory.createPackModel(root);
@@ -110,7 +111,7 @@ public class PackageResolveService {
         try {
             root = new Zipper().unzipFile(new File(zipFile), TempPath + pack.getId(), pack.getPwd());
             if (root == null || !root.isDirectory() || root.list().length == 0) {
-                throw new RuntimeException("Invalid package file " + pack.getId() + ", do not deal with fail-tolerant.");
+                throw new ZipException("Invalid package file.");
             }
             PackageResolver packageResolver = packageResolvers.get(ProfileType.DataSet);
             List<StandardPackage> standardPackages = packageResolver.resolveDataSets(root, pack.getClientId());
@@ -134,7 +135,7 @@ public class PackageResolveService {
         try {
             root = new Zipper().unzipFile(new File(zipFile), TempPath + pack.getId(), pack.getPwd());
             if (root == null || !root.isDirectory() || root.list().length == 0) {
-                throw new RuntimeException("Invalid package file " + pack.getId() + ", do not deal with fail-tolerant.");
+                throw new ZipException("Invalid package file.");
             }
 
             DataSetPackage profile = (DataSetPackage) PackModelFactory.createPackModel(root);
@@ -180,6 +181,5 @@ public class PackageResolveService {
         standardPackage.regularRowKey();
         return standardPackage;
     }
-
 
 }
