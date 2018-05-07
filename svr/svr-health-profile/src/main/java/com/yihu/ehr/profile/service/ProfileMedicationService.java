@@ -17,6 +17,8 @@ public class ProfileMedicationService {
 
     @Autowired
     private ResourceClient resource; //资源服务
+    @Autowired
+    private RedisService redisService;
 
     public List medicationRecords(String demographicId, String filter, String date, String keyWord) throws Exception {
         List<Map<String, Object>> resultList = new ArrayList<>();
@@ -69,26 +71,27 @@ public class ProfileMedicationService {
                             resultMap.put("eventNo", masterMap.get("event_no"));
                             //用药记录追加字段
                             resultMap.put("data", dataList);
-
                             //追加诊断名称 start
-                            String subQ1 = "{\"q\":\"profile_id:" + masterMap.get("rowkey") + "\"}";
-                            Envelop subEnvelop1 = resource.getSubData(subQ1, 1, 500, null);
-                            List<Map<String, Object>> subEventList = subEnvelop1.getDetailModelList();
                             String healthProblemName = "";
-                            //根据诊断名称或根据字典值进行取值
-                            for (Map<String ,Object> temp2 : subEventList) {
-                                String diagnosis = "";
-                                if (!StringUtils.isEmpty(temp2.get("EHR_000112")) || !StringUtils.isEmpty(temp2.get("EHR_000109_VALUE"))) {
-                                    diagnosis = temp2.get("EHR_000112") != null ? (String) temp2.get("EHR_000112") : (String) temp2.get("EHR_000109_VALUE");
+                            if (!StringUtils.isEmpty(masterMap.get("diagnosis_name"))) {
+                                healthProblemName = ((String) masterMap.get("diagnosis_name")).replaceAll(";", "、");
+                            } else if (!StringUtils.isEmpty(masterMap.get("diagnosis"))) {
+                                String [] diagnosisCode = ((String) masterMap.get("diagnosis")).split(";");
+                                for (String code : diagnosisCode) {
+                                    String name = redisService.getIcd10Name(code);
+                                    if (!StringUtils.isEmpty(name)) {
+                                        healthProblemName += name + "、";
+                                    }
                                 }
-                                if (StringUtils.isEmpty(diagnosis) && (!StringUtils.isEmpty(temp2.get("EHR_000295")) || !StringUtils.isEmpty(temp2.get("EHR_000293_VALUE")))) {
-                                    diagnosis = temp2.get("EHR_000295") != null ? (String) temp2.get("EHR_000295") : (String) temp2.get("EHR_000293_VALUE");
-                                }
-                                if (StringUtils.isEmpty(diagnosis) && (!StringUtils.isEmpty(temp2.get("EHR_000820")) || !StringUtils.isEmpty(temp2.get("EHR_000819_VALUE")))) {
-                                    diagnosis = temp2.get("EHR_000820") != null ? (String) temp2.get("EHR_000820") : (String) temp2.get("EHR_000819_VALUE");
-                                }
-                                if (!StringUtils.isEmpty(diagnosis)) {
-                                    healthProblemName += diagnosis + "、";
+                            } else if (!StringUtils.isEmpty(masterMap.get("health_problem_name"))) {
+                                healthProblemName = ((String) masterMap.get("health_problem_name")).replaceAll(";", "、");
+                            } else if (!StringUtils.isEmpty(masterMap.get("health_problem"))) {
+                                String [] _hpCode = ((String) masterMap.get("health_problem")).split(";");
+                                for (String code : _hpCode) {
+                                    String name = redisService.getHealthProblem(code);
+                                    if (!StringUtils.isEmpty(name)) {
+                                        healthProblemName += name + "、";
+                                    }
                                 }
                             }
                             resultMap.put("healthProblemName", healthProblemName);
@@ -102,7 +105,7 @@ public class ProfileMedicationService {
         return resultList;
     }
 
-    public Map<String, Integer> medicationRanking(String demographicId, String hpCode) {
+    public Map<String, Integer>  medicationRanking(String demographicId, String hpCode) {
         String masterQ;
         if (hpCode != null) {
             masterQ = "{\"q\":\"demographic_id:" + demographicId + " AND health_problem:*" +  hpCode + "*\"}";
