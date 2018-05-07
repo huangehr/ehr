@@ -206,7 +206,7 @@ public class AppEndPoint extends EnvelopRestEndPoint {
         String sort = "+sort";
         int page = 1;
         int size = 999;
-        List<SystemDictEntry> systemDictEntryList = systemDictEntryService.search(fields, filters, sort, size, page);
+        List<SystemDictEntry> systemDictEntryList = systemDictEntryService.search(fields, filters, sort, page, size);
         List<SystemDictEntryAppModel> systemDictEntryModelList = (List<SystemDictEntryAppModel>) convertToModels(systemDictEntryList, new ArrayList<SystemDictEntryAppModel>(systemDictEntryList.size()), SystemDictEntryAppModel.class, null);
         List<SystemDictEntryAppModel> DictEntryModelList=new ArrayList<>();
         if (systemDictEntryList.size() > 0) {
@@ -358,12 +358,11 @@ public class AppEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "userId") String userId) throws Exception {
         Envelop envelop = new Envelop();
         //获取系统字典项（医生工作站App类型）
-        String filters = "dictId=" + 179;
-        String fields = "";
+        String filters = "dictId=179";
         String sort = "+sort";
         int page = 1;
         int size = 999;
-        List<SystemDictEntry> systemDictEntryList = systemDictEntryService.search(fields, filters, sort, size, page);
+        List<SystemDictEntry> systemDictEntryList = systemDictEntryService.search(null, filters, sort, page, size);
         List<SystemDictEntryAppModel> systemDictEntryModelList = (List<SystemDictEntryAppModel>) convertToModels(systemDictEntryList, new ArrayList<SystemDictEntryAppModel>(systemDictEntryList.size()), SystemDictEntryAppModel.class, null);
         List<SystemDictEntryAppModel> DictEntryModelList=new ArrayList<>();
         if (systemDictEntryList.size() > 0) {

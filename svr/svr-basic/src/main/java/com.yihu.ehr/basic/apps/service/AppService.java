@@ -267,7 +267,7 @@ public class AppService extends BaseJpaService<App, AppDao> {
                         "   b.source_type as sourceType, b.release_flag as releaseFlag, b.manage_type AS manageType" +
                         "   FROM apps b " +
                         "LEFT JOIN user_app m on m.app_id=b.id " +
-                        "WHERE b.catalog= :catalog AND m.user_id=:userId AND m.show_flag='1' AND b.status='Approved'";
+                        "WHERE  m.user_id=:userId AND m.show_flag='1' AND b.status='Approved'";
         if (!StringUtils.isEmpty(doctorManageType)) {
             sql += "AND b.doctor_manage_type = :doctorManageType";
         }
