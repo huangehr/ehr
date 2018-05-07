@@ -4,7 +4,9 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.model.redis.MRedisMqPublisher;
+import com.yihu.ehr.redis.pubsub.entity.RedisMqChannel;
 import com.yihu.ehr.redis.pubsub.entity.RedisMqPublisher;
+import com.yihu.ehr.redis.pubsub.service.RedisMqChannelService;
 import com.yihu.ehr.redis.pubsub.service.RedisMqPublisherService;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
@@ -29,6 +31,8 @@ public class RedisMqPublisherEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     private RedisMqPublisherService redisMqPublisherService;
+    @Autowired
+    private RedisMqChannelService redisMqChannelService;
 
     @ApiOperation("根据ID获取消息发布者")
     @RequestMapping(value = ServiceApi.Redis.MqPublisher.GetById, method = RequestMethod.GET)
@@ -89,6 +93,11 @@ public class RedisMqPublisherEndPoint extends EnvelopRestEndPoint {
             RedisMqPublisher newEntity = objectMapper.readValue(entityJson, RedisMqPublisher.class);
             newEntity = redisMqPublisherService.save(newEntity);
 
+            // 累计发布者数
+            RedisMqChannel channel = redisMqChannelService.findByChannel(newEntity.getChannel());
+            channel.setPublisherNum(channel.getPublisherNum() + 1);
+            redisMqChannelService.save(channel);
+
             MRedisMqPublisher mRedisMqPublisher = convertToModel(newEntity, MRedisMqPublisher.class);
             envelop.setObj(mRedisMqPublisher);
             envelop.setSuccessFlg(true);
@@ -130,7 +139,13 @@ public class RedisMqPublisherEndPoint extends EnvelopRestEndPoint {
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
         try {
+            RedisMqPublisher publisher = redisMqPublisherService.getById(id);
             redisMqPublisherService.delete(id);
+
+            // 扣减发布者数
+            RedisMqChannel channel = redisMqChannelService.findByChannel(publisher.getChannel());
+            channel.setPublisherNum(channel.getPublisherNum() - 1);
+            redisMqChannelService.save(channel);
 
             envelop.setSuccessFlg(true);
             envelop.setErrorMsg("成功删除消息发布者。");
