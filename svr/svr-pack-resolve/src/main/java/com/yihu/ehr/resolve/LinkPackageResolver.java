@@ -49,11 +49,6 @@ public class LinkPackageResolver extends PackageResolver {
     private FastDFSUtil fastDFSUtil;
 
     @Override
-    public List<StandardPackage> resolveDataSets(File root, String clinetId) throws Exception {
-        return null;
-    }
-
-    @Override
     public void resolve(StandardPackage profile, File root) throws IOException, ParseException , NoSuchAlgorithmException, MyException {
         LinkPackage linkPackModel = (LinkPackage) profile;
 
