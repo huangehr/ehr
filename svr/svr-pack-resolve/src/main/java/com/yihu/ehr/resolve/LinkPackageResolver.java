@@ -2,15 +2,27 @@ package com.yihu.ehr.resolve;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.profile.util.MetaDataRecord;
+import com.yihu.ehr.resolve.model.stage1.LinkFile;
 import com.yihu.ehr.resolve.model.stage1.LinkPackage;
 import com.yihu.ehr.resolve.model.stage1.LinkPackageDataSet;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.util.datetime.DateUtil;
+import com.yihu.ehr.util.ftp.FtpUtils;
+import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPFile;
+import org.csource.common.MyException;
+import org.csource.common.NameValuePair;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.Iterator;
 import java.util.List;
@@ -42,7 +54,7 @@ public class LinkPackageResolver extends PackageResolver {
     }
 
     @Override
-    public void resolve(StandardPackage profile, File root) throws IOException, ParseException , NoSuchAlgorithmException, MyException{
+    public void resolve(StandardPackage profile, File root) throws IOException, ParseException , NoSuchAlgorithmException, MyException {
         LinkPackage linkPackModel = (LinkPackage) profile;
 
         File indexFile = new File(root.getAbsolutePath() + File.separator  + "index"+ File.separator+"patient_index.json");
