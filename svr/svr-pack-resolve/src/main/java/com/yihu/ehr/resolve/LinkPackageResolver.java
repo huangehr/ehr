@@ -25,12 +25,6 @@ import java.util.List;
 @Component
 public class LinkPackageResolver extends PackageResolver {
 
-
-    @Override
-    public List<StandardPackage> resolveDataSets(File root, String clinetId) throws Exception {
-        return null;
-    }
-
     @Override
     public void resolve(StandardPackage profile, File root) throws IOException, ParseException {
         LinkPackage linkPackModel = (LinkPackage) profile;

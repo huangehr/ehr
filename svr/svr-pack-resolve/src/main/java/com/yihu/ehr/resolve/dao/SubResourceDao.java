@@ -4,7 +4,6 @@ import com.yihu.ehr.constants.ProfileType;
 import com.yihu.ehr.hbase.HBaseDao;
 import com.yihu.ehr.hbase.TableBundle;
 import com.yihu.ehr.profile.core.ResourceCore;
-import com.yihu.ehr.profile.family.FileSubResourceFamily;
 import com.yihu.ehr.profile.family.SubResourceFamily;
 import com.yihu.ehr.resolve.model.stage2.ResourceBucket;
 import com.yihu.ehr.resolve.model.stage2.SubRecord;
@@ -31,14 +30,9 @@ public class SubResourceDao {
 
     public void saveOrUpdate(ResourceBucket resBucket) throws Exception {
         String tableName = ResourceCore.SubTable;
-        String basicColumn = SubResourceFamily.Basic;
-        String dataColumn = SubResourceFamily.Data;
         if (resBucket.getProfileType() == ProfileType.File){
             tableName = ResourceCore.FileSubTable;
-            basicColumn = FileSubResourceFamily.Basic;
-            dataColumn = FileSubResourceFamily.Data;
         }
-        
         String rowKey = resBucket.getId();
         TableBundle bundle = new TableBundle();
         if (resBucket.isReUploadFlg()) { //补传处理
@@ -56,12 +50,12 @@ public class SubResourceDao {
                 for (SubRecord record : subRecordList) {
                     bundle.addValues(
                             record.getRowkey(),
-                            basicColumn,
-                            ResourceStorageUtil.getSubResCells(basicColumn, record, resBucket));
+                            SubResourceFamily.Basic,
+                            ResourceStorageUtil.getSubResCells(SubResourceFamily.Basic, record, resBucket));
                     bundle.addValues(
                             record.getRowkey(),
-                            dataColumn,
-                            ResourceStorageUtil.getSubResCells(dataColumn, record, resBucket));
+                            SubResourceFamily.Data,
+                            ResourceStorageUtil.getSubResCells(SubResourceFamily.Data, record, resBucket));
                 }
                 hbaseDao.save(tableName, bundle);
             }
@@ -78,12 +72,12 @@ public class SubResourceDao {
             for (SubRecord record : subRecords.getRecords()) {
                 bundle.addValues(
                         record.getRowkey(),
-                        basicColumn,
-                        ResourceStorageUtil.getSubResCells(basicColumn, record, resBucket));
+                        SubResourceFamily.Basic,
+                        ResourceStorageUtil.getSubResCells(SubResourceFamily.Basic, record, resBucket));
                 bundle.addValues(
                         record.getRowkey(),
-                        dataColumn,
-                        ResourceStorageUtil.getSubResCells(dataColumn, record, resBucket));
+                        SubResourceFamily.Data,
+                        ResourceStorageUtil.getSubResCells(SubResourceFamily.Data, record, resBucket));
             }
             hbaseDao.save(tableName, bundle);
         }

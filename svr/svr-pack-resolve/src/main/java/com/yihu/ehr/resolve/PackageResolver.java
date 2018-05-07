@@ -25,13 +25,6 @@ public abstract class PackageResolver {
     @Autowired
     protected ExtractorChain extractorChain;
 
-    /**
-     *  非档案类型包解析
-     * @param root
-     * @throws Exception
-     */
-    public abstract List<StandardPackage> resolveDataSets(File root, String clientId) throws Exception;
-    
     public abstract void resolve(StandardPackage profile, File root) throws Exception;
 
 
