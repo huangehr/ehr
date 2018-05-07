@@ -150,6 +150,11 @@ hadoop:
 elasticsearch:
   cluster-name: elasticsearch
   cluster-nodes: 172.19.103.9:9300
+ftp:
+  address: 172.19.103.58
+  username: ruiruan
+  password: ruiruan123
+  port: 21
 
 ---
 spring:

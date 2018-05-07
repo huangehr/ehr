@@ -2,15 +2,24 @@ package com.yihu.ehr.resolve;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.profile.util.MetaDataRecord;
+import com.yihu.ehr.resolve.model.stage1.LinkFile;
 import com.yihu.ehr.resolve.model.stage1.LinkPackage;
 import com.yihu.ehr.resolve.model.stage1.LinkPackageDataSet;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.util.datetime.DateUtil;
+import com.yihu.ehr.util.ftp.FtpUtils;
+import org.csource.common.MyException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.Iterator;
 import java.util.List;
@@ -25,6 +34,16 @@ import java.util.List;
 @Component
 public class LinkPackageResolver extends PackageResolver {
 
+    @Value("${ftp.address}")
+    private String address;
+    @Value("${ftp.username}")
+    private String username;
+    @Value("${ftp.password}")
+    private String password;
+    @Value("${ftp.port}")
+    private int port;
+    @Autowired
+    private FastDFSUtil fastDFSUtil;
 
     @Override
     public List<StandardPackage> resolveDataSets(File root, String clinetId) throws Exception {
@@ -32,14 +51,14 @@ public class LinkPackageResolver extends PackageResolver {
     }
 
     @Override
-    public void resolve(StandardPackage profile, File root) throws IOException, ParseException {
+    public void resolve(StandardPackage profile, File root) throws IOException, ParseException , NoSuchAlgorithmException, MyException{
         LinkPackage linkPackModel = (LinkPackage) profile;
 
         File indexFile = new File(root.getAbsolutePath() + File.separator  + "index"+ File.separator+"patient_index.json");
         parseFile(linkPackModel, indexFile);
     }
 
-    private void parseFile(LinkPackage profile, File indexFile) throws IOException, ParseException {
+    private void parseFile(LinkPackage profile, File indexFile) throws IOException, ParseException, NoSuchAlgorithmException, MyException {
         JsonNode jsonNode = objectMapper.readTree(indexFile);
 
         String patientId = jsonNode.get("patient_id").asText();
@@ -75,6 +94,47 @@ public class LinkPackageResolver extends PackageResolver {
             profile.insertDataSet(dataSetCode, dataSet);
         }
 
+        //--------------增加ftp影像文件解析
+        // dataset节点，存储数据集URL
+        JsonNode filesNode = jsonNode.get("files");
+        if(filesNode != null){
+            List<LinkFile> linkFiles = profile.getLinkFiles();
+
+            ArrayNode arrayNode = (ArrayNode) filesNode;
+            //todo cyx 测试数据
+            username = "ceshicyx";
+            password="ceshi123456";
+
+            FtpUtils ftpUtils = new FtpUtils(username, password, address, port);
+            ftpUtils.connect();
+            for (int i = 0; i < arrayNode.size(); ++i){
+                JsonNode fileNode = arrayNode.get(i);
+                String fileName = fileNode.get("file").asText();
+                String fileExtension="";
+                if (fileName.contains(".")) {
+                    fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1);
+                } else {
+                    throw new RuntimeException("上传轻量档案文件失败, 文件缺失扩展名.");
+                }
+                String url = fileNode.get("url").asText();
+                String path = url.substring(5);//将url前面的ftp:/截取掉,剩下的path为文件的完整路径(包含文件名)
+                InputStream inputStream = ftpUtils.getInputStream(path);
+                ObjectNode msg = fastDFSUtil.upload(inputStream, fileExtension, "File from link profile package.");
+                LinkFile linkFile = new LinkFile();
+                linkFile.setFileExtension(fileExtension);
+                linkFile.setOriginName(fileName);
+                String fastdfsUrl = msg.get(FastDFSUtil.GROUP_NAME).asText() + "/" + msg.get(FastDFSUtil.REMOTE_FILE_NAME).asText();
+                linkFile.setUrl(fastdfsUrl);
+                linkFiles.add(linkFile);
+                path = path.substring(0,path.length()-fileName.length());//文件路径,不包含文件名
+                ftpUtils.deleteFile(path,fileName);
+            }
+            ftpUtils.connect();
+        }
+
+
+        //----------------------ftp影像文件解析end----
+
         // summary节点可能不存在
         JsonNode summaryNode = jsonNode.get("summary");
         if (summaryNode == null) return;
@@ -105,5 +165,21 @@ public class LinkPackageResolver extends PackageResolver {
             linkPackageDataSet.setCode(dataSetCode);
             profile.insertDataSet(dataSetCode, linkPackageDataSet);
         }
+    }
+
+    public static void main(String[] args) throws IOException {
+        //FtpUtils ftpUtils = new FtpUtils("ceshicyx", "ceshi123456", "172.19.103.58", 21);
+        //ftpUtils.connect();//
+        //InputStream inputStream = ftpUtils.getInputStream("/aa.txt");
+        //ftpUtils.closeConnect();
+        String url = "ftp://41872607-9/1/testcyx/testcyx-eventno/a02.jpg" ;
+        String fileName = "a02.jpg";
+
+        String path = url.substring(5);//该path包含文件名
+        System.out.println(path);
+        path = path.substring(0,path.length()-fileName.length()-1);
+        System.out.println(path);
+
+
     }
 }

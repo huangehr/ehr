@@ -1,7 +1,6 @@
 package com.yihu.ehr.agModel.template;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.yihu.ehr.util.validate.Required;
 
 import java.io.Serializable;
 import java.util.Date;

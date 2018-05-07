@@ -31,13 +31,13 @@ public class MasterResourceDao {
     private HBaseDao hbaseDao;
 
     public void saveOrUpdate(ResourceBucket resBucket, StandardPackage standardPackage) throws Exception {
-        String tableName = ResourceCore.MasterTable;
-        String dataColumn = MasterResourceFamily.Data;
-        String basicColumn = MasterResourceFamily.Basic;
-        if (resBucket.getProfileType() == ProfileType.File){
-            tableName = ResourceCore.FileMasterTable;
-            dataColumn = FileResourceFamily.Data;
-            basicColumn = FileResourceFamily.Basic;
+        String tableName = ResourceCore.FileMasterTable;
+        String dataColumn = FileResourceFamily.Data;
+        String basicColumn = FileResourceFamily.Basic;
+        if (resBucket.getProfileType() == ProfileType.Standard){
+            tableName = ResourceCore.MasterTable;
+            dataColumn = MasterResourceFamily.Data;
+            basicColumn = MasterResourceFamily.Basic;
         }
 
         String rowKey = resBucket.getId();

@@ -10,7 +10,6 @@ import com.yihu.ehr.resolve.model.stage2.ResourceBucket;
 import com.yihu.ehr.resolve.util.FileTableUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
@@ -38,6 +37,8 @@ public class FileResourceDao {
                 bundle.addValues(rowkey, FileFamily.Data, FileTableUtil.getFileFamilyCellMap(cdaDocument));
             }
             hbaseDao.save(ResourceCore.FileTable, bundle);
+        } else if (resBucket.getProfileType() == ProfileType.Link){
+            //todo cyx
         }
     }
 

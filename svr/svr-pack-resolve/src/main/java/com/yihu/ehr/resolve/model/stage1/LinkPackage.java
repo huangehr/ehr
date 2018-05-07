@@ -4,7 +4,9 @@ import com.yihu.ehr.constants.ProfileType;
 import com.yihu.ehr.profile.annotation.Table;
 import com.yihu.ehr.profile.core.ResourceCore;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 轻量级健康档案。其数据集保存的是机构健康档案中的链接。
@@ -27,5 +29,15 @@ public class LinkPackage extends StandardPackage {
 
     public void setExpireDate(Date expireDate) {
         this.expireDate = expireDate;
+    }
+
+    private List<LinkFile> linkFiles = new ArrayList<>();
+
+    public List<LinkFile> getLinkFiles() {
+        return linkFiles;
+    }
+
+    public void setLinkFiles(List<LinkFile> linkFiles) {
+        this.linkFiles = linkFiles;
     }
 }

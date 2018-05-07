@@ -1,6 +1,8 @@
 package com.yihu.ehr.util.file;
 
+import com.yihu.ehr.util.encrypt.Base64;
 import eu.medsea.mimeutil.MimeUtil;
+
 import java.io.*;
 import java.util.Collection;
 import java.util.HashMap;
@@ -337,6 +339,16 @@ public class FileUtil {
             }
         }
         return result;
+    }
+
+    /**
+     * InputStream转string
+     * @param is 输入流
+     * @return Base64编码 文件字节流
+     */
+    public static String streamToBase64String(InputStream is) {
+        byte[] bytes= FileUtil.getBytesByStream(is);
+        return Base64.encode(bytes);
     }
 
 }
