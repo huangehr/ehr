@@ -23,10 +23,10 @@ public class MRedisMqChannel implements Serializable{
     public String creator; // 创建者
     public Date modifyDate; // 修改时间
     public String modifier; // 修改者
-    public String enqueuedNum; // 入列数
-    public String dequeuedNum; // 出列数
-    public String subscriberNum; // 订阅者数
-    public String publisherNum; // 发布者数
+    public Integer enqueuedNum; // 入列数
+    public Integer dequeuedNum; // 出列数
+    public Integer subscriberNum; // 订阅者数
+    public Integer publisherNum; // 发布者数
 
     public Integer getId() {
         return id;
@@ -102,35 +102,35 @@ public class MRedisMqChannel implements Serializable{
         this.modifier = modifier;
     }
 
-    public String getEnqueuedNum() {
+    public Integer getEnqueuedNum() {
         return enqueuedNum;
     }
 
-    public void setEnqueuedNum(String enqueuedNum) {
+    public void setEnqueuedNum(Integer enqueuedNum) {
         this.enqueuedNum = enqueuedNum;
     }
 
-    public String getDequeuedNum() {
+    public Integer getDequeuedNum() {
         return dequeuedNum;
     }
 
-    public void setDequeuedNum(String dequeuedNum) {
+    public void setDequeuedNum(Integer dequeuedNum) {
         this.dequeuedNum = dequeuedNum;
     }
 
-    public String getSubscriberNum() {
+    public Integer getSubscriberNum() {
         return subscriberNum;
     }
 
-    public void setSubscriberNum(String subscriberNum) {
+    public void setSubscriberNum(Integer subscriberNum) {
         this.subscriberNum = subscriberNum;
     }
 
-    public String getPublisherNum() {
+    public Integer getPublisherNum() {
         return publisherNum;
     }
 
-    public void setPublisherNum(String publisherNum) {
+    public void setPublisherNum(Integer publisherNum) {
         this.publisherNum = publisherNum;
     }
 }

@@ -4,6 +4,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.model.redis.MRedisMqSubscriber;
+import com.yihu.ehr.redis.pubsub.entity.RedisMqChannel;
 import com.yihu.ehr.redis.pubsub.entity.RedisMqSubscriber;
 import com.yihu.ehr.redis.pubsub.service.RedisMqChannelService;
 import com.yihu.ehr.redis.pubsub.service.RedisMqSubscriberService;
@@ -105,6 +106,11 @@ public class RedisMqSubscriberEndPoint extends EnvelopRestEndPoint {
             RedisMqSubscriber newEntity = objectMapper.readValue(entityJson, RedisMqSubscriber.class);
             newEntity = redisMqSubscriberService.save(newEntity);
 
+            // 累计订阅者数
+            RedisMqChannel channel = redisMqChannelService.findByChannel(newEntity.getChannel());
+            channel.setSubscriberNum(channel.getSubscriberNum() + 1);
+            redisMqChannelService.save(channel);
+
             MRedisMqSubscriber mRedisMqSubscriber = convertToModel(newEntity, MRedisMqSubscriber.class);
             envelop.setObj(mRedisMqSubscriber);
             envelop.setSuccessFlg(true);
@@ -146,7 +152,13 @@ public class RedisMqSubscriberEndPoint extends EnvelopRestEndPoint {
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
         try {
+            RedisMqSubscriber subscriber = redisMqSubscriberService.getById(id);
             redisMqSubscriberService.delete(id);
+
+            // 扣减订阅者数
+            RedisMqChannel channel = redisMqChannelService.findByChannel(subscriber.getChannel());
+            channel.setSubscriberNum(channel.getSubscriberNum() - 1);
+            redisMqChannelService.save(channel);
 
             envelop.setSuccessFlg(true);
             envelop.setErrorMsg("成功删除消息订阅者。");
