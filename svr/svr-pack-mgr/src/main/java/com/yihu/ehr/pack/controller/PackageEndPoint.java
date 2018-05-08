@@ -446,10 +446,10 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
 
     //-------------------------------------------------
 
-    @RequestMapping(value = ServiceApi.Packages.Migrate, method = RequestMethod.POST)
+    /*@RequestMapping(value = ServiceApi.Packages.Migrate, method = RequestMethod.POST)
     @ApiOperation(value = "数据迁移")
     public boolean migrate() throws Exception {
         jsonArchivesService.migrate();
         return true;
-    }
+    }*/
 }
