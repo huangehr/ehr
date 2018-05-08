@@ -142,7 +142,7 @@ public class BaseStatistsService {
                                 secondKeyVal = secondKeyVal + "-" + secondMap.get(dimeDimensions[i]).toString() ;
                             }
                         }
-                        if(firstKeyVal.equals(secondKeyVal)){
+                        if(firstKeyVal.equals(secondKeyVal) || "quotaName".equals(dimension)){  // 如果维度是quotaName，则进入逻辑
                             double point = 0;
                             DecimalFormat df = new DecimalFormat("0.0");
                             float dimeResultVal = Float.valueOf(secondMap.get("result").toString());
