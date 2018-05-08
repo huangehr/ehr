@@ -29,6 +29,12 @@ public class EsConfig {
     private String constValue;  // 分母为常量的类型 1总人口数 2……
     private String district;    // 所属区域  根据区域获取该区域下的总人口数
 
+    private String addOperation;//加法运算方式  1 加法 默认 2 减法
+    private String addFirstQuotaCode;//加法第一个指标
+    private String addFirstFilter;//加法第一个指标过滤条件
+    private String addSecondQuotaCode;//加法第二个指标
+    private String addSecondFilter;//加法第二个指标过滤条件
+
     //已停止使用
     private String thousandFlag; //每千，每万 1000,10000
     private String thousandDmolecular; //每千，每万 统计分子
@@ -227,5 +233,45 @@ public class EsConfig {
 
     public void setFullQuery(String fullQuery) {
         this.fullQuery = fullQuery;
+    }
+
+    public String getAddOperation() {
+        return addOperation;
+    }
+
+    public void setAddOperation(String addOperation) {
+        this.addOperation = addOperation;
+    }
+
+    public String getAddFirstQuotaCode() {
+        return addFirstQuotaCode;
+    }
+
+    public void setAddFirstQuotaCode(String addFirstQuotaCode) {
+        this.addFirstQuotaCode = addFirstQuotaCode;
+    }
+
+    public String getAddFirstFilter() {
+        return addFirstFilter;
+    }
+
+    public void setAddFirstFilter(String addFirstFilter) {
+        this.addFirstFilter = addFirstFilter;
+    }
+
+    public String getAddSecondQuotaCode() {
+        return addSecondQuotaCode;
+    }
+
+    public void setAddSecondQuotaCode(String addSecondQuotaCode) {
+        this.addSecondQuotaCode = addSecondQuotaCode;
+    }
+
+    public String getAddSecondFilter() {
+        return addSecondFilter;
+    }
+
+    public void setAddSecondFilter(String addSecondFilter) {
+        this.addSecondFilter = addSecondFilter;
     }
 }
