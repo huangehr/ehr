@@ -30,15 +30,14 @@ public class SubResourceDao {
     private HBaseDao hbaseDao;
 
     public void saveOrUpdate(ResourceBucket resBucket) throws Exception {
-        String tableName = ResourceCore.SubTable;
-        String basicColumn = SubResourceFamily.Basic;
-        String dataColumn = SubResourceFamily.Data;
-        if (resBucket.getProfileType() == ProfileType.File){
-            tableName = ResourceCore.FileSubTable;
-            basicColumn = FileSubResourceFamily.Basic;
-            dataColumn = FileSubResourceFamily.Data;
+        String tableName = ResourceCore.FileSubTable;
+        String dataColumn = FileSubResourceFamily.Basic;
+        String basicColumn = FileSubResourceFamily.Data;
+        if (resBucket.getProfileType() == ProfileType.Standard){
+            tableName = ResourceCore.SubTable;
+            basicColumn = SubResourceFamily.Basic;
+            dataColumn = SubResourceFamily.Data;
         }
-        
         String rowKey = resBucket.getId();
         TableBundle bundle = new TableBundle();
         if (resBucket.isReUploadFlg()) { //补传处理

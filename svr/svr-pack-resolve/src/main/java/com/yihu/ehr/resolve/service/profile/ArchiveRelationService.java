@@ -46,7 +46,7 @@ public class ArchiveRelationService {
         if (!StringUtils.isEmpty(re)) {
             hbaseDao.put(ResourceCore.MasterTable, profileId, ResourceFamily.Basic, MasterResourceFamily.BasicColumns.DemographicId, idCardNo);
         } else {
-            throw new Exception("不存在改条记录");
+            throw new Exception("不存在相关记录");
         }
     }
 
@@ -56,7 +56,7 @@ public class ArchiveRelationService {
             relation.set_id(resourceBucket.getId());
             ProfileType profileType = resourceBucket.getProfileType();
             if(profileType != null){
-                relation.setProfileType(2);
+                relation.setProfileType(profileType.getType());
             }
             relation.setName(resourceBucket.getPatientName());
             relation.setOrg_code(resourceBucket.getOrgCode());

@@ -9,7 +9,6 @@ import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.packs.EsDetailsPackage;
 import com.yihu.ehr.model.packs.EsSimplePackage;
 import com.yihu.ehr.model.security.MKey;
-import com.yihu.ehr.pack.entity.JsonArchives;
 import com.yihu.ehr.pack.feign.SecurityClient;
 import com.yihu.ehr.pack.service.JsonArchivesService;
 import com.yihu.ehr.util.encrypt.RSA;
@@ -67,7 +66,6 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
     private RedisTemplate<String, Serializable> redisTemplate;
     @Autowired
     private JsonArchivesService jsonArchivesService;
-
 
     @RequestMapping(value = ServiceApi.Packages.Packages, method = RequestMethod.POST)
     @ApiOperation(value = "接收档案", notes = "从集成开放平台接收健康档案数据包")
@@ -176,14 +174,11 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             @PathVariable(value = "id") String id,
             @ApiParam(name = "status", value = "状态", required = true)
             @RequestParam(value = "status") ArchiveStatus status,
+            @ApiParam(name = "errorTye", value = "错误类型(0 = 正常; -1 = 未定义; 1 = 压缩包有误; 2 = Json文件有误; 3 = 数据有误;)", required = true)
+            @RequestParam(value = "errorTye") int errorTye,
             @ApiParam(name = "message", value = "消息", required = true)
             @RequestBody String message) throws Exception {
-        Map<String, Object> sourceMap = elasticSearchUtil.findById(INDEX, TYPE, id);
-        if (null == sourceMap) {
-            return false;
-        }
         Map<String, Object> updateSource = new HashMap<>();
-        updateSource.put("resourced", 1);
         if (status == ArchiveStatus.Finished) {
             //入库成功
             Map<String, String> map = objectMapper.readValue(message, Map.class);
@@ -203,9 +198,13 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         } else {
             //入库失败
             updateSource.put("finish_date", null);
-            if (message.endsWith("do not deal with fail-tolerant.")) {
+            if (3 == errorTye) {
                 updateSource.put("fail_count", 3);
             } else {
+                Map<String, Object> sourceMap = elasticSearchUtil.findById(INDEX, TYPE, id);
+                if (null == sourceMap) {
+                    return false;
+                }
                 if ((int)sourceMap.get("fail_count") < 3) {
                     int failCount = (int)sourceMap.get("fail_count");
                     updateSource.put("fail_count", failCount + 1);
@@ -213,6 +212,8 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             }
             updateSource.put("message", message);
         }
+        updateSource.put("resourced", 1);
+        updateSource.put("error_type", errorTye);
         updateSource.put("archive_status", status.ordinal());
         elasticSearchUtil.voidUpdate(INDEX, TYPE, id, updateSource);
         return true;
@@ -231,11 +232,16 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "size") Integer size) throws Exception {
         List<Map<String, Object>> sourceList = elasticSearchUtil.page(INDEX, TYPE, filters, page, size);
         List<Map<String, Object>> updateSourceList = new ArrayList<>(sourceList.size());
+        final int _status = status.ordinal();
         sourceList.forEach(item -> {
             Map<String, Object> updateSource = new HashMap<>();
             updateSource.put("_id", item.get("_id"));
             updateSource.put("archive_status", status.ordinal());
-            updateSource.put("fail_count", 0);
+            if (_status == 2) {
+                updateSource.put("fail_count", 3);
+            } else {
+                updateSource.put("fail_count", 0);
+            }
             updateSourceList.add(updateSource);
         });
         elasticSearchUtil.bulkUpdate(INDEX, TYPE, updateSourceList);
@@ -327,9 +333,10 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             return null;
         }
         Map<String, Object> updateSource = new HashMap<>();
-        updateSource.put("resourced", 1);
-        updateSource.put("message", "正在入库中");
         updateSource.put("parse_date", dateFormat.format(new Date()));
+        updateSource.put("message", "正在入库中");
+        updateSource.put("resourced", 1);
+        updateSource.put("error_type", 0);
         updateSource.put("archive_status", 1);
         source = elasticSearchUtil.update(INDEX, TYPE, String.valueOf(source.get("_id")), updateSource);
         return objectMapper.readValue(objectMapper.writeValueAsString(source), EsDetailsPackage.class);

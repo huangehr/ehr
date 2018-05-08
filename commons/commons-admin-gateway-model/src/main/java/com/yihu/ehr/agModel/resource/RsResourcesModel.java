@@ -1,7 +1,5 @@
 package com.yihu.ehr.agModel.resource;
 
-import java.util.Date;
-
 /**
  * Created by hzp on 2016/5/4.
  * 资源列表

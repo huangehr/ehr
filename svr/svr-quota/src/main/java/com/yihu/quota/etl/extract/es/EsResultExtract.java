@@ -11,7 +11,6 @@ import com.yihu.quota.model.jpa.save.TjQuotaDataSave;
 import com.yihu.quota.service.save.TjDataSaveService;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
-import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.aggregations.bucket.terms.DoubleTerms;
@@ -26,7 +25,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by janseny on 2017/6/24

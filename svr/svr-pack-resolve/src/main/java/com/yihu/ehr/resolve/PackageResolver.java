@@ -7,7 +7,6 @@ import com.yihu.ehr.resolve.service.resource.stage1.extractor.ExtractorChain;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
-import java.util.List;
 
 /**
  * 包解析器。
@@ -25,13 +24,6 @@ public abstract class PackageResolver {
     @Autowired
     protected ExtractorChain extractorChain;
 
-    /**
-     *  非档案类型包解析
-     * @param root
-     * @throws Exception
-     */
-    public abstract List<StandardPackage> resolveDataSets(File root, String clientId) throws Exception;
-    
     public abstract void resolve(StandardPackage profile, File root) throws Exception;
 
 

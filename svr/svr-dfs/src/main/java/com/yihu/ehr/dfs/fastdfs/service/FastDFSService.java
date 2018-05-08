@@ -1,21 +1,15 @@
 package com.yihu.ehr.dfs.fastdfs.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.yihu.ehr.dfs.fastdfs.dao.FastDFSDao;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
-import org.apache.commons.lang3.StringUtils;
-import org.csource.common.MyException;
-import org.csource.common.NameValuePair;
-import org.csource.fastdfs.FileInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.Base64;
+import java.util.Map;
 
 /**
  * Service - 文件服务

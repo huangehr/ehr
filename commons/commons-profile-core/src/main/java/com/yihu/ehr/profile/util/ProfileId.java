@@ -49,7 +49,7 @@ public final class ProfileId implements Comparable<ProfileId>, Serializable {
      * @return 新创建的ID对象.
      */
     public static ProfileId get(final String orgId, final String eventNo, final Date timestamp,final int profileType) {
-        return new ProfileId(orgId, eventNo, timestamp,profileType);
+        return new ProfileId(orgId, eventNo, timestamp, profileType);
     }
 
     /**
@@ -62,7 +62,7 @@ public final class ProfileId implements Comparable<ProfileId>, Serializable {
     }
 
     //档案维度，有时间
-    public ProfileId(final String orgCode, final String eventNo, final Date timestamp,final int profileType) {
+    public ProfileId(final String orgCode, final String eventNo, final Date timestamp, final int profileType) {
         this.orgCode = orgCode;
         this.patientId = "";
         this.eventNo = eventNo;
@@ -170,24 +170,24 @@ public final class ProfileId implements Comparable<ProfileId>, Serializable {
 
     @Override
     public String toString() {
-        String str = "";
-        if (timestamp==0){
+        String str;
+        if (timestamp == 0){
             str = new StringBuilderEx("%1_%2_%3")
                     .arg(orgCode)
                     .arg(patientId)
                     .arg(eventNo)
                     .toString();
-        }else {
+        } else {
             str = new StringBuilderEx("%1_%2_%3")
                     .arg(orgCode)
                     .arg(eventNo)
                     .arg(timestamp)
                     .toString();
         }
-        if(profileType == 1){
+        if (profileType == 1){
             return str;
-        }else{
-            return str+"_"+profileType;
+        } else {
+            return profileType + "_" + str ;
         }
     }
 }

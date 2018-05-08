@@ -4,11 +4,8 @@ import com.yihu.ehr.basic.apps.model.App;
 import com.yihu.ehr.basic.apps.model.AppsRelation;
 import com.yihu.ehr.basic.apps.service.AppService;
 import com.yihu.ehr.basic.apps.service.AppsRelationService;
-import com.yihu.ehr.basic.apps.service.OauthClientDetailsService;
 import com.yihu.ehr.basic.dict.service.SystemDictEntryService;
-import com.yihu.ehr.basic.user.entity.RoleAppRelation;
 import com.yihu.ehr.basic.user.entity.Roles;
-import com.yihu.ehr.basic.user.service.RoleAppRelationService;
 import com.yihu.ehr.basic.user.service.RolesService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ErrorCode;
@@ -206,7 +203,7 @@ public class AppEndPoint extends EnvelopRestEndPoint {
         String sort = "+sort";
         int page = 1;
         int size = 999;
-        List<SystemDictEntry> systemDictEntryList = systemDictEntryService.search(fields, filters, sort, size, page);
+        List<SystemDictEntry> systemDictEntryList = systemDictEntryService.search(fields, filters, sort, page, size);
         List<SystemDictEntryAppModel> systemDictEntryModelList = (List<SystemDictEntryAppModel>) convertToModels(systemDictEntryList, new ArrayList<SystemDictEntryAppModel>(systemDictEntryList.size()), SystemDictEntryAppModel.class, null);
         List<SystemDictEntryAppModel> DictEntryModelList=new ArrayList<>();
         if (systemDictEntryList.size() > 0) {
@@ -349,6 +346,34 @@ public class AppEndPoint extends EnvelopRestEndPoint {
         AppsRelation appsRelation = toEntity(jsonData, AppsRelation.class);
         AppsRelation relation = appsRelationService.save(appsRelation);
         return success(relation);
+    }
+
+    @RequestMapping(value = ServiceApi.Apps.getDoctorAppsByType, method = RequestMethod.GET)
+    @ApiOperation(value = "根据条件，医生工作站-获取用户所拥有的应用")
+    public Envelop getDoctorAppsByType(
+            @ApiParam(name = "userId", value = "用户ID", required = true)
+            @RequestParam(value = "userId") String userId) throws Exception {
+        Envelop envelop = new Envelop();
+        //获取系统字典项（医生工作站App类型）
+        String filters = "dictId=179";
+        String sort = "+sort";
+        int page = 1;
+        int size = 999;
+        List<SystemDictEntry> systemDictEntryList = systemDictEntryService.search(null, filters, sort, page, size);
+        List<SystemDictEntryAppModel> systemDictEntryModelList = (List<SystemDictEntryAppModel>) convertToModels(systemDictEntryList, new ArrayList<SystemDictEntryAppModel>(systemDictEntryList.size()), SystemDictEntryAppModel.class, null);
+        List<SystemDictEntryAppModel> DictEntryModelList=new ArrayList<>();
+        if (systemDictEntryList.size() > 0) {
+            for (SystemDictEntryAppModel dict : systemDictEntryModelList){
+                Collection<App> mAppList = appService.getDoctorAppsByType(userId, dict.getCode());
+                List<MApp> appModelList = (List<MApp>) convertToModels(mAppList, new ArrayList<MApp>(mAppList.size()), MApp.class, null);
+                dict.setChildren(appModelList);
+                DictEntryModelList.add(dict);
+            }
+        }
+        //应用列表
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(DictEntryModelList);
+        return envelop;
     }
 
 
