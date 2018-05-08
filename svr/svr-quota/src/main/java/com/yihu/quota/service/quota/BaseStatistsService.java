@@ -113,25 +113,27 @@ public class BaseStatistsService {
 
     public List<Map<String, Object>> addition(String dimension, List<Map<String, Object>> firstList, List<Map<String, Object>> secondList,int operation){
         List<Map<String, Object>> addResultList = new ArrayList<>();
+        DecimalFormat df = new DecimalFormat("0.0");
+        String [] moleDimensions = dimension.split(";");
         for(Map<String, Object> firstMap :firstList) {
             if (null != firstMap && firstMap.size() > 0 ) {
                 Map<String, Object> map = new HashMap<>();
                 double firstResultVal = Double.valueOf(firstMap.get("result") == null ? "0" : firstMap.get("result").toString());
+                map.put("firstColumn", firstMap.get("firstColumn"));
                 String firstKeyVal = "";
-                String [] moleDimensions = dimension.split(";");
                 for(int i = 0 ;i < moleDimensions.length ; i++){
                     if(i == 0){
                         firstKeyVal = firstMap.get(moleDimensions[i]).toString();
                     }else {
                         firstKeyVal = firstKeyVal + "-" + firstMap.get(moleDimensions[i]).toString() ;
                     }
-                    map.put("firstColumn", firstMap.get("firstColumn"));
                     map.put(moleDimensions[i], firstMap.get(moleDimensions[i]).toString());
                 }
                 if (firstResultVal == 0) {
                     map.put("result",0);
                     addResultList.add(map);
                 } else {
+                    boolean pflag = true;
                     for(Map<String, Object> secondMap :secondList) {
                         String secondKeyVal = "";
                         String [] dimeDimensions = dimension.split(";");
@@ -144,7 +146,6 @@ public class BaseStatistsService {
                         }
                         if(firstKeyVal.equals(secondKeyVal) || "quotaName".equals(dimension)){  // 如果维度是quotaName，则进入逻辑
                             double point = 0;
-                            DecimalFormat df = new DecimalFormat("0.0");
                             float dimeResultVal = Float.valueOf(secondMap.get("result").toString());
                             if(dimeResultVal != 0){
                                 if(operation == 1){ //1 加法 默认
@@ -155,31 +156,43 @@ public class BaseStatistsService {
                             }
                             map.put("result",df.format(point));
                             addResultList.add(map);
-                        }else {
-                            map.put("result",0);
-                            addResultList.add(map);
+                            pflag = false;
+                            break;
                         }
+                    }
+                    if(pflag){
+                        map.put("result",firstResultVal);
+                        addResultList.add(map);
                     }
                 }
             }
         }
         //检查后面指标的维度是否全部有 累加进去
-        for(Map<String, Object> secondMap :secondList) {
-            String secondKeyVal = "";
-            String[] dimeDimensions = dimension.split(";");
-            for (int i = 0; i < dimeDimensions.length; i++) {
-                if (i == 0) {
-                    secondKeyVal = secondMap.get(dimeDimensions[i]).toString();
-                } else {
-                    secondKeyVal = secondKeyVal + "-" + secondMap.get(dimeDimensions[i]).toString();
-                }
+        Map<String, Object> addResuDimenMap = new HashMap<>();
+        for(int k = 0;k < addResultList.size();k++) {
+            Map<String, Object> addResultMap = addResultList.get(k);
+            String addDimenStr = "";
+            for (int i = 0; i < moleDimensions.length; i++) {
+                addDimenStr += addResultMap.get(moleDimensions[i]).toString() + "-";
             }
-            int num = addResultList.size();
-            for(int i = 0;i < num;i++) {
-                Map<String, Object> addResultMap = addResultList.get(i);
-                if( !addResultMap.containsKey(secondKeyVal)){
+            addResuDimenMap.put(addDimenStr,addDimenStr);
+        }
+
+        for(Map<String, Object> secondMap :secondList) {
+            String secondDimenStr = "";
+            String addDimenStr = "";
+            for(int i = 0 ;i < moleDimensions.length ; i++){
+                secondDimenStr +=  secondMap.get(moleDimensions[i]).toString() + "-";
+            }
+            if( !addResuDimenMap.containsKey(secondDimenStr)){
+                if( !addDimenStr.equals(secondDimenStr)){
                     Map<String, Object> map = new HashMap<>();
-                    map.put("result",0);
+                    float dimeResultVal = Float.valueOf(secondMap.get("result").toString());
+                    map.put("result",df.format(dimeResultVal));
+                    map.put("firstColumn", secondMap.get("firstColumn"));
+                    for(int i = 0 ;i < moleDimensions.length ; i++){
+                        map.put(moleDimensions[i], secondMap.get(moleDimensions[i]).toString());
+                    }
                     addResultList.add(map);
                 }
             }
