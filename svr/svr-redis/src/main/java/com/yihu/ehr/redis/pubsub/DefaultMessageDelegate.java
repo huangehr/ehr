@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
@@ -40,13 +39,6 @@ public class DefaultMessageDelegate implements MessageDelegate {
     @Autowired
     private RedisMqChannelService redisMqChannelService;
 
-    // 消息队列编码
-    private String channel;
-
-    public DefaultMessageDelegate(String channel) {
-        this.channel = channel;
-    }
-
     @Override
     public void handleMessage(String message, String channel) {
         try {
@@ -72,20 +64,15 @@ public class DefaultMessageDelegate implements MessageDelegate {
                     logger.info("消息订阅，channel: " + channel + ", subscribedUrl: " + subscribedUrl
                             + ", message: " + messageContent);
 
+                    boolean subFlag = false;
                     try {
                         // 推送消息到指定服务地址
                         HttpHeaders headers = new HttpHeaders();
                         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
                         HttpEntity<String> entity = new HttpEntity<>(messageContent, headers);
                         restTemplate.postForObject(subscribedUrl, entity, String.class);
-
-                        // 发生过订阅失败的场合，订阅成功之后，更新消息状态。
-                        if (!StringUtils.isEmpty(messageId)) {
-                            RedisMqMessageLog messageLog = redisMqMessageLogService.getById(messageId);
-                            messageLog.setStatus(1);
-                            redisMqMessageLogService.save(messageLog);
-                        }
-                    } catch (RestClientException e) {
+                        subFlag = true;
+                    } catch (Exception e) {
                         e.printStackTrace();
                         if (StringUtils.isEmpty(messageId)) {
                             // 头次订阅失败，则记录消息，以便于重试。
@@ -100,15 +87,31 @@ public class DefaultMessageDelegate implements MessageDelegate {
                         }
                     }
 
-                    // 累计出列数
-                    RedisMqChannel mqChannel = redisMqChannelService.findByChannel(channel);
-                    mqChannel.setDequeuedNum(mqChannel.getDequeuedNum() + 1);
-                    redisMqChannelService.save(mqChannel);
+                    if (subFlag) {
+                        // 累计出列数
+                        RedisMqChannel mqChannel = redisMqChannelService.findByChannel(channel);
+                        mqChannel.setDequeuedNum(mqChannel.getDequeuedNum() + 1);
+                        redisMqChannelService.save(mqChannel);
+
+                        // 发生过订阅失败的场合，订阅成功之后，更新消息状态。
+                        if (!StringUtils.isEmpty(messageId)) {
+                            RedisMqMessageLog messageLog = redisMqMessageLogService.getById(messageId);
+                            messageLog.setStatus(1);
+                            redisMqMessageLogService.save(messageLog);
+                        }
+                    }
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    // 消息队列编码
+    private String channel;
+
+    public DefaultMessageDelegate(String channel) {
+        this.channel = channel;
     }
 
     public int hashCode() {

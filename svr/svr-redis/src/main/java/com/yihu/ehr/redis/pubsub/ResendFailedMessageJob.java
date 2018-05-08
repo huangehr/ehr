@@ -24,6 +24,11 @@ import java.util.Map;
 @Component
 public class ResendFailedMessageJob {
 
+    // 最大次数尝试重发订阅失败消息
+    private final int maxFailedNum = 3;
+    // 一次性最多获取订阅失败消息的个数（注意：search 方法 size 超过 10000 会被赋值为 30）
+    private final int perTimeNum = 1000;
+
     @Autowired
     RedisMqMessageLogService redisMqMessageLogService;
     @Resource
@@ -34,11 +39,12 @@ public class ResendFailedMessageJob {
     /*
      * 将订阅失败的消息重新加入到队列进行发布
      */
-    @Scheduled(cron = "*/10 * * * * ?")
+    @Scheduled(cron = "0 */10 * * * ?")
     public void resend() {
         try {
             // 每次最多取一千条最早并且少于3次订阅失败的消息，重新加入到队列进行发布。
-            List<RedisMqMessageLog> messageLogList = redisMqMessageLogService.search("", "status=0;failedNum<3", "+createDate", 1, 1000);
+            String filters = "status=0;failedNum<" + maxFailedNum;
+            List<RedisMqMessageLog> messageLogList = redisMqMessageLogService.search("", filters, "+createDate", 1, perTimeNum);
             for (RedisMqMessageLog messageLog : messageLogList) {
                 // 发布消息
                 Map<String, Object> messageMap = new HashMap<>();
