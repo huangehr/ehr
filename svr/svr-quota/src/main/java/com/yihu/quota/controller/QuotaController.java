@@ -177,7 +177,11 @@ public class QuotaController extends BaseController {
                     } else {
                         resultList =  baseStatistsService.divisionQuota(esConfig.getMolecular(), esConfig.getDenominator(), dimension, molecularFilter, denominatorFilter, esConfig.getPercentOperation(), esConfig.getPercentOperationValue(),dateType, top);
                     }
-                }else {
+                } else if (StringUtils.isNotEmpty(esConfig.getAddOperation())) {
+                    String firstFilter = baseStatistsService.handleFilter(esConfig.getAddFirstFilter(), filters);
+                    String secondFilter = baseStatistsService.handleFilter(esConfig.getAddSecondFilter(), filters);
+                    resultList = baseStatistsService.addQuota(esConfig.getAddFirstQuotaCode(), firstFilter, esConfig.getAddSecondQuotaCode(), secondFilter, esConfig.getAddOperation(),dimension,dateType, top);
+                } else {
                     if(StringUtils.isNotEmpty(esConfig.getSuperiorBaseQuotaCode())){
                         //通过基础指标 抽取查询
                         resultList = baseStatistsService.getQuotaResultList(esConfig.getSuperiorBaseQuotaCode(), dimension,filters,dateType, top);
