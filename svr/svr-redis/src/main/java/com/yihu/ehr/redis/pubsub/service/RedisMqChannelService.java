@@ -2,11 +2,9 @@ package com.yihu.ehr.redis.pubsub.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.query.BaseJpaService;
-import com.yihu.ehr.redis.pubsub.MessageCommonBiz;
 import com.yihu.ehr.redis.pubsub.dao.RedisMqChannelDao;
 import com.yihu.ehr.redis.pubsub.dao.RedisMqPublisherDao;
 import com.yihu.ehr.redis.pubsub.entity.RedisMqChannel;
-import com.yihu.ehr.redis.pubsub.entity.RedisMqMessageLog;
 import com.yihu.ehr.redis.pubsub.entity.RedisMqPublisher;
 import com.yihu.ehr.util.rest.Envelop;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +31,8 @@ public class RedisMqChannelService extends BaseJpaService<RedisMqChannel, RedisM
     RedisMqPublisherDao redisMqPublisherDao;
     @Autowired
     RedisMqMessageLogService redisMqMessageLogService;
+    @Autowired
+    RedisMqChannelService redisMqChannelService;
     @Resource
     RedisTemplate<String, Object> redisTemplate;
     @Autowired
@@ -101,15 +101,17 @@ public class RedisMqChannelService extends BaseJpaService<RedisMqChannel, RedisM
                 return envelop;
             }
 
-            // 记录消息
-            RedisMqMessageLog redisMqMessageLog = MessageCommonBiz.newMessageLog(channel, publisherAppId, message);
-            redisMqMessageLogService.save(redisMqMessageLog);
-
             // 发布消息
             Map<String, Object> messageMap = new HashMap<>();
-            messageMap.put("messageLogId", redisMqMessageLog.getId());
+            messageMap.put("messageId", "");
+            messageMap.put("publisherAppId", publisherAppId);
             messageMap.put("messageContent", message);
             redisTemplate.convertAndSend(channel, objectMapper.writeValueAsString(messageMap));
+
+            // 累计入列数
+            RedisMqChannel mqChannel = redisMqChannelService.findByChannel(channel);
+            mqChannel.setEnqueuedNum(mqChannel.getEnqueuedNum() + 1);
+            redisMqChannelService.save(mqChannel);
 
             envelop.setSuccessFlg(true);
         } catch (Exception e) {

@@ -10,7 +10,6 @@ import com.yihu.ehr.model.packs.EsDetailsPackage;
 import com.yihu.ehr.model.packs.EsSimplePackage;
 import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.pack.feign.SecurityClient;
-import com.yihu.ehr.pack.service.JsonArchivesService;
 import com.yihu.ehr.util.encrypt.RSA;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
@@ -64,8 +63,8 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
     private ElasticSearchUtil elasticSearchUtil;
     @Autowired
     private RedisTemplate<String, Serializable> redisTemplate;
-    @Autowired
-    private JsonArchivesService jsonArchivesService;
+   /* @Autowired
+    private JsonArchivesService jsonArchivesService;*/
 
     @RequestMapping(value = ServiceApi.Packages.Packages, method = RequestMethod.POST)
     @ApiOperation(value = "接收档案", notes = "从集成开放平台接收健康档案数据包")

@@ -9,6 +9,7 @@ import com.yihu.ehr.redis.pubsub.CustomMessageListenerAdapter;
 import com.yihu.ehr.redis.pubsub.MessageCommonBiz;
 import com.yihu.ehr.redis.pubsub.entity.RedisMqChannel;
 import com.yihu.ehr.redis.pubsub.entity.RedisMqMessageLog;
+import com.yihu.ehr.redis.pubsub.entity.RedisMqPublisher;
 import com.yihu.ehr.redis.pubsub.entity.RedisMqSubscriber;
 import com.yihu.ehr.redis.pubsub.service.RedisMqChannelService;
 import com.yihu.ehr.redis.pubsub.service.RedisMqMessageLogService;
@@ -109,6 +110,10 @@ public class RedisMqChannelEndPoint extends EnvelopRestEndPoint {
         envelop.setSuccessFlg(false);
         try {
             RedisMqChannel newEntity = objectMapper.readValue(entityJson, RedisMqChannel.class);
+            newEntity.setDequeuedNum(0);
+            newEntity.setEnqueuedNum(0);
+            newEntity.setPublisherNum(0);
+            newEntity.setSubscriberNum(0);
             newEntity = redisMqChannelService.save(newEntity);
 
             // 开启该订阅者的消息队列的消息监听
@@ -158,16 +163,22 @@ public class RedisMqChannelEndPoint extends EnvelopRestEndPoint {
         RedisMqChannel redisMqChannel = redisMqChannelService.getById(id);
         String channel = redisMqChannel.getChannel();
 
-        List<RedisMqMessageLog> messageLogList = redisMqMessageLogService.findByChannelAndStatus(channel, "0");
+        List<RedisMqMessageLog> messageLogList = redisMqMessageLogService.findByChannel(channel);
         if (messageLogList.size() != 0) {
             envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("该消息队列存在未消费消息，不能删除。");
+            envelop.setErrorMsg("该消息队列存在订阅失败的消息，不能删除。");
             return envelop;
         }
         List<RedisMqSubscriber> subscriberList = redisMqSubscriberService.findByChannel(channel);
         if (subscriberList.size() != 0) {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("该消息队列存在订阅者，不能删除。");
+            return envelop;
+        }
+        List<RedisMqPublisher> publisherList = redisMqPublisherService.findByChannel(channel);
+        if (publisherList.size() != 0) {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("该消息队列存在发布者，不能删除。");
             return envelop;
         }
 
