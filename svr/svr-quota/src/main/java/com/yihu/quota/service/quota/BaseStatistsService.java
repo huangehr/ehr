@@ -112,7 +112,7 @@ public class BaseStatistsService {
 
 
     public List<Map<String, Object>> addition(String dimension, List<Map<String, Object>> firstList, List<Map<String, Object>> secondList,int operation){
-        List<Map<String, Object>> divisionResultList = new ArrayList<>();
+        List<Map<String, Object>> addResultList = new ArrayList<>();
         for(Map<String, Object> firstMap :firstList) {
             if (null != firstMap && firstMap.size() > 0 ) {
                 Map<String, Object> map = new HashMap<>();
@@ -130,7 +130,7 @@ public class BaseStatistsService {
                 }
                 if (firstResultVal == 0) {
                     map.put("result",0);
-                    divisionResultList.add(map);
+                    addResultList.add(map);
                 } else {
                     for(Map<String, Object> secondMap :secondList) {
                         String secondKeyVal = "";
@@ -154,14 +154,37 @@ public class BaseStatistsService {
                                 }
                             }
                             map.put("result",df.format(point));
-                            divisionResultList.add(map);
-                            break;
+                            addResultList.add(map);
+                        }else {
+                            map.put("result",0);
+                            addResultList.add(map);
                         }
                     }
                 }
             }
         }
-        return  divisionResultList;
+        //检查后面指标的维度是否全部有 累加进去
+        for(Map<String, Object> secondMap :secondList) {
+            String secondKeyVal = "";
+            String[] dimeDimensions = dimension.split(";");
+            for (int i = 0; i < dimeDimensions.length; i++) {
+                if (i == 0) {
+                    secondKeyVal = secondMap.get(dimeDimensions[i]).toString();
+                } else {
+                    secondKeyVal = secondKeyVal + "-" + secondMap.get(dimeDimensions[i]).toString();
+                }
+            }
+            int num = addResultList.size();
+            for(int i = 0;i < num;i++) {
+                Map<String, Object> addResultMap = addResultList.get(i);
+                if( !addResultMap.containsKey(secondKeyVal)){
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("result",0);
+                    addResultList.add(map);
+                }
+            }
+        }
+        return  addResultList;
     }
 
     /**
