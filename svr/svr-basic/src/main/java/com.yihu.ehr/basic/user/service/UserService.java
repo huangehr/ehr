@@ -360,7 +360,9 @@ public class UserService extends BaseJpaService<User, XUserRepository> {
         if (demographicInfo != null) {
             xDemographicInfoRepository.save(demographicInfo);
         }
-        roleUserService.batchUpdateRoleUsersRelation(user1.getId(), user.getRole());
+        if (!StringUtils.isEmpty(user.getRole())){
+            roleUserService.batchUpdateRoleUsersRelation(user1.getId(), user.getRole());
+        }
         return user1;
     }
 }
