@@ -259,6 +259,7 @@ public class ServiceApi {
         public static final String RsReportTemplateContent = "/resources/report/getTemplateContent";
         public static final String RsReportIsCategoryApplied = "/resources/report/isCategoryApplied";
         public static final String RsReportByCategoryId = "/resources/report/getByCategoryId";
+        public static final String GetPositionMapByCode = "/open/resources/report/getPositionMapByCode";
 
         /**
          * 资源报表视图配置
