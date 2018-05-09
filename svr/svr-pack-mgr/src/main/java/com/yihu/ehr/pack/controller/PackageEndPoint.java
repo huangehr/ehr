@@ -173,7 +173,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             @PathVariable(value = "id") String id,
             @ApiParam(name = "status", value = "状态", required = true)
             @RequestParam(value = "status") ArchiveStatus status,
-            @ApiParam(name = "errorTye", value = "错误类型(0 = 正常; -1 = 未定义; 1 = 压缩包有误; 2 = Json文件有误; 3 = 数据有误;)", required = true)
+            @ApiParam(name = "errorTye", value = "错误类型(0 = 正常; -1 = 未定义; 1 = 压缩包有误; 2 = Json文件有误; 3 = 数据有误 4 = 内部服务有误;)", required = true)
             @RequestParam(value = "errorTye") int errorTye,
             @ApiParam(name = "message", value = "消息", required = true)
             @RequestBody String message) throws Exception {
