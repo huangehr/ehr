@@ -37,7 +37,7 @@ public class PackageQcService {
      *
      * @param zipPackage 档案包
      */
-    @Async
+    //@Async
     public void qcHandle(ZipPackage zipPackage) {
         sendQcMsg(zipPackage);
         qcReceive(zipPackage);
