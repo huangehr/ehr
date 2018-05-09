@@ -80,7 +80,7 @@ public class PackMillService {
             }
             Boolean isMultiRecord = redisService.getDataSetMultiRecord(srcDataSet.getCdaVersion(), srcDataSet.getCode());
             if (null == isMultiRecord) {
-                throw new ResolveException("IsMultiRecord can not be null.");
+                throw new ResolveException(srcDataSet.getCode() + " is_multi_record can not be null for std version " + srcDataSet.getCdaVersion());
             }
             Set<String> keys = srcDataSet.getRecordKeys();
             if (!isMultiRecord){
@@ -94,7 +94,7 @@ public class PackMillService {
                             continue;
                         }
                         //masterRecord.addResource(resourceMetaData, metaDataRecord.getMetaData(metaDataCode));
-                        dictTransform(masterRecord, stdPack.getCdaVersion(), resMetadata, metaDataRecord.getMetaData(srcMetadataCode));
+                        dictTransform(masterRecord, stdPack.getCdaVersion(), srcDataSet.getCode(), srcMetadataCode, resMetadata, metaDataRecord.getMetaData(srcMetadataCode));
                     }
                     //仅一条记录
                     break;
@@ -115,13 +115,13 @@ public class PackMillService {
                         }
                     }
                     MetaDataRecord metaDataRecord = srcDataSet.getRecord(key);
-                    for (String metaDataCode : metaDataRecord.getMetaDataCodes()){
-                        String resourceMetaData = getResMetadata(stdPack.getCdaVersion(), srcDataSet.getCode(), metaDataCode);
-                        if (StringUtils.isEmpty(resourceMetaData)) {
+                    for (String srcMetadataCode : metaDataRecord.getMetaDataCodes()){
+                        String resMetadata = getResMetadata(stdPack.getCdaVersion(), srcDataSet.getCode(), srcMetadataCode);
+                        if (StringUtils.isEmpty(resMetadata)) {
                             continue;
                         }
                         //subRecord.addResource(resourceMetaData, metaDataRecord.getMetaData(metaDataCode));
-                        dictTransform(subRecord, stdPack.getCdaVersion(), resourceMetaData, metaDataRecord.getMetaData(metaDataCode));
+                        dictTransform(subRecord, stdPack.getCdaVersion(), srcDataSet.getCode(), srcMetadataCode, resMetadata, metaDataRecord.getMetaData(srcMetadataCode));
                     }
                     if (subRecord.getDataGroup().size() > 0) {
                         subRecords.addRecord(subRecord);
@@ -132,7 +132,7 @@ public class PackMillService {
         // files that unable to get structured data, store as they are
         if (stdPack.getProfileType() == ProfileType.File){
             resourceBucket.setCdaDocuments(((FilePackage) stdPack).getCdaDocuments());
-        }else if(stdPack.getProfileType() == ProfileType.Link){
+        } else if (stdPack.getProfileType() == ProfileType.Link){
             LinkPackage linkPackage = (LinkPackage)stdPack;
             resourceBucket.setLinkFiles(linkPackage.getLinkFiles());
         }
@@ -167,11 +167,13 @@ public class PackMillService {
      * STD字典转内部EHR字典
      * @param dataRecord 数据
      * @param cdaVersion 版本号
-     * @param metadataId EHR数据源ID
-     * @param value 原值
+     * @param stdDataSet STD数据集编码
+     * @param srcMetadataCode STD数据元
+     * @param metadataId EHR数据元
+     * @param value 值
      * @throws Exception
      */
-    protected void dictTransform(ResourceRecord dataRecord, String cdaVersion, String metadataId, String value) throws Exception {
+    protected void dictTransform(ResourceRecord dataRecord, String cdaVersion, String stdDataSet, String srcMetadataCode, String metadataId, String value) throws Exception {
         //查询对应内部EHR字段是否有对应字典
         String dictCode = getMetadataDict(metadataId);
         //内部EHR数据元字典不为空情况
@@ -181,7 +183,9 @@ public class PackMillService {
                 if (!value.contains("T") && !value.contains("Z")) {
                     StringBuilder error = new StringBuilder();
                     error.append("Invalid date time format ")
-                            .append(metadataId)
+                            .append(stdDataSet)
+                            .append(" ")
+                            .append(srcMetadataCode)
                             .append(" ")
                             .append(value)
                             .append(" for std version ")
