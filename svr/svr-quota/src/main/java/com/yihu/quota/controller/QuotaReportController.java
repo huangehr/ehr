@@ -934,4 +934,21 @@ public class QuotaReportController extends BaseController {
             return null;
         }
     }
+
+    @RequestMapping(value = ServiceApi.TJ.GetDeviceReports, method = RequestMethod.GET)
+    @ApiOperation(value = "报表-卫生设备一览")
+    public Map<String, String> getDeviceReports(
+            @ApiParam(name = "year", value = "年份", required = true)
+            @RequestParam(value = "year" , required = true) String year,
+            @ApiParam(name = "district", value = "区县", defaultValue = "1")
+            @RequestParam(value = "district", required = true) String district,
+            @ApiParam(name = "organization", value = "机构", defaultValue = "")
+            @RequestParam(value = "organization", required = false) String organization) {
+        Map<String, String> map = new HashMap<>();
+        String costOfOutPatient = baseStatistsService.getCostOfOutPatient();
+        String numOfOutPatient = baseStatistsService.getNumOfOutPatient();
+        map.put("costOfOutPatient", costOfOutPatient);
+        map.put("numOfOutPatient", numOfOutPatient);
+        return map;
+    }
 }
