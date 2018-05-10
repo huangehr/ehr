@@ -76,7 +76,7 @@ public class DefaultMessageDelegate implements MessageDelegate {
                         e.printStackTrace();
                         if (StringUtils.isEmpty(messageId)) {
                             // 头次订阅失败，则记录消息，以便于重试。
-                            RedisMqMessageLog messageLog = MessageCommonBiz.newMessageLog(channel, publisherAppId, message);
+                            RedisMqMessageLog messageLog = MessageCommonBiz.newMessageLog(channel, publisherAppId, messageContent);
                             messageLog.setFailedNum(1);
                             redisMqMessageLogService.save(messageLog);
                         } else {
