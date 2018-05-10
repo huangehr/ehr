@@ -46,8 +46,8 @@ public interface DeviceClient {
     @RequestMapping(value = ServiceApi.Device.DeviceSave, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("保存")
     Envelop save(
-            @ApiParam(name = "modelStr", value = "实体类Json")
-            @RequestBody String modelStr);
+            @ApiParam(name = "device", value = "实体类Json")
+            @RequestBody String device);
 
 
     @RequestMapping(value = ServiceApi.Device.DeviceDelete, method = RequestMethod.POST)
