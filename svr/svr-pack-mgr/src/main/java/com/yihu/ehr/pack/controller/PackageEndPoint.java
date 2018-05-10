@@ -79,6 +79,8 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "package_crypto") String packageCrypto,
             @ApiParam(name = "md5", value = "档案包MD5")
             @RequestParam(value = "md5", required = false) String md5,
+            @ApiParam(name = "packType", value = "包类型 默认为1(结构化) 1结构化档案，2文件档案，3链接档案，4数据集档案")
+            @RequestParam(value = "packType", required = false) Integer packType,
             HttpServletRequest request) throws Exception {
         logger.info("接收档案中....");
         MKey key = securityClient.getOrgKey(orgCode);
@@ -92,8 +94,11 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             throw new ApiException(HttpStatus.FORBIDDEN, ErrorCode.FORBIDDEN, "javax.crypto.BadPaddingException." + ex.getMessage());
         }
         String clientId = getClientId(request);
+        if(packType == null){
+            packType = 1;
+        }
         //更改成异步--->>防止大文件接收,导致阻塞,超时等问题
-        fastDFSTask.savePackageWithOrg(pack,password,orgCode,md5,clientId);
+        fastDFSTask.savePackageWithOrg(pack,password,orgCode,md5,clientId,packType);
         return true;
     }
 
