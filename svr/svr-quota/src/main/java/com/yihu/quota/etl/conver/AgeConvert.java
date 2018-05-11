@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 public class AgeConvert implements Convert {
 
     private static String EHR_003905 = "EHR_003905";  // 门诊年龄
-    private static String EHR_005013 = "EHR_003905";  // 住院年龄
+    private static String EHR_005013 = "EHR_005013";  // 住院年龄
 
 
     /**

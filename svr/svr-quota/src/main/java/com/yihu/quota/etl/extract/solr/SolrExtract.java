@@ -133,7 +133,9 @@ public class SolrExtract {
         //数据转换
         FilterModel filterModel = new FilterModel(list,null);
         filterModel = extractConverUtil.convert(filterModel,qds);
-        list = filterModel.getDataList();
+        if(filterModel != null && filterModel.getDataList() != null){
+            list = filterModel.getDataList();
+        }
 
         Map<String, String> statisticsResultMap = new LinkedHashMap<>(); // 统计结果集
         Map<String, String> daySlaveDictMap = new LinkedHashMap<>(); // 按天统计的所有日期项
