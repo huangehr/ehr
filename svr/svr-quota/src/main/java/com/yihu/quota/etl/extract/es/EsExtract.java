@@ -1,10 +1,5 @@
 package com.yihu.quota.etl.extract.es;
 
-import com.alibaba.druid.sql.ast.SQLExpr;
-import com.alibaba.druid.sql.ast.expr.SQLQueryExpr;
-import com.alibaba.druid.sql.parser.ParserException;
-import com.alibaba.druid.sql.parser.SQLExprParser;
-import com.alibaba.druid.sql.parser.Token;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.quota.etl.Contant;
@@ -19,22 +14,7 @@ import com.yihu.quota.service.quota.BaseStatistsService;
 import com.yihu.quota.vo.DictModel;
 import com.yihu.quota.vo.QuotaVo;
 import com.yihu.quota.vo.SaveModel;
-import net.sf.json.JSONObject;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.Client;
-import org.elasticsearch.search.aggregations.bucket.terms.DoubleTerms;
-import org.elasticsearch.search.aggregations.bucket.terms.LongTerms;
-import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
-import org.elasticsearch.search.aggregations.bucket.terms.Terms;
-import org.elasticsearch.search.aggregations.metrics.sum.InternalSum;
-import org.elasticsearch.search.aggregations.metrics.valuecount.InternalValueCount;
 import org.joda.time.DateTime;
-import org.nlpcn.es4sql.domain.Select;
-import org.nlpcn.es4sql.parse.ElasticSqlExprParser;
-import org.nlpcn.es4sql.parse.SqlParser;
-import org.nlpcn.es4sql.query.AggregationQueryAction;
-import org.nlpcn.es4sql.query.DefaultQueryAction;
-import org.nlpcn.es4sql.query.SqlElasticSearchRequestBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -597,6 +577,7 @@ public class EsExtract {
         for (TjQuotaDimensionSlave slave :tjQuotaDimensionSlaves) {
             allField.append(slave.getKeyVal() + ",");
         }
+
         //拼接where语句 和 分组字段
         StringBuffer whereSql = new StringBuffer(" where ");
         boolean filterFlag = false;
@@ -616,6 +597,7 @@ public class EsExtract {
                 whereSql.append( timeKey + " < '" + endTime + "'");
             }
         }
+
         String selectGroupField = allField.toString();
         String whereGroupField = allField.substring(0,allField.length() - 1);
         //拼接整个sql 语法
@@ -624,7 +606,10 @@ public class EsExtract {
             sql.append("select " + selectGroupField + " count(1) from " + tableName + whereSql + " group by " + whereGroupField + timeGroup );
         } else if (!StringUtils.isEmpty(esConfig.getAddFirstQuotaCode())) {
             String myWhere = "quotaCode in('" + esConfig.getAddFirstQuotaCode().replace("_", "") + "','" + esConfig.getAddSecondQuotaCode().replace("_", "") + "')";
-            sql.append("select " + selectGroupField + " sum(result) from " + tableName + whereSql + " and " + myWhere + " group by " + whereGroupField + timeGroup);
+            if (!"where".equals(whereSql.toString().trim())) {
+                myWhere = " and " + myWhere;
+            }
+            sql.append("select " + selectGroupField + " sum(result) from " + tableName + whereSql + myWhere + " group by " + whereGroupField + timeGroup);
         } else if(esConfig.getAggregation().equals(Contant.quota.aggregation_sum)){
             if(!StringUtils.isEmpty(esConfig.getAggregation()) && StringUtils.isEmpty(selectGroupField)|| selectGroupField.length()==0){
                 sql.append("select sum(" ).append(esConfig.getAggregationKey()).append(" )  from " + tableName + whereSql);
