@@ -1124,7 +1124,9 @@ public class BaseStatistsService {
             lastDate.add(Calendar.YEAR, -1);
             beforeNow = lastDate.get(Calendar.YEAR);
             if (StringUtils.isNotEmpty(filters) && filters.contains("quotaDate")) {
-                String condition = filters.substring(filters.indexOf("'") + 1, filters.indexOf("'") + 5);
+                boolean b = filters.indexOf("'") > -1;
+                int start = b ? filters.indexOf("'") : filters.indexOf("\"");
+                String condition = filters.substring(start + 1, start + 5);
                 now = Integer.parseInt(condition);
                 beforeNow = now - 1;
             }
@@ -1145,7 +1147,9 @@ public class BaseStatistsService {
             // 如果有时间过滤条件，则按时间条件计算
             if (StringUtils.isNotEmpty(filters) && filters.contains("quotaDate")) {
                 Calendar cal = Calendar.getInstance();
-                String condition = filters.substring(filters.indexOf("'") + 1, filters.indexOf("'") + 5);
+                boolean b = filters.indexOf("'") > -1;
+                int start = b ? filters.indexOf("'") : filters.indexOf("\"");
+                String condition = filters.substring(start + 1, start + 5);
                 int year = Integer.parseInt(condition);
                 String condition2 = filters.substring(filters.indexOf("-") + 1, filters.indexOf("-") + 3);
                 int month = Integer.parseInt(condition2);
@@ -1170,5 +1174,14 @@ public class BaseStatistsService {
         List<Map<String, Object>> denoList = divisionQuota(esConfig.getMolecular(), esConfig.getDenominator(), dimension, denominatorFilter, denominatorFilter, esConfig.getPercentOperation(), esConfig.getPercentOperationValue(),null, "");
         resultList = divisionPercent(dimension, moleList, denoList, 1, 100);
         return resultList;
+    }
+
+    public static void main(String[] args) {
+        String filters = "quotaDate >= '2016-01-01' and quotaDate <= '2016-12-31'";
+        boolean b = filters.indexOf("'") > -1;
+        int start = b ? filters.indexOf("'") : filters.indexOf("\"");
+        String condition = filters.substring(start + 1, start + 5);
+        int now = Integer.parseInt(condition);
+        System.out.println(now);
     }
 }
