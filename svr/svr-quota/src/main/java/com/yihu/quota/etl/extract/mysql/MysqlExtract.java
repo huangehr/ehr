@@ -78,7 +78,10 @@ public class MysqlExtract {
                 mapList =  jdbcTemplate.queryForList(mysql);
                 FilterModel filterModel = new FilterModel(mapList,null);
                 //数据转换
-                extractConverUtil.convert(filterModel,qds);
+                filterModel =  extractConverUtil.convert(filterModel,qds);
+                if(filterModel != null && filterModel.getDataList() != null){
+                    mapList = filterModel.getDataList();
+                }
 
             }catch (Exception e){
                 throw new Exception("mysql查询数据出错" + e.getMessage());
