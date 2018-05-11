@@ -5,8 +5,6 @@ import com.yihu.ehr.analyze.feign.PackageMgrClient;
 import com.yihu.ehr.analyze.service.qc.PackageQcService;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.model.packs.EsSimplePackage;
-import com.yihu.ehr.model.packs.MPackage;
-import com.yihu.ehr.util.rest.Envelop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,9 +55,8 @@ public class PackageAnalyzeService {
                 zipPackage.unZip();
                 zipPackage.resolve();
                 zipPackage.save();
-                mgrClient.analyzeStatus(esSimplePackage.get_id(), 3);
-                //处理质控
                 packageQcService.qcHandle(zipPackage);
+                mgrClient.analyzeStatus(esSimplePackage.get_id(), 3);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -76,7 +73,7 @@ public class PackageAnalyzeService {
         }
     }
 
-    public void esSaveData (String index, String type, String dataList) throws Exception {
+    public void esSaveData(String index, String type, String dataList) throws Exception {
         List<Map<String, Object>> list = objectMapper.readValue(dataList, List.class);
         elasticSearchUtil.bulkIndex(index, type, list);
     }

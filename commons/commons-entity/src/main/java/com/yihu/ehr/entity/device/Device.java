@@ -44,6 +44,7 @@ public class Device extends BaseIdentityEntity{
 
     /**
      * 产地
+     * 1进口 2国产/合资
      */
     private String originPlace;
 
@@ -63,7 +64,7 @@ public class Device extends BaseIdentityEntity{
     private Date purchaseTime;
 
     /**
-     * 新旧情况
+     * 新旧情况 1新设备 2	二手设备
      */
     private String isNew;
 
@@ -78,12 +79,14 @@ public class Device extends BaseIdentityEntity{
     private Integer yearLimit;
 
     /**
-     * 状态
+     * 状态 1启用 2未启用 3报废
+
      */
     private String status;
 
     /**
-     * 是否配置GPS
+     * 是否配置GPS  1是 0否
+     *
      */
     private String isGps;
 

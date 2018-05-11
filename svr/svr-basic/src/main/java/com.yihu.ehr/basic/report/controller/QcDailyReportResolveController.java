@@ -26,9 +26,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
@@ -59,7 +61,7 @@ public class QcDailyReportResolveController extends EnvelopRestEndPoint {
     @ApiOperation(value = "接收质控包")
     Envelop receiveReportFile(
             @ApiParam(name = "reportFile", value = "质控包", allowMultiple = true)
-            @RequestParam(value = "reportFile") File reportFile,
+            @RequestParam(value = "reportFile") MultipartFile reportFile,
             @ApiParam(name = "org_code", value = "机构代码")
             @RequestParam(value = "org_code") String orgCode,
             @ApiParam(name = "encrypt_pwd", value = "解压密码,二次加密")
@@ -70,6 +72,7 @@ public class QcDailyReportResolveController extends EnvelopRestEndPoint {
             @RequestParam(value = "type", defaultValue = "1", required = true) int type) throws Exception {
         Envelop envelop = new Envelop();
         String password = null;
+        File file = null;
         try {
             UserSecurity key = userSecurityService.getKeyByOrgCode(orgCode);
             if (key == null || key.getPrivateKey() == null) {
@@ -77,17 +80,16 @@ public class QcDailyReportResolveController extends EnvelopRestEndPoint {
             }
             System.out.println(RSA.encrypt("p5Tm4unF",RSA.genPublicKey(key.getPublicKey())));
             password = RSA.decrypt(encryptPwd, RSA.genPrivateKey(key.getPrivateKey()));
-            InputStream in =  new FileInputStream(reportFile);
+            InputStream in =  reportFile.getInputStream();
             JsonReport jsonReport = reportService.receive(in, password, encryptPwd, md5, orgCode, type);
-            String fileName = TempPath+System.currentTimeMillis()+".zip";
-            File newFile = new File(fileName);
-            reportFile.renameTo(newFile);
+            file = File.createTempFile("tmp", ".zip");
+            reportFile.transferTo(file);
             Zipper zipper = new Zipper();
-            zipper.unzipFile(newFile, TempPath, password);
-            File file = new File(TempPath+"events.json");
-            JsonNode jsonNode = objectMapper.readTree(file);
-            newFile.delete();
+            zipper.unzipFile(file, TempPath, password);
+            File jsonFile = new File(TempPath+"events.json");
+            JsonNode jsonNode = objectMapper.readTree(jsonFile);
             file.delete();
+            jsonFile.delete();
             saveQcPackage(jsonNode,jsonReport);
             if (jsonReport != null) {
                 envelop.setSuccessFlg(true);
@@ -95,6 +97,7 @@ public class QcDailyReportResolveController extends EnvelopRestEndPoint {
                 envelop.setSuccessFlg(false);
             }
         } catch (Exception e) {
+            envelop.setErrorMsg("质控包上传失败");
             e.printStackTrace();
         }
         return envelop;
