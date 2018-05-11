@@ -401,11 +401,11 @@ public class ServiceApi {
         public static final String SimpleUpdate = "/app/simpleUpdate";
 
         //--------------- 医生工作平台 ---------------
-        public static final String GetAppsRelationByUserIdAndParentAppId ="/app/getAppsByUserId";
-        public static final String GetAppsRelationByUserJson ="/app/getAppsByUserJson";
+        public static final String GetAppsRelationByUserIdAndParentAppId = "/app/getAppsByUserId";
+        public static final String GetAppsRelationByUserJson = "/app/getAppsByUserJson";
 
         //--------------- 总支撑平台 ---------------
-        public static final String SaveAppsRelation ="/app/saveAppsRelation";
+        public static final String SaveAppsRelation = "/app/saveAppsRelation";
 
     }
 
@@ -621,7 +621,7 @@ public class ServiceApi {
     public static class PortalFeedback {
         public static final String PortalFeedback = "/portalFeedback";
         public static final String PortalFeedbackAdmin = "/portalFeedback/admin/{portalFeedback_id}";
-        public static final String PortalFeedBackByUserId="/protalFeedback/findByUserId";
+        public static final String PortalFeedBackByUserId = "/protalFeedback/findByUserId";
         public static final String pagePortalFeedback = "/pagePortalFeedback";
     }
 
@@ -1052,6 +1052,7 @@ public class ServiceApi {
         public static final String StdDataSetName = "/redis/stdDataSetName";
         public static final String StdDataSetNameByCode = "/redis/stdDataSetNameByCode";
         public static final String StdDataSetMultiRecord = "/redis/stdDataSetMultiRecord";
+        public static final String StdMetadataCodes = "/redis/stdMetadataCodes";
         public static final String StdMetadataType = "/redis/stdMetaDataType";
         public static final String StdMetadataFormat = "/redis/stdMetaData/format";
         public static final String StdMetadataNullable = "/redis/stdMetaData/nullable";
@@ -1336,11 +1337,7 @@ public class ServiceApi {
         public static final String GetArchiveManCount = "/tj/getArchiveManCount";
 
 
-
         public static final String GetYearDropdownList = "/tj/getYearDropdownList";
-
-
-
 
 
     }
@@ -1485,6 +1482,7 @@ public class ServiceApi {
         public static final String DeviceDelete = "/device/delete";
         public static final String DeviceBatch = "/device/batch";
     }
+
     public static class FastDFS {
         public static final String Upload = "/fastDfs/upload";
         public static final String OpenUpload = "/open/fastDfs/upload";
@@ -1526,14 +1524,6 @@ public class ServiceApi {
         public static final String StatisticDeptTransferTreatmentSum = "/outpatientServiceStatistic/statisticDeptTransferTreatmentSum";
     }
 
-    public class MessageTemplate {
-        public static final String MessageTemplateAdmin = "/messageTemplate/admin/{messageTemplateId}";
-        public static final String MessageTemplate = "/messageTemplate";
-        public static final String MyMessageList = "/messageTemplate/MyMessageList";
-        public static final String MyMessage = "/messageTemplate/MyMessage/admin/{messageId}";
-        public static final String MessageOrderPush = "/messageTemplate/messageOrderPush";
-    }
-
     public static class SingleDisease {
         public static final String GetDropdownList = "/singleDisease/getDropdownList";
         public static final String GetSymptomDetailData = "/singleDisease/getSymptomDetailData";
@@ -1544,9 +1534,9 @@ public class ServiceApi {
      * 后台配置问卷/满意度问题和选项
      */
     public static class SurveyAdminManage {
-        public static final String GetSurveyTemplateList="/admin/surveyTemplate/list";
-        public static final String GetSurveyTemplateOptionsList="/admin/surveyTemplate/options/list";
-        public static final String SaveLabelInfo ="/admin/surveyTemplate/saveLabelInfo";
+        public static final String GetSurveyTemplateList = "/admin/surveyTemplate/list";
+        public static final String GetSurveyTemplateOptionsList = "/admin/surveyTemplate/options/list";
+        public static final String SaveLabelInfo = "/admin/surveyTemplate/saveLabelInfo";
         public static final String SaveTemplate = "/admin/surveyTemplate/saveTemplate";
         public static final String GetTemplateLabel = "/admin/surveyTemplate/getTemplateLabel/{phoneticCode}";
         public static final String GetTemplateById = "/admin/surveyTemplate/getTemplateById";
@@ -1555,12 +1545,11 @@ public class ServiceApi {
 
         public static final String GetSurveyQuestionList = "/admin/surveyQuestion/list";
         public static final String SaveSurveyQuestion = "/admin/surveyQuestion/save";
-        public static final String GetQuestionById="/admin/surveyQuestion/getById";
-        public static final String GetQuestionsByIds ="/admin/surveyQuestion/getByIds";
-        public static final String DelQuestion ="/admin/surveyQuestion/delQuestion";
+        public static final String GetQuestionById = "/admin/surveyQuestion/getById";
+        public static final String GetQuestionsByIds = "/admin/surveyQuestion/getByIds";
+        public static final String DelQuestion = "/admin/surveyQuestion/delQuestion";
         public static final String DelQuestions = "/admin/surveyQuestion/delQuestions";
         public static final String updateQuestion = "/admin/surveyQuestion/update";
-
 
 
     }
@@ -1593,6 +1582,7 @@ public class ServiceApi {
         public static final String updateClientId = "/AppPushMessage/updateClientId";
 
     }
+
     /**
      * 预约-挂号单
      */
@@ -1619,11 +1609,19 @@ public class ServiceApi {
     /**
      * 账号相关
      */
-    public static class AccountRepresentation{
-        public static final String SaveAccontRepresenetation ="/account/save";
-        public static final String GetRandomImageCode ="/account/getRandomImageCode";
-        public static final String CheckRandomImageCode ="/account/checkRandomImageCode";
+    public static class AccountRepresentation {
+        public static final String SaveAccontRepresenetation = "/account/save";
+        public static final String GetRandomImageCode = "/account/getRandomImageCode";
+        public static final String CheckRandomImageCode = "/account/checkRandomImageCode";
         public static final String findUserByPhoneOrName = "/account/findUserByPhoneOrName";
         public static final String ChangePassWord = "/account/changePassWord";
+    }
+
+    public class MessageTemplate {
+        public static final String MessageTemplateAdmin = "/messageTemplate/admin/{messageTemplateId}";
+        public static final String MessageTemplate = "/messageTemplate";
+        public static final String MyMessageList = "/messageTemplate/MyMessageList";
+        public static final String MyMessage = "/messageTemplate/MyMessage/admin/{messageId}";
+        public static final String MessageOrderPush = "/messageTemplate/messageOrderPush";
     }
 }
