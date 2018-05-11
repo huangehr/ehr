@@ -168,13 +168,13 @@ public class QuotaReportController extends BaseController {
             }
             //以查询结果数据最多的指标为主，其他指标对应维度没有数据的补充0
             for (Map<String, Object> vMap : quotaViewResult.get(maxQuotaCode)) {
-                vMap.put(maxQuotaCode, vMap.get("result")==null ? 0 : nf.format(Double.valueOf(vMap.get("result").toString())));
+                vMap.put(maxQuotaCode, vMap.get("result")==null ? 0 : ("--".equals(vMap.get("result")) ? vMap.get("result") : nf.format(Double.valueOf(vMap.get("result").toString()))));
                 for (String viewQuotaCode : otherQuotaViewResult.keySet()) {
                     if(otherQuotaViewResult != null && otherQuotaViewResult.get(viewQuotaCode) != null && otherQuotaViewResult.get(viewQuotaCode).size()>0 ){
                         for (Map<String, Object> quotaResultMap : otherQuotaViewResult.get(viewQuotaCode)) {
                             if (quotaResultMap.get(dimension) != null) {
                                 if (vMap.get(dimension).toString().trim().equals(quotaResultMap.get(dimension).toString().trim())) {
-                                    vMap.put(viewQuotaCode, quotaResultMap.get("result")==null ? 0 : nf.format(Double.valueOf(quotaResultMap.get("result").toString())));
+                                    vMap.put(viewQuotaCode, quotaResultMap.get("result")==null ? 0 : ("--".equals(quotaResultMap.get("result")) ? quotaResultMap.get("result") : nf.format(Double.valueOf(quotaResultMap.get("result").toString()))));
                                     break;
                                 } else {
                                     vMap.put(viewQuotaCode, 0);
@@ -253,7 +253,7 @@ public class QuotaReportController extends BaseController {
     private double calculateSum( double sum,String code,List<Map<String, Object>> dataList){
         for(Map<String, Object> map : dataList){
             if(map.get(code) != null){
-                sum += Double.valueOf(map.get(code).toString());
+                sum += Double.valueOf("--".equals(map.get(code)) ? "0" : map.get(code).toString());
                 if(map.containsKey("children")){
                     calculateSum(sum,code,(List<Map<String, Object>>) map.get("children"));
                 }

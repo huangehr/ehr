@@ -1077,7 +1077,7 @@ public class BaseStatistsService {
                     map.put(moleDimensions[i], moleMap.get(moleDimensions[i]).toString());
                 }
                 if (moleResultVal == 0) {
-                    map.put("result",0);
+                    map.put("result", "--");
                     divisionResultList.add(map);
                 } else {
                     for(Map<String, Object> denoMap :denoList) {
@@ -1098,8 +1098,10 @@ public class BaseStatistsService {
                             float dimeResultVal = Float.valueOf(denoMap.get("result").toString());
                             if(dimeResultVal != 0) {
                                 point = ((moleResultVal - dimeResultVal)/dimeResultVal) * operationValue;
+                                map.put("result", nf.format(point));
+                            } else {
+                                map.put("result", "--");
                             }
-                            map.put("result", nf.format(point));
                             divisionResultList.add(map);
                             break;
                         }
