@@ -22,6 +22,7 @@ public class TjQuotaDimensionSlave implements java.io.Serializable {
     private String keyVal;
     private String type;
     private String groupByKey;//group by用的key
+    private String converClass;
 
 
 
@@ -103,5 +104,14 @@ public class TjQuotaDimensionSlave implements java.io.Serializable {
 
     public void setGroupByKey(String groupByKey) {
         this.groupByKey = groupByKey;
+    }
+
+    @Column(name = "conver_class", length = 100)
+    public String getConverClass() {
+        return converClass;
+    }
+
+    public void setConverClass(String converClass) {
+        this.converClass = converClass;
     }
 }

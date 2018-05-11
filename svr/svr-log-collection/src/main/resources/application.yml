@@ -128,7 +128,7 @@ es:
   clusterName: jkzl
 zookeeper:
   broker:
-    address: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com,node4.hde.h3c.com:2181
+    address: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com:2181
 
 ---
 spring:

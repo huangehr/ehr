@@ -4,10 +4,14 @@ import com.yihu.ehr.query.services.SolrQuery;
 import com.yihu.ehr.solr.SolrUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.quota.etl.Contant;
+import com.yihu.quota.etl.ExtractConverUtil;
+import com.yihu.quota.etl.conver.ConvertHelper;
 import com.yihu.quota.etl.extract.ExtractUtil;
 import com.yihu.quota.etl.model.EsConfig;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionMain;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionSlave;
+import com.yihu.quota.util.SpringUtil;
+import com.yihu.quota.vo.FilterModel;
 import com.yihu.quota.vo.QuotaVo;
 import com.yihu.quota.vo.SaveModel;
 import org.slf4j.Logger;
@@ -31,12 +35,13 @@ public class MysqlExtract {
     @Autowired
     private JdbcTemplate jdbcTemplate;
     @Autowired
-    SolrUtil solrUtil;
+    private SolrUtil solrUtil;
     @Autowired
-    SolrQuery solrQuery;
+    private SolrQuery solrQuery;
     @Autowired
-    ExtractUtil extractUtil;
-
+    private ExtractUtil extractUtil;
+    @Autowired
+    private ExtractConverUtil extractConverUtil;
     private QuotaVo quotaVo;
     private String startTime;
     private String endTime;
@@ -71,6 +76,13 @@ public class MysqlExtract {
             List<Map<String, Object>> mapList = null;
             try {
                 mapList =  jdbcTemplate.queryForList(mysql);
+                FilterModel filterModel = new FilterModel(mapList,null);
+                //数据转换
+                filterModel =  extractConverUtil.convert(filterModel,qds);
+                if(filterModel != null && filterModel.getDataList() != null){
+                    mapList = filterModel.getDataList();
+                }
+
             }catch (Exception e){
                 throw new Exception("mysql查询数据出错" + e.getMessage());
             }
@@ -96,6 +108,7 @@ public class MysqlExtract {
         return returnList;
 
     }
+
 
     public void initParams(String startTime, String endTime) {
         // 初始执行指标，起止日期没有值
