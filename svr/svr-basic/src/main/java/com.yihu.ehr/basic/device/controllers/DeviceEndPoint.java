@@ -50,9 +50,9 @@ public class DeviceEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Device.DeviceSave, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("保存")
     public Envelop save(
-            @ApiParam(name = "modelStr", value = "实体类Json")
-            @RequestBody String modelStr) throws Exception {
-        Device model = objectMapper.readValue(modelStr, Device.class);
+            @ApiParam(name = "device", value = "实体类Json")
+            @RequestBody String device) throws Exception {
+        Device model = objectMapper.readValue(device, Device.class);
         model = deviceService.save(model);
         return success(model);
     }

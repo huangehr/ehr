@@ -47,12 +47,12 @@ public class DeviceController extends BaseController {
     }
 
 
-    @RequestMapping(value = ServiceApi.Device.DeviceSave, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Device.DeviceSave, method = RequestMethod.POST)
     @ApiOperation("保存")
     public Envelop save(
-            @ApiParam(name = "modelStr", value = "实体类Json")
-            @RequestBody String modelStr) throws Exception {
-       return deviceClient.save(modelStr);
+            @ApiParam(name = "device", value = "实体类Json")
+            @RequestBody String device) throws Exception {
+       return deviceClient.save(device);
     }
 
 
