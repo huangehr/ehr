@@ -408,7 +408,6 @@ public class ExtractUtil {
         one.setAreaLevel(areaLevel);
         one.setResult("0");
         one.setCreateTime(new Date());
-        LocalDate today = LocalDate.now();
         one.setQuotaCode(quotaVo.getCode());
         one.setQuotaName(quotaVo.getName());
         one.setTimeLevel(timeLevel);
@@ -416,18 +415,18 @@ public class ExtractUtil {
         allData.put(key, one);
     }
 
-    private SaveModel setSaveModel(SaveModel one) {
-        one.setResult("0");
-        one.setCreateTime(new Date());
-        LocalDate today = LocalDate.now();
-        String yesterDay = (new DateTime().minusDays(1)).toString("yyyy-MM-dd");
-        one.setQuotaDate(yesterDay);
-        one.setQuotaCode(quotaVo.getCode());
-        one.setQuotaName(quotaVo.getName());
-        one.setTimeLevel(timeLevel);
-        one.setSaasId(null);
-        return one;
-    }
+//    private SaveModel setSaveModel(SaveModel one) {
+//        one.setResult("0");
+//        one.setCreateTime(new Date());
+//        LocalDate today = LocalDate.now();
+//        String yesterDay = (new DateTime().minusDays(1)).toString("yyyy-MM-dd");
+//        one.setQuotaDate(yesterDay);
+//        one.setQuotaCode(quotaVo.getCode());
+//        one.setQuotaName(quotaVo.getName());
+//        one.setTimeLevel(timeLevel);
+//        one.setSaasId(null);
+//        return one;
+//    }
 
     private void setSaveModelProperties(List<SaveModel> saveDataMain) {
         for (SaveModel model : saveDataMain) {
@@ -455,6 +454,9 @@ public class ExtractUtil {
                         model.setEconomic("1022");
                         model.setEconomicName("非公立");
                     }
+                } else {
+                    model.setEconomic("0");
+                    model.setEconomicName("未知");
                 }
                 if (!StringUtils.isEmpty(organizations.get(0).getLevelId())) {
                     String levelId = organizations.get(0).getLevelId();

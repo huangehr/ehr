@@ -24,6 +24,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -86,6 +87,22 @@ public class ExtractHelper {
             EsConfig esConfig= (EsConfig) JSONObject.toBean(obj,EsConfig.class);
             //得到主维度
             List<TjQuotaDimensionMain> tjQuotaDimensionMains = dimensionMainService.findTjQuotaDimensionMainByQuotaCode(quotaDataSource.getQuotaCode());
+            //当维度中有机构维度时，机构对应的区县会自动关联出来，所以区县不用在分组计算
+            boolean orgFlag = false;
+            TjQuotaDimensionMain townMain = null;
+            for (int j = 0; j < tjQuotaDimensionMains.size(); j++) {
+                TjQuotaDimensionMain one = tjQuotaDimensionMains.get(j);
+                if ( one.getMainCode().equals("org")) {
+                    orgFlag = true;
+                }
+                if ( one.getMainCode().equals("town")) {
+                    townMain = one;
+                }
+            }
+            if(orgFlag){
+                tjQuotaDimensionMains.remove(townMain);
+            }
+
             //得到细维度
             List<TjQuotaDimensionSlave> tjQuotaDimensionSlaves = dimensionSlaveService.findTjQuotaDimensionSlaveByQuotaCode(quotaDataSource.getQuotaCode());
 
