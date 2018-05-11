@@ -40,7 +40,7 @@ public class EsConfig {
     private String thousandDmolecular; //每千，每万 统计分子
     private String thousandDenominator; //每千，每万 统计分母
 
-
+    private String growthFlag;  // 增幅标志  1 year  2 month
 
     public String getSuperiorBaseQuotaCode() {
         return superiorBaseQuotaCode;
@@ -273,5 +273,13 @@ public class EsConfig {
 
     public void setAddSecondFilter(String addSecondFilter) {
         this.addSecondFilter = addSecondFilter;
+    }
+
+    public String getGrowthFlag() {
+        return growthFlag;
+    }
+
+    public void setGrowthFlag(String growthFlag) {
+        this.growthFlag = growthFlag;
     }
 }
