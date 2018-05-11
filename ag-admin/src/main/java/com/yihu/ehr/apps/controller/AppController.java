@@ -279,6 +279,8 @@ public class AppController extends BaseController {
             MOrganization organization = organizationClient.getOrg(mApp.getOrg());
             appModel.setOrgName(organization == null ? "" : organization.getFullName());
         }
+/*       update by zdm 20180505 此处根据应用已授权的资源rsIds获取资源，filters会出现过长，导致app查询失败。此处也不需要查看资源名称。所以注释。
+
         //获取已授权资源名称
         //根据appId获取授权资源rsIds
         //TODO 提供根据appId获取RsAppResourceModel集合接口来替代
@@ -304,7 +306,7 @@ public class AppController extends BaseController {
             rsNames += m.getName()+",";
         }
         rsNames = rsNames.substring(0,rsNames.length()-1);
-        appModel.setResourceNames(rsNames);
+        appModel.setResourceNames(rsNames);*/
         return appModel;
     }
 

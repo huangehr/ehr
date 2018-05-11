@@ -391,6 +391,7 @@ public class ServiceApi {
         public static final String FilterList = "/apps/filterList";
         public static final String getAppTypeAndApps = "/getAppTypeAndApps";
         public static final String getApps = "/getApps";
+        public static final String getDoctorAppsByType = "/getDoctorAppsByType";
 
         // ---------------- 开放平台 ----------------
         public static final String CheckField = "/app/checkField";
@@ -1471,6 +1472,17 @@ public class ServiceApi {
         public static final String LocationDelete = "/location/delete";
     }
 
+    /**
+     * 设备管理
+     */
+    public static class Device {
+        public static final String FindById = "/device/findById";
+        public static final String DeviceList = "/device/list";
+        public static final String DeviceSave = "/device/save";
+        public static final String DeviceUpdate = "/device/update";
+        public static final String DeviceDelete = "/device/delete";
+        public static final String DeviceBatch = "/device/batch";
+    }
     public static class FastDFS {
         public static final String Upload = "/fastDfs/upload";
         public static final String OpenUpload = "/open/fastDfs/upload";

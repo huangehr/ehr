@@ -35,11 +35,11 @@ public class ResourcesTransformService extends BaseJpaService {
      * @param version String 适配版本
      * @return
      */
-    public List<Map<String,Object>> displayCodeConvert(List<Map<String, Object>> resource,String version, String dataset,boolean withRowkey) {
+    public List<Map<String,Object>> displayCodeConvert(List<Map<String, Object>> resource,String version, String dataset) {
         //返回资源
         List<Map<String, Object>> returnRs =  new ArrayList<Map<String, Object>>();
         for (Map<String, Object> map : resource) {
-            returnRs.add(displayCodeConvert(map, version, dataset,withRowkey));
+            returnRs.add(displayCodeConvert(map, version, dataset));
         }
         return returnRs;
     }
@@ -49,7 +49,7 @@ public class ResourcesTransformService extends BaseJpaService {
      * @param version String 适配版本
      * @return
      */
-    public Map<String, Object> displayCodeConvert(Map<String, Object> resource, String version, String dataset,boolean withRowkey) {
+    public Map<String, Object> displayCodeConvert(Map<String, Object> resource, String version, String dataset) {
         //返回资源
         Map<String,Object> returnMap =  new HashMap<>();
         //适配方案
@@ -74,53 +74,10 @@ public class ResourcesTransformService extends BaseJpaService {
                 }
             }
             //将rowkey放入数据
-            if(withRowkey){
-                returnMap.put("rowkey",resource.get("rowkey"));
-            }
-            /*if (metadataList.size() > 0) {
-                //数据元Map,便于对应查找
-                Map<String, List<String>> adapterMap = new HashMap<>();
-                //数据元放入Map
-                for (RsAdapterMetadata meta : metadataList) {
-                    String key = meta.getMetadataId();
-                    List<String> values = new ArrayList<>();
-                    if(adapterMap.containsKey(key)) {
-                        values = adapterMap.get(key);
-                    }
-                    values.add(meta.getSrcMetadataCode());
-                    adapterMap.put(key, values);
-                }
-
-                //数据元代码转换
-                for (String key : resource.keySet()) {
-                    Object value = resource.get(key);
-                    //字典数据
-                    if (key.lastIndexOf("_VALUE") > 0) {
-                        String srcKey = key.substring(0, key.indexOf("_VALUE"));
-                        if (adapterMap.containsKey(srcKey)) {
-                            List<String> adapterKeys = adapterMap.get(srcKey);
-                            for(String adapterKey : adapterKeys) {
-                                returnMap.put(adapterKey + "_VALUE", value);
-                            }
-                        }
-                        else{
-                            returnMap.put(key, value);
-                        }
-                    }
-                    else{
-                        if (adapterMap.containsKey(key)) {
-                            List<String> adapterKeys = adapterMap.get(key);
-                            for(String adapterKey : adapterKeys) {
-                                returnMap.put(adapterKey, value);
-                            }
-                        }
-                        else{
-                            returnMap.put(key, value);
-                        }
-                    }
-
-                }
-            }*/
+            returnMap.put("rowkey", resource.get("rowkey"));
+            returnMap.put("org_code", resource.get("org_code"));
+            returnMap.put("event_no", resource.get("event_no"));
+            returnMap.put("event_date", resource.get("event_date"));
         }
         return returnMap;
     }

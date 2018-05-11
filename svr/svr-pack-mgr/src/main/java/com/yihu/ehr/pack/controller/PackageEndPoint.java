@@ -1,6 +1,5 @@
 package com.yihu.ehr.pack.controller;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.constants.*;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
@@ -9,9 +8,8 @@ import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.packs.EsDetailsPackage;
 import com.yihu.ehr.model.packs.EsSimplePackage;
 import com.yihu.ehr.model.security.MKey;
-import com.yihu.ehr.pack.entity.JsonArchives;
 import com.yihu.ehr.pack.feign.SecurityClient;
-import com.yihu.ehr.pack.service.JsonArchivesService;
+import com.yihu.ehr.pack.task.FastDFSTask;
 import com.yihu.ehr.util.encrypt.RSA;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
@@ -66,8 +64,9 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private RedisTemplate<String, Serializable> redisTemplate;
     @Autowired
-    private JsonArchivesService jsonArchivesService;
-
+    private FastDFSTask fastDFSTask;
+   /* @Autowired
+    private JsonArchivesService jsonArchivesService;*/
 
     @RequestMapping(value = ServiceApi.Packages.Packages, method = RequestMethod.POST)
     @ApiOperation(value = "接收档案", notes = "从集成开放平台接收健康档案数据包")
@@ -80,7 +79,10 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "package_crypto") String packageCrypto,
             @ApiParam(name = "md5", value = "档案包MD5")
             @RequestParam(value = "md5", required = false) String md5,
+            @ApiParam(name = "packType", value = "包类型 默认为1(结构化) 1结构化档案，2文件档案，3链接档案，4数据集档案")
+            @RequestParam(value = "packType", required = false) Integer packType,
             HttpServletRequest request) throws Exception {
+        logger.info("接收档案中....");
         MKey key = securityClient.getOrgKey(orgCode);
         if (key == null || key.getPrivateKey() == null) {
             throw new ApiException(HttpStatus.FORBIDDEN, ErrorCode.FORBIDDEN, "Invalid private key, maybe you miss the organization code?");
@@ -91,42 +93,12 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         } catch (Exception ex) {
             throw new ApiException(HttpStatus.FORBIDDEN, ErrorCode.FORBIDDEN, "javax.crypto.BadPaddingException." + ex.getMessage());
         }
-        //fastDfs
-        ObjectNode msg = fastDFSUtil.upload(pack.getInputStream(), "zip", "健康档案JSON文件");
-        String group = msg.get(FastDFSUtil.GROUP_NAME).asText();
-        String remoteFile = msg.get(FastDFSUtil.REMOTE_FILE_NAME).asText();
-        //将组与文件ID使用英文分号隔开, 提取的时候, 只需要将它们这个串拆开, 就可以得到组与文件ID
-        String remoteFilePath = String.join(EsDetailsPackage.PATH_SEPARATOR, new String[]{group, remoteFile});
-        //elasticSearch
-        Date now = new Date();
-        String _now = dateFormat.format(now);
-        Map<String, Object> sourceMap = new HashMap<>();
-        sourceMap.put("pwd", password);
-        sourceMap.put("remote_path", remoteFilePath);
-        sourceMap.put("receive_date", _now);
-        sourceMap.put("archive_status", 0);
-        sourceMap.put("org_code", orgCode);
-        sourceMap.put("client_id", getClientId(request));
-        sourceMap.put("resourced", 0);
-        sourceMap.put("md5_value", md5);
-        sourceMap.put("fail_count", 0);
-        sourceMap.put("analyze_status", 0);
-        sourceMap.put("analyze_fail_count", 0);
-        sourceMap.put("pack_type", 1);
-        //保存索引出错的时候，删除文件
-        try {
-            sourceMap = elasticSearchUtil.index(INDEX, TYPE, sourceMap);
-        } catch (Exception e) {
-            fastDFSUtil.delete(group, remoteFile);
-            throw e;
+        String clientId = getClientId(request);
+        if(packType == null){
+            packType = 1;
         }
-        EsSimplePackage esSimplePackage = new EsSimplePackage();
-        esSimplePackage.set_id((sourceMap.get("_id").toString()));
-        esSimplePackage.setPwd(password);
-        esSimplePackage.setReceive_date(now);
-        esSimplePackage.setRemote_path(remoteFilePath);
-        esSimplePackage.setClient_id(getClientId(request));
-        redisTemplate.opsForList().leftPush(RedisCollection.PackageList, objectMapper.writeValueAsString(esSimplePackage));
+        //更改成异步--->>防止大文件接收,导致阻塞,超时等问题
+        fastDFSTask.savePackageWithOrg(pack,password,orgCode,md5,clientId,packType);
         return true;
     }
 
@@ -176,14 +148,11 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             @PathVariable(value = "id") String id,
             @ApiParam(name = "status", value = "状态", required = true)
             @RequestParam(value = "status") ArchiveStatus status,
+            @ApiParam(name = "errorTye", value = "错误类型(0 = 正常; -1 = 未定义; 1 = 压缩包有误; 2 = Json文件有误; 3 = 数据有误;)", required = true)
+            @RequestParam(value = "errorTye") int errorTye,
             @ApiParam(name = "message", value = "消息", required = true)
             @RequestBody String message) throws Exception {
-        Map<String, Object> sourceMap = elasticSearchUtil.findById(INDEX, TYPE, id);
-        if (null == sourceMap) {
-            return false;
-        }
         Map<String, Object> updateSource = new HashMap<>();
-        updateSource.put("resourced", 1);
         if (status == ArchiveStatus.Finished) {
             //入库成功
             Map<String, String> map = objectMapper.readValue(message, Map.class);
@@ -203,9 +172,13 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         } else {
             //入库失败
             updateSource.put("finish_date", null);
-            if (message.endsWith("do not deal with fail-tolerant.")) {
+            if (3 == errorTye) {
                 updateSource.put("fail_count", 3);
             } else {
+                Map<String, Object> sourceMap = elasticSearchUtil.findById(INDEX, TYPE, id);
+                if (null == sourceMap) {
+                    return false;
+                }
                 if ((int)sourceMap.get("fail_count") < 3) {
                     int failCount = (int)sourceMap.get("fail_count");
                     updateSource.put("fail_count", failCount + 1);
@@ -213,6 +186,8 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             }
             updateSource.put("message", message);
         }
+        updateSource.put("resourced", 1);
+        updateSource.put("error_type", errorTye);
         updateSource.put("archive_status", status.ordinal());
         elasticSearchUtil.voidUpdate(INDEX, TYPE, id, updateSource);
         return true;
@@ -231,11 +206,16 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "size") Integer size) throws Exception {
         List<Map<String, Object>> sourceList = elasticSearchUtil.page(INDEX, TYPE, filters, page, size);
         List<Map<String, Object>> updateSourceList = new ArrayList<>(sourceList.size());
+        final int _status = status.ordinal();
         sourceList.forEach(item -> {
             Map<String, Object> updateSource = new HashMap<>();
             updateSource.put("_id", item.get("_id"));
             updateSource.put("archive_status", status.ordinal());
-            updateSource.put("fail_count", 0);
+            if (_status == 2) {
+                updateSource.put("fail_count", 3);
+            } else {
+                updateSource.put("fail_count", 0);
+            }
             updateSourceList.add(updateSource);
         });
         elasticSearchUtil.bulkUpdate(INDEX, TYPE, updateSourceList);
@@ -261,7 +241,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             updateSource.put("analyze_fail_count", 0); //避免手动修改状态后无法解析
         }
         updateSource.put("analyze_status", status);
-        elasticSearchUtil.update(INDEX, TYPE, id, updateSource);
+        elasticSearchUtil.voidUpdate(INDEX, TYPE, id, updateSource);
         return true;
     }
 
@@ -327,9 +307,10 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             return null;
         }
         Map<String, Object> updateSource = new HashMap<>();
-        updateSource.put("resourced", 1);
-        updateSource.put("message", "正在入库中");
         updateSource.put("parse_date", dateFormat.format(new Date()));
+        updateSource.put("message", "正在入库中");
+        updateSource.put("resourced", 1);
+        updateSource.put("error_type", 0);
         updateSource.put("archive_status", 1);
         source = elasticSearchUtil.update(INDEX, TYPE, String.valueOf(source.get("_id")), updateSource);
         return objectMapper.readValue(objectMapper.writeValueAsString(source), EsDetailsPackage.class);

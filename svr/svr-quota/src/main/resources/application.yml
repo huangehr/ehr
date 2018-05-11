@@ -29,7 +29,6 @@ hadoop:
   hbase-properties:
     hbase.zookeeper.property.clientPort: 2181
     zookeeper.znode.parent: /hbase-unsecure
-    hbase.zookeeper.quorum: node1,node2,node3
   user:
     name: root
 
@@ -53,7 +52,9 @@ spring:
 elasticsearch:
   cluster-name: elasticsearch
   cluster-nodes: 172.19.103.9:9300
-
+hadoop:
+  hbase-properties:
+    hbase.zookeeper.quorum: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com
 ---
 spring:
   profiles: test
@@ -74,6 +75,9 @@ spring:
 elasticsearch:
   cluster-name: elasticsearch
   cluster-nodes: 172.19.103.9:9300
+hadoop:
+  hbase-properties:
+    hbase.zookeeper.quorum: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com
 
 ---
 spring:
@@ -95,6 +99,9 @@ spring:
 elasticsearch:
   cluster-name: elasticsearch
   cluster-nodes: 11.1.2.3:9300
+hadoop:
+  hbase-properties:
+    hbase.zookeeper.quorum: node1.ehr.h3c.com,node2.ehr.h3c.com,node3.ehr.h3c.com
 
 ---
 spring:
@@ -116,6 +123,9 @@ spring:
 elasticsearch:
   cluster-name: elasticsearch
   cluster-nodes: 10.176.97.7:9300
+hadoop:
+  hbase-properties:
+    hbase.zookeeper.quorum: node1.jkzl.com,node2.jkzl.com,node3.jkzl.com
 
 ---
 spring:
@@ -137,6 +147,9 @@ spring:
 elasticsearch:
   cluster-name: elasticsearch
   cluster-nodes: 100.100.1.158:9300
+hadoop:
+  hbase-properties:
+    hbase.zookeeper.quorum: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com,node4.hde.h3c.com
 
 ---
 spring:
@@ -154,7 +167,10 @@ spring:
       zk-host: node1.jkzl.com,node2.jkzl.com,node4.jkzl.com:2181/solr
   elasticsearch:
     jest:
-      uris: http://172.10.10.2:9200
+      uris: http://172.10.10.5:9200
 elasticsearch:
   cluster-name: elasticsearch
-  cluster-nodes: 172.10.10.2:9300
+  cluster-nodes: 172.10.10.5:9300
+hadoop:
+  hbase-properties:
+    hbase.zookeeper.quorum: node1.jkzl.com,node2.jkzl.com,node4.jkzl.com

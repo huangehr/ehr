@@ -10,7 +10,6 @@ import com.yihu.ehr.resolve.model.stage2.ResourceBucket;
 import com.yihu.ehr.resolve.util.FileTableUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
@@ -37,6 +36,14 @@ public class FileResourceDao {
                 bundle.addValues(rowkey, FileFamily.Basic, FileTableUtil.getBasicFamilyCellMap(resBucket));
                 bundle.addValues(rowkey, FileFamily.Data, FileTableUtil.getFileFamilyCellMap(cdaDocument));
             }
+            hbaseDao.save(ResourceCore.FileTable, bundle);
+        } else if (resBucket.getProfileType() == ProfileType.Link){
+            TableBundle bundle = new TableBundle();
+            String rowKey = resBucket.getId();
+            bundle.addRows(rowKey);
+            hbaseDao.delete(ResourceCore.FileTable, bundle);
+            bundle.addValues(rowKey, FileFamily.Basic, FileTableUtil.getBasicFamilyCellMap(resBucket));
+            bundle.addValues(rowKey, FileFamily.Data, FileTableUtil.getFileFamilyCellMap(resBucket));
             hbaseDao.save(ResourceCore.FileTable, bundle);
         }
     }

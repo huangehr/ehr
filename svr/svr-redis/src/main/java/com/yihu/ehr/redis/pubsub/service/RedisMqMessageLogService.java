@@ -26,19 +26,13 @@ public class RedisMqMessageLogService extends BaseJpaService<RedisMqMessageLog, 
         return redisMqMessageLogDao.findOne(id);
     }
 
-    public List<RedisMqMessageLog> findByChannelAndStatus(String channel, String status) {
-        return redisMqMessageLogDao.findByChannelAndStatus(channel, status);
+    public List<RedisMqMessageLog> findByChannel(String channel) {
+        return redisMqMessageLogDao.findByChannel(channel);
     }
 
     @Transactional(readOnly = false)
     public RedisMqMessageLog save(RedisMqMessageLog redisMqMessageLog) {
         return redisMqMessageLogDao.save(redisMqMessageLog);
-    }
-
-    @Transactional(readOnly = false)
-    public void saveAndDeleteOld(RedisMqMessageLog newMessageLog, String oldMessageId) {
-        redisMqMessageLogDao.save(newMessageLog);
-        redisMqMessageLogDao.delete(oldMessageId);
     }
 
 

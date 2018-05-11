@@ -1,5 +1,6 @@
 package com.yihu.ehr.profile.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.profile.feign.ResourceClient;
 import com.yihu.ehr.util.rest.Envelop;
 import org.apache.commons.collections.map.HashedMap;
@@ -21,6 +22,8 @@ public class ProfileDiseaseService {
     private ResourceClient resource; //资源服务
     @Autowired
     private RedisService redisService;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     /**
      * 根据时间获取病龄
@@ -75,14 +78,16 @@ public class ProfileDiseaseService {
                         if (!StringUtils.isEmpty(chronicInfo)) {
                             String [] _chronicInfo = chronicInfo.split("-");
                             if (!"0".equals(_chronicInfo[1])) {
-                                String healthProblem = redisService.getHealthProblem(code);
-                                for (String hpCode : healthProblem.split(";")) {
-                                    List<Map<String, Object>> profileList = new ArrayList<>();
-                                    if (hpMap.containsKey(hpCode)) {
-                                        profileList = hpMap.get(code);
+                                String healthProblem = redisService.getHpCodeByIcd10(code); //祝金仙
+                                if (!StringUtils.isEmpty(healthProblem)) {
+                                    for (String hpCode : healthProblem.split(";")) {
+                                        List<Map<String, Object>> profileList = new ArrayList<>();
+                                        if (hpMap.containsKey(hpCode)) {
+                                            profileList = hpMap.get(hpCode);
+                                        }
+                                        profileList.add(item);
+                                        hpMap.put(hpCode, profileList);
                                     }
-                                    profileList.add(item);
-                                    hpMap.put(hpCode, profileList);
                                 }
                             }
                         }

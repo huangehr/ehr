@@ -21,7 +21,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigInteger;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -670,6 +672,7 @@ public class ResourceCenterEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Resources.GetStorageAnalysis, method = RequestMethod.GET)
     @ApiOperation(value = "健康档案 - 健康档案入库情况分析")
     public Envelop getStorageAnalysis() throws Exception {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
@@ -677,24 +680,29 @@ public class ResourceCenterEndPoint extends EnvelopRestEndPoint {
         calendar.set(Calendar.MILLISECOND, 0);
         Date now = DateUtils.addDays(calendar.getTime(), 1);
         Date before = DateUtils.addDays(now, -29);
-        List<Map<String, Long>> receiveGroup = resourceCenterService.getJsonArchiveReceiveDateGroup(before, now);
-        List<String> xData = new ArrayList<>();
-        List<Long> yData = new ArrayList<>();
-        receiveGroup.forEach(item -> {
-            item.forEach((key, value) -> {
-                xData.add(key);
-                yData.add(value);
-            });
-        });
-        List<Map<String, Long>> finishGroup = resourceCenterService.getJsonArchiveFinishDateGroup(before, now);
-        List<String> xData1 = new ArrayList<>();
-        List<Long> yData1 = new ArrayList<>();
-        finishGroup.forEach(item -> {
-            item.forEach((key, value) -> {
-                xData1.add(key);
-                yData1.add(value);
-            });
-        });
+        Map<String, Long> receiveGroup = resourceCenterService.getJsonArchiveReceiveDateGroup(before, now);
+        Map<String, Long> finishGroup = resourceCenterService.getJsonArchiveFinishDateGroup(before, now);
+        List<String> xData = new ArrayList<>(30);
+        List<Long> yData = new ArrayList<>(30);
+        List<String> xData1 = new ArrayList<>(30);
+        List<Long> yData1 = new ArrayList<>(30);
+        for (int i = 30; i >= 1; i --) {
+            String _day = dateFormat.format(DateUtils.addDays(now, -i));
+            //采集量
+            xData.add(_day);
+            if (receiveGroup.containsKey(_day)) {
+                yData.add(receiveGroup.get(_day));
+            } else {
+                yData.add(0L);
+            }
+            //入库量
+            xData1.add(_day);
+            if (finishGroup.containsKey(_day)) {
+                yData1.add(finishGroup.get(_day));
+            } else {
+                yData1.add(0L);
+            }
+        }
         List<Map> resultList = new ArrayList<>(2);
         Map<String, Object> resultMap = new HashMap<>(4);
         resultMap.put("name", "采集量");

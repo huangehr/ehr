@@ -423,6 +423,11 @@ public class EsExtract {
                     nf.setGroupingUsed(false);
                     resultMap.put(keyVal, nf.format(map.get("count(1)")));
                 }
+                if(map.containsKey("SUM(result)")){
+                    NumberFormat nf = NumberFormat.getInstance();
+                    nf.setGroupingUsed(false);
+                    resultMap.put(keyVal, nf.format(map.get("SUM(result)")));
+                }
             }
             TjQuotaDimensionSlave tjQuotaDimensionSlave = new TjQuotaDimensionSlave();
             tjQuotaDimensionSlave.setQuotaCode(quotaVo.getCode());
@@ -615,10 +620,13 @@ public class EsExtract {
         String whereGroupField = allField.substring(0,allField.length() - 1);
         //拼接整个sql 语法
         StringBuffer sql = new StringBuffer();
-        if(StringUtils.isEmpty(esConfig.getAggregation())){
+        if(StringUtils.isEmpty(esConfig.getAggregation()) && StringUtils.isEmpty(esConfig.getAddFirstQuotaCode())){
             sql.append("select " + selectGroupField + " count(1) from " + tableName + whereSql + " group by " + whereGroupField + timeGroup );
-        }else if(esConfig.getAggregation().equals(Contant.quota.aggregation_sum)){
-            if(StringUtils.isEmpty(selectGroupField)|| selectGroupField.length()==0){
+        } else if (!StringUtils.isEmpty(esConfig.getAddFirstQuotaCode())) {
+            String myWhere = "quotaCode in('" + esConfig.getAddFirstQuotaCode().replace("_", "") + "','" + esConfig.getAddSecondQuotaCode().replace("_", "") + "')";
+            sql.append("select " + selectGroupField + " sum(result) from " + tableName + whereSql + " and " + myWhere + " group by " + whereGroupField + timeGroup);
+        } else if(esConfig.getAggregation().equals(Contant.quota.aggregation_sum)){
+            if(!StringUtils.isEmpty(esConfig.getAggregation()) && StringUtils.isEmpty(selectGroupField)|| selectGroupField.length()==0){
                 sql.append("select sum(" ).append(esConfig.getAggregationKey()).append(" )  from " + tableName + whereSql);
             }else {
                 sql.append("select ").append(selectGroupField ).append(" sum(").append(esConfig.getAggregationKey()).append(" ) result from " + tableName + whereSql + " group by "  + whereGroupField + timeGroup );

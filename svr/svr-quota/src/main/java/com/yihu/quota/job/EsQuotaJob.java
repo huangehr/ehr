@@ -12,6 +12,7 @@ import com.yihu.quota.model.jpa.TjQuotaLog;
 import com.yihu.quota.util.SpringUtil;
 import com.yihu.quota.vo.QuotaVo;
 import com.yihu.quota.vo.SaveModel;
+import net.bytebuddy.implementation.bytecode.Throw;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -164,7 +165,8 @@ public class EsQuotaJob implements Job {
                     flag = false ;
                 }
             } catch (Exception e) {
-                e.getMessage();
+                throw  new Exception("Elasticsearch 指标统计时删除数据异常");
+//                e.getMessage();
             } finally {
                 talClient.close();
                 client.close();

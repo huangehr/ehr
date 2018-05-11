@@ -18,6 +18,11 @@ public class RsResourcesModel {
     private String echartType;
     private String dimension;
 
+    private String createDate;
+    private String creator;
+    private String modifyDate;
+    private String modifier;
+
     public String getId() {
         return id;
     }
@@ -107,5 +112,37 @@ public class RsResourcesModel {
 
     public void setDimension(String dimension) {
         this.dimension = dimension;
+    }
+
+    public String getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(String createDate) {
+        this.createDate = createDate;
+    }
+
+    public String getCreator() {
+        return creator;
+    }
+
+    public void setCreator(String creator) {
+        this.creator = creator;
+    }
+
+    public String getModifyDate() {
+        return modifyDate;
+    }
+
+    public void setModifyDate(String modifyDate) {
+        this.modifyDate = modifyDate;
+    }
+
+    public String getModifier() {
+        return modifier;
+    }
+
+    public void setModifier(String modifier) {
+        this.modifier = modifier;
     }
 }

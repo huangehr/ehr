@@ -2,9 +2,12 @@ package com.yihu.ehr.elasticsearch;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.pool.ElasticSearchDruidDataSourceFactory;
+import org.elasticsearch.client.transport.NoNodeAvailableException;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -26,13 +29,15 @@ import java.util.Properties;
 @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class ElasticSearchPool {
 
-    @Value("${elasticsearch.pool.init-size}")
-    private int initSize;
-    @Value("${elasticsearch.pool.max-size}")
-    private int maxSize;
-    private List<TransportClient> clientPool;
+    private static final Logger logger = LoggerFactory.getLogger(ElasticSearchPool.class);
+
     @Autowired
     private ElasticSearchConfig elasticSearchConfig;
+    @Value("${elasticsearch.pool.init-size:1}")
+    private int initSize;
+    @Value("${elasticsearch.pool.max-size:5}")
+    private int maxSize;
+    private List<TransportClient> clientPool;
 
     @PostConstruct
     private void init() {
@@ -40,35 +45,40 @@ public class ElasticSearchPool {
             clientPool = new ArrayList<>();
         }
         synchronized (clientPool) {
-            while (clientPool.size() < initSize) {
-                try{
-                    Settings settings = Settings.builder()
-                            .put("cluster.name", elasticSearchConfig.getClusterName())
-                            .put("client.transport.sniff", true)
-                            .build();
-                    String[] nodeArr = elasticSearchConfig.getClusterNodes().split(",");
-                    InetSocketTransportAddress[] socketArr = new InetSocketTransportAddress[nodeArr.length];
-                    for (int i = 0; i < socketArr.length; i++) {
-                        if (!StringUtils.isEmpty(nodeArr[i])) {
-                            String[] nodeInfo = nodeArr[i].split(":");
-                            socketArr[i] = new InetSocketTransportAddress(new InetSocketAddress(nodeInfo[0], new Integer(nodeInfo[1])));
-                        }
-                    }
-                    TransportClient transportClient = TransportClient.builder().settings(settings).build().addTransportAddresses(socketArr);
-                    clientPool.add(transportClient);
-                }catch (Exception e){
-                    System.out.println("探测集群节点异常！");
+            try {
+                if (initSize < 1) {
+                    initSize = 1;
                 }
+                while (clientPool.size() < initSize) {
+                    TransportClient transportClient = getTransportClient();
+                    clientPool.add(transportClient);
+                }
+                logger.info("[Init ElasticSearch Pool Size " + initSize + "]");
+            } catch (Exception e){
+                logger.error("[" + e.getMessage() + "]");
             }
         }
-        if (clientPool.isEmpty()) {
-            throw new RuntimeException("ElasticSearch连接池初始化失败，请检查相关配置");
+    }
+
+    private TransportClient getTransportClient() {
+        Settings settings = Settings.builder()
+                .put("cluster.name", elasticSearchConfig.getClusterName())
+                .put("client.transport.sniff", false)
+                .build();
+        String[] nodeArr = elasticSearchConfig.getClusterNodes().split(",");
+        InetSocketTransportAddress[] socketArr = new InetSocketTransportAddress[nodeArr.length];
+        for (int i = 0; i < socketArr.length; i++) {
+            if (!StringUtils.isEmpty(nodeArr[i])) {
+                String[] nodeInfo = nodeArr[i].split(":");
+                socketArr[i] = new InetSocketTransportAddress(new InetSocketAddress(nodeInfo[0], new Integer(nodeInfo[1])));
+            }
         }
+        return TransportClient.builder().settings(settings).build().addTransportAddresses(socketArr);
     }
 
     @PreDestroy
     private void destroy(){
-        if (null != clientPool) {
+        if (clientPool != null) {
             for (TransportClient transportClient : clientPool) {
                 transportClient.close();
             }
@@ -80,18 +90,30 @@ public class ElasticSearchPool {
             init();
         }
         int last_index = clientPool.size() - 1;
-        TransportClient transportClient = clientPool.get(last_index);
-        clientPool.remove(last_index);
+        TransportClient transportClient = clientPool.remove(last_index);
+        if (transportClient != null){
+            try {
+                //update by cws 20180504
+                //判断是否有用，能否取到服务器的信息
+                transportClient.listedNodes();
+            } catch (Exception e){
+                if (e instanceof NoNodeAvailableException){
+                    //判断是否报以上错误，或是即为取不到服务
+                    //则重新返回一个新的链接。
+                    return getTransportClient();
+                }
+            }
+        }
         return transportClient;
     }
 
     public synchronized void releaseClient(TransportClient transportClient) {
-        if (clientPool.size() > maxSize) {
-            if (null != transportClient) {
+        if (transportClient != null) {
+            if (clientPool.size() > maxSize) {
                 transportClient.close();
+            } else {
+                clientPool.add(0, transportClient);
             }
-        } else {
-            clientPool.add(transportClient);
         }
     }
 

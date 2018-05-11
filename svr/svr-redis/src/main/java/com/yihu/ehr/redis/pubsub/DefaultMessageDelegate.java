@@ -1,10 +1,13 @@
 package com.yihu.ehr.redis.pubsub;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.redis.pubsub.entity.RedisMqChannel;
 import com.yihu.ehr.redis.pubsub.entity.RedisMqMessageLog;
 import com.yihu.ehr.redis.pubsub.entity.RedisMqSubscriber;
+import com.yihu.ehr.redis.pubsub.service.RedisMqChannelService;
 import com.yihu.ehr.redis.pubsub.service.RedisMqMessageLogService;
 import com.yihu.ehr.redis.pubsub.service.RedisMqSubscriberService;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -33,67 +36,82 @@ public class DefaultMessageDelegate implements MessageDelegate {
     private RedisMqMessageLogService redisMqMessageLogService;
     @Autowired
     private RedisMqSubscriberService redisMqSubscriberService;
+    @Autowired
+    private RedisMqChannelService redisMqChannelService;
+
+    @Override
+    public void handleMessage(String message, String channel) {
+        try {
+            Map<String, Object> messageMap = objectMapper.readValue(message, Map.class);
+            String messageId = messageMap.get("messageId").toString();
+            String publisherAppId = messageMap.get("publisherAppId").toString();
+            String messageContent = messageMap.get("messageContent").toString();
+
+            List<RedisMqSubscriber> subscriberList = redisMqSubscriberService.findByChannel(channel);
+            if (subscriberList.size() == 0) {
+                logger.info("消息订阅（没有订阅者场合），channel: " + channel
+                        + ", message: " + messageContent);
+
+                // 累计出列数
+                RedisMqChannel mqChannel = redisMqChannelService.findByChannel(channel);
+                mqChannel.setDequeuedNum(mqChannel.getDequeuedNum() + 1);
+                redisMqChannelService.save(mqChannel);
+            } else {
+                // 遍历消息队列的订阅者，并推送消息
+                for (RedisMqSubscriber subscriber : subscriberList) {
+                    String subscribedUrl = subscriber.getSubscribedUrl();
+
+                    logger.info("消息订阅，channel: " + channel + ", subscribedUrl: " + subscribedUrl
+                            + ", message: " + messageContent);
+
+                    boolean subFlag = false;
+                    try {
+                        // 推送消息到指定服务地址
+                        HttpHeaders headers = new HttpHeaders();
+                        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+                        HttpEntity<String> entity = new HttpEntity<>(messageContent, headers);
+                        restTemplate.postForObject(subscribedUrl, entity, String.class);
+                        subFlag = true;
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        if (StringUtils.isEmpty(messageId)) {
+                            // 头次订阅失败，则记录消息，以便于重试。
+                            RedisMqMessageLog messageLog = MessageCommonBiz.newMessageLog(channel, publisherAppId, message);
+                            messageLog.setFailedNum(1);
+                            redisMqMessageLogService.save(messageLog);
+                        } else {
+                            // 更新订阅失败次数
+                            RedisMqMessageLog messageLog = redisMqMessageLogService.getById(messageId);
+                            messageLog.setFailedNum(messageLog.getFailedNum() + 1);
+                            redisMqMessageLogService.save(messageLog);
+                        }
+                    }
+
+                    if (subFlag) {
+                        // 累计出列数
+                        RedisMqChannel mqChannel = redisMqChannelService.findByChannel(channel);
+                        mqChannel.setDequeuedNum(mqChannel.getDequeuedNum() + 1);
+                        redisMqChannelService.save(mqChannel);
+
+                        // 发生过订阅失败的场合，订阅成功之后，更新消息状态。
+                        if (!StringUtils.isEmpty(messageId)) {
+                            RedisMqMessageLog messageLog = redisMqMessageLogService.getById(messageId);
+                            messageLog.setStatus(1);
+                            redisMqMessageLogService.save(messageLog);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     // 消息队列编码
     private String channel;
 
     public DefaultMessageDelegate(String channel) {
         this.channel = channel;
-    }
-
-    @Override
-    public void handleMessage(String message, String channel) {
-        try {
-            Map<String, Object> messageMap = objectMapper.readValue(message, Map.class);
-            String messageLogId = messageMap.get("messageLogId").toString();
-            String messageContent = messageMap.get("messageContent").toString();
-
-            List<RedisMqSubscriber> subscriberList = redisMqSubscriberService.findByChannel(channel);
-            if (subscriberList.size() == 0) {
-                logger.info("\n--- Redis发布订阅消费的消息 ---\nchannel: " + channel
-                        + ", messageLogId: " + messageLogId
-                        + ", message: " + messageContent);
-
-                // 消息队列没有订阅者的场合，
-                RedisMqMessageLog redisMqMessageLog = redisMqMessageLogService.getById(messageLogId);
-                if (redisMqMessageLog == null) {
-                    logger.warn("在表 redis_mq_message_log 中没有找到 ID 为：" +  messageLogId + " 的记录");
-                    return;
-                }
-                redisMqMessageLog.setStatus("1");
-                redisMqMessageLogService.save(redisMqMessageLog);
-            } else {
-                // 遍历消息队列的订阅者，并推送消息
-                for (RedisMqSubscriber subscriber : subscriberList) {
-                    String subscribedUrl = subscriber.getSubscribedUrl();
-
-                    logger.info("\n--- Redis发布订阅消费的消息 ---\nchannel: " + channel
-                            + ", messageLogId: " + messageLogId
-                            + ", subscribedUrl: " + subscribedUrl
-                            + ", message: " + messageContent);
-
-                    // 推送消息到指定服务地址
-                    HttpHeaders headers = new HttpHeaders();
-                    headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-                    HttpEntity<String> entity = new HttpEntity<>(messageContent, headers);
-                    restTemplate.postForObject(subscribedUrl, entity, String.class);
-
-                    // 更新消息状态为已消费
-                    RedisMqMessageLog redisMqMessageLog = redisMqMessageLogService.getById(messageLogId);
-                    if (redisMqMessageLog == null) {
-                        logger.warn("在表 redis_mq_message_log 中没有找到 ID 为：" +  messageLogId + " 的记录");
-                        return;
-                    }
-                    int oldConsumeNum = redisMqMessageLog.getConsumedNum();
-                    redisMqMessageLog.setStatus("1");
-                    redisMqMessageLog.setIsRealConsumed("1");
-                    redisMqMessageLog.setConsumedNum(oldConsumeNum + 1);
-                    redisMqMessageLogService.save(redisMqMessageLog);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     public int hashCode() {

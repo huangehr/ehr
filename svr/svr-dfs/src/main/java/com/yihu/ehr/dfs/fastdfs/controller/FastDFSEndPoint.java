@@ -54,6 +54,8 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private FastDFSService fastDFSService;
     @Autowired
+    private FastDFSUtil fastDFSUtil;
+    @Autowired
     private ElasticSearchUtil elasticSearchUtil;
     @Autowired
     private SystemDictService systemDictService;
@@ -92,7 +94,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
             newSource = elasticSearchUtil.index(indexName, indexType, source);
         } catch (Exception e) {
             try {
-                fastDFSService.delete(groupName, remoteFileName);
+                fastDFSUtil.delete(groupName, remoteFileName);
             } catch (Exception e1) {
                 throw e1;
             }
@@ -148,7 +150,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
             newSource = elasticSearchUtil.index(indexName, indexType, source);
         } catch (Exception e) {
             try {
-                fastDFSService.delete(groupName, remoteFileName);
+                fastDFSUtil.delete(groupName, remoteFileName);
             } catch (Exception e1) {
                 throw e1;
             }
@@ -195,7 +197,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
             newSource = elasticSearchUtil.index(indexName, indexType, source);
         } catch (Exception e) {
             try {
-                fastDFSService.delete(groupName, remoteFileName);
+                fastDFSUtil.delete(groupName, remoteFileName);
             }catch (Exception e1) {
                 throw e1;
             }
@@ -242,7 +244,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
             newSource = elasticSearchUtil.index(indexName, indexType, source);
         } catch (Exception e) {
             try {
-                fastDFSService.delete(groupName, remoteFileName);
+                fastDFSUtil.delete(groupName, remoteFileName);
             }catch (Exception e1) {
                 throw e1;
             }
@@ -285,7 +287,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
         String groupName = storagePath.split(":")[0];
         String remoteFileName = storagePath.split(":")[1];
         // 删除文件
-        fastDFSService.delete(groupName, remoteFileName);
+        fastDFSUtil.delete(groupName, remoteFileName);
         // 删除索引
         elasticSearchUtil.delete(indexName, indexType, id);
         return success(true);
@@ -307,7 +309,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
             return failed("参数有误");
         }
         // 删除文件
-        fastDFSService.delete(path.split(":")[0], path.split(":")[1]);
+        fastDFSUtil.delete(path.split(":")[0], path.split(":")[1]);
         List<Map<String, Object>> resultList = elasticSearchUtil.findByField(indexName, indexType,"path", path);
         StringBuilder ids = new StringBuilder();
         for (Map<String, Object> resultMap : resultList) {
@@ -339,7 +341,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
             String groupName = storagePath.split(":")[0];
             String remoteFileName = storagePath.split(":")[1];
             // 删除文件
-            fastDFSService.delete(groupName, remoteFileName);
+            fastDFSUtil.delete(groupName, remoteFileName);
         }
         // 删除索引
         elasticSearchUtil.bulkDelete(indexName, indexType, ids.toString().split(","));
@@ -373,7 +375,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
             return failed("参数有误");
         }
         // 删除旧文件
-        fastDFSService.delete(path.split(":")[0], path.split(":")[1]);
+        fastDFSUtil.delete(path.split(":")[0], path.split(":")[1]);
         // 上传新文件
         ObjectNode objectNode = fastDFSService.upload(file);
         // 更新索引
@@ -418,7 +420,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
         }
         // 删除旧文件
         String oldPath = source.get("path").toString();
-        fastDFSService.delete(oldPath.split(":")[0], oldPath.split(":")[1]);
+        fastDFSUtil.delete(oldPath.split(":")[0], oldPath.split(":")[1]);
         // 上传文件
         ObjectNode objectNode = fastDFSService.upload(paramMap);
         // 更新索引
@@ -459,7 +461,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
         if (path.split(":").length < 2) {
             return failed("参数有误");
         }
-        FileInfo fileInfo = fastDFSService.getFileInfo(path.split(":")[0], path.split(":")[1]);
+        FileInfo fileInfo = fastDFSUtil.getFileInfo(path.split(":")[0], path.split(":")[1]);
         return success(fileInfo);
     }
 
@@ -478,7 +480,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
         String storagePath = source.get("path").toString();
         String groupName = storagePath.split(":")[0];
         String remoteFileName = storagePath.split(":")[1];
-        byte[] bytes = fastDFSService.download(groupName, remoteFileName);
+        byte[] bytes = fastDFSUtil.download(groupName, remoteFileName);
         String fileStream = new String(Base64.getEncoder().encode(bytes));
         if (!StringUtils.isEmpty(fileStream)) {
             return success(fileStream);
@@ -503,7 +505,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
         }
         String groupName = path.split(":")[0];
         String remoteFileName = path.split(":")[1];
-        byte[] bytes = fastDFSService.download(groupName, remoteFileName);
+        byte[] bytes = fastDFSUtil.download(groupName, remoteFileName);
         String fileStream = new String(Base64.getEncoder().encode(bytes));
         if (!StringUtils.isEmpty(fileStream)) {
             return success(fileStream);
@@ -528,7 +530,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
             String storagePath = resultMap.get("path").toString();
             String groupName = storagePath.split(":")[0];
             String remoteFileName = storagePath.split(":")[1];
-            byte [] bytes = fastDFSService.download(groupName, remoteFileName);
+            byte [] bytes = fastDFSUtil.download(groupName, remoteFileName);
             String fileStream = new String(Base64.getEncoder().encode(bytes));
             resultList.add(fileStream);
         }
@@ -556,7 +558,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
         String remoteFileName = remotePath.split(":")[1];
         String localFileName = localPath + remoteFileName.replaceAll("/", "_");
         byte[] bytes;
-        bytes = fastDFSService.download(groupName, remoteFileName);
+        bytes = fastDFSUtil.download(groupName, remoteFileName);
         FileOutputStream fileOutputStream = new FileOutputStream(localFileName);
         fileOutputStream.write(bytes);
         fileOutputStream.close();
@@ -615,7 +617,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.FastDFS.Status, method = RequestMethod.GET)
     @ApiOperation(value = "获取服务器状态信息")
     public Envelop status() throws Exception {
-        Map<String, Object> resultMap = fastDFSService.status();
+        Map<String, Object> resultMap = fastDFSUtil.status();
         return success((List) resultMap.get("space"));
     }
 

@@ -244,12 +244,6 @@ public class OrganizationController extends BaseController {
             if (mAdapterPlans.size() > 0) {
                 return failed("删除失败!该组织机构下面存在标准适配，请先删除标准适配！");
             }
-            //模板管理
-            ResponseEntity<Collection<MTemplate>> mTemplateEntity = templateClient.getTemplates("", "organizationCode=" + orgCode, "", 1, 1);
-            List<MTemplate> mTemplates = (List<MTemplate>) mTemplateEntity.getBody();
-            if (mTemplates.size() > 0) {
-                return failed("删除失败!该组织机构下面存在模板，请先删除模板！");
-            }
             //应用
             ResponseEntity<List<MApp>> mAppEntity = appClient.getApps("", "org=" + orgCode, "", 1, 1);
             List<MApp> mApps = mAppEntity.getBody();

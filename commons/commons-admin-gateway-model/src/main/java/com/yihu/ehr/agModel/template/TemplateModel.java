@@ -1,46 +1,80 @@
 package com.yihu.ehr.agModel.template;
 
-import com.yihu.ehr.util.validate.Required;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @author lincl
  * @version 1.0
  * @created 2016.04.15
  */
-public class TemplateModel {
-    private int id;
+public class TemplateModel implements Serializable {
+
+    public enum Type {
+        clinic, //门诊
+        resident, //住院
+        medicalExam, //体检
+        universal //通用
+    }
+
+    private Integer id;
+    private Date createDate;
+    private String creator;
+    private Date modifyDate;
+    private String modifier;
     private String title;
     private String cdaVersion;
     private String cdaDocumentId;
     private String cdaDocumentName;
-    private String organizationCode;
-    private String organizationName;
-    private String pcTplURL;
-    private String mobileTplURL;
-    private String createTime;
-    private String province;
-    private String city;
-    private String cdaType;
-    private String cdaTypeName;
+    private String pcUrl;
+    private String mobileUrl;
     private String cdaCode;
+    private Type type;
 
-    public String getCdaCode() {
-        return cdaCode;
-    }
-
-    public void setCdaCode(String cdaCode) {
-        this.cdaCode = cdaCode;
-    }
-
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    @Required(filedName = "模版名称")
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    public Date getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
+
+    public String getCreator() {
+        return creator;
+    }
+
+    public void setCreator(String creator) {
+        this.creator = creator;
+    }
+
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    public Date getModifyDate() {
+        return modifyDate;
+    }
+
+    public void setModifyDate(Date modifyDate) {
+        this.modifyDate = modifyDate;
+    }
+
+    public String getModifier() {
+        return modifier;
+    }
+
+    public void setModifier(String modifier) {
+        this.modifier = modifier;
+    }
+
     public String getTitle() {
         return title;
     }
@@ -49,7 +83,6 @@ public class TemplateModel {
         this.title = title;
     }
 
-    @Required(filedName = "版本号")
     public String getCdaVersion() {
         return cdaVersion;
     }
@@ -58,7 +91,6 @@ public class TemplateModel {
         this.cdaVersion = cdaVersion;
     }
 
-    @Required(filedName = "cda文档")
     public String getCdaDocumentId() {
         return cdaDocumentId;
     }
@@ -67,45 +99,14 @@ public class TemplateModel {
         this.cdaDocumentId = cdaDocumentId;
     }
 
-    @Required(filedName = "医疗机构")
-    public String getOrganizationCode() {
-        return organizationCode;
+
+
+    public String getPcUrl() {
+        return pcUrl;
     }
 
-    public void setOrganizationCode(String organizationCode) {
-        this.organizationCode = organizationCode;
-    }
-
-    public String getPcTplURL() {
-        return pcTplURL;
-    }
-
-    public void setPcTplURL(String pcTplURL) {
-        this.pcTplURL = pcTplURL;
-    }
-
-    public String getOrganizationName() {
-        return organizationName;
-    }
-
-    public void setOrganizationName(String organizationName) {
-        this.organizationName = organizationName;
-    }
-
-    public String getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(String createTime) {
-        this.createTime = createTime;
-    }
-
-    public String getMobileTplURL() {
-        return mobileTplURL;
-    }
-
-    public void setMobileTplURL(String mobileTplURL) {
-        this.mobileTplURL = mobileTplURL;
+    public void setPcUrl(String pcUrl) {
+        this.pcUrl = pcUrl;
     }
 
     public String getCdaDocumentName() {
@@ -116,35 +117,27 @@ public class TemplateModel {
         this.cdaDocumentName = cdaDocumentName;
     }
 
-    public String getProvince() {
-        return province;
+    public String getMobileUrl() {
+        return mobileUrl;
     }
 
-    public void setProvince(String province) {
-        this.province = province;
+    public void setMobileUrl(String mobileUrl) {
+        this.mobileUrl = mobileUrl;
     }
 
-    public String getCity() {
-        return city;
+    public String getCdaCode() {
+        return cdaCode;
     }
 
-    public void setCity(String city) {
-        this.city = city;
+    public void setCdaCode(String cdaCode) {
+        this.cdaCode = cdaCode;
     }
 
-    public String getCdaType() {
-        return cdaType;
+    public Type getType() {
+        return type;
     }
 
-    public void setCdaType(String cdaType) {
-        this.cdaType = cdaType;
-    }
-
-    public String getCdaTypeName() {
-        return cdaTypeName;
-    }
-
-    public void setCdaTypeName(String cdaTypeName) {
-        this.cdaTypeName = cdaTypeName;
+    public void setType(Type type) {
+        this.type = type;
     }
 }

@@ -1,8 +1,6 @@
 package com.yihu.ehr.pack.service;
 
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
-import com.yihu.ehr.model.packs.EsDetailsPackage;
-import com.yihu.ehr.model.packs.EsSimplePackage;
 import com.yihu.ehr.pack.dao.JsonArchivesDao;
 import com.yihu.ehr.pack.entity.JsonArchives;
 import com.yihu.ehr.query.BaseJpaService;
@@ -10,7 +8,6 @@ import org.hibernate.FlushMode;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
@@ -25,10 +22,10 @@ import java.util.Map;
  * 临时数据处理
  * Created by progr1mmer on 2018/4/23.
  */
-@Service
+//@Service
 public class JsonArchivesService extends BaseJpaService<JsonArchives, JsonArchivesDao> {
 
-    private static final Integer SINGLE_SIZE = 1000;
+    private static final Integer SINGLE_SIZE = 2000;
     private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private boolean isRun = false;

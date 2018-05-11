@@ -102,6 +102,104 @@ public class BaseStatistsService {
         return dimenListResult;
     }
 
+
+    public List<Map<String, Object>>  addQuota(String addFirstQuotaCode,String firstFilter, String addSecondQuotaCode, String secondFilter,String operation ,String dimension,String dateType, String top) throws Exception {
+        List<Map<String, Object>> firstList = getQuotaResultList(addFirstQuotaCode,dimension,firstFilter,dateType, top);
+        List<Map<String, Object>> secondList =  getQuotaResultList(addSecondQuotaCode,dimension,secondFilter,dateType, top);
+        dimension = StringUtils.isNotEmpty(dateType)? (StringUtils.isNotEmpty(dimension)? dimension +";"+dateType : dateType):dimension;
+        return addition(dimension, firstList, secondList, Integer.valueOf(operation));
+    }
+
+
+    public List<Map<String, Object>> addition(String dimension, List<Map<String, Object>> firstList, List<Map<String, Object>> secondList,int operation){
+        List<Map<String, Object>> addResultList = new ArrayList<>();
+        DecimalFormat df = new DecimalFormat("0.0");
+        String [] moleDimensions = dimension.split(";");
+        for(Map<String, Object> firstMap :firstList) {
+            if (null != firstMap && firstMap.size() > 0 ) {
+                Map<String, Object> map = new HashMap<>();
+                double firstResultVal = Double.valueOf(firstMap.get("result") == null ? "0" : firstMap.get("result").toString());
+                map.put("firstColumn", firstMap.get("firstColumn"));
+                String firstKeyVal = "";
+                for(int i = 0 ;i < moleDimensions.length ; i++){
+                    if(i == 0){
+                        firstKeyVal = firstMap.get(moleDimensions[i]).toString();
+                    }else {
+                        firstKeyVal = firstKeyVal + "-" + firstMap.get(moleDimensions[i]).toString() ;
+                    }
+                    map.put(moleDimensions[i], firstMap.get(moleDimensions[i]).toString());
+                }
+                if (firstResultVal == 0) {
+                    map.put("result",0);
+                    addResultList.add(map);
+                } else {
+                    boolean pflag = true;
+                    for(Map<String, Object> secondMap :secondList) {
+                        String secondKeyVal = "";
+                        String [] dimeDimensions = dimension.split(";");
+                        for(int i = 0 ;i < dimeDimensions.length ; i++){
+                            if(i == 0){
+                                secondKeyVal = secondMap.get(dimeDimensions[i]).toString();
+                            }else {
+                                secondKeyVal = secondKeyVal + "-" + secondMap.get(dimeDimensions[i]).toString() ;
+                            }
+                        }
+                        if(firstKeyVal.equals(secondKeyVal) || "quotaName".equals(dimension)){  // 如果维度是quotaName，则进入逻辑
+                            double point = 0;
+                            float dimeResultVal = Float.valueOf(secondMap.get("result").toString());
+                            if(dimeResultVal != 0){
+                                if(operation == 1){ //1 加法 默认
+                                    point = firstResultVal + dimeResultVal ;
+                                }else if(operation == 2){ //2 减法
+                                    point = firstResultVal - dimeResultVal;
+                                }
+                            }
+                            map.put("result",df.format(point));
+                            addResultList.add(map);
+                            pflag = false;
+                            break;
+                        }
+                    }
+                    if(pflag){
+                        map.put("result",firstResultVal);
+                        addResultList.add(map);
+                    }
+                }
+            }
+        }
+        //检查后面指标的维度是否全部有 累加进去
+        Map<String, Object> addResuDimenMap = new HashMap<>();
+        for(int k = 0;k < addResultList.size();k++) {
+            Map<String, Object> addResultMap = addResultList.get(k);
+            String addDimenStr = "";
+            for (int i = 0; i < moleDimensions.length; i++) {
+                addDimenStr += addResultMap.get(moleDimensions[i]).toString() + "-";
+            }
+            addResuDimenMap.put(addDimenStr,addDimenStr);
+        }
+
+        for(Map<String, Object> secondMap :secondList) {
+            String secondDimenStr = "";
+            String addDimenStr = "";
+            for(int i = 0 ;i < moleDimensions.length ; i++){
+                secondDimenStr +=  secondMap.get(moleDimensions[i]).toString() + "-";
+            }
+            if( !addResuDimenMap.containsKey(secondDimenStr)){
+                if( !addDimenStr.equals(secondDimenStr)){
+                    Map<String, Object> map = new HashMap<>();
+                    float dimeResultVal = Float.valueOf(secondMap.get("result").toString());
+                    map.put("result",df.format(dimeResultVal));
+                    map.put("firstColumn", secondMap.get("firstColumn"));
+                    for(int i = 0 ;i < moleDimensions.length ; i++){
+                        map.put(moleDimensions[i], secondMap.get(moleDimensions[i]).toString());
+                    }
+                    addResultList.add(map);
+                }
+            }
+        }
+        return  addResultList;
+    }
+
     /**
      * 两个维度相同指标除法运算
      * @param molecular
@@ -773,6 +871,10 @@ public class BaseStatistsService {
             molecularFilter = handleFilter(esConfig.getMolecularFilter(), molecularFilter);
             denominatorFilter = handleFilter(esConfig.getDenominatorFilter(), denominatorFilter);
             result =  divisionQuota(esConfig.getMolecular(), esConfig.getDenominator(), dimension, molecularFilter, denominatorFilter, esConfig.getPercentOperation(), esConfig.getPercentOperationValue(),dateType, top);
+        }else if(StringUtils.isNotEmpty(esConfig.getAddOperation())){
+            String firstFilter = handleFilter(esConfig.getAddFirstFilter(), filters);
+            String secondFilter = handleFilter(esConfig.getAddSecondFilter(), filters);
+            result = addQuota(esConfig.getAddFirstQuotaCode(), firstFilter, esConfig.getAddSecondQuotaCode(), secondFilter, esConfig.getAddOperation(),dimension,dateType, top);
         }else if(StringUtils.isNotEmpty(esConfig.getSuperiorBaseQuotaCode())) {
             //二次统计 指标查询
             result = getQuotaResultList(esConfig.getSuperiorBaseQuotaCode(), dimension,filters,dateType, top);

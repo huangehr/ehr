@@ -1,5 +1,6 @@
 package com.yihu.ehr.basic.user.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.basic.dict.service.SystemDictEntryService;
 import com.yihu.ehr.basic.org.model.OrgMemberRelation;
@@ -72,6 +73,8 @@ public class UserEndPoint extends EnvelopRestEndPoint {
     private String appId;
     @Value("${jksr-app.orgcode}")
     private String orgcode;
+    @Value("${jksr-app.registerRoleClientId}")
+    public String registerRoleClientId;
     @Autowired
     private UserService userService;
     @Autowired
@@ -884,16 +887,29 @@ public class UserEndPoint extends EnvelopRestEndPoint {
             envelop.setErrorMsg("电话号码已存在");
             return envelop;
         }
-        // orgcode卫计委机构编码-PDY026797 添加居民的时候 默认 加到卫计委-居民角色中
-        List<Roles> rolesList = rolesService.findByCodeAndAppIdAndOrgCode(Arrays.asList(new String[]{orgcode}),appId,"Patient");
-        //在org_member_relation 表里追加关联关系
-        if(null != rolesList && rolesList.size()>0){
-            user = userService.saveUser(user);
-            roleUserService.batchCreateRoleUsersRelation(userId,String.valueOf(rolesList.get(0).getId()));
-        }else{
-            envelop.setErrorMsg("居民角色不存在！");
-            return envelop;
+        user = userService.saveUser(user);
+        String[]  appIds = registerRoleClientId.split(",");
+        for(String rgAppId : appIds){
+            // orgcode卫计委机构编码-PDY026797 添加居民的时候 默认 加到卫计委-居民角色中
+            List<Roles> rolesList = rolesService.findByCodeAndAppIdAndOrgCode(Arrays.asList(new String[]{orgcode}),rgAppId,"Patient");
+            Roles roles = new Roles();
+            if(null != rolesList && rolesList.size()>0){
+                roles = rolesList.get(0);
+            }else{
+                //如果角色不存在，为该应用创建居民角色
+                roles.setAppId(appId);
+                roles.setName("居民");
+                roles.setCode("Patient");
+                //上饶市卫计委机构
+                roles.setOrgCode(orgcode);
+                roles.setType("1");
+                roles.setDescription("系统创建默认角色");
+                roles = rolesService.save(roles);
+            }
+            //在org_member_relation 表里追加关联关系
+            roleUserService.batchCreateRoleUsersRelation(userId,String.valueOf(roles.getId()));
         }
+
         // 根据身份证号码查找居民，若不存在则创建居民。
         DemographicInfo demographicInfo = demographicService.getDemographicInfo(user.getDemographicId());
         if(null == demographicInfo){
@@ -992,15 +1008,21 @@ public class UserEndPoint extends EnvelopRestEndPoint {
             envelop.setErrorMsg("对不起，该用户不存在，请确认！");
             return envelop;
         }
-        user.setTelephone(telePhoneNew);
-        user = userService.save(user);
-        if (null != user) {
-            envelop.setSuccessFlg(true);
-            envelop.setObj(user);
-        } else {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("更换手机号码失败，请联系管理员！");
+        //同时修改医生表及用户表信息
+        Doctors doctor = doctorService.getByIdCardNo(user.getIdCardNo());
+        if (doctor != null) {
+            doctor.setPhone(telePhoneNew);
         }
+        DemographicInfo demographicInfo = demographicService.getDemographicInfoByIdCardNo(user.getIdCardNo());
+        if (demographicInfo != null) {
+            demographicInfo.setTelephoneNo("{\"联系电话\":\"" + telePhoneNew + "\"}");
+        } else {
+            demographicInfo = objectMapper.readValue(JSON.toJSONString(user), DemographicInfo.class);
+            demographicInfo.setTelephoneNo("{\"联系电话\":\"" + telePhoneNew + "\"}");
+        }
+        User user1 = userService.update(user, doctor, demographicInfo);
+        envelop.setSuccessFlg(true);
+        envelop.setObj(user);
         return envelop;
     }
 

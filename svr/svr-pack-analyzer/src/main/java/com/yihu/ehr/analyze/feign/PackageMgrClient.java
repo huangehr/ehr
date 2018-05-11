@@ -22,10 +22,6 @@ import java.util.Map;
 @RequestMapping(ApiVersion.Version1_0)
 public interface PackageMgrClient {
 
-    @RequestMapping(value = ServiceApi.Packages.AcquirePackage, method = RequestMethod.GET)
-    String acquirePackage(
-            @RequestParam(value = "id") String id);
-
     @RequestMapping(value = ServiceApi.Packages.Package, method = RequestMethod.PUT)
     boolean reportStatus(
             @PathVariable(value = "id") String id,

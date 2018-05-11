@@ -4,15 +4,12 @@ server:
 logging:
   level:
     root: INFO
-
-kafka:
-  broker:
-    address: node1.hde.h3c.com:6667
-
-zookeeper:
-  broker:
-    address: node1.hde.h3c.com:2181,node2.hde.h3c.com:2181
-
+#kafka:
+ # broker:
+  #  address: node1.hde.h3c.com:6667
+#zookeeper:
+ # broker:
+  #  address: node1.hde.h3c.com:2181,node2.hde.h3c.com:2181
 spring:
   session:
     store-type: none
@@ -21,7 +18,6 @@ spring:
     hibernate.dialect: org.hibernate.dialect.MySQL5Dialect
     show-sql: false
 
-
 ---
 spring:
   profiles: dev
@@ -29,15 +25,16 @@ spring:
     url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: chenweishan
     password: chenweishan
-
 service-gateway:
   username: user
   password: eureka
   url: http://192.168.1.221:10000/api/v1.0/admin
-
 kafka:
   broker:
     address: node1.hde.h3c.com:6667
+zookeeper:
+  broker:
+    address: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com:2181
 
 ---
 spring:
@@ -46,16 +43,16 @@ spring:
     url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: weifuwu
     password: weifuwu
-
-
 service-gateway:
   username: user
   password: eureka
   url: http://192.168.1.221:10000/api/v1.0/admin
-
 kafka:
   broker:
     address: node1.hde.h3c.com:6667
+zookeeper:
+  broker:
+    address: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com:2181
 
 ---
 spring:
@@ -64,15 +61,16 @@ spring:
     url: jdbc:mysql://11.1.2.5:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: healthcloud
     password: GP8Qz4qU
-
 service-gateway:
   username: user
   password: eureka
   url: http://11.1.2.13:10000/api/v1.0/admin
-
 kafka:
   broker:
     address: 11.1.2.21:6667
+zookeeper:
+  broker:
+    address: node1.ehr.h3c.com,node2.ehr.h3c.com,node3.ehr.h3c.com:2181
 
 ---
 spring:
@@ -81,7 +79,6 @@ spring:
     url: jdbc:mysql://10.176.97.9:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: healthcloud
     password: GP8Qz4qU
-
 service-gateway:
   username: user
   password: eureka
@@ -97,7 +94,9 @@ service-gateway:
 kafka:
   broker:
     address: 10.176.97.7:6667
-
+zookeeper:
+  broker:
+    address: node1.jkzl.com,node2.jkzl.com,node3.jkzl.com:2181
 
 ---
 spring:
@@ -106,7 +105,6 @@ spring:
     url: jdbc:mysql://100.100.1.159:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: healthcloud
     password: GP8Qz4qU
-
   data:
     mongodb:
       host: 100.100.1.157
@@ -115,12 +113,10 @@ spring:
       password: GMLBq1LG
       authenticationDatabase: admin
       database: ehr
-
 service-gateway:
   username: user
   password: eureka
   url: http://100.100.1.162:10000/api/v1.0/admin
-
 kafka:
   broker:
     address: 100.100.1.155:6667
@@ -130,6 +126,9 @@ es:
   host:  http://100.100.1.158:9300
   tHost: 100.100.1.158:9300
   clusterName: jkzl
+zookeeper:
+  broker:
+    address: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com,node4.hde.h3c.com:2181
 
 ---
 spring:
@@ -138,7 +137,6 @@ spring:
     url: jdbc:mysql://192.168.210.3:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: healthcloud
     password: GP8Qz4qU
-
 service-gateway:
   username: user
   password: eureka
@@ -157,6 +155,9 @@ kafka:
 es:
   index: wlyy_quota
   type: wlyy_quota
-  host:  http://172.10.10.2:9200
-  tHost: 172.10.10.2:9300
+  host:  http://172.10.10.5:9200
+  tHost: 172.10.10.5:9300
   clusterName: jkzl
+zookeeper:
+  broker:
+    address: node1.jkzl.com,node2.jkzl.com,node4.jkzl.com:2181

@@ -11,7 +11,6 @@ import com.yihu.quota.model.jpa.save.TjQuotaDataSave;
 import com.yihu.quota.service.save.TjDataSaveService;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
-import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.aggregations.bucket.terms.DoubleTerms;
@@ -26,7 +25,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by janseny on 2017/6/24
@@ -151,10 +153,10 @@ public class EsResultExtract {
         TransportClient client = elasticSearchPool.getClient();
         List<Map<String, Object>> restltList = null;
         try {
-            restltList =  elasticsearchUtil.queryPageList(client,esConfig.getIndex(),esConfig.getType(),boolQueryBuilder,pageNo,pageSize,"quotaDate");
-        }catch (Exception e){
+            restltList =  elasticsearchUtil.queryPageList(client, esConfig.getIndex(), esConfig.getType(), boolQueryBuilder, pageNo, pageSize,"quotaDate");
+        } catch (Exception e){
             e.getMessage();
-        }finally {
+        } finally {
             elasticSearchPool.releaseClient(client);
         }
         return restltList;
@@ -325,9 +327,9 @@ public class EsResultExtract {
         List<Map<String, Object>> list = null;
         try {
             list = elasticsearchUtil.searcherByGroup(client,esConfig.getIndex(),esConfig.getType(), boolQueryBuilder, aggsField, "result");
-        }catch (Exception e){
+        } catch (Exception e){
             e.getMessage();
-        }finally {
+        } finally {
             elasticSearchPool.releaseClient(client);
         }
         return  list;
@@ -345,9 +347,9 @@ public class EsResultExtract {
         Map<String, Integer> map = null;
         try {
             map = elasticsearchUtil.searcherSumByGroupBySql(client, esConfig.getIndex(), aggsFields, filter, sumField,orderFild,order);;
-        }catch (Exception e){
+        } catch (Exception e){
             e.getMessage();
-        }finally {
+        } finally {
             elasticSearchPool.releaseClient(client);
         }
         return map;
@@ -393,9 +395,9 @@ public class EsResultExtract {
                 }
             }
             return  new ArrayList<>();
-        }catch (Exception e){
+        } catch (Exception e){
             e.getMessage();
-        }finally {
+        } finally {
             elasticSearchPool.releaseClient(client);
         }
         return null;

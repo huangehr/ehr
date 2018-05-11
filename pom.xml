@@ -127,7 +127,7 @@
         <version.zip4j>1.3.2</version.zip4j>
         <version.poi>3.12</version.poi>
         <version.scala>2.10.6</version.scala>
-        <version.elasticsearch>2.4.5</version.elasticsearch>
+        <version.elasticsearch>2.1.0</version.elasticsearch>
         <version.elasticsearch-sql>2.4.1.0</version.elasticsearch-sql>
         <version.jest>2.4.0</version.jest>
         <version.alibaba-druid>1.0.15</version.alibaba-druid>
@@ -139,6 +139,7 @@
         <version.json>20160212</version.json>
         <version.json-lib>2.4</version.json-lib>
         <version.fastjson>1.2.17</version.fastjson>
+        <version.commons-net>3.3</version.commons-net>
     </properties>
 
     <dependencyManagement>
@@ -1023,6 +1024,12 @@
                 <groupId>net.sf.json-lib</groupId>
                 <artifactId>json-lib</artifactId>
                 <version>${version.json-lib}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-net</groupId>
+                <artifactId>commons-net</artifactId>
+                <version>${version.commons-net}</version>
             </dependency>
 
         </dependencies>

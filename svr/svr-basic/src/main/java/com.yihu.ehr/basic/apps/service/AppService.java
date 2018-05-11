@@ -10,11 +10,9 @@ import com.yihu.ehr.basic.user.dao.RoleReportRelationDao;
 import com.yihu.ehr.basic.user.dao.RolesDao;
 import com.yihu.ehr.basic.user.entity.RoleApiRelation;
 import com.yihu.ehr.basic.user.entity.RoleAppRelation;
-import com.yihu.ehr.basic.user.entity.RoleReportRelation;
 import com.yihu.ehr.basic.user.entity.Roles;
 import com.yihu.ehr.entity.oauth2.OauthClientDetails;
 import com.yihu.ehr.query.BaseJpaService;
-import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.SQLQuery;
 import org.hibernate.transform.Transformers;
@@ -23,7 +21,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -252,5 +249,33 @@ public class AppService extends BaseJpaService<App, AppDao> {
 
         List<Map<String,Object>> resultList =  jdbcTemplate.queryForList(sql);
         return resultList;
+    }
+
+    /**
+     * 医生工作站获取 医生授权的应用
+     */
+    public List<App> getDoctorAppsByType(String userId , String doctorManageType) {
+        String sql =
+                "SELECT * FROM (" +
+                        "SELECT b.id, b.name as name, b.secret as secret, b.url as url, b.out_url as outUrl, b.creator as creator," +
+                        "   b.auditor as auditor, b.create_time as createTime, b.audit_time as auditTime , b.catalog as catalog, b.status as status, " +
+                        "   b.description as description, b.org as org, b.code as code," +
+                        "   IF(b.icon IS NULL OR b.icon = '','',CONCAT('" + fastDfsPublicServers + "','/',REPLACE(b.icon,':','/'))) AS icon," +
+                        "   b.source_type as sourceType, b.release_flag as releaseFlag, b.manage_type AS manageType" +
+                        "   FROM apps b " +
+                        "LEFT JOIN user_app m on m.app_id=b.id " +
+                        "WHERE  m.user_id=:userId AND m.show_flag='1' AND b.status='Approved'";
+        if (!StringUtils.isEmpty(doctorManageType)) {
+            sql += "AND b.doctor_manage_type = :doctorManageType";
+        }
+        sql += ") p ORDER BY p.id";
+
+        SQLQuery query = currentSession().createSQLQuery(sql);
+        query.setParameter("userId", userId);
+        if (!StringUtils.isEmpty(doctorManageType)) {
+            query.setParameter("doctorManageType", doctorManageType);
+        }
+        query.setResultTransformer(Transformers.aliasToBean(App.class));
+        return query.list();
     }
 }

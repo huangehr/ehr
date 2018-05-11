@@ -73,9 +73,11 @@ public class ElasticSearchUtil {
         TermsQueryBuilder termsQueryBuilder = QueryBuilders.termsQuery(field, value);
         boolQueryBuilder.must(termsQueryBuilder);
         List<String> idList = elasticSearchClient.getIds(index, type, boolQueryBuilder);
-        String [] idArr = new String[idList.size()];
-        idArr = idList.toArray(idArr);
-        elasticSearchClient.bulkDelete(index, type, idArr);
+        if (idList.size() > 0) {
+            String [] idArr = new String[idList.size()];
+            idArr = idList.toArray(idArr);
+            elasticSearchClient.bulkDelete(index, type, idArr);
+        }
     }
 
     public Map<String, Object> update(String index, String type, String id, Map<String, Object> source) throws DocumentMissingException {
@@ -110,11 +112,6 @@ public class ElasticSearchUtil {
         return elasticSearchClient.findByField(index, type, boolQueryBuilder);
     }
 
-    public List<Map<String, Object>> list(String index, String type, List<Map<String, Object>> filters) {
-        QueryBuilder boolQueryBuilder = getQueryBuilder(filters);
-        return elasticSearchClient.findByField(index, type, boolQueryBuilder);
-    }
-
     public List<Map<String, Object>> page(String index, String type, String filters, int page, int size) {
         return this.page(index, type, filters, null, page, size);
     }
@@ -138,8 +135,8 @@ public class ElasticSearchUtil {
         return elasticSearchClient.findBySql(sql);
     }
 
-    public List<Map<String, Long>> dateHistogram(String index, String type, List<Map<String, Object>> filter, Date start, Date end, String field, DateHistogramInterval interval, String format) {
-        QueryBuilder boolQueryBuilder = getQueryBuilder(filter);
+    public Map<String, Long> dateHistogram(String index, String type, String filters, Date start, Date end, String field, DateHistogramInterval interval, String format) {
+        QueryBuilder boolQueryBuilder = getQueryBuilder(filters);
         return elasticSearchClient.dateHistogram(index, type, boolQueryBuilder, start, end, field, interval, format);
     }
 
@@ -147,14 +144,15 @@ public class ElasticSearchUtil {
      * 查询去重数量
      * @param index
      * @param type
-     * @param filter
+     * @param filters
      * @param filed
      * @return
      */
-    public int cardinality(String index, String type, List<Map<String, Object>> filter,String filed){
-        QueryBuilder boolQueryBuilder = getQueryBuilder(filter);
+    public int cardinality(String index, String type, String filters, String filed){
+        QueryBuilder boolQueryBuilder = getQueryBuilder(filters);
         return elasticSearchClient.cardinality(index, type, boolQueryBuilder, filed);
     }
+
     private List<SortBuilder> getSortBuilder(String sorts) {
         List<SortBuilder> sortBuilderList = new ArrayList<>();
         if (StringUtils.isEmpty(sorts)) {
@@ -238,51 +236,6 @@ public class ElasticSearchUtil {
                 } else {
                     TermQueryBuilder termQueryBuilder = QueryBuilders.termQuery(condition[0], condition[1]);
                     boolQueryBuilder.must(termQueryBuilder);
-                }
-            }
-        }
-        return boolQueryBuilder;
-    }
-
-    public QueryBuilder getQueryBuilder(List<Map<String, Object>> filter) {
-        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-        for (Map<String, Object> param : filter) {
-            String andOr = String.valueOf(param.get("andOr"));
-            String condition = String.valueOf(param.get("condition"));
-            String field = String.valueOf(param.get("field"));
-            Object value = param.get("value");
-            if (condition.equals("=")) {
-                MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchPhraseQuery(field, value);
-                if ("and".equals(andOr)) {
-                    boolQueryBuilder.must(matchQueryBuilder);
-                } else if ("or".equals(andOr)) {
-                    boolQueryBuilder.should(matchQueryBuilder);
-                }
-            } else if (condition.equals("?")) {
-                QueryStringQueryBuilder queryStringQueryBuilder = QueryBuilders.queryStringQuery(field + ":" + value);
-                if ("and".equals(andOr)) {
-                    boolQueryBuilder.must(queryStringQueryBuilder);
-                } else if("or".equals(andOr)) {
-                    boolQueryBuilder.should(queryStringQueryBuilder);
-                }
-            } else {
-                RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery(field);;
-                if (field.endsWith("Date")) {
-                    rangeQueryBuilder.format("yyyy-MM-dd HH:mm:ss");
-                }
-                if (condition.equals(">")) {
-                    rangeQueryBuilder.gt(value);
-                } else if (condition.equals(">=")) {
-                    rangeQueryBuilder.gte(value);
-                } else if (condition.equals("<=")) {
-                    rangeQueryBuilder.lte(value);
-                } else if (condition.equals("<")) {
-                    rangeQueryBuilder.lt(value);
-                }
-                if ("and".equals(andOr)) {
-                    boolQueryBuilder.must(rangeQueryBuilder);
-                } else if ("or".equals(andOr)) {
-                    boolQueryBuilder.should(rangeQueryBuilder);
                 }
             }
         }
