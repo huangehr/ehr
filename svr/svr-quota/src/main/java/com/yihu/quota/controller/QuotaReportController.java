@@ -1,11 +1,14 @@
 package com.yihu.quota.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.abel533.echarts.Option;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.model.echarts.ChartDataModel;
+import com.yihu.ehr.model.report.MQcDevice;
 import com.yihu.ehr.model.resource.MChartInfoModel;
+import com.yihu.ehr.query.common.model.DataList;
 import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.quota.model.jpa.RsResourceQuota;
 import com.yihu.quota.model.jpa.TjQuota;
@@ -15,9 +18,9 @@ import com.yihu.quota.service.dimension.TjDimensionMainService;
 import com.yihu.quota.service.dimension.TjDimensionSlaveService;
 import com.yihu.quota.service.orgHealthCategory.OrgHealthCategoryStatisticsService;
 import com.yihu.quota.service.quota.BaseStatistsService;
+import com.yihu.quota.service.quota.DeviceService;
 import com.yihu.quota.service.quota.QuotaService;
 import com.yihu.quota.service.resource.ResourceQuotaService;
-import com.yihu.quota.service.singledisease.SingleDiseaseService;
 import com.yihu.quota.util.BasesicUtil;
 import com.yihu.quota.util.ReportOption;
 import com.yihu.quota.vo.DictModel;
@@ -33,8 +36,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 
@@ -62,6 +65,8 @@ public class QuotaReportController extends BaseController {
     private OrgHealthCategoryStatisticsService orgHealthCategoryStatisticsService;
     @Autowired
     private BaseStatistsService baseStatistsService;
+    @Autowired
+    private DeviceService deviceService;
 
     public static String orgHealthCategoryCode = "orgHealthCategoryCode";
 
@@ -933,5 +938,42 @@ public class QuotaReportController extends BaseController {
             invalidUserException(e, -1, "查询失败:" + e.getMessage());
             return null;
         }
+    }
+
+    @RequestMapping(value = ServiceApi.TJ.GetDeviceReports, method = RequestMethod.GET)
+    @ApiOperation(value = "报表-卫生设备一览")
+    public Envelop getDeviceReports(
+            @ApiParam(name = "year", value = "年份", required = true)
+            @RequestParam(value = "year" , required = true) String year,
+            @ApiParam(name = "district", value = "区县")
+            @RequestParam(value = "district", required = false) String district,
+            @ApiParam(name = "organization", value = "机构名称或者组织机构代码", defaultValue = "")
+            @RequestParam(value = "organization", required = false) String organization,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page) throws Exception{
+        Envelop envelop = new Envelop();
+        List<MQcDevice> list = new ArrayList<>();
+        DataList dataList = deviceService.listMQcDeviceByYearAndDistrictAndOrg(year,district,organization,page ,size);
+        if(null!= dataList && null!=dataList.getList() && dataList.getList().size()>0){
+            for(int i=0; i<dataList.getList().size(); i++){
+                Map<String,Object> dataMap = (Map<String, Object>) dataList.getList().get(i);
+                MQcDevice newEntity = objectMapper.readValue(toJson(dataMap), MQcDevice.class);
+                list.add(newEntity);
+            }
+        }
+        envelop.setDetailModelList(list);
+        envelop.setSuccessFlg(true);
+        envelop.setPageSize(size);
+        envelop.setCurrPage(page);
+        envelop.setTotalPage((int)dataList.getPage());
+        envelop.setTotalCount((int)dataList.getCount());
+        return envelop;
+    }
+
+    protected String toJson(Object obj) throws JsonProcessingException {
+        objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd"));
+        return objectMapper.writeValueAsString(obj);
     }
 }

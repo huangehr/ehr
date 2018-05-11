@@ -157,7 +157,7 @@ elasticsearch:
   cluster-nodes: 100.100.1.158:9300
 hadoop:
   hbase-properties:
-    hbase.zookeeper.quorum: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com,node4.hde.h3c.com
+    hbase.zookeeper.quorum: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com
 
 ---
 spring:

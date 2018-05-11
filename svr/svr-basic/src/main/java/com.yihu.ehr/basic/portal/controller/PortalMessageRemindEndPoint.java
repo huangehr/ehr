@@ -1,11 +1,8 @@
 package com.yihu.ehr.basic.portal.controller;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.yihu.ehr.basic.appointment.entity.Registration;
 import com.yihu.ehr.basic.appointment.service.RegistrationService;
-import com.yihu.ehr.basic.org.model.OrgDeptDetail;
 import com.yihu.ehr.basic.org.service.OrgDeptDetailService;
 import com.yihu.ehr.basic.portal.model.PortalMessageTemplate;
 import com.yihu.ehr.basic.portal.model.ProtalMessageRemind;
@@ -14,15 +11,9 @@ import com.yihu.ehr.basic.portal.service.PortalMessageTemplateService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
-import com.yihu.ehr.model.packs.EsDetailsPackage;
 import com.yihu.ehr.model.portal.MMessageRemind;
-import com.yihu.ehr.model.portal.MProtalOrderMessage;
 import com.yihu.ehr.model.portal.MRegistration;
-import com.yihu.ehr.model.redis.MRedisCacheCategory;
-import com.yihu.ehr.model.redis.MRedisMqChannel;
-import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.query.common.model.DataList;
-import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -31,10 +22,8 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.math.BigInteger;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
