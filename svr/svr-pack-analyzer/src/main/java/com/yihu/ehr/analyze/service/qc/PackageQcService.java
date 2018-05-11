@@ -2,6 +2,7 @@ package com.yihu.ehr.analyze.service.qc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.yihu.ehr.analyze.feign.HosAdminServiceClient;
 import com.yihu.ehr.analyze.feign.RedisServiceClient;
 import com.yihu.ehr.analyze.service.pack.DataElementRecord;
 import com.yihu.ehr.analyze.service.pack.DataSetRecord;
@@ -9,13 +10,16 @@ import com.yihu.ehr.analyze.service.pack.ZipPackage;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.model.packs.EsSimplePackage;
 import com.yihu.ehr.util.datetime.DateUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,6 +36,8 @@ public class PackageQcService {
     private ObjectMapper objectMapper;
     @Autowired
     private ElasticSearchUtil elasticSearchUtil;
+    @Autowired
+    private HosAdminServiceClient hosAdminServiceClient;
 
     /**
      * 处理质控消息，统一入口，减少异步消息的数量
@@ -55,7 +61,7 @@ public class PackageQcService {
         try {
             elasticSearchUtil.index("qc", "receive_data_pack", packMap);
         } catch (ParseException e) {
-            logger.error("receive_data_pack" + e.getMessage());
+            logger.error("receive_data_pack," + e.getMessage());
         }
 
         Map<String, DataSetRecord> dataSets = zipPackage.getDataSets();
@@ -79,7 +85,13 @@ public class PackageQcService {
             records.forEach((elementCode, dataElement) -> {
                 String rowKey = dataSetRecord.genRowKey(elementCode);
                 Map<String, String> dataGroup = dataElement.getDataGroup();
-                dataGroup.forEach((code, value) -> {
+                List<String> listDataElement = getDataElementList(dataSetRecord.getVersion(), elementCode);
+                for (String code : listDataElement) {
+                    String value = dataGroup.get(code);
+                    if (value == null) {
+                        value = "";
+                    }
+
                     String channel = "qc_channel_" + code;
                     ObjectNode msgNode = objectMapper.createObjectNode();
                     msgNode.put("rowKey", rowKey);
@@ -97,36 +109,15 @@ public class PackageQcService {
                     msgNode.put("receiveTime", receiveTime);
 
                     redisServiceClient.sendMessage("svr-pack-analyzer", channel, msgNode.toString());
-                });
-
-
-                //TODO: 从Redis服务中获取列表
-//                List<String> listDataElement = new ArrayList<>();
-//                for (String code : listDataElement) {
-//                    String value = dataGroup.get(code);
-//                    if (value == null) {
-//                        value = "";
-//                    }
-//
-//                    String channel = "qc_channel_" + code;
-//                    ObjectNode msgNode = objectMapper.createObjectNode();
-//                    msgNode.put("rowKey", rowKey);
-//                    msgNode.put("table", dataSetRecord.getCode());
-//                    msgNode.put("columnFamily", ZipPackage.DATA);
-//                    msgNode.put("version", dataSetRecord.getVersion());
-//                    msgNode.put("code", code);
-//                    msgNode.put("value", value);
-//                    msgNode.put("orgCode", dataSetRecord.getOrgCode());
-//                    msgNode.put("patientId", dataSetRecord.getPatientId());
-//                    msgNode.put("eventNo", dataSetRecord.getEventNo());
-//                    String eventTime = DateUtil.toString(dataSetRecord.getEventTime(), DateUtil.DEFAULT_YMDHMSDATE_FORMAT);
-//                    msgNode.put("eventTime", eventTime);
-//                    String receiveTime = DateUtil.toString(esSimplePackage.getReceive_date(), DateUtil.DEFAULT_YMDHMSDATE_FORMAT);
-//                    msgNode.put("receiveTime", receiveTime);
-//
-//                    redisServiceClient.sendMessage("svr-pack-analyzer", channel, msgNode.toString());
-//                }
+                }
             });
         });
     }
+
+    private List<String> getDataElementList(String version, String dataSetCode) {
+        String metadataCodes = hosAdminServiceClient.getMetadataCodes(version, dataSetCode);
+        String[] metadataList = StringUtils.split(metadataCodes, ",");
+        return Arrays.asList(metadataList);
+    }
+
 }
