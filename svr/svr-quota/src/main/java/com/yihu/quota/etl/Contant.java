@@ -224,6 +224,19 @@ public class Contant {
         public static final String mysql = "2";
     }
 
+    public static class convert{
+        public static String level_age_1="1";
+        public static String level_age_2="2";
+        public static String level_age_3="3";
+        public static String level_age_4="4";
+        public static String level_age_5="5";
+        public static String level_age_1_name="0~6";
+        public static String level_age_2_name="7~17";
+        public static String level_age_3_name="18~40";
+        public static String level_age_4_name="41~65";
+        public static String level_age_5_name=">65";
+    }
+
     public static class quartz_cron {
         //每年 1月1号 0点 0点0秒触发
         public static final String everyYearFirstDay = "0 0 0 1 1 ? *";

@@ -436,101 +436,101 @@ public class EsExtract {
     }
 
 
-    private  List<SaveModel> queryEsBySql(Map<String, TjQuotaDimensionMain> sqls, List<TjQuotaDimensionSlave> tjQuotaDimensionSlaves) {
-        List<SaveModel> returnList = new ArrayList<>();
-        //初始化es链接
-        esConfig = (EsConfig) JSONObject.toBean(JSONObject.fromObject(esConfig), EsConfig.class);
-        //初始化链接
-        Client client = esClientUtil.getClient(esConfig.getHost(), esConfig.getPort(), null);
-        for (Map.Entry<String, TjQuotaDimensionMain> one : sqls.entrySet()) {
-            logger.info("excute sql:" + one.getKey());
-            try {
-                SQLExprParser parser = new ElasticSqlExprParser(one.getKey());
-                SQLExpr expr = parser.expr();
-                if (parser.getLexer().token() != Token.EOF) {
-                    throw new ParserException("illegal sql expr : " + one);
-                }
-                SQLQueryExpr queryExpr = (SQLQueryExpr) expr;
-                //通过抽象语法树，封装成自定义的Select，包含了select、from、where group、limit等
-                Select select = null;
-                select = new SqlParser().parseSelect(queryExpr);
+//    private  List<SaveModel> queryEsBySql(Map<String, TjQuotaDimensionMain> sqls, List<TjQuotaDimensionSlave> tjQuotaDimensionSlaves) {
+//        List<SaveModel> returnList = new ArrayList<>();
+//        //初始化es链接
+//        esConfig = (EsConfig) JSONObject.toBean(JSONObject.fromObject(esConfig), EsConfig.class);
+//        //初始化链接
+//        Client client = esClientUtil.getClient(esConfig.getHost(), esConfig.getPort(), null);
+//        for (Map.Entry<String, TjQuotaDimensionMain> one : sqls.entrySet()) {
+//            logger.info("excute sql:" + one.getKey());
+//            try {
+//                SQLExprParser parser = new ElasticSqlExprParser(one.getKey());
+//                SQLExpr expr = parser.expr();
+//                if (parser.getLexer().token() != Token.EOF) {
+//                    throw new ParserException("illegal sql expr : " + one);
+//                }
+//                SQLQueryExpr queryExpr = (SQLQueryExpr) expr;
+//                //通过抽象语法树，封装成自定义的Select，包含了select、from、where group、limit等
+//                Select select = null;
+//                select = new SqlParser().parseSelect(queryExpr);
+//
+//                AggregationQueryAction action = null;
+//                DefaultQueryAction queryAction = null;
+//                SqlElasticSearchRequestBuilder requestBuilder = null;
+//                if (select.isAgg) {
+//                    //包含计算的的排序分组的
+//                    action = new AggregationQueryAction(client, select);
+//                    requestBuilder = action.explain();
+//                } else {
+//                    //封装成自己的Select对象
+//                    queryAction = new DefaultQueryAction(client, select);
+//                    requestBuilder = queryAction.explain();
+//                }
+//                //之后就是对ES的操作
+//                SearchResponse response = (SearchResponse) requestBuilder.get();
+//                StringTerms stringTerms = (StringTerms) response.getAggregations().asList().get(0);
+//                Iterator<Terms.Bucket> gradeBucketIt = stringTerms.getBuckets().iterator();
+//                //里面存放的数据 例  350200-5-2-2    主维度  细维度1  细维度2  值
+//                Map<String,String> map = new HashMap<>();
+//                //递归解析json
+//                expainJson(gradeBucketIt, map, null);
+//                compute(tjQuotaDimensionSlaves,returnList,one, map);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }finally {
+//                client.close();
+//            }
+//        }
+//        return returnList;
+//    }
 
-                AggregationQueryAction action = null;
-                DefaultQueryAction queryAction = null;
-                SqlElasticSearchRequestBuilder requestBuilder = null;
-                if (select.isAgg) {
-                    //包含计算的的排序分组的
-                    action = new AggregationQueryAction(client, select);
-                    requestBuilder = action.explain();
-                } else {
-                    //封装成自己的Select对象
-                    queryAction = new DefaultQueryAction(client, select);
-                    requestBuilder = queryAction.explain();
-                }
-                //之后就是对ES的操作
-                SearchResponse response = (SearchResponse) requestBuilder.get();
-                StringTerms stringTerms = (StringTerms) response.getAggregations().asList().get(0);
-                Iterator<Terms.Bucket> gradeBucketIt = stringTerms.getBuckets().iterator();
-                //里面存放的数据 例  350200-5-2-2    主维度  细维度1  细维度2  值
-                Map<String,String> map = new HashMap<>();
-                //递归解析json
-                expainJson(gradeBucketIt, map, null);
-                compute(tjQuotaDimensionSlaves,returnList,one, map);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }finally {
-                client.close();
-            }
-        }
-        return returnList;
-    }
-
-    private void compute(List<TjQuotaDimensionSlave> tjQuotaDimensionSlaves, List<SaveModel> returnList, Map.Entry<String, TjQuotaDimensionMain> one, Map<String, String> map) throws Exception {
-        Map<String, SaveModel> allData = new HashMap<>();
-        //初始化主细维度
-        allData= initDimension(tjQuotaDimensionSlaves, one, allData);
-
-
-        for(String key :map.keySet()){
-            SaveModel saveModel = allData.get(key);
-            String count =  map.get(key);
-            if(saveModel != null ){
-                saveModel.setResult(count.toString());
-                returnList.add(saveModel);
-            }
-        }
-        //数据源中不存在的组合 保存数据为0  待实现
-        //ToDo
-    }
+//    private void compute(List<TjQuotaDimensionSlave> tjQuotaDimensionSlaves, List<SaveModel> returnList, Map.Entry<String, TjQuotaDimensionMain> one, Map<String, String> map) throws Exception {
+//        Map<String, SaveModel> allData = new HashMap<>();
+//        //初始化主细维度
+//        allData= initDimension(tjQuotaDimensionSlaves, one, allData);
+//
+//
+//        for(String key :map.keySet()){
+//            SaveModel saveModel = allData.get(key);
+//            String count =  map.get(key);
+//            if(saveModel != null ){
+//                saveModel.setResult(count.toString());
+//                returnList.add(saveModel);
+//            }
+//        }
+//        //数据源中不存在的组合 保存数据为0  待实现
+//        //ToDo
+//    }
 
     /**
      * 初始化主细维度
      */
-    private  Map<String, SaveModel>  initDimension(List<TjQuotaDimensionSlave> tjQuotaDimensionSlaves, Map.Entry<String,
-            TjQuotaDimensionMain> one, Map<String, SaveModel> allData) throws Exception {
-        try {
-            TjQuotaDimensionMain quotaDimensionMain = one.getValue();
-            //查询字典数据
-            List<SaveModel> dictData = jdbcTemplate.query(quotaDimensionMain.getDictSql(), new BeanPropertyRowMapper(SaveModel.class));
-            if (dictData == null) {
-                throw new Exception("主纬度配置有误");
-            }else{
-                //设置到map里面
-                setAllData(allData, dictData, quotaDimensionMain.getType());
-                for (int i = 0; i < tjQuotaDimensionSlaves.size(); i++) {
-                    List<DictModel> dictDataSlave = jdbcTemplate.query(tjQuotaDimensionSlaves.get(i).getDictSql(), new BeanPropertyRowMapper(DictModel.class));
-                    if (dictDataSlave == null) {
-                        throw new Exception("细纬度配置有误");
-                    }else{
-                        allData = setAllSlaveData(allData, dictDataSlave,i);
-                    }
-                }
-            }
-        }catch (Exception e){
-            throw new Exception("纬度配置有误");
-        }
-        return allData;
-    }
+//    private  Map<String, SaveModel>  initDimension(List<TjQuotaDimensionSlave> tjQuotaDimensionSlaves, Map.Entry<String,
+//            TjQuotaDimensionMain> one, Map<String, SaveModel> allData) throws Exception {
+//        try {
+//            TjQuotaDimensionMain quotaDimensionMain = one.getValue();
+//            //查询字典数据
+//            List<SaveModel> dictData = jdbcTemplate.query(quotaDimensionMain.getDictSql(), new BeanPropertyRowMapper(SaveModel.class));
+//            if (dictData == null) {
+//                throw new Exception("主纬度配置有误");
+//            }else{
+//                //设置到map里面
+//                setAllData(allData, dictData, quotaDimensionMain.getType());
+//                for (int i = 0; i < tjQuotaDimensionSlaves.size(); i++) {
+//                    List<DictModel> dictDataSlave = jdbcTemplate.query(tjQuotaDimensionSlaves.get(i).getDictSql(), new BeanPropertyRowMapper(DictModel.class));
+//                    if (dictDataSlave == null) {
+//                        throw new Exception("细纬度配置有误");
+//                    }else{
+//                        allData = setAllSlaveData(allData, dictDataSlave,i);
+//                    }
+//                }
+//            }
+//        }catch (Exception e){
+//            throw new Exception("纬度配置有误");
+//        }
+//        return allData;
+//    }
 
     /**
      * 递归解析json
@@ -539,41 +539,41 @@ public class EsExtract {
      * @param map
      * @param sb
      */
-    private void expainJson(Iterator<Terms.Bucket> gradeBucketIt,Map<String,String>map, StringBuffer sb) {
-        while (gradeBucketIt.hasNext()) {
-            Terms.Bucket b =  gradeBucketIt.next();
-            if (b.getAggregations().asList().get(0) instanceof StringTerms) {
-                StringTerms stringTermsCh = (StringTerms) b.getAggregations().asList().get(0);
-                Iterator<Terms.Bucket> gradeBucketItCh = stringTermsCh.getBuckets().iterator();
-                while (gradeBucketItCh.hasNext()) {
-                    StringBuffer sbTemp = new StringBuffer((sb == null ? "" : (sb.toString() + "-")) + b.getKey());
-                    expainJson(gradeBucketItCh, map, sbTemp);
-                }
-            }else if (b.getAggregations().asList().get(0) instanceof LongTerms) {
-                LongTerms longTermsCh = (LongTerms) b.getAggregations().asList().get(0);
-                Iterator<Terms.Bucket> gradeBucketItCh = longTermsCh.getBuckets().iterator();
-                while (gradeBucketItCh.hasNext()) {
-                    StringBuffer sbTemp = new StringBuffer((sb == null ? "" : (sb.toString() + "-")) + b.getKey());
-                    expainJson(gradeBucketItCh, map, sbTemp);
-                }
-            }else if (b.getAggregations().asList().get(0) instanceof DoubleTerms) {
-                DoubleTerms doubleTermsCh = (DoubleTerms) b.getAggregations().asList().get(0);
-                Iterator<Terms.Bucket> gradeBucketItCh = doubleTermsCh.getBuckets().iterator();
-                while (gradeBucketItCh.hasNext()) {
-                    StringBuffer sbTemp = new StringBuffer((sb == null ? "" : (sb.toString() + "-")) + b.getKey());
-                    expainJson(gradeBucketItCh, map, sbTemp);
-                }
-            }else {
-                if (b.getAggregations().asList().get(0) instanceof InternalValueCount) {
-                    InternalValueCount count = (InternalValueCount) b.getAggregations().asList().get(0);
-                    map.put(new StringBuffer((sb == null ? "" : (sb.toString() + "-"))+ b.getKey()).toString() , Long.valueOf(count.getValue()).toString());
-                }else if (b.getAggregations().asList().get(0) instanceof InternalSum) {
-                    InternalSum count = (InternalSum) b.getAggregations().asList().get(0);
-                    map.put(new StringBuffer((sb == null ? "" : (sb.toString() + "-")) + "-" + b.getKey()).toString() , count.getValue() + "");
-                }
-            }
-        }
-    }
+//    private void expainJson(Iterator<Terms.Bucket> gradeBucketIt,Map<String,String>map, StringBuffer sb) {
+//        while (gradeBucketIt.hasNext()) {
+//            Terms.Bucket b =  gradeBucketIt.next();
+//            if (b.getAggregations().asList().get(0) instanceof StringTerms) {
+//                StringTerms stringTermsCh = (StringTerms) b.getAggregations().asList().get(0);
+//                Iterator<Terms.Bucket> gradeBucketItCh = stringTermsCh.getBuckets().iterator();
+//                while (gradeBucketItCh.hasNext()) {
+//                    StringBuffer sbTemp = new StringBuffer((sb == null ? "" : (sb.toString() + "-")) + b.getKey());
+//                    expainJson(gradeBucketItCh, map, sbTemp);
+//                }
+//            }else if (b.getAggregations().asList().get(0) instanceof LongTerms) {
+//                LongTerms longTermsCh = (LongTerms) b.getAggregations().asList().get(0);
+//                Iterator<Terms.Bucket> gradeBucketItCh = longTermsCh.getBuckets().iterator();
+//                while (gradeBucketItCh.hasNext()) {
+//                    StringBuffer sbTemp = new StringBuffer((sb == null ? "" : (sb.toString() + "-")) + b.getKey());
+//                    expainJson(gradeBucketItCh, map, sbTemp);
+//                }
+//            }else if (b.getAggregations().asList().get(0) instanceof DoubleTerms) {
+//                DoubleTerms doubleTermsCh = (DoubleTerms) b.getAggregations().asList().get(0);
+//                Iterator<Terms.Bucket> gradeBucketItCh = doubleTermsCh.getBuckets().iterator();
+//                while (gradeBucketItCh.hasNext()) {
+//                    StringBuffer sbTemp = new StringBuffer((sb == null ? "" : (sb.toString() + "-")) + b.getKey());
+//                    expainJson(gradeBucketItCh, map, sbTemp);
+//                }
+//            }else {
+//                if (b.getAggregations().asList().get(0) instanceof InternalValueCount) {
+//                    InternalValueCount count = (InternalValueCount) b.getAggregations().asList().get(0);
+//                    map.put(new StringBuffer((sb == null ? "" : (sb.toString() + "-"))+ b.getKey()).toString() , Long.valueOf(count.getValue()).toString());
+//                }else if (b.getAggregations().asList().get(0) instanceof InternalSum) {
+//                    InternalSum count = (InternalSum) b.getAggregations().asList().get(0);
+//                    map.put(new StringBuffer((sb == null ? "" : (sb.toString() + "-")) + "-" + b.getKey()).toString() , count.getValue() + "");
+//                }
+//            }
+//        }
+//    }
 
     /**
      * 拼接sql

@@ -4,10 +4,12 @@ import com.yihu.ehr.query.common.model.SolrGroupEntity;
 import com.yihu.ehr.query.services.SolrQuery;
 import com.yihu.ehr.solr.SolrUtil;
 import com.yihu.quota.etl.Contant;
+import com.yihu.quota.etl.ExtractConverUtil;
 import com.yihu.quota.etl.extract.ExtractUtil;
 import com.yihu.quota.etl.model.EsConfig;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionMain;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionSlave;
+import com.yihu.quota.vo.FilterModel;
 import com.yihu.quota.vo.QuotaVo;
 import com.yihu.quota.vo.SaveModel;
 import org.slf4j.Logger;
@@ -36,12 +38,13 @@ public class SolrExtract {
     @Autowired
     private JdbcTemplate jdbcTemplate;
     @Autowired
-    SolrUtil solrUtil;
+    private SolrUtil solrUtil;
     @Autowired
-    ExtractUtil extractUtil;
+    private ExtractUtil extractUtil;
     @Autowired
-    SolrQuery solrQuery;
-
+    private SolrQuery solrQuery;
+    @Autowired
+    private ExtractConverUtil extractConverUtil;
     private QuotaVo quotaVo;
     private String startTime;
     private String endTime;
@@ -126,6 +129,11 @@ public class SolrExtract {
             // sum 聚合
             list = solrQuery.getSumMultList(core, q, fq, esConfig.getAggregationKey(), dimensionGroupList, null);
         }
+
+        //数据转换
+        FilterModel filterModel = new FilterModel(list,null);
+        filterModel = extractConverUtil.convert(filterModel,qds);
+        list = filterModel.getDataList();
 
         Map<String, String> statisticsResultMap = new LinkedHashMap<>(); // 统计结果集
         Map<String, String> daySlaveDictMap = new LinkedHashMap<>(); // 按天统计的所有日期项
