@@ -30,19 +30,33 @@ import java.util.*;
  * @created 2018.01.16
  */
 public class ZipPackage {
-    //    private static final String STANDARD = "standard";
-    //    private static final String ORIGIN = "origin";
     public static final String DATA = "d";
     private final static String TempPath = System.getProperty("java.io.tmpdir") + java.io.File.separator;
     private EsSimplePackage esSimplePackage;
     private Zipper zipper = new Zipper();
-    //数据集合
+    /**
+     * 数据集合
+     */
     private Map<String, DataSetRecord> dataSets = new TreeMap<>();
-    //1结构化档案，2文件档案，3链接档案，4数据集档案
+    /**
+     * 1结构化档案，2文件档案，3链接档案，4数据集档案
+     */
     private ProfileType profileType;
-    private File zipFile;   //Zip档案包文件
-    private File packFile;  //解压后文件目录
+
+    /**
+     * Zip档案包文件
+     */
+    private File zipFile;
+    /**
+     * 解压后文件目录
+     */
+    private File packFile;
     private Set<String> tableSet = new HashSet<>();
+    private String patientId;
+    private String eventNo;
+    private String orgCode;
+    private String eventType;
+    private String eventTime;
 
     public ZipPackage(EsSimplePackage esSimplePackage) {
         this.esSimplePackage = esSimplePackage;
@@ -138,6 +152,46 @@ public class ZipPackage {
         }
     }
 
+    public String getPatientId() {
+        return patientId;
+    }
+
+    public void setPatientId(String patientId) {
+        this.patientId = patientId;
+    }
+
+    public String getEventNo() {
+        return eventNo;
+    }
+
+    public void setEventNo(String eventNo) {
+        this.eventNo = eventNo;
+    }
+
+    public String getOrgCode() {
+        return orgCode;
+    }
+
+    public void setOrgCode(String orgCode) {
+        this.orgCode = orgCode;
+    }
+
+    public String getEventType() {
+        return eventType;
+    }
+
+    public void setEventType(String eventType) {
+        this.eventType = eventType;
+    }
+
+    public String getEventTime() {
+        return eventTime;
+    }
+
+    public void setEventTime(String eventTime) {
+        this.eventTime = eventTime;
+    }
+
     private void saveDataSet(DataSetRecord dataSetRecord) throws Exception {
         String table = dataSetRecord.getCode();
         createTable(table);
@@ -150,7 +204,7 @@ public class ZipPackage {
 
         TableBundle bundle = new TableBundle();
         if (dataSetRecord.isReUploadFlg()) {
-            String legacyRowKeys[] = hBaseDao.findRowKeys(table, rowKeyPrefix, rowKeyPrefix.substring(0, rowKeyPrefix.length() - 1) + "z",  "^" + rowKeyPrefix);
+            String legacyRowKeys[] = hBaseDao.findRowKeys(table, rowKeyPrefix, rowKeyPrefix.substring(0, rowKeyPrefix.length() - 1) + "z", "^" + rowKeyPrefix);
             if (legacyRowKeys != null && legacyRowKeys.length > 0) {
                 bundle.addRows(legacyRowKeys);
                 hBaseDao.delete(table, bundle);
