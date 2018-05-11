@@ -111,4 +111,7 @@ public class RsReportService extends BaseJpaService<RsReport, RsReportDao> {
         }
     }
 
+    public String getPositionByCode(String code) {
+        return rsReportDao.findPositionByCode(code);
+    }
 }

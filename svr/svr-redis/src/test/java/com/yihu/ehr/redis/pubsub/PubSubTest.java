@@ -37,12 +37,13 @@ public class PubSubTest {
     @Test
     public void redisPubSubTest() throws InterruptedException, JsonProcessingException {
         String channel_01 = "zjj.test.01";
-        for (int i = 0; i < 8000; i++) {
+        for (int i = 0; i < 10000; i++) {
             String channel = channel_01 + i;
             ChannelTopic topic = new ChannelTopic(channel);
-
             CustomMessageListenerAdapter messageListener = MessageCommonBiz.newCustomMessageListenerAdapter(channel);
             redisMessageListenerContainer.addMessageListener(messageListener, topic);
+            // 每次添加channel监听器都会flush，这需要点时间。
+            Thread.sleep(5);
         }
 
 //        Map<String, Object> message = new HashMap<>();
