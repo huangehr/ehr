@@ -1175,13 +1175,4 @@ public class BaseStatistsService {
         resultList = divisionPercent(dimension, moleList, denoList, 1, 100);
         return resultList;
     }
-
-    public static void main(String[] args) {
-        String filters = "quotaDate >= '2016-01-01' and quotaDate <= '2016-12-31'";
-        boolean b = filters.indexOf("'") > -1;
-        int start = b ? filters.indexOf("'") : filters.indexOf("\"");
-        String condition = filters.substring(start + 1, start + 5);
-        int now = Integer.parseInt(condition);
-        System.out.println(now);
-    }
 }
