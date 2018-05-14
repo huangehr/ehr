@@ -48,10 +48,10 @@ public class DailyReportEndPoint extends EnvelopRestEndPoint {
                 msg = msg + "事件时间不能为空、";
             }
             if (map.get("HSI07_01_001") == null || "".equals(map.get("HSI07_01_001"))){
-                msg = msg + "门诊人数不能为空、";
+                msg = msg + "总诊疗人数不能为空、";
             }
             if (map.get("HSI07_01_002") == null || "".equals(map.get("HSI07_01_002"))){
-                msg = msg + "急诊人数不能为空、";
+                msg = msg + "门急诊人数不能为空、";
             }
             if (map.get("HSI07_01_004") == null|| "".equals(map.get("HSI07_01_004"))){
                 msg = msg + "健康检查人数不能为空、";
@@ -68,6 +68,14 @@ public class DailyReportEndPoint extends EnvelopRestEndPoint {
             return failed("参数校验失败");
         } else {
             for (Map<String, Object> map : list) {
+                //补传的时候删除原来数据
+                String filter = "event_date=" + map.get("event_date") + ";org_code?"+map.get("org_code");
+                List<Map<String, Object>> res = elasticSearchUtil.list(INDEX, TYPE, filter);
+                if(res!=null && res.size()>0){
+                    for(Map<String, Object> m : res){
+                        elasticSearchUtil.delete(INDEX, TYPE ,m.get("_id").toString());
+                    }
+                }
                 elasticSearchUtil.index(INDEX, TYPE, map);
             }
             return success(true);
