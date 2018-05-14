@@ -9,6 +9,7 @@ import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.resource.MRsReport;
 import com.yihu.ehr.resource.model.RsReport;
 import com.yihu.ehr.resource.service.RsReportService;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -21,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 资源报表 服务接口
@@ -163,5 +165,20 @@ public class RsReportEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "reportCategoryId") Integer reportCategoryId) throws Exception {
         List<RsReport> list = rsReportService.getByReportCategoryId(reportCategoryId);
         return list;
+    }
+
+    @ApiOperation("根据报表编码获取视图位置")
+    @RequestMapping(value = ServiceApi.Resources.GetPositionMapByCode, method = RequestMethod.GET)
+    public Envelop getPositionByCode(
+            @ApiParam(name = "code", value = "报表编码", required = true)
+            @RequestParam(value = "code") String code) throws Exception {
+        Envelop envelop = new Envelop();
+        String positionMap = rsReportService.getPositionByCode(code);
+        envelop.setSuccessFlg(true);
+        if (StringUtils.isNotEmpty(positionMap)) {
+            Map<String, String> map = objectMapper.readValue(positionMap, Map.class);
+            envelop.setObj(map);
+        }
+        return envelop;
     }
 }

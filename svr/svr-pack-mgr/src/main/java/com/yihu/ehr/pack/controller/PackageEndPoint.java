@@ -1,6 +1,5 @@
 package com.yihu.ehr.pack.controller;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.constants.*;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
@@ -10,6 +9,7 @@ import com.yihu.ehr.model.packs.EsDetailsPackage;
 import com.yihu.ehr.model.packs.EsSimplePackage;
 import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.pack.feign.SecurityClient;
+import com.yihu.ehr.pack.task.FastDFSTask;
 import com.yihu.ehr.util.encrypt.RSA;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
@@ -63,6 +63,8 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
     private ElasticSearchUtil elasticSearchUtil;
     @Autowired
     private RedisTemplate<String, Serializable> redisTemplate;
+    @Autowired
+    private FastDFSTask fastDFSTask;
    /* @Autowired
     private JsonArchivesService jsonArchivesService;*/
 
@@ -77,7 +79,10 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "package_crypto") String packageCrypto,
             @ApiParam(name = "md5", value = "档案包MD5")
             @RequestParam(value = "md5", required = false) String md5,
+            @ApiParam(name = "packType", value = "包类型 默认为1(结构化) 1结构化档案，2文件档案，3链接档案，4数据集档案")
+            @RequestParam(value = "packType", required = false) Integer packType,
             HttpServletRequest request) throws Exception {
+        logger.info("接收档案中....");
         MKey key = securityClient.getOrgKey(orgCode);
         if (key == null || key.getPrivateKey() == null) {
             throw new ApiException(HttpStatus.FORBIDDEN, ErrorCode.FORBIDDEN, "Invalid private key, maybe you miss the organization code?");
@@ -88,42 +93,12 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         } catch (Exception ex) {
             throw new ApiException(HttpStatus.FORBIDDEN, ErrorCode.FORBIDDEN, "javax.crypto.BadPaddingException." + ex.getMessage());
         }
-        //fastDfs
-        ObjectNode msg = fastDFSUtil.upload(pack.getInputStream(), "zip", "健康档案JSON文件");
-        String group = msg.get(FastDFSUtil.GROUP_NAME).asText();
-        String remoteFile = msg.get(FastDFSUtil.REMOTE_FILE_NAME).asText();
-        //将组与文件ID使用英文分号隔开, 提取的时候, 只需要将它们这个串拆开, 就可以得到组与文件ID
-        String remoteFilePath = String.join(EsDetailsPackage.PATH_SEPARATOR, new String[]{group, remoteFile});
-        //elasticSearch
-        Date now = new Date();
-        String _now = dateFormat.format(now);
-        Map<String, Object> sourceMap = new HashMap<>();
-        sourceMap.put("pwd", password);
-        sourceMap.put("remote_path", remoteFilePath);
-        sourceMap.put("receive_date", _now);
-        sourceMap.put("archive_status", 0);
-        sourceMap.put("org_code", orgCode);
-        sourceMap.put("client_id", getClientId(request));
-        sourceMap.put("resourced", 0);
-        sourceMap.put("md5_value", md5);
-        sourceMap.put("fail_count", 0);
-        sourceMap.put("analyze_status", 0);
-        sourceMap.put("analyze_fail_count", 0);
-        sourceMap.put("pack_type", 1);
-        //保存索引出错的时候，删除文件
-        try {
-            sourceMap = elasticSearchUtil.index(INDEX, TYPE, sourceMap);
-        } catch (Exception e) {
-            fastDFSUtil.delete(group, remoteFile);
-            throw e;
+        String clientId = getClientId(request);
+        if(packType == null){
+            packType = 1;
         }
-        EsSimplePackage esSimplePackage = new EsSimplePackage();
-        esSimplePackage.set_id((sourceMap.get("_id").toString()));
-        esSimplePackage.setPwd(password);
-        esSimplePackage.setReceive_date(now);
-        esSimplePackage.setRemote_path(remoteFilePath);
-        esSimplePackage.setClient_id(getClientId(request));
-        redisTemplate.opsForList().leftPush(RedisCollection.PackageList, objectMapper.writeValueAsString(esSimplePackage));
+        //更改成异步--->>防止大文件接收,导致阻塞,超时等问题
+        fastDFSTask.savePackageWithOrg(pack,password,orgCode,md5,clientId,packType);
         return true;
     }
 

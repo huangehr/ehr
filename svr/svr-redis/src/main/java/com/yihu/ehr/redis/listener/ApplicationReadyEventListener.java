@@ -37,6 +37,12 @@ public class ApplicationReadyEventListener implements ApplicationListener<Applic
                 ChannelTopic topic = new ChannelTopic(channel.getChannel());
                 CustomMessageListenerAdapter messageListener = MessageCommonBiz.newCustomMessageListenerAdapter(channel.getChannel());
                 redisMessageListenerContainer.addMessageListener(messageListener, topic);
+                try {
+                    // 每次添加channel监听器都会flush，这需要点时间。
+                    Thread.sleep(5);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         } catch (ParseException e) {
             e.printStackTrace();

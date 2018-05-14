@@ -18,6 +18,10 @@ import springfox.documentation.annotations.ApiIgnore;
 @RequestMapping(ApiVersion.Version1_0)
 public interface HosAdminServiceClient {
 
+    @RequestMapping(value = ServiceApi.Redis.StdMetadataCodes, method = RequestMethod.GET)
+    public String getMetadataCodes(@RequestParam("version") String version,
+                                   @RequestParam("datasetCode") String datasetCode);
+
     @RequestMapping(value = ServiceApi.Redis.StdMetadataType, method = RequestMethod.GET)
     String getMetaDataType(
             @RequestParam("version") String version,

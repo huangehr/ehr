@@ -428,11 +428,11 @@ public class SingleDiseasesController {
         //按相关并发症 饼图
         Map<String, Object> symptomDataInfo = singleDiseaseServiceNew.getPieDataInfoBySql("4", symptomSql, "symptomName");
         if (null != symptomDataInfo && symptomDataInfo.size() > 0) {
-            ArrayList<Map<String, Object>> seriesData = (ArrayList<Map<String, Object>>) diseaseTypeDataInfo.get("seriesData");
+            ArrayList<Map<String, Object>> seriesData = (ArrayList<Map<String, Object>>) symptomDataInfo.get("seriesData");
             Envelop envelop = new Envelop();
             envelop.setSuccessFlg(true);
             envelop.setDetailModelList(seriesData);
-            envelop.setObj(diseaseTypeDataInfo.get("legendData"));
+            envelop.setObj(symptomDataInfo.get("legendData"));
             resultMap.put("symptom",envelop);
         }
         return  resultMap;

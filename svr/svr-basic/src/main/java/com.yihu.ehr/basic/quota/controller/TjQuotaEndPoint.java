@@ -19,6 +19,7 @@ import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Propagation;
@@ -100,7 +101,8 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
             tjquotaDataSource = convertToModel(tjQuotaModel.getTjQuotaDataSourceModel(), TjQuotaDataSource.class);
             tjquotaDataSource.setQuotaCode(tjQuotaModel.getCode());
         }
-        if(tjQuotaModel.getTjQuotaDataSourceModel() != null){
+        if(tjQuotaModel.getTjQuotaDataSaveModel() != null
+                && StringUtils.isNotEmpty(tjQuotaModel.getTjQuotaDataSaveModel().getSaveCode())){
             tjQuotaDataSave = convertToModel(tjQuotaModel.getTjQuotaDataSaveModel(), TjQuotaDataSave.class);
             tjQuotaDataSave.setQuotaCode(tjQuotaModel.getCode());
         }
@@ -114,6 +116,7 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
             tjQuota.setIsInitExec("0");
             tjQuota.setStatus(1);
             tjQuota.setCreateTime(new Date());
+            tjQuota.setUpdateTime(new Date());
         }
         tjQuota = tjQuotaService.saves(tjQuota, tjquotaDataSource, tjQuotaDataSave);
         return Result.success("统计表更新成功！", tjQuota);

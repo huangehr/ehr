@@ -26,9 +26,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
@@ -58,36 +60,35 @@ public class QcDailyReportResolveController extends EnvelopRestEndPoint {
     @RequestMapping(value = "/report/receiveReportFile", method = RequestMethod.POST)
     @ApiOperation(value = "接收质控包")
     Envelop receiveReportFile(
-            @ApiParam(name = "reportFile", value = "质控包", allowMultiple = true)
-            @RequestParam(value = "reportFile") File reportFile,
+            @ApiParam(name = "pack", value = "质控包", allowMultiple = true)
+            @RequestParam(value = "pack") MultipartFile pack,
             @ApiParam(name = "org_code", value = "机构代码")
-            @RequestParam(value = "org_code") String orgCode,
-            @ApiParam(name = "encrypt_pwd", value = "解压密码,二次加密")
-            @RequestParam(value = "encrypt_pwd") String encryptPwd,
+            @RequestParam(value = "org_code") String org_code,
+            @ApiParam(name = "package_crypto", value = "解压密码,二次加密")
+            @RequestParam(value = "package_crypto") String package_crypto,
             @ApiParam(name = "md5", value = "档案包MD5")
             @RequestParam(value = "md5", required = false) String md5,
             @ApiParam(name = "type", value = "文件包类型 1 质控包 2 日报包")
             @RequestParam(value = "type", defaultValue = "1", required = true) int type) throws Exception {
         Envelop envelop = new Envelop();
         String password = null;
+        File file = null;
         try {
-            UserSecurity key = userSecurityService.getKeyByOrgCode(orgCode);
+            UserSecurity key = userSecurityService.getKeyByOrgCode(org_code);
             if (key == null || key.getPrivateKey() == null) {
                 throw new ApiException(ErrorCode.FORBIDDEN, "Invalid private key, maybe you miss the organization code?");
             }
-            System.out.println(RSA.encrypt("p5Tm4unF",RSA.genPublicKey(key.getPublicKey())));
-            password = RSA.decrypt(encryptPwd, RSA.genPrivateKey(key.getPrivateKey()));
-            InputStream in =  new FileInputStream(reportFile);
-            JsonReport jsonReport = reportService.receive(in, password, encryptPwd, md5, orgCode, type);
-            String fileName = TempPath+System.currentTimeMillis()+".zip";
-            File newFile = new File(fileName);
-            reportFile.renameTo(newFile);
+            password = RSA.decrypt(package_crypto, RSA.genPrivateKey(key.getPrivateKey()));
+            InputStream in =  pack.getInputStream();
+            JsonReport jsonReport = reportService.receive(in, password, package_crypto, md5, org_code, type);
+            file = File.createTempFile("tmp", ".zip");
+            pack.transferTo(file);
             Zipper zipper = new Zipper();
-            zipper.unzipFile(newFile, TempPath, password);
-            File file = new File(TempPath+"events.json");
-            JsonNode jsonNode = objectMapper.readTree(file);
-            newFile.delete();
+            zipper.unzipFile(file, TempPath, password);
+            File jsonFile = new File(TempPath+"events.json");
+            JsonNode jsonNode = objectMapper.readTree(jsonFile);
             file.delete();
+            jsonFile.delete();
             saveQcPackage(jsonNode,jsonReport);
             if (jsonReport != null) {
                 envelop.setSuccessFlg(true);
@@ -95,6 +96,7 @@ public class QcDailyReportResolveController extends EnvelopRestEndPoint {
                 envelop.setSuccessFlg(false);
             }
         } catch (Exception e) {
+            envelop.setErrorMsg("质控包上传失败");
             e.printStackTrace();
         }
         return envelop;

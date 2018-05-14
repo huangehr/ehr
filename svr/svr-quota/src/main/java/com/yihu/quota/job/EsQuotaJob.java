@@ -12,6 +12,7 @@ import com.yihu.quota.model.jpa.TjQuotaLog;
 import com.yihu.quota.util.SpringUtil;
 import com.yihu.quota.vo.QuotaVo;
 import com.yihu.quota.vo.SaveModel;
+import net.bytebuddy.implementation.bytecode.Throw;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -90,6 +91,7 @@ public class EsQuotaJob implements Job {
         tjQuotaLog.setQuotaCode(quotaVo.getCode());
         tjQuotaLog.setSaasId(saasid);
         tjQuotaLog.setStartTime(new Date());
+        String time = "时间：" + startTime + "到"+ endTime +" , ";
         try {
             //抽取数据
             List<SaveModel> dataModels = extract();
@@ -108,15 +110,15 @@ public class EsQuotaJob implements Job {
                     //保存数据
                     Boolean success = saveDate(dataSaveModels);
                     tjQuotaLog.setStatus(success ? Contant.save_status.success : Contant.save_status.fail);
-                    tjQuotaLog.setContent(success ? "统计保存成功" : "统计数据 ElasticSearch 保存失败");
-                    System.out.println(success ? "统计保存成功" : "统计数据 ElasticSearch 保存失败");
+                    tjQuotaLog.setContent(success ? time+"统计保存成功" : time+"统计数据 ElasticSearch 保存失败");
+                    System.out.println(success ? time+"统计保存成功" : time+"统计数据 ElasticSearch 保存失败");
                 } else {
                     tjQuotaLog.setStatus(Contant.save_status.success);
-                    tjQuotaLog.setContent("统计成功，统计结果大于0的数据为0条");
+                    tjQuotaLog.setContent(time + "统计成功，统计结果大于0的数据为0条");
                 }
             } else {
                 tjQuotaLog.setStatus(Contant.save_status.fail);
-                tjQuotaLog.setContent("没有抽取到数据");
+                tjQuotaLog.setContent(time + "没有抽取到数据");
             }
 
             // 初始执行时，更新该指标为已初始执行过
@@ -164,7 +166,8 @@ public class EsQuotaJob implements Job {
                     flag = false ;
                 }
             } catch (Exception e) {
-                e.getMessage();
+                throw  new Exception("Elasticsearch 指标统计时删除数据异常");
+//                e.getMessage();
             } finally {
                 talClient.close();
                 client.close();

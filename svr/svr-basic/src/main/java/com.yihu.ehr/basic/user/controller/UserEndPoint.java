@@ -1,5 +1,6 @@
 package com.yihu.ehr.basic.user.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.basic.dict.service.SystemDictEntryService;
 import com.yihu.ehr.basic.org.model.OrgMemberRelation;
@@ -1007,15 +1008,21 @@ public class UserEndPoint extends EnvelopRestEndPoint {
             envelop.setErrorMsg("对不起，该用户不存在，请确认！");
             return envelop;
         }
-        user.setTelephone(telePhoneNew);
-        user = userService.save(user);
-        if (null != user) {
-            envelop.setSuccessFlg(true);
-            envelop.setObj(user);
-        } else {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("更换手机号码失败，请联系管理员！");
+        //同时修改医生表及用户表信息
+        Doctors doctor = doctorService.getByIdCardNo(user.getIdCardNo());
+        if (doctor != null) {
+            doctor.setPhone(telePhoneNew);
         }
+        DemographicInfo demographicInfo = demographicService.getDemographicInfoByIdCardNo(user.getIdCardNo());
+        if (demographicInfo != null) {
+            demographicInfo.setTelephoneNo("{\"联系电话\":\"" + telePhoneNew + "\"}");
+        } else {
+            demographicInfo = objectMapper.readValue(JSON.toJSONString(user), DemographicInfo.class);
+            demographicInfo.setTelephoneNo("{\"联系电话\":\"" + telePhoneNew + "\"}");
+        }
+        User user1 = userService.update(user, doctor, demographicInfo);
+        envelop.setSuccessFlg(true);
+        envelop.setObj(user);
         return envelop;
     }
 

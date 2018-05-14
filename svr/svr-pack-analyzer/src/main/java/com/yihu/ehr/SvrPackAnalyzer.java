@@ -46,17 +46,6 @@ public class SvrPackAnalyzer extends SpringBootServletInitializer implements Com
         schedulerService.addJob(schedulerConfig.getJobMinSize(), schedulerConfig.getCronExp());
     }
 
-    @Bean
-    public Executor asyncExecutor() {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(2);
-        executor.setMaxPoolSize(10);
-        executor.setQueueCapacity(1000);
-        executor.setThreadNamePrefix("qc-");
-        executor.initialize();
-        return executor;
-    }
-
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
         return application.sources(SvrPackAnalyzer.class);

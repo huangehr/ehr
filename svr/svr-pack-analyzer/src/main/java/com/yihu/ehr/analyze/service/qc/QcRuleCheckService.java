@@ -2,7 +2,6 @@ package com.yihu.ehr.analyze.service.qc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.analyze.feign.HosAdminServiceClient;
-import com.yihu.ehr.analyze.feign.RedisServiceClient;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -28,8 +27,6 @@ public class QcRuleCheckService {
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
-    private RedisServiceClient redisServiceClient;
-    @Autowired
     private HosAdminServiceClient hosAdminServiceClient;
     @Autowired
     private ElasticSearchUtil elasticSearchUtil;
@@ -40,20 +37,21 @@ public class QcRuleCheckService {
      * @param data
      */
     public void emptyCheck(String data) {
+        DataElementValue value = null;
         try {
-            DataElementValue value = parse(data);
-            logger.info("code:" + value.getCode() + ",value:" + value.getValue());
-
-            Boolean isNullable = hosAdminServiceClient.isMetaDataNullable(value.getVersion(), value.getTable(), value.getCode());
-            if (!isNullable && StringUtils.isEmpty(value.getValue())) {
-                saveCheckResult(value, "E00001", "不能为空");
-                logger.warn("code:" + value.getCode() + ",value:" + value.getValue());
-            }
+            value = parse(data);
         } catch (IOException e) {
-            e.printStackTrace();
             logger.error(e.getMessage());
+            return;
         }
 
+        logger.info("code:" + value.getCode() + ",value:" + value.getValue());
+
+        Boolean isNullable = hosAdminServiceClient.isMetaDataNullable(value.getVersion(), value.getTable(), value.getCode());
+        if (!isNullable && StringUtils.isEmpty(value.getValue())) {
+            saveCheckResult(value, "E00001", "不能为空");
+            logger.warn("code:" + value.getCode() + ",value:" + value.getValue());
+        }
     }
 
     /**
@@ -63,27 +61,40 @@ public class QcRuleCheckService {
      * @param data
      */
     public void typeCheck(String data) {
+        DataElementValue value = null;
         try {
-            DataElementValue value = parse(data);
-            String type = hosAdminServiceClient.getMetaDataType(value.getVersion(), value.getTable(), value.getCode());
-            switch (type) {
-                case "L":
-                    break;
-                case "N":
-                    break;
-                case "D":
-                    break;
-                case "DT":
-                    break;
-                case "T":
-                    break;
-                default:
-                    break;
-            }
-
+            value = parse(data);
         } catch (IOException e) {
-            e.printStackTrace();
             logger.error(e.getMessage());
+            return;
+        }
+
+        String type = hosAdminServiceClient.getMetaDataType(value.getVersion(), value.getTable(), value.getCode());
+        switch (type) {
+            case "L":
+                if (!("F".equals(data) && "T".equals(data) && "0".equals(data) && "1".equals(data))) {
+                    saveCheckResult(value, "E00003", "值类型错误");
+                }
+
+                break;
+            case "N":
+                if (!StringUtils.isNumeric(data)) {
+                    saveCheckResult(value, "E00003", "值类型错误");
+                }
+
+                break;
+            case "D":
+            case "DT":
+            case "T":
+                if (DateUtil.strToDate(data) == null) {
+                    saveCheckResult(value, "E00003", "值类型错误");
+                }
+                break;
+            case "BY":
+                break;
+            // S1,S2,S3,BY
+            default:
+                break;
         }
     }
 
@@ -94,6 +105,19 @@ public class QcRuleCheckService {
      * @param data
      */
     public void formatCheck(String data) {
+        DataElementValue value = null;
+        try {
+            value = parse(data);
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+            return;
+        }
+
+        String format = hosAdminServiceClient.getMetaDataFormat(value.getVersion(), value.getTable(), value.getCode());
+        switch (format) {
+            default:
+                break;
+        }
     }
 
     /**
@@ -102,44 +126,46 @@ public class QcRuleCheckService {
      * @param data
      */
     public void valueCheck(String data) {
+        DataElementValue value = null;
         try {
-            DataElementValue value = parse(data);
-            logger.info("code:" + value.getCode() + ",value:" + value.getValue());
-            String dict = hosAdminServiceClient.getMetaDataDict(value.getVersion(), value.getTable(), value.getCode());
-            if (StringUtils.isEmpty(dict) || dict.equals("0")) {
-                return;
-            }
-
-            logger.info("code:" + value.getCode() + ",value:" + value.getValue() + ",dict:" + dict);
-            Boolean isExist = hosAdminServiceClient.isDictCodeExist(value.getVersion(), dict, value.getCode());
-            if (!isExist) {
-                saveCheckResult(value, "E00002", "超出值域范围");
-                logger.warn("code:" + value.getCode() + ",value:" + value.getValue() + ",dict:" + dict);
-            }
+            value = parse(data);
         } catch (IOException e) {
             e.printStackTrace();
             logger.error(e.getMessage());
         }
+
+        logger.info("code:" + value.getCode() + ",value:" + value.getValue());
+        String dict = hosAdminServiceClient.getMetaDataDict(value.getVersion(), value.getTable(), value.getCode());
+        if (StringUtils.isEmpty(dict) || dict.equals("0")) {
+            return;
+        }
+
+        logger.info("code:" + value.getCode() + ",value:" + value.getValue() + ",dict:" + dict);
+        Boolean isExist = hosAdminServiceClient.isDictCodeExist(value.getVersion(), dict, value.getCode());
+        if (!isExist) {
+            saveCheckResult(value, "E00002", "超出值域范围");
+            logger.warn("code:" + value.getCode() + ",value:" + value.getValue() + ",dict:" + dict);
+        }
     }
 
     private void saveCheckResult(DataElementValue value, String errorCode, String errorMsg) {
-        try {
-            Map<String, Object> map = new HashMap<>();
-            map.put("rowKey", value.getRowKey());
-            map.put("table", value.getTable());
-            map.put("version", value.getVersion());
-            map.put("code", value.getCode());
-            map.put("value", value.getValue());
-            map.put("orgCode", value.getOrgCode());
-            map.put("patientId", value.getPatientId());
-            map.put("eventNo", value.getEventNo());
-            Date eventTime = DateUtil.strToDate(value.getEventTime());
-            map.put("eventTime", eventTime);
-            Date receiveTime = DateUtil.strToDate(value.getReceiveTime());
-            map.put("receiveTime", receiveTime);
-            map.put("errorCode", errorCode);
-            map.put("errorMsg", errorMsg);
+        Map<String, Object> map = new HashMap<>(12);
+        map.put("rowKey", value.getRowKey());
+        map.put("table", value.getTable());
+        map.put("version", value.getVersion());
+        map.put("code", value.getCode());
+        map.put("value", value.getValue());
+        map.put("orgCode", value.getOrgCode());
+        map.put("patientId", value.getPatientId());
+        map.put("eventNo", value.getEventNo());
+        Date eventTime = DateUtil.strToDate(value.getEventTime());
+        map.put("eventTime", eventTime);
+        Date receiveTime = DateUtil.strToDate(value.getReceiveTime());
+        map.put("receiveTime", receiveTime);
+        map.put("errorCode", errorCode);
+        map.put("errorMsg", errorMsg);
 
+        try {
             elasticSearchUtil.index("qc", "receive_data_element", map);
         } catch (ParseException e) {
             e.printStackTrace();

@@ -8,6 +8,7 @@ import org.csource.fastdfs.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
@@ -78,11 +79,12 @@ public class FastDFSUtil {
             byte fileBuffer[] = new byte[in.available()];
             int len = 0;
             int temp;                             //所有读取的内容都使用temp接收
-            while ((temp = in.read()) != -1) {            //当没有读取完时，继续读取
+            BufferedInputStream bufferedInputStream = new BufferedInputStream(in);
+            while ((temp = bufferedInputStream.read()) != -1) {            //当没有读取完时，继续读取
                 fileBuffer[len] = (byte) temp;
                 len ++;
             }
-            in.close();
+            bufferedInputStream.close();
             message.put(FILE_SIZE, fileBuffer.length);
             String[] results = client.upload_file(fileBuffer, fileExtension, fileMetaData);
             if (results != null) {
@@ -116,11 +118,12 @@ public class FastDFSUtil {
             byte fileBuffer[] = new byte[fileSize];
             int len = 0;
             int temp;                             //所有读取的内容都使用temp接收
-            while ((temp = in.read()) != -1) {            //当没有读取完时，继续读取
+            BufferedInputStream bufferedInputStream = new BufferedInputStream(in);
+            while ((temp = bufferedInputStream.read()) != -1) {            //当没有读取完时，继续读取
                 fileBuffer[len] = (byte) temp;
                 len ++;
             }
-            in.close();
+            bufferedInputStream.close();
             message.put(FILE_SIZE, fileBuffer.length);
             String[] results = client.upload_file(fileBuffer, fileExtension, fileMetaData);
             if (results != null) {
