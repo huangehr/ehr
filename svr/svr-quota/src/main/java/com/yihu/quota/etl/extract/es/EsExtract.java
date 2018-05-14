@@ -211,7 +211,56 @@ public class EsExtract {
                 }
 
                 List<List<Map<String, Object>>> sumOrgTypeList =  stastisOrtType(orgTypeResultList,dimensionMap, dimensionDicMap);
-                for(List<Map<String, Object>> list:sumOrgTypeList){
+
+
+                Map<String,String> dimenKeyValMap = new HashMap<>();
+                dimensionMap.remove("org");
+                for(Map<String,Object> map : orgTypeResultList){
+                    String key = "";
+                    for(String dimen:dimensionMap.keySet()){
+                        key +=  map.get(dimen) + "-" ;
+                    }
+                    dimenKeyValMap.put(key,key);
+                }
+                List<List<Map<String, Object>>> dimenSumOrgTypeList = new ArrayList<>();
+
+                for(String dimenKey :dimenKeyValMap.keySet()){
+                    List<Map<String, Object>> newDimenList = new ArrayList<>();
+                    for(List<Map<String, Object>> list:sumOrgTypeList){
+                        String key = "";
+                        for(Map<String, Object> map :list){
+                            for(String dimen:dimensionMap.keySet()){
+                                key += map.get(dimen)  + "-" ;
+                            }
+                            if(dimenKey.equals(key)){
+                                key +=  map.get("code");
+                                boolean flag = true;
+                                //判断有没有维度一致的 有就结果叠加
+                                if(newDimenList != null && newDimenList.size() > 0){
+                                    for(Map<String, Object> newDimeMap :newDimenList) {
+                                        String newkey = "";
+                                        for (String dimen : dimensionMap.keySet()) {
+                                            newkey += newDimeMap.get(dimen) + "-";
+                                        }
+                                        newkey +=  newDimeMap.get("code");
+                                        if(newkey.equals(key)){
+                                            int newResult = Integer.valueOf(newDimeMap.get("result").toString());
+                                            int result = Integer.valueOf(map.get("result").toString());
+                                            newDimeMap.put("result",newResult + result );
+                                            flag = false;
+                                        }
+                                    }
+                                }
+                                if(flag){
+                                    newDimenList.add(map);
+                                }
+                            }
+                        }
+                    }
+                    dimenSumOrgTypeList.add(newDimenList);
+                }
+
+                for(List<Map<String, Object>> list:dimenSumOrgTypeList){
                     saveModels.addAll(orgHealthCategoryStatisticsService.getAllNodesStatistic(list));
                 }
             }
