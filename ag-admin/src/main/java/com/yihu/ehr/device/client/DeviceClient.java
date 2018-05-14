@@ -47,7 +47,7 @@ public interface DeviceClient {
     @ApiOperation("保存")
     Envelop save(
             @ApiParam(name = "device", value = "实体类Json")
-            @RequestBody String device);
+            @RequestParam(value = "device") String device);
 
 
     @RequestMapping(value = ServiceApi.Device.DeviceDelete, method = RequestMethod.POST)
@@ -66,5 +66,5 @@ public interface DeviceClient {
     @ApiOperation("批量导入")
     boolean addBatch(
             @ApiParam(name = "devices", value = "实体类列表Json")
-            @RequestBody String devices);
+            @RequestParam(value = "devices") String devices);
 }
