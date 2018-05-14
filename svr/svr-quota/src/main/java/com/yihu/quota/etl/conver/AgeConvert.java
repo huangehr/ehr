@@ -25,6 +25,7 @@ public class AgeConvert implements Convert {
      * @return
      */
     public List<Map<String, Object>> convert(JdbcTemplate jdbcTemplate, List<Map<String, Object>> dataList , TjQuotaDimensionSlave slave ) {
+        System.out.println("run in age Conver");
         Map<String,Object> tempMap = new HashMap<>();
         List<Map<String, Object>> result = new ArrayList<>();
         for(Map<String, Object> one:dataList) {
@@ -44,26 +45,36 @@ public class AgeConvert implements Convert {
                         key = EHR_005013;
                     }
                     oldAgeStr = ageStr;
+                    boolean falg = false;
                     if(ageStr.contains("岁") ){
                         ageStr = ageStr.substring(0,ageStr.indexOf("岁"));
+                        falg = true;
                     }else if(ageStr.contains("月")){
                         ageStr = "0";
+                        falg = true;
+                    }else if(ageStr.contains("天")){
+                        ageStr = "0";
+                        falg = true;
                     }else{
                         if(ageStr.contains(".")){
                             ageStr = ageStr.substring(0,ageStr.indexOf("."));
+                            falg = true;
                         }
                     }
-                    age = Integer.valueOf(ageStr);
-                    String ageLevel = getAgeCode(age);
-                    tempMap.put(key,ageLevel);
-                    if(one.get("$statisticsKey") != null){
-                        String statisticsKey = one.get("$statisticsKey").toString();
-                        tempMap.put("$statisticsKey",statisticsKey.replaceAll(oldAgeStr,ageLevel));
+                    System.out.println("run in age Conver ageStr = " + ageStr);
+                    if(falg){
+                        age = Integer.parseInt(ageStr);
+                        String ageLevel = getAgeCode(age);
+                        tempMap.put(key,ageLevel);
+                        if(one.get("$statisticsKey") != null){
+                            String statisticsKey = one.get("$statisticsKey").toString();
+                            tempMap.put("$statisticsKey",statisticsKey.replaceAll(oldAgeStr,ageLevel));
+                        }
+                        result.add(tempMap);
                     }
-                    result.add(tempMap);
                 }
             } catch (Exception e) {
-               throw  new NumberFormatException("年龄转换有误！");
+               throw  new NumberFormatException("年龄转换有误！" + e.getMessage());
             }
         };
         return result;
