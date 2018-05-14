@@ -31,7 +31,7 @@ public class ProfileDiseaseEndPoint extends EnvelopRestEndPoint{
 
     @ApiOperation("主要健康问题")
     @RequestMapping(value = ServiceApi.Profiles.HealthProblem, method = RequestMethod.GET)
-    public List<Map<String, Object>> HealthProblem(
+    public List<Map<String, Object>> healthProblem(
             @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362321200108017313")
             @RequestParam(value = "demographic_id") String demographic_id) throws Exception {
         return profileDiseaseService.getHealthProblem(demographic_id);
@@ -39,7 +39,7 @@ public class ProfileDiseaseEndPoint extends EnvelopRestEndPoint{
 
     @ApiOperation("历史健康情况 - 档案浏览器")
     @RequestMapping(value = ServiceApi.Profiles.HealthCondition, method = RequestMethod.GET)
-    public List<Map<String, Object>> getHealthCondition(
+    public List<Map<String, Object>> healthCondition(
             @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362321200108017313")
             @RequestParam(value = "demographic_id") String demographic_id) {
         return profileDiseaseService.getHealthCondition(demographic_id);
