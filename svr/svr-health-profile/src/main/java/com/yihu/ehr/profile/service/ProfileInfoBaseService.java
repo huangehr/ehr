@@ -117,12 +117,13 @@ public class ProfileInfoBaseService extends BaseJpaService {
             patientMap.put("name", result.get("patient_name") == null? "" : result.get("patient_name"));
             //性别
             String gender = result.get("EHR_000019") == null? "" : (String) result.get("EHR_000019");
-            if (gender.equals("1")) {
-                gender = "男";
-            } else if (gender.equals("2")) {
-                gender = "女";
+            if ("1".equals(gender)) {
+                patientMap.put("gender", "男");
+            } else if ("2".equals(gender)) {
+                patientMap.put("gender", "女");
+            } else {
+                patientMap.put("gender", "未知");
             }
-            patientMap.put("gender", gender == null ? "未知" : gender);
             //出生日期
             String birthday = "";
             if (!StringUtils.isEmpty(result.get("EHR_000007"))) {

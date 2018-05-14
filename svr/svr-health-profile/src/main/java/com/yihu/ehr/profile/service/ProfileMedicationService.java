@@ -42,6 +42,16 @@ public class ProfileMedicationService {
                     List<Map<String, Object>> subList = subEnvelop.getDetailModelList();
                     if (subList.size() > 0) {
                         for (Map<String, Object> subMap : subList) {
+                            if (!StringUtils.isEmpty(subMap.get("EHR_000131"))) {
+                                String drugName = (String) subMap.get("EHR_000131");
+                                if (dataMap.containsKey(drugName)) {
+                                    Integer count = dataMap.get(drugName);
+                                    dataMap.put(drugName, count + 1);
+                                } else {
+                                    dataMap.put(drugName, 1);
+                                }
+                                continue;
+                            }
                             if (!StringUtils.isEmpty(subMap.get("EHR_000100"))) {
                                 String drugName = (String) subMap.get("EHR_000100");
                                 if (dataMap.containsKey(drugName)) {
@@ -51,15 +61,6 @@ public class ProfileMedicationService {
                                     dataMap.put(drugName, 1);
                                 }
                                 continue;
-                            }
-                            if (!StringUtils.isEmpty(subMap.get("EHR_000131"))) {
-                                String drugName = (String) subMap.get("EHR_000131");
-                                if (dataMap.containsKey(drugName)) {
-                                    Integer count = dataMap.get(drugName);
-                                    dataMap.put(drugName, count + 1);
-                                } else {
-                                    dataMap.put(drugName, 1);
-                                }
                             }
                         }
                     }
@@ -162,38 +163,14 @@ public class ProfileMedicationService {
         return resultList;
     }
 
-    public Map<String, Object> recentMedicationSub(String demographicId, String date) throws Exception {
-        Map<String, Object> resultMap = new HashMap<>();
+    public Envelop recentMedicationSub(String demographicId, String date, Integer page, Integer size) throws Exception {
         String masterQ = "{\"q\":\"demographic_id:" + demographicId + "\"}";
         masterQ = SimpleSolrQueryUtil.getQuery(null, date, masterQ);
         Envelop masterEnvelop = resource.getMasterData(masterQ, 1, 500, null);
         List<Map<String, Object>> masterList = masterEnvelop.getDetailModelList();
         List<Map<String, Object>> dataList = new ArrayList<>();
+        Object eventDate = "";
         for (Map<String, Object> event : masterList) {
-            Map<String, Object> baseInfo = new HashMap<>();
-            //姓名
-            baseInfo.put("name", event.get("patient_name") == null ? "" : event.get("patient_name"));
-            //性别
-            String gender = event.get("EHR_000019") == null ? "" : (String) event.get("EHR_000019");
-            if (gender.equals("1")) {
-                gender = "男";
-            } else if (gender.equals("2")) {
-                gender = "女";
-            }
-            baseInfo.put("gender", gender == null ? "未知" : gender);
-            //出生日期
-            String birthday = "";
-            if (!StringUtils.isEmpty(event.get("EHR_000007"))) {
-                birthday = (String) event.get("EHR_000007");
-            }
-            if (StringUtils.isEmpty(birthday) && !StringUtils.isEmpty(event.get("EHR_000320"))) {
-                birthday = (String) event.get("EHR_000320");
-            }
-            baseInfo.put("birthday", birthday);
-            //基本信息
-            resultMap.put("base", baseInfo);
-            //临床诊断
-            resultMap.put("diagnosis", event.get("diagnosis"));
             //详情
             String subQ = "{\"q\":\"profile_id:" + event.get(BasisConstant.rowkey) + " AND (rowkey:*HDSD00_83* OR rowkey:*HDSD00_84*)\"}";
             Envelop subEnvelop = resource.getSubData(subQ, 1, 1000, null);
@@ -224,11 +201,26 @@ public class ProfileMedicationService {
                 }
             }
             if (dataList.size() > 0) {
+                eventDate = event.get(BasisConstant.eventDate);
                 break;
             }
         }
-        resultMap.put("details", dataList);
-        return resultMap;
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(true);
+        envelop.setCurrPage(page);
+        envelop.setPageSize(size);
+        envelop.setTotalPage(dataList.size() % size > 0 ? dataList.size() / size + 1 : dataList.size() / size);
+        envelop.setTotalCount(dataList.size());
+        List result = new ArrayList();
+        for (int i = (page - 1) * size; i < page * size; i ++) {
+            if (i > dataList.size() - 1) {
+                break;
+            }
+            result.add(dataList.get(i));
+        }
+        envelop.setDetailModelList(result);
+        envelop.setObj(eventDate);
+        return envelop;
     }
 
     private Map<String, Integer> sortByValue(Map<String, Integer> sourceMap) {
