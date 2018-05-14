@@ -4,17 +4,12 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.device.client.DeviceClient;
-import com.yihu.ehr.emergency.client.AmbulanceClient;
-import com.yihu.ehr.entity.device.Device;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 
 /**
@@ -51,7 +46,7 @@ public class DeviceController extends BaseController {
     @ApiOperation("保存")
     public Envelop save(
             @ApiParam(name = "device", value = "实体类Json")
-            @RequestBody String device) throws Exception {
+            @RequestParam(value = "device") String device) throws Exception {
        return deviceClient.save(device);
     }
 
@@ -74,9 +69,18 @@ public class DeviceController extends BaseController {
 
     @RequestMapping(value = ServiceApi.Device.DeviceBatch, method = RequestMethod.POST)
     @ApiOperation("批量导入")
-    public boolean addBatch(
+    public Envelop addBatch(
             @ApiParam(name = "devices", value = "实体类列表Json")
-            @RequestBody String devices) throws Exception{
-        return deviceClient.addBatch(devices);
+            @RequestParam(value = "devices") String devices) throws Exception{
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(true);
+        try{
+            deviceClient.addBatch(devices);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("导入失败！"+e.getMessage());
+        }
+        return envelop;
     }
 }

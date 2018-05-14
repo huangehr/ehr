@@ -74,7 +74,7 @@ public class Device extends BaseIdentityEntity{
     private double devicePrice;
 
     /**
-     * 试用年限
+     * 使用年限
      */
     private Integer yearLimit;
 

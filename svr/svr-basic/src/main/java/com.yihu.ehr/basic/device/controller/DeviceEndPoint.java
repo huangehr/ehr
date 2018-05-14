@@ -51,7 +51,7 @@ public class DeviceEndPoint extends EnvelopRestEndPoint {
     @ApiOperation("保存")
     public Envelop save(
             @ApiParam(name = "device", value = "实体类Json")
-            @RequestBody String device) throws Exception {
+            @RequestParam(value = "device") String device) throws Exception {
         Device model = objectMapper.readValue(device, Device.class);
         model = deviceService.save(model);
         return success(model);
@@ -89,7 +89,7 @@ public class DeviceEndPoint extends EnvelopRestEndPoint {
     @ApiOperation("批量导入")
     public boolean addBatch(
             @ApiParam(name = "devices", value = "实体类列表Json")
-            @RequestBody String devices) throws Exception{
+            @RequestParam(value = "devices") String devices) throws Exception{
         List list = objectMapper.readValue(devices, List.class);
         deviceService.addBatch(list);
         return true;

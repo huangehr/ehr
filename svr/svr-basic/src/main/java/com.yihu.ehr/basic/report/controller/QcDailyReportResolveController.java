@@ -60,12 +60,12 @@ public class QcDailyReportResolveController extends EnvelopRestEndPoint {
     @RequestMapping(value = "/report/receiveReportFile", method = RequestMethod.POST)
     @ApiOperation(value = "接收质控包")
     Envelop receiveReportFile(
-            @ApiParam(name = "reportFile", value = "质控包", allowMultiple = true)
-            @RequestParam(value = "reportFile") MultipartFile reportFile,
+            @ApiParam(name = "pack", value = "质控包", allowMultiple = true)
+            @RequestParam(value = "pack") MultipartFile pack,
             @ApiParam(name = "org_code", value = "机构代码")
-            @RequestParam(value = "org_code") String orgCode,
-            @ApiParam(name = "encrypt_pwd", value = "解压密码,二次加密")
-            @RequestParam(value = "encrypt_pwd") String encryptPwd,
+            @RequestParam(value = "org_code") String org_code,
+            @ApiParam(name = "package_crypto", value = "解压密码,二次加密")
+            @RequestParam(value = "package_crypto") String package_crypto,
             @ApiParam(name = "md5", value = "档案包MD5")
             @RequestParam(value = "md5", required = false) String md5,
             @ApiParam(name = "type", value = "文件包类型 1 质控包 2 日报包")
@@ -74,16 +74,15 @@ public class QcDailyReportResolveController extends EnvelopRestEndPoint {
         String password = null;
         File file = null;
         try {
-            UserSecurity key = userSecurityService.getKeyByOrgCode(orgCode);
+            UserSecurity key = userSecurityService.getKeyByOrgCode(org_code);
             if (key == null || key.getPrivateKey() == null) {
                 throw new ApiException(ErrorCode.FORBIDDEN, "Invalid private key, maybe you miss the organization code?");
             }
-            System.out.println(RSA.encrypt("p5Tm4unF",RSA.genPublicKey(key.getPublicKey())));
-            password = RSA.decrypt(encryptPwd, RSA.genPrivateKey(key.getPrivateKey()));
-            InputStream in =  reportFile.getInputStream();
-            JsonReport jsonReport = reportService.receive(in, password, encryptPwd, md5, orgCode, type);
+            password = RSA.decrypt(package_crypto, RSA.genPrivateKey(key.getPrivateKey()));
+            InputStream in =  pack.getInputStream();
+            JsonReport jsonReport = reportService.receive(in, password, package_crypto, md5, org_code, type);
             file = File.createTempFile("tmp", ".zip");
-            reportFile.transferTo(file);
+            pack.transferTo(file);
             Zipper zipper = new Zipper();
             zipper.unzipFile(file, TempPath, password);
             File jsonFile = new File(TempPath+"events.json");
