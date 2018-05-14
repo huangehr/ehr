@@ -56,7 +56,7 @@ public class DiabetesTestScheduler {
 	private ObjectMapper objectMapper;
 
 
-	@Scheduled(cron = "0 10 16 * * ?")
+//	@Scheduled(cron = "0 10 16 * * ?")
 	public void validatorIdentity(){
 		try {
 //			String q =  null; // 查询条件 health_problem:HP0047  HP0047 为糖尿病
