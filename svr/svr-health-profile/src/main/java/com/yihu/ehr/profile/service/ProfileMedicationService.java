@@ -70,7 +70,7 @@ public class ProfileMedicationService {
         return sortByValue(dataMap);
     }
 
-    public List medicationRecords(String demographicId, String filter, String date, String keyWord) throws Exception {
+    public List<Map<String, Object>> medicationRecords(String demographicId, String filter, String date, String keyWord) throws Exception {
         List<Map<String, Object>> resultList = new ArrayList<>();
         String masterQ = "{\"q\":\"demographic_id:" + demographicId + "\"}";
         masterQ = SimpleSolrQueryUtil.getQuery(filter, date, masterQ);

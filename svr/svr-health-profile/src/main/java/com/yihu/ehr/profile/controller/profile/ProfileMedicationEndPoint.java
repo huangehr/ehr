@@ -45,7 +45,7 @@ public class ProfileMedicationEndPoint extends EnvelopRestEndPoint {
 
     @ApiOperation("用药记录 - 上饶PP")
     @RequestMapping(value = ServiceApi.Profiles.MedicationRecords, method = RequestMethod.GET)
-    public List medicationRecords(
+    public List<Map<String, Object>> medicationRecords(
             @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362321200108017313")
             @RequestParam(value = "demographic_id") String demographic_id,
             @ApiParam(name = "filter", value = "健康问题health_problem?hpCode（不传默认查找所有）")
@@ -72,7 +72,7 @@ public class ProfileMedicationEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page") Integer page,
             @ApiParam(name = "size", value = "分页大小", required = true)
             @RequestParam(value = "size") Integer size) throws Exception {
-        List list = profileMedicationService.medicationRecords(demographic_id, filter, date, key_word);
+        List<Map<String, Object>> list = profileMedicationService.medicationRecords(demographic_id, filter, date, key_word);
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(true);
         envelop.setCurrPage(page);
