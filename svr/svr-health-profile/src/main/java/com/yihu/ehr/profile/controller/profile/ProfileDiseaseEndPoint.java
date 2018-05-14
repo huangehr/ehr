@@ -29,25 +29,20 @@ public class ProfileDiseaseEndPoint extends EnvelopRestEndPoint{
     @Autowired
     private ProfileDiseaseService profileDiseaseService;
 
-    @ApiOperation("主要健康问题OK")
+    @ApiOperation("主要健康问题")
     @RequestMapping(value = ServiceApi.Profiles.HealthProblem, method = RequestMethod.GET)
     public List<Map<String, Object>> HealthProblem(
             @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362321200108017313")
-            @RequestParam(value = "demographic_id") String demographic_id) {
+            @RequestParam(value = "demographic_id") String demographic_id) throws Exception {
         return profileDiseaseService.getHealthProblem(demographic_id);
     }
 
-    @ApiOperation("主要健康问题诊断详情OK")
-    @RequestMapping(value = ServiceApi.Profiles.HealthProblemSub, method = RequestMethod.GET)
-    public List<Map<String, Object>> HealthProblemSub(
-            @ApiParam(name = "last_visit_record", value = "最后一次诊断记录", required = true, defaultValue = "49229004X_000406450000000UX0_1485608518000")
-            @RequestParam(value = "last_visit_record") String last_visit_record,
-            @ApiParam(name = "event_type", value = "事件类型", required = true, defaultValue = "0")
-            @RequestParam(value = "event_type") String event_type,
-            @ApiParam(name = "demographic_id", value = "身份证号", defaultValue = "362321200108017313")
-            @RequestParam(value = "demographic_id", required = false) String demographic_id) {
-        return profileDiseaseService.getHealthProblemSub(last_visit_record, event_type, demographic_id);
+    @ApiOperation("历史健康情况 - 档案浏览器")
+    @RequestMapping(value = ServiceApi.Profiles.HealthCondition, method = RequestMethod.GET)
+    public List<Map<String, Object>> getHealthCondition(
+            @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362321200108017313")
+            @RequestParam(value = "demographic_id") String demographic_id) {
+        return profileDiseaseService.getHealthCondition(demographic_id);
     }
-
 
 }

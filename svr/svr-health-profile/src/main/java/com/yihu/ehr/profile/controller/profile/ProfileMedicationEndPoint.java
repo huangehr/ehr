@@ -4,6 +4,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.profile.service.ProfileMedicationService;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -14,11 +15,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 /**
- * EndPoint - 用药记录（兼容 pc & mobile）
+ * EndPoint - 用药记录
  * Created by progr1mmer on 2018/3/13.
  */
 @RestController
@@ -29,7 +31,19 @@ public class ProfileMedicationEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private ProfileMedicationService profileMedicationService;
 
-    @ApiOperation("用药记录")
+    @ApiOperation("用药排行")
+    @RequestMapping(value = ServiceApi.Profiles.MedicationRanking, method = RequestMethod.GET)
+    public Map<String, Integer> medicationRanking(
+            @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362321200108017313")
+            @RequestParam(value = "demographic_id") String demographic_id,
+            @ApiParam(name = "hp_code", value = "健康问题代码（不传默认查找所有）")
+            @RequestParam(value = "hp_code", required = false) String hp_code,
+            @ApiParam(name = "date", value = "某个时间段内（不传默认查找所有）")
+            @RequestParam(value = "date", required = false) String date) throws Exception {
+        return profileMedicationService.medicationRanking(demographic_id, hp_code, date);
+    }
+
+    @ApiOperation("用药记录 - 上饶PP")
     @RequestMapping(value = ServiceApi.Profiles.MedicationRecords, method = RequestMethod.GET)
     public List medicationRecords(
             @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362321200108017313")
@@ -43,23 +57,45 @@ public class ProfileMedicationEndPoint extends EnvelopRestEndPoint {
         return profileMedicationService.medicationRecords(demographic_id, filter, date, key_word);
     }
 
-    @ApiOperation("用药排行")
-    @RequestMapping(value = ServiceApi.Profiles.MedicationRanking, method = RequestMethod.GET)
-    public Map<String, Integer> medicationRanking(
+    @ApiOperation("用药记录 - 档案浏览器")
+    @RequestMapping(value = ServiceApi.Profiles.MedicationRecordsPage, method = RequestMethod.GET)
+    public Envelop medicationRecordsPage (
             @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362321200108017313")
             @RequestParam(value = "demographic_id") String demographic_id,
-            @ApiParam(name = "hp_code", value = "健康问题代码（不传默认查找所有）")
-            @RequestParam(value = "hp_code", required = false) String hp_code) throws Exception {
-        return profileMedicationService.medicationRanking(demographic_id, hp_code);
+            @ApiParam(name = "filter", value = "健康问题health_problem?hpCode（不传默认查找所有）")
+            @RequestParam(value = "filter", required = false) String filter,
+            @ApiParam(name = "date", value = "时间")
+            @RequestParam(value = "date", required = false) String date,
+            @ApiParam(name = "key_word", value = "关键字")
+            @RequestParam(value = "key_word", required = false) String key_word,
+            @ApiParam(name = "page", value = "页码", required = true)
+            @RequestParam(value = "page") Integer page,
+            @ApiParam(name = "size", value = "分页大小", required = true)
+            @RequestParam(value = "size") Integer size) throws Exception {
+        List list = profileMedicationService.medicationRecords(demographic_id, filter, date, key_word);
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(true);
+        envelop.setCurrPage(page);
+        envelop.setPageSize(size);
+        envelop.setTotalPage(list.size() % size > 0 ? list.size() / size + 1 : list.size() / size);
+        envelop.setTotalCount(list.size());
+        List result = new ArrayList();
+        for (int i = (page - 1) * size; i < page * size -1; i ++) {
+            if (i > list.size() - 1) {
+                break;
+            }
+            result.add(list.get(i));
+        }
+        envelop.setDetailModelList(result);
+        return envelop;
     }
 
-
-    @ApiOperation("用药详情")
-    @RequestMapping(value = ServiceApi.Profiles.MedicationSub, method = RequestMethod.GET)
-    public Map<String, Object> medicationSub(
-            @ApiParam(name = "profile_id", value = "主表事件索引", required = true, defaultValue = "49229004X_000406450000000UX0_1485608518000")
-            @RequestParam(value = "profile_id") String profile_id) throws Exception {
-        return profileMedicationService.medicationSub(profile_id);
+    @ApiOperation("最近的处方清单 - 档案浏览器")
+    @RequestMapping(value = ServiceApi.Profiles.RecentMedicationSub, method = RequestMethod.GET)
+    public Map<String, Object> recentMedicationSub(
+            @ApiParam(name = "demographic_id", value = "主表事件索引", required = true, defaultValue = "362321200108017313")
+            @RequestParam(value = "demographic_id") String profile_id) throws Exception {
+        return profileMedicationService.recentMedicationSub(profile_id, null);
     }
 
 }

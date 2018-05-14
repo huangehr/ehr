@@ -26,15 +26,13 @@ import java.util.List;
  */
 @Service
 public class ThridPrescriptionService extends BaseJpaService<ArchiveTemplate, ArchiveTemplateDao> {
+
     @Autowired
     private FastDFSConfig FastDFSConfig;
-
     @Autowired
     private ArchiveTemplateService tempService;
-
     @Autowired
     private ProfileCDAService profileCDAService;
-
     private Map<String, String> usageMap;
 
     public ThridPrescriptionService() {

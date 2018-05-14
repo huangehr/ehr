@@ -15,6 +15,7 @@ import java.util.Date;
 @Table(name = "rs_medication_list")
 @Access(value = AccessType.PROPERTY)
 public class MedicationStat {
+
     private int drugId;
     private String drugName;
     private int month3;
