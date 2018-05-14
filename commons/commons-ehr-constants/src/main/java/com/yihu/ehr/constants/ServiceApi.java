@@ -1368,7 +1368,7 @@ public class ServiceApi {
         public static final String GetOrgDeptsDate = "/org/getOrgDeptsDate";
         public static final String GetOrgDeptInfoList = "/org/userId/getOrgDeptInfoList";
         public static final String getseaOrgsByOrgCode = "/organizations/seaOrgsByOrgCode";
-        public static final String childOrgSaasByAreaCode = "/org/childOrgSaasByAreaCode";
+        public static final String ChildOrgSaasByAreaCode = "/org/childOrgSaasByAreaCode";
 
         // 卫生机构类别
         public static class HealthCategory {
