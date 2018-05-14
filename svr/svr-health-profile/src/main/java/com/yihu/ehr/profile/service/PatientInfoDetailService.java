@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.model.specialdict.MDrugDict;
 import com.yihu.ehr.profile.feign.*;
 import com.yihu.ehr.profile.model.MedicationStat;
+import com.yihu.ehr.profile.util.BasisConstant;
 import com.yihu.ehr.util.log.LogService;
 import com.yihu.ehr.util.rest.Envelop;
 import org.apache.commons.lang.StringUtils;

@@ -36,7 +36,7 @@ public interface OrganizationClient {
 
     @ApiOperation(value = "根据地区代码获取机构列表")
     @RequestMapping(value = "/organizations/areas/{area}", method = RequestMethod.GET)
-    public List<MOrganization> getOrganizationByAreaCode(
+    List<MOrganization> getOrganizationByAreaCode(
             @ApiParam(name = "area", value = "地区代码", defaultValue = "")
             @PathVariable(value = "area") String area);
 }

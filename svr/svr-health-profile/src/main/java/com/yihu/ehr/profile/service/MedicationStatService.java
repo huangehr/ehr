@@ -22,7 +22,6 @@ import java.util.List;
 public class MedicationStatService extends BaseJpaService<ArchiveTemplate, ArchiveTemplateDao> {
 
 
-
     /**
      * 获取用药清单（直接查mysql）
      */

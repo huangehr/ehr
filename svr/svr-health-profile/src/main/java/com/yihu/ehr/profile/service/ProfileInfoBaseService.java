@@ -2,116 +2,128 @@ package com.yihu.ehr.profile.service;
 
 
 import com.yihu.ehr.profile.feign.*;
+import com.yihu.ehr.profile.util.BasisConstant;
+import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.rest.Envelop;
+import org.hibernate.FlushMode;
+import org.hibernate.Query;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-
 import java.util.*;
 
 /**
  * @author hzp 2016-05-26
  */
 @Service
-public class ProfileInfoBaseService {
+public class ProfileInfoBaseService extends BaseJpaService {
 
-    @Value("${spring.application.id}")
-    private String appId;
     @Autowired
-    private ResourceClient resource; //资源服务
+    private ResourceClient resource;
     @Autowired
     private ProfileDiseaseService profileDiseaseService;
 
     /**
      * @获取患者档案基本信息
      */
-    public Map<String, Object> getPatientInfo(String demographicId, String version) {
-        //时间排序
-        /*if (version != null) {
-            envelop = resource.getMasterData("{\"q\":\"demographic_id:" + demographicId + "\"}", null, null, version);
-        } else {
-            envelop = resource.getMasterData("{\"q\":\"demographic_id:" + demographicId + "\"}", null, null, null);
-        }*/
+    public Map<String, Object> getPatientInfo(String demographicId, String version) throws Exception {
         Envelop envelop = resource.getMasterData("{\"q\":\"demographic_id:" + demographicId + "\"}", 1, 500, null);
         List<Map<String, Object>> list = envelop.getDetailModelList();
         Map<String, Object> patientMap = new HashMap<>();
         if (list != null && list.size() > 0) {
             Map<String, Object> result = new HashMap<>();
+            List<String> allergyMedicine = new ArrayList<>();
+            List<String> allergens = new ArrayList<>();
             if (list.size() == 1) {
                 result = list.get(0);
             } else {
                 //合并数据
                 for (Map<String, Object> obj : list) {
                     for (String key : obj.keySet()) {
-                        if (!result.containsKey(key)) {
+                        if ("EHR_004971".equals(key)) {
+                            if (!allergyMedicine.contains(result.get("EHR_004971"))) {
+                                allergyMedicine.add((String) result.get("EHR_004971"));
+                            }
+                            continue;
+                        }
+                        if ("EHR_000011".equals(key)) {
+                            if (!allergens.contains(result.get("EHR_000011"))) {
+                                allergens.add((String) result.get("EHR_000011"));
+                            }
+                            continue;
+                        }
+                        if (!result.containsKey(key) && obj.get(key) != null) {
                             result.put(key, obj.get(key));
                         }
                     }
                 }
             }
             //提取档案类型信息
-            // 1. 新生儿 -> 出生医学证明编号 新生儿姓名 新生儿性别代码 新生儿出生日期
-            if (result.get("EHR_001219") != null || result.get("EHR_001251") != null || result.get("EHR_001252") != null || result.get("EHR_001253") != null) {
+            //身高
+            String height = "";
+            if (!StringUtils.isEmpty(result.get("EHR_000590"))) {
+                height = (String) result.get("EHR_000590");
+            }
+            if (StringUtils.isEmpty(height) && !StringUtils.isEmpty(result.get("EHR_000778"))) {
+                height = (String) result.get("EHR_000778");
+            }
+            if (StringUtils.isEmpty(height) && !StringUtils.isEmpty(result.get("EHR_001339"))) {
+                height = (String) result.get("EHR_001339");
+            }
+            if (StringUtils.isEmpty(height) && !StringUtils.isEmpty(result.get("EHR_004263"))) {
+                height = (String) result.get("EHR_004263");
+            }
+            if (StringUtils.isEmpty(height) && !StringUtils.isEmpty(result.get("EHR_005142"))) {
+                height = (String) result.get("EHR_005142");
+            }
+            patientMap.put("height", height);
+            //体重
+            String weight = "";
+            if (!StringUtils.isEmpty(result.get("EHR_000073"))) {
+                weight = (String) result.get("EHR_000073");
+            }
+            if (StringUtils.isEmpty(weight) && !StringUtils.isEmpty(result.get("EHR_000785"))) {
+                weight = (String) result.get("EHR_000785");
+            }
+            if (StringUtils.isEmpty(weight) && !StringUtils.isEmpty(result.get("EHR_001340"))) {
+                weight = (String) result.get("EHR_001340");
+            }
+            if (StringUtils.isEmpty(weight) && !StringUtils.isEmpty(result.get("EHR_004002"))) {
+                weight = (String) result.get("EHR_004002");
+            }
+            if (StringUtils.isEmpty(weight) && !StringUtils.isEmpty(result.get("EHR_004718"))) {
+                weight = (String) result.get("EHR_004718");
+            }
+            if (StringUtils.isEmpty(weight) && !StringUtils.isEmpty(result.get("EHR_005148"))) {
+                weight = (String) result.get("EHR_005148");
+            }
+            patientMap.put("weight", weight);
+            if (result.get(BasisConstant.diagnosis) != null && result.get(BasisConstant.diagnosis).toString().contains("Z37")) { //1 新生儿
                 patientMap.put("label", "新生儿");
                 //出生身高
                 patientMap.put("height", result.get("EHR_001256") == null ? "" : result.get("EHR_001256"));
                 //出生体重
                 patientMap.put("weight", result.get("EHR_001257") == null ? "" : result.get("EHR_001257")); //单位(g)
-                //2. 慢病
+            } else if (result.get(BasisConstant.diagnosis) != null && result.get(BasisConstant.diagnosis).toString().contains("O80")) { //2 孕妇
+                patientMap.put("label", "孕妇");
+            } else if (profileDiseaseService.getHealthProblem(demographicId).size() > 0){
+                patientMap.put("label", "慢病");
             } else {
-                patientMap.put("label", "患病");
-                //身高
-                String height = "";
-                if (!StringUtils.isEmpty(result.get("EHR_000590"))) {
-                    height = (String) result.get("EHR_000590");
-                }
-                if (StringUtils.isEmpty(height) && !StringUtils.isEmpty(result.get("EHR_000778"))) {
-                    height = (String) result.get("EHR_000778");
-                }
-                if (StringUtils.isEmpty(height) && !StringUtils.isEmpty(result.get("EHR_001339"))) {
-                    height = (String) result.get("EHR_001339");
-                }
-                if (StringUtils.isEmpty(height) && !StringUtils.isEmpty(result.get("EHR_004263"))) {
-                    height = (String) result.get("EHR_004263");
-                }
-                if (StringUtils.isEmpty(height) && !StringUtils.isEmpty(result.get("EHR_005142"))) {
-                    height = (String) result.get("EHR_005142");
-                }
-                patientMap.put("height", height);
-                //体重
-                String weight = "";
-                if (!StringUtils.isEmpty(result.get("EHR_000073"))) {
-                    weight = (String) result.get("EHR_000073");
-                }
-                if (StringUtils.isEmpty(weight) && !StringUtils.isEmpty(result.get("EHR_000785"))) {
-                    weight = (String) result.get("EHR_000785");
-                }
-                if (StringUtils.isEmpty(weight) && !StringUtils.isEmpty(result.get("EHR_001340"))) {
-                    weight = (String) result.get("EHR_001340");
-                }
-                if (StringUtils.isEmpty(weight) && !StringUtils.isEmpty(result.get("EHR_004002"))) {
-                    weight = (String) result.get("EHR_004002");
-                }
-                if (StringUtils.isEmpty(weight) && !StringUtils.isEmpty(result.get("EHR_004718"))) {
-                    weight = (String) result.get("EHR_004718");
-                }
-                if (StringUtils.isEmpty(weight) && !StringUtils.isEmpty(result.get("EHR_005148"))) {
-                    weight = (String) result.get("EHR_005148");
-                }
-                patientMap.put("weight", weight);
+                patientMap.put("label", "就诊");
             }
             //姓名
             patientMap.put("name", result.get("patient_name") == null? "" : result.get("patient_name"));
             //性别
             String gender = result.get("EHR_000019") == null? "" : (String) result.get("EHR_000019");
-            if (gender.equals("1")) {
-                gender = "男";
-            } else if (gender.equals("2")) {
-                gender = "女";
+            if ("1".equals(gender)) {
+                patientMap.put("gender", "男");
+            } else if ("2".equals(gender)) {
+                patientMap.put("gender", "女");
+            } else {
+                patientMap.put("gender", "未知");
             }
-            patientMap.put("gender", gender == null ? "未知" : gender);
             //出生日期
             String birthday = "";
             if (!StringUtils.isEmpty(result.get("EHR_000007"))) {
@@ -149,13 +161,13 @@ public class ProfileInfoBaseService {
             //婚育
             patientMap.put("fertility", result.get("EHR_000540") == null ? "" : result.get("EHR_000540"));
             //ABO血型
-            patientMap.put("ABO", result.get("EHR_000001") == null ? "" : result.get("EHR_000001"));
+            patientMap.put("ABO", result.get("EHR_000001_VALUE") == null ? "" : result.get("EHR_000001_VALUE"));
             //Rh血型
-            patientMap.put("Rh", result.get("EHR_000002") == null ? "" : result.get("EHR_000002"));
+            patientMap.put("Rh", result.get("EHR_000002_VALUE") == null ? "" : result.get("EHR_000002_VALUE"));
             //过敏药物
-            patientMap.put("allergyMedicine", result.get("EHR_004971") == null ? "" : result.get("EHR_004971"));
+            patientMap.put("allergyMedicine", allergyMedicine.isEmpty() ? "" : org.apache.commons.lang3.StringUtils.join(allergyMedicine, "、"));
             //过敏源
-            patientMap.put("allergens", result.get("EHR_000011") == null ? "" : result.get("EHR_000011"));
+            patientMap.put("allergens", allergens.isEmpty() ? "" : org.apache.commons.lang3.StringUtils.join(allergens, "、"));
             //电话
             patientMap.put("patientTel", result.get("EHR_000003") == null ? "" : result.get("EHR_000003"));
             //国籍
@@ -172,7 +184,7 @@ public class ProfileInfoBaseService {
             } else {
                 patientMap.put("householdRegister", "");
             }
-            patientMap.put("img", "");
+            patientMap.put("imgRemotePath", imgRemotePath(demographicId));
             return patientMap;
         } else {
             return patientMap;
@@ -184,7 +196,8 @@ public class ProfileInfoBaseService {
      * @param demographic_id
      * @return
      */
-    public List<Map<String, Object>> profileHistory(String demographic_id) {
+    @Deprecated
+    public List<Map<String, Object>> profileHistory(String demographic_id) throws Exception {
         List<Map<String, Object>> resultList = new ArrayList<>();
         //疾病史
         List<Map<String, Object>> list1 =  profileDiseaseService.getHealthProblem(demographic_id);
@@ -287,11 +300,11 @@ public class ProfileInfoBaseService {
     }
 
     /**
-     * 既往史 - mobile居民端
+     * 既往史
      * @param demographic_id
      * @return
      */
-    public List<Map<String, Object>> pastHistory(String demographic_id) {
+    public List<Map<String, Object>> pastHistory(String demographic_id) throws Exception {
         List<Map<String, Object>> resultList = new ArrayList<>();
         //药物过敏
         Map<String, Object> patientInfo = getPatientInfo(demographic_id, null);
@@ -383,7 +396,7 @@ public class ProfileInfoBaseService {
      * @param demographic_id
      * @return
      */
-    public Map<String, Object> allergensHistory(String demographic_id) {
+    public Map<String, Object> allergensHistory(String demographic_id) throws Exception {
         Map<String, Object> patientInfo = getPatientInfo(demographic_id, null);
         Map<String, Object> allergens = new HashMap<>();
         allergens.put("label", "过敏源");
@@ -485,7 +498,7 @@ public class ProfileInfoBaseService {
         return personHistory;
     }
 
-    private int CompareAgeOfDisease(String AgeOfDisease1, String AgeOfDisease2){
+    private int compareAgeOfDisease(String AgeOfDisease1, String AgeOfDisease2){
         int year1 = 0;
         int month1 = 0;
         int year2 = 0;
@@ -509,22 +522,16 @@ public class ProfileInfoBaseService {
         }
     }
 
-    /**
-     * 全文检索
-     */
-    public Envelop getProfileLucene(String startTime, String endTime,List<String> lucene, Integer page, Integer size) throws Exception {
-        String queryParams = "";
-        if (startTime != null && startTime.length() > 0 && endTime != null && endTime.length() > 0) {
-            queryParams = BasisConstant.eventDate+":["+startTime+" TO "+endTime+"]";
-        } else {
-            if (startTime!=null && startTime.length()>0) {
-                queryParams = BasisConstant.eventDate+":["+startTime+" TO *]";
-            } else if (endTime!=null && endTime.length()>0){
-                queryParams = BasisConstant.eventDate+":[* TO "+endTime+"]";
-            }
+    private String imgRemotePath(String idCardNo) {
+        String sql = "SELECT img_remote_path FROM users WHERE id_card_no = :idCardNo";
+        Session session = currentSession();
+        Query query = session.createSQLQuery(sql);
+        query.setString("idCardNo", idCardNo);
+        query.setFlushMode(FlushMode.COMMIT);
+        Object path = query.uniqueResult();
+        if (path != null) {
+            return (String) path;
         }
-        //全文检索
-        Envelop re = resource.getResources(BasisConstant.patientEvent, "*", "*", "{\"q\":\""+queryParams.replace(' ','+')+"\"}", page, size);
-        return re;
+        return "";
     }
 }

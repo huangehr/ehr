@@ -10,6 +10,7 @@ import com.yihu.ehr.model.packs.EsDetailsPackage;
 import com.yihu.ehr.model.packs.EsSimplePackage;
 import com.yihu.ehr.profile.exception.IllegalJsonDataException;
 import com.yihu.ehr.profile.exception.IllegalJsonFileException;
+import com.yihu.ehr.profile.exception.ResolveException;
 import com.yihu.ehr.resolve.feign.PackageMgrClient;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.resolve.model.stage2.ResourceBucket;
@@ -107,12 +108,12 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
             int errorType = -1;
             if (e instanceof ZipException) {
                 errorType = 1;
-            }
-            if (e instanceof IllegalJsonFileException) {
+            } else if (e instanceof IllegalJsonFileException) {
                 errorType = 2;
-            }
-            if (e instanceof IllegalJsonDataException) {
+            } else if (e instanceof IllegalJsonDataException) {
                 errorType = 3;
+            } else if (e instanceof ResolveException) {
+                errorType = 4;
             }
             if (StringUtils.isBlank(e.getMessage())) {
                 packageMgrClient.reportStatus(packId, ArchiveStatus.Failed, errorType, "Internal Server Error");

@@ -5,6 +5,7 @@ import com.yihu.ehr.profile.feign.DictClient;
 import com.yihu.ehr.profile.feign.GeographyClient;
 import com.yihu.ehr.profile.feign.OrganizationClient;
 import com.yihu.ehr.profile.feign.ResourceClient;
+import com.yihu.ehr.profile.util.BasisConstant;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,21 +22,17 @@ import java.util.Map;
  */
 @Service
 public class SanofiService {
-    @Autowired
-    ResourceClient resourceClient; //资源服务
 
     @Autowired
-    OrganizationClient organization; //机构信息服务
-
+    private ResourceClient resourceClient; //资源服务
     @Autowired
-    DictClient dictClient;
-
+    private OrganizationClient organization; //机构信息服务
     @Autowired
-    GeographyClient addressClient;
-
+    private DictClient dictClient;
+    @Autowired
+    private GeographyClient addressClient;
     @Value("${spring.application.id}")
     String appId;
-
 
     /**
      * @获取患者档案基本信息

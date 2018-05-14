@@ -450,7 +450,7 @@ public class ResourceBrowseService {
      * @return
      * @throws Exception
      */
-    private List<DtoResourceMetadata> getAccessMetadata(RsResource rsResource, String roleId, Map<String, String> correspondMap) throws Exception{
+    private List<DtoResourceMetadata> getAccessMetadata(RsResource rsResource, String roleId, Map<String, String> correspondMap) throws Exception {
         Set<String> rsMetadataIdSet = new HashSet<String>();
         String grantType = rsResource.getGrantType();
         boolean isOtherVersion = false;
@@ -461,6 +461,9 @@ public class ResourceBrowseService {
             String version = rsResource.getCode().split("\\$")[1];
             String code = rsResource.getCode().split("\\$")[0];
             String otherStdMetadataStr = stdTransformClient.stdMetadataCodes(version, code); //省平台临时数据处理
+            if (null == otherStdMetadataStr) {
+                throw new ApiException("省平台数据缓存为空");
+            }
             String [] otherStdMetadataArr = otherStdMetadataStr.split(",");
             List<String> transformEhrMetadataList = new ArrayList<>(); // 此list存储其他标准数据集底下的数据元转换成的平台的数据元的id (EHR_XXXXX)
             for (String otherStdMetadata : otherStdMetadataArr) {

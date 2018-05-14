@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 /**
- * EndPoint - 检查检验（兼容 pc & mobile）
+ * EndPoint - 检查检验
  * Created by progr1mmer on 2018/3/13.
  */
 @RestController
@@ -28,7 +28,7 @@ public class ProfileInspectionEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private ProfileInspectionService profileInspectionService;
 
-    @ApiOperation("检查检验记录")
+    @ApiOperation("检查检验记录 - 上饶APP")
     @RequestMapping(value = ServiceApi.Profiles.InspectionRecords, method = RequestMethod.GET)
     public List inspectionRecords(
             @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "36230119480815004X")

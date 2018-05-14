@@ -55,26 +55,4 @@ public class ProfileCDAEndPoint extends EnvelopRestEndPoint {
         return profileCDAService.getCDAData(profile_id, cda_document_id, true);
     }
 
-    /*@ApiOperation("完整CDA文档")
-    @RequestMapping(value = ServiceApi.Profiles.CDADocument, method = RequestMethod.GET)
-    public Map<String,Object> CDADocument(
-            @ApiParam(name = "profile_id", value = "档案ID",defaultValue="41872607-9_20000001_1465894742000")
-            @RequestParam(value = "profile_id", required = true) String profile_id) throws Exception {
-
-        return  profileCDAService.getCDADocument(profile_id);
-    }
-
-    @ApiOperation("获取cda_document_id")
-    @RequestMapping(value = ServiceApi.Profiles.CDADocumentId, method = RequestMethod.GET)
-    public Map<String, Object> CDADocumentId(
-            @ApiParam(name = "org_code", value = "机构代码",defaultValue="41872607-9")
-            @RequestParam(value = "org_code", required = true) String org_code,
-            @ApiParam(name = "event_no", value = "事件号",defaultValue="20000001")
-            @RequestParam(value = "event_no", required = true) String event_no,
-            @ApiParam(name = "cda_code", value = "模板类别",defaultValue="HSDC01.01")
-            @RequestParam(value = "cda_code", required = true) String cda_code) throws Exception {
-        return profileCDAService.getCDADocumentId(org_code,event_no, cda_code);
-    }*/
-
-
 }

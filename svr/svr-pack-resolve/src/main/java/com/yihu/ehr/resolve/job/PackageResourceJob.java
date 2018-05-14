@@ -8,6 +8,7 @@ import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.model.packs.EsSimplePackage;
 import com.yihu.ehr.profile.exception.IllegalJsonDataException;
 import com.yihu.ehr.profile.exception.IllegalJsonFileException;
+import com.yihu.ehr.profile.exception.ResolveException;
 import com.yihu.ehr.resolve.feign.PackageMgrClient;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.resolve.model.stage2.ResourceBucket;
@@ -72,18 +73,18 @@ public class PackageResourceJob implements InterruptableJob {
             int errorType = -1;
             if (e instanceof ZipException) {
                 errorType = 1;
-            }
-            if (e instanceof IllegalJsonFileException) {
+            } else if (e instanceof IllegalJsonFileException) {
                 errorType = 2;
-            }
-            if (e instanceof IllegalJsonDataException) {
+            } else if (e instanceof IllegalJsonDataException) {
                 errorType = 3;
+            } else if (e instanceof ResolveException) {
+                errorType = 4;
             }
             if (pack != null) {
                 try {
                     if (StringUtils.isNotBlank(e.getMessage())) {
                         packageMgrClient.reportStatus(pack.get_id(), ArchiveStatus.Failed, errorType, e.getMessage());
-                        PackResolveLogger.error(e.getMessage());
+                        PackResolveLogger.error(e.getMessage(), e);
                     } else {
                         packageMgrClient.reportStatus(pack.get_id(), ArchiveStatus.Failed, errorType, "Internal server error, please see task log for detail message.");
                         PackResolveLogger.error("Internal server error, please see task log for detail message.", e);

@@ -312,15 +312,20 @@ public class ServiceApi {
         public static final String AllergensHistory = "/profile/allergensHistory"; //过敏史
         public static final String FamilyHistory = "/profile/familyHistory"; //家族史
         public static final String HealthProblem = "/profile/healthProblem"; //主要健康问题
-        public static final String HealthProblemSub = "/profile/healthProblemSub"; //主要健康问题诊断情况
+        public static final String HealthCondition = "/profile/healthCondition"; //历史健康情况
         public static final String MedicalEvents = "/profile/medicalEvents"; //门诊/住院事件(时间轴)
         public static final String RecentMedicalEvents = "/profile/recentMedicalEvents"; //最近就诊记录
+        public static final String RecentVisits = "/profile/recentVisits"; //近期就诊
+        public static final String RecentVisitsSub = "/profile/recentVisitsSub"; //近期就诊详情
         public static final String CDAClass = "/profile/cdaClass"; //cda分类
         public static final String CDAData = "/profile/cdaData"; //cda数据
         public static final String MedicationRecords = "/profile/medicationRecords"; //患者用药清单
+        public static final String MedicationRecordsPage = "/profile/medicationRecordsPage"; //患者用药清单
         public static final String MedicationRanking = "/profile/medicationRanking"; //患者用药排行
-        public static final String MedicationSub = "/profile/medicationSub"; //患者用药详情
+        public static final String RecentMedicationSub = "/profile/recentMedicationSub"; //患者用药详情
         public static final String InspectionRecords = "/profile/inspectionRecords"; //检查检验记录
+        public static final String MotherhoodOverview = "/profile/motherhoodOverview"; //孕产概况
+
         // ------------------------------ 以上为已对接接口 ------------------------------
 
         public static final String ProfileLucene = "/profile/lucene"; //全文检索
@@ -329,18 +334,15 @@ public class ServiceApi {
         public static final String MedicalYear = "/{demographic_id}/profile/medical_year"; //就诊过年份
         public static final String MedicationUsed = "/{demographic_id}/profile/medication_used"; //患者常用药（按次数）
         public static final String MedicalEvent = "/{event_no}/info"; //某次住院/门诊事件信息
-
         public static final String MedicationMaster = "/profile/medication/master"; //处方主表
         public static final String MedicationPrescription = "/profile/medication/prescription"; //处方笺
         public static final String MedicationDetail = "/profile/medication/detail/{prescription_no}"; //处方细表
         public static final String MedicationDetailChinese = "/profile/medication/detail/chinese"; //中药处方
         public static final String MedicationDetailWestern = "/profile/medication/detail/western"; //西药处方
-
         public static final String OutpatientDiagnosis = "/{demographic_id}/outpatient/diagnosis"; //门诊诊断
         public static final String OutpatientSymptom = "/{demographic_id}/outpatient/symptom"; //门诊症状
         public static final String OutpatientCostMaster = "/{demographic_id}/outpatient/cost/master"; //门诊费用汇总
         public static final String OutpatientCostDetail = "/{demographic_id}/outpatient/cost/detail"; //门诊费用明细
-
         public static final String HospitalizedDiagnosis = "/{demographic_id}/hospitalized/diagnosis"; //住院诊断
         public static final String HospitalizedSymptom = "/{demographic_id}/hospitalized/symptom"; //住院症状
         public static final String HospitalizedCostMaster = "/{demographic_id}/hospitalized/cost/master"; //住院费用汇总
@@ -348,22 +350,15 @@ public class ServiceApi {
         public static final String HospitalizedOrdersTemporary = "/{demographic_id}/hospitalized/orders/temporary"; //住院临时医嘱
         public static final String HospitalizedOrdersLongtime = "/{demographic_id}/hospitalized/orders/longtime"; //住院长期医嘱
         public static final String HospitalizedDeath = "/{demographic_id}/hospitalized/death"; //住院死因链情况
-
         public static final String CDADocumentId = "/profile/cda/document_id"; //cda模板（通过event_no + cda_type）
-
         public static final String CDADocument = "/{profile_id}/cda_document"; //完整CDA文档
-
-
         public static final String ExaminationReport = "/{demographic_id}/examination"; //检查报告单
         public static final String ExaminationImg = "/{demographic_id}/examination/img"; //检查报告单图片
-
         public static final String LaboratoryReport = "/{demographic_id}/laboratory"; //检验报告单
         public static final String LaboratoryImg = "/{demographic_id}/laboratory/img"; //检验报告单图片
         public static final String LaboratoryProject = "/{demographic_id}/laboratory/project"; //检验报告单项目
         public static final String LaboratoryAllergy = "/{demographic_id}/laboratory/allergy"; //检验药敏
-
         public static final String Surgery = "/{demographic_id}/surgery";//手术-手术记录
-
         public static final String IndicatorsClass = "/{demographic_id}/indicators/class"; //获取某个健康问题指标
         public static final String IndicatorsData = "/{demographic_id}/indicators/data"; //获取指标数据
     }

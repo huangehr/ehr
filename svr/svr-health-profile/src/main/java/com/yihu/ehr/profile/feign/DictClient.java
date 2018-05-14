@@ -32,7 +32,7 @@ public interface DictClient {
      * @return
      */
     @RequestMapping(value = "/dictionaries/record_data_sources", method = RequestMethod.GET)
-    public List<MConventionalDict> getRecordDataSourceList();
+    List<MConventionalDict> getRecordDataSourceList();
 
     /**************************** 健康问题 **********************************************/
     //根据健康问题代码获取指标信息
