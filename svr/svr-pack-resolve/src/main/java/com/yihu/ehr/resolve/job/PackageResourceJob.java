@@ -16,7 +16,8 @@ import com.yihu.ehr.resolve.service.resource.stage1.PackageResolveService;
 import com.yihu.ehr.resolve.service.resource.stage2.IdentifyService;
 import com.yihu.ehr.resolve.service.resource.stage2.PackMillService;
 import com.yihu.ehr.resolve.service.resource.stage2.ResourceService;
-import com.yihu.ehr.resolve.util.PackResolveLogger;
+import com.yihu.ehr.resolve.log.PackResolveLogger;
+import com.yihu.ehr.resolve.util.LocalTempPathUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
 import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.lang3.StringUtils;
@@ -28,6 +29,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * 档案包解析作业。
@@ -39,8 +41,6 @@ import java.util.Map;
 @Component
 @DisallowConcurrentExecution
 public class PackageResourceJob implements InterruptableJob {
-
-    private final static String LocalTempPath = System.getProperty("java.io.tmpdir") + java.io.File.separator;
 
     @Override
     public void interrupt() throws UnableToInterruptJobException {
@@ -123,7 +123,7 @@ public class PackageResourceJob implements InterruptableJob {
     private String downloadTo(String filePath) throws Exception {
         FastDFSUtil fastDFSUtil = SpringContext.getService(FastDFSUtil.class);
         String[] tokens = filePath.split(":");
-        return fastDFSUtil.download(tokens[0], tokens[1], LocalTempPath);
+        return fastDFSUtil.download(tokens[0], tokens[1], LocalTempPathUtil.getTempPathWithUUIDSuffix());
     }
 
 }

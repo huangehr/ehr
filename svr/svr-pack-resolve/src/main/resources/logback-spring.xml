@@ -124,7 +124,7 @@
 		</filter>
 	</appender>
 
-	<logger name="com.yihu.ehr.resolve.util.PackResolveLogger" level="WARN" additivity="false">
+	<logger name="com.yihu.ehr.resolve.log.PackResolveLogger" level="WARN" additivity="false">
 		<appender-ref ref="TaskInfoFile" />
 		<appender-ref ref="TaskWarnFile" />
 		<appender-ref ref="TaskErrorFile" />

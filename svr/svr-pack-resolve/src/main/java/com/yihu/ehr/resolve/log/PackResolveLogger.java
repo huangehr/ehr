@@ -1,4 +1,4 @@
-package com.yihu.ehr.resolve.util;
+package com.yihu.ehr.resolve.log;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
