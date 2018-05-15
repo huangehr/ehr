@@ -57,7 +57,7 @@ public class DiabetesCheckScheduler {
 	 * 每天2点 执行一次
 	 * @throws Exception
 	 */
-	@Scheduled(cron = "0 30 17 * * ?")
+//	@Scheduled(cron = "0 30 17 * * ?")
 	public void validatorIdentityScheduler(){
 		try {
 			String q2 = "EHR_000394:*糖耐量*2H血糖* OR EHR_000394:*糖耐量*空腹血糖* OR EHR_000394:*空腹葡萄糖* OR EHR_000394:*葡萄糖耐量试验*";//子项目中文名称
