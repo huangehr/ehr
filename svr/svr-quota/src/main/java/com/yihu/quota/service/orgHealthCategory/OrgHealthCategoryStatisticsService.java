@@ -105,7 +105,7 @@ public class OrgHealthCategoryStatisticsService {
                 if (isEndpoint) {
                     endpointList.add(item);
                 } else {
-                    findEndpointsForOneParent(allOrgHealthCategoryList, id);
+                    endpointList.addAll(findEndpointsForOneParent(allOrgHealthCategoryList, id));
                 }
             }
         }
