@@ -173,4 +173,12 @@ public class RsReportController extends BaseController {
 
     }
 
+    @ApiOperation("根据报表编码获取视图位置")
+    @RequestMapping(value = ServiceApi.Resources.GetPositionMapByCode, method = RequestMethod.GET)
+    public Envelop getPositionByCode(
+            @ApiParam(name = "code", value = "报表编码", required = true)
+            @RequestParam(value = "code") String code) throws Exception {
+        Envelop envelop = rsReportClient.getPositionByCode(code);
+        return envelop;
+    }
 }
