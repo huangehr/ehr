@@ -386,8 +386,13 @@ public class BaseStatistsService {
         for(int i=0 ; i < orgHealthCategoryList.size() ; i++ ){
             Map<String,Object> mapCategory = orgHealthCategoryList.get(i);
             String code = mapCategory.get("code").toString();
+            boolean notExitFalg = true;
             for(Map<String, Object> dimenMap : dimenListResult){
-                if(dimenMap.get(code) != null){
+                boolean flag = false;
+                if(dimenMap.get("orgHealthCategoryCode") != null){
+                    flag = dimenMap.get("orgHealthCategoryCode").equals(code);
+                }
+                if(dimenMap.get(code) != null || flag ){
 //                    mapCategory.putAll(dimenMap);
                     if(dimenMap.containsKey(code)){
                         mapCategory.put(code,dimenMap.get(code));
@@ -398,10 +403,11 @@ public class BaseStatistsService {
                     }
                     mapCategory.put(quotaCode,dimenMap.get("result"));
                     break;
-                }else {
-                    mapCategory.put("result",0);
-                    mapCategory.put(quotaCode,0);
                 }
+            }
+            if(notExitFalg){
+                mapCategory.put("result",0);
+                mapCategory.put(quotaCode,0);
             }
             mapCategory.put("firstColumn",mapCategory.get("text"));
             result.add(mapCategory);
@@ -426,8 +432,13 @@ public class BaseStatistsService {
         for(int i=0 ; i < orgHealthCategoryList.size() ; i++ ){
             Map<String,Object> mapCategory = orgHealthCategoryList.get(i);
             String code = mapCategory.get("code").toString();
+            boolean notExitFalg = true;
             for(Map<String, Object> dimenMap : dimenListResult){
-                if(dimenMap.get(code) != null){
+                boolean flag = false;
+                if(dimenMap.get("orgHealthCategoryCode") != null){
+                    flag = dimenMap.get("orgHealthCategoryCode").equals(code);
+                }
+                if(dimenMap.get(code) != null || flag ){
                     //补充所有信息
                     mapCategory.putAll(dimenMap);
                     if(dimenMap.containsKey(code)){
@@ -438,11 +449,13 @@ public class BaseStatistsService {
                         mapCategory.put(dimenMap.get(dateType).toString(),dimenMap.get("result"));
                     }
                     mapCategory.put(quotaCode,dimenMap.get("result"));
+                    notExitFalg = false;
                     break;
-                }else {
-                    mapCategory.put("result",0);
-                    mapCategory.put(quotaCode,0);
                 }
+            }
+            if(notExitFalg){
+                mapCategory.put("result",0);
+                mapCategory.put(quotaCode,0);
             }
             mapCategory.put("firstColumn",mapCategory.get("text"));
             result.add(mapCategory);
