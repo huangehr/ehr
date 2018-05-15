@@ -5,6 +5,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.model.resource.MRsReport;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -107,4 +108,9 @@ public interface RsReportClient {
     List<RsReportModel> getByCategoryId(
             @ApiParam(name = "reportCategoryId", value = "资源报表分类ID", required = true)
             @RequestParam(value = "reportCategoryId") Integer reportCategoryId);
+
+    @ApiOperation("根据报表编码获取视图位置")
+    @RequestMapping(value = ServiceApi.Resources.GetPositionMapByCode, method = RequestMethod.GET)
+    Envelop getPositionByCode(
+            @RequestParam(value = "code") String code);
 }
