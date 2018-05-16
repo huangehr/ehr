@@ -24,6 +24,8 @@ import io.swagger.annotations.ApiParam;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hdfs.server.namenode.Quota;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -31,11 +33,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -58,6 +56,7 @@ public class QuotaController extends BaseController {
     @Autowired
     private TjDataSaveService dataSaveService;
 
+    private static final Logger log = LoggerFactory.getLogger(QuotaController.class);
     /**
      * 查询结果
      * @param id
@@ -160,6 +159,13 @@ public class QuotaController extends BaseController {
                     }
                 }
             }
+
+            // 判断该指标是否需要同比， 需要的话拼接时间条件
+            if (StringUtils.isNotEmpty(esConfig.getIncrementFlag())) {
+                filters = baseStatistsService.filtersExchangeHandle(filters, esConfig);
+                log.info("filters = {}", filters);
+            }
+
             String molecularFilter = filters;
             String denominatorFilter = filters;
 

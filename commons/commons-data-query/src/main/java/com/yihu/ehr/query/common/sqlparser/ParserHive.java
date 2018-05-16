@@ -1,5 +1,5 @@
 package com.yihu.ehr.query.common.sqlparser;
-;import com.yihu.ehr.query.common.model.QueryEntity;
+import com.yihu.ehr.query.common.model.QueryEntity;
 
 /**
  * Hive的sql解析

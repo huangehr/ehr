@@ -37,6 +37,8 @@ public class Device extends BaseIdentityEntity{
      */
     private String deviceType;
 
+    private String deviceTypeName;
+
     /**
      * 采购数量
      */
@@ -90,7 +92,6 @@ public class Device extends BaseIdentityEntity{
      */
     private String isGps;
 
-
     @Column(name = "device_name", unique = false, nullable = false, insertable = true, updatable = true, length = 50)
     public String getDeviceName() {
         return this.deviceName;
@@ -125,6 +126,15 @@ public class Device extends BaseIdentityEntity{
 
     public void setDeviceType(String value) {
         this.deviceType = value;
+    }
+
+    @Transient
+    public String getDeviceTypeName() {
+        return deviceTypeName;
+    }
+
+    public void setDeviceTypeName(String deviceTypeName) {
+        this.deviceTypeName = deviceTypeName;
     }
 
     @Column(name = "purchase_num", unique = false, nullable = true, insertable = true, updatable = true, length = 10)
