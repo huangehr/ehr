@@ -30,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -98,7 +99,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             packType = 1;
         }
         //更改成异步--->>防止大文件接收,导致阻塞,超时等问题
-        fastDFSTask.savePackageWithOrg(pack,password, orgCode, md5, clientId, packType);
+        fastDFSTask.savePackageWithOrg(pack.getInputStream(), password, orgCode, md5, clientId, packType);
         return true;
     }
 
