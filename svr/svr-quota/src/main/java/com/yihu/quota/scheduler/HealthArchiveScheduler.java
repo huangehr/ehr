@@ -16,10 +16,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
- * Created by wxw on 2018/3/12.
+ * Created by wxw on 2018/3/12
+ * 统计solr主表档案人数（去重）.
  */
 @Component
 public class HealthArchiveScheduler {
@@ -51,6 +53,12 @@ public class HealthArchiveScheduler {
         String keyOrgName = "org_name";
         String keyAddress = "EHR_001211"; //地址 EHR_001227
 
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        calendar.add(Calendar.MONTH, 1);
+        calendar.set(Calendar.DAY_OF_MONTH, 1); // 设置为1号
+        String exitDay = DateUtil.formatDate(calendar.getTime(),DateUtil.DEFAULT_DATE_YMD_FORMAT);
+        log.info("exitDay = {}", exitDay);
 
         BasesicUtil basesicUtil = new BasesicUtil();
         String initializeDate = "2018-05-03";
@@ -74,10 +82,10 @@ public class HealthArchiveScheduler {
                 startDate = DateUtil.formatDate(sDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
                 Date eDate = DateUtils.addMonths(DateUtil.parseDate(startDate,DateUtil.DEFAULT_DATE_YMD_FORMAT),1);
                 endDate = DateUtil.formatDate(eDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
-                if(startDate.equals("2018-04-01")){
+                if(startDate.equals(exitDay)){
                     flag = false;
                 }
-                System.out.println("startDate = " + startDate);
+                log.info("startDate = {}", startDate);
             }
             List<HealthArchiveInfoModel> healthArchiveInfoModelList = new ArrayList<>();
             // 找出就诊档案数

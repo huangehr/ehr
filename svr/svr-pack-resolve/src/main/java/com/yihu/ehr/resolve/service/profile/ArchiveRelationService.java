@@ -55,7 +55,7 @@ public class ArchiveRelationService {
             EsArchiveRelation relation = new EsArchiveRelation();
             relation.set_id(resourceBucket.getId());
             ProfileType profileType = resourceBucket.getProfileType();
-            if(profileType != null){
+            if (profileType != null){
                 relation.setProfileType(profileType.getType());
             }
             relation.setName(resourceBucket.getPatientName());

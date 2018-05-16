@@ -247,4 +247,18 @@ public class Contant {
         //每天0点0分 0秒触发
         public static final String everyDay = "0 0 0 * * ?";
     }
+
+    public static class orgHealthTypeCode {
+        public static final String hospital = "hospital"; //医院卫生机构
+        public static final String basicMedical = "basic_medical"; //基层医疗卫生机构
+        public static final String pro_public = "pro_public";//专业公共卫生机构
+        public static final String other = "other";//其他医疗卫生机构
+
+        public static final String hospital_Id = "13"; //医院卫生机构
+        public static final String basicMedical_Id = "57"; //基层医疗卫生机构
+        public static final String pro_public_Id = "94";//专业公共卫生机构
+        public static final String other_Id = "134";//其他医疗卫生机构
+    }
+
+
 }

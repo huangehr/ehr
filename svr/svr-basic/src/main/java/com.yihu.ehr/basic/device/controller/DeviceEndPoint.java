@@ -1,10 +1,12 @@
-package com.yihu.ehr.basic.device.controllers;
+package com.yihu.ehr.basic.device.controller;
 
 import com.yihu.ehr.basic.device.service.DeviceService;
+import com.yihu.ehr.basic.dict.service.SystemDictEntryService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.entity.device.Device;
+import com.yihu.ehr.entity.dict.SystemDictEntry;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -27,6 +29,10 @@ public class DeviceEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     private DeviceService deviceService;
+
+    @Autowired
+    private SystemDictEntryService systemDictEntryService;
+
     @RequestMapping(value = ServiceApi.Device.DeviceList, method = RequestMethod.GET)
     @ApiOperation(value = "获取所有列表")
     public Envelop list(
@@ -40,12 +46,32 @@ public class DeviceEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page") int page,
             @ApiParam(name = "size", value = "页码", required = true, defaultValue = "15")
             @RequestParam(value = "size") int size) throws Exception {
+        List<SystemDictEntry> systemDictEntryList = systemDictEntryService.search("","dictId=181","+sort",1,10000);
         List<Device> list = deviceService.search(fields, filters, sorts, page, size);
+        for(Device model : list){
+            model.setDeviceTypeName(getTypeName(systemDictEntryList,model.getDeviceType()));
+        }
         int count = (int)deviceService.getCount(filters);
         Envelop envelop = getPageResult(list, count, page, size);
         return envelop;
     }
 
+    /**
+     * 获取数据字段名称
+     * @param systemDictEntryList
+     * @param code
+     * @return
+     */
+    public String getTypeName(List<SystemDictEntry> systemDictEntryList,String code){
+        String name = "";
+        for(SystemDictEntry model : systemDictEntryList){
+            if(code.equals(model.getCode())){
+                name = model.getValue();
+                break;
+            }
+        }
+        return name;
+    }
 
     @RequestMapping(value = ServiceApi.Device.DeviceSave, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("保存")
@@ -78,7 +104,10 @@ public class DeviceEndPoint extends EnvelopRestEndPoint {
     public Envelop findById(
             @ApiParam(name = "id", value = "id")
             @RequestParam(value = "id") String id) throws Exception{
+
         Device model = deviceService.findById(Integer.parseInt(id));
+        SystemDictEntry dict = systemDictEntryService.getDictEntry(181,model.getDeviceType());
+        model.setDeviceTypeName(dict.getValue());
         if (null != model) {
             return success(model);
         }

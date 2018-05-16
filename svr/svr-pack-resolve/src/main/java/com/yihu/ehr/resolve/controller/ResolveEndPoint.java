@@ -18,6 +18,7 @@ import com.yihu.ehr.resolve.service.resource.stage1.PackageResolveService;
 import com.yihu.ehr.resolve.service.resource.stage2.IdentifyService;
 import com.yihu.ehr.resolve.service.resource.stage2.PackMillService;
 import com.yihu.ehr.resolve.service.resource.stage2.ResourceService;
+import com.yihu.ehr.resolve.util.LocalTempPathUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -148,7 +149,7 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "clientId") String clientId,
             @ApiParam(name = "persist", value = "是否入库", required = true, defaultValue = "false")
             @RequestParam(value = "persist", defaultValue = "false") boolean persist) throws Throwable {
-        String zipFile = System.getProperty("java.io.tmpdir") + java.io.File.separator + packageId + ".zip";
+        String zipFile = LocalTempPathUtil.getTempPathWithUUIDSuffix() + packageId + ".zip";
         BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(new File(zipFile)));
         FileCopyUtils.copy(file.getInputStream(), stream);
         stream.close();
@@ -221,7 +222,6 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
 
     private String downloadTo(String filePath) throws Exception {
         String[] tokens = filePath.split(":");
-        return fastDFSUtil.download(tokens[0], tokens[1], System.getProperty("java.io.tmpdir") + java.io.File.separator);
+        return fastDFSUtil.download(tokens[0], tokens[1], LocalTempPathUtil.getTempPathWithUUIDSuffix());
     }
-
 }

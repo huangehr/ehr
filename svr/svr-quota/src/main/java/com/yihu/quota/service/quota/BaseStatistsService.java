@@ -24,6 +24,8 @@ import com.yihu.quota.vo.DictModel;
 import com.yihu.quota.vo.SaveModel;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -69,7 +71,7 @@ public class BaseStatistsService {
 
     private static String orgHealthCategory = "orgHealthCategory";
     public static String orgHealthCategoryCode = "orgHealthCategoryCode";
-
+    private static final Logger log = LoggerFactory.getLogger(BaseStatistsService.class);
     /**
      * 根据指标code 和维度及条件 分组获取指标查询结果集
      * @param code
@@ -386,8 +388,13 @@ public class BaseStatistsService {
         for(int i=0 ; i < orgHealthCategoryList.size() ; i++ ){
             Map<String,Object> mapCategory = orgHealthCategoryList.get(i);
             String code = mapCategory.get("code").toString();
+            boolean notExitFalg = true;
             for(Map<String, Object> dimenMap : dimenListResult){
-                if(dimenMap.get(code) != null){
+                boolean flag = false;
+                if(dimenMap.get("orgHealthCategoryCode") != null){
+                    flag = dimenMap.get("orgHealthCategoryCode").equals(code);
+                }
+                if(dimenMap.get(code) != null || flag ){
 //                    mapCategory.putAll(dimenMap);
                     if(dimenMap.containsKey(code)){
                         mapCategory.put(code,dimenMap.get(code));
@@ -398,10 +405,11 @@ public class BaseStatistsService {
                     }
                     mapCategory.put(quotaCode,dimenMap.get("result"));
                     break;
-                }else {
-                    mapCategory.put("result",0);
-                    mapCategory.put(quotaCode,0);
                 }
+            }
+            if(notExitFalg){
+                mapCategory.put("result",0);
+                mapCategory.put(quotaCode,0);
             }
             mapCategory.put("firstColumn",mapCategory.get("text"));
             result.add(mapCategory);
@@ -426,8 +434,13 @@ public class BaseStatistsService {
         for(int i=0 ; i < orgHealthCategoryList.size() ; i++ ){
             Map<String,Object> mapCategory = orgHealthCategoryList.get(i);
             String code = mapCategory.get("code").toString();
+            boolean notExitFalg = true;
             for(Map<String, Object> dimenMap : dimenListResult){
-                if(dimenMap.get(code) != null){
+                boolean flag = false;
+                if(dimenMap.get("orgHealthCategoryCode") != null){
+                    flag = dimenMap.get("orgHealthCategoryCode").equals(code);
+                }
+                if(dimenMap.get(code) != null || flag ){
                     //补充所有信息
                     mapCategory.putAll(dimenMap);
                     if(dimenMap.containsKey(code)){
@@ -438,11 +451,13 @@ public class BaseStatistsService {
                         mapCategory.put(dimenMap.get(dateType).toString(),dimenMap.get("result"));
                     }
                     mapCategory.put(quotaCode,dimenMap.get("result"));
+                    notExitFalg = false;
                     break;
-                }else {
-                    mapCategory.put("result",0);
-                    mapCategory.put(quotaCode,0);
                 }
+            }
+            if(notExitFalg){
+                mapCategory.put("result",0);
+                mapCategory.put(quotaCode,0);
             }
             mapCategory.put("firstColumn",mapCategory.get("text"));
             result.add(mapCategory);
@@ -861,8 +876,15 @@ public class BaseStatistsService {
                 }
             }
         }
+        // 判断该指标是否需要同比， 需要的话拼接时间条件
+        if (StringUtils.isNotEmpty(esConfig.getIncrementFlag())) {
+            filters = filtersExchangeHandle(filters, esConfig);
+            log.info("filters = {}", filters);
+        }
+
         String molecularFilter = filters;
         String denominatorFilter = filters;
+
         if (StringUtils.isNotEmpty(esConfig.getGrowthFlag())) {
             result = getGrowthByQuota(dimension, filters, esConfig);
         } else {
@@ -1161,13 +1183,13 @@ public class BaseStatistsService {
                 firstDay = sdf.format(cal.getTime());
                 cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
                 lastDay = sdf.format(cal.getTime());
-                System.out.println(firstDay + " " + lastDay);
                 cal.add(Calendar.MONTH, -1);
                 cal.set(Calendar.DAY_OF_MONTH, 1);
                 preMonthFirstDay = sdf.format(cal.getTime());
                 cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
                 preMonthLastDay = sdf.format(cal.getTime());
-                System.out.println(preMonthFirstDay + " " + preMonthLastDay);
+                log.info("firstDay = {}, lastDay = {}", firstDay, lastDay);
+                log.info("preMonthFirstDay = {}, preMonthLastDay = {}", preMonthFirstDay, preMonthLastDay);
             }
             molecularFilter = "quotaDate >= '" + firstDay + "' and quotaDate <= '" + lastDay + "'";
             denominatorFilter = "quotaDate >= '" + preMonthFirstDay + "' and quotaDate <= '" + preMonthLastDay + "'";
@@ -1176,5 +1198,48 @@ public class BaseStatistsService {
         List<Map<String, Object>> denoList = divisionQuota(esConfig.getMolecular(), esConfig.getDenominator(), dimension, denominatorFilter, denominatorFilter, esConfig.getPercentOperation(), esConfig.getPercentOperationValue(),null, "");
         resultList = divisionPercent(dimension, moleList, denoList, 1, 100);
         return resultList;
+    }
+
+    public String filtersExchangeHandle(String filters, EsConfig esConfig) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        Calendar lastDate = Calendar.getInstance();
+        lastDate.set(Calendar.DAY_OF_MONTH, 1); // 设置为1号,当前日期既为本月第一天
+        String firstDay = sdf.format(lastDate.getTime());
+        lastDate.set(Calendar.DAY_OF_MONTH, lastDate.getActualMaximum(Calendar.DAY_OF_MONTH));
+        String lastDay = sdf.format(lastDate.getTime());
+        lastDate.add(Calendar.MONTH, -1);
+        lastDate.set(Calendar.DAY_OF_MONTH, 1);
+        String preMonthFirstDay = sdf.format(lastDate.getTime());
+        lastDate.set(Calendar.DAY_OF_MONTH, lastDate.getActualMaximum(Calendar.DAY_OF_MONTH));
+        String preMonthLastDay = sdf.format(lastDate.getTime());
+        // 如果有时间过滤条件，则按时间条件计算
+        if (StringUtils.isNotEmpty(filters) && filters.contains("quotaDate")) {
+            Calendar cal = Calendar.getInstance();
+            boolean b = filters.indexOf("'") > -1;
+            int start = b ? filters.indexOf("'") : filters.indexOf("\"");
+            String condition = filters.substring(start + 1, start + 5); // 获取年份
+            int year = Integer.parseInt(condition);
+            String condition2 = filters.substring(filters.indexOf("-") + 1, filters.indexOf("-") + 3);  // 获取月份
+            int month = Integer.parseInt(condition2);
+            cal.set(Calendar.YEAR, year);
+            cal.set(Calendar.MONTH, month - 1);
+            cal.set(Calendar.DAY_OF_MONTH, 1); // 设置为1号,当前日期既为本月第一天
+            firstDay = sdf.format(cal.getTime());
+            cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+            lastDay = sdf.format(cal.getTime());
+            cal.add(Calendar.MONTH, -1);
+            cal.set(Calendar.DAY_OF_MONTH, 1);
+            preMonthFirstDay = sdf.format(cal.getTime());
+            cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+            preMonthLastDay = sdf.format(cal.getTime());
+        }
+        if ("1".equals(esConfig.getIncrementFlag())) {
+            // 上月
+            filters = "quotaDate >= '" + preMonthFirstDay + "' and quotaDate <= '" + preMonthLastDay + "'";
+        } else if ("2".equals(esConfig.getIncrementFlag())) {
+            // 当前月
+            filters = "quotaDate >= '" + firstDay + "' and quotaDate <= '" + lastDay + "'";
+        }
+        return filters;
     }
 }

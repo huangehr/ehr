@@ -45,8 +45,8 @@ public class ResourceCenterEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Resources.GetPatientArchiveCount, method = RequestMethod.GET)
     @ApiOperation(value = "顶部栏 - 居民建档数")
     public Envelop getPatientArchiveCount() throws Exception{
-        double count = solrUtil.count("HealthProfile", "*:*");
-        return success(count);
+        BigInteger totalDemographicsNum = resourceCenterService.getDemographicCount();
+        return success(totalDemographicsNum);
     }
 
     @RequestMapping(value = ServiceApi.Resources.GetMedicalResourcesCount, method = RequestMethod.GET)

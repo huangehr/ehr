@@ -29,7 +29,7 @@ public class ProfileDiseaseEndPoint extends EnvelopRestEndPoint{
     @Autowired
     private ProfileDiseaseService profileDiseaseService;
 
-    @ApiOperation("主要健康问题")
+    @ApiOperation("慢病情况")
     @RequestMapping(value = ServiceApi.Profiles.HealthProblem, method = RequestMethod.GET)
     public List<Map<String, Object>> healthProblem(
             @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362321200108017313")

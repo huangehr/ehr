@@ -175,10 +175,7 @@ public class RsReportEndPoint extends EnvelopRestEndPoint {
         Envelop envelop = new Envelop();
         String positionMap = rsReportService.getPositionByCode(code);
         envelop.setSuccessFlg(true);
-        if (StringUtils.isNotEmpty(positionMap)) {
-            Map<String, String> map = objectMapper.readValue(positionMap, Map.class);
-            envelop.setObj(map);
-        }
+        envelop.setObj(positionMap);
         return envelop;
     }
 }

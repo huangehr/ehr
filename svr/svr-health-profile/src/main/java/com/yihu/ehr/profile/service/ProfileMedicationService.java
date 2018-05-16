@@ -178,24 +178,24 @@ public class ProfileMedicationService {
             if (subList.size() > 0) {
                 for (Map<String, Object> subMap : subList) {
                     Map<String, Object> dataMap = new HashMap<>();
-                    dataMap.put("prescriptionNumber", subMap.get("EHR_000086")); //处方编号
-                    dataMap.put("substancesForDrugUse", subMap.get("EHR_000101")); //药物使用次剂量
-                    dataMap.put("prescriptionDrugGroupNumber", subMap.get("EHR_000127")); //处方药品组号
-                    dataMap.put("drugSpecifications", subMap.get("EHR_000129")); //药物规格
-                    dataMap.put("drugFormulationCode", subMap.get("EHR_000130")); //药物剂型代码
-                    dataMap.put("drugFormulationValue", subMap.get("EHR_000130_VALUE")); //药物剂型值
-                    dataMap.put("drugName", subMap.get("EHR_000131")); //药物名称
-                    dataMap.put("drugsUseDosageUnits", subMap.get("EHR_000133")); //药物使用剂量单位
-                    dataMap.put("drugUsageFrequencyCode", subMap.get("EHR_000134")); //药物使用频次代码
-                    dataMap.put("drugUsageFrequencyValue", subMap.get("EHR_000134_VALUE")); //药物使用频次值
-                    dataMap.put("totalDoseOfDrugUsed", subMap.get("EHR_000135")); //药物使用总剂量
-                    dataMap.put("medicationRouteCode", subMap.get("EHR_000136")); //用药途径代码
-                    dataMap.put("medicationRouteValue", subMap.get("EHR_000136_VALUE")); //用药途径值
+                    dataMap.put("prescriptionNumber", subMap.get("EHR_000086") == null ? "" : subMap.get("EHR_000086") ); //处方编号
+                    dataMap.put("substancesForDrugUse", subMap.get("EHR_000101") == null ? "" : subMap.get("EHR_000101")); //药物使用次剂量
+                    dataMap.put("prescriptionDrugGroupNumber", subMap.get("EHR_000127") == null ? "" : subMap.get("EHR_000127")); //处方药品组号
+                    dataMap.put("drugSpecifications", subMap.get("EHR_000129") == null ? "" : subMap.get("EHR_000129")); //药物规格
+                    dataMap.put("drugFormulationCode", subMap.get("EHR_000130") == null ? "" : subMap.get("EHR_000130")); //药物剂型代码
+                    dataMap.put("drugFormulationValue", subMap.get("EHR_000130_VALUE") == null ? "" : subMap.get("EHR_000130_VALUE")); //药物剂型值
+                    dataMap.put("drugName", subMap.get("EHR_000131") == null ? "" : subMap.get("EHR_000131")); //药物名称
+                    dataMap.put("drugsUseDosageUnits", subMap.get("EHR_000133") == null ? "" :  subMap.get("EHR_000133")); //药物使用剂量单位
+                    dataMap.put("drugUsageFrequencyCode", subMap.get("EHR_000134") == null ? "" : subMap.get("EHR_000134")); //药物使用频次代码
+                    dataMap.put("drugUsageFrequencyValue", subMap.get("EHR_000134_VALUE") == null ? "" :  subMap.get("EHR_000134_VALUE")); //药物使用频次值
+                    dataMap.put("totalDoseOfDrugUsed", subMap.get("EHR_000135") == null ? "" : subMap.get("EHR_000135")); //药物使用总剂量
+                    dataMap.put("medicationRouteCode", subMap.get("EHR_000136") == null ? "" : subMap.get("EHR_000136")); //用药途径代码
+                    dataMap.put("medicationRouteValue", subMap.get("EHR_000136_VALUE") == null ? "" : subMap.get("EHR_000136_VALUE")); //用药途径值
                     String dataSetCode = String.valueOf(subMap.get("rowkey")).split("\\$")[1];
                     if ("HDSD00_84".equals(dataSetCode)) { //西药
-                        dataMap.put("drugUseTotalDoseUnit", subMap.get("EHR_001249")); //药物使用总剂量单位
+                        dataMap.put("drugUseTotalDoseUnit", subMap.get("EHR_001249") == null ? "" : subMap.get("EHR_001249")); //药物使用总剂量单位
                     } else { //中药
-                        dataMap.put("drugUseTotalDoseUnit", subMap.get("EHR_001250")); //药物使用总剂量单位
+                        dataMap.put("drugUseTotalDoseUnit", subMap.get("EHR_001250") == null ? "" : subMap.get("EHR_001250")); //药物使用总剂量单位
                     }
                     dataList.add(dataMap);
                 }

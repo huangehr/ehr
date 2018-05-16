@@ -388,18 +388,42 @@ public class ProfileEventService {
             resultMap.put("eventType", temp.get("event_type"));
             resultMap.put("eventNo", temp.get("event_no"));
             if (temp.get("event_type").equals("0")) { //门诊信息
-                resultMap.put("department", temp.get("EHR_000082"));
-                resultMap.put("doctor", temp.get("EHR_000079"));
-                resultMap.put("diagnosticResult", ((String) temp.get("diagnosis_name")).replaceAll(";", "、")); //诊断结果
-                resultMap.put("inspectResult", temp.get("EHR_000318")); //检查名称
-                resultMap.put("examineResult", temp.get("EHR_000352")); //检验项目
+                resultMap.put("department", temp.get("EHR_000082") == null ? "" : temp.get("EHR_000082") );
+                resultMap.put("doctor", temp.get("EHR_000079") == null ? "" : temp.get("EHR_000079"));
+                //诊断名称 start
+                String diagnosticResult = "";
+                if (!StringUtils.isEmpty(temp.get("diagnosis_name"))) {
+                    diagnosticResult = ((String) temp.get("diagnosis_name")).replaceAll(";", "、");
+                } else if (!StringUtils.isEmpty(temp.get("diagnosis"))) {
+                    String [] diagnosisCode = ((String) temp.get("diagnosis")).split(";");
+                    for (String code : diagnosisCode) {
+                        String name = redisService.getIcd10Name(code);
+                        if (!StringUtils.isEmpty(name)) {
+                            diagnosticResult += name + "、";
+                        }
+                    }
+                } else if (!StringUtils.isEmpty(temp.get("health_problem_name"))) {
+                    diagnosticResult = ((String) temp.get("health_problem_name")).replaceAll(";", "、");
+                } else if (!StringUtils.isEmpty(temp.get("health_problem"))) {
+                    String [] _hpCode = ((String) temp.get("health_problem")).split(";");
+                    for (String code : _hpCode) {
+                        String name = redisService.getHealthProblem(code);
+                        if (!StringUtils.isEmpty(name)) {
+                            diagnosticResult += name + "、";
+                        }
+                    }
+                }
+                //诊断名称 end
+                resultMap.put("diagnosticResult", diagnosticResult); //诊断结果
+                resultMap.put("inspectResult", temp.get("EHR_002883") == null ? "" : temp.get("EHR_002883")); //检查名称
+                resultMap.put("examineResult", temp.get("EHR_000352") == null ? "" : temp.get("EHR_000352")); //检验项目
             } else if (temp.get("event_type").equals("1")) { //住院信息
-                resultMap.put("department", temp.get("EHR_000229"));
-                resultMap.put("doctor", temp.get("EHR_005072"));
-                resultMap.put("inResult", temp.get("EHR_000295")); //入院诊断
-                resultMap.put("outResult", temp.get("EHR_000295")); //出院诊断
-                resultMap.put("treatmentResults", temp.get("EHR_000166")); //治疗结果
-                resultMap.put("dischargeInstructions", temp.get("EHR_000157")); //出院医嘱
+                resultMap.put("department", temp.get("EHR_000229") == null ? "" : temp.get("EHR_000229"));
+                resultMap.put("doctor", temp.get("EHR_005072") == null ? "" : temp.get("EHR_005072"));
+                resultMap.put("inResult", temp.get("EHR_000295") == null ? "" :  temp.get("EHR_000295")); //入院诊断
+                resultMap.put("outResult", temp.get("EHR_000295") == null ? "" : temp.get("EHR_000295")); //出院诊断
+                resultMap.put("treatmentResults", temp.get("EHR_000166") == null ? "" : temp.get("EHR_000166")); //治疗结果
+                resultMap.put("dischargeInstructions", temp.get("EHR_000157") == null ? "" :  temp.get("EHR_000157")); //出院医嘱
             }
         }
         return resultMap;

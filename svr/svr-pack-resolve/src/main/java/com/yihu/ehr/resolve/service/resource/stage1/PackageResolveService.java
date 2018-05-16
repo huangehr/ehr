@@ -4,6 +4,7 @@ import com.yihu.ehr.constants.ProfileType;
 import com.yihu.ehr.model.packs.EsSimplePackage;
 import com.yihu.ehr.resolve.*;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
+import com.yihu.ehr.resolve.util.LocalTempPathUtil;
 import com.yihu.ehr.util.compress.Zipper;
 import com.yihu.ehr.util.log.LogService;
 import net.lingala.zip4j.exception.ZipException;
@@ -16,6 +17,7 @@ import javax.annotation.PostConstruct;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import static com.yihu.ehr.constants.ProfileType.*;
 
@@ -29,7 +31,6 @@ import static com.yihu.ehr.constants.ProfileType.*;
 @Service
 public class PackageResolveService {
 
-    private final static String TempPath = System.getProperty("java.io.tmpdir") + java.io.File.separator;
     @Autowired
     private ApplicationContext context;
     @Autowired
@@ -57,7 +58,7 @@ public class PackageResolveService {
     public StandardPackage doResolve(EsSimplePackage pack, String zipFile) throws Exception {
         File root = null;
         try {
-            root = new Zipper().unzipFile(new File(zipFile), TempPath + pack.get_id(), pack.getPwd());
+            root = new Zipper().unzipFile(new File(zipFile), LocalTempPathUtil.getTempPathWithUUIDSuffix() + pack.get_id(), pack.getPwd());
             if (root == null || !root.isDirectory() || root.list().length == 0) {
                 throw new ZipException("Invalid package file.");
             }

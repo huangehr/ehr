@@ -282,8 +282,9 @@ hadoop:
 elasticsearch:
   cluster-name: elasticsearch
   cluster-nodes: 172.10.10.5:9300
-ftp:      #----------------------------------todo 待配置
-  address: 172.19.103.58
-  username: pacs
-  password: pacssr2018
-  port: 21    #----------------------------------todo 待配置
+ftp:
+  address: 192.168.40.20
+  username: jkzl
+  password: jkzlsr2018
+  port: 21
+
