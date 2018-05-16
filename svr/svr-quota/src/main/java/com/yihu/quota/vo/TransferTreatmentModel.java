@@ -21,7 +21,7 @@ public class TransferTreatmentModel {
     private int level;// 机构等级
     private String levelName;//
     private int eventType;    //就诊类型 0 门诊 1 住院
-    private int transFerType;    //转诊类型 1 基层医院向上级医院转诊 2 医院出院向基层机构转诊
+    private int transFerType;    //转诊类型 0 其他 1 基层医院向上级医院转诊 2 医院出院向基层机构转诊
     private String transFerTypeName;
     private int registerType;       //挂号类别  41 专家
     private String chronicDisease;// 慢病  糖尿病 高血压
