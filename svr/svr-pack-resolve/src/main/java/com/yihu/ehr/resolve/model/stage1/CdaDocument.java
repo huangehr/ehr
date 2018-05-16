@@ -50,7 +50,8 @@ public class CdaDocument {
             ObjectNode objectNode = docList.addObject();
             objectNode.put("mime", originFile.getMime());
             objectNode.put("urls", originFile.getUrlsStr());
-            objectNode.put("url_scope", originFile.getUrlScope().name());
+            String name = originFile.getUrlScope()==null ? "":originFile.getUrlScope().name();
+            objectNode.put("url_scope", name);
             objectNode.put("expireDate", originFile.getExpireDate()==null ? null: DateTimeUtil.simpleDateFormat(originFile.getExpireDate()));
             objectNode.put("emr_id",originFile.getEmrId());
             objectNode.put("emr_name",originFile.getEmrName());
