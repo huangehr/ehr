@@ -99,8 +99,10 @@ public class ExtractHelper {
                     townMain = one;
                 }
             }
-            if(orgFlag){
-                tjQuotaDimensionMains.remove(townMain);
+            if(esConfig.getEspecialType() != null){
+                if(orgFlag && !esConfig.getEspecialType().equals("orgHealthCategory") ){
+                    tjQuotaDimensionMains.remove(townMain);
+                }
             }
 
             //得到细维度

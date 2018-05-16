@@ -133,6 +133,7 @@ public class TransferTreatmentScheduler {
 					Date eventDate = null;
 					String transferInOrg = "";
 					String transferOutOrg = "";
+					int transFerType = 0;
 					if(eventSet.get(eventIdKey) != null){
 						eventId = eventSet.get(eventIdKey).toString();
 					}
@@ -164,14 +165,31 @@ public class TransferTreatmentScheduler {
 							//查询机构特殊类型code 并 判断机构类型
 							List<DictModel> inOrgDictDatas = jdbcTemplate.query(orgSql+transferInOrg, new BeanPropertyRowMapper(DictModel.class));
 							List<DictModel> outOrgDictDatas = jdbcTemplate.query(orgSql+transferOutOrg, new BeanPropertyRowMapper(DictModel.class));
-//							if(basicMedicalCodeList.contains()){
-//
-//							}
-//							if(hospitalCodeList.contains()){
-//
-//							}
+							int inOrgType = 0;
+							int outOrgType = 0;
+							if(basicMedicalCodeList.contains(transferInOrg)){
+								inOrgType = 1;
+							}
+							if(hospitalCodeList.contains(transferInOrg)){
+								inOrgType = 2;
+							}
+							if(basicMedicalCodeList.contains(transferOutOrg)){
+								outOrgType = 1;
+							}
+							if(hospitalCodeList.contains(transferOutOrg)){
+								outOrgType = 2;
+							}
+							if(inOrgType !=0 && outOrgType !=0 && inOrgType != outOrgType){
+								if(inOrgType > outOrgType){
+									transFerType = 1;//基层向医院转
+								}
+								if(inOrgType < outOrgType){
+									transFerType = 2;//医院向基层转
+								}
+							}else {
+								transFerType = 0;
+							}
 
-							//提取公共方法  查询 四个特殊机构类型下的 code
 
 
 						}
