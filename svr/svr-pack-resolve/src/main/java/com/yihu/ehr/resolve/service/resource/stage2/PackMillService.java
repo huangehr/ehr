@@ -10,7 +10,7 @@ import com.yihu.ehr.resolve.model.stage1.FilePackage;
 import com.yihu.ehr.resolve.model.stage1.LinkPackage;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.resolve.model.stage2.*;
-import com.yihu.ehr.resolve.util.PackResolveLogger;
+import com.yihu.ehr.resolve.log.PackResolveLogger;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;

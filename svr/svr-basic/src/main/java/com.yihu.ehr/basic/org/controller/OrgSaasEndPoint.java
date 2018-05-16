@@ -15,15 +15,14 @@ import com.yihu.ehr.model.common.ListResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  *
@@ -109,11 +108,14 @@ public class OrgSaasEndPoint extends EnvelopRestEndPoint {
     }
 
     // ----------------------------- 用户登陆根据地区获取层级机构权限 ------------------------------------
-    @RequestMapping(value = ServiceApi.Org.childOrgSaasByAreaCode, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Org.ChildOrgSaasByAreaCode, method = RequestMethod.POST)
     @ApiOperation(value = "根据地区获取层级机构权限")
     public List<String> childOrgSaasByAreaCode (
             @ApiParam(name = "area", value = "地区列表", required = true)
             @RequestParam(value = "area") String area) throws Exception  {
+        if (StringUtils.isEmpty(area)) {
+            return new ArrayList<>();
+        }
         String [] areaArr = area.split(",");
         List<String> orgSaas = new ArrayList<>();
         for (String _area : areaArr) {

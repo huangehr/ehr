@@ -259,7 +259,7 @@ public class ServiceApi {
         public static final String RsReportTemplateContent = "/resources/report/getTemplateContent";
         public static final String RsReportIsCategoryApplied = "/resources/report/isCategoryApplied";
         public static final String RsReportByCategoryId = "/resources/report/getByCategoryId";
-        public static final String GetPositionMapByCode = "/open/resources/report/getPositionMapByCode";
+        public static final String GetPositionMapByCode = "/resources/report/getPositionMapByCode";
 
         /**
          * 资源报表视图配置
@@ -1368,7 +1368,7 @@ public class ServiceApi {
         public static final String GetOrgDeptsDate = "/org/getOrgDeptsDate";
         public static final String GetOrgDeptInfoList = "/org/userId/getOrgDeptInfoList";
         public static final String getseaOrgsByOrgCode = "/organizations/seaOrgsByOrgCode";
-        public static final String childOrgSaasByAreaCode = "/org/childOrgSaasByAreaCode";
+        public static final String ChildOrgSaasByAreaCode = "/org/childOrgSaasByAreaCode";
 
         // 卫生机构类别
         public static class HealthCategory {

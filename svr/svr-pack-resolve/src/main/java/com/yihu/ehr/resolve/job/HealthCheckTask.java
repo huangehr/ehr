@@ -1,9 +1,8 @@
 package com.yihu.ehr.resolve.job;
 
-import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.hbase.HBaseAdmin;
-import com.yihu.ehr.resolve.util.PackResolveLogger;
+import com.yihu.ehr.resolve.log.PackResolveLogger;
 import org.quartz.*;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -45,7 +45,7 @@ public class FastDFSTask {
      * @return
      */
     @Async
-    public Future<Boolean> savePackageWithOrg(MultipartFile pack,String password,String orgCode,String md5,String clientId,Integer packType) throws Exception{
+    public Future<Boolean> savePackageWithOrg(MultipartFile pack, String password, String orgCode, String md5, String clientId, Integer packType) throws Exception {
         logger.info("正在存入fast dfs");
         long t1 = System.currentTimeMillis();
         //fastDfs
@@ -69,7 +69,7 @@ public class FastDFSTask {
         sourceMap.put("fail_count", 0);
         sourceMap.put("analyze_status", 0);
         sourceMap.put("analyze_fail_count", 0);
-        sourceMap.put("pack_type",packType);
+        sourceMap.put("pack_type", packType);
         //保存索引出错的时候，删除文件
         try {
             sourceMap = elasticSearchUtil.index(INDEX, TYPE, sourceMap);
@@ -85,9 +85,9 @@ public class FastDFSTask {
         esSimplePackage.setClient_id(clientId);
         redisTemplate.opsForList().leftPush(RedisCollection.PackageList, objectMapper.writeValueAsString(esSimplePackage));
         long t2 = System.currentTimeMillis();
-        long t = t2-t1;
-        logger.info("耗时:"+t);
+        long t = t2 - t1;
+        logger.info("耗时:" + t);
         logger.info("保存文件至fast dfs成功");
-        return new AsyncResult<Boolean>(true);
+        return new AsyncResult<>(true);
     }
 }
