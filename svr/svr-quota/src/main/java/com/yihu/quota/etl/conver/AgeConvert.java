@@ -80,6 +80,7 @@ public class AgeConvert implements Convert {
         return result;
     }
 
+    // TODO 从数据字典中提取 年龄段区间
     public String getAgeCode(Integer age) {
         if (age <= 6) {
             return Contant.convert.level_age_1;
