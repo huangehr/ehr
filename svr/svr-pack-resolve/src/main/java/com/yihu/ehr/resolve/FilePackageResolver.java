@@ -14,7 +14,6 @@ import com.yihu.ehr.resolve.model.stage1.FilePackage;
 import com.yihu.ehr.resolve.model.stage1.OriginFile;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.resolve.service.resource.stage1.PackModelFactory;
-import com.yihu.ehr.resolve.service.resource.stage2.RedisService;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -142,12 +141,12 @@ public class FilePackageResolver extends PackageResolver {
             ArrayNode content = (ArrayNode) objectNode.get("content");
             for (int j = 0; j < content.size(); ++j) {
                 ObjectNode file = (ObjectNode) content.get(j);
-                String mine_type = file.get("mine_type").asText();
-                String url_scope = file.get("url_scope").asText();
-                String url = file.get("url").asText();
+                String mine_type = file.get("mime_type").asText();//必填
+                String url_scope = file.get("url_scope") == null ? "" : file.get("url_scope").asText();//可选
+                String url = file.get("url")== null ? "": file.get("url").asText();//可选
                 String emr_id = file.get("emr_id").asText();
                 String emr_name = file.get("emr_name").asText();
-                String note = file.has("note")?file.get("note").asText():"";
+                String note = file.has("note")?file.get("note").asText():"";//可选
 
                 OriginFile originFile = new OriginFile();
                 originFile.setMime(mine_type);
