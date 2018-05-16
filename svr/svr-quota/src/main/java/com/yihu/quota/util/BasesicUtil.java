@@ -25,16 +25,22 @@ public class BasesicUtil {
         }
     }
 
+    /**
+     * date1 大 返回 1
+     * date2 大 返回-1
+     * 相等 返回 0
+     * @param DATE1
+     * @param DATE2
+     * @return
+     */
     public int compareDate(String DATE1, String DATE2) {
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         try {
             Date dt1 = df.parse(DATE1);
             Date dt2 = df.parse(DATE2);
             if (dt1.getTime() > dt2.getTime()) {
-                System.out.println("dt1 在dt2前");
                 return 1;
             } else if (dt1.getTime() < dt2.getTime()) {
-                System.out.println("dt1在dt2后");
                 return -1;
             } else {
                 return 0;
