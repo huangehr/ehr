@@ -41,6 +41,7 @@ public class EsConfig {
     private String thousandDenominator; //每千，每万 统计分母
 
     private String growthFlag;  // 增幅标志  1 year  2 month
+    private String incrementFlag;   // 环比  1 上月  2 本月
 
     public String getSuperiorBaseQuotaCode() {
         return superiorBaseQuotaCode;
@@ -281,5 +282,13 @@ public class EsConfig {
 
     public void setGrowthFlag(String growthFlag) {
         this.growthFlag = growthFlag;
+    }
+
+    public String getIncrementFlag() {
+        return incrementFlag;
+    }
+
+    public void setIncrementFlag(String incrementFlag) {
+        this.incrementFlag = incrementFlag;
     }
 }

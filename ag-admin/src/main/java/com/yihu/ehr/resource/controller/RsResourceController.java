@@ -246,7 +246,7 @@ public class RsResourceController extends BaseController {
                 MQuotaConfigModel quotaConfigModel = objectMapper.convertValue(map,MQuotaConfigModel.class);
                 mainModelList.add(quotaConfigModel);
             }
-            ListResult listResult2 = resourceQuotaClient.search("", filters, "", pageSize, page);
+            ListResult listResult2 = resourceQuotaClient.search("", filters, "", 10000, page);
             List<ResourceQuotaModel> mainModelList2  = new ArrayList<>();
             if(listResult2.getTotalCount() != 0) {
                 List<Map<String, Object>> modelList2 = listResult2.getDetailModelList();
