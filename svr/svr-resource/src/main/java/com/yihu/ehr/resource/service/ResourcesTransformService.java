@@ -73,11 +73,12 @@ public class ResourcesTransformService extends BaseJpaService {
                     returnMap.put(srcMetadataCode + "_VALUE", resource.get(metadataId + "_VALUE"));
                 }
             }
-            //将rowkey放入数据
+            //将rowkey等基础字段放入数据
             returnMap.put("rowkey", resource.get("rowkey"));
             returnMap.put("org_code", resource.get("org_code"));
             returnMap.put("event_no", resource.get("event_no"));
             returnMap.put("event_date", resource.get("event_date"));
+            returnMap.put("event_type",resource.get("event_type"));
         }
         return returnMap;
     }
