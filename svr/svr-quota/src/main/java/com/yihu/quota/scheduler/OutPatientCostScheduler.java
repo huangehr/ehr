@@ -49,7 +49,7 @@ public class OutPatientCostScheduler {
     /**
      * 疾病费用统计
      */
-    @Scheduled(cron = "0 36 02 * * ?")
+    @Scheduled(cron = "0 36 07 * * ?")
     public void statisticDiseaseCostScheduler() {
         try {
             Date now = new Date();
@@ -66,7 +66,7 @@ public class OutPatientCostScheduler {
     /**
      * 科室费用统计
      */
-    @Scheduled(cron = "0 05 03 * * ?")
+    @Scheduled(cron = "0 50 07 * * ?")
     public void statisticDeptCostScheduler() {
         try {
             Date now = new Date();
