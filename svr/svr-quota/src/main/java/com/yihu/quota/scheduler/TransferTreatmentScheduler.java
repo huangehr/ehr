@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.elasticsearch.ElasticSearchClient;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.hbase.HBaseDao;
+import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.profile.core.ResourceCore;
 import com.yihu.ehr.solr.SolrUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
@@ -16,6 +17,7 @@ import com.yihu.quota.util.SolrHbaseUtil;
 import com.yihu.quota.vo.CheckInfoModel;
 import com.yihu.quota.vo.DictModel;
 import com.yihu.quota.vo.PersonalInfoModel;
+import com.yihu.quota.vo.TransferTreatmentModel;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.hadoop.hbase.Cell;
@@ -55,16 +57,18 @@ public class TransferTreatmentScheduler {
 //	@Scheduled(cron = "0 10 16 * * ?")
 	public void transferTreatment(){
 		try {
-			String q =  "EHR_000240:*"; // 查询条件 EHR_000240 转诊标识 不为空
+			String q =  "EHR_000310:* AND EHR_000306:*"; // 查询条件 EHR_000310 转入医院 不为空  转诊数据集
 			String fq = "";				// 过滤条件
+			String transferFlag = "EHR_000240";
 			String eventDateKey = "event_date";	//就诊时间
+			String townKey = "org_area";		//区县
+			String inhospitalKey = "EHR_005074";  	//住院号
 			String eventIdKey = "EHR_006202";  	//门（急）诊号
 			String registerTypeKey = "EHR_001240";	//挂号类别/41专家门诊
-			String transferInOrgKey = "EHR_000306";  	//转入机构
-			String transferOutOrgKey = "EHR_000310";  //转出机构
-			String chronicDiseaseKey = "HDSB04_87";	// 慢病诊断
+			String transferInOrgKey = "EHR_000310";  	//转入机构
+			String transferOutOrgKey = "EHR_000306";  //转出机构
 
-			String orgSql = "SELECT hos_type_id as code from organizations where orgCode = ";
+			String orgDictSql = "SELECT org_code as orgCode,hos_type_id as hosTypeId,administrative_division as administrativeDivision, level_id as levelId  from organizations where org_code=";
 			String orgTypCodeHospitalSql = "SELECT code,name from org_health_category where top_pid = " + Contant.orgHealthTypeCode.hospital_Id;
 			String orgTypCodeBasicMedicalSql = "SELECT code,name from org_health_category where top_pid = " + Contant.orgHealthTypeCode.basicMedical_Id;
 			List<DictModel> hospitalDictDatas = jdbcTemplate.query(orgTypCodeHospitalSql, new BeanPropertyRowMapper(DictModel.class));
@@ -123,76 +127,117 @@ public class TransferTreatmentScheduler {
 					}
 					System.out.println("startDate=" + startDate);
 				}
-				//门诊-挂号 数据集
-				//找出转诊的门诊 记录  提取门诊记录号         住院待看是否有此标识
-				List<Map<String,Object>> eventSetList = new ArrayList<>() ;
-				eventSetList = solrHbaseUtil.selectFieldValueList(ResourceCore.SubTable, q, fq, 10000);
-				for(Map<String,Object> eventSet : eventSetList){
+				//找出转诊的门诊 记录  				
+				List<Map<String,Object>> transferSetList = new ArrayList<>() ;
+				transferSetList = solrHbaseUtil.selectFieldValueList(ResourceCore.SubTable, q, fq, 10000);
+				for(Map<String,Object> transferSet : transferSetList){
+					TransferTreatmentModel transferTreatmentModel = new TransferTreatmentModel();
+					String rowKey = transferSet.get("rowkey").toString();
+					String town = "";
 					String eventId = "";
+					int level = 0;
+					String inhospitalId = "";
 					String registerType = "";
 					Date eventDate = null;
 					String transferInOrg = "";
 					String transferOutOrg = "";
 					int transFerType = 0;
-					if(eventSet.get(eventIdKey) != null){
-						eventId = eventSet.get(eventIdKey).toString();
+					String transFerTypeName = "";
+					int transEventType = 0;
+					if(transferSet.get(eventIdKey) != null){
+						eventId = transferSet.get(eventIdKey).toString();
+						transEventType = 0;
 					}
-					if(eventSet.get(eventDateKey) != null){
-						String eventDateStr = eventSet.get(eventDateKey).toString();
+					if(transferSet.get(inhospitalKey) != null){
+						inhospitalId = transferSet.get(inhospitalKey).toString();
+						transEventType = 1;
+					}
+					if(transferSet.get(eventDateKey) != null){
+						String eventDateStr = transferSet.get(eventDateKey).toString();
 						try {
 							eventDate = DateUtil.formatCharDate(eventDateStr, DateUtil.DATE_WORLD_FORMAT);
 						}catch (Exception e){
 							throw new Exception("就诊时间数据有误！" + eventDateStr );
 						}
 					}
-					if(eventSet.get(registerTypeKey) != null){
-						registerType = eventSet.get(registerTypeKey).toString();
+					if(transferSet.get(townKey) != null){
+						town = transferSet.get(townKey).toString();
 					}
-					//转诊（院）记录 数据集
-					List<Map<String,Object>> inHospitalSetList = new ArrayList<>() ;
-					q = eventIdKey + ":" + eventId;//最好加住院的标识 过滤其他数据集
-					inHospitalSetList = solrHbaseUtil.selectFieldValueList(ResourceCore.SubTable, q, fq, 10000);
-					if(inHospitalSetList != null && inHospitalSetList.size() > 0){
-						Map<String,Object> inHospitalSet = inHospitalSetList.get(0);
-						if(inHospitalSet.get(transferInOrgKey) != null){
-							transferInOrg = inHospitalSet.get(transferInOrgKey).toString();
-						}
-						if(inHospitalSet.get(transferOutOrgKey) != null){
-							transferOutOrg = inHospitalSet.get(transferOutOrgKey).toString();
-						}
-						//判断转诊类型 向上转诊 还是 向下转诊
-						if(StringUtils.isNotEmpty(transferInOrg) && StringUtils.isNotEmpty(transferOutOrg)){
-							//查询机构特殊类型code 并 判断机构类型
-							List<DictModel> inOrgDictDatas = jdbcTemplate.query(orgSql+transferInOrg, new BeanPropertyRowMapper(DictModel.class));
-							List<DictModel> outOrgDictDatas = jdbcTemplate.query(orgSql+transferOutOrg, new BeanPropertyRowMapper(DictModel.class));
-							int inOrgType = 0;
-							int outOrgType = 0;
-							if(basicMedicalCodeList.contains(transferInOrg)){
+					if(transferSet.get(transferInOrgKey) != null){
+						transferInOrg = transferSet.get(transferInOrgKey).toString();
+					}
+					if(transferSet.get(transferOutOrgKey) != null){
+						transferOutOrg = transferSet.get(transferOutOrgKey).toString();
+					}
+					//判断转诊类型 向上转诊 还是 向下转诊
+					if(StringUtils.isNotEmpty(transferInOrg) && StringUtils.isNotEmpty(transferOutOrg)) {
+						//查询机构特殊类型code 并 判断机构类型
+						transferInOrg += "'" + transferInOrg + "'";
+						transferOutOrg += "'" + transferOutOrg + "'";
+						List<MOrganization> inOrgDictDatas = jdbcTemplate.query( transferInOrg, new BeanPropertyRowMapper(MOrganization.class));
+						List<MOrganization> outOrgDictDatas = jdbcTemplate.query( transferOutOrg, new BeanPropertyRowMapper(MOrganization.class));
+						int inOrgType = 0;
+						int outOrgType = 0;
+						int inLevel = 9;
+						int outLevel = 9;
+						if(inOrgDictDatas != null && inOrgDictDatas.size() > 0){
+							if (basicMedicalCodeList.contains(inOrgDictDatas.get(0).getHosTypeId())) {
 								inOrgType = 1;
 							}
-							if(hospitalCodeList.contains(transferInOrg)){
+							if (hospitalCodeList.contains(inOrgDictDatas.get(0).getHosTypeId())) {
 								inOrgType = 2;
 							}
-							if(basicMedicalCodeList.contains(transferOutOrg)){
+							inLevel = Integer.parseInt(inOrgDictDatas.get(0).getLevelId() );
+						}
+						if(outOrgDictDatas != null && outOrgDictDatas.size() > 0){
+							if (basicMedicalCodeList.contains(outOrgDictDatas.get(0).getHosTypeId())) {
 								outOrgType = 1;
 							}
-							if(hospitalCodeList.contains(transferOutOrg)){
+							if (hospitalCodeList.contains(outOrgDictDatas.get(0).getHosTypeId())) {
 								outOrgType = 2;
 							}
-							if(inOrgType !=0 && outOrgType !=0 && inOrgType != outOrgType){
-								if(inOrgType > outOrgType){
-									transFerType = 1;//基层向医院转
-								}
-								if(inOrgType < outOrgType){
-									transFerType = 2;//医院向基层转
-								}
-							}else {
-								transFerType = 0;
-							}
-
-
-
+							outLevel = Integer.parseInt(outOrgDictDatas.get(0).getLevelId() );
 						}
+						if (inOrgType != 0 && outOrgType != 0 && inOrgType != outOrgType) {
+							if (inOrgType > outOrgType) {
+								transFerType = 1;
+								transFerTypeName = "基层医院向上到医院转诊";
+							}
+							if (inOrgType < outOrgType) {
+								transFerType = 2;
+								transFerTypeName = "医院向下到基层机构转诊";
+							}
+						} else {
+							transFerType = 0;
+							transFerTypeName = "其他";
+						}
+
+						//门诊号不为空 查询 挂号类别
+						if(StringUtils.isNotEmpty(eventId)){
+							//找门诊挂号数据集 门诊ID 及挂号类别不为空 且有转诊标识不为空
+							q = eventIdKey +":" + eventId + "AND " + registerTypeKey + ":*" + "AND " + transferFlag + ":*";
+							List<Map<String,Object>> eventSetList = new ArrayList<>() ;
+							eventSetList = solrHbaseUtil.selectFieldValueList(ResourceCore.SubTable, q, fq, 10000);
+							if(eventSetList != null && eventSetList.size() > 0){
+								for(Map<String,Object> map :eventSetList){
+									if (map.get(registerTypeKey) != null) {
+										registerType = map.get(registerTypeKey).toString();
+									}
+								}
+							}
+						}
+						transferTreatmentModel.set_id(rowKey);
+						transferTreatmentModel.setTown(town);
+						transferTreatmentModel.setEventDate(eventDate);
+						transferTreatmentModel.setInOrgLevel(outLevel);
+						transferTreatmentModel.setInOrgLevel(inLevel);
+						transferTreatmentModel.setInOrg(transferInOrg);
+						transferTreatmentModel.setOutOrg(transferOutOrg);
+						transferTreatmentModel.setRegisterType(registerType);
+						transferTreatmentModel.setTransEventType(transEventType);
+						transferTreatmentModel.setCreateTime(new Date());
+						saveTransferTreatmentModel(transferTreatmentModel);
+
 					}
 				}
 
@@ -205,43 +250,20 @@ public class TransferTreatmentScheduler {
 		}
 	}
 
-	public void savePersonal(PersonalInfoModel personalInfo){
+	public void saveTransferTreatmentModel(TransferTreatmentModel transferTreatmentModel){
 		try{
-			String index = "singleDiseasePersonal";
-			String type = "personal_info";
+			String index = "transferTreatmentIndex";
+			String type = "transfer_treatment";
 			Map<String, Object> source = new HashMap<>();
-			String jsonPer = objectMapper.writeValueAsString(personalInfo);
+			String jsonPer = objectMapper.writeValueAsString(transferTreatmentModel);
 			source = objectMapper.readValue(jsonPer, Map.class);
 			log.error("开始保存数据" + jsonPer);
-			if(personalInfo.getDemographicId() != null){
-				List<Map<String, Object>> relist = elasticSearchUtil.findByField(index, type, "demographicId", personalInfo.getDemographicId());
-				if( !(relist != null && relist.size() >0)){
-					elasticSearchClient.index(index,type, source);
-				}
-			}else if(personalInfo.getCardId() != null){
-				List<Map<String, Object>> relist = elasticSearchUtil.findByField(index,type, "cardId",personalInfo.getCardId());
-				if( !(relist != null && relist.size() >0)){
-					elasticSearchClient.index(index,type, source);
-				}
-			}else {
-				elasticSearchClient.index(index,type, source);
-			}
+			elasticSearchClient.index(index,type, source);
+
 		}catch (Exception e){
 			e.getMessage();
 		}
 	}
-
-	public  CheckInfoModel setCheckInfoModel(CheckInfoModel baseCheckInfo ){
-		CheckInfoModel checkInfo = new CheckInfoModel();
-		checkInfo.setSexName(baseCheckInfo.getSexName());
-		checkInfo.setSex(baseCheckInfo.getSex());
-		checkInfo.setDemographicId(baseCheckInfo.getDemographicId());
-		checkInfo.setCardId(baseCheckInfo.getCardId());
-		checkInfo.setName(baseCheckInfo.getName());
-		checkInfo.setCreateTime(DateUtils.addHours(new Date(),8));
-		return  checkInfo;
-	}
-
 
 
 }
