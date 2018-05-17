@@ -58,15 +58,15 @@ public class TransferTreatmentScheduler {
 	public void transferTreatment(){
 		try {
 			String q =  "EHR_000310:* AND EHR_000306:*"; // 查询条件 EHR_000310 转入医院 不为空  转诊数据集
-			String fq = "";				// 过滤条件
-			String transferFlag = "EHR_000240";
+			String fq = "";									// 过滤条件
+			String transferFlag = "EHR_000240";			//转诊标识
 			String eventDateKey = "event_date";	//就诊时间
-			String townKey = "org_area";		//区县
+			String townKey = "org_area";			//区县
 			String inhospitalKey = "EHR_005074";  	//住院号
 			String eventIdKey = "EHR_006202";  	//门（急）诊号
 			String registerTypeKey = "EHR_001240";	//挂号类别/41专家门诊
-			String transferInOrgKey = "EHR_000310";  	//转入机构
-			String transferOutOrgKey = "EHR_000306";  //转出机构
+			String transferInOrgKey = "EHR_000310";//转入机构
+			String transferOutOrgKey = "EHR_000306";//转出机构
 
 			String orgDictSql = "SELECT org_code as orgCode,hos_type_id as hosTypeId,administrative_division as administrativeDivision, level_id as levelId  from organizations where org_code=";
 			String orgTypCodeHospitalSql = "SELECT code,name from org_health_category where top_pid = " + Contant.orgHealthTypeCode.hospital_Id;
@@ -136,20 +136,17 @@ public class TransferTreatmentScheduler {
 					String town = "";
 					String eventId = "";
 					int level = 0;
-					String inhospitalId = "";
 					String registerType = "";
 					Date eventDate = null;
 					String transferInOrg = "";
 					String transferOutOrg = "";
 					int transFerType = 0;
-					String transFerTypeName = "";
 					int transEventType = 0;
 					if(transferSet.get(eventIdKey) != null){
 						eventId = transferSet.get(eventIdKey).toString();
 						transEventType = 0;
 					}
 					if(transferSet.get(inhospitalKey) != null){
-						inhospitalId = transferSet.get(inhospitalKey).toString();
 						transEventType = 1;
 					}
 					if(transferSet.get(eventDateKey) != null){
@@ -200,16 +197,13 @@ public class TransferTreatmentScheduler {
 						}
 						if (inOrgType != 0 && outOrgType != 0 && inOrgType != outOrgType) {
 							if (inOrgType > outOrgType) {
-								transFerType = 1;
-								transFerTypeName = "基层医院向上到医院转诊";
+								transFerType = 1;//基层医院向上到医院转诊
 							}
 							if (inOrgType < outOrgType) {
-								transFerType = 2;
-								transFerTypeName = "医院向下到基层机构转诊";
+								transFerType = 2;//医院向下到基层机构转诊
 							}
 						} else {
-							transFerType = 0;
-							transFerTypeName = "其他";
+							transFerType = 0;//其他
 						}
 
 						//门诊号不为空 查询 挂号类别
