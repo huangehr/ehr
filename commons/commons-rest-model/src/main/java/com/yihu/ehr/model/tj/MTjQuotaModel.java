@@ -31,6 +31,8 @@ public class MTjQuotaModel {
     private String isInitExec; // 是否初始执行过，0：否，1：是。
     private String jobClazzName;
     private String resultGetType;
+    //周期指标执行状态：0未开启，1执行中
+    private String jobStatus;
 
     public String getQuotaTypeName() {
         return quotaTypeName;
@@ -246,5 +248,13 @@ public class MTjQuotaModel {
 
     public void setResultGetType(String resultGetType) {
         this.resultGetType = resultGetType;
+    }
+
+    public String getJobStatus() {
+        return jobStatus;
+    }
+
+    public void setJobStatus(String jobStatus) {
+        this.jobStatus = jobStatus;
     }
 }

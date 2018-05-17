@@ -68,5 +68,20 @@ public class JobController extends BaseController {
         }
     }
 
+    @ApiOperation(value = "停止指标")
+    @RequestMapping(value = ServiceApi.TJ.TjQuotaRemove, method = RequestMethod.POST)
+    public boolean removeQuota(
+            @ApiParam(name = "id", value = "指标ID", required = true)
+            @RequestParam(value = "id", required = true) Integer id) {
+        try {
+            jobService.removeJob(id);
+            return true;
+        } catch (Exception e) {
+            error(e);
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 
 }
