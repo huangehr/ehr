@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.*;
 
 /**
- * 按天统计药品费用，并整合solr中主表（HealthProfile）性别、年龄和细表（HealthProfileSub）费用数据到一起，
+ * 整合solr中档案主表（HealthProfile）性别、年龄和档案细表（HealthProfileSub）费用数据到一起，
  * 保存整合后数据到ES，方便按性别、年龄段统计药品费用。
  *
  * @author 张进军
@@ -89,17 +89,23 @@ public class MedicineExpenseScheduler {
         return envelop;
     }
 
+    /**
+     * 保存药品费用、性别、年龄段到ES
+     */
     private void saveData(String fq) throws Exception {
-        // 保存药品费用、性别、年龄段到ES
+        long startTime = System.currentTimeMillis();
+
         long count = solrUtil.count(ResourceCore.SubTable, q, fq);
         List<String> rowKeyList = healthArchiveSchedulerService.selectSubRowKey(ResourceCore.SubTable, q, fq, count);
 
         int currIndex = 0;
         List<Map<String, Object>> hBaseDataList = new ArrayList<>();
         List<String> pageRowKeyList = new ArrayList<>();
+        logger.info("要整合并保存的药品费用记录总数：" + count);
         while (currIndex < count) { // 避免一次操作hbase太多次导致发生异常。
+            long onceStartTime = System.currentTimeMillis();
             pageRowKeyList.clear();
-            for (int i = 0; i < 1000; i++) {
+            for (int i = 0; i < 100; i++) {
                 if (currIndex < count) {
                     pageRowKeyList.add(rowKeyList.get(currIndex));
                     currIndex++;
@@ -108,6 +114,7 @@ public class MedicineExpenseScheduler {
                 }
             }
 
+            hBaseDataList.clear();
             hBaseDataList = healthArchiveSchedulerService.selectHbaseData(ResourceCore.SubTable, pageRowKeyList);
             for (Map<String, Object> subInfo : hBaseDataList) {
                 Map<String, Object> medicineExpenseInfo = new HashMap<>();
@@ -156,7 +163,10 @@ public class MedicineExpenseScheduler {
                 // 保存到ES
                 elasticSearchClient.index("medicine_expense", "medicine_expense_info", medicineExpenseInfo);
             }
+            logger.info("单次遍历数量：" + hBaseDataList.size() + "，耗时：" + ((System.currentTimeMillis() - onceStartTime)/1000) + " 秒");
         }
+
+        logger.info("总耗时：" + ((System.currentTimeMillis() - startTime)/1000/60) + " 分");
     }
 
 }
