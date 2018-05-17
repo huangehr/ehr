@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.io.IOException;
 import java.util.*;
@@ -43,6 +44,7 @@ import java.util.*;
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @Api(value = "赛诺菲数据服务", description = "赛诺菲项目体征数据提取服务")
+@ApiIgnore
 public class SanofiEndPoint {
 
     @Autowired

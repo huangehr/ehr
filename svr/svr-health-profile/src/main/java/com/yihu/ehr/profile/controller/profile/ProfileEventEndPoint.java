@@ -3,8 +3,6 @@ package com.yihu.ehr.profile.controller.profile;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
-import com.yihu.ehr.model.resource.MStdTransformDto;
-import com.yihu.ehr.profile.feign.TransformClient;
 import com.yihu.ehr.profile.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -38,11 +36,11 @@ public class ProfileEventEndPoint extends EnvelopRestEndPoint {
     @ApiOperation("门诊/住院事件(时间轴)")
     @RequestMapping(value = ServiceApi.Profiles.MedicalEvents, method = RequestMethod.GET)
     public List<Map<String, Object>> medicalEvents(
-            @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362321199703137824")
+            @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362301195002141528")
             @RequestParam(value = "demographic_id") String demographic_id,
             @ApiParam(name = "filter", value = "过滤条件")
             @RequestParam(value = "filter", required = false) String filter,
-            @ApiParam(name = "blurry_type", value = "针对需要对特殊档案类型进行查询的参数(0-门诊 2-影像 1-住院 3-体检 4-检验 6-免疫), 此处有值的话filter中就不能再包含event_type")
+            @ApiParam(name = "blurry_type", value = "针对需要对特殊档案类型进行查询的参数(0-门诊 1-住院 2-体检 3-影像 4-检查 5-检验 6-妇幼 7-免疫), 此处有值的话filter中就不能再包含event_type")
             @RequestParam(value = "blurry_type", required = false) String blurry_type,
             @ApiParam(name = "date", value = "时间")
             @RequestParam(value = "date", required = false) String date,
@@ -54,15 +52,15 @@ public class ProfileEventEndPoint extends EnvelopRestEndPoint {
     @ApiOperation("最近的一条就诊记录 - 上饶APP")
     @RequestMapping(value = ServiceApi.Profiles.RecentMedicalEvents, method = RequestMethod.GET)
     public Map<String, Object> recentMedicalEvents(
-            @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362321199703137824")
+            @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362301195002141528")
             @RequestParam(value = "demographic_id") String demographic_id) throws Exception {
         return patientEvent.recentMedicalEvents(demographic_id);
     }
 
     @ApiOperation("近期就诊 - 档案浏览器")
     @RequestMapping(value = ServiceApi.Profiles.RecentVisits, method = RequestMethod.GET)
-    public Map<String, Object> recentVisits(
-            @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362321199703137824")
+    public List<Map<String, Object>> recentVisits(
+            @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362301195002141528")
             @RequestParam(value = "demographic_id") String demographic_id) throws Exception {
         return patientEvent.recentVisits(demographic_id);
     }
@@ -70,7 +68,7 @@ public class ProfileEventEndPoint extends EnvelopRestEndPoint {
     @ApiOperation("近期就诊详情 - 档案浏览器")
     @RequestMapping(value = ServiceApi.Profiles.RecentVisitsSub, method = RequestMethod.GET)
     public Map<String, Object> recentVisitsSub(
-            @ApiParam(name = "profile_id", value = "档案ID", required = true, defaultValue = "362321199703137824")
+            @ApiParam(name = "profile_id", value = "档案ID", required = true, defaultValue = "49229004X_000000481520_1513758586000")
             @RequestParam(value = "profile_id") String profile_id) throws Exception {
         return patientEvent.recentVisitsSub(profile_id);
     }
