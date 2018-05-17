@@ -33,6 +33,8 @@ public class TjQuota implements Serializable {
     private String metadataCode;
     private String isInitExec; // 是否初始执行过，0：否，1：是。
     private String resultGetType; // 指标结果获取方式 1：直接库中获取，2：二次统计获取。
+    //周期指标执行状态：0未开启，1执行中
+    private String jobStatus;
 
     private List<TjQuota> children;
 
@@ -228,5 +230,13 @@ public class TjQuota implements Serializable {
 
     public void setChildren(List<TjQuota> children) {
         this.children = children;
+    }
+    @Column(name = "job_status", length = 1)
+    public String getJobStatus() {
+        return jobStatus;
+    }
+
+    public void setJobStatus(String jobStatus) {
+        this.jobStatus = jobStatus;
     }
 }

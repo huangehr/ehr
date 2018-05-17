@@ -50,9 +50,11 @@ public class JobService {
             boolean existJob = quartzHelper.isExistJob(quotaCode);
             boolean existJobImmediately = quartzHelper.isExistJob(quotaCodeImmediately);
             if (existJob) {
+                //周期执行jobKey
                 quartzHelper.removeJob(quotaCode);
             }
             if (existJobImmediately) {
+                //立即执行jobKey
                 quartzHelper.removeJob(quotaCodeImmediately);
             }
             //往quartz框架添加任务
@@ -60,8 +62,41 @@ public class JobService {
                     (!StringUtils.isEmpty(tjQuota.getJobClazz()) && tjQuota.getExecType().equals("1"))) { // 立即执行
                 quartzHelper.startNow(Class.forName(quotaVo.getJobClazz()), quotaCodeImmediately, params);
             } else {
+                //周期执行指标 更新指标执行状态：0未开启，1执行中
+                tjQuota.setJobStatus("1");
+                quotaDao.save(tjQuota);
                 quartzHelper.addJob(Class.forName(quotaVo.getJobClazz()), quotaVo.getCron(), quotaCode, params);
             }
+        }
+    }
+
+    /**
+     * 停止指标任务
+     *
+     * @param id 指标ID
+     * @throws Exception
+     */
+    public void removeJob(Integer id) throws Exception {
+        TjQuota tjQuota = quotaDao.findOne(id);
+        if (tjQuota != null) {
+            QuotaVo quotaVo = new QuotaVo();
+            BeanUtils.copyProperties(tjQuota, quotaVo);
+            String quotaCode = quotaVo.getCode().replace("_", "");
+            String quotaCodeImmediately = quotaCode + "immediately";
+            boolean existJob = quartzHelper.isExistJob(quotaCode);
+            boolean existJobImmediately = quartzHelper.isExistJob(quotaCodeImmediately);
+            if (existJob) {
+                //周期执行jobKey
+                quartzHelper.removeJob(quotaCode);
+            }
+            if (existJobImmediately) {
+                //立即执行jobKey
+                quartzHelper.removeJob(quotaCodeImmediately);
+            }
+            //周期执行指标 更新指标执行状态：0未开启，1执行中
+            tjQuota.setJobStatus("0");
+            quotaDao.save(tjQuota);
+
         }
     }
 
