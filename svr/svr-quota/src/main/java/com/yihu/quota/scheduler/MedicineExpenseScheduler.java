@@ -1,7 +1,7 @@
 package com.yihu.quota.scheduler;
 
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.elasticsearch.ElasticSearchClient;
+import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.hbase.HBaseDao;
 import com.yihu.ehr.profile.core.ResourceCore;
 import com.yihu.ehr.solr.SolrUtil;
@@ -44,7 +44,7 @@ public class MedicineExpenseScheduler {
     @Autowired
     private HealthArchiveSchedulerService healthArchiveSchedulerService;
     @Autowired
-    private ElasticSearchClient elasticSearchClient;
+    private ElasticSearchUtil elasticSearchUtil;
 
     // 门诊药品费用、住院药品费用过滤条件
     private String q = "(EHR_000045:* AND (EHR_000044:01 OR EHR_000044:02 OR EHR_000044:03)) OR (EHR_000175:* AND (EHR_000174:01 OR EHR_000174:02))";
@@ -99,13 +99,15 @@ public class MedicineExpenseScheduler {
         List<String> rowKeyList = healthArchiveSchedulerService.selectSubRowKey(ResourceCore.SubTable, q, fq, count);
 
         int currIndex = 0;
+        List<Map<String, Object>> medicineExpenseInfoList = new ArrayList<>();
         List<Map<String, Object>> hBaseDataList = new ArrayList<>();
         List<String> pageRowKeyList = new ArrayList<>();
         logger.info("要整合并保存的药品费用记录总数：" + count);
-        while (currIndex < count) { // 避免一次操作hbase太多次导致发生异常。
+        while (currIndex < count) {
+            // 避免一次操作太多次导致发生异常。
             long onceStartTime = System.currentTimeMillis();
             pageRowKeyList.clear();
-            for (int i = 0; i < 100; i++) {
+            for (int i = 0; i < 1000; i++) {
                 if (currIndex < count) {
                     pageRowKeyList.add(rowKeyList.get(currIndex));
                     currIndex++;
@@ -114,9 +116,15 @@ public class MedicineExpenseScheduler {
                 }
             }
 
+            long hbaseStart = System.currentTimeMillis();
             hBaseDataList.clear();
+            medicineExpenseInfoList.clear();
             hBaseDataList = healthArchiveSchedulerService.selectHbaseData(ResourceCore.SubTable, pageRowKeyList);
+            logger.info("单次查询HBase数量：" + pageRowKeyList.size() + "，耗时：" + ((System.currentTimeMillis() - hbaseStart) / 1000) + " 秒");
+
+            long subStart = System.currentTimeMillis();
             for (Map<String, Object> subInfo : hBaseDataList) {
+                long oneSubStart = System.currentTimeMillis();
                 Map<String, Object> medicineExpenseInfo = new HashMap<>();
                 Map<String, Object> masterInfo = hBaseDao.getResultMap(ResourceCore.MasterTable, subInfo.get("profile_id").toString());
                 // _id
@@ -160,13 +168,17 @@ public class MedicineExpenseScheduler {
                 // 创建时间
                 medicineExpenseInfo.put("create_date", new Date());
 
-                // 保存到ES
-                elasticSearchClient.index("medicine_expense", "medicine_expense_info", medicineExpenseInfo);
+                medicineExpenseInfoList.add(medicineExpenseInfo);
             }
-            logger.info("单次遍历数量：" + hBaseDataList.size() + "，耗时：" + ((System.currentTimeMillis() - onceStartTime)/1000) + " 秒");
+            logger.info("收集药品费用数据耗时：" + ((System.currentTimeMillis() - subStart) / 1000) + " 秒");
+
+            // 保存到ES
+            long saveStart = System.currentTimeMillis();
+            elasticSearchUtil.bulkIndex("medicine_expense", "medicine_expense_info", medicineExpenseInfoList);
+            logger.info("保存ES文档数量：" + medicineExpenseInfoList.size() + "，耗时：" + ((System.currentTimeMillis() - saveStart) / 1000) + " 秒");
         }
 
-        logger.info("总耗时：" + ((System.currentTimeMillis() - startTime)/1000/60) + " 分");
+        logger.info("总耗时：" + ((System.currentTimeMillis() - startTime) / 1000 / 60) + " 分");
     }
 
 }
