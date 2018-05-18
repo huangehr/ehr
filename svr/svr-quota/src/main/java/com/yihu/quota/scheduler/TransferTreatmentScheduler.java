@@ -57,11 +57,11 @@ public class TransferTreatmentScheduler {
 //	@Scheduled(cron = "0 10 16 * * ?")
 	public void transferTreatment(){
 		try {
-			String q =  "EHR_000310:* AND EHR_000306:*"; // 查询条件 EHR_000310 转入医院 不为空  转诊数据集
+			String q =  "EHR_000083:* AND EHR_000310:* AND EHR_000306:*"; // 查询条件 EHR_000310 转入医院 EHR_000306 转出医院 不为空  转诊数据集
 			String fq = "";									// 过滤条件
 			String townKey = "org_area";			//区县
 			String eventDateKey = "event_date";	//就诊时间
-			String transferFlag = "EHR_000240";	//转诊标识
+			String transferFlag = "EHR_000083";	//转诊标志
 			String inhospitalKey = "EHR_005074";  	//住院号
 			String eventIdKey = "EHR_006202";  	//门（急）诊号
 			String registerTypeKey = "EHR_001240";	//挂号类别/41专家门诊
