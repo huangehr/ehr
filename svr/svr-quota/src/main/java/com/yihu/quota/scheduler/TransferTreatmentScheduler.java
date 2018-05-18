@@ -59,14 +59,14 @@ public class TransferTreatmentScheduler {
 		try {
 			String q =  "EHR_000310:* AND EHR_000306:*"; // 查询条件 EHR_000310 转入医院 不为空  转诊数据集
 			String fq = "";									// 过滤条件
-			String transferFlag = "EHR_000240";			//转诊标识
-			String eventDateKey = "event_date";	//就诊时间
 			String townKey = "org_area";			//区县
+			String eventDateKey = "event_date";	//就诊时间
+			String transferFlag = "EHR_000240";	//转诊标识
 			String inhospitalKey = "EHR_005074";  	//住院号
 			String eventIdKey = "EHR_006202";  	//门（急）诊号
 			String registerTypeKey = "EHR_001240";	//挂号类别/41专家门诊
-			String transferInOrgKey = "EHR_000310";//转入机构
-			String transferOutOrgKey = "EHR_000306";//转出机构
+			String transferInOrgKey = "EHR_000310";//转入医疗机构代码
+			String transferOutOrgKey = "EHR_000306";//转出医疗机构代码
 
 			String orgDictSql = "SELECT org_code as orgCode,hos_type_id as hosTypeId,administrative_division as administrativeDivision, level_id as levelId  from organizations where org_code=";
 			String orgTypCodeHospitalSql = "SELECT code,name from org_health_category where top_pid = " + Contant.orgHealthTypeCode.hospital_Id;
@@ -129,7 +129,7 @@ public class TransferTreatmentScheduler {
 				}
 				//找出转诊的门诊 记录  				
 				List<Map<String,Object>> transferSetList = new ArrayList<>() ;
-				transferSetList = solrHbaseUtil.selectFieldValueList(ResourceCore.SubTable, q, fq, 10000);
+				transferSetList = solrHbaseUtil.selectFieldValueList(ResourceCore.MasterTable, q, fq, 10000);
 				for(Map<String,Object> transferSet : transferSetList){
 					TransferTreatmentModel transferTreatmentModel = new TransferTreatmentModel();
 					String rowKey = transferSet.get("rowkey").toString();
@@ -205,21 +205,10 @@ public class TransferTreatmentScheduler {
 						} else {
 							transFerType = 0;//其他
 						}
-
-						//门诊号不为空 查询 挂号类别
-						if(StringUtils.isNotEmpty(eventId)){
-							//找门诊挂号数据集 门诊ID 及挂号类别不为空 且有转诊标识不为空
-							q = eventIdKey +":" + eventId + "AND " + registerTypeKey + ":*" + "AND " + transferFlag + ":*";
-							List<Map<String,Object>> eventSetList = new ArrayList<>() ;
-							eventSetList = solrHbaseUtil.selectFieldValueList(ResourceCore.SubTable, q, fq, 10000);
-							if(eventSetList != null && eventSetList.size() > 0){
-								for(Map<String,Object> map :eventSetList){
-									if (map.get(registerTypeKey) != null) {
-										registerType = map.get(registerTypeKey).toString();
-									}
-								}
-							}
+						if (transferSet.get(registerTypeKey) != null) {
+							registerType = transferSet.get(registerTypeKey).toString();
 						}
+
 						transferTreatmentModel.set_id(rowKey);
 						transferTreatmentModel.setTown(town);
 						transferTreatmentModel.setEventDate(eventDate);
