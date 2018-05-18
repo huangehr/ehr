@@ -1,4 +1,4 @@
-package com.yihu.ehr.profile.controller;
+package com.yihu.ehr.profile.controller.prescription;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseRestEndPoint;
@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,6 +20,7 @@ import java.io.FileInputStream;
 @RestController
 @RequestMapping(ApiVersion.Version1_0+"/thridPrescription")
 @Api(value = "第三方处方调阅服务", description = "第三方处方调阅服务")
+@ApiIgnore
 public class ThridPrescriptionEndPoint extends BaseRestEndPoint {
     @Autowired
     private ThridPrescriptionService thridPrescriptionService;

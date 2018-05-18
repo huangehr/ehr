@@ -25,7 +25,7 @@ public class ProfileInspectionService {
 
     public List inspectionRecords(String demographicId, String filter, String date, String searchParam) throws Exception {
         List<Map<String, Object>> resultList = new ArrayList<>();
-        // EHR_000318 报告生成时间
+        // EHR_000318 & EHR_000353 报告生成时间
         String query = "{\"q\":\"demographic_id:" + demographicId + " AND (EHR_000318:* OR EHR_000353:*)\"}";
         query = SimpleSolrQueryUtil.getQuery(filter, date, query);
         Envelop masterEnvelop = resource.getMasterData(query, 1, 500, null);

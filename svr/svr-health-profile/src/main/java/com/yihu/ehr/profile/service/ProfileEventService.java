@@ -48,13 +48,7 @@ public class ProfileEventService {
                 query = "{\"q\":\"demographic_id:" + demographicId + " AND event_type:1\"}";
             } else if ("2".equals(blurryType)) { //体检 medicalExam
                 query = "{\"q\":\"demographic_id:" + demographicId + " AND event_type:2\"}";
-            } else if ("4".equals(blurryType)) { //检查 inspect
-                query = "{\"q\":\"demographic_id:" + demographicId + " AND EHR_000318:*\"}";
-            } else if ("5".equals(blurryType)) { //检验 examine
-                query = "{\"q\":\"demographic_id:" + demographicId + " AND EHR_000353:*\"}";
-            } else if ("6".equals(blurryType)) { //免疫 immunity
-                query = "{\"q\":\"demographic_id:" + demographicId + " AND EHR_002443:*\"}";
-            } else if ("3".equals(blurryType)){ //影像 imagery
+            } else if ("3".equals(blurryType)) { //影像 imagery
                 query = SimpleSolrQueryUtil.getQuery(filter, date, query);
                 envelop = resource.getMasterData(query, 1, 500, null);
                 List<Map<String, Object>> masterList = envelop.getDetailModelList();
@@ -73,7 +67,7 @@ public class ProfileEventService {
                             resultMap.put("cdaVersion", temp.get("cda_version"));
                             resultMap.put("eventDate", temp.get("event_date"));
                             resultMap.put("profileType", temp.get("profile_type"));
-                            resultMap.put("eventType", temp.get("event_type"));
+                            resultMap.put("eventType", blurryType); //更改事件类型
                             resultMap.put("eventNo", temp.get("event_no"));
                             //追加诊断名称 start
                             String healthProblemName = "";
@@ -112,6 +106,15 @@ public class ProfileEventService {
                     }
                 }
                 return resultList;
+            } else if ("4".equals(blurryType)) { //检查 inspect
+                query = "{\"q\":\"demographic_id:" + demographicId + " AND EHR_000318:*\"}";
+            } else if ("5".equals(blurryType)) { //检验 examine
+                query = "{\"q\":\"demographic_id:" + demographicId + " AND EHR_000353:*\"}";
+            } else if ("6".equals(blurryType)) { //妇幼 immunity
+                //query = "{\"q\":\"demographic_id:" + demographicId + " AND EHR_002443:*\"}";
+                return resultList;
+            } else if ("7".equals(blurryType)){  //免疫 immunity
+                query = "{\"q\":\"demographic_id:" + demographicId + " AND EHR_002443:*\"}";
             } else {
                 return resultList;
             }
@@ -128,7 +131,7 @@ public class ProfileEventService {
                     resultMap.put("cdaVersion", temp.get("cda_version"));
                     resultMap.put("eventDate", temp.get("event_date"));
                     resultMap.put("profileType", temp.get("profile_type"));
-                    resultMap.put("eventType", temp.get("event_type"));
+                    resultMap.put("eventType", blurryType); //更改事件类型
                     resultMap.put("eventNo", temp.get("event_no"));
                     //追加诊断名称 start
                     String healthProblemName = "";
@@ -241,10 +244,12 @@ public class ProfileEventService {
         String end = dateFormat.format(now);
         String date = "{\"start\":\"" + start + "\",\"end\":\"" + end + "\"}";
         q = SimpleSolrQueryUtil.getQuery(null, date, q);
-        Envelop envelop = resource.getMasterData(q, 1, 1, null);
+        Envelop envelop = resource.getMasterData(q, 1, 500, null);
         List<Map<String, Object>> eventList = envelop.getDetailModelList();
-        if (eventList.size() > 0) {
-            Map<String ,Object> temp = eventList.get(0);
+        for (Map<String, Object> temp : eventList) {
+            if (temp.get("event_type") != null && temp.get("event_type").equals("2")) {
+                continue;
+            }
             resultMap.put("profileId", temp.get("rowkey"));
             resultMap.put("orgCode", temp.get("org_code"));
             resultMap.put("orgName", temp.get("org_name"));
@@ -279,6 +284,7 @@ public class ProfileEventService {
             }
             resultMap.put("healthProblemName", healthProblemName);
             //追加诊断名称 end
+            break;
         }
         return resultMap;
     }
@@ -289,8 +295,8 @@ public class ProfileEventService {
      * @return
      * @throws Exception
      */
-    public Map<String, Object> recentVisits (String demographicId) throws Exception {
-        Map<String, Object> resultMap = new HashMap<>();
+    public List<Map<String, Object>> recentVisits (String demographicId) throws Exception {
+        List<Map<String, Object>> resultList = new ArrayList<>();
         String q = "{\"q\":\"demographic_id:" + demographicId + "\"}";
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, 0);
@@ -306,8 +312,11 @@ public class ProfileEventService {
         q = SimpleSolrQueryUtil.getQuery(null, date, q);
         Envelop envelop = resource.getMasterData(q, 1, 500, null);
         List<Map<String, Object>> eventList = envelop.getDetailModelList();
-        if (eventList.size() > 0) {
-            Map<String ,Object> temp = eventList.get(0);
+        for (Map<String, Object> temp : eventList) {
+            if (temp.get("event_type") != null && temp.get("event_type").equals("2")) {
+                continue;
+            }
+            Map<String, Object> resultMap = new HashMap<>();
             resultMap.put("profileId", temp.get("rowkey"));
             resultMap.put("orgCode", temp.get("org_code"));
             resultMap.put("orgName", temp.get("org_name"));
@@ -342,8 +351,9 @@ public class ProfileEventService {
             }
             resultMap.put("healthProblemName", healthProblemName);
             //追加诊断名称 end
+            resultList.add(resultMap);
         }
-        return resultMap;
+        return resultList;
     }
 
     public Map<String, Object> recentVisitsSub (String profileId) throws Exception {
@@ -420,6 +430,8 @@ public class ProfileEventService {
             } else if (temp.get("event_type").equals("1")) { //住院信息
                 resultMap.put("department", temp.get("EHR_000229") == null ? "" : temp.get("EHR_000229"));
                 resultMap.put("doctor", temp.get("EHR_005072") == null ? "" : temp.get("EHR_005072"));
+                resultMap.put("inSituation", temp.get("EHR_005203") == null ? "" : temp.get("EHR_005203")); //入院情况
+                resultMap.put("outSituation", temp.get("EHR_000154") == null ? "" : temp.get("EHR_000154")); //出院情况
                 resultMap.put("inResult", temp.get("EHR_000295") == null ? "" :  temp.get("EHR_000295")); //入院诊断
                 resultMap.put("outResult", temp.get("EHR_000295") == null ? "" : temp.get("EHR_000295")); //出院诊断
                 resultMap.put("treatmentResults", temp.get("EHR_000166") == null ? "" : temp.get("EHR_000166")); //治疗结果
