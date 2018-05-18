@@ -15,6 +15,7 @@ public class OrgHealthCategoryShowModel {
     private String orgHealthCategoryName;   //卫生机构类型名字
     private String orgHealthCategoryId;     //卫生机构类型ID
     private String orgHealthCategoryPid;    //卫生机构类型父节点
+    private String orgHealthCategoryTopPid;//顶节点
     private String cloumnKey1;              //表格第1列
     private String cloumnKey2;              //表格第2列
     private String cloumnKey3;
@@ -127,5 +128,13 @@ public class OrgHealthCategoryShowModel {
 
     public void setCloumnKey9(String cloumnKey9) {
         this.cloumnKey9 = cloumnKey9;
+    }
+
+    public String getOrgHealthCategoryTopPid() {
+        return orgHealthCategoryTopPid;
+    }
+
+    public void setOrgHealthCategoryTopPid(String orgHealthCategoryTopPid) {
+        this.orgHealthCategoryTopPid = orgHealthCategoryTopPid;
     }
 }
