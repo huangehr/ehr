@@ -44,6 +44,7 @@ public class SaveModel {
     private String orgHealthCategoryName;   //卫生机构类型名字
     private String orgHealthCategoryId;
     private String orgHealthCategoryPid;
+    private String orgHealthCategoryTopPid;
     private String economic;    // 经济类型代码
     private String economicName;    // 经济类型名称
     private String level;   // 医院等级
@@ -347,5 +348,13 @@ public class SaveModel {
 
     public void setLevelName(String levelName) {
         this.levelName = levelName;
+    }
+
+    public String getOrgHealthCategoryTopPid() {
+        return orgHealthCategoryTopPid;
+    }
+
+    public void setOrgHealthCategoryTopPid(String orgHealthCategoryTopPid) {
+        this.orgHealthCategoryTopPid = orgHealthCategoryTopPid;
     }
 }
