@@ -12,7 +12,7 @@ import java.util.Date;
 public class EsArchiveRelation implements Serializable {
 
     private String _id; //主键关联profile_id
-    private Integer profileType;//1结构化档案，2文件档案，3链接档案，4数据集档案
+    private Integer profile_type;//1结构化档案，2文件档案，3链接档案，4数据集档案
     private String name; //姓名
     private String org_code; //机构编码
     private String org_name; //机构名称
@@ -178,11 +178,11 @@ public class EsArchiveRelation implements Serializable {
         this.identify_flag = identify_flag;
     }
 
-    public Integer getProfileType() {
-        return profileType;
+    public Integer getProfile_type() {
+        return profile_type;
     }
 
-    public void setProfileType(Integer profileType) {
-        this.profileType = profileType;
+    public void setProfile_type(Integer profile_type) {
+        this.profile_type = profile_type;
     }
 }

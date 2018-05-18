@@ -113,6 +113,10 @@ public class ProfileInfoBaseService extends BaseJpaService {
             } else {
                 patientMap.put("label", "就诊");
             }
+            List<String> labels = new ArrayList<>();
+            labels.add("慢病");
+            labels.add("就诊");
+            patientMap.put("label", labels);
             //姓名
             patientMap.put("name", result.get("patient_name") == null? "" : result.get("patient_name"));
             //性别

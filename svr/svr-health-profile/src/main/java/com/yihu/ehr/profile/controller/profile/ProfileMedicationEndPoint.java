@@ -34,7 +34,7 @@ public class ProfileMedicationEndPoint extends EnvelopRestEndPoint {
     @ApiOperation("用药排行")
     @RequestMapping(value = ServiceApi.Profiles.MedicationRanking, method = RequestMethod.GET)
     public Map<String, Integer> medicationRanking(
-            @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362330193903060234")
+            @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362301195002141528")
             @RequestParam(value = "demographic_id") String demographic_id,
             @ApiParam(name = "hp_code", value = "健康问题代码（不传默认查找所有）")
             @RequestParam(value = "hp_code", required = false) String hp_code,
@@ -46,7 +46,7 @@ public class ProfileMedicationEndPoint extends EnvelopRestEndPoint {
     @ApiOperation("用药记录 - 上饶PP")
     @RequestMapping(value = ServiceApi.Profiles.MedicationRecords, method = RequestMethod.GET)
     public List<Map<String, Object>> medicationRecords(
-            @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362321200108017313")
+            @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362301195002141528")
             @RequestParam(value = "demographic_id") String demographic_id,
             @ApiParam(name = "filter", value = "健康问题health_problem?hpCode（不传默认查找所有）")
             @RequestParam(value = "filter", required = false) String filter,
@@ -60,7 +60,7 @@ public class ProfileMedicationEndPoint extends EnvelopRestEndPoint {
     @ApiOperation("用药记录 - 档案浏览器")
     @RequestMapping(value = ServiceApi.Profiles.MedicationRecordsPage, method = RequestMethod.GET)
     public Envelop medicationRecordsPage (
-            @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362330193903060234")
+            @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362301195002141528")
             @RequestParam(value = "demographic_id") String demographic_id,
             @ApiParam(name = "filter", value = "健康问题health_problem?hpCode（不传默认查找所有）")
             @RequestParam(value = "filter", required = false) String filter,
@@ -93,7 +93,7 @@ public class ProfileMedicationEndPoint extends EnvelopRestEndPoint {
     @ApiOperation("最近的处方清单 - 档案浏览器")
     @RequestMapping(value = ServiceApi.Profiles.RecentMedicationSub, method = RequestMethod.GET)
     public Envelop recentMedicationSub(
-            @ApiParam(name = "demographic_id", value = "主表事件索引", required = true, defaultValue = "362330193903060234")
+            @ApiParam(name = "demographic_id", value = "主表事件索引", required = true, defaultValue = "362301195002141528")
             @RequestParam(value = "demographic_id") String demographic_id,
             @ApiParam(name = "page", value = "页码", required = true)
             @RequestParam(value = "page") Integer page,

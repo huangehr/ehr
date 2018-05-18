@@ -11,7 +11,7 @@ import java.util.Date;
  */
 public class OutPatientCostModel {
     @JestId
-    private String id;
+    private String _id;
     private Integer type;    // 1疾病 2科室
     private String code;    // 疾病或科室编码
     private String name;
@@ -23,12 +23,12 @@ public class OutPatientCostModel {
     @CreatedDate
     private Date createTime;//创建时间
 
-    public String getId() {
-        return id;
+    public String get_id() {
+        return _id;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void set_id(String _id) {
+        this._id = _id;
     }
 
     public Integer getType() {

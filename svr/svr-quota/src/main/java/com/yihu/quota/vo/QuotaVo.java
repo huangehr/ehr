@@ -25,6 +25,8 @@ public class QuotaVo implements Serializable {
     private String execType;
     private String status;
     private String remark;
+    //周期指标执行状态：0未开启，1执行中
+    private String jobStatus;
 
 
     @Override
@@ -45,6 +47,7 @@ public class QuotaVo implements Serializable {
                 ", updateUserName='" + updateUserName + '\'' +
                 ", execType='" + execType + '\'' +
                 ", status='" + status + '\'' +
+                ", jobStatus='" + jobStatus + '\'' +
                 ", remark='" + remark + '\'' +
                 '}';
     }
@@ -179,5 +182,11 @@ public class QuotaVo implements Serializable {
         this.dataLevel = dataLevel;
     }
 
+    public String getJobStatus() {
+        return jobStatus;
+    }
 
+    public void setJobStatus(String jobStatus) {
+        this.jobStatus = jobStatus;
+    }
 }

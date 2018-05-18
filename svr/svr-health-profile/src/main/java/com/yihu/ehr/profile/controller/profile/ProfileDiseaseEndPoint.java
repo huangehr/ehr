@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * EndPoint - 健康问题（兼容 pc & mobile）
+ * EndPoint - 健康问题
  * Created by progr1mmer on 2017/12/12.
  */
 @RestController
@@ -32,7 +32,7 @@ public class ProfileDiseaseEndPoint extends EnvelopRestEndPoint{
     @ApiOperation("慢病情况")
     @RequestMapping(value = ServiceApi.Profiles.HealthProblem, method = RequestMethod.GET)
     public List<Map<String, Object>> healthProblem(
-            @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362321200108017313")
+            @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362301195002141528")
             @RequestParam(value = "demographic_id") String demographic_id) throws Exception {
         return profileDiseaseService.getHealthProblem(demographic_id);
     }
@@ -40,7 +40,7 @@ public class ProfileDiseaseEndPoint extends EnvelopRestEndPoint{
     @ApiOperation("历史健康情况 - 档案浏览器")
     @RequestMapping(value = ServiceApi.Profiles.HealthCondition, method = RequestMethod.GET)
     public List<Map<String, Object>> healthCondition(
-            @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362321200108017313")
+            @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362301195002141528")
             @RequestParam(value = "demographic_id") String demographic_id) {
         return profileDiseaseService.getHealthCondition(demographic_id);
     }

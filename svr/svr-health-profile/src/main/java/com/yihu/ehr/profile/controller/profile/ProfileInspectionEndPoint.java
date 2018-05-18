@@ -31,7 +31,7 @@ public class ProfileInspectionEndPoint extends EnvelopRestEndPoint {
     @ApiOperation("检查检验记录 - 上饶APP")
     @RequestMapping(value = ServiceApi.Profiles.InspectionRecords, method = RequestMethod.GET)
     public List inspectionRecords(
-            @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "36230119480815004X")
+            @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362301195002141528")
             @RequestParam(value = "demographic_id") String demographic_id,
             @ApiParam(name = "filter", value = "健康问题health_problem?hpCode（不传默认查找所有）")
             @RequestParam(value = "filter", required = false) String filter,

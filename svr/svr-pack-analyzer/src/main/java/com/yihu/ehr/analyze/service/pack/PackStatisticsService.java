@@ -607,7 +607,6 @@ public class PackStatisticsService extends BaseJpaService {
     public Map<String,Object> getPatientCountTime(String date, String orgCode) throws Exception{
         long starttime = System.currentTimeMillis();
         Date begin = DateUtil.parseDate(date, DateUtil.DEFAULT_DATE_YMD_FORMAT);
-        Date end = DateUtil.addDate(2, begin);
         Date end1 = DateUtil.addDate(2, begin);
         Date end2 = DateUtil.addDate(7, begin);
 
@@ -615,20 +614,20 @@ public class PackStatisticsService extends BaseJpaService {
         String sql2 ="";
         if(StringUtils.isNotEmpty(orgCode)){
             sql1 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=1 AND org_code='"+orgCode+"' AND event_date BETWEEN" +
-                    " '" + DateUtil.toString(begin) + " 00:00:00' AND '" +  DateUtil.toString(end) + " 00:00:00' AND receive_date BETWEEN"+
-                    " '" + DateUtil.toString(begin) + " 00:00:00' AND '" +  DateUtil.toString(end2) + " 00:00:00'";
+                    " '" + date + " 00:00:00' AND '" +  date + " 23:59:59' AND receive_date BETWEEN"+
+                    " '" + date + " 00:00:00' AND '" +  DateUtil.toString(end2) + " 23:59:59'";
 
             sql2 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=0 AND org_code='"+orgCode+"' AND event_date BETWEEN " +
-                    " '" + DateUtil.toString(begin) + " 00:00:00' AND '" +  DateUtil.toString(end) + " 00:00:00' AND receive_date BETWEEN"+
-                    " '" + DateUtil.toString(begin) + " 00:00:00' AND '" +  DateUtil.toString(end1) + " 00:00:00'";
+                    " '" + date + " 00:00:00' AND '" +  date + " 23:59:59' AND receive_date BETWEEN"+
+                    " '" + date + " 00:00:00' AND '" +  DateUtil.toString(end1) + " 23:59:59'";
         }else{
             sql1 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=1  AND event_date BETWEEN" +
-                    " '" + DateUtil.toString(begin) + " 00:00:00' AND '" +  DateUtil.toString(end) + " 00:00:00' AND receive_date BETWEEN"+
-                    " '" + DateUtil.toString(begin) + " 00:00:00' AND '" +  DateUtil.toString(end2) + " 00:00:00' ";
+                    " '" + date + " 00:00:00' AND '" +  date + " 23:59:59' AND receive_date BETWEEN"+
+                    " '" + date + " 00:00:00' AND '" +  DateUtil.toString(end2) + " 23:59:59' ";
 
             sql2 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=0  AND event_date BETWEEN " +
-                    " '" + DateUtil.toString(begin) + " 00:00:00' AND '" +  DateUtil.toString(end) + " 00:00:00' AND receive_date BETWEEN"+
-                    " '" + DateUtil.toString(begin) + " 00:00:00' AND '" +  DateUtil.toString(end1) + " 00:00:00' ";
+                    " '" + date + " 00:00:00' AND '" +  date + " 23:59:59' AND receive_date BETWEEN"+
+                    " '" + date + " 00:00:00' AND '" +  DateUtil.toString(end1) + " 23:59:59' ";
         }
 
         ResultSet resultSet1 = elasticSearchUtil.findBySql(sql1);

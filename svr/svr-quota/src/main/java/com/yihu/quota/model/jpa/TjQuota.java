@@ -32,7 +32,8 @@ public class TjQuota implements java.io.Serializable {
 	private String status;//1: 正常 0：不可用  -1删除
 	private String remark;
 	private String resultGetType; // 指标结果获取方式 1：直接库中获取，2：二次统计获取。
-
+	//周期指标执行状态：0未开启，1执行中
+	private String jobStatus;
 	// Constructors
 
 	/** default constructor */
@@ -49,7 +50,7 @@ public class TjQuota implements java.io.Serializable {
 	public TjQuota(String code, String name, String jobClazz,
 				   Date createTime, String createUser, String createUserName,
 				   Date updateTime, String updateUser, String updateUserName,
-				   String status, String remark,String dataLevel ,String cron ,String execType) {
+				   String status, String remark,String dataLevel ,String cron ,String execType, String jobStatus) {
 		this.code = code;
 		this.name = name;
 		this.jobClazz = jobClazz;
@@ -60,6 +61,7 @@ public class TjQuota implements java.io.Serializable {
 		this.updateUser = updateUser;
 		this.updateUserName = updateUserName;
 		this.status = status;
+		this.jobStatus = jobStatus;
 		this.remark = remark;
 		this.dataLevel = dataLevel;
 		this.cron = cron;
@@ -215,5 +217,13 @@ public class TjQuota implements java.io.Serializable {
 
 	public void setResultGetType(String resultGetType) {
 		this.resultGetType = resultGetType;
+	}
+	@Column(name = "job_status", length = 1)
+	public String getJobStatus() {
+		return jobStatus;
+	}
+
+	public void setJobStatus(String jobStatus) {
+		this.jobStatus = jobStatus;
 	}
 }

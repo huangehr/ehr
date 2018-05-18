@@ -91,15 +91,14 @@ public class EsQuotaJob implements Job {
         tjQuotaLog.setQuotaCode(quotaVo.getCode());
         tjQuotaLog.setSaasId(saasid);
         tjQuotaLog.setStartTime(new Date());
+        logger.info("指标开始执行--"+"QuotaCode="+quotaVo.getCode()+"&saasid="+saasid+"&startTime="+new Date());
         String time = "时间：" + startTime + "到"+ endTime +" , ";
         try {
             //抽取数据
             List<SaveModel> dataModels = extract();
-
             if (dataModels != null && dataModels.size() > 0) {
                 //查询是否已经统计过,如果已统计 先删除后保存
                 deleteRecord();
-
                 List<SaveModel> dataSaveModels = new ArrayList<>();
                 for (SaveModel saveModel : dataModels) {
                     if (saveModel.getResult() != null) {//&& Double.valueOf(saveModel.getResult())>0
@@ -111,14 +110,16 @@ public class EsQuotaJob implements Job {
                     Boolean success = saveDate(dataSaveModels);
                     tjQuotaLog.setStatus(success ? Contant.save_status.success : Contant.save_status.fail);
                     tjQuotaLog.setContent(success ? time+"统计保存成功" : time+"统计数据 ElasticSearch 保存失败");
-                    System.out.println(success ? time+"统计保存成功" : time+"统计数据 ElasticSearch 保存失败");
+                    logger.info("指标执行完成--"+"QuotaCode="+quotaVo.getCode()+"&Status="+tjQuotaLog.getStatus()+"&Content="+tjQuotaLog.getContent());
                 } else {
                     tjQuotaLog.setStatus(Contant.save_status.success);
                     tjQuotaLog.setContent(time + "统计成功，统计结果大于0的数据为0条");
+                    logger.info("指标执行完成--"+"QuotaCode="+quotaVo.getCode()+"&Status="+tjQuotaLog.getStatus()+"&Content="+tjQuotaLog.getContent());
                 }
             } else {
                 tjQuotaLog.setStatus(Contant.save_status.fail);
                 tjQuotaLog.setContent(time + "没有抽取到数据");
+                logger.info("指标执行完成--"+"QuotaCode="+quotaVo.getCode()+"&Status="+tjQuotaLog.getStatus()+"&Content="+tjQuotaLog.getContent());
             }
 
             // 初始执行时，更新该指标为已初始执行过
@@ -130,8 +131,10 @@ public class EsQuotaJob implements Job {
             e.printStackTrace();
             tjQuotaLog.setStatus(Contant.save_status.fail);
             tjQuotaLog.setContent(e.getMessage());
+            logger.error("指标执行异常--"+"QuotaCode="+quotaVo.getCode()+"&Status="+tjQuotaLog.getStatus()+"&Content="+tjQuotaLog.getContent());
         }
         tjQuotaLog.setEndTime(new Date());
+        logger.error("指标执行结束--"+"QuotaCode="+quotaVo.getCode()+"&Status="+tjQuotaLog.getStatus()+"&Content="+tjQuotaLog.getContent()+"&endTime="+tjQuotaLog.getEndTime());
         saveLog(tjQuotaLog);
     }
 

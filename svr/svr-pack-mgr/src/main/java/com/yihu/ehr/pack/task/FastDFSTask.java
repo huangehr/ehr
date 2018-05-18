@@ -14,8 +14,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 
+import java.io.InputStream;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -45,11 +45,11 @@ public class FastDFSTask {
      * @return
      */
     @Async
-    public Future<Boolean> savePackageWithOrg(MultipartFile pack, String password, String orgCode, String md5, String clientId, Integer packType) throws Exception {
+    public Future<Boolean> savePackageWithOrg(InputStream inputStream, String password, String orgCode, String md5, String clientId, Integer packType) throws Exception {
         logger.info("正在存入fast dfs");
         long t1 = System.currentTimeMillis();
         //fastDfs
-        ObjectNode msg = fastDFSUtil.upload(pack.getInputStream(), "zip", "健康档案JSON文件");
+        ObjectNode msg = fastDFSUtil.upload(inputStream, "zip", "健康档案JSON文件");
         String group = msg.get(FastDFSUtil.GROUP_NAME).asText();
         String remoteFile = msg.get(FastDFSUtil.REMOTE_FILE_NAME).asText();
         //将组与文件ID使用英文分号隔开, 提取的时候, 只需要将它们这个串拆开, 就可以得到组与文件ID

@@ -32,7 +32,7 @@ public class ProfilePatientEndPoint extends EnvelopRestEndPoint{
     @ApiOperation("患者基本信息OK")
     @RequestMapping(value = ServiceApi.Profiles.ProfileInfo, method = RequestMethod.GET)
     public Map<String, Object> profileInfo(
-            @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362321200108017313")
+            @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362301195002141528")
             @RequestParam(value = "demographic_id") String demographic_id,
             @ApiParam(name = "version", value = "版本号", defaultValue = "59083976eebd")
             @RequestParam(value = "version", required = false) String version) throws Exception {
@@ -43,7 +43,7 @@ public class ProfilePatientEndPoint extends EnvelopRestEndPoint{
     @ApiOperation("既往史 - pc档案浏览器（弃用）")
     @RequestMapping(value = ServiceApi.Profiles.ProfileHistory, method = RequestMethod.GET)
     public List<Map<String, Object>> profileHistory (
-            @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362321200108017313")
+            @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362301195002141528")
             @RequestParam(value = "demographic_id") String demographic_id) throws Exception {
         return patientInfoBaseService.profileHistory(demographic_id);
     }
@@ -51,7 +51,7 @@ public class ProfilePatientEndPoint extends EnvelopRestEndPoint{
     @ApiOperation("既往史 - 上饶APP")
     @RequestMapping(value = ServiceApi.Profiles.PastHistory, method = RequestMethod.GET)
     public List<Map<String, Object>> pastHistory (
-            @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362321200108017313")
+            @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362301195002141528")
             @RequestParam(value = "demographic_id") String demographic_id) throws Exception {
         return patientInfoBaseService.pastHistory(demographic_id);
     }
@@ -59,7 +59,7 @@ public class ProfilePatientEndPoint extends EnvelopRestEndPoint{
     @ApiOperation("过敏史 - 上饶APP")
     @RequestMapping(value = ServiceApi.Profiles.AllergensHistory, method = RequestMethod.GET)
     public Map<String, Object> allergensHistory (
-            @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362321200108017313")
+            @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362301195002141528")
             @RequestParam(value = "demographic_id") String demographic_id) throws Exception  {
         return patientInfoBaseService.allergensHistory(demographic_id);
     }
@@ -67,7 +67,7 @@ public class ProfilePatientEndPoint extends EnvelopRestEndPoint{
     @ApiOperation("家族史 - 上饶APP")
     @RequestMapping(value = ServiceApi.Profiles.FamilyHistory, method = RequestMethod.GET)
     public Map<String, Object> familyHistory (
-            @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362321200108017313")
+            @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362301195002141528")
             @RequestParam(value = "demographic_id") String demographic_id) {
         return patientInfoBaseService.familyHistory(demographic_id);
     }
@@ -75,7 +75,7 @@ public class ProfilePatientEndPoint extends EnvelopRestEndPoint{
     @ApiOperation("个人史 - 上饶APP")
     @RequestMapping(value = ServiceApi.Profiles.PersonHistory, method = RequestMethod.GET)
     public Map<String, Object> personHistory (
-            @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362321200108017313")
+            @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362301195002141528")
             @RequestParam(value = "demographic_id") String demographic_id) {
         return patientInfoBaseService.personHistory(demographic_id);
     }
