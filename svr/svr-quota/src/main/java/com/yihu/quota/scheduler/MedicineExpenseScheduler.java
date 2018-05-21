@@ -91,7 +91,7 @@ public class MedicineExpenseScheduler {
             String fq = "event_date:[" + startDate + "T00:00:00Z TO  " + endDate + "T23:59:59Z]";
 
             // 保存整合后的药品费用汇总到ES
-//            saveMedicineExpenseCollection(fq);
+            saveMedicineExpenseCollection(fq);
             // 保存整合后的药品费用清单到ES
             saveMedicineExpenseList(fq);
         } catch (Exception e) {
