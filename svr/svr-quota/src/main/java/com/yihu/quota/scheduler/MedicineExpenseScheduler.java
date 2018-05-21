@@ -91,7 +91,7 @@ public class MedicineExpenseScheduler {
             String fq = "event_date:[" + startDate + "T00:00:00Z TO  " + endDate + "T23:59:59Z]";
 
             // 保存整合后的药品费用汇总到ES
-            saveMedicineExpenseCollection(fq);
+//            saveMedicineExpenseCollection(fq);
             // 保存整合后的药品费用清单到ES
             saveMedicineExpenseList(fq);
         } catch (Exception e) {
@@ -276,6 +276,8 @@ public class MedicineExpenseScheduler {
                 medicineExpenseInfo.put("type", type);
                 // 药品费用类型名称
                 medicineExpenseInfo.put("type_value", typeName);
+                // 药品名称
+                medicineExpenseInfo.put("expense", subInfo.get("EHR_000186"));
                 // 费用
                 medicineExpenseInfo.put("expense", Float.valueOf(expense.toString()));
                 // 修改时间
