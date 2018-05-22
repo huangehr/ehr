@@ -58,7 +58,7 @@ public class PackAnalyzeTask {
     }
 
     private void addToQueue(String filters, List<Map<String, Object>> updateSourceList, List<String> pushList) throws Exception {
-        List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, filters, "+receive_date", 1, 1000);
+        List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, filters, "-receive_date", 1, 1000);
         for (Map<String, Object> pack : resultList) {
             Map<String, Object> updateSource = new HashMap<>();
             updateSource.put("_id", pack.get("_id"));
