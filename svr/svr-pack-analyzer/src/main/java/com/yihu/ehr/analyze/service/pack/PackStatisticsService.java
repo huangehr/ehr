@@ -831,7 +831,7 @@ public class PackStatisticsService extends BaseJpaService {
     }
 
     /**
-     * 及时率、完整率、准确率按天统计
+     * 及时率、完整率按天统计
      * @param date
      * @return
      */
@@ -865,12 +865,10 @@ public class PackStatisticsService extends BaseJpaService {
                 resMap.put("time_rate", "0.00%");
                 resMap.put("full_rate", "0.00%");
             }
-            resMap.put("right_rate", "0.00%");
             envelop.setSuccessFlg(true);
         }catch (Exception e){
             resMap.put("time_rate", "0.00%");
             resMap.put("full_rate", "0.00%");
-            resMap.put("right_rate", "0.00%");
             envelop.setSuccessFlg(false);
             e.printStackTrace();
         }
