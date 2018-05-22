@@ -42,7 +42,7 @@ public class ResourceStorageUtil {
             map.put(MasterResourceFamily.BasicColumns.EventNo, resourceBucket.getEventNo());
             map.put(MasterResourceFamily.BasicColumns.EventDate, DateTimeUtil.utcDateTimeFormat(resourceBucket.getEventDate()));
             map.put(MasterResourceFamily.BasicColumns.EventType, StringUtils.isEmpty(resourceBucket.getEventType()) ? "" : Integer.toString(resourceBucket.getEventType().ordinal()));
-            map.put(MasterResourceFamily.BasicColumns.ProfileType, Integer.toString(resourceBucket.getProfileType().ordinal()));
+            map.put(MasterResourceFamily.BasicColumns.ProfileType, Integer.toString(resourceBucket.getProfileType().getType()));
             map.put(MasterResourceFamily.BasicColumns.DemographicId, resourceBucket.getDemographicId());
             map.put(MasterResourceFamily.BasicColumns.ClientId, resourceBucket.getClientId());
             map.put(MasterResourceFamily.BasicColumns.CreateDate, DateTimeUtil.utcDateTimeFormat(new Date()));

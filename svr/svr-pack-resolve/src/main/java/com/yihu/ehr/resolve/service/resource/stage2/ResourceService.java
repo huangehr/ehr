@@ -7,6 +7,7 @@ import com.yihu.ehr.resolve.dao.SubResourceDao;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.resolve.model.stage2.ResourceBucket;
 import com.yihu.ehr.resolve.service.profile.ArchiveRelationService;
+import com.yihu.ehr.resolve.service.profile.UploadService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +31,8 @@ public class ResourceService {
     @Autowired
     private ArchiveRelationService archiveRelationService;
     @Autowired
+    private UploadService uploadService;
+    @Autowired
     private PatientService patientService;
 
     public void save(ResourceBucket resourceBucket, StandardPackage standardPackage) throws Exception {
@@ -44,6 +47,9 @@ public class ResourceService {
 
         //保存ES关联记录
         archiveRelationService.relation(resourceBucket);
+
+        //保存ES 待上传省平台upload记录
+        uploadService.addWaitUpload(resourceBucket);
 
         //保存居民信息记录
         patientService.checkPatient(resourceBucket);
