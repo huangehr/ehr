@@ -126,4 +126,12 @@ public class PackStatisticsEndPoint extends EnvelopRestEndPoint {
             @RequestParam(name = "orgCode",required = false) String orgCode) throws Exception {
         return statisticService.getArchivesRight(startDate, endDate, orgCode);
     }
+
+    @RequestMapping(value = ServiceApi.StasticReport.GetStasticByDay, method = RequestMethod.GET)
+    @ApiOperation(value = "及时率、完整率按天统计")
+    public Envelop getStasticByDay(
+            @ApiParam(name = "date", value = "日期")
+            @RequestParam(name = "date") String date) throws Exception {
+        return statisticService.getStasticByDay(date);
+    }
 }
