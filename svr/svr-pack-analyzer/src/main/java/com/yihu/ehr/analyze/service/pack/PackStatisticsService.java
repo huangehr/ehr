@@ -354,17 +354,17 @@ public class PackStatisticsService extends BaseJpaService {
         String sql1 ="";
         String sql2 ="";
         if(StringUtils.isNotEmpty(orgCode)){
-            sql1 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=1 AND org_code='"+orgCode+"' AND event_date BETWEEN" +
+            sql1 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=1 AND pack_type=1 AND org_code='"+orgCode+"' AND event_date BETWEEN" +
                     " '" + eventDate + " 00:00:00' AND '" +  eventDate + " 23:59:59' AND receive_date BETWEEN '" + receiveDate + " 00:00:00' AND '" +  receiveDate + " 23:59:59'";
 
-            sql2 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=0 AND org_code='"+orgCode+"' AND event_date BETWEEN " +
+            sql2 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=0 AND pack_type=1 AND org_code='"+orgCode+"' AND event_date BETWEEN " +
                     "'" + eventDate + " 00:00:00' AND '" +  eventDate + " 23:59:59' AND receive_date BETWEEN '" + receiveDate + " 00:00:00' AND '" +  receiveDate + " 23:59:59'";
 
         }else{
-            sql1 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=1 AND event_date " +
+            sql1 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=1 AND pack_type=1 AND event_date " +
                     "BETWEEN '" + eventDate + " 00:00:00' AND '" +  eventDate + " 23:59:59' AND receive_date BETWEEN '" + receiveDate + " 00:00:00' AND '" +  receiveDate + " 23:59:59'";
 
-            sql2 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=0 AND event_date " +
+            sql2 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=0 AND pack_type=1 AND event_date " +
                     "BETWEEN '" + eventDate + " 00:00:00' AND '" +  eventDate + " 23:59:59' AND receive_date BETWEEN '" + receiveDate + " 00:00:00' AND '" +  receiveDate + " 23:59:59'";
         }
         ResultSet resultSet1 = elasticSearchUtil.findBySql(sql1);
@@ -391,22 +391,22 @@ public class PackStatisticsService extends BaseJpaService {
         String sql2 ="";
         String sql3 ="";
         if(StringUtils.isNotEmpty(orgCode)){
-            sql1 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=1 AND org_code='"+orgCode+"' AND event_date BETWEEN" +
+            sql1 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=1 AND pack_type=1 AND org_code='"+orgCode+"' AND event_date BETWEEN" +
                     " '" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59'";
 
-            sql2 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=0 AND org_code='"+orgCode+"' AND event_date BETWEEN " +
+            sql2 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=0 AND pack_type=1 AND org_code='"+orgCode+"' AND event_date BETWEEN " +
                     "'" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59'";
 
-            sql3 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE org_code='"+orgCode+"' AND event_date BETWEEN " +
+            sql3 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE pack_type=1 AND org_code='"+orgCode+"' AND event_date BETWEEN " +
                     "'" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59'";
         }else{
-            sql1 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=1 AND event_date " +
+            sql1 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=1 AND pack_type=1 AND event_date " +
                     "BETWEEN '" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59'";
 
-            sql2 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=0 AND event_date " +
+            sql2 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=0 AND pack_type=1 AND event_date " +
                     "BETWEEN '" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59'";
 
-            sql3 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_date " +
+            sql3 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE pack_type=1 AND event_date " +
                     "BETWEEN '" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59'";
         }
         ResultSet resultSet1 = elasticSearchUtil.findBySql(sql1);
@@ -437,22 +437,22 @@ public class PackStatisticsService extends BaseJpaService {
         String sql2 ="";
         String sql3 ="";
         if(StringUtils.isNotEmpty(orgCode)){
-            sql1 = "SELECT COUNT(*) FROM json_archives WHERE event_type=1 AND org_code='"+orgCode+"' AND event_date " +
+            sql1 = "SELECT COUNT(*) FROM json_archives WHERE event_type=1 AND pack_type=1  AND org_code='"+orgCode+"' AND event_date " +
                     "BETWEEN '" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59'";
 
-            sql2 = "SELECT COUNT(*) FROM json_archives WHERE event_type=0 AND org_code='"+orgCode+"' AND event_date " +
+            sql2 = "SELECT COUNT(*) FROM json_archives WHERE event_type=0 AND pack_type=1 AND org_code='"+orgCode+"' AND event_date " +
                     "BETWEEN '" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59'";
 
-            sql3 = "SELECT COUNT(*) FROM json_archives WHERE org_code='"+orgCode+"' AND event_date " +
+            sql3 = "SELECT COUNT(*) FROM json_archives WHERE pack_type=1 AND org_code='"+orgCode+"' AND event_date " +
                     "BETWEEN '" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59'";
         }else{
-            sql1 = "SELECT COUNT(*) FROM json_archives WHERE event_type=1 AND event_date " +
+            sql1 = "SELECT COUNT(*) FROM json_archives WHERE event_type=1 AND pack_type=1 AND event_date " +
                     "BETWEEN '" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59'";
 
-            sql2 = "SELECT COUNT(*) FROM json_archives WHERE event_type=0 AND event_date " +
+            sql2 = "SELECT COUNT(*) FROM json_archives WHERE event_type=0 AND pack_type=1 AND event_date " +
                     "BETWEEN '" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59'";
 
-            sql3 = "SELECT COUNT(*) FROM json_archives WHERE event_date " +
+            sql3 = "SELECT COUNT(*) FROM json_archives WHERE pack_type=1 AND event_date " +
                     "BETWEEN '" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59'";
         }
 
@@ -539,7 +539,7 @@ public class PackStatisticsService extends BaseJpaService {
             Map<String,Object> rate = new HashMap<String,Object>();
             //平台数据
             Map<String,Object> list = getPatientCountTime(DateUtil.toString(date), orgCode);
-            total+=(Integer.parseInt(list.get("inpatient_total").toString())+Integer.parseInt(list.get("oupatient_total").toString()));
+            total+=Integer.parseInt(list.get("total").toString());
             inpatient_total+=Integer.parseInt(list.get("inpatient_total").toString());
             oupatient_total+=Integer.parseInt(list.get("oupatient_total").toString());
             //医院数据
@@ -612,31 +612,41 @@ public class PackStatisticsService extends BaseJpaService {
 
         String sql1 ="";
         String sql2 ="";
+        String sql3 ="";
         if(StringUtils.isNotEmpty(orgCode)){
-            sql1 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=1 AND org_code='"+orgCode+"' AND event_date BETWEEN" +
+            sql1 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=1 AND pack_type=1 AND org_code='"+orgCode+"' AND event_date BETWEEN" +
                     " '" + date + " 00:00:00' AND '" +  date + " 23:59:59' AND receive_date BETWEEN"+
                     " '" + date + " 00:00:00' AND '" +  DateUtil.toString(end2) + " 23:59:59'";
 
-            sql2 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=0 AND org_code='"+orgCode+"' AND event_date BETWEEN " +
+            sql2 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=0 AND pack_type=1 AND org_code='"+orgCode+"' AND event_date BETWEEN " +
                     " '" + date + " 00:00:00' AND '" +  date + " 23:59:59' AND receive_date BETWEEN"+
                     " '" + date + " 00:00:00' AND '" +  DateUtil.toString(end1) + " 23:59:59'";
+            sql3 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE pack_type=1 AND org_code='"+orgCode+"' AND event_date BETWEEN " +
+                    " '" + date + " 00:00:00' AND '" +  date + " 23:59:59' AND receive_date BETWEEN"+
+                    " '" + date + " 00:00:00' AND '" +  DateUtil.toString(end2) + " 23:59:59'";
         }else{
-            sql1 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=1  AND event_date BETWEEN" +
+            sql1 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=1 AND pack_type=1 AND event_date BETWEEN" +
                     " '" + date + " 00:00:00' AND '" +  date + " 23:59:59' AND receive_date BETWEEN"+
                     " '" + date + " 00:00:00' AND '" +  DateUtil.toString(end2) + " 23:59:59' ";
 
-            sql2 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=0  AND event_date BETWEEN " +
+            sql2 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=0 AND pack_type=1 AND event_date BETWEEN " +
                     " '" + date + " 00:00:00' AND '" +  date + " 23:59:59' AND receive_date BETWEEN"+
                     " '" + date + " 00:00:00' AND '" +  DateUtil.toString(end1) + " 23:59:59' ";
+            sql3 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE  pack_type=1 AND event_date BETWEEN " +
+                    " '" + date + " 00:00:00' AND '" +  date + " 23:59:59' AND receive_date BETWEEN"+
+                    " '" + date + " 00:00:00' AND '" +  DateUtil.toString(end2) + " 23:59:59' ";
         }
 
         ResultSet resultSet1 = elasticSearchUtil.findBySql(sql1);
         ResultSet resultSet2 = elasticSearchUtil.findBySql(sql2);
+        ResultSet resultSet3 = elasticSearchUtil.findBySql(sql3);
         Map<String,Object> map = new HashMap<>();
         resultSet1.next();
         resultSet2.next();
+        resultSet3.next();
         map.put("inpatient_total",new Double(resultSet1.getObject("COUNT(DISTINCT event_no)").toString()).intValue());
         map.put("oupatient_total",new Double(resultSet2.getObject("COUNT(DISTINCT event_no)").toString()).intValue());
+        map.put("total",new Double(resultSet3.getObject("COUNT(DISTINCT event_no)").toString()).intValue());
         long endtime = System.currentTimeMillis();
         System.out.println("及时性数据查询耗时：" + (endtime - starttime) + "ms");
         return map;
@@ -819,4 +829,51 @@ public class PackStatisticsService extends BaseJpaService {
         }
         return list;
     }
+
+    /**
+     * 及时率、完整率按天统计
+     * @param date
+     * @return
+     */
+    public Envelop getStasticByDay(String date){
+        Envelop envelop = new Envelop();
+        Map<String,Object> resMap = new HashMap<>();
+        Date begin = DateUtil.parseDate(date, DateUtil.DEFAULT_DATE_YMD_FORMAT);
+        Date end2 = DateUtil.addDate(7, begin);
+        try {
+            String sql1 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE  pack_type=1 AND event_date " +
+                    "BETWEEN '" + date + " 00:00:00' AND '" + date + " 23:59:59'";
+            String sql2 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE pack_type=1 AND event_date BETWEEN " +
+                    " '" + date + " 00:00:00' AND '" +  date + " 23:59:59' AND receive_date BETWEEN"+
+                    " '" + date + " 00:00:00' AND '" +  DateUtil.toString(end2) + " 23:59:59' ";
+            ResultSet resultSet1 = elasticSearchUtil.findBySql(sql1);
+            resultSet1.next();
+            ResultSet resultSet2 = elasticSearchUtil.findBySql(sql2);
+            resultSet2.next();
+            Map<String,Object> map = getPatientCountEs(date,"");
+            //平台档案数据
+            int count_pt = new Double(resultSet1.getObject("COUNT(DISTINCT event_no)").toString()).intValue();
+            //质控包上传数据
+            int count_zk = Integer.parseInt(map.get("total").toString());
+            //及时性数据
+            int count_js =  new Double(resultSet2.getObject("COUNT(DISTINCT event_no)").toString()).intValue();
+
+            if(count_zk!=0){
+                resMap.put("time_rate", String.format("%.2f", ((double)count_js / (double)count_zk)*100)+"%");
+                resMap.put("full_rate", String.format("%.2f", ((double)count_pt / (double)count_zk)*100)+"%");
+            }else{
+                resMap.put("time_rate", "0.00%");
+                resMap.put("full_rate", "0.00%");
+            }
+            envelop.setSuccessFlg(true);
+        }catch (Exception e){
+            resMap.put("time_rate", "0.00%");
+            resMap.put("full_rate", "0.00%");
+            envelop.setSuccessFlg(false);
+            e.printStackTrace();
+        }
+        envelop.setObj(resMap);
+        return envelop;
+    }
+
 }
