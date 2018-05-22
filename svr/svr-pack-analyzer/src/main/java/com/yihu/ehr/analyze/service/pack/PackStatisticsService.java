@@ -866,6 +866,7 @@ public class PackStatisticsService extends BaseJpaService {
                 resMap.put("full_rate", "0.00%");
             }
             resMap.put("right_rate", "0.00%");
+            envelop.setSuccessFlg(true);
         }catch (Exception e){
             resMap.put("time_rate", "0.00%");
             resMap.put("full_rate", "0.00%");
