@@ -1360,6 +1360,8 @@ public class ServiceApi {
         public static final String GetArchivesTime = "/stasticReport/getArchivesTime";
         public static final String GetDataSetCount = "/stasticReport/getDataSetCount";
         public static final String GetArchivesRight = "/stasticReport/getArchivesRight";
+        public static final String GetStasticByDay = "/stasticReport/getStasticByDay";
+
 
     }
 

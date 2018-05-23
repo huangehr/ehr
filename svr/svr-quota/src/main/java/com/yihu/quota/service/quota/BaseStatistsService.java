@@ -469,6 +469,65 @@ public class BaseStatistsService {
         return  result;
     }
 
+    /**
+     * 递归循环 计算各目录结构的值
+     * @param orgHealthCategoryList
+     * @param dimenListResult
+     * @param
+     * @return
+     */
+    public List<Map<String,Object>> allCategoryResultMap(String quotaCode,List<Map<String,Object>> orgHealthCategoryList,List<Map<String, Object>> dimenListResult ){
+
+        List<Map<String,Object>> resultMap = new ArrayList<>();
+        for(int i=0 ; i < orgHealthCategoryList.size() ; i++ ){
+            Map<String,Object> mapCategory = orgHealthCategoryList.get(i);
+            double parentResult = 0;
+            parentResult = getParentAllChildren(mapCategory, dimenListResult,parentResult);
+            mapCategory.put("firstColumn",mapCategory.get("text"));
+            mapCategory.put("result",parentResult);
+            mapCategory.put(quotaCode,parentResult);
+            resultMap.add(mapCategory);
+            if(mapCategory.get("children") != null){
+                List<Map<String,Object>> childrenOrgHealthCategoryList = (List<Map<String, Object>>) mapCategory.get("children");
+                mapCategory.put("children",allCategoryResultMap(quotaCode,childrenOrgHealthCategoryList,dimenListResult));
+            }
+        }
+        return  resultMap;
+    }
+
+    //获取该节点下所有末节点的结果和
+    public  double getParentAllChildren( Map<String,Object> mapCategory, List<Map<String, Object>> dimenListResult, double parentResult ){
+        try {
+                boolean childrenFlag = false;
+                if(mapCategory.get("children") != null){
+                    List<Map<String,Object>> childrenOrgHealthCategoryList = (List<Map<String, Object>>) mapCategory.get("children");
+                    if(childrenOrgHealthCategoryList != null && childrenOrgHealthCategoryList.size() > 0){
+                        childrenFlag = true;
+                    }
+                }
+                if(childrenFlag){
+                    List<Map<String,Object>> childrenOrgHealthCategoryList = (List<Map<String, Object>>) mapCategory.get("children");
+                    for(int j=0 ; j < childrenOrgHealthCategoryList.size() ; j++ ){
+                        Map<String,Object> childrenMapCategory = childrenOrgHealthCategoryList.get(j);
+                        parentResult =  getParentAllChildren(childrenMapCategory, dimenListResult,parentResult);
+                    }
+                }else{
+                    for(Map<String, Object> dimenMap :dimenListResult){
+                        if(dimenMap.get("orgHealthCategoryCode") != null && dimenMap.get("result") != null){
+                            if(dimenMap.get("orgHealthCategoryCode").equals(mapCategory.get("code"))){
+                                double result = Double.parseDouble(dimenMap.get("result").toString());
+                                parentResult += result;
+                                break;
+                            }
+                        }
+                    }
+                }
+        }catch (Exception e){
+            throw new NumberFormatException("统计数据转换异常");
+        }
+        return parentResult;
+    }
+
 
     /**
      * 时间聚合查询指标结果

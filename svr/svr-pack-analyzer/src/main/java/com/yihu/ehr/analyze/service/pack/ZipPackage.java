@@ -10,10 +10,13 @@ import com.yihu.ehr.model.packs.EsSimplePackage;
 import com.yihu.ehr.util.compress.Zipper;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.log.LogService;
+import com.yihu.ehr.util.system.LocalTempPathUtil;
+import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.*;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
@@ -30,19 +33,28 @@ import java.util.*;
  * @created 2018.01.16
  */
 public class ZipPackage {
+
+    public final static String StandardFolder = "standard";
+    public final static String OriginFolder = "origin";
+    public final static String DocumentFolder = "documents";
+    public final static String DocumentsFile = "documents.json";
+    public final static String LinkFile = "index";
+
+    private static final RestTemplate REST_TEMPLATE;
+    private static final HttpHeaders HTTP_HEADERS;
+    static {
+        REST_TEMPLATE = new RestTemplate();
+        HTTP_HEADERS = new HttpHeaders();
+        HTTP_HEADERS.setAccept(Arrays.asList(MediaType.APPLICATION_OCTET_STREAM));
+    }
     public static final String DATA = "d";
-    private final static String TempPath = System.getProperty("java.io.tmpdir") + java.io.File.separator;
     private EsSimplePackage esSimplePackage;
     private Zipper zipper = new Zipper();
+
     /**
      * 数据集合
      */
     private Map<String, DataSetRecord> dataSets = new TreeMap<>();
-    /**
-     * 1结构化档案，2文件档案，3链接档案，4数据集档案
-     */
-    private ProfileType profileType;
-
     /**
      * Zip档案包文件
      */
@@ -74,12 +86,6 @@ public class ZipPackage {
         this.dataSets.put(dataSetCode, dataSet);
     }
 
-    public ProfileType getProfileType() {
-        //目前只解析标准档案包，其他类型档案包不处理
-        profileType = ProfileType.Standard;
-        return profileType;
-    }
-
     public File getPackFile() {
         return packFile;
     }
@@ -88,18 +94,12 @@ public class ZipPackage {
         FastDfsConfig config = SpringContext.getService(FastDfsConfig.class);
         String remotePath = esSimplePackage.getRemote_path();
         String url = config.getPublicServer() + "/" + remotePath.replace(":", "/");
-
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_OCTET_STREAM));
-
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-        ResponseEntity<byte[]> response = restTemplate.exchange(
+        HttpEntity<String> entity = new HttpEntity<>(HTTP_HEADERS);
+        ResponseEntity<byte[]> response = REST_TEMPLATE.exchange(
                 url,
                 HttpMethod.GET, entity, byte[].class);
-
         if (response.getStatusCode() == HttpStatus.OK) {
-            Path path = Files.write(Paths.get(TempPath + esSimplePackage.get_id() + ".zip"), response.getBody());
+            Path path = Files.write(Paths.get(LocalTempPathUtil.getTempPathWithUUIDSuffix() +  esSimplePackage.get_id() + ".zip"), response.getBody());
             zipFile = path.toFile();
         } else {
             zipFile = null;
@@ -111,10 +111,9 @@ public class ZipPackage {
         if (zipFile == null) {
             return;
         }
-        String temp = TempPath + esSimplePackage.get_id();
-        packFile = zipper.unzipFile(zipFile, temp, esSimplePackage.getPwd());
-        if (packFile == null || packFile.list() == null) {
-            throw new RuntimeException("Invalid package file, package id: " + esSimplePackage.get_id());
+        packFile = zipper.unzipFile(zipFile,  LocalTempPathUtil.getTempPathWithUUIDSuffix() + esSimplePackage.get_id(), esSimplePackage.getPwd());
+        if (packFile == null || !packFile.isDirectory() || packFile.list().length == 0) {
+            throw new ZipException("Invalid package file.");
         }
     }
 
@@ -128,10 +127,20 @@ public class ZipPackage {
     }
 
     public void resolve() throws Exception {
-        ProfileType profileType = getProfileType();
+        ProfileType profileType;
+        List<String> directories = CollectionUtils.arrayToList(packFile.list());
+        if (directories.contains(StandardFolder) && directories.contains(OriginFolder)) {
+            profileType = ProfileType.Standard;
+        } else if (directories.contains(DocumentsFile)) {
+            profileType = ProfileType.File;
+        } else if (directories.size() == 1 && directories.contains(LinkFile)) {
+            profileType = ProfileType.Link;
+        } else { // 数据集档案包（zip下只有 .json 数据文件）。
+            profileType = ProfileType.DataSet;
+        }
         //目前只解析标准档案包
         if (profileType != ProfileType.Standard) {
-            throw new RuntimeException("not a package file, package id: " + esSimplePackage.get_id());
+            throw new ZipException("Not a standard package file");
         }
 
         ApplicationContext context = SpringContext.getApplicationContext();

@@ -163,18 +163,7 @@ public class ResourceBrowseService {
                     temp.put("org_code", masterMap.get("org_code"));
                     temp.put("demographic_id", masterMap.get("demographic_id"));
                     temp.put("patient_name", masterMap.get("patient_name"));
-                    String eventType = (String)masterMap.get("event_type");
-                    if (null != eventType) {
-                        if ("0".equals(eventType)) {
-                            temp.put("event_type", "门诊");
-                        } else if ("1".equals(eventType)) {
-                            temp.put("event_type", "住院");
-                        } else if ("2".equals(eventType)) {
-                            temp.put("event_type", "体检");
-                        }
-                    } else {
-                        temp.put("event_type", "未知类型");
-                    }
+                    temp.put("event_type", masterMap.get("event_type"));
                 }
             }
         }
