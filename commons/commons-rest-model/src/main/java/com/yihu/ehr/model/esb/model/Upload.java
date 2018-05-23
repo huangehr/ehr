@@ -13,7 +13,7 @@ public class Upload implements Serializable {
 
     //--------------------es必定不为空的字段-----------------------------------------
     private String _id; //重传或者补传为profile_id,否则为uuid
-    private Integer origin;//0为重传,即reuploadFlag为true    1为补传(事件时间晚于当前时间3天)    2查询索引失败  3查询主表失败     4查询细表失败
+    private Integer origin;//0为重传,即reuploadFlag为true    1为补传(事件时间晚于当前时间2天)    2查询索引失败  3查询主表失败     4查询细表失败
     private Date create_date;
     private String schema_version;//适配省平台版本号
     private Integer failed_count;//失败次数
