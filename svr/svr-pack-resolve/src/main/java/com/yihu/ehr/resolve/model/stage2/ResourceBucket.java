@@ -58,9 +58,11 @@ public class ResourceBucket {
     //身份识别标志
     private boolean identifyFlag;
     // 主记录
-    protected MasterRecord masterRecord;
+    private MasterRecord masterRecord;
     //子记录
-    protected SubRecords subRecords;
+    private SubRecords subRecords;
+    //质控数据
+    private QcRecords qcRecords;
 
     private List<LinkFile> linkFiles = new ArrayList<>();
 
@@ -70,14 +72,7 @@ public class ResourceBucket {
     public ResourceBucket() {
         masterRecord = new MasterRecord();
         subRecords = new SubRecords();
-    }
-
-    public MasterRecord getMasterRecord() {
-        return masterRecord;
-    }
-
-    public SubRecords getSubRecords() {
-        return subRecords;
+        qcRecords = new QcRecords();
     }
 
     public String getId() {
@@ -256,12 +251,28 @@ public class ResourceBucket {
         this.identifyFlag = identifyFlag;
     }
 
+    public MasterRecord getMasterRecord() {
+        return masterRecord;
+    }
+
     public void setMasterRecord(MasterRecord masterRecord) {
         this.masterRecord = masterRecord;
     }
 
+    public SubRecords getSubRecords() {
+        return subRecords;
+    }
+
     public void setSubRecords(SubRecords subRecords) {
         this.subRecords = subRecords;
+    }
+
+    public QcRecords getQcRecords() {
+        return qcRecords;
+    }
+
+    public void setQcRecords(QcRecords qcRecords) {
+        this.qcRecords = qcRecords;
     }
 
     public List<LinkFile> getLinkFiles() {
@@ -271,4 +282,5 @@ public class ResourceBucket {
     public void setLinkFiles(List<LinkFile> linkFiles) {
         this.linkFiles = linkFiles;
     }
+
 }
