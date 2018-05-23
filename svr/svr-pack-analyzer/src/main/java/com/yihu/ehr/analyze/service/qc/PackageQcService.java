@@ -17,10 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Airhead
@@ -85,7 +82,7 @@ public class PackageQcService {
             records.forEach((elementCode, dataElement) -> {
                 String rowKey = dataSetRecord.genRowKey(elementCode);
                 Map<String, String> dataGroup = dataElement.getDataGroup();
-                List<String> listDataElement = getDataElementList(dataSetRecord.getVersion(), elementCode);
+                List<String> listDataElement = getDataElementList(dataSetRecord.getVersion(), dataSetRecord.getCode());
                 for (String code : listDataElement) {
                     String value = dataGroup.get(code);
                     if (value == null) {
@@ -117,6 +114,10 @@ public class PackageQcService {
     private List<String> getDataElementList(String version, String dataSetCode) {
         String metadataCodes = hosAdminServiceClient.getMetadataCodes(version, dataSetCode);
         String[] metadataList = StringUtils.split(metadataCodes, ",");
+        if(metadataList==null){
+            logger.error("version:"+version +",dataSetCode:"+dataSetCode);
+            return new ArrayList<>();
+        }
         return Arrays.asList(metadataList);
     }
 

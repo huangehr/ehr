@@ -129,6 +129,8 @@ ehr:
       - HDSD00_01_185 #出院日期 v1.0
       - HDSD00_16_005 #出院日期时间 v1.3
 #error code and message
+eip:
+  schemaVersion: 5a6951bff0bb
 
 ---
 spring:

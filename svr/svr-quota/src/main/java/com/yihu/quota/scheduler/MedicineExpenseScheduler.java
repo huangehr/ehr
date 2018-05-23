@@ -24,15 +24,15 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.*;
 
 /**
- * 整合solr中档案主表（HealthProfile）性别、年龄和档案细表（HealthProfileSub）费用数据到一起，
- * 保存整合后数据到ES，方便按性别、年龄段统计药品费用。
+ * 整合solr中药品费用跨数据集的数据到一起，
+ * 保存整合后数据到ES，方便按某个跨数据集的维度统计药品费用。
  *
  * @author 张进军
  * @date 2018/5/15 17:05
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0)
-@Api(description = "整合性别、年龄段数据到药品费用中", tags = {"solr跨表数据抽取--整合性别、年龄段数据到药品费用中"})
+@Api(description = "整合药品费用跨数据集的数据到一起", tags = {"solr跨数据集数据抽取--整合药品费用跨数据集的数据到一起"})
 public class MedicineExpenseScheduler {
 
     private static final Logger logger = LoggerFactory.getLogger(MedicineExpenseScheduler.class);
@@ -46,11 +46,15 @@ public class MedicineExpenseScheduler {
     @Autowired
     private ElasticSearchUtil elasticSearchUtil;
 
-    // 门诊药品费用、住院药品费用过滤条件
-    private String q = "(EHR_000045:* AND (EHR_000044:01 OR EHR_000044:02 OR EHR_000044:03)) OR (EHR_000175:* AND (EHR_000174:01 OR EHR_000174:02))";
+    // ES 中药品费用 index
+    private String ME_INDEX = "medicine_expense";
+    // ES 中药品费用汇总 type
+    private String ME_TYPE_COLLECTION = "medicine_expense_collection";
+    // 门诊药品费用汇总、住院药品费用汇总过滤条件
+    private String Q_MZ_ZY_ME_COLLECTION = "(EHR_000045:* AND (EHR_000044:01 OR EHR_000044:02 OR EHR_000044:03)) OR (EHR_000175:* AND (EHR_000174:01 OR EHR_000174:02))";
 
     /**
-     * 抽取昨天的药品费用，整合性别、年龄段数据到药品费用中。
+     * 抽取昨天的药品费用，整合来自其他数据集的部分数据到药品费用中。
      */
     @Scheduled(cron = "0 36 02 * * ?")
     public void extractMedicineExpenseJob() {
@@ -61,14 +65,14 @@ public class MedicineExpenseScheduler {
             String yesterday = DateUtil.formatDate(yesterdayDate, DateUtil.DEFAULT_DATE_YMD_FORMAT);
             String fq = "event_date:[" + yesterday + "T00:00:00Z TO  " + yesterday + "T23:59:59Z]";
 
-            // 保存药品费用、性别、年龄段到ES
-            saveData(fq);
+            // 保存整合后的药品费用汇总到ES
+            saveMedicineExpenseCollection(fq);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    @ApiOperation("抽取指定时间段药品费用，整合性别、年龄段数据到药品费用中")
+    @ApiOperation("抽取指定时间段药品费用，整合来自其他数据集的部分数据到药品费用中。")
     @RequestMapping(value = "extractMedicineExpense", method = RequestMethod.GET)
     public Envelop extractMedicineExpense(
             @ApiParam(name = "startDate", value = "开始日期，格式 YYYY-MM-DD，接口里自动拼接 T00:00:00Z，", required = true)
@@ -79,8 +83,9 @@ public class MedicineExpenseScheduler {
         envelop.setSuccessFlg(true);
         try {
             String fq = "event_date:[" + startDate + "T00:00:00Z TO  " + endDate + "T23:59:59Z]";
-            // 保存药品费用、性别、年龄段到ES
-            saveData(fq);
+
+            // 保存整合后的药品费用汇总到ES
+            saveMedicineExpenseCollection(fq);
         } catch (Exception e) {
             e.printStackTrace();
             envelop.setSuccessFlg(false);
@@ -90,21 +95,21 @@ public class MedicineExpenseScheduler {
     }
 
     /**
-     * 保存药品费用、性别、年龄段到ES
+     * 保存整合后的药品费用汇总到ES
      */
-    private void saveData(String fq) throws Exception {
+    private void saveMedicineExpenseCollection(String fq) throws Exception {
         long startTime = System.currentTimeMillis();
 
-        long count = solrUtil.count(ResourceCore.SubTable, q, fq);
-        List<String> rowKeyList = healthArchiveSchedulerService.selectSubRowKey(ResourceCore.SubTable, q, fq, count);
+        long count = solrUtil.count(ResourceCore.SubTable, Q_MZ_ZY_ME_COLLECTION, fq);
+        List<String> rowKeyList = healthArchiveSchedulerService.selectSubRowKey(ResourceCore.SubTable, Q_MZ_ZY_ME_COLLECTION, fq, count);
 
         int currIndex = 0;
         List<Map<String, Object>> medicineExpenseInfoList = new ArrayList<>();
         List<Map<String, Object>> hBaseDataList = new ArrayList<>();
         List<String> pageRowKeyList = new ArrayList<>();
-        logger.info("要整合并保存的药品费用记录总数：" + count);
+        logger.info("要整合并保存的药品费用汇总记录总数：" + count);
         while (currIndex < count) {
-            // 避免一次操作太多次导致发生异常。
+            // 避免一次操作太多次导致ES、HBase（厦门测试服务器）发生异常。
             long onceStartTime = System.currentTimeMillis();
             pageRowKeyList.clear();
             for (int i = 0; i < 1000; i++) {
@@ -120,26 +125,37 @@ public class MedicineExpenseScheduler {
             hBaseDataList.clear();
             medicineExpenseInfoList.clear();
             hBaseDataList = healthArchiveSchedulerService.selectHbaseData(ResourceCore.SubTable, pageRowKeyList);
-            logger.info("单次查询HBase数量：" + pageRowKeyList.size() + "，耗时：" + ((System.currentTimeMillis() - hbaseStart) / 1000) + " 秒");
+            logger.info("单次查询药品费用汇总的HBase数量：" + pageRowKeyList.size() + "，耗时：" + ((System.currentTimeMillis() - hbaseStart) / 1000) + " 秒");
 
             long subStart = System.currentTimeMillis();
             for (Map<String, Object> subInfo : hBaseDataList) {
-                long oneSubStart = System.currentTimeMillis();
                 Map<String, Object> medicineExpenseInfo = new HashMap<>();
                 Map<String, Object> masterInfo = hBaseDao.getResultMap(ResourceCore.MasterTable, subInfo.get("profile_id").toString());
                 // _id
-                medicineExpenseInfo.put("_id", subInfo.get("rowkey"));
+                String id = subInfo.get("rowkey").toString();
+                medicineExpenseInfo.put("_id", id);
                 // 区县
                 medicineExpenseInfo.put("town", subInfo.get("org_area"));
                 // 机构编码
                 medicineExpenseInfo.put("org_code", subInfo.get("org_code"));
                 // 就诊日期
                 medicineExpenseInfo.put("event_date", subInfo.get("event_date"));
+
+                Object EHR000045 = subInfo.get("EHR_000045"); // 门诊费用
+                Integer type = null; // 药品费用类型，1：门诊，2：住院。
+                String typeName = null; // 药品费用类型名称
+                Object expense = null; // 药品费用
+                if (EHR000045 != null) {
+                    type = 1;
+                    typeName = "门诊";
+                    expense = EHR000045;
+                } else {
+                    type = 2;
+                    typeName = "住院";
+                    expense = subInfo.get("EHR_000175");
+                }
+
                 // 药品费用类型，1：门诊，2：住院。
-                Object EHR000045 = subInfo.get("EHR_000045");
-                int type = EHR000045 != null ? 1 : 2;
-                String typeName = EHR000045 != null ? "门诊" : "住院";
-                Object expense = EHR000045 != null ? EHR000045 : subInfo.get("EHR_000175"); // 药品费用
                 medicineExpenseInfo.put("type", type);
                 // 药品费用类型名称
                 medicineExpenseInfo.put("type_value", typeName);
@@ -165,17 +181,23 @@ public class MedicineExpenseScheduler {
                 }
                 // 费用
                 medicineExpenseInfo.put("expense", Float.valueOf(expense.toString()));
+                // 修改时间
+                String now = DateUtil.getNowDate(DateUtil.utcDateTimePattern);
+                medicineExpenseInfo.put("modified_date", now);
                 // 创建时间
-                medicineExpenseInfo.put("create_date", new Date());
+                Map<String, Object> info = elasticSearchUtil.findById(ME_INDEX, ME_TYPE_COLLECTION, id);
+                if (info == null) {
+                    medicineExpenseInfo.put("created_date", now);
+                }
 
                 medicineExpenseInfoList.add(medicineExpenseInfo);
             }
-            logger.info("收集药品费用数据耗时：" + ((System.currentTimeMillis() - subStart) / 1000) + " 秒");
+            logger.info("收集药品费用汇总数据耗时：" + ((System.currentTimeMillis() - subStart) / 1000) + " 秒");
 
             // 保存到ES
             long saveStart = System.currentTimeMillis();
-            elasticSearchUtil.bulkIndex("medicine_expense", "medicine_expense_info", medicineExpenseInfoList);
-            logger.info("保存ES文档数量：" + medicineExpenseInfoList.size() + "，耗时：" + ((System.currentTimeMillis() - saveStart) / 1000) + " 秒");
+            elasticSearchUtil.bulkIndex(ME_INDEX, ME_TYPE_COLLECTION, medicineExpenseInfoList);
+            logger.info("保存药品费用汇总的ES文档数量：" + medicineExpenseInfoList.size() + "，耗时：" + ((System.currentTimeMillis() - saveStart) / 1000) + " 秒");
         }
 
         logger.info("总耗时：" + ((System.currentTimeMillis() - startTime) / 1000 / 60) + " 分");

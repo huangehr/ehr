@@ -134,7 +134,7 @@ public class EsQuotaJob implements Job {
             logger.error("指标执行异常--"+"QuotaCode="+quotaVo.getCode()+"&Status="+tjQuotaLog.getStatus()+"&Content="+tjQuotaLog.getContent());
         }
         tjQuotaLog.setEndTime(new Date());
-        logger.error("指标执行结束--"+"QuotaCode="+quotaVo.getCode()+"&Status="+tjQuotaLog.getStatus()+"&Content="+tjQuotaLog.getContent()+"&endTime="+tjQuotaLog.getEndTime());
+        logger.info("指标执行结束--"+"QuotaCode="+quotaVo.getCode()+"&Status="+tjQuotaLog.getStatus()+"&Content="+tjQuotaLog.getContent()+"&endTime="+tjQuotaLog.getEndTime());
         saveLog(tjQuotaLog);
     }
 

@@ -12,22 +12,15 @@ import java.util.Date;
  */
 public class TransferTreatmentModel {
 
-    @JestId
-    private String id;
-    private String org;
-    private String orgName;
+    private String _id;
     private String town;
-    private String townName;
-    private int level;// 机构等级
-    private String levelName;//
-    private int eventType;    //就诊类型 0 门诊 1 住院
-    private int transFerType;    //转诊类型 0 其他 1 基层医院向上级医院转诊 2 医院出院向基层机构转诊
-    private String transFerTypeName;
-    private int registerType;       //挂号类别  41 专家
-    private String chronicDisease;// 慢病  糖尿病 高血压
-    private String chronicDiseaseName;//慢病名称
-
-    private String rowKey;
+    private String inOrg;// 转入机构
+    private String outOrg;// 转出机构
+    private int inOrgLevel;// 转入机构等级
+    private int outOrgLevel;// 转出机构等级
+    private int transEventType;    //转诊类型 0 门诊 1 出院
+    private int transFerType;    //转诊方向 0 其他 1 基层医院向上到医院转诊 2 医院向下到基层机构转诊
+    private String registerType;       //挂号类别  41 专家
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssZ")// 2017-06-24T11:51:30+080
     private Date eventDate;
@@ -35,12 +28,12 @@ public class TransferTreatmentModel {
     @CreatedDate
     private Date createTime;//创建时间
 
-    public String getId() {
-        return id;
+    public String get_id() {
+        return _id;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void set_id(String _id) {
+        this._id = _id;
     }
 
     public Date getEventDate() {
@@ -51,28 +44,36 @@ public class TransferTreatmentModel {
         this.eventDate = eventDate;
     }
 
-    public String getRowKey() {
-        return rowKey;
+    public String getInOrg() {
+        return inOrg;
     }
 
-    public void setRowKey(String rowKey) {
-        this.rowKey = rowKey;
+    public void setInOrg(String inOrg) {
+        this.inOrg = inOrg;
     }
 
-    public String getOrg() {
-        return org;
+    public String getOutOrg() {
+        return outOrg;
     }
 
-    public void setOrg(String org) {
-        this.org = org;
+    public void setOutOrg(String outOrg) {
+        this.outOrg = outOrg;
     }
 
-    public String getOrgName() {
-        return orgName;
+    public int getInOrgLevel() {
+        return inOrgLevel;
     }
 
-    public void setOrgName(String orgName) {
-        this.orgName = orgName;
+    public void setInOrgLevel(int inOrgLevel) {
+        this.inOrgLevel = inOrgLevel;
+    }
+
+    public int getOutOrgLevel() {
+        return outOrgLevel;
+    }
+
+    public void setOutOrgLevel(int outOrgLevel) {
+        this.outOrgLevel = outOrgLevel;
     }
 
     public String getTown() {
@@ -83,30 +84,6 @@ public class TransferTreatmentModel {
         this.town = town;
     }
 
-    public String getTownName() {
-        return townName;
-    }
-
-    public void setTownName(String townName) {
-        this.townName = townName;
-    }
-
-    public int getLevel() {
-        return level;
-    }
-
-    public void setLevel(int level) {
-        this.level = level;
-    }
-
-    public String getLevelName() {
-        return levelName;
-    }
-
-    public void setLevelName(String levelName) {
-        this.levelName = levelName;
-    }
-
     public int getTransFerType() {
         return transFerType;
     }
@@ -115,36 +92,12 @@ public class TransferTreatmentModel {
         this.transFerType = transFerType;
     }
 
-    public String getTransFerTypeName() {
-        return transFerTypeName;
-    }
-
-    public void setTransFerTypeName(String transFerTypeName) {
-        this.transFerTypeName = transFerTypeName;
-    }
-
-    public int getRegisterType() {
+    public String getRegisterType() {
         return registerType;
     }
 
-    public void setRegisterType(int registerType) {
+    public void setRegisterType(String registerType) {
         this.registerType = registerType;
-    }
-
-    public String getChronicDisease() {
-        return chronicDisease;
-    }
-
-    public void setChronicDisease(String chronicDisease) {
-        this.chronicDisease = chronicDisease;
-    }
-
-    public String getChronicDiseaseName() {
-        return chronicDiseaseName;
-    }
-
-    public void setChronicDiseaseName(String chronicDiseaseName) {
-        this.chronicDiseaseName = chronicDiseaseName;
     }
 
     public Date getCreateTime() {
@@ -155,11 +108,11 @@ public class TransferTreatmentModel {
         this.createTime = createTime;
     }
 
-    public int getEventType() {
-        return eventType;
+    public int getTransEventType() {
+        return transEventType;
     }
 
-    public void setEventType(int eventType) {
-        this.eventType = eventType;
+    public void setTransEventType(int transEventType) {
+        this.transEventType = transEventType;
     }
 }

@@ -11,6 +11,7 @@ import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionMain;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionSlave;
 import com.yihu.quota.util.BasesicUtil;
 import com.yihu.quota.vo.DictModel;
+import com.yihu.quota.vo.OrgHealthCategoryShowModel;
 import com.yihu.quota.vo.QuotaVo;
 import com.yihu.quota.vo.SaveModel;
 import org.joda.time.DateTime;
@@ -107,39 +108,6 @@ public class ExtractUtil {
             }
             diminMap.put(diminStr, diminStr);
         }
-
-
-//        for(String dimin : diminMap.keySet()){
-//            SaveModel saveAllModel = new SaveModel();
-//            double count = 0;
-//            for(int i=0;i < returnList.size();i++){
-//                String diminStr = "";
-//                SaveModel saveModel = returnList.get(i);
-//                for(String key :dimins){
-//                    diminStr += baseUtil.getFieldValueByName(key, saveModel);
-//                }
-//                if(dimin.equals(diminStr)){
-//                    saveAllModel.setSlaveKey1(saveModel.getSlaveKey1());
-//                    saveAllModel.setSlaveKey1Name(saveModel.getSlaveKey1Name());
-//                    saveAllModel.setSlaveKey2(saveModel.getSlaveKey2());
-//                    saveAllModel.setSlaveKey2Name(saveModel.getSlaveKey2Name());
-//                    saveAllModel.setSlaveKey3(saveModel.getSlaveKey3());
-//                    saveAllModel.setSlaveKey3Name(saveModel.getSlaveKey3Name());
-//                    saveAllModel.setQuotaDate(saveModel.getQuotaDate());
-//                    saveAllModel.setQuotaCode(saveModel.getQuotaCode());
-//                    saveAllModel.setQuotaName(saveModel.getQuotaName());
-//                    count = count + Double.valueOf(saveModel.getResult());
-//                }
-//            }
-//            saveAllModel.setOrg("ALL");
-//            saveAllModel.setOrgName("");
-//            saveAllModel.setTown("ALL");
-//            saveAllModel.setTownName("上饶市");
-//            saveAllModel.setCity("shangrao");
-//            saveAllModel.setCityName("上饶市");
-//            saveAllModel.setResult(String.valueOf(count));
-//            returnList.add(saveAllModel);
-//        }
 
     }
 
@@ -266,6 +234,24 @@ public class ExtractUtil {
                         saveModelTemp.setLevel(mainOne.getLevel());
                         saveModelTemp.setLevelName(mainOne.getLevelName());
                     }
+                    if (!StringUtils.isEmpty(mainOne.getOrgHealthCategoryId())) {
+                        saveModelTemp.setOrgHealthCategoryId(mainOne.getOrgHealthCategoryId());
+                    }
+                    if (!StringUtils.isEmpty(mainOne.getOrgHealthCategoryCode())) {
+                        saveModelTemp.setOrgHealthCategoryCode(mainOne.getOrgHealthCategoryCode());
+                    }
+                    if (!StringUtils.isEmpty(mainOne.getOrgHealthCategoryName())) {
+                        saveModelTemp.setOrgHealthCategoryName(mainOne.getOrgHealthCategoryName());
+                    }
+                    if (!StringUtils.isEmpty(mainOne.getOrgHealthCategoryPid())) {
+                        saveModelTemp.setOrgHealthCategoryPid(mainOne.getOrgHealthCategoryPid());
+                    }
+                    if (!StringUtils.isEmpty(mainOne.getOrgHealthCategoryTopPid())) {
+                        saveModelTemp.setOrgHealthCategoryTopPid(mainOne.getOrgHealthCategoryTopPid());
+                    }
+
+
+
                     code = code.substring(0, 1).toUpperCase() + code.substring(1);
                     StringBuffer keyMethodName = new StringBuffer("set" + code);
                     StringBuffer nameMethodName = new StringBuffer("set" + code + "Name");
@@ -415,38 +401,61 @@ public class ExtractUtil {
         allData.put(key, one);
     }
 
-//    private SaveModel setSaveModel(SaveModel one) {
-//        one.setResult("0");
-//        one.setCreateTime(new Date());
-//        LocalDate today = LocalDate.now();
-//        String yesterDay = (new DateTime().minusDays(1)).toString("yyyy-MM-dd");
-//        one.setQuotaDate(yesterDay);
-//        one.setQuotaCode(quotaVo.getCode());
-//        one.setQuotaName(quotaVo.getName());
-//        one.setTimeLevel(timeLevel);
-//        one.setSaasId(null);
-//        return one;
-//    }
-
     private void setSaveModelProperties(List<SaveModel> saveDataMain) {
+        //上饶区县
+        String townSql = "SELECT id as code,name as name  from address_dict where pid = '361100'";
+        List<DictModel> townDictDatas = jdbcTemplate.query(townSql, new BeanPropertyRowMapper(DictModel.class));
+        Map<String,String> townMap = new HashMap<>();
+        for(DictModel dictModel : townDictDatas){
+            townMap.put(dictModel.getCode(), dictModel.getName());
+        }
+        //机构类型 目录对应的名称和节点id
+        String orgHealthCategorySql = "SELECT id as orgHealthCategoryId,pid as orgHealthCategoryPid,top_pid as orgHealthCategoryTopPid,code as orgHealthCategoryCode, name from org_health_category";
+        List<OrgHealthCategoryShowModel> orgHealthCategoryDictDatas = jdbcTemplate.query(orgHealthCategorySql, new BeanPropertyRowMapper(OrgHealthCategoryShowModel.class));
+        Map<String,OrgHealthCategoryShowModel>  orgHealthCategoryMap = new HashMap<>();
+        for(OrgHealthCategoryShowModel orgHealthCategory : orgHealthCategoryDictDatas){
+            orgHealthCategoryMap.put(orgHealthCategory.getOrgHealthCategoryCode(), orgHealthCategory);
+        }
+
+        //经济类型
+        String economicSql = "SELECT code, catalog from system_dict_entries WHERE dict_id = 102 ";
+        Map<String, Object> economicMap = new HashMap<>();
+        List<Map<String, Object>> list = jdbcTemplate.queryForList(economicSql);
+        if (null != list && list.size() > 0) {
+            for (Map<String, Object> map : list) {
+                economicMap.put(map.get("code") + "", map.get("catalog") + "");
+            }
+        }
+
         for (SaveModel model : saveDataMain) {
             String dictSql = "SELECT org_code as orgCode,hos_type_id as hosTypeId,administrative_division as administrativeDivision, hos_economic as hosEconomic, level_id as levelId  from organizations where org_code=";
             dictSql += "'" + model.getOrg() + "'";
             List<MOrganization> organizations = jdbcTemplate.query(dictSql, new BeanPropertyRowMapper(MOrganization.class));
 
             if (organizations != null && organizations.size() > 0) {
-                if (!StringUtils.isEmpty(organizations.get(0).getAdministrativeDivision())) {
+                MOrganization organization = organizations.get(0);
+                if (!StringUtils.isEmpty(organization.getAdministrativeDivision())) {
                     model.setCity("shangrao");
                     model.setCityName("上饶市");
-                    String townSql = "SELECT id ,name from address_dict where id = " + organizations.get(0).getAdministrativeDivision();
-                    List<AddressDict> addressDicts = jdbcTemplate.query(townSql, new BeanPropertyRowMapper(AddressDict.class));
-                    model.setTown(String.valueOf(addressDicts.get(0).getId()));
-                    model.setTownName(addressDicts.get(0).getName());
+                    String orgCode = organization.getAdministrativeDivision().toString();
+                    if(townMap.get(orgCode) != null ){
+                        model.setTown(orgCode);
+                        model.setTownName(townMap.get(orgCode));
+                    }
                 }
-                if (!StringUtils.isEmpty(organizations.get(0).getHosEconomic())) {
-                    String economicSql = "SELECT DISTINCT catalog from system_dict_entries WHERE dict_id = 102 and code =" + organizations.get(0).getHosEconomic();
-                    List<SystemDictEntry> systemDictEntries = jdbcTemplate.query(economicSql, new BeanPropertyRowMapper(SystemDictEntry.class));
-                    String name = systemDictEntries.get(0).getCatalog();
+                //关联出对应的机构类型
+                if (!StringUtils.isEmpty(organization.getHosTypeId())) {
+                    if(orgHealthCategoryMap.get(organization.getHosTypeId()) != null ){
+                        OrgHealthCategoryShowModel orgHealthCategory = orgHealthCategoryMap.get(organization.getHosTypeId());
+                        model.setOrgHealthCategoryCode(organization.getHosTypeId());
+                        model.setOrgHealthCategoryName(orgHealthCategory.getOrgHealthCategoryName());
+                        model.setOrgHealthCategoryId(orgHealthCategory.getOrgHealthCategoryId());
+                        model.setOrgHealthCategoryPid(orgHealthCategory.getOrgHealthCategoryPid());
+                        model.setOrgHealthCategoryTopPid(orgHealthCategory.getOrgHealthCategoryTopPid());
+                    }
+                }
+                if (!StringUtils.isEmpty(organization.getHosEconomic())) {
+                    String name = economicMap.get(organizations.get(0).getHosEconomic()) + "";
                     if ("公立".equals(name)) {
                         model.setEconomic("1021");
                         model.setEconomicName("公立");
@@ -458,8 +467,8 @@ public class ExtractUtil {
                     model.setEconomic("0");
                     model.setEconomicName("未知");
                 }
-                if (!StringUtils.isEmpty(organizations.get(0).getLevelId())) {
-                    String levelId = organizations.get(0).getLevelId();
+                if (!StringUtils.isEmpty(organization.getLevelId())) {
+                    String levelId = organization.getLevelId();
                     if ("1".equals(levelId)) {
                         model.setLevel(levelId);
                         model.setLevelName("一级");
