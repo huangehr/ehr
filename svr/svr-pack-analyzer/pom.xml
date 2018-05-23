@@ -122,5 +122,9 @@
             <artifactId>commons-redis-mq</artifactId>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.yihu.ehr</groupId>
+            <artifactId>commons-util</artifactId>
+        </dependency>
     </dependencies>
 </project>

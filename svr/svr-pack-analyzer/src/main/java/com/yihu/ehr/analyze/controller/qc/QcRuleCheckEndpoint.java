@@ -18,25 +18,25 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = ApiVersion.Version1_0, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 public class QcRuleCheckEndpoint {
     @Autowired
-    QcRuleCheckService service;
+    private QcRuleCheckService service;
 
     @RequestMapping(value = ServiceApi.PackageAnalyzer.QcEmpty, method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-    public void emptyCheck(@RequestBody String message) {
+    public void emptyCheck(@RequestBody String message) throws Exception {
         service.emptyCheck(message);
     }
 
     @RequestMapping(value = ServiceApi.PackageAnalyzer.QcType, method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-    public void typeCheck(@RequestBody String message) {
+    public void typeCheck(@RequestBody String message) throws Exception {
         service.typeCheck(message);
     }
 
     @RequestMapping(value = ServiceApi.PackageAnalyzer.QcFormat, method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-    public void formatCheck(@RequestBody String message) {
+    public void formatCheck(@RequestBody String message) throws Exception {
         service.formatCheck(message);
     }
 
     @RequestMapping(value = ServiceApi.PackageAnalyzer.QcValue, method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-    public void valueCheck(@RequestBody String message) {
+    public void valueCheck(@RequestBody String message) throws Exception {
         service.valueCheck(message);
     }
 }
