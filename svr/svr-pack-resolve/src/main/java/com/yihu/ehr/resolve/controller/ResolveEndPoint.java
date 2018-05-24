@@ -1,8 +1,8 @@
 package com.yihu.ehr.resolve.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.ArchiveStatus;
-import com.yihu.ehr.constants.ProfileType;
+import com.yihu.ehr.profile.ArchiveStatus;
+import com.yihu.ehr.profile.ProfileType;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
@@ -85,7 +85,7 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
             if (!ProfileType.DataSet.equals(standardPackage.getProfileType())){
                 ResourceBucket resourceBucket = packMillService.grindingPackModel(standardPackage);
                 identifyService.identify(resourceBucket, standardPackage);
-                resourceService.save(resourceBucket, standardPackage);
+                resourceService.save(resourceBucket, standardPackage, pack);
             }
 
             //回填入库状态
@@ -163,7 +163,7 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
         ResourceBucket resourceBucket = packMillService.grindingPackModel(standardPackage);
         if (persist) {
             identifyService.identify(resourceBucket, standardPackage);
-            resourceService.save(resourceBucket, standardPackage);
+            resourceService.save(resourceBucket, standardPackage, pack);
         }
         return new ResponseEntity<>(standardPackage.toJson(), HttpStatus.OK);
     }
@@ -200,7 +200,7 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
         StandardPackage standardPackage = packageResolveService.doResolveImmediateData(data, clientId);
         ResourceBucket resourceBucket = packMillService.grindingPackModel(standardPackage);
         identifyService.identify(resourceBucket, standardPackage);
-        resourceService.save(resourceBucket, standardPackage);
+        resourceService.save(resourceBucket, standardPackage, null);
         //回填入库状态
        /* Map<String, String> map = new HashMap();
         map.put("profileId", standardPackage.getId());

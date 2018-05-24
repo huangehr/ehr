@@ -105,5 +105,9 @@
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-data-elasticsearch</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.yihu.ehr</groupId>
+            <artifactId>commons-profile-core</artifactId>
+        </dependency>
     </dependencies>
 </project>

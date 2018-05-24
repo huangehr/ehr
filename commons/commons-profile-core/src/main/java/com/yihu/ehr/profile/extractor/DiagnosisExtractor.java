@@ -1,9 +1,8 @@
-package com.yihu.ehr.resolve.service.resource.stage1.extractor;
+package com.yihu.ehr.profile.extractor;
 
 import com.yihu.ehr.profile.family.MasterResourceFamily;
 import com.yihu.ehr.profile.util.MetaDataRecord;
 import com.yihu.ehr.profile.util.PackageDataSet;
-import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -29,7 +28,7 @@ public class DiagnosisExtractor extends KeyDataExtractor {
 
     @Override
     public Map<String, Object> extract(PackageDataSet dataSet) throws Exception {
-        Map<String,Object> properties = new HashedMap();
+        Map<String,Object> properties = new HashMap<>();
         Set<String> diagnosis = new HashSet<>();
         Set<String> diagnosisName = new HashSet<>();
         if (dataSets.contains(dataSet.getCode())) {

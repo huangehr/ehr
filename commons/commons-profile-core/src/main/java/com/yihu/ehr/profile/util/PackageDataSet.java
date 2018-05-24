@@ -157,7 +157,7 @@ public class PackageDataSet {
             MetaDataRecord record = this.records.get(rowKey);
             if (record == null){
                 records.put(rowKey, (String)null);
-            }else {
+            } else {
                 ObjectNode metaData = records.putObject(rowKey);
 
                 Set<String> codes = record.getMetaDataCodes();

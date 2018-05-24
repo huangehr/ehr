@@ -54,7 +54,6 @@ public class PackageAnalyzeService {
                 zipPackage.download();
                 zipPackage.unZip();
                 zipPackage.resolve();
-                zipPackage.save();
                 packageQcService.qcHandle(zipPackage);
                 mgrClient.analyzeStatus(esSimplePackage.get_id(), 3);
             }

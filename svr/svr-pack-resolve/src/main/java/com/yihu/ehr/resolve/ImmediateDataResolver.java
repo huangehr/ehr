@@ -2,15 +2,15 @@ package com.yihu.ehr.resolve;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.constants.EventType;
+import com.yihu.ehr.profile.EventType;
+import com.yihu.ehr.profile.extractor.ExtractorChain;
+import com.yihu.ehr.profile.extractor.KeyDataExtractor;
 import com.yihu.ehr.profile.family.MasterResourceFamily;
 import com.yihu.ehr.profile.util.PackageDataSet;
 import com.yihu.ehr.profile.exception.IllegalJsonDataException;
 import com.yihu.ehr.profile.exception.IllegalJsonFileException;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.resolve.service.resource.stage1.DataSetParserWithTranslator;
-import com.yihu.ehr.resolve.service.resource.stage1.extractor.ExtractorChain;
-import com.yihu.ehr.resolve.service.resource.stage1.extractor.KeyDataExtractor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

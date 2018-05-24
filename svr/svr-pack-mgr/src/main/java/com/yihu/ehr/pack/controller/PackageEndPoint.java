@@ -10,6 +10,9 @@ import com.yihu.ehr.model.packs.EsSimplePackage;
 import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.pack.feign.SecurityClient;
 import com.yihu.ehr.pack.task.FastDFSTask;
+import com.yihu.ehr.profile.AnalyzeStatus;
+import com.yihu.ehr.profile.ArchiveStatus;
+import com.yihu.ehr.profile.queue.RedisCollection;
 import com.yihu.ehr.util.encrypt.RSA;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
@@ -30,7 +33,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -83,7 +85,6 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "packType", value = "包类型 默认为1(结构化) 1结构化档案，2文件档案，3链接档案，4数据集档案")
             @RequestParam(value = "packType", required = false) Integer packType,
             HttpServletRequest request) throws Exception {
-        logger.info("接收档案中....");
         MKey key = securityClient.getOrgKey(orgCode);
         if (key == null || key.getPrivateKey() == null) {
             throw new ApiException(HttpStatus.FORBIDDEN, ErrorCode.FORBIDDEN, "Invalid private key, maybe you miss the organization code?");
@@ -149,7 +150,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             @PathVariable(value = "id") String id,
             @ApiParam(name = "status", value = "状态", required = true)
             @RequestParam(value = "status") ArchiveStatus status,
-            @ApiParam(name = "errorTye", value = "错误类型(0 = 正常; -1 = 未定义; 1 = 压缩包有误; 2 = Json文件有误; 3 = 数据有误 4 = 内部服务有误;)", required = true)
+            @ApiParam(name = "errorTye", value = "错误类型(0 = 正常; -1 = 质控服务出错; -2 解析服务出错; 1 = 压缩包有误; 2 = Json文件有误; 3 = Json数据有误)", required = true)
             @RequestParam(value = "errorTye") int errorTye,
             @ApiParam(name = "message", value = "消息", required = true)
             @RequestBody String message) throws Exception {
@@ -194,6 +195,39 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         return true;
     }
 
+    @RequestMapping(value = ServiceApi.PackageAnalyzer.Status, method = RequestMethod.PUT)
+    @ApiOperation(value = "更新档案包分析状态", notes = "更新档案包分析状态")
+    public boolean analyzeStatus(
+            @ApiParam(name = "id", value = "档案包编号", required = true)
+            @PathVariable(value = "id") String id,
+            @ApiParam(name = "status", value = "状态", required = true)
+            @RequestParam(value = "status") AnalyzeStatus status,
+            @ApiParam(name = "errorTye", value = "错误类型(0 = 正常; -1 = 质控服务出错; -2 解析服务出错; 1 = 压缩包有误; 2 = Json文件有误; 3 = Json数据有误)", required = true)
+            @RequestParam(value = "errorTye") int errorTye,
+            @ApiParam(name = "message", value = "消息", required = true)
+            @RequestBody String message) throws Exception {
+        Map<String, Object> updateSource = new HashMap<>();
+        if (status == AnalyzeStatus.Failed) {
+            if (3 == errorTye) {
+                updateSource.put("analyze_fail_count", 3);
+            } else {
+                Map<String, Object> sourceMap = elasticSearchUtil.findById(INDEX, TYPE, id);
+                if (null == sourceMap) {
+                    return false;
+                }
+                if ((int)sourceMap.get("analyze_fail_count") < 3) {
+                    int failCount = (int)sourceMap.get("analyze_fail_count");
+                    updateSource.put("analyze_fail_count", failCount + 1);
+                }
+            }
+            updateSource.put("message", message);
+        }
+        updateSource.put("error_type", errorTye);
+        updateSource.put("analyze_status", status.ordinal());
+        elasticSearchUtil.voidUpdate(INDEX, TYPE, id, updateSource);
+        return true;
+    }
+
     @RequestMapping(value = ServiceApi.Packages.Update, method = RequestMethod.PUT)
     @ApiOperation(value = "根据条件批量修改档案包状态", notes = "修改档案包状态")
     public Integer update(
@@ -221,29 +255,6 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         });
         elasticSearchUtil.bulkUpdate(INDEX, TYPE, updateSourceList);
         return sourceList.size();
-    }
-
-    @RequestMapping(value = ServiceApi.PackageAnalyzer.Status, method = RequestMethod.PUT)
-    @ApiOperation(value = "更新档案包分析状态", notes = "更新档案包分析状态")
-    public boolean analyzeStatus(
-            @ApiParam(value = "档案包编号")
-            @PathVariable(value = "id") String id,
-            @ApiParam(value = "分析状态")
-            @RequestParam(value = "status") Integer status) throws Exception {
-        Map<String, Object> source = elasticSearchUtil.findById(INDEX, TYPE, id);
-        if (null == source) {
-            return false;
-        }
-        Map<String, Object> updateSource = new HashMap<>();
-        //出错时记录错误次数
-        if (status == 2) {
-            updateSource.put("analyze_fail_count", (int)source.get("analyze_fail_count") + 1);
-        } else {
-            updateSource.put("analyze_fail_count", 0); //避免手动修改状态后无法解析
-        }
-        updateSource.put("analyze_status", status);
-        elasticSearchUtil.voidUpdate(INDEX, TYPE, id, updateSource);
-        return true;
     }
 
     @RequestMapping(value = ServiceApi.Packages.Packages, method = RequestMethod.GET)
@@ -360,7 +371,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "count", value = "数量（不要超过10000）", required = true, defaultValue = "500")
             @RequestParam(value = "count") int count) throws Exception {
         if (status == ArchiveStatus.Received || status == ArchiveStatus.Acquired) {
-            if (redisTemplate.opsForList().size(RedisCollection.PackageList) > 0) {
+            if (redisTemplate.opsForList().size(RedisCollection.ResolveQueue) > 0) {
                 return "添加失败，队列中存在消息！";
             } else {
                 List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, "archive_status=" + status.ordinal(), sorts, 1, count);
@@ -370,7 +381,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
                     esSimplePackage.setPwd(String.valueOf(item.get("pwd")));
                     esSimplePackage.setRemote_path(String.valueOf(item.get("remote_path")));
                     esSimplePackage.setClient_id(String.valueOf(item.get("client_id")));
-                    redisTemplate.opsForList().leftPush(RedisCollection.PackageList, objectMapper.writeValueAsString(esSimplePackage));
+                    redisTemplate.opsForList().leftPush(RedisCollection.ResolveQueue, objectMapper.writeValueAsString(esSimplePackage));
                 }
             }
         } else {
@@ -386,7 +397,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
                 esSimplePackage.setPwd(String.valueOf(item.get("pwd")));
                 esSimplePackage.setRemote_path(String.valueOf(item.get("remote_path")));
                 esSimplePackage.setClient_id(String.valueOf(item.get("client_id")));
-                redisTemplate.opsForList().leftPush(RedisCollection.PackageList, objectMapper.writeValueAsString(esSimplePackage));
+                redisTemplate.opsForList().leftPush(RedisCollection.ResolveQueue, objectMapper.writeValueAsString(esSimplePackage));
             }
             elasticSearchUtil.bulkUpdate(INDEX, TYPE, updateSourceList);
         }
@@ -396,13 +407,13 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Packages.QueueSize, method = RequestMethod.GET)
     @ApiOperation(value = "获取当前解析队列数")
     public long queueSize() throws Exception {
-        return redisTemplate.opsForList().size(RedisCollection.PackageList);
+        return redisTemplate.opsForList().size(RedisCollection.ResolveQueue);
     }
 
     @RequestMapping(value = ServiceApi.Packages.QueueSize, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除当前解析队列")
     public boolean deleteQueue() throws Exception {
-        redisTemplate.delete(RedisCollection.PackageList);
+        redisTemplate.delete(RedisCollection.ResolveQueue);
         return true;
     }
 

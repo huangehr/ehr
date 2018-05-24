@@ -2,8 +2,8 @@ package com.yihu.ehr.resolve.model.stage1;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.yihu.ehr.constants.EventType;
-import com.yihu.ehr.constants.ProfileType;
+import com.yihu.ehr.profile.EventType;
+import com.yihu.ehr.profile.ProfileType;
 import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.profile.annotation.Column;
 import com.yihu.ehr.profile.annotation.Table;

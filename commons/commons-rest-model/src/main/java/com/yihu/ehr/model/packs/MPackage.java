@@ -1,7 +1,7 @@
 package com.yihu.ehr.model.packs;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.yihu.ehr.constants.ArchiveStatus;
+import com.yihu.ehr.profile.ArchiveStatus;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;

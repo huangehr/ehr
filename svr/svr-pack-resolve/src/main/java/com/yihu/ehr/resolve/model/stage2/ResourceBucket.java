@@ -1,7 +1,7 @@
 package com.yihu.ehr.resolve.model.stage2;
 
-import com.yihu.ehr.constants.EventType;
-import com.yihu.ehr.constants.ProfileType;
+import com.yihu.ehr.profile.EventType;
+import com.yihu.ehr.profile.ProfileType;
 import com.yihu.ehr.resolve.model.stage1.CdaDocument;
 import com.yihu.ehr.resolve.model.stage1.LinkFile;
 

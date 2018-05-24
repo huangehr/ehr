@@ -1,7 +1,7 @@
 package com.yihu.ehr.pack.dao;
 
-import com.yihu.ehr.constants.ArchiveStatus;
 import com.yihu.ehr.pack.entity.DatasetPackage;
+import com.yihu.ehr.profile.ArchiveStatus;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;

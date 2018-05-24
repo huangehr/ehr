@@ -1,7 +1,7 @@
 package com.yihu.ehr.resolve.feign;
 
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.ArchiveStatus;
+import com.yihu.ehr.profile.ArchiveStatus;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.constants.ServiceApi;
 import org.springframework.cloud.netflix.feign.FeignClient;
