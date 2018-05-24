@@ -1,6 +1,7 @@
 package com.yihu.quota.etl.save.es;
 
 import com.yihu.quota.etl.model.EsConfig;
+import com.yihu.quota.etl.save.LargDataWithRunnable;
 import com.yihu.quota.etl.util.EsClientUtil;
 import com.yihu.quota.vo.SaveModel;
 import io.searchbox.client.JestClient;
@@ -29,6 +30,22 @@ public class ElastricSearchSave {
     private EsClientUtil esClientUtil;
 
     private EsConfig esConfig;
+
+
+    public Boolean saveByMoreThred(List<SaveModel> saveModels, String jsonConfig) {
+        boolean isSuccessed = true;
+        try {
+            LargDataWithRunnable dataWithRunnable = new LargDataWithRunnable(saveModels,jsonConfig,esClientUtil);
+            for(int i=0; i< dataWithRunnable.getThreadCount(); i++){
+                Thread thread = new Thread(dataWithRunnable);
+                thread.start();
+            }
+        } catch (Exception e) {
+            isSuccessed = false;
+            throw new RuntimeException("ES 保存数据异常");
+        }
+        return  isSuccessed;
+    }
 
     public Boolean save(List<SaveModel> smss, String jsonConfig) {
         BulkResult br = null;
