@@ -16,6 +16,13 @@
 	curl -X PUT 'http://172.19.103.9:9200/json_archives/_mapping/info' -d '{"info":{"properties":{"error_type":{"type":"integer"}}}}'
 	curl -X PUT 'http://172.19.103.9:9200/json_archives/_settings' -d '{"index":{"max_result_window":"10000000"}}'
 	curl -X PUT 'http://172.19.103.9:9200/archive_relation/_mapping/info' -d '{"info":{"properties":{"profile_type":{"type":"integer"}}}}'
+
+3. 新建upload
+    index: upload
+	type: info
+    mapping: {"origin": {"type": "integer"},"create_date": {"type": "date","format": "yyyy-MM-dd HH:mm:ss"},"scheme_version": {"type": "string","index": "not_analyzed"},"failed_count": {"type": "integer"},"org_code": {"type": "string","index": "not_analyzed"},"failed_message": {"type": "string","index": "not_analyzed"},"repeat_date": {"type": "date","format": "yyyy-MM-dd"},"start_date": {"type": "date","format": "yyyy-MM-dd HH:mm:ss"},"end_date": {"type": "date","format": "yyyy-MM-dd HH:mm:ss"},"event_date": {"type": "date","format": "yyyy-MM-dd HH:mm:ss"},"row_key": {"type": "string","index": "not_analyzed"},"table": {"type": "string","index": "not_analyzed"},"upload_table": {"type": "string","index": "not_analyzed"}}
+	setting: {"index.max_result_window":"10000000","index.translog.flush_threshold_size":"1g","index.translog.flush_threshold_ops":"100000","index.translog.durability":"async","index.refresh_interval":"30s"}
+    curl -XPUT 'http://172.19.103.9:9200/upload' -d '{"settings":{"index.max_result_window":"10000000","index.translog.flush_threshold_size":"1g","index.translog.flush_threshold_ops":"100000","index.translog.durability":"async","index.refresh_interval":"30s"},"mappings":{"info":{"properties":{"origin":{"type":"integer"},"create_date":{"type":"date","format":"yyyy-MM-dd HH:mm:ss"},"scheme_version":{"type":"string","index":"not_analyzed"},"failed_count":{"type":"integer"},"org_code":{"type":"string","index":"not_analyzed"},"failed_message":{"type":"string","index":"not_analyzed"},"repeat_date":{"type":"date","format":"yyyy-MM-dd"},"start_date":{"type":"date","format":"yyyy-MM-dd HH:mm:ss"},"end_date":{"type":"date","format":"yyyy-MM-dd HH:mm:ss"},"event_date":{"type":"date","format":"yyyy-MM-dd HH:mm:ss"},"row_key":{"type":"string","index":"not_analyzed"},"table": {"type": "string","index": "not_analyzed"},"upload_table": {"type": "string","index": "not_analyzed"}}}}}'
 	
 	
 	

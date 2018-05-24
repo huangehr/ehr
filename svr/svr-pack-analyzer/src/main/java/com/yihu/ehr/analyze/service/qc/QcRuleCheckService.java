@@ -36,17 +36,9 @@ public class QcRuleCheckService {
      *
      * @param data
      */
-    public void emptyCheck(String data) {
-        DataElementValue value = null;
-        try {
-            value = parse(data);
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-            return;
-        }
-
+    public void emptyCheck(String data) throws Exception {
+        DataElementValue value = parse(data);
         logger.info("code:" + value.getCode() + ",value:" + value.getValue());
-
         Boolean isNullable = hosAdminServiceClient.isMetaDataNullable(value.getVersion(), value.getTable(), value.getCode());
         if (!isNullable && StringUtils.isEmpty(value.getValue())) {
             saveCheckResult(value, "E00001", "不能为空");
@@ -60,28 +52,19 @@ public class QcRuleCheckService {
      *
      * @param data
      */
-    public void typeCheck(String data) {
-        DataElementValue value = null;
-        try {
-            value = parse(data);
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-            return;
-        }
-
+    public void typeCheck(String data) throws Exception {
+        DataElementValue value = parse(data);
         String type = hosAdminServiceClient.getMetaDataType(value.getVersion(), value.getTable(), value.getCode());
         switch (type) {
             case "L":
                 if (!("F".equals(data) && "T".equals(data) && "0".equals(data) && "1".equals(data))) {
                     saveCheckResult(value, "E00003", "值类型错误");
                 }
-
                 break;
             case "N":
                 if (!StringUtils.isNumeric(data)) {
                     saveCheckResult(value, "E00003", "值类型错误");
                 }
-
                 break;
             case "D":
             case "DT":
@@ -104,15 +87,8 @@ public class QcRuleCheckService {
      *
      * @param data
      */
-    public void formatCheck(String data) {
-        DataElementValue value = null;
-        try {
-            value = parse(data);
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-            return;
-        }
-
+    public void formatCheck(String data) throws Exception {
+        DataElementValue value = parse(data);
         String format = hosAdminServiceClient.getMetaDataFormat(value.getVersion(), value.getTable(), value.getCode());
         switch (format) {
             default:
@@ -125,21 +101,13 @@ public class QcRuleCheckService {
      *
      * @param data
      */
-    public void valueCheck(String data) {
-        DataElementValue value = null;
-        try {
-            value = parse(data);
-        } catch (IOException e) {
-            e.printStackTrace();
-            logger.error(e.getMessage());
-        }
-
+    public void valueCheck(String data) throws Exception {
+        DataElementValue value = parse(data);
         logger.info("code:" + value.getCode() + ",value:" + value.getValue());
         String dict = hosAdminServiceClient.getMetaDataDict(value.getVersion(), value.getTable(), value.getCode());
         if (StringUtils.isEmpty(dict) || dict.equals("0")) {
             return;
         }
-
         logger.info("code:" + value.getCode() + ",value:" + value.getValue() + ",dict:" + dict);
         Boolean isExist = hosAdminServiceClient.isDictCodeExist(value.getVersion(), dict, value.getCode());
         if (!isExist) {
@@ -148,7 +116,7 @@ public class QcRuleCheckService {
         }
     }
 
-    private void saveCheckResult(DataElementValue value, String errorCode, String errorMsg) {
+    private void saveCheckResult(DataElementValue value, String errorCode, String errorMsg) throws Exception {
         Map<String, Object> map = new HashMap<>(12);
         map.put("rowKey", value.getRowKey());
         map.put("table", value.getTable());
@@ -164,13 +132,7 @@ public class QcRuleCheckService {
         map.put("receiveTime", receiveTime);
         map.put("errorCode", errorCode);
         map.put("errorMsg", errorMsg);
-
-        try {
-            elasticSearchUtil.index("qc", "receive_data_element", map);
-        } catch (ParseException e) {
-            e.printStackTrace();
-            logger.error(e.getMessage());
-        }
+        elasticSearchUtil.index("qc", "receive_data_element", map);
     }
 
     private DataElementValue parse(String data) throws IOException {

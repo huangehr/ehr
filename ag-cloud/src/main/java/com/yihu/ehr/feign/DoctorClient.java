@@ -38,7 +38,7 @@ public interface DoctorClient {
 
     @RequestMapping(value = ServiceApi.Doctors.DoctorAdmin, method = RequestMethod.GET)
     @ApiOperation(value = "获取医生信息", notes = "医生信息")
-    MDoctor getDoctor(@PathVariable(value = "doctor_id") Long doctorId);
+    MDoctor getDoctor(@PathVariable(value = "doctor_id") String doctorId);
 
     @RequestMapping(value = ServiceApi.Doctors.Doctors, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建医生", notes = "重新绑定医生信息")

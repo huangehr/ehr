@@ -19,20 +19,11 @@ public class DataSetRecord {
     private String patientId;
     private String eventNo;
     private String orgCode;
-    private String eventType;
     private Date eventTime;
     private Date createTime;
     private boolean isMultiRecord = false;
     private boolean reUploadFlg = false;
     private Map<String, DataElementRecord> records = new TreeMap<>();
-
-    public String getEventType() {
-        return eventType;
-    }
-
-    public void setEventType(String eventType) {
-        this.eventType = eventType;
-    }
 
     public String getRowKeyPrefix() {
         return orgCode + "_" + patientId + "_" + eventNo + "_" + version;
