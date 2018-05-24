@@ -6,7 +6,6 @@ import com.yihu.ehr.analyze.service.qc.PackageQcService;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.model.packs.EsSimplePackage;
 import com.yihu.ehr.profile.AnalyzeStatus;
-import com.yihu.ehr.profile.ArchiveStatus;
 import com.yihu.ehr.profile.exception.IllegalJsonDataException;
 import com.yihu.ehr.profile.exception.IllegalJsonFileException;
 import net.lingala.zip4j.exception.ZipException;
@@ -16,12 +15,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.Map;
 
 /**
- * 档案解析引擎.
+ * 档案质控引擎.
  *
  * @author Sand
  * @version 1.0
@@ -29,7 +27,11 @@ import java.util.Map;
  */
 @Service
 public class PackageAnalyzeService {
+
     private final static Logger logger = LoggerFactory.getLogger(PackageAnalyzeService.class);
+    private static final String INDEX = "json_archives";
+    private static final String QC_TYPE = "qc_info";
+
     @Autowired
     protected ObjectMapper objectMapper;
     @Autowired
@@ -62,7 +64,12 @@ public class PackageAnalyzeService {
                 zipPackage.unZip();
                 zipPackage.resolve();
                 packageQcService.qcHandle(zipPackage);
+                //保存质控数据
+                elasticSearchUtil.bulkIndex(INDEX, QC_TYPE, zipPackage.getQcRecords());
+                //报告质控状态
                 packageMgrClient.analyzeStatus(esSimplePackage.get_id(), AnalyzeStatus.Finished, 0, "qc success");
+                //发送解析消息
+                packQueueService.push(esSimplePackage);
             }
         } catch (Exception e) {
             int errorType = -1;

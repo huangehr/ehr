@@ -84,6 +84,7 @@ public class ZipPackage {
     //解压后文件目录
     private File packFile;
     //private Set<String> tableSet = new HashSet<>();
+    private List<Map<String, Object>> qcRecords = new ArrayList<>();
 
     public ZipPackage(EsSimplePackage esSimplePackage) {
         this.esSimplePackage = esSimplePackage;
@@ -183,6 +184,13 @@ public class ZipPackage {
 
     public File getPackFile() {
         return packFile;
+    }
+
+    public List<Map<String, Object>> getQcRecords() {
+        return qcRecords;
+    }
+    public void setQcRecords(List<Map<String, Object>> qcRecords) {
+        this.qcRecords = qcRecords;
     }
 
     public void download() throws IOException {

@@ -68,7 +68,6 @@ public class PackageQcService {
         } catch (ParseException e) {
             logger.error("receive_data_pack," + e.getMessage());
         }*/
-        List<Map<String, Object>> qcRecords = new ArrayList<>();
         Map<String, PackageDataSet> dataSets = zipPackage.getDataSets();
         dataSets.forEach((dataSetCode, dataSetRecord) -> {
             Map<String, MetaDataRecord> records = dataSetRecord.getRecords();
@@ -99,7 +98,7 @@ public class PackageQcService {
                             if (!legal) {
                                 //此处生成质控数据（数据未填充）
                                 Map<String, Object> qcRecord = new HashMap<>();
-                                qcRecords.add(qcRecord);
+                                zipPackage.getQcRecords().add(qcRecord);
                             }
                         } catch (Exception e) {
                             logger.error(e.getMessage());
@@ -108,8 +107,6 @@ public class PackageQcService {
                 }
             });
         });
-        //保存数据（需确定新建索引还是增加type）
-        elasticSearchUtil.bulkIndex(INDEX, QC_TYPE, qcRecords);
     }
 
     private List<String> getDataElementList(String version, String dataSetCode) {
