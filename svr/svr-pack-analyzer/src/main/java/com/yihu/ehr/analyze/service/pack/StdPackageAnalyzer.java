@@ -144,8 +144,8 @@ public class StdPackageAnalyzer extends PackageAnalyzer {
         if (StringUtils.isEmpty(zipPackage.getEventNo())) {
             zipPackage.setEventNo(eventNo);
         }
-        if (StringUtils.isEmpty(zipPackage.getEventTime())) {
-            zipPackage.setEventTime(eventTime);
+        if (StringUtils.isEmpty(zipPackage.getEventDate())) {
+            zipPackage.setEventDate(eventTime);
         }
 
         try {

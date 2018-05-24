@@ -50,7 +50,7 @@ public class PackageQcService {
         packMap.put("orgCode", zipPackage.getOrgCode());
         packMap.put("patientId", zipPackage.getPatientId());
         packMap.put("eventNo", zipPackage.getEventNo());
-        packMap.put("eventTime", zipPackage.getEventTime());
+        packMap.put("eventTime", zipPackage.getEventDate());
         packMap.put("eventType", zipPackage.getEventType());
         packMap.put("receiveTime", esSimplePackage.getReceive_date());
         packMap.put("packId", esSimplePackage.get_id());
