@@ -97,6 +97,7 @@ public class PackageQcService {
                             Method _method = clazz.getMethod(method, new Class[]{String.class, String.class, String.class});
                             Boolean legal = (Boolean)_method.invoke(qcRuleCheckService, dataSetCode, metadata, dataGroup.get(metadata));
                             if (!legal) {
+                                //此处生成质控数据（数据未填充）
                                 Map<String, Object> qcRecord = new HashMap<>();
                                 qcRecords.add(qcRecord);
                             }
@@ -107,6 +108,7 @@ public class PackageQcService {
                 }
             });
         });
+        //保存数据（需确定新建索引还是增加type）
         elasticSearchUtil.bulkIndex(INDEX, QC_TYPE, qcRecords);
     }
 
