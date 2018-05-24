@@ -31,6 +31,7 @@ public class SaveHelper {
             }
             case Contant.save.es: {
                 return SpringUtil.getBean(ElastricSearchSave.class).save(dataModels,quotaDataSave.getConfigJson());
+//                return SpringUtil.getBean(ElastricSearchSave.class).saveByMoreThred(dataModels,quotaDataSave.getConfigJson());
             }
         }
         return false;

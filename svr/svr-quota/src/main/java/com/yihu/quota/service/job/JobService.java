@@ -5,6 +5,7 @@ import com.yihu.quota.etl.extract.es.EsResultExtract;
 import com.yihu.quota.model.jpa.TjQuota;
 import com.yihu.quota.util.QuartzHelper;
 import com.yihu.quota.vo.QuotaVo;
+import org.quartz.ObjectAlreadyExistsException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -60,7 +61,12 @@ public class JobService {
             //往quartz框架添加任务
             if ((!StringUtils.isEmpty(executeFlag) && executeFlag.equals("1")) || // 初始执行
                     (!StringUtils.isEmpty(tjQuota.getJobClazz()) && tjQuota.getExecType().equals("1"))) { // 立即执行
-                quartzHelper.startNow(Class.forName(quotaVo.getJobClazz()), quotaCodeImmediately, params);
+               try {
+                   quartzHelper.startNow(Class.forName(quotaVo.getJobClazz()), quotaCodeImmediately, params);
+               }catch (Exception e){
+                   System.out.println(quotaCodeImmediately + "," + tjQuota.getName() + "指标正在执行！");
+                   throw  new ObjectAlreadyExistsException(quotaCodeImmediately + "," + tjQuota.getName() + "指标正在执行！");
+               }
             } else {
                 //周期执行指标 更新指标执行状态：0未开启，1执行中
                 tjQuota.setJobStatus("1");

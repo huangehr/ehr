@@ -173,7 +173,7 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
         String random = randomUtil.getRandomString(6);
         //发送短信
         String api = "MsgGW.Sms.send";
-        String content = "尊敬的用户：欢迎使用健康上饶，您的验证码为:【" + random + "】,有效期n分钟，请尽快完成注册。若非本人操作，请忽略。";
+        String content = "尊敬的用户：欢迎使用健康上饶，您的验证码为:【" + random + "】,有效期10分钟，请尽快完成注册。若非本人操作，请忽略。";
         Map<String, String> apiParamMap = new HashMap<>();
         //手机号码
         apiParamMap.put("mobile", username);
