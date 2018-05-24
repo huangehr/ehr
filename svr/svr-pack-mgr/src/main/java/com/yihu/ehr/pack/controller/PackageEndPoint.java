@@ -166,7 +166,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             updateSource.put("re_upload_flg", map.get("re_upload_flg"));
             updateSource.put("profile_id", map.get("profile_id"));
             updateSource.put("finish_date", dateFormat.format(new Date()));
-            updateSource.put("message", "success");
+            updateSource.put("message", "resolve success");
         } else if (status == ArchiveStatus.Acquired) {
             //开始入库
             updateSource.put("parse_date", dateFormat.format(new Date()));
@@ -220,8 +220,8 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
                     updateSource.put("analyze_fail_count", failCount + 1);
                 }
             }
-            updateSource.put("message", message);
         }
+        updateSource.put("message", message);
         updateSource.put("error_type", errorTye);
         updateSource.put("analyze_status", status.ordinal());
         elasticSearchUtil.voidUpdate(INDEX, TYPE, id, updateSource);

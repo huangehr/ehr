@@ -50,7 +50,7 @@ public class StdPackageResolver extends PackageResolver {
         for (File file : files) {
             PackageDataSet dataSet = generateDataSet(file, origin);
             packageDataSetList.add(dataSet);
-            if (dataSet.isReUploadFlg()){
+            if (dataSet.isReUploadFlg() && !standardPackage.isReUploadFlg()){
                 standardPackage.setReUploadFlg(true);
             }
         }
@@ -58,13 +58,13 @@ public class StdPackageResolver extends PackageResolver {
             for (PackageDataSet dataSet : packageDataSetList) {
                 String dataSetCode = origin ? DataSetUtil.originDataSetCode(dataSet.getCode()) : dataSet.getCode();
                 dataSet.setCode(dataSetCode);
-                standardPackage.setEventDate(dataSet.getEventTime());
+                standardPackage.insertDataSet(dataSetCode, dataSet);
                 standardPackage.setPatientId(dataSet.getPatientId());
                 standardPackage.setEventNo(dataSet.getEventNo());
                 standardPackage.setOrgCode(dataSet.getOrgCode());
                 standardPackage.setCdaVersion(dataSet.getCdaVersion());
                 standardPackage.setCreateDate(dataSet.getCreateTime());
-                standardPackage.insertDataSet(dataSetCode, dataSet);
+                standardPackage.setEventDate(dataSet.getEventTime());
             }
             return;
         }
@@ -129,13 +129,22 @@ public class StdPackageResolver extends PackageResolver {
                         standardPackage.setDiagnosisNameList(diagnosisNameList);
                     }
                 }
+
+                //科室信息
+                if (standardPackage.getDeptCode() == null) {
+                    Map<String, Object> properties = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.Dept);
+                    String deptCode = (String) properties.get(MasterResourceFamily.BasicColumns.DeptCode);
+                    if (StringUtils.isNotEmpty(dataSetCode)) {
+                        standardPackage.setDeptCode(deptCode);
+                    }
+                }
             }
+            standardPackage.insertDataSet(dataSetCode, dataSet);
             standardPackage.setPatientId(dataSet.getPatientId());
             standardPackage.setEventNo(dataSet.getEventNo());
             standardPackage.setOrgCode(dataSet.getOrgCode());
             standardPackage.setCdaVersion(dataSet.getCdaVersion());
             standardPackage.setCreateDate(dataSet.getCreateTime());
-            standardPackage.insertDataSet(dataSetCode, dataSet);
         }
     }
 
@@ -151,7 +160,7 @@ public class StdPackageResolver extends PackageResolver {
         if (jsonNode.isNull()) {
             throw new IllegalJsonFileException("Invalid json file when generate data set");
         }
-        PackageDataSet dataSet = dataSetResolverWithTranslator.parseStructuredJsonDataSet(jsonNode, isOrigin);
+        PackageDataSet dataSet = dataSetParser.parseStructuredJsonDataSet(jsonNode, isOrigin);
         return dataSet;
     }
 }

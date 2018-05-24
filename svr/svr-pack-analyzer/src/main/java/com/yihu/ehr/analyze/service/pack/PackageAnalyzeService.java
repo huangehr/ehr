@@ -5,6 +5,12 @@ import com.yihu.ehr.analyze.feign.PackageMgrClient;
 import com.yihu.ehr.analyze.service.qc.PackageQcService;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.model.packs.EsSimplePackage;
+import com.yihu.ehr.profile.AnalyzeStatus;
+import com.yihu.ehr.profile.ArchiveStatus;
+import com.yihu.ehr.profile.exception.IllegalJsonDataException;
+import com.yihu.ehr.profile.exception.IllegalJsonFileException;
+import net.lingala.zip4j.exception.ZipException;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +35,7 @@ public class PackageAnalyzeService {
     @Autowired
     private PackQueueService packQueueService;
     @Autowired
-    private PackageMgrClient mgrClient;
+    private PackageMgrClient packageMgrClient;
     @Autowired
     private PackageQcService packageQcService;
     @Autowired
@@ -50,20 +56,37 @@ public class PackageAnalyzeService {
         try {
             esSimplePackage = packQueueService.pop();
             if (esSimplePackage != null) {
+                packageMgrClient.analyzeStatus(esSimplePackage.get_id(), AnalyzeStatus.Acquired, 0, "正在质控中");
                 zipPackage = new ZipPackage(esSimplePackage);
                 zipPackage.download();
                 zipPackage.unZip();
                 zipPackage.resolve();
                 packageQcService.qcHandle(zipPackage);
-                mgrClient.analyzeStatus(esSimplePackage.get_id(), 3);
+                packageMgrClient.analyzeStatus(esSimplePackage.get_id(), AnalyzeStatus.Finished, 0, "qc success");
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.error(e.getMessage());
-            try {
-                mgrClient.analyzeStatus(esSimplePackage.get_id(), 2);
-            } catch (Exception e1) {
-                e1.printStackTrace();
+            int errorType = -2;
+            if (e instanceof ZipException) {
+                errorType = 1;
+            } else if (e instanceof IllegalJsonFileException) {
+                errorType = 2;
+            } else if (e instanceof IllegalJsonDataException) {
+                errorType = 3;
+            }
+            if (esSimplePackage != null) {
+                try {
+                    if (StringUtils.isNotBlank(e.getMessage())) {
+                        packageMgrClient.analyzeStatus(esSimplePackage.get_id(), AnalyzeStatus.Failed, errorType, e.getMessage());
+                        logger.error(e.getMessage(), e);
+                    } else {
+                        packageMgrClient.analyzeStatus(esSimplePackage.get_id(), AnalyzeStatus.Failed, errorType, "Internal server error, please see task log for detail message.");
+                        logger.error("Internal server error, please see task log for detail message.", e);
+                    }
+                } catch (Exception e1) {
+                    logger.error("Execute feign fail cause by:" + e1.getMessage());
+                }
+            } else {
+                logger.error("Empty pack cause by:" + e.getMessage());
             }
         } finally {
             if (zipPackage != null) {
@@ -75,9 +98,5 @@ public class PackageAnalyzeService {
     public void esSaveData(String index, String type, String dataList) throws Exception {
         List<Map<String, Object>> list = objectMapper.readValue(dataList, List.class);
         elasticSearchUtil.bulkIndex(index, type, list);
-    }
-
-    @PostConstruct
-    private void init() {
     }
 }

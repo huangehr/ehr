@@ -6,11 +6,11 @@ import com.yihu.ehr.profile.EventType;
 import com.yihu.ehr.profile.extractor.ExtractorChain;
 import com.yihu.ehr.profile.extractor.KeyDataExtractor;
 import com.yihu.ehr.profile.family.MasterResourceFamily;
+import com.yihu.ehr.profile.util.DataSetParser;
 import com.yihu.ehr.profile.util.PackageDataSet;
 import com.yihu.ehr.profile.exception.IllegalJsonDataException;
 import com.yihu.ehr.profile.exception.IllegalJsonFileException;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
-import com.yihu.ehr.resolve.service.resource.stage1.DataSetParserWithTranslator;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -31,7 +31,7 @@ import java.util.Set;
 public class ImmediateDataResolver {
 
     @Autowired
-    protected DataSetParserWithTranslator dataSetResolverWithTranslator;
+    protected DataSetParser dataSetParser;
     @Autowired
     protected ObjectMapper objectMapper;
     @Autowired
@@ -65,7 +65,7 @@ public class ImmediateDataResolver {
 
         int eventType = dataNode.get("event_type").asInt();
 
-        List<PackageDataSet> packageDataSetList = dataSetResolverWithTranslator.parseStructuredImmediateJson(dataNode);
+        List<PackageDataSet> packageDataSetList = dataSetParser.parseStructuredImmediateJson(dataNode);
 
         if (packageDataSetList != null) {
             for (PackageDataSet dataSet : packageDataSetList) {
@@ -162,7 +162,7 @@ public class ImmediateDataResolver {
         if (jsonNode.isNull()) {
             throw new IllegalJsonFileException("Invalid json file when generate data set");
         }
-        List<PackageDataSet> dataSet = dataSetResolverWithTranslator.parseStructuredImmediateJson(jsonNode);
+        List<PackageDataSet> dataSet = dataSetParser.parseStructuredImmediateJson(jsonNode);
         return dataSet;
     }
 }
