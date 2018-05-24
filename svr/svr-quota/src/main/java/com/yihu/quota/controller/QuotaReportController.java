@@ -192,9 +192,9 @@ public class QuotaReportController extends BaseController {
 
             if(dimension.equals(orgHealthCategoryCode)){//如果是特殊机构类型树状机构需要转成树状结构
                 List<Map<String, Object>> orgHealthCategoryList = orgHealthCategoryStatisticsService.getOrgHealthCategoryTreeByPid(-1);
-                dataList = baseStatistsService.setResultAllDimenMap(maxQuotaCode, orgHealthCategoryList, resultList,null);
-                //采用新的 管理出特殊机构类型方式 待调试
-//                dataList = baseStatistsService.allCategoryResultMap(maxQuotaCode, orgHealthCategoryList, resultList);
+//                dataList = baseStatistsService.setResultAllDimenMap(maxQuotaCode, orgHealthCategoryList, resultList,null);
+                //采用新的
+                dataList = baseStatistsService.allCategoryResultMap(maxQuotaCode, orgHealthCategoryList, resultList);
 
             }else {
                 dataList = resultList;
