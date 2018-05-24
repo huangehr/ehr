@@ -65,7 +65,7 @@ public class PackageAnalyzeService {
                 packageMgrClient.analyzeStatus(esSimplePackage.get_id(), AnalyzeStatus.Finished, 0, "qc success");
             }
         } catch (Exception e) {
-            int errorType = -2;
+            int errorType = -1;
             if (e instanceof ZipException) {
                 errorType = 1;
             } else if (e instanceof IllegalJsonFileException) {

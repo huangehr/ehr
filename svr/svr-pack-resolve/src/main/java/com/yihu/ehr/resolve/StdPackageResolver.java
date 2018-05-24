@@ -134,7 +134,7 @@ public class StdPackageResolver extends PackageResolver {
                 if (standardPackage.getDeptCode() == null) {
                     Map<String, Object> properties = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.Dept);
                     String deptCode = (String) properties.get(MasterResourceFamily.BasicColumns.DeptCode);
-                    if (StringUtils.isNotEmpty(dataSetCode)) {
+                    if (StringUtils.isNotEmpty(deptCode)) {
                         standardPackage.setDeptCode(deptCode);
                     }
                 }

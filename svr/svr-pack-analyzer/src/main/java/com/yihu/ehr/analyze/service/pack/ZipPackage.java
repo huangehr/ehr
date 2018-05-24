@@ -62,13 +62,17 @@ public class ZipPackage {
     //事件号
     private String eventNo;
     //事件时间
-    private String eventDate;
+    private Date eventDate;
     //事件类型
     private EventType eventType;
     //病人ID
     private String patientId;
     //科室代码
     private String deptCode;
+    //ICD10诊断列表
+    private Set<String> diagnosisList;
+    //ICD10诊断名称列表
+    private Set<String> diagnosisNameList;
     //数据包
     private EsSimplePackage esSimplePackage;
     //zip辅助对象
@@ -121,10 +125,10 @@ public class ZipPackage {
         this.eventNo = eventNo;
     }
 
-    public String getEventDate() {
+    public Date getEventDate() {
         return eventDate;
     }
-    public void setEventDate(String eventDate) {
+    public void setEventDate(Date eventDate) {
         this.eventDate = eventDate;
     }
 
@@ -147,6 +151,22 @@ public class ZipPackage {
     }
     public void setDeptCode(String deptCode) {
         this.deptCode = deptCode;
+    }
+
+    public Set<String> getDiagnosisList() {
+        return diagnosisList;
+    }
+
+    public void setDiagnosisList(Set<String> diagnosisList) {
+        this.diagnosisList = diagnosisList;
+    }
+
+    public Set<String> getDiagnosisNameList() {
+        return diagnosisNameList;
+    }
+
+    public void setDiagnosisNameList(Set<String> diagnosisNameList) {
+        this.diagnosisNameList = diagnosisNameList;
     }
 
     public EsSimplePackage getEsSimplePackage() {
