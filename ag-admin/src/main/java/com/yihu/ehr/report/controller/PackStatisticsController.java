@@ -33,8 +33,10 @@ public class PackStatisticsController extends BaseController {
             @ApiParam(name = "startDate", value = "开始日期")
             @RequestParam(name = "startDate") String startDate,
             @ApiParam(name = "endDate", value = "结束日期")
-            @RequestParam(name = "endDate") String endDate) {
-        Envelop envelop = packStatisticsClient.getArchiveReportAll(startDate,endDate);
+            @RequestParam(name = "endDate") String endDate,
+            @ApiParam(name = "orgCode", value = "医院代码")
+            @RequestParam(name = "orgCode") String orgCode) {
+        Envelop envelop = packStatisticsClient.getArchiveReportAll(startDate, endDate, orgCode);
         return envelop;
     }
 
@@ -103,5 +105,17 @@ public class PackStatisticsController extends BaseController {
             @ApiParam(name = "orgCode", value = "医院代码")
             @RequestParam(name = "orgCode",required = false) String orgCode) {
         return packStatisticsClient.getArchivesRight(startDate, endDate, orgCode);
+    }
+
+    @RequestMapping(value = ServiceApi.StasticReport.GetErrorCodeList, method = RequestMethod.GET)
+    @ApiOperation(value = "错误数据元列表")
+    public Envelop getErrorCodeList(
+            @ApiParam(name = "startDate", value = "开始日期")
+            @RequestParam(name = "startDate") String startDate,
+            @ApiParam(name = "endDate", value = "结束日期")
+            @RequestParam(name = "endDate") String endDate,
+            @ApiParam(name = "orgCode", value = "医院代码")
+            @RequestParam(name = "orgCode", required = false) String orgCode) throws Exception {
+        return packStatisticsClient.getErrorCodeList(startDate, endDate, orgCode);
     }
 }

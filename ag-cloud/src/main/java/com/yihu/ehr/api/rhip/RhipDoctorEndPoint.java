@@ -58,10 +58,10 @@ public class RhipDoctorEndPoint extends BaseController {
 
 
     @RequestMapping(value = "doctor/{doctor_id}", method = RequestMethod.GET)
-    @ApiOperation(value = "获取医生信息", notes = "医生信息")
+    @ApiOperation(value = "通过身份证获取医生信息", notes = "医生信息")
     public Envelop getUser(
-            @ApiParam(name = "doctor_id", value = "", defaultValue = "")
-            @PathVariable(value = "doctor_id") Long doctorId) {
+            @ApiParam(name = "doctor_id", value = "身份证号", defaultValue = "")
+            @PathVariable(value = "doctor_id") String doctorId) {
         try {
             MDoctor mDoctor = doctorClient.getDoctor(doctorId);
             if (mDoctor == null) {
