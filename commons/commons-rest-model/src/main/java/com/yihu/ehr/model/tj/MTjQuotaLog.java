@@ -11,7 +11,7 @@ public class MTjQuotaLog {
     private long id;
     private String quotaCode;  //
     private String saasId; //
-    private Integer status;//1成功 0失败
+    private Integer status;//1成功 0失败,2执行中
     private String content;//内容
     private Date startTime;//任务开始执行时间
     private Date endTime;//任务结束执行时间

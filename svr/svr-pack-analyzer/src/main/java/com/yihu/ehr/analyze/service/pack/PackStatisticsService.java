@@ -11,9 +11,15 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.search.aggregations.AggregationBuilder;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramBuilder;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
+import org.elasticsearch.search.aggregations.bucket.terms.LongTerms;
+import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
+import org.elasticsearch.search.aggregations.metrics.valuecount.InternalValueCount;
+import org.elasticsearch.search.aggregations.metrics.valuecount.ValueCountBuilder;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -130,14 +136,33 @@ public class PackStatisticsService extends BaseJpaService {
      * @param dateStr
      * @return
      */
-    public List<Map<String,Object>> getArchivesCount(String dateStr) throws Exception {
-        String sql1 = "SELECT COUNT(*) FROM json_archives WHERE (archive_status = 0 OR archive_status = 1) AND receive_date BETWEEN '" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59'";
-        ResultSet resultSet1 = elasticSearchUtil.findBySql(sql1);
-        String sql2 = "SELECT COUNT(*) FROM json_archives WHERE archive_status = 3 AND receive_date BETWEEN '" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59'";
-        ResultSet resultSet2 = elasticSearchUtil.findBySql(sql2);
-        String sql3 = "SELECT COUNT(*) FROM json_archives WHERE receive_date BETWEEN '" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59'";
-        ResultSet resultSet3 = elasticSearchUtil.findBySql(sql3);
+    public List<Map<String,Object>> getArchivesCount(String dateStr, String orgCode) throws Exception {
+        String sql1 = "";
+        String sql2 = "";
+        String sql3 = "";
+        if(StringUtils.isNotEmpty(orgCode)){
+            sql1 = "SELECT COUNT(*) FROM json_archives WHERE (archive_status = 0 OR archive_status = 1) AND org_code='"+orgCode+"'" +
+                    " AND receive_date BETWEEN '" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59'";
+
+            sql2 = "SELECT COUNT(*) FROM json_archives WHERE archive_status = 3 AND org_code='"+orgCode+"'" +
+                    " AND receive_date BETWEEN '" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59'";
+
+            sql3 = "SELECT COUNT(*) FROM json_archives WHERE  org_code='"+orgCode+"'" +
+                    " AND receive_date BETWEEN '" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59'";
+        }else{
+            sql1 = "SELECT COUNT(*) FROM json_archives WHERE (archive_status = 0 OR archive_status = 1) " +
+                    " AND receive_date BETWEEN '" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59'";
+
+            sql2 = "SELECT COUNT(*) FROM json_archives WHERE archive_status = 3 " +
+                    " AND receive_date BETWEEN '" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59'";
+
+            sql3 = "SELECT COUNT(*) FROM json_archives WHERE " +
+                    " receive_date BETWEEN '" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59'";
+        }
         List<Map<String,Object>> dataList = new ArrayList<Map<String,Object>>();
+        ResultSet resultSet1 = elasticSearchUtil.findBySql(sql1);
+        ResultSet resultSet2 = elasticSearchUtil.findBySql(sql2);
+        ResultSet resultSet3 = elasticSearchUtil.findBySql(sql3);
         resultSet1.next();
         resultSet2.next();
         resultSet3.next();
@@ -876,4 +901,46 @@ public class PackStatisticsService extends BaseJpaService {
         return envelop;
     }
 
+    public Envelop getErrorCodeList(String startDate, String endDate, String orgCode) throws Exception{
+        Envelop envelop = new Envelop();
+        List<Map<String, Object>> resultList = new ArrayList<>();
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("receiveTime>=" + startDate + ";");
+        stringBuilder.append("receiveTime<" + endDate + ";");
+        if (StringUtils.isNotEmpty(orgCode) && !"null".equals(orgCode)){
+            stringBuilder.append("orgCode=" + orgCode);
+        }
+        TransportClient transportClient = elasticSearchPool.getClient();
+        try {
+            SearchRequestBuilder builder = transportClient.prepareSearch("qc");
+            builder.setTypes("receive_data_element");
+            builder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
+            builder.setQuery(elasticSearchUtil.getQueryBuilder(stringBuilder.toString()));
+            AggregationBuilder terms = AggregationBuilders.terms("table").field("table");
+            AggregationBuilder termsChild = AggregationBuilders.terms("code").field("code");
+            ValueCountBuilder countBuilder = AggregationBuilders.count("count").field("code");
+            termsChild.subAggregation(countBuilder);
+            terms.subAggregation(termsChild);
+            builder.addAggregation(terms);
+            builder.setSize(0);
+            builder.setExplain(true);
+            SearchResponse response = builder.get();
+            StringTerms stringTerms = response.getAggregations().get("table");
+            stringTerms.getBuckets().forEach(item1 -> {
+                StringTerms term = item1.getAggregations().get("code");
+                term.getBuckets().forEach(item2 -> {
+                    Map<String,Object> temp = new HashMap<>();
+                    InternalValueCount internalValueCount = item2.getAggregations().get("count");
+                    temp.put("table",item1.getKeyAsString());
+                    temp.put("code",item2.getKeyAsString());
+                    temp.put("value",internalValueCount.getProperty("value"));
+                    resultList.add(temp);
+                });
+            });
+            envelop.setObj(resultList);
+        } finally {
+            elasticSearchPool.releaseClient(transportClient);
+        }
+        return envelop;
+    }
 }

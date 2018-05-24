@@ -28,7 +28,9 @@ public interface PackStatisticsClient {
     Envelop getArchiveReportAll(@ApiParam(name = "startDate", value = "开始日期")
                                 @RequestParam(name = "startDate") String startDate,
                                 @ApiParam(name = "endDate", value = "结束日期")
-                                @RequestParam(name = "endDate") String endDate);
+                                @RequestParam(name = "endDate") String endDate,
+                                @ApiParam(name = "orgCode", value = "医院代码")
+                                @RequestParam(name = "orgCode") String orgCode);
 
     @RequestMapping(value =  ServiceApi.StasticReport.GetRecieveOrgCount, method = RequestMethod.GET)
     @ApiOperation(value = "根据接收日期统计各个医院的数据解析情况")
@@ -73,6 +75,16 @@ public interface PackStatisticsClient {
     @RequestMapping(value = ServiceApi.StasticReport.GetArchivesRight, method = RequestMethod.GET)
     @ApiOperation(value = "准确性分析")
     Envelop getArchivesRight(
+            @ApiParam(name = "startDate", value = "开始日期")
+            @RequestParam(name = "startDate") String startDate,
+            @ApiParam(name = "endDate", value = "结束日期")
+            @RequestParam(name = "endDate") String endDate,
+            @ApiParam(name = "orgCode", value = "医院代码")
+            @RequestParam(name = "orgCode", required = false) String orgCode);
+
+    @RequestMapping(value = ServiceApi.StasticReport.GetErrorCodeList, method = RequestMethod.GET)
+    @ApiOperation(value = "错误数据元列表")
+    Envelop getErrorCodeList(
             @ApiParam(name = "startDate", value = "开始日期")
             @RequestParam(name = "startDate") String startDate,
             @ApiParam(name = "endDate", value = "结束日期")

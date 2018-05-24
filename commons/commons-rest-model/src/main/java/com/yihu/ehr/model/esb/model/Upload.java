@@ -13,7 +13,7 @@ public class Upload implements Serializable {
 
     //--------------------es必定不为空的字段-----------------------------------------
     private String _id; //重传或者补传为profile_id,否则为uuid
-    private Integer origin;//0为重传,即reuploadFlag为true    1为补传(事件时间晚于当前时间3天)
+    private Integer origin;//0为重传,即reuploadFlag为true    1为补传(事件时间晚于当前时间2天)    2查询索引失败  3查询主表失败     4查询细表失败
     private Date create_date;
     private String schema_version;//适配省平台版本号
     private Integer failed_count;//失败次数
@@ -21,10 +21,12 @@ public class Upload implements Serializable {
     private Date repeat_date ;//重传时间
 
     //--------------------es可能为空的字段-----------------------------------------
-    private Date start_date;
-    private Date end_date;
-    private Date event_date;
+    private Date start_date;//开始时间
+    private Date end_date;//结束时间
+    private Date event_date;//事件时间
     private String row_key;
+    private String table;//平台数据集code
+    private String upload_table;//待上传的数据集code
 
 
     public String get_id() {
@@ -120,4 +122,19 @@ public class Upload implements Serializable {
         this.event_date = event_date;
     }
 
+    public String getTable() {
+        return table;
+    }
+
+    public void setTable(String table) {
+        this.table = table;
+    }
+
+    public String getUpload_table() {
+        return upload_table;
+    }
+
+    public void setUpload_table(String upload_table) {
+        this.upload_table = upload_table;
+    }
 }
