@@ -82,10 +82,6 @@ zuul:
     gov-server:
       path: /open/govServer/**
       url: http://www.srswjw.gov.cn:8080/
-    # 政府服务平台接口
-    gov-client:
-      path: /open/gov/**
-      url: http://192.168.1.221:9088/gov
 
 ---
 spring:
@@ -111,10 +107,6 @@ zuul:
     gov-server:
       path: /open/govServer/**
       url: http://www.srswjw.gov.cn:8080/
-    # 政府服务平台接口
-    gov-client:
-      path: /open/gov/**
-      url: http://192.168.1.221:9088/gov
 
 ---
 spring:
@@ -140,10 +132,6 @@ zuul:
     gov-server:
       path: /open/govServer/**
       url: http://www.srswjw.gov.cn:8080/
-    # 政府服务平台接口
-    gov-client:
-      path: /open/gov/**
-      url: http://11.1.2.13:9088/gov
 
 ---
 spring:
@@ -169,10 +157,6 @@ zuul:
     gov-server:
       path: /open/govServer/**
       url: http://www.srswjw.gov.cn:8080/
-    # 政府服务平台接口
-    gov-client:
-      path: /open/gov/**
-      url: http://10.176.97.10:9088/gov
 
 ---
 spring:
@@ -198,10 +182,6 @@ zuul:
     gov-server:
       path: /open/govServer/**
       url: http://www.srswjw.gov.cn:8080/
-    # 政府服务平台接口
-    gov-client:
-      path: /open/gov/**
-      url: http://100.100.1.162:9088/gov
 
 ---
 spring:
@@ -227,7 +207,3 @@ zuul:
     gov-server:
       path: /open/govServer/**
       url: http://www.srswjw.gov.cn:8080/
-    # 政府服务平台接口
-    gov-client:
-      path: /open/gov/**
-      url: http://192.168.220.84:9088/gov
