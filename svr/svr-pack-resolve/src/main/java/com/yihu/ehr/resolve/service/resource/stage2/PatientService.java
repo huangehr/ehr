@@ -54,7 +54,7 @@ public class PatientService extends BaseJpaService<DemographicInfo, PatientDao>{
             demographicInfo.setNation(nation);
             String gender = resourceBucket.getMasterRecord().getResourceValue("EHR_000019") == null ? "0" :resourceBucket.getMasterRecord().getResourceValue("EHR_000019").toString();
             demographicInfo.setGender(gender);
-            Date birthday = resourceBucket.getMasterRecord().getResourceValue("EHR_000320") == null ? null:DateTimeUtil.simpleDateParse(resourceBucket.getMasterRecord().getResourceValue("EHR_000320"));
+            Date birthday = resourceBucket.getMasterRecord().getResourceValue("EHR_000007") == null ? null:DateTimeUtil.simpleDateParse(resourceBucket.getMasterRecord().getResourceValue("EHR_000007"));
             demographicInfo.setBirthday(birthday);
             String homeAddress = resourceBucket.getMasterRecord().getResourceValue("EHR_001227") == null ? "" : resourceBucket.getMasterRecord().getResourceValue("EHR_001227").toString();
             demographicInfo.setHomeAddress(homeAddress);

@@ -4,11 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.analyze.feign.HosAdminServiceClient;
 import com.yihu.ehr.analyze.feign.RedisServiceClient;
-import com.yihu.ehr.analyze.service.pack.DataElementRecord;
-import com.yihu.ehr.analyze.service.pack.DataSetRecord;
 import com.yihu.ehr.analyze.service.pack.ZipPackage;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.model.packs.EsSimplePackage;
+import com.yihu.ehr.profile.util.MetaDataRecord;
+import com.yihu.ehr.profile.util.PackageDataSet;
 import com.yihu.ehr.util.datetime.DateUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -61,9 +61,9 @@ public class PackageQcService {
             logger.error("receive_data_pack," + e.getMessage());
         }
 
-        Map<String, DataSetRecord> dataSets = zipPackage.getDataSets();
+        Map<String, PackageDataSet> dataSets = zipPackage.getDataSets();
         dataSets.forEach((key, dataSetRecord) -> {
-            Map<String, DataElementRecord> records = dataSetRecord.getRecords();
+            Map<String, MetaDataRecord> records = dataSetRecord.getRecords();
 
             int size = records.size();
             Map<String, Object> map = new HashMap<>(0);
@@ -80,9 +80,8 @@ public class PackageQcService {
             }
 
             records.forEach((elementCode, dataElement) -> {
-                String rowKey = dataSetRecord.genRowKey(elementCode);
                 Map<String, String> dataGroup = dataElement.getDataGroup();
-                List<String> listDataElement = getDataElementList(dataSetRecord.getVersion(), dataSetRecord.getCode());
+                List<String> listDataElement = getDataElementList(dataSetRecord.getCdaVersion(), dataSetRecord.getCode());
                 for (String code : listDataElement) {
                     String value = dataGroup.get(code);
                     if (value == null) {
@@ -91,10 +90,9 @@ public class PackageQcService {
 
                     String channel = "qc_channel_" + code;
                     ObjectNode msgNode = objectMapper.createObjectNode();
-                    msgNode.put("rowKey", rowKey);
                     msgNode.put("table", dataSetRecord.getCode());
                     msgNode.put("columnFamily", ZipPackage.DATA);
-                    msgNode.put("version", dataSetRecord.getVersion());
+                    msgNode.put("version", dataSetRecord.getCdaVersion());
                     msgNode.put("code", code);
                     msgNode.put("value", value);
                     msgNode.put("orgCode", dataSetRecord.getOrgCode());

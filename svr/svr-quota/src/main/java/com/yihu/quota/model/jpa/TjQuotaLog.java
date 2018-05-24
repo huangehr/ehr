@@ -19,6 +19,10 @@ public class TjQuotaLog {
     private Date startTime;
     private Date endTime;
     private String content;
+    /**
+     * 1成功 0失败，2执行中
+      */
+
     private String status;
 
     @Id

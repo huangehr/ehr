@@ -1,4 +1,4 @@
-package com.yihu.ehr.resolve.service.resource.stage1.extractor;
+package com.yihu.ehr.profile.extractor;
 
 import com.yihu.ehr.profile.util.PackageDataSet;
 

@@ -1,11 +1,11 @@
-package com.yihu.ehr.resolve.service.resource.stage1.extractor;
+package com.yihu.ehr.profile.extractor;
 
 import com.yihu.ehr.profile.util.PackageDataSet;
-import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -20,7 +20,7 @@ public class ExtractorChain {
 
     public Map<String,Object> doExtract(PackageDataSet dataSet, KeyDataExtractor.Filter filter) throws Exception {
 
-        Map<String,Object> re = new HashedMap();
+        Map<String,Object> re = new HashMap<>();
         //就診卡号和就诊卡类型
         if(filter.equals(KeyDataExtractor.Filter.CardInfo)) {
             re = context.getBean(CardInfoExtractor.class).extract(dataSet);

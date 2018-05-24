@@ -1,6 +1,7 @@
 package com.yihu.ehr.analyze.service.pack;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.profile.extractor.ExtractorChain;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -13,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 public abstract class PackageAnalyzer {
     @Autowired
     protected ObjectMapper objectMapper;
+    @Autowired
+    protected ExtractorChain extractorChain;
 
     public abstract void analyze(ZipPackage profile) throws Exception;
 }

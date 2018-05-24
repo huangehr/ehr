@@ -26,6 +26,10 @@
             <groupId>com.yihu.hos</groupId>
             <artifactId>common-rest-model</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.yihu.ehr</groupId>
+            <artifactId>commons-profile-core</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

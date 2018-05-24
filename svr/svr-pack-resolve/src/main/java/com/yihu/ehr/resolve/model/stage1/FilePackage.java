@@ -2,7 +2,7 @@ package com.yihu.ehr.resolve.model.stage1;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.yihu.ehr.constants.ProfileType;
+import com.yihu.ehr.profile.ProfileType;
 import com.yihu.ehr.profile.annotation.Table;
 import com.yihu.ehr.profile.core.ResourceCore;
 

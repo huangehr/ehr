@@ -1,9 +1,8 @@
 package com.yihu.ehr.analyze.service.pack;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.constants.RedisCollection;
+import com.yihu.ehr.profile.queue.RedisCollection;
 import com.yihu.ehr.model.packs.EsSimplePackage;
-import com.yihu.ehr.model.packs.MPackage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;

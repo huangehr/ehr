@@ -1,12 +1,14 @@
 package com.yihu.ehr.analyze.service.pack;
 
 import com.yihu.ehr.analyze.config.FastDfsConfig;
-import com.yihu.ehr.constants.ProfileType;
+import com.yihu.ehr.profile.EventType;
+import com.yihu.ehr.profile.ProfileType;
 import com.yihu.ehr.hbase.HBaseAdmin;
 import com.yihu.ehr.hbase.HBaseDao;
 import com.yihu.ehr.hbase.TableBundle;
 import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.model.packs.EsSimplePackage;
+import com.yihu.ehr.profile.util.PackageDataSet;
 import com.yihu.ehr.util.compress.Zipper;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.log.LogService;
@@ -39,6 +41,7 @@ public class ZipPackage {
     public final static String DocumentFolder = "documents";
     public final static String DocumentsFile = "documents.json";
     public final static String LinkFile = "index";
+    public static final String DATA = "d";
 
     private static final RestTemplate REST_TEMPLATE;
     private static final HttpHeaders HTTP_HEADERS;
@@ -47,14 +50,14 @@ public class ZipPackage {
         HTTP_HEADERS = new HttpHeaders();
         HTTP_HEADERS.setAccept(Arrays.asList(MediaType.APPLICATION_OCTET_STREAM));
     }
-    public static final String DATA = "d";
+
     private EsSimplePackage esSimplePackage;
     private Zipper zipper = new Zipper();
 
     /**
      * 数据集合
      */
-    private Map<String, DataSetRecord> dataSets = new TreeMap<>();
+    private Map<String, PackageDataSet> dataSets = new TreeMap<>();
     /**
      * Zip档案包文件
      */
@@ -63,11 +66,12 @@ public class ZipPackage {
      * 解压后文件目录
      */
     private File packFile;
-    private Set<String> tableSet = new HashSet<>();
+    //private Set<String> tableSet = new HashSet<>();
     private String patientId;
     private String eventNo;
     private String orgCode;
-    private String eventType;
+    private String orgArea;
+    private EventType eventType;
     private String eventTime;
 
     public ZipPackage(EsSimplePackage esSimplePackage) {
@@ -78,11 +82,11 @@ public class ZipPackage {
         return esSimplePackage;
     }
 
-    public Map<String, DataSetRecord> getDataSets() {
+    public Map<String, PackageDataSet> getDataSets() {
         return dataSets;
     }
 
-    public void insertDataSet(String dataSetCode, DataSetRecord dataSet) {
+    public void insertDataSet(String dataSetCode, PackageDataSet dataSet) {
         this.dataSets.put(dataSetCode, dataSet);
     }
 
@@ -153,13 +157,13 @@ public class ZipPackage {
      *
      * @throws Exception
      */
-    public void save() throws Exception {
+   /* public void save() throws Exception {
         Set<String> keySet = dataSets.keySet();
         for (String key : keySet) {
             DataSetRecord dataSetRecord = dataSets.get(key);
             saveDataSet(dataSetRecord);
         }
-    }
+    }*/
 
     public String getPatientId() {
         return patientId;
@@ -185,11 +189,19 @@ public class ZipPackage {
         this.orgCode = orgCode;
     }
 
-    public String getEventType() {
+    public String getOrgArea() {
+        return orgArea;
+    }
+
+    public void setOrgArea(String orgArea) {
+        this.orgArea = orgArea;
+    }
+
+    public EventType getEventType() {
         return eventType;
     }
 
-    public void setEventType(String eventType) {
+    public void setEventType(EventType eventType) {
         this.eventType = eventType;
     }
 
@@ -201,16 +213,12 @@ public class ZipPackage {
         this.eventTime = eventTime;
     }
 
-    private void saveDataSet(DataSetRecord dataSetRecord) throws Exception {
+   /* private void saveDataSet(DataSetRecord dataSetRecord) throws Exception {
         String table = dataSetRecord.getCode();
         createTable(table);
-
         ApplicationContext context = SpringContext.getApplicationContext();
         HBaseDao hBaseDao = context.getBean(HBaseDao.class);
-
-
         String rowKeyPrefix = dataSetRecord.getRowKeyPrefix();
-
         TableBundle bundle = new TableBundle();
         if (dataSetRecord.isReUploadFlg()) {
             String legacyRowKeys[] = hBaseDao.findRowKeys(table, rowKeyPrefix, rowKeyPrefix.substring(0, rowKeyPrefix.length() - 1) + "z", "^" + rowKeyPrefix);
@@ -240,9 +248,9 @@ public class ZipPackage {
 
             hBaseDao.save(table, bundle);
         });
-    }
+    }*/
 
-    private synchronized void createTable(String table) throws Exception {
+    /*private synchronized void createTable(String table) throws Exception {
         boolean created = tableSet.contains(table);
         if (created) {
             return;
@@ -254,6 +262,6 @@ public class ZipPackage {
             hBaseAdmin.createTable(table, DATA);
             tableSet.add(table);
         }
-    }
+    }*/
 
 }

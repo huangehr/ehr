@@ -9,6 +9,8 @@ import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.pack.feign.AppClient;
 import com.yihu.ehr.pack.entity.DatasetPackage;
 import com.yihu.ehr.pack.service.DatasetPackageService;
+import com.yihu.ehr.profile.ArchiveStatus;
+import com.yihu.ehr.profile.queue.RedisCollection;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.encrypt.MD5;
 import io.swagger.annotations.Api;
@@ -150,7 +152,7 @@ public class DatasetPackageEndPoint extends EnvelopRestEndPoint {
         } catch (Exception ex) {
             throw new ApiException(ErrorCode.FORBIDDEN, "javax.crypto.BadPaddingException." + ex.getMessage());
         }
-        redisTemplate.opsForList().leftPush(RedisCollection.PackageList, objectMapper.writeValueAsString(aPackage));
+        redisTemplate.opsForList().leftPush(RedisCollection.AnalyzeQueue, objectMapper.writeValueAsString(aPackage));
         //messageBuffer.putMessage(convertToModel(aPackage, MPackage.class));
         return aPackage;
     }

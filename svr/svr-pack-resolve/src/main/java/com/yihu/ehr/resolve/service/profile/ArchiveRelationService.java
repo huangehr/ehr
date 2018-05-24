@@ -1,7 +1,7 @@
 package com.yihu.ehr.resolve.service.profile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.constants.ProfileType;
+import com.yihu.ehr.profile.ProfileType;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.hbase.HBaseDao;
 import com.yihu.ehr.model.packs.EsArchiveRelation;

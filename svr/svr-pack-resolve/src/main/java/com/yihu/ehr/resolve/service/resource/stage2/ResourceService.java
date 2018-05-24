@@ -1,6 +1,7 @@
 package com.yihu.ehr.resolve.service.resource.stage2;
 
 
+import com.yihu.ehr.model.packs.EsSimplePackage;
 import com.yihu.ehr.resolve.dao.FileResourceDao;
 import com.yihu.ehr.resolve.dao.MasterResourceDao;
 import com.yihu.ehr.resolve.dao.SubResourceDao;
@@ -34,8 +35,10 @@ public class ResourceService {
     private UploadService uploadService;
     @Autowired
     private PatientService patientService;
+    @Autowired
+    private QcRecordService qcRecordService;
 
-    public void save(ResourceBucket resourceBucket, StandardPackage standardPackage) throws Exception {
+    public void save(ResourceBucket resourceBucket, StandardPackage standardPackage, EsSimplePackage esSimplePackage) throws Exception {
         //资源主表
         masterResRepo.saveOrUpdate(resourceBucket, standardPackage);
 
@@ -47,6 +50,9 @@ public class ResourceService {
 
         //保存ES关联记录
         archiveRelationService.relation(resourceBucket);
+
+        //保存ES质控数据
+        qcRecordService.record(resourceBucket, esSimplePackage);
 
         //保存ES 待上传省平台upload记录
         uploadService.addWaitUpload(resourceBucket);

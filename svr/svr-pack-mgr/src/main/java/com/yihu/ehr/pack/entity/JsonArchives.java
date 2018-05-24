@@ -1,7 +1,7 @@
 package com.yihu.ehr.pack.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.yihu.ehr.constants.ArchiveStatus;
+import com.yihu.ehr.profile.ArchiveStatus;
 
 import javax.persistence.*;
 import java.util.Date;

@@ -1,9 +1,9 @@
 package com.yihu.ehr.resolve;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.profile.extractor.ExtractorChain;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.resolve.service.resource.stage1.DataSetParserWithTranslator;
-import com.yihu.ehr.resolve.service.resource.stage1.extractor.ExtractorChain;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
