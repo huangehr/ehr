@@ -241,8 +241,6 @@ public class QuotaReportController extends BaseController {
             }
             dataList.add(0,sumMap);
         }
-        //二次指标为除法运算的  合计需要重新计算
-        //TODO
         return dataList;
     }
 
@@ -257,9 +255,6 @@ public class QuotaReportController extends BaseController {
         for(Map<String, Object> map : dataList){
             if(map.get(code) != null){
                 sum += Double.valueOf("--".equals(map.get(code)) ? "0" : map.get(code).toString());
-                if(map.containsKey("children")){
-                    calculateSum(sum,code,(List<Map<String, Object>>) map.get("children"));
-                }
             }
         }
         return sum;
