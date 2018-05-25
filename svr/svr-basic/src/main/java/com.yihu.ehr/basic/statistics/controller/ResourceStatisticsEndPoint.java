@@ -50,7 +50,7 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
     private ResourceStatisticService statisticService;
 
     @RequestMapping(value = ServiceApi.StasticReport.GetStatisticsElectronicMedicalCount, method = RequestMethod.GET)
-    @ApiOperation(value = "电子病历-最近七天采集总数统计，门诊住院数 - 柱状")
+    @ApiOperation(value = "电子病历-最近七天采集总数统计，门诊住院数 - 柱状 ")
     public Envelop getStatisticsElectronicMedicalCount() throws Exception {
         List<String> dateList = new ArrayList<>();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");

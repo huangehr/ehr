@@ -856,7 +856,7 @@ public class PackStatisticsService extends BaseJpaService {
     }
 
     /**
-     * 及时率、完整率按天统计
+     * app接口
      * @param date
      * @return
      */
@@ -864,6 +864,7 @@ public class PackStatisticsService extends BaseJpaService {
         Envelop envelop = new Envelop();
         Map<String,Object> resMap = new HashMap<>();
         Date begin = DateUtil.parseDate(date, DateUtil.DEFAULT_DATE_YMD_FORMAT);
+        Date end1 = DateUtil.addDate(1, begin);
         Date end2 = DateUtil.addDate(7, begin);
         try {
             String sql1 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE  pack_type=1 AND event_date " +
@@ -871,10 +872,19 @@ public class PackStatisticsService extends BaseJpaService {
             String sql2 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE pack_type=1 AND event_date BETWEEN " +
                     " '" + date + " 00:00:00' AND '" +  date + " 23:59:59' AND receive_date BETWEEN"+
                     " '" + date + " 00:00:00' AND '" +  DateUtil.toString(end2) + " 23:59:59' ";
+            String sql3 = "SELECT COUNT(*) FROM json_archives WHERE " +
+                    " receive_date BETWEEN '" + date + " 00:00:00' AND '" +  date + " 23:59:59'";
+
+            String sql4 = "select count(code) as count from qc/receive_data_element where " +
+                    " receiveTime>='"+date+"' and receiveTime<'"+DateUtil.toString(end1)+"'";
             ResultSet resultSet1 = elasticSearchUtil.findBySql(sql1);
             resultSet1.next();
             ResultSet resultSet2 = elasticSearchUtil.findBySql(sql2);
             resultSet2.next();
+            ResultSet resultSet3= elasticSearchUtil.findBySql(sql3);
+            resultSet3.next();
+            ResultSet resultSet4= elasticSearchUtil.findBySql(sql4);
+            resultSet4.next();
             Map<String,Object> map = getPatientCountEs(date,"");
             //平台档案数据
             int count_pt = new Double(resultSet1.getObject("COUNT(DISTINCT event_no)").toString()).intValue();
@@ -890,6 +900,9 @@ public class PackStatisticsService extends BaseJpaService {
                 resMap.put("time_rate", "0.00%");
                 resMap.put("full_rate", "0.00%");
             }
+            resMap.put("archive_count",resultSet3.getObject("COUNT(*)"));
+            resMap.put("error_count",resultSet4.getObject("count"));
+            resMap.putAll(getPatientTotal(""));
             envelop.setSuccessFlg(true);
         }catch (Exception e){
             resMap.put("time_rate", "0.00%");
@@ -899,6 +912,41 @@ public class PackStatisticsService extends BaseJpaService {
         }
         envelop.setObj(resMap);
         return envelop;
+    }
+
+    /**
+     * 平台就诊人数 总数
+     * @param orgCode
+     * @return
+     */
+    public Map<String,Object> getPatientTotal(String orgCode) throws Exception{
+        String sql1 ="";
+        String sql2 ="";
+        String sql3 ="";
+        if(StringUtils.isNotEmpty(orgCode)){
+            sql1 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=1 AND pack_type=1 AND org_code='"+orgCode+"'";
+
+            sql2 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=0 AND pack_type=1 AND org_code='"+orgCode+"'";
+
+            sql3 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE pack_type=1 AND org_code='"+orgCode+"'";
+        }else{
+            sql1 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=1 AND pack_type=1";
+
+            sql2 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=0 AND pack_type=1";
+
+            sql3 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE pack_type=1 ";
+        }
+        ResultSet resultSet1 = elasticSearchUtil.findBySql(sql1);
+        ResultSet resultSet2 = elasticSearchUtil.findBySql(sql2);
+        ResultSet resultSet3 = elasticSearchUtil.findBySql(sql3);
+        resultSet1.next();
+        resultSet2.next();
+        resultSet3.next();
+        Map<String,Object> map = new HashMap<>();
+        map.put("inpatient_total",new Double(resultSet1.getObject("COUNT(DISTINCT event_no)").toString()).intValue());
+        map.put("oupatient_total",new Double(resultSet2.getObject("COUNT(DISTINCT event_no)").toString()).intValue());
+        map.put("archive_total",new Double(resultSet3.getObject("COUNT(DISTINCT event_no)").toString()).intValue());
+        return map;
     }
 
     public Envelop getErrorCodeList(String startDate, String endDate, String orgCode) throws Exception{

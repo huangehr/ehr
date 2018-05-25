@@ -35,10 +35,6 @@ public class MysqlExtract {
     @Autowired
     private JdbcTemplate jdbcTemplate;
     @Autowired
-    private SolrUtil solrUtil;
-    @Autowired
-    private SolrQuery solrQuery;
-    @Autowired
     private ExtractUtil extractUtil;
     @Autowired
     private ExtractConverUtil extractConverUtil;
@@ -97,7 +93,7 @@ public class MysqlExtract {
                     String result = map.get("result").toString();
                     String mapKey = keyVal.substring(0, keyVal.length() - 1);
                     resultMap.put(mapKey, result);
-                    daySlaveDictMap.put(mapKey,map.get("quotaDate").toString());
+                    daySlaveDictMap.put(mapKey, map.get("quotaDate").toString());
                 }
                 TjQuotaDimensionSlave tjQuotaDimensionSlave = new TjQuotaDimensionSlave();
                 tjQuotaDimensionSlave.setQuotaCode(quotaVo.getCode());
@@ -167,6 +163,12 @@ public class MysqlExtract {
                 sql.append("select sum(" ).append(esConfig.getAggregationKey()).append(" ) result  from " + tableName + whereSql);
             }else {
                 sql.append("select ").append(selectGroupField ).append(" sum(").append(esConfig.getAggregationKey()).append(" ) result from " + tableName + whereSql + " group by " + whereGroupField);
+            }
+        }else if(esConfig.getAggregation().equals(Contant.quota.aggregation_list)){
+            if( StringUtils.isEmpty( esConfig.getAggregationKey()) ){
+                sql.append("select " + selectGroupField + " 1 result from " + tableName + whereSql);
+            }else {
+                sql.append("select " + selectGroupField + esConfig.getAggregationKey() + " result from " + tableName + whereSql);
             }
         }
         return sql.toString();
