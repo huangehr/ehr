@@ -38,7 +38,7 @@ public class MDoctor implements Serializable {
     private String roleType; // 参考系统字典 人员类别
     private String deptName; // 部门名称
     private String jobType; // 参考系统字典 执业类别
-    private String jobLevel; // 参考系统字典 执业级别
+    private String jobLevel; // 参考系统字典 从事专业类别代码-执业级别
     private String jobScope; // 参考系统字典 执业范围
     private String jobState; // 参考系统字典 执业状态
     private String registerFlag; // 是否考试库连带注册-数据手动导入。默认0为是，1为否
