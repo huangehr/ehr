@@ -51,31 +51,123 @@ public class ZipPackage {
         HTTP_HEADERS.setAccept(Arrays.asList(MediaType.APPLICATION_OCTET_STREAM));
     }
 
+    //机构代码
+    private String orgCode;
+    //机构名称
+    private String orgName;
+    //机构地区
+    private String orgArea;
+    //cda版本
+    private String cdaVersion;
+    //事件号
+    private String eventNo;
+    //事件时间
+    private Date eventDate;
+    //事件类型
+    private EventType eventType;
+    //病人ID
+    private String patientId;
+    //科室代码
+    private String deptCode;
+    //ICD10诊断列表
+    private Set<String> diagnosisList;
+    //ICD10诊断名称列表
+    private Set<String> diagnosisNameList;
+    //数据包
     private EsSimplePackage esSimplePackage;
+    //zip辅助对象
     private Zipper zipper = new Zipper();
-
-    /**
-     * 数据集合
-     */
+    //数据集合
     private Map<String, PackageDataSet> dataSets = new TreeMap<>();
-    /**
-     * Zip档案包文件
-     */
+    //Zip档案包文件
     private File zipFile;
-    /**
-     * 解压后文件目录
-     */
+    //解压后文件目录
     private File packFile;
     //private Set<String> tableSet = new HashSet<>();
-    private String patientId;
-    private String eventNo;
-    private String orgCode;
-    private String orgArea;
-    private EventType eventType;
-    private String eventTime;
+    private List<Map<String, Object>> qcRecords = new ArrayList<>();
 
     public ZipPackage(EsSimplePackage esSimplePackage) {
         this.esSimplePackage = esSimplePackage;
+    }
+
+    public String getOrgCode() {
+        return orgCode;
+    }
+    public void setOrgCode(String orgCode) {
+        this.orgCode = orgCode;
+    }
+
+    public String getOrgName() {
+        return orgName;
+    }
+    public void setOrgName(String orgName) {
+        this.orgName = orgName;
+    }
+
+    public String getOrgArea() {
+        return orgArea;
+    }
+    public void setOrgArea(String orgArea) {
+        this.orgArea = orgArea;
+    }
+
+
+    public String getCdaVersion() {
+        return cdaVersion;
+    }
+    public void setCdaVersion(String cdaVersion) {
+        this.cdaVersion = cdaVersion;
+    }
+
+    public String getEventNo() {
+        return eventNo;
+    }
+    public void setEventNo(String eventNo) {
+        this.eventNo = eventNo;
+    }
+
+    public Date getEventDate() {
+        return eventDate;
+    }
+    public void setEventDate(Date eventDate) {
+        this.eventDate = eventDate;
+    }
+
+    public EventType getEventType() {
+        return eventType;
+    }
+    public void setEventType(EventType eventType) {
+        this.eventType = eventType;
+    }
+
+    public String getPatientId() {
+        return patientId;
+    }
+    public void setPatientId(String patientId) {
+        this.patientId = patientId;
+    }
+
+    public String getDeptCode() {
+        return deptCode;
+    }
+    public void setDeptCode(String deptCode) {
+        this.deptCode = deptCode;
+    }
+
+    public Set<String> getDiagnosisList() {
+        return diagnosisList;
+    }
+
+    public void setDiagnosisList(Set<String> diagnosisList) {
+        this.diagnosisList = diagnosisList;
+    }
+
+    public Set<String> getDiagnosisNameList() {
+        return diagnosisNameList;
+    }
+
+    public void setDiagnosisNameList(Set<String> diagnosisNameList) {
+        this.diagnosisNameList = diagnosisNameList;
     }
 
     public EsSimplePackage getEsSimplePackage() {
@@ -92,6 +184,13 @@ public class ZipPackage {
 
     public File getPackFile() {
         return packFile;
+    }
+
+    public List<Map<String, Object>> getQcRecords() {
+        return qcRecords;
+    }
+    public void setQcRecords(List<Map<String, Object>> qcRecords) {
+        this.qcRecords = qcRecords;
     }
 
     public void download() throws IOException {
@@ -121,15 +220,6 @@ public class ZipPackage {
         }
     }
 
-    public void houseKeep() {
-        try {
-            FileUtils.deleteQuietly(zipFile);
-            FileUtils.deleteQuietly(packFile);
-        } catch (Exception e) {
-            LogService.getLogger(PackageAnalyzeService.class).warn("House keep failed after package analyze: " + e.getMessage());
-        }
-    }
-
     public void resolve() throws Exception {
         ProfileType profileType;
         List<String> directories = CollectionUtils.arrayToList(packFile.list());
@@ -146,10 +236,18 @@ public class ZipPackage {
         if (profileType != ProfileType.Standard) {
             throw new ZipException("Not a standard package file");
         }
-
         ApplicationContext context = SpringContext.getApplicationContext();
         StdPackageAnalyzer packageAnalyzer = context.getBean(StdPackageAnalyzer.class);
         packageAnalyzer.analyze(this);
+    }
+
+    public void houseKeep() {
+        try {
+            FileUtils.deleteQuietly(zipFile);
+            FileUtils.deleteQuietly(packFile);
+        } catch (Exception e) {
+            LogService.getLogger(PackageAnalyzeService.class).warn("House keep failed after package analyze: " + e.getMessage());
+        }
     }
 
     /**
@@ -164,54 +262,6 @@ public class ZipPackage {
             saveDataSet(dataSetRecord);
         }
     }*/
-
-    public String getPatientId() {
-        return patientId;
-    }
-
-    public void setPatientId(String patientId) {
-        this.patientId = patientId;
-    }
-
-    public String getEventNo() {
-        return eventNo;
-    }
-
-    public void setEventNo(String eventNo) {
-        this.eventNo = eventNo;
-    }
-
-    public String getOrgCode() {
-        return orgCode;
-    }
-
-    public void setOrgCode(String orgCode) {
-        this.orgCode = orgCode;
-    }
-
-    public String getOrgArea() {
-        return orgArea;
-    }
-
-    public void setOrgArea(String orgArea) {
-        this.orgArea = orgArea;
-    }
-
-    public EventType getEventType() {
-        return eventType;
-    }
-
-    public void setEventType(EventType eventType) {
-        this.eventType = eventType;
-    }
-
-    public String getEventTime() {
-        return eventTime;
-    }
-
-    public void setEventTime(String eventTime) {
-        this.eventTime = eventTime;
-    }
 
    /* private void saveDataSet(DataSetRecord dataSetRecord) throws Exception {
         String table = dataSetRecord.getCode();

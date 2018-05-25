@@ -1,6 +1,7 @@
 package com.yihu.ehr.analyze.feign;
 
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.profile.AnalyzeStatus;
 import com.yihu.ehr.profile.ArchiveStatus;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.constants.ServiceApi;
@@ -19,11 +20,6 @@ import springfox.documentation.annotations.ApiIgnore;
 @RequestMapping(ApiVersion.Version1_0)
 public interface PackageMgrClient {
 
-    @RequestMapping(value = ServiceApi.Packages.Package, method = RequestMethod.PUT)
-    boolean reportStatus(
-            @PathVariable(value = "id") String id,
-            @RequestParam(value = "status") ArchiveStatus status,
-            @RequestBody String message);
 
     @RequestMapping(value = ServiceApi.Packages.Package, method = RequestMethod.GET)
     EsSimplePackage getPackage(
@@ -32,7 +28,9 @@ public interface PackageMgrClient {
     @RequestMapping(value = ServiceApi.PackageAnalyzer.Status, method = {RequestMethod.PUT})
     boolean analyzeStatus(
             @PathVariable(value = "id") String id,
-            @RequestParam(value = "status") Integer status) throws Exception;
+            @RequestParam(value = "status") AnalyzeStatus status,
+            @RequestParam(value = "errorTye") int errorTye,
+            @RequestBody String message) throws Exception;
 
     @RequestMapping(value = ServiceApi.PackageAnalyzer.Queue, method = RequestMethod.GET)
     Long AnalyzeQueueSize() throws Exception;

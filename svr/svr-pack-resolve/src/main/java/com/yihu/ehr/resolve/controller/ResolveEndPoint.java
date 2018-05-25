@@ -83,7 +83,7 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
 
             //非病人维度不做此处理
             if (!ProfileType.DataSet.equals(standardPackage.getProfileType())){
-                ResourceBucket resourceBucket = packMillService.grindingPackModel(standardPackage);
+                ResourceBucket resourceBucket = packMillService.grindingPackModel(standardPackage, pack);
                 identifyService.identify(resourceBucket, standardPackage);
                 resourceService.save(resourceBucket, standardPackage, pack);
             }
@@ -160,7 +160,7 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
         pack.setClient_id(clientId);
         StandardPackage standardPackage = packageResolveService.doResolve(pack, zipFile);
         standardPackage.setClientId(clientId);
-        ResourceBucket resourceBucket = packMillService.grindingPackModel(standardPackage);
+        ResourceBucket resourceBucket = packMillService.grindingPackModel(standardPackage, pack);
         if (persist) {
             identifyService.identify(resourceBucket, standardPackage);
             resourceService.save(resourceBucket, standardPackage, pack);
@@ -196,9 +196,11 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "clientId", required = false) String clientId,
             @ApiParam(name = "echo", value = "返回档案数据")
             @RequestParam(value = "echo",required = false,defaultValue = "true") boolean echo) throws Throwable {
-
+        EsSimplePackage esSimplePackage = new EsSimplePackage();
+        esSimplePackage.set_id(UUID.randomUUID().toString());
+        esSimplePackage.setReceive_date(new Date());
         StandardPackage standardPackage = packageResolveService.doResolveImmediateData(data, clientId);
-        ResourceBucket resourceBucket = packMillService.grindingPackModel(standardPackage);
+        ResourceBucket resourceBucket = packMillService.grindingPackModel(standardPackage, esSimplePackage);
         identifyService.identify(resourceBucket, standardPackage);
         resourceService.save(resourceBucket, standardPackage, null);
         //回填入库状态

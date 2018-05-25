@@ -2,6 +2,7 @@ package com.yihu.ehr.analyze.service.qc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.sun.deploy.security.ValidationState;
 import com.yihu.ehr.analyze.feign.HosAdminServiceClient;
 import com.yihu.ehr.analyze.feign.RedisServiceClient;
 import com.yihu.ehr.analyze.service.pack.ZipPackage;
@@ -14,8 +15,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.io.Serializable;
+import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.util.*;
 
@@ -26,15 +30,20 @@ import java.util.*;
 @Service
 public class PackageQcService {
     private static final Logger logger = LoggerFactory.getLogger(PackageQcService.class);
+    private static final String INDEX = "json_archives";
+    private static final String QC_TYPE = "qc_info";
 
-    @Autowired
-    private RedisServiceClient redisServiceClient;
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
     private ElasticSearchUtil elasticSearchUtil;
     @Autowired
     private HosAdminServiceClient hosAdminServiceClient;
+    @Autowired
+    private RedisTemplate<String, Serializable> redisTemplate;
+    @Autowired
+    private QcRuleCheckService qcRuleCheckService;
+
 
     /**
      * 处理质控消息，统一入口，减少异步消息的数量
@@ -43,14 +52,13 @@ public class PackageQcService {
      *
      * @param zipPackage 档案包
      */
-    public void qcHandle(ZipPackage zipPackage) {
+    public void qcHandle(ZipPackage zipPackage) throws Exception {
         EsSimplePackage esSimplePackage = zipPackage.getEsSimplePackage();
-
-        Map<String, Object> packMap = new HashMap<>(0);
+        /*Map<String, Object> packMap = new HashMap<>(0);
         packMap.put("orgCode", zipPackage.getOrgCode());
         packMap.put("patientId", zipPackage.getPatientId());
         packMap.put("eventNo", zipPackage.getEventNo());
-        packMap.put("eventTime", zipPackage.getEventTime());
+        packMap.put("eventTime", zipPackage.getEventDate());
         packMap.put("eventType", zipPackage.getEventType());
         packMap.put("receiveTime", esSimplePackage.getReceive_date());
         packMap.put("packId", esSimplePackage.get_id());
@@ -59,12 +67,10 @@ public class PackageQcService {
             elasticSearchUtil.index("qc", "receive_data_pack", packMap);
         } catch (ParseException e) {
             logger.error("receive_data_pack," + e.getMessage());
-        }
-
+        }*/
         Map<String, PackageDataSet> dataSets = zipPackage.getDataSets();
-        dataSets.forEach((key, dataSetRecord) -> {
+        dataSets.forEach((dataSetCode, dataSetRecord) -> {
             Map<String, MetaDataRecord> records = dataSetRecord.getRecords();
-
             int size = records.size();
             Map<String, Object> map = new HashMap<>(0);
             map.put("orgCode", dataSetRecord.getOrgCode());
@@ -78,32 +84,26 @@ public class PackageQcService {
             } catch (ParseException e) {
                 logger.error("receive_data_set" + e.getMessage());
             }
-
-            records.forEach((elementCode, dataElement) -> {
+            records.forEach((recordKey, dataElement) -> {
                 Map<String, String> dataGroup = dataElement.getDataGroup();
                 List<String> listDataElement = getDataElementList(dataSetRecord.getCdaVersion(), dataSetRecord.getCode());
-                for (String code : listDataElement) {
-                    String value = dataGroup.get(code);
-                    if (value == null) {
-                        value = "";
+                for (String metadata : listDataElement) {
+                    Serializable serializable = redisTemplate.opsForValue().get("qc:" + zipPackage.getCdaVersion() + ":" + dataSetCode + ":" + metadata);
+                    if (serializable != null) {
+                        String method = serializable.toString();
+                        Class clazz = qcRuleCheckService.getClass();
+                        try {
+                            Method _method = clazz.getMethod(method, new Class[]{String.class, String.class, String.class});
+                            Boolean legal = (Boolean)_method.invoke(qcRuleCheckService, dataSetCode, metadata, dataGroup.get(metadata));
+                            if (!legal) {
+                                //此处生成质控数据（数据未填充）
+                                Map<String, Object> qcRecord = new HashMap<>();
+                                zipPackage.getQcRecords().add(qcRecord);
+                            }
+                        } catch (Exception e) {
+                            logger.error(e.getMessage());
+                        }
                     }
-
-                    String channel = "qc_channel_" + code;
-                    ObjectNode msgNode = objectMapper.createObjectNode();
-                    msgNode.put("table", dataSetRecord.getCode());
-                    msgNode.put("columnFamily", ZipPackage.DATA);
-                    msgNode.put("version", dataSetRecord.getCdaVersion());
-                    msgNode.put("code", code);
-                    msgNode.put("value", value);
-                    msgNode.put("orgCode", dataSetRecord.getOrgCode());
-                    msgNode.put("patientId", dataSetRecord.getPatientId());
-                    msgNode.put("eventNo", dataSetRecord.getEventNo());
-                    String eventTime = DateUtil.toString(dataSetRecord.getEventTime(), DateUtil.DEFAULT_YMDHMSDATE_FORMAT);
-                    msgNode.put("eventTime", eventTime);
-                    String receiveTime = DateUtil.toString(esSimplePackage.getReceive_date(), DateUtil.DEFAULT_YMDHMSDATE_FORMAT);
-                    msgNode.put("receiveTime", receiveTime);
-
-                    redisServiceClient.sendMessage("svr-pack-analyzer", channel, msgNode.toString());
                 }
             });
         });

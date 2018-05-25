@@ -17,34 +17,37 @@ public class ResourceBucket {
 
     //档案ID
     private String id;
-    //就诊时用的就诊卡ID
-    private String cardId;
     //机构代码
     private String orgCode;
     //机构名称
     private String orgName;
     //机构区域
     private String orgArea;
-    //应用来源
+    //cda版本
+    private String cdaVersion;
+    //应用代码
     private String clientId;
-    //人口学ID
-    private String patientId;
     //事件号
     private String eventNo;
-    //事件时间，如挂号，出院，体检时间
+    //事件时间，如挂号，住院，体检等时间
     private Date eventDate;
+    //0门诊 1住院 2体检
+    private EventType eventType;
+    //就诊时用的就诊卡ID
+    private String cardId;
+    //就诊时用的就诊卡类型
+    private String cardType;
+    //人口学ID
+    private String patientId;
+    //患者姓名
+    private String patientName;
     //身份证号
     private String demographicId;
     //1结构化档案，2文件档案，3链接档案
-    private String cdaVersion;
+    //科室代码
+    private String deptCode;
     //档案类型
     private ProfileType profileType;
-    //0门诊 1住院 2体检
-    private EventType eventType;
-    //就诊时用的就诊卡类型
-    private String cardType;
-    //患者姓名
-    private String patientName;
     //ICD10诊断，分号分隔
     private String diagnosis;
     //ICD10诊断名称, 分号分隔
@@ -57,15 +60,13 @@ public class ResourceBucket {
     private boolean reUploadFlg;
     //身份识别标志
     private boolean identifyFlag;
-    // 主记录
+    //主记录
     private MasterRecord masterRecord;
     //子记录
     private SubRecords subRecords;
     //质控数据
     private QcRecords qcRecords;
-
     private List<LinkFile> linkFiles = new ArrayList<>();
-
     // CDA文档列表，Key为HBase rowkey
     private Map<String, CdaDocument> cdaDocuments = new TreeMap<>();
 
@@ -78,31 +79,13 @@ public class ResourceBucket {
     public String getId() {
         return id;
     }
-
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getCardId() {
-        return cardId;
-    }
-
-    public void setCardId(String cardId) {
-        this.cardId = cardId;
-    }
-
-    public String getCardType() {
-        return cardType;
-    }
-
-    public void setCardType(String cardType) {
-        this.cardType = cardType;
     }
 
     public String getOrgCode() {
         return orgCode;
     }
-
     public void setOrgCode(String orgCode) {
         this.orgCode = orgCode;
     }
@@ -110,7 +93,6 @@ public class ResourceBucket {
     public String getOrgName() {
         return orgName;
     }
-
     public void setOrgName(String orgName) {
         this.orgName = orgName;
     }
@@ -118,39 +100,27 @@ public class ResourceBucket {
     public String getOrgArea() {
         return orgArea;
     }
-
     public void setOrgArea(String orgArea) {
         this.orgArea = orgArea;
+    }
+
+    public String getCdaVersion() {
+        return cdaVersion;
+    }
+    public void setCdaVersion(String cdaVersion) {
+        this.cdaVersion = cdaVersion;
     }
 
     public String getClientId() {
         return clientId;
     }
-
     public void setClientId(String clientId) {
         this.clientId = clientId;
-    }
-
-    public String getPatientId() {
-        return patientId;
-    }
-
-    public void setPatientId(String patientId) {
-        this.patientId = patientId;
-    }
-
-    public String getPatientName() {
-        return patientName;
-    }
-
-    public void setPatientName(String patientName) {
-        this.patientName = patientName;
     }
 
     public String getEventNo() {
         return eventNo;
     }
-
     public void setEventNo(String eventNo) {
         this.eventNo = eventNo;
     }
@@ -158,55 +128,69 @@ public class ResourceBucket {
     public Date getEventDate() {
         return eventDate;
     }
-
     public void setEventDate(Date eventDate) {
         this.eventDate = eventDate;
-    }
-
-    public String getDemographicId() {
-        return demographicId;
-    }
-
-    public void setDemographicId(String demographicId) {
-        this.demographicId = demographicId;
-    }
-
-    public String getCdaVersion() {
-        return cdaVersion;
-    }
-
-    public void setCdaVersion(String cdaVersion) {
-        this.cdaVersion = cdaVersion;
-    }
-
-    public ProfileType getProfileType() {
-        return profileType;
-    }
-
-    public void setProfileType(ProfileType profileType) {
-        this.profileType = profileType;
     }
 
     public EventType getEventType() {
         return eventType;
     }
-
     public void setEventType(EventType eventType) {
         this.eventType = eventType;
     }
 
-    public Map<String, CdaDocument> getCdaDocuments() {
-        return cdaDocuments;
+    public String getCardId() {
+        return cardId;
+    }
+    public void setCardId(String cardId) {
+        this.cardId = cardId;
     }
 
-    public void setCdaDocuments(Map<String, CdaDocument> cdaDocuments) {
-        this.cdaDocuments = cdaDocuments;
+    public String getCardType() {
+        return cardType;
+    }
+    public void setCardType(String cardType) {
+        this.cardType = cardType;
+    }
+
+    public String getPatientId() {
+        return patientId;
+    }
+    public void setPatientId(String patientId) {
+        this.patientId = patientId;
+    }
+
+    public String getPatientName() {
+        return patientName;
+    }
+    public void setPatientName(String patientName) {
+        this.patientName = patientName;
+    }
+
+    public String getDemographicId() {
+        return demographicId;
+    }
+    public void setDemographicId(String demographicId) {
+        this.demographicId = demographicId;
+    }
+
+    public String getDeptCode() {
+        return deptCode;
+    }
+    public void setDeptCode(String deptCode) {
+        this.deptCode = deptCode;
+    }
+
+    public ProfileType getProfileType() {
+        return profileType;
+    }
+    public void setProfileType(ProfileType profileType) {
+        this.profileType = profileType;
     }
 
     public String getDiagnosis() {
         return diagnosis;
     }
-
     public void setDiagnosis(String diagnosis) {
         this.diagnosis = diagnosis;
     }
@@ -214,7 +198,6 @@ public class ResourceBucket {
     public String getDiagnosisName() {
         return diagnosisName;
     }
-
     public void setDiagnosisName(String diagnosisName) {
         this.diagnosisName = diagnosisName;
     }
@@ -222,7 +205,6 @@ public class ResourceBucket {
     public String getHealthProblem() {
         return healthProblem;
     }
-
     public void setHealthProblem(String healthProblem) {
         this.healthProblem = healthProblem;
     }
@@ -230,7 +212,6 @@ public class ResourceBucket {
     public String getHealthProblemName() {
         return healthProblemName;
     }
-
     public void setHealthProblemName(String healthProblemName) {
         this.healthProblemName = healthProblemName;
     }
@@ -238,7 +219,6 @@ public class ResourceBucket {
     public boolean isReUploadFlg() {
         return reUploadFlg;
     }
-
     public void setReUploadFlg(boolean reUploadFlg) {
         this.reUploadFlg = reUploadFlg;
     }
@@ -246,7 +226,6 @@ public class ResourceBucket {
     public boolean isIdentifyFlag() {
         return identifyFlag;
     }
-
     public void setIdentifyFlag(boolean identifyFlag) {
         this.identifyFlag = identifyFlag;
     }
@@ -254,7 +233,6 @@ public class ResourceBucket {
     public MasterRecord getMasterRecord() {
         return masterRecord;
     }
-
     public void setMasterRecord(MasterRecord masterRecord) {
         this.masterRecord = masterRecord;
     }
@@ -262,7 +240,6 @@ public class ResourceBucket {
     public SubRecords getSubRecords() {
         return subRecords;
     }
-
     public void setSubRecords(SubRecords subRecords) {
         this.subRecords = subRecords;
     }
@@ -270,15 +247,20 @@ public class ResourceBucket {
     public QcRecords getQcRecords() {
         return qcRecords;
     }
-
     public void setQcRecords(QcRecords qcRecords) {
         this.qcRecords = qcRecords;
+    }
+
+    public Map<String, CdaDocument> getCdaDocuments() {
+        return cdaDocuments;
+    }
+    public void setCdaDocuments(Map<String, CdaDocument> cdaDocuments) {
+        this.cdaDocuments = cdaDocuments;
     }
 
     public List<LinkFile> getLinkFiles() {
         return linkFiles;
     }
-
     public void setLinkFiles(List<LinkFile> linkFiles) {
         this.linkFiles = linkFiles;
     }

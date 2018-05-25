@@ -63,6 +63,7 @@ public class FastDFSTask {
         sourceMap.put("remote_path", remoteFilePath);
         sourceMap.put("receive_date", _now);
         sourceMap.put("org_code", orgCode);
+        sourceMap.put("org_name", redisService.getOrgName(orgCode));
         sourceMap.put("org_area", redisService.getOrgArea(orgCode));
         sourceMap.put("client_id", clientId);
         sourceMap.put("resourced", 0);
