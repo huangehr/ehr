@@ -91,7 +91,7 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
             //回填入库状态
             map.put("profile_id", standardPackage.getId());
             map.put("demographic_id", standardPackage.getDemographicId());
-            map.put("event_type", standardPackage.getEventType() == null ? null : standardPackage.getEventType().getType());
+            map.put("event_type", standardPackage.getEventType() == null ? -1 : standardPackage.getEventType().getType());
             map.put("event_no", standardPackage.getEventNo());
             map.put("event_date", DateUtil.toStringLong(standardPackage.getEventDate()));
             map.put("patient_id", standardPackage.getPatientId());

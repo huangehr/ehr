@@ -84,7 +84,10 @@ public class ZipPackage {
     //解压后文件目录
     private File packFile;
     //private Set<String> tableSet = new HashSet<>();
-    private List<Map<String, Object>> qcRecords = new ArrayList<>();
+    //数据集质控记录
+    private Map<String, Object> qcDataSetRecord = new HashMap<>();
+    //数据元质控记录
+    private List<Map<String, Object>> qcMetadataRecords = new ArrayList<>();
 
     public ZipPackage(EsSimplePackage esSimplePackage) {
         this.esSimplePackage = esSimplePackage;
@@ -186,11 +189,18 @@ public class ZipPackage {
         return packFile;
     }
 
-    public List<Map<String, Object>> getQcRecords() {
-        return qcRecords;
+    public Map<String, Object> getQcDataSetRecord() {
+        return qcDataSetRecord;
     }
-    public void setQcRecords(List<Map<String, Object>> qcRecords) {
-        this.qcRecords = qcRecords;
+    public void setQcDataSetRecord(Map<String, Object> qcDataSetRecord) {
+        this.qcDataSetRecord = qcDataSetRecord;
+    }
+
+    public List<Map<String, Object>> getQcMetadataRecords() {
+        return qcMetadataRecords;
+    }
+    public void setQcMetadataRecords(List<Map<String, Object>> qcMetadataRecords) {
+        this.qcMetadataRecords = qcMetadataRecords;
     }
 
     public void download() throws IOException {
