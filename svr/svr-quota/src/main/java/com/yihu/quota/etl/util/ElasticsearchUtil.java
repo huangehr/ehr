@@ -7,8 +7,11 @@ import com.alibaba.druid.sql.parser.SQLExprParser;
 import com.alibaba.druid.sql.parser.Token;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.elasticsearch.ElasticSearchClient;
 import com.yihu.ehr.elasticsearch.ElasticSearchPool;
 import org.apache.commons.lang.StringUtils;
+import org.elasticsearch.action.bulk.BulkRequestBuilder;
+import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteRequestBuilder;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
@@ -16,6 +19,8 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.TermsQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
@@ -50,7 +55,7 @@ public class ElasticsearchUtil {
     @Autowired
     ObjectMapper objectMapper;
     @Autowired
-    private EsClientUtil esClientUtil;
+    private ElasticSearchClient elasticSearchClient;
     @Autowired
     private ElasticSearchPool elasticSearchPool;
 
@@ -241,7 +246,9 @@ public class ElasticsearchUtil {
      * 查询后 存在 删除
      * @param boolQueryBuilder
      */
-    public void queryDelete(Client client,String index,String type,BoolQueryBuilder boolQueryBuilder){
+    public boolean queryDelete(Client client,String index,String type,BoolQueryBuilder boolQueryBuilder){
+        BulkRequestBuilder bulkRequestBuilder = client.prepareBulk();
+        DeleteRequestBuilder deleteRequestBuilder = null ;
         SearchResponse actionGet = null;
         actionGet = client.prepareSearch(index)
                 .setTypes(type)
@@ -249,14 +256,20 @@ public class ElasticsearchUtil {
                 .setQuery(boolQueryBuilder)
                 .execute().actionGet();
         SearchHits hits = actionGet.getHits();
-        List<Map<String, Object>> matchRsult = new LinkedList<Map<String, Object>>();
         for (SearchHit hit : hits.getHits()){
-            matchRsult.add(hit.getSource());
-            DeleteRequestBuilder drBuilder = client.prepareDelete(index, type, hit.getId());
-            drBuilder.execute().actionGet();
+            deleteRequestBuilder = client.prepareDelete(index, type, hit.getId());
+            bulkRequestBuilder.add(deleteRequestBuilder.request());
         }
+        //进行批量删除操作
+        boolean optFlag = false;
+        BulkResponse bulkResponse = bulkRequestBuilder.execute().actionGet();
+        if (bulkResponse.hasFailures()) {
+            optFlag = false;
+        }else {
+            optFlag = true;
+        }
+        return  optFlag;
     }
-
 
     /**
      * 递归解析json
