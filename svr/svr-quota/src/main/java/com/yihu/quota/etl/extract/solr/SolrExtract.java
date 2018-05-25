@@ -100,13 +100,16 @@ public class SolrExtract {
             dimensionGroupList.add(new SolrGroupEntity(key, SolrGroupEntity.GroupType.FIELD_VALUE));
             fl += key + ",";
         }
-        // 默认追加一个日期字段作为细维度，方便按天统计作为最小单位统计值。
         fl += timeKey;
-        slaveMap.put(timeKey, timeKey);
-        TjQuotaDimensionSlave daySlave = new TjQuotaDimensionSlave();
-        daySlave.setSlaveCode(timeKey);
-        qds.add(daySlave);
-        dimensionGroupList.add(new SolrGroupEntity(timeKey, SolrGroupEntity.GroupType.DATE_RANGE, "+1DAY"));
+
+        if( !esConfig.getAggregation().equals(Contant.quota.aggregation_list)){
+            // 默认追加一个日期字段作为细维度，方便按天统计作为最小单位统计值。
+            slaveMap.put(timeKey, timeKey);
+            TjQuotaDimensionSlave daySlave = new TjQuotaDimensionSlave();
+            daySlave.setSlaveCode(timeKey);
+            qds.add(daySlave);
+            dimensionGroupList.add(new SolrGroupEntity(timeKey, SolrGroupEntity.GroupType.DATE_RANGE, "+1DAY"));
+        }
 
         // 拼接增量或全量的筛选条件
         if (!StringUtils.isEmpty(timeKey)) {
@@ -157,26 +160,7 @@ public class SolrExtract {
         Map<String, String> daySlaveDictMap = new LinkedHashMap<>(); // 按天统计的所有日期项
         if(listFlag){
             if (list != null && list.size() > 0) {
-                for (Map<String, Object> map : list) {
-                    String keyStr  = "";
-                    for(String key :mainMap.keySet()){
-                        keyStr += map.get(key) +  "-";
-                    }
-                    for(String key :slaveMap.keySet()){
-                        if( !key.equals(timeKey)){
-                            keyStr += map.get(key) +  "-";
-                        }
-                    }
-                    Date  quotaDate = (Date) map.get(timeKey);
-                    String quotaDateStr = DateUtil.formatDate(quotaDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
-                    keyStr += quotaDateStr;
-                    if(StringUtils.isEmpty(esConfig.getAggregationKey())){
-                        statisticsResultMap.put(keyStr, "1");
-                    }else {
-                        statisticsResultMap.put(keyStr, map.get(esConfig.getAggregationKey()).toString());
-                    }
-                    daySlaveDictMap.put(keyStr, quotaDateStr);
-                }
+                returnList =  extractUtil.computeList(qdm, qds, list,timeKey,esConfig.getAggregationKey(),quotaVo);
             }
         }else {
             if (list != null && list.size() > 0) {
@@ -188,9 +172,9 @@ public class SolrExtract {
                     daySlaveDictMap.put(statisticsKey, quotaDate);
                 }
             }
+            // 融合主细维度、其组合统计值为SaveModel
+            extractUtil.compute(qdm, qds, returnList, statisticsResultMap, daySlaveDictMap, quotaVo);
         }
-        // 融合主细维度、其组合统计值为SaveModel
-        extractUtil.compute(qdm, qds, returnList, statisticsResultMap, daySlaveDictMap, quotaVo);
         return returnList;
     }
 
