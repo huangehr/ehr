@@ -71,7 +71,7 @@ public class PackAnalyzeEndPoint extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value = ServiceApi.PackageAnalyzer.Analyzer, method = RequestMethod.PUT)
-    @ApiOperation(value = "根据条件批量修改档案包状态", notes = "修改档案包状态")
+    @ApiOperation(value = "分析档案包", notes = "分析档案包")
     public Map<String, Object> analyzer(
             @ApiParam(name = "id", value = "档案包ID")
             @RequestParam(value = "id", required = false) String id) throws Exception {
