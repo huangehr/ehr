@@ -10,6 +10,8 @@ import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.FieldStatsInfo;
 import org.apache.solr.client.solrj.response.PivotField;
 import org.apache.solr.client.solrj.response.RangeFacet;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -190,8 +192,35 @@ public class SolrQuery {
     //region Count 统计
 
     /**
+     * 获取查询返回字段
+     * @param q     查询字符串
+     * @param fq    过滤查询
+     * @param sort  排序
+     * @param start 查询起始行
+     * @param rows  查询行数
+     * @param fields 返回字段
+     * @return
+     */
+    public List<Map<String,Object>> queryReturnFieldList(String tableName, String q ,String fq , Map<String, String> sort, long start, long rows,String[] fields) throws Exception {
+        List<Map<String,Object>> data = new ArrayList<>();
+        SolrDocumentList solrList = solrUtil.query(tableName, q, fq, sort, start, rows,fields);
+        if(solrList!=null && solrList.getNumFound()>0){
+            for (SolrDocument doc : solrList){
+                Map<String,Object> map = new HashMap<>();
+                if(fields != null && fields.length > 0){
+                    for(String key :fields){
+                        map.put(key,doc.getFieldValue(key));
+                    }
+                }
+                data.add(map);
+            }
+        }
+        return  data;
+    }
+
+
+    /**
      * 获取总条数
-     *
      * @param queryString
      * @return
      */
