@@ -72,6 +72,8 @@ public class AgeConvert implements Convert {
                         }
                         result.add(tempMap);
                     }
+                }else{
+                    result.add(tempMap);
                 }
             } catch (Exception e) {
                throw  new NumberFormatException("年龄转换有误！" + e.getMessage());
