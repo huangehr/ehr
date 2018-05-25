@@ -67,7 +67,7 @@ public class PackageAnalyzeService {
                 zipPackage.resolve();
                 packageQcService.qcHandle(zipPackage);
                 //保存数据集质控数据
-                //elasticSearchUtil.bulkIndex(INDEX, QC_DATASET_INFO, zipPackage.getQcMetadataRecords());
+                //elasticSearchUtil.index(INDEX, QC_DATASET_INFO, zipPackage.getQcDataSetRecord());
                 //保存数据元质控数据
                 //elasticSearchUtil.bulkIndex(INDEX, QC_METADATA_INFO, zipPackage.getQcMetadataRecords());
                 //报告质控状态
