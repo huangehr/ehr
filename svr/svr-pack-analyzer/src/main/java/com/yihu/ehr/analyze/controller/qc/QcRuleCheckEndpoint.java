@@ -22,21 +22,21 @@ public class QcRuleCheckEndpoint {
 
     @RequestMapping(value = ServiceApi.PackageAnalyzer.QcEmpty, method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     public void emptyCheck(@RequestBody String message) throws Exception {
-        service.emptyCheck(message);
+        //service.emptyCheck(message);
     }
 
     @RequestMapping(value = ServiceApi.PackageAnalyzer.QcType, method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     public void typeCheck(@RequestBody String message) throws Exception {
-        service.typeCheck(message);
+        //service.typeCheck(message);
     }
 
     @RequestMapping(value = ServiceApi.PackageAnalyzer.QcFormat, method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     public void formatCheck(@RequestBody String message) throws Exception {
-        service.formatCheck(message);
+        //service.formatCheck(message);
     }
 
     @RequestMapping(value = ServiceApi.PackageAnalyzer.QcValue, method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     public void valueCheck(@RequestBody String message) throws Exception {
-        service.valueCheck(message);
+        //service.valueCheck(message);
     }
 }

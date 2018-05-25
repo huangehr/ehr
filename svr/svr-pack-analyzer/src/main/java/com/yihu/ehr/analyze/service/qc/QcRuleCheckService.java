@@ -3,6 +3,9 @@ package com.yihu.ehr.analyze.service.qc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.analyze.feign.HosAdminServiceClient;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
+import com.yihu.ehr.profile.ErrorType;
+import com.yihu.ehr.profile.exception.IllegalEmptyCheckException;
+import com.yihu.ehr.profile.exception.IllegalValueCheckException;
 import com.yihu.ehr.util.datetime.DateUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -11,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,43 +36,64 @@ public class QcRuleCheckService {
     /**
      * 检查值是否为空
      *
-     * @param data
+     * @param version
+     * @param dataSetCode
+     * @param metadata
+     * @param value
+     * @throws Exception
      */
-    public void emptyCheck(String data) throws Exception {
-        DataElementValue value = parse(data);
-        logger.info("code:" + value.getCode() + ",value:" + value.getValue());
-        Boolean isNullable = hosAdminServiceClient.isMetaDataNullable(value.getVersion(), value.getTable(), value.getCode());
-        if (!isNullable && StringUtils.isEmpty(value.getValue())) {
-            saveCheckResult(value, "E00001", "不能为空");
-            logger.warn("code:" + value.getCode() + ",value:" + value.getValue());
+    public int emptyCheck(String version, String dataSetCode, String metadata ,String value) throws Exception {
+        Boolean isNullable = hosAdminServiceClient.isMetaDataNullable(version, dataSetCode, metadata);
+        if (!isNullable && StringUtils.isEmpty(value)) {
+           return ErrorType.EmptyError.getType();
         }
+        return 0;
+    }
+
+    /**
+     * 检查值是否为空
+     *
+     * @param version
+     * @param dataSetCode
+     * @param metadata
+     * @param value
+     * @throws Exception
+     */
+    public int emptyCheckThrowable(String version, String dataSetCode, String metadata ,String value) throws Exception {
+        Boolean isNullable = hosAdminServiceClient.isMetaDataNullable(version, dataSetCode, metadata);
+        if (!isNullable && StringUtils.isEmpty(value)) {
+            throw new IllegalEmptyCheckException(dataSetCode + ":" +metadata + "Is Empty");
+        }
+        return 0;
     }
 
     /**
      * 检查值类型是否正确，通过将值转为对应类型是否成功来判断
      * 暂未实现
      *
-     * @param data
+     * @param version
+     * @param dataSetCode
+     * @param metadata
+     * @param value
      */
-    public void typeCheck(String data) throws Exception {
-        DataElementValue value = parse(data);
-        String type = hosAdminServiceClient.getMetaDataType(value.getVersion(), value.getTable(), value.getCode());
+    public int typeCheck(String version, String dataSetCode, String metadata ,String value) throws Exception {
+        String type = hosAdminServiceClient.getMetaDataType(version, dataSetCode, metadata);
         switch (type) {
             case "L":
-                if (!("F".equals(data) && "T".equals(data) && "0".equals(data) && "1".equals(data))) {
-                    saveCheckResult(value, "E00003", "值类型错误");
+                if (!("F".equals(value) && "T".equals(value) && "0".equals(value) && "1".equals(value))) {
+                    return ErrorType.TypeError.getType();
                 }
                 break;
             case "N":
-                if (!StringUtils.isNumeric(data)) {
-                    saveCheckResult(value, "E00003", "值类型错误");
+                if (!StringUtils.isNumeric(value)) {
+                    return ErrorType.TypeError.getType();
                 }
                 break;
             case "D":
             case "DT":
             case "T":
-                if (DateUtil.strToDate(data) == null) {
-                    saveCheckResult(value, "E00003", "值类型错误");
+                if (DateUtil.strToDate(value) == null) {
+                    return ErrorType.TypeError.getType();
                 }
                 break;
             case "BY":
@@ -79,6 +102,7 @@ public class QcRuleCheckService {
             default:
                 break;
         }
+        return 0;
     }
 
     /**
@@ -99,21 +123,43 @@ public class QcRuleCheckService {
     /**
      * 检查数据是否在值域范围
      *
-     * @param data
+     * @param version
+     * @param dataSetCode
+     * @param metadata
+     * @param value
+     * @throws Exception
      */
-    public void valueCheck(String data) throws Exception {
-        DataElementValue value = parse(data);
-        logger.info("code:" + value.getCode() + ",value:" + value.getValue());
-        String dict = hosAdminServiceClient.getMetaDataDict(value.getVersion(), value.getTable(), value.getCode());
+    public int valueCheck(String version, String dataSetCode, String metadata ,String value) throws Exception {
+        String dict = hosAdminServiceClient.getMetaDataDict(version, dataSetCode, metadata);
         if (StringUtils.isEmpty(dict) || dict.equals("0")) {
-            return;
+            return 0;
         }
-        logger.info("code:" + value.getCode() + ",value:" + value.getValue() + ",dict:" + dict);
-        Boolean isExist = hosAdminServiceClient.isDictCodeExist(value.getVersion(), dict, value.getCode());
+        Boolean isExist = hosAdminServiceClient.isDictCodeExist(version, dict, metadata);
         if (!isExist) {
-            saveCheckResult(value, "E00002", "超出值域范围");
-            logger.warn("code:" + value.getCode() + ",value:" + value.getValue() + ",dict:" + dict);
+            return ErrorType.ValueError.getType();
         }
+        return 0;
+    }
+
+    /**
+     * 检查值是否为空
+     *
+     * @param version
+     * @param dataSetCode
+     * @param metadata
+     * @param value
+     * @throws Exception
+     */
+    public int valueCheckThrowable(String version, String dataSetCode, String metadata ,String value) throws Exception {
+        String dict = hosAdminServiceClient.getMetaDataDict(version, dataSetCode, metadata);
+        if (StringUtils.isEmpty(dict) || dict.equals("0")) {
+            return 0;
+        }
+        Boolean isExist = hosAdminServiceClient.isDictCodeExist(version, dict, metadata);
+        if (!isExist) {
+            throw new IllegalValueCheckException(dataSetCode + ":" +metadata + ":" + value + "Out Value");
+        }
+        return 0;
     }
 
     private void saveCheckResult(DataElementValue value, String errorCode, String errorMsg) throws Exception {
