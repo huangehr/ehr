@@ -15,9 +15,9 @@ import java.util.Map;
  * @created 2015.08.16 10:44
  */
 public class CdaDocument {
-    String id;
-    String name;
-    List<OriginFile> originFiles = new ArrayList<>();
+    private String id;
+    private String name;
+    private List<OriginFile> originFiles = new ArrayList<>();
 
     public String getId() {
         return id;

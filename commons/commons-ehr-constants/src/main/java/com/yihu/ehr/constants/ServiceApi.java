@@ -512,6 +512,8 @@ public class ServiceApi {
         public static final String QcType = "/packAnalyzer/qc/check/type";
         public static final String QcFormat = "/packAnalyzer/qc/check/format";
         public static final String QcValue = "/packAnalyzer/qc/check/value";
+        public static final String UpdateStatus = "/packAnalyzer/updateStatus";
+        public static final String Analyzer = "/packAnalyzer/analyzer";
     }
 
     public static class ArchiveRelation {

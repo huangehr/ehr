@@ -3,12 +3,7 @@ package com.yihu.ehr.resolve;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.yihu.ehr.profile.EventType;
-import com.yihu.ehr.profile.ProfileType;
 import com.yihu.ehr.profile.exception.LegacyPackageException;
-import com.yihu.ehr.profile.extractor.KeyDataExtractor;
-import com.yihu.ehr.profile.family.MasterResourceFamily;
-import com.yihu.ehr.profile.util.DataSetUtil;
 import com.yihu.ehr.profile.util.MetaDataRecord;
 import com.yihu.ehr.profile.util.PackageDataSet;
 import com.yihu.ehr.resolve.config.EventIndexConfig;
@@ -17,10 +12,8 @@ import com.yihu.ehr.profile.exception.IllegalJsonDataException;
 import com.yihu.ehr.profile.exception.IllegalJsonFileException;
 import com.yihu.ehr.resolve.model.stage1.DataSetPackage;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
-import com.yihu.ehr.resolve.service.resource.stage1.PackModelFactory;
 import com.yihu.ehr.resolve.log.PackResolveLogger;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -53,108 +46,14 @@ public class DataSetPackageResolver extends PackageResolver {
     }
 
     /**
-     * 非档案类型--结构化档案包解析JSON文件中的数据。
-     */
-    private List<StandardPackage> parseDataSetFiles(String clientId, File[] files, boolean origin) throws Exception {
-        List<StandardPackage> standardPackageList = new ArrayList<>();
-        StandardPackage standardPackage;
-        for (File file : files) {
-            List<PackageDataSet> packageDataSets = generateDataSet(file, origin);
-            for (PackageDataSet dataSet : packageDataSets) {
-                standardPackage = PackModelFactory.createPackModel(ProfileType.DataSet);
-                String dataSetCode = origin ? DataSetUtil.originDataSetCode(dataSet.getCode()) : dataSet.getCode();
-                dataSet.setCode(dataSetCode);
-
-                // Extract key data from data set if exists
-                if (!origin) {
-                    //就诊卡信息
-                    if (StringUtils.isEmpty(standardPackage.getCardId()) || StringUtils.isEmpty(standardPackage.getCardType())) {
-                        Map<String, Object> properties = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.CardInfo);
-                        String cardId = (String) properties.get(MasterResourceFamily.BasicColumns.CardId);
-                        String cardType = (String) properties.get(MasterResourceFamily.BasicColumns.CardType);
-                        if(!StringUtils.isEmpty(cardId) && !StringUtils.isEmpty(cardType)) {
-                            standardPackage.setCardId(cardId);
-                            standardPackage.setCardType(cardType);
-                        }
-                    }
-
-                    //身份信息
-                    if (StringUtils.isEmpty(standardPackage.getDemographicId()) || StringUtils.isEmpty(standardPackage.getPatientName())) {
-                        Map<String, Object> properties = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.Identity);
-                        String demographicId = (String) properties.get(MasterResourceFamily.BasicColumns.DemographicId);
-                        String patientName = (String) properties.get(MasterResourceFamily.BasicColumns.PatientName);
-                        if(!StringUtils.isEmpty(demographicId) && !StringUtils.isEmpty(patientName)) {
-                            standardPackage.setDemographicId(demographicId);
-                            standardPackage.setPatientName(patientName);
-                        }
-                    }
-
-                    //就诊事件信息
-                    if (standardPackage.getEventDate() == null || standardPackage.getEventType() == null) {
-                        Map<String, Object> properties = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.EventInfo);
-                        Date eventDate = (Date) properties.get(MasterResourceFamily.BasicColumns.EventDate);
-                        EventType eventType = (EventType) properties.get(MasterResourceFamily.BasicColumns.EventType);
-                        if(eventDate != null && eventType != null) {
-                            standardPackage.setEventDate(eventDate);
-                            standardPackage.setEventType(eventType);
-                        }
-                    }
-
-                    //门诊或住院诊断
-                    if (standardPackage.getDiagnosisList() == null || standardPackage.getDiagnosisList().size() <= 0 ) {
-                        Map<String, Object> properties = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.Diagnosis);
-                        Set<String> diagnosisList = (Set<String>) properties.get(MasterResourceFamily.BasicColumns.Diagnosis);
-                        if (diagnosisList != null && diagnosisList.size() > 0) {
-                            standardPackage.setDiagnosisList(diagnosisList);
-                        }
-                    }
-                }
-
-                standardPackage.setPatientId(dataSet.getPatientId());
-                standardPackage.setEventNo(dataSet.getEventNo());
-                standardPackage.setOrgCode(dataSet.getOrgCode());
-                standardPackage.setCdaVersion(dataSet.getCdaVersion());
-                standardPackage.setCreateDate(dataSet.getCreateTime());
-                standardPackage.insertDataSet(dataSetCode, dataSet);
-                standardPackage.setClientId(clientId);
-                int type = standardPackage.getProfileType().getType();
-                standardPackage.regularNonArchiveRowKey(type);//rowkey设置
-                standardPackageList.add(standardPackage);
-            }
-        }
-        return standardPackageList;
-    }
-
-
-    /**
-     * 生产数据集
-     *
-     * @param jsonFile
-     * @param isOrigin
-     * @return
-     * @throws IOException
-     */
-    private List<PackageDataSet> generateDataSet(File jsonFile, boolean isOrigin) throws IOException {
-        JsonNode jsonNode = objectMapper.readTree(jsonFile);
-        if (jsonNode.isNull()) {
-            throw new IllegalJsonFileException("Invalid json file when generate data set");
-        }
-
-        List<PackageDataSet> dataSets = parseNonArchiveJsonDataSet(jsonNode);
-        return dataSets;
-    }
-
-    /**
      * 解析 .json 文件中的 JSON 数据，拼接成SQL语句
      * @param profile
      * @param files
      * @throws IOException
      * @throws ParseException
      */
-
     private void parseFiles(DataSetPackage profile, File[] files) throws IOException, ParseException {
         List<String> sqlList = new ArrayList<>();
-
         for (File file : files) {
             // head 节点
             JsonNode headNode = objectMapper.readTree(file).get("head");
@@ -265,6 +164,23 @@ public class DataSetPackageResolver extends PackageResolver {
     }
 
     /**
+     * 生产数据集
+     *
+     * @param jsonFile
+     * @param isOrigin
+     * @return
+     * @throws IOException
+     */
+    private List<PackageDataSet> generateDataSet(File jsonFile, boolean isOrigin) throws IOException {
+        JsonNode jsonNode = objectMapper.readTree(jsonFile);
+        if (jsonNode.isNull()) {
+            throw new IllegalJsonFileException("Invalid json file when generate data set");
+        }
+        List<PackageDataSet> dataSets = parseNonArchiveJsonDataSet(jsonNode);
+        return dataSets;
+    }
+
+    /**
      *  TODO 未完整逻辑,返回列表
      *  add by HZY at 2017/07/03
      * （非档案类型）结构化档案包数据集处理
@@ -299,7 +215,7 @@ public class DataSetPackageResolver extends PackageResolver {
         columns.forEach(item -> {
             //事件号字段获取
             if (eventIndex.getEventNo().contains(item.get("column").asText())){
-                 eventNo[0] = item.get("column").asText();
+                eventNo[0] = item.get("column").asText();
             }
             //病人ID字段获取
             if (eventIndex.getPatientId().contains(item.get("column").asText())){
@@ -347,5 +263,4 @@ public class DataSetPackageResolver extends PackageResolver {
         }
         return packageDataSetList;
     }
-
 }

@@ -23,16 +23,18 @@ public class EventInfoExtractor extends KeyDataExtractor {
 
     //事件界定数据集
     private Map<String, String> dataSets = new HashMap<>();
-    // 事件时间数据元
-    private List<String> metaData = new ArrayList<>();
+
 
     @Override
     public Map<String, Object> extract(PackageDataSet dataSet) throws Exception {
         Map<String,Object> properties = new HashMap<>();
+        Date eventDate = null;
         EventType eventType = null;
         if (dataSets.containsKey(dataSet.getCode())) {
+            eventDate = dataSet.getEventTime();
             eventType = EventType.valueOf(dataSets.get(dataSet.getCode()));
         }
+        properties.put(MasterResourceFamily.BasicColumns.EventDate, eventDate);
         properties.put(MasterResourceFamily.BasicColumns.EventType, eventType);
         return properties;
     }
@@ -52,9 +54,5 @@ public class EventInfoExtractor extends KeyDataExtractor {
 
     public Map<String, String> getDataSets() {
         return this.dataSets;
-    }
-
-    public List<String> getMetaData() {
-        return this.metaData;
     }
 }

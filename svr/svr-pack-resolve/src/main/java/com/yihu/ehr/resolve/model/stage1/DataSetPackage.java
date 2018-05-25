@@ -2,8 +2,6 @@ package com.yihu.ehr.resolve.model.stage1;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.profile.ProfileType;
-import com.yihu.ehr.profile.annotation.Table;
-import com.yihu.ehr.profile.core.ResourceCore;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import org.springframework.util.StringUtils;
 
@@ -15,7 +13,6 @@ import java.util.List;
  * @author 张进军
  * @created 2017.06.27 11:34
  */
-@Table(ResourceCore.MasterTable)
 public class DataSetPackage extends StandardPackage {
 
     private String pk;                              // 数据集主键（可能是联合主键）

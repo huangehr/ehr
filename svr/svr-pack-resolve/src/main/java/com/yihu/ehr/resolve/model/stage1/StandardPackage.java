@@ -5,10 +5,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.profile.EventType;
 import com.yihu.ehr.profile.ProfileType;
 import com.yihu.ehr.lang.SpringContext;
-import com.yihu.ehr.profile.annotation.Column;
-import com.yihu.ehr.profile.annotation.Table;
-import com.yihu.ehr.profile.core.ResourceCore;
-import com.yihu.ehr.profile.family.MasterResourceFamily;
 import com.yihu.ehr.profile.util.PackageDataSet;
 import com.yihu.ehr.profile.util.ProfileId;
 import com.yihu.ehr.profile.exception.IllegalJsonDataException;
@@ -23,15 +19,16 @@ import java.util.*;
  * @author Sand
  * @created 2015.08.16 10:44
  */
-@Table(ResourceCore.MasterTable)
 public class StandardPackage {
 
-    protected ObjectMapper objectMapper =  SpringContext.getApplicationContext().getBean(ObjectMapper.class);
+    protected ObjectMapper objectMapper = SpringContext.getApplicationContext().getBean(ObjectMapper.class);
 
-    //档案ID
-    private ProfileId profileId;
-    //1结构化档案，2文件档案，3链接档案，4数据集档案
-    private ProfileType profileType;
+    //机构代码
+    private String orgCode;
+    //CDA版本号
+    private String cdaVersion;
+    //应用代码
+    private String clientId;
     //事件号
     private String eventNo;
     //事件时间，如挂号，住院，体检等时间
@@ -48,14 +45,14 @@ public class StandardPackage {
     private String patientName;
     //身份证号码
     private String demographicId;
-    //机构代码
-    private String orgCode;
-    //CDA版本号
-    private String cdaVersion;
+    //科室代码
+    private String deptCode;
+    //档案ID
+    private ProfileId profileId;
+    //1结构化档案，2文件档案，3链接档案，4数据集档案
+    private ProfileType profileType;
     //入库创建时间
     private Date createDate;
-    //应用代码
-    private String clientId;
     //ICD10诊断列表
     private Set<String> diagnosisList;
     //ICD10诊断名称列表
@@ -68,10 +65,8 @@ public class StandardPackage {
     protected Map<String, PackageDataSet> dataSets = new TreeMap<>();
 
     public StandardPackage() {
-        cardId = "";
-        orgCode = "";
-        patientId = "";
-        eventNo = "";
+        this.orgCode = "";
+        this.eventNo = "";
         setProfileType(ProfileType.Standard);
     }
 
@@ -103,118 +98,9 @@ public class StandardPackage {
     }
 
     /**
-     * 1结构化档案，2文件档案，3链接档案，4数据集档案
-     * @return
-     */
-    @Column(value = MasterResourceFamily.BasicColumns.ProfileType, family = MasterResourceFamily.Basic)
-    public ProfileType getProfileType() {
-        return profileType;
-    }
-    public void setProfileType(ProfileType profileType) {
-        this.profileType = profileType;
-    }
-
-    /**
-     * 事件号
-     * @return
-     */
-    @Column(value = MasterResourceFamily.BasicColumns.EventNo, family = MasterResourceFamily.Basic)
-    public String getEventNo() {
-        return eventNo;
-    }
-    public void setEventNo(String eventNo) {
-        this.eventNo = eventNo;
-    }
-
-    /**
-     * 事件时间，如挂号，住院，体检等时间
-     * @return
-     */
-    @Column(value = MasterResourceFamily.BasicColumns.EventDate, family = MasterResourceFamily.Basic)
-    public Date getEventDate() {
-        return eventDate;
-    }
-    public void setEventDate(Date date) {
-        this.eventDate = date;
-    }
-
-    /**
-     * 0门诊 1住院 2体检
-     * @return
-     */
-    @Column(value = MasterResourceFamily.BasicColumns.EventType, family = MasterResourceFamily.Basic)
-    public EventType getEventType() {
-        return eventType;
-    }
-    public void setEventType(EventType eventType) {
-        this.eventType = eventType;
-    }
-
-    /**
-     * 就诊时用的就诊卡
-     * @return
-     */
-    @Column(value = MasterResourceFamily.BasicColumns.CardId, family = MasterResourceFamily.Basic)
-    public String getCardId() {
-        return cardId;
-    }
-    public void setCardId(String cardId) {
-        this.cardId = cardId;
-    }
-
-    /**
-     * 就诊时的就诊卡类型
-     * @return
-     */
-    @Column(value = MasterResourceFamily.BasicColumns.CardType, family = MasterResourceFamily.Basic)
-    public String getCardType() {
-        return cardType;
-    }
-    public void setCardType(String cardType) {
-        this.cardType = cardType;
-    }
-
-    /**
-     * 人口学ID
-     * @return
-     */
-    @Column(value = MasterResourceFamily.BasicColumns.PatientId, family = MasterResourceFamily.Basic)
-    public String getPatientId() {
-        return patientId;
-    }
-    public void setPatientId(String patientId) {
-        this.patientId = patientId;
-    }
-
-    /**
-     * 患者姓名
-     * @return
-     */
-    @Column(value = MasterResourceFamily.BasicColumns.PatientName, family = MasterResourceFamily.Basic)
-    public String getPatientName() {
-        return patientName;
-    }
-    public void setPatientName(String patientName) {
-        this.patientName = patientName;
-    }
-
-    /**
-     * 身份证号码
-     * @return
-     */
-    @Column(value = MasterResourceFamily.BasicColumns.DemographicId, family = MasterResourceFamily.Basic)
-    public String getDemographicId() {
-        return demographicId;
-    }
-    public void setDemographicId(String demographicId) {
-        this.demographicId = demographicId;
-    }
-
-    /**
      * 机构代码
      * @return
      */
-    @Column(value = MasterResourceFamily.BasicColumns.OrgCode, family = MasterResourceFamily.Basic)
     public String getOrgCode() {
         return orgCode;
     }
@@ -226,7 +112,6 @@ public class StandardPackage {
      * CDA版本
      * @return
      */
-    @Column(value = MasterResourceFamily.BasicColumns.CdaVersion, family = MasterResourceFamily.Basic)
     public String getCdaVersion() {
         return cdaVersion;
     }
@@ -235,10 +120,130 @@ public class StandardPackage {
     }
 
     /**
+     * 应用代码ID
+     * @return
+     */
+    public String getClientId() {
+        return clientId;
+    }
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
+    }
+
+    /**
+     * 事件号
+     * @return
+     */
+    public String getEventNo() {
+        return eventNo;
+    }
+    public void setEventNo(String eventNo) {
+        this.eventNo = eventNo;
+    }
+
+    /**
+     * 事件时间，如挂号，住院，体检等时间
+     * @return
+     */
+    public Date getEventDate() {
+        return eventDate;
+    }
+    public void setEventDate(Date date) {
+        this.eventDate = date;
+    }
+
+    /**
+     * 0门诊 1住院 2体检
+     * @return
+     */
+    public EventType getEventType() {
+        return eventType;
+    }
+    public void setEventType(EventType eventType) {
+        this.eventType = eventType;
+    }
+
+    /**
+     * 就诊时用的就诊卡
+     * @return
+     */
+    public String getCardId() {
+        return cardId;
+    }
+    public void setCardId(String cardId) {
+        this.cardId = cardId;
+    }
+
+    /**
+     * 就诊时的就诊卡类型
+     * @return
+     */
+    public String getCardType() {
+        return cardType;
+    }
+    public void setCardType(String cardType) {
+        this.cardType = cardType;
+    }
+
+    /**
+     * 人口学ID
+     * @return
+     */
+    public String getPatientId() {
+        return patientId;
+    }
+    public void setPatientId(String patientId) {
+        this.patientId = patientId;
+    }
+
+    /**
+     * 患者姓名
+     * @return
+     */
+    public String getPatientName() {
+        return patientName;
+    }
+    public void setPatientName(String patientName) {
+        this.patientName = patientName;
+    }
+
+    /**
+     * 身份证号码
+     * @return
+     */
+    public String getDemographicId() {
+        return demographicId;
+    }
+    public void setDemographicId(String demographicId) {
+        this.demographicId = demographicId;
+    }
+
+    /**
+     * 机构编码
+     * @return
+     */
+    public String getDeptCode() {
+        return deptCode;
+    }
+    public void setDeptCode(String deptCode) {
+        this.deptCode = deptCode;
+    }
+
+    /**
+     * 1结构化档案，2文件档案，3链接档案，4数据集档案
+     * @return
+     */
+    public ProfileType getProfileType() {
+        return profileType;
+    }
+    public void setProfileType(ProfileType profileType) {
+        this.profileType = profileType;
+    }
+
+    /**
      * 入库创建时间
      * @return
      */
-    @Column(value = MasterResourceFamily.BasicColumns.CreateDate, family = MasterResourceFamily.Basic)
     public Date getCreateDate() {
         if (createDate == null){
             createDate = new Date();
@@ -247,34 +252,6 @@ public class StandardPackage {
     }
     public void setCreateDate(Date createDate) {
         this.createDate = createDate;
-    }
-
-    /**
-     * 应用代码ID
-     * @return
-     */
-    @Column(value = MasterResourceFamily.BasicColumns.ClientId, family = MasterResourceFamily.Basic)
-    public String getClientId() {
-        return clientId;
-    }
-    public void setClientId(String clientId) {
-        this.clientId = clientId;
-    }
-
-    public boolean isReUploadFlg() {
-        return reUploadFlg;
-    }
-
-    public void setReUploadFlg(boolean reUploadFlg) {
-        this.reUploadFlg = reUploadFlg;
-    }
-
-    public boolean isIdentifyFlag() {
-        return identifyFlag;
-    }
-
-    public void setIdentifyFlag(boolean identifyFlag) {
-        this.identifyFlag = identifyFlag;
     }
 
     /**
@@ -295,9 +272,30 @@ public class StandardPackage {
     public Set<String> getDiagnosisNameList() {
         return diagnosisNameList;
     }
-
     public void setDiagnosisNameList(Set<String> diagnosisNameList) {
         this.diagnosisNameList = diagnosisNameList;
+    }
+
+    /**
+     * 重传标志
+     * @return
+     */
+    public boolean isReUploadFlg() {
+        return reUploadFlg;
+    }
+    public void setReUploadFlg(boolean reUploadFlg) {
+        this.reUploadFlg = reUploadFlg;
+    }
+
+    /**
+     * 身份识别标志
+     * @return
+     */
+    public boolean isIdentifyFlag() {
+        return identifyFlag;
+    }
+    public void setIdentifyFlag(boolean identifyFlag) {
+        this.identifyFlag = identifyFlag;
     }
 
     /**
@@ -349,6 +347,7 @@ public class StandardPackage {
         root.put("diagnosisName", StringUtils.join(this.getDiagnosisNameList(),";"));
         root.put("reUploadFlg", this.isReUploadFlg());
         root.put("identifyFlag", this.isIdentifyFlag());
+        root.put("deptCode", this.deptCode);
         ObjectNode dataSetsNode = root.putObject("dataSets");
         for (String dataSetCode : dataSets.keySet()) {
             PackageDataSet dataSet = dataSets.get(dataSetCode);
@@ -365,41 +364,6 @@ public class StandardPackage {
             String[] rowKeys = dataSet.getRecordKeys().toArray(new String[dataSet.getRecordCount()]);
             for (String rowKey : rowKeys) {
                 dataSet.updateRecordKey(rowKey, String.format(sortFormat, getId(), rowIndex ++));
-            }
-        }
-    }
-
-    //非档案类型 rowKey获取
-    public String getNonArchiveProfileId(String dataSetCode,int type) {
-        if (profileId == null) {
-            if (StringUtils.isEmpty(orgCode)) {
-                throw new IllegalJsonDataException("Build profile id failed, organization code is empty.");
-            }
-
-            if (StringUtils.isEmpty(eventNo) && !"HDSA00_01".equals(dataSetCode)) {
-                throw new IllegalJsonDataException("Build profile id failed, eventNo is empty.");
-            }
-
-            if (StringUtils.isEmpty(patientId) ) {
-                throw new IllegalJsonDataException("Build profile id failed, patientId is empty.\"");
-            }
-
-            this.profileId = ProfileId.get(orgCode, patientId, eventNo,type);
-        }
-
-        return profileId.toString();
-    }
-
-    //非档案类型rowKey更新
-    public void regularNonArchiveRowKey(int type) {
-        for (String dataSetCode : dataSets.keySet()) {
-            PackageDataSet dataSet = dataSets.get(dataSetCode);
-
-            int rowIndex = 0;
-            String sortFormat = dataSet.getRecordCount() > 10 ? "%s$%03d" : "%s$%1d";
-            String[] rowKeys = dataSet.getRecordKeys().toArray(new String[dataSet.getRecordCount()]);
-            for (String rowKey : rowKeys) {
-                dataSet.updateRecordKey(rowKey, String.format(sortFormat, getNonArchiveProfileId(dataSetCode,type), rowIndex++));
             }
         }
     }

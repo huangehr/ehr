@@ -51,9 +51,9 @@ public class FilePackageResolver extends PackageResolver {
 
         String demographicId = root.get("demographic_id") == null ? "" : root.get("demographic_id").asText();
         String patientId = root.get("patient_id") == null ? "" : root.get("patient_id").asText();
+        String orgCode = root.get("org_code") == null ? "" : root.get("org_code").asText();
         String eventNo = root.get("event_no") == null ? "" : root.get("event_no").asText();
         int eventType = root.get("event_type") == null ? -1 : root.get("event_type").asInt();
-        String orgCode = root.get("org_code") == null ? "" : root.get("org_code").asText();
         String eventDate = root.get("event_time") == null ? "" : root.get("event_time").asText();
         String createDate = root.get("create_date") == null ? "" : root.get("create_date").asText();
         String cdaVersion = root.get("inner_version") == null ? "" : root.get("inner_version").asText();
@@ -67,6 +67,12 @@ public class FilePackageResolver extends PackageResolver {
         }
         if (StringUtils.isEmpty(orgCode)){
             errorMsg.append("orgCode is null;");
+        }
+        if (StringUtils.isEmpty(cdaVersion)) {
+            errorMsg.append("innerVersion is null;");
+        }
+        if (StringUtils.isEmpty(eventDate)) {
+            errorMsg.append("eventTime is null;");
         }
         if (!StringUtils.isEmpty(errorMsg.toString())){
             throw new IllegalJsonDataException(errorMsg.toString());

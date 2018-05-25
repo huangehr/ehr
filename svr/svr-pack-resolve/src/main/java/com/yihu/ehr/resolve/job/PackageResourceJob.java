@@ -97,14 +97,14 @@ public class PackageResourceJob implements InterruptableJob {
         ResourceService resourceService = SpringContext.getService(ResourceService.class);
         ObjectMapper objectMapper = new ObjectMapper();
         StandardPackage standardPackage = resolveEngine.doResolve(pack, downloadTo(pack.getRemote_path()));
-        ResourceBucket resourceBucket = packMill.grindingPackModel(standardPackage);
+        ResourceBucket resourceBucket = packMill.grindingPackModel(standardPackage, pack);
         identifyService.identify(resourceBucket, standardPackage);
         resourceService.save(resourceBucket, standardPackage, pack);
         //回填入库状态
         Map<String, Object> map = new HashMap();
         map.put("profile_id", standardPackage.getId());
         map.put("demographic_id", standardPackage.getDemographicId());
-        map.put("event_type", standardPackage.getEventType() == null ? null : standardPackage.getEventType().getType());
+        map.put("event_type", standardPackage.getEventType() == null ? -1 : standardPackage.getEventType().getType());
         map.put("event_no", standardPackage.getEventNo());
         map.put("event_date", DateUtil.toStringLong(standardPackage.getEventDate()));
         map.put("patient_id", standardPackage.getPatientId());

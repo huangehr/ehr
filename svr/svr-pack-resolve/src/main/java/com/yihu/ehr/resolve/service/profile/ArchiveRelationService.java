@@ -68,7 +68,7 @@ public class ArchiveRelationService {
             relation.setTelephone(telephone);
             relation.setCard_type(resourceBucket.getCardType());
             relation.setCard_no(resourceBucket.getCardId());
-            relation.setEvent_type(resourceBucket.getEventType() == null ? null : resourceBucket.getEventType().getType());
+            relation.setEvent_type(resourceBucket.getEventType() == null ? -1 : resourceBucket.getEventType().getType());
             relation.setEvent_no(resourceBucket.getEventNo());
             relation.setEvent_date(resourceBucket.getEventDate());
             char prefix = CHARS.charAt((int)(Math.random() * 26));
