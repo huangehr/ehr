@@ -160,11 +160,11 @@ public class SolrExtract {
                 for (Map<String, Object> map : list) {
                     String keyStr  = "";
                     for(String key :mainMap.keySet()){
-                        keyStr += map.get(key) +  "-";;
+                        keyStr += map.get(key) +  "-";
                     }
                     for(String key :slaveMap.keySet()){
                         if( !key.equals(timeKey)){
-                            keyStr += map.get(key) +  "-";;
+                            keyStr += map.get(key) +  "-";
                         }
                     }
                     Date  quotaDate = (Date) map.get(timeKey);
