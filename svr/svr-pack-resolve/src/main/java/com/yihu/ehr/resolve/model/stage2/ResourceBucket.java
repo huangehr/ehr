@@ -65,7 +65,7 @@ public class ResourceBucket {
     //子记录
     private SubRecords subRecords;
     //质控数据
-    private QcRecords qcRecords;
+    private QcMetadataRecords qcMetadataRecords;
     private List<LinkFile> linkFiles = new ArrayList<>();
     // CDA文档列表，Key为HBase rowkey
     private Map<String, CdaDocument> cdaDocuments = new TreeMap<>();
@@ -73,7 +73,7 @@ public class ResourceBucket {
     public ResourceBucket() {
         masterRecord = new MasterRecord();
         subRecords = new SubRecords();
-        qcRecords = new QcRecords();
+        qcMetadataRecords = new QcMetadataRecords();
     }
 
     public String getId() {
@@ -244,11 +244,11 @@ public class ResourceBucket {
         this.subRecords = subRecords;
     }
 
-    public QcRecords getQcRecords() {
-        return qcRecords;
+    public QcMetadataRecords getQcMetadataRecords() {
+        return qcMetadataRecords;
     }
-    public void setQcRecords(QcRecords qcRecords) {
-        this.qcRecords = qcRecords;
+    public void setQcMetadataRecords(QcMetadataRecords qcMetadataRecords) {
+        this.qcMetadataRecords = qcMetadataRecords;
     }
 
     public Map<String, CdaDocument> getCdaDocuments() {

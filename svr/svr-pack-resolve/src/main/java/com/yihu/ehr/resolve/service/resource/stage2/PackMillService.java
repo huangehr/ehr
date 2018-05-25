@@ -160,25 +160,27 @@ public class PackMillService {
          String resMetadata = redisService.getRsAdapterMetaData(cdaVersion, srcDataSetCode, srcMetadataCode);
          if (StringUtils.isEmpty(resMetadata)){
              //质控数据
-             Map<String, Object> qcRecord = new HashMap<>();
-             qcRecord.put("pack_id", esSimplePackage.get_id());
-             qcRecord.put("org_code", resourceBucket.getOrgCode());
-             qcRecord.put("org_name", resourceBucket.getOrgName());
-             qcRecord.put("org_area", resourceBucket.getOrgArea());
-             qcRecord.put("dept", resourceBucket.getDeptCode());
-             qcRecord.put("diagnosis_name", resourceBucket.getDiagnosisName());
-             qcRecord.put("receive_date", DATE_FORMAT.format(esSimplePackage.getReceive_date()));
-             qcRecord.put("event_date", DateUtil.toStringLong(resourceBucket.getEventDate()));
-             qcRecord.put("event_type", resourceBucket.getEventType() == null ? null : resourceBucket.getEventType().getType());
-             qcRecord.put("event_no", resourceBucket.getEventNo());
-             qcRecord.put("version", cdaVersion);
-             qcRecord.put("dataset", srcDataSetCode);
-             qcRecord.put("metadata", srcMetadataCode);
-             qcRecord.put("value", value);
-             qcRecord.put("qc_step", 2); //资源化质控环节
-             qcRecord.put("qc_error_type", 1); //资源适配错误
-             qcRecord.put("qc_error_message", String.format("Unable to get resource meta data code for ehr meta data %s of %s in %s", srcMetadataCode, srcDataSetCode, cdaVersion));
-             resourceBucket.getQcRecords().addRecord(qcRecord);
+             Map<String, Object> qcMetadataRecord = new HashMap<>();
+             qcMetadataRecord.put("_id", esSimplePackage.get_id() + "_" + srcDataSetCode + "_" + srcMetadataCode);
+             qcMetadataRecord.put("patient_id", resourceBucket.getPatientId());
+             qcMetadataRecord.put("pack_id", esSimplePackage.get_id());
+             qcMetadataRecord.put("org_code", resourceBucket.getOrgCode());
+             qcMetadataRecord.put("org_name", resourceBucket.getOrgName());
+             qcMetadataRecord.put("org_area", resourceBucket.getOrgArea());
+             qcMetadataRecord.put("dept", resourceBucket.getDeptCode());
+             qcMetadataRecord.put("diagnosis_name", resourceBucket.getDiagnosisName());
+             qcMetadataRecord.put("receive_date", DATE_FORMAT.format(esSimplePackage.getReceive_date()));
+             qcMetadataRecord.put("event_date", DateUtil.toStringLong(resourceBucket.getEventDate()));
+             qcMetadataRecord.put("event_type", resourceBucket.getEventType() == null ? -1 : resourceBucket.getEventType().getType());
+             qcMetadataRecord.put("event_no", resourceBucket.getEventNo());
+             qcMetadataRecord.put("version", cdaVersion);
+             qcMetadataRecord.put("dataset", srcDataSetCode);
+             qcMetadataRecord.put("metadata", srcMetadataCode);
+             qcMetadataRecord.put("value", value);
+             qcMetadataRecord.put("qc_step", 2); //资源化质控环节
+             qcMetadataRecord.put("qc_error_type", 1); //资源适配错误
+             qcMetadataRecord.put("qc_error_message", String.format("Unable to get resource meta data code for ehr meta data %s of %s in %s", srcMetadataCode, srcDataSetCode, cdaVersion));
+             resourceBucket.getQcMetadataRecords().addRecord(qcMetadataRecord);
              //日志
              PackResolveLogger.warn(String.format("Unable to get resource meta data code for ehr meta data %s of %s in %s", srcMetadataCode, srcDataSetCode, cdaVersion));
              return null;
@@ -258,25 +260,27 @@ public class PackMillService {
             return dict.split("&");
         }
         //质控数据
-        Map<String, Object> qcRecord = new HashMap<>();
-        qcRecord.put("pack_id", esSimplePackage.get_id());
-        qcRecord.put("org_code", resourceBucket.getOrgCode());
-        qcRecord.put("org_name", resourceBucket.getOrgName());
-        qcRecord.put("org_area", resourceBucket.getOrgArea());
-        qcRecord.put("dept", resourceBucket.getDeptCode());
-        qcRecord.put("diagnosis_name", resourceBucket.getDiagnosisName());
-        qcRecord.put("receive_date", DATE_FORMAT.format(esSimplePackage.getReceive_date()));
-        qcRecord.put("event_date", DateUtil.toStringLong(resourceBucket.getEventDate()));
-        qcRecord.put("event_type", resourceBucket.getEventType() == null ? null : resourceBucket.getEventType().getType());
-        qcRecord.put("event_no", resourceBucket.getEventNo());
-        qcRecord.put("version", version);
-        qcRecord.put("dataset", srcDataSetCode);
-        qcRecord.put("metadata", srcMetadataCode);
-        qcRecord.put("value", srcDictEntryCode);
-        qcRecord.put("qc_step", 2); //资源化质控环节
-        qcRecord.put("qc_error_type", 2); //字典转换错误
-        qcRecord.put("qc_error_message", String.format("Unable to get dict value for meta data %s of %s in %s", srcMetadataCode, srcDataSetCode, version));
-        resourceBucket.getQcRecords().addRecord(qcRecord);
+        Map<String, Object> qcMetadataRecord = new HashMap<>();
+        qcMetadataRecord.put("_id", esSimplePackage.get_id() + "_" + srcDataSetCode + "_" + srcMetadataCode);
+        qcMetadataRecord.put("patient_id", resourceBucket.getPatientId());
+        qcMetadataRecord.put("pack_id", esSimplePackage.get_id());
+        qcMetadataRecord.put("org_code", resourceBucket.getOrgCode());
+        qcMetadataRecord.put("org_name", resourceBucket.getOrgName());
+        qcMetadataRecord.put("org_area", resourceBucket.getOrgArea());
+        qcMetadataRecord.put("dept", resourceBucket.getDeptCode());
+        qcMetadataRecord.put("diagnosis_name", resourceBucket.getDiagnosisName());
+        qcMetadataRecord.put("receive_date", DATE_FORMAT.format(esSimplePackage.getReceive_date()));
+        qcMetadataRecord.put("event_date", DateUtil.toStringLong(resourceBucket.getEventDate()));
+        qcMetadataRecord.put("event_type", resourceBucket.getEventType() == null ? -1 : resourceBucket.getEventType().getType());
+        qcMetadataRecord.put("event_no", resourceBucket.getEventNo());
+        qcMetadataRecord.put("version", version);
+        qcMetadataRecord.put("dataset", srcDataSetCode);
+        qcMetadataRecord.put("metadata", srcMetadataCode);
+        qcMetadataRecord.put("value", srcDictEntryCode);
+        qcMetadataRecord.put("qc_step", 2); //资源化质控环节
+        qcMetadataRecord.put("qc_error_type", 2); //字典转换错误
+        qcMetadataRecord.put("qc_error_message", String.format("Unable to get dict value for meta data %s of %s in %s", srcMetadataCode, srcDataSetCode, version));
+        resourceBucket.getQcMetadataRecords().addRecord(qcMetadataRecord);
         //日志
         PackResolveLogger.warn(String.format("Unable to get dict value for meta data %s of %s in %s", srcMetadataCode, srcDataSetCode, version));
         return "".split("&");
