@@ -67,6 +67,7 @@ public class PackageQcService {
         qcDataSetRecord.put("org_name", zipPackage.getOrgName());
         qcDataSetRecord.put("org_area", zipPackage.getOrgArea());
         qcDataSetRecord.put("dept", zipPackage.getDeptCode());
+        qcDataSetRecord.put("diagnosis_name", zipPackage.getDiagnosisNameList() == null ? "" : StringUtils.join(zipPackage.getDiagnosisNameList().toArray(),";"));
         qcDataSetRecord.put("receive_date", DATE_FORMAT.format(esSimplePackage.getReceive_date()));
         qcDataSetRecord.put("event_date", DateUtil.toStringLong(zipPackage.getEventDate()));
         qcDataSetRecord.put("event_type", zipPackage.getEventType() == null ? -1 : zipPackage.getEventType().getType());
@@ -97,7 +98,7 @@ public class PackageQcService {
                             qcMetadataRecord.put("org_name", zipPackage.getOrgName());
                             qcMetadataRecord.put("org_area", zipPackage.getOrgArea());
                             qcMetadataRecord.put("dept", zipPackage.getDeptCode());
-                            qcMetadataRecord.put("diagnosis_name", StringUtils.join(zipPackage.getDiagnosisList().toArray(),";"));
+                            qcMetadataRecord.put("diagnosis_name", zipPackage.getDiagnosisNameList() == null ? "" : StringUtils.join(zipPackage.getDiagnosisNameList().toArray(),";"));
                             qcMetadataRecord.put("receive_date", DATE_FORMAT.format(esSimplePackage.getReceive_date()));
                             qcMetadataRecord.put("event_date", DateUtil.toStringLong(zipPackage.getEventDate()));
                             qcMetadataRecord.put("event_type", zipPackage.getEventType() == null ? -1 : zipPackage.getEventType().getType());
