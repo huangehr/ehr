@@ -62,6 +62,7 @@ public class Contant {
 
         public static final String aggregation_count = "count";
         public static final String aggregation_sum = "sum";
+        public static final String aggregation_list = "list";
 
     }
 
