@@ -50,7 +50,7 @@ public class JobService {
             String quotaCodeImmediately = quotaCode + "immediately";
             boolean existJob = quartzHelper.isExistJob(quotaCode);
             boolean existJobImmediately = quartzHelper.isExistJob(quotaCodeImmediately);
-            if (existJob) {
+            if (existJob && "0".equals(quotaVo.getJobStatus())) {
                 //周期执行jobKey
                 quartzHelper.removeJob(quotaCode);
             }
