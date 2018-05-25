@@ -89,7 +89,6 @@ public class PackageQcService {
                         Method _method = clazz.getMethod(method, new Class[]{String.class, String.class, String.class});
                         int result = (int)_method.invoke(qcRuleCheckService, dataSetCode, metadata, dataGroup.get(metadata));
                         if (result != 0) {
-                            //此处生成质控数据（数据未填充）
                             Map<String, Object> qcMetadataRecord = new HashMap<>();
                             qcMetadataRecord.put("_id", esSimplePackage.get_id() + "_" + dataSetCode + "_" + metadata);
                             qcMetadataRecord.put("patient_id", zipPackage.getPatientId());
@@ -108,7 +107,7 @@ public class PackageQcService {
                             qcMetadataRecord.put("metadata", metadata);
                             qcMetadataRecord.put("value", dataGroup.get(metadata));
                             qcMetadataRecord.put("qc_step", 1); //标准质控环节
-                            qcMetadataRecord.put("qc_error_type", result); //字典转换错误
+                            qcMetadataRecord.put("qc_error_type", result); //标准质控错误类型
                             qcMetadataRecord.put("qc_error_message", String.format("%s failure for meta data %s of %s in %s", method, metadata, dataSetCode, zipPackage.getCdaVersion()));
                             zipPackage.getQcMetadataRecords().add(qcMetadataRecord);
                         }
