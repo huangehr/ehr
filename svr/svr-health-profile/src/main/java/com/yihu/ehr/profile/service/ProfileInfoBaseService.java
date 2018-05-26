@@ -133,8 +133,8 @@ public class ProfileInfoBaseService extends BaseJpaService {
             if (!StringUtils.isEmpty(result.get("EHR_000007"))) {
                 birthday = (String) result.get("EHR_000007");
             }
-            if (StringUtils.isEmpty(birthday) && !StringUtils.isEmpty(result.get("EHR_000320"))) {
-                birthday = (String) result.get("EHR_000320");
+            if (StringUtils.isEmpty(birthday) && !StringUtils.isEmpty(result.get("EHR_000007"))) {
+                birthday = (String) result.get("EHR_000007");
             }
             patientMap.put("birthday", birthday);
             //年龄

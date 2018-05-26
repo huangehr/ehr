@@ -58,12 +58,19 @@ public class HealthArchiveSchedulerService {
         if(null != archiveInfo.getDemographicId()) {
             List<Map<String, Object>> list = elasticSearchUtil.findByField(index, type, "demographicId", archiveInfo.getDemographicId());
             if(list == null || list.size() == 0) {
+                if (null != archiveInfo.getCardId()) {
+                    // 当存在有身份证号和就诊卡号的时候，判断es的记录是否存在没身份证号但就诊卡号存在相同的记录
+                    List<Map<String, Object>> cardList = elasticSearchUtil.findByField(index, type, "cardId",archiveInfo.getCardId());
+                    if (null != cardList && cardList.size() > 0) {
+                        return;
+                    }
+                }
                 if (null == healthArchiveSchema.get(archiveInfo.getDemographicId())) {
                     healthArchiveSchema.set(archiveInfo.getDemographicId(), archiveInfo.getDemographicId(), 54000);
                     elasticSearchClient.index(index, type, source);
                 }
             }
-        }else if(null != archiveInfo.getCardId()) {
+        } else if(null != archiveInfo.getCardId()) {
             List<Map<String, Object>> list = elasticSearchUtil.findByField(index, type, "cardId",archiveInfo.getCardId());
             if(list == null || list.size() == 0) {
                 if (null == healthArchiveSchema.get(archiveInfo.getCardId())) {
@@ -71,7 +78,7 @@ public class HealthArchiveSchedulerService {
                     elasticSearchClient.index(index, type, source);
                 }
             }
-        }else {
+        } else {
             elasticSearchClient.index(index, type, source);
         }
     }

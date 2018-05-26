@@ -103,6 +103,8 @@ public class ExtractHelper {
                 if(orgFlag && !esConfig.getEspecialType().equals("orgHealthCategory") ){
                     tjQuotaDimensionMains.remove(townMain);
                 }
+            }else {
+                tjQuotaDimensionMains.remove(townMain);
             }
 
             //得到细维度

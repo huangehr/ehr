@@ -1,15 +1,14 @@
-package com.yihu.ehr.resolve.service.resource.stage1.extractor;
+package com.yihu.ehr.profile.extractor;
 
 import com.yihu.ehr.profile.family.MasterResourceFamily;
 import com.yihu.ehr.profile.util.MetaDataRecord;
 import com.yihu.ehr.profile.util.PackageDataSet;
-import org.apache.commons.collections.map.HashedMap;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +36,7 @@ public class CardInfoExtractor extends KeyDataExtractor {
      */
     @Override
     public Map<String, Object> extract(PackageDataSet dataSet) throws Exception {
-        Map<String,Object> properties = new HashedMap();
+        Map<String,Object> properties = new HashMap<>();
         String id = "";
         String type = "";
         //获取就诊卡号和卡类型

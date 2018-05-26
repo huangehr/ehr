@@ -1,7 +1,7 @@
 package com.yihu.ehr.resolve.service.profile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.constants.ProfileType;
+import com.yihu.ehr.profile.ProfileType;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.hbase.HBaseDao;
 import com.yihu.ehr.model.packs.EsArchiveRelation;
@@ -68,7 +68,7 @@ public class ArchiveRelationService {
             relation.setTelephone(telephone);
             relation.setCard_type(resourceBucket.getCardType());
             relation.setCard_no(resourceBucket.getCardId());
-            relation.setEvent_type(resourceBucket.getEventType() == null ? null : resourceBucket.getEventType().getType());
+            relation.setEvent_type(resourceBucket.getEventType() == null ? -1 : resourceBucket.getEventType().getType());
             relation.setEvent_no(resourceBucket.getEventNo());
             relation.setEvent_date(resourceBucket.getEventDate());
             char prefix = CHARS.charAt((int)(Math.random() * 26));

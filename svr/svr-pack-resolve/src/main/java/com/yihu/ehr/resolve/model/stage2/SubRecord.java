@@ -14,7 +14,7 @@ public class SubRecord extends ResourceRecord {
     private final static char Delimiter = '$';
     private final static String RowKeyFormat = "%s$%s$%s";
 
-    String rowkey;
+    private String rowkey;
 
     public String getProfileId(){
         if (StringUtils.isEmpty(rowkey)) return "";

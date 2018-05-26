@@ -27,33 +27,7 @@ public class MasterResourceFamily extends ResourceFamily {
         public static final String DiagnosisName = "diagnosis_name";
         public static final String HealthProblem = "health_problem";
         public static final String HealthProblemName = "health_problem_name";
-        public static final String ChronicInfo = "chronic_info";
+        public static final String DeptCode = "dept_code";
     }
 
-    /**
-     * 获取指定族的列.
-     *
-     * @return
-     */
-    public static String[] getColumns(String family) {
-        if (family.equals(Basic)) {
-            return new String[]{
-                    BasicColumns.CardId,
-                    BasicColumns.CardType,
-                    BasicColumns.OrgCode,
-                    BasicColumns.PatientId,
-                    BasicColumns.PatientName,
-                    BasicColumns.EventNo,
-                    BasicColumns.EventDate,
-                    BasicColumns.EventType,
-                    BasicColumns.ProfileType,
-                    BasicColumns.DemographicId,
-                    BasicColumns.ClientId,
-                    BasicColumns.CreateDate,
-                    BasicColumns.CdaVersion
-            };
-        }
-
-        return null;
-    }
 }

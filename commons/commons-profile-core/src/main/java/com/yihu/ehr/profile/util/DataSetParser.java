@@ -48,7 +48,7 @@ public class DataSetParser {
         //验证档案基础数据的完整性，当其中某字段为空的情况下直接提示档案包信息缺失。
         StringBuilder errorMsg = new StringBuilder();
         if (StringUtils.isEmpty(code)){
-            errorMsg.append("dataSetCode is null;");
+            errorMsg.append("code is null;");
         }
         if (StringUtils.isEmpty(patientId)){
             errorMsg.append("patientId is null;");
@@ -59,20 +59,22 @@ public class DataSetParser {
         if (StringUtils.isEmpty(orgCode)){
             errorMsg.append("orgCode is null;");
         }
+        if (StringUtils.isEmpty(version)) {
+            errorMsg.append("innerVersion is null;");
+        }
+        if (StringUtils.isEmpty(eventTime)) {
+            errorMsg.append("eventTime is null;");
+        }
         if (!StringUtils.isEmpty(errorMsg.toString())){
             throw new IllegalJsonDataException(errorMsg.toString());
         }
+        dataSet.setCode(code);
         dataSet.setPatientId(patientId);
         dataSet.setEventNo(eventNo);
-        dataSet.setCdaVersion(version);
-        dataSet.setCode(code);
         dataSet.setOrgCode(orgCode);
-        try {
-            dataSet.setEventTime(DateUtil.strToDate(eventTime));
-            dataSet.setCreateTime(DateTimeUtil.simpleDateParse(createTime));
-        }  catch (ParseException e) {
-            throw new IllegalJsonDataException("Invalid date time format in dataset " + code);
-        }
+        dataSet.setCdaVersion(version);
+        dataSet.setCreateTime(DateUtil.strToDate(createTime));
+        dataSet.setEventTime(DateUtil.strToDate(eventTime));
         dataSet.setReUploadFlg(reUploadFlg);
         JsonNode dataNode = jsonNode.get("data");
         for (int i = 0; i < dataNode.size(); i ++) {
@@ -89,8 +91,6 @@ public class DataSetParser {
         }
         return dataSet;
     }
-
-
 
     /**
      * 结构化 - 即时交互档案数据集处理

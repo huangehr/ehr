@@ -1,7 +1,7 @@
 package com.yihu.ehr.resolve.dao;
 
-import com.yihu.ehr.constants.EventType;
-import com.yihu.ehr.constants.ProfileType;
+import com.yihu.ehr.profile.EventType;
+import com.yihu.ehr.profile.ProfileType;
 import com.yihu.ehr.hbase.HBaseDao;
 import com.yihu.ehr.hbase.TableBundle;
 import com.yihu.ehr.profile.core.ResourceCore;

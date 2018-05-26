@@ -1,8 +1,8 @@
 package com.yihu.ehr.resolve.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.ArchiveStatus;
-import com.yihu.ehr.constants.ProfileType;
+import com.yihu.ehr.profile.ArchiveStatus;
+import com.yihu.ehr.profile.ProfileType;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
@@ -83,15 +83,15 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
 
             //非病人维度不做此处理
             if (!ProfileType.DataSet.equals(standardPackage.getProfileType())){
-                ResourceBucket resourceBucket = packMillService.grindingPackModel(standardPackage);
+                ResourceBucket resourceBucket = packMillService.grindingPackModel(standardPackage, pack);
                 identifyService.identify(resourceBucket, standardPackage);
-                resourceService.save(resourceBucket, standardPackage);
+                resourceService.save(resourceBucket, standardPackage, pack);
             }
 
             //回填入库状态
             map.put("profile_id", standardPackage.getId());
             map.put("demographic_id", standardPackage.getDemographicId());
-            map.put("event_type", standardPackage.getEventType() == null ? null : standardPackage.getEventType().getType());
+            map.put("event_type", standardPackage.getEventType() == null ? -1 : standardPackage.getEventType().getType());
             map.put("event_no", standardPackage.getEventNo());
             map.put("event_date", DateUtil.toStringLong(standardPackage.getEventDate()));
             map.put("patient_id", standardPackage.getPatientId());
@@ -160,10 +160,10 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
         pack.setClient_id(clientId);
         StandardPackage standardPackage = packageResolveService.doResolve(pack, zipFile);
         standardPackage.setClientId(clientId);
-        ResourceBucket resourceBucket = packMillService.grindingPackModel(standardPackage);
+        ResourceBucket resourceBucket = packMillService.grindingPackModel(standardPackage, pack);
         if (persist) {
             identifyService.identify(resourceBucket, standardPackage);
-            resourceService.save(resourceBucket, standardPackage);
+            resourceService.save(resourceBucket, standardPackage, pack);
         }
         return new ResponseEntity<>(standardPackage.toJson(), HttpStatus.OK);
     }
@@ -196,11 +196,13 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "clientId", required = false) String clientId,
             @ApiParam(name = "echo", value = "返回档案数据")
             @RequestParam(value = "echo",required = false,defaultValue = "true") boolean echo) throws Throwable {
-
+        EsSimplePackage esSimplePackage = new EsSimplePackage();
+        esSimplePackage.set_id(UUID.randomUUID().toString());
+        esSimplePackage.setReceive_date(new Date());
         StandardPackage standardPackage = packageResolveService.doResolveImmediateData(data, clientId);
-        ResourceBucket resourceBucket = packMillService.grindingPackModel(standardPackage);
+        ResourceBucket resourceBucket = packMillService.grindingPackModel(standardPackage, esSimplePackage);
         identifyService.identify(resourceBucket, standardPackage);
-        resourceService.save(resourceBucket, standardPackage);
+        resourceService.save(resourceBucket, standardPackage, null);
         //回填入库状态
        /* Map<String, String> map = new HashMap();
         map.put("profileId", standardPackage.getId());

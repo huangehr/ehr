@@ -34,20 +34,27 @@ public class SolrUtil {
      * 简单查询方法
      */
     public SolrDocumentList query(String tableName, String q, Map<String, String> sort, long start, long rows) throws Exception {
-        return query(tableName, q, null, sort, start, rows);
+        return query(tableName, q, null, sort, start, rows,null);
+    }
+
+    /**
+     * 简单查询返回字段
+     */
+    public SolrDocumentList queryReturnFieldList(String tableName, String q ,String fq , Map<String, String> sort, long start, long rows,String... fields) throws Exception {
+        return query(tableName, q, fq, sort, start, rows,fields);
     }
 
     /**
      * Solr查询方法
-     *
      * @param q     查询字符串
      * @param fq    过滤查询
-     * @param sort  过滤条件
+     * @param sort  排序
      * @param start 查询起始行
      * @param rows  查询行数
+     * @param fields 返回字段
      * @return
      */
-    public SolrDocumentList query(String core, String q, String fq, Map<String, String> sort, long start, long rows) throws Exception {
+    public SolrDocumentList query(String core, String q, String fq , Map<String, String> sort, long start, long rows,String... fields) throws Exception {
         SolrClient conn = pool.getConnection(core);
         SolrQuery query = new SolrQuery();
         if (null != q && !q.equals("")) { //设置查询条件
@@ -58,7 +65,7 @@ public class SolrUtil {
         if (null != fq && !fq.equals("")) { //设置过滤条件
             query.setFilterQueries(fq);
         }
-
+        query.setFields(fields);
         query.setStart(Integer.parseInt(String.valueOf(start)));//设置查询起始行
         query.setRows(Integer.parseInt(String.valueOf(rows)));//设置查询行数
 
@@ -84,7 +91,7 @@ public class SolrUtil {
      *
      * @param q     查询字符串
      * @param fq    过滤查询  多个过滤条件
-     * @param sort  过滤条件
+     * @param sort  排序
      * @param start 查询起始行
      * @param rows  查询行数
      * @return

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.lang.SpringContext;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
 
 import java.util.*;
 
@@ -148,6 +149,8 @@ public class PackageDataSet {
         root.put("patient_id", patientId);
         root.put("event_no", eventNo);
         root.put("org_code", orgCode);
+        root.put("inner_version", cdaVersion);
+        root.put("event_time", DateTimeUtil.utcDateTimeFormat(eventTime));
         return root;
     }
 
@@ -157,7 +160,7 @@ public class PackageDataSet {
             MetaDataRecord record = this.records.get(rowKey);
             if (record == null){
                 records.put(rowKey, (String)null);
-            }else {
+            } else {
                 ObjectNode metaData = records.putObject(rowKey);
 
                 Set<String> codes = record.getMetaDataCodes();

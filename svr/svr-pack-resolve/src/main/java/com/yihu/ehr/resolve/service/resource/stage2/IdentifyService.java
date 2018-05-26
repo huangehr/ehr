@@ -46,7 +46,7 @@ public class IdentifyService {
                 //姓名
                 String name = StringUtils.isNotEmpty(resourceBucket.getPatientName()) ? resourceBucket.getPatientName() : DEFAULT_VALUE;
                 //生日
-                Date birthday = resourceBucket.getMasterRecord().getResourceValue("EHR_000320") == null ? new Date() : DateTimeUtil.simpleDateParse(resourceBucket.getMasterRecord().getResourceValue("EHR_000320"));
+                Date birthday = resourceBucket.getMasterRecord().getResourceValue("EHR_000007") == null ? new Date() : DateTimeUtil.simpleDateParse(resourceBucket.getMasterRecord().getResourceValue("EHR_000007"));
                 //手机号码
                 String telephoneNo = resourceBucket.getMasterRecord().getResourceValue("EHR_000003") == null ? DEFAULT_VALUE : resourceBucket.getMasterRecord().getResourceValue("EHR_000003").toString();
                 telephoneNo += "{\"联系电话\":\"" + telephoneNo + "\"}";

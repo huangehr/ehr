@@ -192,9 +192,9 @@ public class QuotaReportController extends BaseController {
 
             if(dimension.equals(orgHealthCategoryCode)){//如果是特殊机构类型树状机构需要转成树状结构
                 List<Map<String, Object>> orgHealthCategoryList = orgHealthCategoryStatisticsService.getOrgHealthCategoryTreeByPid(-1);
-                dataList = baseStatistsService.setResultAllDimenMap(maxQuotaCode, orgHealthCategoryList, resultList,null);
-                //采用新的 管理出特殊机构类型方式 待调试
-//                dataList = baseStatistsService.allCategoryResultMap(maxQuotaCode, orgHealthCategoryList, resultList);
+//                dataList = baseStatistsService.setResultAllDimenMap(maxQuotaCode, orgHealthCategoryList, resultList,null);
+                //采用新的
+                dataList = baseStatistsService.allCategoryResultMap(maxQuotaCode, orgHealthCategoryList, resultList);
 
             }else {
                 dataList = resultList;
@@ -241,8 +241,6 @@ public class QuotaReportController extends BaseController {
             }
             dataList.add(0,sumMap);
         }
-        //二次指标为除法运算的  合计需要重新计算
-        //TODO
         return dataList;
     }
 
@@ -257,9 +255,6 @@ public class QuotaReportController extends BaseController {
         for(Map<String, Object> map : dataList){
             if(map.get(code) != null){
                 sum += Double.valueOf("--".equals(map.get(code)) ? "0" : map.get(code).toString());
-                if(map.containsKey("children")){
-                    calculateSum(sum,code,(List<Map<String, Object>>) map.get("children"));
-                }
             }
         }
         return sum;

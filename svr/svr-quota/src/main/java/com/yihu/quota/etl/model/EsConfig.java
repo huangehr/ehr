@@ -20,7 +20,7 @@ public class EsConfig {
 
     private String timekey;//根据sql去查询的key 时间控制字段
     private String filter;  // where条件
-    private String aggregation;//聚合方式  默认count，另有sum
+    private String aggregation;//聚合方式  默认count，另有sum ，list
     private String aggregationKey;//聚合字段
     private String especialType; //特殊类型  orgHealthCategory：卫生机构类型
     private String superiorBaseQuotaCode;  // 上级基础指标code

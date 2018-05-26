@@ -1,4 +1,4 @@
-package com.yihu.ehr.constants;
+package com.yihu.ehr.profile;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 

@@ -47,6 +47,7 @@ public class ResourceStorageUtil {
             map.put(MasterResourceFamily.BasicColumns.ClientId, resourceBucket.getClientId());
             map.put(MasterResourceFamily.BasicColumns.CreateDate, DateTimeUtil.utcDateTimeFormat(new Date()));
             map.put(MasterResourceFamily.BasicColumns.CdaVersion, resourceBucket.getCdaVersion());
+            map.put(MasterResourceFamily.BasicColumns.DeptCode, resourceBucket.getDeptCode());
         } else if (family.equals(MasterResourceFamily.Data)){
             MasterRecord masterRecord = resourceBucket.getMasterRecord();
             map = masterRecord.getDataGroup();

@@ -1,4 +1,4 @@
-package com.yihu.ehr.constants;
+package com.yihu.ehr.profile;
 
 /**
  * @author Sand
@@ -6,7 +6,7 @@ package com.yihu.ehr.constants;
  * @created 2015.12.20 15:37
  */
 public enum ArchiveStatus {
-    Received,                   // 0已缓存
+    Received,                   // 0待入库
     Acquired,                   // 1正在入库库
     Failed,                     // 2入库失败
     Finished                   // 3已入库

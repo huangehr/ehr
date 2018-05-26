@@ -1,14 +1,13 @@
 package com.yihu.ehr.resolve.job;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.constants.ArchiveStatus;
-import com.yihu.ehr.constants.RedisCollection;
+import com.yihu.ehr.profile.ArchiveStatus;
+import com.yihu.ehr.profile.queue.RedisCollection;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.model.packs.EsSimplePackage;
 import com.yihu.ehr.profile.exception.IllegalJsonDataException;
 import com.yihu.ehr.profile.exception.IllegalJsonFileException;
-import com.yihu.ehr.profile.exception.ResolveException;
 import com.yihu.ehr.resolve.feign.PackageMgrClient;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.resolve.model.stage2.ResourceBucket;
@@ -29,7 +28,6 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * 档案包解析作业。
@@ -48,16 +46,11 @@ public class PackageResourceJob implements InterruptableJob {
 
     @Override
     public void execute(JobExecutionContext context) {
-        //弃用消息接口
-        //MessageBuffer messageBuffer = SpringContext.getService(MessageBuffer.class);
-        //MPackage pack =  messageBuffer.getMessage();
-        //pack = packageMgrClient.getResolvePackage();
-
         PackageMgrClient packageMgrClient = SpringContext.getService(PackageMgrClient.class);
         //该对象要采用名称的方式获取，否则：expected single matching bean but found 3: redisTemplate,sessionRedisTemplate,stringRedisTemplate
         RedisTemplate<String, Serializable> redisTemplate = SpringContext.getService("redisTemplate");
         ObjectMapper objectMapper = SpringContext.getService(ObjectMapper.class);
-        Serializable serializable = redisTemplate.opsForList().rightPop(RedisCollection.PackageList);
+        Serializable serializable = redisTemplate.opsForList().rightPop(RedisCollection.ResolveQueue);
         EsSimplePackage pack = null;
         try {
             if (serializable != null) {
@@ -68,17 +61,16 @@ public class PackageResourceJob implements InterruptableJob {
                 PackResolveLogger.info("开始入库:" + pack.get_id() + ", Timestamp:" + new Date());
                 packageMgrClient.reportStatus(pack.get_id(), ArchiveStatus.Acquired, 0, "正在入库中");
                 doResolve(pack, packageMgrClient);
+                redisTemplate.opsForList().leftPush(RedisCollection.ProvincialPlatformQueue, serializable.toString());
             }
         } catch (Exception e) {
-            int errorType = -1;
+            int errorType = -2;
             if (e instanceof ZipException) {
                 errorType = 1;
             } else if (e instanceof IllegalJsonFileException) {
                 errorType = 2;
             } else if (e instanceof IllegalJsonDataException) {
                 errorType = 3;
-            } else if (e instanceof ResolveException) {
-                errorType = 4;
             }
             if (pack != null) {
                 try {
@@ -105,14 +97,14 @@ public class PackageResourceJob implements InterruptableJob {
         ResourceService resourceService = SpringContext.getService(ResourceService.class);
         ObjectMapper objectMapper = new ObjectMapper();
         StandardPackage standardPackage = resolveEngine.doResolve(pack, downloadTo(pack.getRemote_path()));
-        ResourceBucket resourceBucket = packMill.grindingPackModel(standardPackage);
+        ResourceBucket resourceBucket = packMill.grindingPackModel(standardPackage, pack);
         identifyService.identify(resourceBucket, standardPackage);
-        resourceService.save(resourceBucket, standardPackage);
+        resourceService.save(resourceBucket, standardPackage, pack);
         //回填入库状态
         Map<String, Object> map = new HashMap();
         map.put("profile_id", standardPackage.getId());
         map.put("demographic_id", standardPackage.getDemographicId());
-        map.put("event_type", standardPackage.getEventType() == null ? null : standardPackage.getEventType().getType());
+        map.put("event_type", standardPackage.getEventType() == null ? -1 : standardPackage.getEventType().getType());
         map.put("event_no", standardPackage.getEventNo());
         map.put("event_date", DateUtil.toStringLong(standardPackage.getEventDate()));
         map.put("patient_id", standardPackage.getPatientId());

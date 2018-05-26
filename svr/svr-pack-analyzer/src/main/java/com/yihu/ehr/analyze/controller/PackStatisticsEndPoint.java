@@ -38,28 +38,31 @@ public class PackStatisticsEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "startDate", value = "开始日期")
             @RequestParam(name = "startDate") String startDate,
             @ApiParam(name = "endDate", value = "结束日期")
-            @RequestParam(name = "endDate") String endDate) throws Exception{
+            @RequestParam(name = "endDate") String endDate,
+            @ApiParam(name = "orgCode", value = "医院代码")
+            @RequestParam(name = "orgCode") String orgCode) throws Exception {
         Envelop envelop = new Envelop();
         Date start = DateUtil.formatCharDateYMD(startDate);
         Date end = DateUtil.formatCharDateYMD(endDate);
-        int day = (int) ((end.getTime() - start.getTime()) / (1000*3600*24))+1;
-        List<Map<String,List<Map<String,Object>>>> res = new ArrayList<>();
-        for(int i =0;i<day;i++){
-            Date date = DateUtil.addDate(i,start);
-            Map<String,List<Map<String,Object>>> map = new HashMap<>();
-            List<Map<String,Object>> list = statisticService.getArchivesCount(DateUtil.toString(date));
-            map.put(DateUtil.toString(date),list);
+        int day = (int) ((end.getTime() - start.getTime()) / (1000 * 3600 * 24)) + 1;
+        List<Map<String, List<Map<String, Object>>>> res = new ArrayList<>();
+        for (int i = 0; i < day; i++) {
+            Date date = DateUtil.addDate(i, start);
+            Map<String, List<Map<String, Object>>> map = new HashMap<>();
+            List<Map<String, Object>> list = statisticService.getArchivesCount(DateUtil.toString(date), orgCode);
+            map.put(DateUtil.toString(date), list);
             res.add(map);
         }
         envelop.setSuccessFlg(true);
         envelop.setDetailModelList(res);
         return envelop;
     }
+
     @RequestMapping(value = ServiceApi.StasticReport.GetRecieveOrgCount, method = RequestMethod.GET)
     @ApiOperation(value = "根据接收日期统计各个医院的数据解析情况")
     public Envelop getRecieveOrgCount(
             @ApiParam(name = "date", value = "日期")
-            @RequestParam(name = "date") String date) throws Exception{
+            @RequestParam(name = "date") String date) throws Exception {
         Envelop envelop = new Envelop();
         List<Map<String, Object>> list = statisticService.getRecieveOrgCount(date);
         envelop.setSuccessFlg(true);
@@ -73,7 +76,7 @@ public class PackStatisticsEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "date", value = "日期")
             @RequestParam(name = "date") String date,
             @ApiParam(name = "orgCode", value = "医院代码")
-            @RequestParam(name = "orgCode") String orgCode) throws Exception{
+            @RequestParam(name = "orgCode") String orgCode) throws Exception {
         Envelop envelop = new Envelop();
         List<Map<String, Object>> list = statisticService.getArchivesInc(date, orgCode);
         envelop.setSuccessFlg(true);
@@ -89,7 +92,7 @@ public class PackStatisticsEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "endDate", value = "结束日期")
             @RequestParam(name = "endDate") String endDate,
             @ApiParam(name = "orgCode", value = "医院代码")
-            @RequestParam(name = "orgCode",required = false) String orgCode) throws Exception{
+            @RequestParam(name = "orgCode", required = false) String orgCode) throws Exception {
         return statisticService.getArchivesFull(startDate, endDate, orgCode);
     }
 
@@ -101,7 +104,7 @@ public class PackStatisticsEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "endDate", value = "结束日期")
             @RequestParam(name = "endDate") String endDate,
             @ApiParam(name = "orgCode", value = "医院代码")
-            @RequestParam(name = "orgCode",required = false) String orgCode) throws Exception{
+            @RequestParam(name = "orgCode", required = false) String orgCode) throws Exception {
         return statisticService.getArchivesTime(startDate, endDate, orgCode);
     }
 
@@ -111,7 +114,7 @@ public class PackStatisticsEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "date", value = "日期")
             @RequestParam(name = "date") String date,
             @ApiParam(name = "orgCode", value = "医院代码")
-            @RequestParam(name = "orgCode",required = false) String orgCode) throws Exception{
+            @RequestParam(name = "orgCode", required = false) String orgCode) throws Exception {
         return statisticService.getDataSetCount(date, orgCode);
     }
 
@@ -123,15 +126,27 @@ public class PackStatisticsEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "endDate", value = "结束日期")
             @RequestParam(name = "endDate") String endDate,
             @ApiParam(name = "orgCode", value = "医院代码")
-            @RequestParam(name = "orgCode",required = false) String orgCode) throws Exception {
+            @RequestParam(name = "orgCode", required = false) String orgCode) throws Exception {
         return statisticService.getArchivesRight(startDate, endDate, orgCode);
     }
 
     @RequestMapping(value = ServiceApi.StasticReport.GetStasticByDay, method = RequestMethod.GET)
-    @ApiOperation(value = "及时率、完整率按天统计")
+    @ApiOperation(value = "app接口")
     public Envelop getStasticByDay(
             @ApiParam(name = "date", value = "日期")
             @RequestParam(name = "date") String date) throws Exception {
         return statisticService.getStasticByDay(date);
+    }
+
+    @RequestMapping(value = ServiceApi.StasticReport.GetErrorCodeList, method = RequestMethod.GET)
+    @ApiOperation(value = "错误数据元列表")
+    public Envelop getErrorCodeList(
+            @ApiParam(name = "startDate", value = "开始日期")
+            @RequestParam(name = "startDate") String startDate,
+            @ApiParam(name = "endDate", value = "结束日期")
+            @RequestParam(name = "endDate") String endDate,
+            @ApiParam(name = "orgCode", value = "医院代码")
+            @RequestParam(name = "orgCode", required = false) String orgCode) throws Exception {
+        return statisticService.getErrorCodeList(startDate, endDate, orgCode);
     }
 }

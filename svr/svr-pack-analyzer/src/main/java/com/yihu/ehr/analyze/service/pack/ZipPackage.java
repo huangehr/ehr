@@ -1,12 +1,14 @@
 package com.yihu.ehr.analyze.service.pack;
 
 import com.yihu.ehr.analyze.config.FastDfsConfig;
-import com.yihu.ehr.constants.ProfileType;
+import com.yihu.ehr.profile.EventType;
+import com.yihu.ehr.profile.ProfileType;
 import com.yihu.ehr.hbase.HBaseAdmin;
 import com.yihu.ehr.hbase.HBaseDao;
 import com.yihu.ehr.hbase.TableBundle;
 import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.model.packs.EsSimplePackage;
+import com.yihu.ehr.profile.util.PackageDataSet;
 import com.yihu.ehr.util.compress.Zipper;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.log.LogService;
@@ -39,6 +41,7 @@ public class ZipPackage {
     public final static String DocumentFolder = "documents";
     public final static String DocumentsFile = "documents.json";
     public final static String LinkFile = "index";
+    public static final String DATA = "d";
 
     private static final RestTemplate REST_TEMPLATE;
     private static final HttpHeaders HTTP_HEADERS;
@@ -47,47 +50,157 @@ public class ZipPackage {
         HTTP_HEADERS = new HttpHeaders();
         HTTP_HEADERS.setAccept(Arrays.asList(MediaType.APPLICATION_OCTET_STREAM));
     }
-    public static final String DATA = "d";
-    private EsSimplePackage esSimplePackage;
-    private Zipper zipper = new Zipper();
 
-    /**
-     * 数据集合
-     */
-    private Map<String, DataSetRecord> dataSets = new TreeMap<>();
-    /**
-     * Zip档案包文件
-     */
-    private File zipFile;
-    /**
-     * 解压后文件目录
-     */
-    private File packFile;
-    private Set<String> tableSet = new HashSet<>();
-    private String patientId;
-    private String eventNo;
+    //机构代码
     private String orgCode;
-    private String eventType;
-    private String eventTime;
+    //机构名称
+    private String orgName;
+    //机构地区
+    private String orgArea;
+    //cda版本
+    private String cdaVersion;
+    //事件号
+    private String eventNo;
+    //事件时间
+    private Date eventDate;
+    //事件类型
+    private EventType eventType;
+    //病人ID
+    private String patientId;
+    //科室代码
+    private String deptCode;
+    //ICD10诊断列表
+    private Set<String> diagnosisList;
+    //ICD10诊断名称列表
+    private Set<String> diagnosisNameList;
+    //数据包
+    private EsSimplePackage esSimplePackage;
+    //zip辅助对象
+    private Zipper zipper = new Zipper();
+    //数据集合
+    private Map<String, PackageDataSet> dataSets = new TreeMap<>();
+    //Zip档案包文件
+    private File zipFile;
+    //解压后文件目录
+    private File packFile;
+    //private Set<String> tableSet = new HashSet<>();
+    //数据集质控记录
+    private Map<String, Object> qcDataSetRecord = new HashMap<>();
+    //数据元质控记录
+    private List<Map<String, Object>> qcMetadataRecords = new ArrayList<>();
 
     public ZipPackage(EsSimplePackage esSimplePackage) {
         this.esSimplePackage = esSimplePackage;
+    }
+
+    public String getOrgCode() {
+        return orgCode;
+    }
+    public void setOrgCode(String orgCode) {
+        this.orgCode = orgCode;
+    }
+
+    public String getOrgName() {
+        return orgName;
+    }
+    public void setOrgName(String orgName) {
+        this.orgName = orgName;
+    }
+
+    public String getOrgArea() {
+        return orgArea;
+    }
+    public void setOrgArea(String orgArea) {
+        this.orgArea = orgArea;
+    }
+
+
+    public String getCdaVersion() {
+        return cdaVersion;
+    }
+    public void setCdaVersion(String cdaVersion) {
+        this.cdaVersion = cdaVersion;
+    }
+
+    public String getEventNo() {
+        return eventNo;
+    }
+    public void setEventNo(String eventNo) {
+        this.eventNo = eventNo;
+    }
+
+    public Date getEventDate() {
+        return eventDate;
+    }
+    public void setEventDate(Date eventDate) {
+        this.eventDate = eventDate;
+    }
+
+    public EventType getEventType() {
+        return eventType;
+    }
+    public void setEventType(EventType eventType) {
+        this.eventType = eventType;
+    }
+
+    public String getPatientId() {
+        return patientId;
+    }
+    public void setPatientId(String patientId) {
+        this.patientId = patientId;
+    }
+
+    public String getDeptCode() {
+        return deptCode;
+    }
+    public void setDeptCode(String deptCode) {
+        this.deptCode = deptCode;
+    }
+
+    public Set<String> getDiagnosisList() {
+        return diagnosisList;
+    }
+
+    public void setDiagnosisList(Set<String> diagnosisList) {
+        this.diagnosisList = diagnosisList;
+    }
+
+    public Set<String> getDiagnosisNameList() {
+        return diagnosisNameList;
+    }
+
+    public void setDiagnosisNameList(Set<String> diagnosisNameList) {
+        this.diagnosisNameList = diagnosisNameList;
     }
 
     public EsSimplePackage getEsSimplePackage() {
         return esSimplePackage;
     }
 
-    public Map<String, DataSetRecord> getDataSets() {
+    public Map<String, PackageDataSet> getDataSets() {
         return dataSets;
     }
 
-    public void insertDataSet(String dataSetCode, DataSetRecord dataSet) {
+    public void insertDataSet(String dataSetCode, PackageDataSet dataSet) {
         this.dataSets.put(dataSetCode, dataSet);
     }
 
     public File getPackFile() {
         return packFile;
+    }
+
+    public Map<String, Object> getQcDataSetRecord() {
+        return qcDataSetRecord;
+    }
+    public void setQcDataSetRecord(Map<String, Object> qcDataSetRecord) {
+        this.qcDataSetRecord = qcDataSetRecord;
+    }
+
+    public List<Map<String, Object>> getQcMetadataRecords() {
+        return qcMetadataRecords;
+    }
+    public void setQcMetadataRecords(List<Map<String, Object>> qcMetadataRecords) {
+        this.qcMetadataRecords = qcMetadataRecords;
     }
 
     public void download() throws IOException {
@@ -117,15 +230,6 @@ public class ZipPackage {
         }
     }
 
-    public void houseKeep() {
-        try {
-            FileUtils.deleteQuietly(zipFile);
-            FileUtils.deleteQuietly(packFile);
-        } catch (Exception e) {
-            LogService.getLogger(PackageAnalyzeService.class).warn("House keep failed after package analyze: " + e.getMessage());
-        }
-    }
-
     public void resolve() throws Exception {
         ProfileType profileType;
         List<String> directories = CollectionUtils.arrayToList(packFile.list());
@@ -142,10 +246,18 @@ public class ZipPackage {
         if (profileType != ProfileType.Standard) {
             throw new ZipException("Not a standard package file");
         }
-
         ApplicationContext context = SpringContext.getApplicationContext();
         StdPackageAnalyzer packageAnalyzer = context.getBean(StdPackageAnalyzer.class);
         packageAnalyzer.analyze(this);
+    }
+
+    public void houseKeep() {
+        try {
+            FileUtils.deleteQuietly(zipFile);
+            FileUtils.deleteQuietly(packFile);
+        } catch (Exception e) {
+            LogService.getLogger(PackageAnalyzeService.class).warn("House keep failed after package analyze: " + e.getMessage());
+        }
     }
 
     /**
@@ -153,64 +265,20 @@ public class ZipPackage {
      *
      * @throws Exception
      */
-    public void save() throws Exception {
+   /* public void save() throws Exception {
         Set<String> keySet = dataSets.keySet();
         for (String key : keySet) {
             DataSetRecord dataSetRecord = dataSets.get(key);
             saveDataSet(dataSetRecord);
         }
-    }
+    }*/
 
-    public String getPatientId() {
-        return patientId;
-    }
-
-    public void setPatientId(String patientId) {
-        this.patientId = patientId;
-    }
-
-    public String getEventNo() {
-        return eventNo;
-    }
-
-    public void setEventNo(String eventNo) {
-        this.eventNo = eventNo;
-    }
-
-    public String getOrgCode() {
-        return orgCode;
-    }
-
-    public void setOrgCode(String orgCode) {
-        this.orgCode = orgCode;
-    }
-
-    public String getEventType() {
-        return eventType;
-    }
-
-    public void setEventType(String eventType) {
-        this.eventType = eventType;
-    }
-
-    public String getEventTime() {
-        return eventTime;
-    }
-
-    public void setEventTime(String eventTime) {
-        this.eventTime = eventTime;
-    }
-
-    private void saveDataSet(DataSetRecord dataSetRecord) throws Exception {
+   /* private void saveDataSet(DataSetRecord dataSetRecord) throws Exception {
         String table = dataSetRecord.getCode();
         createTable(table);
-
         ApplicationContext context = SpringContext.getApplicationContext();
         HBaseDao hBaseDao = context.getBean(HBaseDao.class);
-
-
         String rowKeyPrefix = dataSetRecord.getRowKeyPrefix();
-
         TableBundle bundle = new TableBundle();
         if (dataSetRecord.isReUploadFlg()) {
             String legacyRowKeys[] = hBaseDao.findRowKeys(table, rowKeyPrefix, rowKeyPrefix.substring(0, rowKeyPrefix.length() - 1) + "z", "^" + rowKeyPrefix);
@@ -240,9 +308,9 @@ public class ZipPackage {
 
             hBaseDao.save(table, bundle);
         });
-    }
+    }*/
 
-    private synchronized void createTable(String table) throws Exception {
+    /*private synchronized void createTable(String table) throws Exception {
         boolean created = tableSet.contains(table);
         if (created) {
             return;
@@ -254,6 +322,6 @@ public class ZipPackage {
             hBaseAdmin.createTable(table, DATA);
             tableSet.add(table);
         }
-    }
+    }*/
 
 }

@@ -11,9 +11,15 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.search.aggregations.AggregationBuilder;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramBuilder;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
+import org.elasticsearch.search.aggregations.bucket.terms.LongTerms;
+import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
+import org.elasticsearch.search.aggregations.metrics.valuecount.InternalValueCount;
+import org.elasticsearch.search.aggregations.metrics.valuecount.ValueCountBuilder;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -130,14 +136,33 @@ public class PackStatisticsService extends BaseJpaService {
      * @param dateStr
      * @return
      */
-    public List<Map<String,Object>> getArchivesCount(String dateStr) throws Exception {
-        String sql1 = "SELECT COUNT(*) FROM json_archives WHERE (archive_status = 0 OR archive_status = 1) AND receive_date BETWEEN '" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59'";
-        ResultSet resultSet1 = elasticSearchUtil.findBySql(sql1);
-        String sql2 = "SELECT COUNT(*) FROM json_archives WHERE archive_status = 3 AND receive_date BETWEEN '" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59'";
-        ResultSet resultSet2 = elasticSearchUtil.findBySql(sql2);
-        String sql3 = "SELECT COUNT(*) FROM json_archives WHERE receive_date BETWEEN '" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59'";
-        ResultSet resultSet3 = elasticSearchUtil.findBySql(sql3);
+    public List<Map<String,Object>> getArchivesCount(String dateStr, String orgCode) throws Exception {
+        String sql1 = "";
+        String sql2 = "";
+        String sql3 = "";
+        if(StringUtils.isNotEmpty(orgCode)){
+            sql1 = "SELECT COUNT(*) FROM json_archives WHERE (archive_status = 0 OR archive_status = 1) AND org_code='"+orgCode+"'" +
+                    " AND receive_date BETWEEN '" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59'";
+
+            sql2 = "SELECT COUNT(*) FROM json_archives WHERE archive_status = 3 AND org_code='"+orgCode+"'" +
+                    " AND receive_date BETWEEN '" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59'";
+
+            sql3 = "SELECT COUNT(*) FROM json_archives WHERE  org_code='"+orgCode+"'" +
+                    " AND receive_date BETWEEN '" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59'";
+        }else{
+            sql1 = "SELECT COUNT(*) FROM json_archives WHERE (archive_status = 0 OR archive_status = 1) " +
+                    " AND receive_date BETWEEN '" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59'";
+
+            sql2 = "SELECT COUNT(*) FROM json_archives WHERE archive_status = 3 " +
+                    " AND receive_date BETWEEN '" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59'";
+
+            sql3 = "SELECT COUNT(*) FROM json_archives WHERE " +
+                    " receive_date BETWEEN '" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59'";
+        }
         List<Map<String,Object>> dataList = new ArrayList<Map<String,Object>>();
+        ResultSet resultSet1 = elasticSearchUtil.findBySql(sql1);
+        ResultSet resultSet2 = elasticSearchUtil.findBySql(sql2);
+        ResultSet resultSet3 = elasticSearchUtil.findBySql(sql3);
         resultSet1.next();
         resultSet2.next();
         resultSet3.next();
@@ -831,7 +856,7 @@ public class PackStatisticsService extends BaseJpaService {
     }
 
     /**
-     * 及时率、完整率按天统计
+     * app接口
      * @param date
      * @return
      */
@@ -839,6 +864,7 @@ public class PackStatisticsService extends BaseJpaService {
         Envelop envelop = new Envelop();
         Map<String,Object> resMap = new HashMap<>();
         Date begin = DateUtil.parseDate(date, DateUtil.DEFAULT_DATE_YMD_FORMAT);
+        Date end1 = DateUtil.addDate(1, begin);
         Date end2 = DateUtil.addDate(7, begin);
         try {
             String sql1 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE  pack_type=1 AND event_date " +
@@ -846,10 +872,19 @@ public class PackStatisticsService extends BaseJpaService {
             String sql2 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE pack_type=1 AND event_date BETWEEN " +
                     " '" + date + " 00:00:00' AND '" +  date + " 23:59:59' AND receive_date BETWEEN"+
                     " '" + date + " 00:00:00' AND '" +  DateUtil.toString(end2) + " 23:59:59' ";
+            String sql3 = "SELECT COUNT(*) FROM json_archives WHERE " +
+                    " receive_date BETWEEN '" + date + " 00:00:00' AND '" +  date + " 23:59:59'";
+
+            String sql4 = "select count(code) as count from qc/receive_data_element where " +
+                    " receiveTime>='"+date+"' and receiveTime<'"+DateUtil.toString(end1)+"'";
             ResultSet resultSet1 = elasticSearchUtil.findBySql(sql1);
             resultSet1.next();
             ResultSet resultSet2 = elasticSearchUtil.findBySql(sql2);
             resultSet2.next();
+            ResultSet resultSet3= elasticSearchUtil.findBySql(sql3);
+            resultSet3.next();
+            ResultSet resultSet4= elasticSearchUtil.findBySql(sql4);
+            resultSet4.next();
             Map<String,Object> map = getPatientCountEs(date,"");
             //平台档案数据
             int count_pt = new Double(resultSet1.getObject("COUNT(DISTINCT event_no)").toString()).intValue();
@@ -865,6 +900,9 @@ public class PackStatisticsService extends BaseJpaService {
                 resMap.put("time_rate", "0.00%");
                 resMap.put("full_rate", "0.00%");
             }
+            resMap.put("archive_count",resultSet3.getObject("COUNT(*)"));
+            resMap.put("error_count",resultSet4.getObject("count"));
+            resMap.putAll(getPatientTotal(""));
             envelop.setSuccessFlg(true);
         }catch (Exception e){
             resMap.put("time_rate", "0.00%");
@@ -876,4 +914,81 @@ public class PackStatisticsService extends BaseJpaService {
         return envelop;
     }
 
+    /**
+     * 平台就诊人数 总数
+     * @param orgCode
+     * @return
+     */
+    public Map<String,Object> getPatientTotal(String orgCode) throws Exception{
+        String sql1 ="";
+        String sql2 ="";
+        String sql3 ="";
+        if(StringUtils.isNotEmpty(orgCode)){
+            sql1 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=1 AND pack_type=1 AND org_code='"+orgCode+"'";
+
+            sql2 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=0 AND pack_type=1 AND org_code='"+orgCode+"'";
+
+            sql3 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE pack_type=1 AND org_code='"+orgCode+"'";
+        }else{
+            sql1 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=1 AND pack_type=1";
+
+            sql2 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=0 AND pack_type=1";
+
+            sql3 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE pack_type=1 ";
+        }
+        ResultSet resultSet1 = elasticSearchUtil.findBySql(sql1);
+        ResultSet resultSet2 = elasticSearchUtil.findBySql(sql2);
+        ResultSet resultSet3 = elasticSearchUtil.findBySql(sql3);
+        resultSet1.next();
+        resultSet2.next();
+        resultSet3.next();
+        Map<String,Object> map = new HashMap<>();
+        map.put("inpatient_total",new Double(resultSet1.getObject("COUNT(DISTINCT event_no)").toString()).intValue());
+        map.put("oupatient_total",new Double(resultSet2.getObject("COUNT(DISTINCT event_no)").toString()).intValue());
+        map.put("archive_total",new Double(resultSet3.getObject("COUNT(DISTINCT event_no)").toString()).intValue());
+        return map;
+    }
+
+    public Envelop getErrorCodeList(String startDate, String endDate, String orgCode) throws Exception{
+        Envelop envelop = new Envelop();
+        List<Map<String, Object>> resultList = new ArrayList<>();
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("receiveTime>=" + startDate + ";");
+        stringBuilder.append("receiveTime<" + endDate + ";");
+        if (StringUtils.isNotEmpty(orgCode) && !"null".equals(orgCode)){
+            stringBuilder.append("orgCode=" + orgCode);
+        }
+        TransportClient transportClient = elasticSearchPool.getClient();
+        try {
+            SearchRequestBuilder builder = transportClient.prepareSearch("qc");
+            builder.setTypes("receive_data_element");
+            builder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
+            builder.setQuery(elasticSearchUtil.getQueryBuilder(stringBuilder.toString()));
+            AggregationBuilder terms = AggregationBuilders.terms("table").field("table");
+            AggregationBuilder termsChild = AggregationBuilders.terms("code").field("code");
+            ValueCountBuilder countBuilder = AggregationBuilders.count("count").field("code");
+            termsChild.subAggregation(countBuilder);
+            terms.subAggregation(termsChild);
+            builder.addAggregation(terms);
+            builder.setSize(0);
+            builder.setExplain(true);
+            SearchResponse response = builder.get();
+            StringTerms stringTerms = response.getAggregations().get("table");
+            stringTerms.getBuckets().forEach(item1 -> {
+                StringTerms term = item1.getAggregations().get("code");
+                term.getBuckets().forEach(item2 -> {
+                    Map<String,Object> temp = new HashMap<>();
+                    InternalValueCount internalValueCount = item2.getAggregations().get("count");
+                    temp.put("table",item1.getKeyAsString());
+                    temp.put("code",item2.getKeyAsString());
+                    temp.put("value",internalValueCount.getProperty("value"));
+                    resultList.add(temp);
+                });
+            });
+            envelop.setObj(resultList);
+        } finally {
+            elasticSearchPool.releaseClient(transportClient);
+        }
+        return envelop;
+    }
 }

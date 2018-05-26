@@ -1,14 +1,12 @@
 package com.yihu.ehr.resolve.feign;
 
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.ArchiveStatus;
+import com.yihu.ehr.profile.ArchiveStatus;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.model.packs.EsDetailsPackage;
 import com.yihu.ehr.model.packs.EsSimplePackage;
-import com.yihu.ehr.model.packs.MPackage;
 import org.springframework.cloud.netflix.feign.FeignClient;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
