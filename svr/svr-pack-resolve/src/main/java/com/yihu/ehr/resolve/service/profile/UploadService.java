@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 
@@ -67,9 +66,6 @@ public class UploadService {
         } else if (origin == 1){
             upload.setFailed_message("oldData");
         }
-        Calendar c = Calendar.getInstance();
-        c.add(Calendar.DAY_OF_MONTH, 1);
-        upload.setRepeat_date(c.getTime());
         upload.setEvent_date(resourceBucket.getEventDate());
         upload.setRow_key(resourceBucket.getId());
         elasticSearchUtil.index(INDEX, TYPE, objectMapper.readValue(objectMapper.writeValueAsString(upload), Map.class ));
