@@ -18,7 +18,6 @@ public class Upload implements Serializable {
     private String schema_version;//适配省平台版本号
     private Integer failed_count;//失败次数
     private String failed_message;//失败信息
-    private Date repeat_date ;//重传时间
 
     //--------------------es可能为空的字段-----------------------------------------
     private Date start_date;//开始时间
@@ -76,15 +75,6 @@ public class Upload implements Serializable {
 
     public void setFailed_message(String failed_message) {
         this.failed_message = failed_message;
-    }
-
-    @JsonFormat(pattern="yyyy-MM-dd", timezone = "GMT+8")
-    public Date getRepeat_date() {
-        return repeat_date;
-    }
-
-    public void setRepeat_date(Date repeat_date) {
-        this.repeat_date = repeat_date;
     }
 
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")

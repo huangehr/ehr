@@ -52,7 +52,7 @@ public class ResourceService {
         archiveRelationService.relation(resourceBucket);
 
         //保存ES质控数据
-        qcRecordService.record(resourceBucket, esSimplePackage);
+        qcRecordService.record(resourceBucket);
 
         //保存ES 待上传省平台upload记录
         uploadService.addWaitUpload(resourceBucket);

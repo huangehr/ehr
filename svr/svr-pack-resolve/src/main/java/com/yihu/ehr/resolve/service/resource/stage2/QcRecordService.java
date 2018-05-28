@@ -15,21 +15,14 @@ import java.util.Map;
 public class QcRecordService {
 
     private static final String INDEX = "json_archives";
-    private static final String TYPE = "info";
-    private static final String QC_TYPE = "qc_info";
+    private static final String QC_METADATA_INFO = "qc_metadata_info";
 
     @Autowired
     private ElasticSearchUtil elasticSearchUtil;
 
-    public void record(ResourceBucket resourceBucket, EsSimplePackage esSimplePackage) throws Exception {
-        if (esSimplePackage == null) {
-            return;
-        }
-        Map<String, Object> detailPack = elasticSearchUtil.findById(INDEX, TYPE, esSimplePackage.get_id());
-        resourceBucket.getQcRecords().getRecords().forEach(item -> {
-
-        });
-        elasticSearchUtil.bulkIndex(INDEX, QC_TYPE, resourceBucket.getQcRecords().getRecords());
+    public void record(ResourceBucket resourceBucket) throws Exception {
+        System.out.println(resourceBucket.getQcMetadataRecords().getRecords().size());
+        //elasticSearchUtil.bulkIndex(INDEX, QC_METADATA_INFO, resourceBucket.getQcRecords().getRecords());
     }
 
 }

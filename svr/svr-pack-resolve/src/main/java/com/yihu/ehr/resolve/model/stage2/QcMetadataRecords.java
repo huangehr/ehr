@@ -7,7 +7,7 @@ import java.util.Map;
 /**
  * Created by progr1mmer on 2018/5/22.
  */
-public class QcRecords {
+public class QcMetadataRecords {
 
     private List<Map<String, Object>> records = new ArrayList<>();
 
