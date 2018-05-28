@@ -6,6 +6,7 @@ import com.yihu.ehr.query.common.model.QueryCondition;
 import com.yihu.ehr.query.common.model.SolrGroupEntity;
 import com.yihu.ehr.solr.SolrUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.FieldStatsInfo;
 import org.apache.solr.client.solrj.response.PivotField;
@@ -204,12 +205,17 @@ public class SolrQuery {
     public List<Map<String,Object>> queryReturnFieldList(String tableName, String q ,String fq , Map<String, String> sort, long start, long rows,String[] fields) throws Exception {
         List<Map<String,Object>> data = new ArrayList<>();
         SolrDocumentList solrList = solrUtil.query(tableName, q, fq, sort, start, rows,fields);
+        //如果是时间结果，则被加了八个小时
         if(solrList!=null && solrList.getNumFound()>0){
             for (SolrDocument doc : solrList){
                 Map<String,Object> map = new HashMap<>();
                 if(fields != null && fields.length > 0){
                     for(String key :fields){
-                        map.put(key,doc.getFieldValue(key));
+                        if(key.equals("event_date")){
+                            map.put(key, DateUtils.addHours((Date)doc.getFieldValue(key), -8));
+                        }else {
+                            map.put(key,doc.getFieldValue(key));
+                        }
                     }
                 }
                 data.add(map);
