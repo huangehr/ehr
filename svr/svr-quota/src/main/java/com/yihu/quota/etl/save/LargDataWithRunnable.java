@@ -26,7 +26,7 @@ public class LargDataWithRunnable implements Runnable {
     private List<SaveModel> list;//待处理数据
     private int threadCount = 0;//初始化线程数
     private int flag = 1;       //这是第几个线程
-    private int perCount = 1000;//每个线程处理的数据量
+    private int perCount = 10000;//每个线程处理的数据量
     private int totalCount = 0;//待处理数据总数量
     private int havedCount = 0;//已经处理的数据量
 
@@ -53,16 +53,15 @@ public class LargDataWithRunnable implements Runnable {
                     flag = flag+1;
                     havedCount = sublist.size() + havedCount;
                     logger.debug("这是第" + (flag-1) +"个线程；数据 = "+ sublist.size());
+                    System.out.println(Thread.currentThread().getName()+"这是第" + (flag-1) +"个线程；数据 = "+ sublist.size());
                 }
                 if(sublist != null) {
                     //此处为数据处理（简单打印 ）
-                    System.out.println(Thread.currentThread().getName());
                     BulkResult br = null;
                     boolean isSuccessed = false;
                     try {
                         //得到链接
                         EsConfig esConfig = (EsConfig) JSONObject.toBean(JSONObject.fromObject(jsonConfig), EsConfig.class);
-                        System.out.println(esConfig.getIndex());
                         JestClient jestClient = esClientUtil.getJestClient(esConfig.getHost(),esConfig.getPort());
                         Bulk.Builder bulk = new Bulk.Builder().defaultIndex(esConfig.getIndex()).defaultType(esConfig.getType());
                         for (SaveModel obj : sublist) {
