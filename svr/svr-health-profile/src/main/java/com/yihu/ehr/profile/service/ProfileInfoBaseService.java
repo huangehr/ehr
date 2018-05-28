@@ -12,6 +12,7 @@ import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+
 import java.util.*;
 
 /**
@@ -108,7 +109,7 @@ public class ProfileInfoBaseService extends BaseJpaService {
                 patientMap.put("weight", result.get("EHR_001257") == null ? "" : result.get("EHR_001257")); //单位(g)
             } else if (result.get(BasisConstant.diagnosis) != null && result.get(BasisConstant.diagnosis).toString().contains("O80")) { //2 孕妇
                 patientMap.put("label", "孕妇");
-            } else if (profileDiseaseService.getHealthProblem(demographicId).size() > 0){
+            } else if (profileDiseaseService.getHealthProblem(demographicId).size() > 0) {
                 patientMap.put("label", "慢病");
             } else {
                 patientMap.put("label", "就诊");
@@ -118,9 +119,9 @@ public class ProfileInfoBaseService extends BaseJpaService {
             labels.add("就诊");
             patientMap.put("label", labels);
             //姓名
-            patientMap.put("name", result.get("patient_name") == null? "" : result.get("patient_name"));
+            patientMap.put("name", result.get("patient_name") == null ? "" : result.get("patient_name"));
             //性别
-            String gender = result.get("EHR_000019") == null? "" : (String) result.get("EHR_000019");
+            String gender = result.get("EHR_000019") == null ? "" : (String) result.get("EHR_000019");
             if ("1".equals(gender)) {
                 patientMap.put("gender", "男");
             } else if ("2".equals(gender)) {
@@ -197,6 +198,7 @@ public class ProfileInfoBaseService extends BaseJpaService {
 
     /**
      * 既往史 - pc档案浏览器
+     *
      * @param demographic_id
      * @return
      */
@@ -204,7 +206,7 @@ public class ProfileInfoBaseService extends BaseJpaService {
     public List<Map<String, Object>> profileHistory(String demographic_id) throws Exception {
         List<Map<String, Object>> resultList = new ArrayList<>();
         //疾病史
-        List<Map<String, Object>> list1 =  profileDiseaseService.getHealthProblem(demographic_id);
+        List<Map<String, Object>> list1 = profileDiseaseService.getHealthProblem(demographic_id);
         if (list1 != null && list1.size() > 0) {
             Map<String, Object> medicalHistory = new HashMap<>(2);
             StringBuilder stringBuilder = new StringBuilder();
@@ -266,14 +268,10 @@ public class ProfileInfoBaseService extends BaseJpaService {
                 if (subList != null && subList.size() > 0) {
                     for (Map subTemp : subList) {
                         String operateName;
-                        if (temp.get("EHR_000418") != null) {
-                            operateName = (String) subTemp.get("EHR_000418");
-                        } else {
-                            operateName = (String) subTemp.get("EHR_004045");
-                        }
+                        operateName = (String) subTemp.get("EHR_000418");
                         stringBuilder.append(operateName);
                         stringBuilder.append("、");
-                        index ++;
+                        index++;
                         break;
                     }
                 }
@@ -305,6 +303,7 @@ public class ProfileInfoBaseService extends BaseJpaService {
 
     /**
      * 既往史
+     *
      * @param demographic_id
      * @return
      */
@@ -319,7 +318,7 @@ public class ProfileInfoBaseService extends BaseJpaService {
 
         //疾病
         Map<String, Object> medicalHistory = new HashMap<>();
-        List<Map<String, Object>> list1 =  profileDiseaseService.getHealthProblem(demographic_id);
+        List<Map<String, Object>> list1 = profileDiseaseService.getHealthProblem(demographic_id);
         StringBuilder stringBuilder1 = new StringBuilder();
         if (list1 != null && list1.size() > 0) {
             for (Map temp : list1) {
@@ -348,11 +347,7 @@ public class ProfileInfoBaseService extends BaseJpaService {
                 if (subList != null && subList.size() > 0) {
                     for (Map subTemp : subList) {
                         String operateName;
-                        if (temp.get("EHR_000418") != null) {
-                            operateName = (String) subTemp.get("EHR_000418");
-                        } else {
-                            operateName = (String) subTemp.get("EHR_004045");
-                        }
+                        operateName = (String) subTemp.get("EHR_000418");
                         stringBuilder4.append(operateName);
                         stringBuilder4.append("、");
                         break;
@@ -397,6 +392,7 @@ public class ProfileInfoBaseService extends BaseJpaService {
 
     /**
      * 过敏史
+     *
      * @param demographic_id
      * @return
      */
@@ -410,6 +406,7 @@ public class ProfileInfoBaseService extends BaseJpaService {
 
     /**
      * 家族史
+     *
      * @param demographic_id
      * @return
      */
@@ -422,6 +419,7 @@ public class ProfileInfoBaseService extends BaseJpaService {
 
     /**
      * 个人史
+     *
      * @param demographic_id
      * @return
      */
@@ -443,11 +441,11 @@ public class ProfileInfoBaseService extends BaseJpaService {
                     }
                 }
             }
-            personHistory.put("name", result.get("patient_name") == null? "" : result.get("patient_name"));
+            personHistory.put("name", result.get("patient_name") == null ? "" : result.get("patient_name"));
             //出生地
             String placeOfBirth = "";
             String province = (String) result.get("EHR_004945");
-            String city = (String) result.get("EHR_004946") ;
+            String city = (String) result.get("EHR_004946");
             String county = (String) result.get("EHR_004947");
             if (!StringUtils.isEmpty(province) && !province.equals("-")) {
                 placeOfBirth += province + "-";
@@ -471,9 +469,9 @@ public class ProfileInfoBaseService extends BaseJpaService {
             //生活条件
             personHistory.put("livingCondition", "");
             //文化程度
-            personHistory.put("educationLevel", result.get("EHR_000790") == null? "" : result.get("EHR_000790"));
+            personHistory.put("educationLevel", result.get("EHR_000790") == null ? "" : result.get("EHR_000790"));
             //职业
-            personHistory.put("career", result.get("EHR_000022_VALUE") == null? "" : result.get("EHR_000022_VALUE"));
+            personHistory.put("career", result.get("EHR_000022_VALUE") == null ? "" : result.get("EHR_000022_VALUE"));
             //嗜烟
             String smoke = "";
             if (!StringUtils.isEmpty(result.get("EHR_002114"))) {
@@ -502,18 +500,18 @@ public class ProfileInfoBaseService extends BaseJpaService {
         return personHistory;
     }
 
-    private int compareAgeOfDisease(String AgeOfDisease1, String AgeOfDisease2){
+    private int compareAgeOfDisease(String AgeOfDisease1, String AgeOfDisease2) {
         int year1 = 0;
         int month1 = 0;
         int year2 = 0;
         int month2 = 0;
-        if (AgeOfDisease1.split("年|个月").length>1) {
+        if (AgeOfDisease1.split("年|个月").length > 1) {
             year1 = Integer.parseInt(AgeOfDisease1.split("年|个月")[0]);
             month1 = Integer.parseInt(AgeOfDisease1.split("年|个月")[1]);
         } else {
             month1 = Integer.parseInt(AgeOfDisease1.split("年|个月")[0]);
         }
-        if (AgeOfDisease2.split("年|个月").length>1) {
+        if (AgeOfDisease2.split("年|个月").length > 1) {
             year2 = Integer.parseInt(AgeOfDisease2.split("年|个月")[0]);
             month2 = Integer.parseInt(AgeOfDisease2.split("年|个月")[1]);
         } else {
