@@ -55,6 +55,8 @@ public class ExtractUtil {
      * @param qdm
      * @param qds
      * @param dataList
+     * @param timeKey  时间维度字段
+     * @param aggregationKey 抽取统计的数据值字段
      * @param quotaVo
      * @return
      * @throws Exception
@@ -94,7 +96,7 @@ public class ExtractUtil {
                 slave4DictMap.put(saveModel.getSlaveKey4(), saveModel.getSlaveKey4Name());
             }
         }
-
+        int errorCount = 0;
         for(Map<String, Object> map : dataList){
             SaveModel saveModel = new SaveModel();
             for (TjQuotaDimensionMain main : qdm) {
@@ -160,6 +162,8 @@ public class ExtractUtil {
                 saveModel.setQuotaCode(quotaVo.getCode().replaceAll("_",""));
                 saveModel.setQuotaName(quotaVo.getName());
                 returnList.add(saveModel);
+            }else {
+                errorCount++;
             }
 
         }
@@ -167,6 +171,8 @@ public class ExtractUtil {
         if(orgDictMap != null && orgDictMap.size() > 0){
             setSaveModelProperties(returnList);
         }
+        logger.error("指标：" + quotaVo.getName() + "统计时指标或者机构未关联上错误数据有：" + errorCount);
+        System.out.println("指标：" + quotaVo.getName() + "统计时指标或者机构未关联上错误数据有：" + errorCount);
         return returnList;
     }
 
