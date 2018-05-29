@@ -6,8 +6,10 @@ import com.yihu.ehr.analyze.service.qc.PackageQcService;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.model.packs.EsSimplePackage;
 import com.yihu.ehr.profile.AnalyzeStatus;
+import com.yihu.ehr.profile.exception.IllegalEmptyCheckException;
 import com.yihu.ehr.profile.exception.IllegalJsonDataException;
 import com.yihu.ehr.profile.exception.IllegalJsonFileException;
+import com.yihu.ehr.profile.exception.IllegalValueCheckException;
 import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -83,6 +85,10 @@ public class PackageAnalyzeService {
                 errorType = 2;
             } else if (e instanceof IllegalJsonDataException) {
                 errorType = 3;
+            } else if (e instanceof IllegalEmptyCheckException) {//非空
+                errorType = 4;
+            } else if (e instanceof IllegalValueCheckException) {//值域超出
+                errorType = 5;
             }
             if (esSimplePackage != null) {
                 try {

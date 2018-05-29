@@ -88,7 +88,7 @@ public class PackageQcService {
                         String method = serializable.toString();
                         Class clazz = qcRuleCheckService.getClass();
                         Method _method = clazz.getMethod(method, new Class[]{String.class, String.class, String.class});
-                        int result = (int)_method.invoke(qcRuleCheckService, dataSetCode, metadata, dataGroup.get(metadata));
+                        int result = (int)_method.invoke(qcRuleCheckService, zipPackage.getCdaVersion(), dataSetCode, metadata, dataGroup.get(metadata));
                         if (result != 0) {
                             Map<String, Object> qcMetadataRecord = new HashMap<>();
                             qcMetadataRecord.put("_id", esSimplePackage.get_id() + "_" + dataSetCode + "_" + metadata);

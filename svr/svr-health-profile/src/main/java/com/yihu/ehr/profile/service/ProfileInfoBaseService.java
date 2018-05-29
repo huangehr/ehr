@@ -123,9 +123,9 @@ public class ProfileInfoBaseService extends BaseJpaService {
             }
             patientMap.put("label", labels);
             //姓名
-            patientMap.put("name", result.get("patient_name") == null? "" : result.get("patient_name"));
+            patientMap.put("name", result.get("patient_name") == null ? "" : result.get("patient_name"));
             //性别
-            String gender = result.get("EHR_000019") == null? "" : (String) result.get("EHR_000019");
+            String gender = result.get("EHR_000019") == null ? "" : (String) result.get("EHR_000019");
             if ("1".equals(gender)) {
                 patientMap.put("gender", "男");
             } else if ("2".equals(gender)) {

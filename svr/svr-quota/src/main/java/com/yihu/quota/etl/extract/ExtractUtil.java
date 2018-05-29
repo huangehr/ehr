@@ -5,6 +5,7 @@ import com.yihu.ehr.entity.dict.SystemDictEntry;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.query.services.SolrQuery;
 import com.yihu.ehr.solr.SolrUtil;
+import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.quota.etl.Contant;
 import com.yihu.quota.etl.model.EsConfig;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionMain;
@@ -36,6 +37,9 @@ import java.util.*;
 public class ExtractUtil {
 
     private Logger logger = LoggerFactory.getLogger(ExtractUtil.class);
+    private static String main_town = "twon";
+    private static String main_org = "org";
+    private static String main_year = "year";
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -44,10 +48,177 @@ public class ExtractUtil {
     @Autowired
     SolrQuery solrQuery;
     private QuotaVo quotaVo;
-    private String startTime;
-    private String endTime;
     private String timeLevel;
-    private EsConfig esConfig;
+
+    /**
+     * 抽取列表数据 关联数据字典
+     * @param qdm
+     * @param qds
+     * @param dataList
+     * @param timeKey  时间维度字段
+     * @param aggregationKey 抽取统计的数据值字段
+     * @param quotaVo
+     * @return
+     * @throws Exception
+     */
+    public  List<SaveModel> computeList(List<TjQuotaDimensionMain> qdm, List<TjQuotaDimensionSlave> qds,List<Map<String, Object>> dataList,
+                                        String timeKey,String aggregationKey,QuotaVo quotaVo) throws Exception {
+        this.quotaVo = quotaVo;
+        List<SaveModel> returnList = new ArrayList<>();
+        List<SaveModel> totalSaveModelDictList = getTotalDictDataList(qdm,qds);
+        Map<String,String> townDictMap = new HashMap<>();
+        Map<String,String> orgDictMap = new HashMap<>();
+        Map<String,String> yearDictMap = new HashMap<>();
+        Map<String,String> slave1DictMap = new HashMap<>();
+        Map<String,String> slave2DictMap = new HashMap<>();
+        Map<String,String> slave3DictMap = new HashMap<>();
+        Map<String,String> slave4DictMap = new HashMap<>();
+        for(SaveModel saveModel: totalSaveModelDictList){
+            if(saveModel.getTown() != null){
+                townDictMap.put(saveModel.getTown(), saveModel.getTownName());
+            }
+            if(saveModel.getOrg() != null){
+                orgDictMap.put(saveModel.getOrg(), saveModel.getOrgName());
+            }
+            if(saveModel.getYear() != null){
+                yearDictMap.put(saveModel.getYear(), saveModel.getYearName());
+            }
+            if(saveModel.getSlaveKey1() != null){
+                slave1DictMap.put(saveModel.getSlaveKey1(), saveModel.getSlaveKey1Name());
+            }
+            if(saveModel.getSlaveKey2() != null){
+                slave2DictMap.put(saveModel.getSlaveKey2(), saveModel.getSlaveKey2Name());
+            }
+            if(saveModel.getSlaveKey3() != null){
+                slave3DictMap.put(saveModel.getSlaveKey3(), saveModel.getSlaveKey3Name());
+            }
+            if(saveModel.getSlaveKey4() != null){
+                slave4DictMap.put(saveModel.getSlaveKey4(), saveModel.getSlaveKey4Name());
+            }
+        }
+        int errorCount = 0;
+        for(Map<String, Object> map : dataList){
+            SaveModel saveModel = new SaveModel();
+            for (TjQuotaDimensionMain main : qdm) {
+                String value = map.get(main.getKeyVal()).toString();
+                if(main.getMainCode().equals(main_town) && !StringUtils.isEmpty(townDictMap.get(value))){
+                    saveModel.setTown(value);
+                    saveModel.setTownName(townDictMap.get(value));
+                }else if(main.getMainCode().equals(main_org) && !StringUtils.isEmpty(orgDictMap.get(value))){
+                    saveModel.setOrg(value);
+                    saveModel.setOrgName(orgDictMap.get(value));
+                } else if(main.getMainCode().equals(main_year) && !StringUtils.isEmpty(yearDictMap.get(value))){
+                    saveModel.setYearName(yearDictMap.get(value));
+                    saveModel.setYear(value);
+                }
+            }
+            if(saveModel.getTown() != null || saveModel.getOrg() !=null){
+                for (int i = 0; i < qds.size(); i++) {
+                    int num = i+1 ;
+                    if(num == 1) {
+                        if(map.get(qds.get(i).getKeyVal()) != null){
+                            String value = map.get(qds.get(i).getKeyVal()).toString();
+                            if( !StringUtils.isEmpty(slave1DictMap.get(value))){
+                                saveModel.setSlaveKey1(value);
+                                saveModel.setSlaveKey1Name(slave1DictMap.get(value));
+                            }
+                        }
+                    }else if(num == 2) {
+                        if(map.get(qds.get(i).getKeyVal()) != null){
+                            String value = map.get(qds.get(i).getKeyVal()).toString();
+                            if( !StringUtils.isEmpty(slave2DictMap.get(value))){
+                                saveModel.setSlaveKey2(value);
+                                saveModel.setSlaveKey2Name(slave2DictMap.get(value));
+                            }
+                        }
+                    }else if(num == 3) {
+                        if(map.get(qds.get(i).getKeyVal()) != null){
+                            String value = map.get(qds.get(i).getKeyVal()).toString();
+                            if( !StringUtils.isEmpty(slave3DictMap.get(value))){
+                                saveModel.setSlaveKey3(value);
+                                saveModel.setSlaveKey3Name(slave3DictMap.get(value));
+                            }
+                        }
+                    }else if(num == 4 ) {
+                        if(map.get(qds.get(i).getKeyVal()) != null){
+                            String value = map.get(qds.get(i).getKeyVal()).toString();
+                            if( !StringUtils.isEmpty(slave4DictMap.get(value))){
+                                saveModel.setSlaveKey4(value);
+                                saveModel.setSlaveKey4Name(slave4DictMap.get(value));
+                            }
+                        }
+                    }
+                }
+                if(!StringUtils.isEmpty(timeKey)){
+                    Date  quotaDate = (Date) map.get(timeKey);
+                    String quotaDateStr = DateUtil.formatDate(quotaDate, DateUtil.DEFAULT_DATE_YMD_FORMAT);
+                    saveModel.setQuotaDate(quotaDateStr);
+                }
+                if(!StringUtils.isEmpty(aggregationKey)){
+                    saveModel.setResult(map.get(aggregationKey).toString());
+                }else {
+                    saveModel.setResult("1");
+                }
+                saveModel.setQuotaCode(quotaVo.getCode().replaceAll("_",""));
+                saveModel.setQuotaName(quotaVo.getName());
+                returnList.add(saveModel);
+            }else {
+                errorCount++;
+            }
+
+        }
+        //关联机构相关信息
+        if(orgDictMap != null && orgDictMap.size() > 0){
+            setSaveModelProperties(returnList);
+        }
+        logger.error("指标：" + quotaVo.getName() + "统计时指标或者机构未关联上错误数据有：" + errorCount);
+        System.out.println("指标：" + quotaVo.getName() + "统计时指标或者机构未关联上错误数据有：" + errorCount);
+        return returnList;
+    }
+
+    /**
+     * 获取所有维度字典
+     * @param qdm
+     * @param qds
+     * @return
+     */
+    public List<SaveModel> getTotalDictDataList(List<TjQuotaDimensionMain> qdm, List<TjQuotaDimensionSlave> qds){
+        List<SaveModel> totalSaveModelDictList = new ArrayList<>();
+        for (TjQuotaDimensionMain main : qdm) {
+            List<SaveModel> saveModelDicts = jdbcTemplate.query(main.getDictSql(), new BeanPropertyRowMapper(SaveModel.class));
+            if (saveModelDicts != null) {
+                for(SaveModel saveModel :saveModelDicts){
+                    totalSaveModelDictList.add(saveModel);
+                }
+            }
+        }
+        for (int i = 0; i < qds.size(); i++) {
+            int num = i+1;
+            if(qds.get(i).getDictSql() != null){
+                List<DictModel> dictModels = jdbcTemplate.query(qds.get(i).getDictSql(), new BeanPropertyRowMapper(DictModel.class));
+                if (dictModels != null) {
+                    for(DictModel dictModel :dictModels){
+                        SaveModel saveModel = new SaveModel();
+                        if(num == 1){
+                            saveModel.setSlaveKey1(dictModel.getCode());
+                            saveModel.setSlaveKey1Name(dictModel.getName());
+                        }else  if(num == 2){
+                            saveModel.setSlaveKey2(dictModel.getCode());
+                            saveModel.setSlaveKey2Name(dictModel.getName());
+                        }else  if(num == 3){
+                            saveModel.setSlaveKey3(dictModel.getCode());
+                            saveModel.setSlaveKey3Name(dictModel.getName());
+                        }else  if(num == 4){
+                            saveModel.setSlaveKey4(dictModel.getCode());
+                            saveModel.setSlaveKey4Name(dictModel.getName());
+                        }
+                        totalSaveModelDictList.add(saveModel);
+                    }
+                }
+            }
+        }
+        return totalSaveModelDictList;
+    }
 
     /**
      * 融合主细维度、其组合统计值为SaveModel
@@ -410,7 +581,7 @@ public class ExtractUtil {
             townMap.put(dictModel.getCode(), dictModel.getName());
         }
         //机构类型 目录对应的名称和节点id
-        String orgHealthCategorySql = "SELECT id as orgHealthCategoryId,pid as orgHealthCategoryPid,top_pid as orgHealthCategoryTopPid,code as orgHealthCategoryCode, name from org_health_category";
+        String orgHealthCategorySql = "SELECT id as orgHealthCategoryId,pid as orgHealthCategoryPid,top_pid as orgHealthCategoryTopPid,code as orgHealthCategoryCode, name as orgHealthCategoryName from org_health_category";
         List<OrgHealthCategoryShowModel> orgHealthCategoryDictDatas = jdbcTemplate.query(orgHealthCategorySql, new BeanPropertyRowMapper(OrgHealthCategoryShowModel.class));
         Map<String,OrgHealthCategoryShowModel>  orgHealthCategoryMap = new HashMap<>();
         for(OrgHealthCategoryShowModel orgHealthCategory : orgHealthCategoryDictDatas){
