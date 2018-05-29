@@ -108,6 +108,8 @@ public class PackageResourceJob implements InterruptableJob {
         map.put("event_no", standardPackage.getEventNo());
         map.put("event_date", DateUtil.toStringLong(standardPackage.getEventDate()));
         map.put("patient_id", standardPackage.getPatientId());
+        map.put("dept", standardPackage.getDeptCode());
+        map.put("delay", (pack.getReceive_date().getTime() - standardPackage.getEventDate().getTime()) / 1000);
         map.put("re_upload_flg", String.valueOf(standardPackage.isReUploadFlg()));
         packageMgrClient.reportStatus(pack.get_id(), ArchiveStatus.Finished, 0, objectMapper.writeValueAsString(map));
     }

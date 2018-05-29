@@ -5,6 +5,8 @@ import com.yihu.ehr.profile.feign.*;
 import com.yihu.ehr.profile.util.BasisConstant;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.util.datetime.DateUtil;
+import com.yihu.ehr.util.http.HttpResponse;
+import com.yihu.ehr.util.http.HttpUtils;
 import com.yihu.ehr.util.rest.Envelop;
 import org.hibernate.FlushMode;
 import org.hibernate.Query;
@@ -100,22 +102,25 @@ public class ProfileInfoBaseService extends BaseJpaService {
                 weight = (String) result.get("EHR_005148");
             }
             patientMap.put("weight", weight);
+            List<String> labels = new ArrayList<>();
             if (result.get(BasisConstant.diagnosis) != null && result.get(BasisConstant.diagnosis).toString().contains("Z37")) { //1 新生儿
-                patientMap.put("label", "新生儿");
+                labels.add("新生儿");
                 //出生身高
                 patientMap.put("height", result.get("EHR_001256") == null ? "" : result.get("EHR_001256"));
                 //出生体重
                 patientMap.put("weight", result.get("EHR_001257") == null ? "" : result.get("EHR_001257")); //单位(g)
             } else if (result.get(BasisConstant.diagnosis) != null && result.get(BasisConstant.diagnosis).toString().contains("O80")) { //2 孕妇
-                patientMap.put("label", "孕妇");
+                labels.add("孕妇");
             } else if (profileDiseaseService.getHealthProblem(demographicId).size() > 0){
-                patientMap.put("label", "慢病");
-            } else {
-                patientMap.put("label", "就诊");
+                labels.add("慢病");
             }
-            List<String> labels = new ArrayList<>();
-            labels.add("慢病");
-            labels.add("就诊");
+            Map<String, Object> params = new HashMap<>();
+            params.put("idcard", demographicId);
+            HttpResponse httpResponse = HttpUtils.doGet("http://localhost:8080/label/searchehrbaseinfo", params);
+            if (httpResponse.isSuccessFlg()) {
+                Map<String, Object> labelResult = objectMapper.readValue(httpResponse.getContent(), Map.class);
+                labels = (List)labelResult.get("label");
+            }
             patientMap.put("label", labels);
             //姓名
             patientMap.put("name", result.get("patient_name") == null? "" : result.get("patient_name"));

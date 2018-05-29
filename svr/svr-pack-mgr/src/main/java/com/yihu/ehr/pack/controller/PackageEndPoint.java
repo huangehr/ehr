@@ -158,13 +158,15 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         if (status == ArchiveStatus.Finished) {
             //入库成功
             Map<String, String> map = objectMapper.readValue(message, Map.class);
+            updateSource.put("profile_id", map.get("profile_id"));
+            updateSource.put("demographic_id", map.get("demographic_id"));
             updateSource.put("event_type", map.get("event_type"));
             updateSource.put("event_no", map.get("event_no"));
             updateSource.put("event_date", map.get("event_date"));
             updateSource.put("patient_id", map.get("patient_id"));
-            updateSource.put("demographic_id", map.get("demographic_id"));
+            updateSource.put("dept", map.get("dept"));
+            updateSource.put("delay",  map.get("delay"));
             updateSource.put("re_upload_flg", map.get("re_upload_flg"));
-            updateSource.put("profile_id", map.get("profile_id"));
             updateSource.put("finish_date", dateFormat.format(new Date()));
             updateSource.put("message", "resolve success");
             updateSource.put("resourced", 1);
