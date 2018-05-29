@@ -68,6 +68,9 @@ public class MUser implements Serializable{
      * 居民行业
      */
     private  String profession;
+    private  String department;//部门
+    private  String position;//职务
+
 
 
 
@@ -441,5 +444,21 @@ public class MUser implements Serializable{
 
     public void setProfession(String profession) {
         this.profession = profession;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
+    }
+
+    public String getPosition() {
+        return position;
+    }
+
+    public void setPosition(String position) {
+        this.position = position;
     }
 }

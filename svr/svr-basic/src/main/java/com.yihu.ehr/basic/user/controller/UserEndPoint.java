@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.basic.dict.service.SystemDictEntryService;
 import com.yihu.ehr.basic.org.model.OrgMemberRelation;
+import com.yihu.ehr.basic.org.service.OrgMemberRelationService;
 import com.yihu.ehr.basic.patient.service.DemographicService;
 import com.yihu.ehr.basic.security.service.UserSecurityService;
 import com.yihu.ehr.basic.user.entity.RoleUser;
@@ -91,6 +92,8 @@ public class UserEndPoint extends EnvelopRestEndPoint {
     private DoctorService doctorService;
     @Autowired
     private DemographicService demographicService;
+    @Autowired
+    private OrgMemberRelationService orgMemberRelationService;
 
     @RequestMapping(value = ServiceApi.Users.Users, method = RequestMethod.GET)
     @ApiOperation(value = "获取用户列表", notes = "根据查询条件获取用户列表在前端表格展示")
@@ -234,7 +237,14 @@ public class UserEndPoint extends EnvelopRestEndPoint {
         List<User> users = userService.getUserForLogin(userName);
         if (users != null) {
             if (users.size() == 1) {
-                return convertToModel(users.get(0), MUser.class);
+                MUser mUser = new MUser();
+                List<OrgMemberRelation> memberRelations = orgMemberRelationService.findByField("userId", users.get(0).getId());
+                mUser = convertToModel(users.get(0), MUser.class); mUser = convertToModel(users.get(0), MUser.class);
+                if(memberRelations != null && memberRelations.size() > 0){
+                    mUser.setPosition(memberRelations.get(0).getDutyName());
+                    mUser.setDepartment(memberRelations.get(0).getDeptName());
+                }
+                return mUser;
             }
         }
         return null;
