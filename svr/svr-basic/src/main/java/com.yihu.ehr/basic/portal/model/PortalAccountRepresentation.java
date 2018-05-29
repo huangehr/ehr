@@ -60,7 +60,7 @@ public class PortalAccountRepresentation implements Serializable {
 	public PortalAccountRepresentation() {
 	}
 
-	public PortalAccountRepresentation(String code, Integer status ,String eName, String eMobile, String eIdcard, Integer type, String typeContent, String photo1, Date createTime, String createUser, String createUserName, Date updateTime, String updateUser, String updateUserName) {
+	public PortalAccountRepresentation(String code, Integer status, String eName, String eMobile, String eIdcard, Integer type, String typeContent, String photo, Date createTime, String createUser, String createUserName, Date updateTime, String updateUser, String updateUserName) {
 		this.code = code;
 		this.status = status;
 		this.eName = eName;
