@@ -1,0 +1,116 @@
+package com.yihu.ehr.entity.quality;
+
+import javax.persistence.*;
+import java.util.Date;
+
+/**
+ * 数据质量-平台上传预警值
+ * @author yeshijie on 2018/5/28.
+ */
+@Entity
+@Table(name = "dq_paltform_upload_warning", schema = "", catalog = "healtharchive")
+public class DqPaltformUploadWarning {
+
+    private Long id;
+    private String orgCode;//机构代码
+    private String orgName;//机构名称
+    private Date createTime;//创建时间
+    private Date updateTime;//更新时间
+    private String updateUserId;//操作人id
+    private String updateUserName;//操作人名称
+    private String integrityRate;//完整率
+    private Long errorNum;//错误量
+    private Long dataNum;//数据量
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", unique = true, nullable = false)
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    @Column(name = "org_code")
+    public String getOrgCode() {
+        return orgCode;
+    }
+
+    public void setOrgCode(String orgCode) {
+        this.orgCode = orgCode;
+    }
+
+    @Column(name = "org_name")
+    public String getOrgName() {
+        return orgName;
+    }
+
+    public void setOrgName(String orgName) {
+        this.orgName = orgName;
+    }
+
+    @Column(name = "create_time")
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    @Column(name = "update_time")
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
+    }
+
+    @Column(name = "update_user_id")
+    public String getUpdateUserId() {
+        return updateUserId;
+    }
+
+    public void setUpdateUserId(String updateUserId) {
+        this.updateUserId = updateUserId;
+    }
+
+    @Column(name = "update_user_name")
+    public String getUpdateUserName() {
+        return updateUserName;
+    }
+
+    public void setUpdateUserName(String updateUserName) {
+        this.updateUserName = updateUserName;
+    }
+
+    @Column(name = "integrity_rate")
+    public String getIntegrityRate() {
+        return integrityRate;
+    }
+
+    public void setIntegrityRate(String integrityRate) {
+        this.integrityRate = integrityRate;
+    }
+
+    @Column(name = "error_num")
+    public Long getErrorNum() {
+        return errorNum;
+    }
+
+    public void setErrorNum(Long errorNum) {
+        this.errorNum = errorNum;
+    }
+
+    @Column(name = "data_num")
+    public Long getDataNum() {
+        return dataNum;
+    }
+
+    public void setDataNum(Long dataNum) {
+        this.dataNum = dataNum;
+    }
+}

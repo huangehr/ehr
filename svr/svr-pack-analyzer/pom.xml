@@ -84,6 +84,11 @@
         </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
+            <artifactId>commons-entity</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-util</artifactId>
             <scope>compile</scope>
         </dependency>
