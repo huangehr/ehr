@@ -104,7 +104,9 @@ public class ExtractHelper {
                     tjQuotaDimensionMains.remove(townMain);
                 }
             }else {
-                tjQuotaDimensionMains.remove(townMain);
+                if(orgFlag){
+                    tjQuotaDimensionMains.remove(townMain);
+                }
             }
 
             //得到细维度
