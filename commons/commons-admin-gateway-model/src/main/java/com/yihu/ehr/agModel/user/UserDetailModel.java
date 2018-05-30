@@ -68,6 +68,13 @@ public class UserDetailModel implements Serializable {
 
     //    角色关联属性
     private String demographicId;
+    private String doctorId;
+    /**
+     * 居民行业
+     */
+    private  String profession;
+    private  String department;//部门
+    private  String position;//职务
 
     public String getDemographicId() {
         return demographicId;
@@ -451,5 +458,37 @@ public class UserDetailModel implements Serializable {
 
     public void setStreet(String street) {
         this.street = street;
+    }
+
+    public String getDoctorId() {
+        return doctorId;
+    }
+
+    public void setDoctorId(String doctorId) {
+        this.doctorId = doctorId;
+    }
+
+    public String getProfession() {
+        return profession;
+    }
+
+    public void setProfession(String profession) {
+        this.profession = profession;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
+    }
+
+    public String getPosition() {
+        return position;
+    }
+
+    public void setPosition(String position) {
+        this.position = position;
     }
 }

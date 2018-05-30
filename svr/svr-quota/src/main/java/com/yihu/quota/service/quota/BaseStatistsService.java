@@ -476,27 +476,27 @@ public class BaseStatistsService {
      * @param
      * @return
      */
-    public List<Map<String,Object>> allCategoryResultMap(String quotaCode,List<Map<String,Object>> orgHealthCategoryList,List<Map<String, Object>> dimenListResult ){
+    public List<Map<String,Object>> allCategoryResultMap(List<String> quotaCodes,List<Map<String,Object>> orgHealthCategoryList,List<Map<String, Object>> dimenListResult ){
 
         List<Map<String,Object>> resultMap = new ArrayList<>();
         for(int i=0 ; i < orgHealthCategoryList.size() ; i++ ){
             Map<String,Object> mapCategory = orgHealthCategoryList.get(i);
+            Map<String,Object> map = new HashMap<>();
             double parentResult = 0;
-            parentResult = getParentAllChildren(mapCategory, dimenListResult,parentResult);
             mapCategory.put("firstColumn",mapCategory.get("text"));
-            mapCategory.put("result",parentResult);
-            mapCategory.put(quotaCode,parentResult);
+            map = getParentAllChildren(quotaCodes,mapCategory,map, dimenListResult,parentResult);
+            mapCategory.putAll(map);
             resultMap.add(mapCategory);
             if(mapCategory.get("children") != null){
                 List<Map<String,Object>> childrenOrgHealthCategoryList = (List<Map<String, Object>>) mapCategory.get("children");
-                mapCategory.put("children",allCategoryResultMap(quotaCode,childrenOrgHealthCategoryList,dimenListResult));
+                mapCategory.put("children",allCategoryResultMap(quotaCodes,childrenOrgHealthCategoryList,dimenListResult));
             }
         }
         return  resultMap;
     }
 
     //获取该节点下所有末节点的结果和
-    public  double getParentAllChildren( Map<String,Object> mapCategory, List<Map<String, Object>> dimenListResult, double parentResult ){
+    public   Map<String,Object> getParentAllChildren(List<String> quotaCodes, Map<String,Object> mapCategory,Map<String,Object> returnMap, List<Map<String, Object>> dimenListResult, double parentResult ){
         try {
                 boolean childrenFlag = false;
                 if(mapCategory.get("children") != null){
@@ -509,14 +509,26 @@ public class BaseStatistsService {
                     List<Map<String,Object>> childrenOrgHealthCategoryList = (List<Map<String, Object>>) mapCategory.get("children");
                     for(int j=0 ; j < childrenOrgHealthCategoryList.size() ; j++ ){
                         Map<String,Object> childrenMapCategory = childrenOrgHealthCategoryList.get(j);
-                        parentResult =  getParentAllChildren(childrenMapCategory, dimenListResult,parentResult);
+                        returnMap =  getParentAllChildren(quotaCodes ,childrenMapCategory,returnMap, dimenListResult,parentResult);
                     }
                 }else{
                     for(Map<String, Object> dimenMap :dimenListResult){
                         if(dimenMap.get("orgHealthCategoryCode") != null && dimenMap.get("result") != null){
                             if(dimenMap.get("orgHealthCategoryCode").equals(mapCategory.get("code"))){
                                 double result = Double.parseDouble(dimenMap.get("result").toString());
-                                parentResult += result;
+                                double oldResult = 0;
+                                if(returnMap.get("result") != null){
+                                    oldResult = Double.parseDouble(returnMap.get("result").toString());
+                                }
+                                returnMap.put("result",result + oldResult);
+                                for(String quotaCode : quotaCodes){
+                                    double quotaResult = Double.parseDouble(dimenMap.get(quotaCode).toString());
+                                    double oldQuotaResult = 0;
+                                    if( returnMap.get(quotaCode) != null ){
+                                        oldQuotaResult = Double.parseDouble(returnMap.get(quotaCode).toString());
+                                    }
+                                    returnMap.put(quotaCode,quotaResult + oldQuotaResult);
+                                }
                                 break;
                             }
                         }
@@ -525,7 +537,7 @@ public class BaseStatistsService {
         }catch (Exception e){
             throw new NumberFormatException("统计数据转换异常");
         }
-        return parentResult;
+        return returnMap;
     }
 
 
