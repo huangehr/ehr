@@ -92,15 +92,16 @@ public class OrgHealthCategoryStatisticsService {
             Object itemPid = item.get("pid");
             boolean isEndpoint = Boolean.parseBoolean(item.get("isEndpoint").toString());
             if (itemPid == null && id == pid) { // 顶节点
+                List<Map<String, Object>> topPointList = new ArrayList<>();
                 for (Map<String, Object> topSubItem : allOrgHealthCategoryList) {
                     Object topPid = topSubItem.get("topPid");
                     Object topSubItemPid = topSubItem.get("pid");
                     boolean isEndpointSubItem = Boolean.parseBoolean(topSubItem.get("isEndpoint").toString());
                     if (topSubItemPid != null && Integer.parseInt(topPid.toString()) == pid && isEndpointSubItem) {
-                        endpointList.add(topSubItem);
+                        topPointList.add(topSubItem);
                     }
                 }
-                return endpointList;
+                return topPointList;
             } else if (itemPid != null && (int) itemPid == pid) {
                 if (isEndpoint) {
                     endpointList.add(item);

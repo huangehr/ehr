@@ -128,6 +128,15 @@ public class ElasticSearchUtil {
         }
     }
 
+    public void deleteByFilter(String index, String type, BoolQueryBuilder boolQueryBuilder) {
+        List<String> idList = elasticSearchClient.getIds(index, type, boolQueryBuilder);
+        if (idList.size() > 0) {
+            String [] idArr = new String[idList.size()];
+            idArr = idList.toArray(idArr);
+            elasticSearchClient.bulkDelete(index, type, idArr);
+        }
+    }
+
     /**
      * 更新数据 - 返回最新文档
      * @param index

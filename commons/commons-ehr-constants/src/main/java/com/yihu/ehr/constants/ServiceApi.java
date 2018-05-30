@@ -165,6 +165,9 @@ public class ServiceApi {
         public static final String IntQuotaParam = "/resources/integrated/quota_param";
         public static final String IntResourceUpdate = "/resources/integrated/resource_update";
         public static final String IntResourceQueryUpdate = "/resources/integrated/resource_query_update";
+        //获取分类
+        public static final String IntCategory = "/resources/integrated/category";
+        public static final String IntMetadata = "/resources/integrated/metadata";
 
         //貌似没用了
         public static final String AdapterDicts = "/resources/adapter/dict";

@@ -47,7 +47,7 @@ public class ResourceIntegratedService extends BaseJpaService {
     private RsResourceCategoryDao rsResourceCategoryDao;
 
     /**
-     * 获取档案数据主体列表
+     * 获取档案数据资源列表
      * @return
      */
     @Transactional(readOnly = true)
@@ -79,7 +79,40 @@ public class ResourceIntegratedService extends BaseJpaService {
     }
 
     /**
-     * 根据档案数据主体获取数据元列表
+     * 获取档案数据资源列表
+     * @return
+     */
+    @Transactional(readOnly = true)
+    public List<RsResource> findFileMasterList (String categoryId, String ids, String filters) {
+        String sql;
+        if (filters != null) {
+            if (ids != null) {
+                sql = "SELECT rr.id, rr.code, rr.name, rr.category_id, rr.rs_interface, rr.grant_type FROM rs_resource rr WHERE rr.category_id = '" + categoryId + "' " +
+                        "AND rr.rs_interface = 'getEhrCenter' " +
+                        "AND (rr.id IN (" + ids + ")) " + "OR rr.grant_type = '0') " +
+                        "AND rr.name like " + "'%" + filters + "%'";
+            } else {
+                sql = "SELECT rr.id, rr.code, rr.name, rr.category_id, rr.rs_interface, rr.grant_type FROM rs_resource rr WHERE rr.category_id = '" + categoryId + "'" +
+                        "AND rr.rs_interface = 'getEhrCenter' " +
+                        "AND rr.name like " + "'%" + filters + "%'";
+            }
+        } else {
+            if (ids != null) {
+                sql = "SELECT rr.id, rr.code, rr.name, rr.category_id, rr.rs_interface, rr.grant_type FROM rs_resource rr WHERE rr.category_id = '" + categoryId + "'" +
+                        "AND rr.rs_interface = 'getEhrCenter' " +
+                        "AND rr.id IN (" + ids + ")) " + "OR rr.grant_type = '0') ";
+            } else {
+                sql = "SELECT rr.id, rr.code, rr.name, rr.category_id, rr.rs_interface, rr.grant_type FROM rs_resource rr WHERE rr.category_id = '" + categoryId + "'" +
+                        "AND rr.rs_interface = 'getEhrCenter'";
+            }
+        }
+        RowMapper rowMapper = BeanPropertyRowMapper.newInstance(RsResource.class);
+        return jdbcTemplate.query(sql, rowMapper);
+    }
+
+
+    /**
+     * 获取档案数据资源数据元列表
      * @param rsResource
      * @param roleId
      * @return
@@ -292,7 +325,6 @@ public class ResourceIntegratedService extends BaseJpaService {
                         metadataMap.put("level", "3");
                         metadataMap.put("code", rsMetadata.getId());
                         metadataMap.put("name", rsMetadata.getName());
-                        metadataMap.put("stdCode", rsMetadata.getStdCode());
                         String dictCode = rsMetadata.getDictCode();
                         metadataMap.put("dictCode", rsMetadata.getDictCode());
                         if (!StringUtils.isEmpty(dictCode)){
@@ -305,9 +337,6 @@ public class ResourceIntegratedService extends BaseJpaService {
                                 }
                             }
                         }
-                        metadataMap.put("description", rsMetadata.getDescription());
-                        metadataMap.put("groupData", "");
-                        metadataMap.put("groupType", "");
                         metadataList.add(metadataMap);
                     }
                     masterMap.put("children", metadataList);
@@ -337,6 +366,88 @@ public class ResourceIntegratedService extends BaseJpaService {
                 finalList.add(finalMap.get(key));
             }
             resultList.add(finalList);
+        }
+        return resultList;
+    }
+
+    /**
+     * 综合查询档案数据分类列表
+     * @return
+     * @throws Exception
+     */
+    @Transactional(readOnly = true)
+    public List<Map<String, Object>> intCategory() throws Exception{
+        List<RsResourceCategory> rsResourceCategoryList = rsResourceCategoryDao.findByCode("standard");
+        List<Map<String, Object>> cateMapList = new ArrayList<>(rsResourceCategoryList.size());
+        rsResourceCategoryList.forEach(item -> {
+            Map<String, Object> cateMap = new HashMap<>();
+            cateMap.put("level", 1);
+            cateMap.put("name", item.getName());
+            cateMap.put("cateId", item.getId());
+            cateMapList.add(cateMap);
+        });
+        return cateMapList;
+    }
+
+    /**
+     * 综合查询档案数据列表树
+     * @param filters
+     * @return
+     */
+    @Transactional(readOnly = true)
+    public List< Map<String, Object>> intMetadata(String categoryId, String userResource, String roleId, String filters) throws Exception{
+        List< Map<String, Object>> resultList = new ArrayList<>();
+        List<RsResource> rrList;
+        if (userResource.equals("*")) {
+            rrList = findFileMasterList(categoryId, null, filters);
+        } else {
+            //授权资源
+            List<String> userResourceList = objectMapper.readValue(userResource, List.class);
+            StringBuilder builder = new StringBuilder();
+            for (String id : userResourceList) {
+                builder.append("'");
+                builder.append(id);
+                builder.append("',");
+            }
+            String ids = builder.toString();
+            if (StringUtils.isEmpty(ids)) {
+                rrList = findFileMasterList(categoryId, "''", filters);
+            } else {
+                rrList = findFileMasterList(categoryId, ids.substring(0, ids.length() -1), filters);
+            }
+        }
+        if (rrList != null) {
+            for (RsResource rsResources : rrList) {
+                Map<String, Object> masterMap = new HashMap<String, Object>();
+                masterMap.put("level", "2");
+                masterMap.put("code", rsResources.getCode());
+                masterMap.put("name", rsResources.getName());
+                List<RsMetadata> rmList = findFileMetadataList(rsResources, roleId);
+                if (rmList != null) {
+                    List<Map<String, Object>> metadataList = new ArrayList<Map<String, Object>>();
+                    for (RsMetadata rsMetadata : rmList) {
+                        Map<String, Object> metadataMap = new HashMap<String, Object>();
+                        metadataMap.put("level", "3");
+                        metadataMap.put("code", rsMetadata.getId());
+                        metadataMap.put("name", rsMetadata.getName());
+                        String dictCode = rsMetadata.getDictCode();
+                        metadataMap.put("dictCode", rsMetadata.getDictCode());
+                        if (!StringUtils.isEmpty(dictCode)){
+                            if (dictCode.equals("DATECONDITION")) {
+                                metadataMap.put("dictName", "时间");
+                            } else {
+                                RsDictionary rsDictionary = rsDictionaryDao.findByCode(rsMetadata.getDictCode());
+                                if (rsDictionary != null) {
+                                    metadataMap.put("dictName", rsDictionary.getName());
+                                }
+                            }
+                        }
+                        metadataList.add(metadataMap);
+                    }
+                    masterMap.put("children", metadataList);
+                }
+                resultList.add(masterMap);
+            }
         }
         return resultList;
     }

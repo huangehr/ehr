@@ -19,9 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -40,16 +38,68 @@ public class ResourceIntegratedEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private RsResourceDefaultQueryService resourcesDefaultQueryService;
 
+    @Deprecated
     @ApiOperation("综合查询档案数据列表树")
     @RequestMapping(value = ServiceApi.Resources.IntMetadataList, method = RequestMethod.GET)
     public Envelop getMetadataList(
-            @ApiParam(name = "userResource", value = "授权资源")
+            @ApiParam(name = "userResource", value = "授权资源", required = true)
             @RequestParam(value = "userResource") String userResource,
-            @ApiParam(name = "roleId", value = "角色id")
+            @ApiParam(name = "roleId", value = "角色id", required = true)
             @RequestParam(value = "roleId") String roleId,
             @ApiParam(name = "filters", value = "过滤条件(name)")
             @RequestParam(value = "filters", required = false) String filters) throws Exception {
         List list = resourcesIntegratedService.getMetadataList(userResource, roleId, filters);
+        return success(list);
+    }
+
+    @ApiOperation("综合查询档案数据分类列表")
+    @RequestMapping(value = ServiceApi.Resources.IntCategory, method = RequestMethod.GET)
+    public Envelop intCategory() throws Exception {
+        Map<String, Object> baseMap = new HashMap<String, Object>();
+        List<Map<String, String>> baseList = new ArrayList<Map<String, String>>();
+        //处理基本数据
+        Map<String, String> baseMap1 = new HashMap<String, String>();
+        baseMap1.put("code", "event_date");
+        baseMap1.put("name", "时间");
+        baseList.add(baseMap1);
+        Map<String, String> baseMap2 = new HashMap<String, String>();
+        baseMap2.put("code", "org_name");
+        baseMap2.put("name", "机构名称");
+        baseList.add(baseMap2);
+        Map<String, String> baseMap3 = new HashMap<String, String>();
+        baseMap3.put("code", "org_code");
+        baseMap3.put("name", "机构编号");
+        baseList.add(baseMap3);
+        Map<String, String> baseMap4 = new HashMap<String, String>();
+        baseMap4.put("code", "demographic_id");
+        baseMap4.put("name", "病人身份证号码");
+        baseList.add(baseMap4);
+        Map<String, String> baseMap5 = new HashMap<String, String>();
+        baseMap5.put("code", "patient_name");
+        baseMap5.put("name", "病人姓名");
+        baseList.add(baseMap5);
+        Map<String, String> baseMap6 = new HashMap<String, String>();
+        baseMap6.put("code", "event_type");
+        baseMap6.put("name", "事件类型");
+        baseList.add(baseMap6);
+        baseMap.put("level", "0");
+        baseMap.put("baseInfo", baseList);
+        List<Map<String, Object>> list = resourcesIntegratedService.intCategory();
+        return success(baseMap, list);
+    }
+
+    @ApiOperation("综合查询档案数据资源列表")
+    @RequestMapping(value = ServiceApi.Resources.IntMetadata, method = RequestMethod.GET)
+    public Envelop intMetadata(
+            @ApiParam(name = "categoryId", value = "分类ID", required = true)
+            @RequestParam(value = "categoryId") String categoryId,
+            @ApiParam(name = "userResource", value = "授权资源", required = true)
+            @RequestParam(value = "userResource") String userResource,
+            @ApiParam(name = "roleId", value = "角色id", required = true)
+            @RequestParam(value = "roleId") String roleId,
+            @ApiParam(name = "filters", value = "过滤条件(name)")
+            @RequestParam(value = "filters", required = false) String filters) throws Exception {
+        List<Map<String, Object>> list = resourcesIntegratedService.intMetadata(categoryId, userResource, roleId, filters);
         return success(list);
     }
 

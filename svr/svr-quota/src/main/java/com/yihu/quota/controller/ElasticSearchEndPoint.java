@@ -8,13 +8,15 @@ import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.RangeQueryBuilder;
+import org.elasticsearch.index.query.TermsQueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * EndPoint - Es搜索服务
@@ -76,7 +78,7 @@ public class ElasticSearchEndPoint extends EnvelopRestEndPoint {
         return success(true);
     }
 
-    @RequestMapping(value = ServiceApi.ElasticSearch.DeleteByField, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.ElasticSearch.DeleteByField, method = RequestMethod.GET)
     @ApiOperation(value = "删除数据（单次不能超过10000条）")
     public Envelop deleteByField(
             @ApiParam(name = "index", value = "索引名称", required = true)
@@ -86,8 +88,32 @@ public class ElasticSearchEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "field", value = "字段", required = true)
             @RequestParam(value = "field") String field,
             @ApiParam(name = "value", value = "字段值", required = true)
-            @RequestParam(value = "value") String value) {
-        elasticSearchUtil.deleteByField(index, type, field, value);
+            @RequestParam(value = "value") String value,
+            @ApiParam(name = "field2", value = "字段2", required = false)
+            @RequestParam(value = "field2", required = false) String field2,
+            @ApiParam(name = "value2", value = "字段值", required = false)
+            @RequestParam(value = "value2", required = false) String value2,
+            @ApiParam(name = "dateField", value = "时间字段", required = false)
+            @RequestParam(value = "dateField" , required = false) String dateField,
+            @ApiParam(name = "startDate", value = "时间字段开始时间,时间格式如：2018-01-12", required = false)
+            @RequestParam(value = "startDate", required = false) String startDate,
+            @ApiParam(name = "endDate", value = "时间字段结束时间,时间格式如：2018-01-12", required = false)
+            @RequestParam(value = "endDate", required = false) String endDate) {
+
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        TermsQueryBuilder termsQueryBuilder = QueryBuilders.termsQuery(field, value);
+        boolQueryBuilder.must(termsQueryBuilder);
+        if(StringUtils.isNotEmpty(field2) && StringUtils.isNotEmpty(value2)){
+            TermsQueryBuilder termsQueryBuilder2 = QueryBuilders.termsQuery(field2, value2);
+            boolQueryBuilder.must(termsQueryBuilder2);
+        }
+        if(StringUtils.isNotEmpty(dateField) && startDate != null && endDate != null){
+            RangeQueryBuilder rangeQueryStartTime = QueryBuilders.rangeQuery(dateField).gte(startDate);
+            boolQueryBuilder.must(rangeQueryStartTime);
+            RangeQueryBuilder rangeQueryEndTime = QueryBuilders.rangeQuery(dateField).lte(endDate);
+            boolQueryBuilder.must(rangeQueryEndTime);
+        }
+        elasticSearchUtil.deleteByFilter(index, type, boolQueryBuilder);
         return success(true);
     }
 
