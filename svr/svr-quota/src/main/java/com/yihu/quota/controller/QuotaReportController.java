@@ -194,7 +194,7 @@ public class QuotaReportController extends BaseController {
                 List<Map<String, Object>> orgHealthCategoryList = orgHealthCategoryStatisticsService.getOrgHealthCategoryTreeByPid(-1);
 //                dataList = baseStatistsService.setResultAllDimenMap(maxQuotaCode, orgHealthCategoryList, resultList,null);
                 //采用新的
-                dataList = baseStatistsService.allCategoryResultMap(maxQuotaCode, orgHealthCategoryList, resultList);
+                dataList = baseStatistsService.allCategoryResultMap(quotaCodes, orgHealthCategoryList, resultList);
 
             }else {
                 dataList = resultList;
