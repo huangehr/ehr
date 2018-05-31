@@ -6,7 +6,6 @@ import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.profile.ErrorType;
 import com.yihu.ehr.profile.exception.IllegalEmptyCheckException;
 import com.yihu.ehr.profile.exception.IllegalValueCheckException;
-import com.yihu.ehr.redis.client.RedisClient;
 import com.yihu.ehr.util.datetime.DateUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -43,7 +42,7 @@ public class QcRuleCheckService {
      * @param value
      * @throws Exception
      */
-    public int emptyCheck(String version, String dataSetCode, String metadata ,String value) throws Exception {
+    public int emptyCheck(String version, String dataSetCode, String metadata, String value) throws Exception {
         Boolean isNullable = hosAdminServiceClient.isMetaDataNullable(version, dataSetCode, metadata);
         if (!isNullable && StringUtils.isEmpty(value)) {
            return ErrorType.EmptyError.getType();
@@ -61,9 +60,9 @@ public class QcRuleCheckService {
      * @throws Exception
      */
     public int emptyCheckThrowable(String version, String dataSetCode, String metadata ,String value) throws Exception {
-        int type = emptyCheck(version, dataSetCode, metadata, value);
-        if(type != 0){
-            throw new IllegalEmptyCheckException(dataSetCode + ":" +metadata + "Is Empty");
+        Boolean isNullable = hosAdminServiceClient.isMetaDataNullable(version, dataSetCode, metadata);
+        if (!isNullable && StringUtils.isEmpty(value)) {
+            throw new IllegalEmptyCheckException(String.format("Meta data %s of %s in %s is empty", metadata, dataSetCode, version));
         }
         return 0;
     }
@@ -135,7 +134,7 @@ public class QcRuleCheckService {
         if (StringUtils.isEmpty(dict) || dict.equals("0")) {
             return 0;
         }
-        Boolean isExist = hosAdminServiceClient.isDictCodeExist(version, dict, value);
+        Boolean isExist = hosAdminServiceClient.isDictCodeExist(version, dict, metadata);
         if (!isExist) {
             return ErrorType.ValueError.getType();
         }
@@ -151,10 +150,14 @@ public class QcRuleCheckService {
      * @param value
      * @throws Exception
      */
-    public int valueCheckThrowable(String version, String dataSetCode, String metadata ,String value) throws Exception {
-        int type = valueCheck(version, dataSetCode, metadata, value);
-        if (type !=0) {
-            throw new IllegalValueCheckException(dataSetCode + ":" +metadata + ":" + value + "Out Value");
+    public int valueCheckThrowable(String version, String dataSetCode, String metadata , String value) throws Exception {
+        String dict = hosAdminServiceClient.getMetaDataDict(version, dataSetCode, metadata);
+        if (StringUtils.isEmpty(dict) || dict.equals("0")) {
+            return 0;
+        }
+        Boolean isExist = hosAdminServiceClient.isDictCodeExist(version, dict, metadata);
+        if (!isExist) {
+            throw new IllegalValueCheckException(String.format("Value %s for meta data %s of %s in %s out of range", value, metadata, dataSetCode, version));
         }
         return 0;
     }

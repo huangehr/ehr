@@ -383,7 +383,7 @@ public class ResourceIntegratedService extends BaseJpaService {
             Map<String, Object> cateMap = new HashMap<>();
             cateMap.put("level", 1);
             cateMap.put("name", item.getName());
-            cateMap.put("cateId", item.getId());
+            cateMap.put("id", item.getId());
             cateMapList.add(cateMap);
         });
         return cateMapList;
@@ -422,6 +422,7 @@ public class ResourceIntegratedService extends BaseJpaService {
                 masterMap.put("level", "2");
                 masterMap.put("code", rsResources.getCode());
                 masterMap.put("name", rsResources.getName());
+                masterMap.put("id", rsResources.getId());
                 List<RsMetadata> rmList = findFileMetadataList(rsResources, roleId);
                 if (rmList != null) {
                     List<Map<String, Object>> metadataList = new ArrayList<Map<String, Object>>();
@@ -430,6 +431,7 @@ public class ResourceIntegratedService extends BaseJpaService {
                         metadataMap.put("level", "3");
                         metadataMap.put("code", rsMetadata.getId());
                         metadataMap.put("name", rsMetadata.getName());
+                        metadataMap.put("id", UUID.randomUUID().toString());
                         String dictCode = rsMetadata.getDictCode();
                         metadataMap.put("dictCode", rsMetadata.getDictCode());
                         if (!StringUtils.isEmpty(dictCode)){

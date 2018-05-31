@@ -37,12 +37,6 @@ fast-dfs:
     anti-steal-token: no
     secret-key: FastDFS1234567890
 
-# 就诊事件与CDA文档类型关联
-cda-document-type-options:
-  event-type:
-    - "0": 0dae00065684c9920dc35654490aa9ac   # 门诊
-    - "1": 0dae00065684cb220dc35654490aa9ae   # 住院
-
 eip:
   tenant: jkzl
 

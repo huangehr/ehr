@@ -1,18 +1,23 @@
 package com.yihu.ehr.profile.util;
 
-public class BasisConstant {
+public class BasicConstant {
 
     //主表字段
     public static String rowkey = "rowkey";//主表主键
     public static String demographicId = "demographic_id";//身份证号
-    public static String profileId = "profile_id";//细表外键profile_id
+    public static String profileId = "profile_id";//档案主索引
+    public static String profileType = "profile_type";//档案类型
     public static String healthProblem = "health_problem";//健康问题;分隔
+    public static String healthProblemName = "health_problem_name";//健康问题名称;分隔
     public static String eventDate = "event_date";//事件时间
     public static String eventType = "event_type";//事件类型
+    public static String eventNo = "event_no";//事件类型
     public static String orgCode = "org_code";//医院代码
+    public static String orgArea = "org_area";//机构地区
     public static String orgName = "org_name";//医院名称
     public static String diagnosis = "diagnosis";//诊断代码
-
+    public static String diagnosisName = "diagnosis_name";//诊断名称
+    public static String cdaVersion = "cda_version";//诊断代码
 
 
     /********** 资源代码 ******************/
@@ -26,46 +31,18 @@ public class BasisConstant {
     public static String medicationWesternStat = "RS_MEDICATION_WESTERN_STAT";//患者西药用药统计资源
     public static String medicationChineseStat = "RS_MEDICATION_CHINESE_STAT";//患者中药用药统计资源
 
-    public static String outpatientDiagnosis = "RS_OUTPATIENT_DIAGNOSIS";//门诊诊断
-    public static String outpatientSymptom = "RS_OUTPATIENT_SYMPTOM";//门诊症状
-    public static String outpatientCost = "RS_OUTPATIENT_COST";	//门诊:费用汇总
-    public static String outpatientCostDetail = "RS_OUTPATIENT_COST_DETAIL";	//门诊:费用明细
-
-    public static String hospitalizedDiagnosis = "RS_HOSPITALIZED_DIAGNOSIS";//住院诊断
-    public static String hospitalizedSymptom = "RS_HOSPITALIZED_SYMPTOM";//住院症状
-    public static String hospitalizedCost = "RS_HOSPITALIZED_COST";	//住院:费用汇总
-    public static String hospitalizedCostDetail = "RS_HOSPITALIZED_COST_DETAIL";	//住院:费用明细
     public static String hospitalizedOrdersTemporary = "RS_HOSPITALIZED_ORDERS_TEMPORARY";	//住院临时医嘱
     public static String hospitalizedOrdersLongtime = "RS_HOSPITALIZED_ORDERS_LONGTIME";	//住院长期医嘱
-    public static String hospitalizedDeath = "RS_HOSPITALIZED_DEATH";	//住院死亡记录
 
-    public static String examinationReport = "RS_EXAMINATION_REPORT";//检查报告
-    public static String examinationImg = "RS_EXAMINATION_IMG";//检查报告图片
-    public static String laboratoryReport = "RS_LABORATORY_REPORT";	//检验报告
     public static String laboratoryProject = "RS_LABORATORY_PROJECT";	//检验报告项目
-    public static String laboratoryImg = "RS_LABORATORY_IMG";	//检验报告图片
-    public static String laboratoryAllergy = "RS_LABORATORY_ALLERGY";	//患者检验药敏
-    public static String surgery = "RS_SURGERY";	//患者手术记录
 
-    public static String healthIndicators = "RS_HEALTH_INDICATORS"; //健康指标
-
-    public static String mzzd = "EHR_000109";//门诊诊断代码
-    public static String zyzd = "EHR_000293";//住院诊断代码
     public static String cfbh = "EHR_000086";//处方编号
 
     public static String xysj = "EHR_000090";//西药处方时间
     public static String xymc = "EHR_000100";//西药名称
-    public static String xysl = "EHR_000104";//西药数量
 
     public static String zysj = "EHR_000120";//中药处方时间
     public static String zymc = "EHR_000131";//中药名称
-    public static String zysl = "EHR_000139";//中药数量
-
-    public static String jyzb = "EHR_000392";//检验指标
-    public static String jysj = "EHR_000384";//检验时间
-
-    public static String mzfysj="EHR_000054";//门诊费用时间
-    public static String zyfysj="EHR_000183";//门诊费用时间
 
     //处方签模板标识
     public static String xycd = "HSDC01.04"; //西药CDA_CODE

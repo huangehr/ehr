@@ -2,7 +2,7 @@ package com.yihu.ehr.profile.service;
 
 
 import com.yihu.ehr.profile.feign.*;
-import com.yihu.ehr.profile.util.BasisConstant;
+import com.yihu.ehr.profile.util.BasicConstant;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.http.HttpResponse;
@@ -31,7 +31,7 @@ public class ProfileInfoBaseService extends BaseJpaService {
      * @获取患者档案基本信息
      */
     public Map<String, Object> getPatientInfo(String demographicId, String version) throws Exception {
-        Envelop envelop = resource.getMasterData("{\"q\":\"demographic_id:" + demographicId + "\"}", 1, 500, null);
+        Envelop envelop = resource.getMasterData("{\"q\":\"demographic_id:" + demographicId + "\"}", 1, 1000, null);
         List<Map<String, Object>> list = envelop.getDetailModelList();
         Map<String, Object> patientMap = new HashMap<>();
         if (list != null && list.size() > 0) {
@@ -103,23 +103,27 @@ public class ProfileInfoBaseService extends BaseJpaService {
             }
             patientMap.put("weight", weight);
             List<String> labels = new ArrayList<>();
-            if (result.get(BasisConstant.diagnosis) != null && result.get(BasisConstant.diagnosis).toString().contains("Z37")) { //1 新生儿
+            if (result.get(BasicConstant.diagnosis) != null && result.get(BasicConstant.diagnosis).toString().contains("Z37")) { //1 新生儿
                 labels.add("新生儿");
                 //出生身高
                 patientMap.put("height", result.get("EHR_001256") == null ? "" : result.get("EHR_001256"));
                 //出生体重
                 patientMap.put("weight", result.get("EHR_001257") == null ? "" : result.get("EHR_001257")); //单位(g)
-            } else if (result.get(BasisConstant.diagnosis) != null && result.get(BasisConstant.diagnosis).toString().contains("O80")) { //2 孕妇
+            } else if (result.get(BasicConstant.diagnosis) != null && result.get(BasicConstant.diagnosis).toString().contains("O80")) { //2 孕妇
                 labels.add("孕妇");
             } else if (profileDiseaseService.getHealthProblem(demographicId).size() > 0){
                 labels.add("慢病");
             }
             Map<String, Object> params = new HashMap<>();
             params.put("idcard", demographicId);
-            HttpResponse httpResponse = HttpUtils.doGet("http://localhost:8080/label/searchehrbaseinfo", params);
-            if (httpResponse.isSuccessFlg()) {
-                Map<String, Object> labelResult = objectMapper.readValue(httpResponse.getContent(), Map.class);
-                labels = (List)labelResult.get("label");
+            try {
+                HttpResponse httpResponse = HttpUtils.doGet("http://localhost:8080/label/searchehrbaseinfo", params);
+                if (httpResponse.isSuccessFlg()) {
+                    Map<String, Object> labelResult = objectMapper.readValue(httpResponse.getContent(), Map.class);
+                    labels = (List) labelResult.get("label");
+                }
+            } catch (Exception e) {
+
             }
             patientMap.put("label", labels);
             //姓名
@@ -507,6 +511,19 @@ public class ProfileInfoBaseService extends BaseJpaService {
         return personHistory;
     }
 
+    private String imgRemotePath(String idCardNo) {
+        String sql = "SELECT img_remote_path FROM users WHERE id_card_no = :idCardNo";
+        Session session = currentSession();
+        Query query = session.createSQLQuery(sql);
+        query.setString("idCardNo", idCardNo);
+        query.setFlushMode(FlushMode.COMMIT);
+        Object path = query.uniqueResult();
+        if (path != null) {
+            return (String) path;
+        }
+        return "";
+    }
+
     private int compareAgeOfDisease(String AgeOfDisease1, String AgeOfDisease2){
         int year1 = 0;
         int month1 = 0;
@@ -529,18 +546,5 @@ public class ProfileInfoBaseService extends BaseJpaService {
         } else {
             return 0;
         }
-    }
-
-    private String imgRemotePath(String idCardNo) {
-        String sql = "SELECT img_remote_path FROM users WHERE id_card_no = :idCardNo";
-        Session session = currentSession();
-        Query query = session.createSQLQuery(sql);
-        query.setString("idCardNo", idCardNo);
-        query.setFlushMode(FlushMode.COMMIT);
-        Object path = query.uniqueResult();
-        if (path != null) {
-            return (String) path;
-        }
-        return "";
     }
 }
