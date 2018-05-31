@@ -32,7 +32,7 @@ import java.util.Map;
 public class PackageAnalyzeService {
 
     private final static Logger logger = LoggerFactory.getLogger(PackageAnalyzeService.class);
-    private static final String INDEX = "json_archives";
+    private static final String INDEX = "json_archives_qc";
     private static final String QC_DATASET_INFO = "qc_dataset_info";
     private static final String QC_METADATA_INFO = "qc_metadata_info";
 
@@ -113,6 +113,7 @@ public class PackageAnalyzeService {
     }
 
     public Map<String, Object> analyze (EsSimplePackage esSimplePackage) {
+        long starttime = System.currentTimeMillis();
         ZipPackage zipPackage = null;
         Map<String, Object> result = new HashMap<>();
         try {
@@ -162,6 +163,8 @@ public class PackageAnalyzeService {
                 zipPackage.houseKeep();
             }
         }
+        long endtime = System.currentTimeMillis();
+        System.out.println("耗时：" + (endtime - starttime) + "ms");
         return result;
     }
 
