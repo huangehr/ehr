@@ -263,6 +263,7 @@ public class ServiceApi {
         public static final String RsReportIsCategoryApplied = "/resources/report/isCategoryApplied";
         public static final String RsReportByCategoryId = "/resources/report/getByCategoryId";
         public static final String GetPositionMapByCode = "/resources/report/getPositionMapByCode";
+        public static final String GetRsReportByParam = "/resources/report/getRsReportByParam";
 
         /**
          * 资源报表视图配置
@@ -1518,6 +1519,7 @@ public class ServiceApi {
         public static final String FindById = "/elasticSearch/{id}";
         public static final String FindByField = "/elasticSearch/findByField";
         public static final String Page = "/elasticSearch/page";
+        public static final String PageSort = "/elasticSearch/pageSort";
         public static final String FindBySql = "/elasticSearch/findBySql";
         public static final String DateHistogram = "/elasticSearch/dateHistogram";
 

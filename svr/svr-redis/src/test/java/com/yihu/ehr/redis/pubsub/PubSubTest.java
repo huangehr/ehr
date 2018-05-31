@@ -3,6 +3,7 @@ package com.yihu.ehr.redis.pubsub;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.RedisServiceApp;
+import com.yihu.ehr.redis.pubsub.service.RedisMqChannelService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,11 +34,13 @@ public class PubSubTest {
     RedisTemplate<String, Object> redisTemplate;
     @Autowired
     ObjectMapper objectMapper;
+    @Autowired
+    RedisMqChannelService redisMqChannelService;
 
     @Test
     public void redisPubSubTest() throws InterruptedException, JsonProcessingException {
         String channel_01 = "zjj.test.01";
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 20000; i++) {
             String channel = channel_01 + i;
             ChannelTopic topic = new ChannelTopic(channel);
             CustomMessageListenerAdapter messageListener = MessageCommonBiz.newCustomMessageListenerAdapter(channel);
@@ -50,6 +53,31 @@ public class PubSubTest {
 //        message.put("messageLogId", "");
 //        message.put("messageContent", "a test message.");
 //        redisTemplate.convertAndSend(channel_01, objectMapper.writeValueAsString(message));
+    }
+
+    @Test
+    public void sendMessageTest() throws InterruptedException {
+        PubRunnable r = new PubRunnable("svr-zjj", "test1");
+        for (int i = 0; i < 2; i++) {
+            new Thread(r, "r" + i).start();
+        }
+    }
+
+    public class PubRunnable implements Runnable {
+        private String appId;
+        private String channel;
+
+        PubRunnable (String appId, String channel) {
+            this.appId = appId;
+            this.channel = channel;
+        }
+
+        @Override
+        public void run() {
+            for (int i = 0; i < 1; i++){
+                redisMqChannelService.sendMessage(appId, channel, Thread.currentThread().getName() + ": test message.");
+            }
+        }
     }
 
 }

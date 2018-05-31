@@ -3,6 +3,7 @@ package com.yihu.quota.service.quota;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.profile.core.ResourceCore;
 import com.yihu.ehr.solr.SolrUtil;
+import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.quota.dao.jpa.TjQuotaDao;
 import com.yihu.quota.dao.jpa.TjQuotaGovProvisionDao;
 import com.yihu.quota.etl.extract.es.EsResultExtract;
@@ -71,6 +72,10 @@ public class BaseStatistsService {
 
     private static String orgHealthCategory = "orgHealthCategory";
     public static String orgHealthCategoryCode = "orgHealthCategoryCode";
+    public static String resultField = "result";
+    public static String quotaDateField = "quotaDate";
+    public static String firstColumnField = "firstColumn";
+
     private static final Logger log = LoggerFactory.getLogger(BaseStatistsService.class);
     /**
      * 根据指标code 和维度及条件 分组获取指标查询结果集
@@ -120,8 +125,8 @@ public class BaseStatistsService {
         for(Map<String, Object> firstMap :firstList) {
             if (null != firstMap && firstMap.size() > 0 ) {
                 Map<String, Object> map = new HashMap<>();
-                double firstResultVal = Double.valueOf(firstMap.get("result") == null ? "0" : firstMap.get("result").toString());
-                map.put("firstColumn", firstMap.get("firstColumn"));
+                double firstResultVal = Double.valueOf(firstMap.get("result") == null ? "0" : firstMap.get(resultField).toString());
+                map.put(firstColumnField, firstMap.get(firstColumnField));
                 String firstKeyVal = "";
                 for(int i = 0 ;i < moleDimensions.length ; i++){
                     if(i == 0){
@@ -132,7 +137,7 @@ public class BaseStatistsService {
                     map.put(moleDimensions[i], firstMap.get(moleDimensions[i]).toString());
                 }
                 if (firstResultVal == 0) {
-                    map.put("result",0);
+                    map.put(resultField,0);
                     addResultList.add(map);
                 } else {
                     boolean pflag = true;
@@ -148,7 +153,7 @@ public class BaseStatistsService {
                         }
                         if(firstKeyVal.equals(secondKeyVal) || "quotaName".equals(dimension)){  // 如果维度是quotaName，则进入逻辑
                             double point = 0;
-                            float dimeResultVal = Float.valueOf(secondMap.get("result").toString());
+                            float dimeResultVal = Float.valueOf(secondMap.get(resultField).toString());
                             if(dimeResultVal != 0){
                                 if(operation == 1){ //1 加法 默认
                                     point = firstResultVal + dimeResultVal ;
@@ -156,14 +161,14 @@ public class BaseStatistsService {
                                     point = firstResultVal - dimeResultVal;
                                 }
                             }
-                            map.put("result",df.format(point));
+                            map.put(resultField,df.format(point));
                             addResultList.add(map);
                             pflag = false;
                             break;
                         }
                     }
                     if(pflag){
-                        map.put("result",firstResultVal);
+                        map.put(resultField,firstResultVal);
                         addResultList.add(map);
                     }
                 }
@@ -189,9 +194,9 @@ public class BaseStatistsService {
             if( !addResuDimenMap.containsKey(secondDimenStr)){
                 if( !addDimenStr.equals(secondDimenStr)){
                     Map<String, Object> map = new HashMap<>();
-                    float dimeResultVal = Float.valueOf(secondMap.get("result").toString());
-                    map.put("result",df.format(dimeResultVal));
-                    map.put("firstColumn", secondMap.get("firstColumn"));
+                    float dimeResultVal = Float.valueOf(secondMap.get(resultField).toString());
+                    map.put(resultField,df.format(dimeResultVal));
+                    map.put(firstColumnField, secondMap.get(firstColumnField));
                     for(int i = 0 ;i < moleDimensions.length ; i++){
                         map.put(moleDimensions[i], secondMap.get(moleDimensions[i]).toString());
                     }
@@ -223,30 +228,51 @@ public class BaseStatistsService {
     }
 
     /**
-     * 指标除法运算 分母为常量
-     * @param molecular
-     * @param dimension
-     * @param filters
+     * 指标除法运算 分母按年份获取总数
+     * @param molecular 分子
+     * @param dimension 分母
+     * @param molecularFilter 分子条件
+     * @param denominatorFilter 分母条件
      * @param operation
      * @param operationValue
      * @return
      * @throws Exception
      */
-    public List<Map<String, Object>> divisionQuotaDenoConstant(String molecular, String dimension,String filters,
-        String operation,String operationValue,String dateType,String constValue, String district, String top) throws Exception {
+    public List<Map<String, Object>> divisionQuotaDenoConstant(String molecular, String dimension,String molecularFilter,String denominatorFilter,
+        String operation,String operationValue,String dateType , String top) throws Exception {
         Double denominatorVal = 0.0;
-        List<Map<String, Object>> moleList = getQuotaResultList(molecular,dimension,filters,dateType, top);
-        // 获取分母的数值
-        if ("1".equals(constValue)) {
-            Long sumValue = tjQuotaGovProvisionDao.getSumByDistrict(district);
-            denominatorVal = sumValue.doubleValue();
+        List<Map<String, Object>> moleList = getQuotaResultList(molecular,dimension,molecularFilter,dateType, top);
+        String year = DateUtil.getYearFromYMD(new Date());
+        String town = "";
+        String [] filter = denominatorFilter.split("and");
+        if(filter.length > 0 ){
+            for(String key : filter){
+                if(key.contains(quotaDateField)){
+                    year = key.substring(key.indexOf("'")+1,key.indexOf("'")+5);//quotaDate >= '2018-03-01'
+                }
+                if(key.contains("town")){
+                    town =  key.substring(key.indexOf("=")+1);
+                }
+            }
         }
-        return divisionDenoConstant(dimension, moleList, denominatorVal, Integer.valueOf(operation), Integer.valueOf(operationValue));
+        Long sumValue = null;
+        if(StringUtils.isNotEmpty(town)){
+            sumValue = tjQuotaGovProvisionDao.getSumByDistrict(Long.parseLong(town),year);
+       }else {
+            sumValue = tjQuotaGovProvisionDao.getSumByDistrict(year);
+       }
+        // 获取分母的数值
+        if(sumValue != null && sumValue.doubleValue() != 0){
+            denominatorVal = sumValue.doubleValue();
+            return divisionDenoConstant(dimension, moleList, denominatorVal, Integer.valueOf(operation), Integer.valueOf(operationValue));
+        }else {
+            return  null;
+        }
     }
 
     /**
      * 指标结果相除
-     * 除法运算 分母为常量
+     * 除法运算 分母按年份获取总数
      * @param dimension 维度
      * @param moleList 分子
      * @param denominatorVal 分母 数值
@@ -258,7 +284,7 @@ public class BaseStatistsService {
         List<Map<String, Object>> divisionResultList = new ArrayList<>();
         for (Map<String, Object> moleMap : moleList) {
             Map<String, Object> map = new HashMap<>();
-            double moleResultVal = Double.valueOf(moleMap.get("result").toString());
+            double moleResultVal = Double.valueOf(moleMap.get(resultField).toString());
             String moleKeyVal = "";
             String [] moleDimensions = dimension.split(";");
             for(int i = 0 ;i < moleDimensions.length ; i++){
@@ -270,7 +296,7 @@ public class BaseStatistsService {
                 map.put(moleDimensions[i], moleMap.get(moleDimensions[i]).toString());
             }
             if (moleResultVal == 0) {
-                map.put("result",0);
+                map.put(resultField,0);
                 divisionResultList.add(map);
             } else {
                 double point = 0;
@@ -280,7 +306,7 @@ public class BaseStatistsService {
                 } else if (operation == 2) {
                     point =  (moleResultVal / denominatorVal) / operationValue;
                 }
-                map.put("result", df.format(point));
+                map.put(resultField, df.format(point));
                 divisionResultList.add(map);
             }
         }
@@ -303,7 +329,7 @@ public class BaseStatistsService {
         for(Map<String, Object> moleMap :moleList) {
             if (null != moleMap && moleMap.size() > 0 ) {
                 Map<String, Object> map = new HashMap<>();
-                double moleResultVal = Double.valueOf(moleMap.get("result") == null ? "0" : moleMap.get("result").toString());
+                double moleResultVal = Double.valueOf(moleMap.get(resultField) == null ? "0" : moleMap.get(resultField).toString());
                 String moleKeyVal = "";
                 String [] moleDimensions = dimension.split(";");
                 for(int i = 0 ;i < moleDimensions.length ; i++){
@@ -312,11 +338,11 @@ public class BaseStatistsService {
                     }else {
                         moleKeyVal = moleKeyVal + "-" + moleMap.get(moleDimensions[i]).toString() ;
                     }
-                    map.put("firstColumn", moleMap.get("firstColumn"));
+                    map.put(firstColumnField, moleMap.get(firstColumnField));
                     map.put(moleDimensions[i], moleMap.get(moleDimensions[i]).toString());
                 }
                 if (moleResultVal == 0) {
-                    map.put("result",0);
+                    map.put(resultField,0);
                     divisionResultList.add(map);
                 } else {
                     for(Map<String, Object> denoMap :denoList) {
@@ -332,7 +358,7 @@ public class BaseStatistsService {
                         if(moleKeyVal.equals(dimenKeyVal)){
                             double point = 0;
                             DecimalFormat df = new DecimalFormat("0.0");
-                            float dimeResultVal = Float.valueOf(denoMap.get("result").toString());
+                            float dimeResultVal = Float.valueOf(denoMap.get(resultField).toString());
                             if(dimeResultVal != 0){
                                 if(operation == 1){
                                     point = (moleResultVal/dimeResultVal) * operationValue;
@@ -340,7 +366,7 @@ public class BaseStatistsService {
                                     point = (moleResultVal/dimeResultVal) / operationValue;
                                 }
                             }
-                            map.put("result",df.format(point));
+                            map.put(resultField,df.format(point));
                             divisionResultList.add(map);
                             break;
                         }
@@ -391,27 +417,27 @@ public class BaseStatistsService {
             boolean notExitFalg = true;
             for(Map<String, Object> dimenMap : dimenListResult){
                 boolean flag = false;
-                if(dimenMap.get("orgHealthCategoryCode") != null){
-                    flag = dimenMap.get("orgHealthCategoryCode").equals(code);
+                if(dimenMap.get(orgHealthCategoryCode) != null){
+                    flag = dimenMap.get(orgHealthCategoryCode).equals(code);
                 }
                 if(dimenMap.get(code) != null || flag ){
 //                    mapCategory.putAll(dimenMap);
                     if(dimenMap.containsKey(code)){
                         mapCategory.put(code,dimenMap.get(code));
-                        mapCategory.put("result",dimenMap.get("result")!=null ? dimenMap.get("result"):dimenMap.get(code));
+                        mapCategory.put(resultField,dimenMap.get(resultField)!=null ? dimenMap.get(resultField):dimenMap.get(code));
                     }
                     if(StringUtils.isNotEmpty(dateType)){
-                        mapCategory.put(dimenMap.get(dateType).toString(),dimenMap.get("result"));
+                        mapCategory.put(dimenMap.get(dateType).toString(),dimenMap.get(resultField));
                     }
-                    mapCategory.put(quotaCode,dimenMap.get("result"));
+                    mapCategory.put(quotaCode,dimenMap.get(resultField));
                     break;
                 }
             }
             if(notExitFalg){
-                mapCategory.put("result",0);
+                mapCategory.put(resultField,0);
                 mapCategory.put(quotaCode,0);
             }
-            mapCategory.put("firstColumn",mapCategory.get("text"));
+            mapCategory.put(firstColumnField,mapCategory.get("text"));
             result.add(mapCategory);
             if(mapCategory.get("children") != null){
                 List<Map<String,Object>> childrenOrgHealthCategoryList = (List<Map<String, Object>>) mapCategory.get("children");
@@ -437,29 +463,29 @@ public class BaseStatistsService {
             boolean notExitFalg = true;
             for(Map<String, Object> dimenMap : dimenListResult){
                 boolean flag = false;
-                if(dimenMap.get("orgHealthCategoryCode") != null){
-                    flag = dimenMap.get("orgHealthCategoryCode").equals(code);
+                if(dimenMap.get(orgHealthCategoryCode) != null){
+                    flag = dimenMap.get(orgHealthCategoryCode).equals(code);
                 }
                 if(dimenMap.get(code) != null || flag ){
                     //补充所有信息
                     mapCategory.putAll(dimenMap);
                     if(dimenMap.containsKey(code)){
                         mapCategory.put(code,dimenMap.get(code));
-                        mapCategory.put("result",dimenMap.get("result")!=null ? dimenMap.get("result"):dimenMap.get(code));
+                        mapCategory.put(resultField,dimenMap.get(resultField)!=null ? dimenMap.get(resultField):dimenMap.get(code));
                     }
                     if(StringUtils.isNotEmpty(dateType)){
-                        mapCategory.put(dimenMap.get(dateType).toString(),dimenMap.get("result"));
+                        mapCategory.put(dimenMap.get(dateType).toString(),dimenMap.get(resultField));
                     }
-                    mapCategory.put(quotaCode,dimenMap.get("result"));
+                    mapCategory.put(quotaCode,dimenMap.get(resultField));
                     notExitFalg = false;
                     break;
                 }
             }
             if(notExitFalg){
-                mapCategory.put("result",0);
+                mapCategory.put(resultField,0);
                 mapCategory.put(quotaCode,0);
             }
-            mapCategory.put("firstColumn",mapCategory.get("text"));
+            mapCategory.put(firstColumnField,mapCategory.get("text"));
             result.add(mapCategory);
             if(mapCategory.get("children") != null){
                 List<Map<String,Object>> childrenOrgHealthCategoryList = (List<Map<String, Object>>) mapCategory.get("children");
@@ -476,27 +502,27 @@ public class BaseStatistsService {
      * @param
      * @return
      */
-    public List<Map<String,Object>> allCategoryResultMap(String quotaCode,List<Map<String,Object>> orgHealthCategoryList,List<Map<String, Object>> dimenListResult ){
+    public List<Map<String,Object>> allCategoryResultMap(List<String> quotaCodes,List<Map<String,Object>> orgHealthCategoryList,List<Map<String, Object>> dimenListResult ){
 
         List<Map<String,Object>> resultMap = new ArrayList<>();
         for(int i=0 ; i < orgHealthCategoryList.size() ; i++ ){
             Map<String,Object> mapCategory = orgHealthCategoryList.get(i);
+            Map<String,Object> map = new HashMap<>();
             double parentResult = 0;
-            parentResult = getParentAllChildren(mapCategory, dimenListResult,parentResult);
-            mapCategory.put("firstColumn",mapCategory.get("text"));
-            mapCategory.put("result",parentResult);
-            mapCategory.put(quotaCode,parentResult);
+            mapCategory.put(firstColumnField,mapCategory.get("text"));
+            map = getParentAllChildren(quotaCodes,mapCategory,map, dimenListResult,parentResult);
+            mapCategory.putAll(map);
             resultMap.add(mapCategory);
             if(mapCategory.get("children") != null){
                 List<Map<String,Object>> childrenOrgHealthCategoryList = (List<Map<String, Object>>) mapCategory.get("children");
-                mapCategory.put("children",allCategoryResultMap(quotaCode,childrenOrgHealthCategoryList,dimenListResult));
+                mapCategory.put("children",allCategoryResultMap(quotaCodes,childrenOrgHealthCategoryList,dimenListResult));
             }
         }
         return  resultMap;
     }
 
     //获取该节点下所有末节点的结果和
-    public  double getParentAllChildren( Map<String,Object> mapCategory, List<Map<String, Object>> dimenListResult, double parentResult ){
+    public   Map<String,Object> getParentAllChildren(List<String> quotaCodes, Map<String,Object> mapCategory,Map<String,Object> returnMap, List<Map<String, Object>> dimenListResult, double parentResult ){
         try {
                 boolean childrenFlag = false;
                 if(mapCategory.get("children") != null){
@@ -509,14 +535,26 @@ public class BaseStatistsService {
                     List<Map<String,Object>> childrenOrgHealthCategoryList = (List<Map<String, Object>>) mapCategory.get("children");
                     for(int j=0 ; j < childrenOrgHealthCategoryList.size() ; j++ ){
                         Map<String,Object> childrenMapCategory = childrenOrgHealthCategoryList.get(j);
-                        parentResult =  getParentAllChildren(childrenMapCategory, dimenListResult,parentResult);
+                        returnMap =  getParentAllChildren(quotaCodes ,childrenMapCategory,returnMap, dimenListResult,parentResult);
                     }
                 }else{
                     for(Map<String, Object> dimenMap :dimenListResult){
-                        if(dimenMap.get("orgHealthCategoryCode") != null && dimenMap.get("result") != null){
-                            if(dimenMap.get("orgHealthCategoryCode").equals(mapCategory.get("code"))){
-                                double result = Double.parseDouble(dimenMap.get("result").toString());
-                                parentResult += result;
+                        if(dimenMap.get(orgHealthCategoryCode) != null && dimenMap.get(resultField) != null){
+                            if(dimenMap.get(orgHealthCategoryCode).equals(mapCategory.get("code"))){
+                                double result = Double.parseDouble(dimenMap.get(resultField).toString());
+                                double oldResult = 0;
+                                if(returnMap.get(resultField) != null){
+                                    oldResult = Double.parseDouble(returnMap.get(resultField).toString());
+                                }
+                                returnMap.put(resultField,result + oldResult);
+                                for(String quotaCode : quotaCodes){
+                                    double quotaResult = Double.parseDouble(dimenMap.get(quotaCode).toString());
+                                    double oldQuotaResult = 0;
+                                    if( returnMap.get(quotaCode) != null ){
+                                        oldQuotaResult = Double.parseDouble(returnMap.get(quotaCode).toString());
+                                    }
+                                    returnMap.put(quotaCode,quotaResult + oldQuotaResult);
+                                }
                                 break;
                             }
                         }
@@ -525,7 +563,7 @@ public class BaseStatistsService {
         }catch (Exception e){
             throw new NumberFormatException("统计数据转换异常");
         }
-        return parentResult;
+        return returnMap;
     }
 
 
@@ -568,9 +606,9 @@ public class BaseStatistsService {
                         String dictVal = dimensionDicMap.get(map.get(key).toString().toLowerCase());
                         dataMap.put(key+"Name",dictVal);
                         dataMap.put(key,map.get(key).toString());
-                        dataMap.put("firstColumn", dictVal);
+                        dataMap.put(firstColumnField, dictVal);
                     }else {
-                        if(key.equals("quotaDate")){
+                        if(key.equals(quotaDateField)){
                             String dateFormat = "yyyy-MM-dd";
                             if (dateDime.equals("year")) {
                                 dateFormat = "yyyy";
@@ -589,12 +627,12 @@ public class BaseStatistsService {
                 //维度为特殊机构类型时
                 if(key.equals(orgHealthCategoryCode)){
                     dataMap.put(map.get(orgHealthCategoryCode).toString(),map.get(orgHealthCategoryCode));
-                    dataMap.put("firstColumn",map.get("text"));
+                    dataMap.put(firstColumnField,map.get("text"));
                 }
                 if(key.equals("SUM(result)")){
                     NumberFormat nf = NumberFormat.getInstance();
                     nf.setGroupingUsed(false);
-                    dataMap.put("result",  nf.format(map.get(key)));
+                    dataMap.put(resultField,  nf.format(map.get(key)));
                 }
             }
              resultList.add(dataMap);
@@ -621,7 +659,7 @@ public class BaseStatistsService {
         }else {
             groupDimension = dimension;
         }
-        List<Map<String, Object>>  dimenListResult = esResultExtract.searcherSumGroup(tjQuota, groupDimension, filter, "result", "", "", top);
+        List<Map<String, Object>>  dimenListResult = esResultExtract.searcherSumGroup(tjQuota, groupDimension, filter, resultField, "", "", top);
         List<Map<String, Object>> resultList = new ArrayList<>();
         for(Map<String, Object> map : dimenListResult){
             Map<String,Object> dataMap = new HashMap<>();
@@ -634,18 +672,18 @@ public class BaseStatistsService {
                 if(key.equals("SUM(result)")){
                     NumberFormat nf = NumberFormat.getInstance();
                     nf.setGroupingUsed(false);
-                    dataMap.put("result",  nf.format(map.get(key)));
+                    dataMap.put(resultField,  nf.format(map.get(key)));
                 }
-                if(key.equals("quotaDate")){
+                if(key.equals(quotaDateField)){
                     SimpleDateFormat format =  new SimpleDateFormat("yyyy-MM-dd");
                     Long time = new Long(Long.valueOf(map.get(key).toString()));
                     String quotaDate = format.format(time);
-                    dataMap.put("quotaDate", quotaDate);
+                    dataMap.put(quotaDateField, quotaDate);
                     quotaFlag = true;
                 }
             }
             if(quotaFlag){
-                map.remove("quotaDate");
+                map.remove(quotaDateField);
             }
             dataMap.putAll(map);
             resultList.add(dataMap);
@@ -666,7 +704,7 @@ public class BaseStatistsService {
         Map<String,String>  dimensionDicMap = getDimensionDicMap(code,dimension);
         List<String> dimenList = getDimenList(dimension);
         String groupDimension = joinDimen(dimension);
-        List<Map<String, Object>>  dimenListResult = esResultExtract.searcherSumGroup(tjQuota, groupDimension, filter, "result", groupDimension, "asc", top);
+        List<Map<String, Object>>  dimenListResult = esResultExtract.searcherSumGroup(tjQuota, groupDimension, filter, resultField, groupDimension, "asc", top);
 
         List<Map<String, Object>> resultList = new ArrayList<>();
         for(Map<String, Object> map : dimenListResult){
@@ -676,7 +714,7 @@ public class BaseStatistsService {
                     if(dimensionDicMap.get(map.get(key).toString().toLowerCase())  != null){
                         dataMap.put(key,dimensionDicMap.get(map.get(key).toString().toLowerCase()));
                         dataMap.put(key+"Name",dimensionDicMap.get(map.get(key).toString().toLowerCase()));
-                        dataMap.put("firstColumn",dimensionDicMap.get(map.get(key).toString().toLowerCase()));
+                        dataMap.put(firstColumnField,dimensionDicMap.get(map.get(key).toString().toLowerCase()));
                     }else {
                         dataMap.put(key,map.get(key));
                     }
@@ -684,12 +722,12 @@ public class BaseStatistsService {
                 //维度为特殊机构类型时
                 if(key.equals(orgHealthCategoryCode)){
                     dataMap.put(map.get(orgHealthCategoryCode).toString(),map.get(orgHealthCategoryCode));
-                    dataMap.put("firstColumn",map.get("text"));
+                    dataMap.put(firstColumnField,map.get("text"));
                 }
                 if(key.equals("SUM(result)")){
                     NumberFormat nf = NumberFormat.getInstance();
                     nf.setGroupingUsed(false);
-                    dataMap.put("result",  nf.format(map.get(key)));
+                    dataMap.put(resultField,  nf.format(map.get(key)));
                 }
             }
             resultList.add(dataMap);
@@ -739,14 +777,14 @@ public class BaseStatistsService {
                 String result = "0";
                 for(Map<String,Object> map : dataList){
                     if(map.get(dimen) !=null && map.get(dimen).equals(dictMap.get(code))){
-                        result = map.get("result").toString();
+                        result = map.get(resultField).toString();
                         break;
                     }
                 }
-                oneMap.put("firstColumn",dictMap.get(code));
+                oneMap.put(firstColumnField,dictMap.get(code));
                 oneMap.put(dimen+"Name",dictMap.get(code));
                 oneMap.put(dimen,dictMap.get(code));
-                oneMap.put("result",result);
+                oneMap.put(resultField,result);
                 resultList.add(oneMap);
             }
             return  resultList;
@@ -822,7 +860,7 @@ public class BaseStatistsService {
      */
     private String getQuotaDimensionDictSql(String quotaCode, String dimension) {
         boolean mainFlag = dimension.contains("province") || dimension.contains("city") ||dimension.contains("town")
-                ||dimension.contains("org") ||dimension.contains("year") ||dimension.contains("month") ||dimension.contains("day") || dimension.contains("quotaDate") ;
+                ||dimension.contains("org") ||dimension.contains("year") ||dimension.contains("month") ||dimension.contains("day") || dimension.contains(quotaDateField) ;
         String dictSql = "";
         //查询维度 sql
         if( mainFlag){
@@ -954,7 +992,11 @@ public class BaseStatistsService {
                 //除法指标查询输出结果
                 molecularFilter = handleFilter(esConfig.getMolecularFilter(), molecularFilter);
                 denominatorFilter = handleFilter(esConfig.getDenominatorFilter(), denominatorFilter);
-                result =  divisionQuota(esConfig.getMolecular(), esConfig.getDenominator(), dimension, molecularFilter, denominatorFilter, esConfig.getPercentOperation(), esConfig.getPercentOperationValue(),dateType, top);
+                if (StringUtils.isNotEmpty(esConfig.getDivisionType()) && esConfig.getDivisionType().equals("2")) {
+                    result = divisionQuotaDenoConstant(esConfig.getMolecular(), dimension, molecularFilter, denominatorFilter,esConfig.getPercentOperation(), esConfig.getPercentOperationValue(), dateType, top);
+                } else {
+                    result = divisionQuota(esConfig.getMolecular(), esConfig.getDenominator(), dimension, molecularFilter, denominatorFilter, esConfig.getPercentOperation(), esConfig.getPercentOperationValue(),dateType, top);
+                }
             }else if(StringUtils.isNotEmpty(esConfig.getAddOperation())){
                 String firstFilter = handleFilter(esConfig.getAddFirstFilter(), filters);
                 String secondFilter = handleFilter(esConfig.getAddSecondFilter(), filters);
@@ -981,25 +1023,6 @@ public class BaseStatistsService {
         return resultFilter;
     }
 
-    /**
-     * 获取solr主表HealthProfile的总记录数
-     * @return
-     * @throws Exception
-     */
-    public long getArchiveCount() throws Exception {
-        long count = solrUtil.count(ResourceCore.MasterTable, "", "");
-        return count;
-    }
-
-    /**
-     * 获取ES中health_archive_index索引的总记录数
-     * @return
-     */
-    public long getArchiveManCount() {
-        String sql = "SELECT count(*) FROM health_archive_index";
-        long count = elasticsearchUtil.getCountBySql(sql);
-        return count;
-    }
 
     /**
      * 门急诊费用
@@ -1145,7 +1168,7 @@ public class BaseStatistsService {
         for(Map<String, Object> moleMap : moleList) {
             if (null != moleMap && moleMap.size() > 0 ) {
                 Map<String, Object> map = new HashMap<>();
-                double moleResultVal = Double.valueOf(moleMap.get("result") == null ? "0" : moleMap.get("result").toString());
+                double moleResultVal = Double.valueOf(moleMap.get(resultField) == null ? "0" : moleMap.get(resultField).toString());
                 String moleKeyVal = "";
                 String [] moleDimensions = dimension.split(";");
                 for(int i = 0 ;i < moleDimensions.length ; i++){
@@ -1154,11 +1177,11 @@ public class BaseStatistsService {
                     }else {
                         moleKeyVal = moleKeyVal + "-" + moleMap.get(moleDimensions[i]).toString() ;
                     }
-                    map.put("firstColumn", moleMap.get("firstColumn"));
+                    map.put(firstColumnField, moleMap.get(firstColumnField));
                     map.put(moleDimensions[i], moleMap.get(moleDimensions[i]).toString());
                 }
                 if (moleResultVal == 0) {
-                    map.put("result", "--");
+                    map.put(resultField, "--");
                     divisionResultList.add(map);
                 } else {
                     for(Map<String, Object> denoMap :denoList) {
@@ -1176,12 +1199,12 @@ public class BaseStatistsService {
                             NumberFormat nf = NumberFormat.getInstance();
                             nf.setGroupingUsed(false);
                             nf.setMaximumFractionDigits(1);
-                            float dimeResultVal = Float.valueOf(denoMap.get("result").toString());
+                            float dimeResultVal = Float.valueOf(denoMap.get(resultField).toString());
                             if(dimeResultVal != 0) {
                                 point = ((moleResultVal - dimeResultVal)/dimeResultVal) * operationValue;
-                                map.put("result", nf.format(point));
+                                map.put(resultField, nf.format(point));
                             } else {
-                                map.put("result", "--");
+                                map.put(resultField, "--");
                             }
                             divisionResultList.add(map);
                             break;
@@ -1206,7 +1229,7 @@ public class BaseStatistsService {
             now = lastDate.get(Calendar.YEAR);
             lastDate.add(Calendar.YEAR, -1);
             beforeNow = lastDate.get(Calendar.YEAR);
-            if (StringUtils.isNotEmpty(filters) && filters.contains("quotaDate")) {
+            if (StringUtils.isNotEmpty(filters) && filters.contains(quotaDateField)) {
                 boolean b = filters.indexOf("'") > -1;
                 int start = b ? filters.indexOf("'") : filters.indexOf("\"");
                 String condition = filters.substring(start + 1, start + 5);
@@ -1228,7 +1251,7 @@ public class BaseStatistsService {
             lastDate.set(Calendar.DAY_OF_MONTH, lastDate.getActualMaximum(Calendar.DAY_OF_MONTH));
             String preMonthLastDay = sdf.format(lastDate.getTime());
             // 如果有时间过滤条件，则按时间条件计算
-            if (StringUtils.isNotEmpty(filters) && filters.contains("quotaDate")) {
+            if (StringUtils.isNotEmpty(filters) && filters.contains(quotaDateField)) {
                 Calendar cal = Calendar.getInstance();
                 boolean b = filters.indexOf("'") > -1;
                 int start = b ? filters.indexOf("'") : filters.indexOf("\"");
@@ -1272,7 +1295,7 @@ public class BaseStatistsService {
         lastDate.set(Calendar.DAY_OF_MONTH, lastDate.getActualMaximum(Calendar.DAY_OF_MONTH));
         String preMonthLastDay = sdf.format(lastDate.getTime());
         // 如果有时间过滤条件，则按时间条件计算
-        if (StringUtils.isNotEmpty(filters) && filters.contains("quotaDate")) {
+        if (StringUtils.isNotEmpty(filters) && filters.contains(quotaDateField)) {
             Calendar cal = Calendar.getInstance();
             boolean b = filters.indexOf("'") > -1;
             int start = b ? filters.indexOf("'") : filters.indexOf("\"");

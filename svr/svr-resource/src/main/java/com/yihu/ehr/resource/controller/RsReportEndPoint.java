@@ -8,6 +8,7 @@ import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.resource.MRsReport;
 import com.yihu.ehr.resource.model.RsReport;
+import com.yihu.ehr.resource.service.RsReportCategoryService;
 import com.yihu.ehr.resource.service.RsReportService;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
@@ -39,6 +40,8 @@ public class RsReportEndPoint extends EnvelopRestEndPoint {
     private RsReportService rsReportService;
     @Autowired
     private FastDFSUtil fastDFSUtil;
+    @Autowired
+    private RsReportCategoryService rsReportCategoryService;
 
     @ApiOperation("根据ID获取资源报表")
     @RequestMapping(value = ServiceApi.Resources.RsReport, method = RequestMethod.GET)
@@ -176,6 +179,34 @@ public class RsReportEndPoint extends EnvelopRestEndPoint {
         String positionMap = rsReportService.getPositionByCode(code);
         envelop.setSuccessFlg(true);
         envelop.setObj(positionMap);
+        return envelop;
+    }
+
+    @ApiOperation(value = "根据报表名称模糊查询")
+    @RequestMapping(value = ServiceApi.Resources.GetRsReportByParam, method = RequestMethod.GET)
+    public Envelop searchReportByName(
+            @ApiParam(name = "filters", value = "筛选条件")
+            @RequestParam(value = "filters", required = false) String filters) throws Exception {
+        Envelop envelop = new Envelop();
+        List<Integer> categoryIds = rsReportCategoryService.findCategoryIdsByCodeList();
+        if (null != categoryIds && categoryIds.size() > 0) {
+            String pid = "";
+            for (Integer id : categoryIds) {
+                pid += id + ",";
+            }
+            if (!StringUtils.isEmpty(pid)) {
+                filters += ";reportCategoryId=" + pid.substring(0, pid.length() - 1);
+            }
+        }
+        List<RsReport> rsReports = rsReportService.search(filters);
+        if (null != rsReports && rsReports.size() > 0) {
+            for (RsReport report : rsReports) {
+                String categoryCode = rsReportCategoryService.getCategoryCodeById(report.getReportCategoryId());
+                report.setReportCategoryTopCode(categoryCode);
+            }
+        }
+        envelop.setDetailModelList(rsReports);
+        envelop.setSuccessFlg(true);
         return envelop;
     }
 }

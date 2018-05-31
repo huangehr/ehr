@@ -10,6 +10,9 @@ import org.springframework.data.repository.query.Param;
  */
 public interface TjQuotaGovProvisionDao extends PagingAndSortingRepository<TjQuotaGovProvision, Long>{
 
-    @Query("select sum(gp.population) from TjQuotaGovProvision gp where gp.district = :district")
-    Long getSumByDistrict(@Param("district") String district);
+    @Query("select sum(gp.population) from TjQuotaGovProvision gp where gp.administrativeDivision = :town and gp.year = :year ")
+    Long getSumByDistrict(@Param("town") long town, @Param("year") String year);
+
+    @Query("select sum(gp.population) from TjQuotaGovProvision gp where  gp.year = :year ")
+    Long getSumByDistrict(@Param("year") String year);
 }
