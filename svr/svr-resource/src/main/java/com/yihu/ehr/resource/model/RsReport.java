@@ -19,6 +19,7 @@ public class RsReport {
     private String code; // 报表编码
     private String name; // 报表名称
     private Integer reportCategoryId; // 资源报表分类ID
+    private String reportCategoryTopCode; // 资源报表分类祖先编码
     private String status; // 报表状态
     private String remark; // 备注
     private String templatePath; // 报表模版路径
@@ -65,6 +66,15 @@ public class RsReport {
 
     public void setReportCategoryId(Integer reportCategoryId) {
         this.reportCategoryId = reportCategoryId;
+    }
+
+    @Transient
+    public String getReportCategoryTopCode() {
+        return reportCategoryTopCode;
+    }
+
+    public void setReportCategoryTopCode(String reportCategoryTopCode) {
+        this.reportCategoryTopCode = reportCategoryTopCode;
     }
 
     @Column(name = "STATUS")
