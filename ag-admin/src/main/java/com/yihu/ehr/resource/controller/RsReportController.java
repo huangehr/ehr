@@ -181,4 +181,12 @@ public class RsReportController extends BaseController {
         Envelop envelop = rsReportClient.getPositionByCode(code);
         return envelop;
     }
+
+    @ApiOperation(value = "根据报表名称模糊查询")
+    @RequestMapping(value = ServiceApi.Resources.GetRsReportByParam, method = RequestMethod.GET)
+    public Envelop searchReportByName(
+            @ApiParam(name = "filters", value = "筛选条件")
+            @RequestParam(value = "filters", required = false) String filters) throws Exception {
+        return rsReportClient.searchReportByName(filters);
+    }
 }
