@@ -1,12 +1,15 @@
 package com.yihu.ehr.redis.pubsub.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.profile.queue.RedisCollection;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.redis.pubsub.dao.RedisMqChannelDao;
 import com.yihu.ehr.redis.pubsub.dao.RedisMqPublisherDao;
 import com.yihu.ehr.redis.pubsub.entity.RedisMqChannel;
 import com.yihu.ehr.redis.pubsub.entity.RedisMqPublisher;
 import com.yihu.ehr.util.rest.Envelop;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -24,6 +27,8 @@ import java.util.Map;
  */
 @Service
 public class RedisMqChannelService extends BaseJpaService<RedisMqChannel, RedisMqChannelDao> {
+
+    private static final Logger logger = Logger.getLogger(RedisMqChannelService.class);
 
     @Autowired
     RedisMqChannelDao redisMqChannelDao;
@@ -74,6 +79,11 @@ public class RedisMqChannelService extends BaseJpaService<RedisMqChannel, RedisM
         }
     }
 
+    public Boolean isExist(String channel) {
+        RedisMqChannel channels = redisMqChannelDao.findByChannel(channel);
+        return channels != null;
+    }
+
     /**
      * 发布消息
      *
@@ -101,17 +111,8 @@ public class RedisMqChannelService extends BaseJpaService<RedisMqChannel, RedisM
                 return envelop;
             }
 
-            // 发布消息
-            Map<String, Object> messageMap = new HashMap<>();
-            messageMap.put("messageId", "");
-            messageMap.put("publisherAppId", publisherAppId);
-            messageMap.put("messageContent", message);
-            redisTemplate.convertAndSend(channel, objectMapper.writeValueAsString(messageMap));
-
-            // 累计入列数
-            RedisMqChannel mqChannel = redisMqChannelService.findByChannel(channel);
-            mqChannel.setEnqueuedNum(mqChannel.getEnqueuedNum() + 1);
-            redisMqChannelService.save(mqChannel);
+            // 将消息加入到待发缓存集合中
+            addToPubWaitingMessage(publisherAppId, channel, message, "");
 
             envelop.setSuccessFlg(true);
         } catch (Exception e) {
@@ -122,9 +123,23 @@ public class RedisMqChannelService extends BaseJpaService<RedisMqChannel, RedisM
         return envelop;
     }
 
-    public Boolean isExist(String channel) {
-        RedisMqChannel channels = redisMqChannelDao.findByChannel(channel);
-        return channels != null;
+    /**
+     * 将消息加入到待发缓存集合中
+     *
+     * @param publisherAppId 发布者应用ID
+     * @param channel        消息队列编码
+     * @param message        消息
+     * @param messageId      消息ID，订阅失败重发时才有值，不然为空字符串，即首次发送必为空字符串。
+     * @throws JsonProcessingException
+     */
+    public void addToPubWaitingMessage(String publisherAppId, String channel, String message, String messageId)
+            throws JsonProcessingException {
+        Map<String, Object> messageMap = new HashMap<>();
+        messageMap.put("messageId", messageId);
+        messageMap.put("channel", channel);
+        messageMap.put("publisherAppId", publisherAppId);
+        messageMap.put("messageContent", message);
+        redisTemplate.opsForList().leftPush(RedisCollection.PUB_WAITING_MESSAGES, objectMapper.writeValueAsString(messageMap));
     }
 
 }

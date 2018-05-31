@@ -35,5 +35,9 @@ public class RedisMqMessageLogService extends BaseJpaService<RedisMqMessageLog, 
         return redisMqMessageLogDao.save(redisMqMessageLog);
     }
 
+    @Transactional(readOnly = false)
+    public void updateStatus(String id, Integer status) {
+        redisMqMessageLogDao.updateStatus(id, status);
+    }
 
 }
