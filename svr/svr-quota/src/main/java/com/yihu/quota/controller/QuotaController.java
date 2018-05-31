@@ -174,21 +174,21 @@ public class QuotaController extends BaseController {
             } else {
                 if(tjQuota.getResultGetType().equals("1")){
                     //普通指标直接查询
-                    resultList = baseStatistsService.getQuotaResultList(code, dimension,filters,dateType, top);
+                    resultList = baseStatistsService.getQuotaResultList(code, dimension, filters, dateType, top);
                 }else {
-                    if( (StringUtils.isNotEmpty(esConfig.getMolecular())) && StringUtils.isNotEmpty(esConfig.getDenominator())){//除法
+                    if( (StringUtils.isNotEmpty(esConfig.getMolecular())) && StringUtils.isNotEmpty(esConfig.getDenominator())) {//除法
                         //除法指标查询输出结果
                         molecularFilter = baseStatistsService.handleFilter(esConfig.getMolecularFilter(), molecularFilter);
                         denominatorFilter = baseStatistsService.handleFilter(esConfig.getDenominatorFilter(), denominatorFilter);
-                        if (StringUtils.isNotEmpty(esConfig.getConstValue())) {
-                            resultList = baseStatistsService.divisionQuotaDenoConstant(esConfig.getMolecular(), dimension, filters, esConfig.getPercentOperation(), esConfig.getPercentOperationValue(), dateType, esConfig.getConstValue(), esConfig.getDistrict(), top);
+                        if (StringUtils.isNotEmpty(esConfig.getDivisionType()) && esConfig.getDivisionType().equals("2")) {
+                            resultList = baseStatistsService.divisionQuotaDenoConstant(esConfig.getMolecular(), dimension, molecularFilter, denominatorFilter,esConfig.getPercentOperation(), esConfig.getPercentOperationValue(), dateType, top);
                         } else {
-                            resultList =  baseStatistsService.divisionQuota(esConfig.getMolecular(), esConfig.getDenominator(), dimension, molecularFilter, denominatorFilter, esConfig.getPercentOperation(), esConfig.getPercentOperationValue(),dateType, top);
+                            resultList = baseStatistsService.divisionQuota(esConfig.getMolecular(), esConfig.getDenominator(), dimension, molecularFilter, denominatorFilter, esConfig.getPercentOperation(), esConfig.getPercentOperationValue(), dateType, top);
                         }
                     } else if (StringUtils.isNotEmpty(esConfig.getAddOperation())) {
                         String firstFilter = baseStatistsService.handleFilter(esConfig.getAddFirstFilter(), filters);
                         String secondFilter = baseStatistsService.handleFilter(esConfig.getAddSecondFilter(), filters);
-                        resultList = baseStatistsService.addQuota(esConfig.getAddFirstQuotaCode(), firstFilter, esConfig.getAddSecondQuotaCode(), secondFilter, esConfig.getAddOperation(),dimension,dateType, top);
+                        resultList = baseStatistsService.addQuota(esConfig.getAddFirstQuotaCode(), firstFilter, esConfig.getAddSecondQuotaCode(), secondFilter, esConfig.getAddOperation(), dimension, dateType, top);
                     } else {
                         if(StringUtils.isNotEmpty(esConfig.getSuperiorBaseQuotaCode())){
                             //通过基础指标 抽取查询
