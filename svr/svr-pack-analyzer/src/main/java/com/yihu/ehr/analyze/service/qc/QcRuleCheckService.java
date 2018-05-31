@@ -42,7 +42,7 @@ public class QcRuleCheckService {
      * @param value
      * @throws Exception
      */
-    public int emptyCheck(String version, String dataSetCode, String metadata ,String value) throws Exception {
+    public int emptyCheck(String version, String dataSetCode, String metadata, String value) throws Exception {
         Boolean isNullable = hosAdminServiceClient.isMetaDataNullable(version, dataSetCode, metadata);
         if (!isNullable && StringUtils.isEmpty(value)) {
            return ErrorType.EmptyError.getType();
@@ -62,7 +62,7 @@ public class QcRuleCheckService {
     public int emptyCheckThrowable(String version, String dataSetCode, String metadata ,String value) throws Exception {
         Boolean isNullable = hosAdminServiceClient.isMetaDataNullable(version, dataSetCode, metadata);
         if (!isNullable && StringUtils.isEmpty(value)) {
-            throw new IllegalEmptyCheckException(dataSetCode + ":" +metadata + "Is Empty");
+            throw new IllegalEmptyCheckException(String.format("Meta data %s of %s in %s is empty", metadata, dataSetCode, version));
         }
         return 0;
     }
@@ -150,14 +150,14 @@ public class QcRuleCheckService {
      * @param value
      * @throws Exception
      */
-    public int valueCheckThrowable(String version, String dataSetCode, String metadata ,String value) throws Exception {
+    public int valueCheckThrowable(String version, String dataSetCode, String metadata , String value) throws Exception {
         String dict = hosAdminServiceClient.getMetaDataDict(version, dataSetCode, metadata);
         if (StringUtils.isEmpty(dict) || dict.equals("0")) {
             return 0;
         }
         Boolean isExist = hosAdminServiceClient.isDictCodeExist(version, dict, metadata);
         if (!isExist) {
-            throw new IllegalValueCheckException(dataSetCode + ":" +metadata + ":" + value + "Out Value");
+            throw new IllegalValueCheckException(String.format("Value %s for meta data %s of %s in %s out of range", value, metadata, dataSetCode, version));
         }
         return 0;
     }

@@ -1,54 +1,45 @@
-package com.yihu.ehr.profile.service;
+package com.yihu.ehr.profile.service.old;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.model.specialdict.MDrugDict;
 import com.yihu.ehr.profile.feign.*;
 import com.yihu.ehr.profile.model.MedicationStat;
-import com.yihu.ehr.profile.util.BasisConstant;
+import com.yihu.ehr.profile.service.template.ArchiveTemplateService;
+import com.yihu.ehr.profile.util.BasicConstant;
 import com.yihu.ehr.util.log.LogService;
 import com.yihu.ehr.util.rest.Envelop;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 /**
  * @author hzp 2016-05-26
  */
-@Service
 public class PatientInfoDetailService {
-    @Autowired
-    ResourceClient resource;
 
+    @Autowired
+    private ResourceClient resource;
     //字典信息服务
     @Autowired
-    DictClient dictService;
-
+    private DictClient dictService;
     @Autowired
-    MedicationStatService medicationStatService;
-
+    private MedicationStatService medicationStatService;
     @Autowired
-    ArchiveTemplateService templateService;
-
+    private ArchiveTemplateService templateService;
     //CDA服务
     @Autowired
-    CDADocumentClient cdaService;
-
+    private CDADocumentClient cdaService;
     @Autowired
-    ObjectMapper objectMapper;
-
+    private ObjectMapper objectMapper;
     @Autowired
-    TransformClient transform;
-
-
+    private TransformClient transform;
     @Autowired
-    ThridPrescriptionService thridPrescriptionService;
-
+    private ThridPrescriptionService thridPrescriptionService;
     @Autowired
-    ProflieClient proflieClient;
+    private ProflieClient proflieClient;
 
     /**
      * fastDfs服务器地址
@@ -56,9 +47,8 @@ public class PatientInfoDetailService {
     @Value("${fast-dfs.public-server}")
     private String fastDfsUrl;
 
-
     @Value("${spring.application.id}")
-    String appId;
+    private String appId;
 
     /**
      * 【机构权限控制】通过身份证获取相关rowkeys
@@ -66,7 +56,7 @@ public class PatientInfoDetailService {
     private String getProfileIds(String demographicId,String saasOrg) throws Exception {
         String re = "";
         //获取相关门诊住院记录
-        Envelop main = resource.getResources(BasisConstant.patientEvent, "*", "*", "{\"q\":\"demographic_id:" + demographicId + "\"}", null, null);
+        Envelop main = resource.getResources(BasicConstant.patientEvent, "*", "*", "{\"q\":\"demographic_id:" + demographicId + "\"}", null, null);
         if (main.getDetailModelList() != null && main.getDetailModelList().size() > 0) {
             //主表rowkey条件
             StringBuilder rowkeys = new StringBuilder();
@@ -74,12 +64,12 @@ public class PatientInfoDetailService {
                 if (rowkeys.length() > 0) {
                     rowkeys.append(" OR ");
                 }
-                rowkeys.append(BasisConstant.profileId + ":" + map.get("rowkey").toString());
+                rowkeys.append(BasicConstant.profileId + ":" + map.get("rowkey").toString());
             }
 
             re = "(" + rowkeys.toString() + ")";
         } else {
-            re = BasisConstant.profileId + ":(NOT *)";
+            re = BasicConstant.profileId + ":(NOT *)";
         }
 
         return re;
@@ -108,29 +98,29 @@ public class PatientInfoDetailService {
                         drugQuery += " OR {key}:" + drug.getName();
                     }
                 }
-                xyQueryParams = "{\"q\":\"" + rowkeys + " AND (" + drugQuery.replace("{key}", BasisConstant.xymc) + ")\"}";
-                zyQueryParams = "{\"q\":\"" + rowkeys + " AND (" + drugQuery.replace("{key}", BasisConstant.zymc) + ")\"}";
+                xyQueryParams = "{\"q\":\"" + rowkeys + " AND (" + drugQuery.replace("{key}", BasicConstant.xymc) + ")\"}";
+                zyQueryParams = "{\"q\":\"" + rowkeys + " AND (" + drugQuery.replace("{key}", BasicConstant.zymc) + ")\"}";
             }
         }
 
         //西药统计
-        Envelop resultWestern = resource.getResources(BasisConstant.medicationWesternStat, "*", "*", xyQueryParams.replace(" ", "+"), null, null);
+        Envelop resultWestern = resource.getResources(BasicConstant.medicationWesternStat, "*", "*", xyQueryParams.replace(" ", "+"), null, null);
         if (resultWestern.getDetailModelList() != null && resultWestern.getDetailModelList().size() > 0) {
             List<Map<String, Object>> list = resultWestern.getDetailModelList();
             for (Map<String, Object> map : list) {
                 Map<String, Object> item = new HashMap<>();
-                item.put("name", map.get(BasisConstant.xymc));
+                item.put("name", map.get(BasicConstant.xymc));
                 item.put("count", map.get("$count"));
                 re.add(item);
             }
         }
         //中药统计
-        Envelop resultChinese = resource.getResources(BasisConstant.medicationChineseStat, "*", "*", zyQueryParams.replace(" ", "+"), null, null);
+        Envelop resultChinese = resource.getResources(BasicConstant.medicationChineseStat, "*", "*", zyQueryParams.replace(" ", "+"), null, null);
         if (resultChinese.getDetailModelList() != null && resultChinese.getDetailModelList().size() > 0) {
             List<Map<String, Object>> list = resultChinese.getDetailModelList();
             for (Map<String, Object> map : list) {
                 Map<String, Object> item = new HashMap<>();
-                item.put("name", map.get(BasisConstant.zymc));
+                item.put("name", map.get(BasicConstant.zymc));
                 item.put("count", map.get("$count"));
                 re.add(item);
             }
@@ -177,11 +167,11 @@ public class PatientInfoDetailService {
      */
     public List<Map<String, Object>> getMedicationDetail(String prescriptionNo, String type) throws Exception {
         List<Map<String, Object>> re = new ArrayList<>();
-        String queryParams = BasisConstant.cfbh + ":" + prescriptionNo;
-        String resourceCode = BasisConstant.medicationWestern;
+        String queryParams = BasicConstant.cfbh + ":" + prescriptionNo;
+        String resourceCode = BasicConstant.medicationWestern;
         if (type != null && type.equals("2")) //默认西药
         {
-            resourceCode = BasisConstant.medicationChinese;
+            resourceCode = BasicConstant.medicationChinese;
         }
         Envelop result = resource.getResources(resourceCode, "*", "*","{\"q\":\"" + queryParams + "\"}", null, null);
         re = result.getDetailModelList();
@@ -194,10 +184,10 @@ public class PatientInfoDetailService {
     public List<Map<String, Object>> getMedicationMaster(String demographicId, String profileId, String prescriptionNo,String saasOrg) throws Exception {
         String queryParams = "";
         if (prescriptionNo != null && prescriptionNo.length() > 0) {
-            queryParams = BasisConstant.cfbh + ":" + prescriptionNo;
+            queryParams = BasicConstant.cfbh + ":" + prescriptionNo;
         } else {
             if (profileId != null && profileId.length() > 0) {
-                queryParams = BasisConstant.profileId + ":" + profileId;
+                queryParams = BasicConstant.profileId + ":" + profileId;
             } else {
                 queryParams = getProfileIds(demographicId,saasOrg);
             }
@@ -205,7 +195,7 @@ public class PatientInfoDetailService {
 
         queryParams = "{\"q\":\"" + queryParams + "\"}";
         //获取数据
-        Envelop result = resource.getResources(BasisConstant.medicationMaster, "*","*", queryParams.replace(" ", "+"), null, null);
+        Envelop result = resource.getResources(BasicConstant.medicationMaster, "*","*", queryParams.replace(" ", "+"), null, null);
 
         return result.getDetailModelList();
     }
@@ -228,7 +218,7 @@ public class PatientInfoDetailService {
             if (!StringUtils.isBlank(profileId)) {
                 Map<String, Object> mainEvent = new HashMap<String, Object>();
                 //根据rowkey查询门诊事件
-                Envelop envelop = resource.getResources(BasisConstant.patientEvent, "*", "*", "{\"q\":\"rowkey:" + profileId + "\"}", null, null);
+                Envelop envelop = resource.getResources(BasicConstant.patientEvent, "*", "*", "{\"q\":\"rowkey:" + profileId + "\"}", null, null);
 
                 //门诊事件为空返回null，不为空获取事件信息
                 if (envelop.getDetailModelList() == null || envelop.getDetailModelList().size() < 1) {
@@ -238,7 +228,7 @@ public class PatientInfoDetailService {
                 }
 
                 //查询事件对应主处方信息
-                Envelop mainPres = resource.getResources(BasisConstant.medicationMaster, "*", "*","{\"q\":\"profile_id:" + profileId
+                Envelop mainPres = resource.getResources(BasicConstant.medicationMaster, "*", "*","{\"q\":\"profile_id:" + profileId
                         + (!StringUtils.isBlank(prescriptionNo) ? ("+AND+EHR_000086:" + prescriptionNo) : "") + "\"}", null, null);
 
                 //主处方存在查询对应处方笺是否存在，不存在则根据处方信息生成处方笺
@@ -248,7 +238,7 @@ public class PatientInfoDetailService {
                     //待入库处方笺数据列表
                     List<Map<String, String>> dataList = new ArrayList<Map<String, String>>();
                     //查询处方对应处方笺
-                    Envelop presription = resource.getResources(BasisConstant.medicationPrescription, "*", "*","{\"q\":\"profile_id:"
+                    Envelop presription = resource.getResources(BasicConstant.medicationPrescription, "*", "*","{\"q\":\"profile_id:"
                             + profileId + "\"}", null, null);
                     //处方笺List
                     List<Map<String, Object>> presriptions = presription.getDetailModelList();
@@ -279,7 +269,7 @@ public class PatientInfoDetailService {
                             }
                             //处方笺不存在则生成保存
                             String picPath = thridPrescriptionService.transformImage(profileId, mainEvent.get("org_code").toString(), mainEvent.get("cda_version").toString()
-                                    , main.get("EHR_001203").toString().equals("1") ? BasisConstant.xycd : BasisConstant.zycd, main.get("EHR_001203").toString(), 850, 900);
+                                    , main.get("EHR_001203").toString().equals("1") ? BasicConstant.xycd : BasicConstant.zycd, main.get("EHR_001203").toString(), 850, 900);
                             LogService.getLogger("prescription").info("generate completed");
                             //处方笺文件类型
                             data.put("EHR_001194", "png");
@@ -327,14 +317,14 @@ public class PatientInfoDetailService {
      */
     public Envelop getMedicationList(String type, String demographicId, String hpCode, String startTime, String endTime, Integer page, Integer size,String saasOrg) throws Exception {
         String q = "";
-        String date = BasisConstant.xysj;
-        String name = BasisConstant.xymc;
-        String resourceCode = BasisConstant.medicationWestern;
+        String date = BasicConstant.xysj;
+        String name = BasicConstant.xymc;
+        String resourceCode = BasicConstant.medicationWestern;
         if (type != null && type.equals("2")) //默认查询西药
         {
-            date = BasisConstant.zysj;
-            name = BasisConstant.zymc;
-            resourceCode = BasisConstant.medicationChinese;
+            date = BasicConstant.zysj;
+            name = BasicConstant.zymc;
+            resourceCode = BasicConstant.medicationChinese;
         }
 
         //时间范围
@@ -419,7 +409,7 @@ public class PatientInfoDetailService {
         } else {
             if (eventNo != null) {
                 //获取相关门诊住院记录
-                Envelop main = resource.getResources(BasisConstant.patientEvent, "*","*", "{\"q\":\"event_no:" + eventNo + "\"}", 1, 1);
+                Envelop main = resource.getResources(BasicConstant.patientEvent, "*","*", "{\"q\":\"event_no:" + eventNo + "\"}", 1, 1);
                 if (main.getDetailModelList() != null && main.getDetailModelList().size() > 0) {
                     profileId = ((Map<String, String>) main.getDetailModelList().get(0)).get("rowkey");
                     queryParams = "profile_id:" + profileId;

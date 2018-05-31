@@ -1,11 +1,11 @@
-package com.yihu.ehr.profile.service;
+package com.yihu.ehr.profile.service.old;
 
 
 import com.yihu.ehr.profile.feign.DictClient;
 import com.yihu.ehr.profile.feign.GeographyClient;
 import com.yihu.ehr.profile.feign.OrganizationClient;
 import com.yihu.ehr.profile.feign.ResourceClient;
-import com.yihu.ehr.profile.util.BasisConstant;
+import com.yihu.ehr.profile.util.BasicConstant;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,7 @@ import java.util.Map;
 /**
  * @author hzp 2016-05-26
  */
-@Service
+//@Service
 public class SanofiService {
 
     @Autowired
@@ -57,7 +57,7 @@ public class SanofiService {
             }
         }
         query += "\"}";
-        Envelop result = resourceClient.getResources(BasisConstant.patientInfo, appId,null, query, null, null);
+        Envelop result = resourceClient.getResources(BasicConstant.patientInfo, appId,null, query, null, null);
 
         return result.getDetailModelList();
     }
