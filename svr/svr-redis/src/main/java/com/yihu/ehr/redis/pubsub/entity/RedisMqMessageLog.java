@@ -21,6 +21,7 @@ public class RedisMqMessageLog extends BaseAssignedEntity {
     public String channel; // 消息队列编码
     public String publisherAppId; // 发布者应用ID
     public Integer status; // 消费状态，1：已消费，未消费
+    public String errorMsg; // 异常消息
     public Integer failedNum; // 订阅失败次数
 
     @Column(name = "message")
@@ -59,6 +60,14 @@ public class RedisMqMessageLog extends BaseAssignedEntity {
         this.status = status;
     }
 
+    @Column(name = "error_msg")
+    public String getErrorMsg() {
+        return errorMsg;
+    }
+
+    public void setErrorMsg(String errorMsg) {
+        this.errorMsg = errorMsg;
+    }
 
     @Column(name = "failed_num")
     public Integer getFailedNum() {

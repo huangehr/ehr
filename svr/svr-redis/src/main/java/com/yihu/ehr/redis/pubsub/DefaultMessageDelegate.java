@@ -1,20 +1,20 @@
 package com.yihu.ehr.redis.pubsub;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.redis.pubsub.entity.RedisMqChannel;
+import com.yihu.ehr.profile.queue.RedisCollection;
 import com.yihu.ehr.redis.pubsub.entity.RedisMqMessageLog;
 import com.yihu.ehr.redis.pubsub.entity.RedisMqSubscriber;
-import com.yihu.ehr.redis.pubsub.service.RedisMqChannelService;
-import com.yihu.ehr.redis.pubsub.service.RedisMqMessageLogService;
 import com.yihu.ehr.redis.pubsub.service.RedisMqSubscriberService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 
@@ -28,16 +28,14 @@ public class DefaultMessageDelegate implements MessageDelegate {
 
     private static final Logger logger = Logger.getLogger(DefaultMessageDelegate.class);
 
+    @Resource
+    RedisTemplate<String, Object> redisTemplate;
     @Autowired
     private RestTemplate restTemplate;
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
-    private RedisMqMessageLogService redisMqMessageLogService;
-    @Autowired
     private RedisMqSubscriberService redisMqSubscriberService;
-    @Autowired
-    private RedisMqChannelService redisMqChannelService;
 
     @Override
     public void handleMessage(String message, String channel) {
@@ -49,56 +47,41 @@ public class DefaultMessageDelegate implements MessageDelegate {
 
             List<RedisMqSubscriber> subscriberList = redisMqSubscriberService.findByChannel(channel);
             if (subscriberList.size() == 0) {
-                logger.info("消息订阅（没有订阅者场合），channel: " + channel
-                        + ", message: " + messageContent);
-
-                // 累计出列数
-                RedisMqChannel mqChannel = redisMqChannelService.findByChannel(channel);
-                mqChannel.setDequeuedNum(mqChannel.getDequeuedNum() + 1);
-                redisMqChannelService.save(mqChannel);
+                // 收集订阅成功的消息，定时任务里累计出列数
+                RedisMqMessageLog messageLog = MessageCommonBiz.newMessageLog(channel, publisherAppId, messageContent);
+                redisTemplate.opsForList().leftPush(RedisCollection.SUB_SUCCESSFUL_MESSAGES, objectMapper.writeValueAsString(messageLog));
             } else {
                 // 遍历消息队列的订阅者，并推送消息
                 for (RedisMqSubscriber subscriber : subscriberList) {
                     String subscribedUrl = subscriber.getSubscribedUrl();
 
-                    logger.info("消息订阅，channel: " + channel + ", subscribedUrl: " + subscribedUrl
-                            + ", message: " + messageContent);
-
-                    boolean subFlag = false;
                     try {
                         // 推送消息到指定服务地址
                         HttpHeaders headers = new HttpHeaders();
                         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
                         HttpEntity<String> entity = new HttpEntity<>(messageContent, headers);
                         restTemplate.postForObject(subscribedUrl, entity, String.class);
-                        subFlag = true;
+
+                        // 收集订阅成功的消息，定时任务里累计出列数
+                        RedisMqMessageLog messageLog = MessageCommonBiz.newMessageLog(channel, publisherAppId, messageContent);
+                        if (!StringUtils.isEmpty(messageId)) {
+                            // 首次订阅失败，但重试订阅成功场合
+                            messageLog.setId(messageId);
+                        }
+                        redisTemplate.opsForList().leftPush(RedisCollection.SUB_SUCCESSFUL_MESSAGES, objectMapper.writeValueAsString(messageLog));
                     } catch (Exception e) {
                         e.printStackTrace();
-                        if (StringUtils.isEmpty(messageId)) {
-                            // 头次订阅失败，则记录消息，以便于重试。
-                            RedisMqMessageLog messageLog = MessageCommonBiz.newMessageLog(channel, publisherAppId, messageContent);
-                            messageLog.setFailedNum(1);
-                            redisMqMessageLogService.save(messageLog);
-                        } else {
-                            // 更新订阅失败次数
-                            RedisMqMessageLog messageLog = redisMqMessageLogService.getById(messageId);
-                            messageLog.setFailedNum(messageLog.getFailedNum() + 1);
-                            redisMqMessageLogService.save(messageLog);
-                        }
-                    }
-
-                    if (subFlag) {
-                        // 累计出列数
-                        RedisMqChannel mqChannel = redisMqChannelService.findByChannel(channel);
-                        mqChannel.setDequeuedNum(mqChannel.getDequeuedNum() + 1);
-                        redisMqChannelService.save(mqChannel);
-
-                        // 发生过订阅失败的场合，订阅成功之后，更新消息状态。
+                        // 收集订阅失败的消息
+                        RedisMqMessageLog messageLog = MessageCommonBiz.newMessageLog(channel, publisherAppId, messageContent);
+                        messageLog.setErrorMsg(e.toString());
                         if (!StringUtils.isEmpty(messageId)) {
-                            RedisMqMessageLog messageLog = redisMqMessageLogService.getById(messageId);
-                            messageLog.setStatus(1);
-                            redisMqMessageLogService.save(messageLog);
+                            // 非头次订阅失败
+                            messageLog.setId(messageId);
+                            // 通过 -1 标记为非头次订阅失败，定时任务里累计更新失败次数。
+                            messageLog.setFailedNum(-1);
                         }
+                        redisTemplate.opsForList().leftPush(RedisCollection.SUB_FAILED_MESSAGES, objectMapper.writeValueAsString(messageLog));
+                        break;
                     }
                 }
             }
