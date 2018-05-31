@@ -1,5 +1,6 @@
 package com.yihu.ehr.analyze.service.dataQuality;
 
+import com.yihu.ehr.analyze.dao.DqDatasetWarningDao;
 import com.yihu.ehr.analyze.dao.DqPaltformUploadWarningDao;
 import com.yihu.ehr.entity.quality.DqPaltformUploadWarning;
 import com.yihu.ehr.query.BaseJpaService;
@@ -15,9 +16,15 @@ public class DqPaltformUploadWarningService extends BaseJpaService<DqPaltformUpl
 
     @Autowired
     private DqPaltformUploadWarningDao dqPaltformUploadWarningDao;
+    @Autowired
+    private DqDatasetWarningDao dqDatasetWarningDao;
 
     public DqPaltformUploadWarning findById(Long id) {
         return dqPaltformUploadWarningDao.findOne(id);
+    }
+
+    public DqPaltformUploadWarning findByOrgCode(String orgCode){
+        return dqPaltformUploadWarningDao.findByOrgCode(orgCode);
     }
 
     /**
@@ -28,6 +35,8 @@ public class DqPaltformUploadWarningService extends BaseJpaService<DqPaltformUpl
     public DqPaltformUploadWarning paltformUploadWarningAdd(DqPaltformUploadWarning warning){
 
         save(warning);
+        dqDatasetWarningDao.save(warning.getDatasetWarningList());
+
         return warning;
     }
 

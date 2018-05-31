@@ -2,6 +2,7 @@ package com.yihu.ehr.entity.quality;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 数据质量-平台上传预警值
@@ -21,6 +22,7 @@ public class DqPaltformUploadWarning {
     private String integrityRate;//完整率
     private Long errorNum;//错误量
     private Long dataNum;//数据量
+    private List<DqDatasetWarning> datasetWarningList;//数据集
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -112,5 +114,14 @@ public class DqPaltformUploadWarning {
 
     public void setDataNum(Long dataNum) {
         this.dataNum = dataNum;
+    }
+
+    @Transient
+    public List<DqDatasetWarning> getDatasetWarningList() {
+        return datasetWarningList;
+    }
+
+    public void setDatasetWarningList(List<DqDatasetWarning> datasetWarningList) {
+        this.datasetWarningList = datasetWarningList;
     }
 }

@@ -20,6 +20,10 @@ public class DqPaltformResourceWarningService extends BaseJpaService<DqPaltformR
         return dqPaltformResourceWarningDao.findOne(id);
     }
 
+    public DqPaltformResourceWarning findByOrgCode(String orgCode){
+        return dqPaltformResourceWarningDao.findByOrgCode(orgCode);
+    }
+
     /**
      * 新增平台资源化预警
      * @param warning

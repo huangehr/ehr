@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 平台接收预警值
@@ -28,6 +29,7 @@ public class DqPaltformReceiveWarning {
     private String hospitalInTimeRate;//住院及时率
     private String outpatientInTimeRate;//门诊及时率
     private String peInTimeRate;//体检及时率
+    private List<DqDatasetWarning> datasetWarningList;//数据集
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -166,5 +168,14 @@ public class DqPaltformReceiveWarning {
     @Column(name = "pe_in_time_rate")
     public void setPeInTimeRate(String peInTimeRate) {
         this.peInTimeRate = peInTimeRate;
+    }
+
+    @Transient
+    public List<DqDatasetWarning> getDatasetWarningList() {
+        return datasetWarningList;
+    }
+
+    public void setDatasetWarningList(List<DqDatasetWarning> datasetWarningList) {
+        this.datasetWarningList = datasetWarningList;
     }
 }

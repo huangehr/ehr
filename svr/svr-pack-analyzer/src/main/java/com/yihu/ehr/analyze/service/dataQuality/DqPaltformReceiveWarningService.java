@@ -1,5 +1,6 @@
 package com.yihu.ehr.analyze.service.dataQuality;
 
+import com.yihu.ehr.analyze.dao.DqDatasetWarningDao;
 import com.yihu.ehr.analyze.dao.DqPaltformReceiveWarningDao;
 import com.yihu.ehr.entity.quality.DqPaltformReceiveWarning;
 import com.yihu.ehr.query.BaseJpaService;
@@ -15,9 +16,15 @@ public class DqPaltformReceiveWarningService extends BaseJpaService<DqPaltformRe
 
     @Autowired
     private DqPaltformReceiveWarningDao dqPaltformReceiveWarningDao;
+    @Autowired
+    private DqDatasetWarningDao dqDatasetWarningDao;
 
     public DqPaltformReceiveWarning findById(Long id) {
         return dqPaltformReceiveWarningDao.findOne(id);
+    }
+
+    public DqPaltformReceiveWarning findByOrgCode(String orgCode){
+        return dqPaltformReceiveWarningDao.findByOrgCode(orgCode);
     }
 
     /**
@@ -28,6 +35,7 @@ public class DqPaltformReceiveWarningService extends BaseJpaService<DqPaltformRe
     public DqPaltformReceiveWarning paltformReceiveWarningAdd(DqPaltformReceiveWarning warning){
 
         save(warning);
+        dqDatasetWarningDao.save(warning.getDatasetWarningList());
         return warning;
     }
 

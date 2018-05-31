@@ -9,4 +9,5 @@ import org.springframework.data.repository.PagingAndSortingRepository;
  */
 public interface DqPaltformResourceWarningDao extends PagingAndSortingRepository<DqPaltformResourceWarning, Long> {
 
+    DqPaltformResourceWarning findByOrgCode(String orgCode);
 }
