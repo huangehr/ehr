@@ -102,6 +102,7 @@ public class PackageResourceJob implements InterruptableJob {
         resourceService.save(resourceBucket, standardPackage, pack);
         //回填入库状态
         Map<String, Object> map = new HashMap();
+        map.put("defect", resourceBucket.getQcMetadataRecords().getRecords().isEmpty() ? 0 : 1); //是否解析异常
         map.put("profile_id", standardPackage.getId());
         map.put("demographic_id", standardPackage.getDemographicId());
         map.put("event_type", standardPackage.getEventType() == null ? -1 : standardPackage.getEventType().getType());

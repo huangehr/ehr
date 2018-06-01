@@ -403,7 +403,7 @@ public class ProfileCDAService extends ProfileBasicService {
                                 return;
                             }
                             if (combination[1].equals("HDSD00_77") && dataSetCode.equals("HDSD00_75") && !StringUtils.isEmpty(mark)) {
-                                if (mark.equals(item.get("EHR_006501"))) { //报告单号
+                                if (mark.equals(item.get("EHR_006339"))) { //报告单号
                                     if (tempMap.containsKey(dataSetCode)) {
                                         List<Map<String, Object>> tempList = (List<Map<String, Object>>) tempMap.get(dataSetCode);
                                         tempList.add(resourcesTransformService.stdTransform(item, dataSetCode, cdaVersion));

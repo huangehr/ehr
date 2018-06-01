@@ -40,6 +40,12 @@ public class ProfileInfoBaseService extends BaseJpaService {
             List<String> allergens = new ArrayList<>();
             if (list.size() == 1) {
                 result = list.get(0);
+                if (result.containsKey("EHR_004971")) {
+                    allergyMedicine.add((String) result.get("result"));
+                }
+                if (result.containsKey("EHR_000011")) {
+                    allergens.add((String) result.get("EHR_000011"));
+                }
             } else {
                 //合并数据
                 for (Map<String, Object> obj : list) {
