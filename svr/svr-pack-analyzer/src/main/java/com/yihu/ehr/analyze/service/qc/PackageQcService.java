@@ -88,7 +88,7 @@ public class PackageQcService {
                         Class clazz = qcRuleCheckService.getClass();
                         String[] methods = serializable.toString().split(";");
                         for(int i=0; i<methods.length; i++) {
-                            Method _method = clazz.getMethod(methods[i], new Class[]{String.class, String.class, String.class});
+                            Method _method = clazz.getMethod(methods[i], new Class[]{String.class, String.class, String.class, String.class});
                             _method.setAccessible(true);
                             int result = (int) _method.invoke(qcRuleCheckService, zipPackage.getCdaVersion(), dataSetCode, metadata, dataGroup.get(metadata));
                             if (result != 0) {
@@ -124,12 +124,15 @@ public class PackageQcService {
     }
 
     private List<String> getDataElementList(String version, String dataSetCode) {
+        long starttime = System.currentTimeMillis();
         String metadataCodes = hosAdminServiceClient.getMetadataCodes(version, dataSetCode);
         String[] metadataList = StringUtils.split(metadataCodes, ",");
         if (metadataList == null){
             logger.error("version:" + version + ",dataSetCode:" + dataSetCode);
             return new ArrayList<>();
         }
+        long endtime = System.currentTimeMillis();
+        logger.info("获取数据元耗时：" + (endtime - starttime) + "ms");
         return Arrays.asList(metadataList);
     }
 
