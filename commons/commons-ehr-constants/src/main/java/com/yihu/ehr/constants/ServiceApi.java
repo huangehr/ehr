@@ -1630,4 +1630,11 @@ public class ServiceApi {
         public static final String MyMessage = "/messageTemplate/MyMessage/admin/{messageId}";
         public static final String MessageOrderPush = "/messageTemplate/messageOrderPush";
     }
+
+    /**
+     * 质控相关
+     */
+    public class PACKQCREPORT {
+        public static final String dailyReport = "/packQcReport/dailyReport";
+    }
 }
