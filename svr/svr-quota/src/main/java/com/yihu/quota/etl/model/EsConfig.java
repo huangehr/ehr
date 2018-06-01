@@ -11,37 +11,40 @@ public class EsConfig {
     private String type;// 类型 es 相当于表
     private String clusterName;//es clusterName
     private String table;// 数据库表
-    private String molecular;  // 统计除法的分子  指标code
-    private String molecularFilter;  // 除法的分子过滤条件
-    private String denominator;// 统计除法的分母  指标code
-    private String denominatorFilter;// 除法的分母过滤条件
-    private String percentOperation;//运算方式  1 乘法  2 除法  默认乘法
-    private String percentOperationValue;//运算对应的值  默认 100
-
-    private String timekey;//根据sql去查询的key 时间控制字段
+    private String fullQuery;  //全量查询
     private String filter;  // where条件
+    private String timekey;//根据sql去查询的key 时间控制字段
     private String aggregation;//聚合方式  默认count，另有sum ，list
     private String aggregationKey;//聚合字段
     private String especialType; //特殊类型  orgHealthCategory：卫生机构类型
     private String superiorBaseQuotaCode;  // 上级基础指标code
 
-    private String fullQuery;  //全量查询
-    private String constValue;  // 分母为常量的类型 1总人口数 2……
-    private String district;    // 所属区域  根据区域获取该区域下的总人口数
 
+    //除法运算
+    private String molecular;  // 统计除法的分子  指标code
+    private String molecularFilter;  // 除法的分子过滤条件
+    private String denominator;// 统计除法的分母  指标code
+    private String denominatorFilter;// 除法的分母过滤条件
+    private String percentOperation;//运算方式  1 乘法  2 除法
+    private String percentOperationValue;//运算对应的值
+    private String divisionType; //除法运算类型 1 分子分母各维度对应相除 默认 2 分子按维度 /分母按年份获取总数 如：技术人员每千人口 = 技术人员数/对应区县总人口数*1000
+
+    //加法运算
     private String addOperation;//加法运算方式  1 加法 默认 2 减法
     private String addFirstQuotaCode;//加法第一个指标
     private String addFirstFilter;//加法第一个指标过滤条件
     private String addSecondQuotaCode;//加法第二个指标
     private String addSecondFilter;//加法第二个指标过滤条件
 
+    private String growthFlag;  // 增幅标志  1 year  2 month
+    private String incrementFlag;   // 环比  1 上月  2 本月
+
+
+
     //已停止使用
     private String thousandFlag; //每千，每万 1000,10000
     private String thousandDmolecular; //每千，每万 统计分子
     private String thousandDenominator; //每千，每万 统计分母
-
-    private String growthFlag;  // 增幅标志  1 year  2 month
-    private String incrementFlag;   // 环比  1 上月  2 本月
 
     public String getSuperiorBaseQuotaCode() {
         return superiorBaseQuotaCode;
@@ -212,22 +215,6 @@ public class EsConfig {
         this.denominatorFilter = denominatorFilter;
     }
 
-    public String getConstValue() {
-        return constValue;
-    }
-
-    public void setConstValue(String constValue) {
-        this.constValue = constValue;
-    }
-
-    public String getDistrict() {
-        return district;
-    }
-
-    public void setDistrict(String district) {
-        this.district = district;
-    }
-
     public String getFullQuery() {
         return fullQuery;
     }
@@ -290,5 +277,13 @@ public class EsConfig {
 
     public void setIncrementFlag(String incrementFlag) {
         this.incrementFlag = incrementFlag;
+    }
+
+    public String getDivisionType() {
+        return divisionType;
+    }
+
+    public void setDivisionType(String divisionType) {
+        this.divisionType = divisionType;
     }
 }

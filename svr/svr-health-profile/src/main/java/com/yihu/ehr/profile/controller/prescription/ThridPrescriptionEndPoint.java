@@ -2,7 +2,7 @@ package com.yihu.ehr.profile.controller.prescription;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseRestEndPoint;
-import com.yihu.ehr.profile.service.ThridPrescriptionService;
+import com.yihu.ehr.profile.service.old.ThridPrescriptionService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -17,10 +17,10 @@ import java.io.FileInputStream;
  * Created by cwd on 2016/6/14.
  */
 
-@RestController
+/*@RestController
 @RequestMapping(ApiVersion.Version1_0+"/thridPrescription")
 @Api(value = "第三方处方调阅服务", description = "第三方处方调阅服务")
-@ApiIgnore
+@ApiIgnore*/
 public class ThridPrescriptionEndPoint extends BaseRestEndPoint {
     @Autowired
     private ThridPrescriptionService thridPrescriptionService;

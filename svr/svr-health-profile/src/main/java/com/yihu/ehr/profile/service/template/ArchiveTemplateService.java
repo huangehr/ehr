@@ -1,4 +1,4 @@
-package com.yihu.ehr.profile.service;
+package com.yihu.ehr.profile.service.template;
 
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.profile.dao.ArchiveTemplateDao;

@@ -51,8 +51,10 @@ public class ProfileCDAEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "cda_document_id", value = "模板ID", required = true, defaultValue = "82e8a0b5317a11e7b186a1ae879a6c51")
             @RequestParam(value = "cda_document_id") String cda_document_id,
             @ApiParam(name = "transform", value = "是否转换成标准数据", defaultValue = "false")
-            @RequestParam(value = "transform", required = false) boolean transform) throws Exception {
-        return profileCDAService.getCDAData(profile_id, cda_document_id, true);
+            @RequestParam(value = "transform", required = false) boolean transform,
+            @ApiParam(name = "mark", value = "是否转换成标准数据")
+            @RequestParam(value = "mark", required = false) String mark) throws Exception {
+        return profileCDAService.getCDAData(profile_id, true, mark, cda_document_id);
     }
 
 }

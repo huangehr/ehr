@@ -127,21 +127,21 @@ public class RsResourceService extends BaseJpaService<RsResource, RsResourceDao>
     public List<Map<String, Object>> getResourceTree(Integer dataSource, String userResource, String filters) throws IOException{
         List<RsResourceCategory> rsCateList;
         List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
-        if(userResource.equals("*")){
+        if (userResource.equals("*")){
             rsCateList = rsResourceCategoryDao.findByPid("");
             for(RsResourceCategory rsResourceCategory : rsCateList) {
                 Map<String, Object> childMap = getTreeMap(rsResourceCategory, 0, dataSource, null, filters);
                 resultList.add(childMap);
             }
-        }else {
+        } else {
             rsCateList = rsResourceCategoryDao.findByCodeAndPid("derived", "");
             List<String> userResourceList = objectMapper.readValue(userResource, List.class);
-            if(userResourceList.size() <= 0) {
+            if (userResourceList.size() <= 0) {
                 userResourceList.add("NO_AUTH_RS");
             }
             String [] ids = new String[userResourceList.size()];
             userResourceList.toArray(ids);
-            for(RsResourceCategory rsResourceCategory : rsCateList) {
+            for (RsResourceCategory rsResourceCategory : rsCateList) {
                 Map<String, Object> childMap = getTreeMap(rsResourceCategory, 0, dataSource, ids, filters);
                 if (childMap != null) {
                     resultList.add(childMap);
@@ -161,7 +161,7 @@ public class RsResourceService extends BaseJpaService<RsResource, RsResourceDao>
         Map<String, Object> masterMap = new HashMap<String, Object>();
         List<Map<String, Object>> detailList = new ArrayList<Map<String, Object>>();
         List<Map<String, Object>> childList = new ArrayList<Map<String, Object>>();
-        if(rsResourceCategory != null) {
+        if (rsResourceCategory != null) {
             /**
              * 处理自身数据
              */
@@ -170,13 +170,13 @@ public class RsResourceService extends BaseJpaService<RsResource, RsResourceDao>
             masterMap.put("name", rsResourceCategory.getName());
             masterMap.put("pid", rsResourceCategory.getId());
             List<RsResource> rsList;
-            if(StringUtils.isEmpty(filters)) {
+            if (StringUtils.isEmpty(filters)) {
                 if(null == ids) {
                     rsList = rsResourceDao.findByCategoryIdAndDataSource(rsResourceCategory.getId(), dataSource);
                 }else {
                     rsList = rsResourceDao.findByCategoryIdAndDataSourceAndIdsOrGrantType(rsResourceCategory.getId(), dataSource, ids, "0");
                 }
-            }else {
+            } else {
                 if(null == ids) {
                     rsList = rsResourceDao.findByCategoryIdAndDataSourceAndName(rsResourceCategory.getId(), dataSource, filters);
                 }else {
@@ -194,6 +194,7 @@ public class RsResourceService extends BaseJpaService<RsResource, RsResourceDao>
                     detailMap.put("category_id", rsResource.getCategoryId());
                     detailMap.put("data_source", rsResource.getDataSource());
                     detailMap.put("grant_type", rsResource.getGrantType());
+                    detailMap.put("rs_interface", rsResource.getRsInterface());
                     detailMap.put("category_name", rsResourceCategory.getName());
                     detailMap.put("isNestedPie", "nestedPie".equalsIgnoreCase(rsResource.getEchartType()) ? true : false);
                     detailList.add(detailMap);
@@ -202,14 +203,14 @@ public class RsResourceService extends BaseJpaService<RsResource, RsResourceDao>
             masterMap.put("detailList", detailList);
             //处理下级数据
             List<RsResourceCategory> hList = rsResourceCategoryDao.findByPid(rsResourceCategory.getId());
-            if(hList != null) {
+            if (hList != null) {
                 for(RsResourceCategory category: hList) {
                     childList.add(getTreeMap(category, level + 1, dataSource, ids, filters));
                 }
                 masterMap.put("child", childList);
             }
         }
-        if(ids != null && detailList.size() <= 0 && childList.size() <= 0) {
+        if (ids != null && detailList.size() <= 0 && childList.size() <= 0) {
             return null;
         }
         return masterMap;
@@ -221,7 +222,7 @@ public class RsResourceService extends BaseJpaService<RsResource, RsResourceDao>
             page = 1;
         }
         List<String> rsList = objectMapper.readValue(userResource, List.class);
-        if(rsList.size() <= 0) {
+        if (rsList.size() <= 0) {
             rsList.add("NO_AUTH_RS");
         }
         String hql = "SELECT rsResource FROM RsResource rsResource WHERE rsResource.categoryId IN (SELECT id FROM RsResourceCategory rsResourceCategory WHERE rsResourceCategory.code = 'derived') AND (rsResource.grantType = '0' OR rsResource.creator = :creator OR rsResource.id IN (:ids)) " +

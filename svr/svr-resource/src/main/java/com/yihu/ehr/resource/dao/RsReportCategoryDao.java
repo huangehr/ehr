@@ -32,4 +32,10 @@ public interface RsReportCategoryDao extends CrudRepository<RsReportCategory, In
 
     @Query("select rc.id from RsReportCategory rc where rc.pid =(select r.id from RsReportCategory r where r.code = :code)")
     List<Integer> findCategoryIds(@Param("code") String code);
+
+    @Query("select rc.code from RsReportCategory rc where rc.id = :id")
+    String findCategoryCodeById(@Param("id") Integer id);
+
+    @Query("select rc.id from RsReportCategory rc where rc.pid in (select r.id from RsReportCategory r where r.code in('businessMonitoringSystem','healthMonitorSystem'))")
+    List<Integer> findCategoryIdsByCodeList();
 }
