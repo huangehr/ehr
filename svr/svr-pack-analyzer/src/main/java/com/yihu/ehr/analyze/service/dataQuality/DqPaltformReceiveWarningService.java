@@ -35,7 +35,14 @@ public class DqPaltformReceiveWarningService extends BaseJpaService<DqPaltformRe
     public DqPaltformReceiveWarning paltformReceiveWarningAdd(DqPaltformReceiveWarning warning){
 
         save(warning);
-        dqDatasetWarningDao.save(warning.getDatasetWarningList());
+        if(warning.getDatasetWarningList()!=null&&warning.getDatasetWarningList().size()>0){
+            warning.getDatasetWarningList().forEach(dataset->{
+                dataset.setOrgCode(warning.getOrgCode());
+                dataset.setType("1");
+            });
+            dqDatasetWarningDao.save(warning.getDatasetWarningList());
+        }
+
         return warning;
     }
 

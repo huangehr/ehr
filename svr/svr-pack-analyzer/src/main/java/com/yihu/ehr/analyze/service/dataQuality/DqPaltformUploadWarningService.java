@@ -35,7 +35,13 @@ public class DqPaltformUploadWarningService extends BaseJpaService<DqPaltformUpl
     public DqPaltformUploadWarning paltformUploadWarningAdd(DqPaltformUploadWarning warning){
 
         save(warning);
-        dqDatasetWarningDao.save(warning.getDatasetWarningList());
+        if(warning.getDatasetWarningList()!=null&&warning.getDatasetWarningList().size()>0){
+            warning.getDatasetWarningList().forEach(dataset->{
+                dataset.setOrgCode(warning.getOrgCode());
+                dataset.setType("2");
+            });
+            dqDatasetWarningDao.save(warning.getDatasetWarningList());
+        }
 
         return warning;
     }

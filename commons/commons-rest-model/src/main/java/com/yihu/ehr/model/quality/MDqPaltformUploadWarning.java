@@ -2,6 +2,7 @@ package com.yihu.ehr.model.quality;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 数据质量-平台上传预警值
@@ -19,6 +20,7 @@ public class MDqPaltformUploadWarning implements Serializable {
     private String integrityRate;//完整率
     private Long errorNum;//错误量
     private Long dataNum;//数据量
+    private List<MDqDatasetWarning> datasetWarningList;//数据集
 
     public Long getId() {
         return id;
@@ -98,5 +100,13 @@ public class MDqPaltformUploadWarning implements Serializable {
 
     public void setDataNum(Long dataNum) {
         this.dataNum = dataNum;
+    }
+
+    public List<MDqDatasetWarning> getDatasetWarningList() {
+        return datasetWarningList;
+    }
+
+    public void setDatasetWarningList(List<MDqDatasetWarning> datasetWarningList) {
+        this.datasetWarningList = datasetWarningList;
     }
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 平台接收预警值
@@ -26,6 +27,7 @@ public class MDqPaltformReceiveWarning implements Serializable {
     private String hospitalInTimeRate;//住院及时率
     private String outpatientInTimeRate;//门诊及时率
     private String peInTimeRate;//体检及时率
+    private List<MDqDatasetWarning> datasetWarningList;//数据集
 
     public Long getId() {
         return id;
@@ -147,5 +149,13 @@ public class MDqPaltformReceiveWarning implements Serializable {
 
     public void setPeInTimeRate(String peInTimeRate) {
         this.peInTimeRate = peInTimeRate;
+    }
+
+    public List<MDqDatasetWarning> getDatasetWarningList() {
+        return datasetWarningList;
+    }
+
+    public void setDatasetWarningList(List<MDqDatasetWarning> datasetWarningList) {
+        this.datasetWarningList = datasetWarningList;
     }
 }

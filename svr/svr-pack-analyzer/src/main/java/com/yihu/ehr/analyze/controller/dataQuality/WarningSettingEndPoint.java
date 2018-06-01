@@ -7,9 +7,11 @@ import com.yihu.ehr.analyze.service.dataQuality.DqPaltformUploadWarningService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.entity.quality.DqDatasetWarning;
 import com.yihu.ehr.entity.quality.DqPaltformReceiveWarning;
 import com.yihu.ehr.entity.quality.DqPaltformResourceWarning;
 import com.yihu.ehr.entity.quality.DqPaltformUploadWarning;
+import com.yihu.ehr.model.quality.MDqDatasetWarning;
 import com.yihu.ehr.model.quality.MDqPaltformReceiveWarning;
 import com.yihu.ehr.model.quality.MDqPaltformResourceWarning;
 import com.yihu.ehr.model.quality.MDqPaltformUploadWarning;
@@ -109,6 +111,8 @@ public class WarningSettingEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "id", value = "id", defaultValue = "")
             @PathVariable(value = "id") Long id) {
         DqPaltformReceiveWarning warning =  dqPaltformReceiveWarningService.findById(id);
+        List<DqDatasetWarning> warningList = dqDatasetWarningService.findByOrgCodeAndType(warning.getOrgCode(),"1");
+        warning.setDatasetWarningList(warningList);
         return success(convertToModel(warning, MDqPaltformReceiveWarning.class));
     }
 
@@ -127,6 +131,8 @@ public class WarningSettingEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "id", value = "id", defaultValue = "")
             @PathVariable(value = "id") Long id) {
         DqPaltformUploadWarning warning =  dqPaltformUploadWarningService.findById(id);
+        List<DqDatasetWarning> warningList = dqDatasetWarningService.findByOrgCodeAndType(warning.getOrgCode(),"2");
+        warning.setDatasetWarningList(warningList);
         return success(convertToModel(warning, MDqPaltformUploadWarning.class));
     }
 
@@ -169,18 +175,18 @@ public class WarningSettingEndPoint extends EnvelopRestEndPoint {
         return success(null);
     }
 
-    @RequestMapping(value = ServiceApi.DataQuality.PaltformResourceWarningAdd, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.DataQuality.PaltformResourceWarningDel, method = RequestMethod.POST)
     @ApiOperation(value = "删除平台资源化预警")
-    public Envelop paltformResourceWarningAdd(
+    public Envelop paltformResourceWarningDel(
             @ApiParam(name = "id", value = "1",  defaultValue = "")
             @RequestParam Long id) throws Exception {
         dqPaltformResourceWarningService.delete(id);
         return success(null);
     }
 
-    @RequestMapping(value = ServiceApi.DataQuality.PaltformUploadWarningAdd, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.DataQuality.PaltformUploadWarningDel, method = RequestMethod.POST)
     @ApiOperation(value = "删除平台上传预警")
-    public Envelop paltformUploadWarningAdd(
+    public Envelop paltformUploadWarningDel(
             @ApiParam(name = "id", value = "1",  defaultValue = "")
             @RequestParam Long id) throws Exception {
         dqPaltformUploadWarningService.delete(id);
@@ -189,32 +195,51 @@ public class WarningSettingEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.DataQuality.PaltformReceiveWarningUpd, method = RequestMethod.POST)
     @ApiOperation(value = "新增平台接收预警")
-    public MDqPaltformReceiveWarning paltformReceiveWarningUpd(
+    public Envelop paltformReceiveWarningUpd(
             @ApiParam(name = "jsonData", value = "对象JSON结构体",  defaultValue = "")
             @RequestBody String jsonData) throws Exception {
         DqPaltformReceiveWarning warning = toEntity(jsonData, DqPaltformReceiveWarning.class);
         warning = dqPaltformReceiveWarningService.paltformReceiveWarningUpd(warning);
-        return convertToModel(warning, MDqPaltformReceiveWarning.class);
+        return success(convertToModel(warning, MDqPaltformReceiveWarning.class));
     }
 
     @RequestMapping(value = ServiceApi.DataQuality.PaltformResourceWarningUpd, method = RequestMethod.POST)
     @ApiOperation(value = "新增平台资源化预警")
-    public MDqPaltformResourceWarning paltformResourceWarningUpd(
+    public Envelop paltformResourceWarningUpd(
             @ApiParam(name = "jsonData", value = "对象JSON结构体",  defaultValue = "")
             @RequestBody String jsonData) throws Exception {
         DqPaltformResourceWarning warning = toEntity(jsonData, DqPaltformResourceWarning.class);
         warning = dqPaltformResourceWarningService.paltformResourceWarningUpd(warning);
-        return convertToModel(warning, MDqPaltformResourceWarning.class);
+        return success(convertToModel(warning, MDqPaltformResourceWarning.class));
     }
 
     @RequestMapping(value = ServiceApi.DataQuality.PaltformUploadWarningUpd, method = RequestMethod.POST)
     @ApiOperation(value = "新增平台上传预警")
-    public MDqPaltformUploadWarning paltformUploadWarningUpd(
+    public Envelop paltformUploadWarningUpd(
             @ApiParam(name = "jsonData", value = "对象JSON结构体",  defaultValue = "")
             @RequestBody String jsonData) throws Exception {
         DqPaltformUploadWarning warning = toEntity(jsonData, DqPaltformUploadWarning.class);
         warning = dqPaltformUploadWarningService.paltformUploadWarningUpd(warning);
-        return convertToModel(warning, MDqPaltformUploadWarning.class);
+        return success(convertToModel(warning, MDqPaltformUploadWarning.class));
+    }
+
+    @RequestMapping(value = ServiceApi.DataQuality.DatasetWarningAdd, method = RequestMethod.POST)
+    @ApiOperation(value = "新增数据集")
+    public Envelop datasetWarningAdd(
+            @ApiParam(name = "jsonData", value = "对象JSON结构体",  defaultValue = "")
+            @RequestBody String jsonData) throws Exception {
+        DqDatasetWarning warning = toEntity(jsonData, DqDatasetWarning.class);
+        warning = dqDatasetWarningService.save(warning);
+        return success(convertToModel(warning, MDqDatasetWarning.class));
+    }
+
+    @RequestMapping(value = ServiceApi.DataQuality.DatasetWarningDel, method = RequestMethod.POST)
+    @ApiOperation(value = "删除数据集")
+    public Envelop datasetWarningDel(
+            @ApiParam(name = "id", value = "1",  defaultValue = "")
+            @RequestParam Long id) throws Exception {
+        dqDatasetWarningService.delete(id);
+        return success(null);
     }
 
 }
