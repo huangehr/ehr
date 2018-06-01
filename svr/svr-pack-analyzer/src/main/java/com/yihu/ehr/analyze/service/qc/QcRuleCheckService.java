@@ -6,7 +6,9 @@ import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.profile.ErrorType;
 import com.yihu.ehr.profile.exception.IllegalEmptyCheckException;
 import com.yihu.ehr.profile.exception.IllegalValueCheckException;
+import com.yihu.ehr.redis.client.RedisClient;
 import com.yihu.ehr.util.datetime.DateUtil;
+import com.yihu.ehr.util.string.StringBuilderEx;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +34,8 @@ public class QcRuleCheckService {
     private HosAdminServiceClient hosAdminServiceClient;
     @Autowired
     private ElasticSearchUtil elasticSearchUtil;
+    @Autowired
+    private RedisClient redisClient;
 
     /**
      * 检查值是否为空
@@ -43,9 +47,9 @@ public class QcRuleCheckService {
      * @throws Exception
      */
     public int emptyCheck(String version, String dataSetCode, String metadata, String value) throws Exception {
-        Boolean isNullable = hosAdminServiceClient.isMetaDataNullable(version, dataSetCode, metadata);
-        if (!isNullable && StringUtils.isEmpty(value)) {
-           return ErrorType.EmptyError.getType();
+        String nullable = redisClient.get(makeKey("std_data_set_" + version, dataSetCode + "." + metadata, "nullable"));
+        if (!"1".equals(nullable) && StringUtils.isEmpty(value)) {
+            return ErrorType.EmptyError.getType();
         }
         return 0;
     }
@@ -60,8 +64,8 @@ public class QcRuleCheckService {
      * @throws Exception
      */
     public int emptyCheckThrowable(String version, String dataSetCode, String metadata ,String value) throws Exception {
-        Boolean isNullable = hosAdminServiceClient.isMetaDataNullable(version, dataSetCode, metadata);
-        if (!isNullable && StringUtils.isEmpty(value)) {
+        int type = emptyCheck(version, dataSetCode, metadata, value);
+        if(type != 0){
             throw new IllegalEmptyCheckException(String.format("Meta data %s of %s in %s is empty", metadata, dataSetCode, version));
         }
         return 0;
@@ -130,11 +134,11 @@ public class QcRuleCheckService {
      * @throws Exception
      */
     public int valueCheck(String version, String dataSetCode, String metadata ,String value) throws Exception {
-        String dict = hosAdminServiceClient.getMetaDataDict(version, dataSetCode, metadata);
+        String dict = redisClient.get(makeKey("std_meta_data_" + version,dataSetCode + "." + metadata,"dict_id"));
         if (StringUtils.isEmpty(dict) || dict.equals("0")) {
             return 0;
         }
-        Boolean isExist = hosAdminServiceClient.isDictCodeExist(version, dict, metadata);
+        Boolean isExist =  redisClient.hasKey(makeKey("std_dictionary_entry_" + version, dict + "." + value, "value"));
         if (!isExist) {
             return ErrorType.ValueError.getType();
         }
@@ -151,12 +155,8 @@ public class QcRuleCheckService {
      * @throws Exception
      */
     public int valueCheckThrowable(String version, String dataSetCode, String metadata , String value) throws Exception {
-        String dict = hosAdminServiceClient.getMetaDataDict(version, dataSetCode, metadata);
-        if (StringUtils.isEmpty(dict) || dict.equals("0")) {
-            return 0;
-        }
-        Boolean isExist = hosAdminServiceClient.isDictCodeExist(version, dict, metadata);
-        if (!isExist) {
+        int type = valueCheck(version, dataSetCode, metadata, value);
+        if (type !=0) {
             throw new IllegalValueCheckException(String.format("Value %s for meta data %s of %s in %s out of range", value, metadata, dataSetCode, version));
         }
         return 0;
@@ -183,6 +183,17 @@ public class QcRuleCheckService {
 
     private DataElementValue parse(String data) throws IOException {
         return objectMapper.readValue(data, DataElementValue.class);
+    }
+
+    /**
+     * 获取key
+     */
+    public String makeKey(String table, String key, String column) {
+        return new StringBuilderEx("%1:%2:%3")
+                .arg(table)
+                .arg(key)
+                .arg(column)
+                .toString();
     }
 
 }

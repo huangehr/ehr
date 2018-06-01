@@ -5,7 +5,9 @@ import com.yihu.ehr.analyze.service.pack.ZipPackage;
 import com.yihu.ehr.model.packs.EsSimplePackage;
 import com.yihu.ehr.profile.util.MetaDataRecord;
 import com.yihu.ehr.profile.util.PackageDataSet;
+import com.yihu.ehr.redis.client.RedisClient;
 import com.yihu.ehr.util.datetime.DateUtil;
+import com.yihu.ehr.util.string.StringBuilderEx;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +36,8 @@ public class PackageQcService {
     private RedisTemplate<String, Serializable> redisTemplate;
     @Autowired
     private QcRuleCheckService qcRuleCheckService;
+    @Autowired
+    private RedisClient redisClient;
 
 
     /**
@@ -45,20 +49,6 @@ public class PackageQcService {
      */
     public void qcHandle(ZipPackage zipPackage) throws Exception {
         EsSimplePackage esSimplePackage = zipPackage.getEsSimplePackage();
-        /*Map<String, Object> packMap = new HashMap<>(0);
-        packMap.put("orgCode", zipPackage.getOrgCode());
-        packMap.put("patientId", zipPackage.getPatientId());
-        packMap.put("eventNo", zipPackage.getEventNo());
-        packMap.put("eventTime", zipPackage.getEventDate());
-        packMap.put("eventType", zipPackage.getEventType());
-        packMap.put("receiveTime", esSimplePackage.getReceive_date());
-        packMap.put("packId", esSimplePackage.get_id());
-        packMap.put("_id", esSimplePackage.get_id());
-        try {
-            elasticSearchUtil.index("qc", "receive_data_pack", packMap);
-        } catch (ParseException e) {
-            logger.error("receive_data_pack," + e.getMessage());
-        }*/
         Map<String, Object> qcDataSetRecord = zipPackage.getQcDataSetRecord();
         qcDataSetRecord.put("_id", esSimplePackage.get_id());
         qcDataSetRecord.put("patient_id", zipPackage.getPatientId());
@@ -124,16 +114,23 @@ public class PackageQcService {
     }
 
     private List<String> getDataElementList(String version, String dataSetCode) {
-        long starttime = System.currentTimeMillis();
-        String metadataCodes = hosAdminServiceClient.getMetadataCodes(version, dataSetCode);
+        String metadataCodes = redisClient.get(makeKey("std_data_set_" + version, dataSetCode, "metada_code"));
         String[] metadataList = StringUtils.split(metadataCodes, ",");
         if (metadataList == null){
             logger.error("version:" + version + ",dataSetCode:" + dataSetCode);
             return new ArrayList<>();
         }
-        long endtime = System.currentTimeMillis();
-        logger.info("获取数据元耗时：" + (endtime - starttime) + "ms");
         return Arrays.asList(metadataList);
     }
 
+    /**
+     * 获取key
+     */
+    public String makeKey(String table, String key, String column) {
+        return new StringBuilderEx("%1:%2:%3")
+                .arg(table)
+                .arg(key)
+                .arg(column)
+                .toString();
+    }
 }

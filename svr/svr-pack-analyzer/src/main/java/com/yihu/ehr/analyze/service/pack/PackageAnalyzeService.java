@@ -69,13 +69,13 @@ public class PackageAnalyzeService {
                 zipPackage.resolve();
                 packageQcService.qcHandle(zipPackage);
                 //保存数据集质控数据
-                //elasticSearchUtil.index(INDEX, QC_DATASET_INFO, zipPackage.getQcDataSetRecord());
+                elasticSearchUtil.index(INDEX, QC_DATASET_INFO, zipPackage.getQcDataSetRecord());
                 //保存数据元质控数据
-                //elasticSearchUtil.bulkIndex(INDEX, QC_METADATA_INFO, zipPackage.getQcMetadataRecords());
+                elasticSearchUtil.bulkIndex(INDEX, QC_METADATA_INFO, zipPackage.getQcMetadataRecords());
                 //报告质控状态
-                //packageMgrClient.analyzeStatus(esSimplePackage.get_id(), AnalyzeStatus.Finished, 0, "qc success");
+                packageMgrClient.analyzeStatus(esSimplePackage.get_id(), AnalyzeStatus.Finished, 0, "qc success");
                 //发送解析消息
-                //packQueueService.push(esSimplePackage);
+                packQueueService.push(esSimplePackage);
             }
         } catch (Exception e) {
             int errorType = -1;
@@ -142,6 +142,10 @@ public class PackageAnalyzeService {
                 errorType = 2;
             } else if (e instanceof IllegalJsonDataException) {
                 errorType = 3;
+            } else if (e instanceof IllegalEmptyCheckException) {//非空
+                errorType = 4;
+            } else if (e instanceof IllegalValueCheckException) {//值域超出
+                errorType = 5;
             }
             if (esSimplePackage != null) {
                 try {
