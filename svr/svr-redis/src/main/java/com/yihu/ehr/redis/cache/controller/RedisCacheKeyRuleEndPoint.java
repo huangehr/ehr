@@ -89,6 +89,8 @@ public class RedisCacheKeyRuleEndPoint extends EnvelopRestEndPoint {
         try {
             RedisCacheKeyRule newEntity = objectMapper.readValue(entityJson, RedisCacheKeyRule.class);
             CacheCommonBiz.validateKeyRule(newEntity.getExpression());
+            String simpleExpression = CacheCommonBiz.replaceParams(newEntity.getExpression(), "{}");
+            newEntity.setSimpleExpression(simpleExpression);
             newEntity = redisCacheKeyRuleService.save(newEntity);
 
             MRedisCacheKeyRule mRedisCacheKeyRule = convertToModel(newEntity, MRedisCacheKeyRule.class);
@@ -112,6 +114,8 @@ public class RedisCacheKeyRuleEndPoint extends EnvelopRestEndPoint {
         try {
             RedisCacheKeyRule updateEntity = objectMapper.readValue(entityJson, RedisCacheKeyRule.class);
             CacheCommonBiz.validateKeyRule(updateEntity.getExpression());
+            String simpleExpression = CacheCommonBiz.replaceParams(updateEntity.getExpression(), "{}");
+            updateEntity.setSimpleExpression(simpleExpression);
             updateEntity = redisCacheKeyRuleService.save(updateEntity);
 
             MRedisCacheKeyRule mRedisCacheKeyRule = convertToModel(updateEntity, MRedisCacheKeyRule.class);
@@ -201,7 +205,8 @@ public class RedisCacheKeyRuleEndPoint extends EnvelopRestEndPoint {
         envelop.setSuccessFlg(false);
         try {
             CacheCommonBiz.validateKeyRule(expression);
-            boolean result = redisCacheKeyRuleService.isUniqueExpression(id, categoryCode, expression);
+            String simpleExpression = CacheCommonBiz.replaceParams(expression, "{}");
+            boolean result = redisCacheKeyRuleService.isUniqueExpression(id, categoryCode, simpleExpression);
             envelop.setSuccessFlg(result);
             if (!result) {
                 envelop.setErrorMsg("当前分类下类似的缓存Key规则表达式已经定义过，请重新填写！");

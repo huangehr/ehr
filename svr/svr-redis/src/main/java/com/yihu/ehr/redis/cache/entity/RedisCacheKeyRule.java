@@ -21,6 +21,7 @@ public class RedisCacheKeyRule extends BaseIdentityEntity {
     private String code; // 规则编码
     private String categoryCode; // 缓存分类编码
     private String expression; // 规则表达式
+    private String simpleExpression; // 精简规则表达式
     private String expireTime; // 过期时间，单位秒
     private String remark; // 备注
 
@@ -61,6 +62,15 @@ public class RedisCacheKeyRule extends BaseIdentityEntity {
 
     public void setExpression(String expression) {
         this.expression = expression;
+    }
+
+    @Column(name = "simple_expression", nullable = false)
+    public String getSimpleExpression() {
+        return simpleExpression;
+    }
+
+    public void setSimpleExpression(String simpleExpression) {
+        this.simpleExpression = simpleExpression;
     }
 
     @Column(name = "expire_time")
