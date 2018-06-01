@@ -5,6 +5,7 @@ import com.yihu.ehr.entity.quality.DqPaltformReceiveWarning;
 import com.yihu.ehr.entity.quality.DqPaltformResourceWarning;
 import com.yihu.ehr.entity.quality.DqPaltformUploadWarning;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,8 +24,8 @@ public class WarningSettingService {
     private DqPaltformResourceWarningService dqPaltformResourceWarningService;
     @Autowired
     private DqPaltformUploadWarningService dqPaltformUploadWarningService;
-
-    private static String defaultOrgCode = "1";
+    @Value("&{quality.orgCode}")
+    private String defaultOrgCode;
 
 
     /**
