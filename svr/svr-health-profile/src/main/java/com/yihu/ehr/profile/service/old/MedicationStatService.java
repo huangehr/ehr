@@ -1,4 +1,4 @@
-package com.yihu.ehr.profile.service;
+package com.yihu.ehr.profile.service.old;
 
 import com.yihu.ehr.profile.dao.ArchiveTemplateDao;
 import com.yihu.ehr.profile.model.MedicationStat;
@@ -17,8 +17,8 @@ import java.util.List;
  * @created 2016.07.02 13:49
  * 用药信息服务(待完善)
  */
-@Transactional
-@Service
+//@Transactional
+//@Service
 public class MedicationStatService extends BaseJpaService<ArchiveTemplate, ArchiveTemplateDao> {
 
 

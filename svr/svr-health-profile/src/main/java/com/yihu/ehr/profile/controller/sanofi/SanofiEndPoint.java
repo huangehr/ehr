@@ -10,8 +10,8 @@ import com.yihu.ehr.constants.LisEntry;
 import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.model.resource.MStdTransformDto;
 import com.yihu.ehr.profile.feign.TransformClient;
-import com.yihu.ehr.profile.util.BasisConstant;
-import com.yihu.ehr.profile.service.SanofiService;
+import com.yihu.ehr.profile.util.BasicConstant;
+import com.yihu.ehr.profile.service.old.SanofiService;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -41,10 +41,10 @@ import java.util.*;
  * @version 1.0
  * @created 2015.12.26 16:08
  */
-@RestController
+/*@RestController
 @RequestMapping(value = ApiVersion.Version1_0, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @Api(value = "赛诺菲数据服务", description = "赛诺菲项目体征数据提取服务")
-@ApiIgnore
+@ApiIgnore*/
 public class SanofiEndPoint {
 
     @Autowired
@@ -104,7 +104,7 @@ public class SanofiEndPoint {
         // 人口学信息
 
         query = "{\"q\":\"profile_id:" + profileIds.get(0);
-        dataSetList = sanofiService.getDataSet(BasisConstant.patientInfo, query);
+        dataSetList = sanofiService.getDataSet(BasicConstant.patientInfo, query);
         stdTransformDto.setVersion("56395d75b854");
         stdTransformDto.setSource(objectMapper.writeValueAsString(dataSetList));
         dataSetList = transformClient.stdTransformList(objectMapper.writeValueAsString(stdTransformDto));
@@ -152,7 +152,7 @@ public class SanofiEndPoint {
             query += " AND EHR_000384:[" + DateTimeUtil.utcDateTimeFormat(since) + " TO " + DateTimeUtil.utcDateTimeFormat(to) + "]";
             query += "\"}";
             query = query.replace(" ", "+");
-            dataSetList = sanofiService.getDataSet(BasisConstant.laboratoryProject, query);
+            dataSetList = sanofiService.getDataSet(BasicConstant.laboratoryProject, query);
             stdTransformDto.setVersion("56395d75b854");
             stdTransformDto.setSource(objectMapper.writeValueAsString(dataSetList));
             dataSetList = transformClient.stdTransformList(objectMapper.writeValueAsString(stdTransformDto));
@@ -189,7 +189,7 @@ public class SanofiEndPoint {
             query += " AND EHR_000207:[" + DateTimeUtil.utcDateTimeFormat(since) + " TO " + DateTimeUtil.utcDateTimeFormat(to) + "]";
             query += "\"}";
             query = query.replace(" ", "+");
-            dataSetList = sanofiService.getDataSet(BasisConstant.hospitalizedOrdersTemporary, query);
+            dataSetList = sanofiService.getDataSet(BasicConstant.hospitalizedOrdersTemporary, query);
             stdTransformDto.setVersion("56395d75b854");
             stdTransformDto.setSource(objectMapper.writeValueAsString(dataSetList));
             dataSetList = transformClient.stdTransformList(objectMapper.writeValueAsString(stdTransformDto));
@@ -210,7 +210,7 @@ public class SanofiEndPoint {
             query += " AND EHR_000207:[" + DateTimeUtil.utcDateTimeFormat(since) + " TO " + DateTimeUtil.utcDateTimeFormat(to) + "]";
             query += "\"}";
             query = query.replace(" ", "+");
-            dataSetList = sanofiService.getDataSet(BasisConstant.hospitalizedOrdersLongtime, query);
+            dataSetList = sanofiService.getDataSet(BasicConstant.hospitalizedOrdersLongtime, query);
             stdTransformDto.setVersion("56395d75b854");
             stdTransformDto.setSource(objectMapper.writeValueAsString(dataSetList));
             dataSetList = transformClient.stdTransformList(objectMapper.writeValueAsString(stdTransformDto));

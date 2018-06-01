@@ -7,7 +7,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.profile.model.ArchiveTemplate;
-import com.yihu.ehr.profile.service.ArchiveTemplateService;
+import com.yihu.ehr.profile.service.template.ArchiveTemplateService;
 import com.yihu.ehr.util.compress.Zipper;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;

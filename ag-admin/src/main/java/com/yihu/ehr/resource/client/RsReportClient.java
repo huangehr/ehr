@@ -113,4 +113,9 @@ public interface RsReportClient {
     @RequestMapping(value = ServiceApi.Resources.GetPositionMapByCode, method = RequestMethod.GET)
     Envelop getPositionByCode(
             @RequestParam(value = "code") String code);
+
+    @ApiOperation(value = "根据报表名称模糊查询")
+    @RequestMapping(value = ServiceApi.Resources.GetRsReportByParam, method = RequestMethod.GET)
+    Envelop searchReportByName(
+            @RequestParam(value = "filters", required = false) String filters);
 }

@@ -1,4 +1,4 @@
-package com.yihu.ehr.profile.service;
+package com.yihu.ehr.profile.service.old;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -21,7 +21,7 @@ import java.util.Map;
  * @version 1.0
  * @created 2016.04.13 9:38
  */
-@Component
+//@Component
 public class ProfileDataSetSerializer extends JsonSerializer<MDataSet> {
 
     @Autowired

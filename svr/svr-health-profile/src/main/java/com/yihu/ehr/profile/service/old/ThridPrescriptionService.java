@@ -1,4 +1,4 @@
-package com.yihu.ehr.profile.service;
+package com.yihu.ehr.profile.service.old;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -6,6 +6,8 @@ import com.yihu.ehr.config.FastDFSConfig;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.profile.dao.ArchiveTemplateDao;
 import com.yihu.ehr.profile.model.ArchiveTemplate;
+import com.yihu.ehr.profile.service.template.ArchiveTemplateService;
+import com.yihu.ehr.profile.service.ProfileCDAService;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.log.LogService;
@@ -14,7 +16,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.fit.cssbox.demo.ImageRenderer;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.*;
 
 import java.awt.*;
 import java.io.*;
@@ -24,7 +25,7 @@ import java.util.List;
 /**
  * Created by Administrator on 2016/6/14.
  */
-@Service
+//@Service
 public class ThridPrescriptionService extends BaseJpaService<ArchiveTemplate, ArchiveTemplateDao> {
 
     @Autowired
@@ -112,7 +113,7 @@ public class ThridPrescriptionService extends BaseJpaService<ArchiveTemplate, Ar
         }
 
         //获取CDA数据
-        Map<String, Object> model = profileCDAService.getCDAData(profileId, temp.get(0).getCdaDocumentId(), true);
+        Map<String, Object> model = profileCDAService.getCDAData(profileId, true, null, temp.get(0).getCdaDocumentId());
 
         return CDAToImage(model, type, width, height);
     }

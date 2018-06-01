@@ -1,13 +1,10 @@
 package com.yihu.ehr.profile.service;
 
 
-import com.yihu.ehr.profile.feign.*;
-import com.yihu.ehr.profile.util.BasisConstant;
+import com.yihu.ehr.profile.util.BasicConstant;
 import com.yihu.ehr.profile.util.SimpleSolrQueryUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import org.apache.commons.lang.time.DateUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -19,14 +16,7 @@ import java.util.*;
  * @author hzp 2016-06-27
  */
 @Service
-public class ProfileEventService {
-
-    @Value("${spring.application.id}")
-    private String appId;
-    @Autowired
-    private ResourceClient resource;
-    @Autowired
-    private RedisService redisService;
+public class ProfileEventService extends ProfileBasicService {
 
     /**
      *
@@ -50,7 +40,7 @@ public class ProfileEventService {
                 query = "{\"q\":\"demographic_id:" + demographicId + " AND event_type:2\"}";
             } else if ("3".equals(blurryType)) { //影像 imagery
                 query = SimpleSolrQueryUtil.getQuery(filter, date, query);
-                envelop = resource.getMasterData(query, 1, 500, null);
+                envelop = resource.getMasterData(query, 1, 1000, null);
                 List<Map<String, Object>> masterList = envelop.getDetailModelList();
                 if (masterList != null && masterList.size() > 0) {
                     for (Map<String ,Object> temp : masterList) {
@@ -59,41 +49,10 @@ public class ProfileEventService {
                         Envelop subEnvelop = resource.getSubData(subQ, 1, 1, null);
                         List<Map<String, Object>> subList = subEnvelop.getDetailModelList();
                         if (subList != null && subList.size() > 0) {
-                            Map<String, Object> resultMap = new HashMap<>();
-                            resultMap.put("profileId", temp.get("rowkey"));
-                            resultMap.put("orgCode", temp.get("org_code"));
-                            resultMap.put("orgName", temp.get("org_name"));
-                            resultMap.put("demographicId", temp.get("demographic_id"));
-                            resultMap.put("cdaVersion", temp.get("cda_version"));
-                            resultMap.put("eventDate", temp.get("event_date"));
-                            resultMap.put("profileType", temp.get("profile_type"));
-                            resultMap.put("eventType", blurryType); //更改事件类型
-                            resultMap.put("eventNo", temp.get("event_no"));
-                            //追加诊断名称 start
-                            String healthProblemName = "";
-                            if (!StringUtils.isEmpty(temp.get("diagnosis_name"))) {
-                                healthProblemName = ((String) temp.get("diagnosis_name")).replaceAll(";", "、");
-                            } else if (!StringUtils.isEmpty(temp.get("diagnosis"))) {
-                                String [] diagnosisCode = ((String) temp.get("diagnosis")).split(";");
-                                for (String code : diagnosisCode) {
-                                    String name = redisService.getIcd10Name(code);
-                                    if (!StringUtils.isEmpty(name)) {
-                                        healthProblemName += name + "、";
-                                    }
-                                }
-                            } else if (!StringUtils.isEmpty(temp.get("health_problem_name"))) {
-                                healthProblemName = ((String) temp.get("health_problem_name")).replaceAll(";", "、");
-                            } else if (!StringUtils.isEmpty(temp.get("health_problem"))) {
-                                String [] _hpCode = ((String) temp.get("health_problem")).split(";");
-                                for (String code : _hpCode) {
-                                    String name = redisService.getHealthProblem(code);
-                                    if (!StringUtils.isEmpty(name)) {
-                                        healthProblemName += name + "、";
-                                    }
-                                }
-                            }
-                            resultMap.put("healthProblemName", healthProblemName);
-                            //追加诊断名称 end
+                            Map<String, Object> resultMap = simpleEvent(temp);
+                            resultMap.put("eventType", blurryType);
+                            resultMap.put("mark", "mark"); //临时处理
+                            String healthProblemName = (String) resultMap.get("healthProblemName");
                             if (!StringUtils.isEmpty(searchParam)) {
                                 String orgName = (String) temp.get("org_name");
                                 if (orgName.contains(searchParam) || healthProblemName.contains(searchParam)) {
@@ -107,9 +66,57 @@ public class ProfileEventService {
                 }
                 return resultList;
             } else if ("4".equals(blurryType)) { //检查 inspect
-                query = "{\"q\":\"demographic_id:" + demographicId + " AND EHR_000318:*\"}";
+                query = SimpleSolrQueryUtil.getQuery(filter, date, query);
+                envelop = resource.getMasterData(query, 1, 1000, null);
+                List<Map<String, Object>> eventList = envelop.getDetailModelList();
+                if (eventList != null && eventList.size() > 0) {
+                    for (Map<String, Object> temp : eventList) {
+                        String subQ = "{\"q\":\"rowkey:" + temp.get("rowkey") + "$HDSD00_79$*\"}";
+                        Envelop subEnvelop = resource.getSubData(subQ, 1, 1, null);
+                        List<Map<String, Object>> subList = subEnvelop.getDetailModelList();
+                        if (subList != null && subList.size() > 0) {
+                            Map<String, Object> resultMap = simpleEvent(temp);
+                            resultMap.put("eventType", blurryType);
+                            resultMap.put("mark", subList.get(0).get("EHR_000316")); //检查报告单号
+                            String healthProblemName = (String) resultMap.get("healthProblemName");
+                            if (!StringUtils.isEmpty(searchParam)) {
+                                String orgName = (String) temp.get("org_name");
+                                if (orgName.contains(searchParam) || healthProblemName.contains(searchParam)) {
+                                    resultList.add(resultMap);
+                                }
+                            } else {
+                                resultList.add(resultMap);
+                            }
+                        }
+                    }
+                }
+                return resultList;
             } else if ("5".equals(blurryType)) { //检验 examine
-                query = "{\"q\":\"demographic_id:" + demographicId + " AND EHR_000353:*\"}";
+                query = SimpleSolrQueryUtil.getQuery(filter, date, query);
+                envelop = resource.getMasterData(query, 1, 1000, null);
+                List<Map<String, Object>> eventList = envelop.getDetailModelList();
+                if (eventList != null && eventList.size() > 0) {
+                    for (Map<String, Object> temp : eventList) {
+                        String subQ = "{\"q\":\"rowkey:" + temp.get("rowkey") + "$HDSD00_77$*\"}";
+                        Envelop subEnvelop = resource.getSubData(subQ, 1, 1, null);
+                        List<Map<String, Object>> subList = subEnvelop.getDetailModelList();
+                        if (subList != null && subList.size() > 0) {
+                            Map<String, Object> resultMap = simpleEvent(temp);
+                            resultMap.put("eventType", blurryType);
+                            resultMap.put("mark", subList.get(0).get("EHR_000363")); //检验报告单号
+                            String healthProblemName = (String) resultMap.get("healthProblemName");
+                            if (!StringUtils.isEmpty(searchParam)) {
+                                String orgName = (String) temp.get("org_name");
+                                if (orgName.contains(searchParam) || healthProblemName.contains(searchParam)) {
+                                    resultList.add(resultMap);
+                                }
+                            } else {
+                                resultList.add(resultMap);
+                            }
+                        }
+                    }
+                }
+                return resultList;
             } else if ("6".equals(blurryType)) { //妇幼 immunity
                 //query = "{\"q\":\"demographic_id:" + demographicId + " AND EHR_002443:*\"}";
                 return resultList;
@@ -119,45 +126,13 @@ public class ProfileEventService {
                 return resultList;
             }
             query = SimpleSolrQueryUtil.getQuery(filter, date, query);
-            envelop = resource.getMasterData(query, 1, 500, null);
+            envelop = resource.getMasterData(query, 1, 1000, null);
             List<Map<String, Object>> eventList = envelop.getDetailModelList();
             if (eventList != null && eventList.size() > 0) {
                 for (Map<String ,Object> temp : eventList) {
-                    Map<String, Object> resultMap = new HashMap<>();
-                    resultMap.put("profileId", temp.get("rowkey"));
-                    resultMap.put("orgCode", temp.get("org_code"));
-                    resultMap.put("orgName", temp.get("org_name"));
-                    resultMap.put("demographicId", temp.get("demographic_id"));
-                    resultMap.put("cdaVersion", temp.get("cda_version"));
-                    resultMap.put("eventDate", temp.get("event_date"));
-                    resultMap.put("profileType", temp.get("profile_type"));
-                    resultMap.put("eventType", blurryType); //更改事件类型
-                    resultMap.put("eventNo", temp.get("event_no"));
-                    //追加诊断名称 start
-                    String healthProblemName = "";
-                    if (!StringUtils.isEmpty(temp.get("diagnosis_name"))) {
-                        healthProblemName = ((String) temp.get("diagnosis_name")).replaceAll(";", "、");
-                    } else if (!StringUtils.isEmpty(temp.get("diagnosis"))) {
-                        String [] diagnosisCode = ((String) temp.get("diagnosis")).split(";");
-                        for (String code : diagnosisCode) {
-                            String name = redisService.getIcd10Name(code);
-                            if (!StringUtils.isEmpty(name)) {
-                                healthProblemName += name + "、";
-                            }
-                        }
-                    } else if (!StringUtils.isEmpty(temp.get("health_problem_name"))) {
-                        healthProblemName = ((String) temp.get("health_problem_name")).replaceAll(";", "、");
-                    } else if (!StringUtils.isEmpty(temp.get("health_problem"))) {
-                        String [] _hpCode = ((String) temp.get("health_problem")).split(";");
-                        for (String code : _hpCode) {
-                            String name = redisService.getHealthProblem(code);
-                            if (!StringUtils.isEmpty(name)) {
-                                healthProblemName += name + "、";
-                            }
-                        }
-                    }
-                    resultMap.put("healthProblemName", healthProblemName);
-                    //追加诊断名称 end
+                    Map<String, Object> resultMap = simpleEvent(temp);
+                    resultMap.put("eventType", blurryType);
+                    String healthProblemName = (String) resultMap.get("healthProblemName");
                     if (!StringUtils.isEmpty(searchParam)) {
                         String orgName = (String) temp.get("org_name");
                         if (orgName.contains(searchParam) || healthProblemName.contains(searchParam)) {
@@ -169,54 +144,22 @@ public class ProfileEventService {
                 }
             }
             return resultList;
-        }
-        query = SimpleSolrQueryUtil.getQuery(filter, date, query);
-        envelop = resource.getMasterData(query, 1, 500, null);
-        List<Map<String, Object>> eventList = envelop.getDetailModelList();
-        if (eventList != null && eventList.size() > 0) {
-            for (Map<String ,Object> temp : eventList) {
-                Map<String, Object> resultMap = new HashMap<>();
-                resultMap.put("profileId", temp.get("rowkey"));
-                resultMap.put("orgCode", temp.get("org_code"));
-                resultMap.put("orgName", temp.get("org_name"));
-                resultMap.put("demographicId", temp.get("demographic_id"));
-                resultMap.put("cdaVersion", temp.get("cda_version"));
-                resultMap.put("eventDate", temp.get("event_date"));
-                resultMap.put("profileType", temp.get("profile_type"));
-                resultMap.put("eventType", temp.get("event_type"));
-                resultMap.put("eventNo", temp.get("event_no"));
-                //追加诊断名称 start
-                String healthProblemName = "";
-                if (!StringUtils.isEmpty(temp.get("diagnosis_name"))) {
-                    healthProblemName = ((String) temp.get("diagnosis_name")).replaceAll(";", "、");
-                } else if (!StringUtils.isEmpty(temp.get("diagnosis"))) {
-                    String [] diagnosisCode = ((String) temp.get("diagnosis")).split(";");
-                    for (String code : diagnosisCode) {
-                        String name = redisService.getIcd10Name(code);
-                        if (!StringUtils.isEmpty(name)) {
-                            healthProblemName += name + "、";
+        } else {
+            query = SimpleSolrQueryUtil.getQuery(filter, date, query);
+            envelop = resource.getMasterData(query, 1, 1000, null);
+            List<Map<String, Object>> eventList = envelop.getDetailModelList();
+            if (eventList != null && eventList.size() > 0) {
+                for (Map<String ,Object> temp : eventList) {
+                    Map<String, Object> resultMap = simpleEvent(temp);
+                    String healthProblemName = (String) resultMap.get("healthProblemName");
+                    if (!StringUtils.isEmpty(searchParam)) {
+                        String orgName = (String) temp.get("org_name");
+                        if (orgName.contains(searchParam) || healthProblemName.contains(searchParam)) {
+                            resultList.add(resultMap);
                         }
-                    }
-                } else if (!StringUtils.isEmpty(temp.get("health_problem_name"))) {
-                    healthProblemName = ((String) temp.get("health_problem_name")).replaceAll(";", "、");
-                } else if (!StringUtils.isEmpty(temp.get("health_problem"))) {
-                    String [] _hpCode = ((String) temp.get("health_problem")).split(";");
-                    for (String code : _hpCode) {
-                        String name = redisService.getHealthProblem(code);
-                        if (!StringUtils.isEmpty(name)) {
-                            healthProblemName += name + "、";
-                        }
-                    }
-                }
-                resultMap.put("healthProblemName", healthProblemName);
-                //追加诊断名称 end
-                if (!StringUtils.isEmpty(searchParam)) {
-                    String orgName = (String) temp.get("org_name");
-                    if (orgName.contains(searchParam) || healthProblemName.contains(searchParam)) {
+                    } else {
                         resultList.add(resultMap);
                     }
-                } else {
-                    resultList.add(resultMap);
                 }
             }
         }
@@ -230,7 +173,6 @@ public class ProfileEventService {
      * @throws Exception
      */
     public Map<String, Object> recentMedicalEvents(String demographicId) throws Exception {
-        Map<String, Object> resultMap = new HashMap<>();
         String q = "{\"q\":\"demographic_id:" + demographicId + "\"}";
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, 0);
@@ -247,46 +189,12 @@ public class ProfileEventService {
         Envelop envelop = resource.getMasterData(q, 1, 500, null);
         List<Map<String, Object>> eventList = envelop.getDetailModelList();
         for (Map<String, Object> temp : eventList) {
-            if (temp.get("event_type") != null && temp.get("event_type").equals("2")) {
+            if (temp.get(BasicConstant.eventType) != null && temp.get(BasicConstant.eventType).equals("2")) {
                 continue;
             }
-            resultMap.put("profileId", temp.get("rowkey"));
-            resultMap.put("orgCode", temp.get("org_code"));
-            resultMap.put("orgName", temp.get("org_name"));
-            resultMap.put("demographicId", temp.get("demographic_id"));
-            resultMap.put("cdaVersion", temp.get("cda_version"));
-            resultMap.put("eventDate", temp.get("event_date"));
-            resultMap.put("profileType", temp.get("profile_type"));
-            resultMap.put("eventType", temp.get("event_type"));
-            resultMap.put("eventNo", temp.get("event_no"));
-            //追加诊断名称 start
-            String healthProblemName = "";
-            if (!StringUtils.isEmpty(temp.get("diagnosis_name"))) {
-                healthProblemName = ((String) temp.get("diagnosis_name")).replaceAll(";", "、");
-            } else if (!StringUtils.isEmpty(temp.get("diagnosis"))) {
-                String [] diagnosisCode = ((String) temp.get("diagnosis")).split(";");
-                for (String code : diagnosisCode) {
-                    String name = redisService.getIcd10Name(code);
-                    if (!StringUtils.isEmpty(name)) {
-                        healthProblemName += name + "、";
-                    }
-                }
-            } else if (!StringUtils.isEmpty(temp.get("health_problem_name"))) {
-                healthProblemName = ((String) temp.get("health_problem_name")).replaceAll(";", "、");
-            } else if (!StringUtils.isEmpty(temp.get("health_problem"))) {
-                String [] _hpCode = ((String) temp.get("health_problem")).split(";");
-                for (String code : _hpCode) {
-                    String name = redisService.getHealthProblem(code);
-                    if (!StringUtils.isEmpty(name)) {
-                        healthProblemName += name + "、";
-                    }
-                }
-            }
-            resultMap.put("healthProblemName", healthProblemName);
-            //追加诊断名称 end
-            break;
+            return simpleEvent(temp);
         }
-        return resultMap;
+        return new HashMap<>();
     }
 
     /**
@@ -313,59 +221,24 @@ public class ProfileEventService {
         Envelop envelop = resource.getMasterData(q, 1, 500, null);
         List<Map<String, Object>> eventList = envelop.getDetailModelList();
         for (Map<String, Object> temp : eventList) {
-            if (temp.get("event_type") != null && temp.get("event_type").equals("2")) {
+            if (temp.get(BasicConstant.eventType) != null && temp.get(BasicConstant.eventType).equals("2")) {
                 continue;
             }
-            Map<String, Object> resultMap = new HashMap<>();
-            resultMap.put("profileId", temp.get("rowkey"));
-            resultMap.put("orgCode", temp.get("org_code"));
-            resultMap.put("orgName", temp.get("org_name"));
-            resultMap.put("demographicId", temp.get("demographic_id"));
-            resultMap.put("cdaVersion", temp.get("cda_version"));
-            resultMap.put("eventDate", temp.get("event_date"));
-            resultMap.put("profileType", temp.get("profile_type"));
-            resultMap.put("eventType", temp.get("event_type"));
-            resultMap.put("eventNo", temp.get("event_no"));
-            //追加诊断名称 start
-            String healthProblemName = "";
-            if (!StringUtils.isEmpty(temp.get("diagnosis_name"))) {
-                healthProblemName = ((String) temp.get("diagnosis_name")).replaceAll(";", "、");
-            } else if (!StringUtils.isEmpty(temp.get("diagnosis"))) {
-                String [] diagnosisCode = ((String) temp.get("diagnosis")).split(";");
-                for (String code : diagnosisCode) {
-                    String name = redisService.getIcd10Name(code);
-                    if (!StringUtils.isEmpty(name)) {
-                        healthProblemName += name + "、";
-                    }
-                }
-            } else if (!StringUtils.isEmpty(temp.get("health_problem_name"))) {
-                healthProblemName = ((String) temp.get("health_problem_name")).replaceAll(";", "、");
-            } else if (!StringUtils.isEmpty(temp.get("health_problem"))) {
-                String [] _hpCode = ((String) temp.get("health_problem")).split(";");
-                for (String code : _hpCode) {
-                    String name = redisService.getHealthProblem(code);
-                    if (!StringUtils.isEmpty(name)) {
-                        healthProblemName += name + "、";
-                    }
-                }
-            }
-            resultMap.put("healthProblemName", healthProblemName);
-            //追加诊断名称 end
-            resultList.add(resultMap);
+            resultList.add(simpleEvent(temp));
         }
         return resultList;
     }
 
     public Map<String, Object> recentVisitsSub (String profileId) throws Exception {
-        Map<String, Object> resultMap = new HashMap<>();
         String q = "{\"q\":\"rowkey:" + profileId + "\"}";
         Envelop envelop = resource.getMasterData(q, 1, 1, null);
         List<Map<String, Object>> eventList = envelop.getDetailModelList();
         if (eventList.size() > 0) {
             Map<String ,Object> temp = eventList.get(0);
+            Map<String, Object> resultMap = simpleEvent(temp);
             List<Map<String, Object>> diagnosisList = new ArrayList<>();
-            if (!StringUtils.isEmpty(temp.get(BasisConstant.diagnosis))) {
-                String [] diagnosisCode = ((String) temp.get(BasisConstant.diagnosis)).split(";");
+            if (!StringUtils.isEmpty(temp.get(BasicConstant.diagnosis))) {
+                String [] diagnosisCode = ((String) temp.get(BasicConstant.diagnosis)).split(";");
                 Calendar calendar = Calendar.getInstance();
                 calendar.set(Calendar.HOUR_OF_DAY, 0);
                 calendar.set(Calendar.MINUTE, 0);
@@ -382,51 +255,44 @@ public class ProfileEventService {
                     envelop = resource.getMasterData(q, 1, 500, null);
                     String name = redisService.getIcd10Name(code);
                     Map<String, Object> diagnosisMap = new HashMap<>();
-                    diagnosisMap.put("healthProblemName", name);
+                    diagnosisMap.put("healthProblemName", name == null ? "自定义" : name);
                     diagnosisMap.put("count", envelop.getDetailModelList().size());
                     diagnosisList.add(diagnosisMap);
                 }
             }
             resultMap.put("diagnosis", diagnosisList);
-            resultMap.put("profileId", temp.get("rowkey"));
-            resultMap.put("orgCode", temp.get("org_code"));
-            resultMap.put("orgName", temp.get("org_name"));
-            resultMap.put("demographicId", temp.get("demographic_id"));
-            resultMap.put("cdaVersion", temp.get("cda_version"));
-            resultMap.put("eventDate", temp.get("event_date"));
-            resultMap.put("profileType", temp.get("profile_type"));
-            resultMap.put("eventType", temp.get("event_type"));
-            resultMap.put("eventNo", temp.get("event_no"));
-            if (temp.get("event_type").equals("0")) { //门诊信息
+            if (temp.get(BasicConstant.eventType).equals("0")) { //门诊信息
                 resultMap.put("department", temp.get("EHR_000082") == null ? "" : temp.get("EHR_000082") );
                 resultMap.put("doctor", temp.get("EHR_000079") == null ? "" : temp.get("EHR_000079"));
-                //诊断名称 start
-                String diagnosticResult = "";
-                if (!StringUtils.isEmpty(temp.get("diagnosis_name"))) {
-                    diagnosticResult = ((String) temp.get("diagnosis_name")).replaceAll(";", "、");
-                } else if (!StringUtils.isEmpty(temp.get("diagnosis"))) {
-                    String [] diagnosisCode = ((String) temp.get("diagnosis")).split(";");
-                    for (String code : diagnosisCode) {
-                        String name = redisService.getIcd10Name(code);
-                        if (!StringUtils.isEmpty(name)) {
-                            diagnosticResult += name + "、";
-                        }
-                    }
-                } else if (!StringUtils.isEmpty(temp.get("health_problem_name"))) {
-                    diagnosticResult = ((String) temp.get("health_problem_name")).replaceAll(";", "、");
-                } else if (!StringUtils.isEmpty(temp.get("health_problem"))) {
-                    String [] _hpCode = ((String) temp.get("health_problem")).split(";");
-                    for (String code : _hpCode) {
-                        String name = redisService.getHealthProblem(code);
-                        if (!StringUtils.isEmpty(name)) {
-                            diagnosticResult += name + "、";
-                        }
+                resultMap.put("diagnosticResult", resultMap.get("healthProblemName")); //诊断结果
+                //检查
+                String inspectResultQ = "{\"q\":\"rowkey:" + profileId + "$HDSD00_79$*\"}";
+                envelop = resource.getSubData(inspectResultQ, 1, 500, null);
+                List<Map<String, Object>> inspectResult = new ArrayList<>();
+                List<Map<String, Object>> inspectResultList = envelop.getDetailModelList();
+                for (Map<String, Object> temp1 : inspectResultList) {
+                    if (temp1.get("EHR_002883") != null) {
+                        Map<String, Object> data = new HashMap<>();
+                        data.put("name", temp1.get("EHR_002883"));
+                        data.put("mark", temp1.get("EHR_000316")); //检查报告单号
+                        inspectResult.add(data);
                     }
                 }
-                //诊断名称 end
-                resultMap.put("diagnosticResult", diagnosticResult); //诊断结果
-                resultMap.put("inspectResult", temp.get("EHR_002883") == null ? "" : temp.get("EHR_002883")); //检查名称
-                resultMap.put("examineResult", temp.get("EHR_000352") == null ? "" : temp.get("EHR_000352")); //检验项目
+                resultMap.put("inspectResult", inspectResult);
+                //检验
+                String examineResultQ = "{\"q\":\"rowkey:" + profileId + "$HDSD00_77$*\"}";
+                envelop = resource.getSubData(examineResultQ, 1, 500, null);
+                List<Map<String, Object>> examineResult = new ArrayList<>();
+                List<Map<String, Object>> examineResultList = envelop.getDetailModelList();
+                for (Map<String, Object> temp1 : examineResultList) {
+                    if (temp1.get("EHR_000352") != null) {
+                        Map<String, Object> data = new HashMap<>();
+                        data.put("name", temp1.get("EHR_000352"));
+                        data.put("mark", temp1.get("EHR_000363")); //检验报告单号
+                        examineResult.add(data);
+                    }
+                }
+                resultMap.put("examineResult", examineResult);
             } else if (temp.get("event_type").equals("1")) { //住院信息
                 resultMap.put("department", temp.get("EHR_000229") == null ? "" : temp.get("EHR_000229"));
                 resultMap.put("doctor", temp.get("EHR_005072") == null ? "" : temp.get("EHR_005072"));
@@ -437,8 +303,9 @@ public class ProfileEventService {
                 resultMap.put("treatmentResults", temp.get("EHR_000166") == null ? "" : temp.get("EHR_000166")); //治疗结果
                 resultMap.put("dischargeInstructions", temp.get("EHR_000157") == null ? "" :  temp.get("EHR_000157")); //出院医嘱
             }
+            return resultMap;
         }
-        return resultMap;
+        return new HashMap<>();
     }
 
 }

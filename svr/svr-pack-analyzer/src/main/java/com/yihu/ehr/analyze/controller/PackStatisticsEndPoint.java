@@ -40,7 +40,7 @@ public class PackStatisticsEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "endDate", value = "结束日期")
             @RequestParam(name = "endDate") String endDate,
             @ApiParam(name = "orgCode", value = "医院代码")
-            @RequestParam(name = "orgCode") String orgCode) throws Exception {
+            @RequestParam(name = "orgCode" , required = false) String orgCode) throws Exception {
         Envelop envelop = new Envelop();
         Date start = DateUtil.formatCharDateYMD(startDate);
         Date end = DateUtil.formatCharDateYMD(endDate);
@@ -76,7 +76,7 @@ public class PackStatisticsEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "date", value = "日期")
             @RequestParam(name = "date") String date,
             @ApiParam(name = "orgCode", value = "医院代码")
-            @RequestParam(name = "orgCode") String orgCode) throws Exception {
+            @RequestParam(name = "orgCode", required = false) String orgCode) throws Exception {
         Envelop envelop = new Envelop();
         List<Map<String, Object>> list = statisticService.getArchivesInc(date, orgCode);
         envelop.setSuccessFlg(true);

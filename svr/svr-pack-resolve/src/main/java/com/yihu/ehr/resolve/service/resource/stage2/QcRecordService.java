@@ -14,15 +14,14 @@ import java.util.Map;
 @Service
 public class QcRecordService {
 
-    private static final String INDEX = "json_archives";
+    private static final String INDEX = "json_archives_qc";
     private static final String QC_METADATA_INFO = "qc_metadata_info";
 
     @Autowired
     private ElasticSearchUtil elasticSearchUtil;
 
     public void record(ResourceBucket resourceBucket) throws Exception {
-        System.out.println(resourceBucket.getQcMetadataRecords().getRecords().size());
-        //elasticSearchUtil.bulkIndex(INDEX, QC_METADATA_INFO, resourceBucket.getQcRecords().getRecords());
+        elasticSearchUtil.bulkIndex(INDEX, QC_METADATA_INFO, resourceBucket.getQcMetadataRecords().getRecords());
     }
 
 }

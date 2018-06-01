@@ -1,10 +1,8 @@
 package com.yihu.ehr.profile.service;
 
-import com.yihu.ehr.profile.feign.ResourceClient;
-import com.yihu.ehr.profile.util.BasisConstant;
+import com.yihu.ehr.profile.util.BasicConstant;
 import com.yihu.ehr.profile.util.SimpleSolrQueryUtil;
 import com.yihu.ehr.util.rest.Envelop;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -14,12 +12,7 @@ import java.util.*;
  * Created by progr1mmer on 2018/3/13.
  */
 @Service
-public class ProfileMedicationService {
-
-    @Autowired
-    private ResourceClient resource;
-    @Autowired
-    private RedisService redisService;
+public class ProfileMedicationService extends ProfileBasicService {
 
     public Map<String, Integer> medicationRanking(String demographicId, String hpCode, String date) throws Exception {
         String masterQ;
@@ -79,16 +72,21 @@ public class ProfileMedicationService {
             List<Map<String, Object>> masterList = masterEnvelop.getDetailModelList();
             //循环获取结果集
             for (Map<String, Object> masterMap : masterList) {
-                String rowKey = (String) masterMap.get("rowkey");
+                String rowKey = (String) masterMap.get(BasicConstant.rowkey);
                 String subQ = "{\"q\":\"profile_id:" + rowKey + " AND (rowkey:*HDSD00_83* OR rowkey:*HDSD00_84*)\"}";
                 Envelop subEnvelop = resource.getSubData(subQ, 1, 500, null);
                 if (subEnvelop.isSuccessFlg()) {
                     List<Map<String, Object>> subList = subEnvelop.getDetailModelList();
                     if (subList.size() > 0) {
-                        Map<String, Object> resultMap = new HashMap<>();
                         boolean match = false;
+                        String typeMark = "00"; //中西药标识
                         for (Map<String, Object> subMap : subList) {
                             if (subMap.get("EHR_000131") != null) {
+                                if (subMap.get(BasicConstant.rowkey).toString().contains("HDSD00_83")) {
+                                    typeMark = "01"; //中药
+                                } else {
+                                    typeMark = "02"; //西药
+                                }
                                 if (keyWord != null) {
                                     if (subMap.get("EHR_000131").toString().contains(keyWord)) {
                                         match = true;
@@ -100,6 +98,11 @@ public class ProfileMedicationService {
                                 }
                             }
                             if (subMap.get("EHR_000100") != null) {
+                                if (subMap.get(BasicConstant.rowkey).toString().contains("HDSD00_83")) {
+                                    typeMark = "01"; //中药
+                                } else {
+                                    typeMark = "02"; //西药
+                                }
                                 if (keyWord != null && subMap.get("EHR_000100") != null) {
                                     if (subMap.get("EHR_000100").toString().contains(keyWord)) {
                                         match = true;
@@ -113,44 +116,12 @@ public class ProfileMedicationService {
                         }
                         if (match) {
                             //时间轴基本字段
-                            resultMap.put("profileId", masterMap.get("rowkey"));
-                            resultMap.put("orgCode", masterMap.get("org_code"));
-                            resultMap.put("orgName", masterMap.get("org_name"));
-                            resultMap.put("demographicId", masterMap.get("demographic_id"));
-                            resultMap.put("cdaVersion", masterMap.get("cda_version"));
-                            resultMap.put("eventDate", masterMap.get("event_date"));
-                            resultMap.put("profileType", masterMap.get("profile_type"));
-                            resultMap.put("eventType", masterMap.get("event_type"));
-                            resultMap.put("eventNo", masterMap.get("event_no"));
-                            //追加诊断名称 start
-                            String healthProblemName = "";
-                            if (!StringUtils.isEmpty(masterMap.get("diagnosis_name"))) {
-                                healthProblemName = ((String) masterMap.get("diagnosis_name")).replaceAll(";", "、");
-                            } else if (!StringUtils.isEmpty(masterMap.get("diagnosis"))) {
-                                String [] diagnosisCode = ((String) masterMap.get("diagnosis")).split(";");
-                                for (String code : diagnosisCode) {
-                                    String name = redisService.getIcd10Name(code);
-                                    if (!StringUtils.isEmpty(name)) {
-                                        healthProblemName += name + "、";
-                                    }
-                                }
-                            } else if (!StringUtils.isEmpty(masterMap.get("health_problem_name"))) {
-                                healthProblemName = ((String) masterMap.get("health_problem_name")).replaceAll(";", "、");
-                            } else if (!StringUtils.isEmpty(masterMap.get("health_problem"))) {
-                                String [] _hpCode = ((String) masterMap.get("health_problem")).split(";");
-                                for (String code : _hpCode) {
-                                    String name = redisService.getHealthProblem(code);
-                                    if (!StringUtils.isEmpty(name)) {
-                                        healthProblemName += name + "、";
-                                    }
-                                }
-                            }
-                            resultMap.put("healthProblemName", healthProblemName);
-                            //追加诊断名称 end
-                            if (masterMap.get("event_type").equals("0")) { //门诊信息
+                            Map<String, Object> resultMap = simpleEvent(masterMap);
+                            resultMap.put("mark", typeMark);
+                            if (masterMap.get(BasicConstant.eventType).equals("0")) { //门诊信息
                                 resultMap.put("department", masterMap.get("EHR_000082"));
                                 resultMap.put("doctor", masterMap.get("EHR_000079"));
-                            } else if (masterMap.get("event_type").equals("1")) { //住院信息
+                            } else if (masterMap.get(BasicConstant.eventType).equals("1")) { //住院信息
                                 resultMap.put("department", masterMap.get("EHR_000229"));
                                 resultMap.put("doctor", masterMap.get("EHR_005072"));
                             }
@@ -172,7 +143,7 @@ public class ProfileMedicationService {
         Object eventDate = "";
         for (Map<String, Object> event : masterList) {
             //详情
-            String subQ = "{\"q\":\"profile_id:" + event.get(BasisConstant.rowkey) + " AND (rowkey:*HDSD00_83* OR rowkey:*HDSD00_84*)\"}";
+            String subQ = "{\"q\":\"profile_id:" + event.get(BasicConstant.rowkey) + " AND (rowkey:*HDSD00_83* OR rowkey:*HDSD00_84*)\"}";
             Envelop subEnvelop = resource.getSubData(subQ, 1, 1000, null);
             List<Map<String, Object>> subList = subEnvelop.getDetailModelList();
             if (subList.size() > 0) {
@@ -201,7 +172,7 @@ public class ProfileMedicationService {
                 }
             }
             if (dataList.size() > 0) {
-                eventDate = event.get(BasisConstant.eventDate);
+                eventDate = event.get(BasicConstant.eventDate);
                 break;
             }
         }
