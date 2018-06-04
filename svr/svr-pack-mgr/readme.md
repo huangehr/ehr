@@ -29,6 +29,7 @@
 	curl -X PUT 'http://172.19.103.9:9200/json_archives/info/_mapping' -d '{"info":{"properties":{"org_area":{"type":"string","index":"not_analyzed"}}}}'
 	curl -X PUT 'http://172.19.103.9:9200/json_archives/info/_mapping' -d '{"info":{"properties":{"dept":{"type":"string","index":"not_analyzed"}}}}'
 	curl -X PUT 'http://172.19.103.9:9200/json_archives/info/_mapping' -d '{"info":{"properties":{"delay":{"type":"long"}}}}'
+	curl -X PUT 'http://172.19.103.9:9200/json_archives/info/_mapping' -d '{"info":{"properties":{"defect":{"type":"integer"}}}}'
 	
 	
 	

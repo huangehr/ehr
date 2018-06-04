@@ -86,6 +86,7 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
                 ResourceBucket resourceBucket = packMillService.grindingPackModel(standardPackage, pack);
                 identifyService.identify(resourceBucket, standardPackage);
                 resourceService.save(resourceBucket, standardPackage, pack);
+                map.put("defect", resourceBucket.getQcMetadataRecords().getRecords().isEmpty() ? 0 : 1); //是否解析异常
             }
 
             //回填入库状态

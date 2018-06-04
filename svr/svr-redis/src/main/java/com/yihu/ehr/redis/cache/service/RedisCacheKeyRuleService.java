@@ -62,10 +62,8 @@ public class RedisCacheKeyRuleService extends BaseJpaService<RedisCacheKeyRule, 
         }
     }
 
-    public Boolean isUniqueExpression(Integer id, String categoryCode, String expression) {
-        // todo 存在问题：模糊匹配不准确
-//        String similarExpression = CacheCommonBiz.replaceParams(expression, "%");
-        RedisCacheKeyRule redisCacheKeyRule = redisCacheKeyRuleDao.isUniqueExpression(id, categoryCode, expression);
+    public Boolean isUniqueExpression(Integer id, String categoryCode, String simpleExpression) {
+        RedisCacheKeyRule redisCacheKeyRule = redisCacheKeyRuleDao.isUniqueExpression(id, categoryCode, simpleExpression);
         if (redisCacheKeyRule == null) {
             return true;
         } else {

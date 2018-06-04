@@ -1654,4 +1654,11 @@ public class ServiceApi {
         public static final String DatasetWarningDel = "/dataQuality/warningSetting/datasetWarningDel";
 
     }
+
+    /**
+     * 质控相关
+     */
+    public class PACKQCREPORT {
+        public static final String dailyReport = "/packQcReport/dailyReport";
+    }
 }
