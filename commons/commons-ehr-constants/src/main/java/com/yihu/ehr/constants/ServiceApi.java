@@ -1632,6 +1632,30 @@ public class ServiceApi {
     }
 
     /**
+     * 数据质量监控
+     */
+    public static class DataQuality{
+        public static final String PaltformReceiveWarningList = "/dataQuality/warningSetting/receiveWarningList";
+        public static final String PaltformReceiveWarningAdd = "/dataQuality/warningSetting/receiveWarningAdd";
+        public static final String PaltformReceiveWarningDel = "/dataQuality/warningSetting/receiveWarningDel";
+        public static final String PaltformReceiveWarningUpd = "/dataQuality/warningSetting/receiveWarningUpd";
+        public static final String PaltformReceiveWarning =    "/dataQuality/warningSetting/receiveWarning/{id}";
+        public static final String PaltformResourceWarningList = "/dataQuality/warningSetting/resourceWarningList";
+        public static final String PaltformResourceWarningAdd = "/dataQuality/warningSetting/resourceWarningAdd";
+        public static final String PaltformResourceWarningDel = "/dataQuality/warningSetting/resourceWarningDel";
+        public static final String PaltformResourceWarningUpd = "/dataQuality/warningSetting/resourceWarningUpd";
+        public static final String PaltformResourceWarning =    "/dataQuality/warningSetting/resourceWarning/{id}";
+        public static final String PaltformUploadWarningList = "/dataQuality/warningSetting/uploadWarningList";
+        public static final String PaltformUploadWarningAdd = "/dataQuality/warningSetting/uploadWarningAdd";
+        public static final String PaltformUploadWarningDel = "/dataQuality/warningSetting/uploadWarningDel";
+        public static final String PaltformUploadWarningUpd = "/dataQuality/warningSetting/uploadWarningUpd";
+        public static final String PaltformUploadWarning =    "/dataQuality/warningSetting/uploadWarning/{id}";
+        public static final String DatasetWarningAdd = "/dataQuality/warningSetting/datasetWarningAdd";
+        public static final String DatasetWarningDel = "/dataQuality/warningSetting/datasetWarningDel";
+
+    }
+
+    /**
      * 质控相关
      */
     public class PACKQCREPORT {

@@ -49,6 +49,9 @@ analyze:
     maxSize: 10 #解析入库最大任务数
     cronExp: 0/4 * * * * ? #解析任务触发间隔表达式
 
+quality:
+  orgCode : 1 #默认机构
+
 elasticsearch:
   pool:
     init-size: 5
