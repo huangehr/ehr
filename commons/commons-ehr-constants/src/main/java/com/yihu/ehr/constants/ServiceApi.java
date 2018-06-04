@@ -1658,7 +1658,9 @@ public class ServiceApi {
     /**
      * 质控相关
      */
-    public class PACKQCREPORT {
+    public class PackQcReport {
         public static final String dailyReport = "/packQcReport/dailyReport";
+        public static final String datasetWarningList = "/packQcReport/datasetWarningList";
+        public static final String resourceSuccessfulCount = "/packQcReport/resourceSuccessfulCount";
     }
 }
