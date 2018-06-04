@@ -25,6 +25,7 @@ public class TjQuotaModel {
     private String jobClazzName;
     private String isInitExec; // 是否初始执行过，0：否，1：是。
     private String resultGetType;
+    private String jobStatus;//0未开启，1执行中
 
     private TjQuotaDataSourceModel tjQuotaDataSourceModel;
     private TjQuotaDataSaveModel tjQuotaDataSaveModel;
@@ -220,5 +221,13 @@ public class TjQuotaModel {
 
     public void setResultGetType(String resultGetType) {
         this.resultGetType = resultGetType;
+    }
+
+    public String getJobStatus() {
+        return jobStatus;
+    }
+
+    public void setJobStatus(String jobStatus) {
+        this.jobStatus = jobStatus;
     }
 }
