@@ -229,7 +229,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
         }
 
         Long end5 = System.currentTimeMillis();
-        System.out.println("资源化数据(解析成功和失败)时间："+(end5-end4));
+        System.out.println("资源化数据(解析成功和失败 )时间："+(end5-end4));
 
         String sql6 = "SELECT count(*) c,org_code FROM json_archives/info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' and defect=1 group by org_code";
         ResultSet resultSet6 = elasticSearchUtil.findBySql(sql6);
