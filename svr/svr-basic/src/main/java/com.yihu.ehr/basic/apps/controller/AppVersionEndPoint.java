@@ -33,16 +33,17 @@ public class AppVersionEndPoint extends EnvelopRestEndPoint{
             @ApiParam(name = "code", value = "当前版本ID", defaultValue = "")
             @RequestParam(value = "code")String code,
             @ApiParam(name = "version", value = "要获取的版本", defaultValue = "")
-            @RequestParam(value = "version", required = false)Double version){
+            @RequestParam(value = "version", required = false)String version){
         AppVersion temp = appVersionService.getAppVersionByCode(code);
         if (temp == null) {
             return failed("无效的APP类型失败！");
         }
-        if (version > 0) {
+        /*if (version > 0) {
             //将版本返回前端，前端判断版本是否一致，决定升级与否
             return success(temp);
         } else {
             return failed("版本号有误");
-        }
+        }*/
+        return success(temp);
     }
 }
