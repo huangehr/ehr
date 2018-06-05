@@ -45,6 +45,8 @@ public class LinkPackageResolver extends PackageResolver {
     private String password;
     @Value("${ftp.port}")
     private int port;
+    @Value("${fast-dfs.pacs-group-name:group1}")
+    private String groupName;
     @Autowired
     private FastDFSUtil fastDFSUtil;
 
