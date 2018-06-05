@@ -184,7 +184,7 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
         envelop.setPageSize(result.getSize());
         envelop.setTotalCount(new Long(result.getTotalElements()).intValue());
         if (version != null && version.length() > 0) {
-            envelop.setDetailModelList(resourcesTransformService.displayCodeConvert(result.getContent(), version,null));
+            envelop.setDetailModelList(resourcesTransformService.displayCodeConvert(result.getContent(), version, resourcesCode));
         } else {
             envelop.setDetailModelList(result.getContent());
         }

@@ -37,6 +37,8 @@ public class ResourceIntegratedEndPoint extends EnvelopRestEndPoint {
     private RsResourceService rsService;
     @Autowired
     private RsResourceDefaultQueryService resourcesDefaultQueryService;
+    @Autowired
+    private ResourceBrowseService resourceBrowseService;
 
     @Deprecated
     @ApiOperation("综合查询档案数据列表树")
@@ -93,7 +95,7 @@ public class ResourceIntegratedEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page", required = false) Integer page,
             @ApiParam(name = "size", value = "每页几行(>0)")
             @RequestParam(value = "size", required = false) Integer size) throws Exception{
-        Page<Map<String, Object>> result =  resourcesIntegratedService.searchMetadataData(resourcesCode, metaData, orgCode, areaCode, queryCondition, page, size);
+        Page<Map<String, Object>> result =  resourceBrowseService.getCustomizeData(resourcesCode, metaData, orgCode, areaCode, queryCondition, page, size);
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(true);
         envelop.setCurrPage(result.getNumber());

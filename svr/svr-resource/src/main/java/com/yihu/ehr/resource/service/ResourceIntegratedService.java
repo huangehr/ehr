@@ -429,42 +429,6 @@ public class ResourceIntegratedService extends BaseJpaService {
     }
 
     /**
-     * 综合查询档案数据检索
-     * @return
-     */
-    @Transactional(readOnly = true)
-    public Page<Map<String, Object>> searchMetadataData(String resourcesCode, String metaData, String orgCode, String areaCode, String queryCondition, Integer page, Integer size) throws Exception{
-        Pattern pattern = Pattern.compile("\\[.+?\\]");
-        if (resourcesCode != null) {
-            Matcher rcMatcher = pattern.matcher(resourcesCode);
-            if (!rcMatcher.find()) {
-                return null;
-            }
-        }
-        if (metaData != null) {
-            Matcher mdMatcher = pattern.matcher(metaData);
-            if (!mdMatcher.find()) {
-                metaData = "";
-            }
-        } else {
-            metaData = "";
-        }
-        if (queryCondition == null) {
-            queryCondition = "[]";
-        } else {
-            Matcher qcMatcher = pattern.matcher(queryCondition);
-            if (!qcMatcher.find()) {
-                queryCondition = "[]";
-            } else {
-                if (!queryCondition.contains("{") || !queryCondition.contains("}")) {
-                    queryCondition = "[]";
-                }
-            }
-        }
-        return resourceBrowseService.getCustomizeData(resourcesCode, metaData, orgCode, areaCode, queryCondition, page, size);
-    }
-
-    /**
      * 综合查询指标统计列表树
      * @param filters
      * @return
