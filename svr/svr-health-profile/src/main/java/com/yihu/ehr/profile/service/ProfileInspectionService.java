@@ -39,26 +39,21 @@ public class ProfileInspectionService extends ProfileBasicService {
                     Envelop subEnvelop = resource.getSubData(subQ, 1, 500, null);
                     List<Map<String, Object>> subList = subEnvelop.getDetailModelList();
                     subList.forEach(item -> {
-                        Map<String, Object> resultMap = simpleEvent(temp);
-                        String healthProblemName = (String) resultMap.get("healthProblemName");
-                        String itemName = (String) item.get(nameMap.get(dataset));
-                        if (itemName != null) {
-                            resultMap.put("projectName", itemName);
-                        } else {
-                            if (dataset.equals("HDSD00_79")) {
-                                resultMap.put("projectName", "检查报告-" + healthProblemName);
+                        Map<String, Object> resultMap = simpleEvent(temp, searchParam);
+                        if (resultMap != null) {
+                            String healthProblemName = (String) resultMap.get("healthProblemName");
+                            String itemName = (String) item.get(nameMap.get(dataset));
+                            if (itemName != null) {
+                                resultMap.put("projectName", itemName);
                             } else {
-                                resultMap.put("projectName", "检验报告-" + healthProblemName);
+                                if (dataset.equals("HDSD00_79")) {
+                                    resultMap.put("projectName", "检查报告-" + healthProblemName);
+                                } else {
+                                    resultMap.put("projectName", "检验报告-" + healthProblemName);
+                                }
                             }
-                        }
-                        resultMap.put("type", typeMap.get(dataset));
-                        resultMap.put("mark", item.get(numMap.get(dataset)));
-                        if (!StringUtils.isEmpty(searchParam)) {
-                            String orgName = (String) temp.get("org_name");
-                            if (orgName.contains(searchParam) || itemName.contains(searchParam)) {
-                                resultList.add(resultMap);
-                            }
-                        } else {
+                            resultMap.put("type", typeMap.get(dataset));
+                            resultMap.put("mark", item.get(numMap.get(dataset)));
                             resultList.add(resultMap);
                         }
                     });

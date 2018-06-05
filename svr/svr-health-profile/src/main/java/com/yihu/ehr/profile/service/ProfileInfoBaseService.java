@@ -51,14 +51,14 @@ public class ProfileInfoBaseService extends BaseJpaService {
                 for (Map<String, Object> obj : list) {
                     for (String key : obj.keySet()) {
                         if ("EHR_004971".equals(key)) {
-                            if (!allergyMedicine.contains(result.get("EHR_004971"))) {
-                                allergyMedicine.add((String) result.get("EHR_004971"));
+                            if (!allergyMedicine.contains(obj.get("EHR_004971"))) {
+                                allergyMedicine.add((String) obj.get("EHR_004971"));
                             }
                             continue;
                         }
                         if ("EHR_000011".equals(key)) {
-                            if (!allergens.contains(result.get("EHR_000011"))) {
-                                allergens.add((String) result.get("EHR_000011"));
+                            if (!allergens.contains(obj.get("EHR_000011"))) {
+                                allergens.add((String) obj.get("EHR_000011"));
                             }
                             continue;
                         }
@@ -145,11 +145,11 @@ public class ProfileInfoBaseService extends BaseJpaService {
             }
             //出生日期
             String birthday = "";
-            if (!StringUtils.isEmpty(result.get("EHR_000007"))) {
-                birthday = (String) result.get("EHR_000007");
-            }
             if (StringUtils.isEmpty(birthday) && !StringUtils.isEmpty(result.get("EHR_000007"))) {
                 birthday = (String) result.get("EHR_000007");
+            }
+            if (StringUtils.isEmpty(birthday) && !StringUtils.isEmpty(result.get("EHR_000320"))) {
+                birthday = (String) result.get("EHR_000320");
             }
             patientMap.put("birthday", birthday);
             //年龄

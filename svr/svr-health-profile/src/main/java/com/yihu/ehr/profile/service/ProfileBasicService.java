@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by progr1mmer on 2018/5/31.
@@ -24,7 +26,7 @@ public abstract class ProfileBasicService {
     @Autowired
     protected CDADocumentClient cdaService;
 
-    protected Map<String, Object> simpleEvent (Map<String, Object> detailsEvent) {
+    protected Map<String, Object> simpleEvent (Map<String, Object> detailsEvent, String searchParam) {
         Map<String, Object> simpleEvent = new HashMap<>();
         simpleEvent.put("profileId", detailsEvent.get(BasicConstant.rowkey));
         simpleEvent.put("orgCode", detailsEvent.get(BasicConstant.orgCode));
@@ -35,7 +37,7 @@ public abstract class ProfileBasicService {
         simpleEvent.put("profileType", detailsEvent.get(BasicConstant.profileType));
         simpleEvent.put("eventType", detailsEvent.get(BasicConstant.eventType));
         simpleEvent.put("eventNo", detailsEvent.get(BasicConstant.eventNo));
-        //追加诊断名称 start
+        //诊断名称
         String healthProblemName = "";
         if (!StringUtils.isEmpty(detailsEvent.get(BasicConstant.diagnosisName))) {
             healthProblemName = ((String) detailsEvent.get(BasicConstant.diagnosisName)).replaceAll(";", "、");
@@ -59,7 +61,50 @@ public abstract class ProfileBasicService {
             }
         }
         simpleEvent.put("healthProblemName", healthProblemName);
-        //追加诊断名称 end
+        if (!StringUtils.isEmpty(searchParam)) {
+            Set<String> searchSet = new HashSet<>();
+            //诊断检索数据
+            if (!StringUtils.isEmpty(detailsEvent.get(BasicConstant.diagnosisName))) {
+                String [] data = detailsEvent.get(BasicConstant.diagnosisName).toString().split(";");
+                for (String datum : data) {
+                    searchSet.add(datum);
+                }
+            }
+            if (!StringUtils.isEmpty(detailsEvent.get(BasicConstant.diagnosis))) {
+                String [] data = detailsEvent.get(BasicConstant.diagnosis).toString().split(";");
+                for (String datum : data) {
+                    String name = redisService.getIcd10Name(datum);
+                    if (!StringUtils.isEmpty(name)) {
+                        searchSet.add(name);
+                    }
+                }
+            }
+            if (!StringUtils.isEmpty(detailsEvent.get(BasicConstant.healthProblemName))) {
+                String [] data = detailsEvent.get(BasicConstant.healthProblemName).toString().split(";");
+                for (String datum : data) {
+                    searchSet.add(datum);
+                }
+            }
+            if (!StringUtils.isEmpty(detailsEvent.get(BasicConstant.healthProblem))) {
+                String [] data = detailsEvent.get(BasicConstant.healthProblem).toString().split(";");
+                for (String datum : data) {
+                    String name = redisService.getHealthProblem(datum);
+                    if (!StringUtils.isEmpty(name)) {
+                        searchSet.add(name);
+                    }
+                }
+            }
+            String orgName = "";
+            if (!StringUtils.isEmpty(detailsEvent.get(BasicConstant.orgName))) {
+                orgName = (String) detailsEvent.get(BasicConstant.orgName);
+            }
+            String disease = org.apache.commons.lang3.StringUtils.join(searchSet.toArray(),";");
+            if (disease.contains(searchParam) || orgName.contains(searchParam)) {
+                return simpleEvent;
+            } else {
+                return null;
+            }
+        }
         return simpleEvent;
     }
 }
