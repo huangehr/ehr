@@ -124,10 +124,10 @@ public class PackageAnalyzeService {
                 zipPackage.unZip();
                 zipPackage.resolve();
                 packageQcService.qcHandle(zipPackage);
-                //数据集质控数据
-                result.put("qc_dataset_info", zipPackage.getQcDataSetRecord());
-                //数据元质控数据
-                result.put("qc_metadata_info", zipPackage.getQcMetadataRecords());
+                //保存数据集质控数据
+                elasticSearchUtil.index(INDEX, QC_DATASET_INFO, zipPackage.getQcDataSetRecord());
+                //保存数据元质控数据
+                elasticSearchUtil.bulkIndex(INDEX, QC_METADATA_INFO, zipPackage.getQcMetadataRecords());
                 //报告质控状态
                 //packageMgrClient.analyzeStatus(esSimplePackage.get_id(), AnalyzeStatus.Finished, 0, "qc success");
                 //发送解析消息
