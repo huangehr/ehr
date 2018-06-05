@@ -14,7 +14,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -112,7 +112,7 @@ public class ResourceBrowseDao {
         String basicFl = "";
         String dFl = "";
         String sort = "";
-        if (queryParams != null && queryParams.length() > 0) {
+        if (!StringUtils.isEmpty(queryParams)) {
             if (queryParams.startsWith("{") && queryParams.endsWith("}")) {
                 ObjectMapper objectMapper = new ObjectMapper();
                 Map<String, String> obj = objectMapper.readValue(queryParams, Map.class);
@@ -169,7 +169,7 @@ public class ResourceBrowseDao {
         String basicFl = "";
         String dFl = "";
         String sort = "";
-        if (queryParams != null && queryParams.length() > 0) {
+        if (!StringUtils.isEmpty(queryParams)) {
             if (queryParams.startsWith("{") && queryParams.endsWith("}")) {
                 ObjectMapper objectMapper = new ObjectMapper();
                 Map<String, String> obj = objectMapper.readValue(queryParams, Map.class);
@@ -190,7 +190,7 @@ public class ResourceBrowseDao {
                 if (obj.containsKey("join")) {
                     String join = obj.get("join");
                     fq = q;
-                    q = "{!join fromIndex="+mainJoinCore+" from=rowkey to=profile_id}" +join;
+                    q = "{!join fromIndex="+ mainJoinCore + " from=rowkey to=profile_id}" +join;
                     if (obj.containsKey("table")) {
                         if (fq.length() > 0) {
                             fq = "("+fq+") AND rowkey:*" + obj.get("table") + "*";
@@ -205,9 +205,9 @@ public class ResourceBrowseDao {
                             fq = obj.get("saas");
                         }
                     }
-                } else if(obj.containsKey("table")){
+                } else if (obj.containsKey("table")){
                     if (q.length() > 0) {
-                        q = "("+q+") AND rowkey:*" + obj.get("table") + "*";
+                        q = "(" + q + ") AND rowkey:*" + obj.get("table") + "*";
                     } else {
                         q = "rowkey:*" + obj.get("table") + "*";
                     }
