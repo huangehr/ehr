@@ -190,9 +190,9 @@ public class UsersEndPoint extends BaseController {
                 return failed("电话号码已存在!");
             }
 
-            //设置默认密码为身份证后六位
-            if(!org.springframework.util.StringUtils.isEmpty(detailModel.getIdCardNo())&&detailModel.getIdCardNo().length()>7){
-                String  defaultPassword=detailModel.getIdCardNo().substring(detailModel.getIdCardNo().length()-6,detailModel.getIdCardNo().length());
+            //设置默认密码为身份证后八位
+            if(!org.springframework.util.StringUtils.isEmpty(detailModel.getIdCardNo())&&detailModel.getIdCardNo().length()>9){
+                String  defaultPassword=detailModel.getIdCardNo().substring(detailModel.getIdCardNo().length()-8,detailModel.getIdCardNo().length());
                 detailModel.setPassword(defaultPassword);
             }else{
                 errorMsg += "身份证号格式有误!";
@@ -245,9 +245,9 @@ public class UsersEndPoint extends BaseController {
                 errorMsg += "电话号码不能为空!";
             }
 
-            //设置默认密码为身份证后六位
-            if(!org.springframework.util.StringUtils.isEmpty(detailModel.getIdCardNo())&&detailModel.getIdCardNo().length()>7){
-                String  defaultPassword=detailModel.getIdCardNo().substring(detailModel.getIdCardNo().length()-6,detailModel.getIdCardNo().length());
+            //设置默认密码为身份证后八位
+            if(!org.springframework.util.StringUtils.isEmpty(detailModel.getIdCardNo())&&detailModel.getIdCardNo().length()>9){
+                String  defaultPassword=detailModel.getIdCardNo().substring(detailModel.getIdCardNo().length()-8,detailModel.getIdCardNo().length());
                 detailModel.setPassword(defaultPassword);
             }else{
                 errorMsg += "身份证号格式有误!";

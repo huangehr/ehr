@@ -296,9 +296,9 @@ public class UserController extends BaseController {
                 return failed("电话号码已存在!");
             }
 
-            //设置默认密码为身份证后六位
-            if(!org.springframework.util.StringUtils.isEmpty(detailModel.getIdCardNo())&&detailModel.getIdCardNo().length()>7){
-                String  defaultPassword=detailModel.getIdCardNo().substring(detailModel.getIdCardNo().length()-6,detailModel.getIdCardNo().length());
+            //设置默认密码为身份证后八位
+            if(!org.springframework.util.StringUtils.isEmpty(detailModel.getIdCardNo())&&detailModel.getIdCardNo().length()>9){
+                String  defaultPassword=detailModel.getIdCardNo().substring(detailModel.getIdCardNo().length()-8,detailModel.getIdCardNo().length());
                 detailModel.setPassword(defaultPassword);
             }else{
                 detailModel.setPassword(AgAdminConstants.DefaultPassword);
