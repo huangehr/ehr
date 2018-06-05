@@ -616,7 +616,7 @@ public class UserEndPoint extends EnvelopRestEndPoint {
         if (!StringUtils.isEmpty(msg)) {
             return failed(msg);
         }
-        //设置默认密码为身份证后六位
+        //设置默认密码为身份证后八位
         if (!StringUtils.isEmpty(user1.getIdCardNo()) && user1.getIdCardNo().length() > 9){
             String  defaultPassword = user1.getIdCardNo().substring(user1.getIdCardNo().length() - 8);
             user1.setPassword(DigestUtils.md5Hex(defaultPassword));

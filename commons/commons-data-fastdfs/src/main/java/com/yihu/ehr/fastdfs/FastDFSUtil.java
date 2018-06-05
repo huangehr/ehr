@@ -7,6 +7,7 @@ import org.csource.common.NameValuePair;
 import org.csource.fastdfs.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.util.StringUtils;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -112,6 +113,13 @@ public class FastDFSUtil {
      * 以输入流的方式上传文件
      */
     public ObjectNode uploadBySocket(InputStream in, String fileExtension,int fileSize, NameValuePair[] fileMetaData) throws IOException, MyException, NoSuchAlgorithmException{
+        return uploadBySocket(null,in,fileExtension,fileSize,fileMetaData);
+    }
+
+    /**
+     * 以输入流的方式上传文件
+     */
+    public ObjectNode uploadBySocket(String groupname,InputStream in, String fileExtension,int fileSize, NameValuePair[] fileMetaData) throws IOException, MyException, NoSuchAlgorithmException{
         StorageClient client = pool.getStorageClient();
         try {
             ObjectNode message = new ObjectMapper().createObjectNode();
@@ -125,7 +133,12 @@ public class FastDFSUtil {
             }
             bufferedInputStream.close();
             message.put(FILE_SIZE, fileBuffer.length);
-            String[] results = client.upload_file(fileBuffer, fileExtension, fileMetaData);
+            String[] results = null;
+            if(!StringUtils.isEmpty(groupname)){
+                results = client.upload_file(groupname,fileBuffer, fileExtension, fileMetaData);
+            }else{
+                results = client.upload_file(fileBuffer, fileExtension, fileMetaData);
+            }
             if (results != null) {
                 String groupName = results[0];
                 String remoteFile = results[1];
