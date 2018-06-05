@@ -95,7 +95,7 @@ public class PackQcReportEndPoint extends EnvelopRestEndPoint {
 
         String esIndex = "json_archives";
         String esType = "info ";
-        String fq = "org_code:" + orgCode + "receive_date:[" + receiveDateStart + "T00:00:00Z TO " + receiveDateEnd + "T23:59:59Z]";
+        String fq = "org_code:" + orgCode + "receive_date:[" + receiveDateStart + " 00:00:00 TO " + receiveDateEnd + " 23:59:59]";
 
         try {
             // 门诊
