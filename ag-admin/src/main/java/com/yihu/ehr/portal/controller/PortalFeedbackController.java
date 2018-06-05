@@ -31,8 +31,8 @@ public class PortalFeedbackController extends BaseController{
     @RequestMapping(value = ServiceApi.Portal.Feedback, method = RequestMethod.POST)
     @ApiOperation(value = "创建意见反馈", notes = "重新绑定意见反馈信息")
     public Result createPortalFeedback(
-            @ApiParam(name = "portalFeedback_json_data", value = "", defaultValue = "")
-            @RequestParam(value = "portalFeedback_json_data") String portalFeedbackJsonData) throws Exception {
+            @ApiParam(name = "portalFeedbackJsonData", value = "", defaultValue = "")
+            @RequestParam(value = "portalFeedbackJsonData") String portalFeedbackJsonData) throws Exception {
 
         MPortalFeedback mPortalFeedback = objectMapper.readValue(portalFeedbackJsonData, MPortalFeedback.class);
 
@@ -109,8 +109,8 @@ public class PortalFeedbackController extends BaseController{
     @RequestMapping(value = "/portalFeedback", method = RequestMethod.PUT)
     @ApiOperation(value = "修改意见反馈", notes = "重新绑定意见反馈信息")
     public Result updatePortalFeedback(
-            @ApiParam(name = "portalFeedback_json_data", value = "", defaultValue = "")
-            @RequestParam(value = "portalFeedback_json_data") String portalFeedbackJsonData) throws Exception {
+            @ApiParam(name = "portalFeedbackJsonData", value = "", defaultValue = "")
+            @RequestParam(value = "portalFeedbackJsonData") String portalFeedbackJsonData) throws Exception {
 
             MPortalFeedback mPortalFeedback = objectMapper.readValue(portalFeedbackJsonData, MPortalFeedback.class);
 

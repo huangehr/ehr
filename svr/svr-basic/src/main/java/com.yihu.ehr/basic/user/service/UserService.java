@@ -167,7 +167,8 @@ public class UserService extends BaseJpaService<User, XUserRepository> {
     }
 
     public User resetPassword(User user) {
-        user.setPassword(hashPassword(default_password));
+        String pwd = "12345678";
+        user.setPassword(hashPassword(pwd));
         return user;
     }
 
