@@ -1,5 +1,6 @@
 package com.yihu.ehr.analyze.service.qc;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.analyze.feign.HosAdminServiceClient;
 import com.yihu.ehr.analyze.service.pack.ZipPackage;
 import com.yihu.ehr.model.packs.EsSimplePackage;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import javax.naming.event.ObjectChangeListener;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.text.DateFormat;
@@ -31,13 +33,13 @@ public class PackageQcService {
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     @Autowired
-    private HosAdminServiceClient hosAdminServiceClient;
-    @Autowired
     private RedisTemplate<String, Serializable> redisTemplate;
     @Autowired
     private QcRuleCheckService qcRuleCheckService;
     @Autowired
     private RedisClient redisClient;
+    @Autowired
+    protected ObjectMapper objectMapper;
 
 
     /**
@@ -64,10 +66,12 @@ public class PackageQcService {
         qcDataSetRecord.put("event_no", zipPackage.getEventNo());
         qcDataSetRecord.put("version", zipPackage.getCdaVersion());
         qcDataSetRecord.put("count", zipPackage.getDataSets().size());
-        List<String> details = new ArrayList<>();
+        List<Map<String,Object>> details = new ArrayList<>();
         Map<String, PackageDataSet> dataSets = zipPackage.getDataSets();
         for (String dataSetCode : dataSets.keySet()) {
-            details.add(dataSetCode);
+            Map<String, Object> dataSet = new HashMap<>();
+            dataSet.put(dataSetCode,dataSets.get(dataSetCode).getRecords().size());
+            details.add(dataSet);
             Map<String, MetaDataRecord> records = dataSets.get(dataSetCode).getRecords();
             for (String recordKey : records.keySet()) {
                 Map<String, String> dataGroup = records.get(recordKey).getDataGroup();
@@ -109,7 +113,7 @@ public class PackageQcService {
                 }
             }
         }
-        qcDataSetRecord.put("details", details);
+        qcDataSetRecord.put("details", objectMapper.writeValueAsString(details));
         qcDataSetRecord.put("missing", new ArrayList<>());
     }
 

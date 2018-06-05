@@ -1652,6 +1652,7 @@ public class ServiceApi {
         public static final String PaltformUploadWarning =    "/dataQuality/warningSetting/uploadWarning/{id}";
         public static final String DatasetWarningAdd = "/dataQuality/warningSetting/datasetWarningAdd";
         public static final String DatasetWarningDel = "/dataQuality/warningSetting/datasetWarningDel";
+        public static final String ReceivedPacketNumList = "/dataQuality/receivedPacket/packetNumList";
 
     }
 
@@ -1662,5 +1663,9 @@ public class ServiceApi {
         public static final String dailyReport = "/packQcReport/dailyReport";
         public static final String datasetWarningList = "/packQcReport/datasetWarningList";
         public static final String resourceSuccessfulCount = "/packQcReport/resourceSuccessfulCount";
+        public static final String archiveReport= "/packQcReport/archiveReport";
+        public static final String dataSetList= "/packQcReport/dataSetList";
+        public static final String archiveFailed= "/packQcReport/archiveFailed";
+        public static final String metadataError= "/packQcReport/metadataError";
     }
 }

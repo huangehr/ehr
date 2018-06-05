@@ -95,7 +95,7 @@ public class PackQcReportEndPoint extends EnvelopRestEndPoint {
 
         String esIndex = "json_archives";
         String esType = "info ";
-        String fq = "org_code:" + orgCode + "receive_date:[" + receiveDateStart + " 00:00:00 TO " + receiveDateEnd + " 23:59:59]";
+        String fq = "org_code:" + orgCode + " AND receive_date:[" + receiveDateStart + " 00:00:00 TO " + receiveDateEnd + " 23:59:59]";
 
         try {
             // 门诊
@@ -122,4 +122,53 @@ public class PackQcReportEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
+    @RequestMapping(value = ServiceApi.PackQcReport.archiveReport, method = RequestMethod.GET)
+    @ApiOperation(value = "获取接收档案数据")
+    public Envelop archiveReport(
+            @ApiParam(name = "startDate", value = "开始日期")
+            @RequestParam(name = "startDate") String startDate,
+            @ApiParam(name = "endDate", value = "结束日期")
+            @RequestParam(name = "endDate") String endDate,
+            @ApiParam(name = "orgCode", value = "医院代码")
+            @RequestParam(name = "orgCode", required = false) String orgCode) throws Exception {
+        return packQcReportService.archiveReport(startDate, endDate, orgCode);
+    }
+
+    @RequestMapping(value = ServiceApi.PackQcReport.dataSetList, method = RequestMethod.GET)
+    @ApiOperation(value = "获取接收数据集列表")
+    public Envelop dataSetList(
+            @ApiParam(name = "startDate", value = "开始日期")
+            @RequestParam(name = "startDate") String startDate,
+            @ApiParam(name = "endDate", value = "结束日期")
+            @RequestParam(name = "endDate") String endDate,
+            @ApiParam(name = "orgCode", value = "医院代码")
+            @RequestParam(name = "orgCode", required = false) String orgCode) throws Exception {
+        return packQcReportService.dataSetList(startDate, endDate, orgCode);
+    }
+
+    @RequestMapping(value = ServiceApi.PackQcReport.archiveFailed, method = RequestMethod.GET)
+    @ApiOperation(value = "获取资源化解析失败")
+    public Envelop archiveFailed(
+            @ApiParam(name = "startDate", value = "开始日期")
+            @RequestParam(name = "startDate") String startDate,
+            @ApiParam(name = "endDate", value = "结束日期")
+            @RequestParam(name = "endDate") String endDate,
+            @ApiParam(name = "orgCode", value = "医院代码")
+            @RequestParam(name = "orgCode", required = false) String orgCode) throws Exception {
+        return packQcReportService.archiveFailed(startDate, endDate, orgCode);
+    }
+
+    @RequestMapping(value = ServiceApi.PackQcReport.metadataError, method = RequestMethod.GET)
+    @ApiOperation(value = "获取解析异常")
+    public Envelop metadataError(
+            @ApiParam(name = "step", value = "异常环节")
+            @RequestParam(name = "step") String step,
+            @ApiParam(name = "startDate", value = "开始日期")
+            @RequestParam(name = "startDate") String startDate,
+            @ApiParam(name = "endDate", value = "结束日期")
+            @RequestParam(name = "endDate") String endDate,
+            @ApiParam(name = "orgCode", value = "医院代码")
+            @RequestParam(name = "orgCode", required = false) String orgCode) throws Exception {
+        return packQcReportService.metadataError(step, startDate, endDate, orgCode);
+    }
 }
