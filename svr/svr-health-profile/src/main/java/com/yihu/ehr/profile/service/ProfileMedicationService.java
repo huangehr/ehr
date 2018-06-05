@@ -116,7 +116,7 @@ public class ProfileMedicationService extends ProfileBasicService {
                         }
                         if (match) {
                             //时间轴基本字段
-                            Map<String, Object> resultMap = simpleEvent(masterMap);
+                            Map<String, Object> resultMap = simpleEvent(masterMap, null);
                             resultMap.put("mark", typeMark);
                             if (masterMap.get(BasicConstant.eventType).equals("0")) { //门诊信息
                                 resultMap.put("department", masterMap.get("EHR_000082"));

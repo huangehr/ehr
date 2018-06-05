@@ -49,16 +49,10 @@ public class ProfileEventService extends ProfileBasicService {
                         Envelop subEnvelop = resource.getSubData(subQ, 1, 1, null);
                         List<Map<String, Object>> subList = subEnvelop.getDetailModelList();
                         if (subList != null && subList.size() > 0) {
-                            Map<String, Object> resultMap = simpleEvent(temp);
-                            resultMap.put("eventType", blurryType);
-                            resultMap.put("mark", "mark"); //临时处理
-                            String healthProblemName = (String) resultMap.get("healthProblemName");
-                            if (!StringUtils.isEmpty(searchParam)) {
-                                String orgName = (String) temp.get("org_name");
-                                if (orgName.contains(searchParam) || healthProblemName.contains(searchParam)) {
-                                    resultList.add(resultMap);
-                                }
-                            } else {
+                            Map<String, Object> resultMap = simpleEvent(temp, searchParam);
+                            if (resultMap != null) {
+                                resultMap.put("eventType", blurryType);
+                                resultMap.put("mark", "mark"); //临时处理
                                 resultList.add(resultMap);
                             }
                         }
@@ -75,16 +69,10 @@ public class ProfileEventService extends ProfileBasicService {
                         Envelop subEnvelop = resource.getSubData(subQ, 1, 1, null);
                         List<Map<String, Object>> subList = subEnvelop.getDetailModelList();
                         if (subList != null && subList.size() > 0) {
-                            Map<String, Object> resultMap = simpleEvent(temp);
-                            resultMap.put("eventType", blurryType);
-                            resultMap.put("mark", subList.get(0).get("EHR_000316")); //检查报告单号
-                            String healthProblemName = (String) resultMap.get("healthProblemName");
-                            if (!StringUtils.isEmpty(searchParam)) {
-                                String orgName = (String) temp.get("org_name");
-                                if (orgName.contains(searchParam) || healthProblemName.contains(searchParam)) {
-                                    resultList.add(resultMap);
-                                }
-                            } else {
+                            Map<String, Object> resultMap = simpleEvent(temp, searchParam);
+                            if (resultMap != null) {
+                                resultMap.put("eventType", blurryType);
+                                resultMap.put("mark", subList.get(0).get("EHR_000316")); //检查报告单号
                                 resultList.add(resultMap);
                             }
                         }
@@ -101,16 +89,10 @@ public class ProfileEventService extends ProfileBasicService {
                         Envelop subEnvelop = resource.getSubData(subQ, 1, 1, null);
                         List<Map<String, Object>> subList = subEnvelop.getDetailModelList();
                         if (subList != null && subList.size() > 0) {
-                            Map<String, Object> resultMap = simpleEvent(temp);
-                            resultMap.put("eventType", blurryType);
-                            resultMap.put("mark", subList.get(0).get("EHR_000363")); //检验报告单号
-                            String healthProblemName = (String) resultMap.get("healthProblemName");
-                            if (!StringUtils.isEmpty(searchParam)) {
-                                String orgName = (String) temp.get("org_name");
-                                if (orgName.contains(searchParam) || healthProblemName.contains(searchParam)) {
-                                    resultList.add(resultMap);
-                                }
-                            } else {
+                            Map<String, Object> resultMap = simpleEvent(temp, searchParam);
+                            if (resultMap != null) {
+                                resultMap.put("eventType", blurryType);
+                                resultMap.put("mark", subList.get(0).get("EHR_000363")); //检验报告单号
                                 resultList.add(resultMap);
                             }
                         }
@@ -130,15 +112,9 @@ public class ProfileEventService extends ProfileBasicService {
             List<Map<String, Object>> eventList = envelop.getDetailModelList();
             if (eventList != null && eventList.size() > 0) {
                 for (Map<String ,Object> temp : eventList) {
-                    Map<String, Object> resultMap = simpleEvent(temp);
-                    resultMap.put("eventType", blurryType);
-                    String healthProblemName = (String) resultMap.get("healthProblemName");
-                    if (!StringUtils.isEmpty(searchParam)) {
-                        String orgName = (String) temp.get("org_name");
-                        if (orgName.contains(searchParam) || healthProblemName.contains(searchParam)) {
-                            resultList.add(resultMap);
-                        }
-                    } else {
+                    Map<String, Object> resultMap = simpleEvent(temp, searchParam);
+                    if (resultMap != null) {
+                        resultMap.put("eventType", blurryType);
                         resultList.add(resultMap);
                     }
                 }
@@ -150,14 +126,8 @@ public class ProfileEventService extends ProfileBasicService {
             List<Map<String, Object>> eventList = envelop.getDetailModelList();
             if (eventList != null && eventList.size() > 0) {
                 for (Map<String ,Object> temp : eventList) {
-                    Map<String, Object> resultMap = simpleEvent(temp);
-                    String healthProblemName = (String) resultMap.get("healthProblemName");
-                    if (!StringUtils.isEmpty(searchParam)) {
-                        String orgName = (String) temp.get("org_name");
-                        if (orgName.contains(searchParam) || healthProblemName.contains(searchParam)) {
-                            resultList.add(resultMap);
-                        }
-                    } else {
+                    Map<String, Object> resultMap = simpleEvent(temp, searchParam);
+                    if (resultMap != null) {
                         resultList.add(resultMap);
                     }
                 }
@@ -192,7 +162,7 @@ public class ProfileEventService extends ProfileBasicService {
             if (temp.get(BasicConstant.eventType) != null && temp.get(BasicConstant.eventType).equals("2")) {
                 continue;
             }
-            return simpleEvent(temp);
+            return simpleEvent(temp, null);
         }
         return new HashMap<>();
     }
@@ -224,7 +194,7 @@ public class ProfileEventService extends ProfileBasicService {
             if (temp.get(BasicConstant.eventType) != null && temp.get(BasicConstant.eventType).equals("2")) {
                 continue;
             }
-            resultList.add(simpleEvent(temp));
+            resultList.add(simpleEvent(temp, null));
         }
         return resultList;
     }
@@ -235,7 +205,7 @@ public class ProfileEventService extends ProfileBasicService {
         List<Map<String, Object>> eventList = envelop.getDetailModelList();
         if (eventList.size() > 0) {
             Map<String ,Object> temp = eventList.get(0);
-            Map<String, Object> resultMap = simpleEvent(temp);
+            Map<String, Object> resultMap = simpleEvent(temp, null);
             List<Map<String, Object>> diagnosisList = new ArrayList<>();
             if (!StringUtils.isEmpty(temp.get(BasicConstant.diagnosis))) {
                 String [] diagnosisCode = ((String) temp.get(BasicConstant.diagnosis)).split(";");
@@ -261,45 +231,77 @@ public class ProfileEventService extends ProfileBasicService {
                 }
             }
             resultMap.put("diagnosis", diagnosisList);
+            String subQ = "{\"q\":\"profile_id:" + profileId + "\"}";
+            Envelop subEnvelop = resource.getSubData(subQ, 1, 1000, null);
+            List<Map<String, Object>> subList = subEnvelop.getDetailModelList(); //细表数据
             if (temp.get(BasicConstant.eventType).equals("0")) { //门诊信息
                 resultMap.put("department", temp.get("EHR_000082") == null ? "" : temp.get("EHR_000082") );
                 resultMap.put("doctor", temp.get("EHR_000079") == null ? "" : temp.get("EHR_000079"));
                 resultMap.put("diagnosticResult", resultMap.get("healthProblemName")); //诊断结果
                 //检查
-                String inspectResultQ = "{\"q\":\"rowkey:" + profileId + "$HDSD00_79$*\"}";
-                envelop = resource.getSubData(inspectResultQ, 1, 500, null);
                 List<Map<String, Object>> inspectResult = new ArrayList<>();
-                List<Map<String, Object>> inspectResultList = envelop.getDetailModelList();
-                for (Map<String, Object> temp1 : inspectResultList) {
-                    if (temp1.get("EHR_002883") != null) {
-                        Map<String, Object> data = new HashMap<>();
-                        data.put("name", temp1.get("EHR_002883"));
-                        data.put("mark", temp1.get("EHR_000316")); //检查报告单号
-                        inspectResult.add(data);
+                for (Map<String, Object> temp1 : subList) {
+                    if (temp1.get(BasicConstant.rowkey).toString().contains("HDSD00_79")) {
+                        if (temp1.get("EHR_002883") != null) {
+                            Map<String, Object> data = new HashMap<>();
+                            data.put("name", temp1.get("EHR_002883"));
+                            data.put("mark", temp1.get("EHR_000316")); //检查报告单号
+                            inspectResult.add(data);
+                        }
                     }
                 }
                 resultMap.put("inspectResult", inspectResult);
                 //检验
-                String examineResultQ = "{\"q\":\"rowkey:" + profileId + "$HDSD00_77$*\"}";
-                envelop = resource.getSubData(examineResultQ, 1, 500, null);
                 List<Map<String, Object>> examineResult = new ArrayList<>();
-                List<Map<String, Object>> examineResultList = envelop.getDetailModelList();
-                for (Map<String, Object> temp1 : examineResultList) {
-                    if (temp1.get("EHR_000352") != null) {
-                        Map<String, Object> data = new HashMap<>();
-                        data.put("name", temp1.get("EHR_000352"));
-                        data.put("mark", temp1.get("EHR_000363")); //检验报告单号
-                        examineResult.add(data);
+                for (Map<String, Object> temp1 : subList) {
+                    if (temp1.get(BasicConstant.rowkey).toString().contains("HDSD00_77")) {
+                        if (temp1.get("EHR_000352") != null) {
+                            Map<String, Object> data = new HashMap<>();
+                            data.put("name", temp1.get("EHR_000352"));
+                            data.put("mark", temp1.get("EHR_000363")); //检验报告单号
+                            examineResult.add(data);
+                        }
                     }
                 }
                 resultMap.put("examineResult", examineResult);
-            } else if (temp.get("event_type").equals("1")) { //住院信息
-                resultMap.put("department", temp.get("EHR_000229") == null ? "" : temp.get("EHR_000229"));
-                resultMap.put("doctor", temp.get("EHR_005072") == null ? "" : temp.get("EHR_005072"));
+            } else if (temp.get(BasicConstant.eventType).equals("1")) { //住院信息
+                String department = "";
+                if (!StringUtils.isEmpty(temp.get("EHR_006209"))) {
+                    department = (String) temp.get("EHR_006209");
+                }
+                if (StringUtils.isEmpty(department) && !StringUtils.isEmpty("EHR_000228_VALUE")) {
+                    department = (String) temp.get("EHR_000228_VALUE");
+                }
+                if (StringUtils.isEmpty(department) && !StringUtils.isEmpty("EHR_000228")) {
+                    department = (String) temp.get("EHR_000228");
+                }
+                resultMap.put("department", department);
+                String doctor = "";
+                for (Map<String, Object> temp1 : subList) {
+                    if (temp1.get(BasicConstant.rowkey).toString().contains("HDSD00_11")) {
+                        if (!StringUtils.isEmpty(temp1.get("EHR_005072"))) {
+                            doctor = (String) temp1.get("EHR_005072");
+                            break;
+                        }
+                    }
+                }
+                resultMap.put("doctor", doctor);
                 resultMap.put("inSituation", temp.get("EHR_005203") == null ? "" : temp.get("EHR_005203")); //入院情况
                 resultMap.put("outSituation", temp.get("EHR_000154") == null ? "" : temp.get("EHR_000154")); //出院情况
-                resultMap.put("inResult", temp.get("EHR_000295") == null ? "" :  temp.get("EHR_000295")); //入院诊断
-                resultMap.put("outResult", temp.get("EHR_000295") == null ? "" : temp.get("EHR_000295")); //出院诊断
+                String inResult = "";
+                String outResult = "";
+                for (Map<String, Object> temp1 : subList) {
+                    if (temp1.get(BasicConstant.rowkey).toString().contains("HDSD00_69")) {
+                        if (temp1.get("EHR_006081").equals("入院诊断")) {
+                            inResult = temp1.get("EHR_000293_VALUE") != null ?  (String) temp1.get("EHR_000293_VALUE") :  (String) temp1.get("EHR_000293");
+                        }
+                        if (temp1.get("EHR_006081").equals("出院诊断")) {
+                            outResult = temp1.get("EHR_000293_VALUE") != null ?  (String) temp1.get("EHR_000293_VALUE") :  (String) temp1.get("EHR_000293");
+                        }
+                    }
+                }
+                resultMap.put("inResult", inResult); //入院诊断
+                resultMap.put("outResult", outResult); //出院诊断
                 resultMap.put("treatmentResults", temp.get("EHR_000166") == null ? "" : temp.get("EHR_000166")); //治疗结果
                 resultMap.put("dischargeInstructions", temp.get("EHR_000157") == null ? "" :  temp.get("EHR_000157")); //出院医嘱
             }

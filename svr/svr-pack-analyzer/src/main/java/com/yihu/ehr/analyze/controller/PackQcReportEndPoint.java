@@ -87,16 +87,15 @@ public class PackQcReportEndPoint extends EnvelopRestEndPoint {
     public Envelop resourceSuccessfulCount(
             @ApiParam(name = "orgCode", value = "机构编码", required = true)
             @RequestParam(name = "orgCode") String orgCode,
-            @ApiParam(name = "receiveDate", value = "接收时间")
-            @RequestParam(name = "receiveDate", required = false) String receiveDate) {
+            @ApiParam(name = "receiveDateStart", value = "接收时间（起始），格式 yyyy-MM-dd", required = true)
+            @RequestParam(name = "receiveDateStart") String receiveDateStart,
+            @ApiParam(name = "receiveDateEnd", value = "接收时间（截止），格式 yyyy-MM-dd", required = true)
+            @RequestParam(name = "receiveDateEnd") String receiveDateEnd) {
         Envelop envelop = new Envelop();
 
         String esIndex = "json_archives";
         String esType = "info ";
-        String fq = "org_code:" + orgCode;
-        if (!StringUtils.isEmpty(receiveDate)) {
-            fq += "receive_date:" + receiveDate;
-        }
+        String fq = "org_code:" + orgCode + " AND receive_date:[" + receiveDateStart + " 00:00:00 TO " + receiveDateEnd + " 23:59:59]";
 
         try {
             // 门诊
