@@ -125,7 +125,7 @@ public class PatientEndPoint extends EnvelopRestEndPoint {
     public boolean deletePatient(
             @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
             @PathVariable(value = "id_card_no") String idCardNo) throws Exception{
-        demographicService.delete(new DemographicId(idCardNo));
+        demographicService.delete(idCardNo);
         return true;
     }
 
