@@ -78,16 +78,16 @@ public class DataQualityStatisticsEndPoint extends EnvelopRestEndPoint {
                 if (dqPaltformReceiveWarning == null) {
                     dqPaltformReceiveWarning = dqPaltformReceiveWarningService.findByOrgCode(defaultQualityOrgCode);
                 }
-                if (eventType == 0) {
+                if (eventType == null) {
+                    filters += " AND (delay <= " + dqPaltformReceiveWarning.getOutpatientInTime() +
+                            " OR delay <= " + dqPaltformReceiveWarning.getHospitalInTime() +
+                            " OR delay <= " + dqPaltformReceiveWarning.getPeInTime() + ")";
+                } else if (eventType == 0) {
                     filters += " AND delay <= " + dqPaltformReceiveWarning.getOutpatientInTime();
                 } else if (eventType == 1) {
                     filters += " AND delay <= " + dqPaltformReceiveWarning.getHospitalInTime();
                 } else if (eventType == 2) {
                     filters += " AND delay <= " + dqPaltformReceiveWarning.getPeInTime();
-                } else if (eventType == null) {
-                    filters += " AND (delay <= " + dqPaltformReceiveWarning.getOutpatientInTime() +
-                            " OR delay <= " + dqPaltformReceiveWarning.getHospitalInTime() +
-                            " OR delay <= " + dqPaltformReceiveWarning.getPeInTime() + ")";
                 }
             }
 
