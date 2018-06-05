@@ -1,53 +1,44 @@
-package com.yihu.ehr.analyze.controller.dataQuality;
+package com.yihu.ehr.quality.service;
 
-import com.yihu.ehr.analyze.service.dataQuality.DataQualityStatisticsService;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.constants.ServiceApi;
-import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.util.rest.Envelop;
-import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
+import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
 /**
- * @author yeshijie on 2018/6/1.
+ *  质控-统计
+ * @author yeshijie on 2018/6/5.
  */
-@RestController
-@RequestMapping(value = ApiVersion.Version1_0, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-@Api(value = "DataQualityStatisticsEndPoint", description = "质控-统计", tags = {"档案分析服务-质控-统计"})
-public class DataQualityStatisticsEndPoint extends EnvelopRestEndPoint {
-
-    @Autowired
-    private DataQualityStatisticsService dataQualityStatisticsService;
+@FeignClient(name= MicroServices.Analyzer)
+@RequestMapping(ApiVersion.Version1_0)
+@ApiIgnore
+public interface DataQualityStatisticsClient {
 
 
     @RequestMapping(value = ServiceApi.DataQuality.QualityMonitoringList, method = RequestMethod.GET)
     @ApiOperation(value = "质量监控查询")
-    public Envelop qualityMonitoringList(
+    Envelop qualityMonitoringList(
             @ApiParam(name = "start", value = "开始时间")
             @RequestParam(value = "start", required = false) String start,
             @ApiParam(name = "end", value = "结束时间", defaultValue = "")
             @RequestParam(value = "end", required = false) String end,
             @ApiParam(name = "eventType", value = "就诊类型 0门诊 1住院 2体检,null全部", defaultValue = "")
-            @RequestParam(value = "eventType", required = false) Integer eventType) throws Exception {
-        return success(dataQualityStatisticsService.dataset(start,end,eventType));
-    }
+            @RequestParam(value = "eventType", required = false) Integer eventType);
 
     @RequestMapping(value = ServiceApi.DataQuality.ReceptionList, method = RequestMethod.GET)
     @ApiOperation(value = "接收情况")
-    public Envelop receptionList(
+    Envelop receptionList(
             @ApiParam(name = "start", value = "开始时间")
             @RequestParam(value = "start", required = false) String start,
             @ApiParam(name = "end", value = "结束时间", defaultValue = "")
-            @RequestParam(value = "end", required = false) String end) throws Exception {
-        return success(dataQualityStatisticsService.inTimeAndIntegrityRate(start,end));
-    }
+            @RequestParam(value = "end", required = false) String end);
 
 
 }
