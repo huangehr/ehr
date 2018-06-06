@@ -82,6 +82,10 @@ zuul:
     gov-server:
       path: /open/govServer/**
       url: http://www.srswjw.gov.cn:8080/
+    # 应急指挥
+    emergency-server:
+      path: /open/baidu/**
+      url: http://yingyan.baidu.com/
 
 ---
 spring:
@@ -107,6 +111,10 @@ zuul:
     gov-server:
       path: /open/govServer/**
       url: http://www.srswjw.gov.cn:8080/
+    # 应急指挥
+    emergency-server:
+      path: /open/baidu/**
+      url: http://yingyan.baidu.com/
 
 ---
 spring:
@@ -132,6 +140,10 @@ zuul:
     gov-server:
       path: /open/govServer/**
       url: http://www.srswjw.gov.cn:8080/
+    # 应急指挥
+    emergency-server:
+      path: /open/baidu/**
+      url: http://yingyan.baidu.com/
 
 ---
 spring:
@@ -157,6 +169,10 @@ zuul:
     gov-server:
       path: /open/govServer/**
       url: http://www.srswjw.gov.cn:8080/
+    # 应急指挥
+    emergency-server:
+      path: /open/baidu/**
+      url: http://yingyan.baidu.com/
 
 ---
 spring:
@@ -182,6 +198,10 @@ zuul:
     gov-server:
       path: /open/govServer/**
       url: http://www.srswjw.gov.cn:8080/
+    # 应急指挥
+    emergency-server:
+     path: /open/baidu/**
+     url: http://yingyan.baidu.com/
 
 ---
 spring:
@@ -207,3 +227,7 @@ zuul:
     gov-server:
       path: /open/govServer/**
       url: http://www.srswjw.gov.cn:8080/
+    # 应急指挥
+    emergency-server:
+     path: /open/baidu/**
+     url: http://yingyan.baidu.com/
