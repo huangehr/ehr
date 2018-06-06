@@ -1,6 +1,7 @@
 package com.yihu.ehr.analyze.controller.dataQuality;
 
 import com.yihu.ehr.analyze.service.dataQuality.DataQualityStatisticsService;
+import com.yihu.ehr.analyze.service.dataQuality.DqPaltformReceiveWarningService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
