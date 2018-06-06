@@ -51,6 +51,9 @@ analyze:
 
 quality:
   orgCode : 1 #默认机构
+  hospitalInTime: 7 # 住院及时时间（天）
+  outpatientInTime: 2 # 门诊及时时间（天）
+  peInTime: 2 # 体检及时时间（天）
 
 elasticsearch:
   pool:
@@ -235,8 +238,8 @@ spring:
     port: 6379
     password: q4YaQemf
 fast-dfs:
-  tracker-server: 192.168.50.116:22122,192.168.50.119:22122
-  public-server: http://192.168.50.37:8888
+  tracker-server: 192.168.50.116:22122,192.168.50.119:22122,192.168.50.116:22123
+  public-server: http://192.168.50.37:8888,http://192.168.50.38:8888,http://192.168.50.37:10000
 elasticsearch:
   cluster-name: elasticsearch
   cluster-nodes: 172.10.10.5:9300
