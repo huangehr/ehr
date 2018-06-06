@@ -43,7 +43,7 @@ public class PortalQuestionnaireController extends EnvelopRestEndPoint {
             @ApiParam(name = "messageId",value = "消息id")
             @RequestParam(value = "messageId",required = false)String messageId) throws Exception{
             Map<String, Object> map= questionnaireService.getAllQuestions(surveyTemplateCode);
-            portalMessageRemindService.updateMessageRemind("notifie_flag","1",Long.valueOf(messageId));
+            portalMessageRemindService.updateMessageRemind("readed","1",Long.valueOf(messageId));
             return success(map);
             //return Result.success("查询成功！",jsonObject);
 

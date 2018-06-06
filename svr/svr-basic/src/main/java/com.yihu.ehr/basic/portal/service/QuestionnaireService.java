@@ -177,6 +177,6 @@ public class QuestionnaireService extends BaseJpaService {
 			}
 		}
 		//评价完更改就诊信息评价状态
-		return portalMessageRemindService.updateMessageRemind("notifie_flag","1",Long.valueOf(messageId));
+		return portalMessageRemindService.updateMessageRemind("appraise_flag","1",Long.valueOf(messageId));
 	}
 }
