@@ -69,9 +69,9 @@ public class DataQualityStatisticsEndPoint extends EnvelopRestEndPoint {
             @RequestParam(name = "eventType", required = false) Integer eventType) {
         Envelop envelop = new Envelop();
 
-        String filters = "org_code='" + orgCode + "'";
+        String filters = "org_code='" + orgCode
+                + "' AND event_date BETWEEN '" + eventDateStart + " 00:00:00' AND '" + eventDateEnd + " 23:59:59'";
         try {
-            filters += " AND event_date BETWEEN '" + eventDateStart + " 00:00:00' AND '" + eventDateEnd + " 23:59:59'";
             // 及时率场合
             if ("1".equals(type)) {
                 DqPaltformReceiveWarning dqPaltformReceiveWarning = dqPaltformReceiveWarningService.findByOrgCode(orgCode);
@@ -83,15 +83,15 @@ public class DataQualityStatisticsEndPoint extends EnvelopRestEndPoint {
                             " OR delay <= " + dqPaltformReceiveWarning.getHospitalInTime() +
                             " OR delay <= " + dqPaltformReceiveWarning.getPeInTime() + ")";
                 } else if (eventType == 0) {
-                    filters += " AND delay <= " + dqPaltformReceiveWarning.getOutpatientInTime();
+                    filters += " AND event_type = '0' AND delay <= " + dqPaltformReceiveWarning.getOutpatientInTime();
                 } else if (eventType == 1) {
-                    filters += " AND delay <= " + dqPaltformReceiveWarning.getHospitalInTime();
+                    filters += " AND event_type = '1' AND delay <= " + dqPaltformReceiveWarning.getHospitalInTime();
                 } else if (eventType == 2) {
-                    filters += " AND delay <= " + dqPaltformReceiveWarning.getPeInTime();
+                    filters += " AND event_type = '2' AND delay <= " + dqPaltformReceiveWarning.getPeInTime();
                 }
             }
 
-            StringBuilder sql = new StringBuilder("SELECT count(event_no) packetCount FROM json_archives/info WHERE ");
+            StringBuilder sql = new StringBuilder("SELECT COUNT(event_no) packetCount FROM json_archives/info WHERE ");
             sql.append(filters);
             sql.append(" GROUP BY date_histogram(field='receive_date','interval'='1d',format='yyyy-MM-dd',alias=receiveDate)");
             List<String> fields = new ArrayList<>(2);
