@@ -260,34 +260,8 @@ public class ResourceIntegratedService extends BaseJpaService {
     public List<Object> getMetadataList(String userResource, String roleId, String filters) throws Exception{
         List<Object> resultList = new ArrayList<>();
         Map<String, Object> baseMap = new HashMap<String, Object>();
-        List<Map<String, String>> baseList = new ArrayList<Map<String, String>>();
-        //处理基本数据
-        Map<String, String> baseMap1 = new HashMap<String, String>();
-        baseMap1.put("code", "event_date");
-        baseMap1.put("name", "时间");
-        baseList.add(baseMap1);
-        Map<String, String> baseMap2 = new HashMap<String, String>();
-        baseMap2.put("code", "org_name");
-        baseMap2.put("name", "机构名称");
-        baseList.add(baseMap2);
-        Map<String, String> baseMap3 = new HashMap<String, String>();
-        baseMap3.put("code", "org_code");
-        baseMap3.put("name", "机构编号");
-        baseList.add(baseMap3);
-        Map<String, String> baseMap4 = new HashMap<String, String>();
-        baseMap4.put("code", "demographic_id");
-        baseMap4.put("name", "病人身份证号码");
-        baseList.add(baseMap4);
-        Map<String, String> baseMap5 = new HashMap<String, String>();
-        baseMap5.put("code", "patient_name");
-        baseMap5.put("name", "病人姓名");
-        baseList.add(baseMap5);
-        Map<String, String> baseMap6 = new HashMap<String, String>();
-        baseMap6.put("code", "event_type");
-        baseMap6.put("name", "事件类型");
-        baseList.add(baseMap6);
         baseMap.put("level", "0");
-        baseMap.put("baseInfo", baseList);
+        baseMap.put("baseInfo", new ArrayList<>());
         resultList.add(baseMap);
         List<RsResource> rrList;
         if (userResource.equals("*")) {
@@ -452,42 +426,6 @@ public class ResourceIntegratedService extends BaseJpaService {
             }
         }
         return resultList;
-    }
-
-    /**
-     * 综合查询档案数据检索
-     * @return
-     */
-    @Transactional(readOnly = true)
-    public Page<Map<String, Object>> searchMetadataData(String resourcesCode, String metaData, String orgCode, String areaCode, String queryCondition, Integer page, Integer size) throws Exception{
-        Pattern pattern = Pattern.compile("\\[.+?\\]");
-        if (resourcesCode != null) {
-            Matcher rcMatcher = pattern.matcher(resourcesCode);
-            if (!rcMatcher.find()) {
-                return null;
-            }
-        }
-        if (metaData != null) {
-            Matcher mdMatcher = pattern.matcher(metaData);
-            if (!mdMatcher.find()) {
-                metaData = "";
-            }
-        } else {
-            metaData = "";
-        }
-        if (queryCondition == null) {
-            queryCondition = "[]";
-        } else {
-            Matcher qcMatcher = pattern.matcher(queryCondition);
-            if (!qcMatcher.find()) {
-                queryCondition = "[]";
-            } else {
-                if (!queryCondition.contains("{") || !queryCondition.contains("}")) {
-                    queryCondition = "[]";
-                }
-            }
-        }
-        return resourceBrowseService.getCustomizeData(resourcesCode, metaData, orgCode, areaCode, queryCondition, page, size);
     }
 
     /**

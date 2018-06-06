@@ -181,7 +181,7 @@ public class HbaseQuery {
 		SolrDocumentList solrList = solr.query(table, q, fq, sortMap, start, rows);
 		//Hbase查询
 		List<String> list = new ArrayList<String>();
-		if(solrList!=null && solrList.getNumFound()>0) {
+		if(solrList != null && solrList.getNumFound() > 0) {
 			count = solrList.getNumFound();
 			for (SolrDocument doc : solrList){
 				String rowkey = String.valueOf(doc.getFieldValue("rowkey"));
@@ -189,15 +189,15 @@ public class HbaseQuery {
 			}
 		}
 		Result[] resultList = hbaseDao.getResultList(table, list, basicFl, dFl); //hbase结果集
-		if(resultList != null && resultList.length > 0){
+		if (resultList != null && resultList.length > 0){
 			for (Result result : resultList) {
 				Map<String, Object> obj = resultToMap(result);
-				if(obj!=null) {
+				if (obj != null) {
 					data.add(obj);
 				}
 			}
 		}
-		return new PageImpl<Map<String,Object>>(data,new PageRequest(page-1, rows), count);
+		return new PageImpl<>(data, new PageRequest(page - 1, rows), count);
 	}
 
 	/**

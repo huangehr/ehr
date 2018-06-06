@@ -55,7 +55,7 @@ public class ResourceBrowseService {
     private StdTransformClient stdTransformClient;
 
     //忽略字段
-    private List<String> ignoreField = new ArrayList<String>(Arrays.asList("rowkey", "event_type", "event_no", "event_date", "demographic_id", "patient_id", "org_code", "org_name", "profile_id", "cda_version", "client_id", "profile_type", "patient_name", "org_area", "diagnosis", "health_problem"));
+    private List<String> basicField = new ArrayList<>(Arrays.asList("rowkey", "event_type", "event_no", "event_date", "demographic_id", "patient_id", "org_code", "org_name", "profile_id", "cda_version", "client_id", "profile_type", "patient_name", "org_area", "diagnosis", "health_problem"));
 
     /**
      * 资源浏览 -- 资源数据元结构
@@ -132,42 +132,9 @@ public class ResourceBrowseService {
                 ql = parseCondition(defaultQuery);
             }
             queryParams = addParams(queryParams,"q", solrQuery.conditionToString(ql));
-            return resourcesBrowse(resourcesCode, rsResources.getRsInterface(), roleId, orgCode, areaCode, queryParams, page, size);
+            return getResultData(resourcesCode, roleId, orgCode, areaCode, queryParams, page, size);
         }
         throw new ApiException(ErrorCode.OBJECT_NOT_FOUND, "无相关资源");
-    }
-
-    /**
-     * 资源浏览（细表数据处理）
-     * @param resourcesCode
-     * @param orgCode
-     * @param areaCode
-     * @param queryParams Mysql为sql语句，Hbase为solr查询语法
-     * @param page
-     * @param size
-     * @return
-     * @throws Exception
-     */
-    public  Page<Map<String, Object>> resourcesBrowse(String resourcesCode, String methodName, String roleId, String orgCode, String areaCode, String queryParams, Integer page, Integer size) throws Exception {
-        //获取结果集
-        Page<Map<String,Object>> resultData = getResultData(resourcesCode, roleId, orgCode, areaCode, queryParams, page, size);
-        //细表的话追加主表的数据
-        if (methodName.endsWith("Sub") && !resultData.getContent().isEmpty()) {
-            List<Map<String,Object>> oldList = resultData.getContent();
-            for (Map<String, Object> temp : oldList) {
-                String masterRowKey = (String)temp.get("profile_id");
-                if (masterRowKey != null) {
-                    Map<String, Object> masterMap = hbaseQuery.queryByRowKey(ResourceCore.MasterTable, masterRowKey);
-                    temp.put("event_date", masterMap.get("event_date"));
-                    temp.put("org_name", masterMap.get("org_name"));
-                    temp.put("org_code", masterMap.get("org_code"));
-                    temp.put("demographic_id", masterMap.get("demographic_id"));
-                    temp.put("patient_name", masterMap.get("patient_name"));
-                    temp.put("event_type", masterMap.get("event_type"));
-                }
-            }
-        }
-        return resultData;
     }
 
     /**
@@ -231,9 +198,7 @@ public class ResourceBrowseService {
         queryParams = addParams(queryParams,"saas", saas.toString());
         queryParams = addParams(queryParams,"sort", "{\"create_date\":\"desc\"}");
         //基础数据字段
-        String basicStr = ignoreField.toString();
-        String dealBasicStr = basicStr.substring(1, basicStr.length() - 1).replaceAll(" ", "");
-        queryParams = addParams(queryParams,"basicFl", dealBasicStr);
+        queryParams = addParams(queryParams,"basicFl", org.apache.commons.lang3.StringUtils.join(basicField, ","));
         //数据元信息字段
         if (metaData.equals("")) {
             queryParams = addParams(queryParams,"dFl", "");
@@ -241,7 +206,7 @@ public class ResourceBrowseService {
             //原始集合
             List<String> customizeList = (List<String>) mapper.readValue(metaData, List.class);
             //参数集合
-            List<String> paramList = new ArrayList<String>(customizeList.size() * 2);
+            List<String> paramList = new ArrayList<>(customizeList.size() * 2);
             for (String id : customizeList) {
                 paramList.add(id);
                 String dictCode = redisService.getRsMetaData(id);
@@ -249,12 +214,9 @@ public class ResourceBrowseService {
                     paramList.add(id + "_VALUE");
                 }
             }
-            String dStr = paramList.toString();
-            String dealDStr = dStr.substring(1, dStr.length() - 1).replaceAll(" ", "");
-            queryParams = addParams(queryParams,"dFl", dealDStr);
+            queryParams = addParams(queryParams,"dFl",  org.apache.commons.lang3.StringUtils.join(paramList, ","));
         }
-        Page<Map<String, Object>> result = resourceBrowseDao.getEhrCenter(queryParams, page, size);
-        return result;
+        return resourceBrowseDao.getEhrCenter(queryParams, page, size);
     }
 
     /**
@@ -272,6 +234,9 @@ public class ResourceBrowseService {
         RsResource rsResources = rsResourceDao.findByCode(resourcesCode);
         if (rsResources != null) {
             String methodName = rsResources.getRsInterface(); //执行函数
+            if (methodName.endsWith("Sub")) {
+                queryParams = addParams(queryParams, "table", resourcesCode);
+            }
             //获取资源结构权限，该部分新增其他标准数据集的判断
             List<DtoResourceMetadata> metadataList = getAccessMetadata(rsResources, roleId, new HashMap<>());
             //获取Saas权限
@@ -346,11 +311,9 @@ public class ResourceBrowseService {
                 }
                 */
                 //基础信息字段
-                String basicStr = ignoreField.toString();
-                String dealBasicStr = basicStr.substring(1, basicStr.length() - 1).replaceAll(" ", "");
-                queryParams = addParams(queryParams,"basicFl", dealBasicStr);
+                queryParams = addParams(queryParams,"basicFl", org.apache.commons.lang3.StringUtils.join(basicField, ","));
                 //数据元信息字段
-                List<String> metadataIdList = new ArrayList<String>();
+                List<String> metadataIdList = new ArrayList<>();
                 for (DtoResourceMetadata metadata : metadataList) {
                     String id = metadata.getId();
                     metadataIdList.add(id);
@@ -359,9 +322,7 @@ public class ResourceBrowseService {
                         metadataIdList.add(id + "_VALUE");
                     }
                 }
-                String dStr = metadataIdList.toString();
-                String dealDStr = dStr.substring(1, dStr.length() - 1).replaceAll(" ", "");
-                queryParams = addParams(queryParams,"dFl", dealDStr);
+                queryParams = addParams(queryParams,"dFl", org.apache.commons.lang3.StringUtils.join(metadataIdList, ","));
                 //执行函数
                 Class<ResourceBrowseDao> classType = ResourceBrowseDao.class;
                 Method method = classType.getMethod(methodName, new Class[]{String.class, Integer.class, Integer.class});
@@ -418,14 +379,14 @@ public class ResourceBrowseService {
      * 新增参数
      * @return
      */
-    private String addParams(String oldParams, String key,String value) {
-        String newParam = "";
+    private String addParams(String oldParams, String key, String value) {
+        String newParam;
         if (value.startsWith("[") && value.endsWith("]")) {
             newParam = "\"" + key + "\":" + value;
         } else {
             newParam = "\"" + key + "\":\""+ value.replace("\"","\\\"") + "\"";
         }
-        if (oldParams!=null && oldParams.length()>3 && oldParams.startsWith("{") && oldParams.endsWith("}")) {
+        if (oldParams != null && oldParams.length() > 3 && oldParams.startsWith("{") && oldParams.endsWith("}")) {
             return oldParams.substring(0, oldParams.length() - 1) + "," + newParam + "}";
         } else {
             return "{" + newParam + "}";
