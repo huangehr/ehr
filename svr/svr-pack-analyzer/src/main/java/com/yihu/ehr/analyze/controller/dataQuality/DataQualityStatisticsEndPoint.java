@@ -1,7 +1,6 @@
 package com.yihu.ehr.analyze.controller.dataQuality;
 
 import com.yihu.ehr.analyze.service.dataQuality.DataQualityStatisticsService;
-import com.yihu.ehr.analyze.service.dataQuality.DqPaltformReceiveWarningService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
@@ -42,9 +41,9 @@ public class DataQualityStatisticsEndPoint extends EnvelopRestEndPoint {
     private ElasticSearchUtil esUtil;
 
 
-    @RequestMapping(value = "test", method = RequestMethod.GET)
-    @ApiOperation(value = "测试")
-    public Envelop paltformResourceWarningList(
+    @RequestMapping(value = ServiceApi.DataQuality.QualityMonitoringList, method = RequestMethod.GET)
+    @ApiOperation(value = "质量监控查询")
+    public Envelop qualityMonitoringList(
             @ApiParam(name = "start", value = "开始时间")
             @RequestParam(value = "start", required = false) String start,
             @ApiParam(name = "end", value = "结束时间", defaultValue = "")
@@ -52,6 +51,16 @@ public class DataQualityStatisticsEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "eventType", value = "就诊类型 0门诊 1住院 2体检,null全部", defaultValue = "")
             @RequestParam(value = "eventType", required = false) Integer eventType) throws Exception {
         return success(dataQualityStatisticsService.dataset(start, end, eventType));
+    }
+
+    @RequestMapping(value = ServiceApi.DataQuality.ReceptionList, method = RequestMethod.GET)
+    @ApiOperation(value = "接收情况")
+    public Envelop receptionList(
+            @ApiParam(name = "start", value = "开始时间")
+            @RequestParam(value = "start", required = false) String start,
+            @ApiParam(name = "end", value = "结束时间", defaultValue = "")
+            @RequestParam(value = "end", required = false) String end) throws Exception {
+        return success(dataQualityStatisticsService.inTimeAndIntegrityRate(start,end));
     }
 
     @RequestMapping(value = ServiceApi.DataQuality.ReceivedPacketNumList, method = RequestMethod.GET)
