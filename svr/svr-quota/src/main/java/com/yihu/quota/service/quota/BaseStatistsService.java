@@ -300,9 +300,9 @@ public class BaseStatistsService {
                 divisionResultList.add(map);
             } else {
                 double point = 0;
-                DecimalFormat df = new DecimalFormat("0.0");
+                DecimalFormat df = new DecimalFormat("0.00");
                 if (operation == 1) {
-                    point = (int) (moleResultVal / denominatorVal) * operationValue;
+                    point = (moleResultVal / denominatorVal) * operationValue;
                 } else if (operation == 2) {
                     point =  (moleResultVal / denominatorVal) / operationValue;
                 }
