@@ -617,8 +617,8 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.FastDFS.Status, method = RequestMethod.GET)
     @ApiOperation(value = "获取服务器状态信息")
     public Envelop status() throws Exception {
-        Map<String, Object> resultMap = fastDFSUtil.status();
-        return success((List) resultMap.get("space"));
+        List<Map<String, Object>> status = fastDFSUtil.status();
+        return success(status);
     }
 
     /**

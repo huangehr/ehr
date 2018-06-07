@@ -87,6 +87,7 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
                 identifyService.identify(resourceBucket, standardPackage);
                 resourceService.save(resourceBucket, standardPackage, pack);
                 map.put("defect", resourceBucket.getQcMetadataRecords().getRecords().isEmpty() ? 0 : 1); //是否解析异常
+                map.put("patient_name", resourceBucket.getPatientName());
             }
 
             //回填入库状态
@@ -97,7 +98,8 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
             map.put("event_date", DateUtil.toStringLong(standardPackage.getEventDate()));
             map.put("patient_id", standardPackage.getPatientId());
             map.put("dept", standardPackage.getDeptCode());
-            map.put("delay", (pack.getReceive_date().getTime() - standardPackage.getEventDate().getTime()) / 1000);
+            long delay = pack.getReceive_date().getTime() - standardPackage.getEventDate().getTime();
+            map.put("delay", delay % (1000 * 60 * 60 * 24) > 0 ? delay / (1000 * 60 * 60 * 24) + 1 : delay / (1000 * 60 * 60 * 24));
             map.put("re_upload_flg", String.valueOf(standardPackage.isReUploadFlg()));
             packageMgrClient.reportStatus(packId, ArchiveStatus.Finished, 0, objectMapper.writeValueAsString(map));
             //是否返回数据

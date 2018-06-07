@@ -173,15 +173,19 @@ public class HbaseQuery {
 		long count = 0;
 		List<Map<String,Object>> data = new ArrayList<>();
 
-		if(rows < 0) rows = 50;
-		if(page <0) page = 1;
+		if (rows < 0) {
+			rows = 50;
+		}
+		if (page <0) {
+			page = 1;
+		}
 		long start= (page-1) * rows;
 		Map<String, String> sortMap = getSortMap(sort);
 		//Solr查询
 		SolrDocumentList solrList = solr.query(table, q, fq, sortMap, start, rows);
 		//Hbase查询
 		List<String> list = new ArrayList<String>();
-		if(solrList != null && solrList.getNumFound() > 0) {
+		if (solrList != null && solrList.getNumFound() > 0) {
 			count = solrList.getNumFound();
 			for (SolrDocument doc : solrList){
 				String rowkey = String.valueOf(doc.getFieldValue("rowkey"));
