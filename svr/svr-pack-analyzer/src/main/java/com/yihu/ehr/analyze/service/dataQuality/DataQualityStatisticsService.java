@@ -70,7 +70,21 @@ public class DataQualityStatisticsService extends BaseJpaService {
             datasetMap.put(orgCode,num);
         });
 
-        System.out.println("初始化 数据集数据时间："+(System.currentTimeMillis()-startTime));
+        Long en = System.currentTimeMillis();
+        System.out.println("初始化 数据集数据时间："+(en-startTime));
+
+        //获取医院数据
+        Query query1 = session.createSQLQuery("SELECT org_code,full_name from organizations ");
+        List<Object[]> orgList = query1.list();
+        Map<String, Object> orgMap = new HashedMap(orgList.size());
+        orgList.forEach(one->{
+            String orgCode = one[0].toString();
+            String name = one[1].toString();
+            orgMap.put(orgCode,name);
+        });
+
+        Long end0 = System.currentTimeMillis();
+        System.out.println("获取医院名称时间："+(end0-en));
 
         //统计医院数据
         String sql1 = "SELECT sum(HSI07_01_001) s1,sum(HSI07_01_002) s2,sum(HSI07_01_004) s3,sum(HSI07_01_012) s4,org_code FROM qc/daily_report where create_date>= '"+start+"T00:00:00' AND create_date <='" +  end + "T23:59:59' group by org_code";
@@ -87,7 +101,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
                 if(dataMap.containsKey(orgCode)){
                     dataMap1 = dataMap.get(orgCode);
                 }else {
-                    dataMap1 = initDataMap(datasetMap,orgCode);
+                    dataMap1 = initDataMap(datasetMap,orgMap.get(orgCode),orgCode);
                 }
                 if(eventType == null){
                     dataMap1.put("hospitalArchives",HSI07_01_001);
@@ -110,7 +124,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
         }
 
         Long end1 = System.currentTimeMillis();
-        System.out.println("统计医院数据时间："+(end1-startTime));
+        System.out.println("统计医院数据时间："+(end1-end0));
 
         //统计接收数据
         String sql2 = "SELECT count(*) c,org_code FROM json_archives/info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' ";
@@ -127,7 +141,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
                 if(dataMap.containsKey(orgCode)){
                     dataMap1 = dataMap.get(orgCode);
                 }else {
-                    dataMap1 = initDataMap(datasetMap,orgCode);
+                    dataMap1 = initDataMap(datasetMap,orgMap.get(orgCode),orgCode);
                 }
                 dataMap1.put("receiveArchives",total);
                 dataMap.put(orgCode,dataMap1);
@@ -153,7 +167,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
                 if(dataMap.containsKey(orgCode)){
                     dataMap1 = dataMap.get(orgCode);
                 }else {
-                    dataMap1 = initDataMap(datasetMap,orgCode);
+                    dataMap1 = initDataMap(datasetMap,orgMap.get(orgCode),orgCode);
                 }
                 dataMap1.put("receiveException",total);
                 dataMap.put(orgCode,dataMap1);
@@ -199,7 +213,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
                 if(dataMap.containsKey(orgCode)){
                     dataMap1 = dataMap.get(orgCode);
                 }else {
-                    dataMap1 = initDataMap(datasetMap,orgCode);
+                    dataMap1 = initDataMap(datasetMap,orgMap.get(orgCode),orgCode);
                 }
                 dataMap1.put("receiveDataset",entry.getValue().size());//数据集个数
                 dataMap.put(orgCode,dataMap1);
@@ -223,7 +237,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
                 if(dataMap.containsKey(orgCode)){
                     dataMap1 = dataMap.get(orgCode);
                 }else {
-                    dataMap1 = initDataMap(datasetMap,orgCode);
+                    dataMap1 = initDataMap(datasetMap,orgMap.get(orgCode),orgCode);
                 }
                 if("2".equals(archiveStatus)){
                     dataMap1.put("resourceFailure",total);//失败
@@ -249,7 +263,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
                 if(dataMap.containsKey(orgCode)){
                     dataMap1 = dataMap.get(orgCode);
                 }else {
-                    dataMap1 = initDataMap(datasetMap,orgCode);
+                    dataMap1 = initDataMap(datasetMap,orgMap.get(orgCode),orgCode);
                 }
                 dataMap1.put("resourceException",total);
                 dataMap.put(orgCode,dataMap1);
@@ -276,9 +290,10 @@ public class DataQualityStatisticsService extends BaseJpaService {
      * @param orgCode
      * @return
      */
-    private Map initDataMap(Map<String, Object> datasetMap,String orgCode){
+    private Map initDataMap(Map<String, Object> datasetMap,Object orgName,String orgCode){
         Map dataMap = new HashedMap();
         dataMap.put("orgCode",orgCode);//机构code
+        dataMap.put("orgName",orgName);//机构名称
         dataMap.put("hospitalArchives",0);//医院档案数
         dataMap.put("hospitalDataset",0);//医院数据集
         dataMap.put("receiveArchives",0);//接收档案数
@@ -301,9 +316,10 @@ public class DataQualityStatisticsService extends BaseJpaService {
      * @param orgCode
      * @return
      */
-    private Map initRateMap(Map<String, DqPaltformReceiveWarning> warningMap,String orgCode){
+    private Map initRateMap(Map<String, DqPaltformReceiveWarning> warningMap,Object orgName,String orgCode){
         Map dataMap = new HashedMap();
         dataMap.put("orgCode",orgCode);//机构code
+        dataMap.put("orgCode",orgName);//机构名称
         dataMap.put("outpatientInTime",0);//门诊及时数
         dataMap.put("hospitalInTime",0);//住院及时数
         dataMap.put("peInTime",0);//体检及时数
@@ -393,7 +409,21 @@ public class DataQualityStatisticsService extends BaseJpaService {
             warningMap.put(orgCode,one);
         });
 
-        System.out.println("初始化 数据集数据时间："+(System.currentTimeMillis()-startTime));
+        Long en = System.currentTimeMillis();
+        System.out.println("初始化 数据集数据时间："+(en-startTime));
+
+        //获取医院数据
+        Query query1 = session.createSQLQuery("SELECT org_code,full_name from organizations ");
+        List<Object[]> orgList = query1.list();
+        Map<String, Object> orgMap = new HashedMap(orgList.size());
+        orgList.forEach(one->{
+            String orgCode = one[0].toString();
+            String name = one[1].toString();
+            orgMap.put(orgCode,name);
+        });
+
+        Long end0 = System.currentTimeMillis();
+        System.out.println("获取医院名称时间："+(end0-en));
 
         //统计总数
         String sql1 = "SELECT sum(HSI07_01_001) s1,sum(HSI07_01_002) s2,sum(HSI07_01_004) s3,sum(HSI07_01_012) s4,org_code FROM qc/daily_report where event_date>= '"+start+"T00:00:00' AND event_date <='" +  end + "T23:59:59' group by org_code";
@@ -410,7 +440,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
                 if(dataMap.containsKey(orgCode)){
                     dataMap1 = dataMap.get(orgCode);
                 }else {
-                    dataMap1 = initRateMap(warningMap,orgCode);
+                    dataMap1 = initRateMap(warningMap,orgMap.get(orgCode),orgCode);
                 }
                 dataMap1.put("totalVisit",HSI07_01_001);
                 dataMap1.put("totalOutpatient",HSI07_01_012);
@@ -439,7 +469,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
                 if(dataMap.containsKey(orgCode)){
                     dataMap1 = dataMap.get(orgCode);
                 }else {
-                    dataMap1 = initRateMap(warningMap,orgCode);
+                    dataMap1 = initRateMap(warningMap,orgMap.get(orgCode),orgCode);
                 }
                 boolean flag = StringUtils.isNotBlank(eventType)&&!"null".equals(eventType)&&total>0;
                 if(flag&&isInTime(warningMap,orgCode,eventType,delay)){
@@ -485,7 +515,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
                 if(dataMap.containsKey(orgCode)){
                     dataMap1 = dataMap.get(orgCode);
                 }else {
-                    dataMap1 = initRateMap(warningMap,orgCode);
+                    dataMap1 = initRateMap(warningMap,orgMap.get(orgCode),orgCode);
                 }
                 boolean flag = StringUtils.isNotBlank(eventType)&&!"null".equals(eventType)&&total>0;
                 if(flag){
