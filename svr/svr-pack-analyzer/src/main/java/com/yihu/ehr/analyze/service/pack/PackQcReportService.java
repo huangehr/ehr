@@ -59,6 +59,7 @@ public class PackQcReportService extends BaseJpaService {
     public Envelop dailyReport(String startDate, String endDate, String orgCode) throws Exception{
         Envelop envelop = new Envelop();
         Map<String,Object> resMap = new HashMap<String,Object>();
+        List<Map<String,Object>> list = new ArrayList<>();
         int total=0;
         int inpatient=0;
         int oupatient=0;
@@ -89,7 +90,46 @@ public class PackQcReportService extends BaseJpaService {
         resMap.put("inpatient",inpatient);
         resMap.put("oupatient",oupatient);
         resMap.put("physical",physical);
-        envelop.setObj(resMap);
+        list.add(resMap);
+        envelop.setDetailModelList(list);
+        envelop.setSuccessFlg(true);
+        return envelop;
+    }
+
+    /**
+     * 获取资源化数据
+     * @param startDate
+     * @param endDate
+     * @param orgCode
+     * @return
+     * @throws Exception
+     */
+    public Envelop resourceSuccessfulCount(String startDate, String endDate, String orgCode) throws Exception {
+        Envelop envelop = new Envelop();
+        String index = "json_archives";
+        String type = "info ";
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("pack_type=1;");
+        stringBuilder.append("receive_date>=" + startDate + " 00:00:00;");
+        stringBuilder.append("receive_date<" + endDate + " 23:59:59;");
+        if (StringUtils.isNotEmpty(orgCode) && !"null".equals(orgCode)){
+            stringBuilder.append("org_code=" + orgCode);
+        }
+        // 门诊
+        String fqMz = stringBuilder.toString() + "event_type=0";
+        Long mzCount = elasticSearchUtil.count(index, type, fqMz);
+        // 住院
+        String fqZy = stringBuilder.toString() + "event_type=1";
+        Long zyCount = elasticSearchUtil.count(index, type, fqZy);
+        // 体检
+        String fqTj = stringBuilder.toString() + "event_type=2";
+        Long tjCount = elasticSearchUtil.count(index, type, fqTj);
+        Map<String, Long> resultMap = new HashMap<>();
+        resultMap.put("mzCount", mzCount);
+        resultMap.put("zyCount", zyCount);
+        resultMap.put("tjCount", tjCount);
+
+        envelop.setObj(resultMap);
         envelop.setSuccessFlg(true);
         return envelop;
     }
@@ -176,7 +216,7 @@ public class PackQcReportService extends BaseJpaService {
     }
 
     /**
-     * 获取医院数据
+     * 获取数据集列表数据
      * @param startDate
      * @param endDate
      * @param orgCode
