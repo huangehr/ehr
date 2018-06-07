@@ -10,9 +10,6 @@ import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 /**
  * 质控-预警设置
  * @author yeshijie on 2018/6/5.
@@ -34,9 +31,7 @@ public interface WarningSettingClient{
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page,
-            HttpServletRequest request,
-            HttpServletResponse response);
+            @RequestParam(value = "page", required = false) int page);
 
     @RequestMapping(value = ServiceApi.DataQuality.PaltformResourceWarningList, method = RequestMethod.GET)
     @ApiOperation(value = "平台资源化预警列表")
@@ -50,9 +45,7 @@ public interface WarningSettingClient{
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page,
-            HttpServletRequest request,
-            HttpServletResponse response);
+            @RequestParam(value = "page", required = false) int page);
 
     @RequestMapping(value = ServiceApi.DataQuality.PaltformUploadWarningList, method = RequestMethod.GET)
     @ApiOperation(value = "平台上传预警列表")
@@ -66,9 +59,7 @@ public interface WarningSettingClient{
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page,
-            HttpServletRequest request,
-            HttpServletResponse response);
+            @RequestParam(value = "page", required = false) int page);
 
     @RequestMapping(value = ServiceApi.DataQuality.PaltformReceiveWarning, method = RequestMethod.GET)
     @ApiOperation(value = "根据id查询平台接收预警")
@@ -110,19 +101,19 @@ public interface WarningSettingClient{
     @ApiOperation(value = "删除平台接收预警")
     Envelop paltformReceiveWarningDel(
             @ApiParam(name = "id", value = "1",  defaultValue = "")
-            @RequestParam Long id);
+            @RequestParam(value = "id", required = true) Long id);
 
     @RequestMapping(value = ServiceApi.DataQuality.PaltformResourceWarningDel, method = RequestMethod.POST)
     @ApiOperation(value = "删除平台资源化预警")
     Envelop paltformResourceWarningDel(
             @ApiParam(name = "id", value = "1",  defaultValue = "")
-            @RequestParam Long id);
+            @RequestParam(value = "id", required = true) Long id);
 
     @RequestMapping(value = ServiceApi.DataQuality.PaltformUploadWarningDel, method = RequestMethod.POST)
     @ApiOperation(value = "删除平台上传预警")
     Envelop paltformUploadWarningDel(
             @ApiParam(name = "id", value = "1",  defaultValue = "")
-            @RequestParam Long id);
+            @RequestParam(value = "id", required = true) Long id);
 
     @RequestMapping(value = ServiceApi.DataQuality.PaltformReceiveWarningUpd, method = RequestMethod.POST)
     @ApiOperation(value = "新增平台接收预警")
@@ -152,6 +143,6 @@ public interface WarningSettingClient{
     @ApiOperation(value = "删除数据集")
     Envelop datasetWarningDel(
             @ApiParam(name = "id", value = "1",  defaultValue = "")
-            @RequestParam Long id);
+            @RequestParam(value = "id", required = true) Long id);
 
 }
