@@ -107,7 +107,7 @@ public class PackQcReportService extends BaseJpaService {
     public Envelop resourceSuccessfulCount(String startDate, String endDate, String orgCode) throws Exception {
         Envelop envelop = new Envelop();
         String index = "json_archives";
-        String type = "info ";
+        String type = "info";
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("pack_type=1;");
         stringBuilder.append("receive_date>=" + startDate + " 00:00:00;");
@@ -116,26 +116,28 @@ public class PackQcReportService extends BaseJpaService {
             stringBuilder.append("org_code=" + orgCode);
         }
         // 门诊
-        String fqMz = stringBuilder.toString() + "event_type=0";
-        Long mzCount = elasticSearchUtil.count(index, type, fqMz);
+        String oupatientStr = stringBuilder.toString() + "event_type=0";
+        Long oupatient = elasticSearchUtil.count(index, type, oupatientStr);
         // 住院
-        String fqZy = stringBuilder.toString() + "event_type=1";
-        Long zyCount = elasticSearchUtil.count(index, type, fqZy);
+        String inpatientStr = stringBuilder.toString() + "event_type=1";
+        Long inpatient = elasticSearchUtil.count(index, type, inpatientStr);
         // 体检
-        String fqTj = stringBuilder.toString() + "event_type=2";
-        Long tjCount = elasticSearchUtil.count(index, type, fqTj);
-        Map<String, Long> resultMap = new HashMap<>();
-        resultMap.put("mzCount", mzCount);
-        resultMap.put("zyCount", zyCount);
-        resultMap.put("tjCount", tjCount);
-
-        envelop.setObj(resultMap);
+        String physicalStr = stringBuilder.toString() + "event_type=2";
+        Long physical = elasticSearchUtil.count(index, type, physicalStr);
+        Map<String, Object> resultMap = new HashMap<>();
+        List<Map<String, Object>> resultList = new ArrayList<>();
+        resultMap.put("oupatient", oupatient);
+        resultMap.put("inpatient", inpatient);
+        resultMap.put("physical", physical);
+        resultMap.put("total", oupatient+inpatient+physical);
+        resultList.add(resultMap);
+        envelop.setDetailModelList(resultList);
         envelop.setSuccessFlg(true);
         return envelop;
     }
 
     /**
-     * 获取医院数据
+     * 获取档案数据
      * @param startDate
      * @param endDate
      * @param orgCode
