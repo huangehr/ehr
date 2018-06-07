@@ -733,7 +733,7 @@ public class BaseStatistsService {
             resultList.add(dataMap);
         }
         if (StringUtils.isEmpty(top)) {
-            return noDataDimenDictionary(resultList,dimension,filter);
+            return "town".equals(dimension) ? noDataDimenDictionary(resultList,dimension,filter) : resultList;
         }
         return resultList;
     }
