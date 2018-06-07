@@ -862,13 +862,15 @@ public class QuotaReportController extends BaseController {
                 lineNames.add(tjQuota.getName());
                 i++;
             }
+            NumberFormat nf = NumberFormat.getInstance();
+            nf.setGroupingUsed(false);
             Set<String> hashSet = new HashSet<>(lineNames);
             Map<String, Object> newMap = new HashMap<>();
             for (Map<String, Object> data : lineData.values()) {
                 for (Map.Entry<String, Object> lastMap : data.entrySet()) {
                     if (newMap.containsKey(lastMap.getKey())) {
                         double v = Double.parseDouble(newMap.get(lastMap.getKey()) + "") + Double.parseDouble(lastMap.getValue() + "");
-                        newMap.put(lastMap.getKey() + "", v);
+                        newMap.put(lastMap.getKey() + "", nf.format(v));
                     } else {
                         newMap.put(lastMap.getKey(), lastMap.getValue());
                     }

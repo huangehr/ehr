@@ -16,6 +16,7 @@ import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -51,37 +52,42 @@ public class AttendanceEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "attendance", value = "出勤记录")
             @RequestBody String attendance) throws Exception {
         Attendance newAttendance = toEntity(attendance, Attendance.class);
-        //验证车辆
-        Ambulance ambulance =  ambulanceService.findById(newAttendance.getCarId());
-        if (ambulance == null || ambulance.getStatus() != Ambulance.Status.wait){
-            return failed("无相关车辆或该车辆不处于待命状态");
-        }
-        //验证出勤任务
-        List<Attendance.Status> statuses = new ArrayList<Attendance.Status>();
-        statuses.add(Attendance.Status.start);
-        statuses.add(Attendance.Status.arrival);
-        statuses.add(Attendance.Status.back);
-        Attendance verification = attendanceService.findByCarIdAndStatus(newAttendance.getCarId(), statuses);
-        if (verification != null) {
-            return failed("该车辆有尚未完成的执勤任务");
-        }
-        //验证排班情况
-        List<Schedule> scheduleList = scheduleService.findMatch(ambulance.getId(), new Date());
-        if (scheduleList != null && scheduleList.size() >= 3) {
-            //生成出勤记录
-            List<Integer> idList = new ArrayList<Integer>();
-            for (Schedule schedule : scheduleList) {
-                idList.add(schedule.getId());
+        if(newAttendance.getId()!=null){
+            attendanceService.save(newAttendance);
+            return success(newAttendance);
+        }else {
+            //验证车辆
+            Ambulance ambulance = ambulanceService.findById(newAttendance.getCarId());
+            if (ambulance == null || ambulance.getStatus() != Ambulance.Status.wait) {
+                return failed("无相关车辆或该车辆不处于待命状态");
             }
-            newAttendance.setSchedules(objectMapper.writeValueAsString(idList));
-            //开始任务
-            newAttendance.setStatus(Attendance.Status.start);
-            //更新车辆状态为前往中
-            ambulance.setStatus(Ambulance.Status.onWay);
-            Attendance newAttendance1 = attendanceService.attendance(newAttendance, ambulance);
-            return success(newAttendance1);
-        } else {
-            return failed("该车辆当前时间点排班人员不足");
+            //验证出勤任务
+            List<Attendance.Status> statuses = new ArrayList<Attendance.Status>();
+            statuses.add(Attendance.Status.start);
+            statuses.add(Attendance.Status.arrival);
+            statuses.add(Attendance.Status.back);
+            Attendance verification = attendanceService.findByCarIdAndStatus(newAttendance.getCarId(), statuses);
+            if (verification != null) {
+                return failed("该车辆有尚未完成的执勤任务");
+            }
+            //验证排班情况
+            List<Schedule> scheduleList = scheduleService.findMatch(ambulance.getId(), new Date());
+            if (scheduleList != null && scheduleList.size() >= 3) {
+                //生成出勤记录
+                List<Integer> idList = new ArrayList<Integer>();
+                for (Schedule schedule : scheduleList) {
+                    idList.add(schedule.getId());
+                }
+                newAttendance.setSchedules(objectMapper.writeValueAsString(idList));
+                //开始任务
+                newAttendance.setStatus(Attendance.Status.start);
+                //更新车辆状态为前往中
+                ambulance.setStatus(Ambulance.Status.onWay);
+                Attendance newAttendance1 = attendanceService.attendance(newAttendance, ambulance);
+                return success(newAttendance1);
+            } else {
+                return failed("该车辆当前时间点排班人员不足");
+            }
         }
     }
 
@@ -97,42 +103,56 @@ public class AttendanceEndPoint extends EnvelopRestEndPoint {
         if (ambulance == null) {
             return failed("无相关车辆信息", new Integer(-1));
         }
-        List<Attendance.Status> statuses = new ArrayList<Attendance.Status>();
-        statuses.add(Attendance.Status.start);
-        statuses.add(Attendance.Status.arrival);
-        statuses.add(Attendance.Status.back);
-        Attendance attendance = attendanceService.findByCarIdAndStatus(carId, statuses);
-        if (attendance != null) {
-            if (status.equals("1") && attendance.getStatus() == Attendance.Status.start) { //到达事故地点
-                attendance.setStatus(Attendance.Status.arrival);
-                attendance.setArrivalTime(new Date());
-                ambulance.setStatus(Ambulance.Status.arrival);
-                attendanceService.attendance(attendance, ambulance);
-                return success(status);
-            } else if (status.equals("2")) { //返程中
-                attendance.setStatus(Attendance.Status.back);
-                ambulance.setStatus(Ambulance.Status.back);
-                attendanceService.attendance(attendance, ambulance);
-                return success(status);
-            } else if (status.equals("3")) { //完成任务
-                attendance.setStatus(Attendance.Status.complete);
-                attendance.setCompleteTime(new Date());
-                //完成任务，重新设置车辆为待命中
-                ambulance.setStatus(Ambulance.Status.wait);
-                attendanceService.attendance(attendance, ambulance);
-                return success(status);
-            } else if (status.equals("4")) { //意外中止
-                attendance.setStatus(Attendance.Status.discontinue);
-                attendance.setCompleteTime(new Date());
-                //设置车辆为异常状态
-                ambulance.setStatus(Ambulance.Status.down);
-                attendanceService.attendance(attendance, ambulance);
-                return success(status);
+        if("5".equals(status)){
+            List<Attendance.Status> statuses = new ArrayList<Attendance.Status>();
+            statuses.add(Attendance.Status.start);
+            statuses.add(Attendance.Status.arrival);
+            statuses.add(Attendance.Status.back);
+            Attendance attendance = attendanceService.findByCarIdAndStatus(carId, statuses);
+            attendance.setStatus(Attendance.Status.complete);
+            attendance.setCompleteTime(new Date());
+            //完成任务，重新设置车辆为待命中
+            ambulance.setStatus(Ambulance.Status.wait);
+            attendanceService.attendance(attendance, ambulance);
+            return success(status);
+        }else {
+            List<Attendance.Status> statuses = new ArrayList<Attendance.Status>();
+            statuses.add(Attendance.Status.start);
+            statuses.add(Attendance.Status.arrival);
+            statuses.add(Attendance.Status.back);
+            Attendance attendance = attendanceService.findByCarIdAndStatus(carId, statuses);
+            if (attendance != null) {
+                if (status.equals("1") && attendance.getStatus() == Attendance.Status.start) { //到达事故地点
+                    attendance.setStatus(Attendance.Status.arrival);
+                    attendance.setArrivalTime(new Date());
+                    ambulance.setStatus(Ambulance.Status.arrival);
+                    attendanceService.attendance(attendance, ambulance);
+                    return success(status);
+                } else if (status.equals("2")) { //返程中
+                    attendance.setStatus(Attendance.Status.back);
+                    ambulance.setStatus(Ambulance.Status.back);
+                    attendanceService.attendance(attendance, ambulance);
+                    return success(status);
+                } else if (status.equals("3")) { //完成任务
+                    attendance.setStatus(Attendance.Status.complete);
+                    attendance.setCompleteTime(new Date());
+                    //完成任务，重新设置车辆为待命中
+                    ambulance.setStatus(Ambulance.Status.wait);
+                    attendanceService.attendance(attendance, ambulance);
+                    return success(status);
+                } else if (status.equals("4")) { //意外中止
+                    attendance.setStatus(Attendance.Status.discontinue);
+                    attendance.setCompleteTime(new Date());
+                    //设置车辆为异常状态
+                    ambulance.setStatus(Ambulance.Status.down);
+                    attendanceService.attendance(attendance, ambulance);
+                    return success(status);
+                } else {
+                    return failed("请求更新状态:" + status + ",与当前状态:" + attendance.getStatus().ordinal() + ",不匹配", new Integer(status));
+                }
             } else {
-                return failed("请求更新状态:" + status + ",与当前状态:"+ attendance.getStatus().ordinal() + ",不匹配", new Integer(status));
+                return failed("该车辆无可更新的出勤记录", new Integer(-1));
             }
-        } else {
-            return failed("该车辆无可更新的出勤记录", new Integer(-1));
         }
     }
 
