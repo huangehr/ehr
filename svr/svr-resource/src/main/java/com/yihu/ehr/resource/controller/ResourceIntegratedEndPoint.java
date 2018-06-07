@@ -95,14 +95,7 @@ public class ResourceIntegratedEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page", required = false) Integer page,
             @ApiParam(name = "size", value = "每页几行(>0)")
             @RequestParam(value = "size", required = false) Integer size) throws Exception{
-        Page<Map<String, Object>> result =  resourceBrowseService.getCustomizeData(resourcesCode, metaData, orgCode, areaCode, queryCondition, page, size);
-        Envelop envelop = new Envelop();
-        envelop.setSuccessFlg(true);
-        envelop.setCurrPage(result.getNumber());
-        envelop.setPageSize(result.getSize());
-        envelop.setTotalCount(new Long(result.getTotalElements()).intValue());
-        envelop.setDetailModelList(result.getContent());
-        return envelop;
+       return resourceBrowseService.getCustomizeData(resourcesCode, metaData, orgCode, areaCode, queryCondition, page, size);
     }
 
     @ApiOperation("综合查询指标统计列表树")

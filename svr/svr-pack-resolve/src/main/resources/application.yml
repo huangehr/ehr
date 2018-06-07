@@ -294,7 +294,7 @@ elasticsearch:
   cluster-name: elasticsearch
   cluster-nodes: 172.10.10.5:9300
 ftp:
-  address: 192.168.40.20
+  address: 192.168.220.20
   username: jkzl
   password: jkzlsr2018
   port: 21

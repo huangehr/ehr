@@ -54,7 +54,7 @@ public class ResourcesTransformService extends BaseJpaService {
         Map<String,Object> returnMap =  new HashMap<>();
         //适配方案
         List<RsAdapterScheme> schemeList = adapterSchemeDao.findByAdapterVersion(version);
-        if (resource.size() > 0 || schemeList.size() > 0) {
+        if (resource.size() > 0 && schemeList.size() > 0) {
             //适配方案对应数据元
             List<RsAdapterMetadata> metadataList;
             if (StringUtils.isBlank(dataset)) {

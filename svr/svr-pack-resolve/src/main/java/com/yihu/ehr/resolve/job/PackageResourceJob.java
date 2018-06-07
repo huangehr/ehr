@@ -40,6 +40,8 @@ import java.util.Map;
 @DisallowConcurrentExecution
 public class PackageResourceJob implements InterruptableJob {
 
+    private static final long DAY = 1000 * 60 * 60 * 24;
+
     @Override
     public void interrupt() throws UnableToInterruptJobException {
     }
@@ -110,8 +112,10 @@ public class PackageResourceJob implements InterruptableJob {
         map.put("event_date", DateUtil.toStringLong(standardPackage.getEventDate()));
         map.put("patient_id", standardPackage.getPatientId());
         map.put("dept", standardPackage.getDeptCode());
-        map.put("delay", (pack.getReceive_date().getTime() - standardPackage.getEventDate().getTime()) / 1000);
+        long delay = pack.getReceive_date().getTime() - standardPackage.getEventDate().getTime();
+        map.put("delay", delay % DAY > 0 ? delay / DAY + 1 : delay / DAY);
         map.put("re_upload_flg", String.valueOf(standardPackage.isReUploadFlg()));
+        map.put("patient_name", resourceBucket.getPatientName());
         packageMgrClient.reportStatus(pack.get_id(), ArchiveStatus.Finished, 0, objectMapper.writeValueAsString(map));
     }
 

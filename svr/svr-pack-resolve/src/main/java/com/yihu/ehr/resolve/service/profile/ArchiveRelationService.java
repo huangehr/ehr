@@ -62,7 +62,7 @@ public class ArchiveRelationService {
             relation.setOrg_code(resourceBucket.getOrgCode());
             relation.setOrg_name(resourceBucket.getOrgName());
             relation.setId_card_no( resourceBucket.getDemographicId());
-            int gender = resourceBucket.getMasterRecord().getResourceValue("EHR_000019") == null ? 0 : new Integer(resourceBucket.getMasterRecord().getResourceValue("EHR_000019"));
+            int gender = resourceBucket.getMasterRecord().getResourceValue("EHR_000019") == null ||  "".equals(resourceBucket.getMasterRecord().getResourceValue("EHR_000019"))  ? 0 : new Integer(resourceBucket.getMasterRecord().getResourceValue("EHR_000019"));
             relation.setGender(gender);
             String telephone = resourceBucket.getMasterRecord().getResourceValue("EHR_000003") == null ? "" : resourceBucket.getMasterRecord().getResourceValue("EHR_000003").toString();
             relation.setTelephone(telephone);
