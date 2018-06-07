@@ -22,7 +22,6 @@ public class FastDFSService {
     @Autowired
     private FastDFSUtil fastDFSUtil;
 
-
     public ObjectNode upload(Map<String, String> paramMap) throws Exception{
         String fileStr = paramMap.get("fileStr");
         String fileName = paramMap.get("fileName");

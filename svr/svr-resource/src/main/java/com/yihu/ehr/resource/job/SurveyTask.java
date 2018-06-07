@@ -11,6 +11,7 @@ import com.yihu.ehr.resource.service.ResourceBrowseService;
 import com.yihu.ehr.solr.SolrUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.reflection.MethodUtil;
+import com.yihu.ehr.util.rest.Envelop;
 import org.apache.poi.util.StringUtil;
 import org.apache.solr.common.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,8 +57,8 @@ public class SurveyTask {
         ProtalMessageRemind messageRemind = null;
         for(int i=0; i<totalPages ;i++){
             //查找档案
-            Page<Map<String, Object>> result = resourceBrowseService.getEhrCenter(queryParams, i, size);
-            List list = result.getContent();
+            Envelop envelop = resourceBrowseService.getEhrCenter(null, "*", "*", queryParams, i, size);
+            List list = envelop.getDetailModelList();
             List<Map<String, String>> contentList = new ArrayList<>();
             Registration newEntity = null;
             if(null != list && list.size()>0){
