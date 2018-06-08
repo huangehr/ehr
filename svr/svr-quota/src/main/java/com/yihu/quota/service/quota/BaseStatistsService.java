@@ -244,14 +244,16 @@ public class BaseStatistsService {
         List<Map<String, Object>> moleList = getQuotaResultList(molecular,dimension,molecularFilter,dateType, top);
         String year = DateUtil.getYearFromYMD(new Date());
         String town = "";
-        String [] filter = denominatorFilter.split("and");
-        if(filter.length > 0 ){
-            for(String key : filter){
-                if(key.contains(quotaDateField)){
-                    year = key.substring(key.indexOf("'")+1,key.indexOf("'")+5);//quotaDate >= '2018-03-01'
-                }
-                if(key.contains("town")){
-                    town =  key.substring(key.indexOf("=")+1);
+        if(StringUtils.isNotEmpty(denominatorFilter)){
+            String [] filter = denominatorFilter.split("and");
+            if(filter.length > 0 ){
+                for(String key : filter){
+                    if(key.contains(quotaDateField)){
+                        year = key.substring(key.indexOf("'")+1,key.indexOf("'")+5);//quotaDate >= '2018-03-01'
+                    }
+                    if(key.contains("town")){
+                        town =  key.substring(key.indexOf("=")+1);
+                    }
                 }
             }
         }
