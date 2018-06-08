@@ -513,6 +513,9 @@ public class BaseStatistsService {
             double parentResult = 0;
             mapCategory.put(firstColumnField,mapCategory.get("text"));
             map = getParentAllChildren(quotaCodes,mapCategory,map, dimenListResult,parentResult);
+            if(map == null || map.size() == 0 ){
+                map.put(resultField,0);
+            }
             mapCategory.putAll(map);
             resultMap.add(mapCategory);
             if(mapCategory.get("children") != null){
