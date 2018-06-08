@@ -514,6 +514,9 @@ public class BaseStatistsService {
             mapCategory.put(firstColumnField,mapCategory.get("text"));
             map = getParentAllChildren(quotaCodes,mapCategory,map, dimenListResult,parentResult);
             if(map == null || map.size() == 0 ){
+                for(String quotaCode : quotaCodes){
+                    map.put(quotaCode,0);
+                }
                 map.put(resultField,0);
             }
             mapCategory.putAll(map);
