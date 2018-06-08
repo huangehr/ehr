@@ -52,7 +52,7 @@ public interface TjQuotaJobClient {
 
     @ApiOperation(value = "获取指标统计结果echart图表，支持多条组合")
     @RequestMapping(value = ServiceApi.TJ.GetMoreQuotaGraphicReportPreviews, method = RequestMethod.GET)
-    public MChartInfoModel getMoreQuotaGraphicReportPreviews(
+    MChartInfoModel getMoreQuotaGraphicReportPreviews(
             @ApiParam(name = "quotaIdStr", value = "指标ID,多个用,拼接", required = true)
             @RequestParam(value = "quotaIdStr" , required = true) String quotaIdStr,
             @ApiParam(name = "charstr", value = "多图表类型用,拼接,混合类型只支持柱状和线性", defaultValue = "1")
@@ -64,7 +64,9 @@ public interface TjQuotaJobClient {
             @ApiParam(name = "title", value = "视图名称", defaultValue = "")
             @RequestParam(value = "title", required = false) String title,
             @ApiParam(name = "top", value = "获取前几条数据")
-            @RequestParam(value = "top", required = false) String top);
+            @RequestParam(value = "top", required = false) String top,
+            @ApiParam(name = "MRsResource json串")
+            @RequestParam(value = "mRsResource") String mRsResource);
 
     @ApiOperation(value = "获取指标统计结果echart radar雷达图表")
     @RequestMapping(value = ServiceApi.TJ.GetQuotaRadarGraphicReportPreviews, method = RequestMethod.GET)

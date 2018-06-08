@@ -426,7 +426,7 @@ public class RsResourceController extends BaseController {
                         }else {
                             dimension =  firstDimension;
                         }
-                        chartInfoModel = tjQuotaJobClient.getMoreQuotaGraphicReportPreviews(quotaIdstr, chart, filter, dimension , mRsResources.getName(), top);
+                        chartInfoModel = tjQuotaJobClient.getMoreQuotaGraphicReportPreviews(quotaIdstr, chart, filter, dimension , mRsResources.getName(), top, objectMapper.writeValueAsString(mRsResources));
                     }
                     chartInfoModel.setResourceId(resourceId);
                     chartInfoModel.setDimensionMap(dimensionMap);
