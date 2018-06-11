@@ -1,7 +1,8 @@
 package com.yihu.ehr.resolve.service.resource.stage2;
 
 import com.yihu.ehr.entity.patient.DemographicInfo;
-import com.yihu.ehr.resolve.model.stage1.StandardPackage;
+import com.yihu.ehr.profile.family.ResourceCells;
+import com.yihu.ehr.resolve.model.stage1.OriginalPackage;
 import com.yihu.ehr.resolve.model.stage2.ResourceBucket;
 import com.yihu.ehr.resolve.service.profile.ArchiveRelationService;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
@@ -30,13 +31,13 @@ public class IdentifyService {
     @Autowired
     private PatientService patientService;
 
-    public void identify (ResourceBucket resourceBucket, StandardPackage standardPackage) throws Exception {
+    public void identify (ResourceBucket resourceBucket, OriginalPackage originalPackage) throws Exception {
         boolean identify = false;
         String demographicId = UUID.randomUUID().toString();
-        if (StringUtils.isEmpty(standardPackage.getDemographicId()) || !pattern.matcher(standardPackage.getDemographicId()).find()) {
+        if (StringUtils.isEmpty(resourceBucket.getBasicRecord(ResourceCells.DEMOGRAPHIC_ID)) || !pattern.matcher(resourceBucket.getBasicRecord(ResourceCells.DEMOGRAPHIC_ID)).find()) {
             boolean recognition = false;
-            if (!StringUtils.isEmpty(standardPackage.getCardId())) {
-                List<String> idCardNos = archiveRelationService.findIdCardNoByCardNo(standardPackage.getCardId());
+            if (!StringUtils.isEmpty(resourceBucket.getBasicRecord(ResourceCells.CARD_ID))) {
+                List<String> idCardNos = archiveRelationService.findIdCardNoByCardNo(resourceBucket.getBasicRecord(ResourceCells.CARD_ID));
                 if (!idCardNos.isEmpty()) {
                     recognition = true;
                     demographicId = idCardNos.get(0);
@@ -44,7 +45,7 @@ public class IdentifyService {
             }
             if (!recognition) {
                 //姓名
-                String name = StringUtils.isNotEmpty(resourceBucket.getPatientName()) ? resourceBucket.getPatientName() : DEFAULT_VALUE;
+                String name = StringUtils.isNotEmpty(resourceBucket.getBasicRecord(ResourceCells.PATIENT_NAME)) ? resourceBucket.getBasicRecord(ResourceCells.PATIENT_NAME) : DEFAULT_VALUE;
                 //生日
                 Date birthday = resourceBucket.getMasterRecord().getResourceValue("EHR_000007") == null ? new Date() : DateTimeUtil.simpleDateParse(resourceBucket.getMasterRecord().getResourceValue("EHR_000007"));
                 //手机号码
@@ -81,7 +82,7 @@ public class IdentifyService {
                 }
             }
         } else {
-            demographicId = standardPackage.getDemographicId();
+            demographicId = resourceBucket.getBasicRecord(ResourceCells.DEMOGRAPHIC_ID);
         }
         if (demographicId.length() == 18) {
             identify = idCardValidator.is18Idcard(demographicId);
@@ -89,10 +90,8 @@ public class IdentifyService {
         if (demographicId.length() == 15) {
             identify = idCardValidator.is15Idcard(demographicId);
         }
-        standardPackage.setDemographicId(demographicId);
-        resourceBucket.setDemographicId(demographicId);
-        standardPackage.setIdentifyFlag(identify);
-        resourceBucket.setIdentifyFlag(identify);
+        originalPackage.setIdentifyFlag(identify);
+        resourceBucket.insertBasicRecord(ResourceCells.DEMOGRAPHIC_ID, demographicId);
     }
 
 }

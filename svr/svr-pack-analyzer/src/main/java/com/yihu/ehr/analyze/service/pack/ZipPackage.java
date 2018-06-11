@@ -3,19 +3,14 @@ package com.yihu.ehr.analyze.service.pack;
 import com.yihu.ehr.analyze.config.FastDfsConfig;
 import com.yihu.ehr.profile.EventType;
 import com.yihu.ehr.profile.ProfileType;
-import com.yihu.ehr.hbase.HBaseAdmin;
-import com.yihu.ehr.hbase.HBaseDao;
-import com.yihu.ehr.hbase.TableBundle;
 import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.model.packs.EsSimplePackage;
-import com.yihu.ehr.profile.util.PackageDataSet;
+import com.yihu.ehr.profile.model.PackageDataSet;
 import com.yihu.ehr.util.compress.Zipper;
-import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.log.LogService;
 import com.yihu.ehr.util.system.LocalTempPathUtil;
 import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.*;
 import org.springframework.util.CollectionUtils;
@@ -38,10 +33,8 @@ public class ZipPackage {
 
     public final static String StandardFolder = "standard";
     public final static String OriginFolder = "origin";
-    public final static String DocumentFolder = "documents";
     public final static String DocumentsFile = "documents.json";
     public final static String LinkFile = "index";
-    public static final String DATA = "d";
 
     private static final RestTemplate REST_TEMPLATE;
     private static final HttpHeaders HTTP_HEADERS;
@@ -70,9 +63,9 @@ public class ZipPackage {
     //科室代码
     private String deptCode;
     //ICD10诊断列表
-    private Set<String> diagnosisList;
+    private Set<String> diagnosisCode = new HashSet<>() ;
     //ICD10诊断名称列表
-    private Set<String> diagnosisNameList;
+    private Set<String> diagnosisName = new HashSet<>();
     //数据包
     private EsSimplePackage esSimplePackage;
     //zip辅助对象
@@ -157,20 +150,20 @@ public class ZipPackage {
         this.deptCode = deptCode;
     }
 
-    public Set<String> getDiagnosisList() {
-        return diagnosisList;
+    public Set<String> getDiagnosisCode() {
+        return diagnosisCode;
     }
 
-    public void setDiagnosisList(Set<String> diagnosisList) {
-        this.diagnosisList = diagnosisList;
+    public void setDiagnosisCode(Set<String> diagnosisCode) {
+        this.diagnosisCode = diagnosisCode;
     }
 
-    public Set<String> getDiagnosisNameList() {
-        return diagnosisNameList;
+    public Set<String> getDiagnosisName() {
+        return diagnosisName;
     }
 
-    public void setDiagnosisNameList(Set<String> diagnosisNameList) {
-        this.diagnosisNameList = diagnosisNameList;
+    public void setDiagnosisName(Set<String> diagnosisName) {
+        this.diagnosisName = diagnosisName;
     }
 
     public EsSimplePackage getEsSimplePackage() {
@@ -240,7 +233,7 @@ public class ZipPackage {
         } else if (directories.size() == 1 && directories.contains(LinkFile)) {
             profileType = ProfileType.Link;
         } else { // 数据集档案包（zip下只有 .json 数据文件）。
-            profileType = ProfileType.DataSet;
+            profileType = ProfileType.Simple;
         }
         //目前只解析标准档案包
         if (profileType != ProfileType.Standard) {

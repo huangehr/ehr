@@ -6,9 +6,11 @@ import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.hbase.HBaseDao;
 import com.yihu.ehr.model.packs.EsArchiveRelation;
 import com.yihu.ehr.profile.core.ResourceCore;
-import com.yihu.ehr.profile.family.MasterResourceFamily;
+import com.yihu.ehr.profile.family.ResourceCells;
 import com.yihu.ehr.profile.family.ResourceFamily;
+import com.yihu.ehr.resolve.model.stage1.OriginalPackage;
 import com.yihu.ehr.resolve.model.stage2.ResourceBucket;
+import com.yihu.ehr.util.datetime.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -44,40 +46,40 @@ public class ArchiveRelationService {
         //判断记录是否存在
         String re = hbaseDao.get(ResourceCore.MasterTable,profileId);
         if (!StringUtils.isEmpty(re)) {
-            hbaseDao.put(ResourceCore.MasterTable, profileId, ResourceFamily.Basic, MasterResourceFamily.BasicColumns.DemographicId, idCardNo);
+            hbaseDao.put(ResourceCore.MasterTable, profileId, ResourceFamily.Basic, ResourceCells.DEMOGRAPHIC_ID, idCardNo);
         } else {
             throw new Exception("不存在相关记录");
         }
     }
 
-    public void relation(ResourceBucket resourceBucket) throws Exception {
-        if (!resourceBucket.isReUploadFlg()) {
+    public void relation (ResourceBucket resourceBucket, OriginalPackage originalPackage) throws Exception {
+        if (!originalPackage.isReUploadFlg()) {
             EsArchiveRelation relation = new EsArchiveRelation();
             relation.set_id(resourceBucket.getId());
-            ProfileType profileType = resourceBucket.getProfileType();
+            ProfileType profileType = originalPackage.getProfileType();
             if (profileType != null){
                 relation.setProfile_type(profileType.getType());
             }
-            relation.setName(resourceBucket.getPatientName());
-            relation.setOrg_code(resourceBucket.getOrgCode());
-            relation.setOrg_name(resourceBucket.getOrgName());
-            relation.setId_card_no( resourceBucket.getDemographicId());
+            relation.setName(resourceBucket.getBasicRecord(ResourceCells.PATIENT_NAME));
+            relation.setOrg_code(resourceBucket.getBasicRecord(ResourceCells.ORG_CODE));
+            relation.setOrg_name(resourceBucket.getBasicRecord(ResourceCells.ORG_NAME));
+            relation.setId_card_no( resourceBucket.getBasicRecord(ResourceCells.DEMOGRAPHIC_ID));
             int gender = resourceBucket.getMasterRecord().getResourceValue("EHR_000019") == null ||  "".equals(resourceBucket.getMasterRecord().getResourceValue("EHR_000019"))  ? 0 : new Integer(resourceBucket.getMasterRecord().getResourceValue("EHR_000019"));
             relation.setGender(gender);
             String telephone = resourceBucket.getMasterRecord().getResourceValue("EHR_000003") == null ? "" : resourceBucket.getMasterRecord().getResourceValue("EHR_000003").toString();
             relation.setTelephone(telephone);
-            relation.setCard_type(resourceBucket.getCardType());
-            relation.setCard_no(resourceBucket.getCardId());
-            relation.setEvent_type(resourceBucket.getEventType() == null ? -1 : resourceBucket.getEventType().getType());
-            relation.setEvent_no(resourceBucket.getEventNo());
-            relation.setEvent_date(resourceBucket.getEventDate());
+            relation.setCard_type(resourceBucket.getBasicRecord(ResourceCells.CARD_TYPE));
+            relation.setCard_no(resourceBucket.getBasicRecord(ResourceCells.CARD_ID));
+            relation.setEvent_type(resourceBucket.getBasicRecord(ResourceCells.EVENT_TYPE) == null ? -1 : new Integer(resourceBucket.getBasicRecord(ResourceCells.EVENT_TYPE)));
+            relation.setEvent_no(resourceBucket.getBasicRecord(ResourceCells.EVENT_NO));
+            relation.setEvent_date(DateUtil.strToDate(resourceBucket.getBasicRecord(ResourceCells.EVENT_DATE)));
             char prefix = CHARS.charAt((int)(Math.random() * 26));
             relation.setSn(prefix + "" + new Date().getTime());
             relation.setRelation_date(new Date());
             relation.setCreate_date(new Date());
             //relation.setApply_id(null);
             //relation.setCard_id(null);
-            if (resourceBucket.isIdentifyFlag()) {
+            if (originalPackage.isIdentifyFlag()) {
                 relation.setIdentify_flag(1);
             } else {
                 relation.setIdentify_flag(0);

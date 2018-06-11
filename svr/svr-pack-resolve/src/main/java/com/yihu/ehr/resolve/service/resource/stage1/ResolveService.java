@@ -1,8 +1,9 @@
 package com.yihu.ehr.resolve.service.resource.stage1;
 
-import com.yihu.ehr.profile.ProfileType;
 import com.yihu.ehr.model.packs.EsSimplePackage;
+import com.yihu.ehr.profile.ProfileType;
 import com.yihu.ehr.resolve.*;
+import com.yihu.ehr.resolve.model.stage1.OriginalPackage;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.resolve.util.LocalTempPathUtil;
 import com.yihu.ehr.util.compress.Zipper;
@@ -28,12 +29,10 @@ import static com.yihu.ehr.profile.ProfileType.*;
  * @created 2015.09.09 15:04
  */
 @Service
-public class PackageResolveService {
+public class ResolveService {
 
     @Autowired
     private ApplicationContext context;
-    @Autowired
-    private ImmediateDataResolver immediateDataResolver;
     private Map<ProfileType, PackageResolver> packageResolvers;
 
     @PostConstruct
@@ -42,7 +41,7 @@ public class PackageResolveService {
         packageResolvers.put(Standard, context.getBean(StdPackageResolver.class));
         packageResolvers.put(File, context.getBean(FilePackageResolver.class));
         packageResolvers.put(Link, context.getBean(LinkPackageResolver.class));
-        packageResolvers.put(DataSet, context.getBean(DataSetPackageResolver.class));
+        packageResolvers.put(Simple, context.getBean(SimplePackageResolver.class));
     }
 
     /**
@@ -54,7 +53,7 @@ public class PackageResolveService {
      * 5. 解析完的数据存入HBase，并将JSON文档的状态标记为 Finished。
      * 6. 以上步骤有任何一个失败的，将文档标记为 Failed 状态，即无法决定该JSON档案的去向，需要人为干预。
      */
-    public StandardPackage doResolve(EsSimplePackage pack, String zipFile) throws Exception {
+    public OriginalPackage doResolve(EsSimplePackage pack, String zipFile) throws Exception {
         File root = null;
         try {
             root = new Zipper().unzipFile(new File(zipFile), LocalTempPathUtil.getTempPathWithUUIDSuffix() + pack.get_id(), pack.getPwd());
@@ -62,9 +61,9 @@ public class PackageResolveService {
                 throw new ZipException("Invalid package file.");
             }
             //根据压缩包获取标准档案包
-            StandardPackage standardPackage = PackModelFactory.createPackModel(root);
+            OriginalPackage originalPackage = PackModelFactory.createPackModel(root, pack);
             PackageResolver packageResolver;
-            switch (standardPackage.getProfileType()) {
+            switch (originalPackage.getProfileType()) {
                 case Standard:
                     packageResolver = packageResolvers.get(ProfileType.Standard);
                     break;
@@ -74,18 +73,16 @@ public class PackageResolveService {
                 case Link:
                     packageResolver = packageResolvers.get(ProfileType.Link);
                     break;
-                case DataSet:
-                    packageResolver = packageResolvers.get(ProfileType.DataSet);
+                case Simple:
+                    packageResolver = packageResolvers.get(ProfileType.Simple);
                     break;
                 default:
                     packageResolver = null;
                     break;
             }
-            packageResolver.resolve(standardPackage, root);
-            standardPackage.setClientId(pack.getClient_id());
-            standardPackage.regularRowKey();
-            //profile.determineEventType();
-            return standardPackage;
+            packageResolver.resolve(originalPackage, root);
+            originalPackage.regularRowKey();
+            return originalPackage;
         } finally {
             houseKeep(zipFile, root);
         }
@@ -96,27 +93,28 @@ public class PackageResolveService {
             FileUtils.deleteQuietly(new File(zipFile));
             FileUtils.deleteQuietly(root);
         } catch (Exception e) {
-            LogService.getLogger(PackageResolveService.class).warn("House keep failed after package resolve: " + e.getMessage());
+            LogService.getLogger(ResolveService.class).warn("House keep failed after package resolve: " + e.getMessage());
         }
     }
 
     /* -------------------- 以下是 即时交互的档案入库 ------------------------------*/
+
+    @Autowired
+    private ImmediateDataResolver immediateDataResolver;
 
     /**
      * 即时交互档案数据解析入库流程
      * 1. 解析哥哥数据集数据
      * 2. 对关联字典的数据元进行标准化，将字典的值直接写入数据
      * 3. 解析完的数据存入HBase，并将JSON文档的状态标记为 Finis
-     *
-     * @param data     档案数据
-     * @param clientId 应用ID
+     * @param data
+     * @param esSimplePackage
      * @return
      * @throws Exception
      */
-    public StandardPackage doResolveImmediateData(String data, String clientId) throws Exception {
-        StandardPackage standardPackage = new StandardPackage();
+    public StandardPackage doResolveImmediateData(String data, EsSimplePackage esSimplePackage) throws Exception {
+        StandardPackage standardPackage = new StandardPackage(esSimplePackage.get_id(), esSimplePackage.getReceive_date());
         immediateDataResolver.resolve(standardPackage, data);
-        standardPackage.setClientId(clientId);
         standardPackage.regularRowKey();
         return standardPackage;
     }

@@ -3,6 +3,7 @@ package com.yihu.ehr.resolve.model.stage1;
 import com.yihu.ehr.profile.ProfileType;
 import com.yihu.ehr.profile.annotation.Table;
 import com.yihu.ehr.profile.core.ResourceCore;
+import com.yihu.ehr.resolve.model.stage1.details.LinkFile;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -16,12 +17,30 @@ import java.util.List;
  * @created 2015.08.16 10:44
  */
 @Table(ResourceCore.MasterTable)
-public class LinkPackage extends StandardPackage {
+public class LinkPackage extends OriginalPackage {
+
     public Date expireDate;
     private List<LinkFile> linkFiles = new ArrayList<>();
 
-    public LinkPackage(){
-        setProfileType(ProfileType.Link);
+    public LinkPackage(String packId, Date receiveDate){
+        this.packId = packId;
+        this.receiveDate = receiveDate;
+        this.profileType = ProfileType.Link;
+    }
+
+    @Override
+    public String getId() {
+        return null;
+    }
+
+    @Override
+    public void regularRowKey() {
+
+    }
+
+    @Override
+    public String toJson() {
+        return null;
     }
 
     public Date getExpireDate() {

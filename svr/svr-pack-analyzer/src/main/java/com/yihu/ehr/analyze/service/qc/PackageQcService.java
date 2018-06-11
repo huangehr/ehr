@@ -1,11 +1,10 @@
 package com.yihu.ehr.analyze.service.qc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.analyze.feign.HosAdminServiceClient;
 import com.yihu.ehr.analyze.service.pack.ZipPackage;
 import com.yihu.ehr.model.packs.EsSimplePackage;
-import com.yihu.ehr.profile.util.MetaDataRecord;
-import com.yihu.ehr.profile.util.PackageDataSet;
+import com.yihu.ehr.profile.model.MetaDataRecord;
+import com.yihu.ehr.profile.model.PackageDataSet;
 import com.yihu.ehr.redis.client.RedisClient;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.string.StringBuilderEx;
@@ -16,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import javax.naming.event.ObjectChangeListener;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.text.DateFormat;
@@ -59,7 +57,7 @@ public class PackageQcService {
         qcDataSetRecord.put("org_name", zipPackage.getOrgName());
         qcDataSetRecord.put("org_area", zipPackage.getOrgArea());
         qcDataSetRecord.put("dept", zipPackage.getDeptCode());
-        qcDataSetRecord.put("diagnosis_name", zipPackage.getDiagnosisNameList() == null ? "" : StringUtils.join(zipPackage.getDiagnosisNameList().toArray(),";"));
+        qcDataSetRecord.put("diagnosis_name", StringUtils.join(zipPackage.getDiagnosisName().toArray(),";"));
         qcDataSetRecord.put("receive_date", DATE_FORMAT.format(esSimplePackage.getReceive_date()));
         qcDataSetRecord.put("event_date", DateUtil.toStringLong(zipPackage.getEventDate()));
         qcDataSetRecord.put("event_type", zipPackage.getEventType() == null ? -1 : zipPackage.getEventType().getType());
@@ -94,7 +92,7 @@ public class PackageQcService {
                                 qcMetadataRecord.put("org_name", zipPackage.getOrgName());
                                 qcMetadataRecord.put("org_area", zipPackage.getOrgArea());
                                 qcMetadataRecord.put("dept", zipPackage.getDeptCode());
-                                qcMetadataRecord.put("diagnosis_name", zipPackage.getDiagnosisNameList() == null ? "" : StringUtils.join(zipPackage.getDiagnosisNameList().toArray(), ";"));
+                                qcMetadataRecord.put("diagnosis_name", StringUtils.join(zipPackage.getDiagnosisName().toArray(), ";"));
                                 qcMetadataRecord.put("receive_date", DATE_FORMAT.format(esSimplePackage.getReceive_date()));
                                 qcMetadataRecord.put("event_date", DateUtil.toStringLong(zipPackage.getEventDate()));
                                 qcMetadataRecord.put("event_type", zipPackage.getEventType() == null ? -1 : zipPackage.getEventType().getType());

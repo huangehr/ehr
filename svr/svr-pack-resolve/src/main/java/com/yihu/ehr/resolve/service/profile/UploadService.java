@@ -3,6 +3,7 @@ package com.yihu.ehr.resolve.service.profile;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.model.esb.model.Upload;
+import com.yihu.ehr.resolve.model.stage1.OriginalPackage;
 import com.yihu.ehr.resolve.model.stage2.ResourceBucket;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,31 +31,31 @@ public class UploadService {
     private ElasticSearchUtil elasticSearchUtil;
 
 
-    public void addWaitUpload(ResourceBucket resourceBucket) throws IOException, ParseException {
+    public void addWaitUpload(ResourceBucket resourceBucket, OriginalPackage originalPackage) throws IOException, ParseException {
 
         //结构化数据才进行上传省平台...
-        if (resourceBucket.getProfileType().getType() == 1){
-            if (resourceBucket.isReUploadFlg()) {
+        if (originalPackage.getProfileType().getType() == 1){
+            if (originalPackage.isReUploadFlg()) {
                 //首先删除
                 elasticSearchUtil.delete(INDEX,TYPE,resourceBucket.getId());
                 //重新插入
-                addWaitUpload(resourceBucket,0);
+                addWaitUpload(resourceBucket, originalPackage, 0);
             } else {
                 //判断是否是补传,补传则添加数据
-                long eventTime = resourceBucket.getEventDate().getTime();
+                long eventTime = originalPackage.getEventTime().getTime();
                 long currentTime = new Date().getTime();
                 long diff = currentTime - eventTime;
                 double day = diff / time;
                 if (day > 2){
                     //首先删除
                     elasticSearchUtil.delete(INDEX,TYPE,resourceBucket.getId());
-                    addWaitUpload(resourceBucket,1);
+                    addWaitUpload(resourceBucket, originalPackage, 1);
                 }
             }
         }
     }
 
-    private void addWaitUpload(ResourceBucket resourceBucket,int origin) throws IOException, ParseException {
+    private void addWaitUpload(ResourceBucket resourceBucket, OriginalPackage originalPackage, int origin) throws IOException, ParseException {
         Upload upload = new Upload();
         upload.set_id(resourceBucket.getId());
         upload.setOrigin(origin);
@@ -66,7 +67,7 @@ public class UploadService {
         } else if (origin == 1){
             upload.setFailed_message("oldData");
         }
-        upload.setEvent_date(resourceBucket.getEventDate());
+        upload.setEvent_date(originalPackage.getEventTime());
         upload.setRow_key(resourceBucket.getId());
         elasticSearchUtil.index(INDEX, TYPE, objectMapper.readValue(objectMapper.writeValueAsString(upload), Map.class ));
     }

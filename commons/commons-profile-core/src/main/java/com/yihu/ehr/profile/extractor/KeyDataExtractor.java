@@ -1,6 +1,6 @@
 package com.yihu.ehr.profile.extractor;
 
-import com.yihu.ehr.profile.util.PackageDataSet;
+import com.yihu.ehr.profile.model.PackageDataSet;
 
 /**
  * 关键数据提取器。如：身份证号，事件号，卡号等。

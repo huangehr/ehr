@@ -11,10 +11,12 @@ import com.yihu.ehr.model.packs.EsSimplePackage;
 import com.yihu.ehr.profile.exception.IllegalJsonDataException;
 import com.yihu.ehr.profile.exception.IllegalJsonFileException;
 import com.yihu.ehr.profile.exception.ResolveException;
+import com.yihu.ehr.profile.family.ResourceCells;
 import com.yihu.ehr.resolve.feign.PackageMgrClient;
+import com.yihu.ehr.resolve.model.stage1.OriginalPackage;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.resolve.model.stage2.ResourceBucket;
-import com.yihu.ehr.resolve.service.resource.stage1.PackageResolveService;
+import com.yihu.ehr.resolve.service.resource.stage1.ResolveService;
 import com.yihu.ehr.resolve.service.resource.stage2.IdentifyService;
 import com.yihu.ehr.resolve.service.resource.stage2.PackMillService;
 import com.yihu.ehr.resolve.service.resource.stage2.ResourceService;
@@ -50,7 +52,9 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private FastDFSUtil fastDFSUtil;
     @Autowired
-    private PackageResolveService packageResolveService;
+    private ResolveService packageResolveService;
+    @Autowired
+    private ResolveService packageResolveService2;
     @Autowired
     private PackageMgrClient packageMgrClient;
     @Autowired
@@ -78,33 +82,28 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
                 pack.setClient_id(clientId);
             }
             String zipFile = downloadTo(pack.getRemote_path());
-            StandardPackage standardPackage = packageResolveService.doResolve(pack, zipFile);
-            Map<String, Object> map = new HashMap();
-
-            //非病人维度不做此处理
-            if (!ProfileType.DataSet.equals(standardPackage.getProfileType())){
-                ResourceBucket resourceBucket = packMillService.grindingPackModel(standardPackage, pack);
-                identifyService.identify(resourceBucket, standardPackage);
-                resourceService.save(resourceBucket, standardPackage, pack);
-                map.put("defect", resourceBucket.getQcMetadataRecords().getRecords().isEmpty() ? 0 : 1); //是否解析异常
-                map.put("patient_name", resourceBucket.getPatientName());
-            }
-
+            OriginalPackage originalPackage = packageResolveService2.doResolve(pack, zipFile);
+            ResourceBucket resourceBucket = packMillService.grindingPackModel(originalPackage);
+            identifyService.identify(resourceBucket, originalPackage);
+            resourceService.save(resourceBucket, originalPackage);
             //回填入库状态
-            map.put("profile_id", standardPackage.getId());
-            map.put("demographic_id", standardPackage.getDemographicId());
-            map.put("event_type", standardPackage.getEventType() == null ? -1 : standardPackage.getEventType().getType());
-            map.put("event_no", standardPackage.getEventNo());
-            map.put("event_date", DateUtil.toStringLong(standardPackage.getEventDate()));
-            map.put("patient_id", standardPackage.getPatientId());
-            map.put("dept", standardPackage.getDeptCode());
-            long delay = pack.getReceive_date().getTime() - standardPackage.getEventDate().getTime();
+            Map<String, Object> map = new HashMap();
+            map.put("defect", resourceBucket.getQcMetadataRecords().getRecords().isEmpty() ? 0 : 1); //是否解析异常
+            map.put("patient_name", resourceBucket.getBasicRecord(ResourceCells.PATIENT_NAME));
+            map.put("profile_id", resourceBucket.getId());
+            map.put("demographic_id", resourceBucket.getBasicRecord(ResourceCells.DEMOGRAPHIC_ID));
+            map.put("event_type", originalPackage.getEventType() == null ? -1 : originalPackage.getEventType().getType());
+            map.put("event_no", originalPackage.getEventNo());
+            map.put("event_date", DateUtil.toStringLong(originalPackage.getEventTime()));
+            map.put("patient_id", originalPackage.getPatientId());
+            map.put("dept", resourceBucket.getBasicRecord(ResourceCells.DEPT_CODE));
+            long delay = pack.getReceive_date().getTime() - originalPackage.getEventTime().getTime();
             map.put("delay", delay % (1000 * 60 * 60 * 24) > 0 ? delay / (1000 * 60 * 60 * 24) + 1 : delay / (1000 * 60 * 60 * 24));
-            map.put("re_upload_flg", String.valueOf(standardPackage.isReUploadFlg()));
+            map.put("re_upload_flg", String.valueOf(originalPackage.isReUploadFlg()));
             packageMgrClient.reportStatus(packId, ArchiveStatus.Finished, 0, objectMapper.writeValueAsString(map));
             //是否返回数据
             if (echo) {
-                return standardPackage.toJson();
+                return originalPackage.toJson();
             } else {
                 Map<String, String> resultMap = new HashMap<String, String>();
                 resultMap.put("success", "入库成功！");
@@ -119,7 +118,7 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
             } else if (e instanceof IllegalJsonDataException) {
                 errorType = 3;
             } else if (e instanceof ResolveException) {
-                errorType = 4;
+                errorType = 21; //21以下为质控和解析的公共错误
             }
             if (StringUtils.isBlank(e.getMessage())) {
                 packageMgrClient.reportStatus(packId, ArchiveStatus.Failed, errorType, "Internal Server Error");
@@ -154,23 +153,28 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "clientId") String clientId,
             @ApiParam(name = "persist", value = "是否入库", required = true, defaultValue = "false")
             @RequestParam(value = "persist", defaultValue = "false") boolean persist) throws Throwable {
-        String zipFile = LocalTempPathUtil.getTempPathWithUUIDSuffix() + packageId + ".zip";
-        BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(new File(zipFile)));
-        FileCopyUtils.copy(file.getInputStream(), stream);
-        stream.close();
-        EsSimplePackage pack = new EsSimplePackage();
-        pack.set_id(packageId);
-        pack.setPwd(password);
-        pack.setReceive_date(new Date());
-        pack.setClient_id(clientId);
-        StandardPackage standardPackage = packageResolveService.doResolve(pack, zipFile);
-        standardPackage.setClientId(clientId);
-        ResourceBucket resourceBucket = packMillService.grindingPackModel(standardPackage, pack);
-        if (persist) {
-            identifyService.identify(resourceBucket, standardPackage);
-            resourceService.save(resourceBucket, standardPackage, pack);
+        BufferedOutputStream stream = null;
+        try {
+            String zipFile = LocalTempPathUtil.getTempPathWithUUIDSuffix() + packageId + ".zip";
+            stream = new BufferedOutputStream(new FileOutputStream(new File(zipFile)));
+            FileCopyUtils.copy(file.getInputStream(), stream);
+            EsSimplePackage pack = new EsSimplePackage();
+            pack.set_id(packageId);
+            pack.setPwd(password);
+            pack.setReceive_date(new Date());
+            pack.setClient_id(clientId);
+            OriginalPackage originalPackage = packageResolveService.doResolve(pack, zipFile);
+            ResourceBucket resourceBucket = packMillService.grindingPackModel(originalPackage);
+            if (persist) {
+                identifyService.identify(resourceBucket, originalPackage);
+                resourceService.save(resourceBucket, originalPackage);
+            }
+            return new ResponseEntity<>(originalPackage.toJson(), HttpStatus.OK);
+        } finally {
+            if (stream != null) {
+                stream.close();
+            }
         }
-        return new ResponseEntity<>(standardPackage.toJson(), HttpStatus.OK);
     }
 
     /**
@@ -183,10 +187,10 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Packages.Fetch, method = RequestMethod.GET)
     public String fetch(
             @ApiParam(name = "id", value = "档案包ID", required = true)
-            @PathVariable(value = "id") String id) throws Throwable {
+            @PathVariable(value = "id") String id) throws Exception {
         EsSimplePackage esSimplePackage = packageMgrClient.getPackage(id);
         String zipFile = downloadTo(esSimplePackage.getRemote_path());
-        StandardPackage packModel = packageResolveService.doResolve(esSimplePackage, zipFile);
+        OriginalPackage packModel = packageResolveService.doResolve(esSimplePackage, zipFile);
         return packModel.toJson();
     }
 
@@ -204,18 +208,18 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
         EsSimplePackage esSimplePackage = new EsSimplePackage();
         esSimplePackage.set_id(UUID.randomUUID().toString());
         esSimplePackage.setReceive_date(new Date());
-        StandardPackage standardPackage = packageResolveService.doResolveImmediateData(data, clientId);
-        ResourceBucket resourceBucket = packMillService.grindingPackModel(standardPackage, esSimplePackage);
+        StandardPackage standardPackage = packageResolveService.doResolveImmediateData(data, esSimplePackage);
+        ResourceBucket resourceBucket = packMillService.grindingPackModel(standardPackage);
         identifyService.identify(resourceBucket, standardPackage);
-        resourceService.save(resourceBucket, standardPackage, null);
+        resourceService.save(resourceBucket, standardPackage);
         //回填入库状态
-       /* Map<String, String> map = new HashMap();
+        Map<String, String> map = new HashMap();
         map.put("profileId", standardPackage.getId());
         map.put("demographicId", standardPackage.getDemographicId());
         map.put("eventType", String.valueOf(standardPackage.getEventType().getType()));
         map.put("eventNo", standardPackage.getEventNo());
-        map.put("eventDate", DateUtil.toStringLong(standardPackage.getEventDate()));
-        map.put("patientId", standardPackage.getPatientId());*/
+        map.put("eventDate", DateUtil.toStringLong(standardPackage.getEventTime()));
+        map.put("patientId", standardPackage.getPatientId());
         //是否返回数据
         if (echo) {
             return standardPackage.toJson();

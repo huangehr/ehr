@@ -2,78 +2,38 @@ package com.yihu.ehr.resolve.model.stage1;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.yihu.ehr.profile.EventType;
 import com.yihu.ehr.profile.ProfileType;
-import com.yihu.ehr.lang.SpringContext;
-import com.yihu.ehr.profile.util.PackageDataSet;
-import com.yihu.ehr.profile.util.ProfileId;
 import com.yihu.ehr.profile.exception.IllegalJsonDataException;
+import com.yihu.ehr.profile.model.PackageDataSet;
+import com.yihu.ehr.profile.model.ProfileId;
+import com.yihu.ehr.resolve.model.stage2.ResourceBucket;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.*;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
- * 在内存中构建一个标准档案包结构，将档案包的数据解析进去之后，再使用资源化工具入库。
- *
- * @author Sand
- * @created 2015.08.16 10:44
+ * Created by progr1mmer on 2018/6/8.
  */
-public class StandardPackage {
+public class StandardPackage extends OriginalPackage {
 
-    protected ObjectMapper objectMapper = SpringContext.getApplicationContext().getBean(ObjectMapper.class);
+    private String cardId; //就诊卡
+    private String cardType; //就诊卡类型
+    private String demographicId; //身份证号码
+    private String patientName; //居民姓名
+    private String deptCode; //入院科室编码
+    private Set<String> diagnosisCode = new HashSet<>(); //icd10 诊断代码
+    private Set<String> diagnosisName = new HashSet<>(); //诊断名称
 
-    //机构代码
-    private String orgCode;
-    //CDA版本号
-    private String cdaVersion;
-    //应用代码
-    private String clientId;
-    //事件号
-    private String eventNo;
-    //事件时间，如挂号，住院，体检等时间
-    private Date eventDate;
-    // 0门诊 1住院 2体检
-    private EventType eventType;
-    //就诊时用的就诊卡
-    private String cardId;
-    //就诊时的就诊卡类型
-    private String cardType;
-    //人口学ID
-    private String patientId;
-    //患者姓名
-    private String patientName;
-    //身份证号码
-    private String demographicId;
-    //科室代码
-    private String deptCode;
-    //档案ID
-    private ProfileId profileId;
-    //1结构化档案，2文件档案，3链接档案，4数据集档案
-    private ProfileType profileType;
-    //入库创建时间
-    private Date createDate;
-    //ICD10诊断列表
-    private Set<String> diagnosisList;
-    //ICD10诊断名称列表
-    private Set<String> diagnosisNameList;
-    //重传标识
-    private boolean reUploadFlg;
-    //身份识别标志
-    private boolean identifyFlag;
-    //数据集合
-    protected Map<String, PackageDataSet> dataSets = new TreeMap<>();
-
-    public StandardPackage() {
-        this.orgCode = "";
-        this.eventNo = "";
-        setProfileType(ProfileType.Standard);
+    public StandardPackage(String packId, Date receiveDate) {
+        this.packId = packId;
+        this.receiveDate = receiveDate;
+        this.profileType = ProfileType.Standard;
     }
 
-    /**
-     * ID
-     * @return
-     */
+    @Override
     public String getId() {
         if (profileId == null) {
             if (StringUtils.isEmpty(orgCode)) {
@@ -82,253 +42,20 @@ public class StandardPackage {
             if (StringUtils.isEmpty(eventNo)) {
                 throw new IllegalJsonDataException("Build profile id failed, eventNo is empty.");
             }
-            if (eventDate == null) {
+            if (eventTime == null) {
                 throw new IllegalJsonDataException("Build profile id failed, unable to get event date.");
             }
             if (profileType == null ){
                 throw new IllegalJsonDataException("Build profileType id failed, profileType is empty.");
             }
-            this.profileId = ProfileId.get(orgCode, eventNo, eventDate, profileType.getType());
+            this.profileId = ProfileId.get(orgCode, eventNo, eventTime, profileType.getType());
         }
         return profileId.toString();
     }
 
-    public void setId(String id) {
-        this.profileId = new ProfileId(id);
-    }
-
-    /**
-     * 机构代码
-     * @return
-     */
-    public String getOrgCode() {
-        return orgCode;
-    }
-    public void setOrgCode(String orgCode) {
-        this.orgCode = orgCode;
-    }
-
-    /**
-     * CDA版本
-     * @return
-     */
-    public String getCdaVersion() {
-        return cdaVersion;
-    }
-    public void setCdaVersion(String cdaVersion) {
-        this.cdaVersion = cdaVersion;
-    }
-
-    /**
-     * 应用代码ID
-     * @return
-     */
-    public String getClientId() {
-        return clientId;
-    }
-    public void setClientId(String clientId) {
-        this.clientId = clientId;
-    }
-
-    /**
-     * 事件号
-     * @return
-     */
-    public String getEventNo() {
-        return eventNo;
-    }
-    public void setEventNo(String eventNo) {
-        this.eventNo = eventNo;
-    }
-
-    /**
-     * 事件时间，如挂号，住院，体检等时间
-     * @return
-     */
-    public Date getEventDate() {
-        return eventDate;
-    }
-    public void setEventDate(Date date) {
-        this.eventDate = date;
-    }
-
-    /**
-     * 0门诊 1住院 2体检
-     * @return
-     */
-    public EventType getEventType() {
-        return eventType;
-    }
-    public void setEventType(EventType eventType) {
-        this.eventType = eventType;
-    }
-
-    /**
-     * 就诊时用的就诊卡
-     * @return
-     */
-    public String getCardId() {
-        return cardId;
-    }
-    public void setCardId(String cardId) {
-        this.cardId = cardId;
-    }
-
-    /**
-     * 就诊时的就诊卡类型
-     * @return
-     */
-    public String getCardType() {
-        return cardType;
-    }
-    public void setCardType(String cardType) {
-        this.cardType = cardType;
-    }
-
-    /**
-     * 人口学ID
-     * @return
-     */
-    public String getPatientId() {
-        return patientId;
-    }
-    public void setPatientId(String patientId) {
-        this.patientId = patientId;
-    }
-
-    /**
-     * 患者姓名
-     * @return
-     */
-    public String getPatientName() {
-        return patientName;
-    }
-    public void setPatientName(String patientName) {
-        this.patientName = patientName;
-    }
-
-    /**
-     * 身份证号码
-     * @return
-     */
-    public String getDemographicId() {
-        return demographicId;
-    }
-    public void setDemographicId(String demographicId) {
-        this.demographicId = demographicId;
-    }
-
-    /**
-     * 机构编码
-     * @return
-     */
-    public String getDeptCode() {
-        return deptCode;
-    }
-    public void setDeptCode(String deptCode) {
-        this.deptCode = deptCode;
-    }
-
-    /**
-     * 1结构化档案，2文件档案，3链接档案，4数据集档案
-     * @return
-     */
-    public ProfileType getProfileType() {
-        return profileType;
-    }
-    public void setProfileType(ProfileType profileType) {
-        this.profileType = profileType;
-    }
-
-    /**
-     * 入库创建时间
-     * @return
-     */
-    public Date getCreateDate() {
-        if (createDate == null){
-            createDate = new Date();
-        }
-        return createDate;
-    }
-    public void setCreateDate(Date createDate) {
-        this.createDate = createDate;
-    }
-
-    /**
-     * ICD10诊断列表
-     * @return
-     */
-    public Set<String> getDiagnosisList() {
-        return diagnosisList;
-    }
-    public void setDiagnosisList(Set<String> diagnosisList) {
-        this.diagnosisList = diagnosisList;
-    }
-
-    /**
-     * ICD10诊断名称列表
-     * @return
-     */
-    public Set<String> getDiagnosisNameList() {
-        return diagnosisNameList;
-    }
-    public void setDiagnosisNameList(Set<String> diagnosisNameList) {
-        this.diagnosisNameList = diagnosisNameList;
-    }
-
-    /**
-     * 重传标志
-     * @return
-     */
-    public boolean isReUploadFlg() {
-        return reUploadFlg;
-    }
-    public void setReUploadFlg(boolean reUploadFlg) {
-        this.reUploadFlg = reUploadFlg;
-    }
-
-    /**
-     * 身份识别标志
-     * @return
-     */
-    public boolean isIdentifyFlag() {
-        return identifyFlag;
-    }
-    public void setIdentifyFlag(boolean identifyFlag) {
-        this.identifyFlag = identifyFlag;
-    }
-
-    /**
-     * 数据集合
-     *
-     */
-    public void insertDataSet(String dataSetCode, PackageDataSet dataSet) {
-        this.dataSets.put(dataSetCode, dataSet);
-    }
-    public PackageDataSet getDataSet(String dataSetCode) {
-        return this.dataSets.get(dataSetCode);
-    }
-    public Collection<PackageDataSet> getDataSets() {
-        return dataSets.values();
-    }
-
-    public String getDataSetIndices() {
-        ObjectNode rootNode = objectMapper.createObjectNode();
-
-        for (String dataSetCode : dataSets.keySet()) {
-            Set<String> recordKeys = dataSets.get(dataSetCode).getRecordKeys();
-            rootNode.put(dataSetCode, String.join(",", recordKeys));
-        }
-
-        return rootNode.toString();
-    }
-
+    @Override
     public String toJson() {
-        ObjectNode node = jsonFormat();
-        return node.toString();
-    }
-
-    protected ObjectNode jsonFormat() {
+        ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode root = objectMapper.createObjectNode();
         root.put("id", getId().toString());
         root.put("cardId", this.getCardId());
@@ -336,15 +63,14 @@ public class StandardPackage {
         root.put("patientId", this.getPatientId());
         root.put("eventNo", this.getEventNo());
         root.put("cdaVersion", this.getCdaVersion());
-        root.put("clientId", this.getClientId());
-        root.put("eventTime", DateTimeUtil.utcDateTimeFormat(this.getEventDate()));
+        root.put("eventTime", DateTimeUtil.utcDateTimeFormat(this.getEventTime()));
         root.put("createTime", DateTimeUtil.utcDateTimeFormat(this.getCreateDate()));
         root.put("eventType", this.getEventType() == null? "":this.getEventType().toString());
         root.put("profileType", this.getProfileType().toString());
         root.put("cardType", this.getCardType());
         root.put("patientName", this.getPatientName());
-        root.put("diagnosis", StringUtils.join(this.getDiagnosisList(),";"));
-        root.put("diagnosisName", StringUtils.join(this.getDiagnosisNameList(),";"));
+        root.put("diagnosis", StringUtils.join(this.getDiagnosisCode(),";"));
+        root.put("diagnosisName", StringUtils.join(this.getDiagnosisName(),";"));
         root.put("reUploadFlg", this.isReUploadFlg());
         root.put("identifyFlag", this.isIdentifyFlag());
         root.put("deptCode", this.deptCode);
@@ -353,19 +79,62 @@ public class StandardPackage {
             PackageDataSet dataSet = dataSets.get(dataSetCode);
             dataSetsNode.putPOJO(dataSetCode, dataSet.toJson());
         }
-        return root;
+        return root.toString();
     }
 
-    public void regularRowKey() {
-        for (String dataSetCode : dataSets.keySet()) {
-            PackageDataSet dataSet = dataSets.get(dataSetCode);
-            int rowIndex = 0;
-            String sortFormat = dataSet.getRecordCount() > 10 ? "%s$%03d" : "%s$%1d";
-            String[] rowKeys = dataSet.getRecordKeys().toArray(new String[dataSet.getRecordCount()]);
-            for (String rowKey : rowKeys) {
-                dataSet.updateRecordKey(rowKey, String.format(sortFormat, getId(), rowIndex ++));
-            }
-        }
+    public String getCardId() {
+        return cardId;
     }
 
+    public void setCardId(String cardId) {
+        this.cardId = cardId;
+    }
+
+    public String getCardType() {
+        return cardType;
+    }
+
+    public void setCardType(String cardType) {
+        this.cardType = cardType;
+    }
+
+    public String getDemographicId() {
+        return demographicId;
+    }
+
+    public void setDemographicId(String demographicId) {
+        this.demographicId = demographicId;
+    }
+
+    public String getPatientName() {
+        return patientName;
+    }
+
+    public void setPatientName(String patientName) {
+        this.patientName = patientName;
+    }
+
+    public String getDeptCode() {
+        return deptCode;
+    }
+
+    public void setDeptCode(String deptCode) {
+        this.deptCode = deptCode;
+    }
+
+    public Set<String> getDiagnosisCode() {
+        return diagnosisCode;
+    }
+
+    public void setDiagnosisCode(Set<String> diagnosisCode) {
+        this.diagnosisCode = diagnosisCode;
+    }
+
+    public Set<String> getDiagnosisName() {
+        return diagnosisName;
+    }
+
+    public void setDiagnosisName(Set<String> diagnosisName) {
+        this.diagnosisName = diagnosisName;
+    }
 }

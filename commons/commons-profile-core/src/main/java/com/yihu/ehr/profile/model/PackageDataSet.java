@@ -1,4 +1,4 @@
-package com.yihu.ehr.profile.util;
+package com.yihu.ehr.profile.model;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -139,7 +139,6 @@ public class PackageDataSet {
 
     public JsonNode toJson() {
         ObjectMapper objectMapper = SpringContext.getService(ObjectMapper.class);
-
         return dataSetBody(dataSetHeader(objectMapper));
     }
 

@@ -7,13 +7,11 @@ import com.yihu.ehr.constants.UrlScope;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.profile.EventType;
 import com.yihu.ehr.profile.exception.IllegalJsonDataException;
-import com.yihu.ehr.profile.util.MetaDataRecord;
-import com.yihu.ehr.profile.util.PackageDataSet;
-import com.yihu.ehr.resolve.model.stage1.CdaDocument;
-import com.yihu.ehr.resolve.model.stage1.FilePackage;
-import com.yihu.ehr.resolve.model.stage1.OriginFile;
-import com.yihu.ehr.resolve.model.stage1.StandardPackage;
-import com.yihu.ehr.resolve.service.resource.stage1.PackModelFactory;
+import com.yihu.ehr.profile.model.MetaDataRecord;
+import com.yihu.ehr.profile.model.PackageDataSet;
+import com.yihu.ehr.resolve.model.stage1.*;
+import com.yihu.ehr.resolve.model.stage1.details.CdaDocument;
+import com.yihu.ehr.resolve.model.stage1.details.OriginFile;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -39,14 +37,12 @@ public class FilePackageResolver extends PackageResolver {
     private FastDFSUtil fastDFSUtil;
 
     @Override
-    public void resolve(StandardPackage profile, File root) throws Exception {
-        FilePackage filePackModel = (FilePackage) profile;
-
+    public void resolve(OriginalPackage originalPackage, File root) throws Exception {
         File documents = new File(root.getAbsolutePath() + File.separator + "documents.json");
-        parseFile(filePackModel, documents);
+        parseFile((FilePackage)originalPackage, documents);
     }
 
-    private void parseFile(FilePackage profile, File documents) throws Exception {
+    private void parseFile(FilePackage filePackage, File documents) throws Exception {
         JsonNode root = objectMapper.readTree(documents);
 
         String demographicId = root.get("demographic_id") == null ? "" : root.get("demographic_id").asText();
@@ -77,19 +73,19 @@ public class FilePackageResolver extends PackageResolver {
         if (!StringUtils.isEmpty(errorMsg.toString())){
             throw new IllegalJsonDataException(errorMsg.toString());
         }
-        profile.setDemographicId(demographicId);
-        profile.setPatientId(patientId);
-        profile.setEventNo(eventNo);
+        filePackage.setDemographicId(demographicId);
+        filePackage.setPatientId(patientId);
+        filePackage.setEventNo(eventNo);
         if (eventType != -1) {
-            profile.setEventType(EventType.create(eventType));
+            filePackage.setEventType(EventType.create(eventType));
         }
-        profile.setOrgCode(orgCode);
-        profile.setEventDate(DateUtil.strToDate(eventDate));
-        profile.setCreateDate(DateUtil.strToDate(createDate));
-        profile.setCdaVersion(cdaVersion);
+        filePackage.setOrgCode(orgCode);
+        filePackage.setEventTime(DateUtil.strToDate(eventDate));
+        filePackage.setCreateDate(DateUtil.strToDate(createDate));
+        filePackage.setCdaVersion(cdaVersion);
 
-        parseDataSets(profile, (ObjectNode) root.get("data_sets"));
-        parseFiles(profile, (ArrayNode) root.get("files"), documents.getParent() + File.separator + PackModelFactory.DocumentFolder);
+        parseDataSets(filePackage, (ObjectNode) root.get("data_sets"));
+        parseFiles(filePackage, (ArrayNode) root.get("files"), documents.getParent() + File.separator + "documents");
     }
 
     private void parseDataSets(FilePackage profile, ObjectNode dataSets) {
@@ -106,7 +102,7 @@ public class FilePackageResolver extends PackageResolver {
             dataSet.setCdaVersion(profile.getCdaVersion());
             dataSet.setCode(dataSetCode);
             dataSet.setOrgCode(profile.getOrgCode());
-            dataSet.setEventTime(profile.getEventDate());
+            dataSet.setEventTime(profile.getEventTime());
             dataSet.setCreateTime(profile.getCreateDate());
             ArrayNode records = (ArrayNode) item.getValue();
             for (int i = 0; i < records.size(); ++i) {
