@@ -998,20 +998,15 @@ public class ServiceApi {
     public static class Redis {
 
         //初始化缓存
-        public static final String InitAddress = "/redis/init/address";
         public static final String InitHealthProblem = "/redis/init/healthProblem";
-        public static final String InitIcd10HpR = "/redis/init/icd10HpR";
         public static final String InitIcd10 = "/redis/init/icd10";
-        public static final String InitIcd10ChronicInfo = "/redis/init/icd10ChronicInfo";
-        public static final String InitIndicatorsDict = "/redis/init/indicatorsDict";
         public static final String InitOrgName = "/redis/init/orgName";
         public static final String InitOrgArea = "/redis/init/orgArea";
         public static final String InitOrgSaasArea = "/redis/init/orgSaasArea";
         public static final String InitOrgSaasOrg = "/redis/init/orgSaasOrg";
-        public static final String InitVersions = "/redis/init/versions";
         public static final String InitRsAdapterDict = "/redis/init/rsAdapterDict/{id}";
         public static final String InitRsAdapterMeta = "/redis/init/rsAdapterMeta/{id}";
-        public static final String InitRsMetadata = "/redis/init/rsMetadata";
+        public static final String InitRsMetadataDict = "/redis/init/rsMetadataDict";
 
         //清除缓存
         public static final String Delete = "/redis/delete";
@@ -1023,29 +1018,23 @@ public class ServiceApi {
         public static final String UpdateOrgSaasOrg = "/redis/update/orgSaasOrg";
 
         //获取缓存数据
-        public static final String Address = "/redis/address";
         public static final String HealthProblem = "/redis/healthProblem";
-        public static final String Icd10HpR = "/redis/icd10HpRelation";
         public static final String Icd10Name = "/redis/icd10Name";
         public static final String Icd10ChronicInfo = "/redis/icd10ChronicInfo";
         public static final String Icd10HpCode = "/redis/icd10HpCode";
-        public static final String IndicatorsDict = "/redis/indicatorsDict";
         public static final String OrgName = "/redis/orgName";
         public static final String OrgArea = "/redis/orgArea";
         public static final String OrgSaasArea = "/redis/orgSaasArea";
         public static final String OrgSaasOrg = "/redis/orgSaasOrg";
-
         //App前端Redis
         public static final String AppGetRedisValue = "/redis/getAppClientValue";
         public static final String AppSetRedisValue = "/redis/setAppClientValue";
         public static final String AppSetRedisJsonValue = "/redis/setAppClientJsonValue";
         public static final String AppDeleteRedisValue = "/redis/deleteAppClientValue";
-
         //资源化相关Redis
         public static final String RsAdapterDict = "/redis/rsAdapterDict";
         public static final String RsAdapterMetadata = "/redis/rsAdapterMetaData";
-        public static final String RsMetadata = "/redis/rsMetadata";
-
+        public static final String RsMetadataDict = "/redis/rsMetadata";
         //标准相关Redis
         public static final String StdVersion = "/redis/stdVersion";
         public static final String StdDataSetCode = "/redis/stdDataSetCode";
