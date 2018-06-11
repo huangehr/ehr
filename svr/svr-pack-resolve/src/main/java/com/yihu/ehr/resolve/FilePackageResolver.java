@@ -7,9 +7,11 @@ import com.yihu.ehr.constants.UrlScope;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.profile.EventType;
 import com.yihu.ehr.profile.exception.IllegalJsonDataException;
+import com.yihu.ehr.profile.exception.IllegalJsonFileException;
 import com.yihu.ehr.profile.model.MetaDataRecord;
 import com.yihu.ehr.profile.model.PackageDataSet;
-import com.yihu.ehr.resolve.model.stage1.*;
+import com.yihu.ehr.resolve.model.stage1.FilePackage;
+import com.yihu.ehr.resolve.model.stage1.OriginalPackage;
 import com.yihu.ehr.resolve.model.stage1.details.CdaDocument;
 import com.yihu.ehr.resolve.model.stage1.details.OriginFile;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
@@ -143,11 +145,23 @@ public class FilePackageResolver extends PackageResolver {
             ArrayNode content = (ArrayNode) objectNode.get("content");
             for (int j = 0; j < content.size(); ++j) {
                 ObjectNode file = (ObjectNode) content.get(j);
-                String mine_type = file.get("mime_type").asText();//必填
+                JsonNode mimeNode = file.get("mime_type");
+                if(mimeNode== null) {
+                    throw new IllegalJsonFileException("mime_type is null");
+                }
+                String mine_type = mimeNode.asText();//必填
                 String url_scope = file.get("url_scope") == null ? "" : file.get("url_scope").asText();//可选
                 String url = file.get("url")== null ? "": file.get("url").asText();//可选
-                String emr_id = file.get("emr_id").asText();
-                String emr_name = file.get("emr_name").asText();
+                JsonNode emrId = file.get("emr_id");
+                if(emrId == null){
+                    throw new IllegalJsonFileException("emr_id is null");
+                }
+                String emr_id = emrId.asText();
+                JsonNode emrName = file.get("emr_name");
+                if(emrName == null){
+                    throw new IllegalJsonFileException("emr_name is null");
+                }
+                String emr_name = emrName.asText();
                 String note = file.has("note")?file.get("note").asText():"";//可选
 
                 OriginFile originFile = new OriginFile();
