@@ -1,10 +1,9 @@
 package com.yihu.ehr.resolve.dao;
 
-import com.yihu.ehr.resolve.model.stage1.DataSetPackage;
+import com.yihu.ehr.resolve.model.stage1.SimplePackage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -23,12 +22,12 @@ public class DataSetPackageDao {
     /**
      * 通过转换拼接数据集档案包数据的新增/更新的SQL语句，将档案数据保存到 mysql
      *
-     * @param datasetPackage
+     * @param simplePackage
      */
     @Transactional()
-    public void saveDataset(DataSetPackage datasetPackage) {
-        String[] insertSqlArr = new String[datasetPackage.getSqlList().size()];
-        insertSqlArr = datasetPackage.getSqlList().toArray(insertSqlArr);
+    public void saveDataset(SimplePackage simplePackage) {
+        String[] insertSqlArr = new String[simplePackage.getSqlList().size()];
+        insertSqlArr = simplePackage.getSqlList().toArray(insertSqlArr);
         jdbcTemplate.batchUpdate(insertSqlArr);
     }
 

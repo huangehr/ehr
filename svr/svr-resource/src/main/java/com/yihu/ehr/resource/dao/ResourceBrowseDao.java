@@ -582,7 +582,7 @@ public class ResourceBrowseDao {
      * @return
      */
     public Page<Map<String,Object>> getRawFiles(String queryParams, Integer page, Integer size) throws Exception {
-        String core = ResourceCore.FileTable;
+        String core = ResourceCore.RawFiles;
         String q = "";
         String fq = "";
         String sort = "";

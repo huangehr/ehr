@@ -4,6 +4,7 @@ import com.yihu.ehr.basic.dict.service.SystemDictEntryService;
 import com.yihu.ehr.basic.dict.service.SystemDictService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ErrorCode;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.entity.dict.DictEntryKey;
 import com.yihu.ehr.entity.dict.SystemDict;
 import com.yihu.ehr.entity.dict.SystemDictEntry;
@@ -158,6 +159,20 @@ public class SystemDictEntryEndPoint extends EnvelopRestEndPoint {
             envelop.setDetailModelList(page1.getContent());
             envelop.setSuccessFlg(true);
         }
+        return envelop;
+    }
+    @ApiOperation(value = "未登录获取字典项")
+    @RequestMapping(value = ServiceApi.SystemDict.GetDictEntryByDictIdAndEntryCode, method = RequestMethod.GET)
+    public Envelop getDictEntryByDictIdAndEntryCode(
+            @ApiParam(name = "dictId", value = "字典ID", required = true)
+            @RequestParam(value = "dictId") long dictId,
+            @ApiParam(name = "code", value = "字典项代码", required = true)
+            @RequestParam(value = "code") String code) {
+        Envelop envelop =new Envelop();
+        SystemDictEntry systemDictEntry = systemDictEntryService.getDictEntry(dictId, code);
+        MDictionaryEntry mDictionaryEntry=convertToModel(systemDictEntry, MDictionaryEntry.class);
+        envelop.setObj(mDictionaryEntry);
+        envelop.setSuccessFlg(true);
         return envelop;
     }
 

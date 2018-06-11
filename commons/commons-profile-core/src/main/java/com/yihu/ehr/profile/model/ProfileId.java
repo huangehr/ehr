@@ -1,4 +1,4 @@
-package com.yihu.ehr.profile.util;
+package com.yihu.ehr.profile.model;
 
 import com.yihu.ehr.util.string.StringBuilderEx;
 
@@ -53,9 +53,9 @@ public final class ProfileId implements Comparable<ProfileId>, Serializable {
             orgCode = matcher.group(1);
             eventNo = matcher.group(2);
             timestamp = Long.parseLong(matcher.group(3));
-            if(matcher.groupCount() == 3){
+            if (matcher.groupCount() == 3){
                 profileType = 1;
-            }else{
+            } else{
                 profileType = Integer.parseInt(matcher.group(4));
             }
         } else {
@@ -86,7 +86,7 @@ public final class ProfileId implements Comparable<ProfileId>, Serializable {
      * @return 字符串是否为合法的ObjectId.
      * @throws IllegalArgumentException hexString为空的情况下抛出.
      */
-    public static boolean isValid(final String id) {
+    public static boolean isValid (final String id) {
         if (id == null) {
             throw new IllegalArgumentException();
         }
@@ -109,29 +109,22 @@ public final class ProfileId implements Comparable<ProfileId>, Serializable {
         if (this == o) {
             return true;
         }
-
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-
         ProfileId objectId = (ProfileId)o;
-
         if (orgCode != objectId.orgCode) {
             return false;
         }
-
         if (eventNo != objectId.eventNo) {
             return false;
         }
-
         if (timestamp != objectId.timestamp) {
             return false;
         }
-
         if (profileType != objectId.profileType) {
             return false;
         }
-
         return true;
     }
 
@@ -145,7 +138,6 @@ public final class ProfileId implements Comparable<ProfileId>, Serializable {
         if (other == null) {
             throw new NullPointerException();
         }
-
         return this.toString().compareTo(other.toString());
     }
 

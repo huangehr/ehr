@@ -244,14 +244,16 @@ public class BaseStatistsService {
         List<Map<String, Object>> moleList = getQuotaResultList(molecular,dimension,molecularFilter,dateType, top);
         String year = DateUtil.getYearFromYMD(new Date());
         String town = "";
-        String [] filter = denominatorFilter.split("and");
-        if(filter.length > 0 ){
-            for(String key : filter){
-                if(key.contains(quotaDateField)){
-                    year = key.substring(key.indexOf("'")+1,key.indexOf("'")+5);//quotaDate >= '2018-03-01'
-                }
-                if(key.contains("town")){
-                    town =  key.substring(key.indexOf("=")+1);
+        if(StringUtils.isNotEmpty(denominatorFilter)){
+            String [] filter = denominatorFilter.split("and");
+            if(filter.length > 0 ){
+                for(String key : filter){
+                    if(key.contains(quotaDateField)){
+                        year = key.substring(key.indexOf("'")+1,key.indexOf("'")+5);//quotaDate >= '2018-03-01'
+                    }
+                    if(key.contains("town")){
+                        town =  key.substring(key.indexOf("=")+1);
+                    }
                 }
             }
         }
@@ -511,6 +513,12 @@ public class BaseStatistsService {
             double parentResult = 0;
             mapCategory.put(firstColumnField,mapCategory.get("text"));
             map = getParentAllChildren(quotaCodes,mapCategory,map, dimenListResult,parentResult);
+            if(map == null || map.size() == 0 ){
+                for(String quotaCode : quotaCodes){
+                    map.put(quotaCode,0);
+                }
+                map.put(resultField,0);
+            }
             mapCategory.putAll(map);
             resultMap.add(mapCategory);
             if(mapCategory.get("children") != null){
@@ -985,6 +993,9 @@ public class BaseStatistsService {
         if (StringUtils.isNotEmpty(esConfig.getGrowthFlag())) {
             result = getGrowthByQuota(dimension, filters, esConfig);
         } else {
+            if (StringUtils.isNotEmpty(esConfig.getDateComparisonType())) {
+                filters = getdateComparisonTypeFilter(esConfig,filters);
+            }
             if( (StringUtils.isNotEmpty(esConfig.getEspecialType())) && esConfig.getEspecialType().equals(orgHealthCategory)){
                 //特殊机构类型查询输出结果  只有查询条件没有维度 默认是 机构类型维度
                 result = getOrgHealthCategory(code,filters,dateType,isTrunTree, top);
@@ -1010,6 +1021,72 @@ public class BaseStatistsService {
             }
         }
         return result;
+    }
+
+    public static void main(String args[]) {
+        String year = "";
+        String month = "";
+        String day = "";
+                String key ="'2018-03-01'";
+                String dateStr = key.substring(key.indexOf("'")+1,key.lastIndexOf("'"));
+                year = dateStr.substring(0, 4);
+                month = dateStr.substring(5,7);
+                day = dateStr.substring(8);
+
+        System.out.println(year);
+        System.out.println(month);
+        System.out.println(day);
+    }
+
+    //时间对比类型 时的 查询条件处理
+    public String getdateComparisonTypeFilter(EsConfig esConfig,String filters){
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        Calendar c = Calendar.getInstance();
+        Map<String,String> filterMap = new HashMap<>();
+        if(StringUtils.isNotEmpty(filters)){
+            String [] filter = filters.split("and");
+            String year = "";
+            String month = "";
+            String day = "";
+            if(filter.length > 0 ){
+                for(String key : filter){
+                    filterMap.put(key,key);
+                    Date date = new Date();
+                    if(key.contains(quotaDateField)){
+                        //quotaDate >= '2018-03-01'
+                        String dateStr = key.substring(key.indexOf("'")+1,key.lastIndexOf("'"));
+                        date = DateUtil.parseDate(dateStr,DateUtil.DEFAULT_DATE_YMD_FORMAT);
+                    }
+                    if(esConfig.getDateComparisonType().equals("lastYear")){
+                        c.setTime(date);
+                        c.add(Calendar.YEAR, -1);
+                        Date lastYear = c.getTime();
+                        filterMap.put(key,format.format(lastYear));
+                    }else if(esConfig.getDateComparisonType().equals("lastMonth")) {
+                        c.setTime(date);
+                        c.add(Calendar.MONTH, -1);
+                        Date lastYear = c.getTime();
+                        filterMap.put(key,format.format(lastYear));
+                    }else if(esConfig.getDateComparisonType().equals("lastDay")) {
+                        c.setTime(date);
+                        c.add(Calendar.DATE, -1);
+                        Date lastYear = c.getTime();
+                        filterMap.put(key,format.format(lastYear));
+                    }
+                }
+            }
+            filters = "";
+            if(filterMap != null && filterMap.size() > 0){
+                for(String key : filterMap.keySet()){
+                    if(StringUtils.isEmpty(filters)){
+                        filters = filterMap.get(key);
+                    }else {
+                        filters = " and " + filterMap.get(key);
+                    }
+                }
+            }
+        }
+        return  filters;
     }
 
     public String handleFilter(String secondFilter, String resultFilter) {

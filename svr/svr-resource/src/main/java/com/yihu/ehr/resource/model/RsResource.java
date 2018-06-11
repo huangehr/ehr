@@ -32,6 +32,12 @@ public class RsResource extends BaseAssignedEntity {
     private String echartType;
     //视图展示维度
     private String dimension;
+    // 计量数值
+    private String dataMeasurement;
+    // 单位
+    private String dataUnit;
+    // 单位放置位置
+    private String dataPosition;
 
     @Column(name="code",nullable = false)
     public String getCode() {
@@ -110,5 +116,32 @@ public class RsResource extends BaseAssignedEntity {
 
     public void setDimension(String dimension) {
         this.dimension = dimension;
+    }
+
+    @Column(name="data_measurement")
+    public String getDataMeasurement() {
+        return dataMeasurement;
+    }
+
+    public void setDataMeasurement(String dataMeasurement) {
+        this.dataMeasurement = dataMeasurement;
+    }
+
+    @Column(name="data_unit")
+    public String getDataUnit() {
+        return dataUnit;
+    }
+
+    public void setDataUnit(String dataUnit) {
+        this.dataUnit = dataUnit;
+    }
+
+    @Column(name="data_position")
+    public String getDataPosition() {
+        return dataPosition;
+    }
+
+    public void setDataPosition(String dataPosition) {
+        this.dataPosition = dataPosition;
     }
 }

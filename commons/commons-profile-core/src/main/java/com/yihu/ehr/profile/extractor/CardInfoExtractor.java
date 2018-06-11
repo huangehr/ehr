@@ -1,8 +1,8 @@
 package com.yihu.ehr.profile.extractor;
 
-import com.yihu.ehr.profile.family.MasterResourceFamily;
-import com.yihu.ehr.profile.util.MetaDataRecord;
-import com.yihu.ehr.profile.util.PackageDataSet;
+import com.yihu.ehr.profile.family.ResourceCells;
+import com.yihu.ehr.profile.model.MetaDataRecord;
+import com.yihu.ehr.profile.model.PackageDataSet;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -67,8 +67,8 @@ public class CardInfoExtractor extends KeyDataExtractor {
                 }
             }
         }
-        properties.put(MasterResourceFamily.BasicColumns.CardId, id);
-        properties.put(MasterResourceFamily.BasicColumns.CardType, type);
+        properties.put(ResourceCells.CARD_ID, id);
+        properties.put(ResourceCells.CARD_TYPE, type);
         return properties;
     }
 

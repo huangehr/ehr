@@ -2,29 +2,23 @@ package com.yihu.ehr.resolve;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.profile.extractor.ExtractorChain;
-import com.yihu.ehr.profile.util.DataSetParser;
-import com.yihu.ehr.resolve.model.stage1.StandardPackage;
+import com.yihu.ehr.profile.util.DataSetParserUtil;
+import com.yihu.ehr.resolve.model.stage1.OriginalPackage;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
 
 /**
- * 包解析器。
- *
- * @author Sand
- * @version 1.0
- * @created 2016.04.13 16:14
+ * Created by progr1mmer on 2018/6/8.
  */
 public abstract class PackageResolver {
 
     @Autowired
     protected ObjectMapper objectMapper;
     @Autowired
-    protected DataSetParser dataSetParser;
+    protected DataSetParserUtil dataSetParser;
     @Autowired
     protected ExtractorChain extractorChain;
 
-    public abstract void resolve(StandardPackage profile, File root) throws Exception;
-
-
+    public abstract void resolve(OriginalPackage originalPackage, File root) throws Exception;
 }

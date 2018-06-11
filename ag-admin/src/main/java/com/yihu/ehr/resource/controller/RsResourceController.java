@@ -426,13 +426,18 @@ public class RsResourceController extends BaseController {
                         }else {
                             dimension =  firstDimension;
                         }
-                        chartInfoModel = tjQuotaJobClient.getMoreQuotaGraphicReportPreviews(quotaIdstr, chart, filter, dimension , mRsResources.getName(), top);
+                        chartInfoModel = tjQuotaJobClient.getMoreQuotaGraphicReportPreviews(quotaIdstr, chart, filter, dimension , mRsResources.getName(), top, objectMapper.writeValueAsString(mRsResources));
                     }
-                    chartInfoModel.setResourceId(resourceId);
-                    chartInfoModel.setDimensionMap(dimensionMap);
-                    chartInfoModel.setFirstDimension(firstDimension);
-                    envelop.setObj(chartInfoModel);
-                    envelop.setSuccessFlg(true);
+                    if(chartInfoModel != null){
+                        chartInfoModel.setResourceId(resourceId);
+                        chartInfoModel.setDimensionMap(dimensionMap);
+                        chartInfoModel.setFirstDimension(firstDimension);
+                        envelop.setObj(chartInfoModel);
+                        envelop.setSuccessFlg(true);
+                    }else {
+                        envelop.setSuccessFlg(false);
+                        envelop.setErrorMsg("视图数据查询错误");
+                    }
                 }
             }else{
                 envelop.setErrorMsg("视图中无指标，请确认！");

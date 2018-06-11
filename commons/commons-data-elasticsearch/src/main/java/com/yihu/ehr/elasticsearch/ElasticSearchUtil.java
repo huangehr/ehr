@@ -347,7 +347,7 @@ public class ElasticSearchUtil {
         for (String filter : filterArr) {
             if (filter.contains("?")) {
                 String [] condition = filter.split("\\?");
-                MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery(condition[0], condition[1]);
+                MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchPhraseQuery(condition[0], condition[1]);
                 boolQueryBuilder.must(matchQueryBuilder);
             } else if (filter.contains("<>")) {
                 String [] condition = filter.split("<>");
@@ -362,33 +362,33 @@ public class ElasticSearchUtil {
             } else if (filter.contains(">=")) {
                 String [] condition = filter.split(">=");
                 RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery(condition[0]);
-                if (condition[0].toLowerCase().endsWith("date")) {
+                /*if (condition[0].toLowerCase().endsWith("date")) {
                     rangeQueryBuilder.format("yyyy-MM-dd HH:mm:ss");
-                }
+                }*/
                 rangeQueryBuilder.gte(condition[1]);
                 boolQueryBuilder.must(rangeQueryBuilder);
             } else if (filter.contains(">")) {
                 String [] condition = filter.split(">");
                 RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery(condition[0]);
-                if (condition[0].toLowerCase().endsWith("date")) {
+                /*if (condition[0].toLowerCase().endsWith("date")) {
                     rangeQueryBuilder.format("yyyy-MM-dd HH:mm:ss");
-                }
+                }*/
                 rangeQueryBuilder.gt(condition[1]);
                 boolQueryBuilder.must(rangeQueryBuilder);
             } else if (filter.contains("<=")) {
                 String [] condition = filter.split("<=");
                 RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery(condition[0]);
-                if (condition[0].toLowerCase().endsWith("date")) {
+                /*if (condition[0].toLowerCase().endsWith("date")) {
                     rangeQueryBuilder.format("yyyy-MM-dd HH:mm:ss");
-                }
+                }*/
                 rangeQueryBuilder.lte(condition[1]);
                 boolQueryBuilder.must(rangeQueryBuilder);
             } else if (filter.contains("<")) {
                 String [] condition = filter.split("<");
                 RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery(condition[0]);
-                if (condition[0].toLowerCase().endsWith("date")) {
+                /*if (condition[0].toLowerCase().endsWith("date")) {
                     rangeQueryBuilder.format("yyyy-MM-dd HH:mm:ss");
-                }
+                }*/
                 rangeQueryBuilder.lt(condition[1]);
                 boolQueryBuilder.must(rangeQueryBuilder);
             } else if (filter.contains("=")) {
