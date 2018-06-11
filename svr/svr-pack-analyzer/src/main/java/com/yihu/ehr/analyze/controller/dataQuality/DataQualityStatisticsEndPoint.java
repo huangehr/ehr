@@ -67,6 +67,10 @@ public class DataQualityStatisticsEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.DataQuality.ReceivedPacketNumList, method = RequestMethod.GET)
     @ApiOperation(value = "及时/完整采集的档案包数量集合")
     public Envelop ReceivedPacketNumList(
+            @ApiParam(name = "pageIndex", value = "第几页", required = true)
+            @RequestParam(name = "pageIndex") Integer pageIndex,
+            @ApiParam(name = "pageSize", value = "每页数", required = true)
+            @RequestParam(name = "pageSize") Integer pageSize,
             @ApiParam(name = "type", value = "类型，1及时率，2完整率", required = true)
             @RequestParam(name = "type") String type,
             @ApiParam(name = "orgCode", value = "机构编码", required = true)
@@ -107,10 +111,22 @@ public class DataQualityStatisticsEndPoint extends EnvelopRestEndPoint {
             List<String> fields = new ArrayList<>(2);
             fields.add("packetCount");
             fields.add("receiveDate");
-            List<Map<String, Object>> resultList = esUtil.findBySql(fields, sql.toString());
+            List<Map<String, Object>> searchList = esUtil.findBySql(fields, sql.toString());
+            int count = searchList.size();
 
-            envelop.setDetailModelList(resultList);
-            envelop.setSuccessFlg(true);
+            // 截取当前页数据
+            List<Map<String, Object>> resultList = new ArrayList<>();
+            int startLine = (pageIndex - 1) * pageSize;
+            int endLine = startLine + pageSize - 1;
+            for (int i = startLine; i <= endLine; i++) {
+                if (i < count) {
+                    resultList.add(searchList.get(i));
+                } else {
+                    break;
+                }
+            }
+
+            return getPageResult(resultList, count, pageIndex, pageSize);
         } catch (Exception e) {
             e.printStackTrace();
             envelop.setSuccessFlg(false);

@@ -53,8 +53,8 @@ public class ReportOption {
         //toolbox
         //grid
         option.grid().x("50px");  // left
-        option.grid().y("10px");  // top
-        option.grid().x2("50px"); // right
+        option.grid().y("40px");  // top
+        option.grid().x2("80px"); // right
         option.grid().y2("50px"); // bottom
 //        option.grid().containLabel(true);
         //yAxis
