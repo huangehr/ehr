@@ -33,7 +33,7 @@
         <module>../svr/svr-redis</module>
         <module>../svr/svr-redis-memory</module>
         <module>../svr/svr-quota</module>
-        <module>../svr/svr-log-collection</module>
+        <!--<module>../svr/svr-log-collection</module>-->
     </modules>
 
     <build>

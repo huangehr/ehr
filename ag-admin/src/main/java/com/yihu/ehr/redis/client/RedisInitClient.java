@@ -29,7 +29,7 @@ public interface RedisInitClient {
     String cacheAdapterDict(
             @PathVariable(value = "id") String id);
 
-    @RequestMapping(value= ServiceApi.Redis.InitRsMetadata, method = RequestMethod.POST)
+    /*@RequestMapping(value= ServiceApi.Redis.InitRsMetadata, method = RequestMethod.POST)
     @ApiOperation("Redis缓存数据元字典（dict_code不为空）")
-    String cacheMetadata();
+    String cacheMetadata();*/
 }
