@@ -7,6 +7,7 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.entity.quality.DqPaltformReceiveWarning;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -19,9 +20,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author yeshijie on 2018/6/1.
@@ -61,12 +60,12 @@ public class DataQualityStatisticsEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "start", required = false) String start,
             @ApiParam(name = "end", value = "结束时间", defaultValue = "")
             @RequestParam(value = "end", required = false) String end) throws Exception {
-        return success(dataQualityStatisticsService.inTimeAndIntegrityRate(start,end));
+        return success(dataQualityStatisticsService.inTimeAndIntegrityRate(start, end));
     }
 
     @RequestMapping(value = ServiceApi.DataQuality.ReceivedPacketNumList, method = RequestMethod.GET)
     @ApiOperation(value = "及时/完整采集的档案包数量集合")
-    public Envelop ReceivedPacketNumList(
+    public Envelop receivedPacketNumList(
             @ApiParam(name = "pageIndex", value = "第几页", required = true)
             @RequestParam(name = "pageIndex") Integer pageIndex,
             @ApiParam(name = "pageSize", value = "每页数", required = true)
@@ -127,6 +126,44 @@ public class DataQualityStatisticsEndPoint extends EnvelopRestEndPoint {
             }
 
             return getPageResult(resultList, count, pageIndex, pageSize);
+        } catch (Exception e) {
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.DataQuality.ReceivedPacketReportData, method = RequestMethod.GET)
+    @ApiOperation(value = "档案包接收情况报告数据接口")
+    public Envelop receivedPacketReportData(
+            @ApiParam(name = "reporter", value = "报告人", required = true)
+            @RequestParam(name = "reporter") String reporter,
+            @ApiParam(name = "orgInfoList", value = "机构编码、名称，例：[{orgCode:'xx',orgName:'xx'},{...},...]，医疗云汇总记录的 orgCode 用 all 表示。", required = true)
+            @RequestParam(name = "orgInfoList") List<Map<String, String>> orgInfoList,
+            @ApiParam(name = "eventDateStart", value = "就诊时间（起始），格式 yyyy-MM-dd", required = true)
+            @RequestParam(name = "eventDateStart") String eventDateStart,
+            @ApiParam(name = "eventDateEnd", value = "就诊时间（截止），格式 yyyy-MM-dd", required = true)
+            @RequestParam(name = "eventDateEnd") String eventDateEnd) {
+        Envelop envelop = new Envelop();
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            // 接收档案包总量
+            Long receivedCount = dataQualityStatisticsService.packetCount(orgInfoList, null, eventDateStart, eventDateEnd);
+            // 成功解析档案包总量
+            Long successfulAnalysisCount = dataQualityStatisticsService.packetCount(orgInfoList, "3", eventDateStart, eventDateEnd);
+            // 机构档案包报告汇总
+            List<Map<String, Object>> orgPackReportDataList = dataQualityStatisticsService.orgPackReportData(orgInfoList, eventDateStart, eventDateEnd);
+
+            resultMap.put("searchedDateRange", eventDateStart.replace("-", "") + "-" + eventDateEnd.replace("-", ""));
+            resultMap.put("reportDate", DateTimeUtil.simpleDateFormat(new Date()));
+            resultMap.put("reporter", reporter);
+            resultMap.put("receivedCount", receivedCount);
+            resultMap.put("successfulAnalysisCount", successfulAnalysisCount);
+            resultMap.put("orgPackReportDataList", orgPackReportDataList);
+
+            envelop.setSuccessFlg(true);
+            envelop.setObj(resultMap);
         } catch (Exception e) {
             e.printStackTrace();
             envelop.setSuccessFlg(false);
