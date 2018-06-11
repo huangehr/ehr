@@ -218,7 +218,7 @@ public class ProfileEventService extends ProfileBasicService {
                 Date before = DateUtils.addDays(now, -180);
                 DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
                 String start = dateFormat.format(before);
-                String end = dateFormat.format(now);
+                String end = dateFormat.format(DateUtils.addDays(now, 1));
                 String date = "{\"start\":\"" + start + "\",\"end\":\"" + end + "\"}";
                 for (String code : diagnosisCode) {
                     q = SimpleSolrQueryUtil.getQuery("diagnosis?" + code, date, q);
