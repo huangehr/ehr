@@ -319,7 +319,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
     private Map initRateMap(Map<String, DqPaltformReceiveWarning> warningMap,Object orgName,String orgCode){
         Map dataMap = new HashedMap();
         dataMap.put("orgCode",orgCode);//机构code
-        dataMap.put("orgCode",orgName);//机构名称
+        dataMap.put("orgName",orgName);//机构名称
         dataMap.put("outpatientInTime",0);//门诊及时数
         dataMap.put("hospitalInTime",0);//住院及时数
         dataMap.put("peInTime",0);//体检及时数

@@ -21,6 +21,7 @@ public class MDqPaltformUploadWarning implements Serializable {
     private Long errorNum;//错误量
     private Long dataNum;//数据量
     private List<MDqDatasetWarning> datasetWarningList;//数据集
+    private Integer datasetWarningNum;//数据集数量
 
     public Long getId() {
         return id;
@@ -108,5 +109,13 @@ public class MDqPaltformUploadWarning implements Serializable {
 
     public void setDatasetWarningList(List<MDqDatasetWarning> datasetWarningList) {
         this.datasetWarningList = datasetWarningList;
+    }
+
+    public Integer getDatasetWarningNum() {
+        return datasetWarningNum;
+    }
+
+    public void setDatasetWarningNum(Integer datasetWarningNum) {
+        this.datasetWarningNum = datasetWarningNum;
     }
 }

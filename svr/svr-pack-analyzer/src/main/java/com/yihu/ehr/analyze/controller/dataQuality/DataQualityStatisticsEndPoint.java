@@ -51,7 +51,15 @@ public class DataQualityStatisticsEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "end", required = false) String end,
             @ApiParam(name = "eventType", value = "就诊类型 0门诊 1住院 2体检,null全部", defaultValue = "")
             @RequestParam(value = "eventType", required = false) Integer eventType) throws Exception {
-        return success(dataQualityStatisticsService.dataset(start, end, eventType));
+        Envelop envelop = new Envelop();
+        try {
+            return success(dataQualityStatisticsService.dataset(start, end, eventType));
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return envelop;
     }
 
     @RequestMapping(value = ServiceApi.DataQuality.ReceptionList, method = RequestMethod.GET)
@@ -61,7 +69,15 @@ public class DataQualityStatisticsEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "start", required = false) String start,
             @ApiParam(name = "end", value = "结束时间", defaultValue = "")
             @RequestParam(value = "end", required = false) String end) throws Exception {
-        return success(dataQualityStatisticsService.inTimeAndIntegrityRate(start,end));
+        Envelop envelop = new Envelop();
+        try {
+            return success(dataQualityStatisticsService.inTimeAndIntegrityRate(start,end));
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return envelop;
     }
 
     @RequestMapping(value = ServiceApi.DataQuality.ReceivedPacketNumList, method = RequestMethod.GET)

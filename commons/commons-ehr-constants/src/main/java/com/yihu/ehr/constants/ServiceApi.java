@@ -1649,6 +1649,7 @@ public class ServiceApi {
         public static final String PaltformUploadWarningDel = "/dataQuality/warningSetting/uploadWarningDel";
         public static final String PaltformUploadWarningUpd = "/dataQuality/warningSetting/uploadWarningUpd";
         public static final String PaltformUploadWarning =    "/dataQuality/warningSetting/uploadWarning/{id}";
+        public static final String DatasetWarningList = "/dataQuality/warningSetting/datasetWarningList";
         public static final String DatasetWarningAdd = "/dataQuality/warningSetting/datasetWarningAdd";
         public static final String DatasetWarningDel = "/dataQuality/warningSetting/datasetWarningDel";
         public static final String ReceivedPacketNumList = "/dataQuality/receivedPacket/packetNumList";

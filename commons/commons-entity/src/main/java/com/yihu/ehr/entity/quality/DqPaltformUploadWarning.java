@@ -22,6 +22,7 @@ public class DqPaltformUploadWarning {
     private String integrityRate;//完整率
     private Long errorNum;//错误量
     private Long dataNum;//数据量
+    private Integer datasetWarningNum;//数据集数量
     private List<DqDatasetWarning> datasetWarningList;//数据集
 
     @Id
@@ -114,6 +115,15 @@ public class DqPaltformUploadWarning {
 
     public void setDataNum(Long dataNum) {
         this.dataNum = dataNum;
+    }
+
+    @Transient
+    public Integer getDatasetWarningNum() {
+        return datasetWarningNum;
+    }
+
+    public void setDatasetWarningNum(Integer datasetWarningNum) {
+        this.datasetWarningNum = datasetWarningNum;
     }
 
     @Transient
