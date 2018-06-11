@@ -1422,6 +1422,7 @@ public class ServiceApi {
         public static final String DeleteById = "/dictionaries/{id}";
         public static final String CheckName = "/dictionaries/existence";
         public static final String CheckCode = "/dictionaries/checkCode";
+        public static final String GetDictEntryByDictIdAndEntryCode = "/open/dictionaries/getDictEntryByDictIdAndEntryCode";
 
     }
 
@@ -1492,6 +1493,7 @@ public class ServiceApi {
         public static final String DownloadByObjectId = "/fastDfs/downloadByObjectId";
         public static final String DownloadToLocal = "/fastDfs/downloadToLocal";
         public static final String GetFilePath = "/fastDfs/getFilePath";
+        public static final String GetFileByDictEntry = "/open/fastDfs/getFileByDictEntry";
         public static final String Page = "/fastDfs/page";
         public static final String Status = "/fastDfs/status";
         public static final String GetPublicUrl = "/fastDfs/getPublicUrl";

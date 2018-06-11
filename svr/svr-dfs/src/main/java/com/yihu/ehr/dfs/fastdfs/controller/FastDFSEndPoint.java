@@ -692,4 +692,41 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
         return source;
     }
 
+
+    /**
+     * 根据系统字典项获取Logo
+     * @param dictId
+     * @param code
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = ServiceApi.FastDFS.GetFileByDictEntry, method = RequestMethod.GET)
+    @ApiOperation(value = "根据系统字典id及系统字典项值获取结果集（logo）")
+    public Envelop getFileByDictEntry(
+            @ApiParam(name = "dictId", value = "字典ID", required = true)
+            @RequestParam(value = "dictId") long dictId,
+            @ApiParam(name = "code", value = "字典项代码", required = true)
+            @RequestParam(value = "code") String code) throws Exception {
+        Envelop envelop;
+        StringBuffer dictEntryFilter = new StringBuffer();
+        dictEntryFilter.append("dictId=" + dictId + ";");
+        if (!org.apache.commons.lang3.StringUtils.isEmpty(code)) {
+            dictEntryFilter.append("code=" + code + ";");
+        }
+        List<SystemDictEntry> page =  systemDictEntryService.search(dictEntryFilter.toString());
+        if(page.size()>0){
+            SystemDictEntry systemDictEntry=page.get(0);
+            //filter=[{"andOr":"and","condition":"=","field":"sn","value":"X1522033171859"}]
+            String filter="sn="+systemDictEntry.getValue()+";";
+            List<Map<String, Object>> resultList = elasticSearchUtil.page(indexName, indexType, filter, 1, 1);
+            int count = (int)elasticSearchUtil.count(indexName, indexType, filter);
+            envelop = getPageResult(resultList, count, 1, 5);
+        }else{
+            envelop = new Envelop();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("未设置字典项值！");
+        }
+        return envelop;
+    }
+
 }
