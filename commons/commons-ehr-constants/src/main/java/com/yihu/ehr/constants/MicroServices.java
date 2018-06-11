@@ -12,18 +12,18 @@ public class MicroServices {
     public static final String Configuration = "svr-configuration";
 
     //以下几个微服务聚合svr-basic
-    public static final String Basic = "svr-basic-yy";
-    public static final String Application = "svr-basic-yy";
-    public static final String Geography = "svr-basic-yy";
-    public static final String Patient = "svr-basic-yy";
-    public static final String Portal = "svr-basic-yy";
-    public static final String Security = "svr-basic-yy";
-    public static final String User = "svr-basic-yy";
-    public static final String Family = "svr-basic-yy";
-    public static final String FileResource = "svr-basic-yy";
-    public static final String Dictionary = "svr-basic-yy";
+    public static final String Basic = "svr-basic";
+    public static final String Application = "svr-basic";
+    public static final String Geography = "svr-basic";
+    public static final String Patient = "svr-basic";
+    public static final String Portal = "svr-basic";
+    public static final String Security = "svr-basic";
+    public static final String User = "svr-basic";
+    public static final String Family = "svr-basic";
+    public static final String FileResource = "svr-basic";
+    public static final String Dictionary = "svr-basic";
     public static final String EsbDictionary = "hos-admin";
-    public static final String Organization = "svr-basic-yy";
+    public static final String Organization = "svr-basic";
 
     //以下几个微服务聚合svr-standard
     public static final String Adaption = "svr-standard";
