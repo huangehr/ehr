@@ -59,7 +59,7 @@ public class AppApiCategoryEndPoint extends EnvelopRestEndPoint {
             }
         }
         if (StringUtils.isNotEmpty(parent)) {
-            return failed("请先删除id：" +  parent + "的子类API");
+            return failed("删除失败，请先删除该类别下关联的接口");
         }
         List<String> strIdList = Arrays.asList(idArr);
         List<Integer> intIdList = new ArrayList<>(idArr.length);
