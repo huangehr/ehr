@@ -177,6 +177,7 @@ public class EsQuotaJob implements Job {
         } finally {
             talClient.close();
             client.close();
+            logger.error(quotaVo.getName()+"删除成功");
         }
     }
 
