@@ -3,15 +3,10 @@ package com.yihu.ehr.analyze.service.pack;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.yihu.ehr.analyze.service.RedisService;
 import com.yihu.ehr.profile.EventType;
-import com.yihu.ehr.profile.exception.IllegalJsonDataException;
 import com.yihu.ehr.profile.exception.IllegalJsonFileException;
 import com.yihu.ehr.profile.extractor.KeyDataExtractor;
-import com.yihu.ehr.profile.family.MasterResourceFamily;
-import com.yihu.ehr.profile.util.DataSetParser;
-import com.yihu.ehr.profile.util.MetaDataRecord;
-import com.yihu.ehr.profile.util.PackageDataSet;
-import com.yihu.ehr.util.datetime.DateTimeUtil;
-import com.yihu.ehr.util.datetime.DateUtil;
+import com.yihu.ehr.profile.family.ResourceCells;
+import com.yihu.ehr.profile.model.PackageDataSet;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -19,7 +14,6 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -60,43 +54,38 @@ public class StdPackageAnalyzer extends PackageAnalyzer {
     private void parseFiles(ZipPackage zipPackage, File[] files, boolean origin) throws Exception {
         for (File file : files) {
             PackageDataSet dataSet = analyzeDataSet(file, origin);
+
             //就诊事件信息
             if (zipPackage.getEventDate() == null || zipPackage.getEventType() == null) {
                 Map<String, Object> properties = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.EventInfo);
-                Date eventDate = (Date) properties.get(MasterResourceFamily.BasicColumns.EventDate);
-                EventType eventType = (EventType) properties.get(MasterResourceFamily.BasicColumns.EventType);
-                if (eventDate != null) {
-                    zipPackage.setEventDate(eventDate);
-                }
+                EventType eventType = (EventType) properties.get(ResourceCells.EVENT_TYPE);
                 if (eventType != null) {
                     zipPackage.setEventType(eventType);
                 }
             }
 
             //门诊或住院诊断
-            if (zipPackage.getDiagnosisList() == null
-                    || zipPackage.getDiagnosisList().size() <= 0
-                    || zipPackage.getDiagnosisNameList() == null
-                    || zipPackage.getDiagnosisNameList().size() <= 0) {
+            if (zipPackage.getDiagnosisCode().size() <= 0 || zipPackage.getDiagnosisName().size() <= 0) {
                 Map<String, Object> properties = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.Diagnosis);
-                Set<String> diagnosisList = (Set<String>) properties.get(MasterResourceFamily.BasicColumns.Diagnosis);
-                Set<String> diagnosisNameList = (Set<String>) properties.get(MasterResourceFamily.BasicColumns.DiagnosisName);
-                if (diagnosisList.size() > 0) {
-                    zipPackage.setDiagnosisList(diagnosisList);
+                Set<String> diagnosisCode = (Set<String>) properties.get(ResourceCells.DIAGNOSIS);
+                Set<String> diagnosisName = (Set<String>) properties.get(ResourceCells.DIAGNOSIS_NAME);
+                if (diagnosisCode.size() > 0) {
+                    zipPackage.setDiagnosisCode(diagnosisCode);
                 }
-                if (diagnosisNameList.size() > 0) {
-                    zipPackage.setDiagnosisNameList(diagnosisNameList);
+                if (diagnosisName.size() > 0) {
+                    zipPackage.setDiagnosisName(diagnosisName);
                 }
             }
 
             //科室信息
             if (zipPackage.getDeptCode() == null) {
                 Map<String, Object> properties = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.Dept);
-                String deptCode = (String) properties.get(MasterResourceFamily.BasicColumns.DeptCode);
+                String deptCode = (String) properties.get(ResourceCells.DEPT_CODE);
                 if (StringUtils.isNotEmpty(deptCode)) {
                     zipPackage.setDeptCode(deptCode);
                 }
             }
+
             zipPackage.insertDataSet(dataSet.getCode(), dataSet);
             zipPackage.setPatientId(dataSet.getPatientId());
             zipPackage.setEventNo(dataSet.getEventNo());
@@ -104,6 +93,7 @@ public class StdPackageAnalyzer extends PackageAnalyzer {
             zipPackage.setOrgName(redisService.getOrgName(dataSet.getOrgCode()));
             zipPackage.setOrgArea(redisService.getOrgArea(dataSet.getOrgCode()));
             zipPackage.setCdaVersion(dataSet.getCdaVersion());
+            zipPackage.setEventDate(dataSet.getEventTime());
         }
     }
 

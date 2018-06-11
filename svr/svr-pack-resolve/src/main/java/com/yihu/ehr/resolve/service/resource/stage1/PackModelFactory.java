@@ -1,10 +1,8 @@
 package com.yihu.ehr.resolve.service.resource.stage1;
 
+import com.yihu.ehr.model.packs.EsSimplePackage;
 import com.yihu.ehr.profile.ProfileType;
-import com.yihu.ehr.resolve.model.stage1.DataSetPackage;
-import com.yihu.ehr.resolve.model.stage1.FilePackage;
-import com.yihu.ehr.resolve.model.stage1.LinkPackage;
-import com.yihu.ehr.resolve.model.stage1.StandardPackage;
+import com.yihu.ehr.resolve.model.stage1.*;
 import org.springframework.util.CollectionUtils;
 
 import java.io.File;
@@ -21,7 +19,6 @@ public class PackModelFactory {
 
     public final static String StandardFolder = "standard";
     public final static String OriginFolder = "origin";
-    public final static String DocumentFolder = "documents";
     public final static String DocumentsFile = "documents.json";
     public final static String LinkFile = "index";
 
@@ -30,29 +27,29 @@ public class PackModelFactory {
      * @param root
      * @return
      */
-    public static StandardPackage createPackModel(File root) {
+    public static OriginalPackage createPackModel(File root, EsSimplePackage esSimplePackage) {
         List<String> directories = CollectionUtils.arrayToList(root.list());
         if (directories.contains(StandardFolder) && directories.contains(OriginFolder)) {
-            return createPackModel(ProfileType.Standard);
+            return createPackModel(ProfileType.Standard, esSimplePackage);
         } else if (directories.contains(DocumentsFile)) {
-            return createPackModel(ProfileType.File);
+            return createPackModel(ProfileType.File, esSimplePackage);
         } else if (directories.size() == 1 && directories.contains(LinkFile)) {
-            return createPackModel(ProfileType.Link);
+            return createPackModel(ProfileType.Link, esSimplePackage);
         } else { // 数据集档案包（zip下只有 .json 数据文件）。
-            return createPackModel(ProfileType.DataSet);
+            return createPackModel(ProfileType.Simple, esSimplePackage);
         }
     }
 
-    public static StandardPackage createPackModel(ProfileType type){
+    public static OriginalPackage createPackModel(ProfileType type, EsSimplePackage esSimplePackage){
         switch(type){
             case Standard:
-                return new StandardPackage();
+                return new StandardPackage(esSimplePackage.get_id(), esSimplePackage.getReceive_date());
             case File:
-                return new FilePackage();
+                return new FilePackage(esSimplePackage.get_id(), esSimplePackage.getReceive_date());
             case Link:
-                return new LinkPackage();
-            case DataSet:
-                return new DataSetPackage();
+                return new LinkPackage(esSimplePackage.get_id(), esSimplePackage.getReceive_date());
+            case Simple:
+                return new SimplePackage(esSimplePackage.get_id(), esSimplePackage.getReceive_date());
             default:
                 return null;
         }

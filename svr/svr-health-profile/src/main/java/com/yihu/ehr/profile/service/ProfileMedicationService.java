@@ -16,7 +16,7 @@ public class ProfileMedicationService extends ProfileBasicService {
 
     public Map<String, Integer> medicationRanking(String demographicId, String hpCode, String date) throws Exception {
         String masterQ;
-        if (hpCode != null) {
+        if (!StringUtils.isEmpty(hpCode)) {
             masterQ = "{\"q\":\"demographic_id:" + demographicId + " AND health_problem:*" +  hpCode + "*\"}";
         } else {
             masterQ = "{\"q\":\"demographic_id:" + demographicId + "\"}";
@@ -116,7 +116,7 @@ public class ProfileMedicationService extends ProfileBasicService {
                         }
                         if (match) {
                             //时间轴基本字段
-                            Map<String, Object> resultMap = simpleEvent(masterMap);
+                            Map<String, Object> resultMap = simpleEvent(masterMap, null);
                             resultMap.put("mark", typeMark);
                             if (masterMap.get(BasicConstant.eventType).equals("0")) { //门诊信息
                                 resultMap.put("department", masterMap.get("EHR_000082"));
@@ -155,7 +155,13 @@ public class ProfileMedicationService extends ProfileBasicService {
                     dataMap.put("drugSpecifications", subMap.get("EHR_000129") == null ? "" : subMap.get("EHR_000129")); //药物规格
                     dataMap.put("drugFormulationCode", subMap.get("EHR_000130") == null ? "" : subMap.get("EHR_000130")); //药物剂型代码
                     dataMap.put("drugFormulationValue", subMap.get("EHR_000130_VALUE") == null ? "" : subMap.get("EHR_000130_VALUE")); //药物剂型值
-                    dataMap.put("drugName", subMap.get("EHR_000131") == null ? "" : subMap.get("EHR_000131")); //药物名称
+                    String drugName = "";
+                    if (!StringUtils.isEmpty(subMap.get("EHR_000100"))) {
+                        drugName = (String) subMap.get("EHR_000100");
+                    } else if (!StringUtils.isEmpty(subMap.get("EHR_000131"))) {
+                        drugName = (String) subMap.get("EHR_000131");
+                    }
+                    dataMap.put("drugName", drugName); //药物名称
                     dataMap.put("drugsUseDosageUnits", subMap.get("EHR_000133") == null ? "" :  subMap.get("EHR_000133")); //药物使用剂量单位
                     dataMap.put("drugUsageFrequencyCode", subMap.get("EHR_000134") == null ? "" : subMap.get("EHR_000134")); //药物使用频次代码
                     dataMap.put("drugUsageFrequencyValue", subMap.get("EHR_000134_VALUE") == null ? "" :  subMap.get("EHR_000134_VALUE")); //药物使用频次值

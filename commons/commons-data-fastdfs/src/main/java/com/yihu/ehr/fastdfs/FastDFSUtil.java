@@ -7,6 +7,7 @@ import org.csource.common.NameValuePair;
 import org.csource.fastdfs.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.util.StringUtils;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -112,6 +113,13 @@ public class FastDFSUtil {
      * 以输入流的方式上传文件
      */
     public ObjectNode uploadBySocket(InputStream in, String fileExtension,int fileSize, NameValuePair[] fileMetaData) throws IOException, MyException, NoSuchAlgorithmException{
+        return uploadBySocket(null,in,fileExtension,fileSize,fileMetaData);
+    }
+
+    /**
+     * 以输入流的方式上传文件
+     */
+    public ObjectNode uploadBySocket(String groupname,InputStream in, String fileExtension,int fileSize, NameValuePair[] fileMetaData) throws IOException, MyException, NoSuchAlgorithmException{
         StorageClient client = pool.getStorageClient();
         try {
             ObjectNode message = new ObjectMapper().createObjectNode();
@@ -125,7 +133,12 @@ public class FastDFSUtil {
             }
             bufferedInputStream.close();
             message.put(FILE_SIZE, fileBuffer.length);
-            String[] results = client.upload_file(fileBuffer, fileExtension, fileMetaData);
+            String[] results = null;
+            if(!StringUtils.isEmpty(groupname)){
+                results = client.upload_file(groupname,fileBuffer, fileExtension, fileMetaData);
+            }else{
+                results = client.upload_file(fileBuffer, fileExtension, fileMetaData);
+            }
             if (results != null) {
                 String groupName = results[0];
                 String remoteFile = results[1];
@@ -328,78 +341,54 @@ public class FastDFSUtil {
      * @return
      * @throws IOException
      */
-    public Map<String, Object> status() throws IOException {
+    public List<Map<String, Object>> status() throws IOException {
         TrackerGroup trackerGroup = ClientGlobal.getG_tracker_group();
         int totalServer = trackerGroup.tracker_servers.length;
-        Map<String, Object> finalMap = new HashMap<>(2);
-        Map<String, Long> finalGroupCount = new HashMap<>();
-        List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>(totalServer + 1);
+        List<Map<String, Object>> resultList = new ArrayList<>(totalServer + 1);
         long totalMb  = 0;
         long freeMb = 0;
+        long fileCount = 0;
         TrackerClient trackerClient = new TrackerClient();
         for (int i = 0; i < trackerGroup.tracker_servers.length; i++) {
             TrackerServer trackerServer = null;
             try {
                 trackerServer = trackerGroup.getConnection(i);
                 StructGroupStat[] structGroupStats = trackerClient.listGroups(trackerServer);
-                Map<String, Object> resultMap = new HashMap<String, Object>();
-                long singleTotalMb = 0;
-                long singleFreeMb = 0;
-                resultMap.put("server", trackerServer.getInetSocketAddress());
-                Map<String, Long> groupCount = new HashMap<>();
                 for (StructGroupStat structGroupStat : structGroupStats) {
                     String groupName = structGroupStat.getGroupName();
+                    Map<String, Object> resultMap = new HashMap<>();
+                    resultMap.put("server", groupName);
                     StructStorageStat [] structStorageStats = trackerClient.listStorages(trackerServer, groupName);
-                    if (structStorageStats.length > 0) {
-                        for (StructStorageStat structStorageStat : structStorageStats) {
-                            long count = structStorageStat.getSuccessUploadCount() - structStorageStat.getSuccessDeleteCount();
-                            if (!groupCount.containsKey(groupName)) {
-                                groupCount.put(groupName, count);
-                            } else {
-                                groupCount.put(groupName, groupCount.get(groupName) + count);
-                            }
-                        }
-                    } else {
-                        groupCount.put(groupName, (long)0);
+                    long totalUpload = 0;
+                    long totalDelete = 0;
+                    for (StructStorageStat structStorageStat : structStorageStats) {
+                        totalUpload += structStorageStat.getSuccessUploadCount();
+                        totalDelete += structStorageStat.getSuccessDeleteCount();
                     }
-                    long singleTotalMb1 = structGroupStat.getTotalMB();
-                    singleTotalMb += singleTotalMb1;
-                    long singleFreeMb1 = structGroupStat.getFreeMB();
-                    singleFreeMb += singleFreeMb1;
+                    fileCount += (totalUpload - totalDelete);
+                    long singleTotalMb = structGroupStat.getTotalMB();
+                    totalMb += singleTotalMb;
+                    long singleFreeMb = structGroupStat.getFreeMB();
+                    freeMb += singleFreeMb;
+                    resultMap.put("total", singleTotalMb / 1024);
+                    resultMap.put("free", singleFreeMb / 1024);
+                    resultMap.put("fileCount", totalUpload - totalDelete);
+                    resultList.add(resultMap);
                 }
-                trackerServer.close();
-                resultMap.put("total", singleTotalMb / 1024);
-                resultMap.put("free", singleFreeMb / 1024);
-                resultMap.put("fileCount", groupCount);
-                for (String key : groupCount.keySet()) {
-                    if (finalGroupCount.containsKey(key)) {
-                        for(String key2 : finalGroupCount.keySet()) {
-                            if(key2.equals(key)) {
-                                long count = finalGroupCount.get(key2) + groupCount.get(key2);
-                                finalGroupCount.put(key2, count);
-                            }
-                        }
-                    } else {
-                        finalGroupCount.put(key, groupCount.get(key));
-                    }
-                }
-                resultList.add(resultMap);
-                totalMb += singleTotalMb;
-                freeMb += singleFreeMb;
             } finally {
                 if (null != trackerServer) {
                     trackerServer.close();
                 }
             }
+            break;
         }
-        Map<String, Object> resultMap = new HashMap<String, Object>();
+        Map<String, Object> resultMap = new HashMap<>();
         resultMap.put("server", "all");
         resultMap.put("total", totalMb/1024);
         resultMap.put("free", freeMb/1024);
-        resultMap.put("fileCount", finalGroupCount);
+        resultMap.put("fileCount", fileCount);
         resultList.add(resultMap);
-        finalMap.put("space", resultList);
-        return finalMap;
+        return resultList;
     }
 
 }

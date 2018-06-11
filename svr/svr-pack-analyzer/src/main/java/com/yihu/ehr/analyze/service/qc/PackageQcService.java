@@ -1,10 +1,10 @@
 package com.yihu.ehr.analyze.service.qc;
 
-import com.yihu.ehr.analyze.feign.HosAdminServiceClient;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.analyze.service.pack.ZipPackage;
 import com.yihu.ehr.model.packs.EsSimplePackage;
-import com.yihu.ehr.profile.util.MetaDataRecord;
-import com.yihu.ehr.profile.util.PackageDataSet;
+import com.yihu.ehr.profile.model.MetaDataRecord;
+import com.yihu.ehr.profile.model.PackageDataSet;
 import com.yihu.ehr.redis.client.RedisClient;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.string.StringBuilderEx;
@@ -31,13 +31,13 @@ public class PackageQcService {
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     @Autowired
-    private HosAdminServiceClient hosAdminServiceClient;
-    @Autowired
     private RedisTemplate<String, Serializable> redisTemplate;
     @Autowired
     private QcRuleCheckService qcRuleCheckService;
     @Autowired
     private RedisClient redisClient;
+    @Autowired
+    protected ObjectMapper objectMapper;
 
 
     /**
@@ -57,17 +57,19 @@ public class PackageQcService {
         qcDataSetRecord.put("org_name", zipPackage.getOrgName());
         qcDataSetRecord.put("org_area", zipPackage.getOrgArea());
         qcDataSetRecord.put("dept", zipPackage.getDeptCode());
-        qcDataSetRecord.put("diagnosis_name", zipPackage.getDiagnosisNameList() == null ? "" : StringUtils.join(zipPackage.getDiagnosisNameList().toArray(),";"));
+        qcDataSetRecord.put("diagnosis_name", StringUtils.join(zipPackage.getDiagnosisName().toArray(),";"));
         qcDataSetRecord.put("receive_date", DATE_FORMAT.format(esSimplePackage.getReceive_date()));
         qcDataSetRecord.put("event_date", DateUtil.toStringLong(zipPackage.getEventDate()));
         qcDataSetRecord.put("event_type", zipPackage.getEventType() == null ? -1 : zipPackage.getEventType().getType());
         qcDataSetRecord.put("event_no", zipPackage.getEventNo());
         qcDataSetRecord.put("version", zipPackage.getCdaVersion());
         qcDataSetRecord.put("count", zipPackage.getDataSets().size());
-        List<String> details = new ArrayList<>();
+        List<Map<String,Object>> details = new ArrayList<>();
         Map<String, PackageDataSet> dataSets = zipPackage.getDataSets();
         for (String dataSetCode : dataSets.keySet()) {
-            details.add(dataSetCode);
+            Map<String, Object> dataSet = new HashMap<>();
+            dataSet.put(dataSetCode,dataSets.get(dataSetCode).getRecords().size());
+            details.add(dataSet);
             Map<String, MetaDataRecord> records = dataSets.get(dataSetCode).getRecords();
             for (String recordKey : records.keySet()) {
                 Map<String, String> dataGroup = records.get(recordKey).getDataGroup();
@@ -90,7 +92,7 @@ public class PackageQcService {
                                 qcMetadataRecord.put("org_name", zipPackage.getOrgName());
                                 qcMetadataRecord.put("org_area", zipPackage.getOrgArea());
                                 qcMetadataRecord.put("dept", zipPackage.getDeptCode());
-                                qcMetadataRecord.put("diagnosis_name", zipPackage.getDiagnosisNameList() == null ? "" : StringUtils.join(zipPackage.getDiagnosisNameList().toArray(), ";"));
+                                qcMetadataRecord.put("diagnosis_name", StringUtils.join(zipPackage.getDiagnosisName().toArray(), ";"));
                                 qcMetadataRecord.put("receive_date", DATE_FORMAT.format(esSimplePackage.getReceive_date()));
                                 qcMetadataRecord.put("event_date", DateUtil.toStringLong(zipPackage.getEventDate()));
                                 qcMetadataRecord.put("event_type", zipPackage.getEventType() == null ? -1 : zipPackage.getEventType().getType());
@@ -109,7 +111,7 @@ public class PackageQcService {
                 }
             }
         }
-        qcDataSetRecord.put("details", details);
+        qcDataSetRecord.put("details", objectMapper.writeValueAsString(details));
         qcDataSetRecord.put("missing", new ArrayList<>());
     }
 

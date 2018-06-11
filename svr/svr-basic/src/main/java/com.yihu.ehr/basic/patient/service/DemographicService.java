@@ -129,8 +129,7 @@ public class DemographicService extends BaseJpaService {
     }
 
     public void delete(String id) {
-        DemographicInfo di = (DemographicInfo) getDemographicInfo(id);
-        demographicInfoRepository.delete(di);
+        demographicInfoRepository.delete(id);
     }
 
     public void resetPass(String id) {

@@ -1,6 +1,7 @@
 package com.yihu.ehr.resolve.service.resource.stage2;
 
 import com.yihu.ehr.entity.patient.DemographicInfo;
+import com.yihu.ehr.profile.family.ResourceCells;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.resolve.dao.PatientDao;
 import com.yihu.ehr.resolve.model.stage2.ResourceBucket;
@@ -30,15 +31,12 @@ public class PatientService extends BaseJpaService<DemographicInfo, PatientDao>{
 
     public void checkPatient(ResourceBucket resourceBucket) throws Exception {
         //获取注册信息
-        if (!resourceBucket.isIdentifyFlag()) {
-            return;
-        }
-        String idCardNo = String.valueOf(resourceBucket.getDemographicId().trim());
+        String idCardNo = resourceBucket.getBasicRecord(ResourceCells.DEMOGRAPHIC_ID).trim();
         boolean isRegistered = this.isExists(idCardNo);
         if (!isRegistered) {
             DemographicInfo demographicInfo = new DemographicInfo();
             demographicInfo.setIdCardNo(idCardNo);
-            String name = resourceBucket.getPatientName() == null ? "":resourceBucket.getPatientName().toString();
+            String name = resourceBucket.getBasicRecord(ResourceCells.PATIENT_NAME) == null ? "" : resourceBucket.getBasicRecord(ResourceCells.PATIENT_NAME);
             demographicInfo.setName(name);
             String telephoneNo = resourceBucket.getMasterRecord().getResourceValue("EHR_000003") == null ? "" : resourceBucket.getMasterRecord().getResourceValue("EHR_000003").toString();
             demographicInfo.setTelephoneNo("{\"联系电话\":\"" + telephoneNo + "\"}");

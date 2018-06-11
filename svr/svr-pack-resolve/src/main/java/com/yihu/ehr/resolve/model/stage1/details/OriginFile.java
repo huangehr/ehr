@@ -1,4 +1,4 @@
-package com.yihu.ehr.resolve.model.stage1;
+package com.yihu.ehr.resolve.model.stage1.details;
 
 import com.yihu.ehr.constants.UrlScope;
 

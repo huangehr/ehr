@@ -21,8 +21,6 @@ public class RedisInitService extends BaseJpaService {
     @Autowired
     private JdbcTemplate jdbc;
     @Autowired
-    private AddressDictKeySchema addressDictKeySchema;
-    @Autowired
     private HealthProblemDictKeySchema healthProblemDictKeySchema;
     @Autowired
     private Icd10KeySchema icd10KeySchema;
@@ -36,24 +34,10 @@ public class RedisInitService extends BaseJpaService {
     private RsMetadataKeySchema rsMetadataKeySchema;
 
     /**
-     * 缓存行政地址Redis
-     */
-    public int cacheAddressDict() throws Exception {
-        String sql = "SELECT id, name FROM address_dict";
-        List<Map<String, Object>> list = jdbc.queryForList(sql);
-        //清空相关Redis
-        addressDictKeySchema.deleteAll();
-        for (Map<String, Object> tempMap : list){
-            addressDictKeySchema.set(String.valueOf(tempMap.get("id")), String.valueOf(tempMap.get("name")));
-        }
-        return list.size();
-    }
-
-    /**
      * 缓存健康问题名称Redis
      */
     public int cacheHpName() {
-        String sql = "select code,name from health_problem_dict";
+        String sql = "select code, name from health_problem_dict";
         List<Map<String,Object>> list = jdbc.queryForList(sql);
         //清空相关Redis
         healthProblemDictKeySchema.deleteAll();
@@ -67,8 +51,8 @@ public class RedisInitService extends BaseJpaService {
      * 缓存ICD10 Redis
      */
     public int cacheIcd10() {
-        String sql = "select t.hp_code, d.code, d.name from\n" +
-                "(select r.icd10_id,group_concat(p.`code` separator ';') hp_code \n" +
+        String sql = "select t.hp_code, d.code, d.name, d.chronic_flag, d.type from\n" +
+                "(select r.icd10_id, group_concat(p.`code` separator ';') hp_code \n" +
                 "from icd10_hp_relation r\n" +
                 "left join health_problem_dict p on p.id = r.hp_id \n" +
                 "group by icd10_id) t\n" +
@@ -77,26 +61,16 @@ public class RedisInitService extends BaseJpaService {
         //清空相关Redis
         icd10KeySchema.deleteAll();
         icd10KeySchema.deleteHpCode();
-        for (Map<String,Object> map:list){
-            icd10KeySchema.set((String) map.get("code"), (String)map.get("name"));
-            icd10KeySchema.setHpCode((String) map.get("code"), (String)map.get("hp_code"));
-        }
-        return list.size();
-    }
-
-    /**
-     * 缓存ICD10 Redis
-     */
-    public int cacheIcd10ChronicInfo() {
-        String sql = "SELECT r.code, r.chronic_flag, r.type FROM icd10_dict r WHERE r.chronic_flag != NULL OR r.chronic_flag != ''";
-        List<Map<String, Object>> list = jdbc.queryForList(sql);
-        //清空相关Redis
         icd10KeySchema.deleteChronic();
         list.forEach(item -> {
-            if (item.get("type") != null) {
-                icd10KeySchema.setChronicInfo((String) item.get("code"), item.get("chronic_flag") + "-" + item.get("type"));
-            } else {
-                icd10KeySchema.setChronicInfo((String) item.get("code"), item.get("chronic_flag") + "-0");
+            icd10KeySchema.set((String) item.get("code"), (String)item.get("name"));
+            icd10KeySchema.setHpCode((String) item.get("code"), (String)item.get("hp_code"));
+            if (item.get("chronic_flag") != null) {
+                if (item.get("type") != null) {
+                    icd10KeySchema.setChronicInfo((String) item.get("code"), item.get("chronic_flag") + "-" + item.get("type"));
+                } else {
+                    icd10KeySchema.setChronicInfo((String) item.get("code"), item.get("chronic_flag") + "-0");
+                }
             }
         });
         return list.size();
@@ -107,7 +81,7 @@ public class RedisInitService extends BaseJpaService {
      */
     public int cacheOrgName() {
         String sql = "select org_code, full_name from organizations";
-        List<Map<String,Object>> list = jdbc.queryForList(sql);
+        List<Map<String, Object>> list = jdbc.queryForList(sql);
         //清空相关Redis
         orgKeySchema.deleteAll();
         for (Map<String,Object> map:list){
@@ -244,7 +218,7 @@ public class RedisInitService extends BaseJpaService {
      * 缓存数据元字典（Dict_code不为空）
      * @return
      */
-    public int cacheMetadata() {
+    public int cacheMetadataDict() {
         String sql = "SELECT id, dict_code FROM rs_metadata WHERE dict_code != NULL OR dict_code != ''";
         //String sql1 = "SELECT a FROM RsMetadata a WHERE a.dictCode <> NULL AND a.dictCode <> ''";
         List<Map<String, Object>> metaList = jdbc.queryForList(sql);
@@ -263,17 +237,14 @@ public class RedisInitService extends BaseJpaService {
     //TODO ------------------- 未知用途 --------------------------
     @Autowired
     private IndicatorsDictKeySchema indicatorsDictKeySchema;
-    @Autowired
-    private Icd10HpRelationKeySchema icd10HpRelationKeySchema;
 
     /**
      * 缓存指标
      * @return
      */
-    public boolean cacheIndicatorsDict() {
+    /*public boolean cacheIndicatorsDict() {
         String sql = "SELECT * FROM indicators_dict";
         List<Map<String, Object>> list = jdbc.queryForList(sql);
-        //清空相关Redis
         indicatorsDictKeySchema.deleteAll();
         for (Map<String, Object> tempMap : list) {
             HashMap<String, String> map = new HashMap<>();
@@ -289,28 +260,6 @@ public class RedisInitService extends BaseJpaService {
             indicatorsDictKeySchema.set(String.valueOf(tempMap.get("code")), map);
         }
         return true;
-    }
-
-    /**
-     * 缓存Icd10健康问题
-     * @param force
-     * @return
-     */
-    public boolean cacheIcd10HpRelation(boolean force) {
-        String icd10HpReSql = "SELECT hp_id, icd10_id FROM icd10_hp_relation";
-        String icd10Sql = "SELECT code FROM icd10_dict WHERE id = icd10.id";
-        String hpDictSql = "SELECT code, name FROM health_problem_dict WHERE id = hpDict.id";
-        List<Map<String, Object>> icd10HpReList = jdbc.queryForList(icd10HpReSql);
-        if (force) {
-            //清空相关Redis
-            icd10HpRelationKeySchema.deleteAll();
-        }
-        for (Map<String, Object> tempMap : icd10HpReList) {
-            Map<String, Object> icd10Map = jdbc.queryForMap(icd10Sql.replace("icd10.id", tempMap.get("icd10_id").toString()));
-            Map<String, Object> hpDictMap = jdbc.queryForMap(hpDictSql.replace("hpDict.id", tempMap.get("hp_id").toString()));
-            icd10HpRelationKeySchema.set(icd10Map.get("code").toString(), hpDictMap.get("code") + "__" + hpDictMap.get("name"));
-        }
-        return true;
-    }
+    }*/
 
 }

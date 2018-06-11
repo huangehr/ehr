@@ -2,11 +2,9 @@ package com.yihu.ehr.api.rhip;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.unboundid.util.json.JSONObject;
 import com.yihu.ehr.agModel.geogrephy.GeographyModel;
 import com.yihu.ehr.agModel.patient.PatientDetailModel;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.feign.AddressClient;
@@ -14,11 +12,10 @@ import com.yihu.ehr.feign.ConventionalDictEntryClient;
 import com.yihu.ehr.feign.GeographyClient;
 import com.yihu.ehr.feign.PatientClient;
 import com.yihu.ehr.model.dict.MConventionalDict;
-import com.yihu.ehr.model.dict.MDictionaryEntry;
 import com.yihu.ehr.model.geography.MGeography;
 import com.yihu.ehr.model.geography.MGeographyDict;
 import com.yihu.ehr.model.patient.MDemographicInfo;
-import com.yihu.ehr.profile.util.DataSetParser;
+import com.yihu.ehr.profile.util.DataSetParserUtil;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.rest.Envelop;
@@ -27,7 +24,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -50,7 +46,7 @@ import java.util.Map;
 @Api(value = "patients", description = "区域卫生信息平台-患者服务", tags = {"区域卫生信息平台-患者服务"})
 public class RhipPatientsEndPoint extends BaseController {
     @Autowired
-    DataSetParser dataSetParser;
+    DataSetParserUtil dataSetParser;
 
     @Autowired
     ObjectMapper objectMapper;

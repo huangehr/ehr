@@ -5,6 +5,7 @@ import com.yihu.ehr.model.packs.EsSimplePackage;
 import com.yihu.ehr.resolve.dao.FileResourceDao;
 import com.yihu.ehr.resolve.dao.MasterResourceDao;
 import com.yihu.ehr.resolve.dao.SubResourceDao;
+import com.yihu.ehr.resolve.model.stage1.OriginalPackage;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.resolve.model.stage2.ResourceBucket;
 import com.yihu.ehr.resolve.service.profile.ArchiveRelationService;
@@ -38,27 +39,29 @@ public class ResourceService {
     @Autowired
     private QcRecordService qcRecordService;
 
-    public void save(ResourceBucket resourceBucket, StandardPackage standardPackage, EsSimplePackage esSimplePackage) throws Exception {
+    public void save(ResourceBucket resourceBucket, OriginalPackage originalPackage) throws Exception {
         //资源主表
-        masterResRepo.saveOrUpdate(resourceBucket, standardPackage);
+        masterResRepo.saveOrUpdate(resourceBucket, originalPackage);
 
         //资源子表
-        subResRepo.saveOrUpdate(resourceBucket);
+        subResRepo.saveOrUpdate(resourceBucket, originalPackage);
 
         //存储文件记录
-        fileResRepo.save(resourceBucket);
+        fileResRepo.save(originalPackage);
 
         //保存ES关联记录
-        archiveRelationService.relation(resourceBucket);
+        archiveRelationService.relation(resourceBucket, originalPackage);
 
         //保存ES质控数据
         qcRecordService.record(resourceBucket);
 
         //保存ES 待上传省平台upload记录
-        uploadService.addWaitUpload(resourceBucket);
+        uploadService.addWaitUpload(resourceBucket, originalPackage);
 
         //保存居民信息记录
-        patientService.checkPatient(resourceBucket);
+        if (originalPackage.isIdentifyFlag()) {
+            patientService.checkPatient(resourceBucket);
+        }
     }
 
 }

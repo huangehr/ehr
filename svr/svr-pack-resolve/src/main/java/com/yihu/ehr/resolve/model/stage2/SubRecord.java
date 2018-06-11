@@ -16,24 +16,6 @@ public class SubRecord extends ResourceRecord {
 
     private String rowkey;
 
-    public String getProfileId(){
-        if (StringUtils.isEmpty(rowkey)) return "";
-
-        return rowkey.substring(0, rowkey.indexOf(Delimiter));
-    }
-
-    public String getDataSetCode() {
-        if (StringUtils.isEmpty(rowkey)) return "";
-
-        return rowkey.substring(rowkey.indexOf(Delimiter), rowkey.lastIndexOf(Delimiter));
-    }
-
-    public int getIndex(){
-        if (StringUtils.isEmpty(rowkey)) return 0;
-
-        return Integer.parseInt(rowkey.substring(rowkey.lastIndexOf(Delimiter)));
-    }
-
     public String getRowkey() {
         return rowkey;
     }
@@ -51,4 +33,24 @@ public class SubRecord extends ResourceRecord {
         rowkey = String.format(RowKeyFormat, profileId, dataSetCode, pk);
     }
 
+    public String getProfileId(){
+        if (StringUtils.isEmpty(rowkey)){
+            return "";
+        }
+        return rowkey.substring(0, rowkey.indexOf(Delimiter));
+    }
+
+    public String getDataSetCode() {
+        if (StringUtils.isEmpty(rowkey)) {
+            return "";
+        }
+        return rowkey.substring(rowkey.indexOf(Delimiter), rowkey.lastIndexOf(Delimiter));
+    }
+
+    public int getIndex(){
+        if (StringUtils.isEmpty(rowkey)) {
+            return 0;
+        }
+        return Integer.parseInt(rowkey.substring(rowkey.lastIndexOf(Delimiter)));
+    }
 }

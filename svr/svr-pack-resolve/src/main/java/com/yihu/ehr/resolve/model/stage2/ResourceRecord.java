@@ -17,12 +17,12 @@ public class ResourceRecord {
         dataGroup.put(resourceCode, value);
     }
 
-    public Set<String> resourceCodes(){
-        return dataGroup.keySet();
-    }
-
     public String getResourceValue(String resourceCode){
         return dataGroup.get(resourceCode);
+    }
+
+    public Set<String> resourceCodes(){
+        return dataGroup.keySet();
     }
 
     public Map<String, String> getDataGroup(){

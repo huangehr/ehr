@@ -171,6 +171,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             updateSource.put("message", "resolve success");
             updateSource.put("resourced", 1);
             updateSource.put("defect", map.get("defect"));
+            updateSource.put("patient_name", map.get("patient_name"));
         } else if (status == ArchiveStatus.Acquired) {
             //开始入库
             updateSource.put("parse_date", dateFormat.format(new Date()));

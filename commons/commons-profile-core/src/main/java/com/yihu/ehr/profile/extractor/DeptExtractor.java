@@ -1,8 +1,8 @@
 package com.yihu.ehr.profile.extractor;
 
-import com.yihu.ehr.profile.family.MasterResourceFamily;
-import com.yihu.ehr.profile.util.MetaDataRecord;
-import com.yihu.ehr.profile.util.PackageDataSet;
+import com.yihu.ehr.profile.family.ResourceCells;
+import com.yihu.ehr.profile.model.MetaDataRecord;
+import com.yihu.ehr.profile.model.PackageDataSet;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -40,7 +40,7 @@ public class DeptExtractor extends KeyDataExtractor {
                 }
             }
         }
-        properties.put(MasterResourceFamily.BasicColumns.DeptCode, deptCode);
+        properties.put(ResourceCells.DEPT_CODE, deptCode);
         return properties;
     }
 

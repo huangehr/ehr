@@ -1,9 +1,9 @@
 package com.yihu.ehr.profile.extractor;
 
 import com.yihu.ehr.profile.EventType;
-import com.yihu.ehr.profile.family.MasterResourceFamily;
+import com.yihu.ehr.profile.family.ResourceCells;
 import com.yihu.ehr.profile.util.DataSetUtil;
-import com.yihu.ehr.profile.util.PackageDataSet;
+import com.yihu.ehr.profile.model.PackageDataSet;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -24,18 +24,14 @@ public class EventInfoExtractor extends KeyDataExtractor {
     //事件界定数据集
     private Map<String, String> dataSets = new HashMap<>();
 
-
     @Override
     public Map<String, Object> extract(PackageDataSet dataSet) throws Exception {
         Map<String,Object> properties = new HashMap<>();
-        Date eventDate = null;
         EventType eventType = null;
         if (dataSets.containsKey(dataSet.getCode())) {
-            eventDate = dataSet.getEventTime();
             eventType = EventType.valueOf(dataSets.get(dataSet.getCode()));
         }
-        properties.put(MasterResourceFamily.BasicColumns.EventDate, eventDate);
-        properties.put(MasterResourceFamily.BasicColumns.EventType, eventType);
+        properties.put(ResourceCells.EVENT_TYPE, eventType);
         return properties;
     }
 

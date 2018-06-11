@@ -1,5 +1,6 @@
 package com.yihu.ehr.basic.portal.controller;
 
+import com.yihu.ehr.basic.portal.service.PortalMessageRemindService;
 import com.yihu.ehr.basic.portal.service.QuestionnaireService;
 import com.yihu.ehr.basic.user.entity.User;
 import com.yihu.ehr.constants.ApiVersion;
@@ -31,12 +32,18 @@ public class PortalQuestionnaireController extends EnvelopRestEndPoint {
     @Autowired
     private QuestionnaireService questionnaireService;
 
+    @Autowired
+    private PortalMessageRemindService portalMessageRemindService;
+
     @PostMapping(value = ServiceApi.Questionnaire.GetAllQuestionsByTemplateCode)
     @ApiOperation(value = "根据模板id获取所有问题", notes = "根据模板id获取所有问题")
     public Envelop getAllQuestions(
             @ApiParam(name = "surveyTemplateCode",value = "问卷模板id")
-            @RequestParam(value = "surveyTemplateCode",required = true)String surveyTemplateCode) throws Exception{
+            @RequestParam(value = "surveyTemplateCode",required = true)String surveyTemplateCode,
+            @ApiParam(name = "messageId",value = "消息id")
+            @RequestParam(value = "messageId",required = false)String messageId) throws Exception{
             Map<String, Object> map= questionnaireService.getAllQuestions(surveyTemplateCode);
+            portalMessageRemindService.updateMessageRemind("readed","1",Long.valueOf(messageId));
             return success(map);
             //return Result.success("查询成功！",jsonObject);
 

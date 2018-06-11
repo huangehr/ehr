@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.http.IPInfoUtils;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -13,24 +15,18 @@ public class Test {
 
     @org.junit.Test
     public void test() throws Exception {
-        ObjectMapper objectMapper = new ObjectMapper();
-        System.out.println(objectMapper.writeValueAsString(null));
-
-        String queue = "{\"id\":\"%s\",\"remote_path\":\"%s\"}";
-        System.out.println(String.format(queue, 1, 2));
-
-        String sorts = "sn desc;name asc";
-        String [] sortArr = sorts.split(";");
-        System.out.println(sortArr[0].split(" ")[1].trim());
-
-        System.out.println(IPInfoUtils.isInnerIP("223.84.134.42"));
-
-
-        String s = "+receive_date";
-        System.out.println(s.substring(0, 1));
-        System.out.println(s.substring(1));
-
-        System.out.println(DateUtil.toString(DateUtil.addDate(-3, new Date())) + " 00:00:00");
+        String day1 = "2018-01-02 01:02:03";
+        String day2 = "2018-01-04 01:02:04";
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        long time = dateFormat.parse(day2).getTime() - dateFormat.parse(day1).getTime();
+        System.out.println(time);
+        long day;
+        if (time % (1000 * 60 * 60 * 24) > 0) {
+            day = time / (1000 * 60 * 60 * 24) + 1;
+        } else {
+            day = time / (1000 * 60 * 60 * 24);
+        }
+        System.out.println(day);
     }
 
 

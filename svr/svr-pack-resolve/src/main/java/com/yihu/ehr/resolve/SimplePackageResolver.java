@@ -3,16 +3,16 @@ package com.yihu.ehr.resolve;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.yihu.ehr.profile.exception.LegacyPackageException;
-import com.yihu.ehr.profile.util.MetaDataRecord;
-import com.yihu.ehr.profile.util.PackageDataSet;
-import com.yihu.ehr.resolve.config.EventIndexConfig;
-import com.yihu.ehr.resolve.dao.DataSetPackageDao;
 import com.yihu.ehr.profile.exception.IllegalJsonDataException;
 import com.yihu.ehr.profile.exception.IllegalJsonFileException;
-import com.yihu.ehr.resolve.model.stage1.DataSetPackage;
-import com.yihu.ehr.resolve.model.stage1.StandardPackage;
+import com.yihu.ehr.profile.exception.LegacyPackageException;
+import com.yihu.ehr.profile.model.MetaDataRecord;
+import com.yihu.ehr.profile.model.PackageDataSet;
+import com.yihu.ehr.resolve.config.EventIndexConfig;
+import com.yihu.ehr.resolve.dao.DataSetPackageDao;
 import com.yihu.ehr.resolve.log.PackResolveLogger;
+import com.yihu.ehr.resolve.model.stage1.OriginalPackage;
+import com.yihu.ehr.resolve.model.stage1.SimplePackage;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -30,7 +30,7 @@ import java.util.*;
  * @created 2017.06.27 11:28
  */
 @Component
-public class DataSetPackageResolver extends PackageResolver {
+public class SimplePackageResolver extends PackageResolver {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -40,19 +40,19 @@ public class DataSetPackageResolver extends PackageResolver {
     private DataSetPackageDao dataSetPackageDao;
 
     @Override
-    public void resolve(StandardPackage profile, File root) throws Exception {
+    public void resolve(OriginalPackage originalPackage, File root) throws Exception {
         File originFolder = new File(root.getAbsolutePath());
-        this.parseFiles((DataSetPackage) profile, originFolder.listFiles());
+        this.parseFiles((SimplePackage) originalPackage, originFolder.listFiles());
     }
 
     /**
      * 解析 .json 文件中的 JSON 数据，拼接成SQL语句
-     * @param profile
+     * @param simplePackage
      * @param files
      * @throws IOException
      * @throws ParseException
      */
-    private void parseFiles(DataSetPackage profile, File[] files) throws IOException, ParseException {
+    private void parseFiles(SimplePackage simplePackage, File[] files) throws IOException, ParseException {
         List<String> sqlList = new ArrayList<>();
         for (File file : files) {
             // head 节点
@@ -156,11 +156,11 @@ public class DataSetPackageResolver extends PackageResolver {
                 sqlList.add(sql.toString());
             }
 
-            profile.setOrgCode(orgCode);
-            profile.setCreateDate(DateTimeUtil.utcDateTimeParse(createTime));
+            simplePackage.setOrgCode(orgCode);
+            simplePackage.setCreateDate(DateTimeUtil.utcDateTimeParse(createTime));
         }
-        profile.setSqlList(sqlList);
-        dataSetPackageDao.saveDataset(profile);//执行sql操作
+        simplePackage.setSqlList(sqlList);
+        dataSetPackageDao.saveDataset(simplePackage);//执行sql操作
     }
 
     /**

@@ -8,6 +8,7 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.model.echarts.ChartDataModel;
 import com.yihu.ehr.model.report.MQcDevice;
 import com.yihu.ehr.model.resource.MChartInfoModel;
+import com.yihu.ehr.model.resource.MRsResources;
 import com.yihu.ehr.query.common.model.DataList;
 import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.quota.model.jpa.RsResourceQuota;
@@ -274,8 +275,12 @@ public class QuotaReportController extends BaseController {
             @ApiParam(name = "title", value = "视图名称", defaultValue = "")
             @RequestParam(value = "title", required = false) String title,
             @ApiParam(name = "top", value = "获取前几条数据")
-            @RequestParam(value = "top", required = false) String top
-    ) {
+            @RequestParam(value = "top", required = false) String top,
+            @ApiParam(name = "MRsResource json串")
+            @RequestParam(value = "mRsResource") String mRsResource
+            ) {
+        String xName = "";
+        String yName = "";
         List<String> quotaIds = Arrays.asList(quotaIdStr.split(","));
         List<String> charTypes = Arrays.asList(charstr.split(","));
         MChartInfoModel chartInfoModel = new MChartInfoModel();
@@ -368,10 +373,19 @@ public class QuotaReportController extends BaseController {
                     return null;
                 }
                 int type = Integer.valueOf(typeStr);
+                if (StringUtils.isNotEmpty(mRsResource)) {
+                    MRsResources mRsResources = objectMapper.readValue(mRsResource, MRsResources.class);
+                    String dataPosition = mRsResources.getDataPosition();
+                    if (StringUtils.isNotEmpty(dataPosition) && "x".equalsIgnoreCase(dataPosition)) {
+                        xName = "单位：" + mRsResources.getDataUnit();
+                    } else if (StringUtils.isNotEmpty(dataPosition) && "y".equalsIgnoreCase(dataPosition)) {
+                        yName = "单位：" + mRsResources.getDataUnit();
+                    }
+                }
                 if (type == ReportOption.bar) {
-                    option = reportOption.getLineEchartOptionMoreChart(title, "", "", xData, optionData, lineNames, charTypes);
+                    option = reportOption.getLineEchartOptionMoreChart(title, xName, yName, xData, optionData, lineNames, charTypes);
                 } else if (type == ReportOption.line) {
-                    option = reportOption.getLineEchartOptionMoreChart(title, "", "", xData, optionData, lineNames, charTypes);
+                    option = reportOption.getLineEchartOptionMoreChart(title, xName, yName, xData, optionData, lineNames, charTypes);
                 } else if (type == ReportOption.pie) {
                     List<Map<String, Object>> datalist = new ArrayList<>();
                     for (Map<String, Object> resultMap : listMap) {

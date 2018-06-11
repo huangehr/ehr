@@ -4,11 +4,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
-import com.yihu.ehr.profile.util.MetaDataRecord;
-import com.yihu.ehr.resolve.model.stage1.LinkFile;
-import com.yihu.ehr.resolve.model.stage1.LinkPackage;
-import com.yihu.ehr.resolve.model.stage1.LinkPackageDataSet;
-import com.yihu.ehr.resolve.model.stage1.StandardPackage;
+import com.yihu.ehr.profile.exception.IllegalJsonFileException;
+import com.yihu.ehr.profile.model.LinkPackageDataSet;
+import com.yihu.ehr.profile.model.MetaDataRecord;
+import com.yihu.ehr.resolve.model.stage1.*;
+import com.yihu.ehr.resolve.model.stage1.details.LinkFile;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.ftp.FtpUtils;
 import org.apache.commons.net.ftp.FTPClient;
@@ -45,42 +45,40 @@ public class LinkPackageResolver extends PackageResolver {
     private String password;
     @Value("${ftp.port}")
     private int port;
+    @Value("${fast-dfs.pacs-group-name:group1}")
+    private String groupName;
     @Autowired
     private FastDFSUtil fastDFSUtil;
 
     @Override
-    public void resolve(StandardPackage profile, File root) throws IOException, ParseException , NoSuchAlgorithmException, MyException {
-        LinkPackage linkPackModel = (LinkPackage) profile;
-
-        File indexFile = new File(root.getAbsolutePath() + File.separator  + "index"+ File.separator+"patient_index.json");
-        parseFile(linkPackModel, indexFile);
+    public void resolve(OriginalPackage originalPackage, File root) throws Exception {
+        File indexFile = new File(root.getAbsolutePath() + File.separator  + "index" + File.separator + "patient_index.json");
+        parseFile((LinkPackage) originalPackage, indexFile);
     }
 
-    private void parseFile(LinkPackage profile, File indexFile) throws IOException, ParseException, NoSuchAlgorithmException, MyException {
+    private void parseFile (LinkPackage linkPackage, File indexFile) throws IOException, ParseException, NoSuchAlgorithmException, MyException {
         JsonNode jsonNode = objectMapper.readTree(indexFile);
-
+        if (jsonNode.isNull()) {
+            throw new IllegalJsonFileException("Invalid json file when generate data set");
+        }
         String patientId = jsonNode.get("patient_id").asText();
         String eventNo = jsonNode.get("event_no").asText();
         String orgCode = jsonNode.get("org_code").asText();
         String version = jsonNode.get("inner_version").asText();
         String eventDate = jsonNode.get("event_time").asText();
         String expireDate = jsonNode.get("expire_date").asText();
-        //if (version.equals("000000000000")) throw new LegacyPackageException("Package is collected via cda version 00000000000, ignored.");
-
-        profile.setPatientId(patientId);
-        profile.setEventNo(eventNo);
-        profile.setOrgCode(orgCode);
-        profile.setCdaVersion(version);
-        profile.setEventDate(DateUtil.strToDate(eventDate));
-        profile.setExpireDate(DateUtil.strToDate(expireDate));
-
+        linkPackage.setPatientId(patientId);
+        linkPackage.setEventNo(eventNo);
+        linkPackage.setOrgCode(orgCode);
+        linkPackage.setCdaVersion(version);
+        linkPackage.setEventTime(DateUtil.strToDate(eventDate));
+        linkPackage.setExpireDate(DateUtil.strToDate(expireDate));
         // dataset节点，存储数据集URL
         JsonNode dataSetNode = jsonNode.get("dataset");
         Iterator<String> fieldNames = dataSetNode.fieldNames();
         while (fieldNames.hasNext()) {
             String dataSetCode = fieldNames.next();
             String url = dataSetNode.get(dataSetCode).asText();
-
             LinkPackageDataSet dataSet = new LinkPackageDataSet();
             dataSet.setOrgCode(orgCode);
             dataSet.setPatientId(patientId);
@@ -88,14 +86,13 @@ public class LinkPackageResolver extends PackageResolver {
             dataSet.setCode(dataSetCode);
             dataSet.setUrl(url);
             dataSet.setCdaVersion(version);
-
-            profile.insertDataSet(dataSetCode, dataSet);
+            linkPackage.insertDataSet(dataSetCode, dataSet);
         }
 
         //--------------增加ftp影像文件解析
         JsonNode filesNode = jsonNode.get("files");
-        if(filesNode != null){
-            List<LinkFile> linkFiles = profile.getLinkFiles();
+        if (filesNode != null){
+            List<LinkFile> linkFiles = linkPackage.getLinkFiles();
 
             ArrayNode arrayNode = (ArrayNode) filesNode;
             FtpUtils ftpUtils = new FtpUtils(username, password, address, port);
@@ -104,18 +101,18 @@ public class LinkPackageResolver extends PackageResolver {
             for (int i = 0; i < arrayNode.size(); ++i){
                 JsonNode fileNode = arrayNode.get(i);
                 String fileName = fileNode.get("file").asText();
-                String fileExtension="";
+                String fileExtension;
                 if (fileName.contains(".")) {
                     fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1);
                 } else {
-                    throw new RuntimeException("上传轻量档案文件失败, 文件缺失扩展名.");
+                    throw new IllegalJsonFileException("上传轻量档案文件失败, 文件缺失扩展名.");
                 }
                 String url = fileNode.get("url").asText();
                 String path = url.substring(5);//将url前面的ftp:/截取掉,剩下的path为文件的完整路径(包含文件名)
 
                 FTPFile[] ftpFiles = ftpClient.listFiles(path);
-                if(ftpFiles==null || ftpFiles.length==0){
-                    throw new RuntimeException("ftp上找不到该文件:"+path);
+                if (ftpFiles == null || ftpFiles.length == 0){
+                    throw new RuntimeException("ftp上找不到该文件:" + path);
                 }
                 InputStream inputStream = ftpUtils.getInputStream(path);
                 long fileSize = ftpFiles[0].getSize();
@@ -125,7 +122,6 @@ public class LinkPackageResolver extends PackageResolver {
                 LinkFile linkFile = new LinkFile();
                 linkFile.setFileExtension(fileExtension);
                 linkFile.setOriginName(fileName);
-
                 String fastdfsUrl = msg.get(FastDFSUtil.GROUP_NAME).asText() + "/" + msg.get(FastDFSUtil.REMOTE_FILE_NAME).asText();
                 linkFile.setUrl(fastdfsUrl);
                 linkFiles.add(linkFile);
@@ -138,13 +134,15 @@ public class LinkPackageResolver extends PackageResolver {
 
         // summary节点可能不存在
         JsonNode summaryNode = jsonNode.get("summary");
-        if (summaryNode == null) return;
+        if (summaryNode == null) {
+            return;
+        }
 
         fieldNames = summaryNode.fieldNames();
         while (fieldNames.hasNext()) {
             String dataSetCode = fieldNames.next();
 
-            LinkPackageDataSet linkPackageDataSet = (LinkPackageDataSet)profile.getDataSet(dataSetCode);
+            LinkPackageDataSet linkPackageDataSet = (LinkPackageDataSet)linkPackage.getDataSet(dataSetCode);
             if (linkPackageDataSet == null) linkPackageDataSet = new LinkPackageDataSet();
 
             ArrayNode arrayNode = (ArrayNode) summaryNode.get(dataSetCode);
@@ -164,7 +162,7 @@ public class LinkPackageResolver extends PackageResolver {
             linkPackageDataSet.setEventNo(eventNo);
             linkPackageDataSet.setCdaVersion(version);
             linkPackageDataSet.setCode(dataSetCode);
-            profile.insertDataSet(dataSetCode, linkPackageDataSet);
+            linkPackage.insertDataSet(dataSetCode, linkPackageDataSet);
         }
     }
 }

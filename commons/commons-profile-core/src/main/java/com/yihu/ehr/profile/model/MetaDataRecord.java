@@ -1,4 +1,4 @@
-package com.yihu.ehr.profile.util;
+package com.yihu.ehr.profile.model;
 
 import java.util.Map;
 import java.util.Set;

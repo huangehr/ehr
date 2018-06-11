@@ -1,8 +1,8 @@
 package com.yihu.ehr.profile.extractor;
 
-import com.yihu.ehr.profile.family.MasterResourceFamily;
-import com.yihu.ehr.profile.util.MetaDataRecord;
-import com.yihu.ehr.profile.util.PackageDataSet;
+import com.yihu.ehr.profile.family.ResourceCells;
+import com.yihu.ehr.profile.model.MetaDataRecord;
+import com.yihu.ehr.profile.model.PackageDataSet;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -64,8 +64,8 @@ public class IdentityExtractor extends KeyDataExtractor {
                 }
             }
         }
-        properties.put(MasterResourceFamily.BasicColumns.DemographicId, demographicId);
-        properties.put(MasterResourceFamily.BasicColumns.PatientName, patientName);
+        properties.put(ResourceCells.DEMOGRAPHIC_ID, demographicId);
+        properties.put(ResourceCells.PATIENT_NAME, patientName);
         return properties;
     }
 

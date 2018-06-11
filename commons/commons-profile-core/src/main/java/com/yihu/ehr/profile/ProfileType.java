@@ -10,7 +10,7 @@ public enum ProfileType {
     Standard(1),
     File(2),
     Link(3),
-    DataSet(4);
+    Simple(4);
 
     private int type;
 

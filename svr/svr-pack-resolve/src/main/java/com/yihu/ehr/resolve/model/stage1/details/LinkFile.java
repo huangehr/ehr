@@ -1,4 +1,4 @@
-package com.yihu.ehr.resolve.model.stage1;
+package com.yihu.ehr.resolve.model.stage1.details;
 
 /**
  *轻量型档案文件解析而来

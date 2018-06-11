@@ -2,6 +2,8 @@ package com.yihu.ehr.resolve.job;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.profile.ArchiveStatus;
+import com.yihu.ehr.profile.exception.ResolveException;
+import com.yihu.ehr.profile.family.ResourceCells;
 import com.yihu.ehr.profile.queue.RedisCollection;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.lang.SpringContext;
@@ -9,9 +11,9 @@ import com.yihu.ehr.model.packs.EsSimplePackage;
 import com.yihu.ehr.profile.exception.IllegalJsonDataException;
 import com.yihu.ehr.profile.exception.IllegalJsonFileException;
 import com.yihu.ehr.resolve.feign.PackageMgrClient;
-import com.yihu.ehr.resolve.model.stage1.StandardPackage;
+import com.yihu.ehr.resolve.model.stage1.OriginalPackage;
 import com.yihu.ehr.resolve.model.stage2.ResourceBucket;
-import com.yihu.ehr.resolve.service.resource.stage1.PackageResolveService;
+import com.yihu.ehr.resolve.service.resource.stage1.ResolveService;
 import com.yihu.ehr.resolve.service.resource.stage2.IdentifyService;
 import com.yihu.ehr.resolve.service.resource.stage2.PackMillService;
 import com.yihu.ehr.resolve.service.resource.stage2.ResourceService;
@@ -39,6 +41,8 @@ import java.util.Map;
 @Component
 @DisallowConcurrentExecution
 public class PackageResourceJob implements InterruptableJob {
+
+    private static final long DAY = 1000 * 60 * 60 * 24;
 
     @Override
     public void interrupt() throws UnableToInterruptJobException {
@@ -71,6 +75,8 @@ public class PackageResourceJob implements InterruptableJob {
                 errorType = 2;
             } else if (e instanceof IllegalJsonDataException) {
                 errorType = 3;
+            } else if (e instanceof ResolveException) {
+                errorType = 21; //21以下为质控和解析的公共错误
             }
             if (pack != null) {
                 try {
@@ -91,27 +97,29 @@ public class PackageResourceJob implements InterruptableJob {
     }
 
     private void doResolve(EsSimplePackage pack, PackageMgrClient packageMgrClient) throws Exception {
-        PackageResolveService resolveEngine = SpringContext.getService(PackageResolveService.class);
+        ResolveService resolveEngine = SpringContext.getService(ResolveService.class);
         PackMillService packMill = SpringContext.getService(PackMillService.class);
         IdentifyService identifyService = SpringContext.getService(IdentifyService.class);
         ResourceService resourceService = SpringContext.getService(ResourceService.class);
         ObjectMapper objectMapper = new ObjectMapper();
-        StandardPackage standardPackage = resolveEngine.doResolve(pack, downloadTo(pack.getRemote_path()));
-        ResourceBucket resourceBucket = packMill.grindingPackModel(standardPackage, pack);
-        identifyService.identify(resourceBucket, standardPackage);
-        resourceService.save(resourceBucket, standardPackage, pack);
+        OriginalPackage originalPackage = resolveEngine.doResolve(pack, downloadTo(pack.getRemote_path()));
+        ResourceBucket resourceBucket = packMill.grindingPackModel(originalPackage);
+        identifyService.identify(resourceBucket, originalPackage);
+        resourceService.save(resourceBucket, originalPackage);
         //回填入库状态
         Map<String, Object> map = new HashMap();
         map.put("defect", resourceBucket.getQcMetadataRecords().getRecords().isEmpty() ? 0 : 1); //是否解析异常
-        map.put("profile_id", standardPackage.getId());
-        map.put("demographic_id", standardPackage.getDemographicId());
-        map.put("event_type", standardPackage.getEventType() == null ? -1 : standardPackage.getEventType().getType());
-        map.put("event_no", standardPackage.getEventNo());
-        map.put("event_date", DateUtil.toStringLong(standardPackage.getEventDate()));
-        map.put("patient_id", standardPackage.getPatientId());
-        map.put("dept", standardPackage.getDeptCode());
-        map.put("delay", (pack.getReceive_date().getTime() - standardPackage.getEventDate().getTime()) / 1000);
-        map.put("re_upload_flg", String.valueOf(standardPackage.isReUploadFlg()));
+        map.put("patient_name", resourceBucket.getBasicRecord(ResourceCells.PATIENT_NAME));
+        map.put("profile_id", resourceBucket.getId());
+        map.put("demographic_id", resourceBucket.getBasicRecord(ResourceCells.DEMOGRAPHIC_ID));
+        map.put("event_type", originalPackage.getEventType() == null ? -1 : originalPackage.getEventType().getType());
+        map.put("event_no", originalPackage.getEventNo());
+        map.put("event_date", DateUtil.toStringLong(originalPackage.getEventTime()));
+        map.put("patient_id", originalPackage.getPatientId());
+        map.put("dept", resourceBucket.getBasicRecord(ResourceCells.DEPT_CODE));
+        long delay = pack.getReceive_date().getTime() - originalPackage.getEventTime().getTime();
+        map.put("delay", delay % (1000 * 60 * 60 * 24) > 0 ? delay / (1000 * 60 * 60 * 24) + 1 : delay / (1000 * 60 * 60 * 24));
+        map.put("re_upload_flg", String.valueOf(originalPackage.isReUploadFlg()));
         packageMgrClient.reportStatus(pack.get_id(), ArchiveStatus.Finished, 0, objectMapper.writeValueAsString(map));
     }
 

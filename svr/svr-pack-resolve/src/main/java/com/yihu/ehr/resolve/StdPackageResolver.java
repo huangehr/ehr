@@ -2,11 +2,12 @@ package com.yihu.ehr.resolve;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.yihu.ehr.profile.EventType;
-import com.yihu.ehr.profile.extractor.KeyDataExtractor;
-import com.yihu.ehr.profile.family.MasterResourceFamily;
-import com.yihu.ehr.profile.util.DataSetUtil;
-import com.yihu.ehr.profile.util.PackageDataSet;
 import com.yihu.ehr.profile.exception.IllegalJsonFileException;
+import com.yihu.ehr.profile.extractor.KeyDataExtractor;
+import com.yihu.ehr.profile.family.ResourceCells;
+import com.yihu.ehr.profile.util.DataSetUtil;
+import com.yihu.ehr.profile.model.PackageDataSet;
+import com.yihu.ehr.resolve.model.stage1.OriginalPackage;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.resolve.service.resource.stage1.PackModelFactory;
 import org.apache.commons.lang3.StringUtils;
@@ -17,32 +18,25 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- * 标准档案包解析器.
- * @author Sand
- * @created 2015.09.09 15:04
+ * Created by progr1mmer on 2018/6/8.
  */
 @Component
 public class StdPackageResolver extends PackageResolver {
 
     @Override
-    public void resolve(StandardPackage standardPackage, File root) throws Exception {
+    public void resolve(OriginalPackage originalPackage, File root) throws Exception {
         //解析标准数据
         File standardFolder = new File(root.getAbsolutePath() + File.separator + PackModelFactory.StandardFolder);
-        parseFiles(standardPackage, standardFolder.listFiles(), false);
-
-        //解析原始数据
-        //File originFolder = new File(root.getAbsolutePath() + File.separator + PackModelFactory.OriginFolder);
-        //parseFiles(standardPackage, originFolder.listFiles(), true);
+        parseFiles((StandardPackage) originalPackage, standardFolder.listFiles(), false);
     }
 
     /**
-     * 将标准和原始文件夹中的JSON文件转换为数据集，
+     * 将标准和原始文件夹中的JSON文件转换为数据集
      * 放入标准档案包中
      * @param standardPackage 标准档案包中
      * @param files 文件夹
      * @param origin 是否为标准文件夹
      * @throws Exception
-     * @throws IOException
      */
     private void parseFiles(StandardPackage standardPackage, File[] files, boolean origin) throws Exception {
         List<PackageDataSet> packageDataSetList = new ArrayList<>(files.length);
@@ -64,7 +58,7 @@ public class StdPackageResolver extends PackageResolver {
                 standardPackage.setOrgCode(dataSet.getOrgCode());
                 standardPackage.setCdaVersion(dataSet.getCdaVersion());
                 standardPackage.setCreateDate(dataSet.getCreateTime());
-                standardPackage.setEventDate(dataSet.getEventTime());
+                standardPackage.setEventTime(dataSet.getEventTime());
             }
             return;
         }
@@ -75,24 +69,12 @@ public class StdPackageResolver extends PackageResolver {
             dataSet.setCode(dataSetCode);
             // Extract key data from data set if exists
             if (!origin) {
-                //就诊卡信息
-                if (StringUtils.isEmpty(standardPackage.getCardId()) || StringUtils.isEmpty(standardPackage.getCardType())) {
-                    Map<String, Object> properties = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.CardInfo);
-                    String cardId = (String) properties.get(MasterResourceFamily.BasicColumns.CardId);
-                    String cardType = (String) properties.get(MasterResourceFamily.BasicColumns.CardType);
-                    if (!StringUtils.isEmpty(cardId)) {
-                        standardPackage.setCardId(cardId);
-                    }
-                    if (!StringUtils.isEmpty(cardType)) {
-                        standardPackage.setCardType(cardType);
-                    }
-                }
 
                 //身份信息
                 if (StringUtils.isEmpty(standardPackage.getDemographicId()) || StringUtils.isEmpty(standardPackage.getPatientName())) {
                     Map<String, Object> properties = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.Identity);
-                    String demographicId = (String) properties.get(MasterResourceFamily.BasicColumns.DemographicId);
-                    String patientName = (String) properties.get(MasterResourceFamily.BasicColumns.PatientName);
+                    String demographicId = (String) properties.get(ResourceCells.DEMOGRAPHIC_ID);
+                    String patientName = (String) properties.get(ResourceCells.PATIENT_NAME);
                     if (!StringUtils.isEmpty(demographicId)) {
                         standardPackage.setDemographicId(demographicId.trim());
                     }
@@ -102,38 +84,44 @@ public class StdPackageResolver extends PackageResolver {
                 }
 
                 //就诊事件信息
-                if (standardPackage.getEventDate() == null || standardPackage.getEventType() == null) {
+                if (standardPackage.getEventTime() == null || standardPackage.getEventType() == null) {
                     Map<String, Object> properties = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.EventInfo);
-                    Date eventDate = (Date) properties.get(MasterResourceFamily.BasicColumns.EventDate);
-                    EventType eventType = (EventType) properties.get(MasterResourceFamily.BasicColumns.EventType);
-                    if (eventDate != null) {
-                        standardPackage.setEventDate(eventDate);
-                    }
+                    EventType eventType = (EventType) properties.get(ResourceCells.EVENT_TYPE);
                     if (eventType != null) {
                         standardPackage.setEventType(eventType);
                     }
                 }
 
                 //门诊或住院诊断
-                if (standardPackage.getDiagnosisList() == null
-                        || standardPackage.getDiagnosisList().size() <= 0
-                        || standardPackage.getDiagnosisNameList() == null
-                        || standardPackage.getDiagnosisNameList().size() <= 0) {
+                if (standardPackage.getDiagnosisCode().size() <= 0 || standardPackage.getDiagnosisName().size() <= 0) {
                     Map<String, Object> properties = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.Diagnosis);
-                    Set<String> diagnosisList = (Set<String>) properties.get(MasterResourceFamily.BasicColumns.Diagnosis);
-                    Set<String> diagnosisNameList = (Set<String>) properties.get(MasterResourceFamily.BasicColumns.DiagnosisName);
-                    if (diagnosisList.size() > 0) {
-                        standardPackage.setDiagnosisList(diagnosisList);
+                    Set<String> diagnosisCode = (Set<String>) properties.get(ResourceCells.DIAGNOSIS);
+                    Set<String> diagnosisName = (Set<String>) properties.get(ResourceCells.DIAGNOSIS_NAME);
+                    if (diagnosisCode.size() > 0) {
+                        standardPackage.setDiagnosisCode(diagnosisCode);
                     }
-                    if (diagnosisNameList.size() > 0) {
-                        standardPackage.setDiagnosisNameList(diagnosisNameList);
+                    if (diagnosisName.size() > 0) {
+                        standardPackage.setDiagnosisName(diagnosisName);
+                    }
+                }
+
+                //就诊卡信息
+                if (StringUtils.isEmpty(standardPackage.getCardId()) || StringUtils.isEmpty(standardPackage.getCardType())) {
+                    Map<String, Object> properties = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.CardInfo);
+                    String cardId = (String) properties.get(ResourceCells.CARD_ID);
+                    String cardType = (String) properties.get(ResourceCells.CARD_TYPE);
+                    if (!StringUtils.isEmpty(cardId)) {
+                        standardPackage.setCardId(cardId);
+                    }
+                    if (!StringUtils.isEmpty(cardType)) {
+                        standardPackage.setCardType(cardType);
                     }
                 }
 
                 //科室信息
                 if (standardPackage.getDeptCode() == null) {
                     Map<String, Object> properties = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.Dept);
-                    String deptCode = (String) properties.get(MasterResourceFamily.BasicColumns.DeptCode);
+                    String deptCode = (String) properties.get(ResourceCells.DEPT_CODE);
                     if (StringUtils.isNotEmpty(deptCode)) {
                         standardPackage.setDeptCode(deptCode);
                     }
@@ -145,6 +133,7 @@ public class StdPackageResolver extends PackageResolver {
             standardPackage.setOrgCode(dataSet.getOrgCode());
             standardPackage.setCdaVersion(dataSet.getCdaVersion());
             standardPackage.setCreateDate(dataSet.getCreateTime());
+            standardPackage.setEventTime(dataSet.getEventTime());
         }
     }
 
@@ -163,4 +152,6 @@ public class StdPackageResolver extends PackageResolver {
         PackageDataSet dataSet = dataSetParser.parseStructuredJsonDataSet(jsonNode, isOrigin);
         return dataSet;
     }
+
+
 }

@@ -26,6 +26,9 @@ public class ProfileInfoBaseService extends BaseJpaService {
     private ResourceClient resource;
     @Autowired
     private ProfileDiseaseService profileDiseaseService;
+    @Autowired
+    protected RedisService redisService;
+
 
     /**
      * @获取患者档案基本信息
@@ -51,14 +54,14 @@ public class ProfileInfoBaseService extends BaseJpaService {
                 for (Map<String, Object> obj : list) {
                     for (String key : obj.keySet()) {
                         if ("EHR_004971".equals(key)) {
-                            if (!allergyMedicine.contains(result.get("EHR_004971"))) {
-                                allergyMedicine.add((String) result.get("EHR_004971"));
+                            if (!allergyMedicine.contains(obj.get("EHR_004971"))) {
+                                allergyMedicine.add((String) obj.get("EHR_004971"));
                             }
                             continue;
                         }
                         if ("EHR_000011".equals(key)) {
-                            if (!allergens.contains(result.get("EHR_000011"))) {
-                                allergens.add((String) result.get("EHR_000011"));
+                            if (!allergens.contains(obj.get("EHR_000011"))) {
+                                allergens.add((String) obj.get("EHR_000011"));
                             }
                             continue;
                         }
@@ -145,11 +148,11 @@ public class ProfileInfoBaseService extends BaseJpaService {
             }
             //出生日期
             String birthday = "";
-            if (!StringUtils.isEmpty(result.get("EHR_000007"))) {
-                birthday = (String) result.get("EHR_000007");
-            }
             if (StringUtils.isEmpty(birthday) && !StringUtils.isEmpty(result.get("EHR_000007"))) {
                 birthday = (String) result.get("EHR_000007");
+            }
+            if (StringUtils.isEmpty(birthday) && !StringUtils.isEmpty(result.get("EHR_000320"))) {
+                birthday = (String) result.get("EHR_000320");
             }
             patientMap.put("birthday", birthday);
             //年龄
@@ -235,7 +238,7 @@ public class ProfileInfoBaseService extends BaseJpaService {
         Envelop envelop;
         //传染病史
         String q2 = "{\"q\":\"demographic_id:" + demographic_id + " AND EHR_002393:*\"}";
-        envelop = resource.getMasterData(q2, 1, 500, null);
+        envelop = resource.getMasterData(q2, 1, 1000, null);
         List<Map<String, Object>> list2 = envelop.getDetailModelList();
         if (list2 != null && list2.size() > 0) {
             Map<String, Object> infectiousDisease = new HashMap<>(2);
@@ -251,7 +254,7 @@ public class ProfileInfoBaseService extends BaseJpaService {
         }
         //预防接种史
         String q3 = "{\"q\":\"demographic_id:" + demographic_id + " AND EHR_002443:*\"}";
-        envelop = resource.getMasterData(q3, 1, 500, null);
+        envelop = resource.getMasterData(q3, 1, 1000, null);
         List<Map<String, Object>> list3 = envelop.getDetailModelList();
         if (list3 != null && list3.size() > 0) {
             Map<String, Object> vaccination = new HashMap<>(2);
@@ -267,7 +270,7 @@ public class ProfileInfoBaseService extends BaseJpaService {
         }
         //手术史
         String q4 = "{\"q\":\"demographic_id:" + demographic_id + "\"}";
-        envelop = resource.getMasterData(q4, 1, 500, null);
+        envelop = resource.getMasterData(q4, 1, 1000, null);
         List<Map<String, Object>> list4 = envelop.getDetailModelList();
         if (list4 != null && list4.size() > 0) {
             Map<String, Object> surgery = new HashMap<>(2);
@@ -276,7 +279,7 @@ public class ProfileInfoBaseService extends BaseJpaService {
             for (Map temp : list4) {
                 String masterRowKey = (String) temp.get("rowkey");
                 String subQ = "{\"q\":\"rowkey:" + masterRowKey + "$HDSD00_06$*" + "\"}";
-                Envelop subEnvelop = resource.getSubData(subQ, 1, 500, null);
+                Envelop subEnvelop = resource.getSubData(subQ, 1, 1000, null);
                 List<Map<String, Object>> subList = subEnvelop.getDetailModelList();
                 if (subList != null && subList.size() > 0) {
                     for (Map subTemp : subList) {
@@ -301,7 +304,7 @@ public class ProfileInfoBaseService extends BaseJpaService {
         }
         //孕产史
         String q5 = "{\"q\":\"demographic_id:" + demographic_id + " AND EHR_002443:*\"}";
-        envelop = resource.getMasterData(q5, 1, 500, null);
+        envelop = resource.getMasterData(q5, 1, 1000, null);
         List<Map<String, Object>> list5 = envelop.getDetailModelList();
         if (list5 != null && list5.size() > 0) {
             Map<String, Object> childbirth = new HashMap<>(2);
@@ -332,30 +335,31 @@ public class ProfileInfoBaseService extends BaseJpaService {
         allergyMedicine.put("info", patientInfo.get("allergyMedicine"));
         resultList.add(allergyMedicine);
 
-        //疾病
-        Map<String, Object> medicalHistory = new HashMap<>();
-        List<Map<String, Object>> list1 =  profileDiseaseService.getHealthProblem(demographic_id);
-        StringBuilder stringBuilder1 = new StringBuilder();
-        if (list1 != null && list1.size() > 0) {
-            for (Map temp : list1) {
-                String healthProblemName = (String) temp.get("healthProblemName");
-                stringBuilder1.append(healthProblemName);
-                stringBuilder1.append("、");
-            }
-        }
-        medicalHistory.put("label", "疾病");
-        medicalHistory.put("info", stringBuilder1.toString());
-        resultList.add(medicalHistory);
-
-        //手术
+        //疾病 & 手术
         Envelop envelop;
+        Map<String, Object> medicalHistory = new HashMap<>();
         Map<String, Object> surgery = new HashMap<>();
         String q4 = "{\"q\":\"demographic_id:" + demographic_id + "\"}";
-        envelop = resource.getMasterData(q4, 1, 500, null);
+        envelop = resource.getMasterData(q4, 1, 1000, null);
         List<Map<String, Object>> list4 = envelop.getDetailModelList();
+        Set<String> hpSet = new HashSet<>();
         StringBuilder stringBuilder4 = new StringBuilder();
         if (list4 != null && list4.size() > 0) {
             for (Map temp : list4) {
+                if (!StringUtils.isEmpty(temp.get(BasicConstant.healthProblemName))) {
+                    String [] hpNames = temp.get(BasicConstant.healthProblemName).toString().split(";");
+                    for (String hpName : hpNames) {
+                        hpSet.add(hpName);
+                    }
+                } else if (!StringUtils.isEmpty(temp.get(BasicConstant.healthProblem))) {
+                    String [] _hpCode = ((String) temp.get(BasicConstant.healthProblem)).split(";");
+                    for (String code : _hpCode) {
+                        String name = redisService.getHealthProblem(code);
+                        if (!StringUtils.isEmpty(name)) {
+                            hpSet.add(name);
+                        }
+                    }
+                }
                 String masterRowKey = (String) temp.get("rowkey");
                 String subQ = "{\"q\":\"rowkey:" + masterRowKey + "$HDSD00_06$*" + "\"}";
                 envelop = resource.getSubData(subQ, null, null, null);
@@ -375,6 +379,9 @@ public class ProfileInfoBaseService extends BaseJpaService {
                 }
             }
         }
+        medicalHistory.put("label", "疾病");
+        medicalHistory.put("info", org.apache.commons.lang3.StringUtils.join(hpSet, "、"));
+        resultList.add(medicalHistory);
         surgery.put("label", "手术");
         surgery.put("info", stringBuilder4.toString());
         resultList.add(surgery);
@@ -394,7 +401,7 @@ public class ProfileInfoBaseService extends BaseJpaService {
         //预防接种
         Map<String, Object> vaccination = new HashMap<>(2);
         String q3 = "{\"q\":\"demographic_id:" + demographic_id + " AND EHR_002443:*\"}";
-        envelop = resource.getMasterData(q3, 1, 500, null);
+        envelop = resource.getMasterData(q3, 1, 1000, null);
         List<Map<String, Object>> list3 = envelop.getDetailModelList();
         StringBuilder stringBuilder3 = new StringBuilder();
         if (list3 != null && list3.size() > 0) {
@@ -441,7 +448,7 @@ public class ProfileInfoBaseService extends BaseJpaService {
      * @return
      */
     public Map<String, Object> personHistory(String demographic_id) {
-        Envelop envelop = resource.getMasterData("{\"q\":\"demographic_id:" + demographic_id + "\"}", 1, 500, null);
+        Envelop envelop = resource.getMasterData("{\"q\":\"demographic_id:" + demographic_id + "\"}", 1, 1000, null);
         List<Map<String, Object>> list = envelop.getDetailModelList();
         Map<String, Object> personHistory = new HashMap<>();
         if (list != null && list.size() > 0) {
