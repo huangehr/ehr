@@ -8,15 +8,21 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * @Description:质控错误类型
  */
 public enum ErrorType {
-    EmptyError(1),
-    ValueError(2),
-    TypeError(3),
-    FormatError(4);
+    Normal(0, "验证正常"),
+    EmptyError(1, "字段值为空"),
+    ValueError(2, "值域超出"),
+    TypeError(3, "类型错误"),
+    FormatError(4, "格式错误"),
+    FieldAdaptationError(5, "资源适配错误"),
+    DictAdaptationError(6, "字典适配错误");
 
-    int type;
 
-    ErrorType(int type){
+    private String name;
+    private int type;
+
+    ErrorType(int type, String name){
         this.type = type;
+        this.name = name;
     }
 
     @JsonValue
@@ -24,11 +30,16 @@ public enum ErrorType {
         return type;
     }
 
-    public static EventType create(String ordinal){
+    @JsonValue
+    public String getName(){
+        return name;
+    }
+
+    public static ErrorType create(String ordinal){
         return create(Integer.parseInt(ordinal));
     }
 
-    public static EventType create(int ordinal){
-        return EventType.values()[ordinal];
+    public static ErrorType create(int ordinal){
+        return ErrorType.values()[ordinal];
     }
 }
