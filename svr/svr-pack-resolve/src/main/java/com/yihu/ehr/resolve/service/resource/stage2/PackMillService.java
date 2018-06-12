@@ -1,5 +1,6 @@
 package com.yihu.ehr.resolve.service.resource.stage2;
 
+import com.yihu.ehr.profile.ErrorType;
 import com.yihu.ehr.profile.ProfileType;
 import com.yihu.ehr.profile.core.ResourceCore;
 import com.yihu.ehr.profile.exception.IllegalJsonDataException;
@@ -289,7 +290,7 @@ public class PackMillService {
              qcMetadataRecord.put("dept", resourceBucket.getBasicRecord(ResourceCells.DEPT_CODE));
              qcMetadataRecord.put("diagnosis_name", resourceBucket.getBasicRecord(ResourceCells.DIAGNOSIS_NAME));
              qcMetadataRecord.put("event_date", DateUtil.toStringLong(DateUtil.strToDate(resourceBucket.getBasicRecord(ResourceCells.EVENT_DATE))));
-             qcMetadataRecord.put("event_type", resourceBucket.getBasicRecord(ResourceCells.EVENT_TYPE) == null ? -1 : resourceBucket.getBasicRecord(ResourceCells.EVENT_TYPE));
+             qcMetadataRecord.put("event_type", resourceBucket.getBasicRecord(ResourceCells.EVENT_TYPE) == null ? -1 : new Integer(resourceBucket.getBasicRecord(ResourceCells.EVENT_TYPE)));
              qcMetadataRecord.put("event_no", resourceBucket.getBasicRecord(ResourceCells.EVENT_NO));
              qcMetadataRecord.put("receive_date", DATE_FORMAT.format(resourceBucket.getReceiveDate()));
              qcMetadataRecord.put("version", cdaVersion);
@@ -297,7 +298,8 @@ public class PackMillService {
              qcMetadataRecord.put("metadata", srcMetadataCode);
              qcMetadataRecord.put("value", value);
              qcMetadataRecord.put("qc_step", 2); //资源化质控环节
-             qcMetadataRecord.put("qc_error_type", 1); //资源适配错误
+             qcMetadataRecord.put("qc_error_type", ErrorType.FieldAdaptationError.getType()); //资源适配错误
+             qcMetadataRecord.put("qc_error_name", ErrorType.FieldAdaptationError.getName()); //资源适配错误
              qcMetadataRecord.put("qc_error_message", String.format("Unable to get resource meta data code for ehr meta data %s of %s in %s", srcMetadataCode, srcDataSetCode, cdaVersion));
              resourceBucket.getQcMetadataRecords().addRecord(qcMetadataRecord);
          }
@@ -388,8 +390,8 @@ public class PackMillService {
             qcMetadataRecord.put("org_area", resourceBucket.getBasicRecord(ResourceCells.ORG_AREA));
             qcMetadataRecord.put("dept", resourceBucket.getBasicRecord(ResourceCells.DEPT_CODE));
             qcMetadataRecord.put("diagnosis_name", resourceBucket.getBasicRecord(ResourceCells.DIAGNOSIS_NAME));
-            qcMetadataRecord.put("event_date", DateUtil.toStringLong(DateUtil.strToDate((String) resourceBucket.getBasicRecord(ResourceCells.EVENT_DATE))));
-            qcMetadataRecord.put("event_type", resourceBucket.getBasicRecord(ResourceCells.EVENT_TYPE) == null ? -1 : resourceBucket.getBasicRecord(ResourceCells.EVENT_TYPE));
+            qcMetadataRecord.put("event_date", DateUtil.toStringLong(DateUtil.strToDate(resourceBucket.getBasicRecord(ResourceCells.EVENT_DATE))));
+            qcMetadataRecord.put("event_type", resourceBucket.getBasicRecord(ResourceCells.EVENT_TYPE) == null ? -1 : new Integer(resourceBucket.getBasicRecord(ResourceCells.EVENT_TYPE)));
             qcMetadataRecord.put("event_no", resourceBucket.getBasicRecord(ResourceCells.EVENT_NO));
             qcMetadataRecord.put("receive_date", DATE_FORMAT.format(resourceBucket.getReceiveDate()));
             qcMetadataRecord.put("version", version);
@@ -397,7 +399,8 @@ public class PackMillService {
             qcMetadataRecord.put("metadata", srcMetadataCode);
             qcMetadataRecord.put("value", srcDictEntryCode);
             qcMetadataRecord.put("qc_step", 2); //资源化质控环节
-            qcMetadataRecord.put("qc_error_type", 2); //字典转换错误
+            qcMetadataRecord.put("qc_error_type", ErrorType.DictAdaptationError.getType()); //字典转换错误
+            qcMetadataRecord.put("qc_error_name", ErrorType.DictAdaptationError.getName()); //字典转换错误
             qcMetadataRecord.put("qc_error_message", String.format("Unable to get dict value for meta data %s of %s in %s", srcMetadataCode, srcDataSetCode, version));
             resourceBucket.getQcMetadataRecords().addRecord(qcMetadataRecord);
         }

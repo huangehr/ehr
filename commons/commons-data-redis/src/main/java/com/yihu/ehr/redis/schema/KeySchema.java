@@ -34,7 +34,7 @@ public class KeySchema {
     /**
      * 获取单条缓存
      */
-    public  <T> T get(String key) {
+    public <T> T get(String key) {
         return redisClient.get(makeKey(table, key, column));
     }
 
@@ -49,7 +49,7 @@ public class KeySchema {
      * 删除单条缓存
      */
     public void delete(String key) {
-        redisClient.delete(makeKey(table,key,column));
+        redisClient.delete(makeKey(table, key, column));
     }
 
     /**
@@ -79,6 +79,6 @@ public class KeySchema {
      * 判断是否存在
      */
     public boolean hasKey(String key){
-        return redisClient.hasKey(makeKey(table,key,column));
+        return redisClient.hasKey(makeKey(table, key, column));
     }
 }

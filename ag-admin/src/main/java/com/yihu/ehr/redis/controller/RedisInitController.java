@@ -39,10 +39,10 @@ public class RedisInitController {
         return redisInitClient.cacheAdapterDict(id);
     }
 
-    @RequestMapping(value= ServiceApi.Redis.InitRsMetadata, method = RequestMethod.POST)
+    @RequestMapping(value= ServiceApi.Redis.InitRsMetadataDict, method = RequestMethod.POST)
     @ApiOperation("Redis缓存数据元字典（dict_code不为空）")
-    public String cacheMetadata() throws Exception {
-        return redisInitClient.cacheMetadata();
+    public String cacheMetadataDict() throws Exception {
+        return redisInitClient.cacheMetadataDict();
     }
 
 }

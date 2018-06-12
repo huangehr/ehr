@@ -12,7 +12,7 @@ import java.util.Date;
 public class OutPatientCostModel {
     @JestId
     private String _id;
-    private Integer type;    // 1疾病 2科室
+    private Integer type;    // 1门急诊疾病 2门急诊科室 3住院疾病 4住院科室
     private String code;    // 疾病或科室编码
     private String name;
     private Double result;

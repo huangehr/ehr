@@ -36,29 +36,16 @@ public class RedisInitEndPoint extends EnvelopRestEndPoint {
         return "缓存清除成功！";
     }
 
-    @ApiOperation("Redis缓存行政地址")
-    @RequestMapping(value = ServiceApi.Redis.InitAddress, method = RequestMethod.POST)
-    public String cacheAddressDict() throws Exception {
-        redisInitService.cacheAddressDict();
-        return "缓存行政地址完成！";
-    }
-
     @ApiOperation("Redis缓存HP健康问题名称")
     @RequestMapping(value = ServiceApi.Redis.InitHealthProblem, method = RequestMethod.POST)
     public int cacheHpName() throws Exception {
         return redisInitService.cacheHpName();
     }
 
-    @ApiOperation("Redis缓存ICD10名称和对应HP健康问题编码")
+    @ApiOperation("1.Redis缓存ICD10名称 2.对应HP健康问题编码 3.慢病信息")
     @RequestMapping(value = ServiceApi.Redis.InitIcd10, method = RequestMethod.POST)
     public int cacheIcd10() throws Exception {
         return redisInitService.cacheIcd10();
-    }
-
-    @ApiOperation("缓存ICD10慢病信息")
-    @RequestMapping(value = ServiceApi.Redis.InitIcd10ChronicInfo, method = RequestMethod.POST)
-    public int cacheIcd10ChronicInfo() throws Exception {
-        return redisInitService.cacheIcd10ChronicInfo();
     }
 
     @ApiOperation("Redis缓存机构名称")
@@ -101,29 +88,19 @@ public class RedisInitEndPoint extends EnvelopRestEndPoint {
        return redisInitService.cacheAdapterMetadata(id);
     }
 
-    @RequestMapping(value= ServiceApi.Redis.InitRsMetadata, method = RequestMethod.POST)
+    @RequestMapping(value= ServiceApi.Redis.InitRsMetadataDict, method = RequestMethod.POST)
     @ApiOperation("Redis缓存资源化数据元字典（dict_code不为空）")
-    public int cacheMetadata() throws Exception {
-        return redisInitService.cacheMetadata();
+    public int cacheMetadataDict() throws Exception {
+        return redisInitService.cacheMetadataDict();
     }
 
     //TODO ------------------- 未知用途 --------------------------
 
-    @ApiOperation("Redis缓存指标(-1)")
+    /*@ApiOperation("Redis缓存指标(-1)")
     @RequestMapping(value = ServiceApi.Redis.InitIndicatorsDict, method = RequestMethod.POST)
     public String cacheIndicatorsDict() throws Exception {
         redisInitService.cacheIndicatorsDict();
         return "Redis缓存指标完成！";
-    }
-
-    @ApiOperation("Redis缓存ICD10对应HP健康问题的编码和名称组合值(-1)")
-    @RequestMapping(value = ServiceApi.Redis.InitIcd10HpR, method = RequestMethod.POST)
-    public String cacheIcd10HpRelation(
-            @ApiParam(name = "force", value = "强制清除再缓存", defaultValue = "true")
-            @RequestParam("force") boolean force) throws Exception {
-        redisInitService.cacheIcd10HpRelation(force);
-        return "Redis缓存ICD10对应HP健康问题的编码和名称组合值！";
-    }
-
+    }*/
 
 }

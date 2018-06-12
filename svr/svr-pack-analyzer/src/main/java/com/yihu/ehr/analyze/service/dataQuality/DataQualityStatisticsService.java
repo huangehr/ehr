@@ -285,6 +285,77 @@ public class DataQualityStatisticsService extends BaseJpaService {
     }
 
     /**
+     * 统计机构档案包数量
+     *
+     * @param orgInfoList    机构编码、名称，例：[{orgCode:'xx',orgName:'xx'},{...},...]，医疗云汇总记录的 orgCode 用 all 表示。
+     * @param archiveStatus  解析状态，可为空
+     * @param eventDateStart 就诊时间（起始），格式 yyyy-MM-dd
+     * @param eventDateEnd   就诊时间（截止），格式 yyyy-MM-dd
+     * @return
+     */
+    public Long packetCount(List<Map<String, String>> orgInfoList, String archiveStatus, String eventDateStart, String eventDateEnd) {
+        Long count = 0L;
+        String esIndex = "json_archives";
+        String esType = "info";
+        StringBuilder filter = new StringBuilder("event_date>=" + eventDateStart + " 00:00:00;event_date<=" + eventDateEnd + " 23:59:59");
+        if (!StringUtils.isEmpty(archiveStatus)) {
+            filter.append(";archive_status=" + archiveStatus);
+        }
+        if (orgInfoList.size() == 1 && "all".equals(orgInfoList.get(0).get("orgCode"))) {
+            elasticSearchUtil.count(esIndex, esType, filter.toString());
+        } else {
+            for (Map<String, String> orgInfo : orgInfoList) {
+                filter.append("orgCode=" + orgInfo.get("orgCode"));
+                count += elasticSearchUtil.count(esIndex, esType, filter.toString());
+            }
+        }
+        return count;
+    }
+
+    /**
+     * 机构的档案包接收报告数据
+     *
+     * @param orgInfoList    机构编码、名称，例：[{orgCode:'xx',orgName:'xx'},{...},...]，医疗云汇总记录的 orgCode 用 all 表示。
+     * @param eventDateStart 就诊时间（起始），格式 yyyy-MM-dd
+     * @param eventDateEnd   就诊时间（截止），格式 yyyy-MM-dd
+     * @return
+     * @throws Exception
+     */
+    public List<Map<String, Object>> orgPackReportData(List<Map<String, String>> orgInfoList, String eventDateStart, String eventDateEnd) throws Exception {
+        List<Map<String, Object>> reportDataList = new ArrayList<>();
+        StringBuilder filter = new StringBuilder("event_date[" + eventDateStart + " TO " + eventDateEnd + "]");
+        for (Map<String, String> orgInfo : orgInfoList) {
+            String orgCode = orgInfo.get("orgCode");
+            String orgName = orgInfo.get("orgName");
+
+            Map<String, Object> reportData = new HashMap<>();
+            reportData.put("orgName", orgName);
+            reportData.put("orgCode", orgCode);
+
+            // 医院上报数
+            String reportedNumSql = "SELECT SUM(HSI07_01_001) total,SUM(HSI07_01_002) outpatientNum, SUM(HSI07_01_004) healthExaminationNum, SUM(HSI07_01_012) hospitalDischargeNum FROM qc/daily_report " +
+                    "WHERE event_date BETWEEN '" + eventDateStart + "' AND '" + eventDateEnd;
+            if (!"all".equals(orgInfo.get("orgCode"))) {
+                reportedNumSql += " AND org_code='" + orgCode + "'";
+            }
+            String reportedNumFields = "total,outpatientNum,healthExaminationNum,hospitalDischargeNum";
+            List<Map<String, Object>> reportedNumList = elasticSearchUtil.findBySql(Arrays.asList(reportedNumFields.split(",")), reportedNumSql);
+            reportData.put("reportedNumList", reportedNumList);
+            // TODO 采集情况
+
+            // TODO 采集内容
+
+            // TODO 解析情况
+
+            // TODO 数据集总量
+
+            // TODO 解析失败分析
+
+        }
+        return reportDataList;
+    }
+
+    /**
      * 初始化datamap 数据
      * @param datasetMap
      * @param orgCode
