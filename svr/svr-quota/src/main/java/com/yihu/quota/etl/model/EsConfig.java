@@ -18,6 +18,7 @@ public class EsConfig {
     private String aggregationKey;//聚合字段
     private String especialType; //特殊类型  orgHealthCategory：卫生机构类型
     private String superiorBaseQuotaCode;  // 上级基础指标code
+    private String dateComparisonType;      //时间对比类型  lastYear 去年 lastMonth 上个月 lastWeek 上个星期 lastDay 昨天
 
 
     //除法运算
@@ -285,5 +286,13 @@ public class EsConfig {
 
     public void setDivisionType(String divisionType) {
         this.divisionType = divisionType;
+    }
+
+    public String getDateComparisonType() {
+        return dateComparisonType;
+    }
+
+    public void setDateComparisonType(String dateComparisonType) {
+        this.dateComparisonType = dateComparisonType;
     }
 }

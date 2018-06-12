@@ -16,11 +16,7 @@ import org.springframework.util.StringUtils;
 public class RedisService {
 
     @Autowired
-    private AddressDictKeySchema addressDictKeySchema;
-    @Autowired
     private HealthProblemDictKeySchema healthProblemDictKeySchema;
-    @Autowired
-    private Icd10HpRelationKeySchema icd10HpRelationKeySchema;
     @Autowired
     private Icd10KeySchema icd10KeySchema;
     @Autowired
@@ -38,17 +34,8 @@ public class RedisService {
     @Autowired
     private StdMetaDataKeySchema stdMetaDataKeySchema;
 
-    @Autowired
-    private IndicatorsDictKeySchema indicatorsDictKeySchema;
-
-    /**
-     * 获取地址redis
-     *
-     * @return
-     */
-    public String getAddress(String key) {
-        return addressDictKeySchema.get(key);
-    }
+   /* @Autowired
+    private IndicatorsDictKeySchema indicatorsDictKeySchema;*/
 
     /**
      * 获取健康问题redis
@@ -57,15 +44,6 @@ public class RedisService {
      */
     public String getHealthProblem(String key) {
         return healthProblemDictKeySchema.get(key);
-    }
-
-    /**
-     * 获取ICD10健康问题 redis
-     *
-     * @return
-     */
-    public String getIcd10HpRelation(String key) {
-        return icd10HpRelationKeySchema.get(key);
     }
 
     /**
@@ -276,7 +254,7 @@ public class RedisService {
      *
      * @return
      */
-    public String getIndicators(String key) {
+    /*public String getIndicators(String key) {
         return indicatorsDictKeySchema.get(key);
-    }
+    }*/
 }

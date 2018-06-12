@@ -23,6 +23,13 @@ public class RsResourcesModel {
     private String modifyDate;
     private String modifier;
 
+    // 计量数值
+    private String dataMeasurement;
+    // 单位
+    private String dataUnit;
+    // 单位放置位置
+    private String dataPosition;
+
     public String getId() {
         return id;
     }
@@ -144,5 +151,29 @@ public class RsResourcesModel {
 
     public void setModifier(String modifier) {
         this.modifier = modifier;
+    }
+
+    public String getDataMeasurement() {
+        return dataMeasurement;
+    }
+
+    public void setDataMeasurement(String dataMeasurement) {
+        this.dataMeasurement = dataMeasurement;
+    }
+
+    public String getDataUnit() {
+        return dataUnit;
+    }
+
+    public void setDataUnit(String dataUnit) {
+        this.dataUnit = dataUnit;
+    }
+
+    public String getDataPosition() {
+        return dataPosition;
+    }
+
+    public void setDataPosition(String dataPosition) {
+        this.dataPosition = dataPosition;
     }
 }
