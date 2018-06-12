@@ -15,6 +15,7 @@ public class EsSimplePackage implements Serializable {
     private Date receive_date; //接收时间
     private String remote_path; //fastDfs文件地址
     private String client_id; //应用ID
+    private String rowkey; //rowkey
 
     public String get_id() {
         return _id;
@@ -57,4 +58,11 @@ public class EsSimplePackage implements Serializable {
         this.client_id = client_id;
     }
 
+    public String getRowkey() {
+        return rowkey;
+    }
+
+    public void setRowkey(String rowkey) {
+        this.rowkey = rowkey;
+    }
 }

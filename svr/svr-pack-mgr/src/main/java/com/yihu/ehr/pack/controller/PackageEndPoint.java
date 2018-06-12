@@ -19,6 +19,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +55,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
     private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static final String INDEX = "json_archives";
     private static final String TYPE = "info";
+    private static final Integer PAGE_SIZE = 1000;
 
     @Value("${deploy.region}")
     private Short adminRegion;
@@ -433,6 +435,43 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
     public boolean deleteAnalyzeQueue() throws Exception {
         redisTemplate.delete(RedisCollection.AnalyzeQueue);
         return true;
+    }
+
+    @RequestMapping(value = ServiceApi.Packages.UploadProvincialQueueSize, method = RequestMethod.POST)
+    @ApiOperation(value = "添加省平台上传队列", notes = "通过事件时间，添加已解析的档案包到队列中")
+    public String uploadProvincialQueue(
+            @ApiParam(name = "sorts", value = "排序(建议使用默认值，以解析较早之前的数据)", defaultValue = "event_date")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "startDate", value = "开始时间（eg：2017-01-01）", required = true )
+            @RequestParam(value = "startDate") String startDate,
+            @ApiParam(name = "endDate", value = "结束时间（eg：2017-01-02）", required = true )
+            @RequestParam(value = "endDate") String endDate) throws Exception {
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("event_date>=" + startDate + " 00:00:00;");
+        stringBuilder.append("event_date<" + endDate + " 00:00:00;");
+        stringBuilder.append("archive_status=3");
+        int count = (int)elasticSearchUtil.count(INDEX, TYPE, stringBuilder.toString());
+        if (count > 0) {
+            int page = count / PAGE_SIZE + 1;
+            for (int i = 1; i <= page; i++) {
+                List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, stringBuilder.toString(), sorts, i, PAGE_SIZE);
+                for (Map<String, Object> item : resultList) {
+                    EsSimplePackage esSimplePackage = new EsSimplePackage();
+                    esSimplePackage.set_id(String.valueOf(item.get("_id")));
+                    esSimplePackage.setPwd(String.valueOf(item.get("pwd")));
+                    esSimplePackage.setRemote_path(String.valueOf(item.get("remote_path")));
+                    esSimplePackage.setClient_id(String.valueOf(item.get("client_id")));
+                    esSimplePackage.setRowkey(String.valueOf(item.get("profile_id")));
+                    //存入省平台上传队列
+                redisTemplate.opsForList().leftPush(RedisCollection.ProvincialPlatformQueue, objectMapper.writeValueAsString(esSimplePackage));
+                }
+            }
+            return "操作成功！";
+        }else {
+            return "该段时间内无数据";
+        }
+
     }
 
     //-------------------------------------------------

@@ -41,6 +41,7 @@ public class ServiceApi {
         public static final String ResourceQuery = "/resources/query"; //资源查询接口
         //public static final String ResourceSubQuery = "/resources/sub_query"; //详细资源查询接口
         public static final String ResourceQueryTransform = "/resources/query/transform"; //资源查询接口+转译
+        public static final String ResourceQueryAllTransform = "/resources/queryAll/transform"; //资源查询接口获取所有数据集相关+转译
         public static final String ResourceRawFiles = "/resources/query/raw_files"; //非结构资源查询接口
         public static final String ResourceRawFilesList = "/resources/query/raw_files_list"; //非结构资源List查询接口
         public static final String ResourceMasterData = "/resources/query/master_data"; //主表资源查询接口
@@ -477,6 +478,7 @@ public class ServiceApi {
         public static final String ArchiveRelation = "/archiveRelation"; //档案关联
         public static final String AddResolveQueue = "/packages/addResolveQueue";
         public static final String QueueSize = "/packages/queueSize";
+        public static final String UploadProvincialQueueSize = "/packages/queueSize/UploadProvincial";//上传省平台队列
         public static final String PackageCrypto = "/packages/crypto";
         public static final String Fetch = "/packages/fetch/{id}";
         public static final String ImmediateResolve = "/immediate/resolve";
