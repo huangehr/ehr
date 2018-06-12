@@ -1639,6 +1639,7 @@ public class ServiceApi {
         public static final String PaltformReceiveWarningDel = "/dataQuality/warningSetting/receiveWarningDel";
         public static final String PaltformReceiveWarningUpd = "/dataQuality/warningSetting/receiveWarningUpd";
         public static final String PaltformReceiveWarning =    "/dataQuality/warningSetting/receiveWarning/{id}";
+        public static final String PaltformReceiveWarningDefault =    "/dataQuality/warningSetting/receiveWarningDefault";
         public static final String PaltformResourceWarningList = "/dataQuality/warningSetting/resourceWarningList";
         public static final String PaltformResourceWarningAdd = "/dataQuality/warningSetting/resourceWarningAdd";
         public static final String PaltformResourceWarningDel = "/dataQuality/warningSetting/resourceWarningDel";

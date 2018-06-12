@@ -1,9 +1,6 @@
 package com.yihu.ehr.analyze.controller.dataQuality;
 
-import com.yihu.ehr.analyze.service.dataQuality.DqDatasetWarningService;
-import com.yihu.ehr.analyze.service.dataQuality.DqPaltformReceiveWarningService;
-import com.yihu.ehr.analyze.service.dataQuality.DqPaltformResourceWarningService;
-import com.yihu.ehr.analyze.service.dataQuality.DqPaltformUploadWarningService;
+import com.yihu.ehr.analyze.service.dataQuality.*;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
@@ -21,6 +18,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,6 +43,25 @@ public class WarningSettingEndPoint extends EnvelopRestEndPoint {
     private DqPaltformResourceWarningService dqPaltformResourceWarningService;
     @Autowired
     private DqPaltformUploadWarningService dqPaltformUploadWarningService;
+    @Value("${quality.orgCode}")
+    private String defaultOrgCode;
+    @Autowired
+    private WarningQuestionService warningQuestionService;
+
+    @RequestMapping(value = "test", method = RequestMethod.GET)
+    @ApiOperation(value = "test")
+    public Envelop test() throws Exception {
+        Envelop envelop = new Envelop();
+        try {
+            warningQuestionService.analyze();
+            return success(null);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return envelop;
+    }
 
     @RequestMapping(value = ServiceApi.DataQuality.PaltformReceiveWarningList, method = RequestMethod.GET)
     @ApiOperation(value = "平台接收预警列表")
@@ -62,6 +79,8 @@ public class WarningSettingEndPoint extends EnvelopRestEndPoint {
             String filters = null;
             if(StringUtils.isNotBlank(orgCode)){
                 filters = "orgCode="+orgCode;
+            }else {
+                filters = "orgCode!="+defaultOrgCode;
             }
             String sorts = "-updateTime";
             List<DqPaltformReceiveWarning> list = dqPaltformReceiveWarningService.search(null, filters, sorts, page, size);
@@ -125,6 +144,24 @@ public class WarningSettingEndPoint extends EnvelopRestEndPoint {
             List<DqPaltformUploadWarning> list = dqPaltformUploadWarningService.search(null, filters, sorts, page, size);
             pagedResponse(request, response, dqPaltformUploadWarningService.getCount(filters), page, size);
             return success(convertToModels(list, new ArrayList<>(list.size()), MDqPaltformUploadWarning.class, null));
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.DataQuality.PaltformReceiveWarningDefault, method = RequestMethod.GET)
+    @ApiOperation(value = "查找默认的平台接收预警")
+    public Envelop paltformReceiveWarningDefault() {
+        Envelop envelop = new Envelop();
+        try {
+            DqPaltformReceiveWarning warning =  dqPaltformReceiveWarningService.findByOrgCode(defaultOrgCode);
+            List<DqDatasetWarning> warningList = dqDatasetWarningService.findByOrgCodeAndType(warning.getOrgCode(),"1");
+            warning.setDatasetWarningNum(warningList.size());
+            warning.setDatasetWarningList(warningList);
+            return success(convertToModel(warning, MDqPaltformReceiveWarning.class));
         }catch (Exception e){
             e.printStackTrace();
             envelop.setSuccessFlg(false);

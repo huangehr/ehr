@@ -3,6 +3,7 @@ package com.yihu.ehr.analyze.service.dataQuality;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.yihu.ehr.analyze.dao.DqPaltformReceiveWarningDao;
 import com.yihu.ehr.elasticsearch.ElasticSearchPool;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.entity.quality.DqPaltformReceiveWarning;
@@ -12,6 +13,8 @@ import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -25,20 +28,18 @@ import java.util.*;
  */
 @Service
 public class DataQualityStatisticsService extends BaseJpaService {
+
+    private final static Logger logger = LoggerFactory.getLogger(WarningQuestionService.class);
     @Autowired
     private ElasticSearchUtil elasticSearchUtil;
     @Autowired
     private ElasticSearchPool elasticSearchPool;
     @Autowired
     private WarningSettingService warningSettingService;
+    @Autowired
+    private DqPaltformReceiveWarningDao dqPaltformReceiveWarningDao;
     @Value("${quality.orgCode}")
     private String defaultOrgCode;
-    @Value("${quality.hospitalInTime}")
-    private Integer hospitalInTime;
-    @Value("${quality.outpatientInTime}")
-    private Integer outpatientInTime;
-    @Value("${quality.peInTime}")
-    private Integer peInTime;
 
     /**
      * 统计查询
@@ -71,7 +72,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
         });
 
         Long en = System.currentTimeMillis();
-        System.out.println("初始化 数据集数据时间："+(en-startTime));
+        logger.info("初始化 数据集数据时间："+(en-startTime));
 
         //获取医院数据
         Query query1 = session.createSQLQuery("SELECT org_code,full_name from organizations ");
@@ -84,7 +85,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
         });
 
         Long end0 = System.currentTimeMillis();
-        System.out.println("获取医院名称时间："+(end0-en));
+        logger.info("获取医院名称时间："+(end0-en));
 
         //统计医院数据
         String sql1 = "SELECT sum(HSI07_01_001) s1,sum(HSI07_01_002) s2,sum(HSI07_01_004) s3,sum(HSI07_01_012) s4,org_code FROM qc/daily_report where create_date>= '"+start+"T00:00:00' AND create_date <='" +  end + "T23:59:59' group by org_code";
@@ -124,7 +125,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
         }
 
         Long end1 = System.currentTimeMillis();
-        System.out.println("统计医院数据时间："+(end1-end0));
+        logger.info("统计医院数据时间："+(end1-end0));
 
         //统计接收数据
         String sql2 = "SELECT count(*) c,org_code FROM json_archives/info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' ";
@@ -151,7 +152,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
         }
 
         Long end2 = System.currentTimeMillis();
-        System.out.println("统计接收数据(档案数)时间："+(end2-end1));
+        logger.info("统计接收数据(档案数)时间："+(end2-end1));
 
         String sql3 = "SELECT count(*) c,org_code FROM json_archives_qc/qc_metadata_info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' ";
         if(eventType!=null){
@@ -177,7 +178,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
         }
 
         Long end3 = System.currentTimeMillis();
-        System.out.println("统计接收数据(质量异常)时间："+(end3-end2));
+        logger.info("统计接收数据(质量异常)时间："+(end3-end2));
 
         String sql4 = "SELECT details,org_code FROM json_archives_qc/qc_dataset_info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' ";
         if(eventType!=null){
@@ -186,7 +187,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
         sql4 += " group by org_code";
         ResultSet resultSet4 = elasticSearchUtil.findBySql(sql4);
         try {
-            Map<String, Map<String, Object>> datasetMap1 = new HashMap<>(resultSet1.getFetchSize());
+            Map<String, Map<String, Object>> datasetMap1 = new HashMap<>();
             while (resultSet4.next()) {
                 Map<String, Object> datasetMap2 = null;
                 String orgCode = resultSet4.getString("org_code");
@@ -223,7 +224,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
         }
 
         Long end4 = System.currentTimeMillis();
-        System.out.println("统计接收数据(数据集)时间："+(end4-end3));
+        logger.info("统计接收数据(数据集)时间："+(end4-end3));
 
         //资源化数据
         String sql5 = "SELECT count(*) c,org_code,archive_status FROM json_archives/info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' and (archive_status=2 or archive_status=3) group by org_code,archive_status";
@@ -251,7 +252,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
         }
 
         Long end5 = System.currentTimeMillis();
-        System.out.println("资源化数据(解析成功和失败 )时间："+(end5-end4));
+        logger.info("资源化数据(解析成功和失败 )时间："+(end5-end4));
 
         String sql6 = "SELECT count(*) c,org_code FROM json_archives/info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' and defect=1 group by org_code";
         ResultSet resultSet6 = elasticSearchUtil.findBySql(sql6);
@@ -273,13 +274,13 @@ public class DataQualityStatisticsService extends BaseJpaService {
         }
 
         Long end6 = System.currentTimeMillis();
-        System.out.println("资源化数据(解析异常)时间："+(end6-end5));
+        logger.info("资源化数据(解析异常)时间："+(end6-end5));
 
         for (Map<String, Object> map:dataMap.values()){
             re.add(map);
         }
 
-        System.out.println("总时间时间："+(System.currentTimeMillis()-startTime));
+        logger.info("总时间时间："+(System.currentTimeMillis()-startTime));
 
         return re;
     }
@@ -352,12 +353,6 @@ public class DataQualityStatisticsService extends BaseJpaService {
         }else {
             warning = warningMap.get(defaultOrgCode);
         }
-        if(warning==null){
-            warning = new DqPaltformReceiveWarning();
-            warning.setHospitalInTime(hospitalInTime);
-            warning.setOutpatientInTime(outpatientInTime);
-            warning.setPeInTime(peInTime);
-        }
 
         boolean re = false;
         switch (eventType){
@@ -400,9 +395,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
 
         //初始化 及时率数据
         Session session = currentSession();
-        String hql = "from DqPaltformReceiveWarning";
-        Query query = session.createQuery(hql);
-        List<DqPaltformReceiveWarning> warningList = query.list();
+        List<DqPaltformReceiveWarning> warningList = dqPaltformReceiveWarningDao.findAll();
         Map<String, DqPaltformReceiveWarning> warningMap = new HashedMap(warningList.size());
         warningList.forEach(one->{
             String orgCode = one.getOrgCode();
@@ -410,7 +403,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
         });
 
         Long en = System.currentTimeMillis();
-        System.out.println("初始化 数据集数据时间："+(en-startTime));
+        logger.info("初始化 数据集数据时间："+(en-startTime));
 
         //获取医院数据
         Query query1 = session.createSQLQuery("SELECT org_code,full_name from organizations ");
@@ -423,7 +416,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
         });
 
         Long end0 = System.currentTimeMillis();
-        System.out.println("获取医院名称时间："+(end0-en));
+        logger.info("获取医院名称时间："+(end0-en));
 
         //统计总数
         String sql1 = "SELECT sum(HSI07_01_001) s1,sum(HSI07_01_002) s2,sum(HSI07_01_004) s3,sum(HSI07_01_012) s4,org_code FROM qc/daily_report where event_date>= '"+start+"T00:00:00' AND event_date <='" +  end + "T23:59:59' group by org_code";
@@ -443,9 +436,9 @@ public class DataQualityStatisticsService extends BaseJpaService {
                     dataMap1 = initRateMap(warningMap,orgMap.get(orgCode),orgCode);
                 }
                 dataMap1.put("totalVisit",HSI07_01_001);
-                dataMap1.put("totalOutpatient",HSI07_01_012);
+                dataMap1.put("totalOutpatient",HSI07_01_002);
                 dataMap1.put("totalPe",HSI07_01_004);
-                dataMap1.put("totalHospital",HSI07_01_002);
+                dataMap1.put("totalHospital",HSI07_01_012);
 
                 dataMap.put(orgCode,dataMap1);
             }
@@ -454,7 +447,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
         }
 
         Long end1 = System.currentTimeMillis();
-        System.out.println("统计总数时间："+(end1-startTime));
+        logger.info("统计总数时间："+(end1-startTime));
 
         //统计及时数
         String sql2 = "SELECT count(*) c,org_code,event_type,delay FROM json_archives/info where event_date>= '"+start+" 00:00:00' AND event_date<='" +  end + " 23:59:59' and delay is not null group by org_code,event_type,delay ";
@@ -501,7 +494,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
         }
 
         Long end2 = System.currentTimeMillis();
-        System.out.println("统计及时数时间："+(end2-end1));
+        logger.info("统计及时数时间："+(end2-end1));
 
         //统计完整数
         String sql3 = "SELECT count(*) c,org_code,event_type FROM json_archives/info where event_date>= '"+start+" 00:00:00' AND event_date<='" +  end + " 23:59:59' group by org_code,event_type";
@@ -534,7 +527,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
         }
 
         Long end3 = System.currentTimeMillis();
-        System.out.println("统计完整数时间："+(end3-end2));
+        logger.info("统计完整数时间："+(end3-end2));
 
         //计算及时率及完整率
         for (Map<String, Object> map:dataMap.values()){
@@ -564,7 +557,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
             re.add(map);
         }
 
-        System.out.println("总时间时间："+(System.currentTimeMillis()-startTime));
+        logger.info("总时间时间："+(System.currentTimeMillis()-startTime));
 
         return re;
     }
@@ -575,7 +568,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
      * @param denominator 分母
      * @return
      */
-    private String calRate(double molecular, double denominator){
+    public String calRate(double molecular, double denominator){
         if(molecular==0){
             return "0.00%";
         }else if(denominator==0){

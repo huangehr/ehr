@@ -17,9 +17,8 @@ public class MDqPaltformUploadWarning implements Serializable {
     private Date updateTime;//更新时间
     private String updateUserId;//操作人id
     private String updateUserName;//操作人名称
-    private String integrityRate;//完整率
     private Long errorNum;//错误量
-    private Long dataNum;//数据量
+    private Long acrhiveNum;//档案数
     private List<MDqDatasetWarning> datasetWarningList;//数据集
     private Integer datasetWarningNum;//数据集数量
 
@@ -79,14 +78,6 @@ public class MDqPaltformUploadWarning implements Serializable {
         this.updateUserName = updateUserName;
     }
 
-    public String getIntegrityRate() {
-        return integrityRate;
-    }
-
-    public void setIntegrityRate(String integrityRate) {
-        this.integrityRate = integrityRate;
-    }
-
     public Long getErrorNum() {
         return errorNum;
     }
@@ -95,12 +86,12 @@ public class MDqPaltformUploadWarning implements Serializable {
         this.errorNum = errorNum;
     }
 
-    public Long getDataNum() {
-        return dataNum;
+    public Long getAcrhiveNum() {
+        return acrhiveNum;
     }
 
-    public void setDataNum(Long dataNum) {
-        this.dataNum = dataNum;
+    public void setAcrhiveNum(Long acrhiveNum) {
+        this.acrhiveNum = acrhiveNum;
     }
 
     public List<MDqDatasetWarning> getDatasetWarningList() {
