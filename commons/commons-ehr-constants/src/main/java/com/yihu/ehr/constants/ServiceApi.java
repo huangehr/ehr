@@ -1660,10 +1660,15 @@ public class ServiceApi {
     public class PackQcReport {
         public static final String dailyReport = "/packQcReport/dailyReport";
         public static final String datasetWarningList = "/packQcReport/datasetWarningList";
-        public static final String resourceSuccessfulCount = "/packQcReport/resourceSuccessfulCount";
+        public static final String resourceSuccess = "/packQcReport/resourceSuccess";
         public static final String archiveReport= "/packQcReport/archiveReport";
         public static final String dataSetList= "/packQcReport/dataSetList";
         public static final String archiveFailed= "/packQcReport/archiveFailed";
         public static final String metadataError= "/packQcReport/metadataError";
+        public static final String analyzeErrorList= "/packQcReport/analyzeErrorList";
+        public static final String metadataErrorList= "/packQcReport/metadataErrorList";
+        public static final String metadataErrorDetail= "/packQcReport/metadataErrorDetail";
+        public static final String archiveList= "/packQcReport/archiveList";
+        public static final String archiveDetail= "/packQcReport/archiveDetail";
     }
 }
