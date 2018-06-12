@@ -4,7 +4,9 @@ import com.yihu.ehr.elasticsearch.ElasticSearchClient;
 import com.yihu.ehr.elasticsearch.ElasticSearchPool;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.query.BaseJpaService;
+import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.rest.Envelop;
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
@@ -25,6 +27,7 @@ import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.metrics.valuecount.InternalValueCount;
 import org.elasticsearch.search.aggregations.metrics.valuecount.ValueCountBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -46,7 +49,8 @@ public class PackQcReportService extends BaseJpaService {
     private ElasticSearchPool elasticSearchPool;
     @Autowired
     private ElasticSearchClient elasticSearchClient;
-
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     /**
      * 获取医院数据
@@ -104,7 +108,7 @@ public class PackQcReportService extends BaseJpaService {
      * @return
      * @throws Exception
      */
-    public Envelop resourceSuccessfulCount(String startDate, String endDate, String orgCode) throws Exception {
+    public Envelop resourceSuccess(String startDate, String endDate, String orgCode) throws Exception {
         Envelop envelop = new Envelop();
         String index = "json_archives";
         String type = "info";
@@ -229,6 +233,7 @@ public class PackQcReportService extends BaseJpaService {
         Envelop envelop = new Envelop();
         List<Map<String, Object>> res = new ArrayList<>();
         StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("qc_step=1;");
         stringBuilder.append("receive_date>=" + startDate + " 00:00:00;");
         stringBuilder.append("receive_date<" + endDate + " 23:59:59;");
         if (StringUtils.isNotEmpty(orgCode) && !"null".equals(orgCode)){
@@ -351,6 +356,114 @@ public class PackQcReportService extends BaseJpaService {
         } finally {
             elasticSearchPool.releaseClient(transportClient);
         }
+        return envelop;
+    }
+
+    /**
+     * 解析失败问题查询
+     * @param filters
+     * @param sorts
+     * @param page
+     * @param size
+     * @return
+     * @throws Exception
+     */
+    public List<Map<String, Object>> analyzeErrorList(String filters, String sorts, int page, int size) throws Exception {
+        List<Map<String, Object>> orgs = getOrgs();
+        List<Map<String, Object>> list = elasticSearchUtil.page("json_archives","info", filters, sorts, page, size);
+        for(Map<String, Object> map:list){
+            map.put("orgName",getOrgName(orgs, map.get("org_code")+""));
+        }
+        return list;
+    }
+
+    /**
+     * 异常数据元查询
+     * @param filters
+     * @param sorts
+     * @param page
+     * @param size
+     * @return
+     * @throws Exception
+     */
+    public List<Map<String, Object>> metadataErrorList(String filters, String sorts, int page, int size) throws Exception {
+        List<Map<String, Object>> orgs = getOrgs();
+        List<Map<String, Object>> list = elasticSearchUtil.page("json_archives_qc","qc_metadata_info", filters, sorts, page, size);
+        for(Map<String, Object> map:list){
+            map.put("orgName",getOrgName(orgs, map.get("org_code")+""));
+        }
+        return list;
+    }
+    private List<Map<String, Object>> getOrgs(){
+        return jdbcTemplate.queryForList("SELECT org_code,full_name from organizations");
+    }
+
+    private String getOrgName(List<Map<String, Object>> orgs, String orgCode){
+        String orgName = "";
+        for(Map<String, Object> map : orgs){
+            if(orgCode.equals(map.get("ORG_CODE"))){
+                orgName = ObjectUtils.toString(map.get("FULL_NAME"));
+                break;
+            }
+        }
+        return orgName;
+    }
+
+    /**
+     * 获取异常详情
+     * @param id
+     * @return
+     * @throws Exception
+     */
+    public Envelop metadataErrorDetail(String id) throws Exception {
+        Envelop envelop = new Envelop();
+        Map<String, Object> res = new HashMap<>();
+        Map<String, Object> metedata = elasticSearchUtil.findById("json_archives_qc","qc_metadata_info",id);
+        if("2".equals(metedata.get("qc_step"))){
+            String sql = "SELECT * FROM rs_adapter_scheme WHERE adapter_version='"+metedata.get("version")+"'";
+            List<Map<String, Object>> schemeList = jdbcTemplate.queryForList(sql);
+            if(schemeList!=null&&schemeList.size()>0){
+                metedata.put("scheme", schemeList.get(0).get("NAME"));
+            }
+        }
+        String relationId = metedata.get("org_code")+"_"+metedata.get("event_no")+"_"+ DateUtil.strToDate(metedata.get("event_date")+"").getTime();
+        res.put("metedata",metedata);
+        res.put("relation",elasticSearchUtil.findById("archive_relation","info",relationId));
+        envelop.setObj(res);
+        return envelop;
+    }
+
+    /**
+     * 档案包列表
+     * @param filters
+     * @param sorts
+     * @param page
+     * @param size
+     * @return
+     * @throws Exception
+     */
+    public List<Map<String, Object>> archiveList(String filters, String sorts, int page, int size) throws Exception {
+        List<Map<String, Object>> orgs = getOrgs();
+        List<Map<String, Object>> list = elasticSearchUtil.page("json_archives","info", filters, sorts, page, size);
+        for(Map<String, Object> map:list){
+            map.put("orgName",getOrgName(orgs, map.get("org_code")+""));
+        }
+        return list;
+    }
+
+    /**
+     * 档案包详情
+     * @param id
+     * @return
+     * @throws Exception
+     */
+    public Envelop archiveDetail(String id) throws Exception {
+        Envelop envelop = new Envelop();
+        Map<String, Object> res = new HashMap<>();
+        Map<String, Object> archive = elasticSearchUtil.findById("json_archives","info",id);
+        res.put("archive",archive);
+        res.put("relation",elasticSearchUtil.findById("archive_relation","info",archive.get("profile_id")+""));
+        envelop.setObj(res);
         return envelop;
     }
 }

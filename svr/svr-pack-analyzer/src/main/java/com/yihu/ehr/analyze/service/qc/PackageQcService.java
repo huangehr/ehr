@@ -65,6 +65,7 @@ public class PackageQcService {
         qcDataSetRecord.put("event_no", zipPackage.getEventNo());
         qcDataSetRecord.put("version", zipPackage.getCdaVersion());
         qcDataSetRecord.put("count", zipPackage.getDataSets().size());
+        qcDataSetRecord.put("qc_step", 1);
         List<Map<String, Object>> details = new ArrayList<>();
         Map<String, PackageDataSet> dataSets = zipPackage.getDataSets();
         for (String dataSetCode : dataSets.keySet()) {

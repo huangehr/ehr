@@ -41,6 +41,7 @@ public class ServiceApi {
         public static final String ResourceQuery = "/resources/query"; //资源查询接口
         //public static final String ResourceSubQuery = "/resources/sub_query"; //详细资源查询接口
         public static final String ResourceQueryTransform = "/resources/query/transform"; //资源查询接口+转译
+        public static final String ResourceQueryAllTransform = "/resources/queryAll/transform"; //资源查询接口获取所有数据集相关+转译
         public static final String ResourceRawFiles = "/resources/query/raw_files"; //非结构资源查询接口
         public static final String ResourceRawFilesList = "/resources/query/raw_files_list"; //非结构资源List查询接口
         public static final String ResourceMasterData = "/resources/query/master_data"; //主表资源查询接口
@@ -477,6 +478,7 @@ public class ServiceApi {
         public static final String ArchiveRelation = "/archiveRelation"; //档案关联
         public static final String AddResolveQueue = "/packages/addResolveQueue";
         public static final String QueueSize = "/packages/queueSize";
+        public static final String UploadProvincialQueueSize = "/packages/queueSize/UploadProvincial";//上传省平台队列
         public static final String PackageCrypto = "/packages/crypto";
         public static final String Fetch = "/packages/fetch/{id}";
         public static final String ImmediateResolve = "/immediate/resolve";
@@ -784,6 +786,7 @@ public class ServiceApi {
         public static final String H5Handshake = "/users/h5/handshake";
         public static final String UsersOfAppPhoneExistence = "/usersOfApp/user/onePhone/existence";
         public static final String GetUserOfUsersOfApp = "/usersOfApp/users/getUserOfUsersOfApp";
+        public static final String GetUserInfoAndRolesByUserIdOrCode = "/users/orgDeptMember/getUserInfoAndRolesByUserIdOrCode";
 
 
         public static final String Save = "/users/save";
@@ -1656,10 +1659,15 @@ public class ServiceApi {
     public class PackQcReport {
         public static final String dailyReport = "/packQcReport/dailyReport";
         public static final String datasetWarningList = "/packQcReport/datasetWarningList";
-        public static final String resourceSuccessfulCount = "/packQcReport/resourceSuccessfulCount";
+        public static final String resourceSuccess = "/packQcReport/resourceSuccess";
         public static final String archiveReport= "/packQcReport/archiveReport";
         public static final String dataSetList= "/packQcReport/dataSetList";
         public static final String archiveFailed= "/packQcReport/archiveFailed";
         public static final String metadataError= "/packQcReport/metadataError";
+        public static final String analyzeErrorList= "/packQcReport/analyzeErrorList";
+        public static final String metadataErrorList= "/packQcReport/metadataErrorList";
+        public static final String metadataErrorDetail= "/packQcReport/metadataErrorDetail";
+        public static final String archiveList= "/packQcReport/archiveList";
+        public static final String archiveDetail= "/packQcReport/archiveDetail";
     }
 }

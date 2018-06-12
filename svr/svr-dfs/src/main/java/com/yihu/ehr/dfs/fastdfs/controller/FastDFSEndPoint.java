@@ -50,6 +50,8 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
     private String indexType;
     @Value("${fast-dfs.server.dict-code}")
     private String dictCode;
+    @Value("${fast-dfs.public-server}")
+    private String fastDfsPublicServers;
 
     @Autowired
     private FastDFSService fastDFSService;
@@ -716,9 +718,16 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
         List<SystemDictEntry> page =  systemDictEntryService.search(dictEntryFilter.toString());
         if(page.size()>0){
             SystemDictEntry systemDictEntry=page.get(0);
-            //filter=[{"andOr":"and","condition":"=","field":"sn","value":"X1522033171859"}]
             String filter="sn="+systemDictEntry.getValue()+";";
             List<Map<String, Object>> resultList = elasticSearchUtil.page(indexName, indexType, filter, 1, 1);
+            Map<String, Object> map = new HashMap<>();
+            if(null != resultList && resultList.size()>0){
+                map = resultList.get(0);
+                String path =fastDfsPublicServers+"/"+ map.get("path").toString().replace(":","/");
+                map.put("path",path);
+                resultList.remove(0);
+                resultList.add(map);
+            }
             int count = (int)elasticSearchUtil.count(indexName, indexType, filter);
             envelop = getPageResult(resultList, count, 1, 5);
         }else{

@@ -10,10 +10,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -81,6 +78,62 @@ public class ResourcesTransformService extends BaseJpaService {
             returnMap.put("event_type",resource.get("event_type"));
         }
         return returnMap;
+    }
+
+
+    /**
+     * 资源数据显示代码转换
+     * @param resource Map<数据集编码,数据集数据>
+     * @param version String 适配版本
+     * @return
+     */
+    public Map<String, Object> displayCodeListConvert(Map<String, Object> resource, String version) {
+        //返回资源
+        Map<String,Object> result = new HashMap<>();
+        List<Map<String,Object>> datas = null;//数据集数据列表
+        Map<String,Object> data =  null;
+        //适配方案
+        List<RsAdapterScheme> schemeList = adapterSchemeDao.findByAdapterVersion(version);
+        if (resource.size() > 0 && schemeList.size() > 0) {
+            //适配方案对应数据元
+            List<RsAdapterMetadata> metadataList;
+            List<Map<String,Object>>    metadataResources;
+            Set<String> dataSets = resource.keySet();
+            for (String dataset : dataSets) {
+                datas = new ArrayList<>();
+                metadataResources = (List<Map<String,Object>>) resource.get(dataset);
+                for (Map<String,Object> metadataResource : metadataResources){
+                    data =  new HashMap<>();
+                    if (StringUtils.isBlank(dataset)) {
+                        metadataList = adapterMetadataDao.findByScheme(schemeList.get(0).getId());
+                    } else {
+                        metadataList = adapterMetadataDao.findBySchemeIdAndSrcDatasetCode(schemeList.get(0).getId(), dataset);
+                    }
+                    for (RsAdapterMetadata metadata : metadataList) {
+                        String srcMetadataCode = metadata.getSrcMetadataCode();
+                        String metadataId = metadata.getMetadataId();
+                        if (metadataResource.containsKey(metadataId)) {
+                            data.put(srcMetadataCode, metadataResource.get(metadataId));
+                        }
+                        //同时返回字典值
+                        if (metadataResource.containsKey(metadataId + "_VALUE")) {
+                            data.put(srcMetadataCode + "_VALUE", metadataResource.get(metadataId + "_VALUE"));
+                        }
+                    }
+                    //将rowkey等基础字段放入数据
+                    data.put("rowkey", metadataResource.get("rowkey"));
+                    data.put("org_code", metadataResource.get("org_code"));
+                    data.put("event_no", metadataResource.get("event_no"));
+                    data.put("event_date", metadataResource.get("event_date"));
+                    data.put("event_type",metadataResource.get("event_type"));
+                    datas.add(data);
+                }
+                result.put(dataset,datas);
+            }
+
+        }
+
+        return result;
     }
 
     /**
