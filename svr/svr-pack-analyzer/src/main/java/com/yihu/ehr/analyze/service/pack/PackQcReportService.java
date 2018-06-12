@@ -466,4 +466,35 @@ public class PackQcReportService extends BaseJpaService {
         envelop.setObj(res);
         return envelop;
     }
+
+    /**
+     * 上传列表
+     * @param filters
+     * @param sorts
+     * @param page
+     * @param size
+     * @return
+     * @throws Exception
+     */
+    public List<Map<String, Object>> uploadRecordList(String filters, String sorts, int page, int size) throws Exception {
+        List<Map<String, Object>> orgs = getOrgs();
+        List<Map<String, Object>> list = elasticSearchUtil.page("upload","record", filters, sorts, page, size);
+        for(Map<String, Object> map:list){
+            map.put("orgName",getOrgName(orgs, map.get("org_code")+""));
+        }
+        return list;
+    }
+
+    /**
+     * 上传详情
+     * @param id
+     * @return
+     * @throws Exception
+     */
+    public Envelop uploadRecordDetail(String id) throws Exception {
+        Envelop envelop = new Envelop();
+        Map<String, Object> archive = elasticSearchUtil.findById("upload","record",id);
+        envelop.setObj(archive);
+        return envelop;
+    }
 }
