@@ -1,6 +1,6 @@
 spring:
   application:
-    name: svr-dfs-yy
+    name: svr-dfs
 
 ---
 spring:

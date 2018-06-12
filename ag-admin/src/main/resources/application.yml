@@ -16,10 +16,10 @@ zuul:
   routes:
     svr-dfs:
       path: /dfs/**
-      serviceId: svr-dfs-yy
+      serviceId: svr-dfs
     svr-basic:
       path: /basic/**
-      serviceId: svr-basic-yy
+      serviceId: svr-basic
     svr-quota:
       path: /quota/**
       serviceId: svr-quota
