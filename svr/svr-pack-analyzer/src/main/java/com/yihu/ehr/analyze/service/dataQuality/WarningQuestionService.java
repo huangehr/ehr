@@ -5,6 +5,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.yihu.ehr.analyze.dao.*;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.entity.quality.*;
+import com.yihu.ehr.profile.qualilty.DqWarningRecordType;
+import com.yihu.ehr.profile.qualilty.DqWarningRecordWarningType;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.util.datetime.DateUtil;
 import org.apache.commons.collections.map.HashedMap;
@@ -21,8 +23,8 @@ import java.sql.ResultSet;
 import java.text.NumberFormat;
 import java.util.*;
 
-import static com.yihu.ehr.entity.quality.DqWarningRecord.DqWarningRecordWarningType.archiveNum;
-import static com.yihu.ehr.entity.quality.DqWarningRecord.DqWarningRecordWarningType.errorNum;
+import static com.yihu.ehr.profile.qualilty.DqWarningRecordWarningType.archiveNum;
+import static com.yihu.ehr.profile.qualilty.DqWarningRecordWarningType.errorNum;
 
 /**
  * @author yeshijie on 2018/6/11.
@@ -207,22 +209,22 @@ public class WarningQuestionService extends BaseJpaService {
                     //该医院没有上传数据
                     DqWarningRecord record1 = new DqWarningRecord();
                     record1.setOrgCode(orgCode);
-                    record1.setType(DqWarningRecord.DqWarningRecordType.receive.getValue());
+                    record1.setType(DqWarningRecordType.receive.getValue());
                     record1.setActualValue("0");
                     record1.setId(getCode());
                     record1.setOrgName(orgName);
-                    record1.setWarningType(DqWarningRecord.DqWarningRecordWarningType.archives.getValue());
-                    record1.setQuota(DqWarningRecord.DqWarningRecordWarningType.archives.getName());
+                    record1.setWarningType(DqWarningRecordWarningType.archives.getValue());
+                    record1.setQuota(DqWarningRecordWarningType.archives.getName());
                     record1.setRecordTime(recordTime);
                     record1.setWarningTime(new Date());
                     record1.setWarningValue(warning.getArchiveNum()+"");
                     record1.setStatus("1");
-                    record1.setProblemDescription(DqWarningRecord.DqWarningRecordWarningType.archives.getName()+unqualified);
+                    record1.setProblemDescription(DqWarningRecordWarningType.archives.getName()+unqualified);
                     list.add(record1);
 
                     DqWarningRecord record2 = new DqWarningRecord();
                     record2.setOrgCode(orgCode);
-                    record2.setType(DqWarningRecord.DqWarningRecordType.receive.getValue());
+                    record2.setType(DqWarningRecordType.receive.getValue());
                     record2.setActualValue("0");
                     record2.setId(getCode());
                     record2.setOrgName(orgName);
@@ -237,67 +239,67 @@ public class WarningQuestionService extends BaseJpaService {
 
                     DqWarningRecord record3 = new DqWarningRecord();
                     record3.setOrgCode(orgCode);
-                    record3.setType(DqWarningRecord.DqWarningRecordType.receive.getValue());
+                    record3.setType(DqWarningRecordType.receive.getValue());
                     record3.setActualValue("0");
                     record3.setId(getCode());
                     record3.setOrgName(orgName);
-                    record3.setWarningType(DqWarningRecord.DqWarningRecordWarningType.datasetWarningNum.getValue());
-                    record3.setQuota(DqWarningRecord.DqWarningRecordWarningType.datasetWarningNum.getName());
+                    record3.setWarningType(DqWarningRecordWarningType.datasetWarningNum.getValue());
+                    record3.setQuota(DqWarningRecordWarningType.datasetWarningNum.getName());
                     record3.setRecordTime(recordTime);
                     record3.setWarningTime(new Date());
                     record3.setWarningValue(warning.getDatasetWarningNum()+"");
                     record3.setStatus("1");
-                    record3.setProblemDescription(DqWarningRecord.DqWarningRecordWarningType.datasetWarningNum.getName()+unqualified);
+                    record3.setProblemDescription(DqWarningRecordWarningType.datasetWarningNum.getName()+unqualified);
                     list.add(record3);
 
                     DqWarningRecord record4 = new DqWarningRecord();
                     record4.setOrgCode(orgCode);
-                    record4.setType(DqWarningRecord.DqWarningRecordType.receive.getValue());
+                    record4.setType(DqWarningRecordType.receive.getValue());
                     record4.setActualValue("0");
                     record4.setId(getCode());
                     record4.setOrgName(orgName);
-                    record4.setWarningType(DqWarningRecord.DqWarningRecordWarningType.outpatientInTimeRate.getValue());
-                    record4.setQuota(DqWarningRecord.DqWarningRecordWarningType.outpatientInTimeRate.getName());
+                    record4.setWarningType(DqWarningRecordWarningType.outpatientInTimeRate.getValue());
+                    record4.setQuota(DqWarningRecordWarningType.outpatientInTimeRate.getName());
                     record4.setRecordTime(recordTime);
                     record4.setWarningTime(new Date());
                     record4.setWarningValue(warning.getOutpatientInTimeRate());
                     record4.setStatus("1");
                     String description4 = "就诊日期为："+hospitalMap.get("outpatientReceiveTime")+"的"+
-                            DqWarningRecord.DqWarningRecordWarningType.outpatientInTimeRate.getName()+unqualified;
+                            DqWarningRecordWarningType.outpatientInTimeRate.getName()+unqualified;
                     record4.setProblemDescription(description4);
                     list.add(record4);
 
                     DqWarningRecord record5 = new DqWarningRecord();
                     record5.setOrgCode(orgCode);
-                    record5.setType(DqWarningRecord.DqWarningRecordType.receive.getValue());
+                    record5.setType(DqWarningRecordType.receive.getValue());
                     record5.setActualValue("0");
                     record5.setId(getCode());
                     record5.setOrgName(orgName);
-                    record5.setWarningType(DqWarningRecord.DqWarningRecordWarningType.hospitalInTimeRate.getValue());
-                    record5.setQuota(DqWarningRecord.DqWarningRecordWarningType.hospitalInTimeRate.getName());
+                    record5.setWarningType(DqWarningRecordWarningType.hospitalInTimeRate.getValue());
+                    record5.setQuota(DqWarningRecordWarningType.hospitalInTimeRate.getName());
                     record5.setRecordTime(recordTime);
                     record5.setWarningTime(new Date());
                     record5.setWarningValue(warning.getHospitalInTimeRate());
                     record5.setStatus("1");
                     String description5 = "就诊日期为："+hospitalMap.get("hospitalReceiveTime")+"的"+
-                            DqWarningRecord.DqWarningRecordWarningType.hospitalInTimeRate.getName()+unqualified;
+                            DqWarningRecordWarningType.hospitalInTimeRate.getName()+unqualified;
                     record5.setProblemDescription(description5);
                     list.add(record5);
 
                     DqWarningRecord record6 = new DqWarningRecord();
                     record6.setOrgCode(orgCode);
-                    record6.setType(DqWarningRecord.DqWarningRecordType.receive.getValue());
+                    record6.setType(DqWarningRecordType.receive.getValue());
                     record6.setActualValue("0");
                     record6.setId(getCode());
                     record6.setOrgName(orgName);
-                    record6.setWarningType(DqWarningRecord.DqWarningRecordWarningType.peInTimeRate.getValue());
-                    record6.setQuota(DqWarningRecord.DqWarningRecordWarningType.peInTimeRate.getName());
+                    record6.setWarningType(DqWarningRecordWarningType.peInTimeRate.getValue());
+                    record6.setQuota(DqWarningRecordWarningType.peInTimeRate.getName());
                     record6.setRecordTime(recordTime);
                     record6.setWarningTime(new Date());
                     record6.setWarningValue(warning.getPeInTimeRate());
                     record6.setStatus("1");
                     String description6 = "就诊日期为："+hospitalMap.get("peReceiveTime")+"的"+
-                            DqWarningRecord.DqWarningRecordWarningType.peInTimeRate.getName()+unqualified;
+                            DqWarningRecordWarningType.peInTimeRate.getName()+unqualified;
                     record6.setProblemDescription(description6);
                     list.add(record6);
 
@@ -310,17 +312,17 @@ public class WarningQuestionService extends BaseJpaService {
                     //接收的档案数小于预警值
                     DqWarningRecord record = new DqWarningRecord();
                     record.setOrgCode(orgCode);
-                    record.setType(DqWarningRecord.DqWarningRecordType.receive.getValue());
+                    record.setType(DqWarningRecordType.receive.getValue());
                     record.setActualValue(archiveNum+"");
                     record.setId(getCode());
                     record.setOrgName(orgName);
-                    record.setWarningType(DqWarningRecord.DqWarningRecordWarningType.archives.getValue());
-                    record.setQuota(DqWarningRecord.DqWarningRecordWarningType.archives.getName());
+                    record.setWarningType(DqWarningRecordWarningType.archives.getValue());
+                    record.setQuota(DqWarningRecordWarningType.archives.getName());
                     record.setRecordTime(recordTime);
                     record.setWarningTime(new Date());
                     record.setWarningValue(warning.getArchiveNum()+"");
                     record.setStatus("1");
-                    record.setProblemDescription(DqWarningRecord.DqWarningRecordWarningType.archives.getName()+unqualified);
+                    record.setProblemDescription(DqWarningRecordWarningType.archives.getName()+unqualified);
                     list.add(record);
                 }
 
@@ -330,17 +332,17 @@ public class WarningQuestionService extends BaseJpaService {
                     //接收的质量异常问题数大于预警值
                     DqWarningRecord record = new DqWarningRecord();
                     record.setOrgCode(orgCode);
-                    record.setType(DqWarningRecord.DqWarningRecordType.receive.getValue());
+                    record.setType(DqWarningRecordType.receive.getValue());
                     record.setActualValue(errorNum+"");
                     record.setId(getCode());
                     record.setOrgName(orgName);
-                    record.setWarningType(DqWarningRecord.DqWarningRecordWarningType.errorNum.getValue());
-                    record.setQuota(DqWarningRecord.DqWarningRecordWarningType.errorNum.getName());
+                    record.setWarningType(DqWarningRecordWarningType.errorNum.getValue());
+                    record.setQuota(DqWarningRecordWarningType.errorNum.getName());
                     record.setRecordTime(recordTime);
                     record.setWarningTime(new Date());
                     record.setWarningValue(warning.getErrorNum()+"");
                     record.setStatus("1");
-                    record.setProblemDescription(DqWarningRecord.DqWarningRecordWarningType.errorNum.getName()+unqualified);
+                    record.setProblemDescription(DqWarningRecordWarningType.errorNum.getName()+unqualified);
                     list.add(record);
                 }
                 //3、数据集
@@ -349,17 +351,17 @@ public class WarningQuestionService extends BaseJpaService {
                     //接收的数据集小于预警值
                     DqWarningRecord record = new DqWarningRecord();
                     record.setOrgCode(orgCode);
-                    record.setType(DqWarningRecord.DqWarningRecordType.receive.getValue());
+                    record.setType(DqWarningRecordType.receive.getValue());
                     record.setActualValue(datasetNum+"");
                     record.setId(getCode());
                     record.setOrgName(orgName);
-                    record.setWarningType(DqWarningRecord.DqWarningRecordWarningType.datasetWarningNum.getValue());
-                    record.setQuota(DqWarningRecord.DqWarningRecordWarningType.datasetWarningNum.getName());
+                    record.setWarningType(DqWarningRecordWarningType.datasetWarningNum.getValue());
+                    record.setQuota(DqWarningRecordWarningType.datasetWarningNum.getName());
                     record.setRecordTime(recordTime);
                     record.setWarningTime(new Date());
                     record.setWarningValue(warning.getDatasetWarningList().size()+"");
                     record.setStatus("1");
-                    record.setProblemDescription(DqWarningRecord.DqWarningRecordWarningType.datasetWarningNum.getName()+unqualified);
+                    record.setProblemDescription(DqWarningRecordWarningType.datasetWarningNum.getName()+unqualified);
                     list.add(record);
                 }
                 //4、门诊及时率
@@ -373,18 +375,18 @@ public class WarningQuestionService extends BaseJpaService {
                         //门诊及时率小于预警值
                         DqWarningRecord record = new DqWarningRecord();
                         record.setOrgCode(orgCode);
-                        record.setType(DqWarningRecord.DqWarningRecordType.receive.getValue());
+                        record.setType(DqWarningRecordType.receive.getValue());
                         record.setActualValue(outpatientRate);
                         record.setId(getCode());
                         record.setOrgName(orgName);
-                        record.setWarningType(DqWarningRecord.DqWarningRecordWarningType.outpatientInTimeRate.getValue());
-                        record.setQuota(DqWarningRecord.DqWarningRecordWarningType.outpatientInTimeRate.getName());
+                        record.setWarningType(DqWarningRecordWarningType.outpatientInTimeRate.getValue());
+                        record.setQuota(DqWarningRecordWarningType.outpatientInTimeRate.getName());
                         record.setRecordTime(recordTime);
                         record.setWarningTime(new Date());
                         record.setWarningValue(warning.getOutpatientInTimeRate());
                         record.setStatus("1");
                         String description = "就诊日期为："+hospitalMap.get("outpatientReceiveTime")+"的"+
-                                DqWarningRecord.DqWarningRecordWarningType.outpatientInTimeRate.getName()+unqualified;
+                                DqWarningRecordWarningType.outpatientInTimeRate.getName()+unqualified;
                         record.setProblemDescription(description);
                         list.add(record);
                     }
@@ -403,18 +405,18 @@ public class WarningQuestionService extends BaseJpaService {
                         //住院及时率小于预警值
                         DqWarningRecord record = new DqWarningRecord();
                         record.setOrgCode(orgCode);
-                        record.setType(DqWarningRecord.DqWarningRecordType.receive.getValue());
+                        record.setType(DqWarningRecordType.receive.getValue());
                         record.setActualValue(hospitalRate);
                         record.setId(getCode());
                         record.setOrgName(orgName);
-                        record.setWarningType(DqWarningRecord.DqWarningRecordWarningType.hospitalInTimeRate.getValue());
-                        record.setQuota(DqWarningRecord.DqWarningRecordWarningType.hospitalInTimeRate.getName());
+                        record.setWarningType(DqWarningRecordWarningType.hospitalInTimeRate.getValue());
+                        record.setQuota(DqWarningRecordWarningType.hospitalInTimeRate.getName());
                         record.setRecordTime(recordTime);
                         record.setWarningTime(new Date());
                         record.setWarningValue(warning.getHospitalInTimeRate());
                         record.setStatus("1");
                         String description = "就诊日期为："+hospitalMap.get("hospitalReceiveTime")+"的"+
-                                DqWarningRecord.DqWarningRecordWarningType.hospitalInTimeRate.getName()+unqualified;
+                                DqWarningRecordWarningType.hospitalInTimeRate.getName()+unqualified;
                         record.setProblemDescription(description);
                         list.add(record);
                     }
@@ -432,18 +434,18 @@ public class WarningQuestionService extends BaseJpaService {
                         //住院及时率小于预警值
                         DqWarningRecord record = new DqWarningRecord();
                         record.setOrgCode(orgCode);
-                        record.setType(DqWarningRecord.DqWarningRecordType.receive.getValue());
+                        record.setType(DqWarningRecordType.receive.getValue());
                         record.setActualValue(peRate);
                         record.setId(getCode());
                         record.setOrgName(orgName);
-                        record.setWarningType(DqWarningRecord.DqWarningRecordWarningType.peInTimeRate.getValue());
-                        record.setQuota(DqWarningRecord.DqWarningRecordWarningType.peInTimeRate.getName());
+                        record.setWarningType(DqWarningRecordWarningType.peInTimeRate.getValue());
+                        record.setQuota(DqWarningRecordWarningType.peInTimeRate.getName());
                         record.setRecordTime(recordTime);
                         record.setWarningTime(new Date());
                         record.setWarningValue(warning.getPeInTimeRate());
                         record.setStatus("1");
                         String description = "就诊日期为："+hospitalMap.get("peReceiveTime")+"的"+
-                                DqWarningRecord.DqWarningRecordWarningType.peInTimeRate.getName()+unqualified;
+                                DqWarningRecordWarningType.peInTimeRate.getName()+unqualified;
                         record.setProblemDescription(description);
                         list.add(record);
                     }
@@ -766,51 +768,51 @@ public class WarningQuestionService extends BaseJpaService {
         if(resourceFailure>warning.getFailureNum()){
             //失败数>预警值
             DqWarningRecord record = new DqWarningRecord();
-            record.setType(DqWarningRecord.DqWarningRecordType.resource.getValue());
+            record.setType(DqWarningRecordType.resource.getValue());
             record.setActualValue(resourceFailure+"");
             record.setId(getCode());
-            record.setWarningType(DqWarningRecord.DqWarningRecordWarningType.resourceFailureNum.getValue());
-            record.setQuota(DqWarningRecord.DqWarningRecordWarningType.resourceFailureNum.getName());
+            record.setWarningType(DqWarningRecordWarningType.resourceFailureNum.getValue());
+            record.setQuota(DqWarningRecordWarningType.resourceFailureNum.getName());
             record.setRecordTime(recordTime);
             record.setWarningTime(new Date());
             record.setWarningValue(warning.getFailureNum()+"");
             record.setStatus("1");
             record.setOrgName(orgName);
-            record.setProblemDescription(DqWarningRecord.DqWarningRecordWarningType.resourceFailureNum.getName()+unqualified);
+            record.setProblemDescription(DqWarningRecordWarningType.resourceFailureNum.getName()+unqualified);
             list.add(record);
         }
         //2、质量问题数
         if(resourceException>warning.getErrorNum()){
             //质量问题数>预警值
             DqWarningRecord record = new DqWarningRecord();
-            record.setType(DqWarningRecord.DqWarningRecordType.resource.getValue());
+            record.setType(DqWarningRecordType.resource.getValue());
             record.setActualValue(resourceException+"");
             record.setId(getCode());
-            record.setWarningType(DqWarningRecord.DqWarningRecordWarningType.resourceErrorNum.getValue());
-            record.setQuota(DqWarningRecord.DqWarningRecordWarningType.resourceErrorNum.getName());
+            record.setWarningType(DqWarningRecordWarningType.resourceErrorNum.getValue());
+            record.setQuota(DqWarningRecordWarningType.resourceErrorNum.getName());
             record.setRecordTime(recordTime);
             record.setWarningTime(new Date());
             record.setWarningValue(warning.getErrorNum()+"");
             record.setStatus("1");
             record.setOrgName(orgName);
-            record.setProblemDescription(DqWarningRecord.DqWarningRecordWarningType.resourceErrorNum.getName()+unqualified);
+            record.setProblemDescription(DqWarningRecordWarningType.resourceErrorNum.getName()+unqualified);
             list.add(record);
         }
         //3、未解析量
         if(resourceUnArchive>warning.getUnparsingNum()){
             //未解析量>预警值
             DqWarningRecord record = new DqWarningRecord();
-            record.setType(DqWarningRecord.DqWarningRecordType.resource.getValue());
+            record.setType(DqWarningRecordType.resource.getValue());
             record.setActualValue(resourceUnArchive+"");
             record.setId(getCode());
-            record.setWarningType(DqWarningRecord.DqWarningRecordWarningType.unArchiveNum.getValue());
-            record.setQuota(DqWarningRecord.DqWarningRecordWarningType.unArchiveNum.getName());
+            record.setWarningType(DqWarningRecordWarningType.unArchiveNum.getValue());
+            record.setQuota(DqWarningRecordWarningType.unArchiveNum.getName());
             record.setRecordTime(recordTime);
             record.setWarningTime(new Date());
             record.setWarningValue(warning.getUnparsingNum()+"");
             record.setStatus("1");
             record.setOrgName(orgName);
-            record.setProblemDescription(DqWarningRecord.DqWarningRecordWarningType.unArchiveNum.getName()+unqualified);
+            record.setProblemDescription(DqWarningRecordWarningType.unArchiveNum.getName()+unqualified);
             list.add(record);
         }
 
@@ -883,51 +885,51 @@ public class WarningQuestionService extends BaseJpaService {
         if(uploadArchiveNum<warning.getAcrhiveNum()){
             //档案数<预警值
             DqWarningRecord record = new DqWarningRecord();
-            record.setType(DqWarningRecord.DqWarningRecordType.upload.getValue());
+            record.setType(DqWarningRecordType.upload.getValue());
             record.setActualValue(uploadArchiveNum+"");
             record.setId(getCode());
-            record.setWarningType(archiveNum.getValue());
-            record.setQuota(archiveNum.getName());
+            record.setWarningType(DqWarningRecordWarningType.archiveNum.getValue());
+            record.setQuota(DqWarningRecordWarningType.archiveNum.getName());
             record.setRecordTime(recordTime);
             record.setWarningTime(new Date());
             record.setWarningValue(warning.getAcrhiveNum()+"");
             record.setStatus("1");
             record.setOrgName(orgName);
-            record.setProblemDescription(archiveNum.getName()+unqualified);
+            record.setProblemDescription(DqWarningRecordWarningType.archiveNum.getName()+unqualified);
             list.add(record);
         }
         //2、数据错误问题数
         if(uploadErrorNum>warning.getErrorNum()){
             //数据错误问题数>预警值
             DqWarningRecord record = new DqWarningRecord();
-            record.setType(DqWarningRecord.DqWarningRecordType.upload.getValue());
+            record.setType(DqWarningRecordType.upload.getValue());
             record.setActualValue(uploadErrorNum+"");
             record.setId(getCode());
-            record.setWarningType(DqWarningRecord.DqWarningRecordWarningType.dataErrorNum.getValue());
-            record.setQuota(DqWarningRecord.DqWarningRecordWarningType.dataErrorNum.getName());
+            record.setWarningType(DqWarningRecordWarningType.dataErrorNum.getValue());
+            record.setQuota(DqWarningRecordWarningType.dataErrorNum.getName());
             record.setRecordTime(recordTime);
             record.setWarningTime(new Date());
             record.setWarningValue(warning.getErrorNum()+"");
             record.setStatus("1");
             record.setOrgName(orgName);
-            record.setProblemDescription(DqWarningRecord.DqWarningRecordWarningType.dataErrorNum.getName()+unqualified);
+            record.setProblemDescription(DqWarningRecordWarningType.dataErrorNum.getName()+unqualified);
             list.add(record);
         }
         //3、数据集
         if(uploadDatasetNum > datasetNum){
             //数据错误问题数>预警值
             DqWarningRecord record = new DqWarningRecord();
-            record.setType(DqWarningRecord.DqWarningRecordType.upload.getValue());
+            record.setType(DqWarningRecordType.upload.getValue());
             record.setActualValue(uploadDatasetNum+"");
             record.setId(getCode());
-            record.setWarningType(DqWarningRecord.DqWarningRecordWarningType.uploadDatasetNum.getValue());
-            record.setQuota(DqWarningRecord.DqWarningRecordWarningType.uploadDatasetNum.getName());
+            record.setWarningType(DqWarningRecordWarningType.uploadDatasetNum.getValue());
+            record.setQuota(DqWarningRecordWarningType.uploadDatasetNum.getName());
             record.setRecordTime(recordTime);
             record.setWarningTime(new Date());
             record.setWarningValue(datasetNum+"");
             record.setStatus("1");
             record.setOrgName(orgName);
-            record.setProblemDescription(DqWarningRecord.DqWarningRecordWarningType.uploadDatasetNum.getName()+unqualified);
+            record.setProblemDescription(DqWarningRecordWarningType.uploadDatasetNum.getName()+unqualified);
             list.add(record);
         }
         if(list.size()>0){
