@@ -1669,5 +1669,7 @@ public class ServiceApi {
         public static final String metadataErrorDetail= "/packQcReport/metadataErrorDetail";
         public static final String archiveList= "/packQcReport/archiveList";
         public static final String archiveDetail= "/packQcReport/archiveDetail";
+        public static final String uploadRecordList= "/packQcReport/uploadRecordList";
+        public static final String uploadRecordDetail= "/packQcReport/uploadRecordDetail";
     }
 }
