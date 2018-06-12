@@ -47,43 +47,112 @@ public class OutPatientCostScheduler {
     private static final Logger log = LoggerFactory.getLogger(HealthArchiveScheduler.class);
 
     /**
-     * 疾病费用统计
+     * 门急诊疾病费用统计
      */
     @Scheduled(cron = "0 36 07 * * ?")
-    public void statisticDiseaseCostScheduler() {
+    public void statisticOutPatientDiseaseCostScheduler() {
         try {
             Date now = new Date();
             Date yesterdayDate = DateUtils.addDays(now,-1);
             String yesterday = DateUtil.formatDate(yesterdayDate, DateUtil.DEFAULT_DATE_YMD_FORMAT);
             String fq = "event_date:[" + yesterday + "T00:00:00Z TO  " + yesterday + "T23:59:59Z]";
+            String q =  "EHR_000109:*"; // 查询条件 诊断代码（门诊）
+            String sQuery = "EHR_000045:* AND profile_id:";
+            String sQuery2 = "EHR_000109:* AND profile_id:";
+
+            String keyEventDate = "event_date";
+            String keyArea = "org_area";  // 行政区划代码  EHR_001225
+            String keyDisease = "EHR_000109";  // 诊断代码（门诊）
+            String keyDiseaseName = "EHR_000112";  // 诊断名称（门诊）
+            String keyCost = "EHR_000045";  // 门诊费用金额（元）
             // 抽取并保存到ES
-            saveDiseaseExpenseData(fq);
+            saveDiseaseExpenseData(fq, q, sQuery, sQuery2, keyEventDate, keyArea, keyDisease, keyDiseaseName, keyCost, 1);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     /**
-     * 科室费用统计
+     * 住院疾病费用统计
      */
-    @Scheduled(cron = "0 50 07 * * ?")
-    public void statisticDeptCostScheduler() {
+    @Scheduled(cron = "0 56 07 * * ?")
+    public void statisticInPatientDiseaseCostScheduler() {
         try {
             Date now = new Date();
             Date yesterdayDate = DateUtils.addDays(now,-1);
             String yesterday = DateUtil.formatDate(yesterdayDate, DateUtil.DEFAULT_DATE_YMD_FORMAT);
             String fq = "event_date:[" + yesterday + "T00:00:00Z TO  " + yesterday + "T23:59:59Z]";
-            log.info("抽取科室费用：fq = {}", fq);
+            String q =  "EHR_000293:*"; // 查询条件 诊断代码（住院）
+            String sQuery = "EHR_000175:* AND profile_id:";
+            String sQuery2 = "EHR_000293:* AND profile_id:";
+
+            String keyEventDate = "event_date";
+            String keyArea = "org_area";  // 行政区划代码
+            String keyDisease = "EHR_000293";  // 诊断代码（住院）
+            String keyDiseaseName = "EHR_000295";  // 诊断名称（住院）
+            String keyCost = "EHR_000175";  // 门诊费用金额（元）
             // 抽取并保存到ES
-            saveDeptExpenseData(fq);
+            saveDiseaseExpenseData(fq, q, sQuery, sQuery2, keyEventDate, keyArea, keyDisease, keyDiseaseName, keyCost, 3);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 门急诊科室费用统计
+     */
+    @Scheduled(cron = "0 50 07 * * ?")
+    public void statisticOutPatientDeptCostScheduler() {
+        try {
+            Date now = new Date();
+            Date yesterdayDate = DateUtils.addDays(now,-1);
+            String yesterday = DateUtil.formatDate(yesterdayDate, DateUtil.DEFAULT_DATE_YMD_FORMAT);
+            String fq = "event_date:[" + yesterday + "T00:00:00Z TO  " + yesterday + "T23:59:59Z]";
+            log.info("抽取门急诊科室费用：fq = {}", fq);
+            String q = "EHR_000081:* AND event_type:0";   // 科室
+            String sQuery = "EHR_000045:* AND profile_id:";
+
+            String keyEventDate = "event_date";
+            String keyArea = "org_area";  // 行政区划代码  EHR_001225
+            String keyCost = "EHR_000045";  // 门诊费用金额（元）
+            String keyDept = "EHR_000081";
+            String keyDeptName = "EHR_000082";
+            // 抽取并保存到ES
+            saveDeptExpenseData(fq, q, sQuery, keyEventDate, keyArea, keyCost, keyDept, keyDeptName, 2);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 住院科室费用统计
+     */
+    @Scheduled(cron = "0 05 08 * * ?")
+    public void statisticInPatientDeptCostScheduler() {
+        try {
+            Date now = new Date();
+            Date yesterdayDate = DateUtils.addDays(now,-1);
+            String yesterday = DateUtil.formatDate(yesterdayDate, DateUtil.DEFAULT_DATE_YMD_FORMAT);
+            String fq = "event_date:[" + yesterday + "T00:00:00Z TO  " + yesterday + "T23:59:59Z]";
+            log.info("抽取住院科室费用：fq = {}", fq);
+            String q = "EHR_000228:* AND event_type:1";   // 科室
+            String sQuery = "EHR_000175:* AND profile_id:";
+
+            String keyEventDate = "event_date";
+            String keyArea = "org_area";  // 行政区划代码  EHR_001225
+            String keyCost = "EHR_000175";  // 住院费用金额（元）
+            String keyDept = "EHR_000228";
+            String keyDeptName = "EHR_000229";
+            // 抽取并保存到ES
+            saveDeptExpenseData(fq, q, sQuery, keyEventDate, keyArea, keyCost, keyDept, keyDeptName, 4);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     @ApiOperation("抽取指定时间段疾病费用")
-    @RequestMapping(value = "/extractDiseaseExpense", method = RequestMethod.GET)
-    public Envelop extractDiseaseExpense(
+    @RequestMapping(value = "/extractInPatientDiseaseExpense", method = RequestMethod.GET)
+    public Envelop extractInPatientDiseaseExpense(
             @ApiParam(name = "startDate", value = "开始日期，格式 YYYY-MM-DD，接口里自动拼接 T00:00:00Z，", required = true)
             @RequestParam(value = "startDate") String startDate,
             @ApiParam(name = "endDate", value = "截止日期，格式 YYYY-MM-DD，接口里自动拼接 T23:59:59Z", required = true)
@@ -92,8 +161,47 @@ public class OutPatientCostScheduler {
         envelop.setSuccessFlg(true);
         try {
             String fq = "event_date:[" + startDate + "T00:00:00Z TO  " + endDate + "T23:59:59Z]";
+            String q =  "EHR_000293:*"; // 查询条件 诊断代码（住院）
+            String sQuery = "EHR_000175:* AND profile_id:";
+            String sQuery2 = "EHR_000293:* AND profile_id:";
+
+            String keyEventDate = "event_date";
+            String keyArea = "org_area";  // 行政区划代码
+            String keyDisease = "EHR_000293";  // 诊断代码（住院）
+            String keyDiseaseName = "EHR_000295";  // 诊断名称（住院）
+            String keyCost = "EHR_000175";  // 门诊费用金额（元）
             // 抽取并保存到ES
-            saveDiseaseExpenseData(fq);
+            saveDiseaseExpenseData(fq, q, sQuery, sQuery2, keyEventDate, keyArea, keyDisease, keyDiseaseName, keyCost, 3);
+        } catch (Exception e) {
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return envelop;
+    }
+
+    @ApiOperation("抽取指定时间段门急诊疾病费用")
+    @RequestMapping(value = "/extractOutPatientDiseaseExpense", method = RequestMethod.GET)
+    public Envelop extractOutPatientDiseaseExpense(
+            @ApiParam(name = "startDate", value = "开始日期，格式 YYYY-MM-DD，接口里自动拼接 T00:00:00Z，", required = true)
+            @RequestParam(value = "startDate") String startDate,
+            @ApiParam(name = "endDate", value = "截止日期，格式 YYYY-MM-DD，接口里自动拼接 T23:59:59Z", required = true)
+            @RequestParam(value = "endDate") String endDate) {
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(true);
+        try {
+            String fq = "event_date:[" + startDate + "T00:00:00Z TO  " + endDate + "T23:59:59Z]";
+            String q =  "EHR_000109:*"; // 查询条件 诊断代码（门诊）
+            String sQuery = "EHR_000045:* AND profile_id:";
+            String sQuery2 = "EHR_000109:* AND profile_id:";
+
+            String keyEventDate = "event_date";
+            String keyArea = "org_area";  // 行政区划代码  EHR_001225
+            String keyDisease = "EHR_000109";  // 诊断代码（门诊）
+            String keyDiseaseName = "EHR_000112";  // 诊断名称（门诊）
+            String keyCost = "EHR_000045";  // 门诊费用金额（元）
+            // 抽取并保存到ES
+            saveDiseaseExpenseData(fq, q, sQuery, sQuery2, keyEventDate, keyArea, keyDisease, keyDiseaseName, keyCost, 1);
         } catch (Exception e) {
             e.printStackTrace();
             envelop.setSuccessFlg(false);
@@ -113,8 +221,45 @@ public class OutPatientCostScheduler {
         envelop.setSuccessFlg(true);
         try {
             String fq = "event_date:[" + startDate + "T00:00:00Z TO  " + endDate + "T23:59:59Z]";
+            String q = "EHR_000081:* AND event_type:0";   // 科室
+            String sQuery = "EHR_000045:* AND profile_id:";
+
+            String keyEventDate = "event_date";
+            String keyArea = "org_area";  // 行政区划代码  EHR_001225
+            String keyCost = "EHR_000045";  // 门诊费用金额（元）
+            String keyDept = "EHR_000081";
+            String keyDeptName = "EHR_000082";
             // 抽取并保存到ES
-            saveDeptExpenseData(fq);
+            saveDeptExpenseData(fq, q, sQuery, keyEventDate, keyArea, keyCost, keyDept, keyDeptName, 2);
+        } catch (Exception e) {
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return envelop;
+    }
+
+    @ApiOperation("抽取指定时间段科室费用")
+    @RequestMapping(value = "/extractInPatientDeptExpense", method = RequestMethod.GET)
+    public Envelop extractInPatientDeptExpense(
+            @ApiParam(name = "startDate", value = "开始日期，格式 YYYY-MM-DD，接口里自动拼接 T00:00:00Z，", required = true)
+            @RequestParam(value = "startDate") String startDate,
+            @ApiParam(name = "endDate", value = "截止日期，格式 YYYY-MM-DD，接口里自动拼接 T23:59:59Z", required = true)
+            @RequestParam(value = "endDate") String endDate) {
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(true);
+        try {
+            String fq = "event_date:[" + startDate + "T00:00:00Z TO  " + endDate + "T23:59:59Z]";
+            String q = "EHR_000228:* AND event_type:1";   // 科室
+            String sQuery = "EHR_000175:* AND profile_id:";
+
+            String keyEventDate = "event_date";
+            String keyArea = "org_area";  // 行政区划代码  EHR_001225
+            String keyCost = "EHR_000175";  // 住院费用金额（元）
+            String keyDept = "EHR_000228";
+            String keyDeptName = "EHR_000229";
+            // 抽取并保存到ES
+            saveDeptExpenseData(fq, q, sQuery, keyEventDate, keyArea, keyCost, keyDept, keyDeptName, 4);
         } catch (Exception e) {
             e.printStackTrace();
             envelop.setSuccessFlg(false);
@@ -128,16 +273,11 @@ public class OutPatientCostScheduler {
      * @param fq
      * @throws Exception
      */
-    private void saveDiseaseExpenseData(String fq) throws Exception {
-        String q =  "EHR_000109:*"; // 查询条件 诊断代码（门诊）
+    private void saveDiseaseExpenseData(String fq, String q, String sQuery, String sQuery2, String keyEventDate, String keyArea,
+                    String keyDisease, String keyDiseaseName, String keyCost, Integer type) throws Exception {
+
         String sq = "";
         String sq2 = "";
-
-        String keyEventDate = "event_date";
-        String keyArea = "org_area";  // 行政区划代码  EHR_001225
-        String keyDisease = "EHR_000109";  // 诊断代码（门诊）
-        String keyDiseaseName = "EHR_000112";  // 诊断名称（门诊）
-        String keyCost = "EHR_000045";  // 门诊费用金额（元）
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         List<String> profileIdList = new ArrayList<>() ;
 
@@ -150,8 +290,8 @@ public class OutPatientCostScheduler {
         profileIdList = selectSubProfileId(ResourceCore.SubTable, q, fq, count < 1000 ? 1000 : count);
         if(profileIdList != null && profileIdList.size() > 0) {
             for (String profileId : profileIdList) {
-                sq = "EHR_000045:* AND profile_id:" + profileId;    // EHR_000045:* AND profile_id:xx
-                sq2 = "EHR_000109:* AND profile_id:" + profileId;   // 查询疾病编码
+                sq = sQuery + profileId;    // EHR_000045:* AND profile_id:xx
+                sq2 = sQuery2 + profileId;   // 查询疾病编码
                 List<String> keyList = healthArchiveSchedulerService.selectSubRowKey(ResourceCore.SubTable, sq2, fq, count < 1000 ? 1000 : count);
                 if (keyList != null && keyList.size() > 0) {
                     Double value = 0.0;
@@ -181,8 +321,8 @@ public class OutPatientCostScheduler {
                             }
                             for (Map.Entry<String, String> m : diseaseName.entrySet()) {
                                 OutPatientCostModel outPatientCostModel = new OutPatientCostModel();
-                                outPatientCostModel.set_id(rowKeyName.get(m.getKey()) + "1");
-                                outPatientCostModel.setType(1);
+                                outPatientCostModel.set_id(rowKeyName.get(m.getKey()) + type.toString());
+                                outPatientCostModel.setType(type);
                                 outPatientCostModel.setCode(m.getKey());
                                 outPatientCostModel.setName(m.getValue());
                                 outPatientCostModel.setResult(value);
@@ -204,15 +344,9 @@ public class OutPatientCostScheduler {
      * @param fq
      * @throws Exception
      */
-    public void saveDeptExpenseData(String fq) throws Exception {
-        String q = "EHR_000081:* AND event_type:0";   // 科室
+    public void saveDeptExpenseData(String fq, String q, String sQuery, String keyEventDate, String keyArea, String keyCost,
+                        String keyDept, String keyDeptName, Integer type) throws Exception {
         String sq = "";
-
-        String keyEventDate = "event_date";
-        String keyArea = "org_area";  // 行政区划代码  EHR_001225
-        String keyCost = "EHR_000045";  // 门诊费用金额（元）
-        String keyDept = "EHR_000081";
-        String keyDeptName = "EHR_000082";
         String keyProfileId = "rowkey";
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
@@ -223,7 +357,7 @@ public class OutPatientCostScheduler {
             List<Map<String, Object>> hbaseDataList = healthArchiveSchedulerService.selectHbaseData(ResourceCore.MasterTable, rowKeyList);
             if(hbaseDataList != null && hbaseDataList.size() > 0 ) {
                 for(Map<String, Object> map : hbaseDataList) {
-                    sq = "EHR_000045:* AND profile_id:" + map.get(keyProfileId);
+                    sq = sQuery + map.get(keyProfileId);
                     long count = solrUtil.count(ResourceCore.SubTable, sq, fq);
                     List<String> keyList = healthArchiveSchedulerService.selectSubRowKey(ResourceCore.SubTable, sq, fq, count < 1000 ? 1000 : count);
                     if (keyList != null && keyList.size() > 0) {
@@ -235,8 +369,8 @@ public class OutPatientCostScheduler {
                             }
                         }
                         OutPatientCostModel outPatientCostModel = new OutPatientCostModel();
-                        outPatientCostModel.set_id(map.get("rowkey") + "2");
-                        outPatientCostModel.setType(2);
+                        outPatientCostModel.set_id(map.get("rowkey") + type.toString());
+                        outPatientCostModel.setType(type);
                         outPatientCostModel.setCode(map.get(keyDept) + "");
                         outPatientCostModel.setName(map.get(keyDeptName) + "");
                         outPatientCostModel.setTown(map.get(keyArea) + "");
