@@ -1,12 +1,9 @@
 package com.yihu.ehr.resolve.service.resource.stage2;
 
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
-import com.yihu.ehr.model.packs.EsSimplePackage;
 import com.yihu.ehr.resolve.model.stage2.ResourceBucket;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.Map;
 
 /**
  * Created by progr1mmer on 2018/5/23.

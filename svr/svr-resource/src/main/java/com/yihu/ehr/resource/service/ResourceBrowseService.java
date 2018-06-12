@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.tools.doclint.Env;
 import com.yihu.ehr.constants.ErrorCode;
+import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.resource.MRsColumnsModel;
 import com.yihu.ehr.query.BaseJpaService;
@@ -47,6 +48,9 @@ public class ResourceBrowseService extends BaseJpaService {
     private StdTransformClient stdTransformClient;
     @Autowired
     private RedisService redisService;
+    @Autowired
+    private ElasticSearchUtil elasticSearchUtil;
+
 
     /**
      * 资源浏览 -- 资源数据元结构
@@ -475,6 +479,105 @@ public class ResourceBrowseService extends BaseJpaService {
             return "{" + newParam + "}";
         }
     }
+
+
+    /**
+     * 获取档案包中数据集列表
+     * @param packId
+     * @param version
+     * @return
+     * @throws Exception
+     */
+    public List<String>  dataSetList(String packId, String version) throws Exception {
+        Envelop envelop = new Envelop();
+        List<String> dataSetCodes = new ArrayList<>();
+        StringBuilder stringBuilder = new StringBuilder();
+        if (org.apache.commons.lang.StringUtils.isNotEmpty(packId) && !"null".equals(packId)){
+            stringBuilder.append("pack_id=" + packId).append(";");
+        }
+        if (org.apache.commons.lang.StringUtils.isNotEmpty(version) && !"null".equals(version)){
+            stringBuilder.append("version=" + version);
+        }
+
+        List<Map<String, Object>> list = elasticSearchUtil.list("json_archives_qc", "qc_dataset_info", stringBuilder.toString());
+        for(Map<String, Object> map : list){
+            List<Map<String,Object>> dataSets = objectMapper.readValue(map.get("details").toString(), List.class);
+            dataSets.stream().forEach( dataSet -> {
+                String code = (String) dataSet.keySet().toArray()[0];
+                dataSetCodes.add(code);
+            });
+        }
+        return dataSetCodes;
+    }
+
+
+    /**
+     * 获取结果集
+     * @param dataSets      数据集编码列表
+     * @param roleId        角色ID
+     * @param orgCode       机构编码
+     * @param areaCode      区域编码
+     * @param queryParams   查询条件
+     * @param page          页数
+     * @param size          条数
+     * @return
+     * @throws Exception
+     */
+    public Envelop  getResultDataList (List<String> dataSets, String roleId, String orgCode, String areaCode, String queryParams, Integer page, Integer size) throws Exception {
+       Map<String, Object> resultMap = new HashMap<>();
+        for (String resourcesCode : dataSets) {
+            RsResource rsResources = rsResourceDao.findByCode(resourcesCode);
+            if (rsResources != null) {
+                StringBuilder saas = new StringBuilder();
+                if ("*".equals(orgCode) && "*".equals(areaCode)) {
+                    saas.append("*");
+                } else {
+                    List<String> orgCodeList = objectMapper.readValue(orgCode, List.class);
+                    List<String> areaCodeList = objectMapper.readValue(areaCode, List.class);
+                    if (orgCodeList != null && orgCodeList.size() > 0) {
+                        orgCodeList.forEach(item -> {
+                            if (saas.length() <= 0) {
+                                saas.append("(org_code:" + item);
+                            } else {
+                                saas.append(" OR org_code:" + item);
+                            }
+                        });
+                    }
+                    if (areaCodeList != null && areaCodeList.size() > 0) {
+                        areaCodeList.forEach(item -> {
+                            if (saas.length() <= 0) {
+                                saas.append("(org_area:" + item);
+                            } else {
+                                saas.append(" OR org_area:" + item);
+                            }
+                        });
+                    }
+                    if (saas.length() > 0) {
+                        saas.append(")");
+                    } else {
+                        throw new ApiException(ErrorCode.FORBIDDEN, "无SAAS权限访问资源");
+                    }
+                }
+                String method = rsResources.getRsInterface();
+                Class clazz = resourceBrowseDao.getClass();
+                Method _method = clazz.getMethod(method, new Class[]{String.class, String.class, String.class, String.class, Integer.class, Integer.class});
+                _method.setAccessible(true);
+                Envelop invoke = (Envelop) _method.invoke(resourceBrowseDao, resourcesCode, roleId, saas.toString(), queryParams, page, size);
+                if (invoke.getDetailModelList() !=null && invoke.getDetailModelList().size()>0 ){
+                    resultMap.put(resourcesCode,invoke.getDetailModelList());
+                }
+            }else {
+//                throw new ApiException(ErrorCode.OBJECT_NOT_FOUND, "无相关资源");
+                continue;
+            }
+
+        }
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(true);
+        envelop.setObj(resultMap);
+        return envelop;
+    }
+
 }
 
 

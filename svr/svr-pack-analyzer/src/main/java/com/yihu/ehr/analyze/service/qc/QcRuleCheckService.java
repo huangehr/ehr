@@ -46,12 +46,12 @@ public class QcRuleCheckService {
      * @param value
      * @throws Exception
      */
-    public int emptyCheck(String version, String dataSetCode, String metadata, String value) throws Exception {
+    public ErrorType emptyCheck(String version, String dataSetCode, String metadata, String value) throws Exception {
         String nullable = redisClient.get(makeKey("std_data_set_" + version, dataSetCode + "." + metadata, "nullable"));
         if (!"1".equals(nullable) && StringUtils.isEmpty(value)) {
-            return ErrorType.EmptyError.getType();
+            return ErrorType.EmptyError;
         }
-        return 0;
+        return ErrorType.Normal;
     }
 
     /**
@@ -63,12 +63,12 @@ public class QcRuleCheckService {
      * @param value
      * @throws Exception
      */
-    public int emptyCheckThrowable(String version, String dataSetCode, String metadata ,String value) throws Exception {
-        int type = emptyCheck(version, dataSetCode, metadata, value);
-        if(type != 0){
+    public ErrorType emptyCheckThrowable(String version, String dataSetCode, String metadata ,String value) throws Exception {
+        ErrorType type = emptyCheck(version, dataSetCode, metadata, value);
+        if (type != ErrorType.Normal){
             throw new IllegalEmptyCheckException(String.format("Meta data %s of %s in %s is empty", metadata, dataSetCode, version));
         }
-        return 0;
+        return type;
     }
 
     /**
@@ -80,24 +80,24 @@ public class QcRuleCheckService {
      * @param metadata
      * @param value
      */
-    public int typeCheck(String version, String dataSetCode, String metadata ,String value) throws Exception {
+    public ErrorType typeCheck (String version, String dataSetCode, String metadata ,String value) throws Exception {
         String type = hosAdminServiceClient.getMetaDataType(version, dataSetCode, metadata);
         switch (type) {
             case "L":
                 if (!("F".equals(value) && "T".equals(value) && "0".equals(value) && "1".equals(value))) {
-                    return ErrorType.TypeError.getType();
+                    return ErrorType.TypeError;
                 }
                 break;
             case "N":
                 if (!StringUtils.isNumeric(value)) {
-                    return ErrorType.TypeError.getType();
+                    return ErrorType.TypeError;
                 }
                 break;
             case "D":
             case "DT":
             case "T":
                 if (DateUtil.strToDate(value) == null) {
-                    return ErrorType.TypeError.getType();
+                    return ErrorType.TypeError;
                 }
                 break;
             case "BY":
@@ -106,7 +106,7 @@ public class QcRuleCheckService {
             default:
                 break;
         }
-        return 0;
+        return ErrorType.Normal;
     }
 
     /**
@@ -115,12 +115,12 @@ public class QcRuleCheckService {
      *
      * @param data
      */
-    public void formatCheck(String data) throws Exception {
+    public ErrorType formatCheck(String data) throws Exception {
         DataElementValue value = parse(data);
         String format = hosAdminServiceClient.getMetaDataFormat(value.getVersion(), value.getTable(), value.getCode());
         switch (format) {
             default:
-                break;
+                return ErrorType.Normal;
         }
     }
 
@@ -133,16 +133,16 @@ public class QcRuleCheckService {
      * @param value
      * @throws Exception
      */
-    public int valueCheck(String version, String dataSetCode, String metadata ,String value) throws Exception {
+    public ErrorType valueCheck(String version, String dataSetCode, String metadata ,String value) throws Exception {
         String dict = redisClient.get(makeKey("std_meta_data_" + version,dataSetCode + "." + metadata,"dict_id"));
         if (StringUtils.isEmpty(dict) || dict.equals("0")) {
-            return 0;
+            return ErrorType.Normal;
         }
         Boolean isExist =  redisClient.hasKey(makeKey("std_dictionary_entry_" + version, dict + "." + value, "value"));
         if (!isExist) {
-            return ErrorType.ValueError.getType();
+            return ErrorType.ValueError;
         }
-        return 0;
+        return ErrorType.Normal;
     }
 
     /**
@@ -154,12 +154,12 @@ public class QcRuleCheckService {
      * @param value
      * @throws Exception
      */
-    public int valueCheckThrowable(String version, String dataSetCode, String metadata , String value) throws Exception {
-        int type = valueCheck(version, dataSetCode, metadata, value);
-        if (type !=0) {
+    public ErrorType valueCheckThrowable(String version, String dataSetCode, String metadata , String value) throws Exception {
+        ErrorType type = valueCheck(version, dataSetCode, metadata, value);
+        if (type != ErrorType.Normal) {
             throw new IllegalValueCheckException(String.format("Value %s for meta data %s of %s in %s out of range", value, metadata, dataSetCode, version));
         }
-        return 0;
+        return type;
     }
 
     private void saveCheckResult(DataElementValue value, String errorCode, String errorMsg) throws Exception {

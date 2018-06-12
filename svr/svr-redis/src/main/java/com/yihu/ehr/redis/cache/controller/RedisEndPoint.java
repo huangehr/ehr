@@ -23,14 +23,6 @@ public class RedisEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private RedisService redisService;
 
-    @ApiOperation("通过AddressDict ID获取地址")
-    @RequestMapping(value = ServiceApi.Redis.Address, method = RequestMethod.GET)
-    public String getAddress(
-            @ApiParam(value = "key", required = true)
-            @RequestParam(value = "key") String key) {
-        return redisService.getAddress(key);
-    }
-
     @ApiOperation("通过HP编码取健康问题名称")
     @RequestMapping(value = ServiceApi.Redis.HealthProblem, method = RequestMethod.GET)
     public String getHealthProblem(
@@ -121,7 +113,7 @@ public class RedisEndPoint extends EnvelopRestEndPoint {
     }
 
     @ApiOperation("通过资源化数据元ID获取标准数据元字典编码")
-    @RequestMapping(value = ServiceApi.Redis.RsMetadata, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Redis.RsMetadataDict, method = RequestMethod.GET)
     public String getRsMetaData(
             @ApiParam(value = "key", required = true)
             @RequestParam(value = "key") String key) {
@@ -269,21 +261,12 @@ public class RedisEndPoint extends EnvelopRestEndPoint {
     }
     //------------------------------------ 标准相关 END -------------------------------------------------------
 
-    @ApiOperation("通过指标编码获取指标相关数据")
+    /*@ApiOperation("通过指标编码获取指标相关数据")
     @RequestMapping(value = ServiceApi.Redis.IndicatorsDict, method = RequestMethod.GET)
     public String getIndicators(
             @ApiParam(value = "key")
             @RequestParam(value = "key") String key) {
         return redisService.getIndicators(key);
-    }
-
-    @ApiOperation("通过ICD10编码获取对应的HP健康问题编码和名称组合值")
-    @RequestMapping(value = ServiceApi.Redis.Icd10HpR, method = RequestMethod.GET)
-    public String getIcd10HpRelation(
-            @ApiParam(value = "key")
-            @RequestParam(value = "key") String key) {
-        return redisService.getIcd10HpRelation(key);
-    }
-
+    }*/
 
 }

@@ -33,24 +33,24 @@ import java.util.Map;
 @RestController
 @Controller
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "roles",description = "角色管理", tags = {"安全管理-角色管理"})
-public class RolesEndPoint extends EnvelopRestEndPoint{
+@Api(value = "roles", description = "角色管理", tags = {"安全管理-角色管理"})
+public class RolesEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     private RolesService rolesService;
 
-    @RequestMapping(value = ServiceApi.Roles.RoleBatchAdd,method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Roles.RoleBatchAdd, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "批量新增角色组")
     public boolean roleBatchAdd(
-            @ApiParam(name = "data_json",value = "新增角色组Json字符串")
+            @ApiParam(name = "data_json", value = "新增角色组Json字符串")
             @RequestBody String dataJson,
             @ApiParam(name = "orgCodes", value = "多机构编码拼接字符串")
             @RequestParam(value = "orgCodes") String orgCodes) throws IOException {
-        Roles roles = toEntity(dataJson,Roles.class);
+        Roles roles = toEntity(dataJson, Roles.class);
         Roles rolesNew = null;
-        if(StringUtils.isNotEmpty(orgCodes)){
-            String [] orgs = orgCodes.split(";");
-            for(int i=0;i < orgs.length ;i++){
+        if (StringUtils.isNotEmpty(orgCodes)) {
+            String[] orgs = orgCodes.split(";");
+            for (int i = 0; i < orgs.length; i++) {
                 rolesNew = new Roles();
                 rolesNew.setAppId(roles.getAppId());
                 rolesNew.setCode(roles.getCode());
@@ -61,58 +61,58 @@ public class RolesEndPoint extends EnvelopRestEndPoint{
                 rolesNew = rolesService.save(rolesNew);
             }
         }
-        if(rolesNew != null){
+        if (rolesNew != null) {
             return true;
-        }else {
+        } else {
             return false;
         }
     }
 
-    @RequestMapping(value = ServiceApi.Roles.Role,method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Roles.Role, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "新增角色组")
     public MRoles createRoles(
-            @ApiParam(name = "data_json",value = "新增角色组Json字符串")
+            @ApiParam(name = "data_json", value = "新增角色组Json字符串")
             @RequestBody String dataJson) throws IOException {
-        Roles roles = toEntity(dataJson,Roles.class);
+        Roles roles = toEntity(dataJson, Roles.class);
         Roles rolesNew = rolesService.save(roles);
-        return convertToModel(rolesNew,MRoles.class,null);
+        return convertToModel(rolesNew, MRoles.class, null);
     }
 
-    @RequestMapping(value = ServiceApi.Roles.Role,method = RequestMethod.PUT,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Roles.Role, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改角色组")
     public MRoles updateRoles(
-            @ApiParam(name = "data_json",value = "修改角色组Json字符串")
+            @ApiParam(name = "data_json", value = "修改角色组Json字符串")
             @RequestBody String dataJson) throws IOException {
-        Roles roles = toEntity(dataJson,Roles.class);
+        Roles roles = toEntity(dataJson, Roles.class);
         if (null == rolesService.retrieve(roles.getId())) {
             throw new ApiException(ErrorCode.NOT_FOUND, "角色组未找到！");
         }
         Roles rolesNew = rolesService.save(roles);
-        return convertToModel(rolesNew,MRoles.class,null);
+        return convertToModel(rolesNew, MRoles.class, null);
     }
 
-    @RequestMapping(value = ServiceApi.Roles.RoleId,method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Roles.RoleId, method = RequestMethod.DELETE)
     @ApiOperation(value = "根据角色组id删除")
     public boolean deleteRoles(
-            @ApiParam(name = "id",value = "角色组id")
-            @PathVariable(value = "id") long id){
+            @ApiParam(name = "id", value = "角色组id")
+            @PathVariable(value = "id") long id) {
         rolesService.delete(id);
         return true;
     }
 
-    @RequestMapping(value = ServiceApi.Roles.RoleId,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Roles.RoleId, method = RequestMethod.GET)
     @ApiOperation(value = "根据角色组id查询")
     public MRoles getRolesById(
-            @ApiParam(name = "id",value = "角色组id")
-            @PathVariable(value = "id") long id){
+            @ApiParam(name = "id", value = "角色组id")
+            @PathVariable(value = "id") long id) {
         Roles roles = rolesService.retrieve(id);
         if (roles == null) {
             throw new ApiException(ErrorCode.NOT_FOUND, "角色组未找到！");
         }
-        return convertToModel(roles,MRoles.class);
+        return convertToModel(roles, MRoles.class);
     }
 
-    @RequestMapping(value = ServiceApi.Roles.Roles,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Roles.Roles, method = RequestMethod.GET)
     @ApiOperation(value = "查询角色组列表---分页")
     public Collection<MRoles> searchRoles(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,code,name,description,appId,type")
@@ -126,75 +126,75 @@ public class RolesEndPoint extends EnvelopRestEndPoint{
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page,
             HttpServletRequest request,
-            HttpServletResponse response) throws Exception{
+            HttpServletResponse response) throws Exception {
         List<Roles> rolesList = rolesService.search(fields, filters, sorts, page, size);
         pagedResponse(request, response, rolesService.getCount(filters), page, size);
         return convertToModels(rolesList, new ArrayList<>(rolesList.size()), MRoles.class, fields);
     }
 
-    @RequestMapping(value = ServiceApi.Roles.RolesNoPage,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Roles.RolesNoPage, method = RequestMethod.GET)
     @ApiOperation(value = "查询角色组列表---不分页")
     public Collection<MRoles> searchRolesNoPaging(
-            @ApiParam(name = "filters",value = "过滤条件，为空检索全部",defaultValue = "")
-            @RequestParam(value = "filters",required = false) String filters) throws  Exception{
+            @ApiParam(name = "filters", value = "过滤条件，为空检索全部", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters) throws Exception {
         List<Roles> rolesList = rolesService.search(filters);
-        return convertToModels(rolesList,new ArrayList<MRoles>(rolesList.size()),MRoles.class,"");
+        return convertToModels(rolesList, new ArrayList<MRoles>(rolesList.size()), MRoles.class, "");
     }
 
-    @RequestMapping(value = ServiceApi.Roles.RoleNameExistence,method = RequestMethod.GET)
-    @ApiOperation(value = "角色组名称是否已存在" )
+    @RequestMapping(value = ServiceApi.Roles.RoleNameExistence, method = RequestMethod.GET)
+    @ApiOperation(value = "角色组名称是否已存在")
     public boolean isNameExistence(
-            @ApiParam(name = "app_id",value = "应用id")
+            @ApiParam(name = "app_id", value = "应用id")
             @RequestParam(value = "app_id") String appId,
-            @ApiParam(name = "name",value = "角色组名称")
+            @ApiParam(name = "name", value = "角色组名称")
             @RequestParam(value = "name") String name,
-            @ApiParam(name = "orgCode",value = "机构Code")
+            @ApiParam(name = "orgCode", value = "机构Code")
             @RequestParam(value = "orgCode") String orgCode,
-            @ApiParam(name = "type",value = "角色组类别")
-            @RequestParam(value = "type",required = false) String type){
-        String[] fields = {"appId","name","orgCode","type"};
-        String[] values = {appId,name,orgCode,type};
-        List<Roles> roles = rolesService.findByFields(fields,values);
-        if(roles != null && roles.size() >0){
+            @ApiParam(name = "type", value = "角色组类别")
+            @RequestParam(value = "type", required = false) String type) {
+        String[] fields = {"appId", "name", "orgCode", "type"};
+        String[] values = {appId, name, orgCode, type};
+        List<Roles> roles = rolesService.findByFields(fields, values);
+        if (roles != null && roles.size() > 0) {
             return true;
         }
         return false;
     }
 
     @RequestMapping(value = ServiceApi.Roles.RoleCodeExistence, method = RequestMethod.GET)
-    @ApiOperation(value = "角色组代码是否已存在" )
+    @ApiOperation(value = "角色组代码是否已存在")
     public boolean isCodeExistence(
-            @ApiParam(name = "app_id",value = "应用id")
+            @ApiParam(name = "app_id", value = "应用id")
             @RequestParam(value = "app_id") String appId,
-            @ApiParam(name = "code",value = "角色组代码")
+            @ApiParam(name = "code", value = "角色组代码")
             @RequestParam(value = "code") String code,
-            @ApiParam(name = "orgCode",value = "机构Code")
+            @ApiParam(name = "orgCode", value = "机构Code")
             @RequestParam(value = "orgCode") String orgCode,
-            @ApiParam(name = "type",value = "角色组类别")
-            @RequestParam(value = "type",required = false) String type){
-        String[] fields = {"appId","code","orgCode","type"};
-        String[] values = {appId,code,orgCode,type};
+            @ApiParam(name = "type", value = "角色组类别")
+            @RequestParam(value = "type", required = false) String type) {
+        String[] fields = {"appId", "code", "orgCode", "type"};
+        String[] values = {appId, code, orgCode, type};
         List<Roles> roles = rolesService.findByFields(fields, values);
-        if(roles != null && roles.size() >0){
+        if (roles != null && roles.size() > 0) {
             return true;
         }
         return false;
     }
 
     @RequestMapping(value = ServiceApi.Roles.RoleFindByField, method = RequestMethod.POST)
-    @ApiOperation(value = "通过字段获取角色" )
+    @ApiOperation(value = "通过字段获取角色")
     public Envelop findByFields(
             @ApiParam(name = "appId", value = "应用id", required = true)
             @RequestParam(value = "appId") String appId,
             @ApiParam(name = "code", value = "角色组代码", required = true)
             @RequestParam(value = "code") String code,
             @ApiParam(name = "type", value = "角色组类别", required = true)
-            @RequestParam(value = "type") String type){
+            @RequestParam(value = "type") String type) {
         Envelop envelop = new Envelop();
         String[] fields = {"appId", "code", "type"};
         String[] values = {appId, code, type};
         List<Roles> roles = rolesService.findByFields(fields, values);
-        if(roles != null && roles.size() >0){
+        if (roles != null && roles.size() > 0) {
             envelop.setSuccessFlg(true);
             envelop.setDetailModelList(roles);
             envelop.setObj(roles.get(0).getId());
@@ -204,35 +204,35 @@ public class RolesEndPoint extends EnvelopRestEndPoint{
     }
 
     @RequestMapping(value = ServiceApi.Roles.RoleFindByUserId, method = RequestMethod.GET)
-    @ApiOperation(value = "通过用户ID获取角色" )
+    @ApiOperation(value = "通过用户ID获取角色")
     public Envelop findRolesByUserId(
             @ApiParam(name = "userId", value = "用户Id", required = true)
-            @RequestParam(value = "userId") String userId){
+            @RequestParam(value = "userId") String userId) {
         Envelop envelop = new Envelop();
-        List<Map<String,Object>> roles = rolesService.findRolesByUserId(userId);
-        if(roles != null && roles.size() >0){
+        List<Map<String, Object>> roles = rolesService.findRolesByUserId(userId);
+        if (roles != null && roles.size() > 0) {
             envelop.setSuccessFlg(true);
             envelop.setDetailModelList(roles);
-        }else{
+        } else {
             envelop.setSuccessFlg(false);
         }
         return envelop;
     }
 
     @RequestMapping(value = ServiceApi.Roles.RoleFindByUserIdAndAppId, method = RequestMethod.GET)
-    @ApiOperation(value = "通过用户ID、应用id获取角色" )
+    @ApiOperation(value = "通过用户ID、应用id获取角色")
     public Envelop findRolesByUserIdAndAppId(
             @ApiParam(name = "userId", value = "用户Id", required = true)
             @RequestParam(value = "userId") String userId,
             @ApiParam(name = "appId", value = "应用Id", required = true)
-            @RequestParam(value = "appId") String appId){
+            @RequestParam(value = "appId") String appId) {
         Envelop envelop = new Envelop();
-        List<Map<String,Object>> roles = rolesService.findRolesByUserIdAndAppId(userId,appId);
-        if(roles != null && roles.size() >0){
-            envelop.setSuccessFlg(true);
+        List<Map<String, Object>> roles = rolesService.findRolesByUserIdAndAppId(userId, appId);
+        envelop.setSuccessFlg(true);
+        if (roles != null && roles.size() > 0) {
             envelop.setDetailModelList(roles);
-        }else{
-            envelop.setSuccessFlg(false);
+        } else {
+            envelop.setErrorMsg("未获取到该用户的授权角色！");
         }
         return envelop;
     }

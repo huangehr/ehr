@@ -158,7 +158,7 @@ public class CombinationEndPoint {
                 hosParams.put("nature", nature);
             }
 
-            //region  正式线测试用
+   /*         //region  正式线测试用
             List<Map<String, Object>> allHosList = new ArrayList<>();
             // 获取上饶医院
 //            hosParams.put("provinceCode", "360000");
@@ -172,8 +172,8 @@ public class CombinationEndPoint {
             int totalSr = (int) hosResMapSr.get("Total");
             allHosList.addAll(hosListSr);
             // 获取林芝医院
-            hosParams.put("provinceCode", "540000");
-            hosParams.put("cityCode", "540400");
+            *//*hosParams.put("provinceCode", "540000");
+            hosParams.put("cityCode", "540400");*//*
             Map<String, Object> hosResMapLz = objectMapper.readValue(openService.callFzOpenApi(hosApi, hosParams), Map.class);
             if (!"10000".equals(hosResMapLz.get("Code").toString())) {
                 envelop.setErrorMsg("获取福州总部医院列表，" + hosResMapLz.get("Message").toString());
@@ -205,8 +205,8 @@ public class CombinationEndPoint {
             envelop.setObj(hosResMapLz);
             envelop.setSuccessFlg(true);
             //endregion  正式线测试用
-
-            /*Map<String, Object> hosResMap = objectMapper.readValue(openService.callFzOpenApi(hosApi, hosParams), Map.class);
+*/
+            Map<String, Object> hosResMap = objectMapper.readValue(openService.callFzOpenApi(hosApi, hosParams), Map.class);
             if (!"10000".equals(hosResMap.get("Code").toString())) {
                 envelop.setErrorMsg("获取福州总部医院列表，" + hosResMap.get("Message").toString());
                 return envelop;
@@ -232,7 +232,7 @@ public class CombinationEndPoint {
             hosResMap.put("Result", hosList);
 
             envelop.setObj(hosResMap);
-            envelop.setSuccessFlg(true);*/
+            envelop.setSuccessFlg(true);
         } catch (Exception e) {
             e.printStackTrace();
             envelop.setErrorMsg(e.getMessage());

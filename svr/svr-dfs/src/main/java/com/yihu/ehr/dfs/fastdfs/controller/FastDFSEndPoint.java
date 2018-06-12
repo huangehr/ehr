@@ -50,6 +50,8 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
     private String indexType;
     @Value("${fast-dfs.server.dict-code}")
     private String dictCode;
+    @Value("${fast-dfs.public-server}")
+    private String fastDfsPublicServers;
 
     @Autowired
     private FastDFSService fastDFSService;
@@ -690,6 +692,50 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
         source.put("modifyDate", nowStr);
         source.put("modifier", creator);
         return source;
+    }
+
+
+    /**
+     * 根据系统字典项获取Logo
+     * @param dictId
+     * @param code
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = ServiceApi.FastDFS.GetFileByDictEntry, method = RequestMethod.GET)
+    @ApiOperation(value = "根据系统字典id及系统字典项值获取结果集（logo）")
+    public Envelop getFileByDictEntry(
+            @ApiParam(name = "dictId", value = "字典ID", required = true)
+            @RequestParam(value = "dictId") long dictId,
+            @ApiParam(name = "code", value = "字典项代码", required = true)
+            @RequestParam(value = "code") String code) throws Exception {
+        Envelop envelop;
+        StringBuffer dictEntryFilter = new StringBuffer();
+        dictEntryFilter.append("dictId=" + dictId + ";");
+        if (!org.apache.commons.lang3.StringUtils.isEmpty(code)) {
+            dictEntryFilter.append("code=" + code + ";");
+        }
+        List<SystemDictEntry> page =  systemDictEntryService.search(dictEntryFilter.toString());
+        if(page.size()>0){
+            SystemDictEntry systemDictEntry=page.get(0);
+            String filter="sn="+systemDictEntry.getValue()+";";
+            List<Map<String, Object>> resultList = elasticSearchUtil.page(indexName, indexType, filter, 1, 1);
+            Map<String, Object> map = new HashMap<>();
+            if(null != resultList && resultList.size()>0){
+                map = resultList.get(0);
+                String path =fastDfsPublicServers+"/"+ map.get("path").toString().replace(":","/");
+                map.put("path",path);
+                resultList.remove(0);
+                resultList.add(map);
+            }
+            int count = (int)elasticSearchUtil.count(indexName, indexType, filter);
+            envelop = getPageResult(resultList, count, 1, 5);
+        }else{
+            envelop = new Envelop();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("未设置字典项值！");
+        }
+        return envelop;
     }
 
 }

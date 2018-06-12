@@ -7,10 +7,6 @@ import com.yihu.ehr.basic.org.model.OrgMemberRelation;
 import com.yihu.ehr.basic.org.service.OrgMemberRelationService;
 import com.yihu.ehr.basic.patient.service.DemographicService;
 import com.yihu.ehr.basic.security.service.UserSecurityService;
-import com.yihu.ehr.basic.user.entity.RoleUser;
-import com.yihu.ehr.basic.user.entity.Roles;
-import com.yihu.ehr.basic.user.service.RoleUserService;
-import com.yihu.ehr.basic.user.service.RolesService;
 import com.yihu.ehr.basic.user.entity.Roles;
 import com.yihu.ehr.basic.user.service.RoleUserService;
 import com.yihu.ehr.basic.user.service.RolesService;
@@ -26,7 +22,6 @@ import com.yihu.ehr.entity.patient.DemographicInfo;
 import com.yihu.ehr.entity.security.UserKey;
 import com.yihu.ehr.entity.security.UserSecurity;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
-import com.yihu.ehr.model.patient.MDemographicInfo;
 import com.yihu.ehr.model.user.MH5Handshake;
 import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.util.datetime.DateUtil;
@@ -239,8 +234,9 @@ public class UserEndPoint extends EnvelopRestEndPoint {
             if (users.size() == 1) {
                 MUser mUser = new MUser();
                 List<OrgMemberRelation> memberRelations = orgMemberRelationService.findByField("userId", users.get(0).getId());
-                mUser = convertToModel(users.get(0), MUser.class); mUser = convertToModel(users.get(0), MUser.class);
-                if(memberRelations != null && memberRelations.size() > 0){
+                mUser = convertToModel(users.get(0), MUser.class);
+                mUser = convertToModel(users.get(0), MUser.class);
+                if (memberRelations != null && memberRelations.size() > 0) {
                     mUser.setPosition(memberRelations.get(0).getDutyName());
                     mUser.setDepartment(memberRelations.get(0).getDeptName());
                 }
@@ -617,8 +613,8 @@ public class UserEndPoint extends EnvelopRestEndPoint {
             return failed(msg);
         }
         //设置默认密码为身份证后八位
-        if (!StringUtils.isEmpty(user1.getIdCardNo()) && user1.getIdCardNo().length() > 9){
-            String  defaultPassword = user1.getIdCardNo().substring(user1.getIdCardNo().length() - 8);
+        if (!StringUtils.isEmpty(user1.getIdCardNo()) && user1.getIdCardNo().length() > 9) {
+            String defaultPassword = user1.getIdCardNo().substring(user1.getIdCardNo().length() - 8);
             user1.setPassword(DigestUtils.md5Hex(defaultPassword));
         } else {
             user1.setPassword(DigestUtils.md5Hex(default_password));
@@ -738,11 +734,11 @@ public class UserEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.Users.DistributeSecurityKey, method = RequestMethod.POST)
     @ApiOperation(value = "分配密钥", notes = "重新分配密钥")
-    public Map<String, String> distributeSecurityKey (
+    public Map<String, String> distributeSecurityKey(
             @ApiParam(name = "userId", value = "用户ID")
-            @RequestParam(value = "userId") String userId) throws Exception{
+            @RequestParam(value = "userId") String userId) throws Exception {
         User user = userService.getUser(userId);
-        if(null == user) {
+        if (null == user) {
             return null;
         }
         UserSecurity userSecurity = userSecurityService.getKeyByUserId(userId, false);
@@ -765,9 +761,9 @@ public class UserEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "查询用户公钥", notes = "查询用户公钥")
     public Map<String, String> UserId(
             @ApiParam(name = "userId", value = "登录帐号")
-            @RequestParam(value = "userId") String userId) throws Exception{
+            @RequestParam(value = "userId") String userId) throws Exception {
         User user = userService.getUser(userId);
-        if(null == user) {
+        if (null == user) {
             return null;
         }
         UserSecurity userSecurity = userSecurityService.getKeyByUserId(userId, true);
@@ -853,21 +849,21 @@ public class UserEndPoint extends EnvelopRestEndPoint {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     @ApiOperation(value = "App用户注册信息-创建用户", notes = "App用户注册信息")
     public Envelop appCreateUser(
-            @ApiParam(name = "userJsonData", required = true,value = "用户json", defaultValue = "")
+            @ApiParam(name = "userJsonData", required = true, value = "用户json", defaultValue = "")
             @RequestParam(value = "userJsonData") String userJsonData,
             @ApiParam(name = "appId", value = "应用id-健康上饶appid", defaultValue = "WYo0l73F8e")
             @RequestParam(value = "appId") String appId) throws Exception {
         Envelop envelop = new Envelop();
         User user = toEntity(userJsonData, User.class);
-        if( StringUtils.isEmpty(user.getDemographicId()) ){
+        if (StringUtils.isEmpty(user.getDemographicId())) {
             envelop.setErrorMsg("身份证不能为空");
             return envelop;
         }
-        if( StringUtils.isEmpty(user.getTelephone()) ){
+        if (StringUtils.isEmpty(user.getTelephone())) {
             envelop.setErrorMsg("手机号不能为空");
             return envelop;
         }
-        if( StringUtils.isEmpty(user.getPassword()) ){
+        if (StringUtils.isEmpty(user.getPassword())) {
             envelop.setErrorMsg("密码不能为空");
             return envelop;
         }
@@ -898,14 +894,14 @@ public class UserEndPoint extends EnvelopRestEndPoint {
             return envelop;
         }
         user = userService.saveUser(user);
-        String[]  appIds = registerRoleClientId.split(",");
-        for(String rgAppId : appIds){
+        String[] appIds = registerRoleClientId.split(",");
+        for (String rgAppId : appIds) {
             // orgcode卫计委机构编码-PDY026797 添加居民的时候 默认 加到卫计委-居民角色中
-            List<Roles> rolesList = rolesService.findByCodeAndAppIdAndOrgCode(Arrays.asList(new String[]{orgcode}),rgAppId,"Patient");
+            List<Roles> rolesList = rolesService.findByCodeAndAppIdAndOrgCode(Arrays.asList(new String[]{orgcode}), rgAppId, "Patient");
             Roles roles = new Roles();
-            if(null != rolesList && rolesList.size()>0){
+            if (null != rolesList && rolesList.size() > 0) {
                 roles = rolesList.get(0);
-            }else{
+            } else {
                 //如果角色不存在，为该应用创建居民角色
                 roles.setAppId(appId);
                 roles.setName("居民");
@@ -917,12 +913,12 @@ public class UserEndPoint extends EnvelopRestEndPoint {
                 roles = rolesService.save(roles);
             }
             //在org_member_relation 表里追加关联关系
-            roleUserService.batchCreateRoleUsersRelation(userId,String.valueOf(roles.getId()));
+            roleUserService.batchCreateRoleUsersRelation(userId, String.valueOf(roles.getId()));
         }
 
         // 根据身份证号码查找居民，若不存在则创建居民。
         DemographicInfo demographicInfo = demographicService.getDemographicInfo(user.getDemographicId());
-        if(null == demographicInfo){
+        if (null == demographicInfo) {
             demographicInfo = new DemographicInfo();
             demographicInfo.setIdCardNo(user.getIdCardNo());
             demographicInfo.setTelephoneNo("{\"联系电话\":\"" + user.getTelephone() + "\"}");
@@ -932,7 +928,7 @@ public class UserEndPoint extends EnvelopRestEndPoint {
         }
         envelop.setObj(convertToModel(user, MUser.class, null));
         envelop.setSuccessFlg(true);
-        return envelop ;
+        return envelop;
     }
 
     @RequestMapping(value = ServiceApi.Users.changePasswordByTelephone, method = RequestMethod.POST)
@@ -967,7 +963,7 @@ public class UserEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "passwordNew", required = false) String passwordNew) throws Exception {
         Envelop envelop = new Envelop();
         //获取用户信息，根据用户ID
-        User user  = userService.getUser(userId);
+        User user = userService.getUser(userId);
         if (user == null) {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("对不起，该用户不存在，请确认！");
@@ -1012,7 +1008,7 @@ public class UserEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "telePhoneNew") String telePhoneNew) throws Exception {
         Envelop envelop = new Envelop();
         //获取用户信息，根据用户ID
-        User user  = userService.getUser(userId);
+        User user = userService.getUser(userId);
         if (user == null) {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("对不起，该用户不存在，请确认！");
@@ -1043,15 +1039,50 @@ public class UserEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "userName") String userName) {
         Envelop envelop = new Envelop();
         List<User> userList = userService.getUserForLogin(userName);
-        if(null != userList && userList.size()>0){
+        if (null != userList && userList.size() > 0) {
             User user = userList.get(0);
             envelop.setSuccessFlg(true);
             envelop.setObj(user);
-        }else{
+        } else {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("用户不存在！");
         }
-        return  envelop;
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.Users.GetUserInfoAndRolesByUserIdOrCode, method = RequestMethod.GET)
+    @ApiOperation(value = "用户id或者用户登录账号获取用户信息")
+    public Envelop getUserInfoAndRolesByUserIdOrCode(
+            @ApiParam(name = "userIdOrCode", value = "用户id或者用户登录账号")
+            @RequestParam(value = "userIdOrCode", required = false) String userIdOrCode,
+            @ApiParam(name = "appClientId", value = "应用id")
+            @RequestParam(value = "appClientId", required = true) String appClientId) throws Exception {
+        Envelop envelop = new Envelop();
+        User user;
+        //获取用户信息
+        if (org.apache.commons.lang.StringUtils.isNotEmpty(userIdOrCode)) {
+            user = userService.getUser(userIdOrCode);
+            if (null == user) {
+                List<User> users = userService.getUserForLogin(userIdOrCode);
+                if (null != users && users.size() > 0) {
+                    user = users.get(0);
+                } else {
+                    envelop.setErrorMsg("用户不存在！");
+                    envelop.setSuccessFlg(false);
+                    return envelop;
+                }
+            }
+        } else {
+            envelop.setErrorMsg("用户id或者用户登录账号不能为空！");
+            envelop.setSuccessFlg(false);
+            return envelop;
+        }
+        //根据用户id和应用id获取角色
+        List<Map<String,Object>> roles = rolesService.findRolesByUserIdAndAppId(user.getId(),appClientId);
+        envelop.setObj(user);
+        envelop.setDetailModelList(roles);
+        envelop.setSuccessFlg(true);
+        return envelop;
     }
 
 }

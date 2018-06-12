@@ -41,6 +41,7 @@ public class ServiceApi {
         public static final String ResourceQuery = "/resources/query"; //资源查询接口
         //public static final String ResourceSubQuery = "/resources/sub_query"; //详细资源查询接口
         public static final String ResourceQueryTransform = "/resources/query/transform"; //资源查询接口+转译
+        public static final String ResourceQueryAllTransform = "/resources/queryAll/transform"; //资源查询接口获取所有数据集相关+转译
         public static final String ResourceRawFiles = "/resources/query/raw_files"; //非结构资源查询接口
         public static final String ResourceRawFilesList = "/resources/query/raw_files_list"; //非结构资源List查询接口
         public static final String ResourceMasterData = "/resources/query/master_data"; //主表资源查询接口
@@ -477,6 +478,7 @@ public class ServiceApi {
         public static final String ArchiveRelation = "/archiveRelation"; //档案关联
         public static final String AddResolveQueue = "/packages/addResolveQueue";
         public static final String QueueSize = "/packages/queueSize";
+        public static final String UploadProvincialQueueSize = "/packages/queueSize/UploadProvincial";//上传省平台队列
         public static final String PackageCrypto = "/packages/crypto";
         public static final String Fetch = "/packages/fetch/{id}";
         public static final String ImmediateResolve = "/immediate/resolve";
@@ -784,6 +786,7 @@ public class ServiceApi {
         public static final String H5Handshake = "/users/h5/handshake";
         public static final String UsersOfAppPhoneExistence = "/usersOfApp/user/onePhone/existence";
         public static final String GetUserOfUsersOfApp = "/usersOfApp/users/getUserOfUsersOfApp";
+        public static final String GetUserInfoAndRolesByUserIdOrCode = "/users/orgDeptMember/getUserInfoAndRolesByUserIdOrCode";
 
 
         public static final String Save = "/users/save";
@@ -998,20 +1001,15 @@ public class ServiceApi {
     public static class Redis {
 
         //初始化缓存
-        public static final String InitAddress = "/redis/init/address";
         public static final String InitHealthProblem = "/redis/init/healthProblem";
-        public static final String InitIcd10HpR = "/redis/init/icd10HpR";
         public static final String InitIcd10 = "/redis/init/icd10";
-        public static final String InitIcd10ChronicInfo = "/redis/init/icd10ChronicInfo";
-        public static final String InitIndicatorsDict = "/redis/init/indicatorsDict";
         public static final String InitOrgName = "/redis/init/orgName";
         public static final String InitOrgArea = "/redis/init/orgArea";
         public static final String InitOrgSaasArea = "/redis/init/orgSaasArea";
         public static final String InitOrgSaasOrg = "/redis/init/orgSaasOrg";
-        public static final String InitVersions = "/redis/init/versions";
         public static final String InitRsAdapterDict = "/redis/init/rsAdapterDict/{id}";
         public static final String InitRsAdapterMeta = "/redis/init/rsAdapterMeta/{id}";
-        public static final String InitRsMetadata = "/redis/init/rsMetadata";
+        public static final String InitRsMetadataDict = "/redis/init/rsMetadataDict";
 
         //清除缓存
         public static final String Delete = "/redis/delete";
@@ -1023,29 +1021,23 @@ public class ServiceApi {
         public static final String UpdateOrgSaasOrg = "/redis/update/orgSaasOrg";
 
         //获取缓存数据
-        public static final String Address = "/redis/address";
         public static final String HealthProblem = "/redis/healthProblem";
-        public static final String Icd10HpR = "/redis/icd10HpRelation";
         public static final String Icd10Name = "/redis/icd10Name";
         public static final String Icd10ChronicInfo = "/redis/icd10ChronicInfo";
         public static final String Icd10HpCode = "/redis/icd10HpCode";
-        public static final String IndicatorsDict = "/redis/indicatorsDict";
         public static final String OrgName = "/redis/orgName";
         public static final String OrgArea = "/redis/orgArea";
         public static final String OrgSaasArea = "/redis/orgSaasArea";
         public static final String OrgSaasOrg = "/redis/orgSaasOrg";
-
         //App前端Redis
         public static final String AppGetRedisValue = "/redis/getAppClientValue";
         public static final String AppSetRedisValue = "/redis/setAppClientValue";
         public static final String AppSetRedisJsonValue = "/redis/setAppClientJsonValue";
         public static final String AppDeleteRedisValue = "/redis/deleteAppClientValue";
-
         //资源化相关Redis
         public static final String RsAdapterDict = "/redis/rsAdapterDict";
         public static final String RsAdapterMetadata = "/redis/rsAdapterMetaData";
-        public static final String RsMetadata = "/redis/rsMetadata";
-
+        public static final String RsMetadataDict = "/redis/rsMetadata";
         //标准相关Redis
         public static final String StdVersion = "/redis/stdVersion";
         public static final String StdDataSetCode = "/redis/stdDataSetCode";
@@ -1433,6 +1425,7 @@ public class ServiceApi {
         public static final String DeleteById = "/dictionaries/{id}";
         public static final String CheckName = "/dictionaries/existence";
         public static final String CheckCode = "/dictionaries/checkCode";
+        public static final String GetDictEntryByDictIdAndEntryCode = "/open/dictionaries/getDictEntryByDictIdAndEntryCode";
 
     }
 
@@ -1503,6 +1496,7 @@ public class ServiceApi {
         public static final String DownloadByObjectId = "/fastDfs/downloadByObjectId";
         public static final String DownloadToLocal = "/fastDfs/downloadToLocal";
         public static final String GetFilePath = "/fastDfs/getFilePath";
+        public static final String GetFileByDictEntry = "/open/fastDfs/getFileByDictEntry";
         public static final String Page = "/fastDfs/page";
         public static final String Status = "/fastDfs/status";
         public static final String GetPublicUrl = "/fastDfs/getPublicUrl";
@@ -1654,11 +1648,10 @@ public class ServiceApi {
         public static final String DatasetWarningAdd = "/dataQuality/warningSetting/datasetWarningAdd";
         public static final String DatasetWarningDel = "/dataQuality/warningSetting/datasetWarningDel";
         public static final String ReceivedPacketNumList = "/dataQuality/receivedPacket/packetNumList";
-
+        public static final String ReceivedPacketReportData = "/dataQuality/receivedPacket/packetReportData";
         public static final String QualityMonitoringList = "/dataQuality/quality/qualityMonitoringList";
         public static final String ReceptionList = "/dataQuality/quality/receptionList";
-
-
+        public static final String ReceiveDataset = "/dataQuality/quality/receiveDataset";
 
     }
 
@@ -1668,10 +1661,17 @@ public class ServiceApi {
     public class PackQcReport {
         public static final String dailyReport = "/packQcReport/dailyReport";
         public static final String datasetWarningList = "/packQcReport/datasetWarningList";
-        public static final String resourceSuccessfulCount = "/packQcReport/resourceSuccessfulCount";
+        public static final String resourceSuccess = "/packQcReport/resourceSuccess";
         public static final String archiveReport= "/packQcReport/archiveReport";
         public static final String dataSetList= "/packQcReport/dataSetList";
         public static final String archiveFailed= "/packQcReport/archiveFailed";
         public static final String metadataError= "/packQcReport/metadataError";
+        public static final String analyzeErrorList= "/packQcReport/analyzeErrorList";
+        public static final String metadataErrorList= "/packQcReport/metadataErrorList";
+        public static final String metadataErrorDetail= "/packQcReport/metadataErrorDetail";
+        public static final String archiveList= "/packQcReport/archiveList";
+        public static final String archiveDetail= "/packQcReport/archiveDetail";
+        public static final String uploadRecordList= "/packQcReport/uploadRecordList";
+        public static final String uploadRecordDetail= "/packQcReport/uploadRecordDetail";
     }
 }

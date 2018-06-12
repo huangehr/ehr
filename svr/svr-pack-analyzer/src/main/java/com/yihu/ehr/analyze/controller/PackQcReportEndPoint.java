@@ -38,7 +38,7 @@ public class PackQcReportEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private DqDatasetWarningService dqDatasetWarningService;
     @Autowired
-    private ElasticSearchUtil esUtil;
+    private ElasticSearchUtil elasticSearchUtil;
 
     @RequestMapping(value = ServiceApi.PackQcReport.dailyReport, method = RequestMethod.GET)
     @ApiOperation(value = "获取医院数据")
@@ -47,8 +47,8 @@ public class PackQcReportEndPoint extends EnvelopRestEndPoint {
             @RequestParam(name = "startDate") String startDate,
             @ApiParam(name = "endDate", value = "结束日期")
             @RequestParam(name = "endDate") String endDate,
-            @ApiParam(name = "orgCode", value = "医院代码")
-            @RequestParam(name = "orgCode", required = false) String orgCode) throws Exception {
+            @ApiParam(name = "orgCode", value = "医院代码", required = false)
+            @RequestParam(name = "orgCode") String orgCode) throws Exception {
         return packQcReportService.dailyReport(startDate, endDate, orgCode);
     }
 
@@ -82,16 +82,16 @@ public class PackQcReportEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
-    @RequestMapping(value = ServiceApi.PackQcReport.resourceSuccessfulCount, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.PackQcReport.resourceSuccess, method = RequestMethod.GET)
     @ApiOperation(value = "资源化成功的计数统计")
-    public Envelop resourceSuccessfulCount(
+    public Envelop resourceSuccess(
             @ApiParam(name = "startDate", value = "开始日期")
             @RequestParam(name = "startDate") String startDate,
             @ApiParam(name = "endDate", value = "结束日期")
             @RequestParam(name = "endDate") String endDate,
-            @ApiParam(name = "orgCode", value = "医院代码")
-            @RequestParam(name = "orgCode", required = false) String orgCode) throws Exception{
-        return packQcReportService.resourceSuccessfulCount(startDate, endDate, orgCode);
+            @ApiParam(name = "orgCode", value = "医院代码", required = false)
+            @RequestParam(name = "orgCode") String orgCode) throws Exception {
+        return packQcReportService.resourceSuccess(startDate, endDate, orgCode);
     }
 
     @RequestMapping(value = ServiceApi.PackQcReport.archiveReport, method = RequestMethod.GET)
@@ -101,8 +101,8 @@ public class PackQcReportEndPoint extends EnvelopRestEndPoint {
             @RequestParam(name = "startDate") String startDate,
             @ApiParam(name = "endDate", value = "结束日期")
             @RequestParam(name = "endDate") String endDate,
-            @ApiParam(name = "orgCode", value = "医院代码")
-            @RequestParam(name = "orgCode", required = false) String orgCode) throws Exception {
+            @ApiParam(name = "orgCode", value = "医院代码", required = false)
+            @RequestParam(name = "orgCode") String orgCode) throws Exception {
         return packQcReportService.archiveReport(startDate, endDate, orgCode);
     }
 
@@ -113,8 +113,8 @@ public class PackQcReportEndPoint extends EnvelopRestEndPoint {
             @RequestParam(name = "startDate") String startDate,
             @ApiParam(name = "endDate", value = "结束日期")
             @RequestParam(name = "endDate") String endDate,
-            @ApiParam(name = "orgCode", value = "医院代码")
-            @RequestParam(name = "orgCode", required = false) String orgCode) throws Exception {
+            @ApiParam(name = "orgCode", value = "医院代码", required = false)
+            @RequestParam(name = "orgCode") String orgCode) throws Exception {
         return packQcReportService.dataSetList(startDate, endDate, orgCode);
     }
 
@@ -125,8 +125,8 @@ public class PackQcReportEndPoint extends EnvelopRestEndPoint {
             @RequestParam(name = "startDate") String startDate,
             @ApiParam(name = "endDate", value = "结束日期")
             @RequestParam(name = "endDate") String endDate,
-            @ApiParam(name = "orgCode", value = "医院代码")
-            @RequestParam(name = "orgCode", required = false) String orgCode) throws Exception {
+            @ApiParam(name = "orgCode", value = "医院代码", required = false)
+            @RequestParam(name = "orgCode") String orgCode) throws Exception {
         return packQcReportService.archiveFailed(startDate, endDate, orgCode);
     }
 
@@ -139,8 +139,118 @@ public class PackQcReportEndPoint extends EnvelopRestEndPoint {
             @RequestParam(name = "startDate") String startDate,
             @ApiParam(name = "endDate", value = "结束日期")
             @RequestParam(name = "endDate") String endDate,
-            @ApiParam(name = "orgCode", value = "医院代码")
-            @RequestParam(name = "orgCode", required = false) String orgCode) throws Exception {
+            @ApiParam(name = "orgCode", value = "医院代码", required = false)
+            @RequestParam(name = "orgCode") String orgCode) throws Exception {
         return packQcReportService.metadataError(step, startDate, endDate, orgCode);
+    }
+
+    @RequestMapping(value = ServiceApi.PackQcReport.analyzeErrorList, method = RequestMethod.GET)
+    @ApiOperation(value = "解析失败问题查询")
+    public Envelop analyzeErrorList(
+            @ApiParam(name = "filters", value = "过滤")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "page", value = "分页大小", required = true, defaultValue = "1")
+            @RequestParam(value = "page") int page,
+            @ApiParam(name = "size", value = "页码", required = true, defaultValue = "15")
+            @RequestParam(value = "size") int size) throws Exception {
+        if(StringUtils.isNotEmpty(filters)){
+            filters+="analyze_status=2;"+filters;
+        }else{
+            filters="analyze_status=2";
+        }
+        List<Map<String, Object>> list = packQcReportService.analyzeErrorList(filters, sorts, page, size);
+        int count = (int) elasticSearchUtil.count("json_archives", "info", filters);
+        Envelop envelop = getPageResult(list, count, page, size);
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.PackQcReport.metadataErrorList, method = RequestMethod.GET)
+    @ApiOperation(value = "异常数据元列表")
+    public Envelop metadataErrorList(
+            @ApiParam(name = "filters", value = "过滤")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "page", value = "分页大小", required = true, defaultValue = "1")
+            @RequestParam(value = "page") int page,
+            @ApiParam(name = "size", value = "页码", required = true, defaultValue = "15")
+            @RequestParam(value = "size") int size) throws Exception {
+
+        List<Map<String, Object>> list = packQcReportService.metadataErrorList(filters, sorts, page, size);
+        int count = (int) elasticSearchUtil.count("json_archives_qc", "qc_metadata_info", filters);
+        Envelop envelop = getPageResult(list, count, page, size);
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.PackQcReport.metadataErrorDetail, method = RequestMethod.GET)
+    @ApiOperation(value = "异常数据元详情")
+    public Envelop metadataErrorDetail(
+            @ApiParam(name = "id", value = "主键", required = true)
+            @RequestParam(value = "id") String id) throws Exception {
+
+        Envelop envelop = packQcReportService.metadataErrorDetail(id);
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.PackQcReport.archiveList, method = RequestMethod.GET)
+    @ApiOperation(value = "档案包列表")
+    public Envelop archiveList(
+            @ApiParam(name = "filters", value = "过滤")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "page", value = "分页大小", required = true, defaultValue = "1")
+            @RequestParam(value = "page") int page,
+            @ApiParam(name = "size", value = "页码", required = true, defaultValue = "15")
+            @RequestParam(value = "size") int size) throws Exception {
+
+        if(StringUtils.isNotEmpty(filters)){
+            filters+="archive_status=3;"+filters;
+        }else{
+            filters="archive_status=3";
+        }
+        List<Map<String, Object>> list = packQcReportService.archiveList(filters, sorts, page, size);
+        int count = (int) elasticSearchUtil.count("json_archives", "info", filters);
+        Envelop envelop = getPageResult(list, count, page, size);
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.PackQcReport.archiveDetail, method = RequestMethod.GET)
+    @ApiOperation(value = "档案详情")
+    public Envelop archiveDetail(
+            @ApiParam(name = "id", value = "主键", required = true)
+            @RequestParam(value = "id") String id) throws Exception {
+
+        Envelop envelop = packQcReportService.archiveDetail(id);
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.PackQcReport.uploadRecordList, method = RequestMethod.GET)
+    @ApiOperation(value = "上传记录列表")
+    public Envelop uploadRecordList(
+            @ApiParam(name = "filters", value = "过滤")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "page", value = "分页大小", required = true, defaultValue = "1")
+            @RequestParam(value = "page") int page,
+            @ApiParam(name = "size", value = "页码", required = true, defaultValue = "15")
+            @RequestParam(value = "size") int size) throws Exception {
+        List<Map<String, Object>> list = packQcReportService.uploadRecordList(filters, sorts, page, size);
+        int count = (int) elasticSearchUtil.count("upload", "record", filters);
+        Envelop envelop = getPageResult(list, count, page, size);
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.PackQcReport.uploadRecordDetail, method = RequestMethod.GET)
+    @ApiOperation(value = "上传记录详情")
+    public Envelop uploadRecordDetail(
+            @ApiParam(name = "id", value = "主键", required = true)
+            @RequestParam(value = "id") String id) throws Exception {
+
+        Envelop envelop = packQcReportService.uploadRecordDetail(id);
+        return envelop;
     }
 }
