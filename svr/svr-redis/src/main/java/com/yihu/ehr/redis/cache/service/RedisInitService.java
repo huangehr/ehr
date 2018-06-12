@@ -108,7 +108,7 @@ public class RedisInitService extends BaseJpaService {
      * 缓存机构Saas区域Redis
      */
     public int cacheOrgSaasArea() {
-        String sql = "select org_code,saas_code from org_saas where type='1' order by org_code";
+        String sql = "select org_code, saas_code from org_saas where type='1' order by org_code";
         List<Map<String,Object>> list = jdbc.queryForList(sql);
         //清空相关Redis
         orgKeySchema.deleteOrgSaasArea();

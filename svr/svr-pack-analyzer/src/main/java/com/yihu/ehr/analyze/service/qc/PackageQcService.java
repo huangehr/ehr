@@ -3,6 +3,7 @@ package com.yihu.ehr.analyze.service.qc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.analyze.service.pack.ZipPackage;
 import com.yihu.ehr.model.packs.EsSimplePackage;
+import com.yihu.ehr.profile.ErrorType;
 import com.yihu.ehr.profile.model.MetaDataRecord;
 import com.yihu.ehr.profile.model.PackageDataSet;
 import com.yihu.ehr.redis.client.RedisClient;
@@ -79,11 +80,11 @@ public class PackageQcService {
                     if (serializable != null) {
                         Class clazz = qcRuleCheckService.getClass();
                         String[] methods = serializable.toString().split(";");
-                        for(int i=0; i<methods.length; i++) {
+                        for(int i = 0; i < methods.length; i++) {
                             Method _method = clazz.getMethod(methods[i], new Class[]{String.class, String.class, String.class, String.class});
                             _method.setAccessible(true);
-                            int result = (int) _method.invoke(qcRuleCheckService, zipPackage.getCdaVersion(), dataSetCode, metadata, dataGroup.get(metadata));
-                            if (result != 0) {
+                            ErrorType errorType = (ErrorType) _method.invoke(qcRuleCheckService, zipPackage.getCdaVersion(), dataSetCode, metadata, dataGroup.get(metadata));
+                            if (errorType != ErrorType.Normal) {
                                 Map<String, Object> qcMetadataRecord = new HashMap<>();
                                 qcMetadataRecord.put("_id", esSimplePackage.get_id() + "_" + dataSetCode + "_" + metadata);
                                 qcMetadataRecord.put("patient_id", zipPackage.getPatientId());
@@ -102,7 +103,8 @@ public class PackageQcService {
                                 qcMetadataRecord.put("metadata", metadata);
                                 qcMetadataRecord.put("value", dataGroup.get(metadata));
                                 qcMetadataRecord.put("qc_step", 1); //标准质控环节
-                                qcMetadataRecord.put("qc_error_type", result); //标准质控错误类型
+                                qcMetadataRecord.put("qc_error_type", errorType.getType()); //标准质控错误类型
+                                qcMetadataRecord.put("qc_error_name", errorType.getName()); //标准质控错误类型
                                 qcMetadataRecord.put("qc_error_message", String.format("%s failure for meta data %s of %s in %s", methods[i], metadata, dataSetCode, zipPackage.getCdaVersion()));
                                 zipPackage.getQcMetadataRecords().add(qcMetadataRecord);
                             }
