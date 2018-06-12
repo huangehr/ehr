@@ -1646,8 +1646,7 @@ public class ServiceApi {
         public static final String ReceivedPacketReportData = "/dataQuality/receivedPacket/packetReportData";
         public static final String QualityMonitoringList = "/dataQuality/quality/qualityMonitoringList";
         public static final String ReceptionList = "/dataQuality/quality/receptionList";
-
-
+        public static final String ReceiveDataset = "/dataQuality/quality/receiveDataset";
 
     }
 

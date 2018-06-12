@@ -54,6 +54,7 @@ quality:
   hospitalInTime: 7 # 住院及时时间（天）
   outpatientInTime: 2 # 门诊及时时间（天）
   peInTime: 2 # 体检及时时间（天）
+  version: 59083976eebd #默认版本号
 
 elasticsearch:
   pool:
