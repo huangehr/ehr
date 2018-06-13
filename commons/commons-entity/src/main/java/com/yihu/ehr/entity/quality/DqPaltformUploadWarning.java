@@ -19,9 +19,9 @@ public class DqPaltformUploadWarning {
     private Date updateTime;//更新时间
     private String updateUserId;//操作人id
     private String updateUserName;//操作人名称
-    private String integrityRate;//完整率
     private Long errorNum;//错误量
-    private Long dataNum;//数据量
+    private Long acrhiveNum;//档案数
+    private Integer datasetWarningNum;//数据集数量
     private List<DqDatasetWarning> datasetWarningList;//数据集
 
     @Id
@@ -89,15 +89,6 @@ public class DqPaltformUploadWarning {
         this.updateUserName = updateUserName;
     }
 
-    @Column(name = "integrity_rate")
-    public String getIntegrityRate() {
-        return integrityRate;
-    }
-
-    public void setIntegrityRate(String integrityRate) {
-        this.integrityRate = integrityRate;
-    }
-
     @Column(name = "error_num")
     public Long getErrorNum() {
         return errorNum;
@@ -107,13 +98,22 @@ public class DqPaltformUploadWarning {
         this.errorNum = errorNum;
     }
 
-    @Column(name = "data_num")
-    public Long getDataNum() {
-        return dataNum;
+    @Column(name = "acrhive_num")
+    public Long getAcrhiveNum() {
+        return acrhiveNum;
     }
 
-    public void setDataNum(Long dataNum) {
-        this.dataNum = dataNum;
+    public void setAcrhiveNum(Long acrhiveNum) {
+        this.acrhiveNum = acrhiveNum;
+    }
+
+    @Transient
+    public Integer getDatasetWarningNum() {
+        return datasetWarningNum;
+    }
+
+    public void setDatasetWarningNum(Integer datasetWarningNum) {
+        this.datasetWarningNum = datasetWarningNum;
     }
 
     @Transient

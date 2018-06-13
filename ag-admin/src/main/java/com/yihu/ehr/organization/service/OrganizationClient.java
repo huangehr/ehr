@@ -220,5 +220,7 @@ public interface OrganizationClient {
 
     @RequestMapping(value = "/organizations/getOrgListByAddressPid", method = RequestMethod.GET)
     @ApiOperation(value = "根据区域查询机构列表")
-    Envelop getOrgListByAddressPid(@RequestParam(value = "pid") Integer pid);
+    Envelop getOrgListByAddressPid(
+            @RequestParam(value = "pid") Integer pid,
+            @RequestParam(value = "fullName", required = false) String fullName);
 }

@@ -29,6 +29,7 @@ public class DqPaltformReceiveWarning {
     private String hospitalInTimeRate;//住院及时率
     private String outpatientInTimeRate;//门诊及时率
     private String peInTimeRate;//体检及时率
+    private Integer datasetWarningNum;//数据集数量
     private List<DqDatasetWarning> datasetWarningList;//数据集
 
     @Id
@@ -161,13 +162,22 @@ public class DqPaltformReceiveWarning {
         this.outpatientInTimeRate = outpatientInTimeRate;
     }
 
+    @Column(name = "pe_in_time_rate")
     public String getPeInTimeRate() {
         return peInTimeRate;
     }
 
-    @Column(name = "pe_in_time_rate")
     public void setPeInTimeRate(String peInTimeRate) {
         this.peInTimeRate = peInTimeRate;
+    }
+
+    @Transient
+    public Integer getDatasetWarningNum() {
+        return datasetWarningNum;
+    }
+
+    public void setDatasetWarningNum(Integer datasetWarningNum) {
+        this.datasetWarningNum = datasetWarningNum;
     }
 
     @Transient

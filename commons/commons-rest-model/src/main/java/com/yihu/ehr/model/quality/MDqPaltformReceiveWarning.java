@@ -28,6 +28,7 @@ public class MDqPaltformReceiveWarning implements Serializable {
     private String outpatientInTimeRate;//门诊及时率
     private String peInTimeRate;//体检及时率
     private List<MDqDatasetWarning> datasetWarningList;//数据集
+    private Integer datasetWarningNum;//数据集数量
 
     public Long getId() {
         return id;
@@ -157,5 +158,13 @@ public class MDqPaltformReceiveWarning implements Serializable {
 
     public void setDatasetWarningList(List<MDqDatasetWarning> datasetWarningList) {
         this.datasetWarningList = datasetWarningList;
+    }
+
+    public Integer getDatasetWarningNum() {
+        return datasetWarningNum;
+    }
+
+    public void setDatasetWarningNum(Integer datasetWarningNum) {
+        this.datasetWarningNum = datasetWarningNum;
     }
 }

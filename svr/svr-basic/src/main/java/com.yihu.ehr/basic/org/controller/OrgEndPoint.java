@@ -20,6 +20,7 @@ import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -95,6 +96,35 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
         return (List<MOrganization>) convertToModels(organizationList, new ArrayList<MOrganization>(organizationList.size()), MOrganization.class, fields);
     }
 
+    /**
+     * 机构列表查询
+     *
+     * @param fields
+     * @param filters
+     * @param sorts
+     * @param size
+     * @param page
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/organizations/search", method = RequestMethod.GET)
+    @ApiOperation(value = "根据条件查询机构列表")
+    public Envelop search(
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page) throws Exception {
+        List<Organization> list = orgService.search(fields, filters, sorts, page, size);
+        int count = (int)orgService.getCount(filters);
+        Envelop envelop = getPageResult(list, count, page, size);
+        return envelop;
+    }
     /**
      * 删除机构
      *
@@ -461,10 +491,17 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "根据区域查询机构列表")
     public Envelop getOrgListByAddressPid(
             @ApiParam(name = "pid", value = "区域id", defaultValue = "")
-            @RequestParam(value = "pid") Integer pid) {
+            @RequestParam(value = "pid") Integer pid,
+            @ApiParam(name = "fullName", value = "机构名称", defaultValue = "")
+            @RequestParam(value = "fullName", required = false) String fullName) {
         Envelop envelop = new Envelop();
         try {
-            List<Organization> orgList = orgService.getOrgListByAddressPid(pid);
+            List<Organization> orgList;
+            if (StringUtils.isEmpty(fullName)) {
+                orgList = orgService.getOrgListByAddressPid(pid);
+            } else {
+                orgList = orgService.getOrgListByAddressPidAndParam(pid, fullName);
+            }
             envelop.setSuccessFlg(true);
             envelop.setDetailModelList(orgList);
         }catch (Exception e) {
