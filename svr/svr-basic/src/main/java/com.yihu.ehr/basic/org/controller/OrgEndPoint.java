@@ -97,6 +97,35 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
     }
 
     /**
+     * 机构列表查询
+     *
+     * @param fields
+     * @param filters
+     * @param sorts
+     * @param size
+     * @param page
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/organizations/search", method = RequestMethod.GET)
+    @ApiOperation(value = "根据条件查询机构列表")
+    public Envelop search(
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page) throws Exception {
+        List<Organization> list = orgService.search(fields, filters, sorts, page, size);
+        int count = (int)orgService.getCount(filters);
+        Envelop envelop = getPageResult(list, count, page, size);
+        return envelop;
+    }
+    /**
      * 删除机构
      *
      * @param orgCode
