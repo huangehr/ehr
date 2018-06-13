@@ -21,7 +21,7 @@ public class MDqPaltformResourceWarning implements Serializable {
     private Long failureNum;//失败数
     private Long errorNum;//错误量
     private Long unparsingNum;//未解析量
-    private Long unparsingPeriod;//未解析量预警周期
+    private String unparsingPeriod;//未解析量预警周期
 
     public Long getId() {
         return id;
@@ -105,11 +105,11 @@ public class MDqPaltformResourceWarning implements Serializable {
         this.unparsingNum = unparsingNum;
     }
 
-    public Long getUnparsingPeriod() {
+    public String getUnparsingPeriod() {
         return unparsingPeriod;
     }
 
-    public void setUnparsingPeriod(Long unparsingPeriod) {
+    public void setUnparsingPeriod(String unparsingPeriod) {
         this.unparsingPeriod = unparsingPeriod;
     }
 }

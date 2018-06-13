@@ -140,6 +140,7 @@
         <version.json-lib>2.4</version.json-lib>
         <version.fastjson>1.2.17</version.fastjson>
         <version.commons-net>3.3</version.commons-net>
+        <version.jxl>2.6</version.jxl>
     </properties>
 
     <dependencyManagement>
@@ -822,6 +823,13 @@
                         <artifactId>slf4j-log4j12</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+
+            <!-- export library -->
+            <dependency>
+                <groupId>net.sourceforge.jexcelapi</groupId>
+                <artifactId>jxl</artifactId>
+                <version>${version.jxl}</version>
             </dependency>
 
             <!-- Google library -->

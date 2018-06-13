@@ -20,10 +20,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.sql.ResultSet;
-import java.text.NumberFormat;
 import java.util.*;
 
-import static com.yihu.ehr.profile.qualilty.DqWarningRecordWarningType.archiveNum;
 import static com.yihu.ehr.profile.qualilty.DqWarningRecordWarningType.errorNum;
 
 /**
@@ -195,7 +193,6 @@ public class WarningQuestionService extends BaseJpaService {
         List<DqWarningRecord> list = new ArrayList<>();
         Date recordTime = DateUtil.formatCharDateYMD(dateStr);
         String unqualified = "不合格";
-        NumberFormat nf = NumberFormat.getPercentInstance();
         for (String orgCode : warningMap.keySet()) {
             if(defaultOrgCode.equals(orgCode)){
                 continue;
