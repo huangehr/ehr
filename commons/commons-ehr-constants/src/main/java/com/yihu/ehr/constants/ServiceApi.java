@@ -1653,6 +1653,10 @@ public class ServiceApi {
         public static final String ReceptionList = "/dataQuality/quality/receptionList";
         public static final String ReceiveDataset = "/dataQuality/quality/receiveDataset";
 
+        public static final String WarningRecordList = "/dataQuality/warningRecord/warningRecordList";
+        public static final String WarningRecord =    "/dataQuality/warningRecord/warningRecord/{id}";
+        public static final String WarningRecordUpd = "/dataQuality/warningRecord/warningRecordUpd";
+
     }
 
     /**
