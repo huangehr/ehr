@@ -18,7 +18,7 @@ public class MDqPaltformResourceWarning implements Serializable {
     private Date updateTime;//更新时间
     private String updateUserId;//操作人id
     private String updateUserName;//操作人名称
-    private String successRate;//成功率
+    private Long failureNum;//失败数
     private Long errorNum;//错误量
     private Long unparsingNum;//未解析量
     private Long unparsingPeriod;//未解析量预警周期
@@ -81,12 +81,12 @@ public class MDqPaltformResourceWarning implements Serializable {
         this.updateUserName = updateUserName;
     }
 
-    public String getSuccessRate() {
-        return successRate;
+    public Long getFailureNum() {
+        return failureNum;
     }
 
-    public void setSuccessRate(String successRate) {
-        this.successRate = successRate;
+    public void setFailureNum(Long failureNum) {
+        this.failureNum = failureNum;
     }
 
     public Long getErrorNum() {

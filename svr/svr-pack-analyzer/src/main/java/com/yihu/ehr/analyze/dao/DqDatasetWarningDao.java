@@ -12,4 +12,6 @@ import java.util.List;
 public interface DqDatasetWarningDao extends PagingAndSortingRepository<DqDatasetWarning, Long> {
 
     List<DqDatasetWarning> findByOrgCodeAndType(String orgCode,String type);
+
+    List<DqDatasetWarning> findByType(String type);
 }

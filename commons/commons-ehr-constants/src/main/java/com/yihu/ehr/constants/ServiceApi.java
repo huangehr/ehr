@@ -1633,6 +1633,7 @@ public class ServiceApi {
         public static final String PaltformReceiveWarningDel = "/dataQuality/warningSetting/receiveWarningDel";
         public static final String PaltformReceiveWarningUpd = "/dataQuality/warningSetting/receiveWarningUpd";
         public static final String PaltformReceiveWarning =    "/dataQuality/warningSetting/receiveWarning/{id}";
+        public static final String PaltformReceiveWarningDefault =    "/dataQuality/warningSetting/receiveWarningDefault";
         public static final String PaltformResourceWarningList = "/dataQuality/warningSetting/resourceWarningList";
         public static final String PaltformResourceWarningAdd = "/dataQuality/warningSetting/resourceWarningAdd";
         public static final String PaltformResourceWarningDel = "/dataQuality/warningSetting/resourceWarningDel";
@@ -1643,6 +1644,7 @@ public class ServiceApi {
         public static final String PaltformUploadWarningDel = "/dataQuality/warningSetting/uploadWarningDel";
         public static final String PaltformUploadWarningUpd = "/dataQuality/warningSetting/uploadWarningUpd";
         public static final String PaltformUploadWarning =    "/dataQuality/warningSetting/uploadWarning/{id}";
+        public static final String DatasetWarningList = "/dataQuality/warningSetting/datasetWarningList";
         public static final String DatasetWarningAdd = "/dataQuality/warningSetting/datasetWarningAdd";
         public static final String DatasetWarningDel = "/dataQuality/warningSetting/datasetWarningDel";
         public static final String ReceivedPacketNumList = "/dataQuality/receivedPacket/packetNumList";
@@ -1650,6 +1652,10 @@ public class ServiceApi {
         public static final String QualityMonitoringList = "/dataQuality/quality/qualityMonitoringList";
         public static final String ReceptionList = "/dataQuality/quality/receptionList";
         public static final String ReceiveDataset = "/dataQuality/quality/receiveDataset";
+
+        public static final String WarningRecordList = "/dataQuality/warningRecord/warningRecordList";
+        public static final String WarningRecord =    "/dataQuality/warningRecord/warningRecord/{id}";
+        public static final String WarningRecordUpd = "/dataQuality/warningRecord/warningRecordUpd";
 
     }
 
