@@ -70,4 +70,7 @@ public interface OrganizationRepository extends PagingAndSortingRepository<Organ
 
     @Query(value = "SELECT org.* from Organizations org WHERE org.administrative_division in(SELECT id from address_dict where pid = :pid)", nativeQuery = true)
     List<Organization> getOrgListByAddressPid(@Param("pid") Integer pid);
+
+    @Query(value = "SELECT org.* from Organizations org WHERE org.administrative_division in(SELECT id from address_dict where pid = :pid) and org.full_name like %:fullName%", nativeQuery = true)
+    List<Organization> getOrgListByAddressPidAndParam(@Param("pid") Integer pid, @Param("fullName") String fullName);
 }

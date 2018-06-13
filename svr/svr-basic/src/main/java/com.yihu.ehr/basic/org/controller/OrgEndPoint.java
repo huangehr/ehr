@@ -20,6 +20,7 @@ import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -461,10 +462,17 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "根据区域查询机构列表")
     public Envelop getOrgListByAddressPid(
             @ApiParam(name = "pid", value = "区域id", defaultValue = "")
-            @RequestParam(value = "pid") Integer pid) {
+            @RequestParam(value = "pid") Integer pid,
+            @ApiParam(name = "fullName", value = "机构名称", defaultValue = "")
+            @RequestParam(value = "fullName", required = false) String fullName) {
         Envelop envelop = new Envelop();
         try {
-            List<Organization> orgList = orgService.getOrgListByAddressPid(pid);
+            List<Organization> orgList;
+            if (StringUtils.isEmpty(fullName)) {
+                orgList = orgService.getOrgListByAddressPid(pid);
+            } else {
+                orgList = orgService.getOrgListByAddressPidAndParam(pid, fullName);
+            }
             envelop.setSuccessFlg(true);
             envelop.setDetailModelList(orgList);
         }catch (Exception e) {
