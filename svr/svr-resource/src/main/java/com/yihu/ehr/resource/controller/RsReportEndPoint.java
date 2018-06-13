@@ -166,7 +166,7 @@ public class RsReportEndPoint extends EnvelopRestEndPoint {
     public List<RsReport> getByCategoryId(
             @ApiParam(name = "reportCategoryId", value = "资源报表分类ID", required = true)
             @RequestParam(value = "reportCategoryId") Integer reportCategoryId) throws Exception {
-        List<RsReport> list = rsReportService.getByReportCategoryId(reportCategoryId);
+        List<RsReport> list = rsReportService.getByReportCategoryIdAndStatus(reportCategoryId);
         return list;
     }
 
