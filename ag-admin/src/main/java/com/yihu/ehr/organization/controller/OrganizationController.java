@@ -822,8 +822,10 @@ public class OrganizationController extends BaseController {
     @ApiOperation(value = "根据区域查询机构列表")
     public Envelop getOrgListByAddressPid(
             @ApiParam(name = "pid", value = "区域id", defaultValue = "")
-            @RequestParam(value = "pid") Integer pid) {
-        Envelop envelop = orgClient.getOrgListByAddressPid(pid);
+            @RequestParam(value = "pid") Integer pid,
+            @ApiParam(name = "fullName", value = "机构名称", defaultValue = "")
+            @RequestParam(value = "fullName", required = false) String fullName) {
+        Envelop envelop = orgClient.getOrgListByAddressPid(pid, fullName);
         return envelop;
     }
 
