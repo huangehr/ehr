@@ -114,4 +114,14 @@ public class RsReportService extends BaseJpaService<RsReport, RsReportDao> {
     public String getPositionByCode(String code) {
         return rsReportDao.findPositionByCode(code);
     }
+
+    /**
+     * 根据资源报表分类ID，获取状态为1（有效）的资源报表
+     *
+     * @param reportCategoryId 资源报表分类ID
+     * @return List<RsReport>
+     */
+    public List<RsReport> getByReportCategoryIdAndStatus(Integer reportCategoryId) {
+        return rsReportDao.findByReportCategoryIdAndStatus(reportCategoryId);
+    }
 }
