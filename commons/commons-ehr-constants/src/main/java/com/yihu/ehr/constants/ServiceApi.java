@@ -483,6 +483,7 @@ public class ServiceApi {
         public static final String Fetch = "/packages/fetch/{id}";
         public static final String ImmediateResolve = "/immediate/resolve";
         public static final String Update = "/packages/update";
+        public static final String UpdateAnalyzer = "/packages/updateAnalyzer";
         public static final String Migrate = "/packages/migrate";
     }
 

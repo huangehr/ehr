@@ -62,6 +62,7 @@ public class PackMillService {
                 throw new ResolveException(srcDataSet.getCode() + " is_multi_record can not be null for std version " + srcDataSet.getCdaVersion());
             }
             Set<String> keys = srcDataSet.getRecordKeys();
+            Set<String> existSet = new HashSet<>();
             if (!isMultiRecord){
                 MasterRecord masterRecord = resourceBucket.getMasterRecord();
                 for (String key : keys){
@@ -74,7 +75,8 @@ public class PackMillService {
                                 srcMetadataCode,
                                 resourceBucket,
                                 metaDataRecord.getMetaData(srcMetadataCode),
-                                originalPackage.getProfileType()
+                                originalPackage.getProfileType(),
+                                existSet
                         );
                         if (StringUtils.isEmpty(resMetadata)){
                             continue;
@@ -88,7 +90,8 @@ public class PackMillService {
                                 srcDataSet.getCode(),
                                 srcMetadataCode,
                                 resourceBucket,
-                                originalPackage.getProfileType()
+                                originalPackage.getProfileType(),
+                                existSet
                         );
                     }
                     //仅一条记录
@@ -116,7 +119,8 @@ public class PackMillService {
                                 srcMetadataCode,
                                 resourceBucket,
                                 metaDataRecord.getMetaData(srcMetadataCode),
-                                originalPackage.getProfileType()
+                                originalPackage.getProfileType(),
+                                existSet
                         );
                         if (StringUtils.isEmpty(resMetadata)) {
                             continue;
@@ -130,7 +134,8 @@ public class PackMillService {
                                 srcDataSet.getCode(),
                                 srcMetadataCode,
                                 resourceBucket,
-                                originalPackage.getProfileType()
+                                originalPackage.getProfileType(),
+                                existSet
                         );
                     }
                     if (subRecord.getDataGroup().size() > 0) {
@@ -171,8 +176,16 @@ public class PackMillService {
             resourceBucket.insertBasicRecord(ResourceCells.PATIENT_NAME, standardPackage.getPatientName());
             resourceBucket.insertBasicRecord(ResourceCells.DEMOGRAPHIC_ID, standardPackage.getDemographicId());
             resourceBucket.insertBasicRecord(ResourceCells.ORG_CODE, standardPackage.getOrgCode());
-            resourceBucket.insertBasicRecord(ResourceCells.ORG_NAME, redisService.getOrgName(standardPackage.getOrgCode()));
-            resourceBucket.insertBasicRecord(ResourceCells.ORG_AREA, redisService.getOrgArea(standardPackage.getOrgCode()));
+            String orgName = redisService.getOrgName(standardPackage.getOrgCode());
+            if (StringUtils.isEmpty(orgName)) {
+                throw new ResolveException("can not get org name for code " + standardPackage.getOrgCode());
+            }
+            resourceBucket.insertBasicRecord(ResourceCells.ORG_NAME, orgName);
+            String orgArea = redisService.getOrgArea(standardPackage.getOrgCode());
+            if (StringUtils.isEmpty(orgName)) {
+                throw new ResolveException("can not get org area for code " + standardPackage.getOrgCode());
+            }
+            resourceBucket.insertBasicRecord(ResourceCells.ORG_AREA, orgArea);
             resourceBucket.insertBasicRecord(ResourceCells.CDA_VERSION, standardPackage.getCdaVersion());
             resourceBucket.insertBasicRecord(ResourceCells.CREATE_DATE, DateTimeUtil.utcDateTimeFormat(new Date()));
             resourceBucket.insertBasicRecord(ResourceCells.DEPT_CODE, standardPackage.getDeptCode());
@@ -265,9 +278,11 @@ public class PackMillService {
      * @param srcMetadataCode 标准数据元编码
      * @param resourceBucket 数据包
      * @param value 值
+     * @param profileType 档案类型
+     * @param existSet 已质控数据记录
      * @return
      */
-     protected String getResMetadata(String cdaVersion, String srcDataSetCode, String srcMetadataCode, ResourceBucket resourceBucket, String value, ProfileType profileType){
+     protected String getResMetadata(String cdaVersion, String srcDataSetCode, String srcMetadataCode, ResourceBucket resourceBucket, String value, ProfileType profileType, Set<String> existSet){
          // TODO: 翻译时需要的内容：对CODE与VALUE处理后再翻译
          if ("rBUSINESS_DATE".equals(srcMetadataCode)) {
              return null;
@@ -278,10 +293,16 @@ public class PackMillService {
          }
          //日志
          PackResolveLogger.warn(String.format("Unable to get resource meta data code for ehr meta data %s of %s in %s", srcMetadataCode, srcDataSetCode, cdaVersion));
-         if (profileType == ProfileType.Standard) {
+         if (profileType == ProfileType.Standard && !existSet.contains(srcDataSetCode + "$" + srcMetadataCode)) {
              //质控数据
              Map<String, Object> qcMetadataRecord = new HashMap<>();
-             qcMetadataRecord.put("_id", resourceBucket.getPackId() + "_" + srcDataSetCode + "_" + srcMetadataCode);
+             StringBuilder _id = new StringBuilder();
+             _id.append(resourceBucket.getPackId())
+                     .append("$")
+                     .append(srcDataSetCode)
+                     .append("$")
+                     .append(srcMetadataCode);
+             qcMetadataRecord.put("_id", _id.toString());
              qcMetadataRecord.put("pack_id", resourceBucket.getPackId());
              qcMetadataRecord.put("patient_id", resourceBucket.getBasicRecord(ResourceCells.PATIENT_ID));
              qcMetadataRecord.put("org_code", resourceBucket.getBasicRecord(ResourceCells.ORG_CODE));
@@ -301,13 +322,15 @@ public class PackMillService {
              qcMetadataRecord.put("qc_error_type", ErrorType.FieldAdaptationError.getType()); //资源适配错误
              qcMetadataRecord.put("qc_error_name", ErrorType.FieldAdaptationError.getName()); //资源适配错误
              qcMetadataRecord.put("qc_error_message", String.format("Unable to get resource meta data code for ehr meta data %s of %s in %s", srcMetadataCode, srcDataSetCode, cdaVersion));
+             qcMetadataRecord.put("create_date", DATE_FORMAT.format(new Date()));
              resourceBucket.getQcMetadataRecords().addRecord(qcMetadataRecord);
+             existSet.add(srcDataSetCode + "$" + srcMetadataCode);
          }
          return null;
      }
 
     /**
-     * STD字典转内部EHR字典
+     *
      * @param dataRecord 数据
      * @param cdaVersion 版本号
      * @param metadataId 资源化编码
@@ -315,9 +338,19 @@ public class PackMillService {
      * @param srcDataSetCode 标准数据集编码
      * @param srcMetadataCode 标准数据元编码
      * @param resourceBucket 数据包
+     * @param profileType 档案类型
+     * @param existSet 已质控数据记录
      * @throws Exception
      */
-    protected void dictTransform(ResourceRecord dataRecord, String cdaVersion, String metadataId, String value, String srcDataSetCode, String srcMetadataCode, ResourceBucket resourceBucket, ProfileType profileType) throws Exception {
+    protected void dictTransform(ResourceRecord dataRecord,
+                                 String cdaVersion,
+                                 String metadataId,
+                                 String value,
+                                 String srcDataSetCode,
+                                 String srcMetadataCode,
+                                 ResourceBucket resourceBucket,
+                                 ProfileType profileType,
+                                 Set<String> existSet) throws Exception {
         //查询对应内部EHR字段是否有对应字典
         String dictCode = getMetadataDict(metadataId);
         //内部EHR数据元字典不为空情况
@@ -340,7 +373,7 @@ public class PackMillService {
                 dataRecord.addResource(metadataId, value);
             } else {
                 //查找对应的字典数据
-                String[] dict = getDict(cdaVersion, dictCode, value, resourceBucket, srcDataSetCode, srcMetadataCode, profileType);
+                String[] dict = getDict(cdaVersion, dictCode, value, resourceBucket, srcDataSetCode, srcMetadataCode, profileType, existSet);
                 //对应字典不为空情况下，转换EHR内部字典，并保存字典对应值，为空则不处理
                 if (dict.length > 1) {
                     //保存标准字典值编码(code)
@@ -372,17 +405,42 @@ public class PackMillService {
      * @param srcDictEntryCode STD字典项代码
      * @return
      */
-    public String[] getDict(String version, String dictCode, String srcDictEntryCode, ResourceBucket resourceBucket, String srcDataSetCode, String srcMetadataCode, ProfileType profileType) {
+    /**
+     * 获取对应字典缓存信息
+     * @param version cda版本
+     * @param dictCode EHR内部字典代码
+     * @param srcDictEntryCode STD字典项代码
+     * @param resourceBucket 数据包
+     * @param srcDataSetCode 标准数据集编码
+     * @param srcMetadataCode 标准数据元编码
+     * @param profileType 档案类型
+     * @param existSet 已质控数据记录
+     * @return
+     */
+    public String[] getDict(String version,
+                            String dictCode,
+                            String srcDictEntryCode,
+                            ResourceBucket resourceBucket,
+                            String srcDataSetCode,
+                            String srcMetadataCode,
+                            ProfileType profileType,
+                            Set<String> existSet) {
         String dict = redisService.getRsAdapterDict(version, dictCode, srcDictEntryCode);
         if (dict != null) {
             return dict.split("&");
         }
         //日志
         PackResolveLogger.warn(String.format("Unable to get dict value for meta data %s of %s in %s", srcMetadataCode, srcDataSetCode, version));
-        if (profileType == ProfileType.Standard) {
+        if (profileType == ProfileType.Standard && !existSet.contains(srcDataSetCode + "$" + srcMetadataCode)) {
             //质控数据
             Map<String, Object> qcMetadataRecord = new HashMap<>();
-            qcMetadataRecord.put("_id", resourceBucket.getPackId() + "_" + srcDataSetCode + "_" + srcMetadataCode);
+            StringBuilder _id = new StringBuilder();
+            _id.append(resourceBucket.getPackId())
+                    .append("$")
+                    .append(srcDataSetCode)
+                    .append("$")
+                    .append(srcMetadataCode);
+            qcMetadataRecord.put("_id", _id.toString());
             qcMetadataRecord.put("pack_id", resourceBucket.getPackId());
             qcMetadataRecord.put("patient_id", resourceBucket.getBasicRecord(ResourceCells.PATIENT_ID));
             qcMetadataRecord.put("org_code", resourceBucket.getBasicRecord(ResourceCells.ORG_CODE));
@@ -402,7 +460,9 @@ public class PackMillService {
             qcMetadataRecord.put("qc_error_type", ErrorType.DictAdaptationError.getType()); //字典转换错误
             qcMetadataRecord.put("qc_error_name", ErrorType.DictAdaptationError.getName()); //字典转换错误
             qcMetadataRecord.put("qc_error_message", String.format("Unable to get dict value for meta data %s of %s in %s", srcMetadataCode, srcDataSetCode, version));
+            qcMetadataRecord.put("create_date", DATE_FORMAT.format(new Date()));
             resourceBucket.getQcMetadataRecords().addRecord(qcMetadataRecord);
+            existSet.add(srcDataSetCode + "$" + srcMetadataCode);
         }
         return "".split("&");
     }

@@ -215,7 +215,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             @RequestBody String message) throws Exception {
         Map<String, Object> updateSource = new HashMap<>();
         if (status == AnalyzeStatus.Failed) {
-            if (3 == errorTye) {
+            if (3 == errorTye || 4 == errorTye || 4 == errorTye) {
                 updateSource.put("analyze_fail_count", 3);
             } else {
                 Map<String, Object> sourceMap = elasticSearchUtil.findById(INDEX, TYPE, id);
@@ -227,6 +227,8 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
                     updateSource.put("analyze_fail_count", failCount + 1);
                 }
             }
+        } else if (status == AnalyzeStatus.Acquired) {
+            updateSource.put("analyze_date", dateFormat.format(new Date()));
         }
         updateSource.put("message", message);
         updateSource.put("error_type", errorTye);
@@ -257,6 +259,35 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
                 updateSource.put("fail_count", 3);
             } else {
                 updateSource.put("fail_count", 0);
+            }
+            updateSourceList.add(updateSource);
+        });
+        elasticSearchUtil.bulkUpdate(INDEX, TYPE, updateSourceList);
+        return sourceList.size();
+    }
+
+    @RequestMapping(value = ServiceApi.Packages.UpdateAnalyzer, method = RequestMethod.PUT)
+    @ApiOperation(value = "根据条件批量修改档案包状态", notes = "修改档案包状态")
+    public Integer updateAnalyzer (
+            @ApiParam(name = "filters", value = "条件", required = true)
+            @RequestParam(value = "filters") String filters,
+            @ApiParam(name = "status", value = "状态", required = true)
+            @RequestParam(value = "status") AnalyzeStatus status,
+            @ApiParam(name = "page", value = "消息", required = true)
+            @RequestParam(value = "page") Integer page,
+            @ApiParam(name = "size", value = "状态", required = true)
+            @RequestParam(value = "size") Integer size) throws Exception {
+        List<Map<String, Object>> sourceList = elasticSearchUtil.page(INDEX, TYPE, filters, page, size);
+        List<Map<String, Object>> updateSourceList = new ArrayList<>(sourceList.size());
+        final int _status = status.ordinal();
+        sourceList.forEach(item -> {
+            Map<String, Object> updateSource = new HashMap<>();
+            updateSource.put("_id", item.get("_id"));
+            updateSource.put("analyze_status", status.ordinal());
+            if (_status == 2) {
+                updateSource.put("analyze_fail_count", 3);
+            } else {
+                updateSource.put("analyze_fail_count", 0);
             }
             updateSourceList.add(updateSource);
         });

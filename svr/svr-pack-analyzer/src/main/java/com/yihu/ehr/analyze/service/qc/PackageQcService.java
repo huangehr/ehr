@@ -66,17 +66,22 @@ public class PackageQcService {
         qcDataSetRecord.put("version", zipPackage.getCdaVersion());
         qcDataSetRecord.put("count", zipPackage.getDataSets().size());
         qcDataSetRecord.put("qc_step", 1);
+        qcDataSetRecord.put("create_date", DATE_FORMAT.format(new Date()));
         List<Map<String, Object>> details = new ArrayList<>();
         Map<String, PackageDataSet> dataSets = zipPackage.getDataSets();
         for (String dataSetCode : dataSets.keySet()) {
             Map<String, Object> dataSet = new HashMap<>();
-            dataSet.put(dataSetCode,dataSets.get(dataSetCode).getRecords().size());
+            dataSet.put(dataSetCode, dataSets.get(dataSetCode).getRecords().size());
             details.add(dataSet);
             Map<String, MetaDataRecord> records = dataSets.get(dataSetCode).getRecords();
+            Set<String> existSet = new HashSet<>();
             for (String recordKey : records.keySet()) {
                 Map<String, String> dataGroup = records.get(recordKey).getDataGroup();
                 List<String> listDataElement = getDataElementList(dataSets.get(dataSetCode).getCdaVersion(), dataSetCode);
                 for (String metadata : listDataElement) {
+                    if (existSet.contains(dataSetCode + "$" + metadata)) {
+                        continue;
+                    }
                     Serializable serializable = redisTemplate.opsForValue().get("qc_" + zipPackage.getCdaVersion() + ":" + dataSetCode + ":" + metadata);
                     if (serializable != null) {
                         Class clazz = qcRuleCheckService.getClass();
@@ -87,7 +92,13 @@ public class PackageQcService {
                             ErrorType errorType = (ErrorType) _method.invoke(qcRuleCheckService, zipPackage.getCdaVersion(), dataSetCode, metadata, dataGroup.get(metadata));
                             if (errorType != ErrorType.Normal) {
                                 Map<String, Object> qcMetadataRecord = new HashMap<>();
-                                qcMetadataRecord.put("_id", esSimplePackage.get_id() + "_" + dataSetCode + "_" + metadata);
+                                StringBuilder _id = new StringBuilder();
+                                _id.append(esSimplePackage.get_id())
+                                        .append("$")
+                                        .append(dataSetCode)
+                                        .append("$")
+                                        .append(metadata);
+                                qcMetadataRecord.put("_id", _id.toString());
                                 qcMetadataRecord.put("patient_id", zipPackage.getPatientId());
                                 qcMetadataRecord.put("pack_id", esSimplePackage.get_id());
                                 qcMetadataRecord.put("org_code", zipPackage.getOrgCode());
@@ -105,9 +116,11 @@ public class PackageQcService {
                                 qcMetadataRecord.put("value", dataGroup.get(metadata));
                                 qcMetadataRecord.put("qc_step", 1); //标准质控环节
                                 qcMetadataRecord.put("qc_error_type", errorType.getType()); //标准质控错误类型
-                                qcMetadataRecord.put("qc_error_name", errorType.getName()); //标准质控错误类型
+                                qcMetadataRecord.put("qc_error_name", errorType.getName()); //标准质控错误名称
                                 qcMetadataRecord.put("qc_error_message", String.format("%s failure for meta data %s of %s in %s", methods[i], metadata, dataSetCode, zipPackage.getCdaVersion()));
+                                qcDataSetRecord.put("create_date", DATE_FORMAT.format(new Date()));
                                 zipPackage.getQcMetadataRecords().add(qcMetadataRecord);
+                                existSet.add(dataSetCode + "$" + metadata);
                             }
                         }
                     }
@@ -115,7 +128,7 @@ public class PackageQcService {
             }
         }
         qcDataSetRecord.put("details", objectMapper.writeValueAsString(details));
-        qcDataSetRecord.put("missing", new ArrayList<>());
+        qcDataSetRecord.put("missing", "[]");
     }
 
     private List<String> getDataElementList(String version, String dataSetCode) {
