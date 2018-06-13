@@ -7,6 +7,8 @@ import com.yihu.ehr.query.BaseJpaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+
 /**
  * 数据质量-平台上传预警值
  * @author yeshijie on 2018/5/28.
@@ -53,7 +55,13 @@ public class DqPaltformUploadWarningService extends BaseJpaService<DqPaltformUpl
      */
     public DqPaltformUploadWarning paltformUploadWarningUpd(DqPaltformUploadWarning warning){
 
-        save(warning);
-        return warning;
+        DqPaltformUploadWarning oldWarning = findById(warning.getId());
+        oldWarning.setErrorNum(warning.getErrorNum());
+        oldWarning.setAcrhiveNum(warning.getAcrhiveNum());
+        oldWarning.setUpdateTime(new Date());
+        oldWarning.setUpdateUserId(warning.getUpdateUserId());
+        oldWarning.setUpdateUserName(warning.getUpdateUserName());
+        save(oldWarning);
+        return oldWarning;
     }
 }

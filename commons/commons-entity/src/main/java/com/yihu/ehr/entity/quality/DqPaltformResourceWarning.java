@@ -23,7 +23,7 @@ public class DqPaltformResourceWarning {
     private Long failureNum;//失败数
     private Long errorNum;//质量问题数
     private Long unparsingNum;//未解析量
-    private Long unparsingPeriod;//未解析量预警周期
+    private String unparsingPeriod;//未解析量预警周期(HH:mm)
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -120,11 +120,11 @@ public class DqPaltformResourceWarning {
     }
 
     @Column(name = "unparsing_period")
-    public Long getUnparsingPeriod() {
+    public String getUnparsingPeriod() {
         return unparsingPeriod;
     }
 
-    public void setUnparsingPeriod(Long unparsingPeriod) {
+    public void setUnparsingPeriod(String unparsingPeriod) {
         this.unparsingPeriod = unparsingPeriod;
     }
-}
+    }

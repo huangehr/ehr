@@ -361,7 +361,7 @@ public class WarningSettingEndPoint extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value = ServiceApi.DataQuality.PaltformReceiveWarningUpd, method = RequestMethod.POST)
-    @ApiOperation(value = "新增平台接收预警")
+    @ApiOperation(value = "修改平台接收预警")
     public Envelop paltformReceiveWarningUpd(
             @ApiParam(name = "jsonData", value = "对象JSON结构体",  defaultValue = "")
             @RequestBody String jsonData) throws Exception {
@@ -379,7 +379,7 @@ public class WarningSettingEndPoint extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value = ServiceApi.DataQuality.PaltformResourceWarningUpd, method = RequestMethod.POST)
-    @ApiOperation(value = "新增平台资源化预警")
+    @ApiOperation(value = "修改平台资源化预警")
     public Envelop paltformResourceWarningUpd(
             @ApiParam(name = "jsonData", value = "对象JSON结构体",  defaultValue = "")
             @RequestBody String jsonData) throws Exception {
@@ -397,7 +397,7 @@ public class WarningSettingEndPoint extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value = ServiceApi.DataQuality.PaltformUploadWarningUpd, method = RequestMethod.POST)
-    @ApiOperation(value = "新增平台上传预警")
+    @ApiOperation(value = "修改平台上传预警")
     public Envelop paltformUploadWarningUpd(
             @ApiParam(name = "jsonData", value = "对象JSON结构体",  defaultValue = "")
             @RequestBody String jsonData) throws Exception {
