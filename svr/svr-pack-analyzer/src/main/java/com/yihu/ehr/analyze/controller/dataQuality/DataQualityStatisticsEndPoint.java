@@ -1,5 +1,8 @@
 package com.yihu.ehr.analyze.controller.dataQuality;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.yihu.ehr.analyze.service.dataQuality.DataQualityStatisticsService;
 import com.yihu.ehr.analyze.service.dataQuality.DqPaltformReceiveWarningService;
 import com.yihu.ehr.analyze.service.dataQuality.WarningProblemService;
@@ -13,6 +16,7 @@ import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -150,27 +154,46 @@ public class DataQualityStatisticsEndPoint extends EnvelopRestEndPoint {
     public Envelop receivedPacketReportData(
             @ApiParam(name = "reporter", value = "报告人", required = true)
             @RequestParam(name = "reporter") String reporter,
-            @ApiParam(name = "orgInfoList", value = "机构编码、名称，例：[{orgCode:'xx',orgName:'xx'},{...},...]，医疗云汇总记录的 orgCode 用 all 表示。", required = true)
-            @RequestParam(name = "orgInfoList") List<Map<String, String>> orgInfoList,
+            @ApiParam(name = "orgInfoList", value = "机构编码、名称，例：[{\"orgName\":\"xx\",\"orgCode\":\"jkzl\"}]。", required = true)
+            @RequestParam(name = "orgInfoList") String orgInfoList,
             @ApiParam(name = "eventDateStart", value = "就诊时间（起始），格式 yyyy-MM-dd", required = true)
             @RequestParam(name = "eventDateStart") String eventDateStart,
             @ApiParam(name = "eventDateEnd", value = "就诊时间（截止），格式 yyyy-MM-dd", required = true)
             @RequestParam(name = "eventDateEnd") String eventDateEnd) throws Exception {
-        Map<String, Object> resultMap = new HashMap<>();
-        // 接收档案包总量
-        Long receivedCount = dataQualityStatisticsService.packetCount(orgInfoList, null, eventDateStart, eventDateEnd);
-        // 成功解析档案包总量
-        Long successfulAnalysisCount = dataQualityStatisticsService.packetCount(orgInfoList, "3", eventDateStart, eventDateEnd);
-        // 机构档案包报告汇总
-        List<Map<String, Object>> orgPackReportDataList = dataQualityStatisticsService.orgPackReportData(orgInfoList, eventDateStart, eventDateEnd);
+        Envelop envelop = new Envelop();
+        try{
+            eventDateStart = eventDateStart + " 00:00:00";
+            eventDateEnd = eventDateEnd + " 23:59:59";
+            Map<String, Object> resultMap = new HashMap<>();
+            JSONArray jsonArray = JSON.parseArray(orgInfoList);
+            List<Map<String, String>> list = new ArrayList<>();
+            for(int i=0;i<jsonArray.size();i++){
+                JSONObject json = jsonArray.getJSONObject(i);
+                Map<String, String> map = new HashedMap();
+                map.put("orgCode",json.getString("orgCode"));
+                map.put("orgName",json.getString("orgName"));
+                list.add(map);
+            }
+            // 接收档案包总量
+            Long receivedCount = dataQualityStatisticsService.packetCount(list, null, eventDateStart, eventDateEnd);
+            // 成功解析档案包总量
+            Long successfulAnalysisCount = dataQualityStatisticsService.packetCount(list, "3", eventDateStart, eventDateEnd);
+            // 机构档案包报告汇总
+            List<Map<String, Object>> orgPackReportDataList = dataQualityStatisticsService.orgPackReportData(list, eventDateStart, eventDateEnd);
 
-        resultMap.put("searchedDateRange", eventDateStart.replace("-", "") + "-" + eventDateEnd.replace("-", ""));
-        resultMap.put("reportDate", DateTimeUtil.simpleDateFormat(new Date()));
-        resultMap.put("reporter", reporter);
-        resultMap.put("receivedCount", receivedCount);
-        resultMap.put("successfulAnalysisCount", successfulAnalysisCount);
-        resultMap.put("orgPackReportDataList", orgPackReportDataList);
-       return success(resultMap);
+            resultMap.put("searchedDateRange", eventDateStart.replace("-", "") + "-" + eventDateEnd.replace("-", ""));
+            resultMap.put("reportDate", DateTimeUtil.simpleDateFormat(new Date()));
+            resultMap.put("reporter", reporter);
+            resultMap.put("receivedCount", receivedCount);
+            resultMap.put("successfulAnalysisCount", successfulAnalysisCount);
+            resultMap.put("orgPackReportDataList", orgPackReportDataList);
+            return success(resultMap);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return envelop;
     }
 
     @RequestMapping(value = ServiceApi.DataQuality.ReceiveDataset, method = RequestMethod.GET)

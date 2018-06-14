@@ -4,6 +4,7 @@ package com.yihu.ehr.analyze.service.dataQuality;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.yihu.ehr.analyze.dao.DqPaltformReceiveWarningDao;
+import com.yihu.ehr.analyze.service.pack.PackQcReportService;
 import com.yihu.ehr.elasticsearch.ElasticSearchPool;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.entity.quality.DqPaltformReceiveWarning;
@@ -11,6 +12,14 @@ import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.util.datetime.DateUtil;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
+import org.elasticsearch.action.search.SearchRequestBuilder;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.search.SearchType;
+import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.search.aggregations.AggregationBuilder;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.bucket.terms.LongTerms;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.slf4j.Logger;
@@ -38,6 +47,8 @@ public class DataQualityStatisticsService extends BaseJpaService {
     private WarningSettingService warningSettingService;
     @Autowired
     private DqPaltformReceiveWarningDao dqPaltformReceiveWarningDao;
+    @Autowired
+    private PackQcReportService packQcReportService;
     @Value("${quality.orgCode}")
     private String defaultOrgCode;
     @Value("${quality.cloud}")
@@ -84,8 +95,8 @@ public class DataQualityStatisticsService extends BaseJpaService {
         });
         //统计医疗云平台数据集总数
         query = session.createSQLQuery("SELECT count(DISTINCT dataset_code) c from dq_dataset_warning WHERE type = 1 ");
-        List<Object[]> tmpList = query.list();
-        totalHospitalDataset = Integer.valueOf(tmpList.get(0)[0].toString());
+        List<Object> tmpList = query.list();
+        totalHospitalDataset = Integer.valueOf(tmpList.get(0).toString());
 
         Long en = System.currentTimeMillis();
         logger.info("初始化 数据集数据时间："+(en-startTime));
@@ -304,7 +315,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
         //新增医疗云平台数据
         Map<String, Object> totalMap = new HashedMap();
         totalMap.put("orgCode",cloud);
-        totalMap.put("orgCode",cloudName);
+        totalMap.put("orgName",cloudName);
         totalMap.put("hospitalArchives",totalHospitalAcrhives);//医院档案数
         totalMap.put("hospitalDataset",totalHospitalDataset);//医院数据集
         totalMap.put("receiveArchives",totalReceiveArchives);//接收档案数
@@ -336,15 +347,15 @@ public class DataQualityStatisticsService extends BaseJpaService {
         Long count = 0L;
         String esIndex = "json_archives";
         String esType = "info";
-        StringBuilder filter = new StringBuilder("event_date>=" + eventDateStart + " 00:00:00;event_date<=" + eventDateEnd + " 23:59:59");
+        StringBuilder filter = new StringBuilder("event_date>=" + eventDateStart + ";event_date<=" + eventDateEnd);
         if (!StringUtils.isEmpty(archiveStatus)) {
             filter.append(";archive_status=" + archiveStatus);
         }
-        if (orgInfoList.size() == 1 && "all".equals(orgInfoList.get(0).get("orgCode"))) {
+        if (orgInfoList.size() == 1 && cloud.equals(orgInfoList.get(0).get("orgCode"))) {
             elasticSearchUtil.count(esIndex, esType, filter.toString());
         } else {
             for (Map<String, String> orgInfo : orgInfoList) {
-                filter.append("orgCode=" + orgInfo.get("orgCode"));
+                filter.append(";orgCode=" + orgInfo.get("orgCode"));
                 count += elasticSearchUtil.count(esIndex, esType, filter.toString());
             }
         }
@@ -373,44 +384,159 @@ public class DataQualityStatisticsService extends BaseJpaService {
 
             // 医院上报数
             String reportedNumSql1 = "SELECT SUM(HSI07_01_001) total,SUM(HSI07_01_002) outpatientNum, SUM(HSI07_01_004) healthExaminationNum, SUM(HSI07_01_012) hospitalDischargeNum FROM qc/daily_report " +
-                    "WHERE event_date BETWEEN '" + eventDateStart + "' AND '" + eventDateEnd;
-            if (!"all".equals(orgInfo.get("orgCode"))) {
+                    "WHERE event_date BETWEEN '" + eventDateStart.replace(" ","T") + "' AND '" + eventDateEnd.replace(" ","T")+"'";
+            if (!cloud.equals(orgInfo.get("orgCode"))) {
                 reportedNumSql1 += " AND org_code='" + orgCode + "'";
             }
             String reportedNumFields1 = "total,outpatientNum,healthExaminationNum,hospitalDischargeNum";
             List<Map<String, Object>> reportedNumList1 = elasticSearchUtil.findBySql(Arrays.asList(reportedNumFields1.split(",")), reportedNumSql1);
-            reportData.put("reportedNumList", reportedNumList1);
+            reportData.put("reportedNumList1", reportedNumList1);
             // TODO 采集情况
-            String reportedNumSql2 = "SELECT count(*) total,org_code orgCode,event_type eventType FROM json_archives/info where receive_date BETWEEN '"+eventDateStart+"' AND '" +  eventDateEnd + "' " +
-                    " group by org_code,event_type";
-
-
-//            ResultSet resultSet2 = elasticSearchUtil.findBySql(sql2);
-//            try {
-//                while (resultSet2.next()) {
-//                    Map<String, Object> dataMap1 = null;
-//                    String orgCode = resultSet2.getString("org_code");
-//                    double total = resultSet2.getDouble("c");//接收 档案数
-//                    if(dataMap.containsKey(orgCode)){
-//                        dataMap1 = dataMap.get(orgCode);
-//                    }else {
-//                        dataMap1 = initDataMap(datasetMap,orgMap.get(orgCode),orgCode);
-//                    }
-//                    dataMap1.put("receiveArchives",total);
-//                    dataMap.put(orgCode,dataMap1);
-//                }
-//            }catch (Exception e){
-//                e.getMessage();
-//            }
-
+            String reportedNumSql2 = "SELECT count(*) total FROM json_archives/info where receive_date BETWEEN '"+eventDateStart+"' AND '" +  eventDateEnd + "' " ;
+            if (!cloud.equals(orgInfo.get("orgCode"))) {
+                reportedNumSql2 += " AND org_code='" + orgCode + "'";
+            }
+            reportedNumSql2 += " group by event_type";
+            String reportedNumFields2 = "event_type,total";
+            List<Map<String, Object>> reportedNumList2 = elasticSearchUtil.findBySql(Arrays.asList(reportedNumFields2.split(",")), reportedNumSql2);
+            Map<String, Object> collectionMap = new HashedMap();
+            collectionMap.put("outpatientNum",0);
+            collectionMap.put("healthExaminationNum",0);
+            collectionMap.put("hospitalDischargeNum",0);
+            double totalCollection = 0;
+            for (Map<String, Object> map : reportedNumList2){
+                double total = Double.valueOf(map.get("total").toString());
+                String eventType = map.get("event_type").toString();
+                totalCollection+=total;
+                if("1".equals(eventType)){
+                    collectionMap.put("hospitalDischargeNum",total);
+                }else if("2".equals(eventType)){
+                    collectionMap.put("healthExaminationNum",total);
+                }else if("0".equals(eventType)){
+                    collectionMap.put("outpatientNum",total);
+                }
+            }
+            collectionMap.put("total",totalCollection);
+            reportData.put("collectionMap", collectionMap);
             // TODO 采集内容
+            String reportedNumSql3 = "SELECT count(*) total FROM json_archives/info where receive_date BETWEEN '"+eventDateStart+"' AND '" +  eventDateEnd + "' " ;
+            if (!cloud.equals(orgInfo.get("orgCode"))) {
+                reportedNumSql3 += " AND org_code='" + orgCode + "'";
+            }
+            reportedNumSql3 += " group by event_type,date_histogram(field='receive_date','interval'='1d',format='yyyy-MM-dd',alias=receiveDate)";
+            String reportedNumFields3 = "event_type,receiveDate,total";
+            List<Map<String, Object>> reportedNumList3 = elasticSearchUtil.findBySql(Arrays.asList(reportedNumFields3.split(",")), reportedNumSql3);
+            Map<String, Map<String, Object>> collectionMap2 = new HashedMap();
+            reportedNumList3.forEach(map->{
+                String receiveDate = map.get("receiveDate").toString();
+                String eventType = map.get("event_type").toString();
+                double total = Double.valueOf(map.get("total").toString());
+                Map<String, Object> tmpMap = null;
+                if(collectionMap2.containsKey(receiveDate)){
+                    tmpMap = collectionMap2.get(receiveDate);
+                }else{
+                    tmpMap = new HashedMap();
+                    tmpMap.put("outpatientNum",0);
+                    tmpMap.put("healthExaminationNum",0);
+                    tmpMap.put("hospitalDischargeNum",0);
+                    tmpMap.put("receiveDate",receiveDate);
+                }
+                if("1".equals(eventType)){
+                    tmpMap.put("hospitalDischargeNum",total);
+                }else if("2".equals(eventType)){
+                    tmpMap.put("healthExaminationNum",total);
+                }else if("0".equals(eventType)){
+                    tmpMap.put("outpatientNum",total);
+                }
+                collectionMap2.put(receiveDate,tmpMap);
+            });
+            List<Map<String, Object>> reportedList3 = new ArrayList<>(reportedNumList3.size());
+            for (Map<String, Object> map:collectionMap2.values()){
+                double total = Double.valueOf(map.get("outpatientNum").toString()) +
+                        Double.valueOf(map.get("healthExaminationNum").toString()) +
+                        Double.valueOf(map.get("hospitalDischargeNum").toString());
+                if(total>0){
+                    map.put("total",total);
+                    reportedList3.add(map);
+                }
+            }
 
+            reportData.put("reportedNumList3", reportedList3);
             // TODO 解析情况
-
+            String reportedNumSql4 = "SELECT count(*) total FROM json_archives/info where receive_date BETWEEN '"+eventDateStart+"' AND '" +  eventDateEnd + "' and (archive_status=2 or archive_status=3 or archive_status=0 )" ;
+            if (!cloud.equals(orgInfo.get("orgCode"))) {
+                reportedNumSql4 += " AND org_code='" + orgCode + "'";
+            }
+            reportedNumSql4 += " group by archive_status";
+            String reportedNumFields4 = "archive_status,total";
+            List<Map<String, Object>> reportedNumList4 = elasticSearchUtil.findBySql(Arrays.asList(reportedNumFields4.split(",")), reportedNumSql4);
+            Map<String, Object> archiveMap = new HashedMap();
+            archiveMap.put("archive_status0",0);//archive_status 资源化解析状态 0未解析 1正在解析 2解析失败 3解析完成
+            archiveMap.put("archive_status2",0);
+            archiveMap.put("archive_status3",0);
+            for (Map<String, Object> map : reportedNumList4){
+                double total = Double.valueOf(map.get("total").toString());
+                String eventType = map.get("event_type").toString();
+                if("3".equals(eventType)){
+                    collectionMap.put("archive_status3",total);
+                }else if("2".equals(eventType)){
+                    collectionMap.put("archive_status2",total);
+                }else if("0".equals(eventType)){
+                    collectionMap.put("archive_status0",total);
+                }
+            }
+            reportData.put("archiveMap", archiveMap);
             // TODO 数据集总量
-
+            List<Map<String, Object>> res = new ArrayList<>();
+            StringBuilder stringBuilder1 = new StringBuilder();
+            stringBuilder1.append("qc_step=1;");
+            stringBuilder1.append("receive_date>=" + eventDateStart + ";");
+            stringBuilder1.append("receive_date<" + eventDateEnd + ";");
+            if (!cloud.equals(orgInfo.get("orgCode"))){
+                stringBuilder1.append("org_code=" + orgCode);
+            }
+            List<Map<String, Object>> list = elasticSearchUtil.list("json_archives_qc", "qc_dataset_info", stringBuilder1.toString());
+            for(Map<String, Object> map : list){
+                List<Map<String,Object>> dataSets = objectMapper.readValue(map.get("details").toString(), List.class);
+                for(Map<String, Object> dataSet : dataSets){
+                    for (Map.Entry<String, Object> entry : dataSet.entrySet()) {
+                        packQcReportService.getDataSets(map.get("version")+"", entry.getKey(), (int)entry.getValue(), res);
+                    }
+                }
+            }
+            reportData.put("reportedNumList5", res);
             // TODO 解析失败分析
-
+            StringBuilder stringBuilder2 = new StringBuilder();
+            stringBuilder2.append("archive_status=2;");
+            stringBuilder2.append("receive_date>=" + eventDateStart + ";");
+            stringBuilder2.append("receive_date<" + eventDateEnd + ";");
+            if (!cloud.equals(orgInfo.get("orgCode"))){
+                stringBuilder2.append("org_code=" + orgCode);
+            }
+            TransportClient transportClient = elasticSearchPool.getClient();
+            try {
+                List<Map<String, Object>> resultList = new ArrayList<>();
+                SearchRequestBuilder builder = transportClient.prepareSearch("json_archives");
+                builder.setTypes("info");
+                builder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
+                builder.setQuery(elasticSearchUtil.getQueryBuilder(stringBuilder2.toString()));
+                AggregationBuilder terms = AggregationBuilders.terms("error_type").field("error_type");
+                builder.addAggregation(terms);
+                builder.setSize(0);
+                builder.setExplain(true);
+                SearchResponse response = builder.get();
+                LongTerms longTerms = response.getAggregations().get("error_type");
+                for(Terms.Bucket item: longTerms.getBuckets()){
+                    Map<String, Object> temp = new HashMap<>();
+                    temp.put("error_type", item.getKeyAsString());
+                    temp.put("error_count", item.getDocCount());
+                    resultList.add(temp);
+                }
+                reportData.put("reportedNumList6", resultList);
+            } finally {
+                elasticSearchPool.releaseClient(transportClient);
+            }
+            reportDataList.add(reportData);
         }
         return reportDataList;
     }
