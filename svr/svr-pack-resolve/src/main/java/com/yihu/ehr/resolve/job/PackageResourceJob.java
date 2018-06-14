@@ -121,6 +121,11 @@ public class PackageResourceJob implements InterruptableJob {
         map.put("delay", delay % DAY > 0 ? delay / DAY + 1 : delay / DAY);
         map.put("re_upload_flg", String.valueOf(originalPackage.isReUploadFlg()));
         pack.setRowkey(resourceBucket.getId());
+        pack.setPatient_id(originalPackage.getPatientId());
+        pack.setEvent_date(DateUtil.toStringLong(originalPackage.getEventTime()));
+        pack.setEvent_no(originalPackage.getEventNo());
+        pack.setEvent_type(originalPackage.getEventType() == null ? -1 : originalPackage.getEventType().getType());
+        pack.setOrg_code(originalPackage.getOrgCode());
         packageMgrClient.reportStatus(pack.get_id(), ArchiveStatus.Finished, 0, objectMapper.writeValueAsString(map));
     }
 

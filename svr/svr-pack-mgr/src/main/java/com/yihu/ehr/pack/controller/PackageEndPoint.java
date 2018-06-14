@@ -13,6 +13,7 @@ import com.yihu.ehr.pack.task.FastDFSTask;
 import com.yihu.ehr.profile.AnalyzeStatus;
 import com.yihu.ehr.profile.ArchiveStatus;
 import com.yihu.ehr.profile.queue.RedisCollection;
+import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.encrypt.RSA;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
@@ -494,6 +495,11 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
                     esSimplePackage.setRemote_path(String.valueOf(item.get("remote_path")));
                     esSimplePackage.setClient_id(String.valueOf(item.get("client_id")));
                     esSimplePackage.setRowkey(String.valueOf(item.get("profile_id")));
+                    esSimplePackage.setPatient_id(String.valueOf(item.get("patient_id")));
+                    esSimplePackage.setEvent_date(String.valueOf(item.get("event_date")));
+                    esSimplePackage.setEvent_no(String.valueOf(item.get("event_no")));
+                    esSimplePackage.setEvent_type( Integer.valueOf(item.get("event_type").toString()));
+                    esSimplePackage.setOrg_code(String.valueOf(item.get("org_code")));
                     //存入省平台上传队列
                 redisTemplate.opsForList().leftPush(RedisCollection.ProvincialPlatformQueue, objectMapper.writeValueAsString(esSimplePackage));
                 }
