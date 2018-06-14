@@ -1,5 +1,6 @@
 package com.yihu.ehr.query.services;
 
+import com.yihu.ehr.hbase.HBaseDao;
 import com.yihu.ehr.query.common.enums.Logical;
 import com.yihu.ehr.query.common.enums.Operation;
 import com.yihu.ehr.query.common.model.QueryCondition;
@@ -7,6 +8,10 @@ import com.yihu.ehr.query.common.model.SolrGroupEntity;
 import com.yihu.ehr.solr.SolrUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.apache.hadoop.hbase.Cell;
+import org.apache.hadoop.hbase.CellUtil;
+import org.apache.hadoop.hbase.client.Result;
+import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.FieldStatsInfo;
 import org.apache.solr.client.solrj.response.PivotField;
@@ -35,6 +40,8 @@ public class SolrQuery {
 
     @Autowired
     private SolrUtil solrUtil;
+    @Autowired
+    private HBaseDao hBaseDao;
 
     public void initParams(String startTime, String endTime) {
         // 初始执行指标，起止日期没有值，默认分组聚合前50年的。
@@ -204,21 +211,88 @@ public class SolrQuery {
      */
     public List<Map<String,Object>> queryReturnFieldList(String tableName, String q ,String fq , Map<String, String> sort, long start, long rows,String[] fields) throws Exception {
         List<Map<String,Object>> data = new ArrayList<>();
+        List<String> falseStoreList = new ArrayList<>();
+        boolean isStored = true;
+        for(String key :fields){
+            if(key.contains("EHR_")){
+                isStored = false;
+                falseStoreList.add(key);
+            }
+        }
         SolrDocumentList solrList = solrUtil.query(tableName, q, fq, sort, start, rows,fields);
-        //如果是时间结果，则被加了八个小时
         if(solrList!=null && solrList.getNumFound()>0){
             for (SolrDocument doc : solrList){
                 Map<String,Object> map = new HashMap<>();
                 if(fields != null && fields.length > 0){
                     for(String key :fields){
                         if(key.equals("event_date")){
+                            //如果是时间结果，则被加了八个小时
                             map.put(key, DateUtils.addHours((Date)doc.getFieldValue(key), -8));
                         }else {
-                            map.put(key,doc.getFieldValue(key));
+                            if(doc.getFieldValue(key) != null ){
+                                map.put(key,doc.getFieldValue(key));
+                            }
                         }
                     }
                 }
                 data.add(map);
+            }
+        }
+        //solr 未被存储的数据需要从hbase中查询得到原始数据
+        if( ! isStored){
+            Map<String,Object> map = new HashMap<>();
+            List<String> rowkeyList = new ArrayList<>();
+            if(data != null && data.size() > 0){
+                for (Map<String,Object> keyMap : data) {
+                    if(keyMap.get("rowkey") != null ){
+                        rowkeyList.add( keyMap.get("rowkey").toString() );
+                    }
+                }
+                if(rowkeyList.size() > 20000){
+                    int p = rowkeyList.size()/20000;
+                    int d = rowkeyList.size()%20000;
+                    if( d != 0){
+                        p++;
+                    }
+                    for(int i=0; i<p ;i++){
+                        for(String storeKey :falseStoreList){
+                            Result[] hbaseResult = hBaseDao.getResultList(tableName, rowkeyList, null, storeKey);
+                            if(hbaseResult != null){
+                                for (Map<String,Object> keyMap : data) {
+                                    for (Result result : hbaseResult) {
+                                        String rowkey = Bytes.toString(result.getRow());
+                                        if(keyMap.get("rowkey").toString().equals(rowkey) ){
+                                            String fieldValue = "";
+                                            for(Cell cell : result.rawCells()) {
+                                                fieldValue = Bytes.toString(CellUtil. cloneValue(cell));
+                                            }
+                                            keyMap.put(storeKey,fieldValue);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }else {
+                    for(String storeKey :falseStoreList){
+                        Result[] hbaseResult = hBaseDao.getResultList(tableName, rowkeyList, null, storeKey);
+                        if(hbaseResult != null){
+                            for (Map<String,Object> keyMap : data) {
+                                for (Result result : hbaseResult) {
+                                    String rowkey = Bytes.toString(result.getRow());
+                                    if(keyMap.get("rowkey").toString().equals(rowkey) ){
+                                        String fieldValue = "";
+                                        for(Cell cell : result.rawCells()) {
+                                            fieldValue = Bytes.toString(CellUtil. cloneValue(cell));
+                                        }
+                                        keyMap.put(storeKey,fieldValue);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
             }
         }
         return  data;

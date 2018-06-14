@@ -326,10 +326,10 @@ public class QuotaReportController extends BaseController {
 
                         }
                     }
+                    lineData.put("" + i, dataMap);
+                    lineNames.add(tjQuota.getName());
+                    i++;
                 }
-                lineData.put("" + i, dataMap);
-                lineNames.add(tjQuota.getName());
-                i++;
             }
 //            lineNames.add(title);
 //            lineData.put("", dataMap);

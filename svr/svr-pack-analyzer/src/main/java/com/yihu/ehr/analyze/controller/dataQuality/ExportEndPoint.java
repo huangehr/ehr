@@ -472,7 +472,7 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value = ServiceApi.DataQuality.ExportReceptionList, method = RequestMethod.GET)
-    @ApiOperation(value = "导出平台接收列表")
+    @ApiOperation(value = "导出接收情况列表")
     public void exportReceptionList( @ApiParam(name = "start", value = "开始时间")
                                          @RequestParam(value = "start", required = false) String start,
                                          @ApiParam(name = "end", value = "结束时间", defaultValue = "")
