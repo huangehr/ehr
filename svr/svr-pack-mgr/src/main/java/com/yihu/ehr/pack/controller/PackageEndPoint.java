@@ -511,6 +511,14 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
 
     }
 
+    @RequestMapping(value = ServiceApi.Packages.UploadProvincialQueueSize, method = RequestMethod.DELETE)
+    @ApiOperation(value = "删除省平台上传队列", notes = "通过事件时间，添加已解析的档案包到队列中")
+    public boolean uploadProvincialQueue() {
+        redisTemplate.delete(RedisCollection.ProvincialPlatformQueue);
+        return true;
+    }
+
+
     //-------------------------------------------------
 
     /*@RequestMapping(value = ServiceApi.Packages.Migrate, method = RequestMethod.POST)

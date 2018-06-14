@@ -30,6 +30,8 @@ import java.util.*;
 public class PackageQcService {
     private static final Logger logger = LoggerFactory.getLogger(PackageQcService.class);
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static final Class clazz = QcRuleCheckService.class;
+
 
     @Autowired
     private RedisTemplate<String, Serializable> redisTemplate;
@@ -74,54 +76,51 @@ public class PackageQcService {
             dataSet.put(dataSetCode, dataSets.get(dataSetCode).getRecords().size());
             details.add(dataSet);
             Map<String, MetaDataRecord> records = dataSets.get(dataSetCode).getRecords();
-            Set<String> existSet = new HashSet<>();
+            Set<String> existSet = new HashSet<>(); //存放已经生成了质控信息的数据元
             for (String recordKey : records.keySet()) {
                 Map<String, String> dataGroup = records.get(recordKey).getDataGroup();
                 List<String> listDataElement = getDataElementList(dataSets.get(dataSetCode).getCdaVersion(), dataSetCode);
                 for (String metadata : listDataElement) {
-                    if (existSet.contains(dataSetCode + "$" + metadata)) {
+                    if (existSet.contains(dataSetCode + "$" + metadata)) { //如果该数据元已经有质控数据则跳过
                         continue;
                     }
                     Serializable serializable = redisTemplate.opsForValue().get("qc_" + zipPackage.getCdaVersion() + ":" + dataSetCode + ":" + metadata);
                     if (serializable != null) {
-                        Class clazz = qcRuleCheckService.getClass();
-                        String[] methods = serializable.toString().split(";");
-                        for(int i = 0; i < methods.length; i++) {
-                            Method _method = clazz.getMethod(methods[i], new Class[]{String.class, String.class, String.class, String.class});
-                            _method.setAccessible(true);
-                            ErrorType errorType = (ErrorType) _method.invoke(qcRuleCheckService, zipPackage.getCdaVersion(), dataSetCode, metadata, dataGroup.get(metadata));
-                            if (errorType != ErrorType.Normal) {
-                                Map<String, Object> qcMetadataRecord = new HashMap<>();
-                                StringBuilder _id = new StringBuilder();
-                                _id.append(esSimplePackage.get_id())
-                                        .append("$")
-                                        .append(dataSetCode)
-                                        .append("$")
-                                        .append(metadata);
-                                qcMetadataRecord.put("_id", _id.toString());
-                                qcMetadataRecord.put("patient_id", zipPackage.getPatientId());
-                                qcMetadataRecord.put("pack_id", esSimplePackage.get_id());
-                                qcMetadataRecord.put("org_code", zipPackage.getOrgCode());
-                                qcMetadataRecord.put("org_name", zipPackage.getOrgName());
-                                qcMetadataRecord.put("org_area", zipPackage.getOrgArea());
-                                qcMetadataRecord.put("dept", zipPackage.getDeptCode());
-                                qcMetadataRecord.put("diagnosis_name", StringUtils.join(zipPackage.getDiagnosisName().toArray(), ";"));
-                                qcMetadataRecord.put("receive_date", DATE_FORMAT.format(esSimplePackage.getReceive_date()));
-                                qcMetadataRecord.put("event_date", DateUtil.toStringLong(zipPackage.getEventDate()));
-                                qcMetadataRecord.put("event_type", zipPackage.getEventType() == null ? -1 : zipPackage.getEventType().getType());
-                                qcMetadataRecord.put("event_no", zipPackage.getEventNo());
-                                qcMetadataRecord.put("version", zipPackage.getCdaVersion());
-                                qcMetadataRecord.put("dataset", dataSetCode);
-                                qcMetadataRecord.put("metadata", metadata);
-                                qcMetadataRecord.put("value", dataGroup.get(metadata));
-                                qcMetadataRecord.put("qc_step", 1); //标准质控环节
-                                qcMetadataRecord.put("qc_error_type", errorType.getType()); //标准质控错误类型
-                                qcMetadataRecord.put("qc_error_name", errorType.getName()); //标准质控错误名称
-                                qcMetadataRecord.put("qc_error_message", String.format("%s failure for meta data %s of %s in %s", methods[i], metadata, dataSetCode, zipPackage.getCdaVersion()));
-                                qcMetadataRecord.put("create_date", DATE_FORMAT.format(new Date()));
-                                zipPackage.getQcMetadataRecords().add(qcMetadataRecord);
-                                existSet.add(dataSetCode + "$" + metadata);
-                            }
+                        String method = serializable.toString();
+                        Method _method = clazz.getMethod(method, new Class[]{String.class, String.class, String.class, String.class});
+                        _method.setAccessible(true);
+                        ErrorType errorType = (ErrorType) _method.invoke(qcRuleCheckService, zipPackage.getCdaVersion(), dataSetCode, metadata, dataGroup.get(metadata));
+                        if (errorType != ErrorType.Normal) {
+                            Map<String, Object> qcMetadataRecord = new HashMap<>();
+                            StringBuilder _id = new StringBuilder();
+                            _id.append(esSimplePackage.get_id())
+                                    .append("$")
+                                    .append(dataSetCode)
+                                    .append("$")
+                                    .append(metadata);
+                            qcMetadataRecord.put("_id", _id.toString());
+                            qcMetadataRecord.put("patient_id", zipPackage.getPatientId());
+                            qcMetadataRecord.put("pack_id", esSimplePackage.get_id());
+                            qcMetadataRecord.put("org_code", zipPackage.getOrgCode());
+                            qcMetadataRecord.put("org_name", zipPackage.getOrgName());
+                            qcMetadataRecord.put("org_area", zipPackage.getOrgArea());
+                            qcMetadataRecord.put("dept", zipPackage.getDeptCode());
+                            qcMetadataRecord.put("diagnosis_name", StringUtils.join(zipPackage.getDiagnosisName().toArray(), ";"));
+                            qcMetadataRecord.put("receive_date", DATE_FORMAT.format(esSimplePackage.getReceive_date()));
+                            qcMetadataRecord.put("event_date", DateUtil.toStringLong(zipPackage.getEventDate()));
+                            qcMetadataRecord.put("event_type", zipPackage.getEventType() == null ? -1 : zipPackage.getEventType().getType());
+                            qcMetadataRecord.put("event_no", zipPackage.getEventNo());
+                            qcMetadataRecord.put("version", zipPackage.getCdaVersion());
+                            qcMetadataRecord.put("dataset", dataSetCode);
+                            qcMetadataRecord.put("metadata", metadata);
+                            qcMetadataRecord.put("value", dataGroup.get(metadata));
+                            qcMetadataRecord.put("qc_step", 1); //标准质控环节
+                            qcMetadataRecord.put("qc_error_type", errorType.getType()); //标准质控错误类型
+                            qcMetadataRecord.put("qc_error_name", errorType.getName()); //标准质控错误名称
+                            qcMetadataRecord.put("qc_error_message", String.format("%s failure for meta data %s of %s in %s", method, metadata, dataSetCode, zipPackage.getCdaVersion()));
+                            qcMetadataRecord.put("create_date", DATE_FORMAT.format(new Date()));
+                            zipPackage.getQcMetadataRecords().add(qcMetadataRecord);
+                            existSet.add(dataSetCode + "$" + metadata);
                         }
                     }
                 }
@@ -144,7 +143,7 @@ public class PackageQcService {
     /**
      * 获取key
      */
-    public String makeKey(String table, String key, String column) {
+    private String makeKey(String table, String key, String column) {
         return new StringBuilderEx("%1:%2:%3")
                 .arg(table)
                 .arg(key)

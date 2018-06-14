@@ -193,7 +193,7 @@ public class RedisService {
      */
     public String getMetaDataFormat(String version, String dataSetCode, String innerCode) {
 
-        return stdMetaDataKeySchema.metaDataType(version, dataSetCode, innerCode);
+        return stdMetaDataKeySchema.metaDataFormat(version, dataSetCode, innerCode);
     }
 
     /**
