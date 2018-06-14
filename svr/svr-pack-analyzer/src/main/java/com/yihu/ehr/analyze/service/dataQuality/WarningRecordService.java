@@ -209,6 +209,22 @@ public class WarningRecordService extends BaseJpaService<DqWarningRecord, DqWarn
         }
     }
 
+    public void addQualityMonitoringCell(WritableSheet ws){
+        try {
+            addCell(ws,0,0,"机构");
+            addCell(ws,1,0,"医院档案数");
+            addCell(ws,2,0,"医院数据集");
+            addCell(ws,3,0,"接收档案数");
+            addCell(ws,4,0,"接收数据集");
+            addCell(ws,5,0,"接收质量异常数");
+            addCell(ws,6,0,"资源化解析成功");
+            addCell(ws,7,0,"资源化解析失败");
+            addCell(ws,8,0,"资源化解析异常");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     /**
      * 添加单元格内容
      * @param ws

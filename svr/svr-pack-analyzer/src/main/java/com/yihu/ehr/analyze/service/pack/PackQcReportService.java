@@ -372,9 +372,10 @@ public class PackQcReportService extends BaseJpaService {
      * @throws Exception
      */
     public List<Map<String, Object>> analyzeErrorList(String filters, String sorts, int page, int size) throws Exception {
+        List<Map<String, Object>> orgs = getOrgs();
         List<Map<String, Object>> list = elasticSearchUtil.page("json_archives","info", filters, sorts, page, size);
         for(Map<String, Object> map:list){
-            map.put("org_name",redisClient.get(map.get("org_code")+""));
+            map.put("org_name",getOrgName(orgs, map.get("org_code")+""));
         }
         return list;
     }
@@ -392,7 +393,7 @@ public class PackQcReportService extends BaseJpaService {
         List<Map<String, Object>> orgs = getOrgs();
         List<Map<String, Object>> list = elasticSearchUtil.page("json_archives_qc","qc_metadata_info", filters, sorts, page, size);
         for(Map<String, Object> map:list){
-            map.put("org_name",redisClient.get(map.get("org_code")+""));
+            map.put("org_name",getOrgName(orgs, map.get("org_code")+""));
         }
         return list;
     }
@@ -446,9 +447,10 @@ public class PackQcReportService extends BaseJpaService {
      * @throws Exception
      */
     public List<Map<String, Object>> archiveList(String filters, String sorts, int page, int size) throws Exception {
+        List<Map<String, Object>> orgs = getOrgs();
         List<Map<String, Object>> list = elasticSearchUtil.page("json_archives","info", filters, sorts, page, size);
         for(Map<String, Object> map:list){
-            map.put("org_name",redisClient.get(map.get("org_code")+""));
+            map.put("org_name",getOrgName(orgs, map.get("org_code")+""));
         }
         return list;
     }
@@ -462,8 +464,9 @@ public class PackQcReportService extends BaseJpaService {
     public Envelop archiveDetail(String id) throws Exception {
         Envelop envelop = new Envelop();
         Map<String, Object> res = new HashMap<>();
+        List<Map<String, Object>> orgs = getOrgs();
         Map<String, Object> archive = elasticSearchUtil.findById("json_archives","info",id);
-        archive.put("org_name",redisClient.get(archive.get("org_code")+""));
+        archive.put("org_name",getOrgName(orgs, archive.get("org_code")+""));
         res.put("archive",archive);
         res.put("relation",elasticSearchUtil.findById("archive_relation","info",archive.get("profile_id")+""));
         envelop.setObj(res);
@@ -480,9 +483,10 @@ public class PackQcReportService extends BaseJpaService {
      * @throws Exception
      */
     public List<Map<String, Object>> uploadRecordList(String filters, String sorts, int page, int size) throws Exception {
+        List<Map<String, Object>> orgs = getOrgs();
         List<Map<String, Object>> list = elasticSearchUtil.page("upload","record", filters, sorts, page, size);
         for(Map<String, Object> map:list){
-            map.put("org_name",redisClient.get(map.get("org_code")+""));
+            map.put("org_name",getOrgName(orgs, map.get("org_code")+""));
         }
         return list;
     }
@@ -496,19 +500,18 @@ public class PackQcReportService extends BaseJpaService {
     public Envelop uploadRecordDetail(String id) throws Exception {
         Envelop envelop = new Envelop();
         Map<String,Object> res = new HashMap<>();
+        List<Map<String, Object>> orgs = getOrgs();
         Map<String, Object> uploadRecord = elasticSearchUtil.findById("upload","record",id);
-        uploadRecord.put("org_name",redisClient.get(uploadRecord.get("org_code")+""));
+        uploadRecord.put("org_name",getOrgName(orgs, uploadRecord.get("org_code")+""));
         List<Map<String, Object>> datasets = new ArrayList<>();
         if(uploadRecord.get("missing")!=null) {
-            List<Map<String,Object>> missing = objectMapper.readValue(uploadRecord.get("missing").toString(), List.class);
-            for (Map<String, Object> dataSet : missing) {
-                for (Map.Entry<String, Object> entry : dataSet.entrySet()) {
-                    Map<String, Object> dataset = new HashMap<>();
-                    dataset.put("code", entry.getKey());
-                    dataset.put("name", redisClient.get("std_data_set_" + uploadRecord.get("from_version") + ":" + entry.getKey() + ":name"));
-                    dataset.put("status", "0");
-                    datasets.add(dataset);
-                }
+            List<String> missing = objectMapper.readValue(uploadRecord.get("missing").toString(), List.class);
+            for (String dataSet : missing) {
+                Map<String, Object> dataset = new HashMap<>();
+                dataset.put("code", dataSet);
+                dataset.put("name", redisClient.get("std_data_set_" + uploadRecord.get("from_version") + ":" + dataSet + ":name"));
+                dataset.put("status", "未上传");
+                datasets.add(dataset);
             }
         }
         if(uploadRecord.get("datasets")!=null) {
@@ -518,7 +521,7 @@ public class PackQcReportService extends BaseJpaService {
                     Map<String, Object> dataset = new HashMap<>();
                     dataset.put("code", entry.getKey());
                     dataset.put("name", redisClient.get("std_data_set_" + uploadRecord.get("from_version") + ":" + entry.getKey() + ":name"));
-                    dataset.put("status", "1");
+                    dataset.put("status", "已上传");
                     datasets.add(dataset);
                 }
             }

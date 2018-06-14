@@ -60,6 +60,15 @@ public class RolesEndPoint extends EnvelopRestEndPoint {
                 rolesNew.setOrgCode(orgs[i]);
                 rolesNew = rolesService.save(rolesNew);
             }
+        }else{
+            rolesNew = new Roles();
+            rolesNew.setAppId(roles.getAppId());
+            rolesNew.setCode(roles.getCode());
+            rolesNew.setName(roles.getName());
+            rolesNew.setDescription(roles.getDescription());
+            rolesNew.setType(roles.getType());
+            rolesNew.setOrgCode("");
+            rolesNew = rolesService.save(rolesNew);
         }
         if (rolesNew != null) {
             return true;

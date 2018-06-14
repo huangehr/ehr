@@ -45,9 +45,9 @@ hadoop:
 
 analyze:
   job:
-    minSize: 2 #质控初始任务数
+    minSize: 10 #质控初始任务数
     maxSize: 10 #质控最大任务数
-    cronExp: 0/4 * * * * ? #质控任务触发间隔表达式
+    cronExp: 0/1 * * * * ? #质控任务触发间隔表达式
 
 quality:
   orgCode : 1 #默认机构

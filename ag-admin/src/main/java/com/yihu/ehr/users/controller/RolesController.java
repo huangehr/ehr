@@ -35,9 +35,9 @@ import java.util.List;
  * Created by yww on 2016/7/7.
  */
 @EnableFeignClients
-@RequestMapping(ApiVersion.Version1_0+"/admin")
+@RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
-@Api(value = "roles",description = "角色管理", tags = {"安全管理-角色管理"})
+@Api(value = "roles", description = "角色管理", tags = {"安全管理-角色管理"})
 public class RolesController extends BaseController {
     @Autowired
     private RolesClient rolesClient;
@@ -56,112 +56,112 @@ public class RolesController extends BaseController {
     @Autowired
     private OrganizationClient organizationClient;
 
-    @RequestMapping(value = ServiceApi.Roles.RoleBatchAdd,method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Roles.RoleBatchAdd, method = RequestMethod.POST)
     @ApiOperation(value = "批量新增角色组")
     public Envelop roleBatchAdd(
-            @ApiParam(name = "data_json",value = "新增角色组Json字符串")
+            @ApiParam(name = "data_json", value = "新增角色组Json字符串")
             @RequestParam(value = "data_json") String dataJson,
             @ApiParam(name = "orgCodes", value = "多机构编码拼接字符串")
-            @RequestParam(value = "orgCodes") String orgCodes){
-        MRoles model=new MRoles();
+            @RequestParam(value = "orgCodes") String orgCodes) {
+        MRoles model = new MRoles();
         try {
-            model= objectMapper.readValue(dataJson, MRoles.class);
-            if(null!=model&&model.getDescription().length()>250){
+            model = objectMapper.readValue(dataJson, MRoles.class);
+            if (null != model && model.getDescription().length() > 250) {
                 return failed("角色组描述不能大于250字");
             }
-        }catch (Exception e){
-
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         Boolean flag = rolesClient.roleBatchAdd(dataJson, orgCodes);
-        if(!flag){
+        if (!flag) {
             return failed("新增角色组失败");
-        }else {
-            return  success("新增角色组成功");
+        } else {
+            return success("新增角色组成功");
         }
     }
 
-    @RequestMapping(value = ServiceApi.Roles.Role,method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Roles.Role, method = RequestMethod.POST)
     @ApiOperation(value = "新增角色组")
     public Envelop createRoles(
-            @ApiParam(name = "data_json",value = "新增角色组Json字符串")
-            @RequestParam(value = "data_json") String dataJson){
-        MRoles model=new MRoles();
+            @ApiParam(name = "data_json", value = "新增角色组Json字符串")
+            @RequestParam(value = "data_json") String dataJson) {
+        MRoles model = new MRoles();
         try {
-            model= objectMapper.readValue(dataJson, MRoles.class);
-            if(null!=model&&model.getDescription().length()>250){
+            model = objectMapper.readValue(dataJson, MRoles.class);
+            if (null != model && model.getDescription().length() > 250) {
                 return failed("角色组描述不能大于250字");
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         MRoles mRoles = rolesClient.createRoles(dataJson);
-        if(null == mRoles){
+        if (null == mRoles) {
             return failed("新增角色组失败");
         }
         return success(convertToModel(mRoles, RolesModel.class));
     }
 
-    @RequestMapping(value = ServiceApi.Roles.Role,method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Roles.Role, method = RequestMethod.PUT)
     @ApiOperation(value = "修改角色组")
     public Envelop updateRoles(
-            @ApiParam(name = "data_json",value = "修改角色组Json字符串")
-            @RequestParam(value = "data_json") String dataJson){
-        MRoles model=new MRoles();
+            @ApiParam(name = "data_json", value = "修改角色组Json字符串")
+            @RequestParam(value = "data_json") String dataJson) {
+        MRoles model = new MRoles();
         try {
-            model= objectMapper.readValue(dataJson, MRoles.class);
-            if(null!=model&&model.getDescription().length()>250){
+            model = objectMapper.readValue(dataJson, MRoles.class);
+            if (null != model && model.getDescription().length() > 250) {
                 return failed("角色组描述不能大于250字");
             }
-        }catch (Exception e){
+        } catch (Exception e) {
 
         }
         MRoles mRoles = rolesClient.updateRoles(dataJson);
-        if(null == mRoles){
+        if (null == mRoles) {
             return failed("修改角色组失败");
         }
         return success(convertToModel(mRoles, RolesModel.class));
     }
 
-    @RequestMapping(value = ServiceApi.Roles.RoleId,method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Roles.RoleId, method = RequestMethod.DELETE)
     @ApiOperation(value = "根据角色组id删除")
     public Envelop deleteRoles(
-            @ApiParam(name = "id",value = "角色组id")
-            @PathVariable(value = "id") long id){
+            @ApiParam(name = "id", value = "角色组id")
+            @PathVariable(value = "id") long id) {
         //判断是否已配置人员
         Collection<MRoleUser> mRoleUsers = roleUserClient.searchRoleUserNoPaging("roleId=" + id);
-        if(mRoleUsers != null&&mRoleUsers.size()>0){
+        if (mRoleUsers != null && mRoleUsers.size() > 0) {
             return failed("已配置人员角色组不能删除！");
         }
         //判断是否已配置应用权限
-        Collection<MRoleFeatureRelation> mRelation = roleFeatureRelationClient.searchRoleFeatureNoPaging("roleId="+id);
-        if(mRelation != null && mRelation.size()>0){
+        Collection<MRoleFeatureRelation> mRelation = roleFeatureRelationClient.searchRoleFeatureNoPaging("roleId=" + id);
+        if (mRelation != null && mRelation.size() > 0) {
             return failed("已配置应用权限角色组不能删除！");
         }
         //判断是否已配置接入应用
-        Collection<MRoleAppRelation> mRoleAppRelation = roleAppRelationClient.searchRoleAppNoPaging("roleId="+id);
-        if(mRoleAppRelation != null && mRoleAppRelation.size()>0){
+        Collection<MRoleAppRelation> mRoleAppRelation = roleAppRelationClient.searchRoleAppNoPaging("roleId=" + id);
+        if (mRoleAppRelation != null && mRoleAppRelation.size() > 0) {
             return failed("已配置接入应用角色组不能删除！");
         }
         //判断是否已配应用api
-        Collection<MRoleApiRelation> mRoleApiRelations = roleApiRelationClient.searchRoleApiRelationNoPaging("roleId="+id);
-        if(mRoleApiRelations != null && mRoleApiRelations.size()>0){
+        Collection<MRoleApiRelation> mRoleApiRelations = roleApiRelationClient.searchRoleApiRelationNoPaging("roleId=" + id);
+        if (mRoleApiRelations != null && mRoleApiRelations.size() > 0) {
             return failed("已配置应用api的角色组不能删除！");
         }
 
         boolean bo = rolesClient.deleteRoles(id);
-        if(bo){
+        if (bo) {
             return success(null);
         }
         return failed("角色组删除失败！");
     }
 
-    @RequestMapping(value = ServiceApi.Roles.RoleId,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Roles.RoleId, method = RequestMethod.GET)
     @ApiOperation(value = "根据角色组id查询")
     public Envelop getRolesById(
-            @ApiParam(name = "id",value = "角色组id")
-            @PathVariable(value = "id") long id){
+            @ApiParam(name = "id", value = "角色组id")
+            @PathVariable(value = "id") long id) {
         MRoles mRoles = rolesClient.getRolesById(id);
-        if(null ==mRoles){
+        if (null == mRoles) {
             return failed("获取角色组失败！");
         }
         RolesModel rolesModel = convertToModel(mRoles, RolesModel.class);
@@ -174,7 +174,7 @@ public class RolesController extends BaseController {
         return success(rolesModel);
     }
 
-    @RequestMapping(value = ServiceApi.Roles.Roles,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Roles.Roles, method = RequestMethod.GET)
     @ApiOperation(value = "查询用户角色列表---分页")
     public Envelop searchRoles(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,code,name,description,appId,type")
@@ -186,13 +186,13 @@ public class RolesController extends BaseController {
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page) throws Exception{
+            @RequestParam(value = "page", required = false) int page) throws Exception {
         List<RolesModel> rolesModelList = new ArrayList<>();
         ResponseEntity<Collection<MRoles>> responseEntity = rolesClient.searchRoles(fields, filters, sorts, size, page);
-        Collection<MRoles> mRoles  = responseEntity.getBody();
-        for (MRoles m : mRoles){
+        Collection<MRoles> mRoles = responseEntity.getBody();
+        for (MRoles m : mRoles) {
             RolesModel rolesModel = convertToModel(m, RolesModel.class);
-            if (rolesModel.getOrgCode() != null) {
+            if (rolesModel.getOrgCode() != null && StringUtils.isNotEmpty(rolesModel.getOrgCode())) {
                 MOrganization mOrganization = organizationClient.getOrg(rolesModel.getOrgCode());
                 if (mOrganization != null) {
                     rolesModel.setOrgName(mOrganization.getFullName());
@@ -201,70 +201,76 @@ public class RolesController extends BaseController {
             rolesModelList.add(rolesModel);
         }
         Integer totalCount = getTotalCount(responseEntity);
-        return getResult(rolesModelList,totalCount,page,size);
+        return getResult(rolesModelList, totalCount, page, size);
     }
 
-    @RequestMapping(value = ServiceApi.Roles.RolesNoPage,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Roles.RolesNoPage, method = RequestMethod.GET)
     @ApiOperation(value = "查询用户角色列表---不分页")
     public Envelop searchRolesNoPaging(
-            @ApiParam(name = "filters",value = "过滤条件，为空检索全部",defaultValue = "")
-            @RequestParam(value = "filters",required = false) String filters) throws  Exception{
+            @ApiParam(name = "filters", value = "过滤条件，为空检索全部", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters) throws Exception {
         Envelop envelop = new Envelop();
         Collection<MRoles> mRoles = rolesClient.searchRolesNoPaging(filters);
-        List<RolesModel> rolesModelList = (List<RolesModel>)convertToModels(mRoles,
-                new ArrayList<RolesModel>(),RolesModel.class,null);
+        List<RolesModel> rolesModelList = (List<RolesModel>) convertToModels(mRoles,
+                new ArrayList<RolesModel>(), RolesModel.class, null);
         envelop.setSuccessFlg(true);
         envelop.setDetailModelList(rolesModelList);
         return envelop;
     }
 
-    @RequestMapping(value = ServiceApi.Roles.RoleNameExistence,method = RequestMethod.GET)
-    @ApiOperation(value = "角色组名称是否已存在" )
+    @RequestMapping(value = ServiceApi.Roles.RoleNameExistence, method = RequestMethod.GET)
+    @ApiOperation(value = "角色组名称是否已存在")
     public Envelop isNameExistence(
-            @ApiParam(name = "app_id",value = "应用id")
+            @ApiParam(name = "app_id", value = "应用id")
             @RequestParam(value = "app_id") String appId,
-            @ApiParam(name = "name",value = "角色组名")
+            @ApiParam(name = "name", value = "角色组名")
             @RequestParam(value = "name") String name,
-            @ApiParam(name = "orgCode",value = "机构Code")
+            @ApiParam(name = "orgCode", value = "机构Code")
             @RequestParam(value = "orgCode") String orgCode,
-            @ApiParam(name = "type",value = "角色组类别")
-            @RequestParam(value = "type",required = false) String type){
-        boolean bo = rolesClient.isNameExistence(appId,name,orgCode,type);
-        if(bo){
-            MOrganization organization = organizationClient.getOrg(orgCode);
-            return success(name + "在" + organization.getFullName()+"中已存在！"  );
+            @ApiParam(name = "type", value = "角色组类别")
+            @RequestParam(value = "type", required = false) String type) {
+        boolean bo = rolesClient.isNameExistence(appId, name, orgCode, type);
+        if (bo) {
+            MOrganization organization = null;
+            if (StringUtils.isNotEmpty(orgCode)) {
+                organization = organizationClient.getOrg(orgCode);
+            }
+            return success(name + "在" + (null == organization ? "默认角色组" : organization.getFullName()) + "中已存在！");
         }
         return failed("");
     }
 
-    @RequestMapping(value = ServiceApi.Roles.RoleCodeExistence,method = RequestMethod.GET)
-    @ApiOperation(value = "角色组代码是否已存在" )
+    @RequestMapping(value = ServiceApi.Roles.RoleCodeExistence, method = RequestMethod.GET)
+    @ApiOperation(value = "角色组代码是否已存在")
     public Envelop isCodeExistence(
-            @ApiParam(name = "app_id",value = "应用id")
+            @ApiParam(name = "app_id", value = "应用id")
             @RequestParam(value = "app_id") String appId,
-            @ApiParam(name = "code",value = "角色组代码")
+            @ApiParam(name = "code", value = "角色组代码")
             @RequestParam(value = "code") String code,
-            @ApiParam(name = "orgCode",value = "机构Code")
+            @ApiParam(name = "orgCode", value = "机构Code")
             @RequestParam(value = "orgCode") String orgCode,
-            @ApiParam(name = "type",value = "角色组类别")
-            @RequestParam(value = "type",required = false) String type){
-        boolean  bo = rolesClient.isCodeExistence(appId, code, orgCode, type);
-        if(bo){
-            MOrganization organization = organizationClient.getOrg(orgCode);
-            return success(code + "在" + organization.getFullName()+"中已存在！"  );
+            @ApiParam(name = "type", value = "角色组类别")
+            @RequestParam(value = "type", required = false) String type) {
+        boolean bo = rolesClient.isCodeExistence(appId, code, orgCode, type);
+        if (bo) {
+            MOrganization organization = null;
+            if (StringUtils.isNotEmpty(orgCode)) {
+                organization = organizationClient.getOrg(orgCode);
+            }
+            return success(code + "在" + (null == organization ? "默认角色组" : organization.getFullName()) + "中已存在！");
         }
         return failed("");
     }
 
     @RequestMapping(value = ServiceApi.Roles.RoleFindByField, method = RequestMethod.POST)
-    @ApiOperation(value = "通过字段获取角色" )
+    @ApiOperation(value = "通过字段获取角色")
     public Envelop findByFields(
-            @ApiParam(name = "appId",value = "应用id", required = true)
+            @ApiParam(name = "appId", value = "应用id", required = true)
             @RequestParam(value = "appId") String appId,
-            @ApiParam(name = "code",value = "角色组代码", required = true)
+            @ApiParam(name = "code", value = "角色组代码", required = true)
             @RequestParam(value = "code") String code,
-            @ApiParam(name = "type",value = "角色组类别", required = true)
-            @RequestParam(value = "type", required = false) String type){
+            @ApiParam(name = "type", value = "角色组类别", required = true)
+            @RequestParam(value = "type", required = false) String type) {
         return rolesClient.findByFields(appId, code, type);
     }
 
@@ -274,43 +280,43 @@ public class RolesController extends BaseController {
 //        return rolesModel;
 //    }
 
-    @RequestMapping(value = "/roles/platformAppRolesTree",method = RequestMethod.GET)
-    @ApiOperation(value = "获取平台应用角色组列表,tree" )
+    @RequestMapping(value = "/roles/platformAppRolesTree", method = RequestMethod.GET)
+    @ApiOperation(value = "获取平台应用角色组列表,tree")
     public Envelop getPlatformAppRolesTree(
-            @ApiParam(name = "type",value = "角色组类型，应用角色/用户角色字典值")
+            @ApiParam(name = "type", value = "角色组类型，应用角色/用户角色字典值")
             @RequestParam(value = "type") String type,
-            @ApiParam(name = "source_type",value = "平台应用sourceType字典值")
-            @RequestParam(value = "source_type") String sourceType){
-        if(StringUtils.isEmpty(type)){
+            @ApiParam(name = "source_type", value = "平台应用sourceType字典值")
+            @RequestParam(value = "source_type") String sourceType) {
+        if (StringUtils.isEmpty(type)) {
             return failed("角色组类型不能为空！");
         }
-        if(StringUtils.isEmpty(sourceType)){
+        if (StringUtils.isEmpty(sourceType)) {
             return failed("平台应用类型不能为空！！");
         }
         Envelop envelop = new Envelop();
         //平台应用-应用表中source_type为1
-        Collection<MApp> mApps =  appClient.getAppsNoPage("sourceType="+sourceType);
+        Collection<MApp> mApps = appClient.getAppsNoPage("sourceType=" + sourceType);
         List<PlatformAppRolesTreeModel> appRolesTreeModelList = new ArrayList<>();
 
         //平台应用-角色组对象模型列表
-        for(MApp mApp : mApps){
+        for (MApp mApp : mApps) {
             Collection<MRoles> mRoles = rolesClient.searchRolesNoPaging("appId=" + mApp.getId() + ";");
             List<PlatformAppRolesTreeModel> roleTreeModelList = new ArrayList<>();
-            for(MRoles m : mRoles){
+            for (MRoles m : mRoles) {
                 PlatformAppRolesTreeModel modelTree = new PlatformAppRolesTreeModel();
                 MOrganization org = null;
                 if (!StringUtils.isEmpty(m.getOrgCode())) {
                     org = organizationClient.getOrg(m.getOrgCode());
                 }
                 String orgName = org != null ? "--" + org.getFullName() : "";
-                modelTree.setId(m.getId()+"");
+                modelTree.setId(m.getId() + "");
                 modelTree.setName(m.getName() + orgName);
                 modelTree.setType("1");
                 modelTree.setPid(mApp.getId());
                 modelTree.setChildren(null);
                 roleTreeModelList.add(modelTree);
             }
-            if(roleTreeModelList.size()==0){
+            if (roleTreeModelList.size() == 0) {
                 continue;
             }
             PlatformAppRolesTreeModel app = new PlatformAppRolesTreeModel();
@@ -326,56 +332,56 @@ public class RolesController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = "/roles/app_user_roles",method = RequestMethod.GET)
-    @ApiOperation(value = "获取平台应用与所属用户角色组ids,names组成的对象集合，不分页" )
+    @RequestMapping(value = "/roles/app_user_roles", method = RequestMethod.GET)
+    @ApiOperation(value = "获取平台应用与所属用户角色组ids,names组成的对象集合，不分页")
     public Envelop getPlatformAppRolesView(
-            @ApiParam(name = "type",value = "用户角色组的字典值")
+            @ApiParam(name = "type", value = "用户角色组的字典值")
             @RequestParam(value = "type") String type,
-            @ApiParam(name = "source_type",value = "平台应用sourceType字典值")
+            @ApiParam(name = "source_type", value = "平台应用sourceType字典值")
             @RequestParam(value = "source_type") String sourceType,
-            @ApiParam(name = "user_id",value = "用户id")
-            @RequestParam(value = "user_id") String userId){
-        if(StringUtils.isEmpty(type)){
+            @ApiParam(name = "user_id", value = "用户id")
+            @RequestParam(value = "user_id") String userId) {
+        if (StringUtils.isEmpty(type)) {
             return failed("角色组类型不能为空！");
         }
-        if(StringUtils.isEmpty(sourceType)){
+        if (StringUtils.isEmpty(sourceType)) {
             return failed("平台应用类型不能为空！！");
         }
-        if(StringUtils.isEmpty(userId)){
+        if (StringUtils.isEmpty(userId)) {
             return failed("用户id不能为空！");
         }
         Collection<MRoleUser> mRoleUsers = roleUserClient.searchRoleUserNoPaging("userId=" + userId);
-        if(mRoleUsers == null){
+        if (mRoleUsers == null) {
             return success(null);
         }
         StringBuffer buffer = new StringBuffer();
-        for(MRoleUser m : mRoleUsers){
+        for (MRoleUser m : mRoleUsers) {
             buffer.append(m.getRoleId());
             buffer.append(",");
         }
-        String rolesIds = buffer.substring(0,buffer.length()-1);
+        String rolesIds = buffer.substring(0, buffer.length() - 1);
         Envelop envelop = new Envelop();
-        Collection<MApp> mApps =  appClient.getAppsNoPage("sourceType="+sourceType);
+        Collection<MApp> mApps = appClient.getAppsNoPage("sourceType=" + sourceType);
         //平台应用-角色组对象模型列表
         List<PlatformAppRolesModel> appRolesModelList = new ArrayList<>();
-        for(MApp mApp : mApps){
+        for (MApp mApp : mApps) {
             //查找用户所属角色组
-            Collection<MRoles> mRoles = rolesClient.searchRolesNoPaging("appId=" + mApp.getId()+";id="+rolesIds);
-            if(mRoles == null || mRoles.size() <= 0){
+            Collection<MRoles> mRoles = rolesClient.searchRolesNoPaging("appId=" + mApp.getId() + ";id=" + rolesIds);
+            if (mRoles == null || mRoles.size() <= 0) {
                 continue;
             }
             PlatformAppRolesModel model = new PlatformAppRolesModel();
             String roleIds = "";
             String roleNames = "";
-            for(MRoles m : mRoles){
-                roleIds += m.getId()+",";
-                roleNames += m.getName()+",";
+            for (MRoles m : mRoles) {
+                roleIds += m.getId() + ",";
+                roleNames += m.getName() + ",";
             }
-            if(!StringUtils.isEmpty(roleIds)){
-                roleIds = roleIds.substring(0,roleIds.length()-1);
+            if (!StringUtils.isEmpty(roleIds)) {
+                roleIds = roleIds.substring(0, roleIds.length() - 1);
             }
-            if(!StringUtils.isEmpty(roleNames)){
-                roleNames = roleNames.substring(0,roleNames.length()-1);
+            if (!StringUtils.isEmpty(roleNames)) {
+                roleNames = roleNames.substring(0, roleNames.length() - 1);
             }
             model.setAppId(mApp.getId());
             model.setAppName(mApp.getName());
@@ -388,21 +394,21 @@ public class RolesController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = "/roles/user/features",method = RequestMethod.GET)
-    @ApiOperation(value = "获取用户的权限信息" )
+    @RequestMapping(value = "/roles/user/features", method = RequestMethod.GET)
+    @ApiOperation(value = "获取用户的权限信息")
     public Envelop getPlatformAppRolesView(
-            @ApiParam(name = "user_id",value = "用户编号")
-            @RequestParam(value = "user_id") String userId){
+            @ApiParam(name = "user_id", value = "用户编号")
+            @RequestParam(value = "user_id") String userId) {
 
         try {
             Envelop envelop = success(null);
             Collection<MRoleUser> roles = roleUserClient.searchRoleUserNoPaging("userId=" + userId);
-            if(roles!=null){
+            if (roles != null) {
                 String ids = ListUtils.toString(roles, MRoleUser.class, "getRoleId");
-                if(ids.length()>0){
+                if (ids.length() > 0) {
                     Collection<MRoleFeatureRelation> featureRelations = roleFeatureRelationClient.searchRoleFeatureNoPaging("roleId=" + ids);
                     ids = ListUtils.toString(featureRelations, MRoleFeatureRelation.class, "getFeatureId");
-                    if(ids.length()>0){
+                    if (ids.length() > 0) {
                         Collection<MAppFeature> features = appFeatureClient.getAppFeatureNoPage("id=" + ids);
                         envelop.setDetailModelList((List<MAppFeature>) convertToModels(features,
                                 new ArrayList<>(), MAppFeature.class, null));

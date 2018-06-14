@@ -65,7 +65,7 @@ public class PackageResourceJob implements InterruptableJob {
                 PackResolveLogger.info("开始入库:" + pack.get_id() + ", Timestamp:" + new Date());
                 packageMgrClient.reportStatus(pack.get_id(), ArchiveStatus.Acquired, 0, "正在入库中");
                 doResolve(pack, packageMgrClient);
-                redisTemplate.opsForList().leftPush(RedisCollection.ProvincialPlatformQueue, serializable.toString());
+                redisTemplate.opsForList().leftPush(RedisCollection.ProvincialPlatformQueue, objectMapper.writeValueAsString(pack));
             }
         } catch (Exception e) {
             int errorType = -2;
@@ -118,8 +118,14 @@ public class PackageResourceJob implements InterruptableJob {
         map.put("patient_id", originalPackage.getPatientId());
         map.put("dept", resourceBucket.getBasicRecord(ResourceCells.DEPT_CODE));
         long delay = pack.getReceive_date().getTime() - originalPackage.getEventTime().getTime();
-        map.put("delay", delay % (1000 * 60 * 60 * 24) > 0 ? delay / (1000 * 60 * 60 * 24) + 1 : delay / (1000 * 60 * 60 * 24));
+        map.put("delay", delay % DAY > 0 ? delay / DAY + 1 : delay / DAY);
         map.put("re_upload_flg", String.valueOf(originalPackage.isReUploadFlg()));
+        pack.setRowkey(resourceBucket.getId());
+        pack.setPatient_id(originalPackage.getPatientId());
+        pack.setEvent_date(DateUtil.toStringLong(originalPackage.getEventTime()));
+        pack.setEvent_no(originalPackage.getEventNo());
+        pack.setEvent_type(originalPackage.getEventType() == null ? -1 : originalPackage.getEventType().getType());
+        pack.setOrg_code(originalPackage.getOrgCode());
         packageMgrClient.reportStatus(pack.get_id(), ArchiveStatus.Finished, 0, objectMapper.writeValueAsString(map));
     }
 
