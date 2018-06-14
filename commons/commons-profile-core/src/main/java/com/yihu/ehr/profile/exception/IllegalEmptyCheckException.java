@@ -9,7 +9,7 @@ import java.io.IOException;
  */
 public class IllegalEmptyCheckException extends IOException {
 
-    public IllegalEmptyCheckException(String messgae) {
-        super(messgae);
+    public IllegalEmptyCheckException(String message) {
+        super(message);
     }
 }

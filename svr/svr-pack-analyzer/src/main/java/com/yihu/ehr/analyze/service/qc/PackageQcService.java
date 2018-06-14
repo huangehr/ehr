@@ -50,7 +50,7 @@ public class PackageQcService {
      *
      * @param zipPackage 档案包
      */
-    public void qcHandle(ZipPackage zipPackage) throws Exception {
+    public void qcHandle(ZipPackage zipPackage) throws Throwable {
         EsSimplePackage esSimplePackage = zipPackage.getEsSimplePackage();
         Map<String, Object> qcDataSetRecord = zipPackage.getQcDataSetRecord();
         qcDataSetRecord.put("_id", esSimplePackage.get_id());
@@ -89,7 +89,12 @@ public class PackageQcService {
                         String method = serializable.toString();
                         Method _method = clazz.getMethod(method, new Class[]{String.class, String.class, String.class, String.class});
                         _method.setAccessible(true);
-                        ErrorType errorType = (ErrorType) _method.invoke(qcRuleCheckService, zipPackage.getCdaVersion(), dataSetCode, metadata, dataGroup.get(metadata));
+                        ErrorType errorType;
+                        try {
+                            errorType = (ErrorType) _method.invoke(qcRuleCheckService, zipPackage.getCdaVersion(), dataSetCode, metadata, dataGroup.get(metadata));
+                        } catch (Exception e) {
+                            throw e.getCause();
+                        }
                         if (errorType != ErrorType.Normal) {
                             Map<String, Object> qcMetadataRecord = new HashMap<>();
                             StringBuilder _id = new StringBuilder();

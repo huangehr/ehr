@@ -2,6 +2,7 @@ package com.yihu.ehr.analyze.controller;
 
 import com.yihu.ehr.analyze.feign.PackageMgrClient;
 import com.yihu.ehr.analyze.service.pack.PackageAnalyzeService;
+import com.yihu.ehr.analyze.service.pack.ZipPackage;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
@@ -72,10 +73,10 @@ public class PackAnalyzeEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.PackageAnalyzer.Analyzer, method = RequestMethod.PUT)
     @ApiOperation(value = "分析档案包", notes = "分析档案包")
-    public Map<String, Object> analyzer(
+    public ZipPackage analyzer(
             @ApiParam(name = "id", value = "档案包ID")
-            @RequestParam(value = "id", required = false) String id) throws Exception {
+            @RequestParam(value = "id", required = false) String id) throws Throwable {
         EsSimplePackage esSimplePackage = packageMgrClient.getPackage(id);
-        return  packageAnalyzeService.analyze(esSimplePackage);
+        return packageAnalyzeService.analyze(esSimplePackage);
     }
 }

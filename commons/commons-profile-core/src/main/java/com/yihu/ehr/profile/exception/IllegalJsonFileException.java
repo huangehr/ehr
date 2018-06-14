@@ -7,7 +7,7 @@ import java.io.IOException;
  */
 public class IllegalJsonFileException extends IOException {
 
-    public IllegalJsonFileException(String messgae) {
-        super(messgae);
+    public IllegalJsonFileException(String message) {
+        super(message);
     }
 }

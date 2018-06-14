@@ -2,9 +2,7 @@ package com.yihu.ehr.analyze.service.qc;
 
 import com.yihu.ehr.analyze.service.RedisService;
 import com.yihu.ehr.profile.ErrorType;
-import com.yihu.ehr.profile.exception.IllegalEmptyCheckException;
-import com.yihu.ehr.profile.exception.IllegalJsonDataException;
-import com.yihu.ehr.profile.exception.IllegalValueCheckException;
+import com.yihu.ehr.profile.exception.*;
 import com.yihu.ehr.util.datetime.DateUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,8 +27,7 @@ public class QcRuleCheckService {
      * @param value
      * @throws Exception
      */
-    public ErrorType emptyCheck(String version, String dataSetCode, String metadata, String value) throws Exception {
-        //String nullable = redisClient.get(makeKey("std_data_set_" + version, dataSetCode + "." + metadata, "nullable"));
+    public ErrorType emptyCheck (String version, String dataSetCode, String metadata, String value) {
         if (StringUtils.isBlank(value)) {
             return ErrorType.EmptyError;
         }
@@ -47,11 +44,11 @@ public class QcRuleCheckService {
      * @throws Exception
      */
     public ErrorType emptyCheckThrowable (String version, String dataSetCode, String metadata, String value) throws Exception {
-        ErrorType errorType = this.emptyCheck(version, dataSetCode, metadata, value);
-        if (ErrorType.Normal != errorType) {
+        ErrorType type = this.emptyCheck(version, dataSetCode, metadata, value);
+        if (ErrorType.Normal != type) {
             throw new IllegalEmptyCheckException(String.format("Meta data %s of %s in %s is empty", metadata, dataSetCode, version));
         }
-        return ErrorType.Normal;
+        return type;
     }
 
     /**
@@ -64,43 +61,42 @@ public class QcRuleCheckService {
      * @param value
      */
     public ErrorType typeCheck (String version, String dataSetCode, String metadata, String value) throws Exception {
+        if (StringUtils.isBlank(value)) {
+            return ErrorType.TypeError;
+        }
         String type = redisService.getMetaDataType(version, dataSetCode, metadata);
         if (StringUtils.isBlank(type)) {
-            return ErrorType.Normal;
+            throw new AnalyzerException(String.format("Unable to get meta data type for %s of %s in %s", metadata, dataSetCode, version));
         }
         switch (type) {
             case "D":
-                if (value != null) {
-                    if (!value.contains("T") && !value.contains("Z")) {
-                        StringBuilder error = new StringBuilder();
-                        error.append("Invalid date time format ")
-                                .append(dataSetCode)
-                                .append(" ")
-                                .append(metadata)
-                                .append(" ")
-                                .append(value)
-                                .append(" for std version ")
-                                .append(version)
-                                .append(".");
-                        throw new IllegalJsonDataException(error.toString());
-                    }
+                if (!value.contains("T") && !value.contains("Z")) {
+                    StringBuilder error = new StringBuilder();
+                    error.append("Invalid date time format ")
+                            .append(dataSetCode)
+                            .append(" ")
+                            .append(metadata)
+                            .append(" ")
+                            .append(value)
+                            .append(" for std version ")
+                            .append(version)
+                            .append(".");
+                    throw new IllegalJsonDataException(error.toString());
                 }
                 return ErrorType.Normal;
             case "DT":
-                if (value != null) {
-                    if (!value.contains("T") && !value.contains("Z")) {
-                        StringBuilder error = new StringBuilder();
-                        error.append("Invalid date time format ")
-                                .append(dataSetCode)
-                                .append(" ")
-                                .append(metadata)
-                                .append(" ")
-                                .append(value)
-                                .append(" for std version ")
-                                .append(version)
-                                .append(".");
-                        throw new IllegalJsonDataException(error.toString());
-                    }
+                if (!value.contains("T") && !value.contains("Z")) {
+                    StringBuilder error = new StringBuilder();
+                    error.append("Invalid date time format ")
+                            .append(dataSetCode)
+                            .append(" ")
+                            .append(metadata)
+                            .append(" ")
+                            .append(value)
+                            .append(" for std version ")
+                            .append(version)
+                            .append(".");
+                    throw new IllegalJsonDataException(error.toString());
                 }
                 return ErrorType.Normal;
             case "L":
@@ -127,6 +123,23 @@ public class QcRuleCheckService {
     }
 
     /**
+     * 检查值类型是否正确，通过将值转为对应类型是否成功来判断
+     * 暂未实现
+     *
+     * @param version
+     * @param dataSetCode
+     * @param metadata
+     * @param value
+     */
+    public ErrorType typeCheckThrowable (String version, String dataSetCode, String metadata, String value) throws Exception {
+        ErrorType type = typeCheck(version, dataSetCode, metadata, value);
+        if (ErrorType.Normal != type) {
+            throw new IllegalTypeCheckException(String.format("Data type for %s of %s in %s is error", metadata, dataSetCode, version));
+        }
+        return type;
+    }
+
+    /**
      *
      * @param version
      * @param dataSetCode
@@ -135,49 +148,65 @@ public class QcRuleCheckService {
      * @return
      * @throws Exception
      */
-    public ErrorType formatCheck (String version, String dataSetCode, String metadata, String value) throws Exception {
-        String type = redisService.getMetaDataType(version, dataSetCode, metadata);
-        if (StringUtils.isBlank(type)) {
-            return ErrorType.Normal;
+    public ErrorType formatCheck (String version, String dataSetCode, String metadata, String value) {
+        if (StringUtils.isBlank(value)) {
+            return ErrorType.FormatError;
         }
-        switch (type) {
-            case "D":
-                if (value != null) {
-                    if (!value.contains("T") && !value.contains("Z")) {
-                        StringBuilder error = new StringBuilder();
-                        error.append("Invalid date time format ")
-                                .append(dataSetCode)
-                                .append(" ")
-                                .append(metadata)
-                                .append(" ")
-                                .append(value)
-                                .append(" for std version ")
-                                .append(version)
-                                .append(".");
-                        throw new IllegalJsonDataException(error.toString());
-                    }
+        String format = redisService.getMetaDataFormat(version, dataSetCode, metadata);
+        if (StringUtils.isBlank(format)) {
+            throw new AnalyzerException(String.format("Unable to get meta data format for %s of %s in %s", metadata, dataSetCode, version));
+        }
+        switch (format) {
+            case "DT15":
+                if (!value.contains("T") && !value.contains("Z")) {
+                    StringBuilder error = new StringBuilder();
+                    error.append("Invalid date time format ")
+                            .append(dataSetCode)
+                            .append(" ")
+                            .append(metadata)
+                            .append(" ")
+                            .append(value)
+                            .append(" for std version ")
+                            .append(version)
+                            .append(".");
+                    throw new IllegalJsonDataException(error.toString());
                 }
                 return ErrorType.Normal;
-            case "DT":
-                if (value != null) {
-                    if (!value.contains("T") && !value.contains("Z")) {
-                        StringBuilder error = new StringBuilder();
-                        error.append("Invalid date time format ")
-                                .append(dataSetCode)
-                                .append(" ")
-                                .append(metadata)
-                                .append(" ")
-                                .append(value)
-                                .append(" for std version ")
-                                .append(version)
-                                .append(".");
-                        throw new IllegalJsonDataException(error.toString());
-                    }
+            case "D8":
+                if (!value.contains("T") && !value.contains("Z")) {
+                    StringBuilder error = new StringBuilder();
+                    error.append("Invalid date time format ")
+                            .append(dataSetCode)
+                            .append(" ")
+                            .append(metadata)
+                            .append(" ")
+                            .append(value)
+                            .append(" for std version ")
+                            .append(version)
+                            .append(".");
+                    throw new IllegalJsonDataException(error.toString());
                 }
                 return ErrorType.Normal;
             default:
                 return ErrorType.Normal;
         }
+    }
+
+    /**
+     *
+     * @param version
+     * @param dataSetCode
+     * @param metadata
+     * @param value
+     * @return
+     * @throws Exception
+     */
+    public ErrorType formatCheckThrowable (String version, String dataSetCode, String metadata, String value) throws Exception {
+        ErrorType type = formatCheck(version, dataSetCode, metadata, value);
+        if (ErrorType.Normal != type) {
+            throw new IllegalTypeCheckException(String.format("Data format for %s of %s in %s is error", metadata, dataSetCode, version));
+        }
+        return type;
     }
 
     /**
@@ -189,16 +218,17 @@ public class QcRuleCheckService {
      * @param value
      * @throws Exception
      */
-    public ErrorType valueCheck (String version, String dataSetCode, String metadata, String value) throws Exception {
+    public ErrorType valueCheck (String version, String dataSetCode, String metadata, String value) {
         if (StringUtils.isBlank(value)) {
             return ErrorType.ValueError;
         }
         String dictId = redisService.getMetaDataDict(version, dataSetCode, metadata);
-        if (StringUtils.isNotBlank(dictId)) {
-            String _value = redisService.getDictEntryValue(version, dictId, value);
-            if (StringUtils.isBlank(_value)) {
-                return ErrorType.ValueError;
-            }
+        if (StringUtils.isBlank(dictId)) {
+            throw new AnalyzerException(String.format("Unable to get dict id of %s in %s", dataSetCode, version));
+        }
+        String _value = redisService.getDictEntryValue(version, dictId, value);
+        if (StringUtils.isBlank(_value)) {
+            return ErrorType.ValueError;
         }
         return ErrorType.Normal;
     }
