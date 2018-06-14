@@ -1657,7 +1657,12 @@ public class ServiceApi {
         public static final String WarningRecordList = "/dataQuality/warningRecord/warningRecordList";
         public static final String WarningRecord =    "/dataQuality/warningRecord/warningRecord/{id}";
         public static final String WarningRecordUpd = "/dataQuality/warningRecord/warningRecordUpd";
+
         public static final String ExportWarningRecordToExcel = "/dataQuality/export/exportWarningRecordToExcel";
+        public static final String ExportQualityMonitoring = "/dataQuality/export/exportQualityMonitoring";
+        public static final String ExportReceptionList = "/dataQuality/export/exportReceptionList";
+        public static final String ExportAnalyzeErrorList = "/dataQuality/export/exportAnalyzeErrorList";
+        public static final String ExportMetadataErrorList = "/dataQuality/export/exportMetadataErrorList";
 
     }
 
