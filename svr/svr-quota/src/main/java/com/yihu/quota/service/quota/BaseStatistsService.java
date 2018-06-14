@@ -175,7 +175,7 @@ public class BaseStatistsService {
             }
         }
         //检查后面指标的维度是否全部有 累加进去
-        Map<String, Object> addResuDimenMap = new HashMap<>();
+        /*Map<String, Object> addResuDimenMap = new HashMap<>();
         for(int k = 0;k < addResultList.size();k++) {
             Map<String, Object> addResultMap = addResultList.get(k);
             String addDimenStr = "";
@@ -203,7 +203,7 @@ public class BaseStatistsService {
                     addResultList.add(map);
                 }
             }
-        }
+        }*/
         return  addResultList;
     }
 
