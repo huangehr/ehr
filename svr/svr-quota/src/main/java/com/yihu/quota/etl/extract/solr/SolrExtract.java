@@ -100,7 +100,7 @@ public class SolrExtract {
             dimensionGroupList.add(new SolrGroupEntity(key, SolrGroupEntity.GroupType.FIELD_VALUE));
             fl += key + ",";
         }
-        fl += timeKey;
+        fl += timeKey + ",rowkey";
 
         if( StringUtils.isEmpty(esConfig.getAggregation()) || !esConfig.getAggregation().equals(Contant.quota.aggregation_list)){
             // 默认追加一个日期字段作为细维度，方便按天统计作为最小单位统计值。
