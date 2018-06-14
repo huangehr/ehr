@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.yihu.ehr.analyze.service.dataQuality.DataQualityStatisticsService;
-import com.yihu.ehr.analyze.service.dataQuality.DataQualityStatisticsService;
 import com.yihu.ehr.analyze.service.dataQuality.WarningRecordService;
 import com.yihu.ehr.analyze.service.pack.PackQcReportService;
 import com.yihu.ehr.constants.ApiVersion;
@@ -12,20 +11,14 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.entity.quality.DqWarningRecord;
-import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
-import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import jxl.Workbook;
-import jxl.write.Colour;
-import jxl.write.WritableCellFormat;
-import jxl.write.WritableSheet;
-import jxl.write.WritableWorkbook;
-import org.apache.commons.collections.map.HashedMap;
 import jxl.format.CellFormat;
 import jxl.write.*;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.xwpf.usermodel.*;
@@ -43,8 +36,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.util.*;
-import java.util.List;
-import java.util.Map;
 
 /**
  * 导出
@@ -58,8 +49,6 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private WarningRecordService warningRecordService;
     @Autowired
-    private DataQualityStatisticsService dataQualityStatisticsService;
-    @Autowired
     private PackQcReportService packQcReportService;
     @Autowired
     private ElasticSearchUtil elasticSearchUtil;
@@ -67,8 +56,8 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
     private DataQualityStatisticsService dataQualityStatisticsService;
 
     @RequestMapping(value = ServiceApi.DataQuality.ExportQualityMonitoringListToExcel, method = RequestMethod.GET)
-    @ApiOperation(value = "档案包接收情况报告数据接口")
-    public Envelop exportQualityMonitoringListToExcel(
+    @ApiOperation(value = "生成报告")
+    public void exportQualityMonitoringListToExcel(
             @ApiParam(name = "reporter", value = "报告人", required = true)
             @RequestParam(name = "reporter") String reporter,
             @ApiParam(name = "orgInfoList", value = "机构编码、名称，例：[{\"orgName\":\"xx\",\"orgCode\":\"jkzl\"}]。", required = true)
@@ -79,13 +68,22 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
             @RequestParam(name = "eventDateEnd") String eventDateEnd,
             HttpServletRequest request,
             HttpServletResponse response) {
-        Envelop envelop = new Envelop();
         OutputStream ostream = null;
+        XWPFDocument document = null;
         try{
             String title = eventDateStart.replace("-", "") + "-" + eventDateEnd.replace("-", "")+"接收数据报告";
+            response.setContentType("octets/stream");
+            response.setHeader("Content-Disposition", "attachment; filename="
+                    + new String( title.getBytes("gb2312"), "ISO8859-1" )+".doc");
+
+//            //输出文件
+//            response.setCharacterEncoding("UTF-8");
+//            response.setContentType("application/msword");//导出word格式
+//            response.addHeader("Content-Disposition", "attachment;filename=" +
+//                    new String((title + ".doc").getBytes(),"UTF-8"));
+
             eventDateStart = eventDateStart + " 00:00:00";
             eventDateEnd = eventDateEnd + " 23:59:59";
-            Map<String, Object> resultMap = new HashMap<>();
             JSONArray jsonArray = JSON.parseArray(orgInfoList);
             List<Map<String, String>> list = new ArrayList<>();
             for(int i=0;i<jsonArray.size();i++){
@@ -102,8 +100,8 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
             // 机构档案包报告汇总
             List<Map<String, Object>> orgPackReportDataList = dataQualityStatisticsService.orgPackReportData(list, eventDateStart, eventDateEnd);
 
-            //设置excel
-            XWPFDocument document= new XWPFDocument();
+            //设置word
+            document = new XWPFDocument();
             //添加标题
             XWPFParagraph titleParagraph = document.createParagraph();
             //设置段落居中
@@ -112,26 +110,26 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
             titleParagraphRun.setText(title);
             titleParagraphRun.setColor("000000");
             titleParagraphRun.setFontSize(20);
-
+            titleParagraphRun.setBold(true);
+            addEmptyRow(document);
             //段落
             String reportDate = DateTimeUtil.simpleDateFormat(new Date());
             XWPFParagraph paragraph1 = document.createParagraph();
             XWPFRun run1 = paragraph1.createRun();
-            String text1 = "统计时间:"+reportDate+"\n\r" +
-                    "报告时间:"+reportDate+"\n\r" +
-                    "报告人: "+reporter;
+            String text1 = "                    统计时间:"+reportDate+"\n\r" +
+                           "                    报告时间:"+reportDate+"\n\r" +
+                           "                    报告人: "+reporter;
             run1.setText(text1);
-//            run.setColor("000000");
             run1.setFontSize(12);
-
+            addEmptyRow(document);
             XWPFParagraph paragraph2 = document.createParagraph();
             XWPFRun run2 = paragraph2.createRun();
             String text2 = "接收总量:"+receivedCount+"\n\r" +
                     "成功解析: "+successfulAnalysisCount;
             run2.setText(text2);
-            run2.setFontSize(20);
+            run2.setFontSize(18);
             run2.setBold(true);
-
+            addEmptyRow(document);
             int i =0;
             for (Map<String, Object> map:orgPackReportDataList){
                 i++;
@@ -174,23 +172,23 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                     Map<String, Object> orgMap = reportedNumList1.get(0);
                     XWPFTableRow tableRow = table1.createRow();
                     tableRow.getCell(0).setText("医院上报");
-                    tableRow.getCell(1).setText(orgMap.get("outpatientNum").toString());
-                    tableRow.getCell(2).setText(orgMap.get("hospitalDischargeNum").toString());
-                    tableRow.getCell(3).setText(orgMap.get("healthExaminationNum").toString());
-                    tableRow.getCell(4).setText(orgMap.get("total").toString());
+                    tableRow.getCell(1).setText(Long.valueOf(orgMap.get("outpatientNum").toString())+"");
+                    tableRow.getCell(2).setText(Long.valueOf(orgMap.get("hospitalDischargeNum").toString())+"");
+                    tableRow.getCell(3).setText(Long.valueOf(orgMap.get("healthExaminationNum").toString())+"");
+                    tableRow.getCell(4).setText(Long.valueOf(orgMap.get("total").toString())+"");
                 }
                 double receiveAcrhive = 0;
                 Map<String, Object> collectionMap = (Map<String, Object>)map.get("collectionMap");
                 if(collectionMap.size()>0){
                     XWPFTableRow tableRow = table1.createRow();
                     tableRow.getCell(0).setText("平台接收");
-                    tableRow.getCell(1).setText(collectionMap.get("outpatientNum").toString());
-                    tableRow.getCell(2).setText(collectionMap.get("hospitalDischargeNum").toString());
-                    tableRow.getCell(3).setText(collectionMap.get("healthExaminationNum").toString());
+                    tableRow.getCell(1).setText(Long.valueOf(collectionMap.get("outpatientNum").toString())+"");
+                    tableRow.getCell(2).setText(Long.valueOf(collectionMap.get("hospitalDischargeNum").toString())+"");
+                    tableRow.getCell(3).setText(Long.valueOf(collectionMap.get("healthExaminationNum").toString())+"");
                     receiveAcrhive = Double.valueOf(collectionMap.get("total").toString());
-                    tableRow.getCell(4).setText(collectionMap.get("total").toString());
+                    tableRow.getCell(4).setText(Long.valueOf(collectionMap.get("total").toString())+"");
                 }
-
+                addEmptyRow(document);
                 j++;
                 XWPFParagraph orgParagraph4 = document.createParagraph();
                 XWPFRun orgRun4 = orgParagraph4.createRun();
@@ -216,13 +214,13 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                     reportedNumList3.forEach(item->{
                         XWPFTableRow tableRow = table2.createRow();
                         tableRow.getCell(0).setText(item.get("receiveDate").toString());
-                        tableRow.getCell(1).setText(item.get("outpatientNum").toString());
-                        tableRow.getCell(2).setText(item.get("hospitalDischargeNum").toString());
-                        tableRow.getCell(3).setText(item.get("healthExaminationNum").toString());
-                        tableRow.getCell(4).setText(item.get("total").toString());
+                        tableRow.getCell(1).setText(Long.valueOf(item.get("outpatientNum").toString())+"");
+                        tableRow.getCell(2).setText(Long.valueOf(item.get("hospitalDischargeNum").toString())+"");
+                        tableRow.getCell(3).setText(Long.valueOf(item.get("healthExaminationNum").toString())+"");
+                        tableRow.getCell(4).setText(Long.valueOf(item.get("total").toString())+"");
                     });
                 }
-
+                addEmptyRow(document);
                 i++;
                 XWPFParagraph orgParagraph5 = document.createParagraph();
                 XWPFRun orgRun5 = orgParagraph5.createRun();
@@ -245,12 +243,12 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                 Map<String, Object> archiveMap = (Map<String, Object>)map.get("archiveMap");
                 if(collectionMap.size()>0){
                     XWPFTableRow tableRow = table3.createRow();
-                    tableRow.getCell(0).setText(receiveAcrhive+"");//0未解析 1正在解析 2解析失败 3解析完成
-                    tableRow.getCell(1).setText(archiveMap.get("archive_status3").toString());
-                    tableRow.getCell(2).setText(archiveMap.get("archive_status2").toString());
-                    tableRow.getCell(3).setText(archiveMap.get("archive_status0").toString());
+                    tableRow.getCell(0).setText(Long.valueOf(receiveAcrhive+"")+"");//0未解析 1正在解析 2解析失败 3解析完成
+                    tableRow.getCell(1).setText(Long.valueOf(archiveMap.get("archive_status3").toString())+"");
+                    tableRow.getCell(2).setText(Long.valueOf(archiveMap.get("archive_status2").toString())+"");
+                    tableRow.getCell(3).setText(Long.valueOf(archiveMap.get("archive_status0").toString())+"");
                 }
-
+                addEmptyRow(document);
                 i++;
                 XWPFParagraph orgParagraph6 = document.createParagraph();
                 XWPFRun orgRun6 = orgParagraph6.createRun();
@@ -280,16 +278,16 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                         tableRow.getCell(3).setText(item.get("row").toString());
                     });
                 }
-
+                addEmptyRow(document);
                 i++;
                 XWPFParagraph orgParagraph7 = document.createParagraph();
-                XWPFRun orgRun7 = orgParagraph6.createRun();
+                XWPFRun orgRun7 = orgParagraph7.createRun();
                 String orgText7 = i+".分析";
                 orgRun7.setText(orgText7);
                 orgRun7.setFontSize(12);
                 orgRun7.setBold(true);
                 XWPFParagraph orgParagraph8 = document.createParagraph();
-                XWPFRun orgRun8 = orgParagraph6.createRun();
+                XWPFRun orgRun8 = orgParagraph8.createRun();
                 String orgText8 = i+".1解析失败分析";
                 orgRun8.setText(orgText8);
                 orgRun8.setFontSize(12);
@@ -307,30 +305,24 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                 if(reportedNumList6.size()>0){
                     reportedNumList6.forEach(item->{
                         XWPFTableRow tableRow = table5.createRow();
-                        tableRow.getCell(0).setText(item.get("error_type").toString());
+                        tableRow.getCell(0).setText(getErrorType(item.get("error_type").toString()));
                         tableRow.getCell(1).setText(item.get("error_count").toString());
                     });
                 }
             }
-
-            //输出文件
-            request.setCharacterEncoding("utf-8");
-            response.setContentType("application/msword");//导出word格式
-            response.addHeader("Content-Disposition", "attachment;filename=" +
-                    new String((title + ".doc").getBytes(),
-                            "UTF-8"));
-
             ostream = response.getOutputStream();
-
             document.write(ostream);
-
-            resultMap.put("orgPackReportDataList", orgPackReportDataList);
-            return success(resultMap);
+            ostream.flush();
         }catch (Exception e){
             e.printStackTrace();
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg(e.getMessage());
         }finally {
+            if(document!=null){
+                try {
+                    document.close();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
             if(ostream!=null){
                 try {
                     ostream.close();
@@ -339,7 +331,16 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                 }
             }
         }
-        return envelop;
+    }
+
+    /**
+     * 添加空行
+     * @param document
+     */
+    private void addEmptyRow (XWPFDocument document){
+        XWPFParagraph paragraph = document.createParagraph();
+        XWPFRun paragraphRun = paragraph.createRun();
+        paragraphRun.setText("\r");
     }
 
     @RequestMapping(value = ServiceApi.DataQuality.ExportWarningRecordToExcel, method = RequestMethod.GET)
@@ -677,7 +678,10 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
         String re = "";
         switch (errorType){
             case "-1":
-                re = "未定义";
+                re = "质控服务内部出错";
+                break;
+            case "-2":
+                re = "解析服务内部出错";
                 break;
             case "1":
                 re = "压缩包错误";
@@ -694,8 +698,14 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
             case "5":
                 re = "数据元超出值域错误";
                 break;
+            case "6":
+                re = "字段类型错误";
+                break;
+            case "7":
+                re = "字段格式错误";
+                break;
             case "21":
-                re = "压缩包错误";
+                re = "数据缓存错误";
                 break;
             default:
                 break;

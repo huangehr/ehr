@@ -1,6 +1,8 @@
 package com.yihu.ehr.analyze.controller.dataQuality;
 
+import com.yihu.ehr.analyze.service.dataQuality.WarningQuestionService;
 import com.yihu.ehr.analyze.service.dataQuality.WarningRecordService;
+import com.yihu.ehr.analyze.service.scheduler.WarningSchedulerService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
@@ -30,7 +32,41 @@ public class WarningRecordEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     private WarningRecordService warningRecordService;
+    @Autowired
+    private WarningQuestionService warningQuestionService;
+    @Autowired
+    private WarningSchedulerService warningSchedulerService;
 
+    @RequestMapping(value = ServiceApi.DataQuality.WarningQuestionAnalyze, method = RequestMethod.POST)
+    @ApiOperation(value = "预警问题列表")
+    public Envelop warningQuestionAnalyze(@ApiParam(name = "dateStr", value = "指定日期生成某天的预警信息", defaultValue = "2018-01-01")
+                                          @RequestParam(value = "dateStr", required = false) String dateStr) {
+        Envelop envelop = new Envelop();
+        try {
+            warningQuestionService.analyze(dateStr);
+            return success(null);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.DataQuality.WarningQuestionJob, method = RequestMethod.POST)
+    @ApiOperation(value = "手动启动预警问题job")
+    public Envelop warningQuestionJob() {
+        Envelop envelop = new Envelop();
+        try {
+            warningSchedulerService.init();
+            return success(null);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return envelop;
+    }
 
     @RequestMapping(value = ServiceApi.DataQuality.WarningRecordList, method = RequestMethod.GET)
     @ApiOperation(value = "预警问题列表")
@@ -120,9 +156,6 @@ public class WarningRecordEndPoint extends EnvelopRestEndPoint {
             if(re==-1){
                 envelop.setSuccessFlg(false);
                 envelop.setErrorMsg("记录不存在");
-            }else if(re==-2){
-                envelop.setSuccessFlg(false);
-                envelop.setErrorMsg("已处理，请勿重复操作");
             }else {
                 return success(null);
             }

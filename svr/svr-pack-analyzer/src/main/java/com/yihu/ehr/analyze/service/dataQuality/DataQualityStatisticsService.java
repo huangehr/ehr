@@ -476,12 +476,12 @@ public class DataQualityStatisticsService extends BaseJpaService {
             archiveMap.put("archive_status3",0);
             for (Map<String, Object> map : reportedNumList4){
                 double total = Double.valueOf(map.get("total").toString());
-                String eventType = map.get("event_type").toString();
-                if("3".equals(eventType)){
+                String archiveStatus = map.get("archive_status").toString();
+                if("3".equals(archiveStatus)){
                     collectionMap.put("archive_status3",total);
-                }else if("2".equals(eventType)){
+                }else if("2".equals(archiveStatus)){
                     collectionMap.put("archive_status2",total);
-                }else if("0".equals(eventType)){
+                }else if("0".equals(archiveStatus)){
                     collectionMap.put("archive_status0",total);
                 }
             }
@@ -489,7 +489,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
             // TODO 数据集总量
             List<Map<String, Object>> res = new ArrayList<>();
             StringBuilder stringBuilder1 = new StringBuilder();
-            stringBuilder1.append("qc_step=1;");
+            stringBuilder1.append("qc_step=2;");
             stringBuilder1.append("receive_date>=" + eventDateStart + ";");
             stringBuilder1.append("receive_date<" + eventDateEnd + ";");
             if (!cloud.equals(orgInfo.get("orgCode"))){

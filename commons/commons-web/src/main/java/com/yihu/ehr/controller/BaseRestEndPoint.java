@@ -7,6 +7,7 @@ import com.yihu.ehr.util.datetime.DateTimeUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
 
@@ -172,6 +173,10 @@ public class BaseRestEndPoint extends AbstractController {
         }
 
         return StringUtils.isEmpty(userAgent) ? "" : userAgent.split(" ").length > 1 ? userAgent.split(" ")[1] : userAgent.split(" ")[0];
+    }
+
+    protected int getTotalCount(ResponseEntity responseEntity) {
+        return Integer.parseInt(responseEntity.getHeaders().get(ResourceCount).get(0));
     }
 
     private String linkMap(Map<String, String> map) {

@@ -57,7 +57,7 @@ public class DqPaltformUploadWarningService extends BaseJpaService<DqPaltformUpl
 
         DqPaltformUploadWarning oldWarning = findById(warning.getId());
         oldWarning.setErrorNum(warning.getErrorNum());
-        oldWarning.setAcrhiveNum(warning.getAcrhiveNum());
+        oldWarning.setArchiveNum(warning.getArchiveNum());
         oldWarning.setUpdateTime(new Date());
         oldWarning.setUpdateUserId(warning.getUpdateUserId());
         oldWarning.setUpdateUserName(warning.getUpdateUserName());

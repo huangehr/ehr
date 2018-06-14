@@ -21,6 +21,6 @@ public class WarningQuestionJob implements InterruptableJob {
     @Override
     public void execute(JobExecutionContext context) {
         WarningQuestionService service = SpringContext.getService(WarningQuestionService.class);
-        service.analyze();
+        service.analyze(null);
     }
 }

@@ -41,8 +41,6 @@ public class WarningRecordService extends BaseJpaService<DqWarningRecord, DqWarn
         DqWarningRecord record = dqWarningRecordDao.findOne(id);
         if(record == null){
             return -1;
-        }else if("2".equals(record.getStatus())){
-            return -2;
         }
         record.setStatus("2");
         record.setSolveId(solveId);
