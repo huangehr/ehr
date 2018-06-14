@@ -51,9 +51,9 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private DataQualityStatisticsService dataQualityStatisticsService;
 
-    @RequestMapping(value = ServiceApi.DataQuality.ReceivedPacketReportData, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.DataQuality.ExportQualityMonitoringListToExcel, method = RequestMethod.GET)
     @ApiOperation(value = "档案包接收情况报告数据接口")
-    public Envelop receivedPacketReportData(
+    public Envelop exportQualityMonitoringListToExcel(
             @ApiParam(name = "reporter", value = "报告人", required = true)
             @RequestParam(name = "reporter") String reporter,
             @ApiParam(name = "orgInfoList", value = "机构编码、名称，例：[{\"orgName\":\"xx\",\"orgCode\":\"jkzl\"}]。", required = true)
@@ -325,28 +325,6 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
             }
         }
         return envelop;
-    }
-
-    /**
-     * 添加标题
-     * @param title
-     * @param document
-     */
-    private void addTitle(String title,XWPFDocument document){
-
-    }
-
-    public void test(HttpServletRequest request, HttpServletResponse response,String title ){
-        try{
-
-
-
-
-            System.out.println("create_table document written success.");
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-
     }
 
     @RequestMapping(value = ServiceApi.DataQuality.ExportWarningRecordToExcel, method = RequestMethod.POST)

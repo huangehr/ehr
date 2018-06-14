@@ -59,7 +59,7 @@ public class DqPaltformReceiveWarningService extends BaseJpaService<DqPaltformRe
 
         DqPaltformReceiveWarning oldWarning = findById(warning.getId());
         oldWarning.setErrorNum(warning.getErrorNum());
-        oldWarning.setArchiveNum(warning.getErrorNum());
+        oldWarning.setArchiveNum(warning.getArchiveNum());
         oldWarning.setHospitalInTime(warning.getHospitalInTime());
         oldWarning.setHospitalInTimeRate(warning.getHospitalInTimeRate());
         oldWarning.setOutpatientInTime(warning.getOutpatientInTime());

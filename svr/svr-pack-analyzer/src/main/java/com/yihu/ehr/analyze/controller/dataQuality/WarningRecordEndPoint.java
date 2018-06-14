@@ -74,7 +74,8 @@ public class WarningRecordEndPoint extends EnvelopRestEndPoint {
             String sorts = "-warningTime";
             List<DqWarningRecord> list = warningRecordService.search(null, filters, sorts, page, size);
             pagedResponse(request, response, warningRecordService.getCount(filters), page, size);
-            return success(convertToModels(list, new ArrayList<>(list.size()), MDqWarningRecord.class, null));
+            List<MDqWarningRecord> records = (List<MDqWarningRecord>) convertToModels(list, new ArrayList<>(list.size()), MDqWarningRecord.class, null);
+            return success(records);
         }catch (Exception e){
             e.printStackTrace();
             envelop.setSuccessFlg(false);

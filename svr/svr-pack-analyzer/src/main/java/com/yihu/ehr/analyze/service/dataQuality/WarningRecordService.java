@@ -39,18 +39,18 @@ public class WarningRecordService extends BaseJpaService<DqWarningRecord, DqWarn
      */
     public int warningRecordUpd(String solveTime,String solveId,String solveName,String solveType,String id){
         DqWarningRecord record = dqWarningRecordDao.findOne(id);
-        if(record != null){
-            record.setStatus("2");
-            record.setSolveId(solveId);
-            record.setSolveName(solveName);
-            record.setSolveTime(DateUtil.formatCharDateYMD(solveTime));
-            record.setSolveType(solveType);
-            dqWarningRecordDao.save(record);
-            return 0;
+        if(record == null){
+            return -1;
         }else if("2".equals(record.getStatus())){
             return -2;
         }
-        return -1;
+        record.setStatus("2");
+        record.setSolveId(solveId);
+        record.setSolveName(solveName);
+        record.setSolveTime(DateUtil.formatCharDateYMD(solveTime));
+        record.setSolveType(solveType);
+        dqWarningRecordDao.save(record);
+        return 0;
     }
 
     /**
