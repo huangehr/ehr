@@ -317,7 +317,7 @@ public class PackMillService {
              qcMetadataRecord.put("dept", resourceBucket.getBasicRecord(ResourceCells.DEPT_CODE));
              qcMetadataRecord.put("diagnosis_name", resourceBucket.getBasicRecord(ResourceCells.DIAGNOSIS_NAME));
              qcMetadataRecord.put("event_date", DateUtil.toStringLong(DateUtil.strToDate(resourceBucket.getBasicRecord(ResourceCells.EVENT_DATE))));
-             qcMetadataRecord.put("event_type", resourceBucket.getBasicRecord(ResourceCells.EVENT_TYPE) == null ? -1 : new Integer(resourceBucket.getBasicRecord(ResourceCells.EVENT_TYPE)));
+             qcMetadataRecord.put("event_type", resourceBucket.getBasicRecord(ResourceCells.EVENT_TYPE) == "" ? -1 : new Integer(resourceBucket.getBasicRecord(ResourceCells.EVENT_TYPE)));
              qcMetadataRecord.put("event_no", resourceBucket.getBasicRecord(ResourceCells.EVENT_NO));
              qcMetadataRecord.put("receive_date", DATE_FORMAT.format(resourceBucket.getReceiveDate()));
              qcMetadataRecord.put("version", cdaVersion);
@@ -358,7 +358,6 @@ public class PackMillService {
                                  ProfileType profileType,
                                  Set<String> existSet) throws Exception {
         //查询对应内部EHR字段是否有对应字典
-        //获取是否有标准字典
 
         String dictCode = getMetadataDict(metadataId);
 
@@ -451,7 +450,7 @@ public class PackMillService {
             qcMetadataRecord.put("dept", resourceBucket.getBasicRecord(ResourceCells.DEPT_CODE));
             qcMetadataRecord.put("diagnosis_name", resourceBucket.getBasicRecord(ResourceCells.DIAGNOSIS_NAME));
             qcMetadataRecord.put("event_date", DateUtil.toStringLong(DateUtil.strToDate(resourceBucket.getBasicRecord(ResourceCells.EVENT_DATE))));
-            qcMetadataRecord.put("event_type", resourceBucket.getBasicRecord(ResourceCells.EVENT_TYPE) == null ? -1 : new Integer(resourceBucket.getBasicRecord(ResourceCells.EVENT_TYPE)));
+            qcMetadataRecord.put("event_type", resourceBucket.getBasicRecord(ResourceCells.EVENT_TYPE) == "" ? -1 : new Integer(resourceBucket.getBasicRecord(ResourceCells.EVENT_TYPE)));
             qcMetadataRecord.put("event_no", resourceBucket.getBasicRecord(ResourceCells.EVENT_NO));
             qcMetadataRecord.put("receive_date", DATE_FORMAT.format(resourceBucket.getReceiveDate()));
             qcMetadataRecord.put("version", version);
