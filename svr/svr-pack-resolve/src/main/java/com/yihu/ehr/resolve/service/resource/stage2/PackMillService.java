@@ -282,7 +282,13 @@ public class PackMillService {
      * @param existSet 已质控数据记录
      * @return
      */
-     protected String getResMetadata(String cdaVersion, String srcDataSetCode, String srcMetadataCode, ResourceBucket resourceBucket, String value, ProfileType profileType, Set<String> existSet){
+     protected String getResMetadata(String cdaVersion,
+                                     String srcDataSetCode,
+                                     String srcMetadataCode,
+                                     ResourceBucket resourceBucket,
+                                     String value,
+                                     ProfileType profileType,
+                                     Set<String> existSet){
          // TODO: 翻译时需要的内容：对CODE与VALUE处理后再翻译
          if ("rBUSINESS_DATE".equals(srcMetadataCode)) {
              return null;
@@ -352,7 +358,10 @@ public class PackMillService {
                                  ProfileType profileType,
                                  Set<String> existSet) throws Exception {
         //查询对应内部EHR字段是否有对应字典
+        //获取是否有标准字典
+
         String dictCode = getMetadataDict(metadataId);
+
         //内部EHR数据元字典不为空情况
         if (StringUtils.isNotBlank(dictCode) && StringUtils.isNotBlank(value)) {
             //判断是否为时间格式
@@ -398,13 +407,6 @@ public class PackMillService {
         return redisService.getRsMetaData(metadataId);
     }
 
-    /**
-     * 获取对应字典缓存信息
-     * @param version cda版本
-     * @param dictCode EHR内部字典代码
-     * @param srcDictEntryCode STD字典项代码
-     * @return
-     */
     /**
      * 获取对应字典缓存信息
      * @param version cda版本
