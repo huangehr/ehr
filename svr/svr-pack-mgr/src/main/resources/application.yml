@@ -9,9 +9,9 @@ info:
 
 spring:
   http:
-   multipart:
-    maxRequestSize: 1024MB  #配置最大上传为1G
-    maxFileSize: 1024MB  #配置最大上传为1G
+    multipart:
+      maxRequestSize: 1024MB  #配置最大上传为1G
+      maxFileSize: 1024MB  #配置最大上传为1G
   # REDIS
   redis:
     database: 0 # Database index used by the connection factory.

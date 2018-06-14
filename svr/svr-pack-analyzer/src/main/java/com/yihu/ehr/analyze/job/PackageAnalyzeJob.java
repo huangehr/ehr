@@ -2,6 +2,7 @@ package com.yihu.ehr.analyze.job;
 
 import com.yihu.ehr.analyze.service.pack.PackageAnalyzeService;
 import com.yihu.ehr.lang.SpringContext;
+import org.quartz.DisallowConcurrentExecution;
 import org.quartz.InterruptableJob;
 import org.quartz.JobExecutionContext;
 import org.quartz.UnableToInterruptJobException;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Component;
  * @created 2018.01.15
  */
 @Component
+@DisallowConcurrentExecution
 public class PackageAnalyzeJob implements InterruptableJob {
     @Override
     public void interrupt() throws UnableToInterruptJobException {

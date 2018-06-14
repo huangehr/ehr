@@ -31,7 +31,9 @@
 	curl -X PUT 'http://172.19.103.9:9200/json_archives/info/_mapping' -d '{"info":{"properties":{"delay":{"type":"long"}}}}'
 	curl -X PUT 'http://172.19.103.9:9200/json_archives/info/_mapping' -d '{"info":{"properties":{"defect":{"type":"integer"}}}}'
 	curl -X PUT 'http://172.19.103.9:9200/json_archives/info/_mapping' -d '{"info":{"properties":{"patient_name":{"type":"string","analyzer":"ik","search_analyzer":"ik"}}}}'
-	
+	#2016-06-13
+	curl -X PUT 'http://172.19.103.9:9200/json_archives_qc/qc_dataset_info/_mapping' -d '{"qc_dataset_info":{"properties":{"create_date":{"type":"date","format": "yyyy-MM-dd HH:mm:ss"}}}}'
+	curl -X PUT 'http://172.19.103.9:9200/json_archives_qc/qc_metadata_info/_mapping' -d '{"qc_metadata_info":{"properties":{"create_date":{"type":"date","format": "yyyy-MM-dd HH:mm:ss"}}}}'
 	
 	
 	

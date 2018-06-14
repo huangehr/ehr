@@ -28,7 +28,6 @@ public class PackResolveTask {
     private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     private static final String INDEX = "json_archives";
     private static final String TYPE = "info";
-    private static final String QUEUE = RedisCollection.ResolveQueue;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -41,12 +40,12 @@ public class PackResolveTask {
     public void delayPushTask() throws Exception {
         List<String> esSimplePackageList = new ArrayList<>(200);
         //当解析队列为空，将数据库中状态为缓存状态的档案包加入解析队列
-        if (redisTemplate.opsForList().size(QUEUE) <= 0) {
+        if (redisTemplate.opsForList().size(RedisCollection.ResolveQueue) <= 0) {
             List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, "analyze_status=3;archive_status=0", "+receive_date", 1, 1000);
             for (Map<String, Object> pack : resultList) {
                 String packStr = objectMapper.writeValueAsString(pack);
                 EsSimplePackage esSimplePackage = objectMapper.readValue(packStr, EsSimplePackage.class);
-                redisTemplate.opsForList().leftPush(QUEUE, objectMapper.writeValueAsString(esSimplePackage));
+                redisTemplate.opsForList().leftPush(RedisCollection.ResolveQueue, objectMapper.writeValueAsString(esSimplePackage));
             }
         }
         //将解析状态为失败且错误次数小于三次的档案包重新加入解析队列
@@ -75,6 +74,6 @@ public class PackResolveTask {
             esSimplePackageList.add(objectMapper.writeValueAsString(esSimplePackage));
         }
         elasticSearchUtil.bulkUpdate(INDEX, TYPE, updateSourceList);
-        esSimplePackageList.forEach(item -> redisTemplate.opsForList().leftPush(QUEUE, item));
+        esSimplePackageList.forEach(item -> redisTemplate.opsForList().leftPush(RedisCollection.ResolveQueue, item));
     }
 }

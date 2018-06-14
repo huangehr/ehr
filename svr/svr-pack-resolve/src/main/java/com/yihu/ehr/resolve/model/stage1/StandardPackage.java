@@ -65,7 +65,7 @@ public class StandardPackage extends OriginalPackage {
         root.put("cdaVersion", this.getCdaVersion());
         root.put("eventTime", DateTimeUtil.utcDateTimeFormat(this.getEventTime()));
         root.put("createTime", DateTimeUtil.utcDateTimeFormat(this.getCreateDate()));
-        root.put("eventType", this.getEventType() == null? "":this.getEventType().toString());
+        root.put("eventType", this.getEventType() == null ?  "" : this.getEventType().toString());
         root.put("profileType", this.getProfileType().toString());
         root.put("cardType", this.getCardType());
         root.put("patientName", this.getPatientName());
