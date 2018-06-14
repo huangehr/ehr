@@ -52,6 +52,8 @@ analyze:
 quality:
   orgCode : 1 #默认机构
   version: 59083976eebd #默认版本号
+  cloud: medicalCloud #默认云平台code
+  cloudName: 上饶医疗云 #默认云平台name
 
 elasticsearch:
   pool:

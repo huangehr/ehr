@@ -40,6 +40,10 @@ public class DataQualityStatisticsService extends BaseJpaService {
     private DqPaltformReceiveWarningDao dqPaltformReceiveWarningDao;
     @Value("${quality.orgCode}")
     private String defaultOrgCode;
+    @Value("${quality.cloud}")
+    private String cloud;
+    @Value("${quality.cloudName}")
+    private String cloudName;
 
     /**
      * 统计查询
@@ -59,6 +63,14 @@ public class DataQualityStatisticsService extends BaseJpaService {
         }
 
         Long startTime = System.currentTimeMillis();
+        double totalHospitalAcrhives = 0;//医疗云总档案数
+        double totalHospitalDataset = 0;//医疗云总数据集数
+        double totalReceiveArchives = 0;//医疗云总接收档案数
+        double totalReceiveException = 0;//医疗云总接收质量异常数
+        double totalReceiveDataset = 0;//医疗云总接收据集数
+        double totalResourceFailure = 0;//医疗云总资源化失败数
+        double totalResourceSuccess = 0;//医疗云总资源化成功数
+        double totalResourceException = 0;//医疗云总资源化异常数
 
         //初始化 数据集数据
         Session session = currentSession();
@@ -70,12 +82,16 @@ public class DataQualityStatisticsService extends BaseJpaService {
             Integer num = Integer.valueOf(one[1].toString());
             datasetMap.put(orgCode,num);
         });
+        //统计医疗云平台数据集总数
+        query = session.createSQLQuery("SELECT count(DISTINCT dataset_code) c from dq_dataset_warning WHERE type = 1 ");
+        List<Object[]> tmpList = query.list();
+        totalHospitalDataset = Integer.valueOf(tmpList.get(0)[0].toString());
 
         Long en = System.currentTimeMillis();
         logger.info("初始化 数据集数据时间："+(en-startTime));
 
         //获取医院数据
-        Query query1 = session.createSQLQuery("SELECT org_code,full_name from organizations ");
+        Query query1 = session.createSQLQuery("SELECT org_code,full_name from organizations where org_type = 'Hospital' ");
         List<Object[]> orgList = query1.list();
         Map<String, Object> orgMap = new HashedMap(orgList.size());
         orgList.forEach(one->{
@@ -106,17 +122,16 @@ public class DataQualityStatisticsService extends BaseJpaService {
                 }
                 if(eventType == null){
                     dataMap1.put("hospitalArchives",HSI07_01_001);
+                    totalHospitalAcrhives+=HSI07_01_001;
                 }else if(eventType == 1){
                     dataMap1.put("hospitalArchives",HSI07_01_012);
+                    totalHospitalAcrhives+=HSI07_01_012;
                 }else if(eventType == 2){
                     dataMap1.put("hospitalArchives",HSI07_01_004);
+                    totalHospitalAcrhives+=HSI07_01_004;
                 }else if(eventType == 0) {
                     dataMap1.put("hospitalArchives",HSI07_01_002);
-                }
-                if(datasetMap.containsKey(orgCode)){
-                    dataMap1.put("hospitalDataset",datasetMap.get(orgCode));
-                }else {
-                    dataMap1.put("hospitalDataset",datasetMap.get(defaultOrgCode));
+                    totalHospitalAcrhives+=HSI07_01_002;
                 }
                 dataMap.put(orgCode,dataMap1);
             }
@@ -145,6 +160,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
                     dataMap1 = initDataMap(datasetMap,orgMap.get(orgCode),orgCode);
                 }
                 dataMap1.put("receiveArchives",total);
+                totalReceiveArchives+=total;
                 dataMap.put(orgCode,dataMap1);
             }
         }catch (Exception e){
@@ -171,6 +187,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
                     dataMap1 = initDataMap(datasetMap,orgMap.get(orgCode),orgCode);
                 }
                 dataMap1.put("receiveException",total);
+                totalReceiveException+=total;
                 dataMap.put(orgCode,dataMap1);
             }
         }catch (Exception e){
@@ -187,6 +204,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
         sql4 += " group by org_code";
         ResultSet resultSet4 = elasticSearchUtil.findBySql(sql4);
         try {
+            Map<String,String> totalMap = new HashedMap();
             Map<String, Map<String, Object>> datasetMap1 = new HashMap<>();
             while (resultSet4.next()) {
                 Map<String, Object> datasetMap2 = null;
@@ -202,7 +220,10 @@ public class DataQualityStatisticsService extends BaseJpaService {
                 for(int i=0;i<jsonArray.size();i++){
                     String dataset = jsonArray.get(i).toString();
                     if(!datasetMap2.containsKey(dataset)){
-                        datasetMap2.put(dataset,dataMap);
+                        datasetMap2.put(dataset,dataset);
+                    }
+                    if(totalMap.containsKey(dataset)){
+                        totalMap.put(dataset,dataset);
                     }
                 }
                 datasetMap1.put(orgCode,datasetMap2);
@@ -219,6 +240,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
                 dataMap1.put("receiveDataset",entry.getValue().size());//数据集个数
                 dataMap.put(orgCode,dataMap1);
             }
+            totalReceiveDataset = totalMap.size();
         }catch (Exception e){
             e.getMessage();
         }
@@ -242,8 +264,10 @@ public class DataQualityStatisticsService extends BaseJpaService {
                 }
                 if("2".equals(archiveStatus)){
                     dataMap1.put("resourceFailure",total);//失败
+                    totalResourceFailure+=total;
                 }else {
                     dataMap1.put("resourceSuccess",total);//成功
+                    totalResourceSuccess+=total;
                 }
                 dataMap.put(orgCode,dataMap1);
             }
@@ -267,6 +291,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
                     dataMap1 = initDataMap(datasetMap,orgMap.get(orgCode),orgCode);
                 }
                 dataMap1.put("resourceException",total);
+                totalResourceException+=total;
                 dataMap.put(orgCode,dataMap1);
             }
         }catch (Exception e){
@@ -276,6 +301,19 @@ public class DataQualityStatisticsService extends BaseJpaService {
         Long end6 = System.currentTimeMillis();
         logger.info("资源化数据(解析异常)时间："+(end6-end5));
 
+        //新增医疗云平台数据
+        Map<String, Object> totalMap = new HashedMap();
+        totalMap.put("orgCode",cloud);
+        totalMap.put("orgCode",cloudName);
+        totalMap.put("hospitalArchives",totalHospitalAcrhives);//医院档案数
+        totalMap.put("hospitalDataset",totalHospitalDataset);//医院数据集
+        totalMap.put("receiveArchives",totalReceiveArchives);//接收档案数
+        totalMap.put("receiveDataset",totalReceiveDataset); //接收数据集
+        totalMap.put("receiveException",totalReceiveException);//接收异常
+        totalMap.put("resourceSuccess",totalResourceSuccess);//资源化-成功
+        totalMap.put("resourceFailure",totalResourceFailure);//资源化-失败
+        totalMap.put("resourceException",totalResourceException);//资源化-异常
+        re.add(totalMap);
         for (Map<String, Object> map:dataMap.values()){
             re.add(map);
         }
@@ -334,15 +372,36 @@ public class DataQualityStatisticsService extends BaseJpaService {
             reportData.put("orgCode", orgCode);
 
             // 医院上报数
-            String reportedNumSql = "SELECT SUM(HSI07_01_001) total,SUM(HSI07_01_002) outpatientNum, SUM(HSI07_01_004) healthExaminationNum, SUM(HSI07_01_012) hospitalDischargeNum FROM qc/daily_report " +
+            String reportedNumSql1 = "SELECT SUM(HSI07_01_001) total,SUM(HSI07_01_002) outpatientNum, SUM(HSI07_01_004) healthExaminationNum, SUM(HSI07_01_012) hospitalDischargeNum FROM qc/daily_report " +
                     "WHERE event_date BETWEEN '" + eventDateStart + "' AND '" + eventDateEnd;
             if (!"all".equals(orgInfo.get("orgCode"))) {
-                reportedNumSql += " AND org_code='" + orgCode + "'";
+                reportedNumSql1 += " AND org_code='" + orgCode + "'";
             }
-            String reportedNumFields = "total,outpatientNum,healthExaminationNum,hospitalDischargeNum";
-            List<Map<String, Object>> reportedNumList = elasticSearchUtil.findBySql(Arrays.asList(reportedNumFields.split(",")), reportedNumSql);
-            reportData.put("reportedNumList", reportedNumList);
+            String reportedNumFields1 = "total,outpatientNum,healthExaminationNum,hospitalDischargeNum";
+            List<Map<String, Object>> reportedNumList1 = elasticSearchUtil.findBySql(Arrays.asList(reportedNumFields1.split(",")), reportedNumSql1);
+            reportData.put("reportedNumList", reportedNumList1);
             // TODO 采集情况
+            String reportedNumSql2 = "SELECT count(*) total,org_code orgCode,event_type eventType FROM json_archives/info where receive_date BETWEEN '"+eventDateStart+"' AND '" +  eventDateEnd + "' " +
+                    " group by org_code,event_type";
+
+
+//            ResultSet resultSet2 = elasticSearchUtil.findBySql(sql2);
+//            try {
+//                while (resultSet2.next()) {
+//                    Map<String, Object> dataMap1 = null;
+//                    String orgCode = resultSet2.getString("org_code");
+//                    double total = resultSet2.getDouble("c");//接收 档案数
+//                    if(dataMap.containsKey(orgCode)){
+//                        dataMap1 = dataMap.get(orgCode);
+//                    }else {
+//                        dataMap1 = initDataMap(datasetMap,orgMap.get(orgCode),orgCode);
+//                    }
+//                    dataMap1.put("receiveArchives",total);
+//                    dataMap.put(orgCode,dataMap1);
+//                }
+//            }catch (Exception e){
+//                e.getMessage();
+//            }
 
             // TODO 采集内容
 
@@ -477,7 +536,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
         logger.info("初始化 数据集数据时间："+(en-startTime));
 
         //获取医院数据
-        Query query1 = session.createSQLQuery("SELECT org_code,full_name from organizations ");
+        Query query1 = session.createSQLQuery("SELECT org_code,full_name from organizations where org_type = 'Hospital' ");
         List<Object[]> orgList = query1.list();
         Map<String, Object> orgMap = new HashedMap(orgList.size());
         orgList.forEach(one->{
@@ -488,6 +547,17 @@ public class DataQualityStatisticsService extends BaseJpaService {
 
         Long end0 = System.currentTimeMillis();
         logger.info("获取医院名称时间："+(end0-en));
+
+        double totalVisitNum = 0;//总就诊数
+        double totalOutpatientNum = 0;//总门诊数
+        double totalPeNum = 0;//总体检数
+        double totalHospitalNum = 0;//总住院数
+        double totalOutpatientInTime = 0;//总门诊及时数
+        double totalPeInTime = 0;//总体检及时数
+        double totalHospitalInTime = 0;//总住院及时数
+        double totalOutpatientIntegrity = 0;//总门诊完整数
+        double totalHospitalIntegrity = 0;//总住院完整数
+        double totalPeIntegrity = 0;//总体检完整数
 
         //统计总数
         String sql1 = "SELECT sum(HSI07_01_001) s1,sum(HSI07_01_002) s2,sum(HSI07_01_004) s3,sum(HSI07_01_012) s4,org_code FROM qc/daily_report where event_date>= '"+start+"T00:00:00' AND event_date <='" +  end + "T23:59:59' group by org_code";
@@ -510,7 +580,10 @@ public class DataQualityStatisticsService extends BaseJpaService {
                 dataMap1.put("totalOutpatient",HSI07_01_002);
                 dataMap1.put("totalPe",HSI07_01_004);
                 dataMap1.put("totalHospital",HSI07_01_012);
-
+                totalVisitNum+=HSI07_01_001;
+                totalOutpatientNum+=HSI07_01_002;
+                totalPeNum+=HSI07_01_004;
+                totalHospitalNum+=HSI07_01_012;
                 dataMap.put(orgCode,dataMap1);
             }
         }catch (Exception e){
@@ -538,22 +611,16 @@ public class DataQualityStatisticsService extends BaseJpaService {
                 boolean flag = StringUtils.isNotBlank(eventType)&&!"null".equals(eventType)&&total>0;
                 if(flag&&isInTime(warningMap,orgCode,eventType,delay)){
                     if("0".equals(eventType)){
-                        Object o = dataMap1.get("outpatientInTime");
-                        if(o!=null){
-                            total += Integer.parseInt(o.toString());
-                        }
+                        total += Integer.parseInt(dataMap1.get("outpatientInTime").toString());
+                        totalOutpatientInTime += total;
                         dataMap1.put("outpatientInTime",total);
                     }else if("1".equals(eventType)){
-                        Object o = dataMap1.get("hospitalInTime");
-                        if(o!=null){
-                            total += Integer.parseInt(o.toString());
-                        }
+                        total += Integer.parseInt(dataMap1.get("hospitalInTime").toString());
+                        totalHospitalInTime += total;
                         dataMap1.put("hospitalInTime",total);
                     }else if("2".equals(eventType)){
-                        Object o = dataMap1.get("peInTime");
-                        if(o!=null){
-                            total += Integer.parseInt(o.toString());
-                        }
+                        total += Integer.parseInt(dataMap1.get("peInTime").toString());
+                        totalPeInTime += total;
                         dataMap1.put("peInTime",total);
                     }
 
@@ -585,10 +652,13 @@ public class DataQualityStatisticsService extends BaseJpaService {
                 if(flag){
                     if("0".equals(eventType)){
                         dataMap1.put("outpatientIntegrity",total);
+                        totalOutpatientIntegrity += total;
                     }else if("1".equals(eventType)){
                         dataMap1.put("hospitalIntegrity",total);
+                        totalHospitalIntegrity += total;
                     }else if("2".equals(eventType)){
                         dataMap1.put("peIntegrity",total);
+                        totalPeIntegrity += total;
                     }
                     dataMap.put(orgCode,dataMap1);
                 }
@@ -599,6 +669,34 @@ public class DataQualityStatisticsService extends BaseJpaService {
 
         Long end3 = System.currentTimeMillis();
         logger.info("统计完整数时间："+(end3-end2));
+
+        //计算总数
+        Map<String, Object> totalMap = new HashedMap();
+        totalMap.put("orgCode",cloud);//机构code
+        totalMap.put("orgName",cloudName);//机构名称
+        totalMap.put("outpatientInTime",totalOutpatientInTime);//门诊及时数
+        totalMap.put("hospitalInTime",totalHospitalInTime);//住院及时数
+        totalMap.put("peInTime",totalPeInTime);//体检及时数
+        totalMap.put("outpatientIntegrity",totalOutpatientIntegrity);//门诊完整数
+        totalMap.put("hospitalIntegrity",totalHospitalIntegrity);//住院完整数
+        totalMap.put("peIntegrity",totalPeIntegrity);//体检完整数
+        totalMap.put("totalVisit",totalVisitNum);//总就诊数
+        totalMap.put("totalOutpatient",totalOutpatientNum);//总门诊数
+        totalMap.put("totalPe",totalPeNum);//总体检数
+        totalMap.put("totalHospital",totalHospitalNum);//总住院数
+        double totalVisitIntime = totalOutpatientInTime + totalHospitalInTime + totalPeInTime;
+        double totalVisitIntegrity = totalOutpatientIntegrity + totalHospitalIntegrity + totalPeIntegrity;
+        totalMap.put("visitIntime", totalVisitIntime);
+        totalMap.put("visitIntegrity", totalVisitIntegrity);
+        totalMap.put("outpatientInTimeRate",calRate(totalOutpatientInTime,totalOutpatientNum));
+        totalMap.put("hospitalInTimeRate",calRate(totalHospitalInTime,totalHospitalNum));
+        totalMap.put("peInTimeRate",calRate(totalPeInTime,totalPeNum));
+        totalMap.put("visitIntimeRate",calRate(totalVisitIntime,totalVisitNum));
+        totalMap.put("outpatientIntegrityRate",calRate(totalOutpatientIntegrity,totalOutpatientNum));
+        totalMap.put("hospitalIntegrityRate",calRate(totalHospitalIntegrity,totalHospitalNum));
+        totalMap.put("peIntegrityRate",calRate(totalPeIntegrity,totalPeNum));
+        totalMap.put("visitIntegrityRate",calRate(totalVisitIntegrity,totalVisitNum));
+        re.add(totalMap);
 
         //计算及时率及完整率
         for (Map<String, Object> map:dataMap.values()){

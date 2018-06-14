@@ -7,6 +7,8 @@ import com.yihu.ehr.query.BaseJpaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+
 /**
  * 平台接收预警值
  * @author yeshijie on 2018/5/28.
@@ -34,6 +36,8 @@ public class DqPaltformReceiveWarningService extends BaseJpaService<DqPaltformRe
      */
     public DqPaltformReceiveWarning paltformReceiveWarningAdd(DqPaltformReceiveWarning warning){
 
+        warning.setCreateTime(new Date());
+        warning.setUpdateTime(new Date());
         save(warning);
         if(warning.getDatasetWarningList()!=null&&warning.getDatasetWarningList().size()>0){
             warning.getDatasetWarningList().forEach(dataset->{
@@ -53,7 +57,19 @@ public class DqPaltformReceiveWarningService extends BaseJpaService<DqPaltformRe
      */
     public DqPaltformReceiveWarning paltformReceiveWarningUpd(DqPaltformReceiveWarning warning){
 
-        save(warning);
-        return warning;
+        DqPaltformReceiveWarning oldWarning = findById(warning.getId());
+        oldWarning.setErrorNum(warning.getErrorNum());
+        oldWarning.setArchiveNum(warning.getErrorNum());
+        oldWarning.setHospitalInTime(warning.getHospitalInTime());
+        oldWarning.setHospitalInTimeRate(warning.getHospitalInTimeRate());
+        oldWarning.setOutpatientInTime(warning.getOutpatientInTime());
+        oldWarning.setOutpatientInTimeRate(warning.getOutpatientInTimeRate());
+        oldWarning.setPeInTime(warning.getPeInTime());
+        oldWarning.setPeInTimeRate(warning.getPeInTimeRate());
+        oldWarning.setUpdateTime(new Date());
+        oldWarning.setUpdateUserId(warning.getUpdateUserId());
+        oldWarning.setUpdateUserName(warning.getUpdateUserName());
+        save(oldWarning);
+        return oldWarning;
     }
 }
