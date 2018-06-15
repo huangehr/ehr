@@ -88,10 +88,7 @@ public class PackMillService {
                                 resMetadata,
                                 metaDataRecord.getMetaData(srcMetadataCode),
                                 srcDataSet.getCode(),
-                                srcMetadataCode,
-                                resourceBucket,
-                                originalPackage.getProfileType(),
-                                existSet
+                                srcMetadataCode
                         );
                     }
                     //仅一条记录
@@ -132,10 +129,7 @@ public class PackMillService {
                                 resMetadata,
                                 metaDataRecord.getMetaData(srcMetadataCode),
                                 srcDataSet.getCode(),
-                                srcMetadataCode,
-                                resourceBucket,
-                                originalPackage.getProfileType(),
-                                existSet
+                                srcMetadataCode
                         );
                     }
                     if (subRecord.getDataGroup().size() > 0) {
@@ -343,9 +337,6 @@ public class PackMillService {
      * @param value 值
      * @param srcDataSetCode 标准数据集编码
      * @param srcMetadataCode 标准数据元编码
-     * @param resourceBucket 数据包
-     * @param profileType 档案类型
-     * @param existSet 已质控数据记录
      * @throws Exception
      */
     protected void dictTransform(ResourceRecord dataRecord,
@@ -353,118 +344,24 @@ public class PackMillService {
                                  String metadataId,
                                  String value,
                                  String srcDataSetCode,
-                                 String srcMetadataCode,
-                                 ResourceBucket resourceBucket,
-                                 ProfileType profileType,
-                                 Set<String> existSet) throws Exception {
-        //查询对应内部EHR字段是否有对应字典
-
-        String dictCode = getMetadataDict(metadataId);
-
-        //内部EHR数据元字典不为空情况
-        if (StringUtils.isNotBlank(dictCode) && StringUtils.isNotBlank(value)) {
-            //判断是否为时间格式
-            if (dictCode.equals("DATECONDITION")) {
-                if (!value.contains("T") && !value.contains("Z")) {
-                    StringBuilder error = new StringBuilder();
-                    error.append("Invalid date time format ")
-                            .append(srcDataSetCode)
-                            .append(" ")
-                            .append(srcMetadataCode)
-                            .append(" ")
-                            .append(value)
-                            .append(" for std version ")
-                            .append(cdaVersion)
-                            .append(".");
-                    throw new IllegalJsonDataException(error.toString());
-                }
+                                 String srcMetadataCode) throws Exception {
+        //查询是否有对应字典ID
+        String dictId = redisService.getMetaDataDict(cdaVersion, srcDataSetCode, srcMetadataCode);
+        //字典ID不为空且原始值不为空的情况下
+        if (StringUtils.isNotBlank(dictId) && StringUtils.isNotBlank(value)) {
+            //查找对应的字典值
+            String _value = redisService.getDictEntryValue(cdaVersion, dictId, value);
+            //对应字典值不为空的情况下，保存原始值和字典值
+            if (StringUtils.isNotBlank(_value)) {
+                //保存标准字典值编码(code)
                 dataRecord.addResource(metadataId, value);
+                //保存标准字典值名称(value)
+                dataRecord.addResource(metadataId + "_VALUE", _value);
             } else {
-                //查找对应的字典数据
-                String[] dict = getDict(cdaVersion, dictCode, value, resourceBucket, srcDataSetCode, srcMetadataCode, profileType, existSet);
-                //对应字典不为空情况下，转换EHR内部字典，并保存字典对应值，为空则不处理
-                if (dict.length > 1) {
-                    //保存标准字典值编码(code)
-                    dataRecord.addResource(metadataId, dict[0]);
-                    //保存标准字典值名称(value)
-                    dataRecord.addResource(metadataId + "_VALUE", dict[1]);
-                } else {
-                    dataRecord.addResource(metadataId, value);
-                }
+                dataRecord.addResource(metadataId, value);
             }
-        } else {   //内部EHR数据元字典为空不处理
+        } else {
             dataRecord.addResource(metadataId, value);
         }
-    }
-
-    /**
-     * 获取数据元对应字典缓存
-     * @param metadataId 数据元ID
-     * @return
-     */
-    public String getMetadataDict(String metadataId) {
-        return redisService.getRsMetaData(metadataId);
-    }
-
-    /**
-     * 获取对应字典缓存信息
-     * @param version cda版本
-     * @param dictCode EHR内部字典代码
-     * @param srcDictEntryCode STD字典项代码
-     * @param resourceBucket 数据包
-     * @param srcDataSetCode 标准数据集编码
-     * @param srcMetadataCode 标准数据元编码
-     * @param profileType 档案类型
-     * @param existSet 已质控数据记录
-     * @return
-     */
-    public String[] getDict(String version,
-                            String dictCode,
-                            String srcDictEntryCode,
-                            ResourceBucket resourceBucket,
-                            String srcDataSetCode,
-                            String srcMetadataCode,
-                            ProfileType profileType,
-                            Set<String> existSet) {
-        String dict = redisService.getRsAdapterDict(version, dictCode, srcDictEntryCode);
-        if (dict != null) {
-            return dict.split("&");
-        }
-        //日志
-        PackResolveLogger.warn(String.format("Unable to get dict value for meta data %s of %s in %s", srcMetadataCode, srcDataSetCode, version));
-        if (profileType == ProfileType.Standard && !existSet.contains(srcDataSetCode + "$" + srcMetadataCode)) {
-            //质控数据
-            Map<String, Object> qcMetadataRecord = new HashMap<>();
-            StringBuilder _id = new StringBuilder();
-            _id.append(resourceBucket.getPackId())
-                    .append("$")
-                    .append(srcDataSetCode)
-                    .append("$")
-                    .append(srcMetadataCode);
-            qcMetadataRecord.put("_id", _id.toString());
-            qcMetadataRecord.put("pack_id", resourceBucket.getPackId());
-            qcMetadataRecord.put("patient_id", resourceBucket.getBasicRecord(ResourceCells.PATIENT_ID));
-            qcMetadataRecord.put("org_code", resourceBucket.getBasicRecord(ResourceCells.ORG_CODE));
-            qcMetadataRecord.put("org_name", resourceBucket.getBasicRecord(ResourceCells.ORG_NAME));
-            qcMetadataRecord.put("org_area", resourceBucket.getBasicRecord(ResourceCells.ORG_AREA));
-            qcMetadataRecord.put("dept", resourceBucket.getBasicRecord(ResourceCells.DEPT_CODE));
-            qcMetadataRecord.put("diagnosis_name", resourceBucket.getBasicRecord(ResourceCells.DIAGNOSIS_NAME));
-            qcMetadataRecord.put("event_date", DateUtil.toStringLong(DateUtil.strToDate(resourceBucket.getBasicRecord(ResourceCells.EVENT_DATE))));
-            qcMetadataRecord.put("event_type", resourceBucket.getBasicRecord(ResourceCells.EVENT_TYPE) == "" ? -1 : new Integer(resourceBucket.getBasicRecord(ResourceCells.EVENT_TYPE)));
-            qcMetadataRecord.put("event_no", resourceBucket.getBasicRecord(ResourceCells.EVENT_NO));
-            qcMetadataRecord.put("receive_date", DATE_FORMAT.format(resourceBucket.getReceiveDate()));
-            qcMetadataRecord.put("version", version);
-            qcMetadataRecord.put("dataset", srcDataSetCode);
-            qcMetadataRecord.put("metadata", srcMetadataCode);
-            qcMetadataRecord.put("value", srcDictEntryCode);
-            qcMetadataRecord.put("qc_step", 2); //资源化质控环节
-            qcMetadataRecord.put("qc_error_type", ErrorType.DictAdaptationError.getType()); //字典转换错误
-            qcMetadataRecord.put("qc_error_name", ErrorType.DictAdaptationError.getName()); //字典转换错误
-            qcMetadataRecord.put("qc_error_message", String.format("Unable to get dict value for meta data %s of %s in %s", srcMetadataCode, srcDataSetCode, version));
-            qcMetadataRecord.put("create_date", DATE_FORMAT.format(new Date()));
-            resourceBucket.getQcMetadataRecords().addRecord(qcMetadataRecord);
-            existSet.add(srcDataSetCode + "$" + srcMetadataCode);
-        }
-        return "".split("&");
     }
 }

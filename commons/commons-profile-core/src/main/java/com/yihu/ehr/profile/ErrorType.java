@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public enum ErrorType {
     Normal(0, "验证正常"),
     EmptyError(1, "字段值为空"),
-    ValueError(2, "值域超出"),
+    ValueError(2, "值域错误"),
     TypeError(3, "类型错误"),
     FormatError(4, "格式错误"),
     FieldAdaptationError(5, "资源适配错误"),

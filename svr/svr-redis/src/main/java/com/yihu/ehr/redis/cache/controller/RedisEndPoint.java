@@ -88,17 +88,6 @@ public class RedisEndPoint extends EnvelopRestEndPoint {
     }
 
     //------------------------------------ 资源化相关 START -------------------------------------------------------
-    @ApiOperation("通过StdDataSet版本、标准数据元字典编码和标准数据元字典项编码获取资源化字典映射(rs_adapter_dictionary)")
-    @RequestMapping(value = ServiceApi.Redis.RsAdapterDict, method = RequestMethod.GET)
-    public String getRsAdapterDict(
-            @ApiParam(value = "cdaVersion")
-            @RequestParam(value = "cdaVersion") String cdaVersion,
-            @ApiParam(value = "srcDictCode")
-            @RequestParam(value = "srcDictCode") String srcDictCode,
-            @ApiParam(value = "srcDictEntryCode")
-            @RequestParam(value = "srcDictEntryCode") String srcDictEntryCode) {
-        return redisService.getRsAdapterDict(cdaVersion, srcDictCode, srcDictEntryCode);
-    }
 
     @ApiOperation("通过StdDataSet版本、编码和标准数据元内部编码获取资源化数据元ID(rs_adapter_metadata)")
     @RequestMapping(value = ServiceApi.Redis.RsAdapterMetadata, method = RequestMethod.GET)
@@ -112,13 +101,6 @@ public class RedisEndPoint extends EnvelopRestEndPoint {
         return redisService.getRsAdapterMetaData(cdaVersion, srcDataSetCode, srcMetadataCode);
     }
 
-    @ApiOperation("通过资源化数据元ID获取标准数据元字典编码")
-    @RequestMapping(value = ServiceApi.Redis.RsMetadataDict, method = RequestMethod.GET)
-    public String getRsMetaData(
-            @ApiParam(value = "key", required = true)
-            @RequestParam(value = "key") String key) {
-        return redisService.getRsMetaData(key);
-    }
     //------------------------------------ 资源化相关 END -------------------------------------------------------
 
     //------------------------------------ 标准相关 START -------------------------------------------------------

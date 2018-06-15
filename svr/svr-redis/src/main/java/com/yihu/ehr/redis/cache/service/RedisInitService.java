@@ -7,7 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.HashMap;
+
 import java.util.List;
 import java.util.Map;
 
@@ -28,10 +28,6 @@ public class RedisInitService extends BaseJpaService {
     private OrgKeySchema orgKeySchema;
     @Autowired
     private RsAdapterMetaKeySchema rsAdapterMetaKeySchema;
-    @Autowired
-    private RsAdapterDictKeySchema rsAdapterDictKeySchema;
-    @Autowired
-    private RsMetadataKeySchema rsMetadataKeySchema;
 
     /**
      * 缓存健康问题名称Redis
@@ -171,28 +167,6 @@ public class RedisInitService extends BaseJpaService {
     }
 
     /**
-     * 缓存适配数据字典数据
-     * @param id
-     * @return
-     */
-    public int cacheAdapterDict(String id){
-        String schemaSql = "SELECT adapter_version FROM rs_adapter_scheme WHERE id = " + id;
-        String metaSql = "SELECT dict_code, src_dict_entry_code, dict_entry_code, src_dict_entry_name FROM rs_adapter_dictionary WHERE scheme_id = " + id;
-        Map<String, Object> schemaMap = jdbc.queryForMap(schemaSql);
-        List<Map<String, Object>> dictList = jdbc.queryForList(metaSql);
-        //清空相关Redis
-        rsAdapterDictKeySchema.deleteAll();
-        for (Map<String, Object> dictMap : dictList) {
-            if (StringUtils.isEmpty(dictMap.get("dict_code")) || StringUtils.isEmpty(dictMap.get("src_dict_entry_code"))) {
-                continue;
-            }
-            rsAdapterDictKeySchema.setMetaData(schemaMap.get("adapter_version").toString(), dictMap.get("dict_code").toString(),
-                    dictMap.get("src_dict_entry_code").toString(), dictMap.get("dict_entry_code").toString() + "&" + dictMap.get("src_dict_entry_name"));
-        }
-        return dictList.size();
-    }
-
-    /**
      * 缓存适配数据元数据
      * @param id
      * @return
@@ -213,26 +187,6 @@ public class RedisInitService extends BaseJpaService {
         }
         return metaList.size();
     }
-
-    /**
-     * 缓存数据元字典（Dict_code不为空）
-     * @return
-     */
-    public int cacheMetadataDict() {
-        String sql = "SELECT id, dict_code FROM rs_metadata WHERE dict_code != NULL OR dict_code != ''";
-        //String sql1 = "SELECT a FROM RsMetadata a WHERE a.dictCode <> NULL AND a.dictCode <> ''";
-        List<Map<String, Object>> metaList = jdbc.queryForList(sql);
-        //清空相关Redis
-        rsMetadataKeySchema.deleteAll();
-        for (Map<String, Object> tempMap : metaList) {
-            if (StringUtils.isEmpty(tempMap.get("dict_code"))) {
-                continue;
-            }
-            rsMetadataKeySchema.set((String) tempMap.get("id"), (String) tempMap.get("dict_code"));
-        }
-        return metaList.size();
-    }
-
 
     //TODO ------------------- 未知用途 --------------------------
     @Autowired

@@ -78,32 +78,8 @@
 
     <!-- 如果微服务纳入全局异常处理，请勿修改以上代码，有新的日志处理请在以下追加！！！ -->
 
-	<!-- 开发环境配置 -->
-	<springProfile name="dev">
-		<root level="INFO">
-			<appender-ref ref="console"/>
-		</root>
-	</springProfile>
-
-	<!-- 测试环境配置 -->
-	<springProfile name="test">
-		<root level="WARN">
-			<appender-ref ref="console"/>
-		</root>
-	</springProfile>
-
-    <!-- 上饶过渡环境配置 -->
-    <springProfile name="prod_sr">
-        <root level="WARN">
-            <appender-ref ref="console"/>
-        </root>
-    </springProfile>
-
-    <!-- 上饶正式环境配置 -->
-    <springProfile name="prod_srformal">
-        <root level="WARN">
-            <appender-ref ref="console"/>
-        </root>
-    </springProfile>
+    <root level="INFO">
+        <appender-ref ref="console" />
+    </root>
 
 </configuration>

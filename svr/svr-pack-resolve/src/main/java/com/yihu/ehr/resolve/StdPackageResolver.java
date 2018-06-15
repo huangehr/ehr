@@ -84,7 +84,7 @@ public class StdPackageResolver extends PackageResolver {
                 }
 
                 //就诊事件信息
-                if (standardPackage.getEventTime() == null || standardPackage.getEventType() == null) {
+                if (standardPackage.getEventType() == null) {
                     Map<String, Object> properties = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.EventInfo);
                     EventType eventType = (EventType) properties.get(ResourceCells.EVENT_TYPE);
                     if (eventType != null) {

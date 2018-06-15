@@ -1,7 +1,5 @@
 package com.yihu.ehr.analyze.service;
 
-
-
 import com.yihu.ehr.redis.schema.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,46 +13,9 @@ import org.springframework.stereotype.Service;
 public class RedisService {
 
     @Autowired
-    private HealthProblemDictKeySchema healthProblemDictKeySchema;
-    @Autowired
-    private Icd10KeySchema icd10KeySchema;
-    @Autowired
     private OrgKeySchema orgKeySchema;
     @Autowired
-    private RsAdapterDictKeySchema rsAdapterDictKeySchema;
-    @Autowired
-    private RsAdapterMetaKeySchema rsAdapterMetaKeySchema;
-    @Autowired
-    private RsMetadataKeySchema rsMetadataKeySchema;
-    @Autowired
-    private StdDataSetKeySchema stdDataSetKeySchema;
-    @Autowired
     private StdMetaDataKeySchema stdMetaDataKeySchema;
-
-    /**
-     * 获取健康问题redis
-     *
-     * @return
-     */
-    public String getHealthProblem(String key) {
-        return healthProblemDictKeySchema.get(key);
-    }
-
-    /**
-     *获取ICD10对应健康问题 redis
-     */
-    public String getHpCodeByIcd10(String key) {
-        return icd10KeySchema.getHpCode(key);
-    }
-
-    /**
-     * 获取ICD10慢病信息
-     * @param key
-     * @return
-     */
-    public String getChronicInfo(String key) {
-        return icd10KeySchema.getChronicInfo(key);
-    }
 
     /**
      *获取机构名称redis
@@ -73,42 +34,24 @@ public class RedisService {
     }
 
     /**
-     *获取资源化字典映射 redis
-     * @return
-     */
-    public String getRsAdapterDict(String cdaVersion, String dictCode, String srcDictEntryCode) {
-        return rsAdapterDictKeySchema.getMetaData(cdaVersion, dictCode, srcDictEntryCode);
-    }
-
-    /**
-     *获取资源化数据元映射 redis
-     * @return
-     */
-    public String getRsAdapterMetaData(String cdaVersion, String dictCode, String srcDictEntryCode) {
-        return rsAdapterMetaKeySchema.getMetaData(cdaVersion, dictCode, srcDictEntryCode);
-    }
-
-    /**
-     *获取资源化数据元映射 redis
-     * @return
-     */
-    public String getRsMetaData(String key) {
-        return rsMetadataKeySchema.get(key);
-    }
-
-    /**
-     *获取标准数据集--主从表 redis
-     */
-    public Boolean getDataSetMultiRecord(String version, String code){
-        return stdDataSetKeySchema.dataSetMultiRecord(version, code);
-    }
-
-    /**
      * 获取标准数据元对应类型 redis
      */
     public String getMetaDataType(String version, String dataSetCode, String innerCode) {
 
-        return stdMetaDataKeySchema.metaDataType(version, dataSetCode , innerCode);
+        return stdMetaDataKeySchema.metaDataType(version, dataSetCode, innerCode);
+    }
+
+    /**
+     * 获取数据元格式
+     *
+     * @param version
+     * @param dataSetCode
+     * @param innerCode
+     * @return
+     */
+    public String getMetaDataFormat(String version, String dataSetCode, String innerCode) {
+
+        return stdMetaDataKeySchema.metaDataFormat(version, dataSetCode, innerCode);
     }
 
     /**

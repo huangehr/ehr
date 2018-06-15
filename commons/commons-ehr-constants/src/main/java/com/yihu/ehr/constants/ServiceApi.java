@@ -1008,7 +1008,6 @@ public class ServiceApi {
         public static final String InitOrgArea = "/redis/init/orgArea";
         public static final String InitOrgSaasArea = "/redis/init/orgSaasArea";
         public static final String InitOrgSaasOrg = "/redis/init/orgSaasOrg";
-        public static final String InitRsAdapterDict = "/redis/init/rsAdapterDict/{id}";
         public static final String InitRsAdapterMeta = "/redis/init/rsAdapterMeta/{id}";
         public static final String InitRsMetadataDict = "/redis/init/rsMetadataDict";
 
@@ -1645,11 +1644,9 @@ public class ServiceApi {
         public static final String PaltformUploadWarningDel = "/dataQuality/warningSetting/uploadWarningDel";
         public static final String PaltformUploadWarningUpd = "/dataQuality/warningSetting/uploadWarningUpd";
         public static final String PaltformUploadWarning =    "/dataQuality/warningSetting/uploadWarning/{id}";
-        public static final String DatasetWarningListNoPage = "/dataQuality/warningSetting/datasetWarningListNoPage";
         public static final String DatasetWarningList = "/dataQuality/warningSetting/datasetWarningList";
         public static final String DatasetWarningAdd = "/dataQuality/warningSetting/datasetWarningAdd";
         public static final String DatasetWarningDel = "/dataQuality/warningSetting/datasetWarningDel";
-        public static final String ImportDatasetExcel = "/dataQuality/warningSetting/importDatasetExcel";
         public static final String ReceivedPacketNumList = "/dataQuality/receivedPacket/packetNumList";
         public static final String ReceivedPacketReportData = "/dataQuality/receivedPacket/packetReportData";
         public static final String QualityMonitoringList = "/dataQuality/quality/qualityMonitoringList";
@@ -1667,6 +1664,8 @@ public class ServiceApi {
         public static final String ExportReceptionList = "/dataQuality/export/exportReceptionList";
         public static final String ExportAnalyzeErrorList = "/dataQuality/export/exportAnalyzeErrorList";
         public static final String ExportMetadataErrorList = "/dataQuality/export/exportMetadataErrorList";
+        public static final String ExportArchiveList = "/dataQuality/export/exportArchiveList";
+        public static final String ExportUploadRecordList = "/dataQuality/export/exportUploadRecordList";
         public static final String ExportQualityMonitoringListToExcel = "/dataQuality/export/exportQualityMonitoringListToExcel";
 
     }

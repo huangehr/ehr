@@ -22,11 +22,7 @@ public class RedisService {
     @Autowired
     private OrgKeySchema orgKeySchema;
     @Autowired
-    private RsAdapterDictKeySchema rsAdapterDictKeySchema;
-    @Autowired
     private RsAdapterMetaKeySchema rsAdapterMetaKeySchema;
-    @Autowired
-    private RsMetadataKeySchema rsMetadataKeySchema;
     @Autowired
     private StdCdaVersionKeySchema stdVersionKeySchema;
     @Autowired
@@ -111,15 +107,6 @@ public class RedisService {
     //------------------------------------ 资源化相关 START -------------------------------------------------------
 
     /**
-     * 获取资源化字典映射 redis
-     *
-     * @return
-     */
-    public String getRsAdapterDict(String cdaVersion, String dictCode, String srcDictEntryCode) {
-        return rsAdapterDictKeySchema.getMetaData(cdaVersion, dictCode, srcDictEntryCode);
-    }
-
-    /**
      * 获取资源化数据元映射 redis
      *
      * @return
@@ -128,14 +115,6 @@ public class RedisService {
         return rsAdapterMetaKeySchema.getMetaData(cdaVersion, dictCode, srcDictEntryCode);
     }
 
-    /**
-     * 获取资源化数据元映射 redis
-     *
-     * @return
-     */
-    public String getRsMetaData(String key) {
-        return rsMetadataKeySchema.get(key);
-    }
     //------------------------------------ 资源化相关 END -------------------------------------------------------
 
     //------------------------------------ 标准相关 START -------------------------------------------------------
@@ -193,7 +172,7 @@ public class RedisService {
      */
     public String getMetaDataFormat(String version, String dataSetCode, String innerCode) {
 
-        return stdMetaDataKeySchema.metaDataType(version, dataSetCode, innerCode);
+        return stdMetaDataKeySchema.metaDataFormat(version, dataSetCode, innerCode);
     }
 
     /**

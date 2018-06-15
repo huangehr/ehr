@@ -9,7 +9,7 @@ import java.io.IOException;
  */
 public class IllegalValueCheckException extends IOException {
 
-    public IllegalValueCheckException(String messgae) {
-        super(messgae);
+    public IllegalValueCheckException(String message) {
+        super(message);
     }
 }

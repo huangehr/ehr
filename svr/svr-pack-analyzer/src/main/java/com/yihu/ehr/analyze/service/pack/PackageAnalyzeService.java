@@ -6,10 +6,7 @@ import com.yihu.ehr.analyze.service.qc.PackageQcService;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.model.packs.EsSimplePackage;
 import com.yihu.ehr.profile.AnalyzeStatus;
-import com.yihu.ehr.profile.exception.IllegalEmptyCheckException;
-import com.yihu.ehr.profile.exception.IllegalJsonDataException;
-import com.yihu.ehr.profile.exception.IllegalJsonFileException;
-import com.yihu.ehr.profile.exception.IllegalValueCheckException;
+import com.yihu.ehr.profile.exception.*;
 import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -77,7 +74,7 @@ public class PackageAnalyzeService {
                 //发送解析消息
                 packQueueService.push(esSimplePackage);
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             int errorType = -1;
             if (e instanceof ZipException) {
                 errorType = 1;
@@ -89,6 +86,12 @@ public class PackageAnalyzeService {
                 errorType = 4;
             } else if (e instanceof IllegalValueCheckException) {//值域超出
                 errorType = 5;
+            } else if (e instanceof IllegalTypeCheckException) {//类型
+                errorType = 6;
+            } else if (e instanceof IllegalFormatCheckException) {//格式
+                errorType = 7;
+            } else if (e instanceof AnalyzerException) {
+                errorType = 21;
             }
             if (esSimplePackage != null) {
                 try {
@@ -112,56 +115,17 @@ public class PackageAnalyzeService {
         }
     }
 
-    public Map<String, Object> analyze (EsSimplePackage esSimplePackage) {
+    public ZipPackage analyze (EsSimplePackage esSimplePackage) throws Throwable {
         long starttime = System.currentTimeMillis();
         ZipPackage zipPackage = null;
-        Map<String, Object> result = new HashMap<>();
         try {
             if (esSimplePackage != null) {
-                //packageMgrClient.analyzeStatus(esSimplePackage.get_id(), AnalyzeStatus.Acquired, 0, "正在质控中");
                 zipPackage = new ZipPackage(esSimplePackage);
                 zipPackage.download();
                 zipPackage.unZip();
                 zipPackage.resolve();
                 packageQcService.qcHandle(zipPackage);
-                //保存数据集质控数据
-                elasticSearchUtil.index(INDEX, QC_DATASET_INFO, zipPackage.getQcDataSetRecord());
-                //保存数据元质控数据
-                elasticSearchUtil.bulkIndex(INDEX, QC_METADATA_INFO, zipPackage.getQcMetadataRecords());
-                //报告质控状态
-                //packageMgrClient.analyzeStatus(esSimplePackage.get_id(), AnalyzeStatus.Finished, 0, "qc success");
-                //发送解析消息
-                //packQueueService.push(esSimplePackage);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            /*int errorType = -1;
-            if (e instanceof ZipException) {
-                errorType = 1;
-            } else if (e instanceof IllegalJsonFileException) {
-                errorType = 2;
-            } else if (e instanceof IllegalJsonDataException) {
-                errorType = 3;
-            } else if (e instanceof IllegalEmptyCheckException) {//非空
-                errorType = 4;
-            } else if (e instanceof IllegalValueCheckException) {//值域超出
-                errorType = 5;
-            }
-            if (esSimplePackage != null) {
-                try {
-                    if (StringUtils.isNotBlank(e.getMessage())) {
-                        packageMgrClient.analyzeStatus(esSimplePackage.get_id(), AnalyzeStatus.Failed, errorType, e.getMessage());
-                        logger.error(e.getMessage(), e);
-                    } else {
-                        packageMgrClient.analyzeStatus(esSimplePackage.get_id(), AnalyzeStatus.Failed, errorType, "Internal server error, please see task log for detail message.");
-                        logger.error("Internal server error, please see task log for detail message.", e);
-                    }
-                } catch (Exception e1) {
-                    logger.error("Execute feign fail cause by:" + e1.getMessage());
-                }
-            } else {
-                logger.error("Empty pack cause by:" + e.getMessage());
-            }*/
         } finally {
             if (zipPackage != null) {
                 zipPackage.houseKeep();
@@ -169,7 +133,7 @@ public class PackageAnalyzeService {
         }
         long endtime = System.currentTimeMillis();
         System.out.println("耗时：" + (endtime - starttime) + "ms");
-        return result;
+        return zipPackage;
     }
 
     public void esSaveData(String index, String type, String dataList) throws Exception {

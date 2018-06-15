@@ -636,6 +636,128 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
             e.printStackTrace();
         }
     }
+
+    @RequestMapping(value = ServiceApi.DataQuality.ExportArchiveList, method = RequestMethod.GET)
+    @ApiOperation(value = "导出档案包列表")
+    public void exportArchiveList( @ApiParam(name = "filters", value = "过滤")
+                                         @RequestParam(value = "filters", required = false) String filters,
+                                         @ApiParam(name = "sorts", value = "排序")
+                                         @RequestParam(value = "sorts", required = false) String sorts,
+                                         HttpServletResponse response){
+        int pageSize=1000;
+//        if(StringUtils.isNotEmpty(filters)){
+//            filters+="archive_status=3;"+filters;
+//        }else{
+//            filters="archive_status=3";
+//        }
+        try {
+            String fileName = "接收包列表";
+            //设置下载
+            response.setContentType("octets/stream");
+            response.setHeader("Content-Disposition", "attachment; filename="
+                    + new String( fileName.getBytes("gb2312"), "ISO8859-1" )+".xls");
+            OutputStream os = response.getOutputStream();
+            //写excel
+            WritableWorkbook wwb = Workbook.createWorkbook(os);
+            //创建Excel工作表 指定名称和位置
+            WritableSheet ws = wwb.createSheet(fileName,0);
+            //添加固定信息，题头等
+            addCell(ws,0,0,"接收时间");
+            addCell(ws,1,0,"解析状态");
+            addCell(ws,2,0,"医疗机构");
+            addCell(ws,3,0,"序列号");
+            addCell(ws,4,0,"患者姓名");
+            addCell(ws,5,0,"证件号");
+            addCell(ws,6,0,"就诊时间");
+            addCell(ws,7,0,"就诊类型");
+            WritableCellFormat wc = new WritableCellFormat();
+            wc.setBorder(jxl.format.Border.ALL, jxl.format.BorderLineStyle.THIN, Colour.SKY_BLUE);//边框
+            int count = (int) elasticSearchUtil.count("json_archives", "info", filters);
+            int totalPage = count/pageSize+1;
+            for(int p=0;p<totalPage;p++) {
+                List<Map<String, Object>> list = packQcReportService.archiveList(filters,sorts,p+1,pageSize);
+                for (int i = 0; i < list.size(); i++) {
+                    int j = p*pageSize + i + 1;
+                    Map<String, Object> record = list.get(i);
+                    //添加列表明细
+                    addCell(ws, 0, j, ObjectUtils.toString(record.get("receive_date")), wc);
+                    addCell(ws, 1, j, getAnalyzerStatus(ObjectUtils.toString(record.get("analyze_status"))), wc);
+                    addCell(ws, 2, j, ObjectUtils.toString(record.get("org_name")), wc);
+                    addCell(ws, 3, j, ObjectUtils.toString(record.get("_id")), wc);
+                    addCell(ws, 4, j, ObjectUtils.toString(record.get("patient_name")), wc);
+                    addCell(ws, 5, j, ObjectUtils.toString(record.get("demographic_id")), wc);
+                    addCell(ws, 6, j, ObjectUtils.toString(record.get("event_date")), wc);
+                    addCell(ws, 7, j, getEventType(ObjectUtils.toString(record.get("event_type"))), wc);
+                }
+            }
+            //写入工作表
+            wwb.write();
+            wwb.close();
+            os.flush();
+            os.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    @RequestMapping(value = ServiceApi.DataQuality.ExportUploadRecordList, method = RequestMethod.GET)
+    @ApiOperation(value = "导出上传纪录列表")
+    public void exportUploadRecordList( @ApiParam(name = "filters", value = "过滤")
+                                   @RequestParam(value = "filters", required = false) String filters,
+                                   @ApiParam(name = "sorts", value = "排序")
+                                   @RequestParam(value = "sorts", required = false) String sorts,
+                                   HttpServletResponse response){
+        int pageSize=1000;
+        try {
+            String fileName = "上传纪录列表";
+            //设置下载
+            response.setContentType("octets/stream");
+            response.setHeader("Content-Disposition", "attachment; filename="
+                    + new String( fileName.getBytes("gb2312"), "ISO8859-1" )+".xls");
+            OutputStream os = response.getOutputStream();
+            //写excel
+            WritableWorkbook wwb = Workbook.createWorkbook(os);
+            //创建Excel工作表 指定名称和位置
+            WritableSheet ws = wwb.createSheet(fileName,0);
+            //添加固定信息，题头等
+            addCell(ws,0,0,"上传时间");
+            addCell(ws,1,0,"接收平台");
+            addCell(ws,2,0,"医疗机构");
+            addCell(ws,3,0,"患者姓名");
+            addCell(ws,4,0,"证件号");
+            addCell(ws,5,0,"就诊时间");
+            addCell(ws,6,0,"就诊类型");
+            addCell(ws,7,0,"数据集数量");
+            WritableCellFormat wc = new WritableCellFormat();
+            wc.setBorder(jxl.format.Border.ALL, jxl.format.BorderLineStyle.THIN, Colour.SKY_BLUE);//边框
+            int count = (int) elasticSearchUtil.count("upload", "record", filters);
+            int totalPage = count/pageSize+1;
+            for(int p=0;p<totalPage;p++) {
+                List<Map<String, Object>> list = packQcReportService.uploadRecordList(filters,sorts,p+1,pageSize);
+                for (int i = 0; i < list.size(); i++) {
+                    int j = p*pageSize + i + 1;
+                    Map<String, Object> record = list.get(i);
+                    //添加列表明细
+                    addCell(ws, 0, j, ObjectUtils.toString(record.get("analyze_date")), wc);
+                    addCell(ws, 1, j, getPlatform(ObjectUtils.toString(record.get("to_platform"))), wc);
+                    addCell(ws, 2, j, ObjectUtils.toString(record.get("org_name")), wc);
+                    addCell(ws, 3, j, ObjectUtils.toString(record.get("patient_name")), wc);
+                    addCell(ws, 4, j, ObjectUtils.toString(record.get("idcard_no")), wc);
+                    addCell(ws, 5, j, ObjectUtils.toString(record.get("event_date")), wc);
+                    addCell(ws, 6, j, getEventType(ObjectUtils.toString(record.get("event_type"))), wc);
+                    addCell(ws, 7, j, ObjectUtils.toString(record.get("dataset_count")), wc);
+                }
+            }
+            //写入工作表
+            wwb.write();
+            wwb.close();
+            os.flush();
+            os.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     /**
      * 添加单元格内容
      * @param ws
@@ -738,6 +860,71 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                 break;
             case "6":
                 re = "字典适配错误";
+                break;
+            default:
+                break;
+        }
+        return re;
+    }
+    /**
+     * 解析状态
+     * @param analyzerStatus
+     * @return
+     */
+    public String getAnalyzerStatus(String analyzerStatus){
+        String re = "";
+        switch (analyzerStatus){
+            case "0":
+                re = "未解析";
+                break;
+            case "1":
+                re = "正在解析";
+                break;
+            case "2":
+                re = "解析失败";
+                break;
+            case "3":
+                re = "解析完成";
+                break;
+            default:
+                break;
+        }
+        return re;
+    }
+
+    /**
+     * 就诊类型
+     * @param eventType
+     * @return
+     */
+    public String getEventType(String eventType){
+        String re = "";
+        switch (eventType){
+            case "0":
+                re = "门诊";
+                break;
+            case "1":
+                re = "住院";
+                break;
+            case "2":
+                re = "体检";
+                break;
+            default:
+                break;
+        }
+        return re;
+    }
+
+    /**
+     * 就诊类型
+     * @param platform
+     * @return
+     */
+    public String getPlatform(String platform){
+        String re = "";
+        switch (platform){
+            case "10":
+                re = "省平台";
                 break;
             default:
                 break;

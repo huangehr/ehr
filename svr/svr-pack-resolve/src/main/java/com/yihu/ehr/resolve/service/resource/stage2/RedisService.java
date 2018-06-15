@@ -21,11 +21,7 @@ public class RedisService {
     @Autowired
     private OrgKeySchema orgKeySchema;
     @Autowired
-    private RsAdapterDictKeySchema rsAdapterDictKeySchema;
-    @Autowired
     private RsAdapterMetaKeySchema rsAdapterMetaKeySchema;
-    @Autowired
-    private RsMetadataKeySchema rsMetadataKeySchema;
     @Autowired
     private StdDataSetKeySchema stdDataSetKeySchema;
     @Autowired
@@ -73,14 +69,6 @@ public class RedisService {
     }
 
     /**
-     *获取资源化字典映射 redis
-     * @return
-     */
-    public String getRsAdapterDict(String cdaVersion, String dictCode, String srcDictEntryCode) {
-        return rsAdapterDictKeySchema.getMetaData(cdaVersion, dictCode, srcDictEntryCode);
-    }
-
-    /**
      *获取资源化数据元映射 redis
      * @return
      */
@@ -89,26 +77,10 @@ public class RedisService {
     }
 
     /**
-     *获取资源化数据元映射 redis
-     * @return
-     */
-    public String getRsMetaData(String key) {
-        return rsMetadataKeySchema.get(key);
-    }
-
-    /**
      *获取标准数据集--主从表 redis
      */
     public Boolean getDataSetMultiRecord(String version, String code){
         return stdDataSetKeySchema.dataSetMultiRecord(version, code);
-    }
-
-    /**
-     * 获取标准数据元对应类型 redis
-     */
-    public String getMetaDataType(String version, String dataSetCode, String innerCode) {
-
-        return stdMetaDataKeySchema.metaDataType(version, dataSetCode , innerCode);
     }
 
     /**
