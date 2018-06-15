@@ -25,7 +25,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "PackStatisticsEndPoint", description = "质量监控报表", tags = {"质量监控报表"})
+@Api(value = "PackStatisticsEndPoint", description = "档案分析服务", tags = {"档案分析服务-质量监控报表"})
 public class PackStatisticsEndPoint extends EnvelopRestEndPoint {
 
 

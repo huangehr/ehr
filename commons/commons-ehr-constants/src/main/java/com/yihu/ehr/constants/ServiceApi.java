@@ -1662,6 +1662,8 @@ public class ServiceApi {
         public static final String ExportReceptionList = "/dataQuality/export/exportReceptionList";
         public static final String ExportAnalyzeErrorList = "/dataQuality/export/exportAnalyzeErrorList";
         public static final String ExportMetadataErrorList = "/dataQuality/export/exportMetadataErrorList";
+        public static final String ExportArchiveList = "/dataQuality/export/exportArchiveList";
+        public static final String ExportUploadRecordList = "/dataQuality/export/exportUploadRecordList";
 
     }
 
