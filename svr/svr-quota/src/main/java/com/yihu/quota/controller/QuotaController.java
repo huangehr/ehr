@@ -170,7 +170,7 @@ public class QuotaController extends BaseController {
             String denominatorFilter = filters;
 
             if (StringUtils.isNotEmpty(esConfig.getGrowthFlag())) {
-                resultList = baseStatistsService.getGrowthByQuota(dimension, filters, esConfig);
+                resultList = baseStatistsService.getGrowthByQuota(dimension, filters, esConfig, dateType);
             } else {
                 if(tjQuota.getResultGetType().equals("1")){
                     //普通指标直接查询

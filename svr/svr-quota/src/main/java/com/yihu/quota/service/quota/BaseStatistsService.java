@@ -1014,7 +1014,7 @@ public class BaseStatistsService {
         String denominatorFilter = filters;
 
         if (StringUtils.isNotEmpty(esConfig.getGrowthFlag())) {
-            result = getGrowthByQuota(dimension, filters, esConfig);
+            result = getGrowthByQuota(dimension, filters, esConfig, dateType);
         } else {
             if (StringUtils.isNotEmpty(esConfig.getDateComparisonType())) {
                 filters = getdateComparisonTypeFilter(esConfig,filters);
@@ -1316,7 +1316,7 @@ public class BaseStatistsService {
         return  divisionResultList;
     }
 
-    public List<Map<String, Object>> getGrowthByQuota(String dimension, String filters, EsConfig esConfig) throws Exception {
+    public List<Map<String, Object>> getGrowthByQuota(String dimension, String filters, EsConfig esConfig, String dateType) throws Exception {
         List<Map<String, Object>>  resultList = new ArrayList<>();
         Calendar lastDate = Calendar.getInstance();
         String molecularFilter = "";
@@ -1376,8 +1376,8 @@ public class BaseStatistsService {
             molecularFilter = "quotaDate >= '" + firstDay + "' and quotaDate <= '" + lastDay + "'";
             denominatorFilter = "quotaDate >= '" + preMonthFirstDay + "' and quotaDate <= '" + preMonthLastDay + "'";
         }
-        List<Map<String, Object>> moleList = divisionQuota(esConfig.getMolecular(), esConfig.getDenominator(), dimension, molecularFilter, molecularFilter, esConfig.getPercentOperation(), esConfig.getPercentOperationValue(), null, "");
-        List<Map<String, Object>> denoList = divisionQuota(esConfig.getMolecular(), esConfig.getDenominator(), dimension, denominatorFilter, denominatorFilter, esConfig.getPercentOperation(), esConfig.getPercentOperationValue(),null, "");
+        List<Map<String, Object>> moleList = divisionQuota(esConfig.getMolecular(), esConfig.getDenominator(), dimension, molecularFilter, molecularFilter, esConfig.getPercentOperation(), esConfig.getPercentOperationValue(), dateType, "");
+        List<Map<String, Object>> denoList = divisionQuota(esConfig.getMolecular(), esConfig.getDenominator(), dimension, denominatorFilter, denominatorFilter, esConfig.getPercentOperation(), esConfig.getPercentOperationValue(),dateType, "");
         resultList = divisionPercent(dimension, moleList, denoList, 1, 100);
         return resultList;
     }
