@@ -75,6 +75,11 @@ public class ElasticSearchController extends BaseController {
         long rows = 0;
         List<Map<String, Object>> list = new ArrayList<>();
         try {
+            if(StringUtils.isEmpty(fl)){
+                return;
+            }else {
+                fl += ",rowkey";
+            }
             String [] fields = fl.split(",");
             rows = solrQuery.count(core,q);
             list =  solrQuery.queryReturnFieldList(core, q, null, null, 0, rows,fields);
