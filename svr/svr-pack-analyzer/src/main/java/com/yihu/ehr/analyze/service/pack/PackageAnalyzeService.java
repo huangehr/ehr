@@ -2,10 +2,12 @@ package com.yihu.ehr.analyze.service.pack;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.analyze.feign.PackageMgrClient;
+import com.yihu.ehr.analyze.model.ZipPackage;
 import com.yihu.ehr.analyze.service.qc.PackageQcService;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.model.packs.EsSimplePackage;
 import com.yihu.ehr.profile.AnalyzeStatus;
+import com.yihu.ehr.profile.ProfileType;
 import com.yihu.ehr.profile.exception.*;
 import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.lang3.StringUtils;
@@ -14,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -63,14 +64,19 @@ public class PackageAnalyzeService {
                 zipPackage = new ZipPackage(esSimplePackage);
                 zipPackage.download();
                 zipPackage.unZip();
-                zipPackage.resolve();
-                packageQcService.qcHandle(zipPackage);
-                //保存数据集质控数据
-                elasticSearchUtil.index(INDEX, QC_DATASET_INFO, zipPackage.getQcDataSetRecord());
-                //保存数据元质控数据
-                elasticSearchUtil.bulkIndex(INDEX, QC_METADATA_INFO, zipPackage.getQcMetadataRecords());
-                //报告质控状态
-                packageMgrClient.analyzeStatus(esSimplePackage.get_id(), AnalyzeStatus.Finished, 0, "qc success");
+                ProfileType profileType = zipPackage.resolve();
+                if (ProfileType.Standard == profileType ) {
+                    packageQcService.qcHandle(zipPackage);
+                    //保存数据集质控数据
+                    elasticSearchUtil.index(INDEX, QC_DATASET_INFO, zipPackage.getQcDataSetRecord());
+                    //保存数据元质控数据
+                    elasticSearchUtil.bulkIndex(INDEX, QC_METADATA_INFO, zipPackage.getQcMetadataRecords());
+                    //报告质控状态
+                    packageMgrClient.analyzeStatus(esSimplePackage.get_id(), AnalyzeStatus.Finished, 0, "qc success");
+                } else {
+                    //报告非结构化档案包质控状态
+                    packageMgrClient.analyzeStatus(esSimplePackage.get_id(), AnalyzeStatus.Finished, 0, "Ignore non-standard package file");
+                }
                 //发送解析消息
                 packQueueService.push(esSimplePackage);
             }
@@ -123,7 +129,10 @@ public class PackageAnalyzeService {
                 zipPackage = new ZipPackage(esSimplePackage);
                 zipPackage.download();
                 zipPackage.unZip();
-                zipPackage.resolve();
+                ProfileType profileType = zipPackage.resolve();
+                if (ProfileType.Standard != profileType) {
+                    throw new ZipException("Not a standard package file");
+                }
                 packageQcService.qcHandle(zipPackage);
             }
         } finally {

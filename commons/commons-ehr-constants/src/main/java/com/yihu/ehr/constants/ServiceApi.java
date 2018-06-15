@@ -1035,9 +1035,8 @@ public class ServiceApi {
         public static final String AppSetRedisJsonValue = "/redis/setAppClientJsonValue";
         public static final String AppDeleteRedisValue = "/redis/deleteAppClientValue";
         //资源化相关Redis
-        public static final String RsAdapterDict = "/redis/rsAdapterDict";
         public static final String RsAdapterMetadata = "/redis/rsAdapterMetaData";
-        public static final String RsMetadataDict = "/redis/rsMetadata";
+        public static final String RsMetadataDict = "/redis/rsMetadataDict";
         //标准相关Redis
         public static final String StdVersion = "/redis/stdVersion";
         public static final String StdDataSetCode = "/redis/stdDataSetCode";

@@ -24,6 +24,8 @@ public class RedisService {
     @Autowired
     private RsAdapterMetaKeySchema rsAdapterMetaKeySchema;
     @Autowired
+    private RsMetadataKeySchema rsMetadataKeySchema;
+    @Autowired
     private StdCdaVersionKeySchema stdVersionKeySchema;
     @Autowired
     private StdDataSetKeySchema stdDataSetKeySchema;
@@ -113,6 +115,15 @@ public class RedisService {
      */
     public String getRsAdapterMetaData(String cdaVersion, String dictCode, String srcDictEntryCode) {
         return rsAdapterMetaKeySchema.getMetaData(cdaVersion, dictCode, srcDictEntryCode);
+    }
+
+    /**
+     * 获取资源化数据元映射 redis
+     *
+     * @return
+     */
+    public String getRsMetadataDict(String key) {
+        return rsMetadataKeySchema.get(key);
     }
 
     //------------------------------------ 资源化相关 END -------------------------------------------------------

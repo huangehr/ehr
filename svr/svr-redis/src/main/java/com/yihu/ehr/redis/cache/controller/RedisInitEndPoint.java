@@ -80,6 +80,12 @@ public class RedisInitEndPoint extends EnvelopRestEndPoint {
        return redisInitService.cacheAdapterMetadata(id);
     }
 
+    @RequestMapping(value= ServiceApi.Redis.InitRsMetadataDict, method = RequestMethod.POST)
+    @ApiOperation("Redis缓存资源化数据元字典（dict_code不为空）")
+    public int cacheMetadataDict() throws Exception {
+        return redisInitService.cacheMetadataDict();
+    }
+
     //TODO ------------------- 未知用途 --------------------------
 
     /*@ApiOperation("Redis缓存指标(-1)")

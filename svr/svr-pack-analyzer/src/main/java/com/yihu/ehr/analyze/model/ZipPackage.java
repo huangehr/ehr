@@ -1,6 +1,8 @@
-package com.yihu.ehr.analyze.service.pack;
+package com.yihu.ehr.analyze.model;
 
 import com.yihu.ehr.analyze.config.FastDfsConfig;
+import com.yihu.ehr.analyze.service.pack.PackageAnalyzeService;
+import com.yihu.ehr.analyze.service.pack.StdPackageAnalyzer;
 import com.yihu.ehr.profile.EventType;
 import com.yihu.ehr.profile.ProfileType;
 import com.yihu.ehr.lang.SpringContext;
@@ -38,6 +40,7 @@ public class ZipPackage {
 
     private static final RestTemplate REST_TEMPLATE;
     private static final HttpHeaders HTTP_HEADERS;
+
     static {
         REST_TEMPLATE = new RestTemplate();
         HTTP_HEADERS = new HttpHeaders();
@@ -223,7 +226,7 @@ public class ZipPackage {
         }
     }
 
-    public void resolve() throws Exception {
+    public ProfileType resolve() throws Exception {
         ProfileType profileType;
         List<String> directories = CollectionUtils.arrayToList(packFile.list());
         if (directories.contains(StandardFolder) && directories.contains(OriginFolder)) {
@@ -236,12 +239,13 @@ public class ZipPackage {
             profileType = ProfileType.Simple;
         }
         //目前只解析标准档案包
-        if (profileType != ProfileType.Standard) {
-            throw new ZipException("Not a standard package file");
+        if (ProfileType.Standard != profileType) {
+            return profileType;
         }
         ApplicationContext context = SpringContext.getApplicationContext();
         StdPackageAnalyzer packageAnalyzer = context.getBean(StdPackageAnalyzer.class);
         packageAnalyzer.analyze(this);
+        return profileType;
     }
 
     public void houseKeep() {

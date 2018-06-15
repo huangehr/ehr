@@ -1,7 +1,7 @@
 package com.yihu.ehr.analyze.service.qc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.analyze.service.pack.ZipPackage;
+import com.yihu.ehr.analyze.model.ZipPackage;
 import com.yihu.ehr.model.packs.EsSimplePackage;
 import com.yihu.ehr.profile.ErrorType;
 import com.yihu.ehr.profile.model.MetaDataRecord;

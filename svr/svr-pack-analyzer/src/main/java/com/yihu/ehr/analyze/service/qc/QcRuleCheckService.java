@@ -224,7 +224,7 @@ public class QcRuleCheckService {
         }
         String dictId = redisService.getMetaDataDict(version, dataSetCode, metadata);
         if (StringUtils.isBlank(dictId)) {
-            throw new AnalyzerException(String.format("Unable to get dict id of %s in %s", dataSetCode, version));
+            throw new AnalyzerException(String.format("Unable to get dict id for %s of %s in %s", metadata, dataSetCode, version));
         }
         String _value = redisService.getDictEntryValue(version, dictId, value);
         if (StringUtils.isBlank(_value)) {
