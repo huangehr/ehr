@@ -34,24 +34,18 @@ public class DqDatasetWarningService extends BaseJpaService<DqDatasetWarning, Dq
     /**
      * 导入excel
      * @param codeList
-     * @param type
-     * @param orgCode
      */
-    public void importDatasetExcel(List<String> codeList,String type,String orgCode){
+    public List<DqDatasetWarning> importDatasetExcel(List<String> codeList){
         List<DqDatasetWarning> warningList = new ArrayList<>(codeList.size());
         codeList.forEach(code->{
             String key = DataSetTable+defaultQualityVersion+":"+code+":name";
             if(redisClient.hasKey(key)){
                 DqDatasetWarning warning = new DqDatasetWarning();
-                warning.setOrgCode(orgCode);
-                warning.setType(type);
                 warning.setDatasetCode(code);
                 warning.setDatasetName(redisClient.get(key));
                 warningList.add(warning);
             }
         });
-        if(warningList.size()>0){
-            dqDatasetWarningDao.save(warningList);
-        }
+        return warningList;
     }
 }
