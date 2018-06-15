@@ -72,26 +72,12 @@ public class RedisInitEndPoint extends EnvelopRestEndPoint {
         return redisInitService.cacheOrgSaasOrg();
     }
 
-    @RequestMapping(value= ServiceApi.Redis.InitRsAdapterDict, method = RequestMethod.POST)
-    @ApiOperation("Redis缓存适配数据字典数据")
-    public int cacheAdapterDict(
-            @ApiParam(name = "id", value = "rs_adapter_scheme.id")
-            @PathVariable(value = "id") String id) throws Exception {
-        return redisInitService.cacheAdapterDict(id);
-    }
-
     @RequestMapping(value= ServiceApi.Redis.InitRsAdapterMeta, method = RequestMethod.POST)
     @ApiOperation("Redis缓存适配数据元数据")
     public int cacheAdapterMetadata(
             @ApiParam(name = "id", value = "rs_adapter_scheme.id")
             @PathVariable(value = "id") String id) throws Exception {
        return redisInitService.cacheAdapterMetadata(id);
-    }
-
-    @RequestMapping(value= ServiceApi.Redis.InitRsMetadataDict, method = RequestMethod.POST)
-    @ApiOperation("Redis缓存资源化数据元字典（dict_code不为空）")
-    public int cacheMetadataDict() throws Exception {
-        return redisInitService.cacheMetadataDict();
     }
 
     //TODO ------------------- 未知用途 --------------------------

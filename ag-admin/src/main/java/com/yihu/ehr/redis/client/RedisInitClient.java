@@ -23,13 +23,4 @@ public interface RedisInitClient {
     @ApiOperation("Redis缓存适配数据元数据")
     String cacheAdapterMetadata(
             @PathVariable(value = "id") String id);
-
-    @RequestMapping(value= ServiceApi.Redis.InitRsAdapterDict, method = RequestMethod.POST)
-    @ApiOperation("Redis缓存适配数据字典数据")
-    String cacheAdapterDict(
-            @PathVariable(value = "id") String id);
-
-    @RequestMapping(value= ServiceApi.Redis.InitRsMetadataDict, method = RequestMethod.POST)
-    @ApiOperation("Redis缓存数据元字典（dict_code不为空）")
-    String cacheMetadataDict();
 }

@@ -1008,7 +1008,6 @@ public class ServiceApi {
         public static final String InitOrgArea = "/redis/init/orgArea";
         public static final String InitOrgSaasArea = "/redis/init/orgSaasArea";
         public static final String InitOrgSaasOrg = "/redis/init/orgSaasOrg";
-        public static final String InitRsAdapterDict = "/redis/init/rsAdapterDict/{id}";
         public static final String InitRsAdapterMeta = "/redis/init/rsAdapterMeta/{id}";
         public static final String InitRsMetadataDict = "/redis/init/rsMetadataDict";
 

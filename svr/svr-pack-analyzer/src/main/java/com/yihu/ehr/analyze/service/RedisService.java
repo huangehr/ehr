@@ -1,7 +1,5 @@
 package com.yihu.ehr.analyze.service;
 
-
-
 import com.yihu.ehr.redis.schema.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,19 +13,7 @@ import org.springframework.stereotype.Service;
 public class RedisService {
 
     @Autowired
-    private HealthProblemDictKeySchema healthProblemDictKeySchema;
-    @Autowired
-    private Icd10KeySchema icd10KeySchema;
-    @Autowired
     private OrgKeySchema orgKeySchema;
-    @Autowired
-    private RsAdapterDictKeySchema rsAdapterDictKeySchema;
-    @Autowired
-    private RsAdapterMetaKeySchema rsAdapterMetaKeySchema;
-    @Autowired
-    private RsMetadataKeySchema rsMetadataKeySchema;
-    @Autowired
-    private StdDataSetKeySchema stdDataSetKeySchema;
     @Autowired
     private StdMetaDataKeySchema stdMetaDataKeySchema;
 
