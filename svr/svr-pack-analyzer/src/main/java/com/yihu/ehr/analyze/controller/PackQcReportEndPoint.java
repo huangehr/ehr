@@ -30,7 +30,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "PackQcReportEndPoint", description = "新质控管理报表", tags = {"新质控管理报表"})
+@Api(value = "PackQcReportEndPoint", description = "档案分析服务", tags = {"档案分析服务-新质控管理报表"})
 public class PackQcReportEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
@@ -206,11 +206,11 @@ public class PackQcReportEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "size", value = "页码", required = true, defaultValue = "15")
             @RequestParam(value = "size") int size) throws Exception {
 
-        if(StringUtils.isNotEmpty(filters)){
-            filters+="archive_status=3;"+filters;
-        }else{
-            filters="archive_status=3";
-        }
+//        if(StringUtils.isNotEmpty(filters)){
+//            filters+="archive_status=3;"+filters;
+//        }else{
+//            filters="archive_status=3";
+//        }
         List<Map<String, Object>> list = packQcReportService.archiveList(filters, sorts, page, size);
         int count = (int) elasticSearchUtil.count("json_archives", "info", filters);
         Envelop envelop = getPageResult(list, count, page, size);
