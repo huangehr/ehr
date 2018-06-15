@@ -1,5 +1,7 @@
 package com.yihu.ehr.entity.quality;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
@@ -20,7 +22,7 @@ public class DqPaltformUploadWarning {
     private String updateUserId;//操作人id
     private String updateUserName;//操作人名称
     private Long errorNum;//错误量
-    private Long acrhiveNum;//档案数
+    private Long archiveNum;//档案数
     private Integer datasetWarningNum;//数据集数量
     private List<DqDatasetWarning> datasetWarningList;//数据集
 
@@ -54,6 +56,7 @@ public class DqPaltformUploadWarning {
     }
 
     @Column(name = "create_time")
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getCreateTime() {
         return createTime;
     }
@@ -63,6 +66,7 @@ public class DqPaltformUploadWarning {
     }
 
     @Column(name = "update_time")
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getUpdateTime() {
         return updateTime;
     }
@@ -98,13 +102,13 @@ public class DqPaltformUploadWarning {
         this.errorNum = errorNum;
     }
 
-    @Column(name = "acrhive_num")
-    public Long getAcrhiveNum() {
-        return acrhiveNum;
+    @Column(name = "archive_num")
+    public Long getArchiveNum() {
+        return archiveNum;
     }
 
-    public void setAcrhiveNum(Long acrhiveNum) {
-        this.acrhiveNum = acrhiveNum;
+    public void setArchiveNum(Long archiveNum) {
+        this.archiveNum = archiveNum;
     }
 
     @Transient

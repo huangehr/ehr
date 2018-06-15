@@ -1,5 +1,7 @@
 package com.yihu.ehr.model.quality;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -18,7 +20,7 @@ public class MDqPaltformUploadWarning implements Serializable {
     private String updateUserId;//操作人id
     private String updateUserName;//操作人名称
     private Long errorNum;//错误量
-    private Long acrhiveNum;//档案数
+    private Long archiveNum;//档案数
     private List<MDqDatasetWarning> datasetWarningList;//数据集
     private Integer datasetWarningNum;//数据集数量
 
@@ -46,6 +48,7 @@ public class MDqPaltformUploadWarning implements Serializable {
         this.orgName = orgName;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getCreateTime() {
         return createTime;
     }
@@ -54,6 +57,7 @@ public class MDqPaltformUploadWarning implements Serializable {
         this.createTime = createTime;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getUpdateTime() {
         return updateTime;
     }
@@ -86,12 +90,12 @@ public class MDqPaltformUploadWarning implements Serializable {
         this.errorNum = errorNum;
     }
 
-    public Long getAcrhiveNum() {
-        return acrhiveNum;
+    public Long getArchiveNum() {
+        return archiveNum;
     }
 
-    public void setAcrhiveNum(Long acrhiveNum) {
-        this.acrhiveNum = acrhiveNum;
+    public void setArchiveNum(Long archiveNum) {
+        this.archiveNum = archiveNum;
     }
 
     public List<MDqDatasetWarning> getDatasetWarningList() {

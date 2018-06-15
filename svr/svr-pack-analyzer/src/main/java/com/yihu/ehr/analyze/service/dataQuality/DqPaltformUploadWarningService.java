@@ -6,6 +6,7 @@ import com.yihu.ehr.entity.quality.DqPaltformUploadWarning;
 import com.yihu.ehr.query.BaseJpaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 
@@ -14,6 +15,7 @@ import java.util.Date;
  * @author yeshijie on 2018/5/28.
  */
 @Service
+@Transactional
 public class DqPaltformUploadWarningService extends BaseJpaService<DqPaltformUploadWarning, DqPaltformUploadWarningDao> {
 
     @Autowired
@@ -57,11 +59,31 @@ public class DqPaltformUploadWarningService extends BaseJpaService<DqPaltformUpl
 
         DqPaltformUploadWarning oldWarning = findById(warning.getId());
         oldWarning.setErrorNum(warning.getErrorNum());
-        oldWarning.setAcrhiveNum(warning.getAcrhiveNum());
+        oldWarning.setArchiveNum(warning.getArchiveNum());
         oldWarning.setUpdateTime(new Date());
         oldWarning.setUpdateUserId(warning.getUpdateUserId());
         oldWarning.setUpdateUserName(warning.getUpdateUserName());
+        dqDatasetWarningDao.deleteByOrgCodeAndType(oldWarning.getOrgCode(),"2");
+        if(warning.getDatasetWarningList()!=null&&warning.getDatasetWarningList().size()>0){
+            warning.getDatasetWarningList().forEach(dataset->{
+                dataset.setOrgCode(warning.getOrgCode());
+                dataset.setType("2");
+            });
+            dqDatasetWarningDao.save(warning.getDatasetWarningList());
+        }
         save(oldWarning);
         return oldWarning;
+    }
+
+    /**
+     * 删除
+     * @param id
+     */
+    public void deleteWarning(Long id){
+        DqPaltformUploadWarning oldWarning = findById(id);
+        if(oldWarning!=null){
+            dqDatasetWarningDao.deleteByOrgCodeAndType(oldWarning.getOrgCode(),"2");
+            delete(oldWarning);
+        }
     }
 }
