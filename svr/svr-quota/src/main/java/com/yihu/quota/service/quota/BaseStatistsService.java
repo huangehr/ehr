@@ -174,6 +174,29 @@ public class BaseStatistsService {
                 }
             }
         }
+        // 第一加数列表为空，第二个加数列表不为空
+        if (firstList.size() <= 0 && secondList.size() > 0) {
+            for(Map<String, Object> secondMap :secondList) {
+                Map<String, Object> map = new HashMap<>();
+                map.put(firstColumnField, secondMap.get(firstColumnField));
+                for(int i = 0 ;i < moleDimensions.length ; i++){
+                    map.put(moleDimensions[i], secondMap.get(moleDimensions[i]).toString());
+                }
+                if("quotaName".equals(dimension)) {
+                    double point = 0;
+                    double secondResultVal = Double.valueOf(secondMap.get("result") == null ? "0" : secondMap.get(resultField).toString());
+                    if (secondResultVal != 0) {
+                        if(operation == 1){ //1 加法 默认
+                            point = secondResultVal ;
+                        }else if(operation == 2){ //2 减法
+                            point = -secondResultVal;
+                        }
+                    }
+                    map.put(resultField, df.format(point));
+                    addResultList.add(map);
+                }
+            }
+        }
         //检查后面指标的维度是否全部有 累加进去
         /*Map<String, Object> addResuDimenMap = new HashMap<>();
         for(int k = 0;k < addResultList.size();k++) {
