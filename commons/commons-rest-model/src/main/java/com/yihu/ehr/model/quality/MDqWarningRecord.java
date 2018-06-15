@@ -1,5 +1,7 @@
 package com.yihu.ehr.model.quality;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -65,6 +67,7 @@ public class MDqWarningRecord implements Serializable {
         this.orgName = orgName;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd", timezone = "GMT+8")
     public Date getWarningTime() {
         return warningTime;
     }
@@ -73,6 +76,7 @@ public class MDqWarningRecord implements Serializable {
         this.warningTime = warningTime;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd", timezone = "GMT+8")
     public Date getRecordTime() {
         return recordTime;
     }
@@ -113,6 +117,7 @@ public class MDqWarningRecord implements Serializable {
         this.warningValue = warningValue;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getSolveTime() {
         return solveTime;
     }

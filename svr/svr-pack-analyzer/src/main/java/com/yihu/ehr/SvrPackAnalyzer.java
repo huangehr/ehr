@@ -42,7 +42,7 @@ public class SvrPackAnalyzer extends SpringBootServletInitializer implements Com
 
     @Override
     public void run(String... strings) throws Exception {
-        schedulerService.addJob(schedulerConfig.getJobMinSize(), schedulerConfig.getCronExp());
+//        schedulerService.addJob(schedulerConfig.getJobMinSize(), schedulerConfig.getCronExp());
         warningSchedulerService.init();
     }
 

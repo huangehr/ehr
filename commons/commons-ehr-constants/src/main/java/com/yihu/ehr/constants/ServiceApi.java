@@ -1645,6 +1645,8 @@ public class ServiceApi {
         public static final String PaltformUploadWarningUpd = "/dataQuality/warningSetting/uploadWarningUpd";
         public static final String PaltformUploadWarning =    "/dataQuality/warningSetting/uploadWarning/{id}";
         public static final String DatasetWarningList = "/dataQuality/warningSetting/datasetWarningList";
+        public static final String ImportDatasetExcel = "/dataQuality/warningSetting/importDatasetExcel";
+        public static final String DatasetWarningListNoPage = "/dataQuality/warningSetting/datasetWarningListNoPage";
         public static final String DatasetWarningAdd = "/dataQuality/warningSetting/datasetWarningAdd";
         public static final String DatasetWarningDel = "/dataQuality/warningSetting/datasetWarningDel";
         public static final String ReceivedPacketNumList = "/dataQuality/receivedPacket/packetNumList";
@@ -1656,6 +1658,8 @@ public class ServiceApi {
         public static final String WarningRecordList = "/dataQuality/warningRecord/warningRecordList";
         public static final String WarningRecord =    "/dataQuality/warningRecord/warningRecord/{id}";
         public static final String WarningRecordUpd = "/dataQuality/warningRecord/warningRecordUpd";
+        public static final String WarningQuestionAnalyze = "/dataQuality/warningRecord/warningQuestionAnalyze";
+        public static final String WarningQuestionJob = "/dataQuality/warningRecord/WarningQuestionJob";
 
         public static final String ExportWarningRecordToExcel = "/dataQuality/export/exportWarningRecordToExcel";
         public static final String ExportQualityMonitoring = "/dataQuality/export/exportQualityMonitoring";
@@ -1664,6 +1668,7 @@ public class ServiceApi {
         public static final String ExportMetadataErrorList = "/dataQuality/export/exportMetadataErrorList";
         public static final String ExportArchiveList = "/dataQuality/export/exportArchiveList";
         public static final String ExportUploadRecordList = "/dataQuality/export/exportUploadRecordList";
+        public static final String ExportQualityMonitoringListToExcel = "/dataQuality/export/exportQualityMonitoringListToExcel";
 
     }
 

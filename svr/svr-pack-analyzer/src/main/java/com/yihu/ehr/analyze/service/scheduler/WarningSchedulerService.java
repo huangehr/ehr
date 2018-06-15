@@ -37,7 +37,7 @@ public class WarningSchedulerService {
             GroupMatcher groupMatcher = GroupMatcher.groupEquals(WARNING_QUESTION);
             Set<JobKey> jobKeys = scheduler.getJobKeys(groupMatcher);
             //如果已经在执行了 就忽略
-            if (null == jobKeys) {
+            if (null == jobKeys||jobKeys.size()==0) {
                 JobDetail jobDetail = newJob(WarningQuestionJob.class)
                         .withIdentity(WARNING_QUESTION_JOB, WARNING_QUESTION)
                         .build();
@@ -61,7 +61,7 @@ public class WarningSchedulerService {
         try {
             GroupMatcher groupMatcher = GroupMatcher.groupEquals(WARNING_QUESTION);
             Set<JobKey> jobKeys = scheduler.getJobKeys(groupMatcher);
-            if (null != jobKeys) {
+            if (null != jobKeys&&jobKeys.size()>0) {
                 //已经有定时任务在执行了 先停止旧任务
                 for (JobKey jobKey : jobKeys) {
                     scheduler.deleteJob(jobKey);
@@ -88,7 +88,7 @@ public class WarningSchedulerService {
         try {
             GroupMatcher groupMatcher = GroupMatcher.groupEquals(WARNING_QUESTION);
             Set<JobKey> jobKeys = scheduler.getJobKeys(groupMatcher);
-            if (jobKeys != null) {
+            if (jobKeys != null&&jobKeys.size()>0) {
                 for (JobKey jobKey : jobKeys) {
                     scheduler.deleteJob(jobKey);
                 }

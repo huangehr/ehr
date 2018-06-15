@@ -1,6 +1,10 @@
 package com.yihu.ehr.analyze.controller.dataQuality;
 
-import com.yihu.ehr.analyze.service.dataQuality.*;
+import com.yihu.ehr.analyze.feign.StandardServiceClient;
+import com.yihu.ehr.analyze.service.dataQuality.DqDatasetWarningService;
+import com.yihu.ehr.analyze.service.dataQuality.DqPaltformReceiveWarningService;
+import com.yihu.ehr.analyze.service.dataQuality.DqPaltformResourceWarningService;
+import com.yihu.ehr.analyze.service.dataQuality.DqPaltformUploadWarningService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
@@ -16,14 +20,15 @@ import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import jxl.Sheet;
+import jxl.Workbook;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,23 +50,10 @@ public class WarningSettingEndPoint extends EnvelopRestEndPoint {
     private DqPaltformUploadWarningService dqPaltformUploadWarningService;
     @Value("${quality.orgCode}")
     private String defaultOrgCode;
+    @Value("${quality.version}")
+    private String defaultQualityVersion;
     @Autowired
-    private WarningQuestionService warningQuestionService;
-
-    @RequestMapping(value = "test", method = RequestMethod.GET)
-    @ApiOperation(value = "test")
-    public Envelop test() throws Exception {
-        Envelop envelop = new Envelop();
-        try {
-            warningQuestionService.analyze();
-            return success(null);
-        }catch (Exception e){
-            e.printStackTrace();
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg(e.getMessage());
-        }
-        return envelop;
-    }
+    private StandardServiceClient standardServiceClient;
 
     @RequestMapping(value = ServiceApi.DataQuality.PaltformReceiveWarningList, method = RequestMethod.GET)
     @ApiOperation(value = "平台接收预警列表")
@@ -71,21 +63,19 @@ public class WarningSettingEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
+            @RequestParam(value = "page", required = false) int page){
         Envelop envelop = new Envelop();
         try {
             String filters = null;
             if(StringUtils.isNotBlank(orgCode)){
                 filters = "orgCode="+orgCode;
             }else {
-                filters = "orgCode!="+defaultOrgCode;
+                filters = "orgCode<>"+defaultOrgCode;
             }
             String sorts = "-updateTime";
             List<DqPaltformReceiveWarning> list = dqPaltformReceiveWarningService.search(null, filters, sorts, page, size);
-            pagedResponse(request, response, dqPaltformReceiveWarningService.getCount(filters), page, size);
-            return success(convertToModels(list, new ArrayList<>(list.size()), MDqPaltformReceiveWarning.class, null));
+            List<MDqPaltformReceiveWarning> warnings = (List<MDqPaltformReceiveWarning>)convertToModels(list, new ArrayList<>(list.size()), MDqPaltformReceiveWarning.class, null);
+            return getPageResult(warnings, (int)dqPaltformReceiveWarningService.getCount(filters), page, size);
         }catch (Exception e){
             e.printStackTrace();
             envelop.setSuccessFlg(false);
@@ -102,9 +92,7 @@ public class WarningSettingEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
+            @RequestParam(value = "page", required = false) int page){
         Envelop envelop = new Envelop();
         try {
             String filters = null;
@@ -113,8 +101,8 @@ public class WarningSettingEndPoint extends EnvelopRestEndPoint {
             }
             String sorts = "-updateTime";
             List<DqPaltformResourceWarning> list = dqPaltformResourceWarningService.search(null, filters, sorts, page, size);
-            pagedResponse(request, response, dqPaltformResourceWarningService.getCount(filters), page, size);
-            return success(convertToModels(list, new ArrayList<>(list.size()), MDqPaltformResourceWarning.class, null));
+            List<MDqPaltformResourceWarning> warnings = (List<MDqPaltformResourceWarning>)convertToModels(list, new ArrayList<>(list.size()), MDqPaltformResourceWarning.class, null);
+            return getPageResult(warnings, (int)dqPaltformResourceWarningService.getCount(filters), page, size);
         }catch (Exception e){
             e.printStackTrace();
             envelop.setSuccessFlg(false);
@@ -131,9 +119,7 @@ public class WarningSettingEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
+            @RequestParam(value = "page", required = false) int page) {
         Envelop envelop = new Envelop();
         try {
             String filters = null;
@@ -142,8 +128,8 @@ public class WarningSettingEndPoint extends EnvelopRestEndPoint {
             }
             String sorts = "-updateTime";
             List<DqPaltformUploadWarning> list = dqPaltformUploadWarningService.search(null, filters, sorts, page, size);
-            pagedResponse(request, response, dqPaltformUploadWarningService.getCount(filters), page, size);
-            return success(convertToModels(list, new ArrayList<>(list.size()), MDqPaltformUploadWarning.class, null));
+            List<MDqPaltformUploadWarning> warnings = (List<MDqPaltformUploadWarning>)convertToModels(list, new ArrayList<>(list.size()), MDqPaltformUploadWarning.class, null);
+            return getPageResult(warnings, (int)dqPaltformUploadWarningService.getCount(filters), page, size);
         }catch (Exception e){
             e.printStackTrace();
             envelop.setSuccessFlg(false);
@@ -180,7 +166,7 @@ public class WarningSettingEndPoint extends EnvelopRestEndPoint {
             DqPaltformReceiveWarning warning =  dqPaltformReceiveWarningService.findById(id);
             List<DqDatasetWarning> warningList = dqDatasetWarningService.findByOrgCodeAndType(warning.getOrgCode(),"1");
             warning.setDatasetWarningNum(warningList.size());
-            return success(convertToModel(warning, MDqPaltformReceiveWarning.class));
+            return success(convertToModel(warning, MDqPaltformReceiveWarning.class),warningList);
         }catch (Exception e){
             e.printStackTrace();
             envelop.setSuccessFlg(false);
@@ -216,7 +202,27 @@ public class WarningSettingEndPoint extends EnvelopRestEndPoint {
             DqPaltformUploadWarning warning =  dqPaltformUploadWarningService.findById(id);
             List<DqDatasetWarning> warningList = dqDatasetWarningService.findByOrgCodeAndType(warning.getOrgCode(),"2");
             warning.setDatasetWarningNum(warningList.size());
-            return success(convertToModel(warning, MDqPaltformUploadWarning.class));
+            return success(convertToModel(warning, MDqPaltformUploadWarning.class),warningList);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.DataQuality.DatasetWarningListNoPage, method = RequestMethod.GET)
+    @ApiOperation(value = "预警数据集列表（不分页）")
+    public Envelop datasetWarningListNoPage(
+            @ApiParam(name = "orgCode", value = "机构code", defaultValue = "jkzl")
+            @RequestParam(value = "orgCode", required = true) String orgCode,
+            @ApiParam(name = "type", value = "类型(1平台接收，2平台上传)", defaultValue = "1")
+            @RequestParam(value = "type", required = true) String type) throws Exception {
+        Envelop envelop = new Envelop();
+        try{
+            List<DqDatasetWarning> list = dqDatasetWarningService.findByOrgCodeAndType(orgCode, type);
+            List<MDqDatasetWarning> warnings = (List<MDqDatasetWarning>)convertToModels(list, new ArrayList<>(list.size()), MDqDatasetWarning.class, null);
+            return success(warnings);
         }catch (Exception e){
             e.printStackTrace();
             envelop.setSuccessFlg(false);
@@ -235,30 +241,27 @@ public class WarningSettingEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
+            @RequestParam(value = "page", required = false) int page){
         Envelop envelop = new Envelop();
         try{
             String filters = "orgCode="+orgCode+";type="+type;
             String sorts = "-datasetCode";
             List<DqDatasetWarning> list = dqDatasetWarningService.search(null, filters, sorts, page, size);
-            pagedResponse(request, response, dqDatasetWarningService.getCount(filters), page, size);
-            return success(convertToModels(list, new ArrayList<>(list.size()), MDqDatasetWarning.class, null));
+            List<MDqDatasetWarning> warnings = (List<MDqDatasetWarning>)convertToModels(list, new ArrayList<>(list.size()), MDqDatasetWarning.class, null);
+            return getPageResult(warnings,(int)dqDatasetWarningService.getCount(filters), page, size);
         }catch (Exception e){
             e.printStackTrace();
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg(e.getMessage());
         }
         return envelop;
-
     }
 
     @RequestMapping(value = ServiceApi.DataQuality.PaltformReceiveWarningAdd, method = RequestMethod.POST)
     @ApiOperation(value = "新增平台接收预警")
     public Envelop paltformReceiveWarningAdd(
             @ApiParam(name = "jsonData", value = "对象JSON结构体",  defaultValue = "")
-            @RequestBody String jsonData) throws Exception {
+            @RequestParam(value = "jsonData", required = true) String jsonData) {
         Envelop envelop = new Envelop();
         try {
             DqPaltformReceiveWarning warning = toEntity(jsonData, DqPaltformReceiveWarning.class);
@@ -276,7 +279,7 @@ public class WarningSettingEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "新增平台资源化预警")
     public Envelop paltformResourceWarningAdd(
             @ApiParam(name = "jsonData", value = "对象JSON结构体",  defaultValue = "")
-            @RequestBody String jsonData) throws Exception {
+            @RequestParam(value = "jsonData", required = true) String jsonData) {
         Envelop envelop = new Envelop();
         try {
             DqPaltformResourceWarning warning = toEntity(jsonData, DqPaltformResourceWarning.class);
@@ -294,7 +297,7 @@ public class WarningSettingEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "新增平台上传预警")
     public Envelop paltformUploadWarningAdd(
             @ApiParam(name = "jsonData", value = "对象JSON结构体",  defaultValue = "")
-            @RequestBody String jsonData) throws Exception {
+            @RequestParam(value = "jsonData", required = true) String jsonData){
         Envelop envelop = new Envelop();
         try {
             DqPaltformUploadWarning warning = toEntity(jsonData, DqPaltformUploadWarning.class);
@@ -315,7 +318,7 @@ public class WarningSettingEndPoint extends EnvelopRestEndPoint {
             @RequestParam Long id) throws Exception {
         Envelop envelop = new Envelop();
         try {
-            dqPaltformReceiveWarningService.delete(id);
+            dqPaltformReceiveWarningService.deleteWarning(id);
             return success(null);
         }catch (Exception e){
             e.printStackTrace();
@@ -349,7 +352,7 @@ public class WarningSettingEndPoint extends EnvelopRestEndPoint {
             @RequestParam Long id) throws Exception {
         Envelop envelop = new Envelop();
         try {
-            dqPaltformUploadWarningService.delete(id);
+            dqPaltformUploadWarningService.deleteWarning(id);
             return success(null);
         }catch (Exception e){
             e.printStackTrace();
@@ -364,7 +367,7 @@ public class WarningSettingEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "修改平台接收预警")
     public Envelop paltformReceiveWarningUpd(
             @ApiParam(name = "jsonData", value = "对象JSON结构体",  defaultValue = "")
-            @RequestBody String jsonData) throws Exception {
+            @RequestParam(value = "jsonData", required = true) String jsonData) {
         Envelop envelop = new Envelop();
         try {
             DqPaltformReceiveWarning warning = toEntity(jsonData, DqPaltformReceiveWarning.class);
@@ -382,7 +385,7 @@ public class WarningSettingEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "修改平台资源化预警")
     public Envelop paltformResourceWarningUpd(
             @ApiParam(name = "jsonData", value = "对象JSON结构体",  defaultValue = "")
-            @RequestBody String jsonData) throws Exception {
+            @RequestParam(value = "jsonData", required = true) String jsonData) {
         Envelop envelop = new Envelop();
         try {
             DqPaltformResourceWarning warning = toEntity(jsonData, DqPaltformResourceWarning.class);
@@ -400,7 +403,7 @@ public class WarningSettingEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "修改平台上传预警")
     public Envelop paltformUploadWarningUpd(
             @ApiParam(name = "jsonData", value = "对象JSON结构体",  defaultValue = "")
-            @RequestBody String jsonData) throws Exception {
+            @RequestParam(value = "jsonData", required = true) String jsonData) {
         Envelop envelop = new Envelop();
         try {
             DqPaltformUploadWarning warning = toEntity(jsonData, DqPaltformUploadWarning.class);
@@ -418,7 +421,7 @@ public class WarningSettingEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "新增数据集")
     public Envelop datasetWarningAdd(
             @ApiParam(name = "jsonData", value = "对象JSON结构体",  defaultValue = "")
-            @RequestBody String jsonData) throws Exception {
+            @RequestParam(value = "jsonData", required = true) String jsonData) {
         Envelop envelop = new Envelop();
         try {
             DqDatasetWarning warning = toEntity(jsonData, DqDatasetWarning.class);
@@ -449,6 +452,73 @@ public class WarningSettingEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
-//    public void
+//    @RequestMapping(value = ServiceApi.DataQuality.DatasetList, method = RequestMethod.GET)
+//    @ApiOperation(value = "获取数据集")
+//    public Envelop datasetList(
+//            @ApiParam(name = "orgCode", value = "机构code（平台上传时可不传）", defaultValue = "jkzl")
+//            @RequestParam(value = "orgCode", required = false) String orgCode,
+//            @ApiParam(name = "code", value = "数据集编码", defaultValue = "")
+//            @RequestParam(value = "code", required = false) String code,
+//            @ApiParam(name = "name", value = "数据集名称", defaultValue = "")
+//            @RequestParam(value = "name", required = false) String name,
+//            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+//            @RequestParam(value = "size", required = true) int size,
+//            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+//            @RequestParam(value = "page", required = true) int page) {
+//        Envelop envelop = new Envelop();
+//        try {
+//            String filters = "version="+defaultQualityVersion;
+//            if(StringUtils.isNotBlank(name)){
+//                filters+=";name?"+name;
+//            }
+//            if(StringUtils.isNotBlank(code)){
+//                filters+=";code?"+code;
+//            }
+//            ResponseEntity<List<MStdDataSet>> res = standardServiceClient.searchDataSets(null,filters,"-code",size,page,defaultQualityVersion);
+//            List<MStdDataSet> mStdDataSetList = res.getBody();
+//            List<MDataSet> mDataSets = new ArrayList<>(mStdDataSetList.size());
+//            mStdDataSetList.forEach(item->{
+//                MDataSet set = new MDataSet();
+//                set.setName(item.getName());
+//                set.setCode(item.getCode());
+//            });
+//            int totalCount = getTotalCount(res);
+//            return getPageResult(mDataSets,totalCount,page,size);
+//        }catch (Exception e){
+//            e.printStackTrace();
+//            envelop.setSuccessFlg(false);
+//            envelop.setErrorMsg(e.getMessage());
+//        }
+//        return envelop;
+//    }
+
+    @RequestMapping(value = ServiceApi.DataQuality.ImportDatasetExcel, method = RequestMethod.POST)
+    @ApiOperation(value = "数据集导入")
+    public Envelop importDatasetExcel(MultipartFile file) {
+        Envelop envelop = new Envelop();
+        try {
+            Workbook wb = Workbook.getWorkbook(file.getInputStream());
+            Sheet[] sheets = wb.getSheets();
+            Sheet sheet = sheets[0];
+            int rows = sheet.getRows();
+            List<String> codeList = new ArrayList<>(rows);
+            if(rows>1){
+                for(int row = 1;row<rows;row++){
+                    String code = sheet.getCell(0, row).getContents();
+                    if(StringUtils.isNotBlank(code)){
+                        codeList.add(code);
+                    }
+                }
+            }
+            List<DqDatasetWarning> list = dqDatasetWarningService.importDatasetExcel(codeList);
+            List<MDqDatasetWarning> warnings = (List<MDqDatasetWarning>)convertToModels(list, new ArrayList<>(list.size()), MDqDatasetWarning.class, null);
+            return success(warnings);
+        } catch (Exception e) {
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return envelop;
+    }
 
 }

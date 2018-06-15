@@ -53,8 +53,13 @@ public class WarningQuestionService extends BaseJpaService {
     /**
      * 预警问题生成分析
      */
-    public void analyze(){
-        String dateStr = DateUtil.formatDate(DateUtil.addDate(-1, new Date()),DateUtil.DEFAULT_DATE_YMD_FORMAT);
+    public void analyze(String date){
+        String dateStr = null;
+        if(StringUtils.isBlank(date)){
+            dateStr = DateUtil.formatDate(DateUtil.addDate(-1, new Date()),DateUtil.DEFAULT_DATE_YMD_FORMAT);
+        }else {
+            dateStr = date;
+        }
         receive(dateStr);
         resource(dateStr);
         upload(dateStr);
@@ -344,7 +349,7 @@ public class WarningQuestionService extends BaseJpaService {
                 }
                 //3、数据集
                 Long datasetNum = Long.valueOf(hospitalMap.get("receiveDataset").toString());
-                if(datasetNum<warning.getDatasetWarningList().size()){
+                if(warning.getDatasetWarningList()!=null&&datasetNum<warning.getDatasetWarningList().size()){
                     //接收的数据集小于预警值
                     DqWarningRecord record = new DqWarningRecord();
                     record.setOrgCode(orgCode);
@@ -879,7 +884,7 @@ public class WarningQuestionService extends BaseJpaService {
         String unqualified = "不合格";
         String orgName = "省平台";
         //1、档案数
-        if(uploadArchiveNum<warning.getAcrhiveNum()){
+        if(uploadArchiveNum<warning.getArchiveNum()){
             //档案数<预警值
             DqWarningRecord record = new DqWarningRecord();
             record.setType(DqWarningRecordType.upload.getValue());
@@ -889,7 +894,7 @@ public class WarningQuestionService extends BaseJpaService {
             record.setQuota(DqWarningRecordWarningType.archiveNum.getName());
             record.setRecordTime(recordTime);
             record.setWarningTime(new Date());
-            record.setWarningValue(warning.getAcrhiveNum()+"");
+            record.setWarningValue(warning.getArchiveNum()+"");
             record.setStatus("1");
             record.setOrgName(orgName);
             record.setProblemDescription(DqWarningRecordWarningType.archiveNum.getName()+unqualified);
