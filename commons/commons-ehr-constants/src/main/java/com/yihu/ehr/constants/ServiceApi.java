@@ -467,18 +467,15 @@ public class ServiceApi {
     public static class Packages {
         public static final String Packages = "/packages";
         public static final String Package = "/packages/{id}";
-        public static final String PackageResolve = "/packages/resolve";
-        public static final String PackageSearch = "/packages/search";
-        public static final String PackageDownload = "/packages/download/{id}";
-        public static final String LegacyPackages = "/json_package";
-        public static final String Prescription = "/prescription"; //处方笺维护
-        public static final String ArchiveRelation = "/archiveRelation"; //档案关联
+        public static final String Analyze = "/packages/analyze/{id}";
+        public static final String Resolve = "/packages/resolve/{id}";
+        public static final String Analyzes = "/packages/analyze";
+        public static final String Resolves = "/packages/resolve";
+        public static final String Search = "/packages/search";
+        public static final String Download = "/packages/download/{id}";
+        public static final String PackageCrypto = "/packages/crypto";
         public static final String Queue = "/packages/queue";
         public static final String UploadProvincialQueueSize = "/packages/queueSize/UploadProvincial";//上传省平台队列
-        public static final String PackageCrypto = "/packages/crypto";
-        public static final String Fetch = "/packages/fetch/{id}";
-        public static final String ImmediateResolve = "/immediate/resolve";
-        public static final String Update = "/packages/update";
         public static final String Migrate = "/packages/migrate";
     }
 
@@ -490,14 +487,8 @@ public class ServiceApi {
         public static final String PackageResolve = "/datasetPackages/resolve";
         public static final String PackageSearch = "/datasetPackages/search";
         public static final String PackageDownloads = "/datasetPackages/{id}/downloads";
-
         public static final String ResolveMessage = "/datasetPackages/message/resolve";
         public static final String MessageTimer = "/datasetPackages/message/timer";
-
-    }
-
-    public static class PackageResolve {
-        public static final String Scheduler = "/scheduler";
     }
 
     public static class PackageAnalyzer {
@@ -514,7 +505,16 @@ public class ServiceApi {
         public static final String QcValue = "/packAnalyzer/qc/check/value";
         public static final String UpdateStatus = "/packAnalyzer/updateStatus";
         public static final String Analyzer = "/packAnalyzer/analyzer";
-        public static final String Update = "/packAnalyzer/update";
+    }
+
+    public static class PackageResolve {
+        public static final String Scheduler = "/resolve/scheduler";
+        public static final String Resolve = "/resolve/{id}";
+        public static final String Local = "/resolve/local/{id}";
+        public static final String Fetch = "/resolve/fetch/{id}";
+        public static final String Immediate = "/resolve/immediate";
+        public static final String Prescription = "/resolve/prescription"; //处方笺维护
+        public static final String ArchiveRelation = "/resolve/archiveRelation"; //档案关联
     }
 
     public static class ArchiveRelation {

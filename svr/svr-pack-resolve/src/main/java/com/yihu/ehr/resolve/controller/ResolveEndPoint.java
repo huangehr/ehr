@@ -62,15 +62,15 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
     private StatusReportService statusReportService;
 
     @ApiOperation(value = "健康档案包入库", notes = "若包ID为空，则取最旧的未解析健康档案包", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @RequestMapping(value = ServiceApi.Packages.PackageResolve, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.PackageResolve.Resolve, method = RequestMethod.GET)
     public String resolve(
-            @ApiParam(name = "id", value = "档案包ID")
-            @RequestParam(value = "id", required = false) String packageId,
+            @ApiParam(name = "id", value = "档案包编号", required = true)
+            @PathVariable(value = "id") String id,
             @ApiParam(name = "clientId", value = "模拟应用ID")
             @RequestParam(value = "clientId", required = false) String clientId,
             @ApiParam(name = "echo", value = "返回档案数据", required = true, defaultValue = "true")
             @RequestParam(value = "echo") boolean echo) throws Throwable {
-        EsSimplePackage pack = packageMgrClient.getPackage(packageId);
+        EsSimplePackage pack = packageMgrClient.getPackage(id);
         if (null == pack) {
             Map<String, String> resultMap = new HashMap<String, String>();
             resultMap.put("failure", "无可用档案包！");
@@ -137,7 +137,7 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
      * ObjectMapper Stream API使用，参见：http://wiki.fasterxml.com/JacksonStreamingApi
      */
     @ApiOperation(value = "本地档案包解析", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @RequestMapping(value = ServiceApi.Packages.Package, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.PackageResolve.Local, method = RequestMethod.POST)
     public ResponseEntity<String> resolve(
             @ApiParam(name = "id", value = "档案包ID，忽略此值", required = true, defaultValue = "LocalPackage")
             @PathVariable(value = "id") String packageId,
@@ -180,7 +180,7 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
      * <p>
      */
     @ApiOperation(value = "获取档案解析包内容", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @RequestMapping(value = ServiceApi.Packages.Fetch, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.PackageResolve.Fetch, method = RequestMethod.GET)
     public String fetch(
             @ApiParam(name = "id", value = "档案包ID", required = true)
             @PathVariable(value = "id") String id) throws Exception {
@@ -191,7 +191,7 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
     }
 
     @ApiOperation(value = "即时交互档案解析入库", notes = "即时交互档案解析入库", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @RequestMapping(value = ServiceApi.Packages.ImmediateResolve, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.PackageResolve.Immediate, method = RequestMethod.PUT)
     public String immediateResolve(
             @ApiParam(name = "idCardNo", value = "身份证号")
             @RequestParam(value = "idCardNo", required = false) String idCardNo,

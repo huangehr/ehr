@@ -146,7 +146,42 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         return true;
     }
 
-    @RequestMapping(value = ServiceApi.Packages.Package, method = {RequestMethod.PUT})
+    @RequestMapping(value = ServiceApi.Packages.Analyze, method = RequestMethod.PUT)
+    @ApiOperation(value = "更新档案包分析状态", notes = "更新档案包分析状态")
+    public boolean analyzeStatus(
+            @ApiParam(name = "id", value = "档案包编号", required = true)
+            @PathVariable(value = "id") String id,
+            @ApiParam(name = "status", value = "状态", required = true)
+            @RequestParam(value = "status") AnalyzeStatus status,
+            @ApiParam(name = "errorType", value = "错误类型(0 = 正常; -1 = 质控服务出错; -2 解析服务出错; 1 = 压缩包有误; 2 = Json文件有误; 3 = Json数据有误)", required = true)
+            @RequestParam(value = "errorType") int errorType,
+            @ApiParam(name = "message", value = "消息", required = true)
+            @RequestBody String message) throws Exception {
+        Map<String, Object> updateSource = new HashMap<>();
+        if (status == AnalyzeStatus.Failed) {
+            if (3 <= errorType && errorType <= 7) {
+                updateSource.put("analyze_fail_count", 3);
+            } else {
+                Map<String, Object> sourceMap = elasticSearchUtil.findById(INDEX, TYPE, id);
+                if (null == sourceMap) {
+                    return false;
+                }
+                if ((int)sourceMap.get("analyze_fail_count") < 3) {
+                    int failCount = (int)sourceMap.get("analyze_fail_count");
+                    updateSource.put("analyze_fail_count", failCount + 1);
+                }
+            }
+        } else if (status == AnalyzeStatus.Acquired) {
+            updateSource.put("analyze_date", dateFormat.format(new Date()));
+        }
+        updateSource.put("message", message);
+        updateSource.put("error_type", errorType);
+        updateSource.put("analyze_status", status.ordinal());
+        elasticSearchUtil.voidUpdate(INDEX, TYPE, id, updateSource);
+        return true;
+    }
+
+    @RequestMapping(value = ServiceApi.Packages.Resolve, method = {RequestMethod.PUT})
     @ApiOperation(value = "更新档案包解析状态", notes = "更新档案包解析状态")
     public boolean resolveStatus(
             @ApiParam(name = "id", value = "档案包编号", required = true)
@@ -203,71 +238,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         return true;
     }
 
-    @RequestMapping(value = ServiceApi.PackageAnalyzer.Status, method = RequestMethod.PUT)
-    @ApiOperation(value = "更新档案包分析状态", notes = "更新档案包分析状态")
-    public boolean analyzeStatus(
-            @ApiParam(name = "id", value = "档案包编号", required = true)
-            @PathVariable(value = "id") String id,
-            @ApiParam(name = "status", value = "状态", required = true)
-            @RequestParam(value = "status") AnalyzeStatus status,
-            @ApiParam(name = "errorType", value = "错误类型(0 = 正常; -1 = 质控服务出错; -2 解析服务出错; 1 = 压缩包有误; 2 = Json文件有误; 3 = Json数据有误)", required = true)
-            @RequestParam(value = "errorType") int errorType,
-            @ApiParam(name = "message", value = "消息", required = true)
-            @RequestBody String message) throws Exception {
-        Map<String, Object> updateSource = new HashMap<>();
-        if (status == AnalyzeStatus.Failed) {
-            if (3 <= errorType && errorType <= 7) {
-                updateSource.put("analyze_fail_count", 3);
-            } else {
-                Map<String, Object> sourceMap = elasticSearchUtil.findById(INDEX, TYPE, id);
-                if (null == sourceMap) {
-                    return false;
-                }
-                if ((int)sourceMap.get("analyze_fail_count") < 3) {
-                    int failCount = (int)sourceMap.get("analyze_fail_count");
-                    updateSource.put("analyze_fail_count", failCount + 1);
-                }
-            }
-        } else if (status == AnalyzeStatus.Acquired) {
-            updateSource.put("analyze_date", dateFormat.format(new Date()));
-        }
-        updateSource.put("message", message);
-        updateSource.put("error_type", errorType);
-        updateSource.put("analyze_status", status.ordinal());
-        elasticSearchUtil.voidUpdate(INDEX, TYPE, id, updateSource);
-        return true;
-    }
-
-    @RequestMapping(value = ServiceApi.Packages.Update, method = RequestMethod.PUT)
-    @ApiOperation(value = "根据条件批量修改档案包解析状态", notes = "根据条件批量修改档案包解析状态")
-    public Integer update(
-            @ApiParam(name = "filters", value = "条件", required = true)
-            @RequestParam(value = "filters") String filters,
-            @ApiParam(name = "status", value = "状态", required = true)
-            @RequestParam(value = "status") ArchiveStatus status,
-            @ApiParam(name = "page", value = "消息", required = true)
-            @RequestParam(value = "page") Integer page,
-            @ApiParam(name = "size", value = "状态", required = true)
-            @RequestParam(value = "size") Integer size) throws Exception {
-        List<Map<String, Object>> sourceList = elasticSearchUtil.page(INDEX, TYPE, filters, page, size);
-        List<Map<String, Object>> updateSourceList = new ArrayList<>(sourceList.size());
-        final int _status = status.ordinal();
-        sourceList.forEach(item -> {
-            Map<String, Object> updateSource = new HashMap<>();
-            updateSource.put("_id", item.get("_id"));
-            updateSource.put("archive_status", status.ordinal());
-            if (_status == 2) {
-                updateSource.put("fail_count", 3);
-            } else {
-                updateSource.put("fail_count", 0);
-            }
-            updateSourceList.add(updateSource);
-        });
-        elasticSearchUtil.bulkUpdate(INDEX, TYPE, updateSourceList);
-        return sourceList.size();
-    }
-
-    @RequestMapping(value = ServiceApi.PackageAnalyzer.Update, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Packages.Analyzes, method = RequestMethod.PUT)
     @ApiOperation(value = "根据条件批量修改档案包质控状态", notes = "根据条件批量修改档案包质控状态")
     public Integer updateAnalyzer (
             @ApiParam(name = "filters", value = "条件", required = true)
@@ -296,6 +267,35 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         return sourceList.size();
     }
 
+    @RequestMapping(value = ServiceApi.Packages.Resolves, method = RequestMethod.PUT)
+    @ApiOperation(value = "根据条件批量修改档案包解析状态", notes = "根据条件批量修改档案包解析状态")
+    public Integer update(
+            @ApiParam(name = "filters", value = "条件", required = true)
+            @RequestParam(value = "filters") String filters,
+            @ApiParam(name = "status", value = "状态", required = true)
+            @RequestParam(value = "status") ArchiveStatus status,
+            @ApiParam(name = "page", value = "消息", required = true)
+            @RequestParam(value = "page") Integer page,
+            @ApiParam(name = "size", value = "状态", required = true)
+            @RequestParam(value = "size") Integer size) throws Exception {
+        List<Map<String, Object>> sourceList = elasticSearchUtil.page(INDEX, TYPE, filters, page, size);
+        List<Map<String, Object>> updateSourceList = new ArrayList<>(sourceList.size());
+        final int _status = status.ordinal();
+        sourceList.forEach(item -> {
+            Map<String, Object> updateSource = new HashMap<>();
+            updateSource.put("_id", item.get("_id"));
+            updateSource.put("archive_status", status.ordinal());
+            if (_status == 2) {
+                updateSource.put("fail_count", 3);
+            } else {
+                updateSource.put("fail_count", 0);
+            }
+            updateSourceList.add(updateSource);
+        });
+        elasticSearchUtil.bulkUpdate(INDEX, TYPE, updateSourceList);
+        return sourceList.size();
+    }
+
     @RequestMapping(value = ServiceApi.Packages.Packages, method = RequestMethod.GET)
     @ApiOperation(value = "搜索档案包")
     public Envelop page(
@@ -311,7 +311,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
-    @RequestMapping(value = ServiceApi.Packages.PackageSearch, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Packages.Search, method = RequestMethod.GET)
     @ApiOperation(value = "搜索档案包")
     public List<EsDetailsPackage> search (
             @ApiParam(name = "filters", value = "过滤条件")
@@ -348,7 +348,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         return null;
     }
 
-    @RequestMapping(value = ServiceApi.Packages.PackageDownload, method = {RequestMethod.GET})
+    @RequestMapping(value = ServiceApi.Packages.Download, method = {RequestMethod.GET})
     @ApiOperation(value = "下载档案包", notes = "下载档案包")
     public ResponseEntity downloadPackage(
             @ApiParam(name = "id", value = "档案包编号")
@@ -384,9 +384,13 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Packages.Queue, method = RequestMethod.GET)
     @ApiOperation(value = "获取相关队列数")
     public long queueSize(
-            @ApiParam(name = "queue", value = "队列 - 解析：resolve_queue 质控：analyze_queue 省平台：provincial_platform_queue")
+            @ApiParam(name = "queue", value = "队列 - 质控：analyze_queue 解析：resolve_queue 省平台：provincial_platform_queue", required = true)
             @RequestParam(value = "queue") String queue) throws Exception {
-        return redisTemplate.opsForList().size(queue);
+        if (!queue.endsWith("_vice")) {
+            return redisTemplate.opsForList().size(queue);
+        } else {
+            return redisTemplate.opsForSet().size(queue);
+        }
     }
 
     @RequestMapping(value = ServiceApi.Packages.Queue, method = RequestMethod.DELETE)
@@ -407,7 +411,6 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "startDate") String startDate,
             @ApiParam(name = "endDate", value = "结束时间（eg：2017-01-02）", required = true )
             @RequestParam(value = "endDate") String endDate) throws Exception {
-
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("event_date>=" + startDate + " 00:00:00;");
         stringBuilder.append("event_date<" + endDate + " 00:00:00;");
@@ -430,11 +433,11 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
                     esSimplePackage.setEvent_type( Integer.valueOf(item.get("event_type").toString()));
                     esSimplePackage.setOrg_code(String.valueOf(item.get("org_code")));
                     //存入省平台上传队列
-                redisTemplate.opsForList().leftPush(RedisCollection.ProvincialPlatformQueue, objectMapper.writeValueAsString(esSimplePackage));
+                    redisTemplate.opsForList().leftPush(RedisCollection.ProvincialPlatformQueue, objectMapper.writeValueAsString(esSimplePackage));
                 }
             }
             return "操作成功！";
-        }else {
+        } else {
             return "该段时间内无数据";
         }
 

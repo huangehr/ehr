@@ -19,7 +19,7 @@ import springfox.documentation.annotations.ApiIgnore;
 public interface PatientArchiveClient {
 
 
-    @RequestMapping(value = ApiVersion.Version1_0+ ServiceApi.Packages.ArchiveRelation, method = RequestMethod.POST)
+    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.PackageResolve.ArchiveRelation, method = RequestMethod.POST)
     Result archiveRelation(@RequestParam(value = "profileId") String profileId, @RequestParam(value = "idCardNo") String idCardNo);
 
 
