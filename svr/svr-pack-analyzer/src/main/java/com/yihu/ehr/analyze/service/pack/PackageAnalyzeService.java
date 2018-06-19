@@ -64,11 +64,11 @@ public class PackageAnalyzeService {
      * @created 2018.01.15
      */
     public void analyze() {
-        boolean vice = false;
+        boolean main = true;
         Serializable serializable = redisTemplate.opsForList().rightPop(RedisCollection.AnalyzeQueue);
         if (null == serializable) {
             serializable = redisTemplate.opsForSet().pop(RedisCollection.AnalyzeQueueVice);
-            vice = true;
+            main = false;
         }
         EsSimplePackage esSimplePackage = null;
         ZipPackage zipPackage = null;
@@ -96,7 +96,7 @@ public class PackageAnalyzeService {
                     statusReportService.reportStatus(esSimplePackage.get_id(), AnalyzeStatus.Finished, 0, "Ignore non-standard package file");
                 }
                 //发送解析消息
-                if (!vice) {
+                if (main) {
                     redisTemplate.opsForList().leftPush(RedisCollection.ResolveQueue, objectMapper.writeValueAsString(esSimplePackage));
                 } else {
                     redisTemplate.opsForSet().add(RedisCollection.ResolveQueueVice, objectMapper.writeValueAsString(esSimplePackage));
