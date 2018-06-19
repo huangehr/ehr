@@ -41,8 +41,8 @@ public class DqDatasetWarningService extends BaseJpaService<DqDatasetWarning, Dq
             String key = DataSetTable+defaultQualityVersion+":"+code+":name";
             if(redisClient.hasKey(key)){
                 DqDatasetWarning warning = new DqDatasetWarning();
-                warning.setDatasetCode(code);
-                warning.setDatasetName(redisClient.get(key));
+                warning.setCode(code);
+                warning.setName(redisClient.get(key));
                 warningList.add(warning);
             }
         });

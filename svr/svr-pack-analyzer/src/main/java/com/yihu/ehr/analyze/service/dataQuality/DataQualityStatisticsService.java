@@ -347,7 +347,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
         Long count = 0L;
         String esIndex = "json_archives";
         String esType = "info";
-        StringBuilder filter = new StringBuilder("event_date>=" + eventDateStart + ";event_date<=" + eventDateEnd);
+        StringBuilder filter = new StringBuilder("receive_date>=" + eventDateStart + ";receive_date<=" + eventDateEnd);
         if (!StringUtils.isEmpty(archiveStatus)) {
             filter.append(";archive_status=" + archiveStatus);
         }
@@ -355,7 +355,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
             elasticSearchUtil.count(esIndex, esType, filter.toString());
         } else {
             for (Map<String, String> orgInfo : orgInfoList) {
-                filter.append(";orgCode=" + orgInfo.get("orgCode"));
+                filter.append(";org_code=" + orgInfo.get("orgCode"));
                 count += elasticSearchUtil.count(esIndex, esType, filter.toString());
             }
         }

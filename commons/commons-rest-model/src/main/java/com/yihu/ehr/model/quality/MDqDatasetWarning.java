@@ -12,8 +12,8 @@ public class MDqDatasetWarning implements Serializable {
     private Long id;
     private String orgCode;//机构代码
     private String type;//类型(1平台接收，2平台上传)
-    private String datasetCode;//数据集编码
-    private String datasetName;//数据集名称
+    private String code;//数据集编码
+    private String name;//数据集名称
 
     public Long getId() {
         return id;
@@ -39,19 +39,19 @@ public class MDqDatasetWarning implements Serializable {
         this.type = type;
     }
 
-    public String getDatasetCode() {
-        return datasetCode;
+    public String getCode() {
+        return code;
     }
 
-    public void setDatasetCode(String datasetCode) {
-        this.datasetCode = datasetCode;
+    public void setCode(String code) {
+        this.code = code;
     }
 
-    public String getDatasetName() {
-        return datasetName;
+    public String getName() {
+        return name;
     }
 
-    public void setDatasetName(String datasetName) {
-        this.datasetName = datasetName;
+    public void setName(String name) {
+        this.name = name;
     }
 }

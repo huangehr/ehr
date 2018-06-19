@@ -62,9 +62,9 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
             @RequestParam(name = "reporter") String reporter,
             @ApiParam(name = "orgInfoList", value = "机构编码、名称，例：[{\"orgName\":\"xx\",\"orgCode\":\"jkzl\"}]。", required = true)
             @RequestParam(name = "orgInfoList") String orgInfoList,
-            @ApiParam(name = "eventDateStart", value = "就诊时间（起始），格式 yyyy-MM-dd", required = true)
+            @ApiParam(name = "eventDateStart", value = "接收时间（起始），格式 yyyy-MM-dd", required = true)
             @RequestParam(name = "eventDateStart") String eventDateStart,
-            @ApiParam(name = "eventDateEnd", value = "就诊时间（截止），格式 yyyy-MM-dd", required = true)
+            @ApiParam(name = "eventDateEnd", value = "接收时间（截止），格式 yyyy-MM-dd", required = true)
             @RequestParam(name = "eventDateEnd") String eventDateEnd,
             HttpServletRequest request,
             HttpServletResponse response) {
@@ -172,21 +172,21 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                     Map<String, Object> orgMap = reportedNumList1.get(0);
                     XWPFTableRow tableRow = table1.createRow();
                     tableRow.getCell(0).setText("医院上报");
-                    tableRow.getCell(1).setText(Long.valueOf(orgMap.get("outpatientNum").toString())+"");
-                    tableRow.getCell(2).setText(Long.valueOf(orgMap.get("hospitalDischargeNum").toString())+"");
-                    tableRow.getCell(3).setText(Long.valueOf(orgMap.get("healthExaminationNum").toString())+"");
-                    tableRow.getCell(4).setText(Long.valueOf(orgMap.get("total").toString())+"");
+                    tableRow.getCell(1).setText(Double.valueOf(orgMap.get("outpatientNum").toString()).intValue()+"");
+                    tableRow.getCell(2).setText(Double.valueOf(orgMap.get("hospitalDischargeNum").toString()).intValue()+"");
+                    tableRow.getCell(3).setText(Double.valueOf(orgMap.get("healthExaminationNum").toString()).intValue()+"");
+                    tableRow.getCell(4).setText(Double.valueOf(orgMap.get("total").toString()).intValue()+"");
                 }
                 double receiveAcrhive = 0;
                 Map<String, Object> collectionMap = (Map<String, Object>)map.get("collectionMap");
                 if(collectionMap.size()>0){
                     XWPFTableRow tableRow = table1.createRow();
                     tableRow.getCell(0).setText("平台接收");
-                    tableRow.getCell(1).setText(Long.valueOf(collectionMap.get("outpatientNum").toString())+"");
-                    tableRow.getCell(2).setText(Long.valueOf(collectionMap.get("hospitalDischargeNum").toString())+"");
-                    tableRow.getCell(3).setText(Long.valueOf(collectionMap.get("healthExaminationNum").toString())+"");
+                    tableRow.getCell(1).setText(Double.valueOf(collectionMap.get("outpatientNum").toString()).intValue()+"");
+                    tableRow.getCell(2).setText(Double.valueOf(collectionMap.get("hospitalDischargeNum").toString()).intValue()+"");
+                    tableRow.getCell(3).setText(Double.valueOf(collectionMap.get("healthExaminationNum").toString()).intValue()+"");
                     receiveAcrhive = Double.valueOf(collectionMap.get("total").toString());
-                    tableRow.getCell(4).setText(Long.valueOf(collectionMap.get("total").toString())+"");
+                    tableRow.getCell(4).setText(Double.valueOf(collectionMap.get("total").toString()).intValue()+"");
                 }
                 addEmptyRow(document);
                 j++;
@@ -214,10 +214,10 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                     reportedNumList3.forEach(item->{
                         XWPFTableRow tableRow = table2.createRow();
                         tableRow.getCell(0).setText(item.get("receiveDate").toString());
-                        tableRow.getCell(1).setText(Long.valueOf(item.get("outpatientNum").toString())+"");
-                        tableRow.getCell(2).setText(Long.valueOf(item.get("hospitalDischargeNum").toString())+"");
-                        tableRow.getCell(3).setText(Long.valueOf(item.get("healthExaminationNum").toString())+"");
-                        tableRow.getCell(4).setText(Long.valueOf(item.get("total").toString())+"");
+                        tableRow.getCell(1).setText(Double.valueOf(item.get("outpatientNum").toString()).intValue()+"");
+                        tableRow.getCell(2).setText(Double.valueOf(item.get("hospitalDischargeNum").toString()).intValue()+"");
+                        tableRow.getCell(3).setText(Double.valueOf(item.get("healthExaminationNum").toString()).intValue()+"");
+                        tableRow.getCell(4).setText(Double.valueOf(item.get("total").toString()).intValue()+"");
                     });
                 }
                 addEmptyRow(document);
@@ -243,10 +243,10 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                 Map<String, Object> archiveMap = (Map<String, Object>)map.get("archiveMap");
                 if(collectionMap.size()>0){
                     XWPFTableRow tableRow = table3.createRow();
-                    tableRow.getCell(0).setText(Long.valueOf(receiveAcrhive+"")+"");//0未解析 1正在解析 2解析失败 3解析完成
-                    tableRow.getCell(1).setText(Long.valueOf(archiveMap.get("archive_status3").toString())+"");
-                    tableRow.getCell(2).setText(Long.valueOf(archiveMap.get("archive_status2").toString())+"");
-                    tableRow.getCell(3).setText(Long.valueOf(archiveMap.get("archive_status0").toString())+"");
+                    tableRow.getCell(0).setText(Double.valueOf(receiveAcrhive+"").intValue()+"");//0未解析 1正在解析 2解析失败 3解析完成
+                    tableRow.getCell(1).setText(Double.valueOf(archiveMap.get("archive_status3").toString()).intValue()+"");
+                    tableRow.getCell(2).setText(Double.valueOf(archiveMap.get("archive_status2").toString()).intValue()+"");
+                    tableRow.getCell(3).setText(Double.valueOf(archiveMap.get("archive_status0").toString()).intValue()+"");
                 }
                 addEmptyRow(document);
                 i++;
@@ -358,13 +358,15 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                               @ApiParam(name = "endTime", value = "结束时间", defaultValue = "2018-06-11")
                               @RequestParam(value = "endTime", required = false) String endTime,
                               HttpServletResponse response){
+        WritableWorkbook wwb = null;
+        OutputStream os = null;
         try {
             String fileName = "预警问题列表";
             //设置下载
             response.setContentType("octets/stream");
             response.setHeader("Content-Disposition", "attachment; filename="
                     + new String( fileName.getBytes("gb2312"), "ISO8859-1" )+".xls");
-            OutputStream os = response.getOutputStream();
+            os = response.getOutputStream();
 
             String filters = "type="+type;
             if(StringUtils.isNotBlank(orgCode)){
@@ -385,7 +387,7 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
             String sorts = "-warningTime";
             List<DqWarningRecord> list = warningRecordService.search(null, filters, sorts, 1, 99999);
             //写excel
-            WritableWorkbook wwb = Workbook.createWorkbook(os);
+            wwb = Workbook.createWorkbook(os);
             //创建Excel工作表 指定名称和位置
             WritableSheet ws = wwb.createSheet(fileName,0);
             //添加固定信息，题头等
@@ -406,11 +408,24 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
             }
             //写入工作表
             wwb.write();
-            wwb.close();
             os.flush();
-            os.close();
         } catch (Exception e) {
             e.printStackTrace();
+        }finally {
+            if(wwb!=null){
+                try {
+                    wwb.close();
+                }catch (Exception e){
+                    e.getMessage();
+                }
+            }
+            if(os!=null){
+                try {
+                    os.close();
+                }catch (Exception e){
+                    e.getMessage();
+                }
+            }
         }
     }
 
