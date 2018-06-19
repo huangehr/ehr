@@ -28,6 +28,8 @@ public class RedisInitService extends BaseJpaService {
     private OrgKeySchema orgKeySchema;
     @Autowired
     private RsAdapterMetaKeySchema rsAdapterMetaKeySchema;
+    @Autowired
+    private RsMetadataKeySchema rsMetadataKeySchema;
 
     /**
      * 缓存健康问题名称Redis
@@ -184,6 +186,25 @@ public class RedisInitService extends BaseJpaService {
             }
             rsAdapterMetaKeySchema.setMetaData(schemaMap.get("adapter_version").toString(), metaMap.get("src_dataset_code").toString(),
                     metaMap.get("src_metadata_code").toString(), metaMap.get("metadata_id").toString());
+        }
+        return metaList.size();
+    }
+
+    /**
+     * 缓存数据元字典（Dict_code不为空）
+     * @return
+     */
+    public int cacheMetadataDict() {
+        String sql = "SELECT id, dict_code FROM rs_metadata WHERE dict_code != NULL OR dict_code != ''";
+        //String sql1 = "SELECT a FROM RsMetadata a WHERE a.dictCode <> NULL AND a.dictCode <> ''";
+        List<Map<String, Object>> metaList = jdbc.queryForList(sql);
+        //清空相关Redis
+        rsMetadataKeySchema.deleteAll();
+        for (Map<String, Object> tempMap : metaList) {
+            if (StringUtils.isEmpty(tempMap.get("dict_code"))) {
+                continue;
+            }
+            rsMetadataKeySchema.set((String) tempMap.get("id"), (String) tempMap.get("dict_code"));
         }
         return metaList.size();
     }

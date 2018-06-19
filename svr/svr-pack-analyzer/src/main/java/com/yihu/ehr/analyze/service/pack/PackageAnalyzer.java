@@ -1,6 +1,7 @@
 package com.yihu.ehr.analyze.service.pack;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.analyze.model.ZipPackage;
 import com.yihu.ehr.profile.extractor.ExtractorChain;
 import com.yihu.ehr.profile.util.DataSetParserUtil;
 import org.springframework.beans.factory.annotation.Autowired;

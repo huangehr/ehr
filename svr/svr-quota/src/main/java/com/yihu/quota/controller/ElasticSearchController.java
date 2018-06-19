@@ -66,7 +66,7 @@ public class ElasticSearchController extends BaseController {
     @ApiOperation("根据条件获取solr 数据")
     public void getSolrData(
             @ApiParam(value = "core")
-            @RequestParam(value = "core", required = true) String core,
+            @RequestParam(value = "core 表名", required = true) String core,
             @ApiParam(name = "q", value = "查询条件 多个用  AND 拼接")
             @RequestParam(name = "q",required = true) String q,
             @ApiParam(name = "fl", value = "展示字段 多个用  , 拼接 如：org_area,org_code,EHR_000081")
@@ -75,6 +75,11 @@ public class ElasticSearchController extends BaseController {
         long rows = 0;
         List<Map<String, Object>> list = new ArrayList<>();
         try {
+            if(StringUtils.isEmpty(fl)){
+                return;
+            }else {
+                fl += ",rowkey";
+            }
             String [] fields = fl.split(",");
             rows = solrQuery.count(core,q);
             list =  solrQuery.queryReturnFieldList(core, q, null, null, 0, rows,fields);

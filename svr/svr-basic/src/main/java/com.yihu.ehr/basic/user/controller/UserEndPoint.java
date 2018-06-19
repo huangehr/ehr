@@ -22,6 +22,7 @@ import com.yihu.ehr.entity.patient.DemographicInfo;
 import com.yihu.ehr.entity.security.UserKey;
 import com.yihu.ehr.entity.security.UserSecurity;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
+import com.yihu.ehr.model.org.MJkzlOrgMemberRelation;
 import com.yihu.ehr.model.user.MH5Handshake;
 import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.util.datetime.DateUtil;
@@ -89,6 +90,8 @@ public class UserEndPoint extends EnvelopRestEndPoint {
     private DemographicService demographicService;
     @Autowired
     private OrgMemberRelationService orgMemberRelationService;
+    @Autowired
+    private OrgMemberRelationService relationService;
 
     @RequestMapping(value = ServiceApi.Users.Users, method = RequestMethod.GET)
     @ApiOperation(value = "获取用户列表", notes = "根据查询条件获取用户列表在前端表格展示")
@@ -781,6 +784,7 @@ public class UserEndPoint extends EnvelopRestEndPoint {
 
     /**
      * 用户基本信息验证
+     *
      * @param user
      * @return
      */
@@ -1059,6 +1063,7 @@ public class UserEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "appClientId", required = true) String appClientId) throws Exception {
         Envelop envelop = new Envelop();
         User user;
+        MUser mUser = new MUser();
         //获取用户信息
         if (org.apache.commons.lang.StringUtils.isNotEmpty(userIdOrCode)) {
             user = userService.getUser(userIdOrCode);
@@ -1078,8 +1083,22 @@ public class UserEndPoint extends EnvelopRestEndPoint {
             return envelop;
         }
         //根据用户id和应用id获取角色
-        List<Map<String,Object>> roles = rolesService.findRolesByUserIdAndAppId(user.getId(),appClientId);
-        envelop.setObj(user);
+        List<Map<String, Object>> roles = rolesService.findRolesByUserIdAndAppId(user.getId(), appClientId);
+        mUser = convertToModel(user, MUser.class, null);
+        //医生在总部库中的对应关系
+        MJkzlOrgMemberRelation mJkzlOrgMemberRelation = new MJkzlOrgMemberRelation();
+        List<OrgMemberRelation> memberRelationList = relationService.getByUserId(mUser.getId());
+        if (null != memberRelationList && memberRelationList.size() > 0) {
+            OrgMemberRelation orgMemberRelation = memberRelationList.get(0);
+            mJkzlOrgMemberRelation.setJkzlDoctorSn(orgMemberRelation.getJkzlDoctorSn());
+            mJkzlOrgMemberRelation.setJkzlDoctorUid(orgMemberRelation.getJkzlDoctorUid());
+            mJkzlOrgMemberRelation.setJkzlHosDeptId(orgMemberRelation.getJkzlHosDeptId());
+            mJkzlOrgMemberRelation.setJkzlUserId(orgMemberRelation.getJkzlUserId());
+        }
+        String jkzlOrgId = relationService.getJkzlOrgIds(mUser.getId());
+        mJkzlOrgMemberRelation.setJkzlHosId(jkzlOrgId);
+        mUser.setmJkzlOrgMemberRelation(mJkzlOrgMemberRelation);
+        envelop.setObj(mUser);
         envelop.setDetailModelList(roles);
         envelop.setSuccessFlg(true);
         return envelop;

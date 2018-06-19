@@ -10,15 +10,11 @@ import org.springframework.stereotype.Service;
 public class RedisService {
 
     @Autowired
-    private RsMetadataKeySchema rsMetadataKeySchema;
-    @Autowired
     private StdDataSetKeySchema stdDataSetKeySchema;
     @Autowired
     private RsAdapterMetaKeySchema rsAdapterMetaKeySchema;
-
-    public String getRsMetaData(String key) {
-        return rsMetadataKeySchema.get(key);
-    }
+    @Autowired
+    private RsMetadataKeySchema rsMetadataKeySchema;
 
     public String getDataSetName(String version, String id) {
         return stdDataSetKeySchema.dataSetName(version, id);
@@ -33,6 +29,10 @@ public class RedisService {
      */
     public Boolean getDataSetMultiRecord(String version, String code){
         return stdDataSetKeySchema.dataSetMultiRecord(version, code);
+    }
+
+    public String getRsMetadataDict(String key) {
+        return rsMetadataKeySchema.get(key);
     }
 
 }

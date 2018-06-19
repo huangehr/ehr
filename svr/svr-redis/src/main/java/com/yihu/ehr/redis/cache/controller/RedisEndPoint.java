@@ -101,6 +101,14 @@ public class RedisEndPoint extends EnvelopRestEndPoint {
         return redisService.getRsAdapterMetaData(cdaVersion, srcDataSetCode, srcMetadataCode);
     }
 
+    @ApiOperation("通过资源化数据元ID获取标准数据元字典编码")
+    @RequestMapping(value = ServiceApi.Redis.RsMetadataDict, method = RequestMethod.GET)
+    public String getRsMetaData(
+            @ApiParam(value = "key", required = true)
+            @RequestParam(value = "key") String key) {
+        return redisService.getRsMetadataDict(key);
+    }
+
     //------------------------------------ 资源化相关 END -------------------------------------------------------
 
     //------------------------------------ 标准相关 START -------------------------------------------------------

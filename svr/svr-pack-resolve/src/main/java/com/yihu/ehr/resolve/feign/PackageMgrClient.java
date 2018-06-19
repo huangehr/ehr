@@ -22,27 +22,15 @@ import java.util.Map;
 @RequestMapping(ApiVersion.Version1_0)
 public interface PackageMgrClient {
 
-    @RequestMapping(value = ServiceApi.Packages.AcquirePackage, method = RequestMethod.GET)
-    EsDetailsPackage acquirePackage(
-            @RequestParam(value = "id") String id);
-
-    @RequestMapping(value = ServiceApi.Packages.Package, method = RequestMethod.PUT)
-    boolean reportStatus(
-            @PathVariable(value = "id") String id,
-            @RequestParam(value = "status") ArchiveStatus status,
-            @RequestParam(value = "errorTye") int errorTye,
-            @RequestBody String message);
-
     @RequestMapping(value = ServiceApi.Packages.Package, method = RequestMethod.GET)
     EsSimplePackage getPackage(
             @PathVariable(value = "id") String id);
 
-
-    @RequestMapping(value = ServiceApi.Packages.ResolveMessage, method = RequestMethod.PUT)
-    @Deprecated
-    Map<String, String> sendResolveMessage(
-            @RequestParam(value = "filters", required = false) String filters,
-            @RequestParam(value = "sorts", required = false) String sorts,
-            @RequestParam(value = "count", required = false) int count);
+    @RequestMapping(value = ServiceApi.Packages.Package, method = RequestMethod.PUT)
+    boolean resolveStatus(
+            @PathVariable(value = "id") String id,
+            @RequestParam(value = "status") ArchiveStatus status,
+            @RequestParam(value = "errorType") int errorType,
+            @RequestBody String message);
 
 }

@@ -1,11 +1,9 @@
 package com.yihu.ehr.resource.service;
 
 import com.yihu.ehr.query.BaseJpaService;
-import com.yihu.ehr.redis.schema.RsMetadataKeySchema;
 import com.yihu.ehr.resource.dao.RsResourceMetadataDao;
 import com.yihu.ehr.resource.dao.RsMetadataDao;
 import com.yihu.ehr.resource.model.RsMetadata;
-import org.apache.commons.lang.StringUtils;
 import org.hibernate.SQLQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -32,21 +30,15 @@ public class RsMetadataService extends BaseJpaService<RsMetadata, RsResourceMeta
     @Autowired
     private RsMetadataDao metadataDao;
 
-    @Autowired
-    private RsMetadataKeySchema keySchema;
-
 
     /**
      * 删除数据元
      *
      * @param id String 数据元ID
      */
-    public void deleteMetadata(String id)
-    {
+    public void deleteMetadata(String id) {
         String[] ids = id.split(",");
-
-        for(String id_ : ids)
-        {
+        for (String id_ : ids) {
             RsMetadata metadata = metadataDao.findOne(id_);
             metadata.setValid("0");
             metadataDao.save(metadata);
@@ -69,12 +61,10 @@ public class RsMetadataService extends BaseJpaService<RsMetadata, RsResourceMeta
      * @param metadataArray RsMetadata[]
      * @return List<RsMetadata>
      */
-    public List<RsMetadata> saveMetadataBatch(RsMetadata[] metadataArray)
-    {
+    public List<RsMetadata> saveMetadataBatch(RsMetadata[] metadataArray) {
         List<RsMetadata>  metadataList = new ArrayList<RsMetadata>();
 
-        for(RsMetadata metadata : metadataArray)
-        {
+        for (RsMetadata metadata : metadataArray) {
             metadataList.add(metadataDao.save(metadata));
         }
 
@@ -87,8 +77,7 @@ public class RsMetadataService extends BaseJpaService<RsMetadata, RsResourceMeta
      * @param id String Id
      * @return RsMetadata
      */
-    public RsMetadata getMetadataById(String id)
-    {
+    public RsMetadata getMetadataById(String id) {
         return metadataDao.findOne(id);
     }
 
@@ -100,10 +89,8 @@ public class RsMetadataService extends BaseJpaService<RsMetadata, RsResourceMeta
      * @param size 分页大小
      * @return Page<RsResources> 资源
      */
-    public Page<RsMetadata> getMetadata(String sorts, int page, int size)
-    {
+    public Page<RsMetadata> getMetadata(String sorts, int page, int size) {
         Pageable pageable =  new PageRequest(page,size,parseSorts(sorts));
-
         return metadataDao.findAll(pageable);
     }
 
@@ -111,8 +98,7 @@ public class RsMetadataService extends BaseJpaService<RsMetadata, RsResourceMeta
      * 批量创建数据元
      */
     @Transactional(propagation = Propagation.REQUIRED)
-    public boolean addMetaBatch(List<Map<String, Object>> metaLs)
-    {
+    public boolean addMetaBatch(List<Map<String, Object>> metaLs) {
         String header = "INSERT INTO rs_metadata(id, domain, name, std_code, dict_code, column_type, null_able, description, dict_id, valid) VALUES \n";
         StringBuilder sql = new StringBuilder(header) ;
         Map<String, Object> map;
@@ -142,13 +128,12 @@ public class RsMetadataService extends BaseJpaService<RsMetadata, RsResourceMeta
     }
 
     private Object null2Space(Object o){
-        return o==null? "" : o;
+        return o == null ? "" : o;
     }
     /**
      * 查询内部编码是否已存在， 返回已存在内部编码
      */
-    public List stdCodeExist(String stdCodes)
-    {
+    public List stdCodeExist(String stdCodes) {
         String sql = "SELECT std_code FROM rs_metadata WHERE std_code in(:stdCodes) AND valid<>0";
         SQLQuery sqlQuery = currentSession().createSQLQuery(sql);
         sqlQuery.setParameterList("stdCodes", stdCodes.split(","));
@@ -158,8 +143,7 @@ public class RsMetadataService extends BaseJpaService<RsMetadata, RsResourceMeta
     /**
      * 查询资源标准编码是否已存在， 返回已存在资源标准编码
      */
-    public List idExist( String[] ids)
-    {
+    public List idExist( String[] ids) {
         String sql = "SELECT id FROM rs_metadata WHERE id in(:ids)";
         SQLQuery sqlQuery = currentSession().createSQLQuery(sql);
         sqlQuery.setParameterList("ids", ids);
@@ -171,9 +155,9 @@ public class RsMetadataService extends BaseJpaService<RsMetadata, RsResourceMeta
         String sql = "SELECT MAX(CONVERT(case when ID is not null  then substring(ID,5) else '0' end ,SIGNED)) from rs_metadata";
         SQLQuery sqlQuery = currentSession().createSQLQuery(sql);
         List list = sqlQuery.list();
-        if(list != null && list.size() > 0){
+        if (list != null && list.size() > 0){
             return Integer.valueOf(list.get(0).toString());
-        }else{
+        } else {
             return 0;
         }
     }

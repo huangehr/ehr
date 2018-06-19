@@ -1,6 +1,7 @@
 package com.yihu.ehr.analyze.service.pack;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.yihu.ehr.analyze.model.ZipPackage;
 import com.yihu.ehr.analyze.service.RedisService;
 import com.yihu.ehr.profile.EventType;
 import com.yihu.ehr.profile.exception.IllegalJsonFileException;
@@ -13,7 +14,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 

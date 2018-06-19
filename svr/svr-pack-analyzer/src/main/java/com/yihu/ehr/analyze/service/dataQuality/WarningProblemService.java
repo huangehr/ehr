@@ -53,11 +53,11 @@ public class WarningProblemService extends BaseJpaService {
         versions.forEach(item -> {
             List<DqDatasetWarning> dqDatasetWarnings = dqDatasetWarningService.findByOrgCodeAndType(orgCode, "1");
             dqDatasetWarnings.forEach(item2 -> {
-                if (!upDataset.containsKey(item2.getDatasetCode())) {
-                    unUpDataset.put(item2.getDatasetCode(), item);
+                if (!upDataset.containsKey(item2.getCode())) {
+                    unUpDataset.put(item2.getCode(), item);
                 } else {
-                    if (!upDataset.get(item2.getDatasetCode()).equals(item)) {
-                        unUpDataset.put(item2.getDatasetCode(), item);
+                    if (!upDataset.get(item2.getCode()).equals(item)) {
+                        unUpDataset.put(item2.getCode(), item);
                     }
                 }
             });

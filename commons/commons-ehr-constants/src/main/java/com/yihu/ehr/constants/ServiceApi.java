@@ -466,24 +466,19 @@ public class ServiceApi {
 
     public static class Packages {
         public static final String Packages = "/packages";
-        public static final String AcquirePackage = "/packages/acquire";
         public static final String Package = "/packages/{id}";
         public static final String PackageResolve = "/packages/resolve";
         public static final String PackageSearch = "/packages/search";
         public static final String PackageDownload = "/packages/download/{id}";
-        public static final String ResolveMessage = "/message/resolve";
-        public static final String MessageTimer = "/message/timer";
         public static final String LegacyPackages = "/json_package";
         public static final String Prescription = "/prescription"; //处方笺维护
         public static final String ArchiveRelation = "/archiveRelation"; //档案关联
-        public static final String AddResolveQueue = "/packages/addResolveQueue";
-        public static final String QueueSize = "/packages/queueSize";
+        public static final String Queue = "/packages/queue";
         public static final String UploadProvincialQueueSize = "/packages/queueSize/UploadProvincial";//上传省平台队列
         public static final String PackageCrypto = "/packages/crypto";
         public static final String Fetch = "/packages/fetch/{id}";
         public static final String ImmediateResolve = "/immediate/resolve";
         public static final String Update = "/packages/update";
-        public static final String UpdateAnalyzer = "/packages/updateAnalyzer";
         public static final String Migrate = "/packages/migrate";
     }
 
@@ -507,7 +502,6 @@ public class ServiceApi {
 
     public static class PackageAnalyzer {
         public static final String Scheduler = "/packAnalyzer/scheduler";
-        public static final String Queue = "/packAnalyzer/queue";
         public static final String Status = "/packAnalyzer/status/{id}";
         public static final String DailyReport = "/packAnalyzer/dailyReport";
         public static final String List = "/packAnalyzer/list";
@@ -520,6 +514,7 @@ public class ServiceApi {
         public static final String QcValue = "/packAnalyzer/qc/check/value";
         public static final String UpdateStatus = "/packAnalyzer/updateStatus";
         public static final String Analyzer = "/packAnalyzer/analyzer";
+        public static final String Update = "/packAnalyzer/update";
     }
 
     public static class ArchiveRelation {
@@ -1035,9 +1030,8 @@ public class ServiceApi {
         public static final String AppSetRedisJsonValue = "/redis/setAppClientJsonValue";
         public static final String AppDeleteRedisValue = "/redis/deleteAppClientValue";
         //资源化相关Redis
-        public static final String RsAdapterDict = "/redis/rsAdapterDict";
         public static final String RsAdapterMetadata = "/redis/rsAdapterMetaData";
-        public static final String RsMetadataDict = "/redis/rsMetadata";
+        public static final String RsMetadataDict = "/redis/rsMetadataDict";
         //标准相关Redis
         public static final String StdVersion = "/redis/stdVersion";
         public static final String StdDataSetCode = "/redis/stdDataSetCode";
@@ -1633,6 +1627,7 @@ public class ServiceApi {
         public static final String PaltformReceiveWarningDel = "/dataQuality/warningSetting/receiveWarningDel";
         public static final String PaltformReceiveWarningUpd = "/dataQuality/warningSetting/receiveWarningUpd";
         public static final String PaltformReceiveWarning =    "/dataQuality/warningSetting/receiveWarning/{id}";
+        public static final String PaltformReceiveWarningIsExist =    "/dataQuality/warningSetting/receiveWarningIsExist";
         public static final String PaltformReceiveWarningDefault =    "/dataQuality/warningSetting/receiveWarningDefault";
         public static final String PaltformResourceWarningList = "/dataQuality/warningSetting/resourceWarningList";
         public static final String PaltformResourceWarningAdd = "/dataQuality/warningSetting/resourceWarningAdd";
@@ -1643,6 +1638,7 @@ public class ServiceApi {
         public static final String PaltformUploadWarningAdd = "/dataQuality/warningSetting/uploadWarningAdd";
         public static final String PaltformUploadWarningDel = "/dataQuality/warningSetting/uploadWarningDel";
         public static final String PaltformUploadWarningUpd = "/dataQuality/warningSetting/uploadWarningUpd";
+        public static final String PaltformUploadWarningIsExist =    "/dataQuality/warningSetting/uploadWarningIsExist";
         public static final String PaltformUploadWarning =    "/dataQuality/warningSetting/uploadWarning/{id}";
         public static final String DatasetWarningList = "/dataQuality/warningSetting/datasetWarningList";
         public static final String ImportDatasetExcel = "/dataQuality/warningSetting/importDatasetExcel";
