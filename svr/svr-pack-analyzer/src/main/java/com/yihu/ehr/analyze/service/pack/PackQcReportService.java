@@ -391,6 +391,8 @@ public class PackQcReportService extends BaseJpaService {
         List<Map<String, Object>> list = elasticSearchUtil.page("json_archives_qc","qc_metadata_info", filters, sorts, page, size);
         for(Map<String, Object> map:list){
             map.put("org_name",getOrgName(orgs, map.get("org_code")+""));
+            map.put("dataset_name", redisClient.get("std_data_set_" + map.get("version") + ":" + map.get("dataset") + ":name"));
+            map.put("metadata_name", redisClient.get("std_meta_data_" + map.get("version") + ":" + map.get("dataset")+"."+ map.get("metadata")+ ":name"));
         }
         return list;
     }
@@ -427,6 +429,8 @@ public class PackQcReportService extends BaseJpaService {
                 metedata.put("scheme", schemeList.get(0).get("NAME"));
             }
         }
+        metedata.put("dataset_name", redisClient.get("std_data_set_" + metedata.get("version") + ":" + metedata.get("dataset") + ":name"));
+        metedata.put("metadata_name", redisClient.get("std_meta_data_" + metedata.get("version") + ":" + metedata.get("dataset")+"."+ metedata.get("metadata")+ ":name"));
         String relationId = metedata.get("org_code")+"_"+metedata.get("event_no")+"_"+ DateUtil.strToDate(metedata.get("event_date")+"").getTime();
         res.put("metedata",metedata);
         res.put("relation",elasticSearchUtil.findById("archive_relation","info",relationId));
