@@ -20,6 +20,7 @@ import com.yihu.ehr.resolve.service.resource.stage1.ResolveService;
 import com.yihu.ehr.resolve.service.resource.stage2.IdentifyService;
 import com.yihu.ehr.resolve.service.resource.stage2.PackMillService;
 import com.yihu.ehr.resolve.service.resource.stage2.ResourceService;
+import com.yihu.ehr.resolve.service.resource.stage2.StatusReportService;
 import com.yihu.ehr.resolve.util.LocalTempPathUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
 import io.swagger.annotations.Api;
@@ -52,13 +53,13 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private FastDFSUtil fastDFSUtil;
     @Autowired
-    private ResolveService packageResolveService;
-    @Autowired
-    private ResolveService packageResolveService2;
+    private ResolveService resolveService;
     @Autowired
     private PackageMgrClient packageMgrClient;
     @Autowired
     private IdentifyService identifyService;
+    @Autowired
+    private StatusReportService statusReportService;
 
     @ApiOperation(value = "健康档案包入库", notes = "若包ID为空，则取最旧的未解析健康档案包", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @RequestMapping(value = ServiceApi.Packages.PackageResolve, method = RequestMethod.PUT)
@@ -69,20 +70,15 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "clientId", required = false) String clientId,
             @ApiParam(name = "echo", value = "返回档案数据", required = true, defaultValue = "true")
             @RequestParam(value = "echo") boolean echo) throws Throwable {
-        EsDetailsPackage esDetailsPackage = packageMgrClient.acquirePackage(packageId);
-        if (null == esDetailsPackage) {
+        EsSimplePackage pack = packageMgrClient.getPackage(packageId);
+        if (null == pack) {
             Map<String, String> resultMap = new HashMap<String, String>();
             resultMap.put("failure", "无可用档案包！");
             return objectMapper.writeValueAsString(resultMap);
         }
-        EsSimplePackage pack = objectMapper.readValue(objectMapper.writeValueAsString(esDetailsPackage), EsSimplePackage.class);  //已修改包状态为1 正在入库库
-        String packId = pack.get_id();
         try {
-            if (StringUtils.isEmpty(pack.get_id())) {
-                pack.setClient_id(clientId);
-            }
-            String zipFile = downloadTo(pack.getRemote_path());
-            OriginalPackage originalPackage = packageResolveService2.doResolve(pack, zipFile);
+            statusReportService.reportStatus(pack.get_id(), ArchiveStatus.Acquired, 0, "正在入库中", null);
+            OriginalPackage originalPackage = resolveService.doResolve(pack, downloadTo(pack.getRemote_path()));
             ResourceBucket resourceBucket = packMillService.grindingPackModel(originalPackage);
             identifyService.identify(resourceBucket, originalPackage);
             resourceService.save(resourceBucket, originalPackage);
@@ -100,7 +96,7 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
             long delay = pack.getReceive_date().getTime() - originalPackage.getEventTime().getTime();
             map.put("delay", delay % (1000 * 60 * 60 * 24) > 0 ? delay / (1000 * 60 * 60 * 24) + 1 : delay / (1000 * 60 * 60 * 24));
             map.put("re_upload_flg", String.valueOf(originalPackage.isReUploadFlg()));
-            packageMgrClient.reportStatus(packId, ArchiveStatus.Finished, 0, objectMapper.writeValueAsString(map));
+            statusReportService.reportStatus(pack.get_id(), ArchiveStatus.Finished, 0, "resolve success", map);
             //是否返回数据
             if (echo) {
                 return originalPackage.toJson();
@@ -121,9 +117,9 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
                 errorType = 21; //21以下为质控和解析的公共错误
             }
             if (StringUtils.isBlank(e.getMessage())) {
-                packageMgrClient.reportStatus(packId, ArchiveStatus.Failed, errorType, "Internal Server Error");
+                statusReportService.reportStatus(pack.get_id(), ArchiveStatus.Failed, errorType, "Internal Server Error", null);
             } else {
-                packageMgrClient.reportStatus(packId, ArchiveStatus.Failed, errorType, e.getMessage());
+                statusReportService.reportStatus(pack.get_id(), ArchiveStatus.Failed, errorType, e.getMessage(), null);
             }
             throw e;
         }
@@ -163,7 +159,7 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
             pack.setPwd(password);
             pack.setReceive_date(new Date());
             pack.setClient_id(clientId);
-            OriginalPackage originalPackage = packageResolveService.doResolve(pack, zipFile);
+            OriginalPackage originalPackage = resolveService.doResolve(pack, zipFile);
             ResourceBucket resourceBucket = packMillService.grindingPackModel(originalPackage);
             if (persist) {
                 identifyService.identify(resourceBucket, originalPackage);
@@ -190,7 +186,7 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
             @PathVariable(value = "id") String id) throws Exception {
         EsSimplePackage esSimplePackage = packageMgrClient.getPackage(id);
         String zipFile = downloadTo(esSimplePackage.getRemote_path());
-        OriginalPackage packModel = packageResolveService.doResolve(esSimplePackage, zipFile);
+        OriginalPackage packModel = resolveService.doResolve(esSimplePackage, zipFile);
         return packModel.toJson();
     }
 
@@ -208,7 +204,7 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
         EsSimplePackage esSimplePackage = new EsSimplePackage();
         esSimplePackage.set_id(UUID.randomUUID().toString());
         esSimplePackage.setReceive_date(new Date());
-        StandardPackage standardPackage = packageResolveService.doResolveImmediateData(data, esSimplePackage);
+        StandardPackage standardPackage = resolveService.doResolveImmediateData(data, esSimplePackage);
         ResourceBucket resourceBucket = packMillService.grindingPackModel(standardPackage);
         identifyService.identify(resourceBucket, standardPackage);
         resourceService.save(resourceBucket, standardPackage);

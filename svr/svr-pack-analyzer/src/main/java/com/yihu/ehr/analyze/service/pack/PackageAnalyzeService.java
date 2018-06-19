@@ -4,18 +4,26 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.analyze.feign.PackageMgrClient;
 import com.yihu.ehr.analyze.model.ZipPackage;
 import com.yihu.ehr.analyze.service.qc.PackageQcService;
+import com.yihu.ehr.analyze.service.qc.StatusReportService;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.model.packs.EsSimplePackage;
 import com.yihu.ehr.profile.AnalyzeStatus;
 import com.yihu.ehr.profile.ProfileType;
 import com.yihu.ehr.profile.exception.*;
+import com.yihu.ehr.profile.queue.RedisCollection;
 import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.io.Serializable;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -37,13 +45,14 @@ public class PackageAnalyzeService {
     @Autowired
     protected ObjectMapper objectMapper;
     @Autowired
-    private PackQueueService packQueueService;
-    @Autowired
-    private PackageMgrClient packageMgrClient;
-    @Autowired
     private PackageQcService packageQcService;
     @Autowired
     private ElasticSearchUtil elasticSearchUtil;
+    @Autowired
+    private StatusReportService statusReportService;
+    @Autowired
+    private RedisTemplate<String, Serializable> redisTemplate;
+
 
     /**
      * analyze 档案分析服务
@@ -55,12 +64,21 @@ public class PackageAnalyzeService {
      * @created 2018.01.15
      */
     public void analyze() {
+        boolean vice = false;
+        Serializable serializable = redisTemplate.opsForList().rightPop(RedisCollection.AnalyzeQueue);
+        if (null == serializable) {
+            serializable = redisTemplate.opsForSet().pop(RedisCollection.AnalyzeQueueVice);
+            vice = true;
+        }
         EsSimplePackage esSimplePackage = null;
         ZipPackage zipPackage = null;
         try {
-            esSimplePackage = packQueueService.pop();
+            if (serializable != null) {
+                String packStr = serializable.toString();
+                esSimplePackage = objectMapper.readValue(packStr, EsSimplePackage.class);
+            }
             if (esSimplePackage != null) {
-                packageMgrClient.analyzeStatus(esSimplePackage.get_id(), AnalyzeStatus.Acquired, 0, "正在质控中");
+                statusReportService.reportStatus(esSimplePackage.get_id(), AnalyzeStatus.Acquired, 0, "正在质控中");
                 zipPackage = new ZipPackage(esSimplePackage);
                 zipPackage.download();
                 zipPackage.unZip();
@@ -72,13 +90,17 @@ public class PackageAnalyzeService {
                     //保存数据元质控数据
                     elasticSearchUtil.bulkIndex(INDEX, QC_METADATA_INFO, zipPackage.getQcMetadataRecords());
                     //报告质控状态
-                    packageMgrClient.analyzeStatus(esSimplePackage.get_id(), AnalyzeStatus.Finished, 0, "qc success");
+                    statusReportService.reportStatus(esSimplePackage.get_id(), AnalyzeStatus.Finished, 0, "Qc success");
                 } else {
                     //报告非结构化档案包质控状态
-                    packageMgrClient.analyzeStatus(esSimplePackage.get_id(), AnalyzeStatus.Finished, 0, "Ignore non-standard package file");
+                    statusReportService.reportStatus(esSimplePackage.get_id(), AnalyzeStatus.Finished, 0, "Ignore non-standard package file");
                 }
                 //发送解析消息
-                packQueueService.push(esSimplePackage);
+                if (!vice) {
+                    redisTemplate.opsForList().leftPush(RedisCollection.ResolveQueue, objectMapper.writeValueAsString(esSimplePackage));
+                } else {
+                    redisTemplate.opsForSet().add(RedisCollection.ResolveQueueVice, objectMapper.writeValueAsString(esSimplePackage));
+                }
             }
         } catch (Throwable e) {
             int errorType = -1;
@@ -100,16 +122,12 @@ public class PackageAnalyzeService {
                 errorType = 21;
             }
             if (esSimplePackage != null) {
-                try {
-                    if (StringUtils.isNotBlank(e.getMessage())) {
-                        packageMgrClient.analyzeStatus(esSimplePackage.get_id(), AnalyzeStatus.Failed, errorType, e.getMessage());
-                        logger.error(e.getMessage(), e);
-                    } else {
-                        packageMgrClient.analyzeStatus(esSimplePackage.get_id(), AnalyzeStatus.Failed, errorType, "Internal server error, please see task log for detail message.");
-                        logger.error("Internal server error, please see task log for detail message.", e);
-                    }
-                } catch (Exception e1) {
-                    logger.error("Execute feign fail cause by:" + e1.getMessage());
+                if (StringUtils.isNotBlank(e.getMessage())) {
+                    statusReportService.reportStatus(esSimplePackage.get_id(), AnalyzeStatus.Failed, errorType, e.getMessage());
+                    logger.error(e.getMessage(), e);
+                } else {
+                    statusReportService.reportStatus(esSimplePackage.get_id(), AnalyzeStatus.Failed, errorType, "Internal server error, please see task log for detail message.");
+                    logger.error("Empty exception message, please see the following detail info.", e);
                 }
             } else {
                 logger.error("Empty pack cause by:" + e.getMessage());

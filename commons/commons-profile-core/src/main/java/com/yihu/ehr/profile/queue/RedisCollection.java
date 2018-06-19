@@ -4,8 +4,15 @@ package com.yihu.ehr.profile.queue;
  * Created by progr1mmer on 2017/12/18.
  */
 public class RedisCollection {
-    public static final String ResolveQueue = "resolve_queue";
+    //主质控队列
     public static final String AnalyzeQueue = "analyze_queue";
+    //次质控队列
+    public static final String AnalyzeQueueVice = "analyze_queue_vice";
+    //主解析队列
+    public static final String ResolveQueue = "resolve_queue";
+    //次解析队列
+    public static final String ResolveQueueVice = "resolve_queue_vice";
+    //省平台
     public static final String ProvincialPlatformQueue = "provincial_platform_queue";
 
     /**
