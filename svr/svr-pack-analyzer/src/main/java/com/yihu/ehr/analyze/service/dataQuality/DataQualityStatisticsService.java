@@ -94,7 +94,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
             datasetMap.put(orgCode,num);
         });
         //统计医疗云平台数据集总数
-        query = session.createSQLQuery("SELECT count(DISTINCT dataset_code) c from dq_dataset_warning WHERE type = 1 ");
+        query = session.createSQLQuery("SELECT count(DISTINCT code) c from dq_dataset_warning WHERE type = 1 ");
         List<Object> tmpList = query.list();
         totalHospitalDataset = Integer.valueOf(tmpList.get(0).toString());
 

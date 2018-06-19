@@ -179,7 +179,7 @@ public class WarningSettingEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "验证机构是否存在")
     public Envelop paltformReceiveWarningIsExist(
             @ApiParam(name = "orgCode", value = "机构code", defaultValue = "")
-            @PathVariable(value = "orgCode") String orgCode) {
+            @RequestParam(value = "orgCode") String orgCode) {
         Envelop envelop = new Envelop();
         try {
             DqPaltformReceiveWarning warning =  dqPaltformReceiveWarningService.findByOrgCode(orgCode);
@@ -200,7 +200,7 @@ public class WarningSettingEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "验证机构是否存在")
     public Envelop paltformUploadWarningIsExist(
             @ApiParam(name = "orgCode", value = "机构code", defaultValue = "")
-            @PathVariable(value = "orgCode") String orgCode) {
+            @RequestParam(value = "orgCode") String orgCode) {
         Envelop envelop = new Envelop();
         try {
             DqPaltformUploadWarning warning =  dqPaltformUploadWarningService.findByOrgCode(orgCode);
