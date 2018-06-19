@@ -2,7 +2,7 @@ package com.yihu.ehr.analyze.controller;
 
 import com.yihu.ehr.analyze.feign.PackageMgrClient;
 import com.yihu.ehr.analyze.service.pack.PackageAnalyzeService;
-import com.yihu.ehr.analyze.service.pack.ZipPackage;
+import com.yihu.ehr.analyze.model.ZipPackage;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;

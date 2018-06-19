@@ -6,6 +6,8 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.elasticsearch.ElasticSearchClient;
 import com.yihu.ehr.elasticsearch.ElasticSearchConfig;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
+import com.yihu.ehr.query.services.SolrQuery;
+import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.quota.etl.model.EsConfig;
 import com.yihu.quota.etl.util.ElasticsearchUtil;
 import com.yihu.quota.etl.util.EsClientUtil;
@@ -14,6 +16,12 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -24,8 +32,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.*;
 
 /**
@@ -48,8 +58,60 @@ public class ElasticSearchController extends BaseController {
     private ElasticSearchClient elasticSearchClient;
     @Autowired
     private ElasticSearchConfig elasticSearchConfig;
+    @Autowired
+    private SolrQuery solrQuery;
 
 
+    @RequestMapping(value = "/getSolrData", method = RequestMethod.GET)
+    @ApiOperation("根据条件获取solr 数据")
+    public void getSolrData(
+            @ApiParam(value = "core")
+            @RequestParam(value = "core", required = true) String core,
+            @ApiParam(name = "q", value = "查询条件 多个用  AND 拼接")
+            @RequestParam(name = "q",required = true) String q,
+            @ApiParam(name = "fl", value = "展示字段 多个用  , 拼接 如：org_area,org_code,EHR_000081")
+            @RequestParam(name = "fl",required = true) String fl,HttpServletResponse response
+    ){
+        long rows = 0;
+        List<Map<String, Object>> list = new ArrayList<>();
+        try {
+            if(StringUtils.isEmpty(fl)){
+                return;
+            }else {
+                fl += ",rowkey";
+            }
+            String [] fields = fl.split(",");
+            rows = solrQuery.count(core,q);
+            list =  solrQuery.queryReturnFieldList(core, q, null, null, 0, rows,fields);
+            //创建HSSFWorkbook对象(excel的文档对象)
+            HSSFWorkbook workbook = new HSSFWorkbook();
+            //建立新的sheet对象（excel的表单）
+            HSSFSheet sheet = workbook.createSheet("solr 数据");
+            HSSFRow row0 = sheet.createRow(0);
+            for(int j = 0;j < fields.length ;j++){
+               row0.createCell(j).setCellValue(fields[j]);
+            }
+
+            for(int i = 0;i < list.size() ;i++){
+                Map<String, Object> map = list.get(i);
+                HSSFRow row = sheet.createRow(i+1);
+                for(int j = 0;j < fields.length ;j++){
+                    if(map.get(fields[j]) != null){
+                        row.createCell(j).setCellValue(map.get(fields[j]).toString());
+                    }
+                }
+            }
+            OutputStream output=response.getOutputStream();
+            response.reset();
+            response.setHeader("Content-disposition", "attachment; filename=details.xls");
+            response.setContentType("application/msexcel");
+            workbook.write(output);
+            output.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+//        FileOutputStream output = new FileOutputStream("E:\\solr"+ String.valueOf(System.currentTimeMillis()) +".xls");
+    }
 
     @RequestMapping(value = "/saveElasticsearchDocument", method = RequestMethod.POST)
     @ApiOperation("添加elasticsearch文档")

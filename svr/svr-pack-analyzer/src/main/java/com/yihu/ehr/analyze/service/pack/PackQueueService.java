@@ -13,11 +13,13 @@ import java.io.Serializable;
 
 @Service
 public class PackQueueService {
+
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
     private RedisTemplate<String, Serializable> redisTemplate;
 
+    //获取质控包
     public EsSimplePackage pop() throws IOException {
         Serializable serializable = redisTemplate.opsForList().rightPop(RedisCollection.AnalyzeQueue);
         if (serializable != null) {
@@ -26,6 +28,7 @@ public class PackQueueService {
         return null;
     }
 
+    //推送解析消息
     public void push (EsSimplePackage esSimplePackage) throws JsonProcessingException {
         if (esSimplePackage != null) {
             redisTemplate.opsForList().leftPush(RedisCollection.ResolveQueue, objectMapper.writeValueAsString(esSimplePackage));

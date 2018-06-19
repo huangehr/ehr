@@ -328,7 +328,7 @@ public class ResourceBrowseService extends BaseJpaService {
         List<String> paramList = new ArrayList<>(customizeList.size() * 2);
         for (String id : customizeList) {
             paramList.add(id);
-            String dictCode = redisService.getRsMetaData(id);
+            String dictCode = redisService.getRsMetadataDict(id);
             if (!StringUtils.isEmpty(dictCode)) {
                 paramList.add(id + "_VALUE");
             }

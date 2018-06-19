@@ -174,6 +174,29 @@ public class BaseStatistsService {
                 }
             }
         }
+        // 第一加数列表为空，第二个加数列表不为空
+        if (firstList.size() <= 0 && secondList.size() > 0) {
+            for(Map<String, Object> secondMap :secondList) {
+                Map<String, Object> map = new HashMap<>();
+                map.put(firstColumnField, secondMap.get(firstColumnField));
+                for(int i = 0 ;i < moleDimensions.length ; i++){
+                    map.put(moleDimensions[i], secondMap.get(moleDimensions[i]).toString());
+                }
+                if("quotaName".equals(dimension)) {
+                    double point = 0;
+                    double secondResultVal = Double.valueOf(secondMap.get("result") == null ? "0" : secondMap.get(resultField).toString());
+                    if (secondResultVal != 0) {
+                        if(operation == 1){ //1 加法 默认
+                            point = secondResultVal ;
+                        }else if(operation == 2){ //2 减法
+                            point = -secondResultVal;
+                        }
+                    }
+                    map.put(resultField, df.format(point));
+                    addResultList.add(map);
+                }
+            }
+        }
         //检查后面指标的维度是否全部有 累加进去
         /*Map<String, Object> addResuDimenMap = new HashMap<>();
         for(int k = 0;k < addResultList.size();k++) {
@@ -991,7 +1014,7 @@ public class BaseStatistsService {
         String denominatorFilter = filters;
 
         if (StringUtils.isNotEmpty(esConfig.getGrowthFlag())) {
-            result = getGrowthByQuota(dimension, filters, esConfig);
+            result = getGrowthByQuota(dimension, filters, esConfig, dateType);
         } else {
             if (StringUtils.isNotEmpty(esConfig.getDateComparisonType())) {
                 filters = getdateComparisonTypeFilter(esConfig,filters);
@@ -1293,7 +1316,7 @@ public class BaseStatistsService {
         return  divisionResultList;
     }
 
-    public List<Map<String, Object>> getGrowthByQuota(String dimension, String filters, EsConfig esConfig) throws Exception {
+    public List<Map<String, Object>> getGrowthByQuota(String dimension, String filters, EsConfig esConfig, String dateType) throws Exception {
         List<Map<String, Object>>  resultList = new ArrayList<>();
         Calendar lastDate = Calendar.getInstance();
         String molecularFilter = "";
@@ -1353,8 +1376,8 @@ public class BaseStatistsService {
             molecularFilter = "quotaDate >= '" + firstDay + "' and quotaDate <= '" + lastDay + "'";
             denominatorFilter = "quotaDate >= '" + preMonthFirstDay + "' and quotaDate <= '" + preMonthLastDay + "'";
         }
-        List<Map<String, Object>> moleList = divisionQuota(esConfig.getMolecular(), esConfig.getDenominator(), dimension, molecularFilter, molecularFilter, esConfig.getPercentOperation(), esConfig.getPercentOperationValue(), null, "");
-        List<Map<String, Object>> denoList = divisionQuota(esConfig.getMolecular(), esConfig.getDenominator(), dimension, denominatorFilter, denominatorFilter, esConfig.getPercentOperation(), esConfig.getPercentOperationValue(),null, "");
+        List<Map<String, Object>> moleList = divisionQuota(esConfig.getMolecular(), esConfig.getDenominator(), dimension, molecularFilter, molecularFilter, esConfig.getPercentOperation(), esConfig.getPercentOperationValue(), dateType, "");
+        List<Map<String, Object>> denoList = divisionQuota(esConfig.getMolecular(), esConfig.getDenominator(), dimension, denominatorFilter, denominatorFilter, esConfig.getPercentOperation(), esConfig.getPercentOperationValue(),dateType, "");
         resultList = divisionPercent(dimension, moleList, denoList, 1, 100);
         return resultList;
     }
