@@ -3,6 +3,7 @@ package com.yihu.ehr.resource.dao;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.exception.ApiException;
+import com.yihu.ehr.hbase.HBaseDao;
 import com.yihu.ehr.profile.core.ResourceCore;
 import com.yihu.ehr.query.common.model.SolrGroupEntity;
 import com.yihu.ehr.query.common.sqlparser.ParserFactory;
@@ -15,6 +16,7 @@ import com.yihu.ehr.resource.model.*;
 import com.yihu.ehr.resource.service.RedisService;
 import com.yihu.ehr.util.rest.Envelop;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hadoop.hbase.client.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -64,6 +66,8 @@ public class ResourceBrowseDao {
     private RsResourceQuotaDao rsResourceQuotaDao;
     @Autowired
     private QuotaStatisticsClient quotaStatisticsClient;
+    @Autowired
+    private HBaseDao hbaseDao;
 
     /**
      * 获取资源授权数据元列表
@@ -673,5 +677,222 @@ public class ResourceBrowseDao {
         }
         return hbase.queryIndexBySolr(core, q, sort, fq, basicFl, dFl, page, size);
     }
+
+    /**
+     *
+     * @param resourcesCode 资源编码
+     * @param roleId 角色ID列表
+     * @param saas 权限
+     * @param rowKey  主键
+     * @return
+     * @throws Exception
+     */
+    public List<Map<String,Object>> getEhrCenterByScan (String resourcesCode, String roleId, String saas, String rowKey) throws Exception {
+        //获取Saas权限
+        StringBuilder q = new StringBuilder();
+        if (saas != null && !"*".equals(saas)) {
+            q.append(saas);
+        }
+        String fq = "";
+        final Map<String, String> sort = new HashMap<>();
+        Map<String, Object> query = new HashMap<>();
+        if (rowKey != null) {
+                 if (q.length() > 0) {
+                    q.append(" AND (");
+                    q.append("rowkey:"+rowKey);
+                    q.append(")");
+                } else {
+                    q.append(query.get("q"));
+                }
+             if (query.containsKey("fq")) {
+                fq = (String) query.get("fq");
+            }
+            if (query.containsKey("sort")) {
+                Map<String, String> temp  = objectMapper.readValue((String) query.get("sort"), Map.class);
+                temp.forEach((key, value) -> {
+                    sort.put(key, value);
+                });
+            }
+        }
+        //通过资源代码获取默认参数
+        List<RsResourceDefaultParam> paramsList = resourceDefaultParamDao.findByResourcesCode(resourcesCode);
+        for (RsResourceDefaultParam param : paramsList) {
+            if (param.getParamKey().equals("sort")) {
+                Map<String, String> temp = objectMapper.readValue(param.getParamValue(), Map.class);
+                temp.forEach((key, value) -> {
+                    sort.put(key, value);
+                });
+            }
+        }
+        if (resourcesCode != null) {
+            RsResource rsResources = rsResourceDao.findByCode(resourcesCode);
+            //获取资源结构权限，该部分新增其他标准数据集的判断
+            List<DtoResourceMetadata> metadataList = getAccessMetadata(rsResources, roleId, new HashMap<>());
+            if (metadataList != null && metadataList.size() > 0) {
+                //数据元信息字段
+                List<String> metadataIdList = new ArrayList<>();
+                for (DtoResourceMetadata metadata : metadataList) {
+                    String id = metadata.getId();
+                    metadataIdList.add(id);
+                    String dictCode = metadata.getDictCode();
+                    if (!StringUtils.isEmpty(dictCode)) {
+                        metadataIdList.add(id + "_VALUE");
+                    }
+                }
+
+                List<Map<String,Object>> data = new ArrayList<>();
+                //Scan查询
+                String legacyRowKeys[] = hbaseDao.findRowKeys(ResourceCore.MasterTable, rowKey, rowKey.substring(0, rowKey.length() - 1) + "1", "^" + rowKey);
+                List list = Arrays.asList(legacyRowKeys);
+                Result[] resultList = hbaseDao.getResultList(ResourceCore.MasterTable, list,  StringUtils.join(basicField, ","), StringUtils.join(metadataIdList, ",")); //hbase结果集
+                if (resultList != null && resultList.length > 0){
+                    for (Result result : resultList) {
+                        Map<String, Object> obj = hbase.resultToMap(result);
+                        if (obj != null) {
+                            data.add(obj);
+                        }
+                    }
+                }
+                return data;
+            }
+        } else {
+            String basicFl = "";
+            String dFl = "";
+            if (query.containsKey("basicFl")) {
+                basicFl = (String) query.get("basicFl");
+            }
+            if (query.containsKey("dFl")) {
+                dFl = (String) query.get("dFl");
+            }
+            List<Map<String,Object>> data = new ArrayList<>();
+            //Scan查询
+            String legacyRowKeys[] = hbaseDao.findRowKeys(ResourceCore.MasterTable, rowKey, rowKey.substring(0, rowKey.length() - 1) + "1", "^" + rowKey);
+            List list = Arrays.asList(legacyRowKeys);
+            Result[] resultList = hbaseDao.getResultList(ResourceCore.MasterTable, list, basicFl,dFl); //hbase结果集
+            if (resultList != null && resultList.length > 0){
+                for (Result result : resultList) {
+                    Map<String, Object> obj = hbase.resultToMap(result);
+                    if (obj != null) {
+                        data.add(obj);
+                    }
+                }
+            }
+            return data;
+        }
+        throw new ApiException("资源无相关数据元");
+    }
+
+    /**
+     *
+     * @param resourcesCode 资源编码
+     * @param roleId 角色ID列表
+     * @param saas 权限
+     * @param rowKey
+     * @param page 页码
+     * @param size 页数
+     * @return
+     * @throws Exception
+     */
+    public  List<Map<String,Object>>  getEhrCenterSubByScan (String resourcesCode, String roleId, String saas, String rowKey) throws Exception {
+        //获取Saas权限
+        StringBuilder q = new StringBuilder();
+        if (saas != null && !"*".equals(saas)) {
+            q.append(saas);
+        }
+        String fq = "";
+        final Map<String, String> sort = new HashMap<>();
+        Map<String, Object> query = new HashMap<>();
+            if (query.containsKey("q")) {
+                if (q.length() > 0) {
+                    q.append(" AND (");
+                    q.append("rowKey:"+rowKey);
+                    q.append(")");
+                } else {
+                    q.append("(" + query.get("q") + ")");
+                }
+            }
+            if (query.containsKey("fq")) {
+                fq = (String) query.get("fq");
+            }
+            if (query.containsKey("sort")) {
+                Map<String, String> temp  = objectMapper.readValue((String) query.get("sort"), Map.class);
+                temp.forEach((key, value) -> {
+                    sort.put(key, value);
+                });
+            }
+         //通过资源代码获取默认参数
+        List<RsResourceDefaultParam> paramsList = resourceDefaultParamDao.findByResourcesCode(resourcesCode);
+        for (RsResourceDefaultParam param : paramsList) {
+            if (param.getParamKey().equals("sort")) {
+                Map<String, String> temp = objectMapper.readValue(param.getParamValue(), Map.class);
+                temp.forEach((key, value) -> {
+                    sort.put(key, value);
+                });
+            }
+            if (param.getParamKey().equals("table")) {
+                if (q.length() > 0) {
+                    q.append(" AND (rowkey:*$" + param.getParamValue() + "$*)");
+                } else {
+                    q.append("rowkey:*$" + param.getParamValue() + "$*");
+                }
+            }
+        }
+        if (resourcesCode != null) {
+            RsResource rsResources = rsResourceDao.findByCode(resourcesCode);
+            //获取资源结构权限，该部分新增其他标准数据集的判断
+            List<DtoResourceMetadata> metadataList = getAccessMetadata(rsResources, roleId, new HashMap<>());
+            if (metadataList != null && metadataList.size() > 0) {
+                //数据元信息字段
+                List<String> metadataIdList = new ArrayList<>();
+                for (DtoResourceMetadata metadata : metadataList) {
+                    String id = metadata.getId();
+                    metadataIdList.add(id);
+                    String dictCode = metadata.getDictCode();
+                    if (!StringUtils.isEmpty(dictCode)) {
+                        metadataIdList.add(id + "_VALUE");
+                    }
+                }
+                List<Map<String,Object>> data = new ArrayList<>();
+                //Scan查询
+                String legacyRowKeys[] = hbaseDao.findRowKeys(ResourceCore.SubTable, rowKey, rowKey.substring(0, rowKey.length() - 1) + "1", "^" + rowKey);
+                List list = Arrays.asList(legacyRowKeys);
+                Result[] resultList = hbaseDao.getResultList(ResourceCore.SubTable, list,  StringUtils.join(basicField, ","), StringUtils.join(metadataIdList, ",")); //hbase结果集
+                if (resultList != null && resultList.length > 0){
+                    for (Result result : resultList) {
+                        Map<String, Object> obj = hbase.resultToMap(result);
+                        if (obj != null) {
+                            data.add(obj);
+                        }
+                    }
+                }
+                return data;
+            }
+        } else {
+            String basicFl = "";
+            String dFl = "";
+            if (query.containsKey("basicFl")) {
+                basicFl = (String) query.get("basicFl");
+            }
+            if (query.containsKey("dFl")) {
+                dFl = (String) query.get("dFl");
+            }
+            List<Map<String,Object>> data = new ArrayList<>();
+            //Scan查询
+            String legacyRowKeys[] = hbaseDao.findRowKeys(ResourceCore.SubTable, rowKey, rowKey.substring(0, rowKey.length() - 1) + "1", "^" + rowKey);
+            List list = Arrays.asList(legacyRowKeys);
+            Result[] resultList = hbaseDao.getResultList(ResourceCore.SubTable, list,  basicFl,dFl); //hbase结果集
+            if (resultList != null && resultList.length > 0){
+                for (Result result : resultList) {
+                    Map<String, Object> obj = hbase.resultToMap(result);
+                    if (obj != null) {
+                        data.add(obj);
+                    }
+                }
+            }
+            return data;
+        }
+        throw new ApiException("资源无相关数据元");
+    }
+
 
 }

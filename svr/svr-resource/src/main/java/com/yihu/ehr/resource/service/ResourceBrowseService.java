@@ -8,6 +8,7 @@ import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.resource.MRsColumnsModel;
+import com.yihu.ehr.profile.core.ResourceCore;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.query.common.model.QueryCondition;
 import com.yihu.ehr.query.services.SolrQuery;
@@ -517,15 +518,17 @@ public class ResourceBrowseService extends BaseJpaService {
      * @param roleId        角色ID
      * @param orgCode       机构编码
      * @param areaCode      区域编码
-     * @param queryParams   查询条件
+     * @param rowKey   查询条件
      * @param page          页数
      * @param size          条数
      * @return
      * @throws Exception
      */
-    public Envelop  getResultDataList (List<String> dataSets, String roleId, String orgCode, String areaCode, String queryParams, Integer page, Integer size) throws Exception {
+    public Envelop  getResultDataList (String version,List<String> dataSets, String roleId, String orgCode, String areaCode, String rowKey) throws Exception {
        Map<String, Object> resultMap = new HashMap<>();
+        List<Map<String, Object>> resultData = null;
         for (String resourcesCode : dataSets) {
+            Boolean isMultiRecord = redisService.getDataSetMultiRecord(version, resourcesCode);
             RsResource rsResources = rsResourceDao.findByCode(resourcesCode);
             if (rsResources != null) {
                 StringBuilder saas = new StringBuilder();
@@ -558,13 +561,15 @@ public class ResourceBrowseService extends BaseJpaService {
                         throw new ApiException(ErrorCode.FORBIDDEN, "无SAAS权限访问资源");
                     }
                 }
-                String method = rsResources.getRsInterface();
-                Class clazz = resourceBrowseDao.getClass();
-                Method _method = clazz.getMethod(method, new Class[]{String.class, String.class, String.class, String.class, Integer.class, Integer.class});
-                _method.setAccessible(true);
-                Envelop invoke = (Envelop) _method.invoke(resourceBrowseDao, resourcesCode, roleId, saas.toString(), queryParams, page, size);
-                if (invoke.getDetailModelList() !=null && invoke.getDetailModelList().size()>0 ){
-                    resultMap.put(resourcesCode,invoke.getDetailModelList());
+                if (isMultiRecord) {
+                    //细表
+                    resultData = resourceBrowseDao.getEhrCenterSubByScan(resourcesCode,roleId,saas.toString(),rowKey);
+                } else {
+                    //主表
+                    resultData = resourceBrowseDao.getEhrCenterByScan(resourcesCode,roleId,saas.toString(),rowKey);
+                }
+                if (resultData !=null && resultData.size()>0 ){
+                    resultMap.put(resourcesCode,resultData);
                 }
             }else {
 //                throw new ApiException(ErrorCode.OBJECT_NOT_FOUND, "无相关资源");

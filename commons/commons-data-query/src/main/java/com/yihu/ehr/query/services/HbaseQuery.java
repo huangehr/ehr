@@ -243,7 +243,7 @@ public class HbaseQuery {
 	 * Result 转 JSON
 	 * @return
 	 */
-	private Map<String,Object> resultToMap(Result result){
+	public Map<String,Object> resultToMap(Result result){
 		String rowkey = Bytes.toString(result.getRow());
 		if(rowkey != null && rowkey.length() >  0) {
 			Map<String,Object> obj = new HashMap<>();
@@ -364,4 +364,37 @@ public class HbaseQuery {
 
 		return queryBySolr(table,q, sort,"", fields, "", page, rows);
 	}
+
+	/**
+	 * 查询 queryByScan
+	 */
+	public Page<Map<String,Object>> queryByScan(String table, String rowKey, String sort, String basicFl, String dFl, int page, int rows) throws Exception{
+
+		long count = 0;
+		List<Map<String,Object>> data = new ArrayList<>();
+
+		if (rows < 0) {
+			rows = 50;
+		}
+		if (page <0) {
+			page = 1;
+		}
+		long start= (page-1) * rows;
+		Map<String, String> sortMap = getSortMap(sort);
+		//Scan查询
+		String legacyRowKeys[] = hbaseDao.findRowKeys(table, rowKey, rowKey.substring(0, rowKey.length() - 1) + "1", "^" + rowKey);
+		List list = Arrays.asList(legacyRowKeys);
+		Result[] resultList = hbaseDao.getResultList(table, list, basicFl, dFl); //hbase结果集
+		if (resultList != null && resultList.length > 0){
+			for (Result result : resultList) {
+				Map<String, Object> obj = resultToMap(result);
+				if (obj != null) {
+					data.add(obj);
+				}
+			}
+		}
+		return new PageImpl<>(data, new PageRequest(page - 1, rows), count);
+	}
+
+
 }
