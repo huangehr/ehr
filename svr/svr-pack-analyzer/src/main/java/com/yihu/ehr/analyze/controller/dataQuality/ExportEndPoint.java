@@ -21,6 +21,10 @@ import jxl.write.*;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xwpf.usermodel.*;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTblWidth;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.STTblWidth;
@@ -55,6 +59,7 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private DataQualityStatisticsService dataQualityStatisticsService;
 
+    public static int maxRowSize = 60000;
     @RequestMapping(value = ServiceApi.DataQuality.ExportQualityMonitoringListToExcel, method = RequestMethod.GET)
     @ApiOperation(value = "生成报告")
     public void exportQualityMonitoringListToExcel(
@@ -62,9 +67,9 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
             @RequestParam(name = "reporter") String reporter,
             @ApiParam(name = "orgInfoList", value = "机构编码、名称，例：[{\"orgName\":\"xx\",\"orgCode\":\"jkzl\"}]。", required = true)
             @RequestParam(name = "orgInfoList") String orgInfoList,
-            @ApiParam(name = "eventDateStart", value = "就诊时间（起始），格式 yyyy-MM-dd", required = true)
+            @ApiParam(name = "eventDateStart", value = "接收时间（起始），格式 yyyy-MM-dd", required = true)
             @RequestParam(name = "eventDateStart") String eventDateStart,
-            @ApiParam(name = "eventDateEnd", value = "就诊时间（截止），格式 yyyy-MM-dd", required = true)
+            @ApiParam(name = "eventDateEnd", value = "接收时间（截止），格式 yyyy-MM-dd", required = true)
             @RequestParam(name = "eventDateEnd") String eventDateEnd,
             HttpServletRequest request,
             HttpServletResponse response) {
@@ -172,21 +177,21 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                     Map<String, Object> orgMap = reportedNumList1.get(0);
                     XWPFTableRow tableRow = table1.createRow();
                     tableRow.getCell(0).setText("医院上报");
-                    tableRow.getCell(1).setText(Long.valueOf(orgMap.get("outpatientNum").toString())+"");
-                    tableRow.getCell(2).setText(Long.valueOf(orgMap.get("hospitalDischargeNum").toString())+"");
-                    tableRow.getCell(3).setText(Long.valueOf(orgMap.get("healthExaminationNum").toString())+"");
-                    tableRow.getCell(4).setText(Long.valueOf(orgMap.get("total").toString())+"");
+                    tableRow.getCell(1).setText(Double.valueOf(orgMap.get("outpatientNum").toString()).intValue()+"");
+                    tableRow.getCell(2).setText(Double.valueOf(orgMap.get("hospitalDischargeNum").toString()).intValue()+"");
+                    tableRow.getCell(3).setText(Double.valueOf(orgMap.get("healthExaminationNum").toString()).intValue()+"");
+                    tableRow.getCell(4).setText(Double.valueOf(orgMap.get("total").toString()).intValue()+"");
                 }
                 double receiveAcrhive = 0;
                 Map<String, Object> collectionMap = (Map<String, Object>)map.get("collectionMap");
                 if(collectionMap.size()>0){
                     XWPFTableRow tableRow = table1.createRow();
                     tableRow.getCell(0).setText("平台接收");
-                    tableRow.getCell(1).setText(Long.valueOf(collectionMap.get("outpatientNum").toString())+"");
-                    tableRow.getCell(2).setText(Long.valueOf(collectionMap.get("hospitalDischargeNum").toString())+"");
-                    tableRow.getCell(3).setText(Long.valueOf(collectionMap.get("healthExaminationNum").toString())+"");
+                    tableRow.getCell(1).setText(Double.valueOf(collectionMap.get("outpatientNum").toString()).intValue()+"");
+                    tableRow.getCell(2).setText(Double.valueOf(collectionMap.get("hospitalDischargeNum").toString()).intValue()+"");
+                    tableRow.getCell(3).setText(Double.valueOf(collectionMap.get("healthExaminationNum").toString()).intValue()+"");
                     receiveAcrhive = Double.valueOf(collectionMap.get("total").toString());
-                    tableRow.getCell(4).setText(Long.valueOf(collectionMap.get("total").toString())+"");
+                    tableRow.getCell(4).setText(Double.valueOf(collectionMap.get("total").toString()).intValue()+"");
                 }
                 addEmptyRow(document);
                 j++;
@@ -214,10 +219,10 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                     reportedNumList3.forEach(item->{
                         XWPFTableRow tableRow = table2.createRow();
                         tableRow.getCell(0).setText(item.get("receiveDate").toString());
-                        tableRow.getCell(1).setText(Long.valueOf(item.get("outpatientNum").toString())+"");
-                        tableRow.getCell(2).setText(Long.valueOf(item.get("hospitalDischargeNum").toString())+"");
-                        tableRow.getCell(3).setText(Long.valueOf(item.get("healthExaminationNum").toString())+"");
-                        tableRow.getCell(4).setText(Long.valueOf(item.get("total").toString())+"");
+                        tableRow.getCell(1).setText(Double.valueOf(item.get("outpatientNum").toString()).intValue()+"");
+                        tableRow.getCell(2).setText(Double.valueOf(item.get("hospitalDischargeNum").toString()).intValue()+"");
+                        tableRow.getCell(3).setText(Double.valueOf(item.get("healthExaminationNum").toString()).intValue()+"");
+                        tableRow.getCell(4).setText(Double.valueOf(item.get("total").toString()).intValue()+"");
                     });
                 }
                 addEmptyRow(document);
@@ -243,10 +248,10 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                 Map<String, Object> archiveMap = (Map<String, Object>)map.get("archiveMap");
                 if(collectionMap.size()>0){
                     XWPFTableRow tableRow = table3.createRow();
-                    tableRow.getCell(0).setText(Long.valueOf(receiveAcrhive+"")+"");//0未解析 1正在解析 2解析失败 3解析完成
-                    tableRow.getCell(1).setText(Long.valueOf(archiveMap.get("archive_status3").toString())+"");
-                    tableRow.getCell(2).setText(Long.valueOf(archiveMap.get("archive_status2").toString())+"");
-                    tableRow.getCell(3).setText(Long.valueOf(archiveMap.get("archive_status0").toString())+"");
+                    tableRow.getCell(0).setText(Double.valueOf(receiveAcrhive+"").intValue()+"");//0未解析 1正在解析 2解析失败 3解析完成
+                    tableRow.getCell(1).setText(Double.valueOf(archiveMap.get("archive_status3").toString()).intValue()+"");
+                    tableRow.getCell(2).setText(Double.valueOf(archiveMap.get("archive_status2").toString()).intValue()+"");
+                    tableRow.getCell(3).setText(Double.valueOf(archiveMap.get("archive_status0").toString()).intValue()+"");
                 }
                 addEmptyRow(document);
                 i++;
@@ -358,13 +363,15 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                               @ApiParam(name = "endTime", value = "结束时间", defaultValue = "2018-06-11")
                               @RequestParam(value = "endTime", required = false) String endTime,
                               HttpServletResponse response){
+        WritableWorkbook wwb = null;
+        OutputStream os = null;
         try {
             String fileName = "预警问题列表";
             //设置下载
             response.setContentType("octets/stream");
             response.setHeader("Content-Disposition", "attachment; filename="
                     + new String( fileName.getBytes("gb2312"), "ISO8859-1" )+".xls");
-            OutputStream os = response.getOutputStream();
+            os = response.getOutputStream();
 
             String filters = "type="+type;
             if(StringUtils.isNotBlank(orgCode)){
@@ -385,7 +392,7 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
             String sorts = "-warningTime";
             List<DqWarningRecord> list = warningRecordService.search(null, filters, sorts, 1, 99999);
             //写excel
-            WritableWorkbook wwb = Workbook.createWorkbook(os);
+            wwb = Workbook.createWorkbook(os);
             //创建Excel工作表 指定名称和位置
             WritableSheet ws = wwb.createSheet(fileName,0);
             //添加固定信息，题头等
@@ -406,11 +413,24 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
             }
             //写入工作表
             wwb.write();
-            wwb.close();
             os.flush();
-            os.close();
         } catch (Exception e) {
             e.printStackTrace();
+        }finally {
+            if(wwb!=null){
+                try {
+                    wwb.close();
+                }catch (Exception e){
+                    e.getMessage();
+                }
+            }
+            if(os!=null){
+                try {
+                    os.close();
+                }catch (Exception e){
+                    e.getMessage();
+                }
+            }
         }
     }
 
@@ -533,7 +553,6 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                                         @ApiParam(name = "sorts", value = "排序")
                                         @RequestParam(value = "sorts", required = false) String sorts,
                                         HttpServletResponse response){
-        int pageSize=1000;
         if(StringUtils.isNotEmpty(filters)){
             filters+="analyze_status=2;"+filters;
         }else{
@@ -544,37 +563,37 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
             //设置下载
             response.setContentType("octets/stream");
             response.setHeader("Content-Disposition", "attachment; filename="
-                    + new String( fileName.getBytes("gb2312"), "ISO8859-1" )+".xls");
+                    + new String( fileName.getBytes("gb2312"), "ISO8859-1" )+".xlsx");
             OutputStream os = response.getOutputStream();
             //写excel
-            WritableWorkbook wwb = Workbook.createWorkbook(os);
-            //创建Excel工作表 指定名称和位置
-            WritableSheet ws = wwb.createSheet(fileName,0);
-            //添加固定信息，题头等
-            addCell(ws,0,0,"解析时间");
-            addCell(ws,1,0,"接收时间");
-            addCell(ws,2,0,"医疗机构");
-            addCell(ws,3,0,"序列号");
-            addCell(ws,4,0,"失败原因");
-            WritableCellFormat wc = new WritableCellFormat();
-            wc.setBorder(jxl.format.Border.ALL, jxl.format.BorderLineStyle.THIN, Colour.SKY_BLUE);//边框
+            SXSSFWorkbook wwb = new SXSSFWorkbook(100);
+            wwb.setCompressTempFiles(true);
+            String[] title = {"解析时间","接收时间","医疗机构","序列号","失败原因"};
             int count = (int) elasticSearchUtil.count("json_archives", "info", filters);
-            int totalPage = count/pageSize+1;
-            for(int p=0;p<totalPage;p++) {
-                List<Map<String, Object>> list = packQcReportService.analyzeErrorList(filters,sorts,p+1,pageSize);
-                for (int i = 0; i < list.size(); i++) {
-                    int j = p*pageSize + i + 1;
+            double pageNum = count % maxRowSize > 0 ? count / maxRowSize + 1 : count / maxRowSize;
+            for (int i = 0; i < pageNum; i++) {
+                List<Map<String, Object>> list = packQcReportService.analyzeErrorList(filters,sorts,i+1,maxRowSize);
+                //创建Excel工作表 指定名称和位置
+                Sheet sheet = wwb.createSheet("Sheet" + (i+1));
+                //添加固定信息，题头等
+                Row titleRow = sheet.createRow(0);
+                for (int t = 0; t < title.length; t++) {
+                    Cell xcell = titleRow.createCell(t);
+                    xcell.setCellValue(title[t] + "");
+                }
+                for (int j = 0; j < list.size(); j++) {
+                    Row row = sheet.createRow(j+ 1);
                     Map<String, Object> record = list.get(i);
                     //添加列表明细
-                    addCell(ws, 0, j, ObjectUtils.toString(record.get("analyze_date")), wc);
-                    addCell(ws, 1, j, ObjectUtils.toString(record.get("receive_date")), wc);
-                    addCell(ws, 2, j, ObjectUtils.toString(record.get("org_name")), wc);
-                    addCell(ws, 3, j, ObjectUtils.toString(record.get("_id")), wc);
-                    addCell(ws, 4, j, getErrorType(ObjectUtils.toString(record.get("error_type"))), wc);
+                    row.createCell(0).setCellValue(ObjectUtils.toString(record.get("analyze_date")));
+                    row.createCell(1).setCellValue(ObjectUtils.toString(record.get("receive_date")));
+                    row.createCell(2).setCellValue(ObjectUtils.toString(record.get("org_name")));
+                    row.createCell(3).setCellValue(ObjectUtils.toString(record.get("_id")));
+                    row.createCell(4).setCellValue(ObjectUtils.toString(record.get("_id")));
+                    row.createCell(5).setCellValue(getErrorType(ObjectUtils.toString(record.get("error_type"))));
                 }
             }
-            //写入工作表
-            wwb.write();
+            wwb.write(os);
             wwb.close();
             os.flush();
             os.close();
@@ -586,49 +605,46 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.DataQuality.ExportMetadataErrorList, method = RequestMethod.GET)
     @ApiOperation(value = "导出异常详情列表")
     public void exprotMetadataErrorList( @ApiParam(name = "filters", value = "过滤")
-                                        @RequestParam(value = "filters", required = false) String filters,
-                                        @ApiParam(name = "sorts", value = "排序")
-                                        @RequestParam(value = "sorts", required = false) String sorts,
-                                        HttpServletResponse response){
-        int pageSize=1000;
+                                         @RequestParam(value = "filters", required = false) String filters,
+                                         @ApiParam(name = "sorts", value = "排序")
+                                         @RequestParam(value = "sorts", required = false) String sorts,
+                                         HttpServletResponse response){
         try {
             String fileName = "异常详情列表";
             //设置下载
             response.setContentType("octets/stream");
             response.setHeader("Content-Disposition", "attachment; filename="
-                    + new String( fileName.getBytes("gb2312"), "ISO8859-1" )+".xls");
+                    + new String( fileName.getBytes("gb2312"), "ISO8859-1" )+".xlsx");
             OutputStream os = response.getOutputStream();
             //写excel
-            WritableWorkbook wwb = Workbook.createWorkbook(os);
-            //创建Excel工作表 指定名称和位置
-            WritableSheet ws = wwb.createSheet(fileName,0);
-            //添加固定信息，题头等
-            addCell(ws,0,0,"接收时间");
-            addCell(ws,1,0,"医疗机构");
-            addCell(ws,2,0,"数据集");
-            addCell(ws,3,0,"数据元");
-            addCell(ws,4,0,"主键");
-            addCell(ws,5,0,"错误原因");
-            WritableCellFormat wc = new WritableCellFormat();
-            wc.setBorder(jxl.format.Border.ALL, jxl.format.BorderLineStyle.THIN, Colour.SKY_BLUE);//边框
+            SXSSFWorkbook  wwb = new SXSSFWorkbook(100);
+            wwb.setCompressTempFiles(true);
+            String[] title = {"接收时间","医疗机构","数据集","数据元","主键","错误原因"};
             int count = (int) elasticSearchUtil.count("json_archives_qc", "qc_metadata_info", filters);
-            int totalPage = count/pageSize+1;
-            for(int p=0;p<totalPage;p++) {
-                List<Map<String, Object>> list = packQcReportService.metadataErrorList(filters,sorts,p+1,pageSize);
-                for (int i = 0; i < list.size(); i++) {
-                    int j = p*pageSize + i + 1;
+            double pageNum = count % maxRowSize > 0 ? count / maxRowSize + 1 : count / maxRowSize;
+            for (int i = 0; i < pageNum; i++) {
+                List<Map<String, Object>> list = packQcReportService.metadataErrorList(filters,sorts,i+1,maxRowSize);
+                //创建Excel工作表 指定名称和位置
+                Sheet sheet = wwb.createSheet("Sheet" + (i+1));
+                //添加固定信息，题头等
+                Row titleRow = sheet.createRow(0);
+                for (int t = 0; t < title.length; t++) {
+                    Cell xcell = titleRow.createCell(t);
+                    xcell.setCellValue(title[t] + "");
+                }
+                for (int j = 0; j < list.size(); j++) {
+                    Row row = sheet.createRow(j+ 1);
                     Map<String, Object> record = list.get(i);
                     //添加列表明细
-                    addCell(ws, 0, j, ObjectUtils.toString(record.get("receive_date")), wc);
-                    addCell(ws, 1, j, ObjectUtils.toString(record.get("org_name")), wc);
-                    addCell(ws, 2, j, ObjectUtils.toString(record.get("dataset")), wc);
-                    addCell(ws, 3, j, ObjectUtils.toString(record.get("metadata")), wc);
-                    addCell(ws, 4, j, ObjectUtils.toString(record.get("_id")), wc);
-                    addCell(ws, 5, j, getExceptionType(ObjectUtils.toString(record.get("qc_error_type"))), wc);
+                    row.createCell(0).setCellValue(ObjectUtils.toString(record.get("receive_date")));
+                    row.createCell(1).setCellValue(ObjectUtils.toString(record.get("org_name")));
+                    row.createCell(2).setCellValue(ObjectUtils.toString(record.get("dataset")));
+                    row.createCell(3).setCellValue(ObjectUtils.toString(record.get("metadata")));
+                    row.createCell(4).setCellValue(ObjectUtils.toString(record.get("_id")));
+                    row.createCell(5).setCellValue(getExceptionType(ObjectUtils.toString(record.get("qc_error_type"))));
                 }
             }
-            //写入工作表
-            wwb.write();
+            wwb.write(os);
             wwb.close();
             os.flush();
             os.close();
@@ -640,58 +656,56 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.DataQuality.ExportArchiveList, method = RequestMethod.GET)
     @ApiOperation(value = "导出档案包列表")
     public void exportArchiveList( @ApiParam(name = "filters", value = "过滤")
-                                         @RequestParam(value = "filters", required = false) String filters,
-                                         @ApiParam(name = "sorts", value = "排序")
-                                         @RequestParam(value = "sorts", required = false) String sorts,
-                                         HttpServletResponse response){
-        int pageSize=1000;
+                                   @RequestParam(value = "filters", required = false) String filters,
+                                   @ApiParam(name = "sorts", value = "排序")
+                                   @RequestParam(value = "sorts", required = false) String sorts,
+                                   HttpServletResponse response){
 //        if(StringUtils.isNotEmpty(filters)){
 //            filters+="archive_status=3;"+filters;
 //        }else{
 //            filters="archive_status=3";
 //        }
+
         try {
             String fileName = "接收包列表";
             //设置下载
             response.setContentType("octets/stream");
             response.setHeader("Content-Disposition", "attachment; filename="
-                    + new String( fileName.getBytes("gb2312"), "ISO8859-1" )+".xls");
+                    + new String( fileName.getBytes("gb2312"), "ISO8859-1" )+".xlsx");
             OutputStream os = response.getOutputStream();
             //写excel
-            WritableWorkbook wwb = Workbook.createWorkbook(os);
-            //创建Excel工作表 指定名称和位置
-            WritableSheet ws = wwb.createSheet(fileName,0);
-            //添加固定信息，题头等
-            addCell(ws,0,0,"接收时间");
-            addCell(ws,1,0,"解析状态");
-            addCell(ws,2,0,"医疗机构");
-            addCell(ws,3,0,"序列号");
-            addCell(ws,4,0,"患者姓名");
-            addCell(ws,5,0,"证件号");
-            addCell(ws,6,0,"就诊时间");
-            addCell(ws,7,0,"就诊类型");
-            WritableCellFormat wc = new WritableCellFormat();
-            wc.setBorder(jxl.format.Border.ALL, jxl.format.BorderLineStyle.THIN, Colour.SKY_BLUE);//边框
+            SXSSFWorkbook  wwb = new SXSSFWorkbook(100);
+            wwb.setCompressTempFiles(true);
+
+            String[] title = {"接收时间","解析状态","医疗机构","序列号","患者姓名","证件号","就诊时间","就诊类型"};
+
             int count = (int) elasticSearchUtil.count("json_archives", "info", filters);
-            int totalPage = count/pageSize+1;
-            for(int p=0;p<totalPage;p++) {
-                List<Map<String, Object>> list = packQcReportService.archiveList(filters,sorts,p+1,pageSize);
-                for (int i = 0; i < list.size(); i++) {
-                    int j = p*pageSize + i + 1;
+            double pageNum = count % maxRowSize > 0 ? count / maxRowSize + 1 : count / maxRowSize;
+            for (int i = 0; i < pageNum; i++) {
+                List<Map<String, Object>> list = packQcReportService.archiveList(filters,sorts,i+1,maxRowSize);
+                //创建Excel工作表 指定名称和位置
+                Sheet sheet = wwb.createSheet("Sheet" + (i+1));
+                //添加固定信息，题头等
+                Row titleRow = sheet.createRow(0);
+                for (int t = 0; t < title.length; t++) {
+                    Cell xcell = titleRow.createCell(t);
+                    xcell.setCellValue(title[t] + "");
+                }
+                for (int j = 0; j < list.size(); j++) {
+                    Row row = sheet.createRow(j+ 1);
                     Map<String, Object> record = list.get(i);
                     //添加列表明细
-                    addCell(ws, 0, j, ObjectUtils.toString(record.get("receive_date")), wc);
-                    addCell(ws, 1, j, getAnalyzerStatus(ObjectUtils.toString(record.get("analyze_status"))), wc);
-                    addCell(ws, 2, j, ObjectUtils.toString(record.get("org_name")), wc);
-                    addCell(ws, 3, j, ObjectUtils.toString(record.get("_id")), wc);
-                    addCell(ws, 4, j, ObjectUtils.toString(record.get("patient_name")), wc);
-                    addCell(ws, 5, j, ObjectUtils.toString(record.get("demographic_id")), wc);
-                    addCell(ws, 6, j, ObjectUtils.toString(record.get("event_date")), wc);
-                    addCell(ws, 7, j, getEventType(ObjectUtils.toString(record.get("event_type"))), wc);
+                    row.createCell(0).setCellValue(ObjectUtils.toString(record.get("receive_date")));
+                    row.createCell(1).setCellValue(getAnalyzerStatus(ObjectUtils.toString(record.get("analyze_status"))));
+                    row.createCell(2).setCellValue(ObjectUtils.toString(record.get("org_name")));
+                    row.createCell(3).setCellValue(ObjectUtils.toString(record.get("_id")));
+                    row.createCell(4).setCellValue(ObjectUtils.toString(record.get("patient_name")));
+                    row.createCell(5).setCellValue(ObjectUtils.toString(record.get("demographic_id")));
+                    row.createCell(6).setCellValue(ObjectUtils.toString(record.get("event_date")));
+                    row.createCell(7).setCellValue(getEventType(ObjectUtils.toString(record.get("event_type"))));
                 }
             }
-            //写入工作表
-            wwb.write();
+            wwb.write(os);
             wwb.close();
             os.flush();
             os.close();
@@ -704,53 +718,51 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.DataQuality.ExportUploadRecordList, method = RequestMethod.GET)
     @ApiOperation(value = "导出上传纪录列表")
     public void exportUploadRecordList( @ApiParam(name = "filters", value = "过滤")
-                                   @RequestParam(value = "filters", required = false) String filters,
-                                   @ApiParam(name = "sorts", value = "排序")
-                                   @RequestParam(value = "sorts", required = false) String sorts,
-                                   HttpServletResponse response){
-        int pageSize=1000;
+                                        @RequestParam(value = "filters", required = false) String filters,
+                                        @ApiParam(name = "sorts", value = "排序")
+                                        @RequestParam(value = "sorts", required = false) String sorts,
+                                        HttpServletResponse response){
         try {
             String fileName = "上传纪录列表";
             //设置下载
             response.setContentType("octets/stream");
             response.setHeader("Content-Disposition", "attachment; filename="
-                    + new String( fileName.getBytes("gb2312"), "ISO8859-1" )+".xls");
+                    + new String( fileName.getBytes("gb2312"), "ISO8859-1" )+".xlsx");
             OutputStream os = response.getOutputStream();
             //写excel
-            WritableWorkbook wwb = Workbook.createWorkbook(os);
-            //创建Excel工作表 指定名称和位置
-            WritableSheet ws = wwb.createSheet(fileName,0);
-            //添加固定信息，题头等
-            addCell(ws,0,0,"上传时间");
-            addCell(ws,1,0,"接收平台");
-            addCell(ws,2,0,"医疗机构");
-            addCell(ws,3,0,"患者姓名");
-            addCell(ws,4,0,"证件号");
-            addCell(ws,5,0,"就诊时间");
-            addCell(ws,6,0,"就诊类型");
-            addCell(ws,7,0,"数据集数量");
-            WritableCellFormat wc = new WritableCellFormat();
-            wc.setBorder(jxl.format.Border.ALL, jxl.format.BorderLineStyle.THIN, Colour.SKY_BLUE);//边框
+            SXSSFWorkbook  wwb = new SXSSFWorkbook(100);
+            wwb.setCompressTempFiles(true);
+
+            String[] title = {"上传时间","接收平台","医疗机构","序列号","患者姓名","证件号","就诊时间","就诊类型","数据集数量"};
+
             int count = (int) elasticSearchUtil.count("upload", "record", filters);
-            int totalPage = count/pageSize+1;
-            for(int p=0;p<totalPage;p++) {
-                List<Map<String, Object>> list = packQcReportService.uploadRecordList(filters,sorts,p+1,pageSize);
-                for (int i = 0; i < list.size(); i++) {
-                    int j = p*pageSize + i + 1;
+            double pageNum = count % maxRowSize > 0 ? count / maxRowSize + 1 : count / maxRowSize;
+            for (int i = 0; i < pageNum; i++) {
+                List<Map<String, Object>> list = packQcReportService.uploadRecordList(filters,sorts,i+1,maxRowSize);
+                //创建Excel工作表 指定名称和位置
+                Sheet sheet = wwb.createSheet("Sheet" + (i+1));
+                //添加固定信息，题头等
+                Row titleRow = sheet.createRow(0);
+                for (int t = 0; t < title.length; t++) {
+                    Cell xcell = titleRow.createCell(t);
+                    xcell.setCellValue(title[t] + "");
+                }
+                for (int j = 0; j < list.size(); j++) {
+                    Row row = sheet.createRow(j+ 1);
                     Map<String, Object> record = list.get(i);
                     //添加列表明细
-                    addCell(ws, 0, j, ObjectUtils.toString(record.get("analyze_date")), wc);
-                    addCell(ws, 1, j, getPlatform(ObjectUtils.toString(record.get("to_platform"))), wc);
-                    addCell(ws, 2, j, ObjectUtils.toString(record.get("org_name")), wc);
-                    addCell(ws, 3, j, ObjectUtils.toString(record.get("patient_name")), wc);
-                    addCell(ws, 4, j, ObjectUtils.toString(record.get("idcard_no")), wc);
-                    addCell(ws, 5, j, ObjectUtils.toString(record.get("event_date")), wc);
-                    addCell(ws, 6, j, getEventType(ObjectUtils.toString(record.get("event_type"))), wc);
-                    addCell(ws, 7, j, ObjectUtils.toString(record.get("dataset_count")), wc);
+                    row.createCell(0).setCellValue(ObjectUtils.toString(record.get("analyze_date")));
+                    row.createCell(1).setCellValue(getPlatform(ObjectUtils.toString(record.get("to_platform"))));
+                    row.createCell(2).setCellValue(ObjectUtils.toString(record.get("org_name")));
+                    row.createCell(3).setCellValue(ObjectUtils.toString(record.get("_id")));
+                    row.createCell(4).setCellValue(ObjectUtils.toString(record.get("patient_name")));
+                    row.createCell(5).setCellValue(ObjectUtils.toString(record.get("idcard_no")));
+                    row.createCell(6).setCellValue(ObjectUtils.toString(record.get("event_date")));
+                    row.createCell(7).setCellValue(getEventType(ObjectUtils.toString(record.get("event_type"))));
+                    row.createCell(8).setCellValue(ObjectUtils.toString(record.get("dataset_count")));
                 }
             }
-            //写入工作表
-            wwb.write();
+            wwb.write(os);
             wwb.close();
             os.flush();
             os.close();

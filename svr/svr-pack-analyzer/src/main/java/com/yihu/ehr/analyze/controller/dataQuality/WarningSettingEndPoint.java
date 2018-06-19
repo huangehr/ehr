@@ -175,6 +175,48 @@ public class WarningSettingEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
+    @RequestMapping(value = ServiceApi.DataQuality.PaltformReceiveWarningIsExist, method = RequestMethod.GET)
+    @ApiOperation(value = "验证机构是否存在")
+    public Envelop paltformReceiveWarningIsExist(
+            @ApiParam(name = "orgCode", value = "机构code", defaultValue = "")
+            @RequestParam(value = "orgCode") String orgCode) {
+        Envelop envelop = new Envelop();
+        try {
+            DqPaltformReceiveWarning warning =  dqPaltformReceiveWarningService.findByOrgCode(orgCode);
+            if(warning!=null){
+                return success(1);
+            }else {
+                return success(0);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.DataQuality.PaltformUploadWarningIsExist, method = RequestMethod.GET)
+    @ApiOperation(value = "验证机构是否存在")
+    public Envelop paltformUploadWarningIsExist(
+            @ApiParam(name = "orgCode", value = "机构code", defaultValue = "")
+            @RequestParam(value = "orgCode") String orgCode) {
+        Envelop envelop = new Envelop();
+        try {
+            DqPaltformUploadWarning warning =  dqPaltformUploadWarningService.findByOrgCode(orgCode);
+            if(warning!=null){
+                return success(1);
+            }else {
+                return success(0);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return envelop;
+    }
+
     @RequestMapping(value = ServiceApi.DataQuality.PaltformResourceWarning, method = RequestMethod.GET)
     @ApiOperation(value = "根据id查询平台资源化预警")
     public Envelop getMDqPaltformResourceWarningById(
@@ -245,7 +287,7 @@ public class WarningSettingEndPoint extends EnvelopRestEndPoint {
         Envelop envelop = new Envelop();
         try{
             String filters = "orgCode="+orgCode+";type="+type;
-            String sorts = "-datasetCode";
+            String sorts = "-code";
             List<DqDatasetWarning> list = dqDatasetWarningService.search(null, filters, sorts, page, size);
             List<MDqDatasetWarning> warnings = (List<MDqDatasetWarning>)convertToModels(list, new ArrayList<>(list.size()), MDqDatasetWarning.class, null);
             return getPageResult(warnings,(int)dqDatasetWarningService.getCount(filters), page, size);
@@ -265,6 +307,12 @@ public class WarningSettingEndPoint extends EnvelopRestEndPoint {
         Envelop envelop = new Envelop();
         try {
             DqPaltformReceiveWarning warning = toEntity(jsonData, DqPaltformReceiveWarning.class);
+            DqPaltformReceiveWarning oldWarning = dqPaltformReceiveWarningService.findByOrgCode(warning.getOrgCode());
+            if(oldWarning!=null){
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg("该机构已存在预警记录");
+                return envelop;
+            }
             warning = dqPaltformReceiveWarningService.paltformReceiveWarningAdd(warning);
             return success(convertToModel(warning, MDqPaltformReceiveWarning.class));
         }catch (Exception e){
@@ -301,6 +349,12 @@ public class WarningSettingEndPoint extends EnvelopRestEndPoint {
         Envelop envelop = new Envelop();
         try {
             DqPaltformUploadWarning warning = toEntity(jsonData, DqPaltformUploadWarning.class);
+            DqPaltformUploadWarning oldWarning = dqPaltformUploadWarningService.findByOrgCode(warning.getOrgCode());
+            if(oldWarning!=null){
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg("该机构已存在预警记录");
+                return envelop;
+            }
             warning = dqPaltformUploadWarningService.paltformUploadWarningAdd(warning);
             return success(convertToModel(warning, MDqPaltformUploadWarning.class));
         }catch (Exception e){

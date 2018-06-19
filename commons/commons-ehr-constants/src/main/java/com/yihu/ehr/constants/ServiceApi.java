@@ -1627,6 +1627,7 @@ public class ServiceApi {
         public static final String PaltformReceiveWarningDel = "/dataQuality/warningSetting/receiveWarningDel";
         public static final String PaltformReceiveWarningUpd = "/dataQuality/warningSetting/receiveWarningUpd";
         public static final String PaltformReceiveWarning =    "/dataQuality/warningSetting/receiveWarning/{id}";
+        public static final String PaltformReceiveWarningIsExist =    "/dataQuality/warningSetting/receiveWarningIsExist";
         public static final String PaltformReceiveWarningDefault =    "/dataQuality/warningSetting/receiveWarningDefault";
         public static final String PaltformResourceWarningList = "/dataQuality/warningSetting/resourceWarningList";
         public static final String PaltformResourceWarningAdd = "/dataQuality/warningSetting/resourceWarningAdd";
@@ -1637,6 +1638,7 @@ public class ServiceApi {
         public static final String PaltformUploadWarningAdd = "/dataQuality/warningSetting/uploadWarningAdd";
         public static final String PaltformUploadWarningDel = "/dataQuality/warningSetting/uploadWarningDel";
         public static final String PaltformUploadWarningUpd = "/dataQuality/warningSetting/uploadWarningUpd";
+        public static final String PaltformUploadWarningIsExist =    "/dataQuality/warningSetting/uploadWarningIsExist";
         public static final String PaltformUploadWarning =    "/dataQuality/warningSetting/uploadWarning/{id}";
         public static final String DatasetWarningList = "/dataQuality/warningSetting/datasetWarningList";
         public static final String ImportDatasetExcel = "/dataQuality/warningSetting/importDatasetExcel";
