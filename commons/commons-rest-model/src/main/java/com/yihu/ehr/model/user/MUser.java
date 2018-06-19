@@ -2,6 +2,7 @@ package com.yihu.ehr.model.user;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.yihu.ehr.model.org.MJkzlOrgMemberRelation;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -70,6 +71,8 @@ public class MUser implements Serializable{
     private  String profession;
     private  String department;//部门
     private  String position;//职务
+    //用户机构部门关系
+    private MJkzlOrgMemberRelation mJkzlOrgMemberRelation;
 
 
 
@@ -460,5 +463,13 @@ public class MUser implements Serializable{
 
     public void setPosition(String position) {
         this.position = position;
+    }
+
+    public MJkzlOrgMemberRelation getmJkzlOrgMemberRelation() {
+        return mJkzlOrgMemberRelation;
+    }
+
+    public void setmJkzlOrgMemberRelation(MJkzlOrgMemberRelation mJkzlOrgMemberRelation) {
+        this.mJkzlOrgMemberRelation = mJkzlOrgMemberRelation;
     }
 }
