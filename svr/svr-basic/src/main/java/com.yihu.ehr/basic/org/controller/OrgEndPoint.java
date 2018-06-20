@@ -532,16 +532,21 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
             List<Organization> orgList;
             for (AddressDict addressDict : addList) {
                 List<Map<String, Object>> childListMap = new ArrayList<>();
+                Map<String, Object> allMap = new HashMap<>();
+                allMap.put("text", "全机构");
+                childListMap.add(allMap);
                 Map<String, Object> map = new HashMap<>();
                 map.put("text", addressDict.getName());
                 map.put("value", addressDict.getId());
                 orgList = orgService.getOrgListByAddressPidAndOrgArea(pid, addressDict.getId() + "");
-                orgList.forEach(one -> {
-                    Map<String, Object> childMap = new HashMap<>();
-                    childMap.put("text", one.getFullName());
-                    childMap.put("value", one.getOrgCode());
-                    childListMap.add(childMap);
-                });
+                if (null != orgList && orgList.size() > 0) {
+                    orgList.forEach(one -> {
+                        Map<String, Object> childMap = new HashMap<>();
+                        childMap.put("text", one.getFullName());
+                        childMap.put("value", one.getOrgCode());
+                        childListMap.add(childMap);
+                    });
+                }
                 map.put("children", childListMap);
                 listMap.add(map);
             }
