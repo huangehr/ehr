@@ -313,6 +313,11 @@ public class OrgService extends BaseJpaService<Organization, OrganizationReposit
         return list;
     }
 
+    public List<Organization> getOrgListByAddressPidAndOrgArea(Integer pid, String orgArea) {
+        List<Organization> list = organizationRepository.getOrgListByAddressPidAndOrgArea(pid, orgArea);
+        return list;
+    }
+
     /**
      * 根据用户id获取医生所在的机构id
      * @param userId
