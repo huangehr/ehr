@@ -336,7 +336,7 @@ public class QcDailyReportResolveService {
         filters.append("event_no=").append(eventNo).append(";")
                 .append("patient_id=").append(patientId).append(";")
                 .append("org_code=").append(orgCode).append(";");
-        Collection<EsDetailsPackage> mPackages = packMgrClient.packageList(filters.toString(), null, 1, 1);
+        List<EsDetailsPackage> mPackages = packMgrClient.packageList(filters.toString(), null, 1, 1);
         EsDetailsPackage esDetailsPackage = null;
         for (EsDetailsPackage temp : mPackages) {
             esDetailsPackage = temp;
@@ -361,7 +361,7 @@ public class QcDailyReportResolveService {
         int page = 1;
         int pageSize = 1000;
         Map<String,List<Map<String,Object>>> map = new HashMap<String,List<Map<String,Object>>>();
-        Collection<EsDetailsPackage> mPackages = packMgrClient.packageList("receive_date>=" + beginDate + ";receive_date<" + endDate, "+receive_date", page, pageSize);
+        List<EsDetailsPackage> mPackages = packMgrClient.packageList("receive_date>=" + beginDate + ";receive_date<" + endDate, "+receive_date", page, pageSize);
         while (!mPackages.isEmpty()) {
             for (EsDetailsPackage mPackage : mPackages) {
                 try{
