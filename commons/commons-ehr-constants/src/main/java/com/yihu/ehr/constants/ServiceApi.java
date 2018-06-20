@@ -187,6 +187,8 @@ public class ServiceApi {
         public static final String ResourceRolesMetadataGrant = "/resources/rolesMetadata/grants/{id}";
         public static final String ResourceRolesGrantsNoPage = "/resources/rolesGrants/no_paging";
         public static final String ResourceRolesResMetadataGrants = "/resources/roles_resource/{roles_res_id}/metadata";
+        public static final String RolesGrantResourcesByCategoryId = "/resources/roles/{rolesId}/grantByCategoryId";
+        public static final String DeleteRolesGrantResourcesByCategoryId = "/resources/roles/{rolesId}/deleteGrantByCategoryId";
 
         /**
          * 机构-资源授权
