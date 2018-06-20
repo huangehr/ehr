@@ -116,7 +116,7 @@ public class PackQcReportService extends BaseJpaService {
         stringBuilder.append("receive_date>=" + startDate + " 00:00:00;");
         stringBuilder.append("receive_date<" + endDate + " 23:59:59;");
         if (StringUtils.isNotEmpty(orgCode) && !"null".equals(orgCode)){
-            stringBuilder.append("org_code=" + orgCode);
+            stringBuilder.append("org_code=" + orgCode+";");
         }
         // 门诊
         String oupatientStr = stringBuilder.toString() + "event_type=0";

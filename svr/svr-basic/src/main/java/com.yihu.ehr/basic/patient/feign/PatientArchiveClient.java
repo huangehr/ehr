@@ -4,6 +4,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.model.common.Result;
+import com.yihu.ehr.util.rest.Envelop;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -20,7 +21,7 @@ public interface PatientArchiveClient {
 
 
     @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.PackageResolve.ArchiveRelation, method = RequestMethod.POST)
-    Result archiveRelation(@RequestParam(value = "profileId") String profileId, @RequestParam(value = "idCardNo") String idCardNo);
+    Envelop archiveRelation(@RequestParam(value = "profileId") String profileId, @RequestParam(value = "idCardNo") String idCardNo);
 
 
 

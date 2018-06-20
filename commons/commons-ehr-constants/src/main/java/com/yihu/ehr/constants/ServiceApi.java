@@ -517,12 +517,7 @@ public class ServiceApi {
         public static final String Local = "/resolve/local/{id}";
         public static final String Fetch = "/resolve/fetch/{id}";
         public static final String Immediate = "/resolve/immediate";
-        public static final String Prescription = "/resolve/prescription"; //处方笺维护
         public static final String ArchiveRelation = "/resolve/archiveRelation"; //档案关联
-    }
-
-    public static class ArchiveRelation {
-        public static final String Crud = "/archiveRelation";
     }
 
     public static class Patients {
