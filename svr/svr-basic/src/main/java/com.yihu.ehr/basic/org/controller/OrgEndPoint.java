@@ -517,4 +517,31 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
         }
         return envelop;
     }
+
+    @RequestMapping(value = "/organizations/getOrgListByAddressPidOrArea", method = RequestMethod.GET)
+    @ApiOperation(value = "根据区域、机构区县查询机构列表")
+    public List<Map<String, String>> getOrgListByAddressPidOrArea(
+            @ApiParam(name = "pid", value = "区域id", defaultValue = "")
+            @RequestParam(value = "pid") Integer pid,
+            @ApiParam(name = "orgArea", value = "机构区县", defaultValue = "")
+            @RequestParam(value = "orgArea", required = false) String orgArea) {
+        List<Map<String, String>> listMap = new ArrayList<>();
+        try {
+            List<Organization> orgList;
+            if (StringUtils.isEmpty(orgArea)) {
+                orgList = orgService.getOrgListByAddressPid(pid);
+            } else {
+                orgList = orgService.getOrgListByAddressPidAndOrgArea(pid, orgArea);
+            }
+            orgList.forEach(one -> {
+                Map<String, String> map = new HashMap<>();
+                map.put("text", one.getFullName());
+                map.put("value", one.getOrgCode());
+                listMap.add(map);
+            });
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        return listMap;
+    }
 }
