@@ -29,7 +29,7 @@ public class ProfileManagerEndPoint {
     private ObjectMapper objectMapper;
 
     @ApiOperation(value = "处方笺信息维护")
-    @RequestMapping(value = ServiceApi.Packages.Prescription, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.PackageResolve.Prescription, method = RequestMethod.POST)
     @ResponseBody
     public String prescription(
             @ApiParam(value = "档案ID", defaultValue = "")
@@ -45,14 +45,13 @@ public class ProfileManagerEndPoint {
     }
 
     @ApiOperation(value = "档案关联（单条）")
-    @RequestMapping(value = ServiceApi.Packages.ArchiveRelation, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.PackageResolve.ArchiveRelation, method = RequestMethod.POST)
     @ResponseBody
     public Result archiveRelation(
             @ApiParam(value = "档案ID", defaultValue = "")
             @RequestParam("profileId") String profileId,
             @ApiParam(value = "身份证号码", defaultValue = "")
-            @RequestParam("idCardNo") String idCardNo) throws Throwable
-    {
+            @RequestParam("idCardNo") String idCardNo) throws Throwable {
         archiveRelationService.archiveRelation(profileId,idCardNo);
 
         return Result.success("档案关联成功！");

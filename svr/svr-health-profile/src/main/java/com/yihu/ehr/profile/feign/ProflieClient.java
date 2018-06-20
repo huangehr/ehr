@@ -27,7 +27,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 public interface ProflieClient {
 
 
-    @RequestMapping(value = ServiceApi.Packages.Prescription, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.PackageResolve.Prescription, method = RequestMethod.POST)
     String savePrescription(
             @RequestParam(value = "profileId") String profileId,
             @RequestBody String data,
