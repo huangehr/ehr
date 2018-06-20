@@ -94,6 +94,8 @@ public class ServiceApi {
         public static final String ResourceGrantsNoPage = "/resources/grants/no_paging";
         public static final String AppsGrantResources = "/resources/apps/{appId}/grant";
         public static final String ResourceGrantApps = "/resources/{resourceId}/grant";
+        public static final String AppsGrantResourcesByCategoryId = "/resources/apps/{appId}/grantByCategoryId";
+        public static final String DeleteAppsGrantResourcesByCategoryId = "/resources/apps/{appId}/deleteGrantByCategoryId";
 
         public static final String ResourceMetadatasValid = "/resources/metadatas/valid";
         public static final String ResourceMetadataGrants = "/resources/metadata/grants";
