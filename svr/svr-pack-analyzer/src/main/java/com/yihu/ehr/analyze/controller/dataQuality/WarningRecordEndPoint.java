@@ -17,8 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +36,7 @@ public class WarningRecordEndPoint extends EnvelopRestEndPoint {
     private WarningSchedulerService warningSchedulerService;
 
     @RequestMapping(value = ServiceApi.DataQuality.WarningQuestionAnalyze, method = RequestMethod.POST)
-    @ApiOperation(value = "预警问题列表")
+    @ApiOperation(value = "生成指定日期的预警记录")
     public Envelop warningQuestionAnalyze(@ApiParam(name = "dateStr", value = "指定日期生成某天的预警信息", defaultValue = "2018-01-01")
                                           @RequestParam(value = "dateStr", required = false) String dateStr) {
         Envelop envelop = new Envelop();
@@ -86,9 +84,7 @@ public class WarningRecordEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
+            @RequestParam(value = "page", required = false) int page) {
         Envelop envelop = new Envelop();
         try {
             String filters = "type="+type;
@@ -109,9 +105,8 @@ public class WarningRecordEndPoint extends EnvelopRestEndPoint {
             }
             String sorts = "-warningTime";
             List<DqWarningRecord> list = warningRecordService.search(null, filters, sorts, page, size);
-            pagedResponse(request, response, warningRecordService.getCount(filters), page, size);
             List<MDqWarningRecord> records = (List<MDqWarningRecord>) convertToModels(list, new ArrayList<>(list.size()), MDqWarningRecord.class, null);
-            return success(records);
+            return getPageResult(records,(int)warningRecordService.getCount(filters), page, size);
         }catch (Exception e){
             e.printStackTrace();
             envelop.setSuccessFlg(false);
