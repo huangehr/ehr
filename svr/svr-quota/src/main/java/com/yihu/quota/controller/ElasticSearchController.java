@@ -152,7 +152,6 @@ public class ElasticSearchController extends BaseController {
                     }
                 }
             }
-
             OutputStream output=response.getOutputStream();
             response.reset();
             response.setHeader("Content-disposition", "attachment; filename=details.xls");
