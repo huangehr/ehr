@@ -18,4 +18,9 @@ public interface RsAppResourceDao extends PagingAndSortingRepository<RsAppResour
 
     @Query("select ar.id FROM RsAppResource ar WHERE ar.resourceId=:rsResourceId AND ar.appId=:appId ")
     List<String> findByrsResourceIdAndAppId(@Param("rsResourceId")String rsResourceId, @Param("appId")String appId);
+
+    @Query("select ar FROM RsAppResource ar WHERE ar.resourceId IN (:rsResourceIds) AND ar.appId=:appId ")
+    List<RsAppResource> findByrsResourceIds(@Param("rsResourceIds") String [] rsResourceIds,@Param("appId")String appId);
+
+
 }

@@ -849,6 +849,8 @@ public class RsResourceGrantEndPoint extends EnvelopRestEndPoint {
     public Envelop rolesGrantResourcesByCategoryId(
             @ApiParam(name = "rolesId", value = "角色组ID", defaultValue = "")
             @PathVariable(value = "rolesId") String rolesId,
+            @ApiParam(name = "appId", value = "应用ID", defaultValue = "zkGuSIm2Fg")
+            @RequestParam(value = "appId") String appId,
             @ApiParam(name = "categoryIds", value = "视图分类ID", defaultValue = "0dae002159535497b3865e129433e933")
             @RequestParam(value = "categoryIds", required = false) String categoryIds,
             @ApiParam(name = "resourceIds", value = "资源ID", defaultValue = "d3beebf86ed611e89f87fa163e20f96e")
@@ -865,14 +867,18 @@ public class RsResourceGrantEndPoint extends EnvelopRestEndPoint {
                 String[] categoryIdArray = categoryIds.split(",");
                 for (String categoryId : categoryIdArray) {
                     //根据视图分类id获取 档案数据资源list
-                    List<RsResource> rsResourceList = rsResourceService.findByCategoryIdAndDataSource(categoryId, 1);
-                    for (RsResource rsResource : rsResourceList) {
-                        RsRolesResource rolesRs = new RsRolesResource();
-                        rolesRs.setId(getObjectId(BizObject.RolesResource));
-                        rolesRs.setRolesId(rolesId);
-                        rolesRs.setResourceId(rsResource.getId());
-                        rolesRsList.add(rolesRs);
+                    List<String> rsResourceIdList = rsResourceService.findIdByCategoryIdAndDataSource(categoryId, 1);
+                    if(null!= rsResourceIdList && rsResourceIdList.size()>0){
+                        List<RsAppResource> rsResourceList = rsGrantService.findByrsResourceIds(rsResourceIdList.toArray(new String[rsResourceIdList.size()]),appId);
+                        for (RsAppResource rsResource : rsResourceList) {
+                            RsRolesResource rolesRs = new RsRolesResource();
+                            rolesRs.setId(getObjectId(BizObject.RolesResource));
+                            rolesRs.setRolesId(rolesId);
+                            rolesRs.setResourceId(rsResource.getResourceId());
+                            rolesRsList.add(rolesRs);
+                        }
                     }
+
                 }
             }
         } else {
@@ -934,6 +940,8 @@ public class RsResourceGrantEndPoint extends EnvelopRestEndPoint {
     public Envelop deleteRolesGrantResourcesByCategoryId(
             @ApiParam(name = "rolesId", value = "角色组ID", defaultValue = "")
             @PathVariable(value = "rolesId") String rolesId,
+            @ApiParam(name = "appId", value = "应用ID", defaultValue = "zkGuSIm2Fg")
+            @RequestParam(value = "appId") String appId,
             @ApiParam(name = "categoryIds", value = "视图分类ID", defaultValue = "0dae002159535497b3865e129433e933")
             @RequestParam(value = "categoryIds", required = false) String categoryIds,
             @ApiParam(name = "resourceIds", value = "资源ID", defaultValue = "d3beebf86ed611e89f87fa163e20f96e")
@@ -950,14 +958,18 @@ public class RsResourceGrantEndPoint extends EnvelopRestEndPoint {
                 String[] categoryIdArray = categoryIds.split(",");
                 for (String categoryId : categoryIdArray) {
                     //根据视图分类id获取 档案数据资源list
-                    List<RsResource> rsResourceList = rsResourceService.findByCategoryIdAndDataSource(categoryId, 1);
-                    for (RsResource rsResource : rsResourceList) {
-                        RsRolesResource rolesRs = new RsRolesResource();
-                        rolesRs.setId(getObjectId(BizObject.RolesResource));
-                        rolesRs.setRolesId(rolesId);
-                        rolesRs.setResourceId(rsResource.getId());
-                        rolesRsList.add(rolesRs);
+                    List<String> rsResourceIdList = rsResourceService.findIdByCategoryIdAndDataSource(categoryId, 1);
+                    if(null!= rsResourceIdList && rsResourceIdList.size()>0) {
+                        List<RsAppResource> rsResourceList = rsGrantService.findByrsResourceIds(rsResourceIdList.toArray(new String[rsResourceIdList.size()]), appId);
+                        for (RsAppResource rsResource : rsResourceList) {
+                            RsRolesResource rolesRs = new RsRolesResource();
+                            rolesRs.setId(getObjectId(BizObject.RolesResource));
+                            rolesRs.setRolesId(rolesId);
+                            rolesRs.setResourceId(rsResource.getResourceId());
+                            rolesRsList.add(rolesRs);
+                        }
                     }
+
                 }
             }
         } else {

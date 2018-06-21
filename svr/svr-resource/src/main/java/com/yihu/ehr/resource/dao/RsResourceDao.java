@@ -40,4 +40,9 @@ public interface RsResourceDao extends PagingAndSortingRepository<RsResource, St
             @Param("ids") String [] ids,
             @Param("grantType") String grantType,
             @Param("name") String name);
+
+    @Query("SELECT rsResource.id FROM RsResource rsResource WHERE rsResource.categoryId = :categoryId AND rsResource.dataSource = :dataSource ")
+    List<String> findIdByCategoryIdAndDataSourceAndName(
+            @Param("categoryId") String categoryId,
+            @Param("dataSource") Integer dataSource);
 }
