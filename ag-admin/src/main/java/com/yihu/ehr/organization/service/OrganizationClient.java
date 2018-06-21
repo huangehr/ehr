@@ -224,9 +224,8 @@ public interface OrganizationClient {
             @RequestParam(value = "pid") Integer pid,
             @RequestParam(value = "fullName", required = false) String fullName);
 
-    @RequestMapping(value = "/organizations/getOrgListByAddressPidOrArea", method = RequestMethod.GET)
+    @RequestMapping(value = "/organizations/getOrgListTreeByAddressPid", method = RequestMethod.GET)
     @ApiOperation(value = "根据区域、机构区县查询机构列表")
-    List<Map<String, String>> getOrgListByAddressPidOrArea(
-            @RequestParam(value = "pid") Integer pid,
-            @RequestParam(value = "orgArea", required = false) String orgArea);
+    List<Map<String, Object>> getOrgListTreeByAddressPid(
+            @RequestParam(value = "pid") Integer pid);
 }

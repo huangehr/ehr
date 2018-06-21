@@ -344,7 +344,7 @@ public class ElasticsearchUtil {
             }
             SearchResponse response = (SearchResponse) requestBuilder.get();
             Object queryResult = null;
-            if (sql.toUpperCase().indexOf("GROUP") != -1 || sql.toUpperCase().indexOf("SUM") != -1) {
+            if (sql.toUpperCase().indexOf("GROUP") != -1 || sql.toUpperCase().indexOf("SUM") != -1 || sql.toUpperCase().indexOf("COUNT") != -1) {
                 queryResult = response.getAggregations();
             } else {
                 queryResult = response.getHits();

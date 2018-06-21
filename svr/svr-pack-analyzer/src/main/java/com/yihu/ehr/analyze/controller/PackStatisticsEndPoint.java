@@ -1,5 +1,6 @@
 package com.yihu.ehr.analyze.controller;
 
+import com.yihu.ehr.analyze.service.pack.PackQcReportService;
 import com.yihu.ehr.analyze.service.pack.PackStatisticsService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
@@ -31,6 +32,8 @@ public class PackStatisticsEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     private PackStatisticsService statisticService;
+    @Autowired
+    private PackQcReportService packQcReportService;
 
     @RequestMapping(value = ServiceApi.StasticReport.GetArchiveReportAll, method = RequestMethod.GET)
     @ApiOperation(value = "获取一段时间内数据解析情况")
@@ -115,7 +118,7 @@ public class PackStatisticsEndPoint extends EnvelopRestEndPoint {
             @RequestParam(name = "date") String date,
             @ApiParam(name = "orgCode", value = "医院代码")
             @RequestParam(name = "orgCode", required = false) String orgCode) throws Exception {
-        return statisticService.getDataSetCount(date, orgCode);
+        return packQcReportService.dataSetList(date, date, orgCode);
     }
 
     @RequestMapping(value = ServiceApi.StasticReport.GetArchivesRight, method = RequestMethod.GET)
@@ -136,17 +139,5 @@ public class PackStatisticsEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "date", value = "日期")
             @RequestParam(name = "date") String date) throws Exception {
         return statisticService.getStasticByDay(date);
-    }
-
-    @RequestMapping(value = ServiceApi.StasticReport.GetErrorCodeList, method = RequestMethod.GET)
-    @ApiOperation(value = "错误数据元列表")
-    public Envelop getErrorCodeList(
-            @ApiParam(name = "startDate", value = "开始日期")
-            @RequestParam(name = "startDate") String startDate,
-            @ApiParam(name = "endDate", value = "结束日期")
-            @RequestParam(name = "endDate") String endDate,
-            @ApiParam(name = "orgCode", value = "医院代码")
-            @RequestParam(name = "orgCode", required = false) String orgCode) throws Exception {
-        return statisticService.getErrorCodeList(startDate, endDate, orgCode);
     }
 }

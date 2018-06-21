@@ -8,6 +8,7 @@ import com.yihu.ehr.elasticsearch.ElasticSearchConfig;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.query.services.SolrQuery;
 import com.yihu.ehr.util.datetime.DateUtil;
+import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.quota.etl.model.EsConfig;
 import com.yihu.quota.etl.util.ElasticsearchUtil;
 import com.yihu.quota.etl.util.EsClientUtil;
@@ -61,6 +62,51 @@ public class ElasticSearchController extends BaseController {
     @Autowired
     private SolrQuery solrQuery;
 
+    @ApiOperation("sql查询es")
+    @RequestMapping(value = "/open/getEsInfoBySql", method = RequestMethod.GET)
+    public Envelop getEsInfoBySql(
+            @ApiParam(value = "sql", name = "查询的SQL")
+            @RequestParam(value = "sql") String sql) {
+        Envelop envelop = new Envelop();
+        if (StringUtils.isEmpty(sql)) {
+            envelop.setErrorMsg("sql为空");
+            return envelop;
+        }
+        try {
+            List<Map<String, Object>> listData = elasticsearchUtil.excuteDataModel(sql);
+            envelop.setDetailModelList(listData);
+        } catch (Exception e) {
+            envelop.setErrorMsg("sql执行出错");
+        }
+        return envelop;
+    }
+
+    @ApiOperation("根据index查询es")
+    @RequestMapping(value = "/open/getEsInfoByIndexAndParam", method = RequestMethod.GET)
+    public Envelop getEsInfoByIndexAndParam(
+            @ApiParam(value = "index", name = "es索引")
+            @RequestParam(value = "index") String index,
+            @ApiParam(value = "whereCondition", name = "where 条件")
+            @RequestParam(value = "whereCondition", required = false) String whereCondition) {
+        Envelop envelop = new Envelop();
+        if (StringUtils.isEmpty(index)) {
+            envelop.setErrorMsg("es索引为空");
+            return envelop;
+        }
+        try {
+            StringBuffer sb = new StringBuffer("select * from ");
+            sb.append(index);
+            if (StringUtils.isNotEmpty(whereCondition)) {
+                sb.append(" where ").append(whereCondition).append(" limit 10000");
+            }
+            List<Map<String, Object>> listData = elasticsearchUtil.excuteDataModel(sb.toString());
+            envelop.setDetailModelList(listData);
+            envelop.setObj(listData.size());
+        } catch (Exception e) {
+            envelop.setErrorMsg("sql执行出错");
+        }
+        return envelop;
+    }
 
     @RequestMapping(value = "/getSolrData", method = RequestMethod.GET)
     @ApiOperation("根据条件获取solr 数据,结果不超过5万条")

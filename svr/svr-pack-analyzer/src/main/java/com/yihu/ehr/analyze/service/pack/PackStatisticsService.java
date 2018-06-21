@@ -50,7 +50,9 @@ public class PackStatisticsService extends BaseJpaService {
     public List<Map<String, Object>> getRecieveOrgCount(String dateStr) throws Exception{
         long starttime = System.currentTimeMillis();
         Session session = currentSession();
-        String sql1 = "SELECT org_code, COUNT(org_code) FROM json_archives WHERE (archive_status = 0 OR archive_status = 1) AND receive_date BETWEEN '" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59' GROUP BY org_code";
+        String sql1 = "SELECT org_code, COUNT(org_code) FROM json_archives WHERE " +
+                " (archive_status = 0 OR archive_status = 1) AND (analyze_status = 0 OR analyze_status = 1) " +
+                " AND receive_date BETWEEN '" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59' GROUP BY org_code";
         ResultSet resultSet1 = elasticSearchUtil.findBySql(sql1);
         Map<String, Object[]> dataMap1 = new HashMap<>();
         try {
@@ -67,7 +69,8 @@ public class PackStatisticsService extends BaseJpaService {
         }catch (Exception e){
             dataMap1 = new HashMap<>();
         }
-        String sql2 = "SELECT org_code, COUNT(org_code) FROM json_archives WHERE archive_status = 3 AND receive_date BETWEEN '" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59' GROUP BY org_code";
+        String sql2 = "SELECT org_code, COUNT(org_code) FROM json_archives WHERE archive_status = 3 AND " +
+                " receive_date BETWEEN '" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59' GROUP BY org_code";
         ResultSet resultSet2 = elasticSearchUtil.findBySql(sql2);
         Map<String, Object[]> dataMap2 = new HashMap<>();
         try {
@@ -84,7 +87,8 @@ public class PackStatisticsService extends BaseJpaService {
         }catch (Exception e){
             dataMap2 = new HashMap<>();
         }
-        String sql3 = "SELECT org_code, COUNT(org_code) FROM json_archives WHERE receive_date BETWEEN '" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59' GROUP BY org_code";
+        String sql3 = "SELECT org_code, COUNT(org_code) FROM json_archives WHERE receive_date " +
+                "   BETWEEN '" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59' GROUP BY org_code";
         ResultSet resultSet3 = elasticSearchUtil.findBySql(sql3);
         Map<String, Object[]> dataMap3 = new HashMap<>();
         try {
@@ -141,7 +145,8 @@ public class PackStatisticsService extends BaseJpaService {
         String sql2 = "";
         String sql3 = "";
         if(StringUtils.isNotEmpty(orgCode)){
-            sql1 = "SELECT COUNT(*) FROM json_archives WHERE (archive_status = 0 OR archive_status = 1) AND org_code='"+orgCode+"'" +
+            sql1 = "SELECT COUNT(*) FROM json_archives WHERE (archive_status = 0 OR archive_status = 1) AND " +
+                    " (analyze_status = 0 OR analyze_status = 1) AND org_code='"+orgCode+"'" +
                     " AND receive_date BETWEEN '" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59'";
 
             sql2 = "SELECT COUNT(*) FROM json_archives WHERE archive_status = 3 AND org_code='"+orgCode+"'" +
@@ -151,7 +156,8 @@ public class PackStatisticsService extends BaseJpaService {
                     " AND receive_date BETWEEN '" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59'";
         }else{
             sql1 = "SELECT COUNT(*) FROM json_archives WHERE (archive_status = 0 OR archive_status = 1) " +
-                    " AND receive_date BETWEEN '" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59'";
+                    " AND (analyze_status = 0 OR analyze_status = 1) AND receive_date BETWEEN '" + dateStr + " 00:00:00' " +
+                    " AND '" +  dateStr + " 23:59:59'";
 
             sql2 = "SELECT COUNT(*) FROM json_archives WHERE archive_status = 3 " +
                     " AND receive_date BETWEEN '" + dateStr + " 00:00:00' AND '" +  dateStr + " 23:59:59'";
@@ -677,40 +683,6 @@ public class PackStatisticsService extends BaseJpaService {
         return map;
     }
 
-    /**
-     * 获取数据集数量
-     * @param date
-     * @param orgCode
-     * @return
-     */
-    public Envelop getDataSetCount(String date, String orgCode) {
-        Envelop envelop = new Envelop();
-        Date today = DateUtil.parseDate(date, DateUtil.DEFAULT_DATE_YMD_FORMAT);
-        Date end = DateUtil.addDate(1, today);
-        try{
-            List<String> fields = new ArrayList<String>();
-            fields.add("dataSet");
-            fields.add("count");
-            fields.add("row");
-            String sql ="";
-            if(StringUtils.isNotEmpty(orgCode)){
-                sql = "select dataSet,count(dataSet) as count,sum(dataSetRow) as row from qc/receive_data_set " +
-                        " where receiveTime >= '"+date+"' and receiveTime < '"+DateUtil.toString(end)+"'and orgCode='"+orgCode+"' group by dataSet";
-            }else{
-                sql = "select dataSet,count(dataSet) as count,sum(dataSetRow) as row from qc/receive_data_set " +
-                        " where receiveTime >= '"+date+"' and receiveTime < '"+DateUtil.toString(end)+"' group by dataSet";
-            }
-            List<Map<String, Object>> list = elasticSearchUtil.findBySql(fields,sql);
-            envelop.setDetailModelList(list);
-            envelop.setSuccessFlg(true);
-        }catch(Exception e){
-            e.printStackTrace();
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg(e.getMessage());
-        }
-        return envelop;
-    }
-
     public Envelop getArchivesRight(String startDate, String endDate, String orgCode) {
         Envelop envelop = new Envelop();
         try{
@@ -722,7 +694,7 @@ public class PackStatisticsService extends BaseJpaService {
             for(int i =0;i<day;i++){
                 Map<String,Object> map = new HashMap<String,Object>();
                 Date date = DateUtil.addDate(i,start);
-                Map<String,Object> dataSetCount = getErrorDataSetCount(DateUtil.toString(date), orgCode);
+                Map<String,Object> dataSetCount = getErrorMetadata(DateUtil.toString(date), orgCode);
                 map.put(DateUtil.toString(date),dataSetCount);
                 dataSetCountList.add(map);
             }
@@ -747,7 +719,7 @@ public class PackStatisticsService extends BaseJpaService {
      * @param orgCode
      * @return
      */
-    public Map<String,Object> getErrorDataSetCount(String date, String orgCode) {
+    public Map<String,Object> getErrorMetadata(String date, String orgCode) {
         Map<String,Object> map = new HashMap<String,Object>();
         try{
             Date today = DateUtil.parseDate(date, DateUtil.DEFAULT_DATE_YMD_FORMAT);
@@ -758,15 +730,15 @@ public class PackStatisticsService extends BaseJpaService {
             String sql1 ="";
             String sql2 ="";
             if(StringUtils.isNotEmpty(orgCode)){
-                sql1 = "select count(code) as count from qc/receive_data_element where " +
-                        " receiveTime>='"+date+"' and receiveTime<'"+DateUtil.toString(end)+"' and orgCode='"+orgCode+"'";
-                sql2 = "select count(code) as count from qc/receive_data_element where " +
-                        "   receiveTime='"+DateUtil.toString(yesterday)+"' and receiveTime<'"+date+"' and orgCode='"+orgCode+"'";
+                sql1 = "select count(metadata) as count from json_archives_qc/qc_metadata_info where org_code='"+orgCode+"'" +
+                        " receive_date>='"+date+" 00:00:00' and receive_date<'" + date + " 23:59:59' and (qc_step=1 or qc_step=2)";
+                sql2 = "select count(metadata) as count from json_archives_qc/qc_metadata_info where org_code='"+orgCode+"'" +
+                        " receive_date>='"+yesterday+" 00:00:00' and receive_date<'" + yesterday + " 23:59:59' and (qc_step=1 or qc_step=2)";
             }else{
-                sql1 = "select count(code) as count from qc/receive_data_element where " +
-                        " receiveTime>='"+date+"' and receiveTime<'"+DateUtil.toString(end)+"'";
-                sql2 = "select count(code) as count from qc/receive_data_element where " +
-                        " receiveTime>='"+DateUtil.toString(yesterday)+"' and receiveTime<'"+date+"'";
+                sql1 = "select count(metadata) as count from json_archives_qc/qc_metadata_info where " +
+                        " receive_date>='"+date+" 00:00:00' and receive_date<'" + date + " 23:59:59' and (qc_step=1 or qc_step=2)";
+                sql2 = "select count(metadata) as count from json_archives_qc/qc_metadata_info where " +
+                        " receive_date>='"+DateUtil.toString(yesterday)+" 00:00:00' and receive_date<'" + DateUtil.toString(yesterday) + " 23:59:59' and (qc_step=1 or qc_step=2)";
             }
             double num1=0;
             double num2=0;
@@ -805,15 +777,15 @@ public class PackStatisticsService extends BaseJpaService {
         Date end = DateUtil.addDate(1, today);
         try {
             List<String> fields = new ArrayList<String>();
-            fields.add("errorCode");
+            fields.add("qc_error_type");
             fields.add("count");
             String sql = "";
             if (StringUtils.isNotEmpty(orgCode)) {
-                sql = "select errorCode,count(errorCode) as count  from qc/receive_data_element " +
-                        " where receiveTime>='"+startDate+"' and receiveTime<='"+DateUtil.toString(end)+"'and orgCode='"+orgCode+"' group by errorCode";
+                sql = "select qc_error_type, count(qc_error_type) as count from json_archives_qc/qc_metadata_info where org_code='"+orgCode+"'" +
+                        " receive_date>='"+startDate+" 00:00:00' and receive_date<'" + endDate + " 23:59:59' and (qc_step=1 or qc_step=2) group by qc_error_type";
             } else {
-                sql = "select errorCode,count(errorCode) as count  from qc/receive_data_element " +
-                        " where receiveTime>='"+startDate+"' and receiveTime<='"+DateUtil.toString(end)+"' group by errorCode";
+                sql = "select qc_error_type, count(qc_error_type) as count from json_archives_qc/qc_metadata_info where " +
+                        " receive_date>='"+startDate+" 00:00:00' and receive_date<'" + endDate + " 23:59:59' and (qc_step=1 or qc_step=2) group by qc_error_type";
             }
             list = elasticSearchUtil.findBySql(fields, sql);
         } catch (Exception e){
@@ -835,15 +807,17 @@ public class PackStatisticsService extends BaseJpaService {
         Date end = DateUtil.addDate(1, today);
         try {
             List<String> fields = new ArrayList<String>();
-            fields.add("code");
+            fields.add("metadata");
             fields.add("count");
             String sql = "";
             if (StringUtils.isNotEmpty(orgCode)) {
-                sql = "select code , count(code) as count from qc/receive_data_element " +
-                        " where receiveTime>='"+startDate+"' and receiveTime<='"+DateUtil.toString(end)+"'and orgCode='"+orgCode+"' group by code order by count desc ";
+                sql = "select metadata , count(metadata) as count from json_archives_qc/qc_metadata_info " +
+                        " where receive_date>='"+startDate+" 00:00:00' and receive_date<'" + endDate + " 23:59:59'" +
+                        " and (qc_step=1 or qc_step=2) and org_code='"+orgCode+"' group by metadata order by count desc ";
             } else {
-                sql = "select code , count(code) as count from qc/receive_data_element " +
-                        " where receiveTime>='"+startDate+"' and receiveTime<='"+DateUtil.toString(end)+"' group by code order by count desc ";
+                sql = "select metadata , count(metadata) as count from json_archives_qc/qc_metadata_info " +
+                        " where receive_date>='"+startDate+" 00:00:00' and receive_date<'" + endDate + " 23:59:59' " +
+                        " and (qc_step=1 or qc_step=2) group by metadata order by count desc ";
             }
             list = elasticSearchUtil.findBySql(fields, sql);
             if(list.size()>10){
@@ -864,19 +838,18 @@ public class PackStatisticsService extends BaseJpaService {
         Envelop envelop = new Envelop();
         Map<String,Object> resMap = new HashMap<>();
         Date begin = DateUtil.parseDate(date, DateUtil.DEFAULT_DATE_YMD_FORMAT);
-        Date end1 = DateUtil.addDate(1, begin);
-        Date end2 = DateUtil.addDate(7, begin);
+        Date end = DateUtil.addDate(7, begin);
         try {
             String sql1 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE  pack_type=1 AND event_date " +
                     "BETWEEN '" + date + " 00:00:00' AND '" + date + " 23:59:59'";
             String sql2 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE pack_type=1 AND event_date BETWEEN " +
                     " '" + date + " 00:00:00' AND '" +  date + " 23:59:59' AND receive_date BETWEEN"+
-                    " '" + date + " 00:00:00' AND '" +  DateUtil.toString(end2) + " 23:59:59' ";
-            String sql3 = "SELECT COUNT(*) FROM json_archives WHERE " +
+                    " '" + date + " 00:00:00' AND '" +  DateUtil.toString(end) + " 23:59:59' ";
+            String sql3 = "SELECT COUNT(*) FROM json_archives WHERE pack_type=1 AND" +
                     " receive_date BETWEEN '" + date + " 00:00:00' AND '" +  date + " 23:59:59'";
 
-            String sql4 = "select count(code) as count from qc/receive_data_element where " +
-                    " receiveTime>='"+date+"' and receiveTime<'"+DateUtil.toString(end1)+"'";
+            String sql4 = "select count(metadata) as count from json_archives_qc/qc_metadata_info where " +
+                    " receive_date>='"+date+" 00:00:00' and receive_date<'" + date + " 23:59:59' and (qc_step=1 or qc_step=2)";
             ResultSet resultSet1 = elasticSearchUtil.findBySql(sql1);
             resultSet1.next();
             ResultSet resultSet2 = elasticSearchUtil.findBySql(sql2);
@@ -928,13 +901,14 @@ public class PackStatisticsService extends BaseJpaService {
 
             sql2 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=0 AND pack_type=1 AND org_code='"+orgCode+"'";
 
-            sql3 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE pack_type=1 AND org_code='"+orgCode+"'";
+            sql3 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE pack_type=1 AND " +
+                    " AND (event_type=0 or event_type=1 or event_type=2) org_code='"+orgCode+"'";
         }else{
             sql1 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=1 AND pack_type=1";
 
             sql2 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=0 AND pack_type=1";
 
-            sql3 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE pack_type=1 ";
+            sql3 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE pack_type=1 AND (event_type=0 or event_type=1 or event_type=2)";
         }
         ResultSet resultSet1 = elasticSearchUtil.findBySql(sql1);
         ResultSet resultSet2 = elasticSearchUtil.findBySql(sql2);
@@ -947,48 +921,5 @@ public class PackStatisticsService extends BaseJpaService {
         map.put("oupatient_total",new Double(resultSet2.getObject("COUNT(DISTINCT event_no)").toString()).intValue());
         map.put("archive_total",new Double(resultSet3.getObject("COUNT(DISTINCT event_no)").toString()).intValue());
         return map;
-    }
-
-    public Envelop getErrorCodeList(String startDate, String endDate, String orgCode) throws Exception{
-        Envelop envelop = new Envelop();
-        List<Map<String, Object>> resultList = new ArrayList<>();
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("receiveTime>=" + startDate + ";");
-        stringBuilder.append("receiveTime<" + endDate + ";");
-        if (StringUtils.isNotEmpty(orgCode) && !"null".equals(orgCode)){
-            stringBuilder.append("orgCode=" + orgCode);
-        }
-        TransportClient transportClient = elasticSearchPool.getClient();
-        try {
-            SearchRequestBuilder builder = transportClient.prepareSearch("qc");
-            builder.setTypes("receive_data_element");
-            builder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
-            builder.setQuery(elasticSearchUtil.getQueryBuilder(stringBuilder.toString()));
-            AggregationBuilder terms = AggregationBuilders.terms("table").field("table");
-            AggregationBuilder termsChild = AggregationBuilders.terms("code").field("code");
-            ValueCountBuilder countBuilder = AggregationBuilders.count("count").field("code");
-            termsChild.subAggregation(countBuilder);
-            terms.subAggregation(termsChild);
-            builder.addAggregation(terms);
-            builder.setSize(0);
-            builder.setExplain(true);
-            SearchResponse response = builder.get();
-            StringTerms stringTerms = response.getAggregations().get("table");
-            stringTerms.getBuckets().forEach(item1 -> {
-                StringTerms term = item1.getAggregations().get("code");
-                term.getBuckets().forEach(item2 -> {
-                    Map<String,Object> temp = new HashMap<>();
-                    InternalValueCount internalValueCount = item2.getAggregations().get("count");
-                    temp.put("table",item1.getKeyAsString());
-                    temp.put("code",item2.getKeyAsString());
-                    temp.put("value",internalValueCount.getProperty("value"));
-                    resultList.add(temp);
-                });
-            });
-            envelop.setObj(resultList);
-        } finally {
-            elasticSearchPool.releaseClient(transportClient);
-        }
-        return envelop;
     }
 }
