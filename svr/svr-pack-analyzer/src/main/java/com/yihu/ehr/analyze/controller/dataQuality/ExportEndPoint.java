@@ -441,7 +441,7 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                                @ApiParam(name = "end", value = "结束时间", defaultValue = "")
                                @RequestParam(value = "end", required = false) String end,
                                @ApiParam(name = "eventType", value = "就诊类型 0门诊 1住院 2体检,null全部", defaultValue = "")
-                               @RequestParam(value = "eventType", required = false) Integer eventType,
+                               @RequestParam(value = "eventType", required = false) String eventType,
                               HttpServletResponse response){
         try {
             String fileName = "平台接收列表";
@@ -450,7 +450,11 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
             response.setHeader("Content-Disposition", "attachment; filename="
                     + new String( fileName.getBytes("gb2312"), "ISO8859-1" )+".xls");
             OutputStream os = response.getOutputStream();
-            List<Map<String, Object>> list = dataQualityStatisticsService.dataset(start,end,eventType);
+            Integer type=null;
+            if(StringUtils.isNotEmpty(eventType)&&!"null".equals(eventType)){
+                type=Integer.parseInt(eventType);
+            }
+            List<Map<String, Object>> list = dataQualityStatisticsService.dataset(start, end, type);
             //写excel
             WritableWorkbook wwb = Workbook.createWorkbook(os);
             //创建Excel工作表 指定名称和位置
@@ -499,7 +503,7 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                                          @RequestParam(value = "end", required = false) String end,
                                          HttpServletResponse response){
         try {
-            String fileName = "平台接收列表";
+            String fileName = "接收情况列表";
             //设置下载
             response.setContentType("octets/stream");
             response.setHeader("Content-Disposition", "attachment; filename="
