@@ -4,6 +4,7 @@ import com.yihu.ehr.basic.apps.model.App;
 import com.yihu.ehr.basic.apps.model.AppsRelation;
 import com.yihu.ehr.basic.apps.service.AppService;
 import com.yihu.ehr.basic.apps.service.AppsRelationService;
+import com.yihu.ehr.basic.apps.service.OauthClientDetailsService;
 import com.yihu.ehr.basic.dict.service.SystemDictEntryService;
 import com.yihu.ehr.basic.user.entity.Roles;
 import com.yihu.ehr.basic.user.service.RolesService;
@@ -13,6 +14,7 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.entity.dict.SystemDictEntry;
 import com.yihu.ehr.entity.oauth2.OauthClientDetails;
+import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.app.MApp;
 import com.yihu.ehr.model.dict.SystemDictEntryAppModel;
 import com.yihu.ehr.util.id.BizObject;
@@ -51,6 +53,8 @@ public class AppEndPoint extends EnvelopRestEndPoint {
     private SystemDictEntryService systemDictEntryService;
     @Autowired
     private AppsRelationService appsRelationService;
+    @Autowired
+    private OauthClientDetailsService oauthClientDetailsService;
 
     @RequestMapping(value = ServiceApi.Apps.Apps, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建App")
@@ -99,9 +103,24 @@ public class AppEndPoint extends EnvelopRestEndPoint {
             @RequestBody String appJson) throws Exception {
         App app = toEntity(appJson, App.class);
         if (appService.retrieve(app.getId()) == null) {
-            throw new RuntimeException("不存在相应appId：" + app.getId());
+            throw new ApiException("不存在相应appId：" + app.getId());
         }
-        appService.save(app);
+        OauthClientDetails oauthClientDetails = oauthClientDetailsService.retrieve(app.getId());
+        if (null == oauthClientDetails) {
+            oauthClientDetails = new OauthClientDetails();
+            oauthClientDetails.setClientId(app.getId());
+        }
+        oauthClientDetails.setResourceIds("user");
+        oauthClientDetails.setClientSecret(app.getSecret());
+        oauthClientDetails.setScope("read");
+        oauthClientDetails.setAuthorizedGrantTypes("authorization_code,refresh_token,password,implicit,verify_code");
+        oauthClientDetails.setWebServerRedirectUri(app.getUrl());
+        oauthClientDetails.setAuthorities(null);
+        oauthClientDetails.setAccessTokenValidity(null);
+        oauthClientDetails.setAccessTokenValidity(null);
+        oauthClientDetails.setAdditionalInformation(null);
+        oauthClientDetails.setAutoApprove("true");
+        appService.update(app, oauthClientDetails);
         return convertToModel(app, MApp.class);
     }
 
@@ -275,7 +294,7 @@ public class AppEndPoint extends EnvelopRestEndPoint {
         oauthClientDetails.setResourceIds("user");
         oauthClientDetails.setClientSecret(app.getSecret());
         oauthClientDetails.setScope("read");
-        oauthClientDetails.setAuthorizedGrantTypes("authorization_code,refresh_token,password,implicit");
+        oauthClientDetails.setAuthorizedGrantTypes("authorization_code,refresh_token,password,implicit,verify_code");
         oauthClientDetails.setWebServerRedirectUri(app.getUrl());
         oauthClientDetails.setAuthorities(null);
         oauthClientDetails.setAccessTokenValidity(null);

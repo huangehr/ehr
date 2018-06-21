@@ -882,7 +882,8 @@ public class WarningQuestionService extends BaseJpaService {
         List<DqWarningRecord> list = new ArrayList<>(3);
         Date recordTime = DateUtil.formatCharDateYMD(dateStr);
         String unqualified = "不合格";
-        String orgName = "省平台";
+        String orgName = warning.getOrgName();
+        String orgCode = warning.getOrgCode();
         //1、档案数
         if(uploadArchiveNum<warning.getArchiveNum()){
             //档案数<预警值
@@ -897,6 +898,7 @@ public class WarningQuestionService extends BaseJpaService {
             record.setWarningValue(warning.getArchiveNum()+"");
             record.setStatus("1");
             record.setOrgName(orgName);
+            record.setOrgCode(orgCode);
             record.setProblemDescription(DqWarningRecordWarningType.archiveNum.getName()+unqualified);
             list.add(record);
         }
@@ -914,6 +916,7 @@ public class WarningQuestionService extends BaseJpaService {
             record.setWarningValue(warning.getErrorNum()+"");
             record.setStatus("1");
             record.setOrgName(orgName);
+            record.setOrgCode(orgCode);
             record.setProblemDescription(DqWarningRecordWarningType.dataErrorNum.getName()+unqualified);
             list.add(record);
         }
@@ -931,6 +934,7 @@ public class WarningQuestionService extends BaseJpaService {
             record.setWarningValue(datasetNum+"");
             record.setStatus("1");
             record.setOrgName(orgName);
+            record.setOrgCode(orgCode);
             record.setProblemDescription(DqWarningRecordWarningType.uploadDatasetNum.getName()+unqualified);
             list.add(record);
         }
