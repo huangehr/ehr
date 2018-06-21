@@ -90,8 +90,20 @@ public class AppService extends BaseJpaService<App, AppDao> {
         app.setSecret(getRandomString(AppSecretLength));
         app.setCreateTime(new Date());
         app.setStatus("WaitingForApprove");
-        appDao.save(app);
-        return app;
+        OauthClientDetails oauthClientDetails = new OauthClientDetails();
+        oauthClientDetails.setClientId(app.getId());
+        oauthClientDetails.setResourceIds("user");
+        oauthClientDetails.setClientSecret(app.getSecret());
+        oauthClientDetails.setScope("read");
+        oauthClientDetails.setAuthorizedGrantTypes("authorization_code,refresh_token,password,implicit");
+        oauthClientDetails.setWebServerRedirectUri(app.getUrl());
+        oauthClientDetails.setAuthorities(null);
+        oauthClientDetails.setAccessTokenValidity(null);
+        oauthClientDetails.setAccessTokenValidity(null);
+        oauthClientDetails.setAdditionalInformation(null);
+        oauthClientDetails.setAutoApprove("true");
+        oauthClientDetailsDao.save(oauthClientDetails);
+        return appDao.save(app);
     }
 
     /**
@@ -183,6 +195,11 @@ public class AppService extends BaseJpaService<App, AppDao> {
 
     public App findById(String appId) {
         return appDao.findOne(appId);
+    }
+
+    public App update(App app, OauthClientDetails oauthClientDetails){
+        oauthClientDetailsDao.save(oauthClientDetails);
+        return appDao.save(app);
     }
 
     public void delete(String appId) {
