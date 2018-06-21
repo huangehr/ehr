@@ -1,13 +1,14 @@
 package com.yihu.ehr.basic.org.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.yihu.ehr.basic.address.service.AddressDictService;
 import com.yihu.ehr.basic.org.model.Organization;
 import com.yihu.ehr.basic.security.service.UserSecurityService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.entity.address.AddressDict;
 import com.yihu.ehr.entity.security.UserKey;
 import com.yihu.ehr.entity.security.UserSecurity;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
@@ -53,6 +54,8 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
     private FastDFSUtil fastDFSUtil;
     @Autowired
     private OrgDeptService orgDeptService;
+    @Autowired
+    private AddressDictService addressDictService;
 
 
     @RequestMapping(value = "/organizations/getAllOrgs", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -518,27 +521,35 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
-    @RequestMapping(value = "/organizations/getOrgListByAddressPidOrArea", method = RequestMethod.GET)
+    @RequestMapping(value = "/organizations/getOrgListTreeByAddressPid", method = RequestMethod.GET)
     @ApiOperation(value = "根据区域、机构区县查询机构列表")
-    public List<Map<String, String>> getOrgListByAddressPidOrArea(
+    public List<Map<String, Object>> getOrgListTreeByAddressPid(
             @ApiParam(name = "pid", value = "区域id", defaultValue = "")
-            @RequestParam(value = "pid") Integer pid,
-            @ApiParam(name = "orgArea", value = "机构区县", defaultValue = "")
-            @RequestParam(value = "orgArea", required = false) String orgArea) {
-        List<Map<String, String>> listMap = new ArrayList<>();
+            @RequestParam(value = "pid") Integer pid) {
+        List<Map<String, Object>> listMap = new ArrayList<>();
         try {
+            List<AddressDict> addList = addressDictService.getPidToAddr(pid);
             List<Organization> orgList;
-            if (StringUtils.isEmpty(orgArea)) {
-                orgList = orgService.getOrgListByAddressPid(pid);
-            } else {
-                orgList = orgService.getOrgListByAddressPidAndOrgArea(pid, orgArea);
-            }
-            orgList.forEach(one -> {
-                Map<String, String> map = new HashMap<>();
-                map.put("text", one.getFullName());
-                map.put("value", one.getOrgCode());
+            for (AddressDict addressDict : addList) {
+                List<Map<String, Object>> childListMap = new ArrayList<>();
+                Map<String, Object> allMap = new HashMap<>();
+                allMap.put("text", "全机构");
+                childListMap.add(allMap);
+                Map<String, Object> map = new HashMap<>();
+                map.put("text", addressDict.getName());
+                map.put("value", addressDict.getId());
+                orgList = orgService.getOrgListByAddressPidAndOrgArea(pid, addressDict.getId() + "");
+                if (null != orgList && orgList.size() > 0) {
+                    orgList.forEach(one -> {
+                        Map<String, Object> childMap = new HashMap<>();
+                        childMap.put("text", one.getFullName());
+                        childMap.put("value", one.getOrgCode());
+                        childListMap.add(childMap);
+                    });
+                }
+                map.put("children", childListMap);
                 listMap.add(map);
-            });
+            }
         }catch (Exception e) {
             e.printStackTrace();
         }
