@@ -265,5 +265,16 @@ public class RsResourceService extends BaseJpaService<RsResource, RsResourceDao>
         return rsList;
     }
 
+    /**
+     * 根据分类id获取资源视图，不分主细表
+     * @param rsResourceCategoryId
+     * @param dataSource
+     * @return
+     */
+    public List<String> findIdByCategoryIdAndDataSource(String rsResourceCategoryId, Integer dataSource) {
+        List<String> rsList = rsResourceDao.findIdByCategoryIdAndDataSourceAndName(rsResourceCategoryId, dataSource);
+        return rsList;
+    }
+
 
 }
