@@ -829,4 +829,12 @@ public class OrganizationController extends BaseController {
         return envelop;
     }
 
+    @RequestMapping(value = "/organizations/getOrgListTreeByAddressPid", method = RequestMethod.GET)
+    @ApiOperation(value = "根据区域、机构区县查询机构列表")
+    public List<Map<String, Object>> getOrgListTreeByAddressPid(
+            @ApiParam(name = "pid", value = "区域id", defaultValue = "")
+            @RequestParam(value = "pid") Integer pid) {
+        List<Map<String, Object>> listMap = orgClient.getOrgListTreeByAddressPid(pid);
+        return listMap;
+    }
 }

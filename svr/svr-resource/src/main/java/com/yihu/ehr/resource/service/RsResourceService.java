@@ -49,6 +49,7 @@ public class RsResourceService extends BaseJpaService<RsResource, RsResourceDao>
 
     /**
      * 资源创建
+     *
      * @param resource 资源实体
      * @return RsResources 资源实体
      */
@@ -67,7 +68,7 @@ public class RsResourceService extends BaseJpaService<RsResource, RsResourceDao>
             rsResourceDefaultQueryDao.deleteByResourcesId(id_);
             rsResourceDefaultParamDao.deleteByResourcesId(id_);
             rsResourceMetadataDao.deleteByResourcesId(id_);
-            List<RsRolesResource> rsRolesResourceList =  rsRolesResourceDao.findByResourceId(id_);
+            List<RsRolesResource> rsRolesResourceList = rsRolesResourceDao.findByResourceId(id_);
             rsRolesResourceList.forEach(item -> {
                 rsRolesResourceMetadataDao.deleteByRolesResourceId(item.getId());
             });
@@ -78,22 +79,24 @@ public class RsResourceService extends BaseJpaService<RsResource, RsResourceDao>
 
     /**
      * 资源获取
+     *
      * @param sorts 排序
-     * @param page 页码
-     * @param size 分页大小
+     * @param page  页码
+     * @param size  分页大小
      * @return Page<RsResources> 资源
      */
     public Page<RsResource> getResources(String sorts, int page, int size) {
-        Pageable pageable =  new PageRequest(page,size,parseSorts(sorts));
+        Pageable pageable = new PageRequest(page, size, parseSorts(sorts));
         return rsResourceDao.findAll(pageable);
     }
 
     /**
      * 根据资源分类获取资源
+     *
      * @param CategoryId
      * @return
      */
-    public List<RsResource> findByCategoryId(String CategoryId){
+    public List<RsResource> findByCategoryId(String CategoryId) {
         return rsResourceDao.findByCategoryId(CategoryId);
     }
 
@@ -103,13 +106,13 @@ public class RsResourceService extends BaseJpaService<RsResource, RsResourceDao>
      * @param id String Id
      * @return RsResources
      */
-    public RsResource getResourceById(String id)
-    {
+    public RsResource getResourceById(String id) {
         return rsResourceDao.findOne(id);
     }
 
     /**
      * 根据code获取资源
+     *
      * @param code
      * @return
      */
@@ -119,17 +122,18 @@ public class RsResourceService extends BaseJpaService<RsResource, RsResourceDao>
 
     /**
      * 获取资源列表树
+     *
      * @param dataSource
      * @param userResource
      * @param filters
      * @return
      */
-    public List<Map<String, Object>> getResourceTree(Integer dataSource, String userResource, String filters) throws IOException{
+    public List<Map<String, Object>> getResourceTree(Integer dataSource, String userResource, String filters) throws IOException {
         List<RsResourceCategory> rsCateList;
         List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
-        if (userResource.equals("*")){
+        if (userResource.equals("*")) {
             rsCateList = rsResourceCategoryDao.findByPid("");
-            for(RsResourceCategory rsResourceCategory : rsCateList) {
+            for (RsResourceCategory rsResourceCategory : rsCateList) {
                 Map<String, Object> childMap = getTreeMap(rsResourceCategory, 0, dataSource, null, filters);
                 resultList.add(childMap);
             }
@@ -139,7 +143,7 @@ public class RsResourceService extends BaseJpaService<RsResource, RsResourceDao>
             if (userResourceList.size() <= 0) {
                 userResourceList.add("NO_AUTH_RS");
             }
-            String [] ids = new String[userResourceList.size()];
+            String[] ids = new String[userResourceList.size()];
             userResourceList.toArray(ids);
             for (RsResourceCategory rsResourceCategory : rsCateList) {
                 Map<String, Object> childMap = getTreeMap(rsResourceCategory, 0, dataSource, ids, filters);
@@ -153,11 +157,12 @@ public class RsResourceService extends BaseJpaService<RsResource, RsResourceDao>
 
     /**
      * 递归获取数据
+     *
      * @param rsResourceCategory
      * @param filters
      * @return
      */
-    private Map<String, Object> getTreeMap(RsResourceCategory rsResourceCategory, int level, Integer dataSource, String [] ids, String filters) {
+    private Map<String, Object> getTreeMap(RsResourceCategory rsResourceCategory, int level, Integer dataSource, String[] ids, String filters) {
         Map<String, Object> masterMap = new HashMap<String, Object>();
         List<Map<String, Object>> detailList = new ArrayList<Map<String, Object>>();
         List<Map<String, Object>> childList = new ArrayList<Map<String, Object>>();
@@ -171,15 +176,15 @@ public class RsResourceService extends BaseJpaService<RsResource, RsResourceDao>
             masterMap.put("pid", rsResourceCategory.getId());
             List<RsResource> rsList;
             if (StringUtils.isEmpty(filters)) {
-                if(null == ids) {
+                if (null == ids) {
                     rsList = rsResourceDao.findByCategoryIdAndDataSource(rsResourceCategory.getId(), dataSource);
-                }else {
+                } else {
                     rsList = rsResourceDao.findByCategoryIdAndDataSourceAndIdsOrGrantType(rsResourceCategory.getId(), dataSource, ids, "0");
                 }
             } else {
-                if(null == ids) {
+                if (null == ids) {
                     rsList = rsResourceDao.findByCategoryIdAndDataSourceAndName(rsResourceCategory.getId(), dataSource, filters);
-                }else {
+                } else {
                     rsList = rsResourceDao.findByCategoryIdAndDataSourceAndIdsOrGrantTypeAndName(rsResourceCategory.getId(), dataSource, ids, "0", filters);
                 }
             }
@@ -204,7 +209,7 @@ public class RsResourceService extends BaseJpaService<RsResource, RsResourceDao>
             //处理下级数据
             List<RsResourceCategory> hList = rsResourceCategoryDao.findByPid(rsResourceCategory.getId());
             if (hList != null) {
-                for(RsResourceCategory category: hList) {
+                for (RsResourceCategory category : hList) {
                     childList.add(getTreeMap(category, level + 1, dataSource, ids, filters));
                 }
                 masterMap.put("child", childList);
@@ -216,9 +221,9 @@ public class RsResourceService extends BaseJpaService<RsResource, RsResourceDao>
         return masterMap;
     }
 
-    public List<RsResource> getResourcePage(String userResource, String userId, int page, int size) throws IOException{
+    public List<RsResource> getResourcePage(String userResource, String userId, int page, int size) throws IOException {
         Session session = currentSession();
-        if (page <= 0 ) {
+        if (page <= 0) {
             page = 1;
         }
         List<String> rsList = objectMapper.readValue(userResource, List.class);
@@ -236,17 +241,29 @@ public class RsResourceService extends BaseJpaService<RsResource, RsResourceDao>
         return query.list();
     }
 
-    public Integer getResourceCount(String userResource, String userId) throws IOException{
+    public Integer getResourceCount(String userResource, String userId) throws IOException {
         Session session = currentSession();
         List<String> rsList = objectMapper.readValue(userResource, List.class);
-        if(rsList.size() <= 0) {
+        if (rsList.size() <= 0) {
             rsList.add("NO_AUTH_RS");
         }
         String hql = "SELECT count(rsResource.id) FROM RsResource rsResource WHERE rsResource.categoryId IN (SELECT id FROM RsResourceCategory rsResourceCategory WHERE rsResourceCategory.code = 'derived') AND (rsResource.grantType = '0' OR rsResource.creator = :creator OR rsResource.id IN (:ids)) ";
         Query query = session.createQuery(hql);
         query.setParameter("creator", userId);
         query.setParameterList("ids", rsList);
-        return ((Long)query.list().get(0)).intValue();
+        return ((Long) query.list().get(0)).intValue();
     }
+
+    /**
+     * 根据分类id获取资源视图，不分主细表
+     * @param rsResourceCategoryId
+     * @param dataSource
+     * @return
+     */
+    public List<RsResource> findByCategoryIdAndDataSource(String rsResourceCategoryId, Integer dataSource) {
+        List<RsResource> rsList = rsResourceDao.findByCategoryIdAndDataSource(rsResourceCategoryId, dataSource);
+        return rsList;
+    }
+
 
 }

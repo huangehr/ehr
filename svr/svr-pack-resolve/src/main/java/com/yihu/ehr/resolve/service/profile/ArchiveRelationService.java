@@ -24,6 +24,7 @@ import java.util.Map;
 /**
  * 档案关联
  * Created by hzp on 2017/4/11.
+ * Modified by Progr1mmer
 */
 @Service
 public class ArchiveRelationService {
@@ -44,11 +45,9 @@ public class ArchiveRelationService {
      */
     public void archiveRelation(String profileId, String idCardNo) throws Exception {
         //判断记录是否存在
-        String re = hbaseDao.get(ResourceCore.MasterTable,profileId);
+        String re = hbaseDao.get(ResourceCore.MasterTable, profileId);
         if (!StringUtils.isEmpty(re)) {
             hbaseDao.put(ResourceCore.MasterTable, profileId, ResourceFamily.Basic, ResourceCells.DEMOGRAPHIC_ID, idCardNo);
-        } else {
-            throw new Exception("不存在相关记录");
         }
     }
 

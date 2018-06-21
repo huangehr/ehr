@@ -619,7 +619,7 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
             //写excel
             SXSSFWorkbook  wwb = new SXSSFWorkbook(100);
             wwb.setCompressTempFiles(true);
-            String[] title = {"接收时间","医疗机构","数据集","数据元","主键","错误原因"};
+            String[] title = {"接收时间","医疗机构","数据集","数据集名称","数据元","数据元名称","主键","错误原因"};
             int count = (int) elasticSearchUtil.count("json_archives_qc", "qc_metadata_info", filters);
             double pageNum = count % maxRowSize > 0 ? count / maxRowSize + 1 : count / maxRowSize;
             for (int i = 0; i < pageNum; i++) {
@@ -639,9 +639,11 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                     row.createCell(0).setCellValue(ObjectUtils.toString(record.get("receive_date")));
                     row.createCell(1).setCellValue(ObjectUtils.toString(record.get("org_name")));
                     row.createCell(2).setCellValue(ObjectUtils.toString(record.get("dataset")));
-                    row.createCell(3).setCellValue(ObjectUtils.toString(record.get("metadata")));
-                    row.createCell(4).setCellValue(ObjectUtils.toString(record.get("_id")));
-                    row.createCell(5).setCellValue(getExceptionType(ObjectUtils.toString(record.get("qc_error_type"))));
+                    row.createCell(3).setCellValue(ObjectUtils.toString(record.get("dataset_name")));
+                    row.createCell(4).setCellValue(ObjectUtils.toString(record.get("metadata")));
+                    row.createCell(5).setCellValue(ObjectUtils.toString(record.get("metadata_name")));
+                    row.createCell(6).setCellValue(ObjectUtils.toString(record.get("_id")));
+                    row.createCell(7).setCellValue(getExceptionType(ObjectUtils.toString(record.get("qc_error_type"))));
                 }
             }
             wwb.write(os);

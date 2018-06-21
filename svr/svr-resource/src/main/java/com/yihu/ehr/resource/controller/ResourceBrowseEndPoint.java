@@ -303,17 +303,13 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "orgCode") String orgCode,
             @ApiParam(name = "areaCode", value = "地区编码")
             @RequestParam(value = "areaCode") String areaCode,
-            @ApiParam(name = "queryParams", value = "json查询条件，{\"q\":\"*:*\"}")
-            @RequestParam(value = "queryParams", required = false) String queryParams,
-            @ApiParam(name = "page", value = "第几页")
-            @RequestParam(value = "page", required = false) Integer page,
-            @ApiParam(name = "size", value = "每页几条")
-            @RequestParam(value = "size", required = false) Integer size,
+            @ApiParam(name = "rowKey", value = "rowKey")
+            @RequestParam(value = "rowKey", required = false) String rowKey,
             @ApiParam(name = "version", value = "版本号")
             @RequestParam(value = "version", required = false) String version) throws Exception {
         //获取档案包中包含的数据集
         List<String> dataSets = resourceBrowseService.dataSetList(packId, version);
-        Envelop result = resourceBrowseService.getResultDataList(dataSets, roleId , orgCode, areaCode, queryParams, page, size);
+        Envelop result = resourceBrowseService.getResultDataList(version,dataSets, roleId , orgCode, areaCode, rowKey );
             if (version != null && version.length() > 0) {
             result.setObj(resourcesTransformService.displayCodeListConvert((Map<String, Object>) result.getObj(), version));
         }

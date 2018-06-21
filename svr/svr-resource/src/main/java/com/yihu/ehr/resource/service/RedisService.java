@@ -24,6 +24,13 @@ public class RedisService {
         return rsAdapterMetaKeySchema.getMetaData(cdaVersion, dictCode, srcDictEntryCode);
     }
 
+    /**
+     *获取标准数据集--主从表 redis
+     */
+    public Boolean getDataSetMultiRecord(String version, String code){
+        return stdDataSetKeySchema.dataSetMultiRecord(version, code);
+    }
+
     public String getRsMetadataDict(String key) {
         return rsMetadataKeySchema.get(key);
     }

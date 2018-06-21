@@ -127,5 +127,5 @@ spring:
     port: 6379
     password: q4YaQemf
 fast-dfs:
-  tracker-server: 192.168.50.116:22122,192.168.50.119:22122,192.168.50.116:22123
-  public-server: http://192.168.50.37:8888,http://192.168.50.38:8888,http://192.168.50.37:10000
+  tracker-server: 192.168.220.62:22122
+  public-server: http://192.168.220.62:23000

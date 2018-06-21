@@ -4,15 +4,14 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
+import com.yihu.ehr.model.common.Result;
+import com.yihu.ehr.resolve.service.profile.ArchiveRelationService;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -31,8 +30,10 @@ public class ArchiveRelationEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     private ElasticSearchUtil elasticSearchUtil;
+    @Autowired
+    private ArchiveRelationService archiveRelationService;
 
-    @RequestMapping(value = ServiceApi.ArchiveRelation.Crud, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.PackageResolve.ArchiveRelation, method = RequestMethod.GET)
     @ApiOperation(value = "获取档案关联列表")
     public Envelop list(
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
@@ -47,5 +48,16 @@ public class ArchiveRelationEndPoint extends EnvelopRestEndPoint {
         int count = (int)elasticSearchUtil.count(INDEX, TYPE, filters);
         Envelop envelop = getPageResult(archiveRelationList, count, page, size);
         return envelop;
+    }
+
+    @ApiOperation(value = "档案关联（单条）")
+    @RequestMapping(value = ServiceApi.PackageResolve.ArchiveRelation, method = RequestMethod.POST)
+    public Envelop archiveRelation(
+            @ApiParam(name = "profileId", value = "档案ID", required = true)
+            @RequestParam(value = "profileId") String profileId,
+            @ApiParam(name = "idCardNo", value = "身份证号码", required = true)
+            @RequestParam(value = "idCardNo") String idCardNo) throws Exception {
+        archiveRelationService.archiveRelation(profileId, idCardNo);
+        return success(true);
     }
 }

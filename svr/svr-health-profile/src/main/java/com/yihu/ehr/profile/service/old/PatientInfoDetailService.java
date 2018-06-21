@@ -38,8 +38,6 @@ public class PatientInfoDetailService {
     private TransformClient transform;
     @Autowired
     private ThridPrescriptionService thridPrescriptionService;
-    @Autowired
-    private ProflieClient proflieClient;
 
     /**
      * fastDfs服务器地址
@@ -198,117 +196,6 @@ public class PatientInfoDetailService {
         Envelop result = resource.getResources(BasicConstant.medicationMaster, "*","*", queryParams.replace(" ", "+"), null, null);
 
         return result.getDetailModelList();
-    }
-
-
-    /**
-     * 查询某个事件或某个处方处方笺信息
-     *
-     * @param profileId      主表rowkey
-     * @param prescriptionNo 处方编号
-     * @return
-     * @throws Exception
-     */
-    public List<Map<String, Object>> getPrescription(String profileId, String prescriptionNo,boolean reproduce) throws Exception {
-        try {
-            //处方笺数据
-            List<Map<String, Object>> returnMap = new ArrayList<Map<String, Object>>();
-
-            //profile_id为空返回null，不为空则返回处方笺信息
-            if (!StringUtils.isBlank(profileId)) {
-                Map<String, Object> mainEvent = new HashMap<String, Object>();
-                //根据rowkey查询门诊事件
-                Envelop envelop = resource.getResources(BasicConstant.patientEvent, "*", "*", "{\"q\":\"rowkey:" + profileId + "\"}", null, null);
-
-                //门诊事件为空返回null，不为空获取事件信息
-                if (envelop.getDetailModelList() == null || envelop.getDetailModelList().size() < 1) {
-                    return returnMap;
-                } else {
-                    mainEvent = (Map<String, Object>) envelop.getDetailModelList().get(0);
-                }
-
-                //查询事件对应主处方信息
-                Envelop mainPres = resource.getResources(BasicConstant.medicationMaster, "*", "*","{\"q\":\"profile_id:" + profileId
-                        + (!StringUtils.isBlank(prescriptionNo) ? ("+AND+EHR_000086:" + prescriptionNo) : "") + "\"}", null, null);
-
-                //主处方存在查询对应处方笺是否存在，不存在则根据处方信息生成处方笺
-                if (mainPres.getDetailModelList() != null && mainPres.getDetailModelList().size() > 0) {
-                    //主处方列表
-                    List<Map<String, Object>> mainList = mainPres.getDetailModelList();
-                    //待入库处方笺数据列表
-                    List<Map<String, String>> dataList = new ArrayList<Map<String, String>>();
-                    //查询处方对应处方笺
-                    Envelop presription = resource.getResources(BasicConstant.medicationPrescription, "*", "*","{\"q\":\"profile_id:"
-                            + profileId + "\"}", null, null);
-                    //处方笺List
-                    List<Map<String, Object>> presriptions = presription.getDetailModelList();
-
-                    for (Map<String, Object> main : mainList) {
-                        boolean existedFlag = false;
-                        Map<String, Object> currentPres = new HashMap<String, Object>();
-
-                        //判断对应处方笺是否存在
-                        if (presriptions != null) {
-                            for (Map<String, Object> map : presriptions) {
-                                if (map.containsKey("EHR_000086") && map.get("EHR_000086").toString().equals(main.get("EHR_000086").toString())) {
-                                    existedFlag = true;
-                                    currentPres = map;
-                                }
-                            }
-                        }
-
-                        //对应处方笺不存在则根据处方对应CDA数据生成处方笺图片
-                        if (!existedFlag || reproduce) {
-                            LogService.getLogger("prescription").info("profile:" + profileId + " prescription not existed,will be generated automatically");
-                            //处方笺数据
-                            Map<String, String> data = new HashMap<String, String>();
-                            if(main.get("EHR_001203") == null || StringUtils.isBlank(main.get("EHR_001203").toString()))
-                            {
-                                LogService.getLogger("prescription").error("EHR_001203 is null");
-                                throw new Exception("处方类型为空，请确认数据是否完整");
-                            }
-                            //处方笺不存在则生成保存
-                            String picPath = thridPrescriptionService.transformImage(profileId, mainEvent.get("org_code").toString(), mainEvent.get("cda_version").toString()
-                                    , main.get("EHR_001203").toString().equals("1") ? BasicConstant.xycd : BasicConstant.zycd, main.get("EHR_001203").toString(), 850, 900);
-                            LogService.getLogger("prescription").info("generate completed");
-                            //处方笺文件类型
-                            data.put("EHR_001194", "png");
-                            //处方编码
-                            data.put("EHR_000086", main.get("EHR_000086").toString());
-                            //处方笺图片
-                            data.put("EHR_001195", picPath);
-
-                            dataList.add(data);
-                        } else {
-                            returnMap.add(currentPres);
-                        }
-                    }
-
-                    //新生成的处方笺保存到HBASE
-                    if (dataList.size() > 0) {
-                        LogService.getLogger("prescription").info("prescription saving");
-                        //处方笺保存到HBASE
-                        String listString = proflieClient.savePrescription(profileId, objectMapper.writeValueAsString(dataList), returnMap.size());
-                        List<Map<String, Object>> savedDataList =  objectMapper.readValue(listString,List.class);
-                        returnMap.addAll(savedDataList);
-                        LogService.getLogger("prescription").info("prescription saved");
-                    }
-                }
-            }
-
-            //返回处方笺的图片完整地址
-            if (returnMap.size() > 0) {
-                for (Map<String, Object> map : returnMap) {
-                    String fileUrl = fastDfsUrl + "/" + map.get("EHR_001195").toString();
-                    map.put("EHR_001195", fileUrl);
-                }
-            }
-
-            return returnMap;
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            throw new Exception(ex.getMessage());
-        }
     }
 
     /**
