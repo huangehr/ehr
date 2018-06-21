@@ -58,9 +58,9 @@ public class BaseStatistsService {
     @Autowired
     private TjDataSourceService dataSourceService;
     @Autowired
-    ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
     @Autowired
-    private SolrUtil solrUtil;
+    private QuotaService quotaService;
     @Autowired
     private ElasticsearchUtil elasticsearchUtil;
     @Autowired
@@ -86,6 +86,19 @@ public class BaseStatistsService {
      * @throws Exception
      */
     public List<Map<String, Object>> getQuotaResultList(String code,String dimension,String filter,String dateType, String top) throws Exception {
+        TjQuota tjQuota = quotaService.findByCode(code);
+        if( tjQuota != null && StringUtils.isNotEmpty(tjQuota.getResultGetType())){
+           if (tjQuota.getResultGetType().equals("2")){//二次统计
+               TjQuotaDataSource quotaDataSorce = dataSourceService.findSourceByQuotaCode(code);
+               if(quotaDataSorce != null){
+                   JSONObject obj = new JSONObject().fromObject(quotaDataSorce.getConfigJson());
+                   EsConfig esConfig= (EsConfig) JSONObject.toBean(obj,EsConfig.class);
+                   if(StringUtils.isNotEmpty(esConfig.getSuperiorBaseQuotaCode())){
+                       code =  esConfig.getSuperiorBaseQuotaCode();
+                   }
+               }
+            }
+        }
         List<Map<String, Object>> dimenListResult = new ArrayList<>();
         if(StringUtils.isNotEmpty(dateType)){
             dimenListResult = getTimeAggregationResult(code, dimension, filter, dateType);
@@ -244,8 +257,11 @@ public class BaseStatistsService {
      */
     public List<Map<String, Object>>  divisionQuota(String molecular, String denominator, String dimension,
         String molecularFilter,String denominatorFilters,String operation,String operationValue,String dateType, String top) throws Exception {
-        List<Map<String, Object>> moleList = getQuotaResultList(molecular,dimension,molecularFilter,dateType, top);
-        List<Map<String, Object>> denoList =  getQuotaResultList(denominator,dimension,denominatorFilters,dateType, top);
+//        List<Map<String, Object>> moleList = getQuotaResultList(molecular,dimension,molecularFilter,dateType, top);
+//        List<Map<String, Object>> denoList =  getQuotaResultList(denominator,dimension,denominatorFilters,dateType, top);
+        List<Map<String, Object>> moleList = getSimpleQuotaReport(molecular, molecularFilter,dimension ,false , null);
+        List<Map<String, Object>> denoList =  getSimpleQuotaReport(denominator,denominatorFilters,dimension,false, null);
+
         dimension = StringUtils.isNotEmpty(dateType)? (StringUtils.isNotEmpty(dimension)? dimension +";"+dateType : dateType):dimension;
        return division(dimension,moleList,denoList,Integer.valueOf(operation),Integer.valueOf(operationValue));
     }
@@ -473,52 +489,52 @@ public class BaseStatistsService {
     }
 
 
-    /**
-     * 递归循环 查询机构类型对应的名称和父节点
-     * @param orgHealthCategoryList
-     * @param dimenListResult
-     * @param
-     * @return
-     */
-    public List<Map<String,Object>> setResultAllDimenMap(String quotaCode,List<Map<String,Object>> orgHealthCategoryList,List<Map<String, Object>> dimenListResult,String dateType){
-        List<Map<String,Object>> result = new ArrayList<>();
-        for(int i=0 ; i < orgHealthCategoryList.size() ; i++ ){
-            Map<String,Object> mapCategory = orgHealthCategoryList.get(i);
-            String code = mapCategory.get("code").toString();
-            boolean notExitFalg = true;
-            for(Map<String, Object> dimenMap : dimenListResult){
-                boolean flag = false;
-                if(dimenMap.get(orgHealthCategoryCode) != null){
-                    flag = dimenMap.get(orgHealthCategoryCode).equals(code);
-                }
-                if(dimenMap.get(code) != null || flag ){
-                    //补充所有信息
-                    mapCategory.putAll(dimenMap);
-                    if(dimenMap.containsKey(code)){
-                        mapCategory.put(code,dimenMap.get(code));
-                        mapCategory.put(resultField,dimenMap.get(resultField)!=null ? dimenMap.get(resultField):dimenMap.get(code));
-                    }
-                    if(StringUtils.isNotEmpty(dateType)){
-                        mapCategory.put(dimenMap.get(dateType).toString(),dimenMap.get(resultField));
-                    }
-                    mapCategory.put(quotaCode,dimenMap.get(resultField));
-                    notExitFalg = false;
-                    break;
-                }
-            }
-            if(notExitFalg){
-                mapCategory.put(resultField,0);
-                mapCategory.put(quotaCode,0);
-            }
-            mapCategory.put(firstColumnField,mapCategory.get("text"));
-            result.add(mapCategory);
-            if(mapCategory.get("children") != null){
-                List<Map<String,Object>> childrenOrgHealthCategoryList = (List<Map<String, Object>>) mapCategory.get("children");
-                mapCategory.put("children",setResultAllDimenMap(quotaCode, childrenOrgHealthCategoryList, dimenListResult, dateType));
-            }
-        }
-        return  result;
-    }
+//    /**
+//     * 递归循环 查询机构类型对应的名称和父节点
+//     * @param orgHealthCategoryList
+//     * @param dimenListResult
+//     * @param
+//     * @return
+//     */
+//    public List<Map<String,Object>> setResultAllDimenMap(String quotaCode,List<Map<String,Object>> orgHealthCategoryList,List<Map<String, Object>> dimenListResult,String dateType){
+//        List<Map<String,Object>> result = new ArrayList<>();
+//        for(int i=0 ; i < orgHealthCategoryList.size() ; i++ ){
+//            Map<String,Object> mapCategory = orgHealthCategoryList.get(i);
+//            String code = mapCategory.get("code").toString();
+//            boolean notExitFalg = true;
+//            for(Map<String, Object> dimenMap : dimenListResult){
+//                boolean flag = false;
+//                if(dimenMap.get(orgHealthCategoryCode) != null){
+//                    flag = dimenMap.get(orgHealthCategoryCode).equals(code);
+//                }
+//                if(dimenMap.get(code) != null || flag ){
+//                    //补充所有信息
+//                    mapCategory.putAll(dimenMap);
+//                    if(dimenMap.containsKey(code)){
+//                        mapCategory.put(code,dimenMap.get(code));
+//                        mapCategory.put(resultField,dimenMap.get(resultField)!=null ? dimenMap.get(resultField):dimenMap.get(code));
+//                    }
+//                    if(StringUtils.isNotEmpty(dateType)){
+//                        mapCategory.put(dimenMap.get(dateType).toString(),dimenMap.get(resultField));
+//                    }
+//                    mapCategory.put(quotaCode,dimenMap.get(resultField));
+//                    notExitFalg = false;
+//                    break;
+//                }
+//            }
+//            if(notExitFalg){
+//                mapCategory.put(resultField,0);
+//                mapCategory.put(quotaCode,0);
+//            }
+//            mapCategory.put(firstColumnField,mapCategory.get("text"));
+//            result.add(mapCategory);
+//            if(mapCategory.get("children") != null){
+//                List<Map<String,Object>> childrenOrgHealthCategoryList = (List<Map<String, Object>>) mapCategory.get("children");
+//                mapCategory.put("children",setResultAllDimenMap(quotaCode, childrenOrgHealthCategoryList, dimenListResult, dateType));
+//            }
+//        }
+//        return  result;
+//    }
 
     /**
      * 递归循环 计算各目录结构的值
@@ -1046,21 +1062,6 @@ public class BaseStatistsService {
         return result;
     }
 
-    public static void main(String args[]) {
-        String year = "";
-        String month = "";
-        String day = "";
-                String key ="'2018-03-01'";
-                String dateStr = key.substring(key.indexOf("'")+1,key.lastIndexOf("'"));
-                year = dateStr.substring(0, 4);
-                month = dateStr.substring(5,7);
-                day = dateStr.substring(8);
-
-        System.out.println(year);
-        System.out.println(month);
-        System.out.println(day);
-    }
-
     //时间对比类型 时的 查询条件处理
     public String getdateComparisonTypeFilter(EsConfig esConfig,String filters){
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
@@ -1249,7 +1250,7 @@ public class BaseStatistsService {
      */
     public List<Map<String, Object>> parseIntegerValue(String sql) {
         List<Map<String, Object>> listData = elasticsearchUtil.excuteDataModel(sql);
-        List<Map<String, Object>> handleData = new ArrayList<>();
+            List<Map<String, Object>> handleData = new ArrayList<>();
         listData.forEach(item -> {
             Map<String, Object> myMap = new HashMap<>();
             item.forEach((k,v) -> {
@@ -1265,50 +1266,51 @@ public class BaseStatistsService {
 
     public List<Map<String, Object>> divisionPercent(String dimension, List<Map<String, Object>> moleList, List<Map<String, Object>> denoList,int operation,int operationValue){
         List<Map<String, Object>> divisionResultList = new ArrayList<>();
-        for(Map<String, Object> moleMap : moleList) {
-            if (null != moleMap && moleMap.size() > 0 ) {
+        for(Map<String, Object> denoMap : denoList) {
+            if (null != denoMap && denoMap.size() > 0 ) {
                 Map<String, Object> map = new HashMap<>();
-                double moleResultVal = Double.valueOf(moleMap.get(resultField) == null ? "0" : moleMap.get(resultField).toString());
-                String moleKeyVal = "";
-                String [] moleDimensions = dimension.split(";");
-                for(int i = 0 ;i < moleDimensions.length ; i++){
+                double denoResultVal = Double.valueOf(denoMap.get(resultField) == null ? "0" : denoMap.get(resultField).toString());
+                String denoKeyVal = "";
+                String [] denoDimensions = dimension.split(";");
+                for(int i = 0 ;i < denoDimensions.length ; i++){
                     if(i == 0){
-                        moleKeyVal = moleMap.get(moleDimensions[i]).toString();
+                        denoKeyVal = denoMap.get(denoDimensions[i]).toString();
                     }else {
-                        moleKeyVal = moleKeyVal + "-" + moleMap.get(moleDimensions[i]).toString() ;
+                        denoKeyVal = denoKeyVal + "-" + denoMap.get(denoDimensions[i]).toString() ;
                     }
-                    map.put(firstColumnField, moleMap.get(firstColumnField));
-                    map.put(moleDimensions[i], moleMap.get(moleDimensions[i]).toString());
+                    map.put(firstColumnField, denoMap.get(firstColumnField));
+                    map.put(denoDimensions[i], denoMap.get(denoDimensions[i]).toString());
                 }
-                if (moleResultVal == 0) {
+                if (denoResultVal == 0) {
                     map.put(resultField, "--");
                     divisionResultList.add(map);
                 } else {
-                    for(Map<String, Object> denoMap :denoList) {
-                        String dimenKeyVal = "";
-                        String [] dimeDimensions = dimension.split(";");
-                        for(int i = 0 ;i < dimeDimensions.length ; i++){
-                            if(i == 0){
-                                dimenKeyVal = denoMap.get(dimeDimensions[i]).toString();
-                            }else {
-                                dimenKeyVal = dimenKeyVal + "-" + denoMap.get(dimeDimensions[i]).toString() ;
+                    if(moleList != null && moleList.size() > 0){
+                        for(Map<String, Object> moleMap :moleList) {
+                            String moleKeyVal = "";
+                            String [] moleDimensions = dimension.split(";");
+                            for(int i = 0 ;i < moleDimensions.length ; i++){
+                                if(i == 0){
+                                    moleKeyVal = moleMap.get(moleDimensions[i]).toString();
+                                }else {
+                                    moleKeyVal = moleKeyVal + "-" + moleMap.get(moleDimensions[i]).toString() ;
+                                }
                             }
-                        }
-                        if(moleKeyVal.equals(dimenKeyVal)){
-                            double point = 0;
-                            NumberFormat nf = NumberFormat.getInstance();
-                            nf.setGroupingUsed(false);
-                            nf.setMaximumFractionDigits(1);
-                            float dimeResultVal = Float.valueOf(denoMap.get(resultField).toString());
-                            if(dimeResultVal != 0) {
-                                point = ((moleResultVal - dimeResultVal)/dimeResultVal) * operationValue;
+                            if(denoKeyVal.equals(moleKeyVal)){
+                                double point = 0;
+                                NumberFormat nf = NumberFormat.getInstance();
+                                nf.setGroupingUsed(false);
+                                nf.setMaximumFractionDigits(1);
+                                float moleResultVal = Float.valueOf(moleMap.get(resultField).toString());
+                                point = ((moleResultVal - denoResultVal)/denoResultVal) * operationValue;
                                 map.put(resultField, nf.format(point));
-                            } else {
-                                map.put(resultField, "--");
+                                divisionResultList.add(map);
+                                break;
                             }
-                            divisionResultList.add(map);
-                            break;
                         }
+                    }else {
+                        map.put(resultField, 0);
+                        divisionResultList.add(map);
                     }
                 }
             }
@@ -1376,8 +1378,10 @@ public class BaseStatistsService {
             molecularFilter = "quotaDate >= '" + firstDay + "' and quotaDate <= '" + lastDay + "'";
             denominatorFilter = "quotaDate >= '" + preMonthFirstDay + "' and quotaDate <= '" + preMonthLastDay + "'";
         }
-        List<Map<String, Object>> moleList = divisionQuota(esConfig.getMolecular(), esConfig.getDenominator(), dimension, molecularFilter, molecularFilter, esConfig.getPercentOperation(), esConfig.getPercentOperationValue(), dateType, "");
-        List<Map<String, Object>> denoList = divisionQuota(esConfig.getMolecular(), esConfig.getDenominator(), dimension, denominatorFilter, denominatorFilter, esConfig.getPercentOperation(), esConfig.getPercentOperationValue(),dateType, "");
+        List<Map<String, Object>> moleList = getSimpleQuotaReport(esConfig.getMolecular(), molecularFilter,dimension ,false , null);
+        List<Map<String, Object>> denoList =  getSimpleQuotaReport(esConfig.getDenominator(),denominatorFilter,dimension,false, null);
+//        List<Map<String, Object>> moleList = divisionQuota(esConfig.getMolecular(), esConfig.getDenominator(), dimension, molecularFilter, molecularFilter, esConfig.getPercentOperation(), esConfig.getPercentOperationValue(), dateType, "");
+//        List<Map<String, Object>> denoList = divisionQuota(esConfig.getMolecular(), esConfig.getDenominator(), dimension, denominatorFilter, denominatorFilter, esConfig.getPercentOperation(), esConfig.getPercentOperationValue(),dateType, "");
         resultList = divisionPercent(dimension, moleList, denoList, 1, 100);
         return resultList;
     }
