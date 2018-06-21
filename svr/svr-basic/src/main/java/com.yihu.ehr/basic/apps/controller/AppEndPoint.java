@@ -113,7 +113,7 @@ public class AppEndPoint extends EnvelopRestEndPoint {
         oauthClientDetails.setResourceIds("user");
         oauthClientDetails.setClientSecret(app.getSecret());
         oauthClientDetails.setScope("read");
-        oauthClientDetails.setAuthorizedGrantTypes("authorization_code,refresh_token,password,implicit");
+        oauthClientDetails.setAuthorizedGrantTypes("authorization_code,refresh_token,password,implicit,verify_code");
         oauthClientDetails.setWebServerRedirectUri(app.getUrl());
         oauthClientDetails.setAuthorities(null);
         oauthClientDetails.setAccessTokenValidity(null);
@@ -294,7 +294,7 @@ public class AppEndPoint extends EnvelopRestEndPoint {
         oauthClientDetails.setResourceIds("user");
         oauthClientDetails.setClientSecret(app.getSecret());
         oauthClientDetails.setScope("read");
-        oauthClientDetails.setAuthorizedGrantTypes("authorization_code,refresh_token,password,implicit");
+        oauthClientDetails.setAuthorizedGrantTypes("authorization_code,refresh_token,password,implicit,verify_code");
         oauthClientDetails.setWebServerRedirectUri(app.getUrl());
         oauthClientDetails.setAuthorities(null);
         oauthClientDetails.setAccessTokenValidity(null);
