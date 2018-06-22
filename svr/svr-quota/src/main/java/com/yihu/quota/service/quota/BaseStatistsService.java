@@ -32,6 +32,7 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -133,7 +134,9 @@ public class BaseStatistsService {
 
     public List<Map<String, Object>> addition(String dimension, List<Map<String, Object>> firstList, List<Map<String, Object>> secondList,int operation){
         List<Map<String, Object>> addResultList = new ArrayList<>();
-        DecimalFormat df = new DecimalFormat("0.0");
+        NumberFormat nf = NumberFormat.getInstance();
+        nf.setGroupingUsed(false);
+        nf.setMaximumFractionDigits(2);
         String [] moleDimensions = dimension.split(";");
         for(Map<String, Object> firstMap :firstList) {
             if (null != firstMap && firstMap.size() > 0 ) {
@@ -166,15 +169,17 @@ public class BaseStatistsService {
                         }
                         if(firstKeyVal.equals(secondKeyVal) || "quotaName".equals(dimension)){  // 如果维度是quotaName，则进入逻辑
                             double point = 0;
-                            float dimeResultVal = Float.valueOf(secondMap.get(resultField).toString());
+                            double dimeResultVal = Double.valueOf(secondMap.get(resultField).toString());
                             if(dimeResultVal != 0){
+                                BigDecimal first = new BigDecimal(Double.toString(firstResultVal));
+                                BigDecimal second = new BigDecimal(Double.toString(dimeResultVal));
                                 if(operation == 1){ //1 加法 默认
-                                    point = firstResultVal + dimeResultVal ;
+                                    point = first.add(second).doubleValue();
                                 }else if(operation == 2){ //2 减法
-                                    point = firstResultVal - dimeResultVal;
+                                    point = first.subtract(second).doubleValue();
                                 }
                             }
-                            map.put(resultField,df.format(point));
+                            map.put(resultField,nf.format(point));
                             addResultList.add(map);
                             pflag = false;
                             break;
@@ -205,7 +210,7 @@ public class BaseStatistsService {
                             point = -secondResultVal;
                         }
                     }
-                    map.put(resultField, df.format(point));
+                    map.put(resultField, nf.format(point));
                     addResultList.add(map);
                 }
             }
