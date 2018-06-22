@@ -1642,6 +1642,8 @@ public class ServiceApi {
         public static final String DatasetWarningListNoPage = "/dataQuality/warningSetting/datasetWarningListNoPage";
         public static final String DatasetWarningAdd = "/dataQuality/warningSetting/datasetWarningAdd";
         public static final String DatasetWarningDel = "/dataQuality/warningSetting/datasetWarningDel";
+        public static final String DatasetList = "/dataQuality/warningSetting/datasetList";
+        public static final String Meta_datas = "/dataQuality/warningSetting/meta_datas";
         public static final String ReceivedPacketNumList = "/dataQuality/receivedPacket/packetNumList";
         public static final String ReceivedPacketReportData = "/dataQuality/receivedPacket/packetReportData";
         public static final String QualityMonitoringList = "/dataQuality/quality/qualityMonitoringList";
