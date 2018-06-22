@@ -697,7 +697,7 @@ public class RsResourceGrantEndPoint extends EnvelopRestEndPoint {
         return convertToModel(orgResourceMetadataGrantService.getRsOrgMetadataGrantById(id), MRsOrgResourceMetadata.class);
     }
 
-//-----------------------------------------------------------应用数据元一键授权 start----------------------------------------------------------------------------
+    //-----------------------------------------------------------应用数据元一键(取消)授权  start----------------------------------------------------------------------------
     @ApiOperation("单个应用一键授权多个资源（数据元）")
     @RequestMapping(value = ServiceApi.Resources.AppsGrantResourcesByCategoryId, method = RequestMethod.POST)
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -841,7 +841,160 @@ public class RsResourceGrantEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
-    //-----------------------------------------------------------应用数据元一键授权 end----------------------------------------------------------------------------
+    //-----------------------------------------------------------应用数据元一键(取消)授权 end----------------------------------------------------------------------------
 
+    //-----------------------------------------------------------角色组数据元一键(取消)授权 start-------------------------------------------------------------------------
+    @ApiOperation("单个角色组----一键授权多个资源")
+    @RequestMapping(value = ServiceApi.Resources.RolesGrantResourcesByCategoryId, method = RequestMethod.POST)
+    public Envelop rolesGrantResourcesByCategoryId(
+            @ApiParam(name = "rolesId", value = "角色组ID", defaultValue = "")
+            @PathVariable(value = "rolesId") String rolesId,
+            @ApiParam(name = "appId", value = "应用ID", defaultValue = "zkGuSIm2Fg")
+            @RequestParam(value = "appId") String appId,
+            @ApiParam(name = "categoryIds", value = "视图分类ID", defaultValue = "0dae002159535497b3865e129433e933")
+            @RequestParam(value = "categoryIds", required = false) String categoryIds,
+            @ApiParam(name = "resourceIds", value = "资源ID", defaultValue = "d3beebf86ed611e89f87fa163e20f96e")
+            @RequestParam(value = "resourceIds", required = false) String resourceIds) throws Exception {
+        List<RsRolesResource> rolesRsList = new ArrayList<RsRolesResource>();
+        Envelop envelop = new Envelop();
+        if (StringUtils.isEmpty(resourceIds)) {
+            if (StringUtils.isEmpty(categoryIds)) {
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg("视图分类id与资源id不能同时为空！");
+                return envelop;
+            } else {
+                //根据视图分类id获取视图list
+                String[] categoryIdArray = categoryIds.split(",");
+                for (String categoryId : categoryIdArray) {
+                    //根据视图分类id获取 档案数据资源list
+                    List<String> rsResourceIdList = rsResourceService.findIdByCategoryIdAndDataSource(categoryId, 1);
+                    if(null!= rsResourceIdList && rsResourceIdList.size()>0){
+                        List<RsAppResource> rsResourceList = rsGrantService.findByrsResourceIds(rsResourceIdList.toArray(new String[rsResourceIdList.size()]),appId);
+                        for (RsAppResource rsResource : rsResourceList) {
+                            RsRolesResource rolesRs = new RsRolesResource();
+                            rolesRs.setId(getObjectId(BizObject.RolesResource));
+                            rolesRs.setRolesId(rolesId);
+                            rolesRs.setResourceId(rsResource.getResourceId());
+                            rolesRsList.add(rolesRs);
+                        }
+                    }
+
+                }
+            }
+        } else {
+            String[] resourceIdArray = resourceIds.split(",");
+            for (String resoruceId : resourceIdArray) {
+                RsRolesResource rolesRs = new RsRolesResource();
+                rolesRs.setId(getObjectId(BizObject.RolesResource));
+                rolesRs.setRolesId(rolesId);
+                rolesRs.setResourceId(resoruceId);
+                rolesRsList.add(rolesRs);
+            }
+        }
+        //查找视图是否已经授权，删除已授权数据
+        for (RsRolesResource rsAppResource : rolesRsList) {
+            List<String> rsAppResourcesear = rolesResourceGrantService.findIdByResourceIdAndRolesId(rsAppResource.getResourceId(), rolesId);
+            if (null != rsAppResourcesear && rsAppResourcesear.size() > 0) {
+                rolesResourceGrantService.deleteGrantByIds(rsAppResourcesear.toArray(new String[rsAppResourcesear.size()]));
+            }
+        }
+        //授权视图
+        rolesResourceGrantService.grantResourceBatch(rolesRsList);
+        //授权视图数据元
+        updateRsRolrResourceMetadataByRsAppResource(rolesId, rolesRsList);
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(rolesRsList);
+        envelop.setTotalCount(rolesRsList.size());
+        return envelop;
+    }
+
+    /**
+     * 一键授权-授权数据元
+     *
+     * @param list
+     * @return
+     * @throws Exception
+     */
+    public void updateRsRolrResourceMetadataByRsAppResource(String rolesId, List<RsRolesResource> list) throws Exception {
+        List<RsRolesResourceMetadata> appRsMetadataList = new ArrayList<RsRolesResourceMetadata>();
+        if (null != list && list.size() > 0) {
+            for (RsRolesResource rsAppResource : list) {
+                //根据rs_resoruceId获取rs_resource_metadata中的数据元，授权
+                List<RsResourceMetadata> rsResourceMetadataList = rsResourceMetadataService.getRsMetadataByResourcesId(rsAppResource.getResourceId());
+                for (RsResourceMetadata rsResourceMetadata : rsResourceMetadataList) {
+                    RsRolesResourceMetadata rsRolesResourceMetadata = new RsRolesResourceMetadata();
+                    rsRolesResourceMetadata.setId(getObjectId(BizObject.AppResourceMetadata));
+                    rsRolesResourceMetadata.setRolesResourceId(rsAppResource.getId());
+                    rsRolesResourceMetadata.setResourceMetadataId(rsResourceMetadata.getMetadataId());
+                    rsRolesResourceMetadata.setRolesId(rolesId);
+                    rsRolesResourceMetadata.setResourceMetadataName((null != rsResourceMetadata.getDescription() ? rsResourceMetadata.getDescription().substring(rsResourceMetadata.getDescription().indexOf("--") + 2) : ""));
+                    appRsMetadataList.add(rsRolesResourceMetadata);
+                }
+                rolesResourceMetadataGrantService.grantRsRolesMetadataBatch(appRsMetadataList);
+            }
+        }
+    }
+
+    @ApiOperation("单个角色组----一键取消授权多个资源")
+    @RequestMapping(value = ServiceApi.Resources.DeleteRolesGrantResourcesByCategoryId, method = RequestMethod.PUT)
+    public Envelop deleteRolesGrantResourcesByCategoryId(
+            @ApiParam(name = "rolesId", value = "角色组ID", defaultValue = "")
+            @PathVariable(value = "rolesId") String rolesId,
+            @ApiParam(name = "appId", value = "应用ID", defaultValue = "zkGuSIm2Fg")
+            @RequestParam(value = "appId") String appId,
+            @ApiParam(name = "categoryIds", value = "视图分类ID", defaultValue = "0dae002159535497b3865e129433e933")
+            @RequestParam(value = "categoryIds", required = false) String categoryIds,
+            @ApiParam(name = "resourceIds", value = "资源ID", defaultValue = "d3beebf86ed611e89f87fa163e20f96e")
+            @RequestParam(value = "resourceIds", required = false) String resourceIds) throws Exception {
+        List<RsRolesResource> rolesRsList = new ArrayList<RsRolesResource>();
+        Envelop envelop = new Envelop();
+        if (StringUtils.isEmpty(resourceIds)) {
+            if (StringUtils.isEmpty(categoryIds)) {
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg("视图分类id与资源id不能同时为空！");
+                return envelop;
+            } else {
+                //根据视图分类id获取视图list
+                String[] categoryIdArray = categoryIds.split(",");
+                for (String categoryId : categoryIdArray) {
+                    //根据视图分类id获取 档案数据资源list
+                    List<String> rsResourceIdList = rsResourceService.findIdByCategoryIdAndDataSource(categoryId, 1);
+                    if(null!= rsResourceIdList && rsResourceIdList.size()>0) {
+                        List<RsAppResource> rsResourceList = rsGrantService.findByrsResourceIds(rsResourceIdList.toArray(new String[rsResourceIdList.size()]), appId);
+                        for (RsAppResource rsResource : rsResourceList) {
+                            RsRolesResource rolesRs = new RsRolesResource();
+                            rolesRs.setId(getObjectId(BizObject.RolesResource));
+                            rolesRs.setRolesId(rolesId);
+                            rolesRs.setResourceId(rsResource.getResourceId());
+                            rolesRsList.add(rolesRs);
+                        }
+                    }
+
+                }
+            }
+        } else {
+            String[] resourceIdArray = resourceIds.split(",");
+            for (String resoruceId : resourceIdArray) {
+                RsRolesResource rolesRs = new RsRolesResource();
+                rolesRs.setId(getObjectId(BizObject.RolesResource));
+                rolesRs.setRolesId(rolesId);
+                rolesRs.setResourceId(resoruceId);
+                rolesRsList.add(rolesRs);
+            }
+        }
+        //查找视图是否已经授权，删除已授权数据
+        for (RsRolesResource rsAppResource : rolesRsList) {
+            List<String> rsAppResourcesear = rolesResourceGrantService.findIdByResourceIdAndRolesId(rsAppResource.getResourceId(), rolesId);
+            if (null != rsAppResourcesear && rsAppResourcesear.size() > 0) {
+                rolesResourceGrantService.deleteGrantByIds(rsAppResourcesear.toArray(new String[rsAppResourcesear.size()]));
+            }
+        }
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(rolesRsList);
+        envelop.setTotalCount(rolesRsList.size());
+        return envelop;
+    }
+
+//-----------------------------------------------------------角色组数据元一键(取消)授权 end----------------------------------------------------------------------------
 
 }

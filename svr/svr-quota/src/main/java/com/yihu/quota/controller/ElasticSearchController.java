@@ -5,7 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.elasticsearch.ElasticSearchClient;
 import com.yihu.ehr.elasticsearch.ElasticSearchConfig;
+import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.query.services.SolrQuery;
+import com.yihu.ehr.util.datetime.DateUtil;
+import com.yihu.ehr.util.rest.Envelop;
+import com.yihu.quota.etl.model.EsConfig;
 import com.yihu.quota.etl.util.ElasticsearchUtil;
 import com.yihu.quota.etl.util.EsClientUtil;
 import com.yihu.quota.vo.PersonalInfoModel;
@@ -13,9 +17,12 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
+import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -29,10 +36,8 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.net.URLEncoder;
+import java.util.*;
 
 /**
  * Created by lyr on 2016/7/26.
@@ -57,43 +62,93 @@ public class ElasticSearchController extends BaseController {
     @Autowired
     private SolrQuery solrQuery;
 
+    @ApiOperation("sql查询es")
+    @RequestMapping(value = "/open/getEsInfoBySql", method = RequestMethod.GET)
+    public Envelop getEsInfoBySql(
+            @ApiParam(value = "sql", name = "查询的SQL")
+            @RequestParam(value = "sql") String sql) {
+        Envelop envelop = new Envelop();
+        if (StringUtils.isEmpty(sql)) {
+            envelop.setErrorMsg("sql为空");
+            return envelop;
+        }
+        try {
+            List<Map<String, Object>> listData = elasticsearchUtil.excuteDataModel(sql);
+            envelop.setDetailModelList(listData);
+        } catch (Exception e) {
+            envelop.setErrorMsg("sql执行出错");
+        }
+        return envelop;
+    }
+
+    @ApiOperation("根据index查询es")
+    @RequestMapping(value = "/open/getEsInfoByIndexAndParam", method = RequestMethod.GET)
+    public Envelop getEsInfoByIndexAndParam(
+            @ApiParam(value = "index", name = "es索引")
+            @RequestParam(value = "index") String index,
+            @ApiParam(value = "whereCondition", name = "where 条件")
+            @RequestParam(value = "whereCondition", required = false) String whereCondition) {
+        Envelop envelop = new Envelop();
+        if (StringUtils.isEmpty(index)) {
+            envelop.setErrorMsg("es索引为空");
+            return envelop;
+        }
+        try {
+            StringBuffer sb = new StringBuffer("select * from ");
+            sb.append(index);
+            if (StringUtils.isNotEmpty(whereCondition)) {
+                sb.append(" where ").append(whereCondition).append(" limit 10000");
+            }
+            List<Map<String, Object>> listData = elasticsearchUtil.excuteDataModel(sb.toString());
+            envelop.setDetailModelList(listData);
+            envelop.setObj(listData.size());
+        } catch (Exception e) {
+            envelop.setErrorMsg("sql执行出错");
+        }
+        return envelop;
+    }
 
     @RequestMapping(value = "/getSolrData", method = RequestMethod.GET)
-    @ApiOperation("根据条件获取solr 数据")
+    @ApiOperation("根据条件获取solr 数据,结果不超过5万条")
     public void getSolrData(
-            @ApiParam(value = "core")
-            @RequestParam(value = "core 表名", required = true) String core,
+            @ApiParam(value = "core 表名，如 HealthProfile")
+            @RequestParam(value = "core", required = true) String core,
             @ApiParam(name = "q", value = "查询条件 多个用  AND 拼接")
             @RequestParam(name = "q",required = true) String q,
-            @ApiParam(name = "fl", value = "展示字段 多个用  , 拼接 如：org_area,org_code,EHR_000081")
+            @ApiParam(name = "fl", value = "展示字段 多个用  , 拼接 如 org_area,org_code,EHR_000081")
             @RequestParam(name = "fl",required = true) String fl,HttpServletResponse response
     ){
         long rows = 0;
         List<Map<String, Object>> list = new ArrayList<>();
         try {
+            HSSFWorkbook workbook = new HSSFWorkbook();
+            //建立新的sheet对象（excel的表单）
+            HSSFSheet sheet = workbook.createSheet("solr 数据");
             if(StringUtils.isEmpty(fl)){
-                return;
+                HSSFRow row0 = sheet.createRow(0);
+                row0.createCell(0).setCellValue("展示字段 不能为空");
             }else {
                 fl += ",rowkey";
             }
             String [] fields = fl.split(",");
             rows = solrQuery.count(core,q);
-            list =  solrQuery.queryReturnFieldList(core, q, null, null, 0, rows,fields, null, null);
-            //创建HSSFWorkbook对象(excel的文档对象)
-            HSSFWorkbook workbook = new HSSFWorkbook();
-            //建立新的sheet对象（excel的表单）
-            HSSFSheet sheet = workbook.createSheet("solr 数据");
-            HSSFRow row0 = sheet.createRow(0);
-            for(int j = 0;j < fields.length ;j++){
-               row0.createCell(j).setCellValue(fields[j]);
-            }
-
-            for(int i = 0;i < list.size() ;i++){
-                Map<String, Object> map = list.get(i);
-                HSSFRow row = sheet.createRow(i+1);
+            if(rows > 50000){
+                HSSFRow row0 = sheet.createRow(0);
+                row0.createCell(0).setCellValue("数据超过五万条，数据量过大");
+            }else {
+                list =  solrQuery.queryReturnFieldList(core, q, null, null, 0, rows,fields);
+                HSSFRow row0 = sheet.createRow(0);
                 for(int j = 0;j < fields.length ;j++){
-                    if(map.get(fields[j]) != null){
-                        row.createCell(j).setCellValue(map.get(fields[j]).toString());
+                    row0.createCell(j).setCellValue(fields[j]);
+                }
+
+                for(int i = 0;i < list.size() ;i++){
+                    Map<String, Object> map = list.get(i);
+                    HSSFRow row = sheet.createRow(i+1);
+                    for(int j = 0;j < fields.length ;j++){
+                        if(map.get(fields[j]) != null){
+                            row.createCell(j).setCellValue(map.get(fields[j]).toString());
+                        }
                     }
                 }
             }

@@ -17,6 +17,8 @@ import com.yihu.ehr.model.quality.MDqPaltformReceiveWarning;
 import com.yihu.ehr.model.quality.MDqPaltformResourceWarning;
 import com.yihu.ehr.model.quality.MDqPaltformUploadWarning;
 import com.yihu.ehr.util.rest.Envelop;
+import com.yihu.hos.model.standard.MStdDataSet;
+import com.yihu.hos.model.standard.MStdMetaData;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -26,6 +28,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -506,45 +509,59 @@ public class WarningSettingEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
-//    @RequestMapping(value = ServiceApi.DataQuality.DatasetList, method = RequestMethod.GET)
-//    @ApiOperation(value = "获取数据集")
-//    public Envelop datasetList(
-//            @ApiParam(name = "orgCode", value = "机构code（平台上传时可不传）", defaultValue = "jkzl")
-//            @RequestParam(value = "orgCode", required = false) String orgCode,
-//            @ApiParam(name = "code", value = "数据集编码", defaultValue = "")
-//            @RequestParam(value = "code", required = false) String code,
-//            @ApiParam(name = "name", value = "数据集名称", defaultValue = "")
-//            @RequestParam(value = "name", required = false) String name,
-//            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
-//            @RequestParam(value = "size", required = true) int size,
-//            @ApiParam(name = "page", value = "页码", defaultValue = "1")
-//            @RequestParam(value = "page", required = true) int page) {
-//        Envelop envelop = new Envelop();
-//        try {
-//            String filters = "version="+defaultQualityVersion;
-//            if(StringUtils.isNotBlank(name)){
-//                filters+=";name?"+name;
-//            }
-//            if(StringUtils.isNotBlank(code)){
-//                filters+=";code?"+code;
-//            }
-//            ResponseEntity<List<MStdDataSet>> res = standardServiceClient.searchDataSets(null,filters,"-code",size,page,defaultQualityVersion);
-//            List<MStdDataSet> mStdDataSetList = res.getBody();
-//            List<MDataSet> mDataSets = new ArrayList<>(mStdDataSetList.size());
-//            mStdDataSetList.forEach(item->{
-//                MDataSet set = new MDataSet();
-//                set.setName(item.getName());
-//                set.setCode(item.getCode());
-//            });
-//            int totalCount = getTotalCount(res);
-//            return getPageResult(mDataSets,totalCount,page,size);
-//        }catch (Exception e){
-//            e.printStackTrace();
-//            envelop.setSuccessFlg(false);
-//            envelop.setErrorMsg(e.getMessage());
-//        }
-//        return envelop;
-//    }
+    @RequestMapping(value = ServiceApi.DataQuality.Meta_datas, method = RequestMethod.GET)
+    @ApiOperation(value = "获取数据元")
+    public Envelop meta_datas(
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page) {
+        Envelop envelop = new Envelop();
+        try {
+            ResponseEntity<List<MStdMetaData>> res = standardServiceClient.searchOrgMetaDatas(fields,filters,sorts,size,page,defaultQualityVersion);
+            List<MStdMetaData> mStdDataSetList = res.getBody();
+            int totalCount = getTotalCount(res);
+            return getPageResult(mStdDataSetList,totalCount,page,size);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.DataQuality.DatasetList, method = RequestMethod.GET)
+    @ApiOperation(value = "获取数据集")
+    public Envelop datasetList(
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page) {
+        Envelop envelop = new Envelop();
+        try {
+            ResponseEntity<List<MStdDataSet>> res = standardServiceClient.searchDataSets(fields,filters,sorts,size,page,defaultQualityVersion);
+            List<MStdDataSet> mStdDataSetList = res.getBody();
+            int totalCount = getTotalCount(res);
+            return getPageResult(mStdDataSetList,totalCount,page,size);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return envelop;
+    }
 
     @RequestMapping(value = ServiceApi.DataQuality.ImportDatasetExcel, method = RequestMethod.POST)
     @ApiOperation(value = "数据集导入")
