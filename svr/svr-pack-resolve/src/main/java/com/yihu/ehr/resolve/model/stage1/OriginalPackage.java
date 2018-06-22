@@ -4,7 +4,6 @@ import com.yihu.ehr.profile.EventType;
 import com.yihu.ehr.profile.ProfileType;
 import com.yihu.ehr.profile.model.PackageDataSet;
 import com.yihu.ehr.profile.model.ProfileId;
-import com.yihu.ehr.resolve.model.stage2.ResourceBucket;
 
 import java.util.Date;
 import java.util.Map;
@@ -28,7 +27,7 @@ public abstract class OriginalPackage {
     protected Date createDate;
     protected boolean reUploadFlg;
     //身份识别标志
-    private boolean identifyFlag;
+    protected boolean identifyFlag;
     //原始数据集
     protected Map<String, PackageDataSet> dataSets = new TreeMap<>();
 
