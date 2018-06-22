@@ -316,4 +316,31 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
         return result;
     }
 
+
+    /**
+     * 获取资源数据(转译)
+     */
+    @ApiOperation("获取资源数据，通过数据集列表对应的数据(转译)")
+    @RequestMapping(value = ServiceApi.Resources.ResourceQueryByDataSets, method = RequestMethod.POST)
+    public Envelop getResourceByDataSets(
+            @ApiParam(name = "dataSets", value = "数据集集合")
+            @RequestParam(value = "dataSets") List dataSets,
+            @ApiParam(name = "roleId", value = "角色ID")
+            @RequestParam(value = "roleId") String roleId,
+            @ApiParam(name = "orgCode", value = "机构编码")
+            @RequestParam(value = "orgCode") String orgCode,
+            @ApiParam(name = "areaCode", value = "地区编码")
+            @RequestParam(value = "areaCode") String areaCode,
+            @ApiParam(name = "rowKey", value = "rowKey")
+            @RequestParam(value = "rowKey", required = false) String rowKey,
+            @ApiParam(name = "version", value = "版本号")
+            @RequestParam(value = "version", required = false) String version) throws Exception {
+        //获取档案包中包含的数据集
+        Envelop result = resourceBrowseService.getResultDataList(version,dataSets, roleId , orgCode, areaCode, rowKey );
+        if (version != null && version.length() > 0) {
+            result.setObj(resourcesTransformService.displayCodeListConvert((Map<String, Object>) result.getObj(), version));
+        }
+        return result;
+    }
+
 }

@@ -150,7 +150,7 @@ public class OutPatientCostScheduler {
         }
     }
 
-    @ApiOperation("抽取指定时间段疾病费用")
+    @ApiOperation("抽取指定时间段住院疾病费用")
     @RequestMapping(value = "/extractInPatientDiseaseExpense", method = RequestMethod.GET)
     public Envelop extractInPatientDiseaseExpense(
             @ApiParam(name = "startDate", value = "开始日期，格式 YYYY-MM-DD，接口里自动拼接 T00:00:00Z，", required = true)
@@ -239,7 +239,7 @@ public class OutPatientCostScheduler {
         return envelop;
     }
 
-    @ApiOperation("抽取指定时间段科室费用")
+    @ApiOperation("抽取指定时间段住院科室费用")
     @RequestMapping(value = "/extractInPatientDeptExpense", method = RequestMethod.GET)
     public Envelop extractInPatientDeptExpense(
             @ApiParam(name = "startDate", value = "开始日期，格式 YYYY-MM-DD，接口里自动拼接 T00:00:00Z，", required = true)

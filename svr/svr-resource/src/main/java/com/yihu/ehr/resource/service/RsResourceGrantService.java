@@ -146,4 +146,7 @@ public class RsResourceGrantService extends BaseJpaService<RsAppResource, RsAppR
     public List<String> findByrsResourceIdAndAppId(String rsResourceId, String appId) {
         return appRsDao.findByrsResourceIdAndAppId(rsResourceId, appId);
     }
+    public List<RsAppResource> findByrsResourceIds(String[] rsResourceIds,String appId) {
+        return appRsDao.findByrsResourceIds(rsResourceIds,appId);
+    }
 }

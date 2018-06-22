@@ -42,6 +42,7 @@ public class ServiceApi {
         //public static final String ResourceSubQuery = "/resources/sub_query"; //详细资源查询接口
         public static final String ResourceQueryTransform = "/resources/query/transform"; //资源查询接口+转译
         public static final String ResourceQueryAllTransform = "/resources/queryAll/transform"; //资源查询接口获取所有数据集相关+转译
+        public static final String ResourceQueryByDataSets = "/resources/query/dataSets"; //资源查询接口获取数据集相关的数据+转译
         public static final String ResourceRawFiles = "/resources/query/raw_files"; //非结构资源查询接口
         public static final String ResourceRawFilesList = "/resources/query/raw_files_list"; //非结构资源List查询接口
         public static final String ResourceMasterData = "/resources/query/master_data"; //主表资源查询接口
@@ -187,6 +188,8 @@ public class ServiceApi {
         public static final String ResourceRolesMetadataGrant = "/resources/rolesMetadata/grants/{id}";
         public static final String ResourceRolesGrantsNoPage = "/resources/rolesGrants/no_paging";
         public static final String ResourceRolesResMetadataGrants = "/resources/roles_resource/{roles_res_id}/metadata";
+        public static final String RolesGrantResourcesByCategoryId = "/resources/roles/{rolesId}/grantByCategoryId";
+        public static final String DeleteRolesGrantResourcesByCategoryId = "/resources/roles/{rolesId}/deleteGrantByCategoryId";
 
         /**
          * 机构-资源授权

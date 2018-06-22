@@ -146,4 +146,14 @@ public class RsRolesResourceGrantService extends BaseJpaService<RsRolesResource,
         return rsRolesResourceDao.findByResourceIdAndRolesId(resourceId, roleId);
     }
 
+    /**
+     * 根据资源id和角色id
+     * @param resourceId
+     * @param roleId
+     * @return
+     */
+    public List<String> findIdByResourceIdAndRolesId(String resourceId, String roleId) {
+        return rsRolesResourceDao.findIdByResourceIdAndRolesId(resourceId, roleId);
+    }
+
 }
