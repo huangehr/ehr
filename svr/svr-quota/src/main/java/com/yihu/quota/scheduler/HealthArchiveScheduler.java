@@ -55,6 +55,7 @@ public class HealthArchiveScheduler {
             Date yesterdayDate = DateUtils.addDays(now,-1);
             String yesterday = DateUtil.formatDate(yesterdayDate, DateUtil.DEFAULT_DATE_YMD_FORMAT);
             String fq = "event_date:[" + yesterday + "T00:00:00Z TO  " + yesterday + "T23:59:59Z]";
+            System.out.println("抽取时间：fq = " + fq);
             log.info("抽取时间：fq = {}", fq);
             // 抽取并保存到ES
             handleData(fq);
@@ -75,6 +76,7 @@ public class HealthArchiveScheduler {
         try {
             String fq = "event_date:[" + startDate + "T00:00:00Z TO  " + endDate + "T23:59:59Z]";
             log.info("抽取时间：fq = {}", fq);
+            System.out.println("抽取时间：fq = " + fq);
             // 抽取并保存到ES
             handleData(fq);
         } catch (Exception e) {
@@ -104,6 +106,7 @@ public class HealthArchiveScheduler {
         List<HealthArchiveInfoModel> healthArchiveInfoModelList = new ArrayList<>();
         // 找出就诊档案数
         long count = solrUtil.count(ResourceCore.MasterTable, q, fq);
+        System.out.println("count = " + count);
         List<String> rowKeyList = healthArchiveSchedulerService.selectSubRowKey(ResourceCore.MasterTable, q, fq, count);
         if(rowKeyList != null && rowKeyList.size() > 0) {
             List<Map<String,Object>> hbaseDataList = healthArchiveSchedulerService.selectHbaseData(ResourceCore.MasterTable, rowKeyList);
@@ -128,7 +131,9 @@ public class HealthArchiveScheduler {
                     }
                     if(map.get(keySex) != null){
                         healthArchiveInfoModel.setSex(Integer.valueOf(map.get(keySex).toString()));
-                        healthArchiveInfoModel.setSexName(map.get(keySexValue).toString());
+                        if (null != map.get(keySexValue)) {
+                            healthArchiveInfoModel.setSexName(map.get(keySexValue).toString());
+                        }
                     }
                     if(map.get(keyAge) != null){
                         String birthday = map.get(keyAge).toString().substring(0, 10);
