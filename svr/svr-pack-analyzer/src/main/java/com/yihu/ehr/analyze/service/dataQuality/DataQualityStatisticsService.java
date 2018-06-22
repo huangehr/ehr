@@ -631,6 +631,57 @@ public class DataQualityStatisticsService extends BaseJpaService {
         return re;
     }
 
+    /**
+     * 完整采集的档案包数量集合
+     * @param pageIndex
+     * @param pageSize
+     * @param orgCode
+     * @param eventDateStart
+     * @param eventDateEnd
+     * @param eventType
+     * @return
+     */
+    public Map<String,Object> receivedPacketNumList(Integer pageIndex,Integer pageSize,String orgCode,String eventDateStart,String eventDateEnd,Integer eventType){
+        List<Map<String, Object>> resultList = new ArrayList<>();
+        Map<String,Object> re = new HashedMap();
+        try{
+            String filters = "";
+            if(cloud.equals(orgCode)){
+                filters = " event_date BETWEEN '" + eventDateStart + " 00:00:00' AND '" + eventDateEnd + " 23:59:59'";
+            }else{
+                filters = "org_code='" + orgCode
+                        + "' AND event_date BETWEEN '" + eventDateStart + " 00:00:00' AND '" + eventDateEnd + " 23:59:59'";
+            }
+            // 及时率场合
+
+            StringBuilder sql = new StringBuilder("SELECT COUNT(event_no) packetCount FROM json_archives/info WHERE ");
+            sql.append(filters);
+            sql.append(" GROUP BY date_histogram(field='receive_date','interval'='1d',format='yyyy-MM-dd',alias=receiveDate)");
+            List<String> fields = new ArrayList<>(2);
+            fields.add("packetCount");
+            fields.add("receiveDate");
+            List<Map<String, Object>> searchList = elasticSearchUtil.findBySql(fields, sql.toString());
+            int count = searchList.size();
+
+            // 截取当前页数据
+            int startLine = (pageIndex - 1) * pageSize;
+            int endLine = startLine + pageSize - 1;
+            for (int i = startLine; i <= endLine; i++) {
+                if (i < count) {
+                    resultList.add(searchList.get(i));
+                } else {
+                    break;
+                }
+            }
+            re.put("count",count);
+        }catch (Exception e){
+            e.getMessage();
+            re.put("count",0);
+        }
+        re.put("list",resultList);
+        return re;
+    }
+
 
     /**
      * 及时率和完整率

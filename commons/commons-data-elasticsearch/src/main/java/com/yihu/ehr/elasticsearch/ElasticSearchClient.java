@@ -287,7 +287,9 @@ public class ElasticSearchClient {
             }
             return list;
         } catch (Exception e) {
-           e.printStackTrace();
+            if(!"Error".equals(e.getMessage())){
+                e.printStackTrace();
+            }
            return new ArrayList<>();
         } finally {
             if (resultSet != null) {
