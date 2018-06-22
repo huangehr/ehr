@@ -12,13 +12,13 @@ import com.yihu.ehr.entity.quality.DqDatasetWarning;
 import com.yihu.ehr.entity.quality.DqPaltformReceiveWarning;
 import com.yihu.ehr.entity.quality.DqPaltformResourceWarning;
 import com.yihu.ehr.entity.quality.DqPaltformUploadWarning;
-import com.yihu.ehr.model.adaption.MOrgMetaData;
 import com.yihu.ehr.model.quality.MDqDatasetWarning;
 import com.yihu.ehr.model.quality.MDqPaltformReceiveWarning;
 import com.yihu.ehr.model.quality.MDqPaltformResourceWarning;
 import com.yihu.ehr.model.quality.MDqPaltformUploadWarning;
 import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.hos.model.standard.MStdDataSet;
+import com.yihu.hos.model.standard.MStdMetaData;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -524,8 +524,8 @@ public class WarningSettingEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page", required = false) int page) {
         Envelop envelop = new Envelop();
         try {
-            ResponseEntity<List<MOrgMetaData>> res = standardServiceClient.searchOrgMetaDatas(fields,filters,sorts,size,page,defaultQualityVersion);
-            List<MOrgMetaData> mStdDataSetList = res.getBody();
+            ResponseEntity<List<MStdMetaData>> res = standardServiceClient.searchOrgMetaDatas(fields,filters,sorts,size,page,defaultQualityVersion);
+            List<MStdMetaData> mStdDataSetList = res.getBody();
             int totalCount = getTotalCount(res);
             return getPageResult(mStdDataSetList,totalCount,page,size);
         }catch (Exception e){

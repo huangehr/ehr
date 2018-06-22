@@ -3,8 +3,8 @@ package com.yihu.ehr.analyze.feign;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.constants.ServiceApi;
-import com.yihu.ehr.model.adaption.MOrgMetaData;
 import com.yihu.hos.model.standard.MStdDataSet;
+import com.yihu.hos.model.standard.MStdMetaData;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -42,7 +42,7 @@ public interface StandardServiceClient {
 
     @RequestMapping(value = ServiceApi.Standards.MetaDatas, method = RequestMethod.GET)
     @ApiOperation(value = "查找数据元")
-    ResponseEntity<List<MOrgMetaData>> searchOrgMetaDatas(
+    ResponseEntity<List<MStdMetaData>> searchOrgMetaDatas(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
