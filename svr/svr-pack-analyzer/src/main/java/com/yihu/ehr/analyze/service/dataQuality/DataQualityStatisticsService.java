@@ -767,7 +767,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
             while (resultSet3.next()) {
                 Map<String, Object> dataMap1 = null;
                 String orgCode = resultSet3.getString("org_code");
-                String eventType = resultSet2.getString("event_type");// 事件类型 0门诊 1住院 2体检
+                String eventType = resultSet3.getString("event_type");// 事件类型 0门诊 1住院 2体检
                 double total = resultSet3.getDouble("c");//完整数
                 if(dataMap.containsKey(orgCode)){
                     dataMap1 = dataMap.get(orgCode);
