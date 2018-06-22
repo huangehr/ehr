@@ -6,6 +6,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.*;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.params.FacetParams;
+import org.apache.solr.common.params.GroupParams;
 import org.apache.solr.common.util.NamedList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -34,27 +35,28 @@ public class SolrUtil {
      * 简单查询方法
      */
     public SolrDocumentList query(String tableName, String q, Map<String, String> sort, long start, long rows) throws Exception {
-        return query(tableName, q, null, sort, start, rows,null);
+        return query(tableName, q, null, sort, start, rows, null);
     }
 
     /**
      * 简单查询返回字段
      */
-    public SolrDocumentList queryReturnFieldList(String tableName, String q ,String fq , Map<String, String> sort, long start, long rows,String... fields) throws Exception {
-        return query(tableName, q, fq, sort, start, rows,fields);
+    public SolrDocumentList queryReturnFieldList(String tableName, String q, String fq, Map<String, String> sort, long start, long rows, String... fields) throws Exception {
+        return query(tableName, q, fq, sort, start, rows, fields);
     }
 
     /**
      * Solr查询方法
-     * @param q     查询字符串
-     * @param fq    过滤查询
-     * @param sort  排序
-     * @param start 查询起始行
-     * @param rows  查询行数
+     *
+     * @param q      查询字符串
+     * @param fq     过滤查询
+     * @param sort   排序
+     * @param start  查询起始行
+     * @param rows   查询行数
      * @param fields 返回字段
      * @return
      */
-    public SolrDocumentList query(String core, String q, String fq , Map<String, String> sort, long start, long rows,String... fields) throws Exception {
+    public SolrDocumentList query(String core, String q, String fq, Map<String, String> sort, long start, long rows, String... fields) throws Exception {
         SolrClient conn = pool.getConnection(core);
         SolrQuery query = new SolrQuery();
         if (null != q && !q.equals("")) { //设置查询条件
@@ -83,6 +85,66 @@ public class SolrUtil {
         SolrDocumentList docs = rsp.getResults();
         return docs;
 
+    }
+
+    /**
+     * Solr单个字段去重查询
+     *
+     * @param q          可选，查询字符串
+     * @param fq         可选，过滤查询
+     * @param sort       可选，排序
+     * @param start      必填，查询起始行
+     * @param rows       必填，查询行数
+     * @param fields     必填，返回字段
+     * @param groupField 必填，分组去重字段。针对一个字段去重。
+     * @param groupSort  可选，组内排序字段，如："event_date asc"
+     * @return
+     */
+    public SolrDocumentList queryDistinctOneField(String core, String q, String fq, Map<String, String> sort, long start, long rows,
+                                                  String[] fields, String groupField, String groupSort) throws Exception {
+        SolrClient conn = pool.getConnection(core);
+        SolrQuery query = new SolrQuery();
+        if (StringUtils.isNotEmpty(q)) {
+            query.setQuery(q);
+        } else {
+            query.setQuery("*:*");
+        }
+        if (StringUtils.isNotEmpty(fq)) {
+            query.setFilterQueries(fq);
+        }
+        if (sort != null) {
+            for (Object co : sort.keySet()) {
+                if (ASC.equals(sort.get(co).toLowerCase())) {
+                    query.addSort(co.toString(), SolrQuery.ORDER.asc);
+                } else {
+                    query.addSort(co.toString(), SolrQuery.ORDER.desc);
+                }
+            }
+        }
+        query.setFields(fields);
+        query.setStart(Integer.parseInt(String.valueOf(start)));
+        query.setRows(Integer.parseInt(String.valueOf(rows)));
+        query.setParam(GroupParams.GROUP, true);
+        query.setParam(GroupParams.GROUP_FORMAT, "simple");
+        query.setParam(GroupParams.GROUP_FIELD, groupField);
+        if (StringUtils.isNotEmpty(groupSort)) {
+            query.setParam(GroupParams.GROUP_SORT, groupSort);
+        }
+
+        SolrDocumentList solrDocumentList = new SolrDocumentList();
+        QueryResponse response = conn.query(query);
+        GroupResponse groupResponse = response.getGroupResponse();
+        if (groupResponse != null) {
+            List<GroupCommand> groupList = groupResponse.getValues();
+            for (GroupCommand groupCommand : groupList) {
+                List<Group> groups = groupCommand.getValues();
+                for (Group group : groups) {
+                    solrDocumentList = group.getResult();
+                }
+            }
+        }
+
+        return solrDocumentList;
     }
 
 
@@ -152,7 +214,7 @@ public class SolrUtil {
         query.setRows(0);
 
         QueryResponse rsp = conn.query(query);
-        long count =  rsp.getResults().getNumFound();
+        long count = rsp.getResults().getNumFound();
         //query.setStart(start);
         //rsp = conn.query(query);
         //SolrDocumentList docs = rsp.getResults();
@@ -272,7 +334,7 @@ public class SolrUtil {
         }
     }
 
-     /**
+    /**
      * 分组数值统计
      *
      * @param core       表名

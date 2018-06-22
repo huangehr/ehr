@@ -5,10 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.elasticsearch.ElasticSearchClient;
 import com.yihu.ehr.elasticsearch.ElasticSearchConfig;
-import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.query.services.SolrQuery;
-import com.yihu.ehr.util.datetime.DateUtil;
-import com.yihu.quota.etl.model.EsConfig;
 import com.yihu.quota.etl.util.ElasticsearchUtil;
 import com.yihu.quota.etl.util.EsClientUtil;
 import com.yihu.quota.vo.PersonalInfoModel;
@@ -16,12 +13,9 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.time.DateUtils;
-import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.util.CellRangeAddress;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -35,8 +29,10 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by lyr on 2016/7/26.
@@ -82,7 +78,7 @@ public class ElasticSearchController extends BaseController {
             }
             String [] fields = fl.split(",");
             rows = solrQuery.count(core,q);
-            list =  solrQuery.queryReturnFieldList(core, q, null, null, 0, rows,fields);
+            list =  solrQuery.queryReturnFieldList(core, q, null, null, 0, rows,fields, null, null);
             //创建HSSFWorkbook对象(excel的文档对象)
             HSSFWorkbook workbook = new HSSFWorkbook();
             //建立新的sheet对象（excel的表单）

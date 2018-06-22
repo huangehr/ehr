@@ -3,7 +3,6 @@ package com.yihu.quota.vo;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.searchbox.annotations.JestId;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.Id;
 
 import java.util.Date;
 
@@ -49,6 +48,8 @@ public class SaveModel {
     private String economicName;    // 经济类型名称
     private String level;   // 医院等级
     private String levelName;   // 医院等级名称
+    private String distinctField;   // 去重字段
+    private String distinctFieldValue;   // 去重字段值
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssZ")// 2017-06-24T11:51:30+080
     @CreatedDate
@@ -356,5 +357,21 @@ public class SaveModel {
 
     public void setOrgHealthCategoryTopPid(String orgHealthCategoryTopPid) {
         this.orgHealthCategoryTopPid = orgHealthCategoryTopPid;
+    }
+
+    public String getDistinctField() {
+        return distinctField;
+    }
+
+    public void setDistinctField(String distinctField) {
+        this.distinctField = distinctField;
+    }
+
+    public String getDistinctFieldValue() {
+        return distinctFieldValue;
+    }
+
+    public void setDistinctFieldValue(String distinctFieldValue) {
+        this.distinctFieldValue = distinctFieldValue;
     }
 }
