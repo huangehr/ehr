@@ -10,7 +10,6 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
-import com.yihu.ehr.entity.quality.DqPaltformReceiveWarning;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
@@ -37,7 +36,8 @@ public class DataQualityStatisticsEndPoint extends EnvelopRestEndPoint {
 
     @Value("${quality.orgCode}")
     private String defaultQualityOrgCode;
-
+    @Value("${quality.cloud}")
+    private String defaultCloud;
     @Autowired
     private DataQualityStatisticsService dataQualityStatisticsService;
     @Autowired
@@ -93,7 +93,7 @@ public class DataQualityStatisticsEndPoint extends EnvelopRestEndPoint {
             @RequestParam(name = "pageIndex") Integer pageIndex,
             @ApiParam(name = "pageSize", value = "每页数", required = true)
             @RequestParam(name = "pageSize") Integer pageSize,
-            @ApiParam(name = "type", value = "类型，1及时率，2完整率", required = true)
+            @ApiParam(name = "type", value = "类型，1及时率，2完整率", required = false)
             @RequestParam(name = "type") String type,
             @ApiParam(name = "orgCode", value = "机构编码", required = true)
             @RequestParam(name = "orgCode") String orgCode,
@@ -102,51 +102,19 @@ public class DataQualityStatisticsEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "eventDateEnd", value = "就诊时间（截止），格式 yyyy-MM-dd", required = true)
             @RequestParam(name = "eventDateEnd") String eventDateEnd,
             @ApiParam(name = "eventType", value = "就诊类型，0门诊、1住院、2体检，不传则查全部就诊类型的")
-            @RequestParam(name = "eventType", required = false) Integer eventType) throws Exception {
-        String filters = "org_code='" + orgCode
-                + "' AND event_date BETWEEN '" + eventDateStart + " 00:00:00' AND '" + eventDateEnd + " 23:59:59'";
-        // 及时率场合
-        if ("1".equals(type)) {
-            DqPaltformReceiveWarning dqPaltformReceiveWarning = dqPaltformReceiveWarningService.findByOrgCode(orgCode);
-            if (dqPaltformReceiveWarning == null) {
-                dqPaltformReceiveWarning = dqPaltformReceiveWarningService.findByOrgCode(defaultQualityOrgCode);
-            }
-            if (eventType == null) {
-                filters += " AND (delay <= " + dqPaltformReceiveWarning.getOutpatientInTime() +
-                        " OR delay <= " + dqPaltformReceiveWarning.getHospitalInTime() +
-                        " OR delay <= " + dqPaltformReceiveWarning.getPeInTime() + ")";
-            } else if (eventType == 0) {
-                filters += " AND event_type = '0' AND delay <= " + dqPaltformReceiveWarning.getOutpatientInTime();
-            } else if (eventType == 1) {
-                filters += " AND event_type = '1' AND delay <= " + dqPaltformReceiveWarning.getHospitalInTime();
-            } else if (eventType == 2) {
-                filters += " AND event_type = '2' AND delay <= " + dqPaltformReceiveWarning.getPeInTime();
-            }
+            @RequestParam(name = "eventType", required = false) Integer eventType) {
+        Envelop envelop = new Envelop();
+        try {
+            Map<String,Object> re = dataQualityStatisticsService.receivedPacketNumList(pageIndex, pageSize, orgCode, eventDateStart, eventDateEnd, eventType);
+            List<Map<String, Object>> resultList = (List<Map<String, Object>>)re.get("list");
+            int count = Integer.valueOf(re.get("count").toString());
+            return getPageResult(resultList, count, pageIndex, pageSize);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
         }
-
-        StringBuilder sql = new StringBuilder("SELECT COUNT(event_no) packetCount FROM json_archives/info WHERE ");
-        sql.append(filters);
-        sql.append(" GROUP BY date_histogram(field='receive_date','interval'='1d',format='yyyy-MM-dd',alias=receiveDate)");
-        List<String> fields = new ArrayList<>(2);
-        fields.add("packetCount");
-        fields.add("receiveDate");
-        List<Map<String, Object>> searchList = esUtil.findBySql(fields, sql.toString());
-        int count = searchList.size();
-
-        // 截取当前页数据
-        List<Map<String, Object>> resultList = new ArrayList<>();
-        int startLine = (pageIndex - 1) * pageSize;
-        int endLine = startLine + pageSize - 1;
-        for (int i = startLine; i <= endLine; i++) {
-            if (i < count) {
-                resultList.add(searchList.get(i));
-            } else {
-                break;
-            }
-        }
-
-        return getPageResult(resultList, count, pageIndex, pageSize);
-
+        return envelop;
     }
 
     @RequestMapping(value = ServiceApi.DataQuality.ReceivedPacketReportData, method = RequestMethod.GET)

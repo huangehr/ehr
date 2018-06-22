@@ -14,12 +14,15 @@ public class EsConfig {
     private String fullQuery;  //全量查询
     private String filter;  // where条件
     private String timekey;//根据sql去查询的key 时间控制字段
-    private String aggregation;//聚合方式  默认count，另有sum ，list
+    private String aggregation;// 聚合方式，默认count：计数；sum：求和；list：查询；distinct：去重查询；
     private String aggregationKey;//聚合字段
     private String especialType; //特殊类型  orgHealthCategory：卫生机构类型
     private String superiorBaseQuotaCode;  // 上级基础指标code
     private String dateComparisonType;      //时间对比类型  lastYear 去年 lastMonth 上个月 lastWeek 上个星期 lastDay 昨天
 
+    // 去重查询
+    private String distinctGroupField; // 分组去重字段
+    private String distinctGroupSort; // 去重组内排序，如：“event_date asc”。
 
     //除法运算
     private String molecular;  // 统计除法的分子  指标code
@@ -295,4 +298,21 @@ public class EsConfig {
     public void setDateComparisonType(String dateComparisonType) {
         this.dateComparisonType = dateComparisonType;
     }
+
+    public String getDistinctGroupField() {
+        return distinctGroupField;
+    }
+
+    public void setDistinctGroupField(String distinctGroupField) {
+        this.distinctGroupField = distinctGroupField;
+    }
+
+    public String getDistinctGroupSort() {
+        return distinctGroupSort;
+    }
+
+    public void setDistinctGroupSort(String distinctGroupSort) {
+        this.distinctGroupSort = distinctGroupSort;
+    }
+
 }

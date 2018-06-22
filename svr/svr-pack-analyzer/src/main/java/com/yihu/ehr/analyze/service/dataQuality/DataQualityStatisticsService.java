@@ -87,7 +87,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
         Session session = currentSession();
         Query query = session.createSQLQuery("SELECT org_code,COUNT(*) c from dq_dataset_warning WHERE type = 1 GROUP BY org_code");
         List<Object[]> datasetList = query.list();
-        Map<String, Object> datasetMap = new HashedMap(datasetList.size());
+        Map<String, Object> datasetMap = new HashedMap();
         datasetList.forEach(one->{
             String orgCode = one[0].toString();
             Integer num = Integer.valueOf(one[1].toString());
@@ -104,7 +104,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
         //获取医院数据
         Query query1 = session.createSQLQuery("SELECT org_code,full_name from organizations where org_type = 'Hospital' ");
         List<Object[]> orgList = query1.list();
-        Map<String, Object> orgMap = new HashedMap(orgList.size());
+        Map<String, Object> orgMap = new HashedMap();
         orgList.forEach(one->{
             String orgCode = one[0].toString();
             String name = one[1].toString();
@@ -117,7 +117,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
         //统计医院数据
         String sql1 = "SELECT sum(HSI07_01_001) s1,sum(HSI07_01_002) s2,sum(HSI07_01_004) s3,sum(HSI07_01_012) s4,org_code FROM qc/daily_report where create_date>= '"+start+"T00:00:00' AND create_date <='" +  end + "T23:59:59' group by org_code";
         ResultSet resultSet1 = elasticSearchUtil.findBySql(sql1);
-        Map<String, Map<String, Object>> dataMap = new HashMap<>(resultSet1.getRow());
+        Map<String, Map<String, Object>> dataMap = new HashMap<>();
         try {
             while (resultSet1.next()) {
                 Map<String, Object> dataMap1 = null;
@@ -450,7 +450,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
                 }
                 collectionMap2.put(receiveDate,tmpMap);
             });
-            List<Map<String, Object>> reportedList3 = new ArrayList<>(reportedNumList3.size());
+            List<Map<String, Object>> reportedList3 = new ArrayList<>();
             for (Map<String, Object> map:collectionMap2.values()){
                 double total = Double.valueOf(map.get("outpatientNum").toString()) +
                         Double.valueOf(map.get("healthExaminationNum").toString()) +
@@ -631,6 +631,57 @@ public class DataQualityStatisticsService extends BaseJpaService {
         return re;
     }
 
+    /**
+     * 完整采集的档案包数量集合
+     * @param pageIndex
+     * @param pageSize
+     * @param orgCode
+     * @param eventDateStart
+     * @param eventDateEnd
+     * @param eventType
+     * @return
+     */
+    public Map<String,Object> receivedPacketNumList(Integer pageIndex,Integer pageSize,String orgCode,String eventDateStart,String eventDateEnd,Integer eventType){
+        List<Map<String, Object>> resultList = new ArrayList<>();
+        Map<String,Object> re = new HashedMap();
+        try{
+            String filters = "";
+            if(cloud.equals(orgCode)){
+                filters = " event_date BETWEEN '" + eventDateStart + " 00:00:00' AND '" + eventDateEnd + " 23:59:59'";
+            }else{
+                filters = "org_code='" + orgCode
+                        + "' AND event_date BETWEEN '" + eventDateStart + " 00:00:00' AND '" + eventDateEnd + " 23:59:59'";
+            }
+            // 及时率场合
+
+            StringBuilder sql = new StringBuilder("SELECT COUNT(event_no) packetCount FROM json_archives/info WHERE ");
+            sql.append(filters);
+            sql.append(" GROUP BY date_histogram(field='receive_date','interval'='1d',format='yyyy-MM-dd',alias=receiveDate)");
+            List<String> fields = new ArrayList<>(2);
+            fields.add("packetCount");
+            fields.add("receiveDate");
+            List<Map<String, Object>> searchList = elasticSearchUtil.findBySql(fields, sql.toString());
+            int count = searchList.size();
+
+            // 截取当前页数据
+            int startLine = (pageIndex - 1) * pageSize;
+            int endLine = startLine + pageSize - 1;
+            for (int i = startLine; i <= endLine; i++) {
+                if (i < count) {
+                    resultList.add(searchList.get(i));
+                } else {
+                    break;
+                }
+            }
+            re.put("count",count);
+        }catch (Exception e){
+            e.getMessage();
+            re.put("count",0);
+        }
+        re.put("list",resultList);
+        return re;
+    }
+
 
     /**
      * 及时率和完整率
@@ -688,7 +739,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
         //统计总数
         String sql1 = "SELECT sum(HSI07_01_001) s1,sum(HSI07_01_002) s2,sum(HSI07_01_004) s3,sum(HSI07_01_012) s4,org_code FROM qc/daily_report where event_date>= '"+start+"T00:00:00' AND event_date <='" +  end + "T23:59:59' group by org_code";
         ResultSet resultSet1 = elasticSearchUtil.findBySql(sql1);
-        Map<String, Map<String, Object>> dataMap = new HashMap<>(resultSet1.getRow());
+        Map<String, Map<String, Object>> dataMap = new HashMap<>();
         try {
             while (resultSet1.next()) {
                 Map<String, Object> dataMap1 = null;
@@ -767,7 +818,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
             while (resultSet3.next()) {
                 Map<String, Object> dataMap1 = null;
                 String orgCode = resultSet3.getString("org_code");
-                String eventType = resultSet2.getString("event_type");// 事件类型 0门诊 1住院 2体检
+                String eventType = resultSet3.getString("event_type");// 事件类型 0门诊 1住院 2体检
                 double total = resultSet3.getDouble("c");//完整数
                 if(dataMap.containsKey(orgCode)){
                     dataMap1 = dataMap.get(orgCode);

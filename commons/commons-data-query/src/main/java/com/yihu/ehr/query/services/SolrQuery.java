@@ -197,40 +197,64 @@ public class SolrQuery {
 
     //endregion solr语法转换
 
-    //region Count 统计
+    //region 获取指定字段的查询集合，可选择去重查询
 
     /**
-     * 获取查询返回字段
-     * @param q     查询字符串
-     * @param fq    过滤查询
-     * @param sort  排序
-     * @param start 查询起始行
-     * @param rows  查询行数
+     * 获取指定字段的查询集合，可选择去重查询
+     *
+     * @param q      查询字符串
+     * @param fq     过滤查询
+     * @param sort   排序
+     * @param start  查询起始行
+     * @param rows   查询行数
      * @param fields 返回字段
+     * @param groupField 可选，分组去重字段
+     * @param groupSort 可选，组内排序字段
      * @return
      */
-    public List<Map<String,Object>> queryReturnFieldList(String tableName, String q ,String fq , Map<String, String> sort, long start, long rows,String[] fields) throws Exception {
-        List<Map<String,Object>> data = new ArrayList<>();
+    public List<Map<String, Object>> queryReturnFieldList(String tableName,
+                                                          String q,
+                                                          String fq,
+                                                          Map<String, String> sort,
+                                                          long start,
+                                                          long rows,
+                                                          String[] fields,
+                                                          String groupField,
+                                                          String groupSort) throws Exception {
+        List<Map<String, Object>> data = new ArrayList<>();
         List<String> falseStoreList = new ArrayList<>();
         boolean isStored = true;
-        for(String key :fields){
-            if(key.contains("EHR_")){
+        for (String key : fields) {
+            if (key.contains("EHR_")) {
                 isStored = false;
                 falseStoreList.add(key);
             }
         }
-        SolrDocumentList solrList = solrUtil.query(tableName, q, fq, sort, start, rows,fields);
-        if(solrList!=null && solrList.getNumFound()>0){
-            for (SolrDocument doc : solrList){
-                Map<String,Object> map = new HashMap<>();
-                if(fields != null && fields.length > 0){
-                    for(String key :fields){
-                        if(key.equals("event_date")){
+        SolrDocumentList solrDocList = new SolrDocumentList();
+        if (StringUtils.isEmpty(groupField)) {
+            solrDocList = solrUtil.query(tableName, q, fq, sort, start, rows, fields);
+        } else {
+            // 去重查询
+            solrDocList = solrUtil.queryDistinctOneField(tableName, q, fq, sort, start, rows, fields, groupField, groupSort);
+        }
+        if (solrDocList != null && solrDocList.getNumFound() > 0) {
+            for (SolrDocument doc : solrDocList) {
+                Map<String, Object> map = new HashMap<>();
+
+                // 去重查询场合
+                if (!StringUtils.isEmpty(groupField)) {
+                    map.put("distinctField", groupField);
+                    map.put("distinctFieldValue", doc.getFieldValue(groupField));
+                }
+
+                if (fields != null && fields.length > 0) {
+                    for (String key : fields) {
+                        if (key.equals("event_date")) {
                             //如果是时间结果，则被加了八个小时
-                            map.put(key, DateUtils.addHours((Date)doc.getFieldValue(key), -8));
-                        }else {
-                            if(doc.getFieldValue(key) != null ){
-                                map.put(key,doc.getFieldValue(key));
+                            map.put(key, DateUtils.addHours((Date) doc.getFieldValue(key), -8));
+                        } else {
+                            if (doc.getFieldValue(key) != null) {
+                                map.put(key, doc.getFieldValue(key));
                             }
                         }
                     }
@@ -239,53 +263,53 @@ public class SolrQuery {
             }
         }
         //solr 未被存储的数据需要从hbase中查询得到原始数据
-        if( ! isStored){
-            Map<String,Object> map = new HashMap<>();
+        if (!isStored) {
+            Map<String, Object> map = new HashMap<>();
             List<String> rowkeyList = new ArrayList<>();
-            if(data != null && data.size() > 0){
-                for (Map<String,Object> keyMap : data) {
-                    if(keyMap.get("rowkey") != null ){
-                        rowkeyList.add( keyMap.get("rowkey").toString() );
+            if (data.size() > 0) {
+                for (Map<String, Object> keyMap : data) {
+                    if (keyMap.get("rowkey") != null) {
+                        rowkeyList.add(keyMap.get("rowkey").toString());
                     }
                 }
-                if(rowkeyList.size() > 20000){
-                    int p = rowkeyList.size()/20000;
-                    int d = rowkeyList.size()%20000;
-                    if( d != 0){
+                if (rowkeyList.size() > 20000) {
+                    int p = rowkeyList.size() / 20000;
+                    int d = rowkeyList.size() % 20000;
+                    if (d != 0) {
                         p++;
                     }
-                    for(int i=0; i<p ;i++){
-                        for(String storeKey :falseStoreList){
+                    for (int i = 0; i < p; i++) {
+                        for (String storeKey : falseStoreList) {
                             Result[] hbaseResult = hBaseDao.getResultList(tableName, rowkeyList, null, storeKey);
-                            if(hbaseResult != null){
-                                for (Map<String,Object> keyMap : data) {
+                            if (hbaseResult != null) {
+                                for (Map<String, Object> keyMap : data) {
                                     for (Result result : hbaseResult) {
                                         String rowkey = Bytes.toString(result.getRow());
-                                        if(keyMap.get("rowkey").toString().equals(rowkey) ){
+                                        if (keyMap.get("rowkey").toString().equals(rowkey)) {
                                             String fieldValue = "";
-                                            for(Cell cell : result.rawCells()) {
-                                                fieldValue = Bytes.toString(CellUtil. cloneValue(cell));
+                                            for (Cell cell : result.rawCells()) {
+                                                fieldValue = Bytes.toString(CellUtil.cloneValue(cell));
                                             }
-                                            keyMap.put(storeKey,fieldValue);
+                                            keyMap.put(storeKey, fieldValue);
                                         }
                                     }
                                 }
                             }
                         }
                     }
-                }else {
-                    for(String storeKey :falseStoreList){
+                } else {
+                    for (String storeKey : falseStoreList) {
                         Result[] hbaseResult = hBaseDao.getResultList(tableName, rowkeyList, null, storeKey);
-                        if(hbaseResult != null){
-                            for (Map<String,Object> keyMap : data) {
+                        if (hbaseResult != null) {
+                            for (Map<String, Object> keyMap : data) {
                                 for (Result result : hbaseResult) {
                                     String rowkey = Bytes.toString(result.getRow());
-                                    if(keyMap.get("rowkey").toString().equals(rowkey) ){
+                                    if (keyMap.get("rowkey").toString().equals(rowkey)) {
                                         String fieldValue = "";
-                                        for(Cell cell : result.rawCells()) {
-                                            fieldValue = Bytes.toString(CellUtil. cloneValue(cell));
+                                        for (Cell cell : result.rawCells()) {
+                                            fieldValue = Bytes.toString(CellUtil.cloneValue(cell));
                                         }
-                                        keyMap.put(storeKey,fieldValue);
+                                        keyMap.put(storeKey, fieldValue);
                                     }
                                 }
                             }
@@ -295,12 +319,16 @@ public class SolrQuery {
 
             }
         }
-        return  data;
+        return data;
     }
 
+    //endregion 获取指定字段的查询集合，可选择去重查询
+
+    //region Count 统计
 
     /**
      * 获取总条数
+     *
      * @param queryString
      * @return
      */
@@ -871,7 +899,7 @@ public class SolrQuery {
 
     //endregion 多级数值统计
 
-    //region 指标多维度求和统计
+    //region 求和统计
 
     /**
      * 多维度求和统计（包含自定义分组）
@@ -1018,7 +1046,7 @@ public class SolrQuery {
         }
     }
 
-    //endregion 多维度求和统计
+    //endregion 求和统计
 
     //region 公共私有方法
 
