@@ -25,13 +25,11 @@ import org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
 import org.elasticsearch.search.aggregations.bucket.terms.LongTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Author: zhengwei
@@ -51,6 +49,8 @@ public class PackQcReportService extends BaseJpaService {
     private JdbcTemplate jdbcTemplate;
     @Autowired
     private RedisClient redisClient;
+    @Value("${quality.cloud}")
+    private String cloud;
     /**
      * 获取医院数据
      * @param startDate
@@ -61,6 +61,7 @@ public class PackQcReportService extends BaseJpaService {
      */
     public Envelop dailyReport(String startDate, String endDate, String orgCode) throws Exception{
         Envelop envelop = new Envelop();
+        Date end = DateUtil.addDate(1, DateUtil.formatCharDateYMD(endDate));
         Map<String,Object> resMap = new HashMap<String,Object>();
         List<Map<String,Object>> list = new ArrayList<>();
         int total=0;
@@ -73,10 +74,10 @@ public class PackQcReportService extends BaseJpaService {
         boolQueryBuilder.must(startRange);
 
         RangeQueryBuilder endRange = QueryBuilders.rangeQuery("create_date");
-        endRange.lte(endDate);
+        endRange.lt(DateUtil.toString(end));
         boolQueryBuilder.must(endRange);
 
-        if (StringUtils.isNotEmpty(orgCode)) {
+        if (StringUtils.isNotEmpty(orgCode)&&!cloud.equals(orgCode)) {
             MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery("org_code", orgCode);
             boolQueryBuilder.must(matchQueryBuilder);
         }
@@ -115,7 +116,7 @@ public class PackQcReportService extends BaseJpaService {
         stringBuilder.append("pack_type=1;");
         stringBuilder.append("receive_date>=" + startDate + " 00:00:00;");
         stringBuilder.append("receive_date<" + endDate + " 23:59:59;");
-        if (StringUtils.isNotEmpty(orgCode) && !"null".equals(orgCode)){
+        if (StringUtils.isNotEmpty(orgCode) && !"null".equals(orgCode)&&!cloud.equals(orgCode)){
             stringBuilder.append("org_code=" + orgCode+";");
         }
         // 门诊
@@ -153,7 +154,7 @@ public class PackQcReportService extends BaseJpaService {
         stringBuilder.append("pack_type=1;");
         stringBuilder.append("receive_date>=" + startDate + " 00:00:00;");
         stringBuilder.append("receive_date<" + endDate + " 23:59:59;");
-        if (StringUtils.isNotEmpty(orgCode) && !"null".equals(orgCode)){
+        if (StringUtils.isNotEmpty(orgCode) && !"null".equals(orgCode)&&!cloud.equals(orgCode)){
             stringBuilder.append("org_code=" + orgCode);
         }
         TransportClient transportClient = elasticSearchPool.getClient();
@@ -235,7 +236,7 @@ public class PackQcReportService extends BaseJpaService {
         stringBuilder.append("qc_step=1;");
         stringBuilder.append("receive_date>=" + startDate + " 00:00:00;");
         stringBuilder.append("receive_date<" + endDate + " 23:59:59;");
-        if (StringUtils.isNotEmpty(orgCode) && !"null".equals(orgCode)){
+        if (StringUtils.isNotEmpty(orgCode) && !"null".equals(orgCode)&&!cloud.equals(orgCode)){
             stringBuilder.append("org_code=" + orgCode);
         }
         List<Map<String, Object>> list = elasticSearchUtil.list("json_archives_qc", "qc_dataset_info", stringBuilder.toString());
@@ -285,7 +286,7 @@ public class PackQcReportService extends BaseJpaService {
         stringBuilder.append("archive_status=2;");
         stringBuilder.append("receive_date>=" + startDate + " 00:00:00;");
         stringBuilder.append("receive_date<" + endDate + " 23:59:59;");
-        if (StringUtils.isNotEmpty(orgCode) && !"null".equals(orgCode)){
+        if (StringUtils.isNotEmpty(orgCode) && !"null".equals(orgCode)&&!cloud.equals(orgCode)){
             stringBuilder.append("org_code=" + orgCode);
         }
         TransportClient transportClient = elasticSearchPool.getClient();
@@ -329,7 +330,7 @@ public class PackQcReportService extends BaseJpaService {
         stringBuilder.append("qc_step="+step+";");
         stringBuilder.append("receive_date>=" + startDate + " 00:00:00;");
         stringBuilder.append("receive_date<" + endDate + " 23:59:59;");
-        if (StringUtils.isNotEmpty(orgCode) && !"null".equals(orgCode)){
+        if (StringUtils.isNotEmpty(orgCode) && !"null".equals(orgCode)&&!cloud.equals(orgCode)){
             stringBuilder.append("org_code=" + orgCode);
         }
         TransportClient transportClient = elasticSearchPool.getClient();
@@ -420,6 +421,7 @@ public class PackQcReportService extends BaseJpaService {
      */
     public Envelop metadataErrorDetail(String id) throws Exception {
         Envelop envelop = new Envelop();
+        List<Map<String, Object>> orgs = getOrgs();
         Map<String, Object> res = new HashMap<>();
         Map<String, Object> metedata = elasticSearchUtil.findById("json_archives_qc","qc_metadata_info",id);
         if("2".equals(metedata.get("qc_step"))){
@@ -429,6 +431,7 @@ public class PackQcReportService extends BaseJpaService {
                 metedata.put("scheme", schemeList.get(0).get("NAME"));
             }
         }
+        metedata.put("org_name",getOrgName(orgs, metedata.get("org_code")+""));
         metedata.put("dataset_name", redisClient.get("std_data_set_" + metedata.get("version") + ":" + metedata.get("dataset") + ":name"));
         metedata.put("metadata_name", redisClient.get("std_meta_data_" + metedata.get("version") + ":" + metedata.get("dataset")+"."+ metedata.get("metadata")+ ":name"));
         String relationId = metedata.get("org_code")+"_"+metedata.get("event_no")+"_"+ DateUtil.strToDate(metedata.get("event_date")+"").getTime();
