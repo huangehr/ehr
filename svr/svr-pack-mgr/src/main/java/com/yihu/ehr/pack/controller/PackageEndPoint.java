@@ -432,6 +432,8 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
                     esSimplePackage.setEvent_no(String.valueOf(item.get("event_no")));
                     esSimplePackage.setEvent_type( Integer.valueOf(item.get("event_type").toString()));
                     esSimplePackage.setOrg_code(String.valueOf(item.get("org_code")));
+                    esSimplePackage.setIdcard_no(String.valueOf(item.get("demographic_id")));
+                    esSimplePackage.setPatient_name(String.valueOf(item.get("patient_name")));
                     //存入省平台上传队列
                     redisTemplate.opsForList().leftPush(RedisCollection.ProvincialPlatformQueue, objectMapper.writeValueAsString(esSimplePackage));
                 }

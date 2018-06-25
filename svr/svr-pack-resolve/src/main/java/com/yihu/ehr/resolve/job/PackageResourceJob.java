@@ -124,6 +124,8 @@ public class PackageResourceJob implements InterruptableJob {
         pack.setEvent_no(originalPackage.getEventNo());
         pack.setEvent_type(originalPackage.getEventType() == null ? -1 : originalPackage.getEventType().getType());
         pack.setOrg_code(originalPackage.getOrgCode());
+        pack.setPatient_name(resourceBucket.getBasicRecord(ResourceCells.PATIENT_NAME));
+        pack.setIdcard_no(resourceBucket.getBasicRecord(ResourceCells.DEMOGRAPHIC_ID));
         statusReportService.reportStatus(pack.get_id(), ArchiveStatus.Finished, 0, "resolve success",  map);
     }
 
