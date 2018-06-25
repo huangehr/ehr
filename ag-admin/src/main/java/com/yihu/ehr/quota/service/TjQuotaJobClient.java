@@ -66,7 +66,7 @@ public interface TjQuotaJobClient {
             @ApiParam(name = "top", value = "获取前几条数据")
             @RequestParam(value = "top", required = false) String top,
             @ApiParam(name = "MRsResource json串")
-            @RequestParam(value = "mRsResource") String mRsResource);
+            @RequestParam(value = "mRsResource", required = false) String mRsResource);
 
     @ApiOperation(value = "获取指标统计结果echart radar雷达图表")
     @RequestMapping(value = ServiceApi.TJ.GetQuotaRadarGraphicReportPreviews, method = RequestMethod.GET)
