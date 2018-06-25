@@ -405,7 +405,13 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                 filters += ";recordTime<="+endTime;
             }
             String sorts = "-warningTime";
-            List<DqWarningRecord> list = warningRecordService.search(null, filters, sorts, 1, 99999);
+            List<DqWarningRecord> list = new ArrayList<>();
+            int pageSize = 10000;
+            int count = (int) warningRecordService.getCount(filters);
+            int pageNum = count % pageSize > 0 ? count / pageSize + 1 : count / pageSize;
+            for(int i =0;i<pageNum;i++) {
+                list.addAll(warningRecordService.search(null, filters, sorts, i+1, pageSize));
+            }
             //写excel
             wwb = Workbook.createWorkbook(os);
             //创建Excel工作表 指定名称和位置
@@ -602,7 +608,7 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                 }
                 for (int j = 0; j < list.size(); j++) {
                     Row row = sheet.createRow(j+ 1);
-                    Map<String, Object> record = list.get(i);
+                    Map<String, Object> record = list.get(j);
                     //添加列表明细
                     row.createCell(0).setCellValue(ObjectUtils.toString(record.get("analyze_date")));
                     row.createCell(1).setCellValue(ObjectUtils.toString(record.get("receive_date")));
@@ -653,7 +659,7 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                 }
                 for (int j = 0; j < list.size(); j++) {
                     Row row = sheet.createRow(j+ 1);
-                    Map<String, Object> record = list.get(i);
+                    Map<String, Object> record = list.get(j);
                     //添加列表明细
                     row.createCell(0).setCellValue(ObjectUtils.toString(record.get("receive_date")));
                     row.createCell(1).setCellValue(ObjectUtils.toString(record.get("org_name")));
@@ -714,7 +720,7 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                 }
                 for (int j = 0; j < list.size(); j++) {
                     Row row = sheet.createRow(j+ 1);
-                    Map<String, Object> record = list.get(i);
+                    Map<String, Object> record = list.get(j);
                     //添加列表明细
                     row.createCell(0).setCellValue(ObjectUtils.toString(record.get("receive_date")));
                     row.createCell(1).setCellValue(getAnalyzerStatus(ObjectUtils.toString(record.get("analyze_status"))));
@@ -770,7 +776,7 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                 }
                 for (int j = 0; j < list.size(); j++) {
                     Row row = sheet.createRow(j+ 1);
-                    Map<String, Object> record = list.get(i);
+                    Map<String, Object> record = list.get(j);
                     //添加列表明细
                     row.createCell(0).setCellValue(ObjectUtils.toString(record.get("analyze_date")));
                     row.createCell(1).setCellValue(getPlatform(ObjectUtils.toString(record.get("to_platform"))));
@@ -956,7 +962,7 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
     public String getPlatform(String platform){
         String re = "";
         switch (platform){
-            case "10":
+            case "jiangxi_001":
                 re = "省平台";
                 break;
             default:
