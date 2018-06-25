@@ -154,6 +154,9 @@ public class SolrExtract {
             listFlag = true;
             // 查询列表
             try {
+                if (esConfig.getAggregation().equals(Contant.quota.aggregation_list) && !StringUtils.isEmpty(esConfig.getAggregationKey())) {
+                    fl = fl + "," + esConfig.getAggregationKey();
+                }
                 long rows = solrQuery.count(core, fq);
                 list = solrQuery.queryReturnFieldList(core, q, fq, null, 0, rows, fl.split(","), null, null);
             } catch (Exception e) {
