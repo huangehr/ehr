@@ -1,8 +1,6 @@
 package com.yihu.quota.service.quota;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.profile.core.ResourceCore;
-import com.yihu.ehr.solr.SolrUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.quota.dao.jpa.TjQuotaDao;
 import com.yihu.quota.dao.jpa.TjQuotaGovProvisionDao;
