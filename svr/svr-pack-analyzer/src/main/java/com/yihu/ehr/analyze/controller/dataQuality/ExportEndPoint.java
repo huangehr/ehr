@@ -148,9 +148,9 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
             run2.setFontSize(18);
             run2.setBold(true);
             addEmptyRow(document);
-            int i = 0;
             int h = 0;
             for (Map<String, Object> map:orgPackReportDataList){
+                int i = 0;
                 i++;
                 h++;
                 XWPFParagraph orgParagraph1 = document.createParagraph();
