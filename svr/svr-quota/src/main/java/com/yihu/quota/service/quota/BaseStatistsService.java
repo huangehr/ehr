@@ -1038,7 +1038,7 @@ public class BaseStatistsService {
             if (StringUtils.isNotEmpty(esConfig.getDateComparisonType())) {
                 filters = getdateComparisonTypeFilter(esConfig,filters);
             }
-            if( (StringUtils.isNotEmpty(esConfig.getEspecialType())) && esConfig.getEspecialType().equals(orgHealthCategory)){
+            if( (StringUtils.isNotEmpty(esConfig.getEspecialType())) && esConfig.getEspecialType().equals(orgHealthCategory) && dimension.contains(orgHealthCategoryCode)){
                 //特殊机构类型查询输出结果  只有查询条件没有维度 默认是 机构类型维度
                 result = getOrgHealthCategory(code,filters,dateType,isTrunTree, top);
             }else if( (StringUtils.isNotEmpty(esConfig.getMolecular())) && StringUtils.isNotEmpty(esConfig.getDenominator())){//除法
