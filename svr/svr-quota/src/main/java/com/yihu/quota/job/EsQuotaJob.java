@@ -160,13 +160,15 @@ public class EsQuotaJob implements Job {
             boolQueryBuilder.must(rangeQueryEndTime);
         }
         boolean flag = true ;
-        Client talClient = esClientUtil.getClient(esConfig.getHost(), 9300, esConfig.getClusterName());
-        Client client = esClientUtil.getClient(esConfig.getHost(), 9300, esConfig.getClusterName());
+        Client talClient = elasticSearchPool.getClient();
+        Client client = elasticSearchPool.getClient();
+//        Client talClient = esClientUtil.getClient(esConfig.getHost(), 9300, esConfig.getClusterName());
+//        Client client = esClientUtil.getClient(esConfig.getHost(), 9300, esConfig.getClusterName());
         try {
             while (flag){
                 long count = elasticsearchUtil.getTotalCount(talClient, esConfig.getIndex() ,esConfig.getType(), boolQueryBuilder);
                 if(count != 0){
-                    elasticsearchUtil.queryDelete(client, esConfig.getIndex() ,esConfig.getType(),boolQueryBuilder);
+                    flag = elasticsearchUtil.queryDelete(client, esConfig.getIndex() ,esConfig.getType(),boolQueryBuilder);
                 }else {
                     flag = false ;
                 }
