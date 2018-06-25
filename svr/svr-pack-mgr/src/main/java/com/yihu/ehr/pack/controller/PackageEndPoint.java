@@ -9,9 +9,11 @@ import com.yihu.ehr.model.packs.EsDetailsPackage;
 import com.yihu.ehr.model.packs.EsSimplePackage;
 import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.pack.feign.SecurityClient;
+import com.yihu.ehr.pack.service.RedisService;
 import com.yihu.ehr.pack.task.FastDFSTask;
 import com.yihu.ehr.profile.AnalyzeStatus;
 import com.yihu.ehr.profile.ArchiveStatus;
+import com.yihu.ehr.profile.exception.ResolveException;
 import com.yihu.ehr.profile.queue.RedisCollection;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.encrypt.RSA;
@@ -71,6 +73,9 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
     private RedisTemplate<String, Serializable> redisTemplate;
     @Autowired
     private FastDFSTask fastDFSTask;
+    @Autowired
+    private RedisService redisService;
+
    /* @Autowired
     private JsonArchivesService jsonArchivesService;*/
 
@@ -432,6 +437,15 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
                     esSimplePackage.setEvent_no(String.valueOf(item.get("event_no")));
                     esSimplePackage.setEvent_type( Integer.valueOf(item.get("event_type").toString()));
                     esSimplePackage.setOrg_code(String.valueOf(item.get("org_code")));
+                    esSimplePackage.setIdcard_no(String.valueOf(item.get("demographic_id")));
+                    esSimplePackage.setPatient_name(String.valueOf(item.get("patient_name")));
+                    if (String.valueOf(item.get("org_code")) !=null ){
+                        String orgName = redisService.getOrgName(String.valueOf(item.get("org_code")));
+                        if (StringUtils.isNoneEmpty(orgName)) {
+                            esSimplePackage.setOrg_name(orgName);
+                        }
+                    }
+
                     //存入省平台上传队列
                     redisTemplate.opsForList().leftPush(RedisCollection.ProvincialPlatformQueue, objectMapper.writeValueAsString(esSimplePackage));
                 }
