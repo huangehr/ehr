@@ -20,6 +20,7 @@ public class EsSimplePackage implements Serializable {
     private String patient_id;//病人ID
     private String event_no;//事件号
     private String org_code;//机构代码
+    private String org_name;//机构名称
     private String event_date;//事件时间
     private Integer event_type;//事件类型
     private String patient_name;//病人姓名
@@ -129,5 +130,13 @@ public class EsSimplePackage implements Serializable {
 
     public void setIdcard_no(String idcard_no) {
         this.idcard_no = idcard_no;
+    }
+
+    public String getOrg_name() {
+        return org_name;
+    }
+
+    public void setOrg_name(String org_name) {
+        this.org_name = org_name;
     }
 }
