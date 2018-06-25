@@ -29,6 +29,7 @@ import org.apache.poi.xwpf.usermodel.*;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTblWidth;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.STTblWidth;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -39,7 +40,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.OutputStream;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 导出
@@ -58,6 +62,8 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
     private ElasticSearchUtil elasticSearchUtil;
     @Autowired
     private DataQualityStatisticsService dataQualityStatisticsService;
+    @Value("${quality.cloud}")
+    private String defaultCloud;
 
     public static int maxRowSize = 60000;
     @RequestMapping(value = ServiceApi.DataQuality.ExportQualityMonitoringListToExcel, method = RequestMethod.GET)
@@ -91,17 +97,24 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
             eventDateEnd = eventDateEnd + " 23:59:59";
             JSONArray jsonArray = JSON.parseArray(orgInfoList);
             List<Map<String, String>> list = new ArrayList<>();
+            List<Map<String, String>> alllist = new ArrayList<>();
             for(int i=0;i<jsonArray.size();i++){
                 JSONObject json = jsonArray.getJSONObject(i);
                 Map<String, String> map = new HashedMap();
                 map.put("orgCode",json.getString("orgCode"));
                 map.put("orgName",json.getString("orgName"));
                 list.add(map);
+                if(defaultCloud.equals(json.getString("orgCode"))){
+                    alllist.add(map);
+                }
+            }
+            if(alllist.size()==0){
+                alllist = list;
             }
             // 接收档案包总量
-            Long receivedCount = dataQualityStatisticsService.packetCount(list, null, eventDateStart, eventDateEnd);
+            Long receivedCount = dataQualityStatisticsService.packetCount(alllist, null, eventDateStart, eventDateEnd);
             // 成功解析档案包总量
-            Long successfulAnalysisCount = dataQualityStatisticsService.packetCount(list, "3", eventDateStart, eventDateEnd);
+            Long successfulAnalysisCount = dataQualityStatisticsService.packetCount(alllist, "3", eventDateStart, eventDateEnd);
             // 机构档案包报告汇总
             List<Map<String, Object>> orgPackReportDataList = dataQualityStatisticsService.orgPackReportData(list, eventDateStart, eventDateEnd);
 
@@ -135,12 +148,14 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
             run2.setFontSize(18);
             run2.setBold(true);
             addEmptyRow(document);
-            int i =0;
+            int i = 0;
+            int h = 0;
             for (Map<String, Object> map:orgPackReportDataList){
                 i++;
+                h++;
                 XWPFParagraph orgParagraph1 = document.createParagraph();
                 XWPFRun orgRun1 = orgParagraph1.createRun();
-                String orgText1 = i+"."+map.get("orgCode")+"(" + map.get("orgName")+")";
+                String orgText1 = h+"."+map.get("orgCode")+"(" + map.get("orgName")+")";
                 orgRun1.setText(orgText1);
                 orgRun1.setFontSize(16);
                 orgRun1.setBold(true);
@@ -390,7 +405,13 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                 filters += ";recordTime<="+endTime;
             }
             String sorts = "-warningTime";
-            List<DqWarningRecord> list = warningRecordService.search(null, filters, sorts, 1, 99999);
+            List<DqWarningRecord> list = new ArrayList<>();
+            int pageSize = 10000;
+            int count = (int) warningRecordService.getCount(filters);
+            int pageNum = count % pageSize > 0 ? count / pageSize + 1 : count / pageSize;
+            for(int i =0;i<pageNum;i++) {
+                list.addAll(warningRecordService.search(null, filters, sorts, i+1, pageSize));
+            }
             //写excel
             wwb = Workbook.createWorkbook(os);
             //创建Excel工作表 指定名称和位置
@@ -587,7 +608,7 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                 }
                 for (int j = 0; j < list.size(); j++) {
                     Row row = sheet.createRow(j+ 1);
-                    Map<String, Object> record = list.get(i);
+                    Map<String, Object> record = list.get(j);
                     //添加列表明细
                     row.createCell(0).setCellValue(ObjectUtils.toString(record.get("analyze_date")));
                     row.createCell(1).setCellValue(ObjectUtils.toString(record.get("receive_date")));
@@ -638,7 +659,7 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                 }
                 for (int j = 0; j < list.size(); j++) {
                     Row row = sheet.createRow(j+ 1);
-                    Map<String, Object> record = list.get(i);
+                    Map<String, Object> record = list.get(j);
                     //添加列表明细
                     row.createCell(0).setCellValue(ObjectUtils.toString(record.get("receive_date")));
                     row.createCell(1).setCellValue(ObjectUtils.toString(record.get("org_name")));
@@ -699,7 +720,7 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                 }
                 for (int j = 0; j < list.size(); j++) {
                     Row row = sheet.createRow(j+ 1);
-                    Map<String, Object> record = list.get(i);
+                    Map<String, Object> record = list.get(j);
                     //添加列表明细
                     row.createCell(0).setCellValue(ObjectUtils.toString(record.get("receive_date")));
                     row.createCell(1).setCellValue(getAnalyzerStatus(ObjectUtils.toString(record.get("analyze_status"))));
@@ -755,7 +776,7 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                 }
                 for (int j = 0; j < list.size(); j++) {
                     Row row = sheet.createRow(j+ 1);
-                    Map<String, Object> record = list.get(i);
+                    Map<String, Object> record = list.get(j);
                     //添加列表明细
                     row.createCell(0).setCellValue(ObjectUtils.toString(record.get("analyze_date")));
                     row.createCell(1).setCellValue(getPlatform(ObjectUtils.toString(record.get("to_platform"))));
@@ -941,7 +962,7 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
     public String getPlatform(String platform){
         String re = "";
         switch (platform){
-            case "10":
+            case "jiangxi_001":
                 re = "省平台";
                 break;
             default:

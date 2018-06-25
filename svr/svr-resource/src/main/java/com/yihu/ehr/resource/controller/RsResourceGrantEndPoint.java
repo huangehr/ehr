@@ -936,7 +936,7 @@ public class RsResourceGrantEndPoint extends EnvelopRestEndPoint {
     }
 
     @ApiOperation("单个角色组----一键取消授权多个资源")
-    @RequestMapping(value = ServiceApi.Resources.DeleteRolesGrantResourcesByCategoryId, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Resources.DeleteRolesGrantResourcesByCategoryId, method = RequestMethod.POST)
     public Envelop deleteRolesGrantResourcesByCategoryId(
             @ApiParam(name = "rolesId", value = "角色组ID", defaultValue = "")
             @PathVariable(value = "rolesId") String rolesId,

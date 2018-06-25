@@ -95,8 +95,8 @@ public class ServiceApi {
         public static final String ResourceGrantsNoPage = "/resources/grants/no_paging";
         public static final String AppsGrantResources = "/resources/apps/{appId}/grant";
         public static final String ResourceGrantApps = "/resources/{resourceId}/grant";
-        public static final String AppsGrantResourcesByCategoryId = "/resources/apps/{appId}/grantByCategoryId";
-        public static final String DeleteAppsGrantResourcesByCategoryId = "/resources/apps/{appId}/deleteGrantByCategoryId";
+        public static final String AppsGrantResourcesByCategoryId = "/resources/appsAppId/grantByCategoryId";
+        public static final String DeleteAppsGrantResourcesByCategoryId = "/resources/appsAppId/deleteGrantByCategoryId";
 
         public static final String ResourceMetadatasValid = "/resources/metadatas/valid";
         public static final String ResourceMetadataGrants = "/resources/metadata/grants";
@@ -188,8 +188,8 @@ public class ServiceApi {
         public static final String ResourceRolesMetadataGrant = "/resources/rolesMetadata/grants/{id}";
         public static final String ResourceRolesGrantsNoPage = "/resources/rolesGrants/no_paging";
         public static final String ResourceRolesResMetadataGrants = "/resources/roles_resource/{roles_res_id}/metadata";
-        public static final String RolesGrantResourcesByCategoryId = "/resources/roles/{rolesId}/grantByCategoryId";
-        public static final String DeleteRolesGrantResourcesByCategoryId = "/resources/roles/{rolesId}/deleteGrantByCategoryId";
+        public static final String RolesGrantResourcesByCategoryId = "/resources/rolesRolesId/grantByCategoryId";
+        public static final String DeleteRolesGrantResourcesByCategoryId = "/resources/rolesRolesId/deleteGrantByCategoryId";
 
         /**
          * 机构-资源授权
