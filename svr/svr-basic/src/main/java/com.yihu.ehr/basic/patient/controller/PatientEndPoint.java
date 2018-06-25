@@ -19,10 +19,12 @@ import com.yihu.ehr.entity.patient.DemographicInfo;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.patient.MDemographicInfo;
+import com.yihu.ehr.model.patient.MPatientInfo;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.log.LogService;
 import com.yihu.ehr.util.phonics.PinyinUtil;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -57,11 +59,9 @@ public class PatientEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private FastDFSUtil fastDFSUtil;
     @Autowired
-    ObjectMapper objectMapper;
-    @Autowired
     private RoleUserService roleUserService;
     @Autowired
-    private UserService userManager;
+    private UserService userService;
     @Autowired
     private DoctorService doctorService;
 
@@ -203,14 +203,14 @@ public class PatientEndPoint extends EnvelopRestEndPoint {
         String telNo = demographicInfo.getTelephoneNo();
         JSONObject object = new JSONObject(telNo);
         String tel = object.getField("联系电话").toString();
-        User user = userManager.getUserByIdCardNo(demographicInfo.getIdCardNo());
+        User user = userService.getUserByIdCardNo(demographicInfo.getIdCardNo());
         if (!StringUtils.isEmpty(user)) {
             user.setRealName(demographicInfo.getName());
             user.setGender(demographicInfo.getGender());
             user.setTelephone(tel.substring(1,tel.length() - 1));
             user.setMartialStatus(demographicInfo.getMartialStatus());
             user.setBirthday(DateUtil.toString(demographicInfo.getBirthday()));
-            userManager.save(user);
+            userService.save(user);
         }
         Doctors doctors = doctorService.getByIdCardNo(demographicInfo.getIdCardNo());
         if (!StringUtils.isEmpty(doctors)) {
@@ -338,66 +338,62 @@ public class PatientEndPoint extends EnvelopRestEndPoint {
     }
 
 
-            /**
-             * 用户信息 查询（添加查询条件修改）
-             * @param search
-             * @param province
-             * @param city
-             * @param district
-             * @param page
-             * @param rows
-             * @return
-             * @throws Exception
-             */
-            @RequestMapping(value = "/populationsByParams",method = RequestMethod.GET)
-            @ApiOperation(value = "用户信息 查询（添加查询条件修改）")
-            public List<MDemographicInfo> searchPatientByParams(
-                    @ApiParam(name = "search", value = "搜索内容", defaultValue = "")
-                    @RequestParam(value = "search",required = false) String search,
-                    @ApiParam(name = "gender", value = "性别", defaultValue = "")
-                    @RequestParam(value = "gender") String gender,
-                    @ApiParam(name = "home_province", value = "省", defaultValue = "")
-                    @RequestParam(value = "home_province",required = false) String province,
-                    @ApiParam(name = "home_city", value = "市", defaultValue = "")
-                    @RequestParam(value = "home_city",required = false) String city,
-                    @ApiParam(name = "home_district", value = "县", defaultValue = "")
-                    @RequestParam(value = "home_district",required = false) String district,
-                    @ApiParam(name = "searchRegisterTimeStart", value = "注册开始时间", defaultValue = "")
-                    @RequestParam(value = "searchRegisterTimeStart") String searchRegisterTimeStart,
-                    @ApiParam(name = "searchRegisterTimeEnd", value = "注册结束时间", defaultValue = "")
-                    @RequestParam(value = "searchRegisterTimeEnd") String searchRegisterTimeEnd,
-                    @ApiParam(name = "page", value = "当前页", defaultValue = "")
-                    @RequestParam(value = "page") Integer page,
-                    @ApiParam(name = "rows", value = "行数", defaultValue = "")
-                    @RequestParam(value = "rows") Integer rows,
+    /**
+     * 用户信息 查询（添加查询条件修改）
+     * @param search
+     * @param province
+     * @param city
+     * @param district
+     * @param page
+     * @param rows
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/populationsByParams",method = RequestMethod.GET)
+    @ApiOperation(value = "用户信息 查询（添加查询条件修改）")
+    public List<MDemographicInfo> searchPatientByParams(
+            @ApiParam(name = "search", value = "搜索内容", defaultValue = "")
+            @RequestParam(value = "search",required = false) String search,
+            @ApiParam(name = "gender", value = "性别", defaultValue = "")
+            @RequestParam(value = "gender") String gender,
+            @ApiParam(name = "home_province", value = "省", defaultValue = "")
+            @RequestParam(value = "home_province",required = false) String province,
+            @ApiParam(name = "home_city", value = "市", defaultValue = "")
+            @RequestParam(value = "home_city",required = false) String city,
+            @ApiParam(name = "home_district", value = "县", defaultValue = "")
+            @RequestParam(value = "home_district",required = false) String district,
+            @ApiParam(name = "searchRegisterTimeStart", value = "注册开始时间", defaultValue = "")
+            @RequestParam(value = "searchRegisterTimeStart") String searchRegisterTimeStart,
+            @ApiParam(name = "searchRegisterTimeEnd", value = "注册结束时间", defaultValue = "")
+            @RequestParam(value = "searchRegisterTimeEnd") String searchRegisterTimeEnd,
+            @ApiParam(name = "page", value = "当前页", defaultValue = "")
+            @RequestParam(value = "page") Integer page,
+            @ApiParam(name = "rows", value = "行数", defaultValue = "")
+            @RequestParam(value = "rows") Integer rows,
             HttpServletRequest request,HttpServletResponse response) throws Exception{
-                Map<String, Object> conditionMap = new HashMap<>();
-                conditionMap.put("search", search);
-                conditionMap.put("page", page);
-                conditionMap.put("pageSize", rows);
-                conditionMap.put("province", province);
-                conditionMap.put("city", city);
-                conditionMap.put("district", district);
-                conditionMap.put("gender", gender);
+        Map<String, Object> conditionMap = new HashMap<>();
+        conditionMap.put("search", search);
+        conditionMap.put("page", page);
+        conditionMap.put("pageSize", rows);
+        conditionMap.put("province", province);
+        conditionMap.put("city", city);
+        conditionMap.put("district", district);
+        conditionMap.put("gender", gender);
 
-                Date startDate = DateTimeUtil.simpleDateTimeParse(searchRegisterTimeStart);
-                Date endDate = DateTimeUtil.simpleDateTimeParse(searchRegisterTimeEnd);
-                if(null!=endDate){
-                    Calendar calendar   =   new GregorianCalendar();
-                    calendar.setTime(endDate);
-                    calendar.add(calendar.DATE,1);//把日期往后增加一天.整数往后推,负数往前移动
-                    endDate=calendar.getTime();   //日期往后推一天
-                }
-                conditionMap.put("startDate", startDate);
-                conditionMap.put("endDate", endDate);
-        //        List<DemographicInfo> demographicInfos = demographicService.searchPatient(conditionMap);
-        //        Integer totalCount = demographicService.searchPatientTotalCount(conditionMap);
-        //        List<MDemographicInfo> mDemographicInfos = (List<MDemographicInfo>)convertToModels(demographicInfos,new ArrayList<MDemographicInfo>(demographicInfos.size()), MDemographicInfo.class, null);
-        //        return getResult(mDemographicInfos,totalCount);
-                List<DemographicInfo> demographicInfos = demographicService.searchPatientByParams(conditionMap);
-                Long totalCount =Long.parseLong(demographicService.searchPatientByParamsTotalCount(conditionMap).toString());
-                pagedResponse(request, response, totalCount, page, rows);
-                return (List<MDemographicInfo>)convertToModels(demographicInfos,new ArrayList<MDemographicInfo>(demographicInfos.size()), MDemographicInfo.class, null);
+        Date startDate = DateTimeUtil.simpleDateTimeParse(searchRegisterTimeStart);
+        Date endDate = DateTimeUtil.simpleDateTimeParse(searchRegisterTimeEnd);
+        if(null!=endDate){
+            Calendar calendar   =   new GregorianCalendar();
+            calendar.setTime(endDate);
+            calendar.add(calendar.DATE,1);//把日期往后增加一天.整数往后推,负数往前移动
+            endDate=calendar.getTime();   //日期往后推一天
+        }
+        conditionMap.put("startDate", startDate);
+        conditionMap.put("endDate", endDate);
+        List<DemographicInfo> demographicInfos = demographicService.searchPatientByParams(conditionMap);
+        Long totalCount =Long.parseLong(demographicService.searchPatientByParamsTotalCount(conditionMap).toString());
+        pagedResponse(request, response, totalCount, page, rows);
+        return (List<MDemographicInfo>)convertToModels(demographicInfos,new ArrayList<MDemographicInfo>(demographicInfos.size()), MDemographicInfo.class, null);
 
     }
 
@@ -473,6 +469,69 @@ public class PatientEndPoint extends EnvelopRestEndPoint {
         List<RoleUser> models = objectMapper.readValue(jsonData,javaType);
         return roleUserService.saveRoleUser(models,userId);
 
+    }
+
+    //--------------------------------- zuul --------------------------
+
+    /**
+     *
+     * @param search
+     * @param gender
+     * @param homeAddress
+     * @param searchRegisterTimeStart
+     * @param searchRegisterTimeEnd
+     * @param page
+     * @param rows
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/populations/byParams", method = RequestMethod.GET)
+    @ApiOperation(value = "用户信息 查询（添加查询条件修改）")
+    public Envelop searchPatientByParams(
+            @ApiParam(name = "search", value = "搜索内容")
+            @RequestParam(value = "search", required = false) String search,
+            @ApiParam(name = "gender", value = "性别")
+            @RequestParam(value = "gender", required = false) String gender,
+            @ApiParam(name = "homeAddress", value = "省")
+            @RequestParam(value = "homeAddress",required = false) String homeAddress,
+            @ApiParam(name = "searchRegisterTimeStart", value = "注册开始时间")
+            @RequestParam(value = "searchRegisterTimeStart", required = false) String searchRegisterTimeStart,
+            @ApiParam(name = "searchRegisterTimeEnd", value = "注册结束时间")
+            @RequestParam(value = "searchRegisterTimeEnd", required = false) String searchRegisterTimeEnd,
+            @ApiParam(name = "page", value = "当前页", required = true)
+            @RequestParam(value = "page") Integer page,
+            @ApiParam(name = "rows", value = "行数", required = true)
+            @RequestParam(value = "rows") Integer rows) throws Exception{
+        List<DemographicInfo> demographicInfoList = demographicService.search(search, gender, homeAddress, searchRegisterTimeStart, searchRegisterTimeEnd, page, rows);
+        List<MPatientInfo> mPatientInfoList = new ArrayList<>(demographicInfoList.size());
+        demographicInfoList.forEach(item -> {
+            MPatientInfo mPatientInfo = new MPatientInfo();
+            mPatientInfo.setIdCardNo(item.getIdCardNo());
+            mPatientInfo.setName(item.getName());
+            mPatientInfo.setGender(item.getGender());
+            if (item.getTelephoneNo() != null) {
+                try {
+                    //联系电话
+                    String tag = "联系电话";
+                    Map<String, String> telephoneNo = objectMapper.readValue(item.getTelephoneNo(), Map.class);
+                    mPatientInfo.setTelephoneNo(telephoneNo.get(tag));
+                } catch (Exception e) {
+                    mPatientInfo.setTelephoneNo(item.getTelephoneNo());
+                }
+            } else {
+                mPatientInfo.setTelephoneNo("");
+            }
+            mPatientInfo.setHomeAddress(item.getHomeAddress());
+            mPatientInfo.setRegisterTime(item.getRegisterTime());
+            User user = userService.getUserByIdCardNo(item.getIdCardNo());
+            if (user != null) {
+                mPatientInfo.setUserId(user.getId());
+            }
+            mPatientInfoList.add(mPatientInfo);
+        });
+        Integer count = demographicService.count(search, gender, homeAddress, searchRegisterTimeStart, searchRegisterTimeEnd);
+        Envelop envelop = getPageResult(mPatientInfoList, count, page, rows);
+        return envelop;
     }
 
 }

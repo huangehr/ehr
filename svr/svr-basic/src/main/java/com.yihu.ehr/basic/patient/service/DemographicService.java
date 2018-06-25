@@ -5,6 +5,7 @@ import com.yihu.ehr.basic.address.service.AddressService;
 import com.yihu.ehr.basic.patient.dao.XDemographicInfoRepository;
 import com.yihu.ehr.entity.patient.DemographicInfo;
 import com.yihu.ehr.query.BaseJpaService;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
@@ -16,10 +17,7 @@ import org.springframework.util.StringUtils;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 人口学索引实现类.
@@ -34,7 +32,6 @@ public class DemographicService extends BaseJpaService {
 
     @PersistenceContext
     protected EntityManager entityManager;
-
     @Autowired
     private XDemographicInfoRepository demographicInfoRepository;
     @Autowired
@@ -133,12 +130,12 @@ public class DemographicService extends BaseJpaService {
     }
 
     public void resetPass(String id) {
-
         String pwd = "12345678";
         DemographicInfo demInfo = getDemographicInfo(id);
         demInfo.setPassword(DigestUtils.md5Hex(pwd));
         demographicInfoRepository.save(demInfo);
     }
+
     public List<DemographicInfo> searchPatientByParams(Map<String, Object> args) {
         Session session = entityManager.unwrap(Session.class);
         String search = (String) args.get("search");
@@ -384,7 +381,7 @@ public class DemographicService extends BaseJpaService {
     public DemographicInfo getDemographicInfoByIdCardNo(String idCardNo) {
         List<DemographicInfo> demInfoList = demographicInfoRepository.getDemographicInfoByIdCardNo(idCardNo);
         DemographicInfo demInfo=null;
-        if(null!=demInfoList&&demInfoList.size()>0){
+        if (null != demInfoList&&demInfoList.size() > 0){
             demInfo=demInfoList.get(0);
         }
         return demInfo;
@@ -392,7 +389,7 @@ public class DemographicService extends BaseJpaService {
 
     //统计年龄段人口数
     public List<Object> getStatisticsDemographicsAgeCount() {
-        Session session = session = entityManager.unwrap(Session.class);;
+        Session session = entityManager.unwrap(Session.class);;
         String sql = "SELECT count(1), tt.age  from(  " +
                 " SELECT t1.id ,  " +
                 "  ELT(   CEIL(  FLOOR( TIMESTAMPDIFF(MONTH, STR_TO_DATE(t1.id ,'%Y%m%d'), CURDATE())/12) /10+1 ), " +
@@ -403,7 +400,116 @@ public class DemographicService extends BaseJpaService {
         return query.list();
     }
 
-    public DemographicInfo findByIdCardNo(String idCardNo) {
-        return demographicInfoRepository.findOne(idCardNo);
+    /**
+     * 居民信息列表
+     * @param search 匹配身份证号码或者姓名
+     * @param gender 性别
+     * @param homeAddress 家庭住址
+     * @param searchRegisterTimeStart 注册开始时间
+     * @param searchRegisterTimeEnd 注册结束时间
+     * @param page 页码
+     * @param size 页数
+     * @return
+     * @throws Exception
+     */
+    public List<DemographicInfo> search (String search,
+                                String gender,
+                                String homeAddress,
+                                String searchRegisterTimeStart,
+                                String searchRegisterTimeEnd,
+                                Integer page,
+                                Integer size) throws Exception {
+        Session session = entityManager.unwrap(Session.class);
+        String hql = "from DemographicInfo where 1 = 1";
+        if (!StringUtils.isEmpty(search)) {
+            hql += " and ((id like :search) or (name like :search))";
+        }
+        if (!StringUtils.isEmpty(gender)) {
+            hql += " and gender = (:gender)";
+        }
+        if (!StringUtils.isEmpty(homeAddress)) {
+            hql += " and homeAddress like :homeAddress";
+        }
+
+        if (!StringUtils.isEmpty(searchRegisterTimeStart)) {
+            hql += " and registerTime>= :searchRegisterTimeStart";
+        }
+        if (!StringUtils.isEmpty(searchRegisterTimeEnd)) {
+            hql += " and registerTime < :searchRegisterTimeEnd";
+        }
+        hql += " order by registerTime desc";
+        Query query = session.createQuery(hql);
+        if (!StringUtils.isEmpty(search)) {
+            query.setString("search", "%" + search + "%");
+        }
+        if (!StringUtils.isEmpty(gender)) {
+            query.setString("gender", gender);
+        }
+        if (!StringUtils.isEmpty(homeAddress)) {
+            query.setString("homeAddress", "%" + homeAddress + "%");
+        }
+        if (!StringUtils.isEmpty(searchRegisterTimeStart)) {
+            query.setDate("searchRegisterTimeStart",  DateTimeUtil.simpleDateTimeParse(searchRegisterTimeStart));
+        }
+        if (!StringUtils.isEmpty(searchRegisterTimeEnd)) {
+            Date endDate = DateTimeUtil.simpleDateTimeParse(searchRegisterTimeEnd);
+            Calendar calendar = new GregorianCalendar();
+            calendar.setTime(endDate);
+            calendar.add(calendar.DATE,1);//把日期往后增加一天.整数往后推,负数往前移动
+            endDate = calendar.getTime();   //日期往后推一天
+            query.setDate("searchRegisterTimeEnd", endDate);
+        }
+        query.setMaxResults(size);
+        query.setFirstResult((page - 1) * size);
+        List<DemographicInfo> demographicInfos = query.list();
+        return demographicInfos;
+    }
+
+    //统计年龄段人口数
+    public Integer count (String search,
+                          String gender,
+                          String homeAddress,
+                          String searchRegisterTimeStart,
+                          String searchRegisterTimeEnd) throws Exception {
+        Session session = entityManager.unwrap(Session.class);
+        String hql = "select count(*) from DemographicInfo where 1 = 1";
+        if (!StringUtils.isEmpty(search)) {
+            hql += " and ((id like :search) or (name like :search))";
+        }
+        if (!StringUtils.isEmpty(gender)) {
+            hql += " and gender = (:gender)";
+        }
+        if (!StringUtils.isEmpty(homeAddress)) {
+            hql += " and homeAddress like :homeAddress";
+        }
+
+        if (!StringUtils.isEmpty(searchRegisterTimeStart)) {
+            hql += " and registerTime>= :searchRegisterTimeStart";
+        }
+        if (!StringUtils.isEmpty(searchRegisterTimeEnd)) {
+            hql += " and registerTime < :searchRegisterTimeEnd";
+        }
+        Query query = session.createQuery(hql);
+        if (!StringUtils.isEmpty(search)) {
+            query.setString("search", "%" + search + "%");
+        }
+        if (!StringUtils.isEmpty(gender)) {
+            query.setString("gender", gender);
+        }
+        if (!StringUtils.isEmpty(homeAddress)) {
+            query.setString("homeAddress", "%" + homeAddress + "%");
+        }
+        if (!StringUtils.isEmpty(searchRegisterTimeStart)) {
+            query.setDate("searchRegisterTimeStart",  DateTimeUtil.simpleDateTimeParse(searchRegisterTimeStart));
+        }
+        if (!StringUtils.isEmpty(searchRegisterTimeEnd)) {
+            Date endDate = DateTimeUtil.simpleDateTimeParse(searchRegisterTimeEnd);
+            Calendar calendar = new GregorianCalendar();
+            calendar.setTime(endDate);
+            calendar.add(calendar.DATE,1);//把日期往后增加一天.整数往后推,负数往前移动
+            endDate = calendar.getTime();   //日期往后推一天
+            query.setDate("searchRegisterTimeEnd", endDate);
+        }
+        return ((Long)query.list().get(0)).intValue();
     }
 }
