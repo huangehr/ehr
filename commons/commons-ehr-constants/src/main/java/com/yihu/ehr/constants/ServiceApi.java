@@ -315,7 +315,6 @@ public class ServiceApi {
      */
     public static class Profiles {
         public static final String ProfileInfo = "/profile/baseInfo"; //基本信息
-        public static final String ProfileHistory = "/profile/profileHistory"; //既往史 - pc档案浏览器
         public static final String PastHistory = "/profile/pastHistory"; //既往史 - mobile居民端
         public static final String PersonHistory = "/profile/personHistory"; //个人史
         public static final String AllergensHistory = "/profile/allergensHistory"; //过敏史
