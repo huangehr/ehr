@@ -92,7 +92,7 @@ public class BaseStatistsService {
                if(quotaDataSorce != null){
                    JSONObject obj = new JSONObject().fromObject(quotaDataSorce.getConfigJson());
                    EsConfig esConfig= (EsConfig) JSONObject.toBean(obj,EsConfig.class);
-                   if(StringUtils.isNotEmpty(esConfig.getSuperiorBaseQuotaCode())){
+                   if(StringUtils.isNotEmpty(esConfig.getSuperiorBaseQuotaCode()) && StringUtils.isEmpty(esConfig.getEspecialType()) ){
                        code =  esConfig.getSuperiorBaseQuotaCode();
                    }
                }
@@ -262,6 +262,9 @@ public class BaseStatistsService {
         String molecularFilter,String denominatorFilters,String operation,String operationValue,String dateType, String top) throws Exception {
 //        List<Map<String, Object>> moleList = getQuotaResultList(molecular,dimension,molecularFilter,dateType, top);
 //        List<Map<String, Object>> denoList =  getQuotaResultList(denominator,dimension,denominatorFilters,dateType, top);
+        if(StringUtils.isEmpty(dimension) && StringUtils.isNotEmpty(dateType)){
+            dimension = dateType;
+        }
         List<Map<String, Object>> moleList = getSimpleQuotaReport(molecular, molecularFilter,dimension ,false , null);
         List<Map<String, Object>> denoList =  getSimpleQuotaReport(denominator,denominatorFilters,dimension,false, null);
 
@@ -1038,7 +1041,7 @@ public class BaseStatistsService {
             if (StringUtils.isNotEmpty(esConfig.getDateComparisonType())) {
                 filters = getdateComparisonTypeFilter(esConfig,filters);
             }
-            if( (StringUtils.isNotEmpty(esConfig.getEspecialType())) && esConfig.getEspecialType().equals(orgHealthCategory) && dimension.contains(orgHealthCategoryCode)){
+            if( (StringUtils.isNotEmpty(esConfig.getEspecialType())) && esConfig.getEspecialType().equals(orgHealthCategory)){
                 //特殊机构类型查询输出结果  只有查询条件没有维度 默认是 机构类型维度
                 result = getOrgHealthCategory(code,filters,dateType,isTrunTree, top);
             }else if( (StringUtils.isNotEmpty(esConfig.getMolecular())) && StringUtils.isNotEmpty(esConfig.getDenominator())){//除法
