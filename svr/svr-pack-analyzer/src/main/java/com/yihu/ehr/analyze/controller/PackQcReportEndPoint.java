@@ -75,10 +75,8 @@ public class PackQcReportEndPoint extends EnvelopRestEndPoint {
             if (!StringUtils.isEmpty(orgCode)) {
                 filters += ";orgCode=" + orgCode;
             }
-            String fields = "datasetCode,datasetName";
-            List<DqDatasetWarning> redisMqChannelList = dqDatasetWarningService.search(fields, filters, "", page, size);
+            List<DqDatasetWarning> list = dqDatasetWarningService.search(null, filters, "", page, size);
             int count = (int) dqDatasetWarningService.getCount(filters);
-            List<DqDatasetWarning> list = (List<DqDatasetWarning>) convertToModels(redisMqChannelList, new ArrayList<DqDatasetWarning>(), DqDatasetWarning.class, fields);
             envelop = getPageResult(list, count, page, size);
         } catch (Exception e) {
             e.printStackTrace();
