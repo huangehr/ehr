@@ -11,6 +11,7 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.entity.quality.DqWarningRecord;
+import com.yihu.ehr.redis.client.RedisClient;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -62,10 +63,13 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
     private ElasticSearchUtil elasticSearchUtil;
     @Autowired
     private DataQualityStatisticsService dataQualityStatisticsService;
+    @Autowired
+    private RedisClient redisClient;
     @Value("${quality.cloud}")
     private String defaultCloud;
 
-    public static int maxRowSize = 60000;
+    public static int maxRowSize = 100000;
+    public static int esSize = 1000;
     @RequestMapping(value = ServiceApi.DataQuality.ExportQualityMonitoringListToExcel, method = RequestMethod.GET)
     @ApiOperation(value = "生成报告")
     public void exportQualityMonitoringListToExcel(
@@ -579,7 +583,7 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                                         @RequestParam(value = "sorts", required = false) String sorts,
                                         HttpServletResponse response){
         if(StringUtils.isNotEmpty(filters)){
-            filters+="analyze_status=2;"+filters;
+            filters="analyze_status=2;"+filters;
         }else{
             filters="analyze_status=2";
         }
@@ -593,7 +597,7 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
             //写excel
             SXSSFWorkbook wwb = new SXSSFWorkbook(100);
             wwb.setCompressTempFiles(true);
-            String[] title = {"解析时间","接收时间","医疗机构","序列号","失败原因"};
+            String[] title = {"接收时间","解析时间","医疗机构","序列号","失败原因","失败信息"};
             int count = (int) elasticSearchUtil.count("json_archives", "info", filters);
             double pageNum = count % maxRowSize > 0 ? count / maxRowSize + 1 : count / maxRowSize;
             for (int i = 0; i < pageNum; i++) {
@@ -610,12 +614,12 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                     Row row = sheet.createRow(j+ 1);
                     Map<String, Object> record = list.get(j);
                     //添加列表明细
-                    row.createCell(0).setCellValue(ObjectUtils.toString(record.get("analyze_date")));
-                    row.createCell(1).setCellValue(ObjectUtils.toString(record.get("receive_date")));
+                    row.createCell(0).setCellValue(ObjectUtils.toString(record.get("receive_date")));
+                    row.createCell(1).setCellValue(ObjectUtils.toString(record.get("analyze_date")));
                     row.createCell(2).setCellValue(ObjectUtils.toString(record.get("org_name")));
                     row.createCell(3).setCellValue(ObjectUtils.toString(record.get("_id")));
-                    row.createCell(4).setCellValue(ObjectUtils.toString(record.get("_id")));
-                    row.createCell(5).setCellValue(getErrorType(ObjectUtils.toString(record.get("error_type"))));
+                    row.createCell(4).setCellValue(getErrorType(ObjectUtils.toString(record.get("error_type"))));
+                    row.createCell(5).setCellValue(getErrorType(ObjectUtils.toString(record.get("message"))));
                 }
             }
             wwb.write(os);
@@ -634,6 +638,7 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                                          @ApiParam(name = "sorts", value = "排序")
                                          @RequestParam(value = "sorts", required = false) String sorts,
                                          HttpServletResponse response){
+        long starttime = System.currentTimeMillis();
         try {
             String fileName = "异常详情列表";
             //设置下载
@@ -641,6 +646,7 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
             response.setHeader("Content-Disposition", "attachment; filename="
                     + new String( fileName.getBytes("gb2312"), "ISO8859-1" )+".xlsx");
             OutputStream os = response.getOutputStream();
+            List<Map<String, Object>> orgs = packQcReportService.getOrgs();
             //写excel
             SXSSFWorkbook  wwb = new SXSSFWorkbook(100);
             wwb.setCompressTempFiles(true);
@@ -648,7 +654,23 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
             int count = (int) elasticSearchUtil.count("json_archives_qc", "qc_metadata_info", filters);
             double pageNum = count % maxRowSize > 0 ? count / maxRowSize + 1 : count / maxRowSize;
             for (int i = 0; i < pageNum; i++) {
-                List<Map<String, Object>> list = packQcReportService.metadataErrorList(filters,sorts,i+1,maxRowSize);
+                double page = 0;
+                if(count<=maxRowSize){
+                    page = count % esSize > 0 ? count / esSize + 1 : count / esSize;
+                }else{
+                    if(i==pageNum-1){
+                        double num = (count-(pageNum-1)*maxRowSize);
+                        page =  num% esSize > 0 ? num / esSize + 1 : num / esSize;
+                    }else{
+                        page = maxRowSize % esSize > 0 ? maxRowSize / esSize + 1 : maxRowSize / esSize;
+                    }
+                }
+                List<Map<String, Object>> list = new ArrayList<>();
+                for(int p =0;p<page;p++){
+                    list.addAll(elasticSearchUtil.page("json_archives_qc","qc_metadata_info", filters, sorts, p+1, esSize));
+                    logger.info("es查询耗时：" + (System.currentTimeMillis() - starttime) + "ms");
+                }
+                logger.info("查询耗时：" + (System.currentTimeMillis() - starttime) + "ms");
                 //创建Excel工作表 指定名称和位置
                 Sheet sheet = wwb.createSheet("Sheet" + (i+1));
                 //添加固定信息，题头等
@@ -662,11 +684,11 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                     Map<String, Object> record = list.get(j);
                     //添加列表明细
                     row.createCell(0).setCellValue(ObjectUtils.toString(record.get("receive_date")));
-                    row.createCell(1).setCellValue(ObjectUtils.toString(record.get("org_name")));
+                    row.createCell(1).setCellValue(packQcReportService.getOrgName(orgs, record.get("org_code")+""));
                     row.createCell(2).setCellValue(ObjectUtils.toString(record.get("dataset")));
-                    row.createCell(3).setCellValue(ObjectUtils.toString(record.get("dataset_name")));
+                    row.createCell(3).setCellValue(redisClient.get("std_data_set_" + record.get("version") + ":" + record.get("dataset") + ":name")+"");
                     row.createCell(4).setCellValue(ObjectUtils.toString(record.get("metadata")));
-                    row.createCell(5).setCellValue(ObjectUtils.toString(record.get("metadata_name")));
+                    row.createCell(5).setCellValue(redisClient.get("std_meta_data_" + record.get("version") + ":" + record.get("dataset")+"."+ record.get("metadata")+ ":name")+"");
                     row.createCell(6).setCellValue(ObjectUtils.toString(record.get("_id")));
                     row.createCell(7).setCellValue(getExceptionType(ObjectUtils.toString(record.get("qc_error_type"))));
                 }
@@ -675,6 +697,7 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
             wwb.close();
             os.flush();
             os.close();
+            logger.info("导出耗时：" + (System.currentTimeMillis() - starttime) + "ms");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -688,7 +711,7 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                                    @RequestParam(value = "sorts", required = false) String sorts,
                                    HttpServletResponse response){
 //        if(StringUtils.isNotEmpty(filters)){
-//            filters+="archive_status=3;"+filters;
+//            filters="archive_status=3;"+filters;
 //        }else{
 //            filters="archive_status=3";
 //        }
