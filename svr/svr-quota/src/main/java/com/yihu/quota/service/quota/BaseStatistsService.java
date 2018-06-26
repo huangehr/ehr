@@ -262,6 +262,9 @@ public class BaseStatistsService {
         String molecularFilter,String denominatorFilters,String operation,String operationValue,String dateType, String top) throws Exception {
 //        List<Map<String, Object>> moleList = getQuotaResultList(molecular,dimension,molecularFilter,dateType, top);
 //        List<Map<String, Object>> denoList =  getQuotaResultList(denominator,dimension,denominatorFilters,dateType, top);
+        if(StringUtils.isEmpty(dimension) && StringUtils.isNotEmpty(dateType)){
+            dimension = dateType;
+        }
         List<Map<String, Object>> moleList = getSimpleQuotaReport(molecular, molecularFilter,dimension ,false , null);
         List<Map<String, Object>> denoList =  getSimpleQuotaReport(denominator,denominatorFilters,dimension,false, null);
 
