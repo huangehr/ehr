@@ -398,11 +398,11 @@ public class PackQcReportService extends BaseJpaService {
         return list;
     }
 
-    private List<Map<String, Object>> getOrgs(){
+    public List<Map<String, Object>> getOrgs(){
         return jdbcTemplate.queryForList("SELECT org_code,full_name from organizations");
     }
 
-    private String getOrgName(List<Map<String, Object>> orgs, String orgCode){
+    public String getOrgName(List<Map<String, Object>> orgs, String orgCode){
         String orgName = "";
         for(Map<String, Object> map : orgs){
             if(orgCode.equals(map.get("ORG_CODE"))){
@@ -424,7 +424,7 @@ public class PackQcReportService extends BaseJpaService {
         List<Map<String, Object>> orgs = getOrgs();
         Map<String, Object> res = new HashMap<>();
         Map<String, Object> metedata = elasticSearchUtil.findById("json_archives_qc","qc_metadata_info",id);
-        if("2".equals(metedata.get("qc_step"))){
+        if("2".equals(metedata.get("qc_step")+"")){
             String sql = "SELECT * FROM rs_adapter_scheme WHERE adapter_version='"+metedata.get("version")+"'";
             List<Map<String, Object>> schemeList = jdbcTemplate.queryForList(sql);
             if(schemeList!=null&&schemeList.size()>0){
