@@ -49,6 +49,8 @@ public class WarningQuestionService extends BaseJpaService {
     private ElasticSearchUtil elasticSearchUtil;
     @Value("${quality.orgCode}")
     private String defaultOrgCode;
+    @Value("${quality.cloud}")
+    private String cloud;
 
     /**
      * 预警问题生成分析
@@ -767,13 +769,14 @@ public class WarningQuestionService extends BaseJpaService {
         Date recordTime = DateUtil.formatCharDateYMD(dateStr);
         String unqualified = "不合格";
         String orgName = "医疗云平台";
+        String id = DateUtil.getCurrentString(DateUtil.DEFAULT_CHAR_DATE_YMD_FORMAT)+"_"+ dateStr +"_"+cloud+"_";
         //1、失败数
         if(resourceFailure>warning.getFailureNum()){
             //失败数>预警值
             DqWarningRecord record = new DqWarningRecord();
             record.setType(DqWarningRecordType.resource.getValue());
             record.setActualValue(resourceFailure+"");
-            record.setId(getCode());
+            record.setId(id+DqWarningRecordWarningType.resourceFailureNum.getValue());
             record.setWarningType(DqWarningRecordWarningType.resourceFailureNum.getValue());
             record.setQuota(DqWarningRecordWarningType.resourceFailureNum.getName());
             record.setRecordTime(recordTime);
@@ -790,7 +793,7 @@ public class WarningQuestionService extends BaseJpaService {
             DqWarningRecord record = new DqWarningRecord();
             record.setType(DqWarningRecordType.resource.getValue());
             record.setActualValue(resourceException+"");
-            record.setId(getCode());
+            record.setId(id+DqWarningRecordWarningType.resourceErrorNum.getValue());
             record.setWarningType(DqWarningRecordWarningType.resourceErrorNum.getValue());
             record.setQuota(DqWarningRecordWarningType.resourceErrorNum.getName());
             record.setRecordTime(recordTime);
@@ -807,7 +810,7 @@ public class WarningQuestionService extends BaseJpaService {
             DqWarningRecord record = new DqWarningRecord();
             record.setType(DqWarningRecordType.resource.getValue());
             record.setActualValue(resourceUnArchive+"");
-            record.setId(getCode());
+            record.setId(id+DqWarningRecordWarningType.unArchiveNum.getValue());
             record.setWarningType(DqWarningRecordWarningType.unArchiveNum.getValue());
             record.setQuota(DqWarningRecordWarningType.unArchiveNum.getName());
             record.setRecordTime(recordTime);
@@ -885,13 +888,14 @@ public class WarningQuestionService extends BaseJpaService {
         String unqualified = "不合格";
         String orgName = warning.getOrgName();
         String orgCode = warning.getOrgCode();
+        String id = DateUtil.getCurrentString(DateUtil.DEFAULT_CHAR_DATE_YMD_FORMAT)+"_"+ dateStr +"_"+orgCode+"_";
         //1、档案数
         if(uploadArchiveNum<warning.getArchiveNum()){
             //档案数<预警值
             DqWarningRecord record = new DqWarningRecord();
             record.setType(DqWarningRecordType.upload.getValue());
             record.setActualValue(uploadArchiveNum+"");
-            record.setId(getCode());
+            record.setId(id+DqWarningRecordWarningType.archiveNum.getValue());
             record.setWarningType(DqWarningRecordWarningType.archiveNum.getValue());
             record.setQuota(DqWarningRecordWarningType.archiveNum.getName());
             record.setRecordTime(recordTime);
@@ -909,7 +913,7 @@ public class WarningQuestionService extends BaseJpaService {
             DqWarningRecord record = new DqWarningRecord();
             record.setType(DqWarningRecordType.upload.getValue());
             record.setActualValue(uploadErrorNum+"");
-            record.setId(getCode());
+            record.setId(id+DqWarningRecordWarningType.dataErrorNum.getValue());
             record.setWarningType(DqWarningRecordWarningType.dataErrorNum.getValue());
             record.setQuota(DqWarningRecordWarningType.dataErrorNum.getName());
             record.setRecordTime(recordTime);
@@ -927,7 +931,7 @@ public class WarningQuestionService extends BaseJpaService {
             DqWarningRecord record = new DqWarningRecord();
             record.setType(DqWarningRecordType.upload.getValue());
             record.setActualValue(uploadDatasetNum+"");
-            record.setId(getCode());
+            record.setId(id+DqWarningRecordWarningType.uploadDatasetNum.getValue());
             record.setWarningType(DqWarningRecordWarningType.uploadDatasetNum.getValue());
             record.setQuota(DqWarningRecordWarningType.uploadDatasetNum.getName());
             record.setRecordTime(recordTime);
