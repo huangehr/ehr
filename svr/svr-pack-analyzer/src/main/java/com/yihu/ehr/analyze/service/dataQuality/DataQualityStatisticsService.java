@@ -95,7 +95,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
             datasetMap.put(orgCode,num);
         });
         //统计医疗云平台数据集总数
-        query = session.createSQLQuery("SELECT count(DISTINCT code) c from dq_dataset_warning WHERE type = 1 ");
+        query = session.createSQLQuery("SELECT count(DISTINCT code) c from dq_dataset_warning WHERE type = 1 and org_code != '"+defaultOrgCode+"'");
         List<Object> tmpList = query.list();
         totalHospitalDataset = Integer.valueOf(tmpList.get(0).toString());
 
@@ -635,15 +635,15 @@ public class DataQualityStatisticsService extends BaseJpaService {
         switch (eventType){
             case "0":
                 //0门诊
-                re = warning.getOutpatientInTime() < delay;
+                re = warning.getOutpatientInTime() >= delay;
                 break;
             case "1":
                 //1住院
-                re = warning.getHospitalInTime() < delay;
+                re = warning.getHospitalInTime() >= delay;
                 break;
             case "2":
                 //2体检
-                re = warning.getPeInTime() < delay;
+                re = warning.getPeInTime() >= delay;
                 break;
             default:
                 break;
