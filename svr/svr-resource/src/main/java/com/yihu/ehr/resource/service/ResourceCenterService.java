@@ -244,17 +244,6 @@ public class ResourceCenterService extends BaseJpaService {
         return (String) query.uniqueResult();
     }
 
-    public String getDeptNameByCode(String deptCode) {
-        Session session = currentSession();
-        String sql = "SELECT entry.value FROM std_dictionary_entry_59083976eebd entry " +
-                "INNER JOIN std_dictionary_59083976eebd dict ON entry.dict_id = dict.id " +
-                "WHERE dict.code = 'STD_DEPARTMENT' AND entry.code = :deptCode";
-        Query query = session.createSQLQuery(sql);
-        query.setFlushMode(FlushMode.COMMIT);
-        query.setString("deptCode", deptCode);
-        return (String) query.uniqueResult();
-    }
-
     public int getCurrentCityId() {
         Session session = currentSession();
         String sql = "SELECT entry.value FROM system_dict_entries entry " +

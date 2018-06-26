@@ -5,6 +5,7 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.model.tj.EchartReportModel;
 import com.yihu.ehr.model.tj.MapDataModel;
+import com.yihu.ehr.resource.service.RedisService;
 import com.yihu.ehr.resource.service.ResourceCenterService;
 import com.yihu.ehr.solr.SolrUtil;
 import com.yihu.ehr.util.rest.Envelop;
@@ -39,6 +40,8 @@ public class ResourceCenterEndPoint extends EnvelopRestEndPoint {
     private ResourceCenterService resourceCenterService;
     @Autowired
     private SolrUtil solrUtil;
+    @Autowired
+    private RedisService redisService;
 
     // ------------------------------- 统计相关 start ------------------------------------
 
@@ -798,7 +801,7 @@ public class ResourceCenterEndPoint extends EnvelopRestEndPoint {
         Map<String, Long> dataMap = new HashMap<>(countList.size());
         for (FacetField.Count count : countList) {
             String deptCode = count.getName();
-            String deptName = resourceCenterService.getDeptNameByCode(deptCode);
+            String deptName = redisService.getDictEntryValue("59083976eebd", "253", deptCode);
             if (!StringUtils.isEmpty(deptName)) {
                 long count1 = count.getCount();
                 dataMap.put(deptName, count1);

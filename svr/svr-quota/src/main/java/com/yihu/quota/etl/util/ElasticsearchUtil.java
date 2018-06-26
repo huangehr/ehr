@@ -242,7 +242,7 @@ public class ElasticsearchUtil {
      * 查询后 存在 删除
      * @param boolQueryBuilder
      */
-    public boolean queryDelete(Client client,String index,String type,BoolQueryBuilder boolQueryBuilder){
+    public synchronized  boolean queryDelete(Client client,String index,String type,BoolQueryBuilder boolQueryBuilder){
         BulkRequestBuilder bulkRequestBuilder = client.prepareBulk();
         DeleteRequestBuilder deleteRequestBuilder = null ;
         SearchResponse actionGet = null;
