@@ -58,7 +58,7 @@ public class WarningQuestionService extends BaseJpaService {
     public void analyze(String date){
         String dateStr = null;
         if(StringUtils.isBlank(date)){
-            dateStr = DateUtil.formatDate(DateUtil.addDate(-1, new Date()),DateUtil.DEFAULT_DATE_YMD_FORMAT);
+            dateStr = DateUtil.formatDate(new Date(),DateUtil.DEFAULT_DATE_YMD_FORMAT);
         }else {
             dateStr = date;
         }
@@ -267,7 +267,7 @@ public class WarningQuestionService extends BaseJpaService {
                     record4.setQuota(DqWarningRecordWarningType.outpatientInTimeRate.getName());
                     record4.setRecordTime(recordTime);
                     record4.setWarningTime(new Date());
-                    record4.setWarningValue(warning.getOutpatientInTimeRate());
+                    record4.setWarningValue(warning.getOutpatientInTimeRate()+"%");
                     record4.setStatus("1");
                     String description4 = "就诊日期为："+dateStr+"的"+
                             DqWarningRecordWarningType.outpatientInTimeRate.getName()+unqualified;
@@ -284,7 +284,7 @@ public class WarningQuestionService extends BaseJpaService {
                     record5.setQuota(DqWarningRecordWarningType.hospitalInTimeRate.getName());
                     record5.setRecordTime(recordTime);
                     record5.setWarningTime(new Date());
-                    record5.setWarningValue(warning.getHospitalInTimeRate());
+                    record5.setWarningValue(warning.getHospitalInTimeRate()+"%");
                     record5.setStatus("1");
                     String description5 = "就诊日期为："+dateStr+"的"+
                             DqWarningRecordWarningType.hospitalInTimeRate.getName()+unqualified;
@@ -301,7 +301,7 @@ public class WarningQuestionService extends BaseJpaService {
                     record6.setQuota(DqWarningRecordWarningType.peInTimeRate.getName());
                     record6.setRecordTime(recordTime);
                     record6.setWarningTime(new Date());
-                    record6.setWarningValue(warning.getPeInTimeRate());
+                    record6.setWarningValue(warning.getPeInTimeRate()+"%");
                     record6.setStatus("1");
                     String description6 = "就诊日期为："+dateStr+"的"+
                             DqWarningRecordWarningType.peInTimeRate.getName()+unqualified;
@@ -388,7 +388,7 @@ public class WarningQuestionService extends BaseJpaService {
                         record.setQuota(DqWarningRecordWarningType.outpatientInTimeRate.getName());
                         record.setRecordTime(recordTime);
                         record.setWarningTime(new Date());
-                        record.setWarningValue(warning.getOutpatientInTimeRate());
+                        record.setWarningValue(warning.getOutpatientInTimeRate()+"%");
                         record.setStatus("1");
                         String description = "就诊日期为："+hospitalMap.get("outpatientReceiveTime")+"的"+
                                 DqWarningRecordWarningType.outpatientInTimeRate.getName()+unqualified;
@@ -418,7 +418,7 @@ public class WarningQuestionService extends BaseJpaService {
                         record.setQuota(DqWarningRecordWarningType.hospitalInTimeRate.getName());
                         record.setRecordTime(recordTime);
                         record.setWarningTime(new Date());
-                        record.setWarningValue(warning.getHospitalInTimeRate());
+                        record.setWarningValue(warning.getHospitalInTimeRate()+"%");
                         record.setStatus("1");
                         String description = "就诊日期为："+hospitalMap.get("hospitalReceiveTime")+"的"+
                                 DqWarningRecordWarningType.hospitalInTimeRate.getName()+unqualified;
@@ -447,7 +447,7 @@ public class WarningQuestionService extends BaseJpaService {
                         record.setQuota(DqWarningRecordWarningType.peInTimeRate.getName());
                         record.setRecordTime(recordTime);
                         record.setWarningTime(new Date());
-                        record.setWarningValue(warning.getPeInTimeRate());
+                        record.setWarningValue(warning.getPeInTimeRate()+"%");
                         record.setStatus("1");
                         String description = "就诊日期为："+hospitalMap.get("peReceiveTime")+"的"+
                                 DqWarningRecordWarningType.peInTimeRate.getName()+unqualified;
