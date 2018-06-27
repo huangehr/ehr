@@ -52,6 +52,7 @@ public class HealthArchiveSchedulerService {
      * @throws Exception
      */
     public void saveHealthArchiveInfo(String index, String type, HealthArchiveInfoModel archiveInfo) throws Exception {
+        System.out.println("方法：保存到ES");
         Map<String, Object> source = new HashMap<>();
         String jsonPer = objectMapper.writeValueAsString(archiveInfo);
         source = objectMapper.readValue(jsonPer, Map.class);

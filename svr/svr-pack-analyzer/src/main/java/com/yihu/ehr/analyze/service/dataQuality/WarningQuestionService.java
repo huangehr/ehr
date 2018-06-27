@@ -49,6 +49,8 @@ public class WarningQuestionService extends BaseJpaService {
     private ElasticSearchUtil elasticSearchUtil;
     @Value("${quality.orgCode}")
     private String defaultOrgCode;
+    @Value("${quality.cloud}")
+    private String cloud;
 
     /**
      * 预警问题生成分析
@@ -56,7 +58,7 @@ public class WarningQuestionService extends BaseJpaService {
     public void analyze(String date){
         String dateStr = null;
         if(StringUtils.isBlank(date)){
-            dateStr = DateUtil.formatDate(DateUtil.addDate(-1, new Date()),DateUtil.DEFAULT_DATE_YMD_FORMAT);
+            dateStr = DateUtil.formatDate(new Date(),DateUtil.DEFAULT_DATE_YMD_FORMAT);
         }else {
             dateStr = date;
         }
@@ -204,6 +206,7 @@ public class WarningQuestionService extends BaseJpaService {
             }
             try {
                 String orgName = orgMap.get(orgCode);
+                String id = DateUtil.getCurrentString(DateUtil.DEFAULT_CHAR_DATE_YMD_FORMAT)+"_"+ dateStr +"_"+orgCode+"_";
                 DqPaltformReceiveWarning warning = warningMap.get(orgCode);
 
                 Map<String, Object> hospitalMap = dataMap.get(orgCode);
@@ -213,7 +216,7 @@ public class WarningQuestionService extends BaseJpaService {
                     record1.setOrgCode(orgCode);
                     record1.setType(DqWarningRecordType.receive.getValue());
                     record1.setActualValue("0");
-                    record1.setId(getCode());
+                    record1.setId(id+DqWarningRecordWarningType.archives.getValue());
                     record1.setOrgName(orgName);
                     record1.setWarningType(DqWarningRecordWarningType.archives.getValue());
                     record1.setQuota(DqWarningRecordWarningType.archives.getName());
@@ -228,10 +231,10 @@ public class WarningQuestionService extends BaseJpaService {
                     record2.setOrgCode(orgCode);
                     record2.setType(DqWarningRecordType.receive.getValue());
                     record2.setActualValue("0");
-                    record2.setId(getCode());
+                    record2.setId(id+DqWarningRecordWarningType.errorNum.getValue());
                     record2.setOrgName(orgName);
-                    record2.setWarningType(errorNum.getValue());
-                    record2.setQuota(errorNum.getName());
+                    record2.setWarningType(DqWarningRecordWarningType.errorNum.getValue());
+                    record2.setQuota(DqWarningRecordWarningType.errorNum.getName());
                     record2.setRecordTime(recordTime);
                     record2.setWarningTime(new Date());
                     record2.setWarningValue(warning.getErrorNum()+"");
@@ -243,7 +246,7 @@ public class WarningQuestionService extends BaseJpaService {
                     record3.setOrgCode(orgCode);
                     record3.setType(DqWarningRecordType.receive.getValue());
                     record3.setActualValue("0");
-                    record3.setId(getCode());
+                    record3.setId(id+DqWarningRecordWarningType.datasetWarningNum.getValue());
                     record3.setOrgName(orgName);
                     record3.setWarningType(DqWarningRecordWarningType.datasetWarningNum.getValue());
                     record3.setQuota(DqWarningRecordWarningType.datasetWarningNum.getName());
@@ -258,15 +261,15 @@ public class WarningQuestionService extends BaseJpaService {
                     record4.setOrgCode(orgCode);
                     record4.setType(DqWarningRecordType.receive.getValue());
                     record4.setActualValue("0");
-                    record4.setId(getCode());
+                    record4.setId(id+DqWarningRecordWarningType.outpatientInTimeRate.getValue());
                     record4.setOrgName(orgName);
                     record4.setWarningType(DqWarningRecordWarningType.outpatientInTimeRate.getValue());
                     record4.setQuota(DqWarningRecordWarningType.outpatientInTimeRate.getName());
                     record4.setRecordTime(recordTime);
                     record4.setWarningTime(new Date());
-                    record4.setWarningValue(warning.getOutpatientInTimeRate());
+                    record4.setWarningValue(warning.getOutpatientInTimeRate()+"%");
                     record4.setStatus("1");
-                    String description4 = "就诊日期为："+hospitalMap.get("outpatientReceiveTime")+"的"+
+                    String description4 = "就诊日期为："+dateStr+"的"+
                             DqWarningRecordWarningType.outpatientInTimeRate.getName()+unqualified;
                     record4.setProblemDescription(description4);
                     list.add(record4);
@@ -275,15 +278,15 @@ public class WarningQuestionService extends BaseJpaService {
                     record5.setOrgCode(orgCode);
                     record5.setType(DqWarningRecordType.receive.getValue());
                     record5.setActualValue("0");
-                    record5.setId(getCode());
+                    record5.setId(id+DqWarningRecordWarningType.hospitalInTimeRate.getValue());
                     record5.setOrgName(orgName);
                     record5.setWarningType(DqWarningRecordWarningType.hospitalInTimeRate.getValue());
                     record5.setQuota(DqWarningRecordWarningType.hospitalInTimeRate.getName());
                     record5.setRecordTime(recordTime);
                     record5.setWarningTime(new Date());
-                    record5.setWarningValue(warning.getHospitalInTimeRate());
+                    record5.setWarningValue(warning.getHospitalInTimeRate()+"%");
                     record5.setStatus("1");
-                    String description5 = "就诊日期为："+hospitalMap.get("hospitalReceiveTime")+"的"+
+                    String description5 = "就诊日期为："+dateStr+"的"+
                             DqWarningRecordWarningType.hospitalInTimeRate.getName()+unqualified;
                     record5.setProblemDescription(description5);
                     list.add(record5);
@@ -292,15 +295,15 @@ public class WarningQuestionService extends BaseJpaService {
                     record6.setOrgCode(orgCode);
                     record6.setType(DqWarningRecordType.receive.getValue());
                     record6.setActualValue("0");
-                    record6.setId(getCode());
+                    record6.setId(id+DqWarningRecordWarningType.peInTimeRate.getValue());
                     record6.setOrgName(orgName);
                     record6.setWarningType(DqWarningRecordWarningType.peInTimeRate.getValue());
                     record6.setQuota(DqWarningRecordWarningType.peInTimeRate.getName());
                     record6.setRecordTime(recordTime);
                     record6.setWarningTime(new Date());
-                    record6.setWarningValue(warning.getPeInTimeRate());
+                    record6.setWarningValue(warning.getPeInTimeRate()+"%");
                     record6.setStatus("1");
-                    String description6 = "就诊日期为："+hospitalMap.get("peReceiveTime")+"的"+
+                    String description6 = "就诊日期为："+dateStr+"的"+
                             DqWarningRecordWarningType.peInTimeRate.getName()+unqualified;
                     record6.setProblemDescription(description6);
                     list.add(record6);
@@ -316,7 +319,7 @@ public class WarningQuestionService extends BaseJpaService {
                     record.setOrgCode(orgCode);
                     record.setType(DqWarningRecordType.receive.getValue());
                     record.setActualValue(archiveNum+"");
-                    record.setId(getCode());
+                    record.setId(id+DqWarningRecordWarningType.archives.getValue());
                     record.setOrgName(orgName);
                     record.setWarningType(DqWarningRecordWarningType.archives.getValue());
                     record.setQuota(DqWarningRecordWarningType.archives.getName());
@@ -336,7 +339,7 @@ public class WarningQuestionService extends BaseJpaService {
                     record.setOrgCode(orgCode);
                     record.setType(DqWarningRecordType.receive.getValue());
                     record.setActualValue(errorNum+"");
-                    record.setId(getCode());
+                    record.setId(id+DqWarningRecordWarningType.errorNum.getValue());
                     record.setOrgName(orgName);
                     record.setWarningType(DqWarningRecordWarningType.errorNum.getValue());
                     record.setQuota(DqWarningRecordWarningType.errorNum.getName());
@@ -355,7 +358,7 @@ public class WarningQuestionService extends BaseJpaService {
                     record.setOrgCode(orgCode);
                     record.setType(DqWarningRecordType.receive.getValue());
                     record.setActualValue(datasetNum+"");
-                    record.setId(getCode());
+                    record.setId(id+DqWarningRecordWarningType.datasetWarningNum.getValue());
                     record.setOrgName(orgName);
                     record.setWarningType(DqWarningRecordWarningType.datasetWarningNum.getValue());
                     record.setQuota(DqWarningRecordWarningType.datasetWarningNum.getName());
@@ -379,13 +382,13 @@ public class WarningQuestionService extends BaseJpaService {
                         record.setOrgCode(orgCode);
                         record.setType(DqWarningRecordType.receive.getValue());
                         record.setActualValue(outpatientRate);
-                        record.setId(getCode());
+                        record.setId(id+DqWarningRecordWarningType.outpatientInTimeRate.getValue());
                         record.setOrgName(orgName);
                         record.setWarningType(DqWarningRecordWarningType.outpatientInTimeRate.getValue());
                         record.setQuota(DqWarningRecordWarningType.outpatientInTimeRate.getName());
                         record.setRecordTime(recordTime);
                         record.setWarningTime(new Date());
-                        record.setWarningValue(warning.getOutpatientInTimeRate());
+                        record.setWarningValue(warning.getOutpatientInTimeRate()+"%");
                         record.setStatus("1");
                         String description = "就诊日期为："+hospitalMap.get("outpatientReceiveTime")+"的"+
                                 DqWarningRecordWarningType.outpatientInTimeRate.getName()+unqualified;
@@ -409,13 +412,13 @@ public class WarningQuestionService extends BaseJpaService {
                         record.setOrgCode(orgCode);
                         record.setType(DqWarningRecordType.receive.getValue());
                         record.setActualValue(hospitalRate);
-                        record.setId(getCode());
+                        record.setId(id+DqWarningRecordWarningType.hospitalInTimeRate.getValue());
                         record.setOrgName(orgName);
                         record.setWarningType(DqWarningRecordWarningType.hospitalInTimeRate.getValue());
                         record.setQuota(DqWarningRecordWarningType.hospitalInTimeRate.getName());
                         record.setRecordTime(recordTime);
                         record.setWarningTime(new Date());
-                        record.setWarningValue(warning.getHospitalInTimeRate());
+                        record.setWarningValue(warning.getHospitalInTimeRate()+"%");
                         record.setStatus("1");
                         String description = "就诊日期为："+hospitalMap.get("hospitalReceiveTime")+"的"+
                                 DqWarningRecordWarningType.hospitalInTimeRate.getName()+unqualified;
@@ -438,13 +441,13 @@ public class WarningQuestionService extends BaseJpaService {
                         record.setOrgCode(orgCode);
                         record.setType(DqWarningRecordType.receive.getValue());
                         record.setActualValue(peRate);
-                        record.setId(getCode());
+                        record.setId(id+DqWarningRecordWarningType.peInTimeRate.getValue());
                         record.setOrgName(orgName);
                         record.setWarningType(DqWarningRecordWarningType.peInTimeRate.getValue());
                         record.setQuota(DqWarningRecordWarningType.peInTimeRate.getName());
                         record.setRecordTime(recordTime);
                         record.setWarningTime(new Date());
-                        record.setWarningValue(warning.getPeInTimeRate());
+                        record.setWarningValue(warning.getPeInTimeRate()+"%");
                         record.setStatus("1");
                         String description = "就诊日期为："+hospitalMap.get("peReceiveTime")+"的"+
                                 DqWarningRecordWarningType.peInTimeRate.getName()+unqualified;
@@ -766,13 +769,14 @@ public class WarningQuestionService extends BaseJpaService {
         Date recordTime = DateUtil.formatCharDateYMD(dateStr);
         String unqualified = "不合格";
         String orgName = "医疗云平台";
+        String id = DateUtil.getCurrentString(DateUtil.DEFAULT_CHAR_DATE_YMD_FORMAT)+"_"+ dateStr +"_"+cloud+"_";
         //1、失败数
         if(resourceFailure>warning.getFailureNum()){
             //失败数>预警值
             DqWarningRecord record = new DqWarningRecord();
             record.setType(DqWarningRecordType.resource.getValue());
             record.setActualValue(resourceFailure+"");
-            record.setId(getCode());
+            record.setId(id+DqWarningRecordWarningType.resourceFailureNum.getValue());
             record.setWarningType(DqWarningRecordWarningType.resourceFailureNum.getValue());
             record.setQuota(DqWarningRecordWarningType.resourceFailureNum.getName());
             record.setRecordTime(recordTime);
@@ -789,7 +793,7 @@ public class WarningQuestionService extends BaseJpaService {
             DqWarningRecord record = new DqWarningRecord();
             record.setType(DqWarningRecordType.resource.getValue());
             record.setActualValue(resourceException+"");
-            record.setId(getCode());
+            record.setId(id+DqWarningRecordWarningType.resourceErrorNum.getValue());
             record.setWarningType(DqWarningRecordWarningType.resourceErrorNum.getValue());
             record.setQuota(DqWarningRecordWarningType.resourceErrorNum.getName());
             record.setRecordTime(recordTime);
@@ -806,7 +810,7 @@ public class WarningQuestionService extends BaseJpaService {
             DqWarningRecord record = new DqWarningRecord();
             record.setType(DqWarningRecordType.resource.getValue());
             record.setActualValue(resourceUnArchive+"");
-            record.setId(getCode());
+            record.setId(id+DqWarningRecordWarningType.unArchiveNum.getValue());
             record.setWarningType(DqWarningRecordWarningType.unArchiveNum.getValue());
             record.setQuota(DqWarningRecordWarningType.unArchiveNum.getName());
             record.setRecordTime(recordTime);
@@ -882,14 +886,16 @@ public class WarningQuestionService extends BaseJpaService {
         List<DqWarningRecord> list = new ArrayList<>(3);
         Date recordTime = DateUtil.formatCharDateYMD(dateStr);
         String unqualified = "不合格";
-        String orgName = "省平台";
+        String orgName = warning.getOrgName();
+        String orgCode = warning.getOrgCode();
+        String id = DateUtil.getCurrentString(DateUtil.DEFAULT_CHAR_DATE_YMD_FORMAT)+"_"+ dateStr +"_"+orgCode+"_";
         //1、档案数
         if(uploadArchiveNum<warning.getArchiveNum()){
             //档案数<预警值
             DqWarningRecord record = new DqWarningRecord();
             record.setType(DqWarningRecordType.upload.getValue());
             record.setActualValue(uploadArchiveNum+"");
-            record.setId(getCode());
+            record.setId(id+DqWarningRecordWarningType.archiveNum.getValue());
             record.setWarningType(DqWarningRecordWarningType.archiveNum.getValue());
             record.setQuota(DqWarningRecordWarningType.archiveNum.getName());
             record.setRecordTime(recordTime);
@@ -897,6 +903,7 @@ public class WarningQuestionService extends BaseJpaService {
             record.setWarningValue(warning.getArchiveNum()+"");
             record.setStatus("1");
             record.setOrgName(orgName);
+            record.setOrgCode(orgCode);
             record.setProblemDescription(DqWarningRecordWarningType.archiveNum.getName()+unqualified);
             list.add(record);
         }
@@ -906,7 +913,7 @@ public class WarningQuestionService extends BaseJpaService {
             DqWarningRecord record = new DqWarningRecord();
             record.setType(DqWarningRecordType.upload.getValue());
             record.setActualValue(uploadErrorNum+"");
-            record.setId(getCode());
+            record.setId(id+DqWarningRecordWarningType.dataErrorNum.getValue());
             record.setWarningType(DqWarningRecordWarningType.dataErrorNum.getValue());
             record.setQuota(DqWarningRecordWarningType.dataErrorNum.getName());
             record.setRecordTime(recordTime);
@@ -914,6 +921,7 @@ public class WarningQuestionService extends BaseJpaService {
             record.setWarningValue(warning.getErrorNum()+"");
             record.setStatus("1");
             record.setOrgName(orgName);
+            record.setOrgCode(orgCode);
             record.setProblemDescription(DqWarningRecordWarningType.dataErrorNum.getName()+unqualified);
             list.add(record);
         }
@@ -923,7 +931,7 @@ public class WarningQuestionService extends BaseJpaService {
             DqWarningRecord record = new DqWarningRecord();
             record.setType(DqWarningRecordType.upload.getValue());
             record.setActualValue(uploadDatasetNum+"");
-            record.setId(getCode());
+            record.setId(id+DqWarningRecordWarningType.uploadDatasetNum.getValue());
             record.setWarningType(DqWarningRecordWarningType.uploadDatasetNum.getValue());
             record.setQuota(DqWarningRecordWarningType.uploadDatasetNum.getName());
             record.setRecordTime(recordTime);
@@ -931,6 +939,7 @@ public class WarningQuestionService extends BaseJpaService {
             record.setWarningValue(datasetNum+"");
             record.setStatus("1");
             record.setOrgName(orgName);
+            record.setOrgCode(orgCode);
             record.setProblemDescription(DqWarningRecordWarningType.uploadDatasetNum.getName()+unqualified);
             list.add(record);
         }
@@ -993,15 +1002,15 @@ public class WarningQuestionService extends BaseJpaService {
         switch (eventType){
             case "0":
                 //0门诊
-                re = warning.getOutpatientInTime() < delay;
+                re = warning.getOutpatientInTime() >= delay;
                 break;
             case "1":
                 //1住院
-                re = warning.getHospitalInTime() < delay;
+                re = warning.getHospitalInTime() >= delay;
                 break;
             case "2":
                 //2体检
-                re = warning.getPeInTime() < delay;
+                re = warning.getPeInTime() >= delay;
                 break;
             default:
                 break;

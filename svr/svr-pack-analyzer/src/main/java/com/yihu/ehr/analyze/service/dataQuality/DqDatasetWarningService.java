@@ -4,6 +4,7 @@ import com.yihu.ehr.analyze.dao.DqDatasetWarningDao;
 import com.yihu.ehr.entity.quality.DqDatasetWarning;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.redis.client.RedisClient;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -39,10 +40,11 @@ public class DqDatasetWarningService extends BaseJpaService<DqDatasetWarning, Dq
         List<DqDatasetWarning> warningList = new ArrayList<>(codeList.size());
         codeList.forEach(code->{
             String key = DataSetTable+defaultQualityVersion+":"+code+":name";
-            if(redisClient.hasKey(key)){
+            String value = redisClient.get(key);
+            if(StringUtils.isNotBlank(value)){
                 DqDatasetWarning warning = new DqDatasetWarning();
-                warning.setDatasetCode(code);
-                warning.setDatasetName(redisClient.get(key));
+                warning.setCode(code);
+                warning.setName(value);
                 warningList.add(warning);
             }
         });

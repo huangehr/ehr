@@ -19,13 +19,9 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.TermsQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
-import org.elasticsearch.search.aggregations.bucket.histogram.InternalHistogram;
 import org.elasticsearch.search.aggregations.bucket.terms.*;
 import org.elasticsearch.search.aggregations.metrics.sum.InternalSum;
 import org.elasticsearch.search.aggregations.metrics.sum.SumBuilder;
@@ -246,7 +242,7 @@ public class ElasticsearchUtil {
      * 查询后 存在 删除
      * @param boolQueryBuilder
      */
-    public boolean queryDelete(Client client,String index,String type,BoolQueryBuilder boolQueryBuilder){
+    public synchronized  boolean queryDelete(Client client,String index,String type,BoolQueryBuilder boolQueryBuilder){
         BulkRequestBuilder bulkRequestBuilder = client.prepareBulk();
         DeleteRequestBuilder deleteRequestBuilder = null ;
         SearchResponse actionGet = null;
@@ -344,7 +340,7 @@ public class ElasticsearchUtil {
             }
             SearchResponse response = (SearchResponse) requestBuilder.get();
             Object queryResult = null;
-            if (sql.toUpperCase().indexOf("GROUP") != -1 || sql.toUpperCase().indexOf("SUM") != -1) {
+            if (sql.toUpperCase().indexOf("GROUP") != -1 || sql.toUpperCase().indexOf("SUM") != -1 || sql.toUpperCase().indexOf("COUNT") != -1) {
                 queryResult = response.getAggregations();
             } else {
                 queryResult = response.getHits();

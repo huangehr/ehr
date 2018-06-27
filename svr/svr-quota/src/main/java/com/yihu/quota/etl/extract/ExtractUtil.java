@@ -1,13 +1,10 @@
 package com.yihu.quota.etl.extract;
 
-import com.yihu.ehr.entity.address.AddressDict;
-import com.yihu.ehr.entity.dict.SystemDictEntry;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.query.services.SolrQuery;
 import com.yihu.ehr.solr.SolrUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.quota.etl.Contant;
-import com.yihu.quota.etl.model.EsConfig;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionMain;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionSlave;
 import com.yihu.quota.util.BasesicUtil;
@@ -15,7 +12,6 @@ import com.yihu.quota.vo.DictModel;
 import com.yihu.quota.vo.OrgHealthCategoryShowModel;
 import com.yihu.quota.vo.QuotaVo;
 import com.yihu.quota.vo.SaveModel;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -26,7 +22,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import java.time.LocalDate;
 import java.util.*;
 
 /**
@@ -102,6 +97,15 @@ public class ExtractUtil {
         int errorCount = 0;
         for(Map<String, Object> map : dataList){
             SaveModel saveModel = new SaveModel();
+
+            // 去重查询场合
+            Object distinctField = map.get("distinctField");
+            Object distinctFieldValue = map.get("distinctFieldValue");
+            if (distinctField != null) {
+                saveModel.setDistinctField(distinctField.toString());
+                saveModel.setDistinctFieldValue(distinctFieldValue.toString());
+            }
+
             for (TjQuotaDimensionMain main : qdm) {
                 String value = map.get(main.getKeyVal()).toString();
                 if(main.getMainCode().equals(main_town) && !StringUtils.isEmpty(townDictMap.get(value))){

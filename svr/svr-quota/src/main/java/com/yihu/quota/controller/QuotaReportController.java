@@ -277,7 +277,7 @@ public class QuotaReportController extends BaseController {
             @ApiParam(name = "top", value = "获取前几条数据")
             @RequestParam(value = "top", required = false) String top,
             @ApiParam(name = "MRsResource json串")
-            @RequestParam(value = "mRsResource") String mRsResource
+            @RequestParam(value = "mRsResource", required = false) String mRsResource
             ) {
         String xName = "";
         String yName = "";
@@ -959,7 +959,7 @@ public class QuotaReportController extends BaseController {
     public Envelop getDeviceReports(
             @ApiParam(name = "year", value = "年份", required = true)
             @RequestParam(value = "year" , required = true) String year,
-            @ApiParam(name = "district", value = "区县")
+            @ApiParam(name = "district", value = "区县编码")
             @RequestParam(value = "district", required = false) String district,
             @ApiParam(name = "organization", value = "机构名称或者组织机构代码", defaultValue = "")
             @RequestParam(value = "organization", required = false) String organization,

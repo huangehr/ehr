@@ -14,7 +14,7 @@ import springfox.documentation.annotations.ApiIgnore;
 @RequestMapping(ApiVersion.Version1_0)
 public interface PackResolveClient {
 
-    @RequestMapping(value = ServiceApi.Packages.Fetch, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.PackageResolve.Fetch, method = RequestMethod.GET)
     String fetch(
             @PathVariable(value = "id") String id);
 }

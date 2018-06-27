@@ -10,7 +10,6 @@ import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.model.packs.EsSimplePackage;
 import com.yihu.ehr.profile.exception.IllegalJsonDataException;
 import com.yihu.ehr.profile.exception.IllegalJsonFileException;
-import com.yihu.ehr.resolve.feign.PackageMgrClient;
 import com.yihu.ehr.resolve.model.stage1.OriginalPackage;
 import com.yihu.ehr.resolve.model.stage2.ResourceBucket;
 import com.yihu.ehr.resolve.service.resource.stage1.ResolveService;
@@ -18,6 +17,7 @@ import com.yihu.ehr.resolve.service.resource.stage2.IdentifyService;
 import com.yihu.ehr.resolve.service.resource.stage2.PackMillService;
 import com.yihu.ehr.resolve.service.resource.stage2.ResourceService;
 import com.yihu.ehr.resolve.log.PackResolveLogger;
+import com.yihu.ehr.resolve.service.resource.stage2.StatusReportService;
 import com.yihu.ehr.resolve.util.LocalTempPathUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
 import net.lingala.zip4j.exception.ZipException;
@@ -50,11 +50,14 @@ public class PackageResourceJob implements InterruptableJob {
 
     @Override
     public void execute(JobExecutionContext context) {
-        PackageMgrClient packageMgrClient = SpringContext.getService(PackageMgrClient.class);
+        StatusReportService statusReportService = SpringContext.getService(StatusReportService.class);
         //该对象要采用名称的方式获取，否则：expected single matching bean but found 3: redisTemplate,sessionRedisTemplate,stringRedisTemplate
         RedisTemplate<String, Serializable> redisTemplate = SpringContext.getService("redisTemplate");
         ObjectMapper objectMapper = SpringContext.getService(ObjectMapper.class);
         Serializable serializable = redisTemplate.opsForList().rightPop(RedisCollection.ResolveQueue);
+        if (null == serializable) {
+            serializable = redisTemplate.opsForSet().pop(RedisCollection.ResolveQueueVice);
+        }
         EsSimplePackage pack = null;
         try {
             if (serializable != null) {
@@ -63,8 +66,8 @@ public class PackageResourceJob implements InterruptableJob {
             }
             if (pack != null) {
                 PackResolveLogger.info("开始入库:" + pack.get_id() + ", Timestamp:" + new Date());
-                packageMgrClient.reportStatus(pack.get_id(), ArchiveStatus.Acquired, 0, "正在入库中");
-                doResolve(pack, packageMgrClient);
+                statusReportService.reportStatus(pack.get_id(), ArchiveStatus.Acquired, 0, "正在入库中", null);
+                doResolve(pack, statusReportService);
                 redisTemplate.opsForList().leftPush(RedisCollection.ProvincialPlatformQueue, objectMapper.writeValueAsString(pack));
             }
         } catch (Exception e) {
@@ -79,16 +82,12 @@ public class PackageResourceJob implements InterruptableJob {
                 errorType = 21; //21以下为质控和解析的公共错误
             }
             if (pack != null) {
-                try {
-                    if (StringUtils.isNotBlank(e.getMessage())) {
-                        packageMgrClient.reportStatus(pack.get_id(), ArchiveStatus.Failed, errorType, e.getMessage());
-                        PackResolveLogger.error(e.getMessage(), e);
-                    } else {
-                        packageMgrClient.reportStatus(pack.get_id(), ArchiveStatus.Failed, errorType, "Internal server error, please see task log for detail message.");
-                        PackResolveLogger.error("Internal server error, please see task log for detail message.", e);
-                    }
-                } catch (Exception e1) {
-                    PackResolveLogger.error("Execute feign fail cause by:" + e1.getMessage());
+                if (StringUtils.isNotBlank(e.getMessage())) {
+                    statusReportService.reportStatus(pack.get_id(), ArchiveStatus.Failed, errorType, e.getMessage(), null);
+                    PackResolveLogger.error(e.getMessage(), e);
+                } else {
+                    statusReportService.reportStatus(pack.get_id(), ArchiveStatus.Failed, errorType, "Internal server error, please see task log for detail message.", null);
+                    PackResolveLogger.error("Empty exception message, please see the following detail info.", e);
                 }
             } else {
                 PackResolveLogger.error("Empty pack cause by:" + e.getMessage());
@@ -96,12 +95,11 @@ public class PackageResourceJob implements InterruptableJob {
         }
     }
 
-    private void doResolve(EsSimplePackage pack, PackageMgrClient packageMgrClient) throws Exception {
+    private void doResolve(EsSimplePackage pack, StatusReportService statusReportService) throws Exception {
         ResolveService resolveEngine = SpringContext.getService(ResolveService.class);
         PackMillService packMill = SpringContext.getService(PackMillService.class);
         IdentifyService identifyService = SpringContext.getService(IdentifyService.class);
         ResourceService resourceService = SpringContext.getService(ResourceService.class);
-        ObjectMapper objectMapper = new ObjectMapper();
         OriginalPackage originalPackage = resolveEngine.doResolve(pack, downloadTo(pack.getRemote_path()));
         ResourceBucket resourceBucket = packMill.grindingPackModel(originalPackage);
         identifyService.identify(resourceBucket, originalPackage);
@@ -126,7 +124,10 @@ public class PackageResourceJob implements InterruptableJob {
         pack.setEvent_no(originalPackage.getEventNo());
         pack.setEvent_type(originalPackage.getEventType() == null ? -1 : originalPackage.getEventType().getType());
         pack.setOrg_code(originalPackage.getOrgCode());
-        packageMgrClient.reportStatus(pack.get_id(), ArchiveStatus.Finished, 0, objectMapper.writeValueAsString(map));
+        pack.setOrg_name(resourceBucket.getBasicRecord(ResourceCells.ORG_NAME));
+        pack.setPatient_name(resourceBucket.getBasicRecord(ResourceCells.PATIENT_NAME));
+        pack.setIdcard_no(resourceBucket.getBasicRecord(ResourceCells.DEMOGRAPHIC_ID));
+        statusReportService.reportStatus(pack.get_id(), ArchiveStatus.Finished, 0, "resolve success",  map);
     }
 
     private String downloadTo(String filePath) throws Exception {

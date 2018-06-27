@@ -185,12 +185,14 @@ public class ElasticSearchClient {
     }
 
     public List<Map<String, Object>> findByField(String index, String type, QueryBuilder queryBuilder) {
+        int size = (int)count(index, type, queryBuilder);
         TransportClient transportClient = elasticSearchPool.getClient();
         try {
             SearchRequestBuilder builder = transportClient.prepareSearch(index);
             builder.setTypes(type);
             builder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
             builder.setQuery(queryBuilder);
+            builder.setFrom(0).setSize(size);
             builder.setExplain(true);
             SearchResponse response = builder.get();
             SearchHits hits = response.getHits();
@@ -285,7 +287,9 @@ public class ElasticSearchClient {
             }
             return list;
         } catch (Exception e) {
-           e.printStackTrace();
+            if(!"Error".equals(e.getMessage())){
+                e.printStackTrace();
+            }
            return new ArrayList<>();
         } finally {
             if (resultSet != null) {

@@ -1,15 +1,18 @@
 package com.yihu.quota.etl.extract.solr;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.query.common.model.SolrGroupEntity;
 import com.yihu.ehr.query.services.SolrQuery;
 import com.yihu.ehr.solr.SolrUtil;
-import com.yihu.ehr.util.datetime.DateUtil;
+import com.yihu.quota.dao.jpa.save.TjQuotaDataSaveDao;
 import com.yihu.quota.etl.Contant;
 import com.yihu.quota.etl.ExtractConverUtil;
 import com.yihu.quota.etl.extract.ExtractUtil;
 import com.yihu.quota.etl.model.EsConfig;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionMain;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionSlave;
+import com.yihu.quota.model.jpa.save.TjQuotaDataSave;
 import com.yihu.quota.vo.FilterModel;
 import com.yihu.quota.vo.QuotaVo;
 import com.yihu.quota.vo.SaveModel;
@@ -21,6 +24,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -46,6 +50,13 @@ public class SolrExtract {
     private SolrQuery solrQuery;
     @Autowired
     private ExtractConverUtil extractConverUtil;
+    @Autowired
+    private ElasticSearchUtil esUtil;
+    @Autowired
+    private TjQuotaDataSaveDao tjQuotaDataSaveDao;
+    @Autowired
+    private ObjectMapper objectMapper;
+
     private QuotaVo quotaVo;
     private String startTime;
     private String endTime;
@@ -81,7 +92,7 @@ public class SolrExtract {
         String fq = null; // 过滤条件
         String fl = ""; // 结果指定查询字段
         List<SolrGroupEntity> dimensionGroupList = new ArrayList<>(); // 维度分组统计条件
-        if(StringUtils.isEmpty(esConfig.getTimekey())){
+        if (StringUtils.isEmpty(esConfig.getTimekey())) {
             throw new Exception("数据源配置 timeKey 不能为空！");
         }
         String timeKey = esConfig.getTimekey();
@@ -102,7 +113,7 @@ public class SolrExtract {
         }
         fl += timeKey + ",rowkey";
 
-        if( StringUtils.isEmpty(esConfig.getAggregation()) || !esConfig.getAggregation().equals(Contant.quota.aggregation_list)){
+        if (StringUtils.isEmpty(esConfig.getAggregation()) || !esConfig.getAggregation().equals(Contant.quota.aggregation_list)) {
             // 默认追加一个日期字段作为细维度，方便按天统计作为最小单位统计值。
             slaveMap.put(timeKey, timeKey);
             TjQuotaDimensionSlave daySlave = new TjQuotaDimensionSlave();
@@ -136,33 +147,43 @@ public class SolrExtract {
                 || Contant.quota.aggregation_count.equals(esConfig.getAggregation())) {
             // count 聚合
             list = solrQuery.getCountMultList(core, q, fq, dimensionGroupList, null);
-        }else if(esConfig.getAggregation().equals(Contant.quota.aggregation_sum) && !StringUtils.isEmpty(esConfig.getAggregationKey())){
+        } else if (!StringUtils.isEmpty(esConfig.getAggregationKey()) && Contant.quota.aggregation_sum.equals(esConfig.getAggregation())) {
             // sum 聚合
             list = solrQuery.getSumMultList(core, q, fq, esConfig.getAggregationKey(), dimensionGroupList, null);
-        }else if(esConfig.getAggregation().equals(Contant.quota.aggregation_list)){
+        } else if (Contant.quota.aggregation_list.equals(esConfig.getAggregation())) {
             listFlag = true;
-            //查询列表
+            // 查询列表
             try {
-                long rows = solrQuery.count(core,fq);
-                list =  solrQuery.queryReturnFieldList(core, q, fq, null, 0, rows, fl.split(","));
-            }catch (Exception e){
+                if (esConfig.getAggregation().equals(Contant.quota.aggregation_list) && !StringUtils.isEmpty(esConfig.getAggregationKey())) {
+                    fl = fl + "," + esConfig.getAggregationKey();
+                }
+                long rows = solrQuery.count(core, fq);
+                list = solrQuery.queryReturnFieldList(core, q, fq, null, 0, rows, fl.split(","), null, null);
+            } catch (Exception e) {
                 throw new Exception("solr 查询异常 " + e.getMessage());
             }
+        } else if (Contant.quota.aggregation_distinct.equals(esConfig.getAggregation())) {
+            listFlag = true;
+            // 去重查询
+            fl += "," + esConfig.getDistinctGroupField();
+            list = solrQuery.queryReturnFieldList(core, q, fq, null, 0, -1, fl.split(","), esConfig.getDistinctGroupField(), esConfig.getDistinctGroupSort());
+            // 对比ES中如果已存在该条数据则更新，并从集合中移除该条数据。
+            checkEsDistinctData(list);
         }
 
         //数据转换
-        FilterModel filterModel = new FilterModel(list,null);
-        filterModel = extractConverUtil.convert(filterModel,qds);
-        if(filterModel != null && filterModel.getDataList() != null){
+        FilterModel filterModel = new FilterModel(list, null);
+        filterModel = extractConverUtil.convert(filterModel, qds);
+        if (filterModel != null && filterModel.getDataList() != null) {
             list = filterModel.getDataList();
         }
         Map<String, String> statisticsResultMap = new LinkedHashMap<>(); // 统计结果集
         Map<String, String> daySlaveDictMap = new LinkedHashMap<>(); // 按天统计的所有日期项
-        if(listFlag){
+        if (listFlag) {
             if (list != null && list.size() > 0) {
-                returnList =  extractUtil.computeList(qdm, qds, list,timeKey,esConfig.getAggregationKey(),quotaVo);
+                returnList = extractUtil.computeList(qdm, qds, list, timeKey, esConfig.getAggregationKey(), quotaVo);
             }
-        }else {
+        } else {
             if (list != null && list.size() > 0) {
                 for (Map<String, Object> objectMap : list) {
                     String statisticsKey = objectMap.get("$statisticsKey").toString();
@@ -176,6 +197,43 @@ public class SolrExtract {
             extractUtil.compute(qdm, qds, returnList, statisticsResultMap, daySlaveDictMap, quotaVo);
         }
         return returnList;
+    }
+
+    /**
+     * 去重查询后，对比ES中如果已存在该条数据则更新，并从集合中移除该条数据。
+     *
+     * @param distinctQueryList 去重查询结果集
+     */
+    private void checkEsDistinctData(List<Map<String, Object>> distinctQueryList) throws IOException {
+        List<Map<String, Object>> updateList = new ArrayList<>();
+
+        String esIndex = null;
+        String esType = null;
+        if (distinctQueryList.size() > 0) {
+            TjQuotaDataSave quotaDataSave = tjQuotaDataSaveDao.findByQuotaCode(quotaVo.getCode());
+            Map<String, Object> configJson = objectMapper.readValue(quotaDataSave.getConfigJson(), Map.class);
+            esIndex = configJson.get("index").toString();
+            esType = configJson.get("type").toString();
+        }
+
+        Iterator<Map<String, Object>> iterator = distinctQueryList.iterator();
+        while (iterator.hasNext()) {
+            Map<String, Object> item = iterator.next();
+            String distinctField = item.get("distinctField").toString();
+            String distinctFieldValue = item.get("distinctFieldValue").toString();
+
+            String filters = "quotaCode=" + quotaVo.getCode() + ";distinctField=" + distinctField + ";distinctFieldValue=" + distinctFieldValue;
+            List<Map<String, Object>> existedList = esUtil.list(esIndex, esType, filters);
+            if (existedList.size() > 0) {
+                Map<String, Object> quotaData = existedList.get(0);
+                updateList.add(quotaData);
+                iterator.remove();
+            }
+        }
+
+        if (updateList.size() != 0) {
+            esUtil.bulkUpdate(esIndex, esType, updateList);
+        }
     }
 
 }

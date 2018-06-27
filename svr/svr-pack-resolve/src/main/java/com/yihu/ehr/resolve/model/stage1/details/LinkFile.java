@@ -10,6 +10,8 @@ public class LinkFile {
     private String originName;//原始文件名
     private String fileExtension;//文件扩展名
     private long fileSize;//文件大小
+    private String reportFormNo;//所属报告单号
+    private String serialNo;//子项序号
 
 
     public String getUrl() {
@@ -42,5 +44,21 @@ public class LinkFile {
 
     public void setFileSize(long fileSize) {
         this.fileSize = fileSize;
+    }
+
+    public String getReportFormNo() {
+        return reportFormNo;
+    }
+
+    public void setReportFormNo(String reportFormNo) {
+        this.reportFormNo = reportFormNo;
+    }
+
+    public String getSerialNo() {
+        return serialNo;
+    }
+
+    public void setSerialNo(String serialNo) {
+        this.serialNo = serialNo;
     }
 }

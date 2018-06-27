@@ -20,7 +20,6 @@ import springfox.documentation.annotations.ApiIgnore;
 @RequestMapping(ApiVersion.Version1_0)
 public interface PackageMgrClient {
 
-
     @RequestMapping(value = ServiceApi.Packages.Package, method = RequestMethod.GET)
     EsSimplePackage getPackage(
             @PathVariable(value = "id") String id);
@@ -29,9 +28,7 @@ public interface PackageMgrClient {
     boolean analyzeStatus(
             @PathVariable(value = "id") String id,
             @RequestParam(value = "status") AnalyzeStatus status,
-            @RequestParam(value = "errorTye") int errorTye,
+            @RequestParam(value = "errorType") int errorType,
             @RequestBody String message) throws Exception;
 
-    @RequestMapping(value = ServiceApi.PackageAnalyzer.Queue, method = RequestMethod.GET)
-    Long AnalyzeQueueSize() throws Exception;
 }

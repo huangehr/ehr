@@ -21,7 +21,6 @@ spring:
       max-idle: 8 # Max number of "idle" connections in the pool. Use a negative value to indicate an unlimited number of idle connections.
       max-wait: -1 # Maximum amount of time (in milliseconds) a connection allocation should block before throwing an exception when the pool is exhausted. Use a negative value to block indefinitely.
       min-idle: 1 # Target for the minimum number of idle connections to maintain in the pool. This setting only has an effect if it is positive.
-  # SOLR (SolrProperties)
 
 fast-dfs:
   connect-timeout: 10
@@ -36,12 +35,8 @@ fast-dfs:
     anti-steal-token: no
     secret-key: FastDFS1234567890
 
-hadoop:
-  hbase-properties:
-    hbase.zookeeper.property.clientPort: 2181
-    zookeeper.znode.parent: /hbase-unsecure
-  user:
-    name: root
+eip:
+  tenant: jkzl
 
 analyze:
   job:
@@ -138,9 +133,6 @@ fast-dfs:
 elasticsearch:
   cluster-name: elasticsearch
   cluster-nodes: 172.19.103.9:9300
-hadoop:
-  hbase-properties:
-    hbase.zookeeper.quorum: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com
 
 ---
 spring:
@@ -159,9 +151,6 @@ fast-dfs:
 elasticsearch:
   cluster-name: elasticsearch
   cluster-nodes: 172.19.103.9:9300
-hadoop:
-  hbase-properties:
-    hbase.zookeeper.quorum: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com
 
 ---
 spring:
@@ -180,9 +169,6 @@ fast-dfs:
 elasticsearch:
   cluster-name: elasticsearch
   cluster-nodes: 11.1.2.7:9300
-hadoop:
-  hbase-properties:
-    hbase.zookeeper.quorum: node1.ehr.h3c.com,node2.ehr.h3c.com,node3.ehr.h3c.com
 
 ---
 spring:
@@ -201,9 +187,6 @@ fast-dfs:
 elasticsearch:
   cluster-name: elasticsearch
   cluster-nodes: 10.176.97.7:9300
-hadoop:
-  hbase-properties:
-    hbase.zookeeper.quorum: node1.jkzl.com,node2.jkzl.com,node3.jkzl.com
 
 ---
 spring:
@@ -222,9 +205,6 @@ fast-dfs:
 elasticsearch:
   cluster-name: elasticsearch
   cluster-nodes: 100.100.1.158:9300
-hadoop:
-  hbase-properties:
-    hbase.zookeeper.quorum: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com
 
 ---
 spring:
@@ -238,11 +218,8 @@ spring:
     port: 6379
     password: q4YaQemf
 fast-dfs:
-  tracker-server: 192.168.50.116:22122,192.168.50.119:22122,192.168.50.116:22123
-  public-server: http://192.168.50.37:8888,http://192.168.50.38:8888,http://192.168.50.37:10000
+  tracker-server: 192.168.50.116:22122,192.168.50.119:22122
+  public-server: http://192.168.220.62:23000
 elasticsearch:
   cluster-name: elasticsearch
   cluster-nodes: 172.10.10.5:9300
-hadoop:
-  hbase-properties:
-    hbase.zookeeper.quorum: node1.jkzl.com,node2.jkzl.com,node4.jkzl.com

@@ -222,7 +222,7 @@ zuul:
       url: http://service.yihu.com:8080/
     fastdfs-server:
       path: /file/**
-      url: http://192.168.50.37:8888/
+      url: http://192.168.220.62:23000/
     # 卫计委官网
     gov-server:
       path: /open/govServer/**

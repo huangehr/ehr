@@ -11,14 +11,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Collection;
+import java.util.List;
 
 @ApiIgnore
 @FeignClient(value = MicroServices.Package)
 @RequestMapping(ApiVersion.Version1_0)
 public interface PackMgrClient {
 
-    @RequestMapping(value = ServiceApi.Packages.PackageSearch, method = RequestMethod.GET)
-    Collection<EsDetailsPackage> packageList(
+    @RequestMapping(value = ServiceApi.Packages.Search, method = RequestMethod.GET)
+    List<EsDetailsPackage> packageList(
             @RequestParam(value = "filters", required = false) String filters,
             @RequestParam(value = "sorts", required = false) String sorts,
             @RequestParam(value = "page") int page,

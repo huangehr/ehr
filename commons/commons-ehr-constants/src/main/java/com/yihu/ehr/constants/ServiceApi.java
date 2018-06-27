@@ -42,6 +42,7 @@ public class ServiceApi {
         //public static final String ResourceSubQuery = "/resources/sub_query"; //详细资源查询接口
         public static final String ResourceQueryTransform = "/resources/query/transform"; //资源查询接口+转译
         public static final String ResourceQueryAllTransform = "/resources/queryAll/transform"; //资源查询接口获取所有数据集相关+转译
+        public static final String ResourceQueryByDataSets = "/resources/query/dataSets"; //资源查询接口获取数据集相关的数据+转译
         public static final String ResourceRawFiles = "/resources/query/raw_files"; //非结构资源查询接口
         public static final String ResourceRawFilesList = "/resources/query/raw_files_list"; //非结构资源List查询接口
         public static final String ResourceMasterData = "/resources/query/master_data"; //主表资源查询接口
@@ -94,6 +95,8 @@ public class ServiceApi {
         public static final String ResourceGrantsNoPage = "/resources/grants/no_paging";
         public static final String AppsGrantResources = "/resources/apps/{appId}/grant";
         public static final String ResourceGrantApps = "/resources/{resourceId}/grant";
+        public static final String AppsGrantResourcesByCategoryId = "/resources/appsAppId/grantByCategoryId";
+        public static final String DeleteAppsGrantResourcesByCategoryId = "/resources/appsAppId/deleteGrantByCategoryId";
 
         public static final String ResourceMetadatasValid = "/resources/metadatas/valid";
         public static final String ResourceMetadataGrants = "/resources/metadata/grants";
@@ -185,6 +188,8 @@ public class ServiceApi {
         public static final String ResourceRolesMetadataGrant = "/resources/rolesMetadata/grants/{id}";
         public static final String ResourceRolesGrantsNoPage = "/resources/rolesGrants/no_paging";
         public static final String ResourceRolesResMetadataGrants = "/resources/roles_resource/{roles_res_id}/metadata";
+        public static final String RolesGrantResourcesByCategoryId = "/resources/rolesRolesId/grantByCategoryId";
+        public static final String DeleteRolesGrantResourcesByCategoryId = "/resources/rolesRolesId/deleteGrantByCategoryId";
 
         /**
          * 机构-资源授权
@@ -310,7 +315,6 @@ public class ServiceApi {
      */
     public static class Profiles {
         public static final String ProfileInfo = "/profile/baseInfo"; //基本信息
-        public static final String ProfileHistory = "/profile/profileHistory"; //既往史 - pc档案浏览器
         public static final String PastHistory = "/profile/pastHistory"; //既往史 - mobile居民端
         public static final String PersonHistory = "/profile/personHistory"; //个人史
         public static final String AllergensHistory = "/profile/allergensHistory"; //过敏史
@@ -466,24 +470,16 @@ public class ServiceApi {
 
     public static class Packages {
         public static final String Packages = "/packages";
-        public static final String AcquirePackage = "/packages/acquire";
         public static final String Package = "/packages/{id}";
-        public static final String PackageResolve = "/packages/resolve";
-        public static final String PackageSearch = "/packages/search";
-        public static final String PackageDownload = "/packages/download/{id}";
-        public static final String ResolveMessage = "/message/resolve";
-        public static final String MessageTimer = "/message/timer";
-        public static final String LegacyPackages = "/json_package";
-        public static final String Prescription = "/prescription"; //处方笺维护
-        public static final String ArchiveRelation = "/archiveRelation"; //档案关联
-        public static final String AddResolveQueue = "/packages/addResolveQueue";
-        public static final String QueueSize = "/packages/queueSize";
-        public static final String UploadProvincialQueueSize = "/packages/queueSize/UploadProvincial";//上传省平台队列
+        public static final String Analyze = "/packages/analyze/{id}";
+        public static final String Resolve = "/packages/resolve/{id}";
+        public static final String Analyzes = "/packages/analyze";
+        public static final String Resolves = "/packages/resolve";
+        public static final String Search = "/packages/search";
+        public static final String Download = "/packages/download/{id}";
         public static final String PackageCrypto = "/packages/crypto";
-        public static final String Fetch = "/packages/fetch/{id}";
-        public static final String ImmediateResolve = "/immediate/resolve";
-        public static final String Update = "/packages/update";
-        public static final String UpdateAnalyzer = "/packages/updateAnalyzer";
+        public static final String Queue = "/packages/queue";
+        public static final String UploadProvincialQueueSize = "/packages/queueSize/UploadProvincial";//上传省平台队列
         public static final String Migrate = "/packages/migrate";
     }
 
@@ -495,19 +491,12 @@ public class ServiceApi {
         public static final String PackageResolve = "/datasetPackages/resolve";
         public static final String PackageSearch = "/datasetPackages/search";
         public static final String PackageDownloads = "/datasetPackages/{id}/downloads";
-
         public static final String ResolveMessage = "/datasetPackages/message/resolve";
         public static final String MessageTimer = "/datasetPackages/message/timer";
-
-    }
-
-    public static class PackageResolve {
-        public static final String Scheduler = "/scheduler";
     }
 
     public static class PackageAnalyzer {
         public static final String Scheduler = "/packAnalyzer/scheduler";
-        public static final String Queue = "/packAnalyzer/queue";
         public static final String Status = "/packAnalyzer/status/{id}";
         public static final String DailyReport = "/packAnalyzer/dailyReport";
         public static final String List = "/packAnalyzer/list";
@@ -522,8 +511,13 @@ public class ServiceApi {
         public static final String Analyzer = "/packAnalyzer/analyzer";
     }
 
-    public static class ArchiveRelation {
-        public static final String Crud = "/archiveRelation";
+    public static class PackageResolve {
+        public static final String Scheduler = "/resolve/scheduler";
+        public static final String Resolve = "/resolve/{id}";
+        public static final String Local = "/resolve/local/{id}";
+        public static final String Fetch = "/resolve/fetch/{id}";
+        public static final String Immediate = "/resolve/immediate";
+        public static final String ArchiveRelation = "/resolve/archiveRelation"; //档案关联
     }
 
     public static class Patients {
@@ -1632,6 +1626,7 @@ public class ServiceApi {
         public static final String PaltformReceiveWarningDel = "/dataQuality/warningSetting/receiveWarningDel";
         public static final String PaltformReceiveWarningUpd = "/dataQuality/warningSetting/receiveWarningUpd";
         public static final String PaltformReceiveWarning =    "/dataQuality/warningSetting/receiveWarning/{id}";
+        public static final String PaltformReceiveWarningIsExist =    "/dataQuality/warningSetting/receiveWarningIsExist";
         public static final String PaltformReceiveWarningDefault =    "/dataQuality/warningSetting/receiveWarningDefault";
         public static final String PaltformResourceWarningList = "/dataQuality/warningSetting/resourceWarningList";
         public static final String PaltformResourceWarningAdd = "/dataQuality/warningSetting/resourceWarningAdd";
@@ -1642,12 +1637,15 @@ public class ServiceApi {
         public static final String PaltformUploadWarningAdd = "/dataQuality/warningSetting/uploadWarningAdd";
         public static final String PaltformUploadWarningDel = "/dataQuality/warningSetting/uploadWarningDel";
         public static final String PaltformUploadWarningUpd = "/dataQuality/warningSetting/uploadWarningUpd";
+        public static final String PaltformUploadWarningIsExist =    "/dataQuality/warningSetting/uploadWarningIsExist";
         public static final String PaltformUploadWarning =    "/dataQuality/warningSetting/uploadWarning/{id}";
         public static final String DatasetWarningList = "/dataQuality/warningSetting/datasetWarningList";
         public static final String ImportDatasetExcel = "/dataQuality/warningSetting/importDatasetExcel";
         public static final String DatasetWarningListNoPage = "/dataQuality/warningSetting/datasetWarningListNoPage";
         public static final String DatasetWarningAdd = "/dataQuality/warningSetting/datasetWarningAdd";
         public static final String DatasetWarningDel = "/dataQuality/warningSetting/datasetWarningDel";
+        public static final String DatasetList = "/dataQuality/warningSetting/datasetList";
+        public static final String Meta_datas = "/dataQuality/warningSetting/meta_datas";
         public static final String ReceivedPacketNumList = "/dataQuality/receivedPacket/packetNumList";
         public static final String ReceivedPacketReportData = "/dataQuality/receivedPacket/packetReportData";
         public static final String QualityMonitoringList = "/dataQuality/quality/qualityMonitoringList";

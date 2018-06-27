@@ -140,11 +140,6 @@ public class EsResultExtract {
         return esConfig;
     }
 
-//    public Client getEsClient(){
-//       esConfigUtil.getConfig(esConfig.getHost(), esConfig.getPort(),esConfig.getIndex(),esConfig.getType(), esConfig.getClusterName());
-//        return elasticSearchPool.getClient();
-//    }
-
     public List<Map<String, Object>> queryResultPage(TjQuota tjQuota ,String filters,int pageNo,int pageSize) throws Exception {
         pageNo = (pageNo-1)*pageSize;
         initialize(tjQuota,filters);

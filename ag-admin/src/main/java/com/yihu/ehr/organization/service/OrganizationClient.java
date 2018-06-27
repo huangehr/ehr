@@ -223,4 +223,9 @@ public interface OrganizationClient {
     Envelop getOrgListByAddressPid(
             @RequestParam(value = "pid") Integer pid,
             @RequestParam(value = "fullName", required = false) String fullName);
+
+    @RequestMapping(value = "/organizations/getOrgListTreeByAddressPid", method = RequestMethod.GET)
+    @ApiOperation(value = "根据区域、机构区县查询机构列表")
+    List<Map<String, Object>> getOrgListTreeByAddressPid(
+            @RequestParam(value = "pid") Integer pid);
 }
