@@ -199,7 +199,7 @@ public class OrgDeptController extends BaseController {
             if (mOrgDeptNew == null) {
                 return failed("保存失败!");
             }
-          /*  //同步科室信息
+          /*  //同步科室信息-因为在预约挂号后台追加排班信息时，会判断是否存在科室，若不存在，总部自动追加。EHR使用标准科室。
             Map<String, Object> result = saveSynDept(orgDeptModel);
             if (result.get("Code").toString().equals("10000")) {
                 //同步成功
