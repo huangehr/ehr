@@ -509,11 +509,11 @@ public class PackQcReportService extends BaseJpaService {
         uploadRecord.put("org_name",getOrgName(orgs, uploadRecord.get("org_code")+""));
         List<Map<String, Object>> datasets = new ArrayList<>();
         if(uploadRecord.get("missing")!=null) {
-            List<String> missing = objectMapper.readValue(uploadRecord.get("missing").toString(), List.class);
-            for (String dataSet : missing) {
+            String[] missing = uploadRecord.get("missing").toString().split(",");
+            for (int i=0;i<missing.length;i++) {
                 Map<String, Object> dataset = new HashMap<>();
-                dataset.put("code", dataSet);
-                dataset.put("name", redisClient.get("std_data_set_" + uploadRecord.get("version") + ":" + dataSet + ":name"));
+                dataset.put("code", missing[i]);
+                dataset.put("name", redisClient.get("std_data_set_" + uploadRecord.get("version") + ":" + missing[i] + ":name"));
                 dataset.put("status", "未上传");
                 datasets.add(dataset);
             }
