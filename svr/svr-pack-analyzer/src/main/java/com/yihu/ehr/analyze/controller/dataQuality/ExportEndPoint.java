@@ -147,7 +147,7 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
             XWPFParagraph paragraph2 = document.createParagraph();
             XWPFRun run2 = paragraph2.createRun();
             String text2 = "接收总量:"+receivedCount+"\n\r" +
-                    "成功解析: "+successfulAnalysisCount;
+                    "成功解析:"+successfulAnalysisCount;
             run2.setText(text2);
             run2.setFontSize(18);
             run2.setBold(true);
