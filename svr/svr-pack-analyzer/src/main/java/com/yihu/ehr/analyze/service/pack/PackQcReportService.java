@@ -513,7 +513,7 @@ public class PackQcReportService extends BaseJpaService {
             for (String dataSet : missing) {
                 Map<String, Object> dataset = new HashMap<>();
                 dataset.put("code", dataSet);
-                dataset.put("name", redisClient.get("std_data_set_" + uploadRecord.get("from_version") + ":" + dataSet + ":name"));
+                dataset.put("name", redisClient.get("std_data_set_" + uploadRecord.get("version") + ":" + dataSet + ":name"));
                 dataset.put("status", "未上传");
                 datasets.add(dataset);
             }
@@ -524,7 +524,7 @@ public class PackQcReportService extends BaseJpaService {
                 for (Map.Entry<String, Object> entry : dataSet.entrySet()) {
                     Map<String, Object> dataset = new HashMap<>();
                     dataset.put("code", entry.getKey());
-                    dataset.put("name", redisClient.get("std_data_set_" + uploadRecord.get("from_version") + ":" + entry.getKey() + ":name"));
+                    dataset.put("name", redisClient.get("std_data_set_" + uploadRecord.get("version") + ":" + entry.getKey() + ":name"));
                     dataset.put("status", "已上传");
                     datasets.add(dataset);
                 }
