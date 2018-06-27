@@ -291,18 +291,7 @@ public class PatientController extends BaseController {
         mUser.setMartialStatus(detailModel.getMartialStatus());
         mUser.setEmail(detailModel.getEmail());
         mUser.setTelephone(phone);
-
-        /*mUser.setProvinceId();
-        mUser.setProvinceName();
-        mUser.setCityId();
-        mUser.setCityName();
-        mUser.setAreaId();
-        mUser.setAreaName();*/
-
-
         mUser = userClient.createUser(objectMapper.writeValueAsString(mUser));
-
-
         if (mUser == null) {
             return failed("保存失败!");
         }
@@ -310,28 +299,34 @@ public class PatientController extends BaseController {
         //系统demographics是否存在居民信息校验
         if (!patientClient.isExistIdCardNo(detailModel.getIdCardNo())) {
             //            系统中不存在该身份证号，新增居民
-
+            MDemographicInfo demographicInfo = patientClient.getPatient(detailModel.getIdCardNo());
             //新增家庭地址信息
             GeographyModel geographyModel = detailModel.getHomeAddressInfo();
             detailModel.setHomeAddress("");
             if (!geographyModel.nullAddress()) {
-                String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
-                detailModel.setHomeAddress(addressId);
+//                String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
+                detailModel.setHomeAddress(getAddressByGeographyModel(geographyModel));
+            }else{
+                detailModel.setHomeAddress(demographicInfo.getHomeAddress());
             }
             //新增户籍地址信息
             geographyModel = detailModel.getBirthPlaceInfo();
             detailModel.setBirthPlace("");
             if (!geographyModel.nullAddress()) {
-                String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
-                detailModel.setBirthPlace(addressId);
+//                String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
+                detailModel.setBirthPlace(getAddressByGeographyModel(geographyModel));
+            }else {
+                detailModel.setBirthPlace(demographicInfo.getBirthPlace());
             }
 
             //新增工作地址信息
             geographyModel = detailModel.getWorkAddressInfo();
             detailModel.setWorkAddress("");
             if (!geographyModel.nullAddress()) {
-                String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
-                detailModel.setWorkAddress(addressId);
+//                String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
+                detailModel.setWorkAddress(getAddressByGeographyModel(geographyModel));
+            }else{
+                detailModel.setWorkAddress(demographicInfo.getWorkAddress());
             }
 
             //新增人口信息
@@ -399,10 +394,13 @@ public class PatientController extends BaseController {
 
         //新增家庭地址信息
         GeographyModel geographyModel = detailModel.getHomeAddressInfo();
+        MDemographicInfo demographicInfo = patientClient.getPatient(detailModel.getIdCardNo());
         detailModel.setHomeAddress("");
         if (!geographyModel.nullAddress()) {
 //            String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
             detailModel.setHomeAddress(getAddressByGeographyModel(geographyModel));
+        }else{
+            detailModel.setHomeAddress(demographicInfo.getHomeAddress());
         }
         //新增户籍地址信息
         geographyModel = detailModel.getBirthPlaceInfo();
@@ -410,6 +408,8 @@ public class PatientController extends BaseController {
         if (!geographyModel.nullAddress()) {
 //            String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
             detailModel.setBirthPlace(getAddressByGeographyModel(geographyModel));
+        }else{
+            detailModel.setBirthPlace(demographicInfo.getBirthPlace());
         }
 
         //新增工作地址信息
@@ -418,6 +418,8 @@ public class PatientController extends BaseController {
         if (!geographyModel.nullAddress()) {
 //            String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
             detailModel.setWorkAddress(getAddressByGeographyModel(geographyModel));
+        }else {
+            detailModel.setWorkAddress(demographicInfo.getWorkAddress());
         }
 
         //新增人口信息
@@ -481,13 +483,15 @@ public class PatientController extends BaseController {
         if (StringUtils.isNotEmpty(errorMsg)) {
             return failed(errorMsg);
         }
-
+        MDemographicInfo demographicInfo = patientClient.getPatient(detailModel.getIdCardNo());
         //新增家庭地址信息
         GeographyModel geographyModel = detailModel.getHomeAddressInfo();
         detailModel.setHomeAddress("");
         if (!geographyModel.nullAddress()) {
 //            String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
             detailModel.setHomeAddress(getAddressByGeographyModel(geographyModel));
+        }else{
+            detailModel.setHomeAddress(demographicInfo.getHomeAddress());
         }
         //新增户籍地址信息
         geographyModel = detailModel.getBirthPlaceInfo();
@@ -495,6 +499,8 @@ public class PatientController extends BaseController {
         if (!geographyModel.nullAddress()) {
 //            String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
             detailModel.setBirthPlace(getAddressByGeographyModel(geographyModel));
+        }else {
+            detailModel.setBirthPlace(demographicInfo.getBirthPlace());
         }
 
         //新增工作地址信息
@@ -503,6 +509,8 @@ public class PatientController extends BaseController {
         if (!geographyModel.nullAddress()) {
 //            String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
             detailModel.setWorkAddress(getAddressByGeographyModel(geographyModel));
+        }else {
+            detailModel.setWorkAddress(demographicInfo.getWorkAddress());
         }
 
         //修改人口信息
@@ -1007,6 +1015,11 @@ public class PatientController extends BaseController {
         return mUser;
     }
 
+    /**
+     * 用于用户地址转换
+     * @param geographyModel 地址对象
+     * @return
+     */
     public String getAddressByGeographyModel(GeographyModel geographyModel) {
         String address = "";
         String province = (null == geographyModel.getProvince() ? "" : geographyModel.getProvince());

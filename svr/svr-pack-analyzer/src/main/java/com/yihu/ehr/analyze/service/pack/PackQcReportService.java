@@ -370,11 +370,7 @@ public class PackQcReportService extends BaseJpaService {
      * @throws Exception
      */
     public List<Map<String, Object>> analyzeErrorList(String filters, String sorts, int page, int size) throws Exception {
-        List<Map<String, Object>> orgs = getOrgs();
         List<Map<String, Object>> list = elasticSearchUtil.page("json_archives","info", filters, sorts, page, size);
-        for(Map<String, Object> map:list){
-            map.put("org_name",getOrgName(orgs, map.get("org_code")+""));
-        }
         return list;
     }
 
@@ -388,10 +384,8 @@ public class PackQcReportService extends BaseJpaService {
      * @throws Exception
      */
     public List<Map<String, Object>> metadataErrorList(String filters, String sorts, int page, int size) throws Exception {
-        List<Map<String, Object>> orgs = getOrgs();
         List<Map<String, Object>> list = elasticSearchUtil.page("json_archives_qc","qc_metadata_info", filters, sorts, page, size);
         for(Map<String, Object> map:list){
-            map.put("org_name",getOrgName(orgs, map.get("org_code")+""));
             map.put("dataset_name", redisClient.get("std_data_set_" + map.get("version") + ":" + map.get("dataset") + ":name"));
             map.put("metadata_name", redisClient.get("std_meta_data_" + map.get("version") + ":" + map.get("dataset")+"."+ map.get("metadata")+ ":name"));
         }
@@ -421,7 +415,6 @@ public class PackQcReportService extends BaseJpaService {
      */
     public Envelop metadataErrorDetail(String id) throws Exception {
         Envelop envelop = new Envelop();
-        List<Map<String, Object>> orgs = getOrgs();
         Map<String, Object> res = new HashMap<>();
         Map<String, Object> metedata = elasticSearchUtil.findById("json_archives_qc","qc_metadata_info",id);
         if("2".equals(metedata.get("qc_step")+"")){
@@ -431,13 +424,13 @@ public class PackQcReportService extends BaseJpaService {
                 metedata.put("scheme", schemeList.get(0).get("NAME"));
             }
         }
-        metedata.put("org_name",getOrgName(orgs, metedata.get("org_code")+""));
         metedata.put("dataset_name", redisClient.get("std_data_set_" + metedata.get("version") + ":" + metedata.get("dataset") + ":name"));
         metedata.put("metadata_name", redisClient.get("std_meta_data_" + metedata.get("version") + ":" + metedata.get("dataset")+"."+ metedata.get("metadata")+ ":name"));
         String relationId = metedata.get("org_code")+"_"+metedata.get("event_no")+"_"+ DateUtil.strToDate(metedata.get("event_date")+"").getTime();
         res.put("metedata",metedata);
         res.put("relation",elasticSearchUtil.findById("archive_relation","info",relationId));
         envelop.setObj(res);
+        envelop.setSuccessFlg(true);
         return envelop;
     }
 
@@ -451,11 +444,7 @@ public class PackQcReportService extends BaseJpaService {
      * @throws Exception
      */
     public List<Map<String, Object>> archiveList(String filters, String sorts, int page, int size) throws Exception {
-        List<Map<String, Object>> orgs = getOrgs();
         List<Map<String, Object>> list = elasticSearchUtil.page("json_archives","info", filters, sorts, page, size);
-        for(Map<String, Object> map:list){
-            map.put("org_name",getOrgName(orgs, map.get("org_code")+""));
-        }
         return list;
     }
 
@@ -468,12 +457,11 @@ public class PackQcReportService extends BaseJpaService {
     public Envelop archiveDetail(String id) throws Exception {
         Envelop envelop = new Envelop();
         Map<String, Object> res = new HashMap<>();
-        List<Map<String, Object>> orgs = getOrgs();
         Map<String, Object> archive = elasticSearchUtil.findById("json_archives","info",id);
-        archive.put("org_name",getOrgName(orgs, archive.get("org_code")+""));
         res.put("archive",archive);
         res.put("relation",elasticSearchUtil.findById("archive_relation","info",archive.get("profile_id")+""));
         envelop.setObj(res);
+        envelop.setSuccessFlg(true);
         return envelop;
     }
 
@@ -487,11 +475,7 @@ public class PackQcReportService extends BaseJpaService {
      * @throws Exception
      */
     public List<Map<String, Object>> uploadRecordList(String filters, String sorts, int page, int size) throws Exception {
-        List<Map<String, Object>> orgs = getOrgs();
         List<Map<String, Object>> list = elasticSearchUtil.page("upload","record", filters, sorts, page, size);
-        for(Map<String, Object> map:list){
-            map.put("org_name",getOrgName(orgs, map.get("org_code")+""));
-        }
         return list;
     }
 
@@ -504,16 +488,14 @@ public class PackQcReportService extends BaseJpaService {
     public Envelop uploadRecordDetail(String id) throws Exception {
         Envelop envelop = new Envelop();
         Map<String,Object> res = new HashMap<>();
-        List<Map<String, Object>> orgs = getOrgs();
         Map<String, Object> uploadRecord = elasticSearchUtil.findById("upload","record",id);
-        uploadRecord.put("org_name",getOrgName(orgs, uploadRecord.get("org_code")+""));
         List<Map<String, Object>> datasets = new ArrayList<>();
         if(uploadRecord.get("missing")!=null) {
-            List<String> missing = objectMapper.readValue(uploadRecord.get("missing").toString(), List.class);
-            for (String dataSet : missing) {
+            List<String> missing = (List<String>)uploadRecord.get("missing");
+            for (String code : missing) {
                 Map<String, Object> dataset = new HashMap<>();
-                dataset.put("code", dataSet);
-                dataset.put("name", redisClient.get("std_data_set_" + uploadRecord.get("from_version") + ":" + dataSet + ":name"));
+                dataset.put("code", code);
+                dataset.put("name", redisClient.get("std_data_set_" + uploadRecord.get("version") + ":" + code + ":name"));
                 dataset.put("status", "未上传");
                 datasets.add(dataset);
             }
@@ -524,7 +506,7 @@ public class PackQcReportService extends BaseJpaService {
                 for (Map.Entry<String, Object> entry : dataSet.entrySet()) {
                     Map<String, Object> dataset = new HashMap<>();
                     dataset.put("code", entry.getKey());
-                    dataset.put("name", redisClient.get("std_data_set_" + uploadRecord.get("from_version") + ":" + entry.getKey() + ":name"));
+                    dataset.put("name", redisClient.get("std_data_set_" + uploadRecord.get("version") + ":" + entry.getKey() + ":name"));
                     dataset.put("status", "已上传");
                     datasets.add(dataset);
                 }
@@ -532,6 +514,7 @@ public class PackQcReportService extends BaseJpaService {
         }
         res.put("uploadRecord", uploadRecord);
         res.put("datasets", datasets);
+        envelop.setSuccessFlg(true);
         envelop.setObj(res);
         return envelop;
     }
