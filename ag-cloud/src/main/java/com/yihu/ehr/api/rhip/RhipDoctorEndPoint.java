@@ -2,7 +2,6 @@ package com.yihu.ehr.api.rhip;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.agModel.org.OrgModel;
 import com.yihu.ehr.agModel.user.DoctorDetailModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
@@ -24,9 +23,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -114,7 +113,7 @@ public class RhipDoctorEndPoint extends BaseController {
             DoctorDetailModel detailModel = objectMapper.readValue(doctorJsonData, DoctorDetailModel.class);
             String errorMsg = null;
             if (StringUtils.isEmpty(detailModel.getCode())) {
-                errorMsg += "账户不能为空!";
+                errorMsg += "医生标识编码不能为空!";
             }
             if (StringUtils.isEmpty(detailModel.getName())) {
                 errorMsg += "姓名不能为空!";
@@ -127,23 +126,23 @@ public class RhipDoctorEndPoint extends BaseController {
                 return failed("身份证号已存在!");
             }
 
-            if (StringUtils.isEmpty(detailModel.getSkill())) {
-                errorMsg += "医生专长不能为空!";
-            }
+//            if (StringUtils.isEmpty(detailModel.getSkill())) {
+//                errorMsg += "医生专长不能为空!";
+//            }
 
-            if (StringUtils.isEmpty(detailModel.getEmail())) {
-                errorMsg += "邮箱不能为空!";
-            }else if (null != doctorClient.emailsExistence( "["+objectMapper.writeValueAsString(detailModel.getEmail())+"]")
-                    && userClient.isEmailExists( detailModel.getEmail())) {
-                return failed("邮箱已存在!");
-            }
+//            if (StringUtils.isEmpty(detailModel.getEmail())) {
+//                errorMsg += "邮箱不能为空!";
+//            }else if (null != doctorClient.emailsExistence( "["+objectMapper.writeValueAsString(detailModel.getEmail())+"]")
+//                    && userClient.isEmailExists( detailModel.getEmail())) {
+//                return failed("邮箱已存在!");
+//            }
 
-            if (StringUtils.isEmpty(detailModel.getPhone())) {
-                errorMsg += "手机-主号码不能为空!";
-            }else if (null != doctorClient.idExistence( "["+objectMapper.writeValueAsString(detailModel.getPhone())+"]")
-                    && userClient.isTelephoneExists( detailModel.getPhone())) {
-                return failed("电话号码已存在!");
-            }
+//            if (StringUtils.isEmpty(detailModel.getPhone())) {
+//                errorMsg += "手机-主号码不能为空!";
+//            }else if (null != doctorClient.idExistence( "["+objectMapper.writeValueAsString(detailModel.getPhone())+"]")
+//                    && userClient.isTelephoneExists( detailModel.getPhone())) {
+//                return failed("电话号码已存在!");
+//            }
             String mOrgDeptStr = "";
             String orgCode = "";
             String deptName = "";
@@ -230,23 +229,23 @@ public class RhipDoctorEndPoint extends BaseController {
                 return failed("身份证号不存在!");
             }
 
-            if (StringUtils.isEmpty(detailModel.getSkill())) {
-                errorMsg += "医生专长不能为空!";
-            }
-
-            if (StringUtils.isEmpty(detailModel.getEmail())) {
-                errorMsg += "邮箱不能为空!";
-            }else if (null == doctorClient.emailsExistence( "["+objectMapper.writeValueAsString(detailModel.getEmail())+"]")
-                    && !userClient.isEmailExists( detailModel.getEmail())) {
-                return failed("邮箱不存在!");
-            }
-
-            if (StringUtils.isEmpty(detailModel.getPhone())) {
-                errorMsg += "手机-主号码不能为空!";
-            }else if (null == doctorClient.idExistence( "["+objectMapper.writeValueAsString(detailModel.getPhone())+"]")
-                    && !userClient.isTelephoneExists( detailModel.getPhone())) {
-                return failed("电话号码不存在!");
-            }
+//            if (StringUtils.isEmpty(detailModel.getSkill())) {
+//                errorMsg += "医生专长不能为空!";
+//            }
+//
+//            if (StringUtils.isEmpty(detailModel.getEmail())) {
+//                errorMsg += "邮箱不能为空!";
+//            }else if (null == doctorClient.emailsExistence( "["+objectMapper.writeValueAsString(detailModel.getEmail())+"]")
+//                    && !userClient.isEmailExists( detailModel.getEmail())) {
+//                return failed("邮箱不存在!");
+//            }
+//
+//            if (StringUtils.isEmpty(detailModel.getPhone())) {
+//                errorMsg += "手机-主号码不能为空!";
+//            }else if (null == doctorClient.idExistence( "["+objectMapper.writeValueAsString(detailModel.getPhone())+"]")
+//                    && !userClient.isTelephoneExists( detailModel.getPhone())) {
+//                return failed("电话号码不存在!");
+//            }
             String mOrgDeptStr = "";
             String orgCode = "";
             String deptName = "";
@@ -318,6 +317,19 @@ public class RhipDoctorEndPoint extends BaseController {
         mDoctor.setInsertTime(DateTimeUtil.simpleDateTimeParse(detailModel.getInsertTime()));
 
         return mDoctor;
+    }
+
+    public static void main(String[] args) {
+        ObjectMapper objectMapper =new ObjectMapper();
+
+        String doctorJsonData="{\"idCardNo\":\"342221333122223423\",\"code\":\"CWS\",\"name\":\"陈新川\"}\",\"model\":\"{\"orgCode\":\"492240421\",\"deptName\":\"骨科\"}";
+        try {
+            DoctorDetailModel detailModel = objectMapper.readValue(doctorJsonData, DoctorDetailModel.class);
+            System.out.println(detailModel);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
 }

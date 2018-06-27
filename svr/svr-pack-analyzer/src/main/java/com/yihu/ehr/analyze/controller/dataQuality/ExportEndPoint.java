@@ -68,8 +68,7 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
     @Value("${quality.cloud}")
     private String defaultCloud;
 
-    public static int maxRowSize = 100000;
-    public static int esSize = 1000;
+    public static int maxRowSize = 60000;
     @RequestMapping(value = ServiceApi.DataQuality.ExportQualityMonitoringListToExcel, method = RequestMethod.GET)
     @ApiOperation(value = "生成报告")
     public void exportQualityMonitoringListToExcel(
@@ -147,7 +146,7 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
             XWPFParagraph paragraph2 = document.createParagraph();
             XWPFRun run2 = paragraph2.createRun();
             String text2 = "接收总量:"+receivedCount+"\n\r" +
-                    "成功解析: "+successfulAnalysisCount;
+                    "成功解析:"+successfulAnalysisCount;
             run2.setText(text2);
             run2.setFontSize(18);
             run2.setBold(true);
@@ -619,7 +618,7 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                     row.createCell(2).setCellValue(ObjectUtils.toString(record.get("org_name")));
                     row.createCell(3).setCellValue(ObjectUtils.toString(record.get("_id")));
                     row.createCell(4).setCellValue(getErrorType(ObjectUtils.toString(record.get("error_type"))));
-                    row.createCell(5).setCellValue(getErrorType(ObjectUtils.toString(record.get("message"))));
+                    row.createCell(5).setCellValue(ObjectUtils.toString(record.get("message")));
                 }
             }
             wwb.write(os);
@@ -638,7 +637,6 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                                          @ApiParam(name = "sorts", value = "排序")
                                          @RequestParam(value = "sorts", required = false) String sorts,
                                          HttpServletResponse response){
-        long starttime = System.currentTimeMillis();
         try {
             String fileName = "异常详情列表";
             //设置下载
@@ -650,26 +648,12 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
             //写excel
             SXSSFWorkbook  wwb = new SXSSFWorkbook(100);
             wwb.setCompressTempFiles(true);
+            long starttime = System.currentTimeMillis();
             String[] title = {"接收时间","医疗机构","数据集","数据集名称","数据元","数据元名称","主键","错误原因"};
             int count = (int) elasticSearchUtil.count("json_archives_qc", "qc_metadata_info", filters);
             double pageNum = count % maxRowSize > 0 ? count / maxRowSize + 1 : count / maxRowSize;
             for (int i = 0; i < pageNum; i++) {
-                double page = 0;
-                if(count<=maxRowSize){
-                    page = count % esSize > 0 ? count / esSize + 1 : count / esSize;
-                }else{
-                    if(i==pageNum-1){
-                        double num = (count-(pageNum-1)*maxRowSize);
-                        page =  num% esSize > 0 ? num / esSize + 1 : num / esSize;
-                    }else{
-                        page = maxRowSize % esSize > 0 ? maxRowSize / esSize + 1 : maxRowSize / esSize;
-                    }
-                }
-                List<Map<String, Object>> list = new ArrayList<>();
-                for(int p =0;p<page;p++){
-                    list.addAll(elasticSearchUtil.page("json_archives_qc","qc_metadata_info", filters, sorts, p+1, esSize));
-                    logger.info("es查询耗时：" + (System.currentTimeMillis() - starttime) + "ms");
-                }
+                List<Map<String, Object>> list = packQcReportService.metadataErrorList(filters,sorts,i+1,maxRowSize);
                 logger.info("查询耗时：" + (System.currentTimeMillis() - starttime) + "ms");
                 //创建Excel工作表 指定名称和位置
                 Sheet sheet = wwb.createSheet("Sheet" + (i+1));
@@ -684,11 +668,11 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                     Map<String, Object> record = list.get(j);
                     //添加列表明细
                     row.createCell(0).setCellValue(ObjectUtils.toString(record.get("receive_date")));
-                    row.createCell(1).setCellValue(packQcReportService.getOrgName(orgs, record.get("org_code")+""));
+                    row.createCell(1).setCellValue(ObjectUtils.toString(record.get("org_name")));
                     row.createCell(2).setCellValue(ObjectUtils.toString(record.get("dataset")));
-                    row.createCell(3).setCellValue(redisClient.get("std_data_set_" + record.get("version") + ":" + record.get("dataset") + ":name")+"");
+                    row.createCell(3).setCellValue(ObjectUtils.toString(record.get("dataset_name")));
                     row.createCell(4).setCellValue(ObjectUtils.toString(record.get("metadata")));
-                    row.createCell(5).setCellValue(redisClient.get("std_meta_data_" + record.get("version") + ":" + record.get("dataset")+"."+ record.get("metadata")+ ":name")+"");
+                    row.createCell(5).setCellValue(ObjectUtils.toString(record.get("metadata_name")));
                     row.createCell(6).setCellValue(ObjectUtils.toString(record.get("_id")));
                     row.createCell(7).setCellValue(getExceptionType(ObjectUtils.toString(record.get("qc_error_type"))));
                 }

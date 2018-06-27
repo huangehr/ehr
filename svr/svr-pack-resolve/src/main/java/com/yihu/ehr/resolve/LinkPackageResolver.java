@@ -100,20 +100,40 @@ public class LinkPackageResolver extends PackageResolver {
             FTPClient ftpClient = ftpUtils.getFtpClient();
             for (int i = 0; i < arrayNode.size(); ++i){
                 JsonNode fileNode = arrayNode.get(i);
-                String fileName = fileNode.get("file").asText();
+                JsonNode file = fileNode.get("file");
+                if(file == null){
+                    throw new IllegalJsonFileException("fileName is null.");
+                }
+                String fileName = file.asText();
                 String fileExtension;
                 if (fileName.contains(".")) {
                     fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1);
                 } else {
-                    throw new IllegalJsonFileException("上传轻量档案文件失败, 文件缺失扩展名.");
+                    throw new IllegalJsonFileException("上传影像档案文件失败, 文件缺失扩展名.");
                 }
-                String url = fileNode.get("url").asText();
+                JsonNode urlNode = fileNode.get("url");
+                if(urlNode == null){
+                    throw new IllegalJsonFileException("缺失ftp路径地址");
+                }
+                String url = urlNode.asText();
+                if(!url.startsWith("ftp:/")){
+                    throw new IllegalJsonFileException("ftp路径地址格式有误");
+                }
                 String path = url.substring(5);//将url前面的ftp:/截取掉,剩下的path为文件的完整路径(包含文件名)
-
                 FTPFile[] ftpFiles = ftpClient.listFiles(path);
                 if (ftpFiles == null || ftpFiles.length == 0){
                     throw new RuntimeException("ftp上找不到该文件:" + path);
                 }
+                JsonNode reportFormNoNode = fileNode.get("report_form_no");
+                if(reportFormNoNode == null){
+                    throw new RuntimeException("report_form_no is null");
+                }
+                String reportFormNo = reportFormNoNode.asText();
+                JsonNode serialNoNode = fileNode.get("serial_no");
+                if(serialNoNode == null){
+                    throw new RuntimeException("serial_no is null");
+                }
+                String serialNo = serialNoNode.asText();
                 InputStream inputStream = ftpUtils.getInputStream(path);
                 long fileSize = ftpFiles[0].getSize();
                 NameValuePair[] fileMetaData = new NameValuePair[1];
@@ -122,6 +142,8 @@ public class LinkPackageResolver extends PackageResolver {
                 LinkFile linkFile = new LinkFile();
                 linkFile.setFileExtension(fileExtension);
                 linkFile.setOriginName(fileName);
+                linkFile.setReportFormNo(reportFormNo);
+                linkFile.setSerialNo(serialNo);
                 String fastdfsUrl = msg.get(FastDFSUtil.GROUP_NAME).asText() + "/" + msg.get(FastDFSUtil.REMOTE_FILE_NAME).asText();
                 linkFile.setUrl(fastdfsUrl);
                 linkFiles.add(linkFile);
