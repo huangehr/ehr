@@ -115,7 +115,7 @@ public class WarningQuestionService extends BaseJpaService {
         Map<String, Map<String, Object>> dataMap = new HashMap<>(warningList.size());
 
         //统计接收档案数据
-        String sql1 = "SELECT count(*) c,org_code FROM json_archives/info where receive_date>= '"+dateStr+" 00:00:00' AND receive_date<='" +  dateStr + " 23:59:59' group by org_code";
+        String sql1 = "SELECT count(*) c,org_code FROM json_archives/info where receive_date>= '"+dateStr+" 00:00:00' AND receive_date<='" +  dateStr + " 23:59:59'  AND pack_type=1 group by org_code";
         try {
             ResultSet resultSet1 = elasticSearchUtil.findBySql(sql1);
             while (resultSet1.next()) {
@@ -520,7 +520,7 @@ public class WarningQuestionService extends BaseJpaService {
             }
 
             //统计及时数
-            String sql3 = "SELECT count(*) c,org_code,event_type,delay FROM json_archives/info where event_date>= '"+defaultPeDateStr+" 00:00:00' AND event_date<='" +  defaultPeDateStr + " 23:59:59' and delay is not null group by org_code,event_type,delay ";
+            String sql3 = "SELECT count(distinct event_no) c,org_code,event_type,delay FROM json_archives/info where event_date>= '"+defaultPeDateStr+" 00:00:00' AND event_date<='" +  defaultPeDateStr + " 23:59:59' AND pack_type=1 and delay is not null group by org_code,event_type,delay ";
             try {
                 ResultSet resultSet3 = elasticSearchUtil.findBySql(sql3);
                 while (resultSet3.next()) {
@@ -556,7 +556,7 @@ public class WarningQuestionService extends BaseJpaService {
                 e.getMessage();
             }
 
-            String sql4 = "SELECT count(*) c,org_code,delay FROM json_archives/info where event_date>= '"+defaultHospitalDateStr+" 00:00:00' AND event_date<='" +  defaultHospitalDateStr + " 23:59:59' and event_type= '"+1+"' and delay is not null group by org_code,delay ";
+            String sql4 = "SELECT count(distinct event_no) c,org_code,delay FROM json_archives/info where event_date>= '"+defaultHospitalDateStr+" 00:00:00' AND event_date<='" +  defaultHospitalDateStr + " 23:59:59' AND pack_type=1 and event_type= '"+1+"' and delay is not null group by org_code,delay ";
             try {
                 ResultSet resultSet4 = elasticSearchUtil.findBySql(sql4);
                 while (resultSet4.next()) {
@@ -628,7 +628,7 @@ public class WarningQuestionService extends BaseJpaService {
                         e.getMessage();
                     }
 
-                    String sql2 = "SELECT count(*) c,delay FROM json_archives/info where event_date>= '"+outpatientDateStr+" 00:00:00' AND event_date<='" +  outpatientDateStr + " 23:59:59' and org_code = '"+orgCode+"' and event_type= '2' group by delay ";
+                    String sql2 = "SELECT count(*) c,delay FROM json_archives/info where event_date>= '"+outpatientDateStr+" 00:00:00' AND event_date<='" +  outpatientDateStr + " 23:59:59' and org_code = '"+orgCode+"' AND pack_type=1 and event_type= '2' group by delay ";
                     ResultSet resultSet2 = elasticSearchUtil.findBySql(sql2);
                     try {
                         while (resultSet2.next()) {
@@ -664,7 +664,7 @@ public class WarningQuestionService extends BaseJpaService {
                         e.getMessage();
                     }
 
-                    String sql2 = "SELECT count(*) c,delay FROM json_archives/info where event_date>= '"+outpatientDateStr+" 00:00:00' AND event_date<='" +  outpatientDateStr + " 23:59:59' and org_code = '"+orgCode+"' and event_type= '0' group by delay ";
+                    String sql2 = "SELECT count(distinct event_no) c,delay FROM json_archives/info where event_date>= '"+outpatientDateStr+" 00:00:00' AND event_date<='" +  outpatientDateStr + " 23:59:59' and org_code = '"+orgCode+"' AND pack_type=1 and event_type= '0' group by delay ";
                     ResultSet resultSet2 = elasticSearchUtil.findBySql(sql2);
                     try {
                         while (resultSet2.next()) {
@@ -700,7 +700,7 @@ public class WarningQuestionService extends BaseJpaService {
                         e.getMessage();
                     }
 
-                    String sql2 = "SELECT count(*) c,delay FROM json_archives/info where event_date>= '"+hospitalDateStr+" 00:00:00' AND event_date<='" +  hospitalDateStr + " 23:59:59' and org_code = '"+orgCode+"' and event_type= '1' group by delay ";
+                    String sql2 = "SELECT count(distinct event_no) c,delay FROM json_archives/info where event_date>= '"+hospitalDateStr+" 00:00:00' AND event_date<='" +  hospitalDateStr + " 23:59:59' and org_code = '"+orgCode+"' AND pack_type=1 and event_type= '1' group by delay ";
                     ResultSet resultSet2 = elasticSearchUtil.findBySql(sql2);
                     try {
                         while (resultSet2.next()) {
@@ -740,7 +740,7 @@ public class WarningQuestionService extends BaseJpaService {
         double resourceUnArchive = 0;
         double resourceException = 0;
         //资源化数据
-        String sql1 = "SELECT count(*) c,archive_status FROM json_archives/info where receive_date>= '"+dateStr+" 00:00:00' AND receive_date<='" +  dateStr + " 23:59:59' and (archive_status=2 or archive_status=0) group by archive_status";
+        String sql1 = "SELECT count(*) c,archive_status FROM json_archives/info where receive_date>= '"+dateStr+" 00:00:00' AND receive_date<='" +  dateStr + " 23:59:59' AND pack_type=1 and (archive_status=2 or archive_status=0) group by archive_status";
         try {
             ResultSet resultSet1 = elasticSearchUtil.findBySql(sql1);
             while (resultSet1.next()) {
@@ -756,7 +756,7 @@ public class WarningQuestionService extends BaseJpaService {
             e.getMessage();
         }
 
-        String sql2 = "SELECT count(*) c FROM json_archives/info where receive_date>= '"+dateStr+" 00:00:00' AND receive_date<='" +  dateStr + " 23:59:59' and defect=1";
+        String sql2 = "SELECT count(*) c FROM json_archives/info where receive_date>= '"+dateStr+" 00:00:00' AND receive_date<='" +  dateStr + " 23:59:59' AND pack_type=1 and defect=1";
         try {
             ResultSet resultSet2 = elasticSearchUtil.findBySql(sql2);
             resultSet2.next();
@@ -851,10 +851,10 @@ public class WarningQuestionService extends BaseJpaService {
             while (resultSet1.next()) {
                 String status = resultSet1.getString("upload_status");// 0失败，1成功
                 double total = resultSet1.getDouble("c");
-                if("0".equals(status)){
-                    uploadErrorNum = total;
-                }else {
+                if("1".equals(status)){
                     uploadSuccessNum = total;
+                }else {
+                    uploadErrorNum = total;
                 }
             }
             uploadArchiveNum = uploadErrorNum + uploadSuccessNum;
