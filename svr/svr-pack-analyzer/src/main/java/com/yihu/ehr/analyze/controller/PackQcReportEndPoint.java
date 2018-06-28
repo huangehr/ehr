@@ -19,6 +19,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -45,6 +46,8 @@ public class PackQcReportEndPoint extends EnvelopRestEndPoint {
     private ElasticSearchUtil elasticSearchUtil;
     @Autowired
     private HosAdminServiceClient hosAdminServiceClient;
+    @Value("${quality.cloud}")
+    private String cloud;
 
     @RequestMapping(value = ServiceApi.PackQcReport.dailyReport, method = RequestMethod.GET)
     @ApiOperation(value = "获取医院数据")
@@ -72,7 +75,7 @@ public class PackQcReportEndPoint extends EnvelopRestEndPoint {
         Envelop envelop = new Envelop();
         try {
             String filters = "type=" + type;
-            if (!StringUtils.isEmpty(orgCode)) {
+            if (!StringUtils.isEmpty(orgCode)&&!cloud.equals(orgCode)) {
                 filters += ";orgCode=" + orgCode;
             }
             List<DqDatasetWarning> list = dqDatasetWarningService.search(null, filters, "", page, size);
@@ -160,9 +163,9 @@ public class PackQcReportEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "size", value = "页码", required = true, defaultValue = "15")
             @RequestParam(value = "size") int size) throws Exception {
         if(StringUtils.isNotEmpty(filters)){
-            filters="analyze_status=2;"+filters;
+            filters="analyze_status=2||archive_status=2;"+filters;
         }else{
-            filters="analyze_status=2";
+            filters="analyze_status=2||archive_status=2";
         }
         List<Map<String, Object>> list = packQcReportService.analyzeErrorList(filters, sorts, page, size);
         int count = (int) elasticSearchUtil.count("json_archives", "info", filters);

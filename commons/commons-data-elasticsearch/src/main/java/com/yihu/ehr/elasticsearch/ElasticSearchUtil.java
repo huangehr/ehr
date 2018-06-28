@@ -345,7 +345,15 @@ public class ElasticSearchUtil {
         }
         String [] filterArr = filters.split(";");
         for (String filter : filterArr) {
-            if (filter.contains("?")) {
+            if(filter.contains("||")){
+                String [] fileds = filter.split("\\|\\|");
+                BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
+                for (String filed : fileds) {
+                    String [] condition = filed.split("=");
+                    queryBuilder.should(QueryBuilders.termQuery(condition[0], condition[1]));
+                }
+                boolQueryBuilder.must(queryBuilder);
+            } else if (filter.contains("?")) {
                 String [] condition = filter.split("\\?");
                 MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchPhraseQuery(condition[0], condition[1]);
                 boolQueryBuilder.must(matchQueryBuilder);
