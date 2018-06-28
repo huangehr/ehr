@@ -1325,6 +1325,10 @@ public class ServiceApi {
 
         public static final String GetYearDropdownList = "/tj/getYearDropdownList";
 
+        public static class Scheduler {
+            public static final String ExtractMedicineExpense = "/tj/scheduler/extractMedicineExpense";
+            public static final String ExtractChronicDisease = "/tj/scheduler/extractChronicDisease";
+        }
 
     }
 
@@ -1688,4 +1692,5 @@ public class ServiceApi {
         public static final String uploadRecordList= "/packQcReport/uploadRecordList";
         public static final String uploadRecordDetail= "/packQcReport/uploadRecordDetail";
     }
+
 }
