@@ -9,6 +9,8 @@ import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
@@ -51,6 +53,7 @@ public class PackQcReportService extends BaseJpaService {
     private RedisClient redisClient;
     @Value("${quality.cloud}")
     private String cloud;
+    protected final Log logger = LogFactory.getLog(this.getClass());
     /**
      * 获取医院数据
      * @param startDate
