@@ -1,6 +1,7 @@
 package com.yihu.quota.scheduler;
 
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.hbase.HBaseDao;
 import com.yihu.ehr.profile.core.ResourceCore;
@@ -49,7 +50,7 @@ public class ChronicDiseaseScheduler {
 
     // ES 中慢性病 index
     private String CD_INDEX = "chronic_disease";
-    // ES 中慢性病汇总 type
+    // ES 中慢性病患者汇总 type
     private String CD_TYPE_PATIENT = "chronic_disease_patient";
 
     /**
@@ -72,7 +73,7 @@ public class ChronicDiseaseScheduler {
     }
 
     @ApiOperation("抽取指定时间段高血压疾病、糖尿病疾病患者数据")
-    @RequestMapping(value = "extractChronicDisease", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.TJ.Scheduler.ExtractChronicDisease, method = RequestMethod.GET)
     public Envelop extractChronicDisease(
             @ApiParam(name = "startDate", value = "开始日期，格式 YYYY-MM-DD，接口里自动拼接 T00:00:00Z，", required = true)
             @RequestParam(value = "startDate") String startDate,
