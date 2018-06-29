@@ -94,7 +94,7 @@ public class EsQuotaJob implements Job {
             //查询是否已经统计过,如果已统计 先删除后保存
             deleteRecord(quotaVo);
             if(quotaDataSource.getSourceCode().equals("2") && esConfig.getAggregation().equals("list")){//来源solr
-                moreThredQuota(quotaDataSource,tjQuotaLog,esConfig);
+                moreThredQuota(tjQuotaLog,esConfig);
             }else{
                 //统计并保存
                 quota(tjQuotaLog, quotaVo);
@@ -110,7 +110,7 @@ public class EsQuotaJob implements Job {
     /*
      * 多线程执行指标
      */
-    public void moreThredQuota(TjQuotaDataSource quotaDataSource,TjQuotaLog tjQuotaLog, EsConfig esConfig){
+    public void moreThredQuota(TjQuotaLog tjQuotaLog, EsConfig esConfig){
         try {
             int rows = solrExtract.getExtractTotal(startTime,endTime, esConfig);
             int perCount = Contant.compute.perCount;
