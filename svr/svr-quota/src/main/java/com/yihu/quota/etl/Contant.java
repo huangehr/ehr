@@ -39,6 +39,7 @@ public class Contant {
     public static class compute {
         public static final String add = "1"; //累加
         public static final String division = "2"; //相除
+        public static final int perCount = 20000;//单位统计量
     }
 
     /**
