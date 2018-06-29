@@ -4,15 +4,17 @@ import com.yihu.ehr.elasticsearch.ElasticSearchPool;
 import com.yihu.quota.dao.jpa.TjQuotaLogDao;
 import com.yihu.quota.etl.Contant;
 import com.yihu.quota.etl.extract.ExtractHelper;
+import com.yihu.quota.etl.extract.solr.SolrExtract;
 import com.yihu.quota.etl.model.EsConfig;
 import com.yihu.quota.etl.save.SaveHelper;
 import com.yihu.quota.etl.util.ElasticsearchUtil;
-import com.yihu.quota.etl.util.EsClientUtil;
 import com.yihu.quota.model.jpa.TjQuotaLog;
+import com.yihu.quota.model.jpa.source.TjQuotaDataSource;
+import com.yihu.quota.service.source.TjDataSourceService;
 import com.yihu.quota.util.SpringUtil;
 import com.yihu.quota.vo.QuotaVo;
 import com.yihu.quota.vo.SaveModel;
-import net.bytebuddy.implementation.bytecode.Throw;
+import net.sf.json.JSONObject;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -55,8 +57,6 @@ public class EsQuotaJob implements Job {
     @Autowired
     private TjQuotaLogDao tjQuotaLogDao;
     @Autowired
-    private EsClientUtil esClientUtil;
-    @Autowired
     private ExtractHelper extractHelper;
     @Autowired
     ElasticsearchUtil elasticsearchUtil;
@@ -64,6 +64,10 @@ public class EsQuotaJob implements Job {
     private ElasticSearchPool elasticSearchPool;
     @Autowired
     private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private SolrExtract solrExtract;
+    @Autowired
+    private TjDataSourceService dataSourceService;
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
@@ -72,8 +76,27 @@ public class EsQuotaJob implements Job {
             SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
             //初始化参数
             initParams(context);
-            //统计并保存
-            quota();
+            quotaVo.setExecuteFlag(executeFlag);
+
+            TjQuotaLog tjQuotaLog = new TjQuotaLog();
+            tjQuotaLog.setQuotaCode(quotaVo.getCode());
+            tjQuotaLog.setSaasId(saasid);
+            tjQuotaLog.setStartTime(new Date());
+            tjQuotaLog.setStatus( Contant.save_status.executing);  //指标执行中
+            tjQuotaLog.setContent( "时间：" + startTime + "到"+ endTime +" , " + "任务执行中。");
+            tjQuotaLog = saveLog(tjQuotaLog);
+            TjQuotaDataSource quotaDataSource = dataSourceService.findSourceByQuotaCode(quotaVo.getCode());
+            if (quotaDataSource == null) {
+                throw new Exception("数据源配置错误");
+            }
+            //查询是否已经统计过,如果已统计 先删除后保存
+            deleteRecord(quotaVo);
+            if(quotaDataSource.getSourceCode().equals("2")){//来源solr
+                moreThredQuota(quotaDataSource,tjQuotaLog);
+            }else{
+                //统计并保存
+                quota(tjQuotaLog, quotaVo);
+            }
         } catch (Exception e) {
             //如果出錯立即重新執行
             JobExecutionException e2 = new JobExecutionException(e);
@@ -82,68 +105,101 @@ public class EsQuotaJob implements Job {
         }
     }
 
+    /*
+     * 多线程执行指标
+     */
+    public void moreThredQuota(TjQuotaDataSource quotaDataSource,TjQuotaLog tjQuotaLog){
+        try {
+            JSONObject obj = new JSONObject().fromObject(quotaDataSource.getConfigJson());
+            EsConfig esConfig= (EsConfig) JSONObject.toBean(obj,EsConfig.class);
+            int rows = solrExtract.getExtractTotal(startTime,endTime, esConfig);
+            int perCount = Contant.compute.perCount;
+            if(rows > perCount*50){
+                throw new Exception("数据量过大请缩小抽取时间范围");
+            }
+            if (rows > perCount) {
+                int count  = rows/perCount;
+                int remainder = rows % perCount;
+                if(remainder != 0){
+                    count ++;
+                }else {
+                    remainder = perCount;
+                }
+                for (int i = 0; i < count; i++) {
+                    //防止过快执行导致参数被覆盖
+                    Thread.sleep(1000);
+                    final int f = i;//传值用。
+                    final TjQuotaLog quotaLogf = tjQuotaLog;//传值用。
+                    final QuotaVo quotaVof = quotaVo;//传值用。
+                    if (f != 0){
+                        quotaVof.setStart(f*perCount);
+                    }else {
+                        quotaVof.setStart(0);
+                    }
+                    if(i+1 == count){
+                        quotaVof.setRows(remainder);
+                    }else {
+                        quotaVof.setRows(perCount);
+                    }
+                    Thread th = new Thread(new Thread(){
+                        public void run(){
+                            System.out.println("启动第 "+ f + " 个线程。 ");//只能访问外部的final变量。
+                            quota(quotaLogf, quotaVof);
+                        }
+                    });
+                    th.start();
+                }
+            }else {
+                //统计并保存
+                quota(tjQuotaLog, quotaVo);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
     /**
      * 统计过程
      */
-    private void quota() {
-        String message = "";
-        TjQuotaLog tjQuotaLog = new TjQuotaLog();
-        tjQuotaLog.setQuotaCode(quotaVo.getCode());
-        tjQuotaLog.setSaasId(saasid);
-        tjQuotaLog.setStartTime(new Date());
-        //指标执行中
-        tjQuotaLog.setStatus( Contant.save_status.executing);
+    public void quota(TjQuotaLog tjQuotaLog,QuotaVo quotaVo) {
+        String s = "起始条数：" + quotaVo.getStart() + " ，每次 "+ quotaVo.getRows();
+        System.out.println(s);
         String time = "时间：" + startTime + "到"+ endTime +" , ";
-        tjQuotaLog.setContent( time+"任务执行中。");
-        tjQuotaLog=saveLog(tjQuotaLog);
+        String status = "";
+        String content = "";
         try {
             //抽取数据
-            List<SaveModel> dataModels = extract();
+            List<SaveModel> dataModels = extract(quotaVo);
             if (dataModels != null && dataModels.size() > 0) {
-                //查询是否已经统计过,如果已统计 先删除后保存
-                deleteRecord();
-                List<SaveModel> dataSaveModels = new ArrayList<>();
-                for (SaveModel saveModel : dataModels) {
-                    if (saveModel.getResult() != null) {//&& Double.valueOf(saveModel.getResult())>0
-                        dataSaveModels.add(saveModel);
-                    }
-                }
-                if (dataSaveModels != null && dataSaveModels.size() > 0) {
-                    //保存数据
-                    Boolean success = saveDate(dataSaveModels);
-                    tjQuotaLog.setStatus(success ? Contant.save_status.success : Contant.save_status.fail);
-                    tjQuotaLog.setContent(success ? time+"统计保存成功" : time+"统计数据 ElasticSearch 保存失败");
-                    tjQuotaLog=saveLog(tjQuotaLog);
-                } else {
-                    tjQuotaLog.setStatus(Contant.save_status.success);
-                    tjQuotaLog.setContent(time + "统计成功，统计结果大于0的数据为0条");
-                    tjQuotaLog=saveLog(tjQuotaLog);
-                }
+                //保存数据
+                Boolean success = saveData(dataModels,quotaVo);
+                status = success ? Contant.save_status.success : Contant.save_status.fail;
+                content = success ? time+"统计保存成功" : time+"统计数据 ElasticSearch 保存失败";
+                System.out.println(content+dataModels.size());
             } else {
-                tjQuotaLog.setStatus(Contant.save_status.fail);
-                tjQuotaLog.setContent(time + "没有抽取到数据");
-                tjQuotaLog=saveLog(tjQuotaLog);
+                status = Contant.save_status.fail;
+                content = time + "没有抽取到数据";
             }
-
             // 初始执行时，更新该指标为已初始执行过
-            if (executeFlag.equals("1")) {
+            if (quotaVo.getExecuteFlag().equals("1")) {
                 String sql = "UPDATE tj_quota SET is_init_exec = '1' WHERE id = " + quotaVo.getId();
                 jdbcTemplate.update(sql);
             }
         } catch (Exception e) {
             tjQuotaLog.setStatus(Contant.save_status.fail);
             tjQuotaLog.setContent(e.getMessage());
-            tjQuotaLog=saveLog(tjQuotaLog);
+            tjQuotaLog = saveLog(tjQuotaLog);
             e.printStackTrace();
         }
+        tjQuotaLog.setStatus(status);
+        tjQuotaLog.setContent(content);
         tjQuotaLog.setEndTime(new Date());
         saveLog(tjQuotaLog);
     }
 
-    private void deleteRecord() throws Exception {
+    private void deleteRecord(QuotaVo quotaVo) throws Exception {
         EsConfig esConfig = extractHelper.getEsConfig(quotaVo.getCode());
         EsConfig sourceEsConfig = extractHelper.getDataSourceEsConfig(quotaVo.getCode());
-
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         QueryStringQueryBuilder termQueryQuotaCode = QueryBuilders.queryStringQuery("quotaCode:" + quotaVo.getCode().replaceAll("_", ""));
         boolQueryBuilder.must(termQueryQuotaCode);
@@ -152,18 +208,16 @@ public class EsQuotaJob implements Job {
             endTime = LocalDate.now().toString();
         }
         if (!StringUtils.isEmpty(startTime)) {
-            RangeQueryBuilder rangeQueryStartTime = QueryBuilders.rangeQuery("quotaDate").gte(startTime);
+            RangeQueryBuilder rangeQueryStartTime = QueryBuilders.rangeQuery("quotaDate").gte(startTime.substring(0, 10));
             boolQueryBuilder.must(rangeQueryStartTime);
         }
         if (!StringUtils.isEmpty(endTime)) {
-            RangeQueryBuilder rangeQueryEndTime = QueryBuilders.rangeQuery("quotaDate").lte(endTime);
+            RangeQueryBuilder rangeQueryEndTime = QueryBuilders.rangeQuery("quotaDate").lte(endTime.substring(0, 10));
             boolQueryBuilder.must(rangeQueryEndTime);
         }
         boolean flag = true ;
         Client talClient = elasticSearchPool.getClient();
         Client client = elasticSearchPool.getClient();
-//        Client talClient = esClientUtil.getClient(esConfig.getHost(), 9300, esConfig.getClusterName());
-//        Client client = esClientUtil.getClient(esConfig.getHost(), 9300, esConfig.getClusterName());
         try {
             while (flag){
                 long count = elasticsearchUtil.getTotalCount(talClient, esConfig.getIndex() ,esConfig.getType(), boolQueryBuilder);
@@ -174,29 +228,25 @@ public class EsQuotaJob implements Job {
                 }
             }
         } catch (Exception e) {
-            e.getMessage();
+            e.printStackTrace();
             throw  new Exception("Elasticsearch 指标统计时删除数据异常");
         } finally {
             talClient.close();
             client.close();
-            logger.error(quotaVo.getName()+"删除成功");
+            logger.error(quotaVo.getCode()+" delete success");
         }
     }
 
-
-
     /**
      * 抽取数据
-     *
      * @return
      */
-    private List<SaveModel> extract() throws Exception {
+    private List<SaveModel> extract(QuotaVo quotaVo) throws Exception {
         return SpringUtil.getBean(ExtractHelper.class).extractData(quotaVo, startTime, endTime, timeLevel, saasid);
     }
 
     /**
      * 初始化参数
-     *
      * @param context
      */
     private void initParams(JobExecutionContext context) {
@@ -235,7 +285,7 @@ public class EsQuotaJob implements Job {
      *
      * @param dataModels
      */
-    private Boolean saveDate(List<SaveModel> dataModels) {
+    private Boolean saveData(List<SaveModel> dataModels,QuotaVo quotaVo) {
         try {
             return SpringUtil.getBean(SaveHelper.class).save(dataModels, quotaVo);
         } catch (Exception e) {

@@ -27,6 +27,9 @@ public class QuotaVo implements Serializable {
     private String remark;
     //周期指标执行状态：0未开启，1执行中
     private String jobStatus;
+    private int start ;
+    private int rows;
+    private String executeFlag;
 
 
     @Override
@@ -188,5 +191,29 @@ public class QuotaVo implements Serializable {
 
     public void setJobStatus(String jobStatus) {
         this.jobStatus = jobStatus;
+    }
+
+    public int getStart() {
+        return start;
+    }
+
+    public void setStart(int start) {
+        this.start = start;
+    }
+
+    public int getRows() {
+        return rows;
+    }
+
+    public void setRows(int rows) {
+        this.rows = rows;
+    }
+
+    public String getExecuteFlag() {
+        return executeFlag;
+    }
+
+    public void setExecuteFlag(String executeFlag) {
+        this.executeFlag = executeFlag;
     }
 }
