@@ -628,7 +628,7 @@ public class WarningQuestionService extends BaseJpaService {
                         e.getMessage();
                     }
 
-                    String sql2 = "SELECT count(*) c,delay FROM json_archives/info where event_date>= '"+outpatientDateStr+" 00:00:00' AND event_date<='" +  outpatientDateStr + " 23:59:59' and org_code = '"+orgCode+"' AND pack_type=1 and event_type= '2' group by delay ";
+                    String sql2 = "SELECT count(distinct event_no) c,delay FROM json_archives/info where event_date>= '"+outpatientDateStr+" 00:00:00' AND event_date<='" +  outpatientDateStr + " 23:59:59' and org_code = '"+orgCode+"' AND pack_type=1 and event_type= '2' group by delay ";
                     ResultSet resultSet2 = elasticSearchUtil.findBySql(sql2);
                     try {
                         while (resultSet2.next()) {
