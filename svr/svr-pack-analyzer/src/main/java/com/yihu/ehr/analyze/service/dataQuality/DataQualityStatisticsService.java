@@ -270,7 +270,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
             e.getMessage();
         }
 
-        String sql6 = "SELECT count(*) c,org_code FROM json_archives/info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' AND pack_type=1 and defect=1 group by org_code";
+        String sql6 = "SELECT count(*) c,org_code FROM json_archives_qc/qc_metadata_info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' AND qc_step=2 group by org_code";
         ResultSet resultSet6 = elasticSearchUtil.findBySql(sql6);
         try {
             while (resultSet6.next()) {
