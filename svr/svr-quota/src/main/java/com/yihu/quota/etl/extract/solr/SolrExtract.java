@@ -2,6 +2,7 @@ package com.yihu.quota.etl.extract.solr;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
+import com.yihu.ehr.hbase.HBaseDao;
 import com.yihu.ehr.query.common.model.SolrGroupEntity;
 import com.yihu.ehr.query.services.SolrQuery;
 import com.yihu.ehr.solr.SolrUtil;
@@ -20,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -40,10 +40,6 @@ public class SolrExtract {
 
     private Logger logger = LoggerFactory.getLogger(SolrExtract.class);
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-    @Autowired
-    private SolrUtil solrUtil;
     @Autowired
     private ExtractUtil extractUtil;
     @Autowired
@@ -81,6 +77,28 @@ public class SolrExtract {
         // 统计数据
         return statiscSlor(qdm, qds, quotaVo);
     }
+
+    public int getExtractTotal(String startTime, String endTime,  EsConfig esConfig) throws Exception {
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.esConfig = esConfig;
+        solrQuery.initParams(this.startTime, this.endTime);
+        String core = esConfig.getTable(); // solr的core名
+        String q = null; // 过滤条件
+        // 统计数据数量
+        String timeKey = esConfig.getTimekey();
+        if (!StringUtils.isEmpty(timeKey)) {
+            if (!StringUtils.isEmpty(startTime) && !StringUtils.isEmpty(endTime)) {
+                q = String.format("%s:[%s TO %s]", timeKey, startTime, endTime);
+            } else {
+                q = timeKey + ":[* TO *]";
+            }
+        }
+        long rows = solrQuery.count(core, q + " AND " + esConfig.getFilter());
+        return Integer.valueOf(String.valueOf(rows));
+    }
+
+
 
     public List<SaveModel> statiscSlor(List<TjQuotaDimensionMain> qdm,
                                        List<TjQuotaDimensionSlave> qds,
@@ -157,8 +175,7 @@ public class SolrExtract {
                 if (esConfig.getAggregation().equals(Contant.quota.aggregation_list) && !StringUtils.isEmpty(esConfig.getAggregationKey())) {
                     fl = fl + "," + esConfig.getAggregationKey();
                 }
-                long rows = solrQuery.count(core, fq);
-                list = solrQuery.queryReturnFieldList(core, q, fq, null, 0, rows, fl.split(","), null, null);
+                list = solrQuery.queryReturnFieldList(core, q, fq, null, quotaVo.getStart(), quotaVo.getRows(), fl.split(","), null, null);
             } catch (Exception e) {
                 throw new Exception("solr 查询异常 " + e.getMessage());
             }
