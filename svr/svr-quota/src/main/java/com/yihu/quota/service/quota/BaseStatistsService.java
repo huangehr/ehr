@@ -198,19 +198,17 @@ public class BaseStatistsService {
                 for(int i = 0 ;i < moleDimensions.length ; i++){
                     map.put(moleDimensions[i], secondMap.get(moleDimensions[i]).toString());
                 }
-                if("quotaName".equals(dimension)) {
-                    double point = 0;
-                    double secondResultVal = Double.valueOf(secondMap.get("result") == null ? "0" : secondMap.get(resultField).toString());
-                    if (secondResultVal != 0) {
-                        if(operation == 1){ //1 加法 默认
-                            point = secondResultVal ;
-                        }else if(operation == 2){ //2 减法
-                            point = -secondResultVal;
-                        }
+                double point = 0;
+                double secondResultVal = Double.valueOf(secondMap.get("result") == null ? "0" : secondMap.get(resultField).toString());
+                if (secondResultVal != 0) {
+                    if(operation == 1){ //1 加法 默认
+                        point = secondResultVal ;
+                    }else if(operation == 2){ //2 减法
+                        point = -secondResultVal;
                     }
-                    map.put(resultField, nf.format(point));
-                    addResultList.add(map);
                 }
+                map.put(resultField, nf.format(point));
+                addResultList.add(map);
             }
         }
         //检查后面指标的维度是否全部有 累加进去
