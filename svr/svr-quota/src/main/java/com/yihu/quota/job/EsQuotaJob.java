@@ -108,12 +108,14 @@ public class EsQuotaJob implements Job {
     }
 
     /*
-     * 多线程执行指标
+     * solr list 方式 多线程执行指标
      */
     public void moreThredQuota(TjQuotaLog tjQuotaLog, EsConfig esConfig){
         try {
-            int rows = solrExtract.getExtractTotal(startTime,endTime, esConfig);
             int perCount = Contant.compute.perCount;
+            quotaVo.setStart(0);
+            quotaVo.setRows(perCount);
+            int rows = solrExtract.getExtractTotal(startTime,endTime, esConfig);
             if(rows > perCount*50){
                 throw new Exception("数据量过大请缩小抽取时间范围");
             }
@@ -162,8 +164,6 @@ public class EsQuotaJob implements Job {
      * 统计过程
      */
     public void quota(TjQuotaLog tjQuotaLog,QuotaVo quotaVo) {
-        String s = "起始条数：" + quotaVo.getStart() + " ，每次 "+ quotaVo.getRows();
-        System.out.println(s);
         String time = "时间：" + startTime + "到"+ endTime +" , ";
         String status = "";
         String content = "";
