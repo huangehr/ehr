@@ -150,43 +150,36 @@ public class BaseStatistsService {
                     }
                     map.put(moleDimensions[i], firstMap.get(moleDimensions[i]).toString());
                 }
-                if (firstResultVal == 0) {
-                    map.put(resultField,0);
-                    addResultList.add(map);
-                } else {
-                    boolean pflag = true;
-                    for(Map<String, Object> secondMap :secondList) {
-                        String secondKeyVal = "";
-                        String [] dimeDimensions = dimension.split(";");
-                        for(int i = 0 ;i < dimeDimensions.length ; i++){
-                            if(i == 0){
-                                secondKeyVal = secondMap.get(dimeDimensions[i]).toString();
-                            }else {
-                                secondKeyVal = secondKeyVal + "-" + secondMap.get(dimeDimensions[i]).toString() ;
-                            }
-                        }
-                        if(firstKeyVal.equals(secondKeyVal) || "quotaName".equals(dimension)){  // 如果维度是quotaName，则进入逻辑
-                            double point = 0;
-                            double dimeResultVal = Double.valueOf(secondMap.get(resultField).toString());
-                            if(dimeResultVal != 0){
-                                BigDecimal first = new BigDecimal(Double.toString(firstResultVal));
-                                BigDecimal second = new BigDecimal(Double.toString(dimeResultVal));
-                                if(operation == 1){ //1 加法 默认
-                                    point = first.add(second).doubleValue();
-                                }else if(operation == 2){ //2 减法
-                                    point = first.subtract(second).doubleValue();
-                                }
-                            }
-                            map.put(resultField,nf.format(point));
-                            addResultList.add(map);
-                            pflag = false;
-                            break;
+                boolean pflag = true;
+                for(Map<String, Object> secondMap :secondList) {
+                    String secondKeyVal = "";
+                    String [] dimeDimensions = dimension.split(";");
+                    for(int i = 0 ;i < dimeDimensions.length ; i++){
+                        if(i == 0){
+                            secondKeyVal = secondMap.get(dimeDimensions[i]).toString();
+                        }else {
+                            secondKeyVal = secondKeyVal + "-" + secondMap.get(dimeDimensions[i]).toString() ;
                         }
                     }
-                    if(pflag){
-                        map.put(resultField,firstResultVal);
+                    if(firstKeyVal.equals(secondKeyVal) || "quotaName".equals(dimension)){  // 如果维度是quotaName，则进入逻辑
+                        double point = 0;
+                        double dimeResultVal = Double.valueOf(secondMap.get(resultField).toString());
+                        BigDecimal first = new BigDecimal(Double.toString(firstResultVal));
+                        BigDecimal second = new BigDecimal(Double.toString(dimeResultVal));
+                        if(operation == 1){ //1 加法 默认
+                            point = first.add(second).doubleValue();
+                        }else if(operation == 2){ //2 减法
+                            point = first.subtract(second).doubleValue();
+                        }
+                        map.put(resultField,nf.format(point));
                         addResultList.add(map);
+                        pflag = false;
+                        break;
                     }
+                }
+                if(pflag){
+                    map.put(resultField,firstResultVal);
+                    addResultList.add(map);
                 }
             }
         }
