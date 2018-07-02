@@ -286,7 +286,7 @@ public class PackQcReportService extends BaseJpaService {
     public Envelop archiveFailed(String startDate, String endDate, String orgCode) throws Exception {
         Envelop envelop = new Envelop();
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("archive_status=2;");
+        stringBuilder.append("archive_status=2;pack_type=1;");
         stringBuilder.append("receive_date>=" + startDate + " 00:00:00;");
         stringBuilder.append("receive_date<" + endDate + " 23:59:59;");
         if (StringUtils.isNotEmpty(orgCode) && !"null".equals(orgCode)&&!cloud.equals(orgCode)){
@@ -320,7 +320,7 @@ public class PackQcReportService extends BaseJpaService {
     }
 
     /**
-     * 获取解析异常
+     * 获取数据元异常
      * @param startDate
      * @param endDate
      * @param orgCode
