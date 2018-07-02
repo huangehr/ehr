@@ -203,6 +203,21 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
+    @ApiOperation("Hbase从表统计")
+    @RequestMapping(value = ServiceApi.Resources.ResourceHealthFile, method = RequestMethod.GET)
+    public Envelop healthFile(
+            @ApiParam(name = "filters", value = "检索条件")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "检索条件")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "page", value = "页数", required = true)
+            @RequestParam(value = "page") Integer page,
+            @ApiParam(name = "size", value = "分页大小", required = true)
+            @RequestParam(value = "size", required = false) Integer size) throws Exception {
+        Envelop envelop = resourceBrowseService.getEhrFile(filters, sorts, page, size);
+        return envelop;
+    }
+
     @ApiOperation("Mysql查询")
     @RequestMapping(value = ServiceApi.Resources.ResourceMysql, method = RequestMethod.GET)
     public Envelop getMysqlData(

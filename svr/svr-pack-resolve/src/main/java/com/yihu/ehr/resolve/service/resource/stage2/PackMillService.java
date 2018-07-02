@@ -1,5 +1,9 @@
 package com.yihu.ehr.resolve.service.resource.stage2;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.profile.ErrorType;
 import com.yihu.ehr.profile.ProfileType;
 import com.yihu.ehr.profile.core.ResourceCore;
@@ -15,6 +19,9 @@ import com.yihu.ehr.resolve.model.stage1.FilePackage;
 import com.yihu.ehr.resolve.model.stage1.LinkPackage;
 import com.yihu.ehr.resolve.model.stage1.OriginalPackage;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
+import com.yihu.ehr.resolve.model.stage1.details.CdaDocument;
+import com.yihu.ehr.resolve.model.stage1.details.LinkFile;
+import com.yihu.ehr.resolve.model.stage1.details.OriginFile;
 import com.yihu.ehr.resolve.model.stage2.*;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
@@ -39,6 +46,8 @@ public class PackMillService {
 
     @Autowired
     private RedisService redisService;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     /**
      *
@@ -138,6 +147,9 @@ public class PackMillService {
                 }
             }
         }
+        if (originalPackage.getProfileType() == ProfileType.File || originalPackage.getProfileType() == ProfileType.Link) {
+            resourceBucket.insertBasicRecord(ResourceCells.SUB_ROWKEYS, objectMapper.writeValueAsString(resourceBucket.getSubRowkeys()));
+        }
         return resourceBucket;
     }
 
@@ -226,6 +238,32 @@ public class PackMillService {
             resourceBucket.insertBasicRecord(ResourceCells.ORG_AREA, redisService.getOrgArea(filePackage.getOrgCode()));
             resourceBucket.insertBasicRecord(ResourceCells.CDA_VERSION, filePackage.getCdaVersion());
             resourceBucket.insertBasicRecord(ResourceCells.CREATE_DATE, DateTimeUtil.utcDateTimeFormat(new Date()));
+            resourceBucket.insertBasicRecord(ResourceCells.PATIENT_NAME, filePackage.getPatientName());
+            resourceBucket.insertBasicRecord(ResourceCells.DEMOGRAPHIC_ID, filePackage.getDemographicId());
+            ArrayNode root = objectMapper.createArrayNode();
+            Map<String, CdaDocument> cdaDocuments = filePackage.getCdaDocuments();
+            cdaDocuments.keySet().forEach(item -> {
+                CdaDocument cdaDocument = cdaDocuments.get(item);
+                for (OriginFile originFile : cdaDocument.getOriginFiles()) {
+                    ObjectNode subNode = root.addObject();
+                    subNode.put("mime", originFile.getMime());
+                    subNode.put("url", originFile.getUrlsStr());
+                    String name = originFile.getUrlScope()==null ? "":originFile.getUrlScope().name();
+                    subNode.put("url_score", name);
+                    subNode.put("emr_id", originFile.getEmrId());
+                    subNode.put("emr_name", originFile.getEmrName());
+                    subNode.put("expire_date", originFile.getExpireDate()== null ? "" : DateTimeUtil.utcDateTimeFormat(originFile.getExpireDate()));
+                    subNode.put("note", originFile.getNote());
+                    StringBuilder builder = new StringBuilder();
+                    for (String fileName : originFile.getFileUrls().keySet()){
+                        builder.append(fileName).append(":").append(originFile.getFileUrls().get(fileName)).append(";");
+                    }
+                    subNode.put("files", builder.toString());
+                    subNode.put("cda_document_id", cdaDocument.getId());
+                    subNode.put("cda_document_name", cdaDocument.getName());
+                }
+            });
+            resourceBucket.insertBasicRecord(ResourceCells.FILE_LIST, root.toString());
             return resourceBucket;
         } else if (originalPackage.getProfileType() == ProfileType.Link) {
             resourceBucket = new ResourceBucket(
@@ -249,6 +287,19 @@ public class PackMillService {
             resourceBucket.insertBasicRecord(ResourceCells.ORG_AREA, redisService.getOrgArea(linkPackage.getOrgCode()));
             resourceBucket.insertBasicRecord(ResourceCells.CDA_VERSION, linkPackage.getCdaVersion());
             resourceBucket.insertBasicRecord(ResourceCells.CREATE_DATE, DateTimeUtil.utcDateTimeFormat(new Date()));
+            resourceBucket.insertBasicRecord(ResourceCells.PATIENT_NAME, linkPackage.getPatientName());
+            resourceBucket.insertBasicRecord(ResourceCells.DEMOGRAPHIC_ID, linkPackage.getDemographicId());
+            ArrayNode root = objectMapper.createArrayNode();
+            linkPackage.getLinkFiles().forEach(item -> {
+                ObjectNode subNode = root.addObject();
+                subNode.put("file_extension", item.getFileExtension());
+                subNode.put("origin_name", item.getOriginName());
+                subNode.put("report_form_no", item.getReportFormNo());
+                subNode.put("serial_no", item.getSerialNo());
+                subNode.put("file_size", item.getFileSize());
+                subNode.put("url", item.getUrl());
+            });
+            resourceBucket.insertBasicRecord(ResourceCells.FILE_LIST, root.toString());
             return resourceBucket;
         } else if (originalPackage.getProfileType() == ProfileType.Simple) {
             resourceBucket = new ResourceBucket(

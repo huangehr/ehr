@@ -2,6 +2,7 @@ package com.yihu.ehr.resource.dao;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.hbase.HBaseDao;
 import com.yihu.ehr.profile.core.ResourceCore;
@@ -39,6 +40,8 @@ public class ResourceBrowseDao {
     private Integer defaultSize = 1000;
     private String mainJoinCore = ResourceCore.MasterTable + "_shard1_replica1";
     private String subJoinCore = ResourceCore.SubTable + "_shard1_replica1";
+    private static final String INDEX = "archive_relation";
+    private static final String TYPE = "info";
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -68,6 +71,8 @@ public class ResourceBrowseDao {
     private QuotaStatisticsClient quotaStatisticsClient;
     @Autowired
     private HBaseDao hbaseDao;
+    @Autowired
+    private ElasticSearchUtil elasticSearchUtil;
 
     /**
      * 获取资源授权数据元列表
@@ -375,23 +380,6 @@ public class ResourceBrowseDao {
         throw new ApiException("资源无相关数据元");
     }
 
-    public Envelop getQuotaData (String resourcesCode, String roleId, String saas, String queryParams, Integer page, Integer size) {
-        RsResource rsResource = rsResourceDao.findByCode(resourcesCode);
-        if (rsResource.getDimension() != null && "orgHealthCategoryCode".equals(rsResource.getDimension())) {
-            List<RsResourceQuota> list = rsResourceQuotaDao.findByResourceId(rsResource.getId());
-            final StringBuilder quotaCodeStr = new StringBuilder();
-            list.forEach(item -> {
-                quotaCodeStr.append(item.getQuotaCode()).append(",");
-            });
-            List<Map<String, Object>> resultList = quotaStatisticsClient.getQuotaReportTwoDimensionalTable(quotaCodeStr.toString(), null, rsResource.getDimension(), null);
-            Envelop envelop = new Envelop();
-            envelop.setSuccessFlg(true);
-            envelop.setDetailModelList(resultList);
-            return envelop;
-        }
-        return null;
-    }
-
     /**
      * habse主表的solr分组统计
      * {"q":"*:*","groupFields":"key1,key2","statsFields":"key3,key4","customGroup":[{"groupField":"lastUpdateTime","groupCondition":{"3Month":"last_update_time:[2016-02-16 TO *]","6Month":"last_update_time:[2015-11-10 TO *]"}}]}
@@ -548,8 +536,65 @@ public class ResourceBrowseDao {
 
     }
 
+    public Envelop getQuotaData (String resourcesCode, String roleId, String saas, String queryParams, Integer page, Integer size) {
+        RsResource rsResource = rsResourceDao.findByCode(resourcesCode);
+        if (rsResource.getDimension() != null && "orgHealthCategoryCode".equals(rsResource.getDimension())) {
+            List<RsResourceQuota> list = rsResourceQuotaDao.findByResourceId(rsResource.getId());
+            final StringBuilder quotaCodeStr = new StringBuilder();
+            list.forEach(item -> {
+                quotaCodeStr.append(item.getQuotaCode()).append(",");
+            });
+            List<Map<String, Object>> resultList = quotaStatisticsClient.getQuotaReportTwoDimensionalTable(quotaCodeStr.toString(), null, rsResource.getDimension(), null);
+            Envelop envelop = new Envelop();
+            envelop.setSuccessFlg(true);
+            envelop.setDetailModelList(resultList);
+            return envelop;
+        }
+        return null;
+    }
+
+    /**
+     * 获取非结构化资源
+     * @param filters
+     * @param sorts
+     * @param page
+     * @param size
+     * @return
+     * @throws Exception
+     */
+    public Envelop getEhrFile (String filters, String sorts, Integer page, Integer size) throws Exception {
+        List<Map<String, Object>> esList = elasticSearchUtil.page(INDEX, TYPE, filters, sorts, page, size);
+        List<String> rowkeys = new ArrayList<>(esList.size());
+        esList.forEach(item -> rowkeys.add((String) item.get("_id")));
+        List<Map<String, Object>> hbaseList = new ArrayList<>(esList.size());
+        Result[] results = hbaseDao.getResultList("HealthFile", rowkeys, "", ""); //hbase结果集
+        if (results != null && results.length > 0){
+            for (Result result : results) {
+                Map<String, Object> obj = hbase.resultToMap(result);
+                if (obj != null) {
+                    hbaseList.add(obj);
+                } else {
+                    hbaseList.add(new HashMap<>());
+                }
+            }
+        }
+        int count = (int)elasticSearchUtil.count(INDEX, TYPE, filters);
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(true);
+        envelop.setCurrPage(page);
+        envelop.setPageSize(size);
+        envelop.setTotalCount(count);
+        envelop.setDetailModelList(hbaseList);
+        return envelop;
+    }
+
     /**
      * 获取Mysql配置库数据
+     * @param queryParams
+     * @param page
+     * @param size
+     * @return
+     * @throws Exception
      */
     public Page<Map<String,Object>> getMysqlData(String queryParams, Integer page, Integer size) throws Exception {
         String sql = queryParams;
@@ -788,8 +833,6 @@ public class ResourceBrowseDao {
      * @param roleId 角色ID列表
      * @param saas 权限
      * @param rowKey
-     * @param page 页码
-     * @param size 页数
      * @return
      * @throws Exception
      */
