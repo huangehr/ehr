@@ -1,9 +1,10 @@
 package com.yihu.ehr.users.service;
 
-import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.model.user.MDoctor;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -42,7 +43,7 @@ public interface DoctorClient {
 
     @RequestMapping(value = ServiceApi.Doctors.Doctors, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建医生", notes = "重新绑定医生信息")
-    MDoctor createDoctor(
+    Envelop createDoctor(
             @ApiParam(name = "doctor_json_data", value = "", defaultValue = "")
             @RequestBody String doctoJsonData,
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
@@ -50,7 +51,7 @@ public interface DoctorClient {
 
     @RequestMapping(value = ServiceApi.Doctors.Doctors, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改医生", notes = "重新绑定医生信息")
-    MDoctor updateDoctor(
+    Envelop updateDoctor(
             @ApiParam(name = "doctor_json_data", value = "", defaultValue = "")
             @RequestBody String doctoJsonData,
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
