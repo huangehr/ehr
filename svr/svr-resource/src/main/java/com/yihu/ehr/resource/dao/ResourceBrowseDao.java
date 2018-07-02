@@ -46,7 +46,7 @@ public class ResourceBrowseDao {
     @Autowired
     private JdbcTemplate jdbcTemplate;
     @Autowired
-    private HbaseQuery hbase;
+    private HbaseQuery hbaseQuery;
     @Autowired
     private SolrQuery solr;
     @Autowired
@@ -247,7 +247,7 @@ public class ResourceBrowseDao {
                         metadataIdList.add(id + "_VALUE");
                     }
                 }
-                Page<Map<String, Object>>  result = hbase.queryBySolr(ResourceCore.MasterTable, q.toString(), objectMapper.writeValueAsString(sort), fq, StringUtils.join(basicField, ","), StringUtils.join(metadataIdList, ","), page, size);
+                Page<Map<String, Object>>  result = hbaseQuery.queryBySolr(ResourceCore.MasterTable, q.toString(), objectMapper.writeValueAsString(sort), fq, StringUtils.join(basicField, ","), StringUtils.join(metadataIdList, ","), page, size);
                 Envelop envelop = new Envelop();
                 envelop.setSuccessFlg(true);
                 envelop.setCurrPage(result.getNumber());
@@ -265,7 +265,7 @@ public class ResourceBrowseDao {
             if (query.containsKey("dFl")) {
                 dFl = (String) query.get("dFl");
             }
-            Page<Map<String, Object>>  result = hbase.queryBySolr(ResourceCore.MasterTable, q.toString(), objectMapper.writeValueAsString(sort), fq, basicFl, dFl, page, size);
+            Page<Map<String, Object>>  result = hbaseQuery.queryBySolr(ResourceCore.MasterTable, q.toString(), objectMapper.writeValueAsString(sort), fq, basicFl, dFl, page, size);
             Envelop envelop = new Envelop();
             envelop.setSuccessFlg(true);
             envelop.setCurrPage(result.getNumber());
@@ -350,7 +350,7 @@ public class ResourceBrowseDao {
                         metadataIdList.add(id + "_VALUE");
                     }
                 }
-                Page<Map<String, Object>> result = hbase.queryBySolr(ResourceCore.SubTable, q.toString(), objectMapper.writeValueAsString(sort), fq, StringUtils.join(basicField, ","), StringUtils.join(metadataIdList, ","), page, size);
+                Page<Map<String, Object>> result = hbaseQuery.queryBySolr(ResourceCore.SubTable, q.toString(), objectMapper.writeValueAsString(sort), fq, StringUtils.join(basicField, ","), StringUtils.join(metadataIdList, ","), page, size);
                 Envelop envelop = new Envelop();
                 envelop.setSuccessFlg(true);
                 envelop.setCurrPage(result.getNumber());
@@ -368,7 +368,7 @@ public class ResourceBrowseDao {
             if (query.containsKey("dFl")) {
                 dFl = (String) query.get("dFl");
             }
-            Page<Map<String, Object>> result = hbase.queryBySolr(ResourceCore.SubTable, q.toString(), objectMapper.writeValueAsString(sort), fq, basicFl, dFl, page, size);
+            Page<Map<String, Object>> result = hbaseQuery.queryBySolr(ResourceCore.SubTable, q.toString(), objectMapper.writeValueAsString(sort), fq, basicFl, dFl, page, size);
             Envelop envelop = new Envelop();
             envelop.setSuccessFlg(true);
             envelop.setCurrPage(result.getNumber());
@@ -570,7 +570,7 @@ public class ResourceBrowseDao {
         Result[] results = hbaseDao.getResultList("HealthFile", rowkeys, "", ""); //hbase结果集
         if (results != null && results.length > 0){
             for (Result result : results) {
-                Map<String, Object> obj = hbase.resultToMap(result);
+                Map<String, Object> obj = hbaseQuery.resultToMap(result);
                 if (obj != null) {
                     hbaseList.add(obj);
                 } else {
@@ -663,7 +663,7 @@ public class ResourceBrowseDao {
         if (size == null) {
             size = defaultSize;
         }
-        return hbase.queryBySolr(core, q, sort, fq, page, size);
+        return hbaseQuery.queryBySolr(core, q, sort, fq, page, size);
     }
 
     /**
@@ -720,7 +720,7 @@ public class ResourceBrowseDao {
         if (size == null) {
             size = defaultSize;
         }
-        return hbase.queryIndexBySolr(core, q, sort, fq, basicFl, dFl, page, size);
+        return hbaseQuery.queryIndexBySolr(core, q, sort, fq, basicFl, dFl, page, size);
     }
 
     /**
@@ -792,7 +792,7 @@ public class ResourceBrowseDao {
                 Result[] resultList = hbaseDao.getResultList(ResourceCore.MasterTable, list,  StringUtils.join(basicField, ","), StringUtils.join(metadataIdList, ",")); //hbase结果集
                 if (resultList != null && resultList.length > 0){
                     for (Result result : resultList) {
-                        Map<String, Object> obj = hbase.resultToMap(result);
+                        Map<String, Object> obj = hbaseQuery.resultToMap(result);
                         if (obj != null) {
                             data.add(obj);
                         }
@@ -816,7 +816,7 @@ public class ResourceBrowseDao {
             Result[] resultList = hbaseDao.getResultList(ResourceCore.MasterTable, list, basicFl,dFl); //hbase结果集
             if (resultList != null && resultList.length > 0){
                 for (Result result : resultList) {
-                    Map<String, Object> obj = hbase.resultToMap(result);
+                    Map<String, Object> obj = hbaseQuery.resultToMap(result);
                     if (obj != null) {
                         data.add(obj);
                     }
@@ -902,7 +902,7 @@ public class ResourceBrowseDao {
                 Result[] resultList = hbaseDao.getResultList(ResourceCore.SubTable, list,  StringUtils.join(basicField, ","), StringUtils.join(metadataIdList, ",")); //hbase结果集
                 if (resultList != null && resultList.length > 0){
                     for (Result result : resultList) {
-                        Map<String, Object> obj = hbase.resultToMap(result);
+                        Map<String, Object> obj = hbaseQuery.resultToMap(result);
                         if (obj != null) {
                             data.add(obj);
                         }
@@ -926,7 +926,7 @@ public class ResourceBrowseDao {
             Result[] resultList = hbaseDao.getResultList(ResourceCore.SubTable, list,  basicFl,dFl); //hbase结果集
             if (resultList != null && resultList.length > 0){
                 for (Result result : resultList) {
-                    Map<String, Object> obj = hbase.resultToMap(result);
+                    Map<String, Object> obj = hbaseQuery.resultToMap(result);
                     if (obj != null) {
                         data.add(obj);
                     }
