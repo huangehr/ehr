@@ -169,7 +169,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
             e.getMessage();
         }
 
-        String sql3 = "SELECT count(*) c,org_code FROM json_archives_qc/qc_metadata_info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' ";
+        String sql3 = "SELECT count(*) c,org_code FROM json_archives_qc/qc_metadata_info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' and qc_step=1";
         if(eventType!=null){
             sql3 += " and event_type = "+eventType ;
         }
