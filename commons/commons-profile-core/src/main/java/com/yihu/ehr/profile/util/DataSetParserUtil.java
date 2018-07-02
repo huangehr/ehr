@@ -33,7 +33,7 @@ public class DataSetParserUtil {
     public PackageDataSet parseStructuredJsonDataSet(JsonNode jsonNode, boolean isOrigin) {
         PackageDataSet dataSet = new PackageDataSet();
 
-        String code = jsonNode.get("code") == null? "" : jsonNode.get("code").asText();
+        String code = jsonNode.get("code") == null ? "" : jsonNode.get("code").asText();
         String patientId = jsonNode.get("patient_id") == null ? "" : jsonNode.get("patient_id").asText();
         String eventNo = jsonNode.get("event_no") == null ? "" : jsonNode.get("event_no").asText();
         String orgCode = jsonNode.get("org_code") == null ? "" : jsonNode.get("org_code").asText();

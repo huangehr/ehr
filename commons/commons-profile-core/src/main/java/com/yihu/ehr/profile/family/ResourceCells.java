@@ -32,6 +32,7 @@ public class ResourceCells {
     public static final String HEALTH_PROBLEM = "health_problem";
     public static final String HEALTH_PROBLEM_NAME = "health_problem_name";
     public static final String DEPT_CODE = "dept_code";
+    public static final String SUB_ROWKEYS = "sub_rowkeys";
 
     //RawFiles
     public static final String CDA_DOCUMENT_ID = "cda_document_id";
@@ -70,12 +71,15 @@ public class ResourceCells {
                         EVENT_DATE,
                         EVENT_TYPE,
                         PATIENT_ID,
+                        PATIENT_NAME,
                         DEMOGRAPHIC_ID,
                         ORG_CODE,
                         ORG_NAME,
                         ORG_AREA,
                         CDA_VERSION,
-                        CREATE_DATE
+                        CREATE_DATE,
+                        FILE_LIST,
+                        SUB_ROWKEYS
                 ));
             case Link:
                 return new ArrayList<>(Arrays.asList(
@@ -84,11 +88,15 @@ public class ResourceCells {
                         EVENT_DATE,
                         EVENT_TYPE,
                         PATIENT_ID,
+                        PATIENT_NAME,
+                        DEMOGRAPHIC_ID,
                         ORG_CODE,
                         ORG_NAME,
                         ORG_AREA,
                         CDA_VERSION,
-                        CREATE_DATE
+                        CREATE_DATE,
+                        FILE_LIST,
+                        SUB_ROWKEYS
                 ));
             case Simple:
                 return new ArrayList<>();

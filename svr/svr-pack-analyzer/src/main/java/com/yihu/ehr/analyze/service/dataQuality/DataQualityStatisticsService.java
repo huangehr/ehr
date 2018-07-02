@@ -145,7 +145,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
         }
 
         //统计接收数据
-        String sql2 = "SELECT count(event_no) c,org_code FROM json_archives/info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' AND pack_type=1 ";
+        String sql2 = "SELECT count(*) c,org_code FROM json_archives/info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' AND pack_type=1 ";
         if(eventType!=null){
             sql2 += " and event_type = "+eventType ;
         }
@@ -244,7 +244,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
         }
 
         //资源化数据
-        String sql5 = "SELECT count(event_no) c,org_code,archive_status FROM json_archives/info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' AND pack_type=1 and (archive_status=2 or archive_status=3) group by org_code,archive_status";
+        String sql5 = "SELECT count(*) c,org_code,archive_status FROM json_archives/info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' AND pack_type=1 and (archive_status=2 or archive_status=3) group by org_code,archive_status";
         ResultSet resultSet5 = elasticSearchUtil.findBySql(sql5);
         try {
             while (resultSet5.next()) {
@@ -270,7 +270,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
             e.getMessage();
         }
 
-        String sql6 = "SELECT count(event_no) c,org_code FROM json_archives/info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' AND pack_type=1 and defect=1 group by org_code";
+        String sql6 = "SELECT count(*) c,org_code FROM json_archives_qc/qc_metadata_info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' AND qc_step=2 group by org_code";
         ResultSet resultSet6 = elasticSearchUtil.findBySql(sql6);
         try {
             while (resultSet6.next()) {
@@ -322,7 +322,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
     public Long packetCount(List<Map<String, String>> orgInfoList, String archiveStatus, String eventDateStart, String eventDateEnd) {
         Long count = 0L;
         if (orgInfoList.size() == 1 && cloud.equals(orgInfoList.get(0).get("orgCode"))) {
-            String sql1 = "SELECT count(event_no) c FROM json_archives/info where receive_date>= '"+eventDateStart+"' AND receive_date<='" +  eventDateEnd + "' AND pack_type=1 ";
+            String sql1 = "SELECT count(*) c FROM json_archives/info where receive_date>= '"+eventDateStart+"' AND receive_date<='" +  eventDateEnd + "' AND pack_type=1 ";
             if (!StringUtils.isEmpty(archiveStatus)) {
                 sql1+=" and archive_status ="+archiveStatus;
             }
@@ -338,7 +338,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
         } else {
             for (Map<String, String> orgInfo : orgInfoList) {
                 //统计接收数据
-                String sql2 = "SELECT count(event_no) c FROM json_archives/info where receive_date>= '"+eventDateStart+"' AND receive_date<='" +  eventDateEnd + "' AND pack_type=1 and org_code='" + orgInfo.get("orgCode")+"'";
+                String sql2 = "SELECT count(*) c FROM json_archives/info where receive_date>= '"+eventDateStart+"' AND receive_date<='" +  eventDateEnd + "' AND pack_type=1 and org_code='" + orgInfo.get("orgCode")+"'";
                 if (!StringUtils.isEmpty(archiveStatus)) {
                     sql2+=" and archive_status ="+archiveStatus;
                 }
@@ -386,7 +386,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
             List<Map<String, Object>> reportedNumList1 = elasticSearchUtil.findBySql(Arrays.asList(reportedNumFields1.split(",")), reportedNumSql1);
             reportData.put("reportedNumList1", reportedNumList1);
             // TODO 采集情况
-            String reportedNumSql2 = "SELECT count(event_no) total FROM json_archives/info where receive_date BETWEEN '"+eventDateStart+"' AND '" +  eventDateEnd + "' and pack_type=1 " ;
+            String reportedNumSql2 = "SELECT count(*) total FROM json_archives/info where receive_date BETWEEN '"+eventDateStart+"' AND '" +  eventDateEnd + "' and pack_type=1 " ;
             if (!cloud.equals(orgInfo.get("orgCode"))) {
                 reportedNumSql2 += " AND org_code='" + orgCode + "'";
             }
@@ -413,7 +413,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
             collectionMap.put("total",totalCollection);
             reportData.put("collectionMap", collectionMap);
             // TODO 采集内容
-            String reportedNumSql3 = "SELECT count(event_no) total FROM json_archives/info where receive_date BETWEEN '"+eventDateStart+"' AND '" +  eventDateEnd + "' and pack_type=1 " ;
+            String reportedNumSql3 = "SELECT count(*) total FROM json_archives/info where receive_date BETWEEN '"+eventDateStart+"' AND '" +  eventDateEnd + "' and pack_type=1 " ;
             if (!cloud.equals(orgInfo.get("orgCode"))) {
                 reportedNumSql3 += " AND org_code='" + orgCode + "'";
             }
@@ -457,7 +457,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
 
             reportData.put("reportedNumList3", reportedList3);
             // TODO 解析情况
-            String reportedNumSql4 = "SELECT count(event_no) total FROM json_archives/info where receive_date BETWEEN '"+eventDateStart+"' AND '" +  eventDateEnd + "' and (archive_status=2 or archive_status=3 or archive_status=0 ) and pack_type=1 " ;
+            String reportedNumSql4 = "SELECT count(*) total FROM json_archives/info where receive_date BETWEEN '"+eventDateStart+"' AND '" +  eventDateEnd + "' and (archive_status=2 or archive_status=3 or archive_status=0 ) and pack_type=1 " ;
             if (!cloud.equals(orgInfo.get("orgCode"))) {
                 reportedNumSql4 += " AND org_code='" + orgCode + "'";
             }
@@ -648,7 +648,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
             }
             // 及时率场合
 
-            StringBuilder sql = new StringBuilder("SELECT COUNT(distinct event_no) packetCount FROM json_archives/info WHERE ");
+            StringBuilder sql = new StringBuilder("SELECT COUNT(*) packetCount FROM json_archives/info WHERE ");
             sql.append(filters);
             sql.append(" GROUP BY date_histogram(field='receive_date','interval'='1d',format='yyyy-MM-dd',alias=receiveDate)");
             List<String> fields = new ArrayList<>(2);
