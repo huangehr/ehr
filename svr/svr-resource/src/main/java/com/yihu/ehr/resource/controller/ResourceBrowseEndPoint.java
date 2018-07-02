@@ -203,7 +203,7 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
-    @ApiOperation("Hbase从表统计")
+    @ApiOperation("获取非结构化数据")
     @RequestMapping(value = ServiceApi.Resources.ResourceHealthFile, method = RequestMethod.GET)
     public Envelop healthFile(
             @ApiParam(name = "filters", value = "检索条件")
