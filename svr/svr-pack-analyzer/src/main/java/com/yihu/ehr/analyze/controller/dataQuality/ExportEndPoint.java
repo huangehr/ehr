@@ -13,24 +13,20 @@ import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.entity.quality.DqWarningRecord;
 import com.yihu.ehr.redis.client.RedisClient;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
-import com.yihu.ehr.util.datetime.DateUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import javafx.util.Pair;
 import jxl.Workbook;
 import jxl.format.CellFormat;
 import jxl.write.*;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang3.BooleanUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xwpf.usermodel.*;
-import org.elasticsearch.index.query.*;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTblWidth;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.STTblWidth;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,14 +37,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.persistence.criteria.Path;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.OutputStream;
-import java.lang.Boolean;
 import java.math.BigInteger;
 import java.sql.ResultSet;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 导出
@@ -279,10 +276,7 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                 i++;
                 XWPFParagraph orgParagraph6 = document.createParagraph();
                 XWPFRun orgRun6 = orgParagraph6.createRun();
-                String orgText6 = i+".数据集总量{解析完成}";
-                orgRun6.setText(orgText6);
-                orgRun6.setFontSize(12);
-                orgRun6.setBold(true);
+
                 //设置表格
                 XWPFTable table4 = document.createTable();
                 //列宽自动分割
@@ -296,15 +290,21 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                 table14RowTitle.addNewTableCell().setText("总数");
                 table14RowTitle.addNewTableCell().setText("行数");
                 List<Map<String, Object>> reportedNumList5 = (List<Map<String, Object>>)map.get("reportedNumList5");
+                Double datasetnum = 0d;
                 if(reportedNumList5.size()>0){
-                    reportedNumList5.forEach(item->{
+                    for(Map<String, Object> item:reportedNumList5){
                         XWPFTableRow tableRow = table4.createRow();
                         tableRow.getCell(0).setText(item.get("dataset").toString());
                         tableRow.getCell(1).setText(item.get("name").toString());
                         tableRow.getCell(2).setText(item.get("count").toString());
                         tableRow.getCell(3).setText(item.get("row").toString());
-                    });
+                        datasetnum+=Double.valueOf(item.get("count").toString());
+                    }
                 }
+                String orgText6 = i+".数据集总量("+datasetnum.longValue()+")";
+                orgRun6.setText(orgText6);
+                orgRun6.setFontSize(12);
+                orgRun6.setBold(true);
                 addEmptyRow(document);
                 i++;
                 XWPFParagraph orgParagraph7 = document.createParagraph();

@@ -20,6 +20,7 @@ import java.util.Map;
  * @author linaz
  * @created 2016.04.15
  */
+@Deprecated
 public class FileTableUtil {
 
     public static Map<String, String> getBasicFamilyCellMap(OriginalPackage originalPackage) {

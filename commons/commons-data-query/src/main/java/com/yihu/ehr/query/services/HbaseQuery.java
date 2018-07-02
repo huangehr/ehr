@@ -245,7 +245,7 @@ public class HbaseQuery {
 	 */
 	public Map<String,Object> resultToMap(Result result){
 		String rowkey = Bytes.toString(result.getRow());
-		if(rowkey != null && rowkey.length() >  0) {
+		if (rowkey != null && rowkey.length() >  0) {
 			Map<String,Object> obj = new HashMap<>();
 			obj.put("rowkey", rowkey);
 			for(Cell cell : result.rawCells()) {

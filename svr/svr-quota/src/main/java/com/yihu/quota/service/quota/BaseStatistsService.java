@@ -190,8 +190,8 @@ public class BaseStatistsService {
                 }
             }
         }
-        // 第一加数列表为空，第二个加数列表不为空
-        if (firstList.size() <= 0 && secondList.size() > 0) {
+        // 第一加数列表个数小雨第二个加数列表
+        if (secondList.size() - firstList.size() > 0) {
             for(Map<String, Object> secondMap :secondList) {
                 Map<String, Object> map = new HashMap<>();
                 map.put(firstColumnField, secondMap.get(firstColumnField));
