@@ -30,6 +30,7 @@ public class EsArchiveRelation implements Serializable {
     private Long apply_id; //关联档案申请id
     private Long card_id; //申领卡ID
     private Integer identify_flag; //身份识别标识 0不可识别 1可以识别
+    private Integer upload_flag; //影像档案腾讯云上传标识
 
     public String get_id() {
         return _id;
@@ -184,5 +185,13 @@ public class EsArchiveRelation implements Serializable {
 
     public void setProfile_type(Integer profile_type) {
         this.profile_type = profile_type;
+    }
+
+    public Integer getUpload_flag() {
+        return upload_flag;
+    }
+
+    public void setUpload_flag(Integer upload_flag) {
+        this.upload_flag = upload_flag;
     }
 }

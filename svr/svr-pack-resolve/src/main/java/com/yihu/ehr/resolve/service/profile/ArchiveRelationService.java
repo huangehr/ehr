@@ -58,11 +58,14 @@ public class ArchiveRelationService {
             ProfileType profileType = originalPackage.getProfileType();
             if (profileType != null){
                 relation.setProfile_type(profileType.getType());
+                if (profileType == ProfileType.Link) {
+                    relation.setUpload_flag(0);
+                }
             }
             relation.setName(resourceBucket.getBasicRecord(ResourceCells.PATIENT_NAME));
             relation.setOrg_code(resourceBucket.getBasicRecord(ResourceCells.ORG_CODE));
             relation.setOrg_name(resourceBucket.getBasicRecord(ResourceCells.ORG_NAME));
-            relation.setId_card_no( resourceBucket.getBasicRecord(ResourceCells.DEMOGRAPHIC_ID));
+            relation.setId_card_no(resourceBucket.getBasicRecord(ResourceCells.DEMOGRAPHIC_ID));
             int gender = resourceBucket.getMasterRecord().getResourceValue("EHR_000019") == null ||  "".equals(resourceBucket.getMasterRecord().getResourceValue("EHR_000019"))  ? 0 : new Integer(resourceBucket.getMasterRecord().getResourceValue("EHR_000019"));
             relation.setGender(gender);
             String telephone = resourceBucket.getMasterRecord().getResourceValue("EHR_000003") == null ? "" : resourceBucket.getMasterRecord().getResourceValue("EHR_000003").toString();

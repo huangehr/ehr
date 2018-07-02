@@ -131,4 +131,9 @@ public class ResourceBucket {
         this.qcMetadataRecords = qcMetadataRecords;
     }
 
+    public List<String> getSubRowkeys() {
+        List<String> rowkeys = new ArrayList<>();
+        subRecords.forEach(item -> rowkeys.add(item.getRowkey()));
+        return rowkeys;
+    }
 }

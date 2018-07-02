@@ -393,6 +393,19 @@ public class ResourceBrowseService extends BaseJpaService {
     }
 
     /**
+     * 获取非结构化资源
+     * @param filters
+     * @param sorts
+     * @param page
+     * @param size
+     * @return
+     * @throws Exception
+     */
+    public Envelop getEhrFile (String filters, String sorts, Integer page, Integer size) throws Exception {
+        return resourceBrowseDao.getEhrFile(filters, sorts, page, size);
+    }
+
+    /**
      * Mysql数据
      * @param queryParams
      * @param page

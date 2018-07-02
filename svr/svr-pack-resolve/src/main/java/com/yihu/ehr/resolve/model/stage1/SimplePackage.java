@@ -68,14 +68,14 @@ public class SimplePackage extends OriginalPackage {
     public String toJson() {
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode root = objectMapper.createObjectNode();
-        root.put("orgCode", this.getOrgCode());
-        root.put("patientId", this.getPatientId());
-        root.put("eventNo", this.getEventNo());
-        root.put("cdaVersion", this.getCdaVersion());
-        root.put("eventTime", DateTimeUtil.utcDateTimeFormat(this.getEventTime()));
-        root.put("createTime", DateTimeUtil.utcDateTimeFormat(this.getCreateDate()));
-        root.put("eventType", StringUtils.isEmpty(this.getEventType()) ? "" : this.getEventType().toString());
-        root.put("profileType", this.getProfileType().toString());
+        root.put("orgCode", this.orgCode);
+        root.put("patientId", this.patientId);
+        root.put("eventNo", this.eventNo);
+        root.put("cdaVersion", this.cdaVersion);
+        root.put("eventTime", DateTimeUtil.utcDateTimeFormat(this.eventTime));
+        root.put("createTime", DateTimeUtil.utcDateTimeFormat(this.createDate));
+        root.put("eventType", StringUtils.isEmpty(this.eventType) ? "" : this.eventType.toString());
+        root.put("profileType", this.profileType.toString());
         return root.toString();
     }
 

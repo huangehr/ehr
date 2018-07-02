@@ -21,6 +21,7 @@ import java.util.*;
  */
 public class FilePackage extends OriginalPackage {
 
+    private String patientName; //居民姓名
     private String demographicId; //身份证号码
 
     public FilePackage(String packId, Date receiveDate) {
@@ -38,6 +39,14 @@ public class FilePackage extends OriginalPackage {
 
     public void setDemographicId(String demographicId) {
         this.demographicId = demographicId;
+    }
+
+    public String getPatientName() {
+        return patientName;
+    }
+
+    public void setPatientName(String patientName) {
+        this.patientName = patientName;
     }
 
     public Map<String, CdaDocument> getCdaDocuments() {
@@ -72,27 +81,27 @@ public class FilePackage extends OriginalPackage {
     public String toJson() {
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode root = objectMapper.createObjectNode();
-        root.put("id", getId().toString());
-        root.put("orgCode", this.getOrgCode());
-        root.put("patientId", this.getPatientId());
-        root.put("eventNo", this.getEventNo());
-        root.put("cdaVersion", this.getCdaVersion());
-        root.put("eventTime", DateTimeUtil.utcDateTimeFormat(this.getEventTime()));
-        root.put("createTime", DateTimeUtil.utcDateTimeFormat(this.getCreateDate()));
-        root.put("eventType", this.getEventType() == null ? "" : this.getEventType().toString());
-        root.put("profileType", this.getProfileType().toString());
-        root.put("reUploadFlg", this.isReUploadFlg());
-        root.put("identifyFlag", this.isIdentifyFlag());
+        root.put("id", getId());
+        root.put("orgCode", this.orgCode);
+        root.put("patientId", this.patientId);
+        root.put("eventNo", this.eventNo);
+        root.put("cdaVersion", this.cdaVersion);
+        root.put("eventTime", DateTimeUtil.utcDateTimeFormat(this.eventTime));
+        root.put("eventType", this.eventType == null ? "" : this.eventType.toString());
+        root.put("createTime", DateTimeUtil.utcDateTimeFormat(this.createDate));
+        root.put("profileType", this.profileType.toString());
+        root.put("patientName", this.patientName);
+        root.put("demographicId", this.demographicId);
+        root.put("reUploadFlg", this.reUploadFlg);
+        root.put("identifyFlag", this.identifyFlag);
         ObjectNode dataSetsNode = root.putObject("dataSets");
         for (String dataSetCode : dataSets.keySet()) {
             PackageDataSet dataSet = dataSets.get(dataSetCode);
             dataSetsNode.putPOJO(dataSetCode, dataSet.toJson());
         }
-        if (cdaDocuments != null) {
-            ArrayNode files = root.putArray("documents");
-            for (String key : cdaDocuments.keySet()) {
-                files.add(cdaDocuments.get(key).toJson());
-            }
+        ArrayNode files = root.putArray("files");
+        for (String key : cdaDocuments.keySet()) {
+            files.add(cdaDocuments.get(key).toJson());
         }
         return root.toString();
     }
