@@ -109,7 +109,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
         });
 
         //统计医院数据
-        String sql1 = "SELECT sum(HSI07_01_001) s1,sum(HSI07_01_002) s2,sum(HSI07_01_004) s3,sum(HSI07_01_012) s4,org_code FROM qc/daily_report where create_date>= '"+start+"T00:00:00' AND create_date <='" +  end + "T23:59:59' group by org_code";
+        String sql1 = "SELECT sum(HSI07_01_001) s1,sum(HSI07_01_002) s2,sum(HSI07_01_004) s3,sum(HSI07_01_012) s4,org_code FROM qc/daily_report where event_date>= '"+start+"T00:00:00' AND event_date <='" +  end + "T23:59:59' group by org_code";
         ResultSet resultSet1 = elasticSearchUtil.findBySql(sql1);
         Map<String, Map<String, Object>> dataMap = new HashMap<>();
         try {
@@ -502,6 +502,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
             // TODO 解析失败分析
             StringBuilder stringBuilder2 = new StringBuilder();
             stringBuilder2.append("archive_status=2;");
+            stringBuilder2.append("pack_type=1;");
             stringBuilder2.append("receive_date>=" + eventDateStart + ";");
             stringBuilder2.append("receive_date<" + eventDateEnd + ";");
             if (!cloud.equals(orgInfo.get("orgCode"))){
