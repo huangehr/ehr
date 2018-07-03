@@ -13,9 +13,7 @@ public enum ErrorType {
     ValueError(2, "值域错误"),
     TypeError(3, "类型错误"),
     FormatError(4, "格式错误"),
-    FieldAdaptationError(5, "资源适配错误"),
-    DictAdaptationError(6, "字典适配错误");
-
+    FieldAdaptationError(5, "资源适配错误");
 
     private String name;
     private int type;

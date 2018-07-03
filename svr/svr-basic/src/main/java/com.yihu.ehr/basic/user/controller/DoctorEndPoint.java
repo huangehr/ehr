@@ -120,147 +120,174 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Doctors.Doctors, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     @ApiOperation(value = "创建医生", notes = "创建医生信息")
-    public MDoctor createDoctor(
+    public Envelop createDoctor(
             @ApiParam(name = "doctor_json_data", value = "", defaultValue = "")
             @RequestBody String doctoJsonData,
             @ApiParam(name = "model", value = "所属机构部门关系", defaultValue = "")
-            @RequestParam("model") String model) throws Exception {
-        List<MOrgDeptJson> orgDeptJsonList = objectMapper.readValue(model, new TypeReference<List<MOrgDeptJson>>() {});
-        MOrgDeptJson mOrgDeptJson = orgDeptJsonList.get(0);
-        Organization organization = orgService.getOrgById(mOrgDeptJson.getOrgId());
-        OrgDept orgDept = orgDeptService.searchBydeptId(Integer.parseInt(mOrgDeptJson.getDeptIds().split(",")[0]));
+            @RequestParam("model") String model) {
+        Envelop envelop = new Envelop();
+        try {
+            List<MOrgDeptJson> orgDeptJsonList = objectMapper.readValue(model, new TypeReference<List<MOrgDeptJson>>() {
+            });
+            MOrgDeptJson mOrgDeptJson = orgDeptJsonList.get(0);
+            Organization organization = orgService.getOrgById(mOrgDeptJson.getOrgId());
+            OrgDept orgDept = orgDeptService.searchBydeptId(Integer.parseInt(mOrgDeptJson.getDeptIds().split(",")[0]));
 
-        Doctors doctor = toEntity(doctoJsonData, Doctors.class);
-        doctor.setInsertTime(new Date());
-        doctor.setUpdateTime(new Date());
-        doctor.setStatus("1");
-        doctor.setPyCode(PinyinUtil.getPinYinHeadChar(doctor.getName(), false));
-        doctor.setOrgId(organization.getId().toString());
-        doctor.setOrgCode(organization.getOrgCode());
-        doctor.setOrgFullName(organization.getFullName());
-        doctor.setDeptName(orgDept.getName());
-        Doctors d= doctorService.save(doctor);
+            Doctors doctor = toEntity(doctoJsonData, Doctors.class);
+            doctor.setInsertTime(new Date());
+            doctor.setUpdateTime(new Date());
+            doctor.setStatus("1");
+            doctor.setPyCode(PinyinUtil.getPinYinHeadChar(doctor.getName(), false));
+            doctor.setOrgId(organization.getId().toString());
+            doctor.setOrgCode(organization.getOrgCode());
+            doctor.setOrgFullName(organization.getFullName());
+            doctor.setDeptName(orgDept.getName());
+            Doctors d = doctorService.save(doctor);
 
-        String idCardNo = d.getIdCardNo();
-        User user = null;
-        if(!StringUtils.isEmpty(idCardNo)){
-            //通过身份证 判断居民是否存在
-            user = userManager.getUserByIdCardNo(idCardNo);
-        }
-        String defaultPassword ="";
-        if(user == null){
-            user =new User();
-            user.setId(getObjectId(BizObject.User));
-            user.setCreateDate(new Date());
-            if(!StringUtils.isEmpty(doctor.getIdCardNo())&&doctor.getIdCardNo().length()>9){
-                defaultPassword=doctor.getIdCardNo().substring(doctor.getIdCardNo().length()-8);
-                user.setPassword(DigestUtils.md5Hex(defaultPassword));
-            }else{
-                user.setPassword(DigestUtils.md5Hex(default_password));
+            String idCardNo = d.getIdCardNo();
+            User user = null;
+            if (!StringUtils.isEmpty(idCardNo)) {
+                //通过身份证 判断居民是否存在
+                user = userManager.getUserByIdCardNo(idCardNo);
             }
-            if(StringUtils.isEmpty(d.getRoleType())){
-                user.setUserType("5");
-            }else{
-                user.setUserType(d.getRoleType());
-            }
-            user.setIdCardNo(d.getIdCardNo());
-            user.setDoctorId(d.getId().toString());
-            user.setEmail(d.getEmail());
-            user.setGender(d.getSex());
-            user.setTelephone(d.getPhone());
-            user.setLoginCode(d.getIdCardNo());
-            user.setRealName(d.getName());
-            user.setProvinceId(0);
-            user.setCityId(0);
-            user.setAreaId(0);
-            user.setActivated(true);
-            user.setImgRemotePath(d.getPhoto());
-            user = userManager.saveUser(user);
-        }else{
-            //todo 是否修改user信息
-            //......
-            defaultPassword = user.getPassword();
-        }
-        //创建居民
-        DemographicInfo demographicInfo =new DemographicInfo();
-        if(!StringUtils.isEmpty(doctor.getIdCardNo())&&doctor.getIdCardNo().length()>9){
-            defaultPassword=doctor.getIdCardNo().substring(doctor.getIdCardNo().length()-8);
-            demographicInfo.setPassword(DigestUtils.md5Hex(defaultPassword));
-        }else{
-            demographicInfo.setPassword(DigestUtils.md5Hex(default_password));
-        }
-        demographicInfo.setRegisterTime(new Date());
-        demographicInfo.setIdCardNo(d.getIdCardNo());
-        demographicInfo.setName(d.getName());
-        demographicInfo.setTelephoneNo("{\"联系电话\":\""+d.getPhone()+"\"}");
-        demographicInfo.setGender(d.getSex());
-        demographicService.savePatient(demographicInfo);
-
-        //创建用户与机构关系
-        orgMemberRelationInfo(orgDeptJsonList, user, d);
-
-        // 根据机构获取医生角色id,保存到role_users表中,appId是健康上饶APP对应的id:WYo0l73F8e
-        List<String> orgList = orgService.getOrgList(orgDeptJsonList);
-        if (null != orgList && orgList.size() > 0) {
-            List<Roles> rolesList = rolesService.findByCodeAndAppIdAndOrgCode(orgList,"WYo0l73F8e","Doctor");
-            if (null != rolesList && rolesList.size() > 0) {
-                roleUserService.batchCreateRoleUsersRelation(user.getId(),String.valueOf(rolesList.get(0).getId()));
+            String defaultPassword = "";
+            if (user == null) {
+                user = new User();
+                user.setId(getObjectId(BizObject.User));
+                user.setCreateDate(new Date());
+                if (!StringUtils.isEmpty(doctor.getIdCardNo()) && doctor.getIdCardNo().length() > 9) {
+                    defaultPassword = doctor.getIdCardNo().substring(doctor.getIdCardNo().length() - 8);
+                    user.setPassword(DigestUtils.md5Hex(defaultPassword));
+                } else {
+                    user.setPassword(DigestUtils.md5Hex(default_password));
+                }
+                if (StringUtils.isEmpty(d.getRoleType())) {
+                    user.setUserType("5");
+                } else {
+                    user.setUserType(d.getRoleType());
+                }
+                user.setIdCardNo(d.getIdCardNo());
+                user.setDoctorId(d.getId().toString());
+                user.setEmail(d.getEmail());
+                user.setGender(d.getSex());
+                user.setTelephone(d.getPhone());
+                user.setLoginCode(d.getIdCardNo());
+                user.setRealName(d.getName());
+                user.setProvinceId(0);
+                user.setCityId(0);
+                user.setAreaId(0);
+                user.setActivated(true);
+                user.setImgRemotePath(d.getPhoto());
+                user = userManager.saveUser(user);
             } else {
-                // 不存在 则往角色表中插入该应用的医生角色
-                Roles roles = new Roles();
-                roles.setCode("Doctor");
-                roles.setName("医生");
-                roles.setAppId("WYo0l73F8e");
-                roles.setType("1");
-                roles.setOrgCode(orgList.get(0));
-                roles = rolesService.save(roles);
-                roleUserService.batchCreateRoleUsersRelation(user.getId(), String.valueOf(roles.getId()));
+                //todo 是否修改user信息
+                //......
+                defaultPassword = user.getPassword();
             }
+
+            d.setUserId(user.getId());
+            d = doctorService.save(d);
+
+            //创建居民
+            DemographicInfo demographicInfo = new DemographicInfo();
+            if (!StringUtils.isEmpty(doctor.getIdCardNo()) && doctor.getIdCardNo().length() > 9) {
+                defaultPassword = doctor.getIdCardNo().substring(doctor.getIdCardNo().length() - 8);
+                demographicInfo.setPassword(DigestUtils.md5Hex(defaultPassword));
+            } else {
+                demographicInfo.setPassword(DigestUtils.md5Hex(default_password));
+            }
+            demographicInfo.setRegisterTime(new Date());
+            demographicInfo.setIdCardNo(d.getIdCardNo());
+            demographicInfo.setName(d.getName());
+            demographicInfo.setTelephoneNo("{\"联系电话\":\"" + d.getPhone() + "\"}");
+            demographicInfo.setGender(d.getSex());
+            demographicService.savePatient(demographicInfo);
+
+            //创建用户与机构关系
+            orgMemberRelationInfo(orgDeptJsonList, user, d);
+
+            // 根据机构获取医生角色id,保存到role_users表中,appId是健康上饶APP对应的id:WYo0l73F8e
+            List<String> orgList = orgService.getOrgList(orgDeptJsonList);
+            if (null != orgList && orgList.size() > 0) {
+                List<Roles> rolesList = rolesService.findByCodeAndAppIdAndOrgCode(orgList, "WYo0l73F8e", "Doctor");
+                if (null != rolesList && rolesList.size() > 0) {
+                    roleUserService.batchCreateRoleUsersRelation(user.getId(), String.valueOf(rolesList.get(0).getId()));
+                } else {
+                    // 不存在 则往角色表中插入该应用的医生角色
+                    Roles roles = new Roles();
+                    roles.setCode("Doctor");
+                    roles.setName("医生");
+                    roles.setAppId("WYo0l73F8e");
+                    roles.setType("1");
+                    roles.setOrgCode(orgList.get(0));
+                    roles = rolesService.save(roles);
+                    roleUserService.batchCreateRoleUsersRelation(user.getId(), String.valueOf(roles.getId()));
+                }
+            }
+
+            envelop.setObj(objectMapper.writeValueAsString(doctor));
+            envelop.setSuccessFlg(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
         }
 
-        return convertToModel(doctor, MDoctor.class);
+        return envelop;
     }
 
     @RequestMapping(value = ServiceApi.Doctors.Doctors, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     @ApiOperation(value = "修改医生", notes = "重新绑定医生信息")
-    public MDoctor updateDoctor(
+    public Envelop updateDoctor(
             @ApiParam(name = "doctor_json_data", value = "", defaultValue = "")
             @RequestBody String doctoJsonData,
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
-            @RequestParam("model") String model) throws Exception {
-        List<MOrgDeptJson> orgDeptJsonList = objectMapper.readValue(model, new TypeReference<List<MOrgDeptJson>>() {});
-        MOrgDeptJson mOrgDeptJson = orgDeptJsonList.get(0);
-        Organization organization = orgService.getOrgById(mOrgDeptJson.getOrgId());
-        OrgDept orgDept = orgDeptService.searchBydeptId(Integer.parseInt(mOrgDeptJson.getDeptIds().split(",")[0]));
+            @RequestParam("model") String model) {
+        Envelop envelop = new Envelop();
+        try {
+            List<MOrgDeptJson> orgDeptJsonList = objectMapper.readValue(model, new TypeReference<List<MOrgDeptJson>>() {
+            });
+            MOrgDeptJson mOrgDeptJson = orgDeptJsonList.get(0);
+            Organization organization = orgService.getOrgById(mOrgDeptJson.getOrgId());
+            OrgDept orgDept = orgDeptService.searchBydeptId(Integer.parseInt(mOrgDeptJson.getDeptIds().split(",")[0]));
 
-        Doctors doctors = toEntity(doctoJsonData, Doctors.class);
-        doctors.setOrgId(organization.getId().toString());
-        doctors.setOrgCode(organization.getOrgCode());
-        doctors.setOrgFullName(organization.getFullName());
-        doctors.setDeptName(orgDept.getName());
-        doctors.setUpdateTime(new Date());
-        doctorService.save(doctors);
+            Doctors doctors = toEntity(doctoJsonData, Doctors.class);
+            doctors.setOrgId(organization.getId().toString());
+            doctors.setOrgCode(organization.getOrgCode());
+            doctors.setOrgFullName(organization.getFullName());
+            doctors.setDeptName(orgDept.getName());
+            doctors.setUpdateTime(new Date());
+            doctorService.save(doctors);
 
-        //同时修改用户表
-        User user = userManager.getUserByIdCardNo(doctors.getIdCardNo());
-        if (!StringUtils.isEmpty(user)) {
-            user.setRealName(doctors.getName());
-            user.setGender(doctors.getSex());
-            user.setTelephone(doctors.getPhone());
-            userManager.save(user);
+            //同时修改用户表
+            User user = userManager.getUserByIdCardNo(doctors.getIdCardNo());
+            if (!StringUtils.isEmpty(user)) {
+                user.setRealName(doctors.getName());
+                user.setGender(doctors.getSex());
+                user.setTelephone(doctors.getPhone());
+                userManager.save(user);
+            }
+            //修改居民
+            DemographicInfo demographicInfo = demographicService.getDemographicInfoByIdCardNo(doctors.getIdCardNo());
+            if (!StringUtils.isEmpty(demographicInfo)) {
+                demographicInfo.setName(doctors.getName());
+                demographicInfo.setGender(doctors.getSex());
+                demographicInfo.setTelephoneNo("{\"联系电话\":\"" + doctors.getPhone() + "\"}");
+                demographicService.save(demographicInfo);
+            }
+            //修改用户与机构关系
+            orgMemberRelationInfo(orgDeptJsonList, user, doctors);
+
+            envelop.setObj(objectMapper.writeValueAsString(doctors));
+            envelop.setSuccessFlg(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
         }
-        //修改居民
-        DemographicInfo demographicInfo = demographicService.getDemographicInfoByIdCardNo(doctors.getIdCardNo());
-        if (!StringUtils.isEmpty(demographicInfo)) {
-            demographicInfo.setName(doctors.getName());
-            demographicInfo.setGender(doctors.getSex());
-            demographicInfo.setTelephoneNo("{\"联系电话\":\"" + doctors.getPhone() + "\"}");
-            demographicService.save(demographicInfo);
-        }
-        //修改用户与机构关系
-        orgMemberRelationInfo(orgDeptJsonList, user, doctors);
-        return convertToModel(doctors, MDoctor.class);
+
+        return envelop;
     }
 
     @RequestMapping(value = ServiceApi.Doctors.DoctorsExistence, method = RequestMethod.GET)
