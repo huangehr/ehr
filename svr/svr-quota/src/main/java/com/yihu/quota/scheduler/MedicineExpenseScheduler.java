@@ -134,7 +134,9 @@ public class MedicineExpenseScheduler {
                 Map<String, Object> masterInfo = hBaseDao.getResultMap(ResourceCore.MasterTable, subInfo.get("profile_id").toString());
                 if (masterInfo == null) {
                     logger.warn("rowkey:" + subInfo.get("profile_id").toString() + " 在主表中没记录。");
+                    continue;
                 }
+
                 // _id
                 String id = subInfo.get("rowkey").toString();
                 medicineExpenseInfo.put("_id", id);
