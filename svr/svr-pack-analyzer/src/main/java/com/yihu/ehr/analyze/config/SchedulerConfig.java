@@ -12,11 +12,11 @@ import org.springframework.scheduling.quartz.SchedulerFactoryBean;
  */
 @Configuration
 public class SchedulerConfig {
-    @Value("${analyze.job.maxSize}")
+    @Value("${ehr.job.maxSize}")
     private int jobMaxSize;
-    @Value("${analyze.job.minSize}")
+    @Value("${ehr.job.minSize}")
     private int jobMinSize;
-    @Value("${analyze.job.cronExp}")
+    @Value("${ehr.job.cronExp}")
     private String cronExp;
 
     public int getJobMaxSize() {

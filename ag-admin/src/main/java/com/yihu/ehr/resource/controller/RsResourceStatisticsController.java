@@ -102,6 +102,43 @@ public class RsResourceStatisticsController extends ExtendController {
         return  envelop;
     }
 
+
+    @ApiOperation(value = "获取视图 统计报表 二维表 上卷下钻")
+    @RequestMapping(value = ServiceApi.TJ.GetQuotaReportTwoDimensionalTableUpDown, method = RequestMethod.GET)
+    public Envelop GetQuotaReportTwoDimensionalTableUpDown(
+            @ApiParam(name = "resourceId", value = "资源ID", defaultValue = "")
+            @RequestParam(value = "resourceId") String resourceId,
+            @ApiParam(name = "filters", value = "检索条件 多个条件用 and 拼接 如：town=361002 and org=10000001 ", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "page", value = "获取前几条数据")
+            @RequestParam(value = "page", required = false) String page,
+            @ApiParam(name = "pageSize", value = "获取前几条数据")
+            @RequestParam(value = "pageSize", required = false) String pageSize,
+            @ApiParam(name = "top", value = "获取前几条数据")
+            @RequestParam(value = "top", required = false) String top){
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(false);
+        Envelop resourceResult =  resourcesClient.getResourceById(resourceId);
+        String quotaCodeStr = "";
+        if(!resourceResult.isSuccessFlg()){
+            envelop.setErrorMsg("视图不存在，请确认！");
+            return envelop;
+        }else {
+            List<ResourceQuotaModel> list = resourceQuotaClient.getByResourceId(resourceId);
+            if (list != null && list.size() > 0) {
+                for (ResourceQuotaModel resourceQuotaModel : list) {
+                    quotaCodeStr = quotaCodeStr + resourceQuotaModel.getQuotaCode() + ",";
+                }
+            }
+        }
+        RsResourcesModel rsResourcesModel = objectMapper.convertValue(resourceResult.getObj(), RsResourcesModel.class);
+        List<Map<String, Object>> resultList = rsResourceStatisticsClient.getQuotaReportTwoDimensionalTable(quotaCodeStr, filters, rsResourcesModel.getDimension(), top);
+        envelop.setObj(resultList);
+        envelop.setSuccessFlg(true);
+        return  envelop;
+    }
+
+
     @RequestMapping(value = ServiceApi.TJ.GetArchiveCount, method = RequestMethod.GET)
     @ApiOperation(value = "获取档案总数")
     public Envelop getArchiveCount() throws Exception {

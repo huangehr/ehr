@@ -108,7 +108,12 @@ public class HttpClientUtil {
             logger.debug("用户："+username+";发起get请求出错，请求连接：" + url + "，IOException异常信息：" + e.getLocalizedMessage()+"，请求标示："+getKey);
             e.printStackTrace();
         } finally {
-            // getMethod.releaseConnection();
+            if (getMethod != null) {
+                getMethod.releaseConnection();
+            }
+            if (httpClient != null) {
+                ((SimpleHttpConnectionManager)httpClient.getHttpConnectionManager()).shutdown();
+            }
         }
         return response;
     }
@@ -173,7 +178,12 @@ public class HttpClientUtil {
             logger.debug("用户：" + username + ";发起post请求出错，请求连接：" + url + "，IOException异常信息：" + e.getLocalizedMessage() + "，请求标示：" + postKey);
             e.printStackTrace();
         } finally {
-            // getMethod.releaseConnection();
+            if (postMethod != null) {
+                postMethod.releaseConnection();
+            }
+            if (httpClient != null) {
+                ((SimpleHttpConnectionManager)httpClient.getHttpConnectionManager()).shutdown();
+            }
         }
         return response;
     }
@@ -228,7 +238,12 @@ public class HttpClientUtil {
             logger.debug("用户：" + username + ";发起put请求出错，请求连接：" + url + "，IOException异常信息：" + e.getLocalizedMessage() + "，请求标示：" + putKey);
             e.printStackTrace();
         } finally {
-            // getMethod.releaseConnection();
+            if (putMethod != null) {
+                putMethod.releaseConnection();
+            }
+            if (httpClient != null) {
+                ((SimpleHttpConnectionManager)httpClient.getHttpConnectionManager()).shutdown();
+            }
         }
         return response;
     }
@@ -283,7 +298,12 @@ public class HttpClientUtil {
             logger.debug("用户：" + username + ";发起delete请求出错，请求连接：" + url + "，IOException异常信息：" + e.getLocalizedMessage() + "，请求标示：" + deleteKey);
             e.printStackTrace();
         } finally {
-            // getMethod.releaseConnection();
+            if (deleteMethod != null) {
+                deleteMethod.releaseConnection();
+            }
+            if (httpClient != null) {
+                ((SimpleHttpConnectionManager)httpClient.getHttpConnectionManager()).shutdown();
+            }
         }
         return response;
     }

@@ -55,7 +55,7 @@ public class PackageAnalyzeService {
 
 
     /**
-     * analyze 档案分析服务
+     * ehr 档案分析服务
      * 1.从队列中取出档案
      * 2.分析档案
      * 3.数据入库

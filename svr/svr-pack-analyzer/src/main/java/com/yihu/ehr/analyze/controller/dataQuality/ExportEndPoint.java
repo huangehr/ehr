@@ -11,6 +11,7 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.entity.quality.DqWarningRecord;
+import com.yihu.ehr.redis.client.RedisClient;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -29,6 +30,7 @@ import org.apache.poi.xwpf.usermodel.*;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTblWidth;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.STTblWidth;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -39,7 +41,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.OutputStream;
 import java.math.BigInteger;
-import java.util.*;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 导出
@@ -58,6 +64,10 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
     private ElasticSearchUtil elasticSearchUtil;
     @Autowired
     private DataQualityStatisticsService dataQualityStatisticsService;
+    @Autowired
+    private RedisClient redisClient;
+    @Value("${quality.cloud}")
+    private String defaultCloud;
 
     public static int maxRowSize = 60000;
     @RequestMapping(value = ServiceApi.DataQuality.ExportQualityMonitoringListToExcel, method = RequestMethod.GET)
@@ -91,17 +101,24 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
             eventDateEnd = eventDateEnd + " 23:59:59";
             JSONArray jsonArray = JSON.parseArray(orgInfoList);
             List<Map<String, String>> list = new ArrayList<>();
+            List<Map<String, String>> alllist = new ArrayList<>();
             for(int i=0;i<jsonArray.size();i++){
                 JSONObject json = jsonArray.getJSONObject(i);
                 Map<String, String> map = new HashedMap();
                 map.put("orgCode",json.getString("orgCode"));
                 map.put("orgName",json.getString("orgName"));
                 list.add(map);
+                if(defaultCloud.equals(json.getString("orgCode"))){
+                    alllist.add(map);
+                }
+            }
+            if(alllist.size()==0){
+                alllist = list;
             }
             // 接收档案包总量
-            Long receivedCount = dataQualityStatisticsService.packetCount(list, null, eventDateStart, eventDateEnd);
+            Long receivedCount = dataQualityStatisticsService.packetCount(alllist, null, eventDateStart, eventDateEnd);
             // 成功解析档案包总量
-            Long successfulAnalysisCount = dataQualityStatisticsService.packetCount(list, "3", eventDateStart, eventDateEnd);
+            Long successfulAnalysisCount = dataQualityStatisticsService.packetCount(alllist, "3", eventDateStart, eventDateEnd);
             // 机构档案包报告汇总
             List<Map<String, Object>> orgPackReportDataList = dataQualityStatisticsService.orgPackReportData(list, eventDateStart, eventDateEnd);
 
@@ -130,17 +147,19 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
             XWPFParagraph paragraph2 = document.createParagraph();
             XWPFRun run2 = paragraph2.createRun();
             String text2 = "接收总量:"+receivedCount+"\n\r" +
-                    "成功解析: "+successfulAnalysisCount;
+                    "成功解析:"+successfulAnalysisCount;
             run2.setText(text2);
             run2.setFontSize(18);
             run2.setBold(true);
             addEmptyRow(document);
-            int i =0;
+            int h = 0;
             for (Map<String, Object> map:orgPackReportDataList){
+                int i = 0;
                 i++;
+                h++;
                 XWPFParagraph orgParagraph1 = document.createParagraph();
                 XWPFRun orgRun1 = orgParagraph1.createRun();
-                String orgText1 = i+"."+map.get("orgCode")+"(" + map.get("orgName")+")";
+                String orgText1 = h+"."+map.get("orgCode")+"(" + map.get("orgName")+")";
                 orgRun1.setText(orgText1);
                 orgRun1.setFontSize(16);
                 orgRun1.setBold(true);
@@ -257,10 +276,7 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                 i++;
                 XWPFParagraph orgParagraph6 = document.createParagraph();
                 XWPFRun orgRun6 = orgParagraph6.createRun();
-                String orgText6 = i+".数据集总量{解析完成}";
-                orgRun6.setText(orgText6);
-                orgRun6.setFontSize(12);
-                orgRun6.setBold(true);
+
                 //设置表格
                 XWPFTable table4 = document.createTable();
                 //列宽自动分割
@@ -274,15 +290,21 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                 table14RowTitle.addNewTableCell().setText("总数");
                 table14RowTitle.addNewTableCell().setText("行数");
                 List<Map<String, Object>> reportedNumList5 = (List<Map<String, Object>>)map.get("reportedNumList5");
+                Double datasetnum = 0d;
                 if(reportedNumList5.size()>0){
-                    reportedNumList5.forEach(item->{
+                    for(Map<String, Object> item:reportedNumList5){
                         XWPFTableRow tableRow = table4.createRow();
                         tableRow.getCell(0).setText(item.get("dataset").toString());
                         tableRow.getCell(1).setText(item.get("name").toString());
                         tableRow.getCell(2).setText(item.get("count").toString());
                         tableRow.getCell(3).setText(item.get("row").toString());
-                    });
+                        datasetnum+=Double.valueOf(item.get("count").toString());
+                    }
                 }
+                String orgText6 = i+".数据集总量("+datasetnum.longValue()+")";
+                orgRun6.setText(orgText6);
+                orgRun6.setFontSize(12);
+                orgRun6.setBold(true);
                 addEmptyRow(document);
                 i++;
                 XWPFParagraph orgParagraph7 = document.createParagraph();
@@ -390,7 +412,13 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                 filters += ";recordTime<="+endTime;
             }
             String sorts = "-warningTime";
-            List<DqWarningRecord> list = warningRecordService.search(null, filters, sorts, 1, 99999);
+            List<DqWarningRecord> list = new ArrayList<>();
+            int pageSize = 10000;
+            int count = (int) warningRecordService.getCount(filters);
+            int pageNum = count % pageSize > 0 ? count / pageSize + 1 : count / pageSize;
+            for(int i =0;i<pageNum;i++) {
+                list.addAll(warningRecordService.search(null, filters, sorts, i+1, pageSize));
+            }
             //写excel
             wwb = Workbook.createWorkbook(os);
             //创建Excel工作表 指定名称和位置
@@ -558,9 +586,9 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                                         @RequestParam(value = "sorts", required = false) String sorts,
                                         HttpServletResponse response){
         if(StringUtils.isNotEmpty(filters)){
-            filters+="analyze_status=2;"+filters;
+            filters="analyze_status=2||archive_status=2;"+filters;
         }else{
-            filters="analyze_status=2";
+            filters="analyze_status=2||archive_status=2";
         }
         try {
             String fileName = "解析失败问题列表";
@@ -572,7 +600,7 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
             //写excel
             SXSSFWorkbook wwb = new SXSSFWorkbook(100);
             wwb.setCompressTempFiles(true);
-            String[] title = {"解析时间","接收时间","医疗机构","序列号","失败原因"};
+            String[] title = {"接收时间","解析时间","医疗机构","序列号","失败原因","环节","失败信息"};
             int count = (int) elasticSearchUtil.count("json_archives", "info", filters);
             double pageNum = count % maxRowSize > 0 ? count / maxRowSize + 1 : count / maxRowSize;
             for (int i = 0; i < pageNum; i++) {
@@ -587,14 +615,20 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                 }
                 for (int j = 0; j < list.size(); j++) {
                     Row row = sheet.createRow(j+ 1);
-                    Map<String, Object> record = list.get(i);
+                    Map<String, Object> record = list.get(j);
                     //添加列表明细
-                    row.createCell(0).setCellValue(ObjectUtils.toString(record.get("analyze_date")));
-                    row.createCell(1).setCellValue(ObjectUtils.toString(record.get("receive_date")));
+
+                    row.createCell(0).setCellValue(ObjectUtils.toString(record.get("receive_date")));
+                    row.createCell(1).setCellValue(ObjectUtils.toString(record.get("analyze_date")));
                     row.createCell(2).setCellValue(ObjectUtils.toString(record.get("org_name")));
                     row.createCell(3).setCellValue(ObjectUtils.toString(record.get("_id")));
-                    row.createCell(4).setCellValue(ObjectUtils.toString(record.get("_id")));
-                    row.createCell(5).setCellValue(getErrorType(ObjectUtils.toString(record.get("error_type"))));
+                    row.createCell(4).setCellValue(getErrorType(ObjectUtils.toString(record.get("error_type"))));
+                    if("2".equals(record.get("analyze_status"))){
+                        row.createCell(5).setCellValue("质控");
+                    }else{
+                        row.createCell(5).setCellValue("解析");
+                    }
+                    row.createCell(6).setCellValue(ObjectUtils.toString(record.get("message")));
                 }
             }
             wwb.write(os);
@@ -620,35 +654,36 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
             response.setHeader("Content-Disposition", "attachment; filename="
                     + new String( fileName.getBytes("gb2312"), "ISO8859-1" )+".xlsx");
             OutputStream os = response.getOutputStream();
+            List<Map<String, Object>> orgs = packQcReportService.getOrgs();
             //写excel
             SXSSFWorkbook  wwb = new SXSSFWorkbook(100);
             wwb.setCompressTempFiles(true);
-            String[] title = {"接收时间","医疗机构","数据集","数据集名称","数据元","数据元名称","主键","错误原因"};
-            int count = (int) elasticSearchUtil.count("json_archives_qc", "qc_metadata_info", filters);
-            double pageNum = count % maxRowSize > 0 ? count / maxRowSize + 1 : count / maxRowSize;
-            for (int i = 0; i < pageNum; i++) {
-                List<Map<String, Object>> list = packQcReportService.metadataErrorList(filters,sorts,i+1,maxRowSize);
-                //创建Excel工作表 指定名称和位置
-                Sheet sheet = wwb.createSheet("Sheet" + (i+1));
-                //添加固定信息，题头等
-                Row titleRow = sheet.createRow(0);
-                for (int t = 0; t < title.length; t++) {
-                    Cell xcell = titleRow.createCell(t);
-                    xcell.setCellValue(title[t] + "");
-                }
-                for (int j = 0; j < list.size(); j++) {
-                    Row row = sheet.createRow(j+ 1);
-                    Map<String, Object> record = list.get(i);
-                    //添加列表明细
-                    row.createCell(0).setCellValue(ObjectUtils.toString(record.get("receive_date")));
-                    row.createCell(1).setCellValue(ObjectUtils.toString(record.get("org_name")));
-                    row.createCell(2).setCellValue(ObjectUtils.toString(record.get("dataset")));
-                    row.createCell(3).setCellValue(ObjectUtils.toString(record.get("dataset_name")));
-                    row.createCell(4).setCellValue(ObjectUtils.toString(record.get("metadata")));
-                    row.createCell(5).setCellValue(ObjectUtils.toString(record.get("metadata_name")));
-                    row.createCell(6).setCellValue(ObjectUtils.toString(record.get("_id")));
-                    row.createCell(7).setCellValue(getExceptionType(ObjectUtils.toString(record.get("qc_error_type"))));
-                }
+            String[] title = {"医疗机构","数据集","数据集名称","数据元","数据元名称","错误原因"};
+            String sql = "SELECT org_code, dataset, metadata, qc_error_type ,version FROM json_archives_qc/qc_metadata_info" +
+                    " where "+getWhere(filters)+"" +
+                    " group by org_code,dataset,metadata,qc_error_type,version";
+            ResultSet resultSet = elasticSearchUtil.findBySql(sql);
+            //创建Excel工作表 指定名称和位置
+            Sheet sheet = wwb.createSheet("Sheet1");
+            //添加固定信息，题头等
+            Row titleRow = sheet.createRow(0);
+            for (int t = 0; t < title.length; t++) {
+                Cell xcell = titleRow.createCell(t);
+                xcell.setCellValue(title[t] + "");
+            }
+            int j=1;
+            while (resultSet.next()) {
+                Row row = sheet.createRow(j);
+                //添加列表明细
+                String dataset_name = redisClient.get("std_data_set_" + resultSet.getString("version") + ":" + resultSet.getString("dataset") + ":name");
+                String metadata_name = redisClient.get("std_meta_data_" + resultSet.getString("version") + ":" + resultSet.getString("dataset")+"."+ resultSet.getString("metadata")+ ":name");
+                row.createCell(0).setCellValue(packQcReportService.getOrgName(orgs,resultSet.getString("org_code")));
+                row.createCell(1).setCellValue(resultSet.getString("dataset"));
+                row.createCell(2).setCellValue(dataset_name);
+                row.createCell(3).setCellValue(resultSet.getString("metadata"));
+                row.createCell(4).setCellValue(metadata_name);
+                row.createCell(6).setCellValue(getExceptionType(resultSet.getString("qc_error_type")));
+                j++;
             }
             wwb.write(os);
             wwb.close();
@@ -667,7 +702,7 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                                    @RequestParam(value = "sorts", required = false) String sorts,
                                    HttpServletResponse response){
 //        if(StringUtils.isNotEmpty(filters)){
-//            filters+="archive_status=3;"+filters;
+//            filters="archive_status=3;"+filters;
 //        }else{
 //            filters="archive_status=3";
 //        }
@@ -684,11 +719,12 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
             wwb.setCompressTempFiles(true);
 
             String[] title = {"接收时间","解析状态","医疗机构","序列号","患者姓名","证件号","就诊时间","就诊类型"};
-
+            long starttime = System.currentTimeMillis();
             int count = (int) elasticSearchUtil.count("json_archives", "info", filters);
             double pageNum = count % maxRowSize > 0 ? count / maxRowSize + 1 : count / maxRowSize;
             for (int i = 0; i < pageNum; i++) {
                 List<Map<String, Object>> list = packQcReportService.archiveList(filters,sorts,i+1,maxRowSize);
+                logger.info("查询耗时：" + (System.currentTimeMillis() - starttime) + "ms");
                 //创建Excel工作表 指定名称和位置
                 Sheet sheet = wwb.createSheet("Sheet" + (i+1));
                 //添加固定信息，题头等
@@ -699,10 +735,10 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                 }
                 for (int j = 0; j < list.size(); j++) {
                     Row row = sheet.createRow(j+ 1);
-                    Map<String, Object> record = list.get(i);
+                    Map<String, Object> record = list.get(j);
                     //添加列表明细
                     row.createCell(0).setCellValue(ObjectUtils.toString(record.get("receive_date")));
-                    row.createCell(1).setCellValue(getAnalyzerStatus(ObjectUtils.toString(record.get("analyze_status"))));
+                    row.createCell(1).setCellValue(getAnalyzerStatus(record.get("analyze_status")+"",record.get("archive_status")+""));
                     row.createCell(2).setCellValue(ObjectUtils.toString(record.get("org_name")));
                     row.createCell(3).setCellValue(ObjectUtils.toString(record.get("_id")));
                     row.createCell(4).setCellValue(ObjectUtils.toString(record.get("patient_name")));
@@ -715,6 +751,7 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
             wwb.close();
             os.flush();
             os.close();
+            logger.info("导出耗时：" + (System.currentTimeMillis() - starttime) + "ms");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -755,7 +792,7 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                 }
                 for (int j = 0; j < list.size(); j++) {
                     Row row = sheet.createRow(j+ 1);
-                    Map<String, Object> record = list.get(i);
+                    Map<String, Object> record = list.get(j);
                     //添加列表明细
                     row.createCell(0).setCellValue(ObjectUtils.toString(record.get("analyze_date")));
                     row.createCell(1).setCellValue(getPlatform(ObjectUtils.toString(record.get("to_platform"))));
@@ -889,23 +926,26 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
      * @param analyzerStatus
      * @return
      */
-    public String getAnalyzerStatus(String analyzerStatus){
+    public String getAnalyzerStatus(String analyzerStatus, String archiveStatus){
         String re = "";
-        switch (analyzerStatus){
-            case "0":
-                re = "未解析";
-                break;
-            case "1":
+        if("3".equals(analyzerStatus)){
+            if("0".equals(archiveStatus)){
+                re = "待解析";
+            }else if("1".equals(archiveStatus)){
                 re = "正在解析";
-                break;
-            case "2":
+            }else if("2".equals(archiveStatus)){
                 re = "解析失败";
-                break;
-            case "3":
+            }else if("3".equals(archiveStatus)){
                 re = "解析完成";
-                break;
-            default:
-                break;
+            }
+        }else{
+            if("0".equals(analyzerStatus)){
+                re = "待质控";
+            }else if("1".equals(analyzerStatus)){
+                re = "正在质控";
+            }else if("2".equals(analyzerStatus)){
+                re = "质控失败";
+            }
         }
         return re;
     }
@@ -941,12 +981,40 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
     public String getPlatform(String platform){
         String re = "";
         switch (platform){
-            case "10":
+            case "jiangxi_001":
                 re = "省平台";
                 break;
             default:
                 break;
         }
         return re;
+    }
+
+    private String getWhere(String filters){
+        String whereStr = "";
+        String [] filterArr = filters.split(";");
+        for (String filter : filterArr) {
+            if (filter.contains(">=")) {
+                String [] condition = filter.split(">=");
+                whereStr+=" and "+condition[0]+">='"+condition[1]+"'";
+            } else if (filter.contains(">")) {
+                String [] condition = filter.split(">");
+                whereStr+=" and "+condition[0]+">'"+condition[1]+"'";
+            } else if (filter.contains("<=")) {
+                String [] condition = filter.split("<=");
+                whereStr+=" and "+condition[0]+"<='"+condition[1]+"'";
+            } else if (filter.contains("<")) {
+                String [] condition = filter.split("<");
+                whereStr+=" and "+condition[0]+"<'"+condition[1]+"'";
+            } else if (filter.contains("=")) {
+                String [] condition = filter.split("=");
+                whereStr+=" and "+condition[0]+"='"+condition[1]+"'";
+            }
+        }
+        if(StringUtils.isNotEmpty(whereStr)){
+            return whereStr.substring(4, whereStr.length());
+        }else{
+            return "";
+        }
     }
 }

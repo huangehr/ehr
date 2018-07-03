@@ -3,6 +3,7 @@ package com.yihu.ehr.analyze.service.dataQuality;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.yihu.ehr.analyze.dao.DqPaltformReceiveWarningDao;
 import com.yihu.ehr.analyze.service.pack.PackQcReportService;
 import com.yihu.ehr.elasticsearch.ElasticSearchPool;
@@ -38,7 +39,7 @@ import java.util.*;
 @Service
 public class DataQualityStatisticsService extends BaseJpaService {
 
-    private final static Logger logger = LoggerFactory.getLogger(WarningQuestionService.class);
+    private final static Logger logger = LoggerFactory.getLogger(DataQualityStatisticsService.class);
     @Autowired
     private ElasticSearchUtil elasticSearchUtil;
     @Autowired
@@ -73,7 +74,6 @@ public class DataQualityStatisticsService extends BaseJpaService {
             end = dateStr;
         }
 
-        Long startTime = System.currentTimeMillis();
         double totalHospitalAcrhives = 0;//医疗云总档案数
         double totalHospitalDataset = 0;//医疗云总数据集数
         double totalReceiveArchives = 0;//医疗云总接收档案数
@@ -94,12 +94,9 @@ public class DataQualityStatisticsService extends BaseJpaService {
             datasetMap.put(orgCode,num);
         });
         //统计医疗云平台数据集总数
-        query = session.createSQLQuery("SELECT count(DISTINCT code) c from dq_dataset_warning WHERE type = 1 ");
+        query = session.createSQLQuery("SELECT count(DISTINCT code) c from dq_dataset_warning WHERE type = 1 and org_code != '"+defaultOrgCode+"'");
         List<Object> tmpList = query.list();
         totalHospitalDataset = Integer.valueOf(tmpList.get(0).toString());
-
-        Long en = System.currentTimeMillis();
-        logger.info("初始化 数据集数据时间："+(en-startTime));
 
         //获取医院数据
         Query query1 = session.createSQLQuery("SELECT org_code,full_name from organizations where org_type = 'Hospital' ");
@@ -111,11 +108,8 @@ public class DataQualityStatisticsService extends BaseJpaService {
             orgMap.put(orgCode,name);
         });
 
-        Long end0 = System.currentTimeMillis();
-        logger.info("获取医院名称时间："+(end0-en));
-
         //统计医院数据
-        String sql1 = "SELECT sum(HSI07_01_001) s1,sum(HSI07_01_002) s2,sum(HSI07_01_004) s3,sum(HSI07_01_012) s4,org_code FROM qc/daily_report where create_date>= '"+start+"T00:00:00' AND create_date <='" +  end + "T23:59:59' group by org_code";
+        String sql1 = "SELECT sum(HSI07_01_001) s1,sum(HSI07_01_002) s2,sum(HSI07_01_004) s3,sum(HSI07_01_012) s4,org_code FROM qc/daily_report where event_date>= '"+start+"T00:00:00' AND event_date <='" +  end + "T23:59:59' group by org_code";
         ResultSet resultSet1 = elasticSearchUtil.findBySql(sql1);
         Map<String, Map<String, Object>> dataMap = new HashMap<>();
         try {
@@ -150,11 +144,8 @@ public class DataQualityStatisticsService extends BaseJpaService {
             e.getMessage();
         }
 
-        Long end1 = System.currentTimeMillis();
-        logger.info("统计医院数据时间："+(end1-end0));
-
         //统计接收数据
-        String sql2 = "SELECT count(*) c,org_code FROM json_archives/info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' ";
+        String sql2 = "SELECT count(*) c,org_code FROM json_archives/info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' AND pack_type=1 ";
         if(eventType!=null){
             sql2 += " and event_type = "+eventType ;
         }
@@ -177,9 +168,6 @@ public class DataQualityStatisticsService extends BaseJpaService {
         }catch (Exception e){
             e.getMessage();
         }
-
-        Long end2 = System.currentTimeMillis();
-        logger.info("统计接收数据(档案数)时间："+(end2-end1));
 
         String sql3 = "SELECT count(*) c,org_code FROM json_archives_qc/qc_metadata_info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' ";
         if(eventType!=null){
@@ -205,14 +193,11 @@ public class DataQualityStatisticsService extends BaseJpaService {
             e.getMessage();
         }
 
-        Long end3 = System.currentTimeMillis();
-        logger.info("统计接收数据(质量异常)时间："+(end3-end2));
-
-        String sql4 = "SELECT details,org_code FROM json_archives_qc/qc_dataset_info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' ";
+        String sql4 = "SELECT details,org_code FROM json_archives_qc/qc_dataset_info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' and qc_step=1 ";
         if(eventType!=null){
             sql4 += " and event_type = "+eventType ;
         }
-        sql4 += " group by org_code";
+        sql4 += " group by org_code,details";
         ResultSet resultSet4 = elasticSearchUtil.findBySql(sql4);
         try {
             Map<String,String> totalMap = new HashedMap();
@@ -229,12 +214,14 @@ public class DataQualityStatisticsService extends BaseJpaService {
 
                 JSONArray jsonArray = JSON.parseArray(details);
                 for(int i=0;i<jsonArray.size();i++){
-                    String dataset = jsonArray.get(i).toString();
-                    if(!datasetMap2.containsKey(dataset)){
-                        datasetMap2.put(dataset,dataset);
-                    }
-                    if(totalMap.containsKey(dataset)){
-                        totalMap.put(dataset,dataset);
+                    JSONObject tmp = jsonArray.getJSONObject(i);
+                    for(String dataset:tmp.keySet()){
+                        if(!datasetMap2.containsKey(dataset)){
+                            datasetMap2.put(dataset,dataset);
+                        }
+                        if(!totalMap.containsKey(dataset)){
+                            totalMap.put(dataset,dataset);
+                        }
                     }
                 }
                 datasetMap1.put(orgCode,datasetMap2);
@@ -256,11 +243,8 @@ public class DataQualityStatisticsService extends BaseJpaService {
             e.getMessage();
         }
 
-        Long end4 = System.currentTimeMillis();
-        logger.info("统计接收数据(数据集)时间："+(end4-end3));
-
         //资源化数据
-        String sql5 = "SELECT count(*) c,org_code,archive_status FROM json_archives/info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' and (archive_status=2 or archive_status=3) group by org_code,archive_status";
+        String sql5 = "SELECT count(*) c,org_code,archive_status FROM json_archives/info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' AND pack_type=1 and (archive_status=2 or archive_status=3) group by org_code,archive_status";
         ResultSet resultSet5 = elasticSearchUtil.findBySql(sql5);
         try {
             while (resultSet5.next()) {
@@ -286,10 +270,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
             e.getMessage();
         }
 
-        Long end5 = System.currentTimeMillis();
-        logger.info("资源化数据(解析成功和失败 )时间："+(end5-end4));
-
-        String sql6 = "SELECT count(*) c,org_code FROM json_archives/info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' and defect=1 group by org_code";
+        String sql6 = "SELECT count(*) c,org_code FROM json_archives_qc/qc_metadata_info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' AND qc_step=2 group by org_code";
         ResultSet resultSet6 = elasticSearchUtil.findBySql(sql6);
         try {
             while (resultSet6.next()) {
@@ -309,9 +290,6 @@ public class DataQualityStatisticsService extends BaseJpaService {
             e.getMessage();
         }
 
-        Long end6 = System.currentTimeMillis();
-        logger.info("资源化数据(解析异常)时间："+(end6-end5));
-
         //新增医疗云平台数据
         Map<String, Object> totalMap = new HashedMap();
         totalMap.put("orgCode",cloud);
@@ -329,8 +307,6 @@ public class DataQualityStatisticsService extends BaseJpaService {
             re.add(map);
         }
 
-        logger.info("总时间时间："+(System.currentTimeMillis()-startTime));
-
         return re;
     }
 
@@ -345,18 +321,36 @@ public class DataQualityStatisticsService extends BaseJpaService {
      */
     public Long packetCount(List<Map<String, String>> orgInfoList, String archiveStatus, String eventDateStart, String eventDateEnd) {
         Long count = 0L;
-        String esIndex = "json_archives";
-        String esType = "info";
-        StringBuilder filter = new StringBuilder("receive_date>=" + eventDateStart + ";receive_date<=" + eventDateEnd);
-        if (!StringUtils.isEmpty(archiveStatus)) {
-            filter.append(";archive_status=" + archiveStatus);
-        }
         if (orgInfoList.size() == 1 && cloud.equals(orgInfoList.get(0).get("orgCode"))) {
-            elasticSearchUtil.count(esIndex, esType, filter.toString());
+            String sql1 = "SELECT count(*) c FROM json_archives/info where receive_date>= '"+eventDateStart+"' AND receive_date<='" +  eventDateEnd + "' AND pack_type=1 ";
+            if (!StringUtils.isEmpty(archiveStatus)) {
+                sql1+=" and archive_status ="+archiveStatus;
+            }
+            try {
+                ResultSet resultSet1 = elasticSearchUtil.findBySql(sql1);
+                while (resultSet1.next()) {
+                    Double total = resultSet1.getDouble("c");//接收 档案数
+                    count+=total.longValue();
+                }
+            }catch (Exception e){
+                e.getMessage();
+            }
         } else {
             for (Map<String, String> orgInfo : orgInfoList) {
-                filter.append(";org_code=" + orgInfo.get("orgCode"));
-                count += elasticSearchUtil.count(esIndex, esType, filter.toString());
+                //统计接收数据
+                String sql2 = "SELECT count(*) c FROM json_archives/info where receive_date>= '"+eventDateStart+"' AND receive_date<='" +  eventDateEnd + "' AND pack_type=1 and org_code='" + orgInfo.get("orgCode")+"'";
+                if (!StringUtils.isEmpty(archiveStatus)) {
+                    sql2+=" and archive_status ="+archiveStatus;
+                }
+                try {
+                    ResultSet resultSet2 = elasticSearchUtil.findBySql(sql2);
+                    while (resultSet2.next()) {
+                        Double total = resultSet2.getDouble("c");//接收 档案数
+                        count+=total.longValue();
+                    }
+                }catch (Exception e){
+                    e.getMessage();
+                }
             }
         }
         return count;
@@ -392,7 +386,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
             List<Map<String, Object>> reportedNumList1 = elasticSearchUtil.findBySql(Arrays.asList(reportedNumFields1.split(",")), reportedNumSql1);
             reportData.put("reportedNumList1", reportedNumList1);
             // TODO 采集情况
-            String reportedNumSql2 = "SELECT count(*) total FROM json_archives/info where receive_date BETWEEN '"+eventDateStart+"' AND '" +  eventDateEnd + "' " ;
+            String reportedNumSql2 = "SELECT count(*) total FROM json_archives/info where receive_date BETWEEN '"+eventDateStart+"' AND '" +  eventDateEnd + "' and pack_type=1 " ;
             if (!cloud.equals(orgInfo.get("orgCode"))) {
                 reportedNumSql2 += " AND org_code='" + orgCode + "'";
             }
@@ -419,7 +413,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
             collectionMap.put("total",totalCollection);
             reportData.put("collectionMap", collectionMap);
             // TODO 采集内容
-            String reportedNumSql3 = "SELECT count(*) total FROM json_archives/info where receive_date BETWEEN '"+eventDateStart+"' AND '" +  eventDateEnd + "' " ;
+            String reportedNumSql3 = "SELECT count(*) total FROM json_archives/info where receive_date BETWEEN '"+eventDateStart+"' AND '" +  eventDateEnd + "' and pack_type=1 " ;
             if (!cloud.equals(orgInfo.get("orgCode"))) {
                 reportedNumSql3 += " AND org_code='" + orgCode + "'";
             }
@@ -463,7 +457,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
 
             reportData.put("reportedNumList3", reportedList3);
             // TODO 解析情况
-            String reportedNumSql4 = "SELECT count(*) total FROM json_archives/info where receive_date BETWEEN '"+eventDateStart+"' AND '" +  eventDateEnd + "' and (archive_status=2 or archive_status=3 or archive_status=0 )" ;
+            String reportedNumSql4 = "SELECT count(*) total FROM json_archives/info where receive_date BETWEEN '"+eventDateStart+"' AND '" +  eventDateEnd + "' and (archive_status=2 or archive_status=3 or archive_status=0 ) and pack_type=1 " ;
             if (!cloud.equals(orgInfo.get("orgCode"))) {
                 reportedNumSql4 += " AND org_code='" + orgCode + "'";
             }
@@ -478,18 +472,18 @@ public class DataQualityStatisticsService extends BaseJpaService {
                 double total = Double.valueOf(map.get("total").toString());
                 String archiveStatus = map.get("archive_status").toString();
                 if("3".equals(archiveStatus)){
-                    collectionMap.put("archive_status3",total);
+                    archiveMap.put("archive_status3",total);
                 }else if("2".equals(archiveStatus)){
-                    collectionMap.put("archive_status2",total);
+                    archiveMap.put("archive_status2",total);
                 }else if("0".equals(archiveStatus)){
-                    collectionMap.put("archive_status0",total);
+                    archiveMap.put("archive_status0",total);
                 }
             }
             reportData.put("archiveMap", archiveMap);
             // TODO 数据集总量
             List<Map<String, Object>> res = new ArrayList<>();
             StringBuilder stringBuilder1 = new StringBuilder();
-            stringBuilder1.append("qc_step=2;");
+            stringBuilder1.append("qc_step=1;");
             stringBuilder1.append("receive_date>=" + eventDateStart + ";");
             stringBuilder1.append("receive_date<" + eventDateEnd + ";");
             if (!cloud.equals(orgInfo.get("orgCode"))){
@@ -508,6 +502,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
             // TODO 解析失败分析
             StringBuilder stringBuilder2 = new StringBuilder();
             stringBuilder2.append("archive_status=2;");
+            stringBuilder2.append("pack_type=1;");
             stringBuilder2.append("receive_date>=" + eventDateStart + ";");
             stringBuilder2.append("receive_date<" + eventDateEnd + ";");
             if (!cloud.equals(orgInfo.get("orgCode"))){
@@ -614,15 +609,15 @@ public class DataQualityStatisticsService extends BaseJpaService {
         switch (eventType){
             case "0":
                 //0门诊
-                re = warning.getOutpatientInTime() < delay;
+                re = warning.getOutpatientInTime() >= delay;
                 break;
             case "1":
                 //1住院
-                re = warning.getHospitalInTime() < delay;
+                re = warning.getHospitalInTime() >= delay;
                 break;
             case "2":
                 //2体检
-                re = warning.getPeInTime() < delay;
+                re = warning.getPeInTime() >= delay;
                 break;
             default:
                 break;
@@ -647,14 +642,14 @@ public class DataQualityStatisticsService extends BaseJpaService {
         try{
             String filters = "";
             if(cloud.equals(orgCode)){
-                filters = " event_date BETWEEN '" + eventDateStart + " 00:00:00' AND '" + eventDateEnd + " 23:59:59'";
+                filters = " event_date BETWEEN '" + eventDateStart + " 00:00:00' AND '" + eventDateEnd + " 23:59:59' and pack_type=1 ";
             }else{
                 filters = "org_code='" + orgCode
-                        + "' AND event_date BETWEEN '" + eventDateStart + " 00:00:00' AND '" + eventDateEnd + " 23:59:59'";
+                        + "' AND event_date BETWEEN '" + eventDateStart + " 00:00:00' AND '" + eventDateEnd + " 23:59:59' and pack_type=1 ";
             }
             // 及时率场合
 
-            StringBuilder sql = new StringBuilder("SELECT COUNT(event_no) packetCount FROM json_archives/info WHERE ");
+            StringBuilder sql = new StringBuilder("SELECT COUNT(*) packetCount FROM json_archives/info WHERE ");
             sql.append(filters);
             sql.append(" GROUP BY date_histogram(field='receive_date','interval'='1d',format='yyyy-MM-dd',alias=receiveDate)");
             List<String> fields = new ArrayList<>(2);
@@ -698,8 +693,6 @@ public class DataQualityStatisticsService extends BaseJpaService {
             end = dateStr;
         }
 
-        Long startTime = System.currentTimeMillis();
-
         //初始化 及时率数据
         Session session = currentSession();
         List<DqPaltformReceiveWarning> warningList = dqPaltformReceiveWarningDao.findAll();
@@ -708,9 +701,6 @@ public class DataQualityStatisticsService extends BaseJpaService {
             String orgCode = one.getOrgCode();
             warningMap.put(orgCode,one);
         });
-
-        Long en = System.currentTimeMillis();
-        logger.info("初始化 数据集数据时间："+(en-startTime));
 
         //获取医院数据
         Query query1 = session.createSQLQuery("SELECT org_code,full_name from organizations where org_type = 'Hospital' ");
@@ -721,9 +711,6 @@ public class DataQualityStatisticsService extends BaseJpaService {
             String name = one[1].toString();
             orgMap.put(orgCode,name);
         });
-
-        Long end0 = System.currentTimeMillis();
-        logger.info("获取医院名称时间："+(end0-en));
 
         double totalVisitNum = 0;//总就诊数
         double totalOutpatientNum = 0;//总门诊数
@@ -738,9 +725,9 @@ public class DataQualityStatisticsService extends BaseJpaService {
 
         //统计总数
         String sql1 = "SELECT sum(HSI07_01_001) s1,sum(HSI07_01_002) s2,sum(HSI07_01_004) s3,sum(HSI07_01_012) s4,org_code FROM qc/daily_report where event_date>= '"+start+"T00:00:00' AND event_date <='" +  end + "T23:59:59' group by org_code";
-        ResultSet resultSet1 = elasticSearchUtil.findBySql(sql1);
         Map<String, Map<String, Object>> dataMap = new HashMap<>();
         try {
+            ResultSet resultSet1 = elasticSearchUtil.findBySql(sql1);
             while (resultSet1.next()) {
                 Map<String, Object> dataMap1 = null;
                 String orgCode = resultSet1.getString("org_code");
@@ -764,20 +751,19 @@ public class DataQualityStatisticsService extends BaseJpaService {
                 dataMap.put(orgCode,dataMap1);
             }
         }catch (Exception e){
-            e.getMessage();
+            if(!"Error".equals(e.getMessage())){
+                e.printStackTrace();
+            }
         }
 
-        Long end1 = System.currentTimeMillis();
-        logger.info("统计总数时间："+(end1-startTime));
-
         //统计及时数
-        String sql2 = "SELECT count(*) c,org_code,event_type,delay FROM json_archives/info where event_date>= '"+start+" 00:00:00' AND event_date<='" +  end + " 23:59:59' and delay is not null group by org_code,event_type,delay ";
-        ResultSet resultSet2 = elasticSearchUtil.findBySql(sql2);
+        String sql2 = "SELECT count(distinct event_no) c,org_code,event_type,delay FROM json_archives/info where event_date>= '"+start+" 00:00:00' AND event_date<='" +  end + " 23:59:59' AND pack_type=1 and delay is not null group by org_code,event_type,delay ";
         try {
+            ResultSet resultSet2 = elasticSearchUtil.findBySql(sql2);
             while (resultSet2.next()) {
                 Map<String, Object> dataMap1 = null;
                 String orgCode = resultSet2.getString("org_code");
-                long delay = resultSet2.getLong("delay");// 延时时间
+                long delay = Long.valueOf(resultSet2.getString("delay"));// 延时时间
                 String eventType = resultSet2.getString("event_type");// 事件类型 0门诊 1住院 2体检
                 double total = resultSet2.getDouble("c");//及时数
                 if(dataMap.containsKey(orgCode)){
@@ -788,15 +774,15 @@ public class DataQualityStatisticsService extends BaseJpaService {
                 boolean flag = StringUtils.isNotBlank(eventType)&&!"null".equals(eventType)&&total>0;
                 if(flag&&isInTime(warningMap,orgCode,eventType,delay)){
                     if("0".equals(eventType)){
-                        total += Integer.parseInt(dataMap1.get("outpatientInTime").toString());
+                        total += Double.parseDouble(dataMap1.get("outpatientInTime").toString());
                         totalOutpatientInTime += total;
                         dataMap1.put("outpatientInTime",total);
                     }else if("1".equals(eventType)){
-                        total += Integer.parseInt(dataMap1.get("hospitalInTime").toString());
+                        total += Double.parseDouble(dataMap1.get("hospitalInTime").toString());
                         totalHospitalInTime += total;
                         dataMap1.put("hospitalInTime",total);
                     }else if("2".equals(eventType)){
-                        total += Integer.parseInt(dataMap1.get("peInTime").toString());
+                        total += Double.parseDouble(dataMap1.get("peInTime").toString());
                         totalPeInTime += total;
                         dataMap1.put("peInTime",total);
                     }
@@ -805,16 +791,15 @@ public class DataQualityStatisticsService extends BaseJpaService {
                 }
             }
         }catch (Exception e){
-            e.getMessage();
+            if(!"Error".equals(e.getMessage())){
+                e.printStackTrace();
+            }
         }
 
-        Long end2 = System.currentTimeMillis();
-        logger.info("统计及时数时间："+(end2-end1));
-
         //统计完整数
-        String sql3 = "SELECT count(*) c,org_code,event_type FROM json_archives/info where event_date>= '"+start+" 00:00:00' AND event_date<='" +  end + " 23:59:59' group by org_code,event_type";
-        ResultSet resultSet3 = elasticSearchUtil.findBySql(sql3);
+        String sql3 = "SELECT count(distinct event_no) c,org_code,event_type FROM json_archives/info where event_date>= '"+start+" 00:00:00' AND event_date<='" +  end + " 23:59:59' AND pack_type=1 group by org_code,event_type";
         try {
+            ResultSet resultSet3 = elasticSearchUtil.findBySql(sql3);
             while (resultSet3.next()) {
                 Map<String, Object> dataMap1 = null;
                 String orgCode = resultSet3.getString("org_code");
@@ -841,11 +826,10 @@ public class DataQualityStatisticsService extends BaseJpaService {
                 }
             }
         }catch (Exception e){
-            e.getMessage();
+            if(!"Error".equals(e.getMessage())){
+                e.printStackTrace();
+            }
         }
-
-        Long end3 = System.currentTimeMillis();
-        logger.info("统计完整数时间："+(end3-end2));
 
         //计算总数
         Map<String, Object> totalMap = new HashedMap();
@@ -902,8 +886,6 @@ public class DataQualityStatisticsService extends BaseJpaService {
             map.put("visitIntegrityRate",calRate(visitIntegrity,totalVisit));
             re.add(map);
         }
-
-        logger.info("总时间时间："+(System.currentTimeMillis()-startTime));
 
         return re;
     }

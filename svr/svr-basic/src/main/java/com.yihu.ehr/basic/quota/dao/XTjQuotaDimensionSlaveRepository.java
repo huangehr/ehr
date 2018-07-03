@@ -19,4 +19,7 @@ public interface XTjQuotaDimensionSlaveRepository extends PagingAndSortingReposi
     int deleteByQuotaCode(@Param("quotaCode") String quotaCode);
 
     List<TjQuotaDimensionSlave> findByQuotaCode(String quotaCode);
+
+    @Query("select DimensionSlave from TjQuotaDimensionSlave DimensionSlave where DimensionSlave.quotaCode = :quotaCode and DimensionSlave.slaveCode = :slaveCode")
+    List<TjQuotaDimensionSlave> getTjQuotaDimensionSlaveByCodeAndDimen(@Param("quotaCode") String quotaCode,@Param("slaveCode") String slaveCode);
 }

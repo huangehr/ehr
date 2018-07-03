@@ -1,5 +1,8 @@
 package com.yihu.ehr.analyze.controller;
 
+import com.yihu.ehr.analyze.feign.HosAdminServiceClient;
+import com.yihu.ehr.analyze.model.AdapterDatasetModel;
+import com.yihu.ehr.analyze.model.AdapterMetadataModel;
 import com.yihu.ehr.analyze.service.dataQuality.DqDatasetWarningService;
 import com.yihu.ehr.analyze.service.pack.PackQcReportService;
 import com.yihu.ehr.constants.ApiVersion;
@@ -7,21 +10,23 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.entity.quality.DqDatasetWarning;
+import com.yihu.ehr.model.adaption.MAdapterDataSet;
+import com.yihu.ehr.model.resource.MRsAdapterMetadata;
 import com.yihu.ehr.util.rest.Envelop;
+import com.yihu.hos.model.standard.MStdMetaData;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Author: zhengwei
@@ -39,6 +44,10 @@ public class PackQcReportEndPoint extends EnvelopRestEndPoint {
     private DqDatasetWarningService dqDatasetWarningService;
     @Autowired
     private ElasticSearchUtil elasticSearchUtil;
+    @Autowired
+    private HosAdminServiceClient hosAdminServiceClient;
+    @Value("${quality.cloud}")
+    private String cloud;
 
     @RequestMapping(value = ServiceApi.PackQcReport.dailyReport, method = RequestMethod.GET)
     @ApiOperation(value = "获取医院数据")
@@ -66,13 +75,11 @@ public class PackQcReportEndPoint extends EnvelopRestEndPoint {
         Envelop envelop = new Envelop();
         try {
             String filters = "type=" + type;
-            if (!StringUtils.isEmpty(orgCode)) {
+            if (!StringUtils.isEmpty(orgCode)&&!cloud.equals(orgCode)) {
                 filters += ";orgCode=" + orgCode;
             }
-            String fields = "datasetCode,datasetName";
-            List<DqDatasetWarning> redisMqChannelList = dqDatasetWarningService.search(fields, filters, "", page, size);
+            List<DqDatasetWarning> list = dqDatasetWarningService.search(null, filters, "", page, size);
             int count = (int) dqDatasetWarningService.getCount(filters);
-            List<DqDatasetWarning> list = (List<DqDatasetWarning>) convertToModels(redisMqChannelList, new ArrayList<DqDatasetWarning>(), DqDatasetWarning.class, fields);
             envelop = getPageResult(list, count, page, size);
         } catch (Exception e) {
             e.printStackTrace();
@@ -156,9 +163,9 @@ public class PackQcReportEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "size", value = "页码", required = true, defaultValue = "15")
             @RequestParam(value = "size") int size) throws Exception {
         if(StringUtils.isNotEmpty(filters)){
-            filters+="analyze_status=2;"+filters;
+            filters="analyze_status=2||archive_status=2;"+filters;
         }else{
-            filters="analyze_status=2";
+            filters="analyze_status=2||archive_status=2";
         }
         List<Map<String, Object>> list = packQcReportService.analyzeErrorList(filters, sorts, page, size);
         int count = (int) elasticSearchUtil.count("json_archives", "info", filters);
@@ -207,7 +214,7 @@ public class PackQcReportEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "size") int size) throws Exception {
 
 //        if(StringUtils.isNotEmpty(filters)){
-//            filters+="archive_status=3;"+filters;
+//            filters="archive_status=3;"+filters;
 //        }else{
 //            filters="archive_status=3";
 //        }
@@ -252,5 +259,53 @@ public class PackQcReportEndPoint extends EnvelopRestEndPoint {
 
         Envelop envelop = packQcReportService.uploadRecordDetail(id);
         return envelop;
+    }
+
+    @RequestMapping(value = "/packQcReport/adapterDatasetList", method = RequestMethod.GET)
+    @ApiOperation(value = "上传数据集列表")
+    public Envelop adapterDatasetList(
+            @ApiParam(name = "version", value = "版本号")
+            @RequestParam(value = "version", required = true) String version,
+            @ApiParam(name = "filters", value = "过滤")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "page", value = "分页大小", required = true, defaultValue = "1")
+            @RequestParam(value = "page") int page,
+            @ApiParam(name = "size", value = "页码", required = true, defaultValue = "15")
+            @RequestParam(value = "size") int size){
+        if(StringUtils.isNotEmpty(filters)){
+            filters="needCrawer=1;"+filters;
+        }else{
+            filters="needCrawer=1;";
+        }
+        ResponseEntity<Collection<AdapterDatasetModel>> res = hosAdminServiceClient.adapterDatasetList(version, null, filters , sorts ,page, size);
+        List<AdapterDatasetModel> list = (List<AdapterDatasetModel>)res.getBody();
+        int totalCount = getTotalCount(res);
+        return getPageResult(list,totalCount,page,size);
+    }
+
+    @RequestMapping(value = "/packQcReport/adapterMetadataList", method = RequestMethod.GET)
+    @ApiOperation(value = "上传数据元列表")
+    public Envelop adapterMetadataList(
+            @ApiParam(name = "version", value = "版本号")
+            @RequestParam(value = "version", required = true) String version,
+            @ApiParam(name = "filters", value = "过滤")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "page", value = "分页大小", required = true, defaultValue = "1")
+            @RequestParam(value = "page") int page,
+            @ApiParam(name = "size", value = "页码", required = true, defaultValue = "15")
+            @RequestParam(value = "size") int size){
+        if(StringUtils.isNotEmpty(filters)){
+            filters="needCrawer=1;"+filters;
+        }else{
+            filters="needCrawer=1;";
+        }
+        ResponseEntity<Collection<AdapterMetadataModel>> res = hosAdminServiceClient.adapterMetadataList(version, null, filters , sorts ,page, size);
+        List<AdapterMetadataModel> list = (List<AdapterMetadataModel>)res.getBody();
+        int totalCount = getTotalCount(res);
+        return getPageResult(list,totalCount,page,size);
     }
 }

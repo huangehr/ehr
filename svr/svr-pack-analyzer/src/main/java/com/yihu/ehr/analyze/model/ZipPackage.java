@@ -253,7 +253,7 @@ public class ZipPackage {
             FileUtils.deleteQuietly(zipFile);
             FileUtils.deleteQuietly(packFile);
         } catch (Exception e) {
-            LogService.getLogger(PackageAnalyzeService.class).warn("House keep failed after package analyze: " + e.getMessage());
+            LogService.getLogger(PackageAnalyzeService.class).warn("House keep failed after package ehr: " + e.getMessage());
         }
     }
 

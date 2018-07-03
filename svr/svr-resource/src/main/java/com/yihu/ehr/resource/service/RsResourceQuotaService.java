@@ -131,11 +131,14 @@ public class RsResourceQuotaService extends BaseJpaService<RsResourceQuota, RsRe
     public void updateResourceQuota(List<ResourceQuotaJson> list) {
         for (ResourceQuotaJson json : list) {
             RsResourceQuota resourceQuota = resourceQuotaDao.findByResourceIdAndQuotaId(json.getResourceId(), json.getQuotaId());
-            Integer pid = json.getPid();
-            if (null != pid && pid != 0) {
-                resourceQuota.setPid(pid);
-                resourceQuotaDao.save(resourceQuota);
-            };
+            if (null != resourceQuota) {
+                Integer parentId = resourceQuota.getPid();
+                Integer pid = json.getPid();
+                if (parentId != pid) {
+                    resourceQuota.setPid(pid);
+                    resourceQuotaDao.save(resourceQuota);
+                }
+            }
         }
     }
 }

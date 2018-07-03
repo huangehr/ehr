@@ -236,7 +236,7 @@ public class PatientController extends BaseController {
         }
         if (StringUtils.isEmpty(detailModel.getIdCardNo())) {
             errorMsg += "身份证号不能为空!";
-        }else if( ! pattern.matcher(detailModel.getIdCardNo()).find()){
+        } else if (!pattern.matcher(detailModel.getIdCardNo()).find()) {
             errorMsg += "身份证号格式不正!";
         }
         if (StringUtils.isEmpty(detailModel.getGender())) {
@@ -279,9 +279,9 @@ public class PatientController extends BaseController {
         mUser.setLoginCode(loginCode);
         mUser.setDemographicId(detailModel.getIdCardNo());
 //       账号信息密码设为默认
-        if(null != detailModel.getIdCardNo()){
-            mUser.setPassword(DigestUtils.md5Hex(detailModel.getIdCardNo().substring(detailModel.getIdCardNo().length()-8)));
-        }else{
+        if (null != detailModel.getIdCardNo()) {
+            mUser.setPassword(DigestUtils.md5Hex(detailModel.getIdCardNo().substring(detailModel.getIdCardNo().length() - 8)));
+        } else {
             mUser.setPassword("12345678");
         }
         mUser.setId(detailModel.getUserId());
@@ -291,18 +291,7 @@ public class PatientController extends BaseController {
         mUser.setMartialStatus(detailModel.getMartialStatus());
         mUser.setEmail(detailModel.getEmail());
         mUser.setTelephone(phone);
-
-        /*mUser.setProvinceId();
-        mUser.setProvinceName();
-        mUser.setCityId();
-        mUser.setCityName();
-        mUser.setAreaId();
-        mUser.setAreaName();*/
-
-
         mUser = userClient.createUser(objectMapper.writeValueAsString(mUser));
-
-
         if (mUser == null) {
             return failed("保存失败!");
         }
@@ -310,28 +299,34 @@ public class PatientController extends BaseController {
         //系统demographics是否存在居民信息校验
         if (!patientClient.isExistIdCardNo(detailModel.getIdCardNo())) {
             //            系统中不存在该身份证号，新增居民
-
+            MDemographicInfo demographicInfo = patientClient.getPatient(detailModel.getIdCardNo());
             //新增家庭地址信息
             GeographyModel geographyModel = detailModel.getHomeAddressInfo();
             detailModel.setHomeAddress("");
             if (!geographyModel.nullAddress()) {
-                String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
-                detailModel.setHomeAddress(addressId);
+//                String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
+                detailModel.setHomeAddress(getAddressByGeographyModel(geographyModel));
+            }else{
+                detailModel.setHomeAddress(demographicInfo.getHomeAddress());
             }
             //新增户籍地址信息
             geographyModel = detailModel.getBirthPlaceInfo();
             detailModel.setBirthPlace("");
             if (!geographyModel.nullAddress()) {
-                String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
-                detailModel.setBirthPlace(addressId);
+//                String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
+                detailModel.setBirthPlace(getAddressByGeographyModel(geographyModel));
+            }else {
+                detailModel.setBirthPlace(demographicInfo.getBirthPlace());
             }
 
             //新增工作地址信息
             geographyModel = detailModel.getWorkAddressInfo();
             detailModel.setWorkAddress("");
             if (!geographyModel.nullAddress()) {
-                String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
-                detailModel.setWorkAddress(addressId);
+//                String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
+                detailModel.setWorkAddress(getAddressByGeographyModel(geographyModel));
+            }else{
+                detailModel.setWorkAddress(demographicInfo.getWorkAddress());
             }
 
             //新增人口信息
@@ -366,18 +361,14 @@ public class PatientController extends BaseController {
 //            String jsonData = inputStream + "," + imageName;
 //            path = patientClient.uploadPicture(jsonData);
 //        }
-
         PatientDetailModel detailModel = objectMapper.readValue(patientModelJsonData, PatientDetailModel.class);
-//        if (!StringUtils.isEmpty(path)) {
-//            detailModel.setPicPath(path);
-//        }
         String errorMsg = "";
         if (StringUtils.isEmpty(detailModel.getName())) {
             errorMsg += "姓名不能为空!";
         }
         if (StringUtils.isEmpty(detailModel.getIdCardNo())) {
             errorMsg += "身份证号不能为空!";
-        }else if( ! pattern.matcher(detailModel.getIdCardNo()).find()){
+        } else if (!pattern.matcher(detailModel.getIdCardNo()).find()) {
             errorMsg += "身份证号格式不正!";
         }
         if (StringUtils.isEmpty(detailModel.getGender())) {
@@ -403,25 +394,32 @@ public class PatientController extends BaseController {
 
         //新增家庭地址信息
         GeographyModel geographyModel = detailModel.getHomeAddressInfo();
+        MDemographicInfo demographicInfo = patientClient.getPatient(detailModel.getIdCardNo());
         detailModel.setHomeAddress("");
         if (!geographyModel.nullAddress()) {
-            String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
-            detailModel.setHomeAddress(addressId);
+//            String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
+            detailModel.setHomeAddress(getAddressByGeographyModel(geographyModel));
+        }else{
+            detailModel.setHomeAddress(demographicInfo.getHomeAddress());
         }
         //新增户籍地址信息
         geographyModel = detailModel.getBirthPlaceInfo();
         detailModel.setBirthPlace("");
         if (!geographyModel.nullAddress()) {
-            String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
-            detailModel.setBirthPlace(addressId);
+//            String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
+            detailModel.setBirthPlace(getAddressByGeographyModel(geographyModel));
+        }else{
+            detailModel.setBirthPlace(demographicInfo.getBirthPlace());
         }
 
         //新增工作地址信息
         geographyModel = detailModel.getWorkAddressInfo();
         detailModel.setWorkAddress("");
         if (!geographyModel.nullAddress()) {
-            String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
-            detailModel.setWorkAddress(addressId);
+//            String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
+            detailModel.setWorkAddress(getAddressByGeographyModel(geographyModel));
+        }else {
+            detailModel.setWorkAddress(demographicInfo.getWorkAddress());
         }
 
         //新增人口信息
@@ -466,7 +464,7 @@ public class PatientController extends BaseController {
         }
         if (StringUtils.isEmpty(detailModel.getIdCardNo())) {
             errorMsg += "身份证号不能为空!";
-        }else if( ! pattern.matcher(detailModel.getIdCardNo()).find()){
+        } else if (!pattern.matcher(detailModel.getIdCardNo()).find()) {
             errorMsg += "身份证号格式不正!";
         }
         if (StringUtils.isEmpty(detailModel.getGender())) {
@@ -485,28 +483,34 @@ public class PatientController extends BaseController {
         if (StringUtils.isNotEmpty(errorMsg)) {
             return failed(errorMsg);
         }
-
+        MDemographicInfo demographicInfo = patientClient.getPatient(detailModel.getIdCardNo());
         //新增家庭地址信息
         GeographyModel geographyModel = detailModel.getHomeAddressInfo();
         detailModel.setHomeAddress("");
         if (!geographyModel.nullAddress()) {
-            String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
-            detailModel.setHomeAddress(addressId);
+//            String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
+            detailModel.setHomeAddress(getAddressByGeographyModel(geographyModel));
+        }else{
+            detailModel.setHomeAddress(demographicInfo.getHomeAddress());
         }
         //新增户籍地址信息
         geographyModel = detailModel.getBirthPlaceInfo();
         detailModel.setBirthPlace("");
         if (!geographyModel.nullAddress()) {
-            String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
-            detailModel.setBirthPlace(addressId);
+//            String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
+            detailModel.setBirthPlace(getAddressByGeographyModel(geographyModel));
+        }else {
+            detailModel.setBirthPlace(demographicInfo.getBirthPlace());
         }
 
         //新增工作地址信息
         geographyModel = detailModel.getWorkAddressInfo();
         detailModel.setWorkAddress("");
         if (!geographyModel.nullAddress()) {
-            String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
-            detailModel.setWorkAddress(addressId);
+//            String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
+            detailModel.setWorkAddress(getAddressByGeographyModel(geographyModel));
+        }else {
+            detailModel.setWorkAddress(demographicInfo.getWorkAddress());
         }
 
         //修改人口信息
@@ -536,6 +540,7 @@ public class PatientController extends BaseController {
             @PathVariable(value = "id_card_no") String idCardNo) throws Exception {
         return patientClient.isExistIdCardNo(idCardNo);
     }
+
     /**
      * 手机号码是否已存在校验
      *
@@ -589,39 +594,38 @@ public class PatientController extends BaseController {
         MGeography mGeography = null;
         if (!StringUtils.isEmpty(demographicInfo.getHomeAddress())) {
             //家庭地址
-            mGeography = addressClient.getAddressById(demographicInfo.getHomeAddress());
-            if (mGeography != null) {
-                detailModel.setHomeAddressFull(mGeography.fullAddress());
-                detailModel.setHomeAddressInfo(convertToModel(mGeography, GeographyModel.class));
+//            mGeography = addressClient.getAddressById(demographicInfo.getHomeAddress());
+//            if (mGeography != null) {
+                detailModel.setHomeAddressFull(demographicInfo.getHomeAddress());
+//                detailModel.setHomeAddressInfo(convertToModel(mGeography, GeographyModel.class));
 
-                detailModel.getHomeAddressInfo().setProvinceId(geographyToCode(detailModel.getHomeAddressInfo().getProvince(), 156));
+              /*  detailModel.getHomeAddressInfo().setProvinceId(geographyToCode(detailModel.getHomeAddressInfo().getProvince(), 156));
                 detailModel.getHomeAddressInfo().setCityId(geographyToCode(detailModel.getHomeAddressInfo().getCity(), detailModel.getHomeAddressInfo().getProvinceId()));
-                detailModel.getHomeAddressInfo().setDistrictId(geographyToCode(detailModel.getHomeAddressInfo().getDistrict(), detailModel.getHomeAddressInfo().getCityId()));
-            }
+                detailModel.getHomeAddressInfo().setDistrictId(geographyToCode(detailModel.getHomeAddressInfo().getDistrict(), detailModel.getHomeAddressInfo().getCityId()));*/
+//            }
         }
         if (!StringUtils.isEmpty(demographicInfo.getBirthPlace())) {
-            //户籍地址
+          /*  //户籍地址
             mGeography = addressClient.getAddressById(demographicInfo.getBirthPlace());
-            if (mGeography != null) {
-                detailModel.setBirthPlaceFull(mGeography.fullAddress());
-                detailModel.setBirthPlaceInfo(convertToModel(mGeography, GeographyModel.class));
+            if (mGeography != null) {*/
+                detailModel.setBirthPlaceFull(demographicInfo.getBirthPlace());
+              /*  detailModel.setBirthPlaceInfo(convertToModel(mGeography, GeographyModel.class));
 
                 detailModel.getBirthPlaceInfo().setProvinceId(geographyToCode(detailModel.getBirthPlaceInfo().getProvince(), 156));
                 detailModel.getBirthPlaceInfo().setCityId(geographyToCode(detailModel.getBirthPlaceInfo().getCity(), detailModel.getBirthPlaceInfo().getProvinceId()));
                 detailModel.getBirthPlaceInfo().setDistrictId(geographyToCode(detailModel.getBirthPlaceInfo().getDistrict(), detailModel.getBirthPlaceInfo().getCityId()));
-            }
+            }*/
         }
         //工作地址
         if (!StringUtils.isEmpty(demographicInfo.getWorkAddress())) {
-            mGeography = addressClient.getAddressById(demographicInfo.getWorkAddress());
-            if (mGeography != null) {
-                detailModel.setWorkAddressFull(mGeography.fullAddress());
-                detailModel.setWorkAddressInfo(convertToModel(mGeography, GeographyModel.class));
-
+           /* mGeography = addressClient.getAddressById(demographicInfo.getWorkAddress());
+            if (mGeography != null) {*/
+                detailModel.setWorkAddressFull(demographicInfo.getWorkAddress());
+               /* detailModel.setWorkAddressInfo(convertToModel(mGeography, GeographyModel.class));
                 detailModel.getWorkAddressInfo().setProvinceId(geographyToCode(detailModel.getWorkAddressInfo().getProvince(), 156));
                 detailModel.getWorkAddressInfo().setCityId(geographyToCode(detailModel.getWorkAddressInfo().getCity(), detailModel.getWorkAddressInfo().getProvinceId()));
                 detailModel.getWorkAddressInfo().setDistrictId(geographyToCode(detailModel.getWorkAddressInfo().getDistrict(), detailModel.getWorkAddressInfo().getCityId()));
-            }
+            }*/
         }
 
         //联系电话
@@ -697,13 +701,13 @@ public class PatientController extends BaseController {
                 }
 
                 //获取居民账户id
-                String fields= "id,demographicId,realName";
-                String filters="demographicId="+patientInfo.getIdCardNo();
-                String sorts="+demographicId,+realName";
+                String fields = "id,demographicId,realName";
+                String filters = "demographicId=" + patientInfo.getIdCardNo();
+                String sorts = "+demographicId,+realName";
                 ResponseEntity<List<MUser>> userEntity = userClient.searchUsers(fields, filters, sorts, 20, 1, null);
                 List<MUser> mUsers = userEntity.getBody();
-                if(null!=mUsers&&mUsers.size()>0){
-                    for(MUser u:mUsers){
+                if (null != mUsers && mUsers.size() > 0) {
+                    for (MUser u : mUsers) {
                         patient.setUserId(u.getId());
                     }
                 }
@@ -777,13 +781,13 @@ public class PatientController extends BaseController {
                 }
 
                 //获取居民账户id
-                String fields= "id,demographicId,realName";
-                String filters="demographicId="+patientInfo.getIdCardNo();
-                String sorts="+demographicId,+realName";
+                String fields = "id,demographicId,realName";
+                String filters = "demographicId=" + patientInfo.getIdCardNo();
+                String sorts = "+demographicId,+realName";
                 ResponseEntity<List<MUser>> userEntity = userClient.searchUsers(fields, filters, sorts, 20, 1, null);
                 List<MUser> mUsers = userEntity.getBody();
-                if(null!=mUsers&&mUsers.size()>0){
-                    for(MUser u:mUsers){
+                if (null != mUsers && mUsers.size() > 0) {
+                    for (MUser u : mUsers) {
                         patient.setUserId(u.getId());
                     }
                 }
@@ -895,7 +899,7 @@ public class PatientController extends BaseController {
             @RequestParam(value = "type") String type,
             @ApiParam(name = "source_type", value = "平台应用sourceType字典值")
             @RequestParam(value = "source_type") String sourceType,
-            @ApiParam(name = "user_id",value = "用户id")
+            @ApiParam(name = "user_id", value = "用户id")
             @RequestParam(value = "user_id") String userId) {
 //        if(org.apache.commons.lang.StringUtils.isEmpty(type)){
 //            return failed("角色组类型不能为空！");
@@ -908,16 +912,16 @@ public class PatientController extends BaseController {
         //平台应用-应用表中source_type为1
         Collection<MApp> mApps = appClient.getAppsNoPage(sourceType);
         List<PlatformAppRolesTreeModel> appRolesTreeModelList = new ArrayList<>();
-        Map<String,String> appRolesTreeModelMap=new HashedMap();
-        Collection<MRoleUser> mRoleUsers = roleUserClient.searchRoleUserNoPaging("userId="+userId);
-        Map<String,String> roleUserModel=new HashedMap();
-        for (MRoleUser model : mRoleUsers){
-            roleUserModel.put(String.valueOf(model.getRoleId()),String.valueOf(model.getRoleId()));
+        Map<String, String> appRolesTreeModelMap = new HashedMap();
+        Collection<MRoleUser> mRoleUsers = roleUserClient.searchRoleUserNoPaging("userId=" + userId);
+        Map<String, String> roleUserModel = new HashedMap();
+        for (MRoleUser model : mRoleUsers) {
+            roleUserModel.put(String.valueOf(model.getRoleId()), String.valueOf(model.getRoleId()));
         }
         //平台应用-角色组对象模型列表
 
         for (MApp mApp : mApps) {
-            boolean checkFlag=false;
+            boolean checkFlag = false;
             Collection<MRoles> mRoles = rolesClient.searchRolesNoPaging("appId=" + mApp.getId());
             List<PlatformAppRolesTreeModel> roleTreeModelList = new ArrayList<>();
             for (MRoles m : mRoles) {
@@ -927,14 +931,14 @@ public class PatientController extends BaseController {
                 modelTree.setType("1");
                 modelTree.setPid(mApp.getId());
                 modelTree.setChildren(null);
-                if(null!=roleUserModel.get(String.valueOf(m.getId()))){
+                if (null != roleUserModel.get(String.valueOf(m.getId()))) {
                     modelTree.setIschecked(true);
-                    checkFlag=true;
-                }else{
+                    checkFlag = true;
+                } else {
                     modelTree.setIschecked(false);
                 }
                 roleTreeModelList.add(modelTree);
-                appRolesTreeModelMap.put(String.valueOf(m.getId()),m.getName());
+                appRolesTreeModelMap.put(String.valueOf(m.getId()), m.getName());
             }
             if (roleTreeModelList.size() == 0) {
                 continue;
@@ -954,14 +958,14 @@ public class PatientController extends BaseController {
 
         List<MRoleUser> mRoleUserList = new ArrayList<>();
         MRoleUser mr;
-        for (MRoleUser m : mRoleUsers){
-            if(null!=appRolesTreeModelMap.get(String.valueOf(m.getRoleId()))){
-                mr=new MRoleUser();
+        for (MRoleUser m : mRoleUsers) {
+            if (null != appRolesTreeModelMap.get(String.valueOf(m.getRoleId()))) {
+                mr = new MRoleUser();
                 mr.setRoleId(m.getRoleId());
                 mr.setRoleName(appRolesTreeModelMap.get(String.valueOf(m.getRoleId())));
                 MRoles roles = rolesClient.getRolesById(m.getRoleId());
                 Collection<MApp> appCollection = appClient.getAppsNoPage("id=" + roles.getAppId());
-                for(MApp app : appCollection){
+                for (MApp app : appCollection) {
                     mr.setAppName(app.getName());
                 }
                 mRoleUserList.add(mr);
@@ -976,7 +980,7 @@ public class PatientController extends BaseController {
      *
      * @return
      */
-    @RequestMapping(value = "/appUserRolesSave",method = RequestMethod.PUT)
+    @RequestMapping(value = "/appUserRolesSave", method = RequestMethod.PUT)
     @ApiOperation(value = "居民信息-角色授权-角色组保存")
     public Envelop saveRoleUser(
             @ApiParam(name = "userId", value = "居民账户id", defaultValue = "")
@@ -1000,7 +1004,6 @@ public class PatientController extends BaseController {
     }
 
 
-
     public MUser convertToMUser(UserDetailModel detailModel) {
         if (detailModel == null) {
             return null;
@@ -1010,6 +1013,22 @@ public class PatientController extends BaseController {
         mUser.setLastLoginTime(StringToDate(detailModel.getLastLoginTime(), AgAdminConstants.DateTimeFormat));
 
         return mUser;
+    }
+
+    /**
+     * 用于用户地址转换
+     * @param geographyModel 地址对象
+     * @return
+     */
+    public String getAddressByGeographyModel(GeographyModel geographyModel) {
+        String address = "";
+        String province = (null == geographyModel.getProvince() ? "" : geographyModel.getProvince());
+        String city = (null == geographyModel.getCity() ? "" : geographyModel.getCity());
+        String district = (null == geographyModel.getDistrict() ? "" : geographyModel.getDistrict());
+        String town = (null == geographyModel.getTown() ? "" : geographyModel.getTown());
+        String street = (null == geographyModel.getStreet() ? "" : geographyModel.getStreet());
+        address = province + city + district + town + street;
+        return address;
     }
 
 

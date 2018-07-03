@@ -8,8 +8,8 @@
         <version>1.2.0</version>
         <relativePath>../../ehr-ms-parent-pom/pom.xml</relativePath>
     </parent>
-    <modelVersion>4.0.0</modelVersion>
 
+    <modelVersion>4.0.0</modelVersion>
     <artifactId>svr-quota</artifactId>
     <packaging>${packaging.type}</packaging>
 

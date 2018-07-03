@@ -1,6 +1,7 @@
 package com.yihu.quota.scheduler;
 
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.hbase.HBaseDao;
 import com.yihu.ehr.profile.core.ResourceCore;
@@ -73,7 +74,7 @@ public class MedicineExpenseScheduler {
     }
 
     @ApiOperation("抽取指定时间段药品费用，整合来自其他数据集的部分数据到药品费用中。")
-    @RequestMapping(value = "extractMedicineExpense", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.TJ.Scheduler.ExtractMedicineExpense, method = RequestMethod.GET)
     public Envelop extractMedicineExpense(
             @ApiParam(name = "startDate", value = "开始日期，格式 YYYY-MM-DD，接口里自动拼接 T00:00:00Z，", required = true)
             @RequestParam(value = "startDate") String startDate,

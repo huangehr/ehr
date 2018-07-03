@@ -277,7 +277,7 @@ public class QuotaReportController extends BaseController {
             @ApiParam(name = "top", value = "获取前几条数据")
             @RequestParam(value = "top", required = false) String top,
             @ApiParam(name = "MRsResource json串")
-            @RequestParam(value = "mRsResource") String mRsResource
+            @RequestParam(value = "mRsResource", required = false) String mRsResource
             ) {
         String xName = "";
         String yName = "";

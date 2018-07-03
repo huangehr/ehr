@@ -49,6 +49,7 @@ public class ServiceApi {
         public static final String ResourceSubData = "/resources/query/sub_data"; //细表资源查询接口
         public static final String ResourceMasterStat = "/resources/query/master_stat"; //主表资源统计接口
         public static final String ResourceSubStat = "/resources/query/sub_stat"; //细表资源查询接口
+        public static final String ResourceHealthFile = "/resources/query/health_file"; //细表资源查询接口
         public static final String ResourceMysql = "/resources/query/mysql"; //mysql资源查询接口
         public static final String SolrIndexData = "/resources/query/solrIndex"; //solr索引列表查询接口
 
@@ -95,8 +96,8 @@ public class ServiceApi {
         public static final String ResourceGrantsNoPage = "/resources/grants/no_paging";
         public static final String AppsGrantResources = "/resources/apps/{appId}/grant";
         public static final String ResourceGrantApps = "/resources/{resourceId}/grant";
-        public static final String AppsGrantResourcesByCategoryId = "/resources/apps/{appId}/grantByCategoryId";
-        public static final String DeleteAppsGrantResourcesByCategoryId = "/resources/apps/{appId}/deleteGrantByCategoryId";
+        public static final String AppsGrantResourcesByCategoryId = "/resources/appsAppId/grantByCategoryId";
+        public static final String DeleteAppsGrantResourcesByCategoryId = "/resources/appsAppId/deleteGrantByCategoryId";
 
         public static final String ResourceMetadatasValid = "/resources/metadatas/valid";
         public static final String ResourceMetadataGrants = "/resources/metadata/grants";
@@ -188,8 +189,8 @@ public class ServiceApi {
         public static final String ResourceRolesMetadataGrant = "/resources/rolesMetadata/grants/{id}";
         public static final String ResourceRolesGrantsNoPage = "/resources/rolesGrants/no_paging";
         public static final String ResourceRolesResMetadataGrants = "/resources/roles_resource/{roles_res_id}/metadata";
-        public static final String RolesGrantResourcesByCategoryId = "/resources/roles/{rolesId}/grantByCategoryId";
-        public static final String DeleteRolesGrantResourcesByCategoryId = "/resources/roles/{rolesId}/deleteGrantByCategoryId";
+        public static final String RolesGrantResourcesByCategoryId = "/resources/rolesRolesId/grantByCategoryId";
+        public static final String DeleteRolesGrantResourcesByCategoryId = "/resources/rolesRolesId/deleteGrantByCategoryId";
 
         /**
          * 机构-资源授权
@@ -315,7 +316,6 @@ public class ServiceApi {
      */
     public static class Profiles {
         public static final String ProfileInfo = "/profile/baseInfo"; //基本信息
-        public static final String ProfileHistory = "/profile/profileHistory"; //既往史 - pc档案浏览器
         public static final String PastHistory = "/profile/pastHistory"; //既往史 - mobile居民端
         public static final String PersonHistory = "/profile/personHistory"; //个人史
         public static final String AllergensHistory = "/profile/allergensHistory"; //过敏史
@@ -1326,6 +1326,10 @@ public class ServiceApi {
 
         public static final String GetYearDropdownList = "/tj/getYearDropdownList";
 
+        public static class Scheduler {
+            public static final String ExtractMedicineExpense = "/tj/scheduler/extractMedicineExpense";
+            public static final String ExtractChronicDisease = "/tj/scheduler/extractChronicDisease";
+        }
 
     }
 
@@ -1689,4 +1693,5 @@ public class ServiceApi {
         public static final String uploadRecordList= "/packQcReport/uploadRecordList";
         public static final String uploadRecordDetail= "/packQcReport/uploadRecordDetail";
     }
+
 }

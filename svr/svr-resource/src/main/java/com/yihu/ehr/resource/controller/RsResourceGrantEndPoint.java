@@ -848,7 +848,7 @@ public class RsResourceGrantEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Resources.RolesGrantResourcesByCategoryId, method = RequestMethod.POST)
     public Envelop rolesGrantResourcesByCategoryId(
             @ApiParam(name = "rolesId", value = "角色组ID", defaultValue = "")
-            @PathVariable(value = "rolesId") String rolesId,
+            @RequestParam(value = "rolesId") String rolesId,
             @ApiParam(name = "appId", value = "应用ID", defaultValue = "zkGuSIm2Fg")
             @RequestParam(value = "appId") String appId,
             @ApiParam(name = "categoryIds", value = "视图分类ID", defaultValue = "0dae002159535497b3865e129433e933")
@@ -936,10 +936,10 @@ public class RsResourceGrantEndPoint extends EnvelopRestEndPoint {
     }
 
     @ApiOperation("单个角色组----一键取消授权多个资源")
-    @RequestMapping(value = ServiceApi.Resources.DeleteRolesGrantResourcesByCategoryId, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Resources.DeleteRolesGrantResourcesByCategoryId, method = RequestMethod.POST)
     public Envelop deleteRolesGrantResourcesByCategoryId(
             @ApiParam(name = "rolesId", value = "角色组ID", defaultValue = "")
-            @PathVariable(value = "rolesId") String rolesId,
+            @RequestParam(value = "rolesId") String rolesId,
             @ApiParam(name = "appId", value = "应用ID", defaultValue = "zkGuSIm2Fg")
             @RequestParam(value = "appId") String appId,
             @ApiParam(name = "categoryIds", value = "视图分类ID", defaultValue = "0dae002159535497b3865e129433e933")
