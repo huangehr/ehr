@@ -9,6 +9,8 @@ import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 
 /**
@@ -17,7 +19,7 @@ import org.springframework.data.web.config.EnableSpringDataWebSupport;
 @Configuration
 @EnableAutoConfiguration(exclude = {SecurityAutoConfiguration.class})
 @EnableFeignClients
-@EnableDiscoveryClient
+@EnableDiscoveryClient //服务注册到发现服务
 @EnableEurekaClient
 @EnableSpringDataWebSupport
 @SpringBootApplication
