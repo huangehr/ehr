@@ -11,6 +11,8 @@ import java.util.List;
  */
 public class ResourceCells {
 
+    public static final String ROWKEY = "rowkey";
+
     //Basic
     public static final String PROFILE_ID = "profile_id";
     public static final String PROFILE_TYPE = "profile_type";

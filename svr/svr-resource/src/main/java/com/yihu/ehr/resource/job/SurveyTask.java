@@ -73,8 +73,8 @@ public class SurveyTask {
                         newEntity = new Registration();
                         //身份证号码 没有用户id 表示该用户未注册
                         String userId = "";
-                        if (null != map.get("demographic_id") && !StringUtils.isEmpty(map.get("demographic_id").toString())&&map.get("demographic_id").toString().length()<19) {
-                            newEntity.setCardNo(map.get("demographic_id").toString());
+                        if (null != map.get("EHR_000017") && !StringUtils.isEmpty(map.get("EHR_000017").toString())) {
+                            newEntity.setCardNo(map.get("EHR_000017").toString());
                             userId = messageTemplateService.getUserIdByIdCardNo(newEntity.getCardNo());
                         }
                         if (!StringUtils.isEmpty(userId)) {

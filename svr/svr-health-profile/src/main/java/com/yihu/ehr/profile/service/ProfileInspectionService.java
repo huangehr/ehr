@@ -36,7 +36,7 @@ public class ProfileInspectionService extends ProfileBasicService {
                 //循环获取结果集
                 for (Map<String, Object> temp : masterList) {
                     String subQ = "{\"q\":\"rowkey:" + temp.get("rowkey") + "$" + dataset + "$*\"}";
-                    Envelop subEnvelop = resource.getSubData(subQ, 1, 500, null);
+                    Envelop subEnvelop = resource.getSubData(subQ, 1, 1000, null);
                     List<Map<String, Object>> subList = subEnvelop.getDetailModelList();
                     subList.forEach(item -> {
                         Map<String, Object> resultMap = simpleEvent(temp, searchParam);
