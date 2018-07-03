@@ -1375,6 +1375,12 @@ public class BaseStatistsService {
             molecularFilter = "quotaDate >= '" + firstDay + "' and quotaDate <= '" + lastDay + "'";
             denominatorFilter = "quotaDate >= '" + preMonthFirstDay + "' and quotaDate <= '" + preMonthLastDay + "'";
         }
+        if (StringUtils.isNotEmpty(esConfig.getMolecularFilter())) {
+            molecularFilter += " and " + esConfig.getMolecularFilter();
+        }
+        if (StringUtils.isNotEmpty(esConfig.getDenominatorFilter())) {
+            denominatorFilter += " and " + esConfig.getDenominatorFilter();
+        }
         List<Map<String, Object>> moleList = getSimpleQuotaReport(esConfig.getMolecular(), molecularFilter,dimension ,false , null);
         List<Map<String, Object>> denoList =  getSimpleQuotaReport(esConfig.getDenominator(),denominatorFilter,dimension,false, null);
 //        List<Map<String, Object>> moleList = divisionQuota(esConfig.getMolecular(), esConfig.getDenominator(), dimension, molecularFilter, molecularFilter, esConfig.getPercentOperation(), esConfig.getPercentOperationValue(), dateType, "");
@@ -1422,6 +1428,9 @@ public class BaseStatistsService {
         } else if ("2".equals(esConfig.getIncrementFlag())) {
             // 当前月
             filters = "quotaDate >= '" + firstDay + "' and quotaDate <= '" + lastDay + "'";
+        }
+        if (StringUtils.isNotEmpty(esConfig.getFilter())) {
+            filters += " and " + esConfig.getFilter();
         }
         return filters;
     }
