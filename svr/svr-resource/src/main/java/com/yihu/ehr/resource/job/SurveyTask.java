@@ -50,14 +50,14 @@ public class SurveyTask {
         //检索条件
         String date = DateUtil.getNowDate(DateUtil.DEFAULT_DATE_YMD_FORMAT);
         String queryParams = "create_date:["+date+"T00:00:00Z  TO "+date+ "T23:59:59Z"+"] AND event_type: \"0\"";
-//        String queryParams = "create_date:[2018-01-29T10:00:00Z  TO 2018-01-29T23:59:59Z"+"] AND event_type: \"0\" AND  demographic_id: \"362321199203110529\"";
         int count = (int)(solrUtil.count("HealthProfile", queryParams));
         int size = 1000;
         int totalPages = count%size == 0 ? count/size : (count/size)+1;
         ProtalMessageRemind messageRemind = null;
         for(int i=0; i<totalPages ;i++){
             //查找档案
-            Envelop envelop = resourceBrowseService.getEhrCenter(null, "*", "*", queryParams, i, size);
+            queryParams = "{\"q\":\"create_date:["+date+"T00:00:00Z TO "+date+ "T23:59:59Z] AND event_type:0\"}";
+            Envelop envelop = resourceBrowseService.getEhrCenter(null, "*", "*", queryParams, i + 1, size);
             List list = envelop.getDetailModelList();
             List<Map<String, String>> contentList = new ArrayList<>();
             Registration newEntity = null;
