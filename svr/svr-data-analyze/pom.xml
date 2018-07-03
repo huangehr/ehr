@@ -135,5 +135,10 @@
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-entity</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.yihu.ehr</groupId>
+            <artifactId>svr-quota</artifactId>
+            <version>1.2.0</version>
+        </dependency>
     </dependencies>
 </project>
