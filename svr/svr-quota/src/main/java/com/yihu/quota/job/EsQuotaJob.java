@@ -93,7 +93,7 @@ public class EsQuotaJob implements Job {
             EsConfig esConfig = (EsConfig) JSONObject.toBean(obj,EsConfig.class);
             //查询是否已经统计过,如果已统计 先删除后保存
             deleteRecord(quotaVo);
-            if(quotaDataSource.getSourceCode().equals("2") && esConfig.getAggregation().equals("list")){//来源solr
+            if(quotaDataSource.getSourceCode().equals("2") && esConfig.getAggregation()!= null && esConfig.getAggregation().equals("list")) {//来源solr
                 moreThredQuota(tjQuotaLog,esConfig);
             }else{
                 //统计并保存
