@@ -1,6 +1,6 @@
 package com.yihu.ehr.profile.service;
 
-import com.yihu.ehr.profile.util.BasicConstant;
+import com.yihu.ehr.profile.family.ResourceCells;
 import com.yihu.ehr.util.rest.Envelop;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
@@ -36,8 +36,8 @@ public class ProfileDiseaseService extends ProfileBasicService {
             //进行降序
             Collections.sort(eventList, new ProfileDiseaseService.EventDateComparatorDesc());
             eventList.forEach(item -> {
-                if (item.containsKey(BasicConstant.diagnosis)) {
-                    String diagnosis = (String) item.get(BasicConstant.diagnosis);
+                if (item.containsKey(ResourceCells.DIAGNOSIS)) {
+                    String diagnosis = (String) item.get(ResourceCells.DIAGNOSIS);
                     String [] _diagnosis = diagnosis.split(";");
                     for (String code : _diagnosis) {
                         String chronicInfo = redisService.getChronicInfo(code);
@@ -71,7 +71,7 @@ public class ProfileDiseaseService extends ProfileBasicService {
                 for (int i = 0; i < profileList.size(); i++) {
                     Map<String, Object> profile = profileList.get(i);
                     //事件类型
-                    String eventType = (String) profile.get(BasicConstant.eventType);
+                    String eventType = (String) profile.get(ResourceCells.EVENT_TYPE);
                     String recentEvent = "";
                     if ("0".equals(eventType)) {
                         recentEvent = "门诊";
@@ -84,24 +84,24 @@ public class ProfileDiseaseService extends ProfileBasicService {
                     }
                     //第一条
                     if (i == 0) {
-                        obj.put("lastVisitDate", profile.get(BasicConstant.eventDate));
-                        obj.put("lastVisitOrgCode", profile.get(BasicConstant.orgCode));
-                        obj.put("lastVisitOrg", profile.get(BasicConstant.orgName));
-                        obj.put("lastVisitRecord", profile.get(BasicConstant.rowkey));
+                        obj.put("lastVisitDate", profile.get(ResourceCells.EVENT_DATE));
+                        obj.put("lastVisitOrgCode", profile.get(ResourceCells.ORG_CODE));
+                        obj.put("lastVisitOrg", profile.get(ResourceCells.ORG_NAME));
+                        obj.put("lastVisitRecord", profile.get(ResourceCells.ROWKEY));
                         obj.put("recentEvent", recentEvent);
                         obj.put("eventType", eventType);
                     }
                     //最后一条
                     if (i == profileList.size() - 1) {
-                        obj.put("ageOfDisease", getAgeOfDisease(profile.get(BasicConstant.eventDate)));
-                        obj.put("firstVisitDate", profile.get(BasicConstant.eventDate));
-                        obj.put("firstVisitOrgCode", profile.get(BasicConstant.orgCode));
-                        obj.put("firstVisitOrg", profile.get(BasicConstant.orgName));
-                        obj.put("firstVisitRecord", profile.get(BasicConstant.rowkey));
+                        obj.put("ageOfDisease", getAgeOfDisease(profile.get(ResourceCells.EVENT_DATE)));
+                        obj.put("firstVisitDate", profile.get(ResourceCells.EVENT_DATE));
+                        obj.put("firstVisitOrgCode", profile.get(ResourceCells.ORG_CODE));
+                        obj.put("firstVisitOrg", profile.get(ResourceCells.ORG_NAME));
+                        obj.put("firstVisitRecord", profile.get(ResourceCells.ROWKEY));
                     }
                     //提取并发症
-                    if (profile.containsKey(BasicConstant.diagnosis)) {
-                        String diagnosis = (String) profile.get(BasicConstant.diagnosis);
+                    if (profile.containsKey(ResourceCells.DIAGNOSIS)) {
+                        String diagnosis = (String) profile.get(ResourceCells.DIAGNOSIS);
                         String [] _diagnosis = diagnosis.split(";");
                         for (String diagnosisCode : _diagnosis) {
                             if (!redisService.getHpCodeByIcd10(diagnosisCode).contains(hpCode)) {
@@ -137,9 +137,9 @@ public class ProfileDiseaseService extends ProfileBasicService {
                     Collections.sort(value, new ProfileDiseaseService.EventDateComparatorDesc());
                     Map<String, Object> profile = value.get(value.size() - 1);
                     data.put("name", redisService.getIcd10Name(key));
-                    data.put("date", profile.get(BasicConstant.eventDate));
-                    data.put("org", profile.get(BasicConstant.orgName));
-                    data.put("record", profile.get(BasicConstant.rowkey));
+                    data.put("date", profile.get(ResourceCells.EVENT_DATE));
+                    data.put("org", profile.get(ResourceCells.ORG_NAME));
+                    data.put("record", profile.get(ResourceCells.ROWKEY));
                     complicationList.add(data);
                 });
                 obj.put("complication", complicationList);
@@ -167,8 +167,8 @@ public class ProfileDiseaseService extends ProfileBasicService {
             //进行降序
             Collections.sort(eventList, new ProfileDiseaseService.EventDateComparatorDesc());
             for (Map<String, Object> item : eventList) {
-                if (item.containsKey(BasicConstant.healthProblem)) {
-                    String healthProblem = (String) item.get(BasicConstant.healthProblem);
+                if (item.containsKey(ResourceCells.HEALTH_PROBLEM)) {
+                    String healthProblem = (String) item.get(ResourceCells.HEALTH_PROBLEM);
                     String [] _healthProblem = healthProblem.split(";");
                     for (String code : _healthProblem) {
                         List<Map<String, Object>> profileList = new ArrayList<>();
@@ -193,7 +193,7 @@ public class ProfileDiseaseService extends ProfileBasicService {
                 for (int i = 0; i < profileList.size(); i++) {
                     Map<String, Object> profile = profileList.get(i);
                     //事件类型
-                    String eventType = (String) profile.get(BasicConstant.eventType);
+                    String eventType = (String) profile.get(ResourceCells.EVENT_TYPE);
                     String recentEvent = "";
                     if ("0".equals(eventType)) {
                         recentEvent = "门诊";
@@ -204,30 +204,30 @@ public class ProfileDiseaseService extends ProfileBasicService {
                     } else if ("2".equals(eventType)) {
                         recentEvent = "体检";
                     }
-                    String subQ = "{\"q\":\"rowkey:" + profile.get(BasicConstant.rowkey) + "$HDSD00_06$*" + "\"}";
-                    Envelop subEnvelop = resource.getSubData(subQ, 1, 500, null);
+                    String subQ = "{\"q\":\"rowkey:" + profile.get(ResourceCells.ROWKEY) + "$HDSD00_06$*" + "\"}";
+                    Envelop subEnvelop = resource.getSubData(subQ, 1, 1, null);
                     if (subEnvelop.getDetailModelList().size() > 0) {
                         operateTimes ++;
                     }
                     //第一条
                     if (i == 0) {
-                        obj.put("lastVisitDate", profile.get(BasicConstant.eventDate));
-                        obj.put("lastVisitOrgCode", profile.get(BasicConstant.orgCode));
-                        obj.put("lastVisitOrg", profile.get(BasicConstant.orgName));
-                        obj.put("lastVisitRecord", profile.get(BasicConstant.rowkey));
+                        obj.put("lastVisitDate", profile.get(ResourceCells.EVENT_DATE));
+                        obj.put("lastVisitOrgCode", profile.get(ResourceCells.ORG_CODE));
+                        obj.put("lastVisitOrg", profile.get(ResourceCells.ORG_NAME));
+                        obj.put("lastVisitRecord", profile.get(ResourceCells.ROWKEY));
                         obj.put("recentEvent", recentEvent);
                         obj.put("eventType", eventType);
                     }
                     //最后一条
                     if (i == profileList.size() - 1) {
-                        obj.put("firstVisitDate", profile.get(BasicConstant.eventDate));
-                        obj.put("firstVisitOrgCode", profile.get(BasicConstant.orgCode));
-                        obj.put("firstVisitOrg", profile.get(BasicConstant.orgName));
-                        obj.put("firstVisitRecord", profile.get(BasicConstant.rowkey));
+                        obj.put("firstVisitDate", profile.get(ResourceCells.EVENT_DATE));
+                        obj.put("firstVisitOrgCode", profile.get(ResourceCells.ORG_CODE));
+                        obj.put("firstVisitOrg", profile.get(ResourceCells.ORG_NAME));
+                        obj.put("firstVisitRecord", profile.get(ResourceCells.ROWKEY));
                     }
                     //提取常见症状
-                    if (profile.containsKey(BasicConstant.diagnosis)) {
-                        String diagnosis = (String) profile.get(BasicConstant.diagnosis);
+                    if (profile.containsKey(ResourceCells.DIAGNOSIS)) {
+                        String diagnosis = (String) profile.get(ResourceCells.DIAGNOSIS);
                         String [] _diagnosis = diagnosis.split(";");
                         for (String diagnosisCode : _diagnosis) {
                             String healthProblem = redisService.getHpCodeByIcd10(diagnosisCode);//通过ICD10获取健康问题
@@ -296,8 +296,8 @@ public class ProfileDiseaseService extends ProfileBasicService {
     static class EventDateComparatorDesc implements Comparator<Map<String, Object>> {
         @Override
         public int compare(Map<String, Object> m1, Map<String, Object> m2) {
-            String eventDate1 = (String)m1.get(BasicConstant.eventDate);
-            String eventDate2 = (String)m2.get(BasicConstant.eventDate);
+            String eventDate1 = (String)m1.get(ResourceCells.EVENT_DATE);
+            String eventDate2 = (String)m2.get(ResourceCells.EVENT_DATE);
             String str1 = eventDate1.substring(0, eventDate1.length()-1).replaceAll("[a-zA-Z]"," ");
             String str2 = eventDate2.substring(0, eventDate1.length()-1).replaceAll("[a-zA-Z]"," ");
             DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

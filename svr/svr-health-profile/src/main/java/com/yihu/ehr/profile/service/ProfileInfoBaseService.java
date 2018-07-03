@@ -1,8 +1,8 @@
 package com.yihu.ehr.profile.service;
 
 
+import com.yihu.ehr.profile.family.ResourceCells;
 import com.yihu.ehr.profile.feign.*;
-import com.yihu.ehr.profile.util.BasicConstant;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.http.HttpResponse;
@@ -112,13 +112,13 @@ public class ProfileInfoBaseService extends BaseJpaService {
             }
             patientMap.put("weight", weight);
             List<String> labels = new ArrayList<>();
-            if (result.get(BasicConstant.diagnosis) != null && result.get(BasicConstant.diagnosis).toString().contains("Z37")) { //1 新生儿
+            if (result.get(ResourceCells.DIAGNOSIS) != null && result.get(ResourceCells.DIAGNOSIS).toString().contains("Z37")) { //1 新生儿
                 labels.add("新生儿");
                 //出生身高
                 patientMap.put("height", result.get("EHR_001256") == null ? "" : result.get("EHR_001256"));
                 //出生体重
                 patientMap.put("weight", result.get("EHR_001257") == null ? "" : result.get("EHR_001257")); //单位(g)
-            } else if (result.get(BasicConstant.diagnosis) != null && result.get(BasicConstant.diagnosis).toString().contains("O80")) { //2 孕妇
+            } else if (result.get(ResourceCells.DIAGNOSIS) != null && result.get(ResourceCells.DIAGNOSIS).toString().contains("O80")) { //2 孕妇
                 labels.add("孕妇");
             } else if (profileDiseaseService.getHealthProblem(demographicId).size() > 0){
                 labels.add("慢病");
@@ -238,13 +238,13 @@ public class ProfileInfoBaseService extends BaseJpaService {
         StringBuilder stringBuilder4 = new StringBuilder();
         if (list4 != null && list4.size() > 0) {
             for (Map temp : list4) {
-                if (!StringUtils.isEmpty(temp.get(BasicConstant.healthProblemName))) {
-                    String [] hpNames = temp.get(BasicConstant.healthProblemName).toString().split(";");
+                if (!StringUtils.isEmpty(temp.get(ResourceCells.HEALTH_PROBLEM_NAME))) {
+                    String [] hpNames = temp.get(ResourceCells.HEALTH_PROBLEM_NAME).toString().split(";");
                     for (String hpName : hpNames) {
                         hpSet.add(hpName);
                     }
-                } else if (!StringUtils.isEmpty(temp.get(BasicConstant.healthProblem))) {
-                    String [] _hpCode = ((String) temp.get(BasicConstant.healthProblem)).split(";");
+                } else if (!StringUtils.isEmpty(temp.get(ResourceCells.HEALTH_PROBLEM))) {
+                    String [] _hpCode = ((String) temp.get(ResourceCells.HEALTH_PROBLEM)).split(";");
                     for (String code : _hpCode) {
                         String name = redisService.getHealthProblem(code);
                         if (!StringUtils.isEmpty(name)) {

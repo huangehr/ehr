@@ -1,8 +1,8 @@
 package com.yihu.ehr.profile.service;
 
+import com.yihu.ehr.profile.family.ResourceCells;
 import com.yihu.ehr.profile.feign.CDADocumentClient;
 import com.yihu.ehr.profile.feign.ResourceClient;
-import com.yihu.ehr.profile.util.BasicConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
@@ -28,31 +28,31 @@ public abstract class ProfileBasicService {
 
     protected Map<String, Object> simpleEvent (Map<String, Object> detailsEvent, String searchParam) {
         Map<String, Object> simpleEvent = new HashMap<>();
-        simpleEvent.put("profileId", detailsEvent.get(BasicConstant.rowkey));
-        simpleEvent.put("orgCode", detailsEvent.get(BasicConstant.orgCode));
-        simpleEvent.put("orgName", detailsEvent.get(BasicConstant.orgName));
-        simpleEvent.put("demographicId", detailsEvent.get(BasicConstant.demographicId));
-        simpleEvent.put("cdaVersion", detailsEvent.get(BasicConstant.cdaVersion));
-        simpleEvent.put("eventDate", detailsEvent.get(BasicConstant.eventDate));
-        simpleEvent.put("profileType", detailsEvent.get(BasicConstant.profileType));
-        simpleEvent.put("eventType", detailsEvent.get(BasicConstant.eventType));
-        simpleEvent.put("eventNo", detailsEvent.get(BasicConstant.eventNo));
+        simpleEvent.put("profileId", detailsEvent.get(ResourceCells.ROWKEY));
+        simpleEvent.put("orgCode", detailsEvent.get(ResourceCells.ORG_CODE));
+        simpleEvent.put("orgName", detailsEvent.get(ResourceCells.ORG_NAME));
+        simpleEvent.put("demographicId", detailsEvent.get(ResourceCells.DEMOGRAPHIC_ID));
+        simpleEvent.put("cdaVersion", detailsEvent.get(ResourceCells.CDA_VERSION));
+        simpleEvent.put("eventDate", detailsEvent.get(ResourceCells.EVENT_DATE));
+        simpleEvent.put("profileType", detailsEvent.get(ResourceCells.PROFILE_TYPE));
+        simpleEvent.put("eventType", detailsEvent.get(ResourceCells.EVENT_TYPE));
+        simpleEvent.put("eventNo", detailsEvent.get(ResourceCells.EVENT_NO));
         //诊断名称
         String healthProblemName = "";
-        if (!StringUtils.isEmpty(detailsEvent.get(BasicConstant.diagnosisName))) {
-            healthProblemName = ((String) detailsEvent.get(BasicConstant.diagnosisName)).replaceAll(";", "、");
-        } else if (!StringUtils.isEmpty(detailsEvent.get(BasicConstant.diagnosis))) {
-            String [] diagnosisCode = ((String) detailsEvent.get(BasicConstant.diagnosis)).split(";");
+        if (!StringUtils.isEmpty(detailsEvent.get(ResourceCells.DIAGNOSIS_NAME))) {
+            healthProblemName = ((String) detailsEvent.get(ResourceCells.DIAGNOSIS_NAME)).replaceAll(";", "、");
+        } else if (!StringUtils.isEmpty(detailsEvent.get(ResourceCells.DIAGNOSIS))) {
+            String [] diagnosisCode = ((String) detailsEvent.get(ResourceCells.DIAGNOSIS)).split(";");
             for (String code : diagnosisCode) {
                 String name = redisService.getIcd10Name(code);
                 if (!StringUtils.isEmpty(name)) {
                     healthProblemName += name + "、";
                 }
             }
-        } else if (!StringUtils.isEmpty(detailsEvent.get(BasicConstant.healthProblemName))) {
-            healthProblemName = ((String) detailsEvent.get(BasicConstant.healthProblemName)).replaceAll(";", "、");
-        } else if (!StringUtils.isEmpty(detailsEvent.get(BasicConstant.healthProblem))) {
-            String [] _hpCode = ((String) detailsEvent.get(BasicConstant.healthProblem)).split(";");
+        } else if (!StringUtils.isEmpty(detailsEvent.get(ResourceCells.HEALTH_PROBLEM_NAME))) {
+            healthProblemName = ((String) detailsEvent.get(ResourceCells.HEALTH_PROBLEM_NAME)).replaceAll(";", "、");
+        } else if (!StringUtils.isEmpty(detailsEvent.get(ResourceCells.HEALTH_PROBLEM))) {
+            String [] _hpCode = ((String) detailsEvent.get(ResourceCells.HEALTH_PROBLEM)).split(";");
             for (String code : _hpCode) {
                 String name = redisService.getHealthProblem(code);
                 if (!StringUtils.isEmpty(name)) {
@@ -64,14 +64,14 @@ public abstract class ProfileBasicService {
         if (!StringUtils.isEmpty(searchParam)) {
             Set<String> searchSet = new HashSet<>();
             //诊断检索数据
-            if (!StringUtils.isEmpty(detailsEvent.get(BasicConstant.diagnosisName))) {
-                String [] data = detailsEvent.get(BasicConstant.diagnosisName).toString().split(";");
+            if (!StringUtils.isEmpty(detailsEvent.get(ResourceCells.DIAGNOSIS_NAME))) {
+                String [] data = detailsEvent.get(ResourceCells.DIAGNOSIS_NAME).toString().split(";");
                 for (String datum : data) {
                     searchSet.add(datum);
                 }
             }
-            if (!StringUtils.isEmpty(detailsEvent.get(BasicConstant.diagnosis))) {
-                String [] data = detailsEvent.get(BasicConstant.diagnosis).toString().split(";");
+            if (!StringUtils.isEmpty(detailsEvent.get(ResourceCells.DIAGNOSIS))) {
+                String [] data = detailsEvent.get(ResourceCells.DIAGNOSIS).toString().split(";");
                 for (String datum : data) {
                     String name = redisService.getIcd10Name(datum);
                     if (!StringUtils.isEmpty(name)) {
@@ -79,14 +79,14 @@ public abstract class ProfileBasicService {
                     }
                 }
             }
-            if (!StringUtils.isEmpty(detailsEvent.get(BasicConstant.healthProblemName))) {
-                String [] data = detailsEvent.get(BasicConstant.healthProblemName).toString().split(";");
+            if (!StringUtils.isEmpty(detailsEvent.get(ResourceCells.HEALTH_PROBLEM_NAME))) {
+                String [] data = detailsEvent.get(ResourceCells.HEALTH_PROBLEM_NAME).toString().split(";");
                 for (String datum : data) {
                     searchSet.add(datum);
                 }
             }
-            if (!StringUtils.isEmpty(detailsEvent.get(BasicConstant.healthProblem))) {
-                String [] data = detailsEvent.get(BasicConstant.healthProblem).toString().split(";");
+            if (!StringUtils.isEmpty(detailsEvent.get(ResourceCells.HEALTH_PROBLEM))) {
+                String [] data = detailsEvent.get(ResourceCells.HEALTH_PROBLEM).toString().split(";");
                 for (String datum : data) {
                     String name = redisService.getHealthProblem(datum);
                     if (!StringUtils.isEmpty(name)) {
@@ -95,8 +95,8 @@ public abstract class ProfileBasicService {
                 }
             }
             String orgName = "";
-            if (!StringUtils.isEmpty(detailsEvent.get(BasicConstant.orgName))) {
-                orgName = (String) detailsEvent.get(BasicConstant.orgName);
+            if (!StringUtils.isEmpty(detailsEvent.get(ResourceCells.ORG_NAME))) {
+                orgName = (String) detailsEvent.get(ResourceCells.ORG_NAME);
             }
             String disease = org.apache.commons.lang3.StringUtils.join(searchSet.toArray(),";");
             if (disease.contains(searchParam) || orgName.contains(searchParam)) {
