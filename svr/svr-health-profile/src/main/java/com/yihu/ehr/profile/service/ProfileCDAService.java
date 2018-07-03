@@ -1,9 +1,9 @@
 package com.yihu.ehr.profile.service;
 
 
+import com.yihu.ehr.profile.family.ResourceCells;
 import com.yihu.ehr.profile.model.ArchiveTemplate;
 import com.yihu.ehr.profile.service.template.ArchiveTemplateService;
-import com.yihu.ehr.profile.util.BasicConstant;
 import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.ehr.profile.model.MCDADocument;
 import com.yihu.hos.model.standard.MCdaDataSet;
@@ -36,9 +36,9 @@ public class ProfileCDAService extends ProfileBasicService {
         List<Map<String, Object>> dataList = envelop.getDetailModelList();
         if (dataList.size() > 0) {
             Map<String, Object> obj = dataList.get(0);
-            String profileType = obj.get(BasicConstant.profileType).toString();
-            String cdaVersion = obj.get(BasicConstant.cdaVersion).toString();
-            String eventType = obj.get(BasicConstant.eventType).toString();
+            String profileType = obj.get(ResourceCells.PROFILE_TYPE).toString();
+            String cdaVersion = obj.get(ResourceCells.CDA_VERSION).toString();
+            String eventType = obj.get(ResourceCells.EVENT_TYPE).toString();
             if (profileType.equals("0") || profileType.equals("1")) {
                 //根据机构获取定制模板
                 List<ArchiveTemplate> list;
@@ -55,14 +55,14 @@ public class ProfileCDAService extends ProfileBasicService {
                     Map<String, Object> temp = new HashMap<>();
                     if (item.getTitle().contains("检查报告")) {
                         String subQ = "{\"q\":\"rowkey:" + profileId + "$HDSD00_79$*\"}";
-                        Envelop subEnvelop = resource.getSubData(subQ, 1, 500, null);
+                        Envelop subEnvelop = resource.getSubData(subQ, 1, 1000, null);
                         List<Map<String, Object>> subList = subEnvelop.getDetailModelList();
                         List<Map<String, Object>> data = new ArrayList<>();
                         subList.forEach(item2 -> {
                             Map<String, Object> dataMap = new HashMap<>();
                             String item2Name = (String) item2.get("EHR_002883"); //检查名称
-                            dataMap.put(BasicConstant.profileId, item2.get(BasicConstant.rowkey));
-                            dataMap.put(BasicConstant.profileType, profileType);
+                            dataMap.put(ResourceCells.PROFILE_ID, item2.get(ResourceCells.ROWKEY));
+                            dataMap.put(ResourceCells.PROFILE_TYPE, profileType);
                             dataMap.put("cda_document_id", item.getCdaDocumentId());
                             dataMap.put("cda_code", item.getCdaCode());
                             dataMap.put("pc_template", item.getPcUrl());
@@ -78,14 +78,14 @@ public class ProfileCDAService extends ProfileBasicService {
                         temp.put("records", data);
                     } else if (item.getTitle().contains("检验报告")) {
                         String subQ = "{\"q\":\"rowkey:" + profileId + "$HDSD00_77$*\"}";
-                        Envelop subEnvelop = resource.getSubData(subQ, 1, 500, null);
+                        Envelop subEnvelop = resource.getSubData(subQ, 1, 1000, null);
                         List<Map<String, Object>> subList = subEnvelop.getDetailModelList();
                         List<Map<String, Object>> data = new ArrayList<>();
                         subList.forEach(item2 -> {
                             Map<String, Object> dataMap = new HashMap<>();
                             String item2Name = (String) item2.get("EHR_000352"); //检验项目
-                            dataMap.put(BasicConstant.profileId, item2.get(BasicConstant.rowkey));
-                            dataMap.put(BasicConstant.profileType, profileType);
+                            dataMap.put(ResourceCells.PROFILE_ID, item2.get(ResourceCells.ROWKEY));
+                            dataMap.put(ResourceCells.PROFILE_TYPE, profileType);
                             dataMap.put("cda_document_id", item.getCdaDocumentId());
                             dataMap.put("cda_code", item.getCdaCode());
                             dataMap.put("pc_template", item.getPcUrl());
@@ -101,36 +101,44 @@ public class ProfileCDAService extends ProfileBasicService {
                         temp.put("records", data);
                     } else if (item.getTitle().contains("处方")) {
                         if (item.getTitle().contains("中药")) {
-                            Map<String, Object> dataMap = new HashMap<>();
-                            dataMap.put(BasicConstant.profileId, profileId);
-                            dataMap.put(BasicConstant.profileType, profileType);
-                            dataMap.put("cda_document_id", item.getCdaDocumentId());
-                            dataMap.put("cda_code", item.getCdaCode());
-                            dataMap.put("pc_template", item.getPcUrl());
-                            dataMap.put("mobile_template", item.getMobileUrl());
-                            dataMap.put("template_id", item.getId());
-                            dataMap.put("name", "中药处方");
-                            dataMap.put("mark", "01");
-                            prescription.add(dataMap);
+                            String subQ = "{\"q\":\"rowkey:" + profileId + "$HDSD00_83$*\"}";
+                            Envelop subEnvelop = resource.getSubData(subQ, 1, 1, null);
+                            if (subEnvelop.getDetailModelList() != null && subEnvelop.getDetailModelList().size() > 0) {
+                                Map<String, Object> dataMap = new HashMap<>();
+                                dataMap.put(ResourceCells.PROFILE_ID, profileId);
+                                dataMap.put(ResourceCells.PROFILE_TYPE, profileType);
+                                dataMap.put("cda_document_id", item.getCdaDocumentId());
+                                dataMap.put("cda_code", item.getCdaCode());
+                                dataMap.put("pc_template", item.getPcUrl());
+                                dataMap.put("mobile_template", item.getMobileUrl());
+                                dataMap.put("template_id", item.getId());
+                                dataMap.put("name", "中药处方");
+                                dataMap.put("mark", "01");
+                                prescription.add(dataMap);
+                            }
                             return;
                         } else if (item.getTitle().contains("西药")) {
-                            Map<String, Object> dataMap = new HashMap<>();
-                            dataMap.put(BasicConstant.profileId, profileId);
-                            dataMap.put(BasicConstant.profileType, profileType);
-                            dataMap.put("cda_document_id", item.getCdaDocumentId());
-                            dataMap.put("cda_code", item.getCdaCode());
-                            dataMap.put("pc_template", item.getPcUrl());
-                            dataMap.put("mobile_template", item.getMobileUrl());
-                            dataMap.put("template_id", item.getId());
-                            dataMap.put("name", "西药处方");
-                            dataMap.put("mark", "02");
-                            prescription.add(dataMap);
+                            String subQ = "{\"q\":\"rowkey:" + profileId + "$HDSD00_84$*\"}";
+                            Envelop subEnvelop = resource.getSubData(subQ, 1, 1, null);
+                            if (subEnvelop.getDetailModelList() != null && subEnvelop.getDetailModelList().size() > 0) {
+                                Map<String, Object> dataMap = new HashMap<>();
+                                dataMap.put(ResourceCells.PROFILE_ID, profileId);
+                                dataMap.put(ResourceCells.PROFILE_TYPE, profileType);
+                                dataMap.put("cda_document_id", item.getCdaDocumentId());
+                                dataMap.put("cda_code", item.getCdaCode());
+                                dataMap.put("pc_template", item.getPcUrl());
+                                dataMap.put("mobile_template", item.getMobileUrl());
+                                dataMap.put("template_id", item.getId());
+                                dataMap.put("name", "西药处方");
+                                dataMap.put("mark", "02");
+                                prescription.add(dataMap);
+                            }
                             return;
                         }
                     } else {
                         Map<String, Object> dataMap = new HashMap<>();
-                        dataMap.put(BasicConstant.profileId, profileId);
-                        dataMap.put(BasicConstant.profileType, profileType);
+                        dataMap.put(ResourceCells.PROFILE_ID, profileId);
+                        dataMap.put(ResourceCells.PROFILE_TYPE, profileType);
                         dataMap.put("cda_document_id", item.getCdaDocumentId());
                         dataMap.put("cda_code", item.getCdaCode());
                         dataMap.put("pc_template", item.getPcUrl());
@@ -145,12 +153,14 @@ public class ProfileCDAService extends ProfileBasicService {
                     }
                     result.add(temp);
                 });
-                Map<String, Object> temp = new HashMap<>();
-                temp.put("template_name", "门诊处方");
-                temp.put("multi", true);
-                temp.put("data", new HashMap<>());
-                temp.put("records", prescription);
-                result.add(temp);
+                if (prescription.size() > 0) {
+                    Map<String, Object> temp = new HashMap<>();
+                    temp.put("template_name", "门诊处方");
+                    temp.put("multi", true);
+                    temp.put("data", new HashMap<>());
+                    temp.put("records", prescription);
+                    result.add(temp);
+                }
             } else {  //非结构化取数据rawfile
                 Envelop data = resource.getRawFiles(profileId, null, null, null);
                 if (data.getDetailModelList() != null) {
@@ -160,8 +170,8 @@ public class ProfileCDAService extends ProfileBasicService {
                         //获取cda内容
                         MCDADocument cdaDocument = cdaService.getCDADocuments(cdaVersion,cdaDocumentId);
                         Map<String, Object> item = new HashMap<>();
-                        item.put(BasicConstant.profileId, profileId);
-                        item.put(BasicConstant.profileType, profileType);
+                        item.put(ResourceCells.PROFILE_ID, profileId);
+                        item.put(ResourceCells.PROFILE_TYPE, profileType);
                         item.put("cda_document_id", cdaDocumentId);
                         item.put("cda_code", cdaDocument.getCode());
                         item.put("template_name", cdaDocument.getName());
@@ -205,7 +215,7 @@ public class ProfileCDAService extends ProfileBasicService {
         List<Map<String, Object>> eventList = envelop.getDetailModelList();
         if (eventList != null && eventList.size() > 0) {
             Map<String, Object> event = eventList.get(0);
-            String cdaVersion = String.valueOf(event.get(BasicConstant.cdaVersion));
+            String cdaVersion = String.valueOf(event.get(ResourceCells.CDA_VERSION));
             Map<String, Object> result = new HashMap<>();
             Map<String, Object> dataMap = new HashMap<>();
             Map<String, List<MCdaDataSet>> cdaDataSetMap = cdaService.getCDADataSetByCDAIdList(cdaVersion, cdaDocumentIdList);
@@ -236,12 +246,12 @@ public class ProfileCDAService extends ProfileBasicService {
                         Envelop subData = resource.getSubData(subQ, 1, 2000, null);
                         List<Map<String, Object>> subList = subData.getDetailModelList();
                         subList.forEach(item -> {
-                            item.put(BasicConstant.orgArea, event.get(BasicConstant.orgArea));
-                            item.put(BasicConstant.orgName, event.get(BasicConstant.orgName));
-                            item.put(BasicConstant.eventDate, event.get(BasicConstant.eventDate));
-                            String dataSetCode = String.valueOf(item.get(BasicConstant.rowkey)).split("\\$")[1];
+                            item.put(ResourceCells.ORG_AREA, event.get(ResourceCells.ORG_AREA));
+                            item.put(ResourceCells.ORG_NAME, event.get(ResourceCells.ORG_NAME));
+                            item.put(ResourceCells.EVENT_DATE, event.get(ResourceCells.EVENT_DATE));
+                            String dataSetCode = String.valueOf(item.get(ResourceCells.ROWKEY)).split("\\$")[1];
                             if (combination[1].equals(dataSetCode)) {
-                                if (profileId.equals(item.get(BasicConstant.rowkey))) {
+                                if (profileId.equals(item.get(ResourceCells.ROWKEY))) {
                                     if (tempMap.containsKey(dataSetCode)) {
                                         List<Map<String, Object>> tempList = (List<Map<String, Object>>) tempMap.get(dataSetCode);
                                         tempList.add(item);
@@ -311,10 +321,10 @@ public class ProfileCDAService extends ProfileBasicService {
                         Envelop subData = resource.getSubData(subQ, 1, 2000, null);
                         List<Map<String, Object>> subList = subData.getDetailModelList();
                         subList.forEach(item -> {
-                            item.put(BasicConstant.orgArea, event.get(BasicConstant.orgArea));
-                            item.put(BasicConstant.orgName, event.get(BasicConstant.orgName));
-                            item.put(BasicConstant.eventDate, event.get(BasicConstant.eventDate));
-                            String dataSetCode = String.valueOf(item.get(BasicConstant.rowkey)).split("\\$")[1];
+                            item.put(ResourceCells.ORG_AREA, event.get(ResourceCells.ORG_AREA));
+                            item.put(ResourceCells.ORG_NAME, event.get(ResourceCells.ORG_NAME));
+                            item.put(ResourceCells.EVENT_DATE, event.get(ResourceCells.EVENT_DATE));
+                            String dataSetCode = String.valueOf(item.get(ResourceCells.ROWKEY)).split("\\$")[1];
                             if (tempMap.containsKey(dataSetCode)) {
                                 List<Map<String, Object>> tempList = (List<Map<String, Object>>) tempMap.get(dataSetCode);
                                 tempList.add(item);
@@ -359,12 +369,12 @@ public class ProfileCDAService extends ProfileBasicService {
                         Envelop subData = resource.getSubData(subQ, 1, 2000, null);
                         List<Map<String, Object>> subList = subData.getDetailModelList();
                         subList.forEach(item -> {
-                            item.put(BasicConstant.orgArea, event.get(BasicConstant.orgArea));
-                            item.put(BasicConstant.orgName, event.get(BasicConstant.orgName));
-                            item.put(BasicConstant.eventDate, event.get(BasicConstant.eventDate));
-                            String dataSetCode = String.valueOf(item.get(BasicConstant.rowkey)).split("\\$")[1];
+                            item.put(ResourceCells.ORG_AREA, event.get(ResourceCells.ORG_AREA));
+                            item.put(ResourceCells.ORG_NAME, event.get(ResourceCells.ORG_NAME));
+                            item.put(ResourceCells.EVENT_DATE, event.get(ResourceCells.EVENT_DATE));
+                            String dataSetCode = String.valueOf(item.get(ResourceCells.ROWKEY)).split("\\$")[1];
                             if (combination[1].equals(dataSetCode)) {
-                                if (profileId.equals(item.get(BasicConstant.rowkey))) {
+                                if (profileId.equals(item.get(ResourceCells.ROWKEY))) {
                                     if (tempMap.containsKey(dataSetCode)) {
                                         List<Map<String, Object>> tempList = (List<Map<String, Object>>) tempMap.get(dataSetCode);
                                         tempList.add(resourcesTransformService.stdTransform(item, dataSetCode, cdaVersion));
@@ -435,10 +445,10 @@ public class ProfileCDAService extends ProfileBasicService {
                         Envelop subData = resource.getSubData(subQ, 1, 2000, null);
                         List<Map<String, Object>> subList = subData.getDetailModelList();
                         subList.forEach(item -> {
-                            item.put(BasicConstant.orgArea, event.get(BasicConstant.orgArea));
-                            item.put(BasicConstant.orgName, event.get(BasicConstant.orgName));
-                            item.put(BasicConstant.eventDate, event.get(BasicConstant.eventDate));
-                            String dataSetCode = String.valueOf(item.get(BasicConstant.rowkey)).split("\\$")[1];
+                            item.put(ResourceCells.ORG_AREA, event.get(ResourceCells.ORG_AREA));
+                            item.put(ResourceCells.ORG_NAME, event.get(ResourceCells.ORG_NAME));
+                            item.put(ResourceCells.EVENT_DATE, event.get(ResourceCells.EVENT_DATE));
+                            String dataSetCode = String.valueOf(item.get(ResourceCells.ROWKEY)).split("\\$")[1];
                             if (tempMap.containsKey(dataSetCode)) {
                                 List<Map<String, Object>> tempList = (List<Map<String, Object>>) tempMap.get(dataSetCode);
                                 tempList.add(resourcesTransformService.stdTransform(item, dataSetCode, cdaVersion));

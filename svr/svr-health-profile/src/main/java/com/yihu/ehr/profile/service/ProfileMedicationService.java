@@ -1,6 +1,6 @@
 package com.yihu.ehr.profile.service;
 
-import com.yihu.ehr.profile.util.BasicConstant;
+import com.yihu.ehr.profile.family.ResourceCells;
 import com.yihu.ehr.profile.util.SimpleSolrQueryUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import org.springframework.stereotype.Service;
@@ -28,9 +28,9 @@ public class ProfileMedicationService extends ProfileBasicService {
             List<Map<String, Object>> masterList = masterEnvelop.getDetailModelList();
             //循环获取结果集
             for (Map<String, Object> masterMap : masterList) {
-                String rowKey = (String) masterMap.get("rowkey");
-                String subQ = "{\"q\":\"profile_id:" + rowKey + " AND (rowkey:*HDSD00_83* OR rowkey:*HDSD00_84*)\"}";
-                Envelop subEnvelop = resource.getSubData(subQ, 1, 500, null);
+                String rowKey = (String) masterMap.get(ResourceCells.ROWKEY);
+                String subQ = "{\"q\":\"rowkey:" + rowKey + "$HDSD00_83$* OR rowkey:" + rowKey + "$HDSD00_84$*\"}";
+                Envelop subEnvelop = resource.getSubData(subQ, 1, 1000, null);
                 if (subEnvelop.isSuccessFlg()) {
                     List<Map<String, Object>> subList = subEnvelop.getDetailModelList();
                     if (subList.size() > 0) {
@@ -72,9 +72,9 @@ public class ProfileMedicationService extends ProfileBasicService {
             List<Map<String, Object>> masterList = masterEnvelop.getDetailModelList();
             //循环获取结果集
             for (Map<String, Object> masterMap : masterList) {
-                String rowKey = (String) masterMap.get(BasicConstant.rowkey);
-                String subQ = "{\"q\":\"profile_id:" + rowKey + " AND (rowkey:*HDSD00_83* OR rowkey:*HDSD00_84*)\"}";
-                Envelop subEnvelop = resource.getSubData(subQ, 1, 500, null);
+                String rowKey = (String) masterMap.get(ResourceCells.ROWKEY);
+                String subQ = "{\"q\":\"rowkey:" + rowKey + "$HDSD00_83$* OR rowkey:" + rowKey + "$HDSD00_84$*\"}";
+                Envelop subEnvelop = resource.getSubData(subQ, 1, 1000, null);
                 if (subEnvelop.isSuccessFlg()) {
                     List<Map<String, Object>> subList = subEnvelop.getDetailModelList();
                     if (subList.size() > 0) {
@@ -82,7 +82,7 @@ public class ProfileMedicationService extends ProfileBasicService {
                         String typeMark = "00"; //中西药标识
                         for (Map<String, Object> subMap : subList) {
                             if (subMap.get("EHR_000131") != null) {
-                                if (subMap.get(BasicConstant.rowkey).toString().contains("HDSD00_83")) {
+                                if (subMap.get(ResourceCells.ROWKEY).toString().contains("HDSD00_83")) {
                                     typeMark = "01"; //中药
                                 } else {
                                     typeMark = "02"; //西药
@@ -98,7 +98,7 @@ public class ProfileMedicationService extends ProfileBasicService {
                                 }
                             }
                             if (subMap.get("EHR_000100") != null) {
-                                if (subMap.get(BasicConstant.rowkey).toString().contains("HDSD00_83")) {
+                                if (subMap.get(ResourceCells.ROWKEY).toString().contains("HDSD00_83")) {
                                     typeMark = "01"; //中药
                                 } else {
                                     typeMark = "02"; //西药
@@ -118,10 +118,10 @@ public class ProfileMedicationService extends ProfileBasicService {
                             //时间轴基本字段
                             Map<String, Object> resultMap = simpleEvent(masterMap, null);
                             resultMap.put("mark", typeMark);
-                            if (masterMap.get(BasicConstant.eventType).equals("0")) { //门诊信息
+                            if (masterMap.get(ResourceCells.EVENT_TYPE).equals("0")) { //门诊信息
                                 resultMap.put("department", masterMap.get("EHR_000082"));
                                 resultMap.put("doctor", masterMap.get("EHR_000079"));
-                            } else if (masterMap.get(BasicConstant.eventType).equals("1")) { //住院信息
+                            } else if (masterMap.get(ResourceCells.EVENT_TYPE).equals("1")) { //住院信息
                                 resultMap.put("department", masterMap.get("EHR_000229"));
                                 resultMap.put("doctor", masterMap.get("EHR_005072"));
                             }
@@ -143,7 +143,8 @@ public class ProfileMedicationService extends ProfileBasicService {
         Object eventDate = "";
         for (Map<String, Object> event : masterList) {
             //详情
-            String subQ = "{\"q\":\"profile_id:" + event.get(BasicConstant.rowkey) + " AND (rowkey:*HDSD00_83* OR rowkey:*HDSD00_84*)\"}";
+            String rowKey = (String) event.get(ResourceCells.ROWKEY);
+            String subQ = "{\"q\":\"rowkey:" + rowKey + "$HDSD00_83$* OR rowkey:" + rowKey + "$HDSD00_84$*\"}";
             Envelop subEnvelop = resource.getSubData(subQ, 1, 1000, null);
             List<Map<String, Object>> subList = subEnvelop.getDetailModelList();
             if (subList.size() > 0) {
@@ -178,7 +179,7 @@ public class ProfileMedicationService extends ProfileBasicService {
                 }
             }
             if (dataList.size() > 0) {
-                eventDate = event.get(BasicConstant.eventDate);
+                eventDate = event.get(ResourceCells.EVENT_DATE);
                 break;
             }
         }
