@@ -20,6 +20,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
@@ -46,6 +47,8 @@ public class PortalMessageRemindEndPoint extends EnvelopRestEndPoint {
     private PortalMessageTemplateService portalMessageTemplateService;
     @Autowired
     private RegistrationService registrationService;
+    @Value("${jksr-app.registerRoleClientId}")
+    public String registerRoleClientId;
 
     @RequestMapping(value = ServiceApi.MessageRemind.MessageRemindTop, method = RequestMethod.GET)
     @ApiOperation(value = "获取提醒消息前10数据", notes = "根据日期查询前10的数据在前端表格展示")
@@ -201,6 +204,11 @@ public class PortalMessageRemindEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "notifie", value = "是否通知：0为通知，1为不再通知", defaultValue = "0")
             @RequestParam(value = "notifie", required = false) String notifie) throws Exception {
         Envelop envelop = new Envelop();
+        String[] appIds = registerRoleClientId.split(",");
+        boolean index = Arrays.asList(appIds).contains(appId);
+        if(index){
+            appId="WYo0l73F8e";
+        }
         List<MMessageRemind> messageRemindList = new ArrayList<>();
         DataList list = messageRemindService.listMessageRemindValue(appId,toUserId,typeId,type,page,size,notifie);
         //模板消息类型：101：挂号结果推送，获取订单信息
