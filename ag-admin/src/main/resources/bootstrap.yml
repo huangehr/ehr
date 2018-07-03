@@ -1,6 +1,6 @@
 spring:
   application:
-    name: ag-admin-zhoujie
+    name: ag-admin
 
 ---
 spring:

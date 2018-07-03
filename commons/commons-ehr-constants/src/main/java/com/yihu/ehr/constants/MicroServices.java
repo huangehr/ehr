@@ -47,7 +47,7 @@ public class MicroServices {
 
     public static final String StdRedis = "hos-admin";
 
-    public static final String Quota = "svr-quota-zhoujie";
+    public static final String Quota = "svr-quota";
 
     public static final String Dfs = "svr-dfs";
 
