@@ -32,10 +32,6 @@ public class TjQuotaDimensionSlaveService extends BaseJpaService<TjQuotaDimensio
         return tjQuotaDimensionSlaveRepository.findByQuotaCode(quotaCode);
     }
 
-    public List<TjQuotaDimensionSlave> getTjQuotaDimensionSlaveByCodeAndDimen(String quotaCode,String dimen) {
-        return tjQuotaDimensionSlaveRepository.getTjQuotaDimensionSlaveByCodeAndDimen(quotaCode,dimen);
-    }
-
     /**
      * 批量细维度
      */
