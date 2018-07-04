@@ -127,6 +127,7 @@ public class PortalMessageTemplateService extends BaseJpaService<PortalMessageTe
         remind.setReceivedMessages(JSON.toJSONString(mH5Message));
         remind.setPortalMessagerTemplateType(mH5Message.getPortalMessagerTemplateType());
         remind.setNotifieFlag("0");
+        remind.setAppraiseFlag("0");//未评价，与满意度调查保持一致
         if(null != newEntity){
             remind.setVisitTime(newEntity.getRegisterDate());
             remind.setOrderId(newEntity.getId());
