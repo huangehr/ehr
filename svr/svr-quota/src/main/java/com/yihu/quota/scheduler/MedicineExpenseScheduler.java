@@ -57,7 +57,7 @@ public class MedicineExpenseScheduler {
     /**
      * 抽取昨天的药品费用，整合来自其他数据集的部分数据到药品费用中。
      */
-    @Scheduled(cron = "0 36 02 * * ?")
+    @Scheduled(cron = "0 36 08 * * ?")
     public void extractMedicineExpenseJob() {
         try {
             Date currDate = new Date();

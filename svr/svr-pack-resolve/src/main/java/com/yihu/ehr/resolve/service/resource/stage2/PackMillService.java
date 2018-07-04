@@ -180,6 +180,7 @@ public class PackMillService {
             resourceBucket.insertBasicRecord(ResourceCells.CARD_TYPE, standardPackage.getCardType());
             resourceBucket.insertBasicRecord(ResourceCells.PATIENT_ID, standardPackage.getPatientId());
             resourceBucket.insertBasicRecord(ResourceCells.PATIENT_NAME, standardPackage.getPatientName());
+            resourceBucket.insertBasicRecord(ResourceCells.PATIENT_AGE, standardPackage.getPatientAge());
             resourceBucket.insertBasicRecord(ResourceCells.DEMOGRAPHIC_ID, standardPackage.getDemographicId());
             resourceBucket.insertBasicRecord(ResourceCells.ORG_CODE, standardPackage.getOrgCode());
             String orgName = redisService.getOrgName(standardPackage.getOrgCode());

@@ -121,6 +121,7 @@ public class SurveyTask {
                         messageRemind.setReaded(0);//未读
                         messageRemind.setToUserId(userId);
                         messageRemind.setContent(contentJson);
+                        messageRemind.setAppraiseFlag("0");
                         messageRemindService.save(messageRemind);
                     }
 

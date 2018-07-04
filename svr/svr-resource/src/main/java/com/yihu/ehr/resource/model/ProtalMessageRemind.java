@@ -48,6 +48,10 @@ public class ProtalMessageRemind {
      * 总部推送消息类型 ，101：挂号结果推送，102：退号结果推送，-101：订单操作推送，100：满意度调查
      */
     private String portalMessagerTemplateType;
+    /**
+     * 满意度调查-是否评价 0为未评、1为已评
+     */
+    private String appraiseFlag;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -180,5 +184,12 @@ public class ProtalMessageRemind {
     public void setPortalMessagerTemplateType(String portalMessagerTemplateType) {
         this.portalMessagerTemplateType = portalMessagerTemplateType;
     }
+    @Column(name = "appraise_flag", nullable = true, insertable = true, updatable = true)
+    public String getAppraiseFlag() {
+        return appraiseFlag;
+    }
 
+    public void setAppraiseFlag(String appraiseFlag) {
+        this.appraiseFlag = appraiseFlag;
+    }
 }

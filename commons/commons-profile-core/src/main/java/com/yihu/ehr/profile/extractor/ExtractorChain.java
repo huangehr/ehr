@@ -29,7 +29,7 @@ public class ExtractorChain {
         else if (filter.equals(KeyDataExtractor.Filter.EventInfo)) {
             re = context.getBean(EventInfoExtractor.class).extract(dataSet);
         }
-        //身份证和姓名
+        //身份证和姓名和就诊年龄
         else if (filter.equals(KeyDataExtractor.Filter.Identity)) {
             re = context.getBean(IdentityExtractor.class).extract(dataSet);
         }

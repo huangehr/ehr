@@ -92,6 +92,7 @@ ehr:
         id-card-no: HDSA00_01_017 #身份证号码 v1.0 & v1.3
         id-card-type: HDSA00_01_016 #身份证类型 v1.0 & v1.3
         patient-name: HDSA00_01_009 #本人姓名 v1.3 (v1.0:HDSD00_01_002)
+        birthday: HDSA00_01_012 #出生日期
     #卡提取参数，从就诊摘要提取
     card:
       data-sets:
