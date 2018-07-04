@@ -122,7 +122,7 @@ public class ElastricSearchSave {
             }
             return isSuccessed;
         } catch (Exception e) {
-            throw new RuntimeException("ES 保存数据异常");
+            throw new RuntimeException("ES 保存数据异常"+ e.getMessage());
         }
     }
 
