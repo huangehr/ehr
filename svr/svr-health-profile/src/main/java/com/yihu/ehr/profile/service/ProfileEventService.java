@@ -1,6 +1,7 @@
 package com.yihu.ehr.profile.service;
 
 
+import com.yihu.ehr.profile.family.ResourceCells;
 import com.yihu.ehr.profile.util.BasicConstant;
 import com.yihu.ehr.profile.util.SimpleSolrQueryUtil;
 import com.yihu.ehr.util.rest.Envelop;
@@ -159,7 +160,7 @@ public class ProfileEventService extends ProfileBasicService {
         Envelop envelop = resource.getMasterData(q, 1, 500, null);
         List<Map<String, Object>> eventList = envelop.getDetailModelList();
         for (Map<String, Object> temp : eventList) {
-            if (temp.get(BasicConstant.eventType) != null && temp.get(BasicConstant.eventType).equals("2")) {
+            if (temp.get(ResourceCells.EVENT_TYPE) != null && temp.get(ResourceCells.EVENT_TYPE).equals("2")) {
                 continue;
             }
             return simpleEvent(temp, null);
@@ -191,7 +192,7 @@ public class ProfileEventService extends ProfileBasicService {
         Envelop envelop = resource.getMasterData(q, 1, 500, null);
         List<Map<String, Object>> eventList = envelop.getDetailModelList();
         for (Map<String, Object> temp : eventList) {
-            if (temp.get(BasicConstant.eventType) != null && temp.get(BasicConstant.eventType).equals("2")) {
+            if (temp.get(ResourceCells.EVENT_TYPE) != null && temp.get(ResourceCells.EVENT_TYPE).equals("2")) {
                 continue;
             }
             resultList.add(simpleEvent(temp, null));
@@ -207,8 +208,8 @@ public class ProfileEventService extends ProfileBasicService {
             Map<String ,Object> temp = eventList.get(0);
             Map<String, Object> resultMap = simpleEvent(temp, null);
             List<Map<String, Object>> diagnosisList = new ArrayList<>();
-            if (!StringUtils.isEmpty(temp.get(BasicConstant.diagnosis))) {
-                String [] diagnosisCode = ((String) temp.get(BasicConstant.diagnosis)).split(";");
+            if (!StringUtils.isEmpty(temp.get(ResourceCells.DIAGNOSIS))) {
+                String [] diagnosisCode = ((String) temp.get(ResourceCells.DIAGNOSIS)).split(";");
                 Calendar calendar = Calendar.getInstance();
                 calendar.set(Calendar.HOUR_OF_DAY, 0);
                 calendar.set(Calendar.MINUTE, 0);
@@ -234,14 +235,14 @@ public class ProfileEventService extends ProfileBasicService {
             String subQ = "{\"q\":\"profile_id:" + profileId + "\"}";
             Envelop subEnvelop = resource.getSubData(subQ, 1, 1000, null);
             List<Map<String, Object>> subList = subEnvelop.getDetailModelList(); //细表数据
-            if (temp.get(BasicConstant.eventType).equals("0")) { //门诊信息
+            if (temp.get(ResourceCells.EVENT_TYPE).equals("0")) { //门诊信息
                 resultMap.put("department", temp.get("EHR_000082") == null ? "" : temp.get("EHR_000082") );
                 resultMap.put("doctor", temp.get("EHR_000079") == null ? "" : temp.get("EHR_000079"));
                 resultMap.put("diagnosticResult", resultMap.get("healthProblemName")); //诊断结果
                 //检查
                 List<Map<String, Object>> inspectResult = new ArrayList<>();
                 for (Map<String, Object> temp1 : subList) {
-                    if (temp1.get(BasicConstant.rowkey).toString().contains("HDSD00_79")) {
+                    if (temp1.get(ResourceCells.ROWKEY).toString().contains("HDSD00_79")) {
                         if (temp1.get("EHR_002883") != null) {
                             Map<String, Object> data = new HashMap<>();
                             data.put("name", temp1.get("EHR_002883"));
@@ -254,7 +255,7 @@ public class ProfileEventService extends ProfileBasicService {
                 //检验
                 List<Map<String, Object>> examineResult = new ArrayList<>();
                 for (Map<String, Object> temp1 : subList) {
-                    if (temp1.get(BasicConstant.rowkey).toString().contains("HDSD00_77")) {
+                    if (temp1.get(ResourceCells.ROWKEY).toString().contains("HDSD00_77")) {
                         if (temp1.get("EHR_000352") != null) {
                             Map<String, Object> data = new HashMap<>();
                             data.put("name", temp1.get("EHR_000352"));
@@ -264,7 +265,7 @@ public class ProfileEventService extends ProfileBasicService {
                     }
                 }
                 resultMap.put("examineResult", examineResult);
-            } else if (temp.get(BasicConstant.eventType).equals("1")) { //住院信息
+            } else if (temp.get(ResourceCells.EVENT_TYPE).equals("1")) { //住院信息
                 String department = "";
                 if (!StringUtils.isEmpty(temp.get("EHR_006209"))) {
                     department = (String) temp.get("EHR_006209");
@@ -278,7 +279,7 @@ public class ProfileEventService extends ProfileBasicService {
                 resultMap.put("department", department);
                 String doctor = "";
                 for (Map<String, Object> temp1 : subList) {
-                    if (temp1.get(BasicConstant.rowkey).toString().contains("HDSD00_11")) {
+                    if (temp1.get(ResourceCells.ROWKEY).toString().contains("HDSD00_11")) {
                         if (!StringUtils.isEmpty(temp1.get("EHR_005072"))) {
                             doctor = (String) temp1.get("EHR_005072");
                             break;
@@ -291,7 +292,7 @@ public class ProfileEventService extends ProfileBasicService {
                 String inResult = "";
                 String outResult = "";
                 for (Map<String, Object> temp1 : subList) {
-                    if (temp1.get(BasicConstant.rowkey).toString().contains("HDSD00_69")) {
+                    if (temp1.get(ResourceCells.ROWKEY).toString().contains("HDSD00_69")) {
                         if (temp1.get("EHR_006081").equals("入院诊断")) {
                             inResult = temp1.get("EHR_000293_VALUE") != null ?  (String) temp1.get("EHR_000293_VALUE") :  (String) temp1.get("EHR_000293");
                         }

@@ -2,24 +2,6 @@ package com.yihu.ehr.profile.util;
 
 public class BasicConstant {
 
-    //主表字段
-    public static String rowkey = "rowkey";//主表主键
-    public static String demographicId = "demographic_id";//身份证号
-    public static String profileId = "profile_id";//档案主索引
-    public static String profileType = "profile_type";//档案类型
-    public static String healthProblem = "health_problem";//健康问题;分隔
-    public static String healthProblemName = "health_problem_name";//健康问题名称;分隔
-    public static String eventDate = "event_date";//事件时间
-    public static String eventType = "event_type";//事件类型
-    public static String eventNo = "event_no";//事件类型
-    public static String orgCode = "org_code";//医院代码
-    public static String orgArea = "org_area";//机构地区
-    public static String orgName = "org_name";//医院名称
-    public static String diagnosis = "diagnosis";//诊断代码
-    public static String diagnosisName = "diagnosis_name";//诊断名称
-    public static String cdaVersion = "cda_version";//诊断代码
-
-
     /********** 资源代码 ******************/
     public static String patientInfo = "RS_PATIENT_INFO";//患者基本信息资源
     public static String patientEvent = "RS_PATIENT_EVENT";//患者门诊/住院事件资源
