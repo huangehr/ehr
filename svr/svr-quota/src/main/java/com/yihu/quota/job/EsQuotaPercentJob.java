@@ -119,13 +119,11 @@ public class EsQuotaPercentJob implements Job {
                 Boolean success = saveDate(dataSaveModels);
                 tjQuotaLog.setStatus(success ? Contant.save_status.success : Contant.save_status.fail);
                 tjQuotaLog.setContent(success?"统计保存成功":"统计数据ElasticSearch保存失败");
-                System.out.println(success?"统计保存成功":"统计数据ElasticSearch保存失败");
             }else {
                 tjQuotaLog.setStatus(Contant.save_status.fail);
                 tjQuotaLog.setContent("没有抽取到数据");
             }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
             logger.error(e.getMessage());
             message = e.getMessage();
             tjQuotaLog.setStatus(Contant.save_status.fail);
