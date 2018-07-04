@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.model.user.EhrUserSimple;
+import com.yihu.ehr.oauth2.client.FzApiClient;
 import com.yihu.ehr.oauth2.model.Oauth2Failed;
 import com.yihu.ehr.oauth2.model.VerifyCode;
 import com.yihu.ehr.oauth2.oauth2.EhrOAuth2ExceptionTranslator;
@@ -12,7 +13,6 @@ import com.yihu.ehr.oauth2.oauth2.EhrUserDetailsService;
 import com.yihu.ehr.oauth2.oauth2.jdbc.EhrJdbcClientDetailsService;
 import com.yihu.ehr.oauth2.oauth2.redis.EhrRedisTokenStore;
 import com.yihu.ehr.oauth2.oauth2.redis.EhrRedisVerifyCodeService;
-import com.yihu.ehr.util.fzgateway.FzGatewayUtil;
 import com.yihu.ehr.util.id.RandomUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import org.slf4j.Logger;
@@ -25,7 +25,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
-import org.springframework.security.oauth2.common.exceptions.*;
+import org.springframework.security.oauth2.common.exceptions.InvalidClientException;
+import org.springframework.security.oauth2.common.exceptions.InvalidGrantException;
+import org.springframework.security.oauth2.common.exceptions.InvalidRequestException;
+import org.springframework.security.oauth2.common.exceptions.UnsupportedGrantTypeException;
 import org.springframework.security.oauth2.provider.*;
 import org.springframework.security.oauth2.provider.endpoint.AbstractEndpoint;
 import org.springframework.security.oauth2.provider.error.WebResponseExceptionTranslator;
@@ -66,6 +69,9 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
     private EhrUserDetailsService ehrUserDetailsService;
     @Autowired
     private EhrRedisVerifyCodeService ehrRedisVerifyCodeService;
+    @Autowired
+    private FzApiClient fzApiClient;
+
     @Value("${fz-gateway.url}")
     private String fzGatewayUrl;
     @Value("${fz-gateway.clientId}")
@@ -183,7 +189,11 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
         apiParamMap.put("content", content);
         //渠道号
         apiParamMap.put("clientId", fzClientId);
-        String result = FzGatewayUtil.httpPost(fzGatewayUrl, fzClientId, fzClientVersion, api, apiParamMap, 1);
+        String result = null;
+        Envelop resultEnvelop = fzApiClient.fzInnerApi(api, objectMapper.writeValueAsString(apiParamMap), 1);
+        if (resultEnvelop.isSuccessFlg()) {
+            result = resultEnvelop.getObj().toString();
+        }
         if (!StringUtils.isEmpty(result)) {
             Map<String, Object> resultMap = objectMapper.readValue(result, Map.class);
             Integer resultCode = 0;
