@@ -186,7 +186,9 @@ public class ExtractUtil {
                     saveModel.setQuotaDate(quotaDateStr);
                 }
                 if(!StringUtils.isEmpty(aggregationKey)){
-                    saveModel.setResult(map.get(aggregationKey).toString());
+                    if(map.get(aggregationKey) != null){
+                        saveModel.setResult(map.get(aggregationKey).toString());
+                    }
                 }else {
                     saveModel.setResult("1");
                 }
