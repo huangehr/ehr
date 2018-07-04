@@ -113,48 +113,8 @@ public class PackQcReportService extends BaseJpaService {
      */
     public Envelop resourceSuccess(String startDate, String endDate, String orgCode) throws Exception {
         Envelop envelop = new Envelop();
-        String index = "json_archives";
-        String type = "info";
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("pack_type=1;");
-        stringBuilder.append("receive_date>=" + startDate + " 00:00:00;");
-        stringBuilder.append("receive_date<" + endDate + " 23:59:59;");
-        if (StringUtils.isNotEmpty(orgCode) && !"null".equals(orgCode)&&!cloud.equals(orgCode)){
-            stringBuilder.append("org_code=" + orgCode+";");
-        }
-        // 门诊
-        String oupatientStr = stringBuilder.toString() + "event_type=0";
-        Long oupatient = elasticSearchUtil.count(index, type, oupatientStr);
-        // 住院
-        String inpatientStr = stringBuilder.toString() + "event_type=1";
-        Long inpatient = elasticSearchUtil.count(index, type, inpatientStr);
-        // 体检
-        String physicalStr = stringBuilder.toString() + "event_type=2";
-        Long physical = elasticSearchUtil.count(index, type, physicalStr);
-        Map<String, Object> resultMap = new HashMap<>();
-        List<Map<String, Object>> resultList = new ArrayList<>();
-        resultMap.put("oupatient", oupatient);
-        resultMap.put("inpatient", inpatient);
-        resultMap.put("physical", physical);
-        resultMap.put("total", oupatient+inpatient+physical);
-        resultList.add(resultMap);
-        envelop.setDetailModelList(resultList);
-        envelop.setSuccessFlg(true);
-        return envelop;
-    }
-
-    /**
-     * 获取档案数据
-     * @param startDate
-     * @param endDate
-     * @param orgCode
-     * @return
-     * @throws Exception
-     */
-    public Envelop archiveReport(String startDate, String endDate, String orgCode) throws Exception {
-        Envelop envelop = new Envelop();
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("pack_type=1;");
+        stringBuilder.append("pack_type=1;archive_status=3;");
         stringBuilder.append("receive_date>=" + startDate + " 00:00:00;");
         stringBuilder.append("receive_date<" + endDate + " 23:59:59;");
         if (StringUtils.isNotEmpty(orgCode) && !"null".equals(orgCode)&&!cloud.equals(orgCode)){
@@ -221,6 +181,33 @@ public class PackQcReportService extends BaseJpaService {
         } finally {
             elasticSearchPool.releaseClient(transportClient);
         }
+        return envelop;
+    }
+
+    /**
+     * 获取档案数据
+     * @param startDate
+     * @param endDate
+     * @param orgCode
+     * @return
+     * @throws Exception
+     */
+    public Envelop archiveReport(String startDate, String endDate, String orgCode) throws Exception {
+        Envelop envelop = new Envelop();
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("pack_type=1;");
+        stringBuilder.append("receive_date>=" + startDate + " 00:00:00;");
+        stringBuilder.append("receive_date<" + endDate + " 23:59:59;");
+        if (StringUtils.isNotEmpty(orgCode) && !"null".equals(orgCode)&&!cloud.equals(orgCode)){
+            stringBuilder.append("org_code=" + orgCode+";");
+        }
+        Map<String, Object> resultMap = new HashMap<>();
+        List<Map<String, Object>> resultList = new ArrayList<>();
+        Long total = elasticSearchUtil.count("json_archives", "info", stringBuilder.toString());
+        resultMap.put("total", total);
+        resultList.add(resultMap);
+        envelop.setDetailModelList(resultList);
+        envelop.setSuccessFlg(true);
         return envelop;
     }
 
