@@ -269,7 +269,6 @@ public class SolrQuery {
         }
         boolean isStored = true;
         for (String key : falseStroreIndexMap.keySet()) {
-            System.out.println("查询条数：" + solrDocList.size() + " map key " + falseStroreIndexMap.get(key));
             if (key.contains("EHR_") && falseStroreIndexMap.get(key)==solrDocList.size()) {
                 isStored = false;
                 falseStoreList.add(key);
