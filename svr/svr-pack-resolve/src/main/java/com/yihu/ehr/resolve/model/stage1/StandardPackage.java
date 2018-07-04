@@ -22,6 +22,7 @@ public class StandardPackage extends OriginalPackage {
     private String cardId; //就诊卡
     private String cardType; //就诊卡类型
     private String patientName; //居民姓名
+    private String patientAge; //就诊年龄
     private String demographicId; //身份证号码
     private String deptCode; //入院科室编码
     private Set<String> diagnosisCode = new HashSet<>(); //icd10 诊断代码
@@ -69,6 +70,7 @@ public class StandardPackage extends OriginalPackage {
         root.put("profileType", this.profileType.toString());
         root.put("cardType", this.cardType);
         root.put("patientName", this.patientName);
+        root.put("patientAge", this.patientAge);
         root.put("demographicId", this.demographicId);
         root.put("diagnosis", StringUtils.join(this.diagnosisCode,";"));
         root.put("diagnosisName", StringUtils.join(this.diagnosisName,";"));
@@ -113,6 +115,14 @@ public class StandardPackage extends OriginalPackage {
 
     public void setPatientName(String patientName) {
         this.patientName = patientName;
+    }
+
+    public String getPatientAge() {
+        return patientAge;
+    }
+
+    public void setPatientAge(String patientAge) {
+        this.patientAge = patientAge;
     }
 
     public String getDeptCode() {
