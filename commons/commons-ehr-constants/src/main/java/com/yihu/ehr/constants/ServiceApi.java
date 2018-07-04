@@ -1564,6 +1564,7 @@ public class ServiceApi {
      */
     public static class Fz {
         public static final String OpenApi = "/fz/open/api";
+        public static final String InnerApi = "/fz/inner/api";
     }
 
     /**

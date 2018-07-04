@@ -2,6 +2,7 @@ package com.yihu.ehr.basic.user.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.basic.fileresource.service.FileResourceManager;
+import com.yihu.ehr.basic.fzopen.service.OpenService;
 import com.yihu.ehr.basic.org.dao.OrganizationRepository;
 import com.yihu.ehr.basic.org.model.Organization;
 import com.yihu.ehr.basic.org.service.OrgService;
@@ -14,7 +15,6 @@ import com.yihu.ehr.entity.patient.DemographicInfo;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.util.datetime.DateUtil;
-import com.yihu.ehr.util.fzgateway.FzGatewayUtil;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Query;
@@ -45,12 +45,6 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
 
     Logger logger = LoggerFactory.getLogger(DoctorService.class);
 
-    @Value("${fz-gateway.url}")
-    private String fzGatewayUrl;
-    @Value("${fz-gateway.clientId}")
-    private String fzClientId;
-    @Value("${fz-gateway.clientVersion}")
-    private String fzClientVersion;
     @Value("${fast-dfs.public-server}")
     private String dfsPublicUrl;
 
@@ -68,6 +62,8 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
     private FileResourceManager fileResourceManager;
     @Autowired
     private OrgService orgService;
+    @Autowired
+    private OpenService fzOpenService;
 
     /**
      * 根据用户ID获取医生信息
@@ -366,14 +362,14 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
     public Map<String, Object> syncDoctor(Doctors doctor, String orgId, String deptName) throws  Exception{
         String api = "baseinfo.DoctorInfoApi.addDoctorFromMedicalCloud";
         int apiVersion = 1;
-        Map<String, Object> params = new HashMap<>();
+        Map<String, Object> apiParams = new HashMap<>();
         Organization org = orgService.getOrgById(orgId);
-        params.put("orgID", org.getJkzlOrgId());
-        params.put("deptName", deptName);
-        params.put("doctorName", doctor.getName());
+        apiParams.put("orgID", org.getJkzlOrgId());
+        apiParams.put("deptName", deptName);
+        apiParams.put("doctorName", doctor.getName());
         // 云平台：0（未知），总部：3（未知）
         String sex = "0".equals(doctor.getSex()) ? "3" : doctor.getSex();
-        params.put("sex", sex);
+        apiParams.put("sex", sex);
         // 转换共同临床职称
         String lczc = "";
         if ("1".equals(doctor.getLczc())) { // 主任医师
@@ -385,16 +381,16 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
         } else if ("4".equals(doctor.getLczc())) { // 医师
             lczc = "4";
         }
-        params.put("lczc", lczc);
-        params.put("phone", doctor.getPhone());
-        params.put("skill", doctor.getSkill());
-        params.put("intro", doctor.getIntroduction());
+        apiParams.put("lczc", lczc);
+        apiParams.put("phone", doctor.getPhone());
+        apiParams.put("skill", doctor.getSkill());
+        apiParams.put("intro", doctor.getIntroduction());
         String photoUrl = "";
         if (!StringUtils.isEmpty(doctor.getPhoto())) {
             photoUrl = dfsPublicUrl + "/" +  fileResourceManager.getStoragePathById(doctor.getPhoto()).replace(":", "/");
         }
-        params.put("photoUri", photoUrl);
-        String syncResult = FzGatewayUtil.httpPost(fzGatewayUrl, fzClientId, fzClientVersion, api, params, apiVersion);
+        apiParams.put("photoUri", photoUrl);
+        String syncResult = fzOpenService.callFzInnerApi(api, apiParams, apiVersion);
 
         Map<String, Object> syncResultMap = null;
         try {
