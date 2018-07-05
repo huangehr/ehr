@@ -201,6 +201,17 @@ public class SolrQuery {
     //region 获取指定字段的查询集合，可选择去重查询
 
     /**
+     * 获取总条数
+     *
+     * @param queryString
+     * @return
+     */
+    public long count(String table, String queryString) throws Exception {
+        return solrUtil.count(table, queryString);
+    }
+
+
+    /**
      * 获取指定字段的查询集合，可选择去重查询
      *
      * @param q      查询字符串
@@ -304,17 +315,6 @@ public class SolrQuery {
             }
         }
         return data;
-    }
-
-
-    /**
-     * 获取总条数
-     *
-     * @param queryString
-     * @return
-     */
-    public long count(String table, String queryString) throws Exception {
-        return solrUtil.count(table, queryString);
     }
 
     /**
