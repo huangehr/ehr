@@ -110,89 +110,8 @@ public class WarningQuestionService extends BaseJpaService {
             entry.getValue().setDatasetWarningList(datasetMap.get(orgCode));
         }
 
-
         //2.统计实际值
         Map<String, Map<String, Object>> dataMap = new HashMap<>(warningList.size());
-
-        //统计接收档案数据
-        String sql1 = "SELECT count(*) c,org_code FROM json_archives/info where receive_date>= '"+dateStr+" 00:00:00' AND receive_date<='" +  dateStr + " 23:59:59'  AND pack_type=1 group by org_code";
-        try {
-            ResultSet resultSet1 = elasticSearchUtil.findBySql(sql1);
-            while (resultSet1.next()) {
-                Map<String, Object> map = null;
-                String orgCode = resultSet1.getString("org_code");
-                double total = resultSet1.getDouble("c");//接收 档案数
-                if(dataMap.containsKey(orgCode)){
-                    map = dataMap.get(orgCode);
-                }else {
-                    map = initDataMap(defaultWarning);
-                }
-                map.put("receiveArchives",total);
-                dataMap.put(orgCode,map);
-            }
-        }catch (Exception e){
-            e.getMessage();
-        }
-
-        //统计质量异常
-        String sql2 = "SELECT count(*) c,org_code FROM json_archives_qc/qc_metadata_info where receive_date>= '"+dateStr+" 00:00:00' AND receive_date<='" +  dateStr + " 23:59:59' group by org_code";
-        try {
-            ResultSet resultSet2 = elasticSearchUtil.findBySql(sql2);
-            while (resultSet2.next()) {
-                Map<String, Object> map = null;
-                String orgCode = resultSet2.getString("org_code");
-                double total = resultSet2.getDouble("c");//接收 质量异常
-                if(dataMap.containsKey(orgCode)){
-                    map = dataMap.get(orgCode);
-                }else {
-                    map = initDataMap(defaultWarning);
-                }
-                map.put("receiveException",total);
-                dataMap.put(orgCode,map);
-            }
-        }catch (Exception e){
-            e.getMessage();
-        }
-
-        //数据集
-        String sql3 = "SELECT details,org_code FROM json_archives_qc/qc_dataset_info where receive_date>= '"+dateStr+" 00:00:00' AND receive_date<='" +  dateStr + " 23:59:59' group by org_code";
-        try {
-            ResultSet resultSet3 = elasticSearchUtil.findBySql(sql3);
-            Map<String, Map<String, Object>> datasetMap1 = new HashMap<>();
-            while (resultSet3.next()) {
-                Map<String, Object> map = null;
-                String orgCode = resultSet3.getString("org_code");
-                String details = resultSet3.getString("details");//接收 数据集
-                if(datasetMap1.containsKey(orgCode)){
-                    map = datasetMap1.get(orgCode);
-                }else {
-                    map = initDataMap(defaultWarning);
-                }
-                JSONArray jsonArray = JSON.parseArray(details);
-                for(int i=0;i<jsonArray.size();i++){
-                    String dataset = jsonArray.get(i).toString();
-                    if(!map.containsKey(dataset)){
-                        map.put(dataset,dataMap);
-                    }
-                }
-                datasetMap1.put(orgCode,map);
-            }
-
-            for (Map.Entry<String, Map<String, Object>> entry : datasetMap1.entrySet()) {
-                String orgCode = entry.getKey();
-                Map<String, Object> map = null;
-                if(dataMap.containsKey(orgCode)){
-                    map = dataMap.get(orgCode);
-                }else {
-                    map = initDataMap(defaultWarning);
-                }
-                map.put("receiveDataset",entry.getValue().size());//数据集个数
-                dataMap.put(orgCode,map);
-            }
-        }catch (Exception e){
-            e.getMessage();
-        }
-
         //及时率
         inTimeWarning(warningMap,dataMap);
 
@@ -208,8 +127,48 @@ public class WarningQuestionService extends BaseJpaService {
                 String orgName = orgMap.get(orgCode);
                 String id = DateUtil.getCurrentString(DateUtil.DEFAULT_CHAR_DATE_YMD_FORMAT)+"_"+ dateStr +"_"+orgCode+"_";
                 DqPaltformReceiveWarning warning = warningMap.get(orgCode);
-
                 Map<String, Object> hospitalMap = dataMap.get(orgCode);
+                //统计接收档案数据
+                String sql1 = "SELECT count(*) c FROM json_archives/info where receive_date>= '"+dateStr+" 00:00:00' AND receive_date<='" +  dateStr + " 23:59:59'  AND pack_type=1 and org_code='"+orgCode+"'";
+                try {
+                    ResultSet resultSet1 = elasticSearchUtil.findBySql(sql1);
+                    resultSet1.next();
+                    double total = resultSet1.getDouble("c");//接收 档案数
+                    hospitalMap.put("receiveArchives",total);
+                }catch (Exception e){
+                    e.getMessage();
+                }
+                //统计质量异常
+                String sql2 = "SELECT count(*) c FROM json_archives_qc/qc_metadata_info where receive_date>= '"+dateStr+" 00:00:00' AND receive_date<='" +  dateStr + " 23:59:59' and qc_step=1 and org_code='"+orgCode+"'";
+                try {
+                    ResultSet resultSet2 = elasticSearchUtil.findBySql(sql2);
+                    resultSet2.next();
+                    double total = resultSet2.getDouble("c");//接收 质量异常
+                    hospitalMap.put("receiveException",total);
+                }catch (Exception e){
+                    e.getMessage();
+                }
+
+                //数据集
+                String sql3 = "SELECT distinct details FROM json_archives_qc/qc_dataset_info where receive_date>= '"+dateStr+" 00:00:00' AND receive_date<='" +  dateStr + " 23:59:59' and qc_step=1 and org_code='"+orgCode+"' ";
+                try {
+                    ResultSet resultSet3 = elasticSearchUtil.findBySql(sql3);
+                    Map<String, Object> datasetMap1 = new HashMap<>();
+                    while (resultSet3.next()) {
+                        String details = resultSet3.getString("details");//接收 数据集
+                        JSONArray jsonArray = JSON.parseArray(details);
+                        for(int i=0;i<jsonArray.size();i++){
+                            String dataset = jsonArray.get(i).toString();
+                            if(!datasetMap1.containsKey(dataset)){
+                                datasetMap1.put(dataset,dataMap);
+                            }
+                        }
+                    }
+                    hospitalMap.put("receiveDataset",datasetMap1.size());//数据集个数
+                }catch (Exception e){
+                    e.getMessage();
+                }
+
                 if(hospitalMap==null){
                     //该医院没有上传数据
                     DqWarningRecord record1 = new DqWarningRecord();
@@ -471,253 +430,97 @@ public class WarningQuestionService extends BaseJpaService {
      * 及时率预警
      */
     public void inTimeWarning(Map<String, DqPaltformReceiveWarning> warningMap,Map<String, Map<String, Object>> dataMap){
-        //1.先统计通用的及时数
-        DqPaltformReceiveWarning defaultWarning = warningMap.get(defaultOrgCode);
-        Integer defaultPe = defaultWarning.getPeInTime();
-        Integer defaultHospital = defaultWarning.getHospitalInTime();
-        Integer defaultOutpatient = defaultWarning.getOutpatientInTime();
-        String defaultPeDateStr = DateUtil.formatDate(DateUtil.addDate(-(defaultPe+1), new Date()),DateUtil.DEFAULT_DATE_YMD_FORMAT);
-        String defaultHospitalDateStr = DateUtil.formatDate(DateUtil.addDate(-(defaultHospital+1), new Date()),DateUtil.DEFAULT_DATE_YMD_FORMAT);
-        try{
-            //统计总数
-            String sql1 = "SELECT sum(HSI07_01_002) s2,sum(HSI07_01_004) s3,org_code FROM qc/daily_report where event_date>= '"+defaultPeDateStr+"T00:00:00' AND event_date <='" +  defaultPeDateStr + "T23:59:59' group by org_code";
-            try {
-                ResultSet resultSet1 = elasticSearchUtil.findBySql(sql1);
-                while (resultSet1.next()) {
-                    String orgCode = resultSet1.getString("org_code");
-                    double HSI07_01_002 = resultSet1.getDouble("s2");//门急诊
-                    double HSI07_01_004 = resultSet1.getDouble("s3");//体检
-                    Map<String, Object> map = null;
-                    if(dataMap.containsKey(orgCode)){
-                        map = dataMap.get(orgCode);
-                    }else {
-                        map = initDataMap(defaultWarning);
-                    }
-                    map.put("totalOutpatient",HSI07_01_002);
-                    map.put("totalPe",HSI07_01_004);
-                    dataMap.put(orgCode,map);
-                }
-            }catch (Exception e){
-                e.getMessage();
-            }
-            String sql2 = "SELECT sum(HSI07_01_012) s4,org_code FROM qc/daily_report where event_date>= '"+defaultHospitalDateStr+"T00:00:00' AND event_date <='" +  defaultHospitalDateStr + "T23:59:59' group by org_code";
-            try {
-                ResultSet resultSet2 = elasticSearchUtil.findBySql(sql2);
-                while (resultSet2.next()) {
-                    String orgCode = resultSet2.getString("org_code");
-                    double HSI07_01_012 = resultSet2.getDouble("s4");//住院
-                    Map<String, Object> map = null;
-                    if(dataMap.containsKey(orgCode)){
-                        map = dataMap.get(orgCode);
-                    }else {
-                        map = initDataMap(defaultWarning);
-                    }
-                    map.put("totalHospital",HSI07_01_012);
-                    dataMap.put(orgCode,map);
-                }
-            }catch (Exception e){
-                e.getMessage();
-            }
-
-            //统计及时数
-            String sql3 = "SELECT count(distinct event_no) c,org_code,event_type,delay FROM json_archives/info where event_date>= '"+defaultPeDateStr+" 00:00:00' AND event_date<='" +  defaultPeDateStr + " 23:59:59' AND pack_type=1 and delay is not null group by org_code,event_type,delay ";
-            try {
-                ResultSet resultSet3 = elasticSearchUtil.findBySql(sql3);
-                while (resultSet3.next()) {
-                    String orgCode = resultSet3.getString("org_code");
-                    long delay = resultSet3.getLong("delay");// 延时时间
-                    String eventType = resultSet3.getString("event_type");// 事件类型 0门诊 1住院 2体检
-                    double total = resultSet3.getDouble("c");//及时数
-                    Map<String, Object> map = null;
-                    if(dataMap.containsKey(orgCode)){
-                        map = dataMap.get(orgCode);
-                    }else {
-                        map = initDataMap(defaultWarning);
-                    }
-                    boolean flag = StringUtils.isNotBlank(eventType)&&!"null".equals(eventType)&&total>0;
-                    if(flag&&isInTime(warningMap,orgCode,eventType,delay)){
-                        if("0".equals(eventType)){
-                            Object o = map.get("outpatientInTime");
-                            if(o!=null){
-                                total += Integer.parseInt(o.toString());
-                            }
-                            map.put("outpatientInTime",total);
-                        }else if("2".equals(eventType)){
-                            Object o = map.get("peInTime");
-                            if(o!=null){
-                                total += Integer.parseInt(o.toString());
-                            }
-                            map.put("peInTime",total);
-                        }
-                        dataMap.put(orgCode,map);
-                    }
-                }
-            }catch (Exception e){
-                e.getMessage();
-            }
-
-            String sql4 = "SELECT count(distinct event_no) c,org_code,delay FROM json_archives/info where event_date>= '"+defaultHospitalDateStr+" 00:00:00' AND event_date<='" +  defaultHospitalDateStr + " 23:59:59' AND pack_type=1 and event_type= '"+1+"' and delay is not null group by org_code,delay ";
-            try {
-                ResultSet resultSet4 = elasticSearchUtil.findBySql(sql4);
-                while (resultSet4.next()) {
-                    String orgCode = resultSet4.getString("org_code");
-                    long delay = resultSet4.getLong("delay");// 延时时间
-                    double total = resultSet4.getDouble("c");//及时数
-                    Map<String, Object> map = null;
-                    if(dataMap.containsKey(orgCode)){
-                        map = dataMap.get(orgCode);
-                    }else {
-                        map = initDataMap(defaultWarning);
-                    }
-                    boolean flag = total>0;
-                    if(flag&&isInTime(warningMap,orgCode,"1",delay)){
-                        Object o = map.get("hospitalInTime");
-                        if(o!=null){
-                            total += Integer.parseInt(o.toString());
-                        }
-                        map.put("hospitalInTime",total);
-                        dataMap.put(orgCode,map);
-                    }
-                }
-            }catch (Exception e){
-                e.getMessage();
-            }
-
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-
-        //2、统计门诊体检及时时间不等于2，住院及时时间不等于7的数据
+        //统计
         for (String orgCode : warningMap.keySet()) {
             try {
                 if(defaultOrgCode.equals(orgCode)){
                     continue;
                 }
                 Map<String, Object> map = null;
-                if(dataMap.containsKey(orgCode)){
-                    map = dataMap.get(orgCode);
-                }else {
-                    map = initDataMap(defaultWarning);
-                }
                 DqPaltformReceiveWarning warning = warningMap.get(orgCode);
-                boolean flag = warning.getHospitalInTime().equals(defaultHospital)
-                        &&warning.getPeInTime().equals(defaultPe)
-                        &&warning.getOutpatientInTime().equals(defaultOutpatient);
-                if(flag){
-                    //预警值=默认值的 直接按默认的第一步已经计算过了
-                    continue;
-                }
-
+                map = initDataMap(warning);
                 String peDateStr = DateUtil.formatDate(DateUtil.addDate(-(warning.getPeInTime()+1), new Date()),DateUtil.DEFAULT_DATE_YMD_FORMAT);
                 String hospitalDateStr = DateUtil.formatDate(DateUtil.addDate(-(warning.getHospitalInTime()+1), new Date()),DateUtil.DEFAULT_DATE_YMD_FORMAT);
                 String outpatientDateStr = DateUtil.formatDate(DateUtil.addDate(-(warning.getOutpatientInTime()+1), new Date()),DateUtil.DEFAULT_DATE_YMD_FORMAT);
 
-                //统计总数
                 //体检
-                if(!warning.getPeInTime().equals(defaultPe)){
+                try {
                     String sql1 = "SELECT sum(HSI07_01_004) s3 FROM qc/daily_report where event_date>= '"+peDateStr+"T00:00:00' AND event_date <='" +  peDateStr + "T23:59:59' and org_code = '"+orgCode+"' ";
-                    try {
-                        ResultSet resultSet1 = elasticSearchUtil.findBySql(sql1);
-                        while (resultSet1.next()) {
-                            double HSI07_01_004 = resultSet1.getDouble("s3");//体检
-                            map.put("totalPe",HSI07_01_004);
-                            map.put("peReceiveTime",peDateStr);
-                            dataMap.put(orgCode,map);
-                        }
-                    }catch (Exception e){
-                        e.getMessage();
+                    ResultSet resultSet1 = elasticSearchUtil.findBySql(sql1);
+                    resultSet1.next();
+                    double HSI07_01_004 = resultSet1.getDouble("s3");//体检
+                    map.put("totalPe",HSI07_01_004);
+                    map.put("peReceiveTime",peDateStr);
+                }catch (Exception e){
+                    if(!"Error".equals(e.getMessage())){
+                        e.printStackTrace();
                     }
-
-                    String sql2 = "SELECT count(distinct event_no) c,delay FROM json_archives/info where event_date>= '"+outpatientDateStr+" 00:00:00' AND event_date<='" +  outpatientDateStr + " 23:59:59' and org_code = '"+orgCode+"' AND pack_type=1 and event_type= '2' group by delay ";
+                }
+                try {
+                    String sql2 = "SELECT count(distinct event_no) c FROM json_archives/info where event_date>= '"+peDateStr+" 00:00:00' AND event_date<='" +  peDateStr + " 23:59:59' and org_code = '"+orgCode+"' AND pack_type=1 and event_type=2 and delay <="+warning.getPeInTime();
                     ResultSet resultSet2 = elasticSearchUtil.findBySql(sql2);
-                    try {
-                        while (resultSet2.next()) {
-                            long delay = resultSet2.getLong("delay");// 延时时间
-                            double total = resultSet2.getDouble("c");//及时数
-                            if(total>0&&isInTime(warningMap,orgCode,"2",delay)){
-                                Object o = map.get("peInTime");
-                                if(o!=null){
-                                    total += Integer.parseInt(o.toString());
-                                }
-                                map.put("peInTime",total);
-                                map.put("peReceiveTime",peDateStr);
-                                dataMap.put(orgCode,map);
-                            }
-                        }
-                    }catch (Exception e){
-                        e.getMessage();
+                    resultSet2.next();
+                    double total = resultSet2.getDouble("c");//及时数
+                    map.put("peInTime",total);
+                    map.put("peReceiveTime",peDateStr);
+                }catch (Exception e){
+                    if(!"Error".equals(e.getMessage())){
+                        e.printStackTrace();
                     }
                 }
 
-                if(!warning.getOutpatientInTime().equals(defaultOutpatient)){
-                    //门诊
+                //门诊
+                try {
                     String sql1 = "SELECT sum(HSI07_01_002) s2 FROM qc/daily_report where event_date>= '"+outpatientDateStr+"T00:00:00' AND event_date <='"+outpatientDateStr+"T23:59:59' and org_code = '"+orgCode+"' ";
-                    try {
-                        ResultSet resultSet1 = elasticSearchUtil.findBySql(sql1);
-                        while (resultSet1.next()) {
-                            double HSI07_01_002 = resultSet1.getDouble("s4");//门急诊
-                            map.put("totalOutpatient",HSI07_01_002);
-                            map.put("outpatientReceiveTime",outpatientDateStr);
-                            dataMap.put(orgCode,map);
-                        }
-                    }catch (Exception e){
-                        e.getMessage();
-                    }
-
-                    String sql2 = "SELECT count(distinct event_no) c,delay FROM json_archives/info where event_date>= '"+outpatientDateStr+" 00:00:00' AND event_date<='" +  outpatientDateStr + " 23:59:59' and org_code = '"+orgCode+"' AND pack_type=1 and event_type= '0' group by delay ";
-                    ResultSet resultSet2 = elasticSearchUtil.findBySql(sql2);
-                    try {
-                        while (resultSet2.next()) {
-                            long delay = resultSet2.getLong("delay");// 延时时间
-                            double total = resultSet2.getDouble("c");//及时数
-                            if(total>0&&isInTime(warningMap,orgCode,"0",delay)){
-                                Object o = map.get("outpatientInTime");
-                                if(o!=null){
-                                    total += Integer.parseInt(o.toString());
-                                }
-                                map.put("outpatientInTime",total);
-                                map.put("outpatientReceiveTime",outpatientDateStr);
-                                dataMap.put(orgCode,map);
-                            }
-                        }
-                    }catch (Exception e){
-                        e.getMessage();
+                    ResultSet resultSet1 = elasticSearchUtil.findBySql(sql1);
+                    resultSet1.next();
+                    double HSI07_01_002 = resultSet1.getDouble("s4");//门急诊
+                    map.put("totalOutpatient",HSI07_01_002);
+                    map.put("outpatientReceiveTime",outpatientDateStr);
+                }catch (Exception e){
+                    if(!"Error".equals(e.getMessage())){
+                        e.printStackTrace();
                     }
                 }
 
-                if(!warning.getHospitalInTime().equals(defaultHospital)){
-                    //住院
-                    String sql1 = "SELECT sum(HSI07_01_012) s4 FROM qc/daily_report where event_date>= '"+hospitalDateStr+"T00:00:00' AND event_date <='"+hospitalDateStr+"T23:59:59' and org_code = '"+orgCode+"' ";
-                    try {
-                        ResultSet resultSet1 = elasticSearchUtil.findBySql(sql1);
-                        while (resultSet1.next()) {
-                            double HSI07_01_012 = resultSet1.getDouble("s4");//住院
-                            map.put("totalHospital",HSI07_01_012);
-                            map.put("hospitalReceiveTime",hospitalDateStr);
-                            dataMap.put(orgCode,map);
-                        }
-                    }catch (Exception e){
-                        e.getMessage();
-                    }
-
-                    String sql2 = "SELECT count(distinct event_no) c,delay FROM json_archives/info where event_date>= '"+hospitalDateStr+" 00:00:00' AND event_date<='" +  hospitalDateStr + " 23:59:59' and org_code = '"+orgCode+"' AND pack_type=1 and event_type= '1' group by delay ";
+                try {
+                    String sql2 = "SELECT count(distinct event_no) c FROM json_archives/info where event_date>= '"+outpatientDateStr+" 00:00:00' AND event_date<='" +  outpatientDateStr + " 23:59:59' and org_code = '"+orgCode+"' AND pack_type=1 and event_type=0 and delay <="+warning.getOutpatientInTime();
                     ResultSet resultSet2 = elasticSearchUtil.findBySql(sql2);
-                    try {
-                        while (resultSet2.next()) {
-                            long delay = resultSet2.getLong("delay");// 延时时间
-                            double total = resultSet2.getDouble("c");//及时数
-                            if(total>0&&isInTime(warningMap,orgCode,"1",delay)){
-                                Object o = map.get("hospitalInTime");
-                                if(o!=null){
-                                    total += Integer.parseInt(o.toString());
-                                }
-                                map.put("hospitalInTime",total);
-                                map.put("hospitalReceiveTime",hospitalDateStr);
-                                dataMap.put(orgCode,map);
-                            }
-                        }
-                    }catch (Exception e){
-                        e.getMessage();
+                    resultSet2.next();
+                    double total = resultSet2.getDouble("c");//及时数
+                    map.put("outpatientInTime",total);
+                    map.put("outpatientReceiveTime",outpatientDateStr);
+                }catch (Exception e){
+                    if(!"Error".equals(e.getMessage())){
+                        e.printStackTrace();
+                    }
+                }
+
+                //住院
+                String sql1 = "SELECT sum(HSI07_01_012) s4 FROM qc/daily_report where event_date>= '"+hospitalDateStr+"T00:00:00' AND event_date <='"+hospitalDateStr+"T23:59:59' and org_code = '"+orgCode+"' ";
+                try {
+                    ResultSet resultSet1 = elasticSearchUtil.findBySql(sql1);
+                    resultSet1.next();
+                    double HSI07_01_012 = resultSet1.getDouble("s4");//住院
+                    map.put("totalHospital",HSI07_01_012);
+                    map.put("hospitalReceiveTime",hospitalDateStr);
+                }catch (Exception e){
+                    if(!"Error".equals(e.getMessage())){
+                        e.printStackTrace();
+                    }
+                }
+
+                String sql2 = "SELECT count(distinct event_no) c FROM json_archives/info where event_date>= '"+hospitalDateStr+" 00:00:00' AND event_date<='" +  hospitalDateStr + " 23:59:59' and org_code = '"+orgCode+"' AND pack_type=1 and event_type=1 and delay <="+warning.getHospitalInTime();
+
+                try {
+                    ResultSet resultSet2 = elasticSearchUtil.findBySql(sql2);
+                    resultSet2.next();
+                    double total = resultSet2.getDouble("c");//及时数
+                    map.put("hospitalInTime",total);
+                    map.put("hospitalReceiveTime",hospitalDateStr);
+                }catch (Exception e){
+                    if(!"Error".equals(e.getMessage())){
+                        e.printStackTrace();
                     }
                 }
             }catch (Exception e){
@@ -756,7 +559,7 @@ public class WarningQuestionService extends BaseJpaService {
             e.getMessage();
         }
 
-        String sql2 = "SELECT count(*) c FROM json_archives/info where receive_date>= '"+dateStr+" 00:00:00' AND receive_date<='" +  dateStr + " 23:59:59' AND pack_type=1 and defect=1";
+        String sql2 = "SELECT count(*) c FROM json_archives_qc/qc_metadata_info where receive_date>= '"+dateStr+" 00:00:00' AND receive_date<='" +  dateStr + " 23:59:59' AND qc_step=2 ";
         try {
             ResultSet resultSet2 = elasticSearchUtil.findBySql(sql2);
             resultSet2.next();
