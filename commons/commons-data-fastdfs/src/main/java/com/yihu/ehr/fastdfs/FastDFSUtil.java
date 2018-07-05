@@ -112,14 +112,14 @@ public class FastDFSUtil {
     /**
      * 以输入流的方式上传文件
      */
-    public ObjectNode uploadBySocket(InputStream in, String fileExtension,int fileSize, NameValuePair[] fileMetaData) throws IOException, MyException, NoSuchAlgorithmException{
-        return uploadBySocket(null,in,fileExtension,fileSize,fileMetaData);
+    public ObjectNode uploadBySocket(InputStream in, String fileExtension, int fileSize, NameValuePair[] fileMetaData) throws IOException, MyException, NoSuchAlgorithmException{
+        return uploadBySocket(null, in, fileExtension, fileSize, fileMetaData);
     }
 
     /**
      * 以输入流的方式上传文件
      */
-    public ObjectNode uploadBySocket(String groupname,InputStream in, String fileExtension,int fileSize, NameValuePair[] fileMetaData) throws IOException, MyException, NoSuchAlgorithmException{
+    public ObjectNode uploadBySocket(String _groupName, InputStream in, String fileExtension, int fileSize, NameValuePair[] fileMetaData) throws IOException, MyException, NoSuchAlgorithmException{
         StorageClient client = pool.getStorageClient();
         try {
             ObjectNode message = new ObjectMapper().createObjectNode();
@@ -134,9 +134,9 @@ public class FastDFSUtil {
             bufferedInputStream.close();
             message.put(FILE_SIZE, fileBuffer.length);
             String[] results = null;
-            if(!StringUtils.isEmpty(groupname)){
-                results = client.upload_file(groupname,fileBuffer, fileExtension, fileMetaData);
-            }else{
+            if (!StringUtils.isEmpty(_groupName)){
+                results = client.upload_file(_groupName, fileBuffer, fileExtension, fileMetaData);
+            } else{
                 results = client.upload_file(fileBuffer, fileExtension, fileMetaData);
             }
             if (results != null) {

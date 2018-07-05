@@ -1,4 +1,5 @@
 package com.yihu.ehr.basic.user.entity;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.annotations.Formula;
 
@@ -45,33 +46,63 @@ public class Doctors {
     private String jobScope; // 参考系统字典 执业范围
     private String jobState; // 参考系统字典 执业状态
     private String registerFlag; // 是否考试库连带注册-数据手动导入。默认0为是，1为否
+    private String SFZJZL;    //身份证件种类 ,代码：身份证件类别
+    private String CSRQ;    //出生日期 ,格式为：YYYYMMDD，例如：20131125
+    private String MZDM;    //民族代码 ,代码：民族代码
+    private String CJGZRQ;    //参加工作日期 ,格式为：YYYYMMDD，例如：20131125
+    private String SZKSDM;    //所在科室代码 ,代码：所在科室代码
+    private String YSZYZSBM;    //医师/卫生监督员执业证书编码 ,
+    private String SFDDDZYYS;    //是否多地点执业医师 ,代码：是否不确定代码
+    private String DEZYDWJGLB;    //第2执业单位的机构类别 ,代码：多点执业单位的机构类别
+    private String DSZYDWJGLB;    //第3执业单位的机构类别 ,代码：多点执业单位的机构类别
+    private String SFHDGJZS;    //是否获得国家住院医师规范化培训合格证书 ,代码：是否不确定代码
+    private String ZYYSZSBM;    //住院医师规范化培训合格证书编码 ,填写证书编码
+    private String ZYJSZWDM;    //专业技术职务(聘)代码 ,代码：聘任专业技术职务代码
+    private String XLDM;    //学历代码 ,代码：学历代码
+    private String XWDM;    //学位代码 ,代码：学位代码
+    private String SZYDM;    //所学专业代码 ,代码：所学专业代码
+    private String ZKTC1;    //专科特长1
+    private String ZKTC2;    //专科特长2
+    private String ZKTC3;    //专科特长3
+    private String NNRYLDQK;    //年内人员流动情况 ,代码：调动情况代码
+    private String DRDCSJ;    //调入/调出时间 ,格式为：YYYYMMDD，例如：20131125
+    private String BZQK;    //编制情况 ,代码：编制情况
+    private String SFZCQKYX;    //是否注册为全科医学专业 ,代码：是否不确定代码
+    private String QDHGZS;    //全科医生取得培训合格证书情况 ,代码：全科医生培训合格证书
+    private String XZSQPZGZ;    //是否由乡镇卫生院或社区卫生服务机构派驻村卫生室工作 ,代码：是否不确定代码
+    private String SFCSTJGZ;    //是否从事统计信息化业务工作 ,代码：是否不确定代码
+    private String TJXXHGZ;    //统计信息化业务工作 ,代码: 统计信息化业务工作
+
 
     // 临时属性
     private String lczcName;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id",unique = true,nullable = false)
+    @Column(name = "id", unique = true, nullable = false)
     public Long getId() {
         return id;
     }
+
     public void setId(Long id) {
         this.id = id;
     }
 
 
-    @Column(name = "userId",  nullable = true)
+    @Column(name = "userId", nullable = true)
     public String getUserId() {
         return userId;
     }
+
     public void setUserId(String userId) {
         this.userId = userId;
     }
 
-    @Column(name = "code",  nullable = false)
+    @Column(name = "code", nullable = false)
     public String getCode() {
         return code;
     }
+
     public void setCode(String code) {
         this.code = code;
     }
@@ -79,6 +110,7 @@ public class Doctors {
     public String getEmail() {
         return email;
     }
+
     public void setEmail(String email) {
         this.email = email;
     }
@@ -229,7 +261,7 @@ public class Doctors {
         this.updateTime = updateTime;
     }
 
-    @Column(name = "id_card_no",  nullable = false)
+    @Column(name = "id_card_no", nullable = false)
     public String getIdCardNo() {
         return idCardNo;
     }
@@ -335,5 +367,213 @@ public class Doctors {
 
     public void setLczcName(String lczcName) {
         this.lczcName = lczcName;
+    }
+    @Column(name = "SFZJZL")
+    public String getSFZJZL() {
+        return SFZJZL;
+    }
+
+    public void setSFZJZL(String SFZJZL) {
+        this.SFZJZL = SFZJZL;
+    }
+    @Column(name = "CSRQ")
+    public String getCSRQ() {
+        return CSRQ;
+    }
+
+    public void setCSRQ(String CSRQ) {
+        this.CSRQ = CSRQ;
+    }
+    @Column(name = "MZDM")
+    public String getMZDM() {
+        return MZDM;
+    }
+
+    public void setMZDM(String MZDM) {
+        this.MZDM = MZDM;
+    }
+    @Column(name = "CJGZRQ")
+    public String getCJGZRQ() {
+        return CJGZRQ;
+    }
+
+    public void setCJGZRQ(String CJGZRQ) {
+        this.CJGZRQ = CJGZRQ;
+    }
+    @Column(name = "SZKSDM")
+    public String getSZKSDM() {
+        return SZKSDM;
+    }
+
+    public void setSZKSDM(String SZKSDM) {
+        this.SZKSDM = SZKSDM;
+    }
+    @Column(name = "YSZYZSBM")
+    public String getYSZYZSBM() {
+        return YSZYZSBM;
+    }
+
+    public void setYSZYZSBM(String YSZYZSBM) {
+        this.YSZYZSBM = YSZYZSBM;
+    }
+    @Column(name = "SFDDDZYYS")
+    public String getSFDDDZYYS() {
+        return SFDDDZYYS;
+    }
+
+    public void setSFDDDZYYS(String SFDDDZYYS) {
+        this.SFDDDZYYS = SFDDDZYYS;
+    }
+    @Column(name = "DEZYDWJGLB")
+    public String getDEZYDWJGLB() {
+        return DEZYDWJGLB;
+    }
+
+    public void setDEZYDWJGLB(String DEZYDWJGLB) {
+        this.DEZYDWJGLB = DEZYDWJGLB;
+    }
+    @Column(name = "DSZYDWJGLB")
+    public String getDSZYDWJGLB() {
+        return DSZYDWJGLB;
+    }
+
+    public void setDSZYDWJGLB(String DSZYDWJGLB) {
+        this.DSZYDWJGLB = DSZYDWJGLB;
+    }
+    @Column(name = "SFHDGJZS")
+    public String getSFHDGJZS() {
+        return SFHDGJZS;
+    }
+
+    public void setSFHDGJZS(String SFHDGJZS) {
+        this.SFHDGJZS = SFHDGJZS;
+    }
+    @Column(name = "ZYYSZSBM")
+    public String getZYYSZSBM() {
+        return ZYYSZSBM;
+    }
+
+    public void setZYYSZSBM(String ZYYSZSBM) {
+        this.ZYYSZSBM = ZYYSZSBM;
+    }
+    @Column(name = "ZYJSZWDM")
+    public String getZYJSZWDM() {
+        return ZYJSZWDM;
+    }
+
+    public void setZYJSZWDM(String ZYJSZWDM) {
+        this.ZYJSZWDM = ZYJSZWDM;
+    }
+    @Column(name = "XLDM")
+    public String getXLDM() {
+        return XLDM;
+    }
+
+    public void setXLDM(String XLDM) {
+        this.XLDM = XLDM;
+    }
+    @Column(name = "XWDM")
+    public String getXWDM() {
+        return XWDM;
+    }
+
+    public void setXWDM(String XWDM) {
+        this.XWDM = XWDM;
+    }
+    @Column(name = "SZYDM")
+    public String getSZYDM() {
+        return SZYDM;
+    }
+
+    public void setSZYDM(String SZYDM) {
+        this.SZYDM = SZYDM;
+    }
+    @Column(name = "ZKTC1")
+    public String getZKTC1() {
+        return ZKTC1;
+    }
+
+    public void setZKTC1(String ZKTC1) {
+        this.ZKTC1 = ZKTC1;
+    }
+    @Column(name = "ZKTC2")
+    public String getZKTC2() {
+        return ZKTC2;
+    }
+
+    public void setZKTC2(String ZKTC2) {
+        this.ZKTC2 = ZKTC2;
+    }
+    @Column(name = "ZKTC3")
+    public String getZKTC3() {
+        return ZKTC3;
+    }
+
+    public void setZKTC3(String ZKTC3) {
+        this.ZKTC3 = ZKTC3;
+    }
+    @Column(name = "NNRYLDQK")
+    public String getNNRYLDQK() {
+        return NNRYLDQK;
+    }
+
+    public void setNNRYLDQK(String NNRYLDQK) {
+        this.NNRYLDQK = NNRYLDQK;
+    }
+    @Column(name = "DRDCSJ")
+    public String getDRDCSJ() {
+        return DRDCSJ;
+    }
+
+    public void setDRDCSJ(String DRDCSJ) {
+        this.DRDCSJ = DRDCSJ;
+    }
+    @Column(name = "BZQK")
+    public String getBZQK() {
+        return BZQK;
+    }
+
+    public void setBZQK(String BZQK) {
+        this.BZQK = BZQK;
+    }
+    @Column(name = "SFZCQKYX")
+    public String getSFZCQKYX() {
+        return SFZCQKYX;
+    }
+
+    public void setSFZCQKYX(String SFZCQKYX) {
+        this.SFZCQKYX = SFZCQKYX;
+    }
+    @Column(name = "QDHGZS")
+    public String getQDHGZS() {
+        return QDHGZS;
+    }
+
+    public void setQDHGZS(String QDHGZS) {
+        this.QDHGZS = QDHGZS;
+    }
+    @Column(name = "XZSQPZGZ")
+    public String getXZSQPZGZ() {
+        return XZSQPZGZ;
+    }
+
+    public void setXZSQPZGZ(String XZSQPZGZ) {
+        this.XZSQPZGZ = XZSQPZGZ;
+    }
+    @Column(name = "SFCSTJGZ")
+    public String getSFCSTJGZ() {
+        return SFCSTJGZ;
+    }
+
+    public void setSFCSTJGZ(String SFCSTJGZ) {
+        this.SFCSTJGZ = SFCSTJGZ;
+    }
+    @Column(name = "TJXXHGZ")
+    public String getTJXXHGZ() {
+        return TJXXHGZ;
+    }
+
+    public void setTJXXHGZ(String TJXXHGZ) {
+        this.TJXXHGZ = TJXXHGZ;
     }
 }

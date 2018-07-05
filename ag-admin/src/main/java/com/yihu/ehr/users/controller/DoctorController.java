@@ -1,7 +1,6 @@
 package com.yihu.ehr.users.controller;
 
 import com.yihu.ehr.agModel.user.DoctorDetailModel;
-import com.yihu.ehr.agModel.user.DoctorsModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseController;
@@ -32,7 +31,6 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
@@ -234,13 +232,12 @@ public class DoctorController extends BaseController {
                 return failed(errorMsg);
             }
             MDoctor mDoctor = convertToMDoctor(detailModel);
-            mDoctor = doctorClient.createDoctor(objectMapper.writeValueAsString(mDoctor), model);
-            if (mDoctor == null || mDoctor.getId() == null) {
-                return failed("保存失败!");
+            Envelop envelop = doctorClient.createDoctor(objectMapper.writeValueAsString(mDoctor), model);
+            if (envelop.isSuccessFlg()) {
+                mDoctor = objectMapper.readValue(envelop.getObj().toString(), MDoctor.class);
+                detailModel = convertToModel(mDoctor, DoctorDetailModel.class);
             }
-
-            detailModel = convertToModel(mDoctor, DoctorDetailModel.class);
-            return success(detailModel);
+            return envelop;
         } catch (Exception ex) {
             ex.printStackTrace();
             return failedSystem();
@@ -282,15 +279,13 @@ public class DoctorController extends BaseController {
                 return failed(errorMsg);
             }
             MDoctor mDoctor = convertToMDoctor(detailModel);
-            mDoctor = doctorClient.updateDoctor(objectMapper.writeValueAsString(mDoctor), model);
-            if(mDoctor == null || mDoctor.getId() == null){
-                return failed("保存失败!");
+            Envelop envelop = doctorClient.updateDoctor(objectMapper.writeValueAsString(mDoctor), model);
+            if (envelop.isSuccessFlg()) {
+                mDoctor = objectMapper.readValue(envelop.getObj().toString(), MDoctor.class);
+                detailModel = convertToModel(mDoctor, DoctorDetailModel.class);
             }
-
-            detailModel = convertToModel(mDoctor, DoctorDetailModel.class);
-            return success(detailModel);
-        }
-        catch (Exception ex){
+            return envelop;
+        } catch (Exception ex){
             ex.printStackTrace();
             return failedSystem();
         }
