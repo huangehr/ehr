@@ -64,7 +64,6 @@ public class JobService {
                try {
                    quartzHelper.startNow(Class.forName(quotaVo.getJobClazz()), quotaCodeImmediately, params);
                }catch (Exception e){
-                   System.out.println(quotaCodeImmediately + "," + tjQuota.getName() + "指标正在执行！");
                    throw  new ObjectAlreadyExistsException(quotaCodeImmediately + "," + tjQuota.getName() + "指标正在执行！");
                }
             } else {
