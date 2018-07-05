@@ -9,6 +9,7 @@ import com.yihu.ehr.profile.queue.RedisCollection;
 import com.yihu.ehr.query.services.SolrQuery;
 import com.yihu.ehr.resource.service.ResourceBrowseService;
 import com.yihu.ehr.resource.service.ResourcesTransformService;
+import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -22,10 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by hzp on 2016/4/13.
@@ -400,7 +398,7 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
                     EsSimplePackage esSimplePackage = new EsSimplePackage();
                     esSimplePackage.setRowkey(String.valueOf(item.get("rowkey")));
                     esSimplePackage.setPatient_id(String.valueOf(item.get("patient_id")));
-                    esSimplePackage.setEvent_date(String.valueOf(item.get("event_date")));
+                    esSimplePackage.setEvent_date(DateUtil.toStringLong((Date)item.get("event_date")));
                     esSimplePackage.setEvent_no(String.valueOf(item.get("event_no")));
                     esSimplePackage.setEvent_type( Integer.valueOf(item.get("event_type").toString()));
                     esSimplePackage.setOrg_code(String.valueOf(item.get("org_code")));
