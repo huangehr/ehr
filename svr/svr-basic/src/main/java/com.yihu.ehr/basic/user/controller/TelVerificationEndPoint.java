@@ -2,28 +2,27 @@ package com.yihu.ehr.basic.user.controller;
 
 import com.yihu.ehr.basic.apps.model.App;
 import com.yihu.ehr.basic.apps.service.AppService;
+import com.yihu.ehr.basic.fzopen.service.OpenService;
 import com.yihu.ehr.basic.user.service.UserTelVerificationService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.entity.user.UserTelVerification;
-import com.yihu.ehr.model.app.MApp;
 import com.yihu.ehr.util.datetime.DateUtil;
-import com.yihu.ehr.util.fzgateway.FzGatewayUtil;
 import com.yihu.ehr.util.id.RandomUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -40,12 +39,11 @@ public class TelVerificationEndPoint extends EnvelopRestEndPoint {
     private UserTelVerificationService userTelVerificationService;
     @Autowired
     private AppService appService;
-    @Value("${fz-gateway.url}")
-    private String fzGatewayUrl;
+    @Autowired
+    private OpenService fzOpenService;
+
     @Value("${fz-gateway.clientId}")
     private String fzClientId;
-    @Value("${fz-gateway.clientVersion}")
-    private String fzClientVersion;
     @Value("${fz-gateway.handlerId}")
     private String fzHandlerId;
 
@@ -79,7 +77,7 @@ public class TelVerificationEndPoint extends EnvelopRestEndPoint {
             String code = random;
             String api = "MsgGW.Sms.send";
             String content = "尊敬的用户：欢迎使用健康上饶，您的验证码为:【" + code + "】,有效期10分钟，请尽快完成注册。若非本人操作，请忽略。";
-            Map<String, String> apiParamMap = new HashMap<>();
+            Map<String, Object> apiParamMap = new HashMap<>();
             //发送短信
             //手机号码
             apiParamMap.put("mobile", tel);
@@ -89,7 +87,7 @@ public class TelVerificationEndPoint extends EnvelopRestEndPoint {
             apiParamMap.put("content", content);
             //渠道号
             apiParamMap.put("clientId", fzClientId);
-            String resultStr = FzGatewayUtil.httpPost(fzGatewayUrl,fzClientId,fzClientVersion,api,apiParamMap, 1);
+            String resultStr = fzOpenService.callFzInnerApi(api,apiParamMap, 1);
             if (resultStr != null) {
                 Map<String, Object> resultMap = objectMapper.readValue(resultStr, Map.class);
                 Integer resultCode = 0;

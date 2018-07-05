@@ -52,13 +52,13 @@ public class StdPackageResolver extends PackageResolver {
             for (PackageDataSet dataSet : packageDataSetList) {
                 String dataSetCode = origin ? DataSetUtil.originDataSetCode(dataSet.getCode()) : dataSet.getCode();
                 dataSet.setCode(dataSetCode);
-                standardPackage.insertDataSet(dataSetCode, dataSet);
                 standardPackage.setPatientId(dataSet.getPatientId());
                 standardPackage.setEventNo(dataSet.getEventNo());
                 standardPackage.setOrgCode(dataSet.getOrgCode());
                 standardPackage.setCdaVersion(dataSet.getCdaVersion());
                 standardPackage.setCreateDate(dataSet.getCreateTime());
                 standardPackage.setEventTime(dataSet.getEventTime());
+                standardPackage.insertDataSet(dataSetCode, dataSet);
             }
             return;
         }
@@ -75,11 +75,15 @@ public class StdPackageResolver extends PackageResolver {
                     Map<String, Object> properties = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.Identity);
                     String demographicId = (String) properties.get(ResourceCells.DEMOGRAPHIC_ID);
                     String patientName = (String) properties.get(ResourceCells.PATIENT_NAME);
+                    String patientAge = (String) properties.get(ResourceCells.PATIENT_AGE);
                     if (!StringUtils.isEmpty(demographicId)) {
                         standardPackage.setDemographicId(demographicId.trim());
                     }
                     if (!StringUtils.isEmpty(patientName)) {
                         standardPackage.setPatientName(patientName);
+                    }
+                    if (!StringUtils.isEmpty(patientAge)) {
+                        standardPackage.setPatientAge(patientAge);
                     }
                 }
 
@@ -127,13 +131,25 @@ public class StdPackageResolver extends PackageResolver {
                     }
                 }
             }
+            if (null == standardPackage.getPatientId()) {
+                standardPackage.setPatientId(dataSet.getPatientId());
+            }
+            if (null == standardPackage.getEventNo()) {
+                standardPackage.setEventNo(dataSet.getEventNo());
+            }
+            if (null == standardPackage.getOrgCode()) {
+                standardPackage.setOrgCode(dataSet.getOrgCode());
+            }
+            if (null == standardPackage.getCdaVersion()) {
+                standardPackage.setCdaVersion(dataSet.getCdaVersion());
+            }
+            if (null == standardPackage.getCreateDate()) {
+                standardPackage.setCreateDate(dataSet.getCreateTime());
+            }
+            if (null == standardPackage.getEventTime()) {
+                standardPackage.setEventTime(dataSet.getEventTime());
+            }
             standardPackage.insertDataSet(dataSetCode, dataSet);
-            standardPackage.setPatientId(dataSet.getPatientId());
-            standardPackage.setEventNo(dataSet.getEventNo());
-            standardPackage.setOrgCode(dataSet.getOrgCode());
-            standardPackage.setCdaVersion(dataSet.getCdaVersion());
-            standardPackage.setCreateDate(dataSet.getCreateTime());
-            standardPackage.setEventTime(dataSet.getEventTime());
         }
     }
 

@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 福州总部接口网关相关
+ * 福州总部网关内部接口相关
  *
  * @author 张进军
  * @date 2018/3/29 11:44
@@ -17,7 +17,11 @@ import java.util.Map;
 public class FzGatewayUtil {
 
     /**
-     * HTTP POST 调用福州总部网关接口
+     * HTTP POST 调用福州总部网关内部接口
+     *
+     * 备注：由于福州总部IP权限控制，目前只有对 ag-admin、ag-zuul 所在服务器的IP开放权限，
+     * 所以只能在这两个微服务中调用该接口。如果需要在其他微服务中调用福州总部内部接口，可使用
+     * svr-basic 对该接口的转发接口：OpenService 中 callFzInnerApi。
      *
      * @param gatewayUrl    总部网关地址
      * @param clientId      渠道ID

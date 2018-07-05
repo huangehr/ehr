@@ -53,6 +53,8 @@ public class EsQuotaJob implements Job {
     private String startTime; //开始时间
     private String timeLevel; //时间
     private String executeFlag; // 执行动作 1 手动执行 2 周期执行
+    private int haveThreadCount = 0;//已完成线程数
+    private int threadCount = 1;//总线程数
 
     @Autowired
     private TjQuotaLogDao tjQuotaLogDao;
@@ -93,7 +95,7 @@ public class EsQuotaJob implements Job {
             EsConfig esConfig = (EsConfig) JSONObject.toBean(obj,EsConfig.class);
             //查询是否已经统计过,如果已统计 先删除后保存
             deleteRecord(quotaVo);
-            if(quotaDataSource.getSourceCode().equals("2") && esConfig.getAggregation().equals("list")){//来源solr
+            if(quotaDataSource.getSourceCode().equals("2") && esConfig.getAggregation()!= null && esConfig.getAggregation().equals("list")) {//来源solr
                 moreThredQuota(tjQuotaLog,esConfig);
             }else{
                 //统计并保存
@@ -108,12 +110,14 @@ public class EsQuotaJob implements Job {
     }
 
     /*
-     * 多线程执行指标
+     * solr list 方式 多线程执行指标
      */
     public void moreThredQuota(TjQuotaLog tjQuotaLog, EsConfig esConfig){
         try {
-            int rows = solrExtract.getExtractTotal(startTime,endTime, esConfig);
             int perCount = Contant.compute.perCount;
+            quotaVo.setStart(0);
+            quotaVo.setRows(perCount);
+            int rows = solrExtract.getExtractTotal(startTime,endTime, esConfig);
             if(rows > perCount*50){
                 throw new Exception("数据量过大请缩小抽取时间范围");
             }
@@ -125,6 +129,7 @@ public class EsQuotaJob implements Job {
                 }else {
                     remainder = perCount;
                 }
+                threadCount = count;
                 for (int i = 0; i < count; i++) {
                     //防止过快执行导致参数被覆盖
                     Thread.sleep(1000);
@@ -162,8 +167,6 @@ public class EsQuotaJob implements Job {
      * 统计过程
      */
     public void quota(TjQuotaLog tjQuotaLog,QuotaVo quotaVo) {
-        String s = "起始条数：" + quotaVo.getStart() + " ，每次 "+ quotaVo.getRows();
-        System.out.println(s);
         String time = "时间：" + startTime + "到"+ endTime +" , ";
         String status = "";
         String content = "";
@@ -180,6 +183,7 @@ public class EsQuotaJob implements Job {
                 status = Contant.save_status.fail;
                 content = time + "没有抽取到数据";
             }
+            haveThreadCount++;
             // 初始执行时，更新该指标为已初始执行过
             if (quotaVo.getExecuteFlag().equals("1")) {
                 String sql = "UPDATE tj_quota SET is_init_exec = '1' WHERE id = " + quotaVo.getId();
@@ -191,10 +195,12 @@ public class EsQuotaJob implements Job {
             tjQuotaLog = saveLog(tjQuotaLog);
             e.printStackTrace();
         }
-        tjQuotaLog.setStatus(status);
-        tjQuotaLog.setContent(content);
-        tjQuotaLog.setEndTime(new Date());
-        saveLog(tjQuotaLog);
+        if(haveThreadCount  == threadCount){
+            tjQuotaLog.setStatus(status);
+            tjQuotaLog.setContent(content);
+            tjQuotaLog.setEndTime(new Date());
+            saveLog(tjQuotaLog);
+        }
     }
 
     private void deleteRecord(QuotaVo quotaVo) throws Exception {

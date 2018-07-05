@@ -3,6 +3,7 @@ package com.yihu.ehr.profile.service.old;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.model.specialdict.MDrugDict;
+import com.yihu.ehr.profile.family.ResourceCells;
 import com.yihu.ehr.profile.feign.*;
 import com.yihu.ehr.profile.model.MedicationStat;
 import com.yihu.ehr.profile.service.template.ArchiveTemplateService;
@@ -62,12 +63,12 @@ public class PatientInfoDetailService {
                 if (rowkeys.length() > 0) {
                     rowkeys.append(" OR ");
                 }
-                rowkeys.append(BasicConstant.profileId + ":" + map.get("rowkey").toString());
+                rowkeys.append(ResourceCells.PROFILE_ID + ":" + map.get("rowkey").toString());
             }
 
             re = "(" + rowkeys.toString() + ")";
         } else {
-            re = BasicConstant.profileId + ":(NOT *)";
+            re = ResourceCells.PROFILE_ID + ":(NOT *)";
         }
 
         return re;
@@ -185,7 +186,7 @@ public class PatientInfoDetailService {
             queryParams = BasicConstant.cfbh + ":" + prescriptionNo;
         } else {
             if (profileId != null && profileId.length() > 0) {
-                queryParams = BasicConstant.profileId + ":" + profileId;
+                queryParams = ResourceCells.PROFILE_ID + ":" + profileId;
             } else {
                 queryParams = getProfileIds(demographicId,saasOrg);
             }

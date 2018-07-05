@@ -150,67 +150,58 @@ public class BaseStatistsService {
                     }
                     map.put(moleDimensions[i], firstMap.get(moleDimensions[i]).toString());
                 }
-                if (firstResultVal == 0) {
-                    map.put(resultField,0);
-                    addResultList.add(map);
-                } else {
-                    boolean pflag = true;
-                    for(Map<String, Object> secondMap :secondList) {
-                        String secondKeyVal = "";
-                        String [] dimeDimensions = dimension.split(";");
-                        for(int i = 0 ;i < dimeDimensions.length ; i++){
-                            if(i == 0){
-                                secondKeyVal = secondMap.get(dimeDimensions[i]).toString();
-                            }else {
-                                secondKeyVal = secondKeyVal + "-" + secondMap.get(dimeDimensions[i]).toString() ;
-                            }
-                        }
-                        if(firstKeyVal.equals(secondKeyVal) || "quotaName".equals(dimension)){  // 如果维度是quotaName，则进入逻辑
-                            double point = 0;
-                            double dimeResultVal = Double.valueOf(secondMap.get(resultField).toString());
-                            if(dimeResultVal != 0){
-                                BigDecimal first = new BigDecimal(Double.toString(firstResultVal));
-                                BigDecimal second = new BigDecimal(Double.toString(dimeResultVal));
-                                if(operation == 1){ //1 加法 默认
-                                    point = first.add(second).doubleValue();
-                                }else if(operation == 2){ //2 减法
-                                    point = first.subtract(second).doubleValue();
-                                }
-                            }
-                            map.put(resultField,nf.format(point));
-                            addResultList.add(map);
-                            pflag = false;
-                            break;
+                boolean pflag = true;
+                for(Map<String, Object> secondMap :secondList) {
+                    String secondKeyVal = "";
+                    String [] dimeDimensions = dimension.split(";");
+                    for(int i = 0 ;i < dimeDimensions.length ; i++){
+                        if(i == 0){
+                            secondKeyVal = secondMap.get(dimeDimensions[i]).toString();
+                        }else {
+                            secondKeyVal = secondKeyVal + "-" + secondMap.get(dimeDimensions[i]).toString() ;
                         }
                     }
-                    if(pflag){
-                        map.put(resultField,firstResultVal);
+                    if(firstKeyVal.equals(secondKeyVal) || "quotaName".equals(dimension)){  // 如果维度是quotaName，则进入逻辑
+                        double point = 0;
+                        double dimeResultVal = Double.valueOf(secondMap.get(resultField).toString());
+                        BigDecimal first = new BigDecimal(Double.toString(firstResultVal));
+                        BigDecimal second = new BigDecimal(Double.toString(dimeResultVal));
+                        if(operation == 1){ //1 加法 默认
+                            point = first.add(second).doubleValue();
+                        }else if(operation == 2){ //2 减法
+                            point = first.subtract(second).doubleValue();
+                        }
+                        map.put(resultField,nf.format(point));
                         addResultList.add(map);
+                        pflag = false;
+                        break;
                     }
+                }
+                if(pflag){
+                    map.put(resultField,firstResultVal);
+                    addResultList.add(map);
                 }
             }
         }
-        // 第一加数列表为空，第二个加数列表不为空
-        if (firstList.size() <= 0 && secondList.size() > 0) {
+        // 第一加数列表个数小雨第二个加数列表
+        if (secondList.size() - firstList.size() > 0) {
             for(Map<String, Object> secondMap :secondList) {
                 Map<String, Object> map = new HashMap<>();
                 map.put(firstColumnField, secondMap.get(firstColumnField));
                 for(int i = 0 ;i < moleDimensions.length ; i++){
                     map.put(moleDimensions[i], secondMap.get(moleDimensions[i]).toString());
                 }
-                if("quotaName".equals(dimension)) {
-                    double point = 0;
-                    double secondResultVal = Double.valueOf(secondMap.get("result") == null ? "0" : secondMap.get(resultField).toString());
-                    if (secondResultVal != 0) {
-                        if(operation == 1){ //1 加法 默认
-                            point = secondResultVal ;
-                        }else if(operation == 2){ //2 减法
-                            point = -secondResultVal;
-                        }
+                double point = 0;
+                double secondResultVal = Double.valueOf(secondMap.get("result") == null ? "0" : secondMap.get(resultField).toString());
+                if (secondResultVal != 0) {
+                    if(operation == 1){ //1 加法 默认
+                        point = secondResultVal ;
+                    }else if(operation == 2){ //2 减法
+                        point = -secondResultVal;
                     }
-                    map.put(resultField, nf.format(point));
-                    addResultList.add(map);
                 }
+                map.put(resultField, nf.format(point));
+                addResultList.add(map);
             }
         }
         //检查后面指标的维度是否全部有 累加进去
@@ -1384,6 +1375,12 @@ public class BaseStatistsService {
             molecularFilter = "quotaDate >= '" + firstDay + "' and quotaDate <= '" + lastDay + "'";
             denominatorFilter = "quotaDate >= '" + preMonthFirstDay + "' and quotaDate <= '" + preMonthLastDay + "'";
         }
+        if (StringUtils.isNotEmpty(esConfig.getMolecularFilter())) {
+            molecularFilter += " and " + esConfig.getMolecularFilter();
+        }
+        if (StringUtils.isNotEmpty(esConfig.getDenominatorFilter())) {
+            denominatorFilter += " and " + esConfig.getDenominatorFilter();
+        }
         List<Map<String, Object>> moleList = getSimpleQuotaReport(esConfig.getMolecular(), molecularFilter,dimension ,false , null);
         List<Map<String, Object>> denoList =  getSimpleQuotaReport(esConfig.getDenominator(),denominatorFilter,dimension,false, null);
 //        List<Map<String, Object>> moleList = divisionQuota(esConfig.getMolecular(), esConfig.getDenominator(), dimension, molecularFilter, molecularFilter, esConfig.getPercentOperation(), esConfig.getPercentOperationValue(), dateType, "");
@@ -1431,6 +1428,9 @@ public class BaseStatistsService {
         } else if ("2".equals(esConfig.getIncrementFlag())) {
             // 当前月
             filters = "quotaDate >= '" + firstDay + "' and quotaDate <= '" + lastDay + "'";
+        }
+        if (StringUtils.isNotEmpty(esConfig.getFilter())) {
+            filters += " and " + esConfig.getFilter();
         }
         return filters;
     }

@@ -49,6 +49,7 @@ public class ServiceApi {
         public static final String ResourceSubData = "/resources/query/sub_data"; //细表资源查询接口
         public static final String ResourceMasterStat = "/resources/query/master_stat"; //主表资源统计接口
         public static final String ResourceSubStat = "/resources/query/sub_stat"; //细表资源查询接口
+        public static final String ResourceHealthFile = "/resources/query/health_file"; //细表资源查询接口
         public static final String ResourceMysql = "/resources/query/mysql"; //mysql资源查询接口
         public static final String SolrIndexData = "/resources/query/solrIndex"; //solr索引列表查询接口
 
@@ -1563,6 +1564,7 @@ public class ServiceApi {
      */
     public static class Fz {
         public static final String OpenApi = "/fz/open/api";
+        public static final String InnerApi = "/fz/inner/api";
     }
 
     /**

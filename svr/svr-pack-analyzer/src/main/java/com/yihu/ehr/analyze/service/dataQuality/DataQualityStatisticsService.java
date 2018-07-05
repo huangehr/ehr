@@ -109,7 +109,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
         });
 
         //统计医院数据
-        String sql1 = "SELECT sum(HSI07_01_001) s1,sum(HSI07_01_002) s2,sum(HSI07_01_004) s3,sum(HSI07_01_012) s4,org_code FROM qc/daily_report where create_date>= '"+start+"T00:00:00' AND create_date <='" +  end + "T23:59:59' group by org_code";
+        String sql1 = "SELECT sum(HSI07_01_001) s1,sum(HSI07_01_002) s2,sum(HSI07_01_004) s3,sum(HSI07_01_012) s4,org_code FROM qc/daily_report where event_date>= '"+start+"T00:00:00' AND event_date <='" +  end + "T23:59:59' group by org_code";
         ResultSet resultSet1 = elasticSearchUtil.findBySql(sql1);
         Map<String, Map<String, Object>> dataMap = new HashMap<>();
         try {
@@ -145,7 +145,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
         }
 
         //统计接收数据
-        String sql2 = "SELECT count(event_no) c,org_code FROM json_archives/info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' AND pack_type=1 ";
+        String sql2 = "SELECT count(*) c,org_code FROM json_archives/info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' AND pack_type=1 ";
         if(eventType!=null){
             sql2 += " and event_type = "+eventType ;
         }
@@ -169,7 +169,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
             e.getMessage();
         }
 
-        String sql3 = "SELECT count(*) c,org_code FROM json_archives_qc/qc_metadata_info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' ";
+        String sql3 = "SELECT count(*) c,org_code FROM json_archives_qc/qc_metadata_info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' and qc_step=1";
         if(eventType!=null){
             sql3 += " and event_type = "+eventType ;
         }
@@ -244,7 +244,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
         }
 
         //资源化数据
-        String sql5 = "SELECT count(event_no) c,org_code,archive_status FROM json_archives/info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' AND pack_type=1 and (archive_status=2 or archive_status=3) group by org_code,archive_status";
+        String sql5 = "SELECT count(*) c,org_code,archive_status FROM json_archives/info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' AND pack_type=1 and (archive_status=2 or archive_status=3) group by org_code,archive_status";
         ResultSet resultSet5 = elasticSearchUtil.findBySql(sql5);
         try {
             while (resultSet5.next()) {
@@ -270,7 +270,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
             e.getMessage();
         }
 
-        String sql6 = "SELECT count(event_no) c,org_code FROM json_archives/info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' AND pack_type=1 and defect=1 group by org_code";
+        String sql6 = "SELECT count(*) c,org_code FROM json_archives_qc/qc_metadata_info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' AND qc_step=2 group by org_code";
         ResultSet resultSet6 = elasticSearchUtil.findBySql(sql6);
         try {
             while (resultSet6.next()) {
@@ -322,7 +322,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
     public Long packetCount(List<Map<String, String>> orgInfoList, String archiveStatus, String eventDateStart, String eventDateEnd) {
         Long count = 0L;
         if (orgInfoList.size() == 1 && cloud.equals(orgInfoList.get(0).get("orgCode"))) {
-            String sql1 = "SELECT count(event_no) c FROM json_archives/info where receive_date>= '"+eventDateStart+"' AND receive_date<='" +  eventDateEnd + "' AND pack_type=1 ";
+            String sql1 = "SELECT count(*) c FROM json_archives/info where receive_date>= '"+eventDateStart+"' AND receive_date<='" +  eventDateEnd + "' AND pack_type=1 ";
             if (!StringUtils.isEmpty(archiveStatus)) {
                 sql1+=" and archive_status ="+archiveStatus;
             }
@@ -338,7 +338,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
         } else {
             for (Map<String, String> orgInfo : orgInfoList) {
                 //统计接收数据
-                String sql2 = "SELECT count(event_no) c FROM json_archives/info where receive_date>= '"+eventDateStart+"' AND receive_date<='" +  eventDateEnd + "' AND pack_type=1 and org_code='" + orgInfo.get("orgCode")+"'";
+                String sql2 = "SELECT count(*) c FROM json_archives/info where receive_date>= '"+eventDateStart+"' AND receive_date<='" +  eventDateEnd + "' AND pack_type=1 and org_code='" + orgInfo.get("orgCode")+"'";
                 if (!StringUtils.isEmpty(archiveStatus)) {
                     sql2+=" and archive_status ="+archiveStatus;
                 }
@@ -386,7 +386,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
             List<Map<String, Object>> reportedNumList1 = elasticSearchUtil.findBySql(Arrays.asList(reportedNumFields1.split(",")), reportedNumSql1);
             reportData.put("reportedNumList1", reportedNumList1);
             // TODO 采集情况
-            String reportedNumSql2 = "SELECT count(event_no) total FROM json_archives/info where receive_date BETWEEN '"+eventDateStart+"' AND '" +  eventDateEnd + "' and pack_type=1 " ;
+            String reportedNumSql2 = "SELECT count(*) total FROM json_archives/info where receive_date BETWEEN '"+eventDateStart+"' AND '" +  eventDateEnd + "' and pack_type=1 " ;
             if (!cloud.equals(orgInfo.get("orgCode"))) {
                 reportedNumSql2 += " AND org_code='" + orgCode + "'";
             }
@@ -413,7 +413,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
             collectionMap.put("total",totalCollection);
             reportData.put("collectionMap", collectionMap);
             // TODO 采集内容
-            String reportedNumSql3 = "SELECT count(event_no) total FROM json_archives/info where receive_date BETWEEN '"+eventDateStart+"' AND '" +  eventDateEnd + "' and pack_type=1 " ;
+            String reportedNumSql3 = "SELECT count(*) total FROM json_archives/info where receive_date BETWEEN '"+eventDateStart+"' AND '" +  eventDateEnd + "' and pack_type=1 " ;
             if (!cloud.equals(orgInfo.get("orgCode"))) {
                 reportedNumSql3 += " AND org_code='" + orgCode + "'";
             }
@@ -457,7 +457,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
 
             reportData.put("reportedNumList3", reportedList3);
             // TODO 解析情况
-            String reportedNumSql4 = "SELECT count(event_no) total FROM json_archives/info where receive_date BETWEEN '"+eventDateStart+"' AND '" +  eventDateEnd + "' and (archive_status=2 or archive_status=3 or archive_status=0 ) and pack_type=1 " ;
+            String reportedNumSql4 = "SELECT count(*) total FROM json_archives/info where receive_date BETWEEN '"+eventDateStart+"' AND '" +  eventDateEnd + "' and (archive_status=2 or archive_status=3 or archive_status=0 ) and pack_type=1 " ;
             if (!cloud.equals(orgInfo.get("orgCode"))) {
                 reportedNumSql4 += " AND org_code='" + orgCode + "'";
             }
@@ -502,6 +502,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
             // TODO 解析失败分析
             StringBuilder stringBuilder2 = new StringBuilder();
             stringBuilder2.append("archive_status=2;");
+            stringBuilder2.append("pack_type=1;");
             stringBuilder2.append("receive_date>=" + eventDateStart + ";");
             stringBuilder2.append("receive_date<" + eventDateEnd + ";");
             if (!cloud.equals(orgInfo.get("orgCode"))){
@@ -648,7 +649,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
             }
             // 及时率场合
 
-            StringBuilder sql = new StringBuilder("SELECT COUNT(distinct event_no) packetCount FROM json_archives/info WHERE ");
+            StringBuilder sql = new StringBuilder("SELECT COUNT(*) packetCount FROM json_archives/info WHERE ");
             sql.append(filters);
             sql.append(" GROUP BY date_histogram(field='receive_date','interval'='1d',format='yyyy-MM-dd',alias=receiveDate)");
             List<String> fields = new ArrayList<>(2);
@@ -723,10 +724,10 @@ public class DataQualityStatisticsService extends BaseJpaService {
         double totalPeIntegrity = 0;//总体检完整数
 
         //统计总数
-        String sql1 = "SELECT sum(HSI07_01_001) s1,sum(HSI07_01_002) s2,sum(HSI07_01_004) s3,sum(HSI07_01_012) s4,org_code FROM qc/daily_report where event_date>= '"+start+"T00:00:00' AND event_date <='" +  end + "T23:59:59' group by org_code";
+        String sqlsum = "SELECT sum(HSI07_01_001) s1,sum(HSI07_01_002) s2,sum(HSI07_01_004) s3,sum(HSI07_01_012) s4,org_code FROM qc/daily_report where event_date>= '"+start+"T00:00:00' AND event_date <='" +  end + "T23:59:59' group by org_code";
         Map<String, Map<String, Object>> dataMap = new HashMap<>();
         try {
-            ResultSet resultSet1 = elasticSearchUtil.findBySql(sql1);
+            ResultSet resultSet1 = elasticSearchUtil.findBySql(sqlsum);
             while (resultSet1.next()) {
                 Map<String, Object> dataMap1 = null;
                 String orgCode = resultSet1.getString("org_code");
@@ -755,39 +756,13 @@ public class DataQualityStatisticsService extends BaseJpaService {
             }
         }
 
-        //统计及时数
-        String sql2 = "SELECT count(distinct event_no) c,org_code,event_type,delay FROM json_archives/info where event_date>= '"+start+" 00:00:00' AND event_date<='" +  end + " 23:59:59' AND pack_type=1 and delay is not null group by org_code,event_type,delay ";
+        //统计有数据的医院code
+        String sqlOrg = "SELECT org_codeFROM json_archives/info where event_date>= '"+start+" 00:00:00' AND event_date<='" +  end + " 23:59:59' AND pack_type=1 group by org_code ";
         try {
-            ResultSet resultSet2 = elasticSearchUtil.findBySql(sql2);
-            while (resultSet2.next()) {
-                Map<String, Object> dataMap1 = null;
-                String orgCode = resultSet2.getString("org_code");
-                long delay = Long.valueOf(resultSet2.getString("delay"));// 延时时间
-                String eventType = resultSet2.getString("event_type");// 事件类型 0门诊 1住院 2体检
-                double total = resultSet2.getDouble("c");//及时数
-                if(dataMap.containsKey(orgCode)){
-                    dataMap1 = dataMap.get(orgCode);
-                }else {
-                    dataMap1 = initRateMap(warningMap,orgMap.get(orgCode),orgCode);
-                }
-                boolean flag = StringUtils.isNotBlank(eventType)&&!"null".equals(eventType)&&total>0;
-                if(flag&&isInTime(warningMap,orgCode,eventType,delay)){
-                    if("0".equals(eventType)){
-                        total += Double.parseDouble(dataMap1.get("outpatientInTime").toString());
-                        totalOutpatientInTime += total;
-                        dataMap1.put("outpatientInTime",total);
-                    }else if("1".equals(eventType)){
-                        total += Double.parseDouble(dataMap1.get("hospitalInTime").toString());
-                        totalHospitalInTime += total;
-                        dataMap1.put("hospitalInTime",total);
-                    }else if("2".equals(eventType)){
-                        total += Double.parseDouble(dataMap1.get("peInTime").toString());
-                        totalPeInTime += total;
-                        dataMap1.put("peInTime",total);
-                    }
-
-                    dataMap.put(orgCode,dataMap1);
-                }
+            ResultSet resultSetOrg = elasticSearchUtil.findBySql(sqlOrg);
+            while (resultSetOrg.next()) {
+                String orgCode = resultSetOrg.getString("org_code");
+                dataMap.put(orgCode,initRateMap(warningMap,orgMap.get(orgCode),orgCode));
             }
         }catch (Exception e){
             if(!"Error".equals(e.getMessage())){
@@ -795,40 +770,54 @@ public class DataQualityStatisticsService extends BaseJpaService {
             }
         }
 
-        //统计完整数
-        String sql3 = "SELECT count(distinct event_no) c,org_code,event_type FROM json_archives/info where event_date>= '"+start+" 00:00:00' AND event_date<='" +  end + " 23:59:59' AND pack_type=1 group by org_code,event_type";
-        try {
-            ResultSet resultSet3 = elasticSearchUtil.findBySql(sql3);
-            while (resultSet3.next()) {
-                Map<String, Object> dataMap1 = null;
-                String orgCode = resultSet3.getString("org_code");
-                String eventType = resultSet3.getString("event_type");// 事件类型 0门诊 1住院 2体检
-                double total = resultSet3.getDouble("c");//完整数
-                if(dataMap.containsKey(orgCode)){
-                    dataMap1 = dataMap.get(orgCode);
-                }else {
-                    dataMap1 = initRateMap(warningMap,orgMap.get(orgCode),orgCode);
-                }
-                boolean flag = StringUtils.isNotBlank(eventType)&&!"null".equals(eventType)&&total>0;
-                if(flag){
-                    if("0".equals(eventType)){
-                        dataMap1.put("outpatientIntegrity",total);
-                        totalOutpatientIntegrity += total;
-                    }else if("1".equals(eventType)){
-                        dataMap1.put("hospitalIntegrity",total);
-                        totalHospitalIntegrity += total;
-                    }else if("2".equals(eventType)){
-                        dataMap1.put("peIntegrity",total);
-                        totalPeIntegrity += total;
-                    }
-                    dataMap.put(orgCode,dataMap1);
-                }
+        //按医院code查找，直接group by查找结果有问题
+        for (Map<String, Object> map:dataMap.values()){
+            String orgCode = map.get("orgCode").toString();
+            //完整数
+            getPatientCount(start,end,orgCode,map);
+            //及时率
+            DqPaltformReceiveWarning warning = null;
+            if(warningMap.containsKey(orgCode)){
+                warning = warningMap.get(orgCode);
+            }else {
+                warning = warningMap.get(defaultOrgCode);
             }
-        }catch (Exception e){
-            if(!"Error".equals(e.getMessage())){
-                e.printStackTrace();
+            try{
+                long starttime = System.currentTimeMillis();
+                String sql0 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=2 AND pack_type=1 AND org_code='"+orgCode+"' AND event_date " +
+                        "BETWEEN '" + start + " 00:00:00' AND '" +  end + " 23:59:59' and delay <="+warning.getPeInTime();
+
+                String sql1 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=1 AND pack_type=1 AND org_code='"+orgCode+"' AND event_date " +
+                        "BETWEEN '" + start + " 00:00:00' AND '" +  end + " 23:59:59' and delay <="+warning.getHospitalInTime();
+
+                String sql2 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=0 AND pack_type=1 AND org_code='"+orgCode+"' AND event_date " +
+                        "BETWEEN '" + start + " 00:00:00' AND '" +  end + " 23:59:59' and delay <="+warning.getOutpatientInTime();
+
+                ResultSet resultSet0 = elasticSearchUtil.findBySql(sql0);
+                ResultSet resultSet1 = elasticSearchUtil.findBySql(sql1);
+                ResultSet resultSet2 = elasticSearchUtil.findBySql(sql2);
+                resultSet0.next();
+                resultSet1.next();
+                resultSet2.next();
+                double outpatientInTime = new Double(resultSet2.getObject("COUNT(DISTINCT event_no)").toString());//门诊及时数
+                double hospitalInTime = new Double(resultSet1.getObject("COUNT(DISTINCT event_no)").toString());//住院及时数
+                double peInTime = new Double(resultSet0.getObject("COUNT(DISTINCT event_no)").toString());//体检及时数
+                totalPeInTime += peInTime;
+                totalHospitalInTime += hospitalInTime;
+                totalOutpatientInTime += outpatientInTime;
+
+                map.put("outpatientInTime",outpatientInTime);//门诊及时数
+                map.put("hospitalInTime",hospitalInTime);//住院及时数
+                map.put("peInTime",peInTime);//体检及时数
+                map.put("visitIntegrity",outpatientInTime+hospitalInTime+peInTime);//就诊
+                logger.info("平台就诊及时人数 去重复：" + (System.currentTimeMillis() - starttime) + "ms");
+            }catch (Exception e){
+                if(!"Error".equals(e.getMessage())){
+                    e.printStackTrace();
+                }
             }
         }
+
 
         //计算总数
         Map<String, Object> totalMap = new HashedMap();
@@ -837,25 +826,33 @@ public class DataQualityStatisticsService extends BaseJpaService {
         totalMap.put("outpatientInTime",totalOutpatientInTime);//门诊及时数
         totalMap.put("hospitalInTime",totalHospitalInTime);//住院及时数
         totalMap.put("peInTime",totalPeInTime);//体检及时数
-        totalMap.put("outpatientIntegrity",totalOutpatientIntegrity);//门诊完整数
-        totalMap.put("hospitalIntegrity",totalHospitalIntegrity);//住院完整数
-        totalMap.put("peIntegrity",totalPeIntegrity);//体检完整数
+        getPatientCount(start,end,null,totalMap);
+        totalOutpatientIntegrity = Double.valueOf(totalMap.get("outpatientIntegrity").toString());//门诊完整数
+        totalHospitalIntegrity = Double.valueOf(totalMap.get("hospitalIntegrity").toString());//住院完整数
+        totalPeIntegrity = Double.valueOf(totalMap.get("peIntegrity").toString());//体检完整数
+        double totalVisitIntegrity = Double.valueOf(totalMap.get("visitIntegrity").toString());//就诊完整数
         totalMap.put("totalVisit",totalVisitNum);//总就诊数
         totalMap.put("totalOutpatient",totalOutpatientNum);//总门诊数
         totalMap.put("totalPe",totalPeNum);//总体检数
         totalMap.put("totalHospital",totalHospitalNum);//总住院数
         double totalVisitIntime = totalOutpatientInTime + totalHospitalInTime + totalPeInTime;
-        double totalVisitIntegrity = totalOutpatientIntegrity + totalHospitalIntegrity + totalPeIntegrity;
         totalMap.put("visitIntime", totalVisitIntime);
-        totalMap.put("visitIntegrity", totalVisitIntegrity);
         totalMap.put("outpatientInTimeRate",calRate(totalOutpatientInTime,totalOutpatientNum));
+        totalMap.put("outpatientInTimeRate1",totalOutpatientInTime+"/"+totalOutpatientNum);
         totalMap.put("hospitalInTimeRate",calRate(totalHospitalInTime,totalHospitalNum));
+        totalMap.put("hospitalInTimeRate1",totalHospitalInTime+"/"+totalHospitalNum);
         totalMap.put("peInTimeRate",calRate(totalPeInTime,totalPeNum));
+        totalMap.put("peInTimeRate1",totalPeInTime+"/"+totalPeNum);
         totalMap.put("visitIntimeRate",calRate(totalVisitIntime,totalVisitNum));
+        totalMap.put("visitIntimeRate1",totalVisitIntime+"/"+totalVisitNum);
         totalMap.put("outpatientIntegrityRate",calRate(totalOutpatientIntegrity,totalOutpatientNum));
+        totalMap.put("outpatientIntegrityRate1",totalOutpatientIntegrity+"/"+totalOutpatientNum);
         totalMap.put("hospitalIntegrityRate",calRate(totalHospitalIntegrity,totalHospitalNum));
+        totalMap.put("hospitalIntegrityRate1",totalHospitalIntegrity+"/"+totalHospitalNum);
         totalMap.put("peIntegrityRate",calRate(totalPeIntegrity,totalPeNum));
+        totalMap.put("peIntegrityRate1",totalPeIntegrity+"/"+totalPeNum);
         totalMap.put("visitIntegrityRate",calRate(totalVisitIntegrity,totalVisitNum));
+        totalMap.put("visitIntegrityRate1",totalVisitIntegrity+"/"+totalVisitNum);
         re.add(totalMap);
 
         //计算及时率及完整率
@@ -876,17 +873,84 @@ public class DataQualityStatisticsService extends BaseJpaService {
             map.put("visitIntime", visitIntime);
             map.put("visitIntegrity", visitIntegrity);
             map.put("outpatientInTimeRate",calRate(outpatientInTime,totalOutpatient));
+            map.put("outpatientInTimeRate1",outpatientInTime+"/"+totalOutpatient);
             map.put("hospitalInTimeRate",calRate(hospitalInTime,totalHospital));
+            map.put("hospitalInTimeRate1",hospitalInTime+"/"+totalHospital);
             map.put("peInTimeRate",calRate(peInTime,totalPe));
+            map.put("peInTimeRate1",peInTime+"/"+totalPe);
             map.put("visitIntimeRate",calRate(visitIntime,totalVisit));
+            map.put("visitIntimeRate1",visitIntime+"/"+totalVisit);
             map.put("outpatientIntegrityRate",calRate(outpatientIntegrity,totalOutpatient));
+            map.put("outpatientIntegrityRate1",outpatientIntegrity+"/"+totalOutpatient);
             map.put("hospitalIntegrityRate",calRate(hospitalIntegrity,totalHospital));
+            map.put("hospitalIntegrityRate1",hospitalIntegrity+"/"+totalHospital);
             map.put("peIntegrityRate",calRate(peIntegrity,totalPe));
+            map.put("peIntegrityRate1",peIntegrity+"/"+totalPe);
             map.put("visitIntegrityRate",calRate(visitIntegrity,totalVisit));
+            map.put("visitIntegrityRate1",visitIntegrity+"/"+totalVisit);
             re.add(map);
         }
 
         return re;
+    }
+
+    /**
+     * 平台就诊人数 去重复(完整人数)
+     * @param start
+     * @param end
+     * @param orgCode
+     * @return
+     */
+    public void getPatientCount(String start,String end, String orgCode,Map<String, Object> map) throws Exception{
+        try{
+            long starttime = System.currentTimeMillis();
+            String sql0 ="";
+            String sql1 ="";
+            String sql2 ="";
+            String sql3 ="";
+            if(StringUtils.isNotEmpty(orgCode)){
+                sql0 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=2 AND pack_type=1 AND org_code='"+orgCode+"' AND event_date BETWEEN" +
+                        " '" + start + " 00:00:00' AND '" +  end + " 23:59:59'";
+
+                sql1 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=1 AND pack_type=1 AND org_code='"+orgCode+"' AND event_date BETWEEN" +
+                        " '" + start + " 00:00:00' AND '" +  end + " 23:59:59'";
+
+                sql2 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=0 AND pack_type=1 AND org_code='"+orgCode+"' AND event_date BETWEEN " +
+                        "'" + start + " 00:00:00' AND '" +  end + " 23:59:59'";
+
+                sql3 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE pack_type=1 AND org_code='"+orgCode+"' AND event_date BETWEEN " +
+                        "'" + start + " 00:00:00' AND '" +  end + " 23:59:59'";
+            }else{
+                sql0 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=2 AND pack_type=1 AND event_date " +
+                        "BETWEEN '" + start + " 00:00:00' AND '" +  end + " 23:59:59'";
+
+                sql1 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=1 AND pack_type=1 AND event_date " +
+                        "BETWEEN '" + start + " 00:00:00' AND '" +  end + " 23:59:59'";
+
+                sql2 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=0 AND pack_type=1 AND event_date " +
+                        "BETWEEN '" + start + " 00:00:00' AND '" +  end + " 23:59:59'";
+
+                sql3 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE pack_type=1 AND event_date " +
+                        "BETWEEN '" + start + " 00:00:00' AND '" +  end + " 23:59:59'";
+            }
+            ResultSet resultSet0 = elasticSearchUtil.findBySql(sql0);
+            ResultSet resultSet1 = elasticSearchUtil.findBySql(sql1);
+            ResultSet resultSet2 = elasticSearchUtil.findBySql(sql2);
+            ResultSet resultSet3 = elasticSearchUtil.findBySql(sql3);
+            resultSet0.next();
+            resultSet1.next();
+            resultSet2.next();
+            resultSet3.next();
+            map.put("peIntegrity",new Double(resultSet0.getObject("COUNT(DISTINCT event_no)").toString()).intValue());//体检
+            map.put("hospitalIntegrity",new Double(resultSet1.getObject("COUNT(DISTINCT event_no)").toString()).intValue());//住院
+            map.put("outpatientIntegrity",new Double(resultSet2.getObject("COUNT(DISTINCT event_no)").toString()).intValue());//门诊
+            map.put("visitIntegrity",new Double(resultSet3.getObject("COUNT(DISTINCT event_no)").toString()).intValue());//就诊
+            logger.info("平台就诊人数 去重复：" + (System.currentTimeMillis() - starttime) + "ms");
+        }catch (Exception e){
+            if(!"Error".equals(e.getMessage())){
+                e.printStackTrace();
+            }
+        }
     }
 
     /**

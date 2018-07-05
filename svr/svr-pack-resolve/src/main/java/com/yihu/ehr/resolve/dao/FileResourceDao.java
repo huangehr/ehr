@@ -20,7 +20,8 @@ import java.util.Map;
  * @author Sand
  * @created 2016.05.09 19:13
  */
-@Repository
+@Deprecated
+//@Repository
 public class FileResourceDao {
 
     @Autowired

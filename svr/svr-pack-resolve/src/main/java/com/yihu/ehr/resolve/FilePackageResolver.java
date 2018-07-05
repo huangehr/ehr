@@ -8,6 +8,8 @@ import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.profile.EventType;
 import com.yihu.ehr.profile.exception.IllegalJsonDataException;
 import com.yihu.ehr.profile.exception.IllegalJsonFileException;
+import com.yihu.ehr.profile.extractor.KeyDataExtractor;
+import com.yihu.ehr.profile.family.ResourceCells;
 import com.yihu.ehr.profile.model.MetaDataRecord;
 import com.yihu.ehr.profile.model.PackageDataSet;
 import com.yihu.ehr.resolve.model.stage1.FilePackage;
@@ -46,7 +48,9 @@ public class FilePackageResolver extends PackageResolver {
 
     private void parseFile(FilePackage filePackage, File documents) throws Exception {
         JsonNode root = objectMapper.readTree(documents);
-
+        if (root.isNull()) {
+            throw new IllegalJsonFileException("Invalid json file when generate data set");
+        }
         String demographicId = root.get("demographic_id") == null ? "" : root.get("demographic_id").asText();
         String patientId = root.get("patient_id") == null ? "" : root.get("patient_id").asText();
         String orgCode = root.get("org_code") == null ? "" : root.get("org_code").asText();
@@ -55,6 +59,7 @@ public class FilePackageResolver extends PackageResolver {
         String eventDate = root.get("event_time") == null ? "" : root.get("event_time").asText();
         String createDate = root.get("create_date") == null ? "" : root.get("create_date").asText();
         String cdaVersion = root.get("inner_version") == null ? "" : root.get("inner_version").asText();
+
         //验证档案基础数据的完整性，当其中某字段为空的情况下直接提示档案包信息缺失。
         StringBuilder errorMsg = new StringBuilder();
         if (StringUtils.isEmpty(patientId)){
@@ -75,22 +80,22 @@ public class FilePackageResolver extends PackageResolver {
         if (!StringUtils.isEmpty(errorMsg.toString())){
             throw new IllegalJsonDataException(errorMsg.toString());
         }
-        filePackage.setDemographicId(demographicId);
         filePackage.setPatientId(patientId);
         filePackage.setEventNo(eventNo);
         if (eventType != -1) {
             filePackage.setEventType(EventType.create(eventType));
         }
         filePackage.setOrgCode(orgCode);
-        filePackage.setEventTime(DateUtil.strToDate(eventDate));
-        filePackage.setCreateDate(DateUtil.strToDate(createDate));
         filePackage.setCdaVersion(cdaVersion);
+        filePackage.setCreateDate(DateUtil.strToDate(createDate));
+        filePackage.setEventTime(DateUtil.strToDate(eventDate));
+        filePackage.setDemographicId(demographicId);
 
         parseDataSets(filePackage, (ObjectNode) root.get("data_sets"));
         parseFiles(filePackage, (ArrayNode) root.get("files"), documents.getParent() + File.separator + "documents");
     }
 
-    private void parseDataSets(FilePackage profile, ObjectNode dataSets) {
+    private void parseDataSets(FilePackage filePackage, ObjectNode dataSets) throws Exception {
         if (dataSets == null) {
             return;
         }
@@ -99,13 +104,13 @@ public class FilePackageResolver extends PackageResolver {
             Map.Entry<String, JsonNode> item = iterator.next();
             String dataSetCode = item.getKey();
             PackageDataSet dataSet = new PackageDataSet();
-            dataSet.setPatientId(profile.getPatientId());
-            dataSet.setEventNo(profile.getEventNo());
-            dataSet.setCdaVersion(profile.getCdaVersion());
             dataSet.setCode(dataSetCode);
-            dataSet.setOrgCode(profile.getOrgCode());
-            dataSet.setEventTime(profile.getEventTime());
-            dataSet.setCreateTime(profile.getCreateDate());
+            dataSet.setPatientId(filePackage.getPatientId());
+            dataSet.setEventNo(filePackage.getEventNo());
+            dataSet.setOrgCode(filePackage.getOrgCode());
+            dataSet.setCdaVersion(filePackage.getCdaVersion());
+            dataSet.setCreateTime(filePackage.getCreateDate());
+            dataSet.setEventTime(filePackage.getEventTime());
             ArrayNode records = (ArrayNode) item.getValue();
             for (int i = 0; i < records.size(); ++i) {
                 MetaDataRecord record = new MetaDataRecord();
@@ -121,7 +126,19 @@ public class FilePackageResolver extends PackageResolver {
                 }
                 dataSet.addRecord(Integer.toString(i), record);
             }
-            profile.insertDataSet(dataSetCode, dataSet);
+            //提取身份信息
+            if (StringUtils.isEmpty(filePackage.getDemographicId()) || StringUtils.isEmpty(filePackage.getPatientName())) {
+                Map<String, Object> properties = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.Identity);
+                String demographicId = (String) properties.get(ResourceCells.DEMOGRAPHIC_ID);
+                String patientName = (String) properties.get(ResourceCells.PATIENT_NAME);
+                if (!StringUtils.isEmpty(demographicId)) {
+                    filePackage.setDemographicId(demographicId.trim());
+                }
+                if (!StringUtils.isEmpty(patientName)) {
+                    filePackage.setPatientName(patientName);
+                }
+            }
+            filePackage.insertDataSet(dataSetCode, dataSet);
         }
     }
 
@@ -146,19 +163,19 @@ public class FilePackageResolver extends PackageResolver {
             for (int j = 0; j < content.size(); ++j) {
                 ObjectNode file = (ObjectNode) content.get(j);
                 JsonNode mimeNode = file.get("mime_type");
-                if(mimeNode== null) {
+                if (mimeNode== null) {
                     throw new IllegalJsonFileException("mime_type is null");
                 }
                 String mine_type = mimeNode.asText();//必填
                 String url_scope = file.get("url_scope") == null ? "" : file.get("url_scope").asText();//可选
                 String url = file.get("url")== null ? "": file.get("url").asText();//可选
                 JsonNode emrId = file.get("emr_id");
-                if(emrId == null){
+                if (emrId == null){
                     throw new IllegalJsonFileException("emr_id is null");
                 }
                 String emr_id = emrId.asText();
                 JsonNode emrName = file.get("emr_name");
-                if(emrName == null){
+                if (emrName == null){
                     throw new IllegalJsonFileException("emr_name is null");
                 }
                 String emr_name = emrName.asText();
@@ -180,18 +197,17 @@ public class FilePackageResolver extends PackageResolver {
                 if (file.get("name") != null) {
                     String fileList[] = file.get("name").asText().split(";");
                     for (String fileName : fileList) {
-                        String fileNames[] = fileName.split(",");
-                        for (String file_name : fileNames) {
-                            File f = new File(documentsPath + File.separator + file_name);
-                            if (f.exists()) {
-                                String storageUrl = saveFile(documentsPath + File.separator + file_name);
-                                originFile.addUrl(file_name.substring(0, file_name.indexOf('.')), storageUrl);
-                            }
+                        File f = new File(documentsPath + File.separator + fileName);
+                        if (f.exists()) {
+                            String storageUrl = saveFile(documentsPath + File.separator + fileName);
+                            originFile.addUrl(fileName.substring(0, fileName.indexOf('.')), storageUrl);
                         }
                     }
                 }
-                for (String fileUrl : url.split(",")) {
-                    originFile.addUrl(fileUrl, fileUrl);
+                if (!StringUtils.isEmpty(url)) {
+                    for (String fileUrl : url.split(",")) {
+                        originFile.addUrl(fileUrl, fileUrl);
+                    }
                 }
                 cdaDocument.getOriginFiles().add(originFile);
             }
