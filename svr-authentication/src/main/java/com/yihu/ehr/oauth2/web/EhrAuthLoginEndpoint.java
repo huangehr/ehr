@@ -170,7 +170,7 @@ public class EhrAuthLoginEndpoint extends AbstractEndpoint {
         String username = parameters.get("username");
         if (StringUtils.isEmpty(username)){
             envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("手机号码【username】不能为空！");
+            envelop.setErrorMsg("手机号码【"+username+"】不能为空！");
             return new ResponseEntity<>(envelop, headers, HttpStatus.OK);
         }
         VerifyCode verifyCode = new VerifyCode();
