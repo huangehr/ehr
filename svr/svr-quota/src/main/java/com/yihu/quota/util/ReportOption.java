@@ -299,7 +299,6 @@ public class ReportOption {
         radar.data(new Data().name(title).value(radarVal));
         radar.itemStyle().normal().areaStyle().type("default");
         option.series().add(radar);
-        System.out.println("雷达图：" + option);
         return option;
     }
 
@@ -335,7 +334,6 @@ public class ReportOption {
             }
             option.series().add(pie);
         }
-        System.out.println("嵌套饼图：" + option);
         return option;
     }
 
