@@ -1001,12 +1001,15 @@ public class QuotaReportController extends BaseController {
      */
     public List<List<Object>> discountByMeasurement(List<List<Object>> optionData, String dataMeasurement) {
         if (!StringUtils.isEmpty(dataMeasurement)) {
+            NumberFormat nf = NumberFormat.getInstance();
+            nf.setGroupingUsed(false);
+            nf.setMaximumFractionDigits(2);
             List<List<Object>> handleList = new ArrayList<>();
             double v = Double.parseDouble(dataMeasurement);
             optionData.forEach(one -> {
                 List<Object> list = new ArrayList<>();
                 one.forEach(item -> {
-                    item = Double.parseDouble(item.toString()) / v;
+                    item = nf.format(Double.parseDouble(item.toString()) / v);
                     list.add(item);
                 });
                 handleList.add(list);
