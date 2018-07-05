@@ -204,8 +204,7 @@ public class ExtractUtil {
         if(orgDictMap != null && orgDictMap.size() > 0){
             setSaveModelProperties(returnList);
         }
-        logger.error("指标：" + quotaVo.getName() + "统计时指标或者机构未关联上错误数据有：" + errorCount);
-        System.out.println("指标：" + quotaVo.getName() + "统计时指标或者机构未关联上错误数据有：" + errorCount);
+        logger.info("指标：" + quotaVo.getName() + "统计时指标或者机构未关联上错误数据有：" + errorCount);
         return returnList;
     }
 

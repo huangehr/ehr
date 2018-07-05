@@ -64,7 +64,6 @@ public class MysqlExtract {
         //获取mysql
         String mysql = getSql(qdm,qds);
         logger.debug(mysql);
-        System.out.println("统计mysql :" + mysql);
         if( !StringUtils.isEmpty(mysql)){
             Map<String,String> resultMap = new HashMap<>();
             Map<String, String> daySlaveDictMap = new HashMap<>();

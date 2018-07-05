@@ -54,8 +54,7 @@ public class ElastricSearchSave {
                             end = (i + 1) * perCount-1;
                         }
                     }
-                    logger.debug("data save 这是第" + (i+1) + "个线程；数据 = " + start+ " - " + end);
-                    System.out.println("data save 这是第" + (i+1) + "个线程；数据 = " + start+ " - " + end);
+                    logger.info("data save 这是第" + (i+1) + "个线程；数据 = " + start+ " - " + end);
                     List<SaveModel> list = saveModels.subList(start, end);
                     LargDataWithRunnable dataWithRunnable = new LargDataWithRunnable(list,jsonConfig,esClientUtil);
                     Thread thread = new Thread(dataWithRunnable);
@@ -64,8 +63,6 @@ public class ElastricSearchSave {
             }else {
                 save(saveModels,jsonConfig);
             }
-
-
         } catch (Exception e) {
             throw new RuntimeException("ES 保存数据异常");
         }
@@ -76,7 +73,6 @@ public class ElastricSearchSave {
         BulkResult br = null;
         boolean isSuccessed = false;
         try {
-            System.out.println("ES 开始保存 " + smss.size());
             int perCount = Contant.compute.perCount;
             //初始化参数
             esConfig = (EsConfig) JSONObject.toBean(JSONObject.fromObject(jsonConfig), EsConfig.class);
