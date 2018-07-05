@@ -267,10 +267,14 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                 Map<String, Object> archiveMap = (Map<String, Object>)map.get("archiveMap");
                 if(collectionMap.size()>0){
                     XWPFTableRow tableRow = table3.createRow();
-                    tableRow.getCell(0).setText(Double.valueOf(receiveAcrhive+"").intValue()+"");//0未解析 1正在解析 2解析失败 3解析完成
-                    tableRow.getCell(1).setText(Double.valueOf(archiveMap.get("archive_status3").toString()).intValue()+"");
-                    tableRow.getCell(2).setText(Double.valueOf(archiveMap.get("archive_status2").toString()).intValue()+"");
-                    tableRow.getCell(3).setText(Double.valueOf(archiveMap.get("archive_status0").toString()).intValue()+"");
+                    int archive_status3 = Double.valueOf(archiveMap.get("archive_status3").toString()).intValue();
+                    int archive_status2 = Double.valueOf(archiveMap.get("archive_status3").toString()).intValue();
+                    int archive_status1 = Double.valueOf(archiveMap.get("archive_status3").toString()).intValue();
+                    int archive_status0 = Double.valueOf(archiveMap.get("archive_status3").toString()).intValue();
+                    tableRow.getCell(0).setText((archive_status3+archive_status2+archive_status1+archive_status0)+"");//0未解析 1正在解析 2解析失败 3解析完成
+                    tableRow.getCell(1).setText(archive_status3+"");
+                    tableRow.getCell(2).setText(archive_status2+"");
+                    tableRow.getCell(3).setText(archive_status0+"");
                 }
                 addEmptyRow(document);
                 i++;
@@ -298,7 +302,7 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                         tableRow.getCell(1).setText(item.get("name").toString());
                         tableRow.getCell(2).setText(item.get("count").toString());
                         tableRow.getCell(3).setText(item.get("row").toString());
-                        datasetnum+=Double.valueOf(item.get("count").toString());
+                        datasetnum++;
                     }
                 }
                 String orgText6 = i+".数据集总量("+datasetnum.longValue()+")";

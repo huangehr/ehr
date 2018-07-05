@@ -141,153 +141,129 @@ public class DataQualityStatisticsService extends BaseJpaService {
                 dataMap.put(orgCode,dataMap1);
             }
         }catch (Exception e){
-            e.getMessage();
+            if(!"Error".equals(e.getMessage())){
+                e.printStackTrace();
+            }
         }
 
-        //统计接收数据
-        String sql2 = "SELECT count(*) c,org_code FROM json_archives/info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' AND pack_type=1 ";
-        if(eventType!=null){
-            sql2 += " and event_type = "+eventType ;
-        }
-        sql2 += " group by org_code";
-        ResultSet resultSet2 = elasticSearchUtil.findBySql(sql2);
+        //统计有数据的医院code
+        String sqlOrg = "SELECT org_code FROM json_archives/info where event_date>= '"+start+" 00:00:00' AND event_date<='" +  end + " 23:59:59' AND pack_type=1 group by org_code ";
         try {
-            while (resultSet2.next()) {
-                Map<String, Object> dataMap1 = null;
-                String orgCode = resultSet2.getString("org_code");
+            ResultSet resultSetOrg = elasticSearchUtil.findBySql(sqlOrg);
+            while (resultSetOrg.next()) {
+                String orgCode = resultSetOrg.getString("org_code");
+                if(!datasetMap.containsKey(orgCode)){
+                    dataMap.put(orgCode,initDataMap(datasetMap,orgMap.get(orgCode),orgCode));
+                }
+            }
+        }catch (Exception e){
+            if(!"Error".equals(e.getMessage())){
+                e.printStackTrace();
+            }
+        }
+
+
+        for (Map<String, Object> map:dataMap.values()){
+            String orgCode = map.get("orgCode").toString();
+            //统计接收数据
+            String sql2 = "SELECT count(*) c FROM json_archives/info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' AND pack_type=1 and org_code='"+orgCode+"' ";
+            if(eventType!=null){
+                sql2 += " and event_type = "+eventType ;
+            }
+            try {
+                ResultSet resultSet2 = elasticSearchUtil.findBySql(sql2);
+                resultSet2.next();
                 double total = resultSet2.getDouble("c");//接收 档案数
-                if(dataMap.containsKey(orgCode)){
-                    dataMap1 = dataMap.get(orgCode);
-                }else {
-                    dataMap1 = initDataMap(datasetMap,orgMap.get(orgCode),orgCode);
-                }
-                dataMap1.put("receiveArchives",total);
+                map.put("receiveArchives",total);
                 totalReceiveArchives+=total;
-                dataMap.put(orgCode,dataMap1);
+            }catch (Exception e){
+                if(!"Error".equals(e.getMessage())){
+                    e.printStackTrace();
+                }
             }
-        }catch (Exception e){
-            e.getMessage();
-        }
 
-        String sql3 = "SELECT count(*) c,org_code FROM json_archives_qc/qc_metadata_info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' and qc_step=1";
-        if(eventType!=null){
-            sql3 += " and event_type = "+eventType ;
-        }
-        sql3 += " group by org_code";
-        ResultSet resultSet3 = elasticSearchUtil.findBySql(sql3);
-        try {
-            while (resultSet3.next()) {
-                Map<String, Object> dataMap1 = null;
-                String orgCode = resultSet3.getString("org_code");
+            //接收 质量异常
+            String sql3 = "SELECT count(*) c,org_code FROM json_archives_qc/qc_metadata_info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' and qc_step=1 and org_code='"+orgCode+"' ";
+            if(eventType!=null){
+                sql3 += " and event_type = "+eventType ;
+            }
+            try {
+                ResultSet resultSet3 = elasticSearchUtil.findBySql(sql3);
+                resultSet3.next();
                 double total = resultSet3.getDouble("c");//接收 质量异常
-                if(dataMap.containsKey(orgCode)){
-                    dataMap1 = dataMap.get(orgCode);
-                }else {
-                    dataMap1 = initDataMap(datasetMap,orgMap.get(orgCode),orgCode);
-                }
-                dataMap1.put("receiveException",total);
+                map.put("receiveException",total);
                 totalReceiveException+=total;
-                dataMap.put(orgCode,dataMap1);
-            }
-        }catch (Exception e){
-            e.getMessage();
-        }
-
-        String sql4 = "SELECT details,org_code FROM json_archives_qc/qc_dataset_info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' and qc_step=1 ";
-        if(eventType!=null){
-            sql4 += " and event_type = "+eventType ;
-        }
-        sql4 += " group by org_code,details";
-        ResultSet resultSet4 = elasticSearchUtil.findBySql(sql4);
-        try {
-            Map<String,String> totalMap = new HashedMap();
-            Map<String, Map<String, Object>> datasetMap1 = new HashMap<>();
-            while (resultSet4.next()) {
-                Map<String, Object> datasetMap2 = null;
-                String orgCode = resultSet4.getString("org_code");
-                String details = resultSet4.getString("details");//接收 数据集
-                if(datasetMap1.containsKey(orgCode)){
-                    datasetMap2 = datasetMap1.get(orgCode);
-                }else {
-                    datasetMap2 = new HashedMap();
+            }catch (Exception e){
+                if(!"Error".equals(e.getMessage())){
+                    e.printStackTrace();
                 }
+            }
 
-                JSONArray jsonArray = JSON.parseArray(details);
-                for(int i=0;i<jsonArray.size();i++){
-                    JSONObject tmp = jsonArray.getJSONObject(i);
-                    for(String dataset:tmp.keySet()){
-                        if(!datasetMap2.containsKey(dataset)){
-                            datasetMap2.put(dataset,dataset);
-                        }
-                        if(!totalMap.containsKey(dataset)){
-                            totalMap.put(dataset,dataset);
+            //接收 数据集
+            String sql4 = "SELECT distinct details FROM json_archives_qc/qc_dataset_info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' and qc_step=1 and org_code='"+orgCode+"' ";
+            if(eventType!=null){
+                sql4 += " and event_type = "+eventType ;
+            }
+            try {
+                ResultSet resultSet4 = elasticSearchUtil.findBySql(sql4);
+                Map<String,String> totalMap = new HashedMap();
+                Map<String, Object> datasetMap1 = new HashedMap();;
+                while (resultSet4.next()) {
+                    String details = resultSet4.getString("details");//接收 数据集
+                    JSONArray jsonArray = JSON.parseArray(details);
+                    for(int i=0;i<jsonArray.size();i++){
+                        JSONObject tmp = jsonArray.getJSONObject(i);
+                        for(String dataset:tmp.keySet()){
+                            if(!datasetMap1.containsKey(dataset)){
+                                datasetMap1.put(dataset,dataset);
+                            }
+                            if(!totalMap.containsKey(dataset)){
+                                totalMap.put(dataset,dataset);
+                            }
                         }
                     }
                 }
-                datasetMap1.put(orgCode,datasetMap2);
+                map.put("receiveDataset",datasetMap1.size());//数据集个数
+                totalReceiveDataset = totalMap.size();
+            }catch (Exception e){
+                if(!"Error".equals(e.getMessage())){
+                    e.printStackTrace();
+                }
             }
 
-            for (Map.Entry<String, Map<String, Object>> entry : datasetMap1.entrySet()) {
-                String orgCode = entry.getKey();
-                Map<String, Object> dataMap1 = null;
-                if(dataMap.containsKey(orgCode)){
-                    dataMap1 = dataMap.get(orgCode);
-                }else {
-                    dataMap1 = initDataMap(datasetMap,orgMap.get(orgCode),orgCode);
-                }
-                dataMap1.put("receiveDataset",entry.getValue().size());//数据集个数
-                dataMap.put(orgCode,dataMap1);
-            }
-            totalReceiveDataset = totalMap.size();
-        }catch (Exception e){
-            e.getMessage();
-        }
+            //资源化数据
+            String sql52 = "SELECT count(*) c FROM json_archives/info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' AND pack_type=1 and archive_status=2 and org_code='"+orgCode+"' ";
+            String sql53 = "SELECT count(*) c FROM json_archives/info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' AND pack_type=1 and archive_status=3 and org_code='"+orgCode+"' ";
 
-        //资源化数据
-        String sql5 = "SELECT count(*) c,org_code,archive_status FROM json_archives/info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' AND pack_type=1 and (archive_status=2 or archive_status=3) group by org_code,archive_status";
-        ResultSet resultSet5 = elasticSearchUtil.findBySql(sql5);
-        try {
-            while (resultSet5.next()) {
-                Map<String, Object> dataMap1 = null;
-                String orgCode = resultSet5.getString("org_code");
-                String archiveStatus = resultSet5.getString("archive_status");// 2失败，3成功
-                double total = resultSet5.getDouble("c");//资源化 解析成功和失败
-                if(dataMap.containsKey(orgCode)){
-                    dataMap1 = dataMap.get(orgCode);
-                }else {
-                    dataMap1 = initDataMap(datasetMap,orgMap.get(orgCode),orgCode);
+            try {
+                ResultSet resultSet52 = elasticSearchUtil.findBySql(sql52);
+                ResultSet resultSet53 = elasticSearchUtil.findBySql(sql53);
+                resultSet52.next();
+                resultSet53.next();
+                double total2 = resultSet52.getDouble("c");//资源化 解析成功和失败 // 2失败，3成功
+                double total3 = resultSet53.getDouble("c");//资源化 解析成功和失败 // 2失败，3成功
+                map.put("resourceFailure",total2);//失败
+                totalResourceFailure+=total2;
+                map.put("resourceSuccess",total3);//成功
+                totalResourceSuccess+=total3;
+            }catch (Exception e){
+                if(!"Error".equals(e.getMessage())){
+                    e.printStackTrace();
                 }
-                if("2".equals(archiveStatus)){
-                    dataMap1.put("resourceFailure",total);//失败
-                    totalResourceFailure+=total;
-                }else {
-                    dataMap1.put("resourceSuccess",total);//成功
-                    totalResourceSuccess+=total;
-                }
-                dataMap.put(orgCode,dataMap1);
             }
-        }catch (Exception e){
-            e.getMessage();
-        }
 
-        String sql6 = "SELECT count(*) c,org_code FROM json_archives_qc/qc_metadata_info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' AND qc_step=2 group by org_code";
-        ResultSet resultSet6 = elasticSearchUtil.findBySql(sql6);
-        try {
-            while (resultSet6.next()) {
-                Map<String, Object> dataMap1 = null;
-                String orgCode = resultSet6.getString("org_code");
+            String sql6 = "SELECT count(*) c,org_code FROM json_archives_qc/qc_metadata_info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' AND qc_step=2 and org_code='"+orgCode+"'";
+            try {
+                ResultSet resultSet6 = elasticSearchUtil.findBySql(sql6);
+                resultSet6.next();
                 double total = resultSet6.getDouble("c");//资源化 解析异常
-                if(dataMap.containsKey(orgCode)){
-                    dataMap1 = dataMap.get(orgCode);
-                }else {
-                    dataMap1 = initDataMap(datasetMap,orgMap.get(orgCode),orgCode);
-                }
-                dataMap1.put("resourceException",total);
+                map.put("resourceException",total);
                 totalResourceException+=total;
-                dataMap.put(orgCode,dataMap1);
+            }catch (Exception e){
+                if(!"Error".equals(e.getMessage())){
+                    e.printStackTrace();
+                }
             }
-        }catch (Exception e){
-            e.getMessage();
         }
 
         //新增医疗云平台数据
@@ -457,7 +433,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
 
             reportData.put("reportedNumList3", reportedList3);
             // TODO 解析情况
-            String reportedNumSql4 = "SELECT count(*) total FROM json_archives/info where receive_date BETWEEN '"+eventDateStart+"' AND '" +  eventDateEnd + "' and (archive_status=2 or archive_status=3 or archive_status=0 ) and pack_type=1 " ;
+            String reportedNumSql4 = "SELECT count(*) total FROM json_archives/info where receive_date BETWEEN '"+eventDateStart+"' AND '" +  eventDateEnd + "' and pack_type=1 " ;
             if (!cloud.equals(orgInfo.get("orgCode"))) {
                 reportedNumSql4 += " AND org_code='" + orgCode + "'";
             }
@@ -466,6 +442,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
             List<Map<String, Object>> reportedNumList4 = elasticSearchUtil.findBySql(Arrays.asList(reportedNumFields4.split(",")), reportedNumSql4);
             Map<String, Object> archiveMap = new HashedMap();
             archiveMap.put("archive_status0",0);//archive_status 资源化解析状态 0未解析 1正在解析 2解析失败 3解析完成
+            archiveMap.put("archive_status1",0);
             archiveMap.put("archive_status2",0);
             archiveMap.put("archive_status3",0);
             for (Map<String, Object> map : reportedNumList4){
@@ -477,6 +454,8 @@ public class DataQualityStatisticsService extends BaseJpaService {
                     archiveMap.put("archive_status2",total);
                 }else if("0".equals(archiveStatus)){
                     archiveMap.put("archive_status0",total);
+                }else if("1".equals(archiveStatus)){
+                    archiveMap.put("archive_status1",total);
                 }
             }
             reportData.put("archiveMap", archiveMap);
@@ -757,7 +736,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
         }
 
         //统计有数据的医院code
-        String sqlOrg = "SELECT org_codeFROM json_archives/info where event_date>= '"+start+" 00:00:00' AND event_date<='" +  end + " 23:59:59' AND pack_type=1 group by org_code ";
+        String sqlOrg = "SELECT org_code FROM json_archives/info where event_date>= '"+start+" 00:00:00' AND event_date<='" +  end + " 23:59:59' AND pack_type=1 group by org_code ";
         try {
             ResultSet resultSetOrg = elasticSearchUtil.findBySql(sqlOrg);
             while (resultSetOrg.next()) {
