@@ -373,8 +373,10 @@ public class QuotaReportController extends BaseController {
                     return null;
                 }
                 int type = Integer.valueOf(typeStr);
+                String dataMeasurement = "";
                 if (StringUtils.isNotEmpty(mRsResource)) {
                     MRsResources mRsResources = objectMapper.readValue(mRsResource, MRsResources.class);
+                    dataMeasurement = mRsResources.getDataMeasurement();
                     String dataPosition = mRsResources.getDataPosition();
                     if (StringUtils.isNotEmpty(dataPosition) && "x".equalsIgnoreCase(dataPosition)) {
                         xName = "单位：" + mRsResources.getDataUnit();
@@ -383,9 +385,9 @@ public class QuotaReportController extends BaseController {
                     }
                 }
                 if (type == ReportOption.bar) {
-                    option = reportOption.getLineEchartOptionMoreChart(title, xName, yName, xData, optionData, lineNames, charTypes);
+                    option = reportOption.getLineEchartOptionMoreChart(title, xName, yName, xData, discountByMeasurement(optionData, dataMeasurement), lineNames, charTypes);
                 } else if (type == ReportOption.line) {
-                    option = reportOption.getLineEchartOptionMoreChart(title, xName, yName, xData, optionData, lineNames, charTypes);
+                    option = reportOption.getLineEchartOptionMoreChart(title, xName, yName, xData, discountByMeasurement(optionData, dataMeasurement), lineNames, charTypes);
                 } else if (type == ReportOption.pie) {
                     List<Map<String, Object>> datalist = new ArrayList<>();
                     for (Map<String, Object> resultMap : listMap) {
@@ -989,5 +991,28 @@ public class QuotaReportController extends BaseController {
     protected String toJson(Object obj) throws JsonProcessingException {
         objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd"));
         return objectMapper.writeValueAsString(obj);
+    }
+
+    /**
+     * 如果有计量单位，则把数值换算成相应的数值单位
+     * @param optionData
+     * @param dataMeasurement
+     * @return
+     */
+    public List<List<Object>> discountByMeasurement(List<List<Object>> optionData, String dataMeasurement) {
+        if (!StringUtils.isEmpty(dataMeasurement)) {
+            List<List<Object>> handleList = new ArrayList<>();
+            double v = Double.parseDouble(dataMeasurement);
+            optionData.forEach(one -> {
+                List<Object> list = new ArrayList<>();
+                one.forEach(item -> {
+                    item = Double.parseDouble(item.toString()) / v;
+                    list.add(item);
+                });
+                handleList.add(list);
+            });
+            return handleList;
+        }
+        return optionData;
     }
 }
