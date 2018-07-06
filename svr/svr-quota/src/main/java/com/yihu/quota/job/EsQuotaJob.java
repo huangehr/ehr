@@ -73,20 +73,21 @@ public class EsQuotaJob implements Job {
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
+        TjQuotaLog tjQuotaLog = new TjQuotaLog();
+        String time = "";
         try {
             //springz注入
             SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
             //初始化参数
             initParams(context);
             quotaVo.setExecuteFlag(executeFlag);
-
-            TjQuotaLog tjQuotaLog = new TjQuotaLog();
             tjQuotaLog.setQuotaCode(quotaVo.getCode());
             tjQuotaLog.setSaasId(saasid);
             tjQuotaLog.setStartTime(new Date());
             tjQuotaLog.setStatus( Contant.save_status.executing);  //指标执行中
             tjQuotaLog.setContent( "时间：" + startTime + "到"+ endTime +" , " + "任务执行中。");
             tjQuotaLog = saveLog(tjQuotaLog);
+            time = "时间：" + startTime + "到"+ endTime +" , ";
             TjQuotaDataSource quotaDataSource = dataSourceService.findSourceByQuotaCode(quotaVo.getCode());
             if (quotaDataSource == null) {
                 throw new Exception("数据源配置错误");
@@ -103,6 +104,10 @@ public class EsQuotaJob implements Job {
             }
         } catch (Exception e) {
             //如果出錯立即重新執行
+            tjQuotaLog.setStatus(Contant.save_status.fail);
+            tjQuotaLog.setEndTime(new Date());
+            tjQuotaLog.setContent( time+"统计异常," + e.getMessage());
+            saveLog(tjQuotaLog);
             JobExecutionException e2 = new JobExecutionException(e);
             e2.setRefireImmediately(true);
             e.printStackTrace();
@@ -148,7 +153,7 @@ public class EsQuotaJob implements Job {
                     }
                     Thread th = new Thread(new Thread(){
                         public void run(){
-                            System.out.println("启动第 "+ f + " 个线程。 ");//只能访问外部的final变量。
+                            logger.info("启动第 "+ f + " 个线程。 ");//只能访问外部的final变量。
                             quota(quotaLogf, quotaVof);
                         }
                     });
@@ -177,13 +182,14 @@ public class EsQuotaJob implements Job {
                 //保存数据
                 Boolean success = saveData(dataModels,quotaVo);
                 status = success ? Contant.save_status.success : Contant.save_status.fail;
-                content = success ? time+"统计保存成功" : time+"统计数据 ElasticSearch 保存失败";
-                System.out.println(content+dataModels.size());
+                content = success ? time+"统计保存成功" : time+"统计保存失败";
+                logger.info(content + dataModels.size());
+                haveThreadCount++;
             } else {
                 status = Contant.save_status.fail;
                 content = time + "没有抽取到数据";
+                haveThreadCount++;
             }
-            haveThreadCount++;
             // 初始执行时，更新该指标为已初始执行过
             if (quotaVo.getExecuteFlag().equals("1")) {
                 String sql = "UPDATE tj_quota SET is_init_exec = '1' WHERE id = " + quotaVo.getId();
@@ -195,7 +201,17 @@ public class EsQuotaJob implements Job {
             tjQuotaLog = saveLog(tjQuotaLog);
             e.printStackTrace();
         }
-        if(haveThreadCount  == threadCount){
+        if(threadCount > 1){
+            if(haveThreadCount  == threadCount){
+                tjQuotaLog.setStatus(Contant.save_status.success);
+                tjQuotaLog.setContent(time+"统计保存成功");
+            }else {
+                tjQuotaLog.setStatus(Contant.save_status.fail);
+                tjQuotaLog.setContent( time+"统计保存失败");
+            }
+            tjQuotaLog.setEndTime(new Date());
+            saveLog(tjQuotaLog);
+        }else {
             tjQuotaLog.setStatus(status);
             tjQuotaLog.setContent(content);
             tjQuotaLog.setEndTime(new Date());
@@ -239,7 +255,7 @@ public class EsQuotaJob implements Job {
         } finally {
             talClient.close();
             client.close();
-            logger.error(quotaVo.getCode()+" delete success");
+            logger.debug(quotaVo.getCode()+" delete success");
         }
     }
 

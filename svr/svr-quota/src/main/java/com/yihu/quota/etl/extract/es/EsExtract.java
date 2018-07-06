@@ -79,6 +79,7 @@ public class EsExtract {
         //普通通用 拼接sql 方式
         //拼凑查询的sql
         String sql = getSql(qdm, qds);
+        logger.debug("查询sql:" + sql);
         //根据sql查询ES
         try {
             saveModels = queryEsBySql(sql,esConfig.getTimekey(),qdm, qds);
@@ -123,6 +124,7 @@ public class EsExtract {
         this.saasid = saasid;
         this.quotaVo = quotaVo;
         this.esConfig = esConfig;
+        System.out.println();
 
         List<SaveModel> saveModels = new ArrayList<>();
         try {
@@ -328,8 +330,6 @@ public class EsExtract {
             }
             Map<String,String> resultMap = new HashMap<>();
             Map<String, String> daySlaveDictMap = new HashMap<>();
-
-            System.out.println("查询分组 mysql= " + sql.toString());
             List<Map<String, Object>> listMap = elasticsearchUtil.excuteDataModel(sql.toString());
             for(Map<String, Object> map : listMap){
                 String keyVal = "";
