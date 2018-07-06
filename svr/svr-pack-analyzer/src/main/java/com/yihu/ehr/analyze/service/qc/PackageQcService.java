@@ -13,7 +13,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
@@ -33,8 +32,6 @@ public class PackageQcService {
     private static final Class clazz = QcRuleCheckService.class;
 
 
-    @Autowired
-    private RedisTemplate<String, Serializable> redisTemplate;
     @Autowired
     private QcRuleCheckService qcRuleCheckService;
     @Autowired
@@ -84,7 +81,7 @@ public class PackageQcService {
                     if (existSet.contains(dataSetCode + "$" + metadata)) { //如果该数据元已经有质控数据则跳过
                         continue;
                     }
-                    Serializable serializable = redisTemplate.opsForValue().get("qc_" + zipPackage.getCdaVersion() + ":" + dataSetCode + ":" + metadata);
+                    Serializable serializable = redisClient.get("qc_" + zipPackage.getCdaVersion() + ":" + dataSetCode + ":" + metadata);
                     if (serializable != null) {
                         String method = serializable.toString();
                         Method _method = clazz.getMethod(method, new Class[]{String.class, String.class, String.class, String.class});
