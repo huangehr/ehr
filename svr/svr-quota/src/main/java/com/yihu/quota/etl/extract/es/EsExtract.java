@@ -79,6 +79,7 @@ public class EsExtract {
         //普通通用 拼接sql 方式
         //拼凑查询的sql
         String sql = getSql(qdm, qds);
+        logger.debug("查询sql:" + sql);
         //根据sql查询ES
         try {
             saveModels = queryEsBySql(sql,esConfig.getTimekey(),qdm, qds);
@@ -123,6 +124,7 @@ public class EsExtract {
         this.saasid = saasid;
         this.quotaVo = quotaVo;
         this.esConfig = esConfig;
+        System.out.println();
 
         List<SaveModel> saveModels = new ArrayList<>();
         try {
@@ -316,101 +318,6 @@ public class EsExtract {
         return  dimenSumList;
     }
 
-
-
-
-
-
-    private Map<String, SaveModel> setAllSlaveData(Map<String, SaveModel> allData, List<DictModel> dictData,Integer key) {
-        try {
-            Map<String, SaveModel> returnAllData = new HashMap<>();
-            for (Map.Entry<String, SaveModel> one : allData.entrySet()) {
-                for (int i = 0; i < dictData.size(); i++) {
-                    DictModel dictOne = dictData.get(i);
-                    //设置新key
-                    StringBuffer newKey = new StringBuffer(one.getKey() + "-" + dictOne.getCode());
-                    //设置新的value
-                    SaveModel saveModelTemp = new SaveModel();
-                    BeanUtils.copyProperties(one.getValue(), saveModelTemp);
-
-                    StringBuffer keyMethodName = new StringBuffer("setSlaveKey" + (key + 1));
-                    StringBuffer nameMethodName = new StringBuffer("setSlaveKey" + (key + 1) + "Name");
-
-                    SaveModel.class.getMethod(keyMethodName.toString(), String.class).invoke(saveModelTemp, dictOne.getCode());
-                    SaveModel.class.getMethod(nameMethodName.toString(), String.class).invoke(saveModelTemp, dictOne.getName());
-                    returnAllData.put(newKey.toString(), saveModelTemp);
-                }
-            }
-            return returnAllData;
-        } catch (Exception e) {
-
-        }
-        return null;
-    }
-
-    /**
-     * @param allData
-     * @param dictData
-     * @param dictType
-     */
-    private void setAllData(Map<String, SaveModel> allData, List<SaveModel> dictData, String dictType) {
-        switch (dictType) {
-            case Contant.main_dimension.area_province: {
-                //设置省的全部的值
-                dictData.stream().forEach(one -> {
-                    //StringBuffer key = new StringBuffer(one.getProvince());
-                    setOneData(allData, one.getProvince(), one, Contant.main_dimension_areaLevel.area_province);
-                });
-                break;
-            }
-            case Contant.main_dimension.area_city: {
-                //设置市的全部的值
-                dictData.stream().forEach(one -> {
-                    //StringBuffer key = new StringBuffer(one.getProvince() + "-" + one.getCity());
-                    setOneData(allData, one.getCity(), one, Contant.main_dimension_areaLevel.area_city);
-                });
-                break;
-            }
-            case Contant.main_dimension.area_town: {
-                //设置区的全部的值
-                dictData.stream().forEach(one -> {
-                    //StringBuffer key = new StringBuffer(one.getProvince() + "-" + one.getCity() + "-" + one.getTown());
-                    setOneData(allData, one.getTown(), one, Contant.main_dimension_areaLevel.area_town);
-                });
-                break;
-            }
-            case Contant.main_dimension.area_org: {
-                //设置机构
-                dictData.stream().forEach(one -> {
-                    // StringBuffer key = new StringBuffer(one.getProvince() + "-" + one.getCity() + "-" + one.getTown() + "-" + one.getHospital());
-                    setOneData(allData, one.getOrg(), one, Contant.main_dimension_areaLevel.area_org);
-                });
-                break;
-            }
-            case Contant.main_dimension.area_team: {
-                //设置团队
-                dictData.stream().forEach(one -> {
-                    // StringBuffer key = new StringBuffer(one.getProvince() + "-" + one.getCity() + "-" + one.getTown() + "-" + one.getHospital() + "-" + one.getTeam());
-                    setOneData(allData, one.getTeam(), one, Contant.main_dimension_areaLevel.area_team);
-                });
-                break;
-            }
-        }
-    }
-
-    private void setOneData(Map<String, SaveModel> allData, String key, SaveModel one, String areaLevel) {
-        one.setAreaLevel(areaLevel);
-        one.setResult("0");
-        one.setCreateTime(new Date());
-        String yesterDay = (new DateTime().minusDays(1)).toString("yyyy-MM-dd");
-        one.setQuotaDate(yesterDay);
-        one.setQuotaCode(quotaVo.getCode());
-        one.setQuotaName(quotaVo.getName());
-        one.setTimeLevel(timeLevel);
-        one.setSaasId(saasid);
-        allData.put(key, one);
-    }
-
     private  List<SaveModel> queryEsBySql(String sql,String timekey,List<TjQuotaDimensionMain> qdm,  List<TjQuotaDimensionSlave> qds) {
         List<SaveModel> returnList = new ArrayList<>();
         try {
@@ -423,8 +330,6 @@ public class EsExtract {
             }
             Map<String,String> resultMap = new HashMap<>();
             Map<String, String> daySlaveDictMap = new HashMap<>();
-
-            System.out.println("查询分组 mysql= " + sql.toString());
             List<Map<String, Object>> listMap = elasticsearchUtil.excuteDataModel(sql.toString());
             for(Map<String, Object> map : listMap){
                 String keyVal = "";
@@ -468,146 +373,6 @@ public class EsExtract {
 
         return returnList;
     }
-
-
-//    private  List<SaveModel> queryEsBySql(Map<String, TjQuotaDimensionMain> sqls, List<TjQuotaDimensionSlave> tjQuotaDimensionSlaves) {
-//        List<SaveModel> returnList = new ArrayList<>();
-//        //初始化es链接
-//        esConfig = (EsConfig) JSONObject.toBean(JSONObject.fromObject(esConfig), EsConfig.class);
-//        //初始化链接
-//        Client client = esClientUtil.getClient(esConfig.getHost(), esConfig.getPort(), null);
-//        for (Map.Entry<String, TjQuotaDimensionMain> one : sqls.entrySet()) {
-//            logger.info("excute sql:" + one.getKey());
-//            try {
-//                SQLExprParser parser = new ElasticSqlExprParser(one.getKey());
-//                SQLExpr expr = parser.expr();
-//                if (parser.getLexer().token() != Token.EOF) {
-//                    throw new ParserException("illegal sql expr : " + one);
-//                }
-//                SQLQueryExpr queryExpr = (SQLQueryExpr) expr;
-//                //通过抽象语法树，封装成自定义的Select，包含了select、from、where group、limit等
-//                Select select = null;
-//                select = new SqlParser().parseSelect(queryExpr);
-//
-//                AggregationQueryAction action = null;
-//                DefaultQueryAction queryAction = null;
-//                SqlElasticSearchRequestBuilder requestBuilder = null;
-//                if (select.isAgg) {
-//                    //包含计算的的排序分组的
-//                    action = new AggregationQueryAction(client, select);
-//                    requestBuilder = action.explain();
-//                } else {
-//                    //封装成自己的Select对象
-//                    queryAction = new DefaultQueryAction(client, select);
-//                    requestBuilder = queryAction.explain();
-//                }
-//                //之后就是对ES的操作
-//                SearchResponse response = (SearchResponse) requestBuilder.get();
-//                StringTerms stringTerms = (StringTerms) response.getAggregations().asList().get(0);
-//                Iterator<Terms.Bucket> gradeBucketIt = stringTerms.getBuckets().iterator();
-//                //里面存放的数据 例  350200-5-2-2    主维度  细维度1  细维度2  值
-//                Map<String,String> map = new HashMap<>();
-//                //递归解析json
-//                expainJson(gradeBucketIt, map, null);
-//                compute(tjQuotaDimensionSlaves,returnList,one, map);
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }finally {
-//                client.close();
-//            }
-//        }
-//        return returnList;
-//    }
-
-//    private void compute(List<TjQuotaDimensionSlave> tjQuotaDimensionSlaves, List<SaveModel> returnList, Map.Entry<String, TjQuotaDimensionMain> one, Map<String, String> map) throws Exception {
-//        Map<String, SaveModel> allData = new HashMap<>();
-//        //初始化主细维度
-//        allData= initDimension(tjQuotaDimensionSlaves, one, allData);
-//
-//
-//        for(String key :map.keySet()){
-//            SaveModel saveModel = allData.get(key);
-//            String count =  map.get(key);
-//            if(saveModel != null ){
-//                saveModel.setResult(count.toString());
-//                returnList.add(saveModel);
-//            }
-//        }
-//        //数据源中不存在的组合 保存数据为0  待实现
-//        //ToDo
-//    }
-
-    /**
-     * 初始化主细维度
-     */
-//    private  Map<String, SaveModel>  initDimension(List<TjQuotaDimensionSlave> tjQuotaDimensionSlaves, Map.Entry<String,
-//            TjQuotaDimensionMain> one, Map<String, SaveModel> allData) throws Exception {
-//        try {
-//            TjQuotaDimensionMain quotaDimensionMain = one.getValue();
-//            //查询字典数据
-//            List<SaveModel> dictData = jdbcTemplate.query(quotaDimensionMain.getDictSql(), new BeanPropertyRowMapper(SaveModel.class));
-//            if (dictData == null) {
-//                throw new Exception("主纬度配置有误");
-//            }else{
-//                //设置到map里面
-//                setAllData(allData, dictData, quotaDimensionMain.getType());
-//                for (int i = 0; i < tjQuotaDimensionSlaves.size(); i++) {
-//                    List<DictModel> dictDataSlave = jdbcTemplate.query(tjQuotaDimensionSlaves.get(i).getDictSql(), new BeanPropertyRowMapper(DictModel.class));
-//                    if (dictDataSlave == null) {
-//                        throw new Exception("细纬度配置有误");
-//                    }else{
-//                        allData = setAllSlaveData(allData, dictDataSlave,i);
-//                    }
-//                }
-//            }
-//        }catch (Exception e){
-//            throw new Exception("纬度配置有误");
-//        }
-//        return allData;
-//    }
-
-    /**
-     * 递归解析json
-     *
-     * @param gradeBucketIt
-     * @param map
-     * @param sb
-     */
-//    private void expainJson(Iterator<Terms.Bucket> gradeBucketIt,Map<String,String>map, StringBuffer sb) {
-//        while (gradeBucketIt.hasNext()) {
-//            Terms.Bucket b =  gradeBucketIt.next();
-//            if (b.getAggregations().asList().get(0) instanceof StringTerms) {
-//                StringTerms stringTermsCh = (StringTerms) b.getAggregations().asList().get(0);
-//                Iterator<Terms.Bucket> gradeBucketItCh = stringTermsCh.getBuckets().iterator();
-//                while (gradeBucketItCh.hasNext()) {
-//                    StringBuffer sbTemp = new StringBuffer((sb == null ? "" : (sb.toString() + "-")) + b.getKey());
-//                    expainJson(gradeBucketItCh, map, sbTemp);
-//                }
-//            }else if (b.getAggregations().asList().get(0) instanceof LongTerms) {
-//                LongTerms longTermsCh = (LongTerms) b.getAggregations().asList().get(0);
-//                Iterator<Terms.Bucket> gradeBucketItCh = longTermsCh.getBuckets().iterator();
-//                while (gradeBucketItCh.hasNext()) {
-//                    StringBuffer sbTemp = new StringBuffer((sb == null ? "" : (sb.toString() + "-")) + b.getKey());
-//                    expainJson(gradeBucketItCh, map, sbTemp);
-//                }
-//            }else if (b.getAggregations().asList().get(0) instanceof DoubleTerms) {
-//                DoubleTerms doubleTermsCh = (DoubleTerms) b.getAggregations().asList().get(0);
-//                Iterator<Terms.Bucket> gradeBucketItCh = doubleTermsCh.getBuckets().iterator();
-//                while (gradeBucketItCh.hasNext()) {
-//                    StringBuffer sbTemp = new StringBuffer((sb == null ? "" : (sb.toString() + "-")) + b.getKey());
-//                    expainJson(gradeBucketItCh, map, sbTemp);
-//                }
-//            }else {
-//                if (b.getAggregations().asList().get(0) instanceof InternalValueCount) {
-//                    InternalValueCount count = (InternalValueCount) b.getAggregations().asList().get(0);
-//                    map.put(new StringBuffer((sb == null ? "" : (sb.toString() + "-"))+ b.getKey()).toString() , Long.valueOf(count.getValue()).toString());
-//                }else if (b.getAggregations().asList().get(0) instanceof InternalSum) {
-//                    InternalSum count = (InternalSum) b.getAggregations().asList().get(0);
-//                    map.put(new StringBuffer((sb == null ? "" : (sb.toString() + "-")) + "-" + b.getKey()).toString() , count.getValue() + "");
-//                }
-//            }
-//        }
-//    }
 
     /**
      * 拼接sql
@@ -664,6 +429,12 @@ public class EsExtract {
                 sql.append("select sum(" ).append(esConfig.getAggregationKey()).append(" )  from " + tableName + whereSql);
             }else {
                 sql.append("select ").append(selectGroupField ).append(" sum(").append(esConfig.getAggregationKey()).append(" ) result from " + tableName + whereSql + " group by "  + whereGroupField + timeGroup );
+            }
+        }else if(esConfig.getAggregation().equals(Contant.quota.aggregation_list)){
+            if( StringUtils.isEmpty( esConfig.getAggregationKey()) ){
+                sql.append("select " + selectGroupField + " 1 result from " + tableName + whereSql);
+            }else {
+                sql.append("select " + selectGroupField + esConfig.getAggregationKey() + " result from " + tableName + whereSql);
             }
         }
         return sql.toString();

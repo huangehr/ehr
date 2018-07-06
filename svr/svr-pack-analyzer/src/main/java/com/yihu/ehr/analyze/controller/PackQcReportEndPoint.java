@@ -96,8 +96,8 @@ public class PackQcReportEndPoint extends EnvelopRestEndPoint {
             @RequestParam(name = "startDate") String startDate,
             @ApiParam(name = "endDate", value = "结束日期")
             @RequestParam(name = "endDate") String endDate,
-            @ApiParam(name = "orgCode", value = "医院代码", required = false)
-            @RequestParam(name = "orgCode") String orgCode) throws Exception {
+            @ApiParam(name = "orgCode", value = "医院代码")
+            @RequestParam(name = "orgCode", required = false) String orgCode) throws Exception {
         return packQcReportService.resourceSuccess(startDate, endDate, orgCode);
     }
 
@@ -108,8 +108,8 @@ public class PackQcReportEndPoint extends EnvelopRestEndPoint {
             @RequestParam(name = "startDate") String startDate,
             @ApiParam(name = "endDate", value = "结束日期")
             @RequestParam(name = "endDate") String endDate,
-            @ApiParam(name = "orgCode", value = "医院代码", required = false)
-            @RequestParam(name = "orgCode") String orgCode) throws Exception {
+            @ApiParam(name = "orgCode", value = "医院代码")
+            @RequestParam(name = "orgCode", required = false) String orgCode) throws Exception {
         return packQcReportService.archiveReport(startDate, endDate, orgCode);
     }
 
@@ -120,8 +120,8 @@ public class PackQcReportEndPoint extends EnvelopRestEndPoint {
             @RequestParam(name = "startDate") String startDate,
             @ApiParam(name = "endDate", value = "结束日期")
             @RequestParam(name = "endDate") String endDate,
-            @ApiParam(name = "orgCode", value = "医院代码", required = false)
-            @RequestParam(name = "orgCode") String orgCode) throws Exception {
+            @ApiParam(name = "orgCode", value = "医院代码")
+            @RequestParam(name = "orgCode", required = false) String orgCode) throws Exception {
         return packQcReportService.dataSetList(startDate, endDate, orgCode);
     }
 
@@ -132,8 +132,8 @@ public class PackQcReportEndPoint extends EnvelopRestEndPoint {
             @RequestParam(name = "startDate") String startDate,
             @ApiParam(name = "endDate", value = "结束日期")
             @RequestParam(name = "endDate") String endDate,
-            @ApiParam(name = "orgCode", value = "医院代码", required = false)
-            @RequestParam(name = "orgCode") String orgCode) throws Exception {
+            @ApiParam(name = "orgCode", value = "医院代码")
+            @RequestParam(name = "orgCode", required = false) String orgCode) throws Exception {
         return packQcReportService.archiveFailed(startDate, endDate, orgCode);
     }
 
@@ -146,8 +146,8 @@ public class PackQcReportEndPoint extends EnvelopRestEndPoint {
             @RequestParam(name = "startDate") String startDate,
             @ApiParam(name = "endDate", value = "结束日期")
             @RequestParam(name = "endDate") String endDate,
-            @ApiParam(name = "orgCode", value = "医院代码", required = false)
-            @RequestParam(name = "orgCode") String orgCode) throws Exception {
+            @ApiParam(name = "orgCode", value = "医院代码")
+            @RequestParam(name = "orgCode", required = false) String orgCode) throws Exception {
         return packQcReportService.metadataError(step, startDate, endDate, orgCode);
     }
 
