@@ -44,4 +44,10 @@ public class GovernmentBrowseLogController extends ExtendController<GovernmentBr
             @RequestParam(value = "userId", required = false) String userId) {
         return governmentBrowseLogClient.getBrowseName(userId);
     }
+
+    @RequestMapping(value = ServiceApi.Government.searchHotBrowseLog, method = RequestMethod.GET)
+    @ApiOperation(value = "热门监测报表")
+    public List<GovernmentBrowseLog> getHotBrowseLog() {
+        return governmentBrowseLogClient.getHotBrowseLog();
+    }
 }

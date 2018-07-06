@@ -12,6 +12,7 @@ public class GovernmentBrowseLogModel {
     private String userName;
     private String createTime;
     private String type;
+    private String showType;
 
     public int getId() {
         return id;
@@ -67,5 +68,13 @@ public class GovernmentBrowseLogModel {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getShowType() {
+        return showType;
+    }
+
+    public void setShowType(String showType) {
+        this.showType = showType;
     }
 }
