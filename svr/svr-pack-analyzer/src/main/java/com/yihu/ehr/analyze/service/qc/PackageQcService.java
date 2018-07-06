@@ -81,9 +81,8 @@ public class PackageQcService {
                     if (existSet.contains(dataSetCode + "$" + metadata)) { //如果该数据元已经有质控数据则跳过
                         continue;
                     }
-                    Serializable serializable = redisClient.get("qc_" + zipPackage.getCdaVersion() + ":" + dataSetCode + ":" + metadata);
-                    if (serializable != null) {
-                        String method = serializable.toString();
+                    String method = redisClient.get("qc_" + zipPackage.getCdaVersion() + ":" + dataSetCode + ":" + metadata);
+                    if (method != null) {
                         Method _method = clazz.getMethod(method, new Class[]{String.class, String.class, String.class, String.class});
                         _method.setAccessible(true);
                         ErrorType errorType;

@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
  * Created by progr1mmer on 2018/7/4.
  */
 @Component
-@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+@Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class EventClassLoader extends ClassLoader {
 
     @Autowired
