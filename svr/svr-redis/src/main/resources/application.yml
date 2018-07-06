@@ -123,3 +123,20 @@ ehr-redis:
     pubsub:
       publisherAppId: svr-redis
       responseTimeChannel: redis.cache.reponse-time
+
+---
+spring:
+  profiles: demo_guigang
+  datasource:
+    url: jdbc:mysql://10.128.100.50:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: healthcloud
+    password: GP8Qz4qU
+  redis:
+    host: 10.128.100.51
+    port: 6379
+    password: q4YaQemf
+ehr-redis:
+  mq:
+    pubsub:
+      publisherAppId: svr-redis
+      responseTimeChannel: redis.cache.reponse-time

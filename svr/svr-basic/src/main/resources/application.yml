@@ -346,3 +346,54 @@ fz-gateway:
   clientVersion: 1.0
   secret: 9U6PBF2JM3PE1IHRJ7GEITMJHNMEHOFZQ2XUCKD9TO2
   handlerId: 50641
+
+---
+spring:
+  profiles: demo_guigang
+  datasource:
+    url: jdbc:mysql://10.128.100.50:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: healthcloud
+    password: GP8Qz4qU
+  # -- unknown use --
+  ldap:
+    host: 192.168.210.3
+    port: 389
+    bindDn: cn=admin,dc=ehr,dc=jkzl
+    password: jkzl
+    root: dc=ehr,dc=jkzl
+  # -- unknown use --
+  redis:
+    host: 10.128.100.51 # Redis server host.
+    port: 6379
+    password: q4YaQemf
+  data:
+    mongodb:
+      host: 10.128.100.52
+      port: 20000
+      username: jkzlehr
+      password: GMLBq1LG
+      authenticationDatabase: admin
+      database: ehr
+  elasticsearch:
+    jest:
+      uris: http://10.128.100.51:9200
+fast-dfs:
+  tracker-server: 10.128.100.51:22122
+  public-server: http://10.128.100.51:23000,http://10.128.100.52:23000
+es:
+  index: wlyy_quota_test
+  type: wlyy_quota_test
+  host: http://10.128.100.51:9200
+  tHost: 10.128.100.51:9300
+  clusterName: jkzl
+h5:
+  secret: 9U6PBF2JM3PE1IHRJ7GEITMJHNMEHOFZQ2XUCKD9TO2
+  appId: 9000401
+  clientId: WYo0l73F8e
+#福州总部网关参数配置
+fz-gateway:
+  url: http://10.128.100.63:10001/fzGateway/WSGW/rest
+  clientId: 9000401
+  clientVersion: 1.0
+  secret: 9U6PBF2JM3PE1IHRJ7GEITMJHNMEHOFZQ2XUCKD9TO2
+  handlerId: 50641

@@ -30,3 +30,7 @@ spring:
 ---
 spring:
   profiles: prod_srformal
+
+---
+spring:
+  profiles: demo_guigang

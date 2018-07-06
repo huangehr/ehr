@@ -68,3 +68,11 @@ eureka:
   instance:
     ip-address: 192.168.200.61:8761
     prefer-ip-address: true
+
+---
+spring:
+  profiles: demo_guigang
+eureka:
+  instance:
+    ip-address: 10.128.100.63:8761
+    prefer-ip-address: true

@@ -231,3 +231,32 @@ zuul:
     emergency-server:
      path: /open/baidu/**
      url: http://yingyan.baidu.com/
+
+---
+spring:
+  profiles: demo_guigang
+  redis:
+    host: 10.128.100.51
+    port: 6379
+    password: q4YaQemf
+zuul:
+  routes:
+    # 福州总部开放平台接口相关
+    jkzl-server:
+      path: /jkzl/**
+      url: https://api.yihu.com/OpenPlatform/cgiBin/1.0/
+    # 福州总部网关
+    fz-gateway:
+      path: /fzGateway/**
+      url: http://service.yihu.com:8080/
+    fastdfs-server:
+      path: /file/**
+      url: http://192.168.220.62:23000/
+    # 卫计委官网
+    gov-server:
+      path: /open/govServer/**
+      url: http://www.srswjw.gov.cn:8080/
+    # 应急指挥
+    emergency-server:
+     path: /open/baidu/**
+     url: http://yingyan.baidu.com/

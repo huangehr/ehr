@@ -223,3 +223,21 @@ fast-dfs:
 elasticsearch:
   cluster-name: elasticsearch
   cluster-nodes: 172.10.10.5:9300
+
+---
+spring:
+  profiles: demo_guigang
+  datasource:
+    url: jdbc:mysql://10.128.100.50:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: healthcloud
+    password: GP8Qz4qU
+  redis:
+    host: 10.128.100.51
+    port: 6379
+    password: q4YaQemf
+fast-dfs:
+  tracker-server: 10.128.100.51:22122
+  public-server: http://10.128.100.51:23000,http://10.128.100.52:23000
+elasticsearch:
+  cluster-name: elasticsearch
+  cluster-nodes: 10.128.100.51:9300

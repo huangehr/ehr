@@ -129,3 +129,18 @@ spring:
 fast-dfs:
   tracker-server: 192.168.50.116:22122,192.168.50.119:22122
   public-server: http://192.168.220.62:23000
+
+---
+spring:
+  profiles: demo_guigang
+  datasource:
+    url: jdbc:mysql://10.128.100.50:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: healthcloud
+    password: GP8Qz4qU
+  redis:
+    host: 10.128.100.51
+    port: 6379
+    password: q4YaQemf
+fast-dfs:
+  tracker-server: 10.128.100.51:22122
+  public-server: http://10.128.100.51:23000,http://10.128.100.52:23000

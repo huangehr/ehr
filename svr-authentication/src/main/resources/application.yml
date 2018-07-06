@@ -122,3 +122,20 @@ fz-gateway:
   clientId: 9000401
   clientVersion: 1.0
   handlerId: 50641
+
+---
+spring:
+  profiles: demo_guigang
+  datasource:
+    url: jdbc:mysql://10.128.100.50:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: healthcloud
+    password: GP8Qz4qU
+  redis:
+    host: 10.128.100.51
+    port: 6379
+    password: q4YaQemf
+fz-gateway:
+  url: http://10.128.100.63:10001/fzGateway/WSGW/rest
+  clientId: 9000401
+  clientVersion: 1.0
+  handlerId: 50641

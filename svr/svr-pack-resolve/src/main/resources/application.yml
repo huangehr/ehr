@@ -300,3 +300,30 @@ ftp:
   password: jkzlsr2018
   port: 21
 
+---
+spring:
+  profiles: demo_guigang
+  datasource:
+    url: jdbc:mysql://10.128.100.50:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: healthcloud
+    password: GP8Qz4qU
+  redis:
+    host: 10.128.100.51
+    port: 6379
+    password: q4YaQemf
+fast-dfs:
+  tracker-server: 10.128.100.51:22122
+  public-server: http://10.128.100.51:23000,http://10.128.100.52:23000
+  pacs-group-name: group2 # 指定影像文件落入到哪个group上
+hadoop:
+  hbase-properties:
+    hbase.zookeeper.quorum: node1.jkzl.com,node2.jkzl.com,node3.jkzl.com
+elasticsearch:
+  cluster-name: elasticsearch
+  cluster-nodes: 10.128.100.51:9300
+ftp:
+  address: 192.168.220.20
+  username: jkzl
+  password: jkzlsr2018
+  port: 21
+
