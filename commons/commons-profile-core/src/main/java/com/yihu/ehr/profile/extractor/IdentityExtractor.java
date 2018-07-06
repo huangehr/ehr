@@ -37,6 +37,8 @@ public class IdentityExtractor extends KeyDataExtractor {
     private String idCardType;
     @Value("${ehr.pack-extractor.identity.meta-data.patient-name:patient-name}")
     private String patientName;
+    @Value("${ehr.pack-extractor.identity.meta-data.patient-sex:patient-sex}")
+    private String patientSex;
     @Value("${ehr.pack-extractor.identity.meta-data.birthday:birthday}")
     private String birthday;
 
@@ -46,6 +48,7 @@ public class IdentityExtractor extends KeyDataExtractor {
         Map<String,Object> properties = new HashMap<>();
         String _demographicId = "";
         String _patientName = "";
+        String _patientSex = "";
         String _birthday = "";
         //获取身份证和姓名
         if (dataSets.contains(dataSet.getCode())) {
@@ -76,6 +79,13 @@ public class IdentityExtractor extends KeyDataExtractor {
                         _patientName = val.trim();
                     }
                 }
+                //获取性别
+                if (StringUtils.isEmpty(_patientSex)) {
+                    String val = record.getMetaData(patientSex);
+                    if (val != null) {
+                        _patientSex = val.trim();
+                    }
+                }
                 //获取生日
                 if (StringUtils.isEmpty(_birthday)) {
                     String val = record.getMetaData(birthday);
@@ -87,6 +97,7 @@ public class IdentityExtractor extends KeyDataExtractor {
         }
         properties.put(ResourceCells.DEMOGRAPHIC_ID, _demographicId);
         properties.put(ResourceCells.PATIENT_NAME, _patientName);
+        properties.put(ResourceCells.PATIENT_SEX, _patientSex);
         properties.put(ResourceCells.PATIENT_AGE, this.getPatientAge(dataSet.getEventTime(), _birthday, _demographicId));
         return properties;
     }

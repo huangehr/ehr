@@ -36,11 +36,13 @@ public class ProfileMedicationEndPoint extends EnvelopRestEndPoint {
     public Map<String, Integer> medicationRanking(
             @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362301195002141528")
             @RequestParam(value = "demographic_id") String demographic_id,
+            @ApiParam(name = "filter", value = "过滤条件org_code=xxxxx")
+            @RequestParam(value = "filter", required = false) String filter,
             @ApiParam(name = "hp_code", value = "健康问题代码（不传默认查找所有）")
             @RequestParam(value = "hp_code", required = false) String hp_code,
             @ApiParam(name = "date", value = "某个时间段内（不传默认查找所有）")
             @RequestParam(value = "date", required = false) String date) throws Exception {
-        return profileMedicationService.medicationRanking(demographic_id, hp_code, date);
+        return profileMedicationService.medicationRanking(demographic_id, filter, hp_code, date);
     }
 
     @ApiOperation("用药记录 - 上饶PP")
