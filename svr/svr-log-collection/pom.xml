@@ -83,7 +83,6 @@
         <dependency>
             <groupId>org.springframework.kafka</groupId>
             <artifactId>spring-kafka</artifactId>
-            <version>1.0.6.RELEASE</version>
             <exclusions>
                 <exclusion>
                     <artifactId>kafka-clients</artifactId>

@@ -293,11 +293,13 @@ public class ProfileEventService extends ProfileBasicService {
                 String outResult = "";
                 for (Map<String, Object> temp1 : subList) {
                     if (temp1.get(ResourceCells.ROWKEY).toString().contains("HDSD00_69")) {
-                        if (temp1.get("EHR_006081").equals("入院诊断")) {
-                            inResult = temp1.get("EHR_000293_VALUE") != null ?  (String) temp1.get("EHR_000293_VALUE") :  (String) temp1.get("EHR_000293");
-                        }
-                        if (temp1.get("EHR_006081").equals("出院诊断")) {
-                            outResult = temp1.get("EHR_000293_VALUE") != null ?  (String) temp1.get("EHR_000293_VALUE") :  (String) temp1.get("EHR_000293");
+                        if (temp1.get("EHR_006081") != null) {
+                            if (temp1.get("EHR_006081").equals("入院诊断")) {
+                                inResult = temp1.get("EHR_000293_VALUE") != null ?  (String) temp1.get("EHR_000293_VALUE") :  (String) temp1.get("EHR_000293");
+                            }
+                            if (temp1.get("EHR_006081").equals("出院诊断")) {
+                                outResult = temp1.get("EHR_000293_VALUE") != null ?  (String) temp1.get("EHR_000293_VALUE") :  (String) temp1.get("EHR_000293");
+                            }
                         }
                     }
                 }

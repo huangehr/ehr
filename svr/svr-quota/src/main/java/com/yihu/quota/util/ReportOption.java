@@ -97,6 +97,8 @@ public class ReportOption {
                 line.smooth(true);
 //                line.stack("stack");
                 line.itemStyle().normal().lineStyle().shadowColor("rgba(0,0,0,0.4)");
+                line.itemStyle().normal().label().show(true);   // 设置在图形中显示出具体的数值
+                line.itemStyle().normal().label().position(Position.top);   // 设置显示数值的位置
 
                 List<Object> lineValList = lineDatas.get(i);
                 Object[] lineVal = (Object[]) lineValList.toArray(new Object[lineValList.size()]);
