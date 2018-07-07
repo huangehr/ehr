@@ -106,4 +106,84 @@ public class GovFirstPageReportEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
+    @ApiOperation(value = "按月统计门急诊费用")
+    @RequestMapping(value = ServiceApi.GovFirsPage.Report.StatEmergencyExpense, method = RequestMethod.GET)
+    public Envelop statEmergencyExpense(
+            @ApiParam(name = "orgCode", value = "机构编码", required = true)
+            @RequestParam String orgCode,
+            @ApiParam(name = "date", value = "日期（年月），格式：yyyy-MM-dd", required = true)
+            @RequestParam String date) {
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(false);
+        try {
+            String result = govFirstPageReportService.statEmergencyExpense(orgCode, date);
+            envelop.setObj(result);
+            envelop.setSuccessFlg(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            envelop.setErrorMsg("发生异常：" + e.getMessage());
+        }
+        return envelop;
+    }
+
+    @ApiOperation(value = "按月统计住院费用")
+    @RequestMapping(value = ServiceApi.GovFirsPage.Report.StatHospitalizationExpense, method = RequestMethod.GET)
+    public Envelop statHospitalizationExpense(
+            @ApiParam(name = "orgCode", value = "机构编码", required = true)
+            @RequestParam String orgCode,
+            @ApiParam(name = "date", value = "日期（年月），格式：yyyy-MM-dd", required = true)
+            @RequestParam String date) {
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(false);
+        try {
+            String result = govFirstPageReportService.statHospitalizationExpense(orgCode, date);
+            envelop.setObj(result);
+            envelop.setSuccessFlg(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            envelop.setErrorMsg("发生异常：" + e.getMessage());
+        }
+        return envelop;
+    }
+
+    @ApiOperation(value = "按月统计门急诊人均医药费用")
+    @RequestMapping(value = ServiceApi.GovFirsPage.Report.AverageEmergencyExpense, method = RequestMethod.GET)
+    public Envelop averageEmergencyExpense(
+            @ApiParam(name = "orgCode", value = "机构编码", required = true)
+            @RequestParam String orgCode,
+            @ApiParam(name = "date", value = "日期（年月），格式：yyyy-MM-dd", required = true)
+            @RequestParam String date) {
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(false);
+        try {
+            String result = govFirstPageReportService.averageEmergencyExpense(orgCode, date);
+            envelop.setObj(result);
+            envelop.setSuccessFlg(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            envelop.setErrorMsg("发生异常：" + e.getMessage());
+        }
+        return envelop;
+    }
+
+    @ApiOperation(value = "按月统计住院人均医药费用")
+    @RequestMapping(value = ServiceApi.GovFirsPage.Report.AverageHospitalizationExpense, method = RequestMethod.GET)
+    public Envelop averageHospitalizationExpense(
+            @ApiParam(name = "orgCode", value = "机构编码", required = true)
+            @RequestParam String orgCode,
+            @ApiParam(name = "date", value = "日期（年月），格式：yyyy-MM-dd", required = true)
+            @RequestParam String date) {
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(false);
+        try {
+            String result = govFirstPageReportService.averageHospitalizationExpense(orgCode, date);
+            envelop.setObj(result);
+            envelop.setSuccessFlg(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            envelop.setErrorMsg("发生异常：" + e.getMessage());
+        }
+        return envelop;
+    }
+
 }

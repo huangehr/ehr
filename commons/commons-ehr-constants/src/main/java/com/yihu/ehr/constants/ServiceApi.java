@@ -1728,6 +1728,10 @@ public class ServiceApi {
             public static final String CountHospitalizationAttendance = "/govFirstPage/report/countHospitalizationAttendance";
             public static final String AverageHospitalStayDay = "/govFirstPage/report/averageHospitalStayDay";
             public static final String StatHospitalizationHeadToHeadRatio = "/govFirstPage/report/statHospitalizationHeadToHeadRatio";
+            public static final String StatEmergencyExpense = "/govFirstPage/report/statEmergencyExpense";
+            public static final String StatHospitalizationExpense = "/govFirstPage/report/statHospitalizationExpense";
+            public static final String AverageEmergencyExpense = "/govFirstPage/report/averageEmergencyExpense";
+            public static final String AverageHospitalizationExpense = "/govFirstPage/report/averageHospitalizationExpense";
         }
 
     }
