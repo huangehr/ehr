@@ -1722,6 +1722,14 @@ public class ServiceApi {
             public static final String GetCategoryQuotaList = "/govFirstPage/quotaVisibility/getCategoryQuotaList";
         }
 
+        // 政府服务平台首页 - 报表接口
+        public static class Report {
+            public static final String CountEmergencyAttendance = "/govFirstPage/report/countEmergencyAttendance";
+            public static final String CountHospitalizationAttendance = "/govFirstPage/report/countHospitalizationAttendance";
+            public static final String AverageHospitalStayDay = "/govFirstPage/report/averageHospitalStayDay";
+            public static final String StatHospitalizationHeadToHeadRatio = "/govFirstPage/report/statHospitalizationHeadToHeadRatio";
+        }
+
     }
 
 }
