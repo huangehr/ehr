@@ -74,32 +74,6 @@ zookeeper:
 
 ---
 spring:
-  profiles: prod_sr
-  datasource:
-    url: jdbc:mysql://10.176.97.9:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: healthcloud
-    password: GP8Qz4qU
-service-gateway:
-  username: user
-  password: eureka
-  url: http://10.176.97.10:10000/api/v1.0/admin
-  data:
-    mongodb:
-      host: 10.176.97.9
-      port: 29000
-      username: jkzlehr
-      password: GMLBq1LG
-      authenticationDatabase: admin
-      database: ehr
-kafka:
-  broker:
-    address: 10.176.97.7:6667
-zookeeper:
-  broker:
-    address: node1.jkzl.com,node2.jkzl.com,node3.jkzl.com:2181
-
----
-spring:
   profiles: prod_fzzy
   datasource:
     url: jdbc:mysql://100.100.1.159:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false

@@ -61,17 +61,6 @@ spring:
 
 ---
 spring:
-  profiles: prod_sr
-  cloud:
-    config:
-      server:
-        git:
-          uri: http://10.176.97.10:3000/jkzl/ehr.config.git
-          basedir: /usr/local/ehr-config
-        default-label: master
-
----
-spring:
   profiles: prod_fzzy
   cloud:
     config:

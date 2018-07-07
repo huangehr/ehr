@@ -75,23 +75,6 @@ ehr-redis:
 
 ---
 spring:
-  profiles: prod_sr
-  datasource:
-    url: jdbc:mysql://10.176.97.9:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: healthcloud
-    password: GP8Qz4qU
-  redis:
-    host: 10.176.97.5
-    port: 6390
-    password: q4YaQemf
-ehr-redis:
-  mq:
-    pubsub:
-      publisherAppId: svr-redis
-      responseTimeChannel: redis.cache.reponse-time
-
----
-spring:
   profiles: prod_fzzy
   datasource:
     url: jdbc:mysql://100.100.1.159:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false

@@ -94,21 +94,6 @@ fast-dfs:
 
 ---
 spring:
-  profiles: prod_sr
-  datasource:
-    url: jdbc:mysql://10.176.97.9:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: healthcloud
-    password: GP8Qz4qU
-  redis:
-    host: 10.176.97.5
-    port: 6390
-    password: q4YaQemf
-fast-dfs:
-  tracker-server: 10.176.97.5:22122
-  public-server: http://10.176.97.5:8888
-
----
-spring:
   profiles: prod_fzzy
 
   datasource:

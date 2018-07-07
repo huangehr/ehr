@@ -34,16 +34,6 @@ spring:
 
 ---
 spring:
-  profiles: prod_sr
-  cloud:
-    config:
-      username: user
-      password: configuration
-      uri: http://10.176.97.10:1221
-      label: master
-
----
-spring:
   profiles: prod_fzzy
   cloud:
     config:
