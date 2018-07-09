@@ -146,7 +146,7 @@ public class GovFirstPageReportEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
-    @ApiOperation(value = "按月统计门急诊人均医药费用")
+    @ApiOperation(value = "按月统计门急诊人均费用")
     @RequestMapping(value = ServiceApi.GovFirsPage.Report.AverageEmergencyExpense, method = RequestMethod.GET)
     public Envelop averageEmergencyExpense(
             @ApiParam(name = "orgCode", value = "机构编码", required = true)
@@ -166,7 +166,7 @@ public class GovFirstPageReportEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
-    @ApiOperation(value = "按月统计住院人均医药费用")
+    @ApiOperation(value = "按月统计住院人均费用")
     @RequestMapping(value = ServiceApi.GovFirsPage.Report.AverageHospitalizationExpense, method = RequestMethod.GET)
     public Envelop averageHospitalizationExpense(
             @ApiParam(name = "orgCode", value = "机构编码", required = true)

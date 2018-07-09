@@ -181,7 +181,7 @@ public class GovFirstPageReportService {
     }
 
     /**
-     * 按月统计门急诊人均医药费用
+     * 按月统计门急诊人均费用
      *
      * @param orgCode 机构编码
      * @param date    日期（年月），格式：yyyy-MM-dd
@@ -202,7 +202,7 @@ public class GovFirstPageReportService {
     }
 
     /**
-     * 按月统计住院人均医药费用
+     * 按月统计住院人均费用
      *
      * @param orgCode 机构编码
      * @param date    日期（年月），格式：yyyy-MM-dd
