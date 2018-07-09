@@ -142,7 +142,7 @@ public class GovFirstPageReportService {
 
             // 门急诊费用，说明：HDSD00_71 门诊-费用汇总，EHR_000045 门诊费用金额
             String q = String.format("rowkey:*$HDSD00_71$* AND event_date:[%s TO %s] AND org_code:%s", firstDate, lastDate, orgCode);
-            FieldStatsInfo statsInfo = solrUtil.getStats(ResourceCore.MasterTable, q, null, "EHR_000045");
+            FieldStatsInfo statsInfo = solrUtil.getStats(ResourceCore.SubTable, q, null, "EHR_000045");
             Long expense = Long.getLong(statsInfo.getSum().toString());
 
             DecimalFormat df = new DecimalFormat("#.00");
@@ -169,7 +169,7 @@ public class GovFirstPageReportService {
 
             // 统计住院费用，说明：HDSD00_68 住院-费用汇总，EHR_000175 住院费用金额
             String q = String.format("rowkey:*$HDSD00_68$* AND event_date:[%s TO %s] AND org_code:%s", firstDate, lastDate, orgCode);
-            FieldStatsInfo statsInfo = solrUtil.getStats(ResourceCore.MasterTable, q, null, "EHR_000175");
+            FieldStatsInfo statsInfo = solrUtil.getStats(ResourceCore.SubTable, q, null, "EHR_000175");
             Long expense = Long.getLong(statsInfo.getSum().toString());
 
             DecimalFormat df = new DecimalFormat("#.00");
@@ -216,6 +216,60 @@ public class GovFirstPageReportService {
 
             DecimalFormat df = new DecimalFormat("#.00");
             result = df.format(expense / count);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    /**
+     * 按月统计门急诊医药费用
+     *
+     * @param orgCode 机构编码
+     * @param date    日期（年月），格式：yyyy-MM-dd
+     * @return
+     */
+    public String statEmergencyMedicineExpense(String orgCode, String date) {
+        String result = null;
+        try {
+            String firstDate = DateUtil.getFirstDate(date, "yyyy-MM", DateUtil.utcDateTimePattern);
+            String lastDate = DateUtil.getLastDate(date, "yyyy-MM", DateUtil.utcDateTimePattern);
+            lastDate.replace("00:00:00", "23:59:59");
+
+            // 门急诊医药费用，说明：HDSD00_71 门诊-费用汇总，EHR_000044 门诊费用分类代码，EHR_000045 门诊费用金额
+            String q = String.format("rowkey:*$HDSD00_71$* AND (EHR_000044:01 OR EHR_000044:02 OR EHR_000044:03) AND event_date:[%s TO %s] AND org_code:%s", firstDate, lastDate, orgCode);
+            FieldStatsInfo statsInfo = solrUtil.getStats(ResourceCore.SubTable, q, null, "EHR_000045");
+            Long expense = Long.getLong(statsInfo.getSum().toString());
+
+            DecimalFormat df = new DecimalFormat("#.00");
+            result = df.format(expense);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    /**
+     * 按月统计住院医药费用
+     *
+     * @param orgCode 机构编码
+     * @param date    日期（年月），格式：yyyy-MM-dd
+     * @return
+     */
+    public String statHospitalizationMedicineExpense(String orgCode, String date) {
+        String result = null;
+        try {
+            String firstDate = DateUtil.getFirstDate(date, "yyyy-MM", DateUtil.utcDateTimePattern);
+            String lastDate = DateUtil.getLastDate(date, "yyyy-MM", DateUtil.utcDateTimePattern);
+            lastDate.replace("00:00:00", "23:59:59");
+
+            // 统计住院费用，说明：HDSD00_68 住院-费用汇总，EHR_000174 住院费用分类代码，EHR_000175 住院费用金额
+            String q = String.format("rowkey:*$HDSD00_68$* AND (EHR_000174:03 OR EHR_000174:04 OR EHR_000174:05) AND event_date:[%s TO %s] AND org_code:%s", firstDate, lastDate, orgCode);
+            FieldStatsInfo statsInfo = solrUtil.getStats(ResourceCore.SubTable, q, null, "EHR_000175");
+            Long expense = Long.getLong(statsInfo.getSum().toString());
+
+            DecimalFormat df = new DecimalFormat("#.00");
+            result = df.format(expense);
         } catch (Exception e) {
             e.printStackTrace();
         }
