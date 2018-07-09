@@ -194,6 +194,73 @@ public class DateUtil {
         return resultDateString;
     }
 
+    /**
+     * 获取上一个月第一天
+     * @param dateSource 源日期
+     * @param dateSourceFormat 源日期格式
+     * @return 日期，格式：yyyy-MM-01'T'00:00:00'Z'
+     * @throws Exception
+     */
+    public static String getFirstDateOfLashMonth(String dateSource, String dateSourceFormat) throws Exception {
+        DateFormat dsf = new SimpleDateFormat(dateSourceFormat);
+        DateFormat df = new SimpleDateFormat("yyyy-MM-01'T'00:00:00'Z'");
+        java.util.Date date;
+
+        String resultDateString;
+
+        if (dateSource == null || dateSource.equals("")) {
+            throw new Exception(dateSource + " is invalid.");
+        }
+
+        try {
+            date = dsf.parse(dateSource);
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(date);
+            cal.add(Calendar.MONTH, -1);
+            cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+            resultDateString = df.format(cal.getTime());
+
+        } catch (ParseException e) {
+            throw new Exception(dateSource + " is invalid.");
+        }
+
+        return resultDateString;
+    }
+
+    /**
+     * 获取上一个月最一天
+     * @param dateSource 源日期
+     * @param dateSourceFormat 源日期格式
+     * @param dateFormat 日期返回格式
+     * @return
+     * @throws Exception
+     */
+    public static String getLastDateOfLashMonth(String dateSource, String dateSourceFormat, String dateFormat) throws Exception {
+        DateFormat dsf = new SimpleDateFormat(dateSourceFormat);
+        DateFormat df = new SimpleDateFormat(dateFormat);
+        java.util.Date date;
+
+        String resultDateString;
+
+        if (dateSource == null || dateSource.equals("")) {
+            throw new Exception(dateSource + " is invalid.");
+        }
+
+        try {
+            date = dsf.parse(dateSource);
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(date);
+            cal.add(Calendar.MONTH, -1);
+            cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+            resultDateString = df.format(cal.getTime());
+
+        } catch (ParseException e) {
+            throw new Exception(dateSource + " is invalid.");
+        }
+
+        return resultDateString;
+    }
+
     public static String getYearFromDBDate(String dateStr) {
 
         if (dateStr == null || dateStr.length() != DEFAULT_CHAR_DATE_YMD_FORMAT.length()) {

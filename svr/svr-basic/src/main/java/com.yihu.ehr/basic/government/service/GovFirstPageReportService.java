@@ -19,6 +19,10 @@ import java.text.DecimalFormat;
 @Service
 public class GovFirstPageReportService {
 
+    String dateSourceFormat = "yyyy-MM";
+    String lastDateFormat = "yyyy-MM-dd'T'23:59:59'Z'";
+    DecimalFormat df = new DecimalFormat("#.00");
+
     @Autowired
     private SolrUtil solrUtil;
 
@@ -32,9 +36,8 @@ public class GovFirstPageReportService {
     public Long countEmergencyAttendance(String orgCode, String date) {
         Long result = 0L;
         try {
-            String firstDate = DateUtil.getFirstDate(date, "yyyy-MM", DateUtil.utcDateTimePattern);
-            String lastDate = DateUtil.getLastDate(date, "yyyy-MM", DateUtil.utcDateTimePattern);
-            lastDate.replace("00:00:00", "23:59:59");
+            String firstDate = DateUtil.getFirstDate(date, dateSourceFormat, DateUtil.utcDateTimePattern);
+            String lastDate = DateUtil.getLastDate(date, dateSourceFormat, lastDateFormat);
             String q = String.format("event_type:0 AND event_date:[%s TO %s] AND org_code:%s", firstDate, lastDate, orgCode);
             result = solrUtil.count(ResourceCore.MasterTable, q);
         } catch (Exception e) {
@@ -53,9 +56,8 @@ public class GovFirstPageReportService {
     public Long countHospitalizationAttendance(String orgCode, String date) {
         Long result = 0L;
         try {
-            String firstDate = DateUtil.getFirstDate(date, "yyyy-MM", DateUtil.utcDateTimePattern);
-            String lastDate = DateUtil.getLastDate(date, "yyyy-MM", DateUtil.utcDateTimePattern);
-            lastDate.replace("00:00:00", "23:59:59");
+            String firstDate = DateUtil.getFirstDate(date, dateSourceFormat, DateUtil.utcDateTimePattern);
+            String lastDate = DateUtil.getLastDate(date, dateSourceFormat, lastDateFormat);
             String q = String.format("event_type:1 AND event_date:[%s TO %s] AND org_code:%s", firstDate, lastDate, orgCode);
             result = solrUtil.count(ResourceCore.MasterTable, q);
         } catch (Exception e) {
@@ -74,9 +76,8 @@ public class GovFirstPageReportService {
     public Double averageHospitalStayDay(String orgCode, String date) {
         Double result = 0D;
         try {
-            String firstDate = DateUtil.getFirstDate(date, "yyyy-MM", DateUtil.utcDateTimePattern);
-            String lastDate = DateUtil.getLastDate(date, "yyyy-MM", DateUtil.utcDateTimePattern);
-            lastDate.replace("00:00:00", "23:59:59");
+            String firstDate = DateUtil.getFirstDate(date, dateSourceFormat, DateUtil.utcDateTimePattern);
+            String lastDate = DateUtil.getLastDate(date, dateSourceFormat, lastDateFormat);
 
             // 总住院日，说明：EHR_000155 出院日期，EHR_000170 实际住院天数
             String q_days = String.format("event_type:1 AND EHR_000155:* AND EHR_000170:[1 TO *] AND event_date:[%s TO %s] AND org_code:%s", firstDate, lastDate, orgCode);
@@ -103,9 +104,8 @@ public class GovFirstPageReportService {
     public String statHospitalizationHeadToHeadRatio(String orgCode, String date) {
         String result = null;
         try {
-            String firstDate = DateUtil.getFirstDate(date, "yyyy-MM", DateUtil.utcDateTimePattern);
-            String lastDate = DateUtil.getLastDate(date, "yyyy-MM", DateUtil.utcDateTimePattern);
-            lastDate.replace("00:00:00", "23:59:59");
+            String firstDate = DateUtil.getFirstDate(date, dateSourceFormat, DateUtil.utcDateTimePattern);
+            String lastDate = DateUtil.getLastDate(date, dateSourceFormat, lastDateFormat);
 
             String q = String.format("event_type:1 AND event_date:[%s TO %s] AND org_code:%s", firstDate, lastDate, orgCode);
             // 总住院人次
@@ -118,7 +118,6 @@ public class GovFirstPageReportService {
                 patientCount = patientSolrDocList.getNumFound();
             }
 
-            DecimalFormat df = new DecimalFormat("#.00");
             result = df.format((count / patientCount) * 100) + "%";
         } catch (Exception e) {
             e.printStackTrace();
@@ -136,16 +135,14 @@ public class GovFirstPageReportService {
     public String statEmergencyExpense(String orgCode, String date) {
         String result = null;
         try {
-            String firstDate = DateUtil.getFirstDate(date, "yyyy-MM", DateUtil.utcDateTimePattern);
-            String lastDate = DateUtil.getLastDate(date, "yyyy-MM", DateUtil.utcDateTimePattern);
-            lastDate.replace("00:00:00", "23:59:59");
+            String firstDate = DateUtil.getFirstDate(date, dateSourceFormat, DateUtil.utcDateTimePattern);
+            String lastDate = DateUtil.getLastDate(date, dateSourceFormat, lastDateFormat);
 
             // 门急诊费用，说明：HDSD00_71 门诊-费用汇总，EHR_000045 门诊费用金额
             String q = String.format("rowkey:*$HDSD00_71$* AND event_date:[%s TO %s] AND org_code:%s", firstDate, lastDate, orgCode);
             FieldStatsInfo statsInfo = solrUtil.getStats(ResourceCore.SubTable, q, null, "EHR_000045");
-            Long expense = Long.getLong(statsInfo.getSum().toString());
+            Double expense = Double.parseDouble(statsInfo.getSum().toString());
 
-            DecimalFormat df = new DecimalFormat("#.00");
             result = df.format(expense);
         } catch (Exception e) {
             e.printStackTrace();
@@ -163,17 +160,67 @@ public class GovFirstPageReportService {
     public String statHospitalizationExpense(String orgCode, String date) {
         String result = null;
         try {
-            String firstDate = DateUtil.getFirstDate(date, "yyyy-MM", DateUtil.utcDateTimePattern);
-            String lastDate = DateUtil.getLastDate(date, "yyyy-MM", DateUtil.utcDateTimePattern);
-            lastDate.replace("00:00:00", "23:59:59");
+            String firstDate = DateUtil.getFirstDate(date, dateSourceFormat, DateUtil.utcDateTimePattern);
+            String lastDate = DateUtil.getLastDate(date, dateSourceFormat, lastDateFormat);
 
             // 统计住院费用，说明：HDSD00_68 住院-费用汇总，EHR_000175 住院费用金额
             String q = String.format("rowkey:*$HDSD00_68$* AND event_date:[%s TO %s] AND org_code:%s", firstDate, lastDate, orgCode);
             FieldStatsInfo statsInfo = solrUtil.getStats(ResourceCore.SubTable, q, null, "EHR_000175");
-            Long expense = Long.getLong(statsInfo.getSum().toString());
+            Double expense = Double.parseDouble(statsInfo.getSum().toString());
 
-            DecimalFormat df = new DecimalFormat("#.00");
             result = df.format(expense);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    /**
+     * 按月统计门急诊费用环比
+     *
+     * @param orgCode 机构编码
+     * @param date    日期（年月），格式：yyyy-MM-dd
+     * @return
+     */
+    public String statEmergencyExpenseRatio(String orgCode, String date) {
+        String result = null;
+        try {
+            String firstDate = DateUtil.getFirstDate(date, dateSourceFormat, DateUtil.utcDateTimePattern);
+            String lastDate = DateUtil.getLastDate(date, dateSourceFormat, lastDateFormat);
+
+            Double expense = Double.parseDouble(statEmergencyExpense(orgCode, date));
+            // 上月门急诊费用
+            String preFirstDate = DateUtil.getFirstDateOfLashMonth(firstDate, DateUtil.utcDateTimePattern);
+            Double preExpense = Double.parseDouble(statEmergencyExpense(orgCode, preFirstDate));
+
+            // 环比
+            result = df.format((expense - preExpense) / preExpense * 100) + "%";
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    /**
+     * 按月统计住院费用环比
+     *
+     * @param orgCode 机构编码
+     * @param date    日期（年月），格式：yyyy-MM-dd
+     * @return
+     */
+    public String statHospitalizationExpenseRatio(String orgCode, String date) {
+        String result = null;
+        try {
+            String firstDate = DateUtil.getFirstDate(date, dateSourceFormat, DateUtil.utcDateTimePattern);
+            String lastDate = DateUtil.getLastDate(date, dateSourceFormat, lastDateFormat);
+
+            Double expense = Double.parseDouble(statHospitalizationExpense(orgCode, date));
+            // 上月住院费用
+            String preFirstDate = DateUtil.getFirstDateOfLashMonth(firstDate, DateUtil.utcDateTimePattern);
+            Double preExpense = Double.parseDouble(statHospitalizationExpense(orgCode, preFirstDate));
+
+            // 环比
+            result = df.format((expense - preExpense) / preExpense * 100) + "%";
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -193,7 +240,6 @@ public class GovFirstPageReportService {
             Long count = countEmergencyAttendance(orgCode, date);
             Double expense = Double.parseDouble(statEmergencyExpense(orgCode, date));
 
-            DecimalFormat df = new DecimalFormat("#.00");
             result = df.format(expense / count);
         } catch (Exception e) {
             e.printStackTrace();
@@ -214,7 +260,6 @@ public class GovFirstPageReportService {
             Long count = countHospitalizationAttendance(orgCode, date);
             Double expense = Double.parseDouble(statHospitalizationExpense(orgCode, date));
 
-            DecimalFormat df = new DecimalFormat("#.00");
             result = df.format(expense / count);
         } catch (Exception e) {
             e.printStackTrace();
@@ -232,16 +277,14 @@ public class GovFirstPageReportService {
     public String statEmergencyMedicineExpense(String orgCode, String date) {
         String result = null;
         try {
-            String firstDate = DateUtil.getFirstDate(date, "yyyy-MM", DateUtil.utcDateTimePattern);
-            String lastDate = DateUtil.getLastDate(date, "yyyy-MM", DateUtil.utcDateTimePattern);
-            lastDate.replace("00:00:00", "23:59:59");
+            String firstDate = DateUtil.getFirstDate(date, dateSourceFormat, DateUtil.utcDateTimePattern);
+            String lastDate = DateUtil.getLastDate(date, dateSourceFormat, lastDateFormat);
 
             // 门急诊医药费用，说明：HDSD00_71 门诊-费用汇总，EHR_000044 门诊费用分类代码，EHR_000045 门诊费用金额
             String q = String.format("rowkey:*$HDSD00_71$* AND (EHR_000044:01 OR EHR_000044:02 OR EHR_000044:03) AND event_date:[%s TO %s] AND org_code:%s", firstDate, lastDate, orgCode);
             FieldStatsInfo statsInfo = solrUtil.getStats(ResourceCore.SubTable, q, null, "EHR_000045");
-            Long expense = Long.getLong(statsInfo.getSum().toString());
+            Double expense = Double.parseDouble(statsInfo.getSum().toString());
 
-            DecimalFormat df = new DecimalFormat("#.00");
             result = df.format(expense);
         } catch (Exception e) {
             e.printStackTrace();
@@ -259,16 +302,14 @@ public class GovFirstPageReportService {
     public String statHospitalizationMedicineExpense(String orgCode, String date) {
         String result = null;
         try {
-            String firstDate = DateUtil.getFirstDate(date, "yyyy-MM", DateUtil.utcDateTimePattern);
-            String lastDate = DateUtil.getLastDate(date, "yyyy-MM", DateUtil.utcDateTimePattern);
-            lastDate.replace("00:00:00", "23:59:59");
+            String firstDate = DateUtil.getFirstDate(date, dateSourceFormat, DateUtil.utcDateTimePattern);
+            String lastDate = DateUtil.getLastDate(date, dateSourceFormat, lastDateFormat);
 
             // 统计住院费用，说明：HDSD00_68 住院-费用汇总，EHR_000174 住院费用分类代码，EHR_000175 住院费用金额
             String q = String.format("rowkey:*$HDSD00_68$* AND (EHR_000174:03 OR EHR_000174:04 OR EHR_000174:05) AND event_date:[%s TO %s] AND org_code:%s", firstDate, lastDate, orgCode);
             FieldStatsInfo statsInfo = solrUtil.getStats(ResourceCore.SubTable, q, null, "EHR_000175");
-            Long expense = Long.getLong(statsInfo.getSum().toString());
+            Double expense = Double.parseDouble(statsInfo.getSum().toString());
 
-            DecimalFormat df = new DecimalFormat("#.00");
             result = df.format(expense);
         } catch (Exception e) {
             e.printStackTrace();
