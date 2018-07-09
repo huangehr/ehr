@@ -147,12 +147,12 @@ public class DataQualityStatisticsService extends BaseJpaService {
         }
 
         //统计有数据的医院code
-        String sqlOrg = "SELECT org_code FROM json_archives/info where event_date>= '"+start+" 00:00:00' AND event_date<='" +  end + " 23:59:59' AND pack_type=1 group by org_code ";
+        String sqlOrg = "SELECT org_code FROM json_archives/info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' group by org_code ";
         try {
             ResultSet resultSetOrg = elasticSearchUtil.findBySql(sqlOrg);
             while (resultSetOrg.next()) {
                 String orgCode = resultSetOrg.getString("org_code");
-                if(!datasetMap.containsKey(orgCode)){
+                if(!dataMap.containsKey(orgCode)){
                     dataMap.put(orgCode,initDataMap(datasetMap,orgMap.get(orgCode),orgCode));
                 }
             }
@@ -161,7 +161,6 @@ public class DataQualityStatisticsService extends BaseJpaService {
                 e.printStackTrace();
             }
         }
-
 
         for (Map<String, Object> map:dataMap.values()){
             String orgCode = map.get("orgCode").toString();
@@ -736,7 +735,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
         }
 
         //统计有数据的医院code
-        String sqlOrg = "SELECT org_code FROM json_archives/info where event_date>= '"+start+" 00:00:00' AND event_date<='" +  end + " 23:59:59' AND pack_type=1 group by org_code ";
+        String sqlOrg = "SELECT org_code FROM json_archives/info where event_date>= '"+start+" 00:00:00' AND event_date<='" +  end + " 23:59:59' group by org_code ";
         try {
             ResultSet resultSetOrg = elasticSearchUtil.findBySql(sqlOrg);
             while (resultSetOrg.next()) {
