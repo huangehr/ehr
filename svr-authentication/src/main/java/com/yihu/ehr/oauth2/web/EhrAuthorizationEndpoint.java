@@ -235,18 +235,23 @@ public class EhrAuthorizationEndpoint extends AbstractEndpoint {
         }
         try {
             if (!(principal instanceof Authentication) || !((Authentication) principal).isAuthenticated()) {
-                if (parameters.containsKey("user")) {
-                    String userName = parameters.get("user");
-                    UserDetails userDetails = ehrUserDetailsService.loadUserByUsername(userName);
-                    UsernamePasswordAuthenticationToken userAuth = new UsernamePasswordAuthenticationToken(userDetails.getUsername(), userDetails.getPassword(), userDetails.getAuthorities());
-                    SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
-                    securityContext.setAuthentication(userAuth);
-                    SecurityContextHolderStrategy securityContextHolderStrategy = SecurityContextHolder.getContextHolderStrategy();
-                    securityContextHolderStrategy.setContext(securityContext);
-                    principal = userAuth;
+                if (parameters.containsKey("token")) {
+                    String token = parameters.get("token");
+                    OAuth2Authentication authentication = ehrRedisTokenStore.readAuthentication(token);
+                    if (authentication != null) {
+                        String userName = authentication.getName();
+                        UserDetails userDetails = ehrUserDetailsService.loadUserByUsername(userName);
+                        UsernamePasswordAuthenticationToken userAuth = new UsernamePasswordAuthenticationToken(userDetails.getUsername(), userDetails.getPassword(), userDetails.getAuthorities());
+                        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+                        securityContext.setAuthentication(userAuth);
+                        SecurityContextHolderStrategy securityContextHolderStrategy = SecurityContextHolder.getContextHolderStrategy();
+                        securityContextHolderStrategy.setContext(securityContext);
+                        principal = userAuth;
+                    } else {
+                        throw new InsufficientAuthenticationException("User must be authenticated with Spring Security before authorization can be completed.");
+                    }
                 } else {
-                    throw new InsufficientAuthenticationException(
-                            "User must be provided.");
+                    throw new InsufficientAuthenticationException("Token must be provided.");
                 }
             }
             ClientDetails client = getClientDetailsService().loadClientByClientId(authorizationRequest.getClientId());
