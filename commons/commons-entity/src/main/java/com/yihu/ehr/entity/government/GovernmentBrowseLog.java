@@ -18,6 +18,7 @@ public class GovernmentBrowseLog {
     private String userName;
     private Date createTime;
     private String type;
+    private String showType;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -83,5 +84,14 @@ public class GovernmentBrowseLog {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    @Transient
+    public String getShowType() {
+        return showType;
+    }
+
+    public void setShowType(String showType) {
+        this.showType = showType;
     }
 }
