@@ -14,6 +14,8 @@ public class RedisCollection {
     public static final String ResolveQueueVice = "resolve_queue_vice";
     //省平台
     public static final String ProvincialPlatformQueue = "provincial_platform_queue";
+    /**省平台补传队列 */
+    public static final String PROVINCIAL_PLATFORM_QUEUE_SUPPLEMENT= "provincial_platform_queue_supplement";
 
     /**
      * 待发布的消息缓存集合
