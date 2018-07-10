@@ -1734,6 +1734,8 @@ public class ServiceApi {
             public static final String AverageHospitalizationExpense = "/govFirstPage/report/averageHospitalizationExpense";
             public static final String StatEmergencyMedicineExpense = "/govFirstPage/report/statEmergencyMedicineExpense";
             public static final String StatHospitalizationMedicineExpense = "/govFirstPage/report/statHospitalizationMedicineExpense";
+            public static final String StatAttendanceTrend = "/govFirstPage/report/statAttendanceTrend";
+            public static final String StatExpenseTrend = "/govFirstPage/report/statExpenseTrend";
         }
 
     }

@@ -261,6 +261,40 @@ public class DateUtil {
         return resultDateString;
     }
 
+    /**
+     * 获取指定日期间隔月份数的某月第一天
+     * @param dateSource 源日期
+     * @param dateSourceFormat 源日期格式
+     * @param gap 间隔数，负数往前推，0表示当前日期的月份，整数往后推
+     * @return 日期，格式：yyyy-MM-01'T'00:00:00'Z'
+     * @throws Exception
+     */
+    public static String getFirstDateOfSomeMonth(String dateSource, String dateSourceFormat, int gap) throws Exception {
+        DateFormat dsf = new SimpleDateFormat(dateSourceFormat);
+        DateFormat df = new SimpleDateFormat("yyyy-MM-01'T'00:00:00'Z'");
+        java.util.Date date;
+
+        String resultDateString;
+
+        if (dateSource == null || dateSource.equals("")) {
+            throw new Exception(dateSource + " is invalid.");
+        }
+
+        try {
+            date = dsf.parse(dateSource);
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(date);
+            cal.add(Calendar.MONTH, gap);
+            cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+            resultDateString = df.format(cal.getTime());
+
+        } catch (ParseException e) {
+            throw new Exception(dateSource + " is invalid.");
+        }
+
+        return resultDateString;
+    }
+
     public static String getYearFromDBDate(String dateStr) {
 
         if (dateStr == null || dateStr.length() != DEFAULT_CHAR_DATE_YMD_FORMAT.length()) {

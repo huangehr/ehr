@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author 张进军
  * @date 2018/7/6 13:46
@@ -217,6 +220,54 @@ public class GovFirstPageReportEndPoint extends EnvelopRestEndPoint {
         envelop.setSuccessFlg(false);
         try {
             String result = govFirstPageReportService.statHospitalizationMedicineExpense(orgCode, date);
+            envelop.setObj(result);
+            envelop.setSuccessFlg(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            envelop.setErrorMsg("发生异常：" + e.getMessage());
+        }
+        return envelop;
+    }
+
+    @ApiOperation(value = "统计近6个月的门急诊、住院人次趋势")
+    @RequestMapping(value = ServiceApi.GovFirsPage.Report.StatAttendanceTrend, method = RequestMethod.GET)
+    public Envelop statAttendanceTrend(
+            @ApiParam(name = "orgCode", value = "机构编码", required = true)
+            @RequestParam String orgCode,
+            @ApiParam(name = "date", value = "日期（年月），格式：yyyy-MM-dd", required = true)
+            @RequestParam String date) {
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(false);
+        try {
+            Map<String, Object> result = new HashMap<>();
+            Map<String, Object> emergencyAttendanceTrend = govFirstPageReportService.statAttendanceTrend(orgCode, date, 0);
+            Map<String, Object> hospitalizationAttendanceTrend = govFirstPageReportService.statAttendanceTrend(orgCode, date, 1);
+            result.put("emergencyAttendanceTrend", emergencyAttendanceTrend);
+            result.put("hospitalizationAttendanceTrend", hospitalizationAttendanceTrend);
+            envelop.setObj(result);
+            envelop.setSuccessFlg(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            envelop.setErrorMsg("发生异常：" + e.getMessage());
+        }
+        return envelop;
+    }
+
+    @ApiOperation(value = "统计近6个月的门急诊、住院费用趋势")
+    @RequestMapping(value = ServiceApi.GovFirsPage.Report.StatExpenseTrend, method = RequestMethod.GET)
+    public Envelop statExpenseTrend(
+            @ApiParam(name = "orgCode", value = "机构编码", required = true)
+            @RequestParam String orgCode,
+            @ApiParam(name = "date", value = "日期（年月），格式：yyyy-MM-dd", required = true)
+            @RequestParam String date) {
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(false);
+        try {
+            Map<String, Object> result = new HashMap<>();
+            Map<String, Object> emergencyExpenseTrend = govFirstPageReportService.statExpenseTrend(orgCode, date, 0);
+            Map<String, Object> hospitalizationExpenseTrend = govFirstPageReportService.statExpenseTrend(orgCode, date, 1);
+            result.put("emergencyExpenseTrend", emergencyExpenseTrend);
+            result.put("hospitalizationExpenseTrend", hospitalizationExpenseTrend);
             envelop.setObj(result);
             envelop.setSuccessFlg(true);
         } catch (Exception e) {
