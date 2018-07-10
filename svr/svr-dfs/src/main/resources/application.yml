@@ -15,6 +15,10 @@ spring:
     min-idle: 2
     validation-query: SELECT 1
     test-on-borrow: true
+  http:
+    multipart:
+      max-file-size: 1024MB
+      max-request-size: 1024MB
 
 fast-dfs:
   connect-timeout: 10

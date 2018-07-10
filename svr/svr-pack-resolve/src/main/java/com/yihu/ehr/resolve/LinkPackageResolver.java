@@ -173,7 +173,7 @@ public class LinkPackageResolver extends PackageResolver {
                     NameValuePair[] fileMetaData = new NameValuePair[1];
                     fileMetaData[0] = new NameValuePair("description", "File from link profile package.");
                     //影像文件存在group2
-                    ObjectNode msg = fastDFSUtil.uploadBySocket(groupName, inputStream, fileExtension, (int)fileSize, fileMetaData);
+                    ObjectNode msg = fastDFSUtil.upload(groupName, inputStream, fileExtension, fileMetaData);
                     LinkFile linkFile = new LinkFile();
                     linkFile.setFileExtension(fileExtension);
                     linkFile.setOriginName(fileName);
