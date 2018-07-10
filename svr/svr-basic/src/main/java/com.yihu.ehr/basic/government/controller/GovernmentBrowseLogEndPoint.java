@@ -44,4 +44,10 @@ public class GovernmentBrowseLogEndPoint extends EnvelopRestEndPoint {
         List<GovernmentBrowseLog> browseName = governmentBrowseLogService.getBrowseName(userId);
         return browseName;
     }
+
+    @RequestMapping(value = ServiceApi.Government.searchHotBrowseLog, method = RequestMethod.GET)
+    @ApiOperation(value = "热门监测报表")
+    public List<GovernmentBrowseLog> getHotBrowseLog() {
+        return governmentBrowseLogService.getHotBrowseLog();
+    }
 }

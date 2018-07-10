@@ -101,7 +101,13 @@ public class ProcessorEndPoint extends EnvelopRestEndPoint{
             @RequestParam(value = "processor") String processor,
             @ApiParam(name = "active", value = "活跃状态", required = true)
             @RequestParam(value = "active") boolean active) throws Exception {
+        EventProcessor eventProcessor = eventProcessorService.findByName(processor);
+        if (null == eventProcessor) {
+            throw new ApiException("processor " + processor + " no exists");
+        }
+        eventProcessor.setActive(active);
         dealChain.switchProcessorStatus(processor, active);
+        eventProcessorService.save(eventProcessor);
         return active;
     }
 

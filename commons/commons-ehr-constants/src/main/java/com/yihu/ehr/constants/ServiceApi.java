@@ -1398,6 +1398,7 @@ public class ServiceApi {
 
         public static final String AddGovernmentBrowseLog = "/governmentBrowseLog/save";
         public static final String searchGovernmentBrowseLog = "/governmentBrowseLog/searchByUserId";
+        public static final String searchHotBrowseLog = "/governmentBrowseLog/searchHotBrowseLog";
 
         public static final String GovernmentMenuReportMonitorTypeSave = "/governmentMenuReportMonitorType/save";
         public static final String GovernmentMenuReportMonitorTypeDelete = "/governmentMenuReportMonitorType/delete";

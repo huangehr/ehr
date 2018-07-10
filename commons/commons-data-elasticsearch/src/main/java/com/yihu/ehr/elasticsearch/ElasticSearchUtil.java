@@ -346,9 +346,9 @@ public class ElasticSearchUtil {
         String [] filterArr = filters.split(";");
         for (String filter : filterArr) {
             if(filter.contains("||")){
-                String [] fileds = filter.split("\\|\\|");
+                String [] fields = filter.split("\\|\\|");
                 BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
-                for (String filed : fileds) {
+                for (String filed : fields) {
                     String [] condition = filed.split("=");
                     queryBuilder.should(QueryBuilders.termQuery(condition[0], condition[1]));
                 }
