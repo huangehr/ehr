@@ -16,6 +16,14 @@ public class SimpleSolrQueryUtil {
 
     private static ObjectMapper objectMapper = new ObjectMapper();
 
+    /**
+     *
+     * @param filter 处理基础字段 org_code=49229004X
+     * @param date 时间类型 {"start":"2018-01-01T00:00:00Z","end":"2018-02-01T00:00:00Z","month":"2018-03"}
+     * @param q 基础参数
+     * @return
+     * @throws Exception
+     */
     public static String getQuery(String filter, String date, String q) throws Exception {
         Map<String, String> qMap = objectMapper.readValue(q, Map.class);
         String param = qMap.get("q");

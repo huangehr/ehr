@@ -96,8 +96,8 @@ FastDFS
     a.服务说明：
         1.此服务在FastDFS的文件服务中加入了建立在ElasticSearch基础上的文件检索功能，以解决FastDFS在文件管理中的缺陷
         --- 索引信息 Start ---
-        ["sn":{"type":"string","index":"not_analyzed"},"name":{"type":"string","analyzer":"ik","search_analyzer":"ik"},"path":{"type":"string","index":"not_analyzed"},"objectId":{"type":"string","index":"not_analyzed"},"size":{"type":"integer"},"type":{"type":"string","index":"not_analyzed"},"createDate":{"type":"date","format":"yyyy-MM-dd HH:mm:ss"},"creator":{"type":"string","index":"not_analyzed"},"modifyDate":{"type":"date","format":"yyyy-MM-dd HH:mm:ss"},"modifier":{"type":"string","index":"not_analyzed"}]
-        [
+        {"sn":{"type":"string","index":"not_analyzed"},"name":{"type":"string","analyzer":"ik","search_analyzer":"ik"},"path":{"type":"string","index":"not_analyzed"},"objectId":{"type":"string","index":"not_analyzed"},"size":{"type":"integer"},"type":{"type":"string","index":"not_analyzed"},"createDate":{"type":"date","format":"yyyy-MM-dd HH:mm:ss"},"creator":{"type":"string","index":"not_analyzed"},"modifyDate":{"type":"date","format":"yyyy-MM-dd HH:mm:ss"},"modifier":{"type":"string","index":"not_analyzed"}}
+        {
             "sn": {
                 "type": "string",
                 "index": "not_analyzed"
@@ -138,7 +138,7 @@ FastDFS
                 "type": "string",
                 "index": "not_analyzed"
             }
-        ]
+        }
         --- 索引信息 End ---
     b.配置说明：
         1.详见application.yml文件，其中如果有多个tracker-server，请用逗号（,）分隔

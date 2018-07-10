@@ -30,4 +30,8 @@ public interface GovernmentBrowseLogClient {
     @RequestMapping(value = ServiceApi.Government.searchGovernmentBrowseLog, method = RequestMethod.GET)
     @ApiOperation(value = "浏览记录")
     List<GovernmentBrowseLogModel> getBrowseName(@RequestParam(value = "userId", required = false) String userId);
+
+    @RequestMapping(value = ServiceApi.Government.searchHotBrowseLog, method = RequestMethod.GET)
+    @ApiOperation(value = "热门监测报表")
+    List<GovernmentBrowseLog> getHotBrowseLog();
 }

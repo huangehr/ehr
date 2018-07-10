@@ -751,7 +751,6 @@ public class SingleDiseaseService {
                     // 转成相应的年龄段
                     String keyName = exchangeInfo(result);
                     String strDate = one.get("date_histogram(field=eventDate,interval=month)") + "";
-                    System.out.println("age rturn data = "+ strDate);
                     if(StringUtils.isNotEmpty(strDate) && strDate.length() > 7){
                         value.put(strDate.substring(5, 7) + "-"+ keyName, one.get("COUNT(birthYear)") + "");
                     }

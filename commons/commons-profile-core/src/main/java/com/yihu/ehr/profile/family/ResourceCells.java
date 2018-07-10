@@ -36,6 +36,7 @@ public class ResourceCells {
     public static final String DEPT_CODE = "dept_code"; //科室编码
     public static final String SUB_ROWKEYS = "sub_rowkeys"; //细表索引
     public static final String PATIENT_AGE = "patient_age"; //就诊年龄
+    public static final String PATIENT_SEX = "patient_sex"; //患者性别
 
     //RawFiles
     public static final String CDA_DOCUMENT_ID = "cda_document_id";
@@ -56,6 +57,7 @@ public class ResourceCells {
                         PATIENT_ID,
                         PATIENT_NAME,
                         PATIENT_AGE,
+                        PATIENT_SEX,
                         DEMOGRAPHIC_ID,
                         ORG_CODE,
                         ORG_NAME,
@@ -118,7 +120,10 @@ public class ResourceCells {
                         ORG_AREA,
                         EVENT_TYPE,
                         EVENT_NO,
-                        EVENT_DATE
+                        EVENT_DATE,
+                        PATIENT_AGE,
+                        PATIENT_SEX,
+                        DEPT_CODE
                 ));
             case File:
                 return new ArrayList<>(Arrays.asList(

@@ -1398,6 +1398,7 @@ public class ServiceApi {
 
         public static final String AddGovernmentBrowseLog = "/governmentBrowseLog/save";
         public static final String searchGovernmentBrowseLog = "/governmentBrowseLog/searchByUserId";
+        public static final String searchHotBrowseLog = "/governmentBrowseLog/searchHotBrowseLog";
 
         public static final String GovernmentMenuReportMonitorTypeSave = "/governmentMenuReportMonitorType/save";
         public static final String GovernmentMenuReportMonitorTypeDelete = "/governmentMenuReportMonitorType/delete";
@@ -1693,6 +1694,35 @@ public class ServiceApi {
         public static final String archiveDetail= "/packQcReport/archiveDetail";
         public static final String uploadRecordList= "/packQcReport/uploadRecordList";
         public static final String uploadRecordDetail= "/packQcReport/uploadRecordDetail";
+    }
+
+    // 政府服务平台首页
+    public static class GovFirsPage {
+
+        // 政府服务平台首页 - 指标分类
+        public static class QuotaCategory {
+            public static final String Prefix = "/govFirstPage/quotaCategory";
+            public static final String GetById = "/govFirstPage/quotaCategory/{id}";
+            public static final String Search = "/govFirstPage/quotaCategory/search";
+            public static final String Save = "/govFirstPage/quotaCategory/save";
+            public static final String Delete = "/govFirstPage/quotaCategory/delete";
+            public static final String IsUniqueCode = "/govFirstPage/quotaCategory/isUniqueCode";
+            public static final String IsUniqueName = "/govFirstPage/quotaCategory/isUniqueName";
+        }
+
+        // 政府服务平台首页 - 指标展示管理
+        public static class QuotaVisibility {
+            public static final String Prefix = "/govFirstPage/quotaVisibility";
+            public static final String GetById = "/govFirstPage/quotaVisibility/{id}";
+            public static final String Search = "/govFirstPage/quotaVisibility/search";
+            public static final String Save = "/govFirstPage/quotaVisibility/save";
+            public static final String Delete = "/govFirstPage/quotaVisibility/delete";
+            public static final String IsUniqueCode = "/govFirstPage/quotaVisibility/isUniqueCode";
+            public static final String IsUniqueName = "/govFirstPage/quotaVisibility/isUniqueName";
+            public static final String UpdateStatus = "/govFirstPage/quotaVisibility/updateStatus";
+            public static final String GetCategoryQuotaList = "/govFirstPage/quotaVisibility/getCategoryQuotaList";
+        }
+
     }
 
 }

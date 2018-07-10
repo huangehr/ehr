@@ -76,6 +76,7 @@ public class StdPackageResolver extends PackageResolver {
                     String demographicId = (String) properties.get(ResourceCells.DEMOGRAPHIC_ID);
                     String patientName = (String) properties.get(ResourceCells.PATIENT_NAME);
                     String patientAge = (String) properties.get(ResourceCells.PATIENT_AGE);
+                    String patientSex = (String) properties.get(ResourceCells.PATIENT_SEX);
                     if (!StringUtils.isEmpty(demographicId)) {
                         standardPackage.setDemographicId(demographicId.trim());
                     }
@@ -84,6 +85,9 @@ public class StdPackageResolver extends PackageResolver {
                     }
                     if (!StringUtils.isEmpty(patientAge)) {
                         standardPackage.setPatientAge(patientAge);
+                    }
+                    if (!StringUtils.isEmpty(patientSex)) {
+                        standardPackage.setPatientSex(patientSex);
                     }
                 }
 

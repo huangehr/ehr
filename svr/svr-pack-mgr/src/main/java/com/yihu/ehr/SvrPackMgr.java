@@ -22,14 +22,14 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 @EnableAsync
 @SpringBootApplication
-public class PackageServiceApp extends SpringBootServletInitializer {
+public class SvrPackMgr extends SpringBootServletInitializer {
 
     public static void main(String[] args) {
-        SpringApplication.run(PackageServiceApp.class, args);
+        SpringApplication.run(SvrPackMgr.class, args);
     }
 
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        return application.sources(PackageServiceApp.class);
+        return application.sources(SvrPackMgr.class);
     }
 }

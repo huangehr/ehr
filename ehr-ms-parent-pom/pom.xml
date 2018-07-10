@@ -34,6 +34,7 @@
         <module>../svr/svr-redis-memory</module>
         <module>../svr/svr-quota</module>
         <module>../svr/svr-log-collection</module>
+        <module>../svr/svr-pack-event</module>
     </modules>
 
     <build>

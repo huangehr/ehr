@@ -104,7 +104,8 @@ public class ProfileDiseaseService extends ProfileBasicService {
                         String diagnosis = (String) profile.get(ResourceCells.DIAGNOSIS);
                         String [] _diagnosis = diagnosis.split(";");
                         for (String diagnosisCode : _diagnosis) {
-                            if (!redisService.getHpCodeByIcd10(diagnosisCode).contains(hpCode)) {
+                            String _hpCode = redisService.getHpCodeByIcd10(diagnosisCode);
+                            if (_hpCode != null && !_hpCode.contains(hpCode)) {
                                 if (complication.containsKey(diagnosisCode)) {
                                     complication.get(diagnosisCode).add(profile);
                                 } else {
@@ -128,7 +129,7 @@ public class ProfileDiseaseService extends ProfileBasicService {
                 String start = dateFormat.format(before);
                 String end = dateFormat.format(DateUtils.addDays(now, 1));
                 String date = "{\"start\":\"" + start + "\",\"end\":\"" + end + "\"}";
-                Map<String, Integer> medication = profileMedicationService.medicationRanking(demographicId, hpCode, date);
+                Map<String, Integer> medication = profileMedicationService.medicationRanking(demographicId, null, hpCode, date);
                 obj.put("medical", medication);
                 //并发症确诊
                 List<Map<String, Object>> complicationList = new ArrayList<>();

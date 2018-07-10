@@ -1218,7 +1218,6 @@ public class BaseStatistsService {
         Map<String, List<String>> map = new HashMap<>();
         List<String> xData = new ArrayList<>();
         List<String> valueData = new ArrayList<>();
-        System.out.println("listData count " + listData.size());
         if (null != listData  && listData.size() >0 && listData.get(0) !=null ) {
             listData.forEach(one -> {
                 if(xdataName.contains("date_histogram")){
@@ -1234,8 +1233,6 @@ public class BaseStatistsService {
             });
             map.put("xData", xData);
             map.put("valueData", valueData);
-        } else {
-            System.out.println("ssss" + listData.size());
         }
         return map;
     }

@@ -14,14 +14,14 @@ import java.util.*;
 @Service
 public class ProfileMedicationService extends ProfileBasicService {
 
-    public Map<String, Integer> medicationRanking(String demographicId, String hpCode, String date) throws Exception {
+    public Map<String, Integer> medicationRanking(String demographicId, String filter, String hpCode, String date) throws Exception {
         String masterQ;
         if (!StringUtils.isEmpty(hpCode)) {
             masterQ = "{\"q\":\"demographic_id:" + demographicId + " AND health_problem:*" +  hpCode + "*\"}";
         } else {
             masterQ = "{\"q\":\"demographic_id:" + demographicId + "\"}";
         }
-        masterQ = SimpleSolrQueryUtil.getQuery(null, date, masterQ);
+        masterQ = SimpleSolrQueryUtil.getQuery(filter, date, masterQ);
         Map<String, Integer> dataMap = new HashMap<>();
         Envelop masterEnvelop = resource.getMasterData(masterQ, 1, 500, null);
         if (masterEnvelop.isSuccessFlg()) {
