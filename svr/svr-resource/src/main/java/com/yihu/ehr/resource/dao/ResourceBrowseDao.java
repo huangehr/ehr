@@ -572,6 +572,16 @@ public class ResourceBrowseDao {
             for (Result result : results) {
                 Map<String, Object> obj = hbaseQuery.resultToMap(result);
                 if (obj != null) {
+                    if (obj.get("file_list") != null) {
+                        String file_list = (String) obj.get("file_list");
+                        List<Map<String, String>> list = objectMapper.readValue(file_list, List.class);
+                        obj.put("file_list", list);
+                    }
+                    if (obj.get("sub_rowkeys") != null) {
+                        String sub_rowkeys = (String) obj.get("sub_rowkeys");
+                        List<String> list = objectMapper.readValue(sub_rowkeys, List.class);
+                        obj.put("sub_rowkeys", list);
+                    }
                     hbaseList.add(obj);
                 } else {
                     hbaseList.add(new HashMap<>());
