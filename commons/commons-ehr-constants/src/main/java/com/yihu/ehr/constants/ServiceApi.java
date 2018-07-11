@@ -1723,6 +1723,22 @@ public class ServiceApi {
             public static final String GetCategoryQuotaList = "/govFirstPage/quotaVisibility/getCategoryQuotaList";
         }
 
+        // 政府服务平台首页 - 报表接口
+        public static class Report {
+            public static final String CountEmergencyAttendance = "/govFirstPage/report/countEmergencyAttendance";
+            public static final String CountHospitalizationAttendance = "/govFirstPage/report/countHospitalizationAttendance";
+            public static final String AverageHospitalStayDay = "/govFirstPage/report/averageHospitalStayDay";
+            public static final String StatHospitalizationHeadToHeadRatio = "/govFirstPage/report/statHospitalizationHeadToHeadRatio";
+            public static final String StatEmergencyExpense = "/govFirstPage/report/statEmergencyExpense";
+            public static final String StatHospitalizationExpense = "/govFirstPage/report/statHospitalizationExpense";
+            public static final String AverageEmergencyExpense = "/govFirstPage/report/averageEmergencyExpense";
+            public static final String AverageHospitalizationExpense = "/govFirstPage/report/averageHospitalizationExpense";
+            public static final String StatEmergencyMedicineExpense = "/govFirstPage/report/statEmergencyMedicineExpense";
+            public static final String StatHospitalizationMedicineExpense = "/govFirstPage/report/statHospitalizationMedicineExpense";
+            public static final String StatAttendanceTrend = "/govFirstPage/report/statAttendanceTrend";
+            public static final String StatExpenseTrend = "/govFirstPage/report/statExpenseTrend";
+        }
+
     }
 
 }

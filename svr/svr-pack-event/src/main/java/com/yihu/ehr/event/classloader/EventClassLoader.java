@@ -21,7 +21,7 @@ import java.net.URLClassLoader;
 @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class EventClassLoader extends ClassLoader {
 
-    @Value("${fast-dfs.public-server}")
+    @Value("${fast-dfs.public-server:http://120.0.0.1:8080}")
     private String publicServer;
 
     @Autowired

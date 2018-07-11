@@ -44,14 +44,14 @@ public class FastDFSConfig {
         if (ClientGlobal.g_connect_timeout < 0) {
             ClientGlobal.g_connect_timeout = 5;
         }
-
         ClientGlobal.g_connect_timeout *= 1000;
+
         ClientGlobal.g_network_timeout = networkTimeout;
         if (ClientGlobal.g_network_timeout < 0) {
             ClientGlobal.g_network_timeout = 30;
         }
-
         ClientGlobal.g_network_timeout *= 1000;
+
         ClientGlobal.g_charset = charset;
         if (ClientGlobal.g_charset == null || ClientGlobal.g_charset.length() == 0) {
             ClientGlobal.g_charset = "ISO8859-1";
@@ -79,6 +79,7 @@ public class FastDFSConfig {
                 ClientGlobal.g_secret_key = secretKey;
             }
         }
+        System.out.println("ClientGlobal.configInfo(): " + ClientGlobal.configInfo());
     }
 
     @Bean
