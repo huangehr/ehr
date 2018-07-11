@@ -14,7 +14,6 @@ import com.yihu.ehr.basic.user.entity.User;
 import com.yihu.ehr.entity.patient.DemographicInfo;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.query.BaseJpaService;
-import com.yihu.ehr.util.datetime.DateUtil;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Query;
@@ -164,7 +163,10 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
      */
     @Transactional(propagation = Propagation.REQUIRED)
     public String addDoctorBatch(List<Map<String, Object>> doctorLs) {
-        String header = "INSERT INTO doctors(code, name, sex, org_code, org_id, org_full_name, dept_name, skill, work_portal, email, phone, jxzc, lczc, xlzc, xzzc, introduction, id_card_no, insert_time, office_tel, status, role_type, job_type, job_level, job_scope, job_state, register_flag) VALUES \n";
+        String header = "INSERT INTO doctors(org_id, org_code, org_full_name, name, SFZJZL, id_card_no, CSRQ, sex, MZDM, CJGZRQ, office_tel, phone, SZKSDM, dept_name, " +
+                "role_type, YSZYZSBM, job_type, job_scope, SFDDDZYYS, DEZYDWJGLB, DSZYDWJGLB, SFHDGJZS, ZYYSZSBM, xzzc, " +
+                "lczc, ZYJSZWDM, XLDM, XWDM, SZYDM, ZKTC1, ZKTC2, ZKTC3, NNRYLDQK, DRDCSJ, " +
+                "BZQK, SFZCQKYX, QDHGZS, XZSQPZGZ, SFCSTJGZ, TJXXHGZ) VALUES \n";
         StringBuilder sql = new StringBuilder(header) ;
         Map<String, Object> map;
         SQLQuery query;
@@ -172,33 +174,46 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
         DemographicInfo demographicInfo =null;
         for(int i=1; i<=doctorLs.size(); i++){
             map = doctorLs.get(i-1);
-            sql.append("('"+ null2Space(map.get("code")) +"'");
-            sql.append(",'"+ map.get("name") +"'");
-            sql.append(",'"+ map.get("sex") +"'");
+            sql.append("('"+ null2Space(map.get("orgId")) +"'");
             sql.append(",'"+ map.get("orgCode") +"'");
-            Organization org= getOrg(map.get("orgCode").toString());
-            sql.append(",'"+ org.getId() +"'");
             sql.append(",'"+ map.get("orgFullName") +"'");
-            sql.append(",'"+ map.get("orgDeptName") +"'");
-            sql.append(",'"+ map.get("skill") +"'");
-            sql.append(",'"+ map.get("workPortal") +"'");
-            sql.append(",'"+ null2Space(map.get("email")) +"'");
-            sql.append(",'"+ null2Space(map.get("phone")) +"'");
-            sql.append(",'"+ map.get("jxzc") +"'");
-            sql.append(",'"+ map.get("lczc") +"'");
-            sql.append(",'"+ map.get("xlzc") +"'");
-            sql.append(",'"+ map.get("xzzc") +"'");
-            sql.append(",'"+ map.get("introduction") +"'");
+            sql.append(",'"+ map.get("name") +"'");
+            sql.append(",'"+ map.get("sfzjzl") +"'");
             sql.append(",'"+ map.get("idCardNo") +"'");
-            sql.append(",'"+ DateUtil.getNowDateTime()+"'");
+            sql.append(",'"+ map.get("csrq") +"'");
+            sql.append(",'"+ map.get("sex") +"'");
+            sql.append(",'"+ map.get("mzdm") +"'");
+            sql.append(",'"+ map.get("cjgzrq") +"'");
             sql.append(",'"+ map.get("officeTel") +"'");
-            sql.append(",'1'");
-            sql.append(",'"+ map.get("roleType") +"'");
-            sql.append(",'"+ map.get("jobType") +"'");
-            sql.append(",'"+ map.get("jobLevel") +"'");
-            sql.append(",'"+ map.get("jobScope") +"'");
-            sql.append(",'"+ map.get("jobState") +"'");
-            sql.append(",'"+ map.get("registerFlag") +"'");
+            sql.append(",'"+ map.get("phone") +"'");
+            sql.append(",'"+ map.get("szksdm") +"'");
+            sql.append(",'"+ map.get("dept_name") +"'");
+            sql.append(",'"+ map.get("role_type") +"'");
+            sql.append(",'"+ map.get("yszyzsbm") +"'");
+            sql.append(",'"+ map.get("job_type")+"'");
+            sql.append(",'"+ map.get("job_scope") +"'");
+            sql.append(",'"+ map.get("sfdddzyys") +"'");
+            sql.append(",'"+ map.get("dezydwjglb") +"'");
+            sql.append(",'"+ map.get("dszydwjglb") +"'");
+            sql.append(",'"+ map.get("sfhdgjzs") +"'");
+            sql.append(",'"+ map.get("zyyszsbm") +"'");
+            sql.append(",'"+ map.get("xzzc") +"'");
+            sql.append(",'"+ map.get("lczc") +"'");
+            sql.append(",'"+ map.get("zyjszwdm") +"'");
+            sql.append(",'"+ map.get("xldm") +"'");
+            sql.append(",'"+ map.get("xwdm") +"'");
+            sql.append(",'"+ map.get("szydm") +"'");
+            sql.append(",'"+ map.get("zktc1") +"'");
+            sql.append(",'"+ map.get("zktc2") +"'");
+            sql.append(",'"+ map.get("zktc3") +"'");
+            sql.append(",'"+ map.get("nnryldqk") +"'");
+            sql.append(",'"+ map.get("drdcsj") +"'");
+            sql.append(",'"+ map.get("bzqk") +"'");
+            sql.append(",'"+ map.get("sfzcqkyx") +"'");
+            sql.append(",'"+ map.get("qdhgzs") +"'");
+            sql.append(",'"+ map.get("xzsqpzgz") +"'");
+            sql.append(",'"+ map.get("sfcstjgz") +"'");
+            sql.append(",'"+ map.get("tjxxhgz") +"'");
             sql.append(")\n");
 
             if(i%100==0 || i == doctorLs.size()){
