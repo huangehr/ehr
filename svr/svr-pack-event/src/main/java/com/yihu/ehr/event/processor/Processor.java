@@ -10,6 +10,10 @@ public abstract class Processor {
     protected boolean active = true;
     protected String type; //事件类型
 
+    public Processor(String type) {
+        this.type = type;
+    }
+
     public String getType() {
         return type;
     }

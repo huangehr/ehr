@@ -12,7 +12,7 @@ import java.util.Map;
 public class PatientAgeProcessor extends Processor {
 
     public PatientAgeProcessor(String type) {
-        this.type = type;
+        super(type);
     }
 
     @Override
