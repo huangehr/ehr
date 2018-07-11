@@ -177,11 +177,11 @@ elasticsearch:
 spring:
   profiles: demo_guigang
   datasource:
-    url: jdbc:mysql://10.128.100.50:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    url: jdbc:mysql://192.168.50.51:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: healthcloud
     password: GP8Qz4qU
   redis:
-    host: 10.128.100.51
+    host: 192.168.50.52
     port: 6379
     password: q4YaQemf
   data:
@@ -191,8 +191,8 @@ hadoop:
   hbase-properties:
     hbase.zookeeper.quorum: node1.jkzl.com,node2.jkzl.com,node3.jkzl.com
 fast-dfs:
-  tracker-server: 10.128.100.51:22122
-  public-server: http://10.128.100.51:23000,http://10.128.100.52:23000
+  tracker-server: 192.168.50.52:22122
+  public-server: http://192.168.50.52:23000,http://192.168.50.53:23000
 elasticsearch:
   cluster-name: elasticsearch
-  cluster-nodes: 10.128.100.51:9300
+  cluster-nodes: 192.168.50.52:9300
