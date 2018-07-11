@@ -207,7 +207,7 @@ zuul:
 spring:
   profiles: demo_guigang
   redis:
-    host: 10.128.100.51
+    host: 192.168.50.52
     port: 6379
     password: q4YaQemf
 zuul:

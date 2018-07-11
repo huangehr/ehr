@@ -137,5 +137,5 @@ spring:
     password: q4YaQemf
 fast-dfs:
   tracker-server: 192.168.50.52:22122
-  public-server: http://192.168.50.52:23000,http://192.168.50.53:23000
+  public-server: http://192.168.50.52:8888
 

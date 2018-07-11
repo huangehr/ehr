@@ -139,4 +139,4 @@ zuul:
   routes:
     fastdfs-server:
       path: /file/**
-      url: http://10.128.100.51:23000/
+      url: http://192.168.50.52:8888/

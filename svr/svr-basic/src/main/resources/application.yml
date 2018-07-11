@@ -300,7 +300,7 @@ fz-gateway:
 spring:
   profiles: demo_guigang
   datasource:
-    url: jdbc:mysql://10.128.100.50:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    url: jdbc:mysql://192.168.50.51:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: healthcloud
     password: GP8Qz4qU
   # -- unknown use --
@@ -312,12 +312,12 @@ spring:
     root: dc=ehr,dc=jkzl
   # -- unknown use --
   redis:
-    host: 10.128.100.51 # Redis server host.
+    host: 192.168.50.52 # Redis server host.
     port: 6379
     password: q4YaQemf
   data:
     mongodb:
-      host: 10.128.100.52
+      host: 192.168.50.53
       port: 20000
       username: jkzlehr
       password: GMLBq1LG
@@ -325,15 +325,15 @@ spring:
       database: ehr
   elasticsearch:
     jest:
-      uris: http://10.128.100.51:9200
+      uris: http://192.168.50.52:9200
 fast-dfs:
-  tracker-server: 10.128.100.51:22122
-  public-server: http://10.128.100.51:23000,http://10.128.100.52:23000
+  tracker-server: 192.168.50.52:22122
+  public-server: http://192.168.50.52:8888
 es:
   index: wlyy_quota_test
   type: wlyy_quota_test
-  host: http://10.128.100.51:9200
-  tHost: 10.128.100.51:9300
+  host: http://192.168.50.52:9200
+  tHost: 192.168.50.52:9300
   clusterName: jkzl
 h5:
   secret: 9U6PBF2JM3PE1IHRJ7GEITMJHNMEHOFZQ2XUCKD9TO2
@@ -341,7 +341,7 @@ h5:
   clientId: WYo0l73F8e
 #福州总部网关参数配置
 fz-gateway:
-  url: http://10.128.100.63:10001/fzGateway/WSGW/rest
+  url: http://192.168.50.64:10001/fzGateway/WSGW/rest
   clientId: 9000401
   clientVersion: 1.0
   secret: 9U6PBF2JM3PE1IHRJ7GEITMJHNMEHOFZQ2XUCKD9TO2
