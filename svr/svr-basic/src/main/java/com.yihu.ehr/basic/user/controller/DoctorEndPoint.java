@@ -519,9 +519,7 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
                         if ("1".equals(doctor.getLczc()) || "2".equals(doctor.getLczc()) || "3".equals(doctor.getLczc()) || "4".equals(doctor.getLczc())) {
                             Map<String, Object> deptDoc = doctorService.syncDoctor(doctor, orgDeptJson.getOrgId(), orgDept.getName());
                             if ("10000".equals(deptDoc.get("Code").toString())) {
-                                if (deptDoc.get("userId") != null) {
-                                    memberRelation.setJkzlUserId(deptDoc.get("userId").toString());
-                                }
+                                memberRelation.setJkzlUserId(deptDoc.get("userId").toString());
                                 memberRelation.setJkzlDoctorUid(deptDoc.get("doctorUid").toString());
                                 memberRelation.setJkzlDoctorSn(deptDoc.get("doctorSn").toString());
                                 memberRelation.setJkzlHosDeptId(deptDoc.get("hosDeptId").toString());

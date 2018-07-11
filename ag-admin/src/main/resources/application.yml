@@ -98,21 +98,6 @@ zuul:
 
 ---
 spring:
-  profiles: prod_sr
-#总部统一网关接口参数配置
-service-gateway:
-  url: http://service.yihu.com:8080/WSGW/rest
-  handlerId: 50641
-  clientId: 9000401
-  clientVersion: 1.0
-zuul:
-  routes:
-    fastdfs-server:
-      path: /file/**
-      url: http://10.176.97.5:8888/
-
----
-spring:
   profiles: prod_fzzy
 #总部统一网关接口参数配置
 service-gateway:
@@ -140,3 +125,18 @@ zuul:
     fastdfs-server:
       path: /file/**
       url: http://192.168.220.62:23000/
+
+---
+spring:
+  profiles: demo_guigang
+#总部统一网关接口参数配置
+service-gateway:
+  url: http://service.yihu.com:8080/WSGW/rest
+  handlerId: 50641
+  clientId: 9000401
+  clientVersion: 1.0
+zuul:
+  routes:
+    fastdfs-server:
+      path: /file/**
+      url: http://192.168.50.52:8888/
