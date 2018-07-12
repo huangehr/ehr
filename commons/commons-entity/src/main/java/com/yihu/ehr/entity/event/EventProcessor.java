@@ -16,7 +16,7 @@ public class EventProcessor extends BaseIdentityEntity {
     private String name; //类名，包含完整包名
     private String processType; //处理器类型
     private boolean active; //活跃状态
-    private String remote_path; //文件系统.class存放的路径，当运行环境上下文加载不到此类的时候则尝试从此加载
+    private String remote_path; //文件系统.class或者.jar文件存放的路径，当运行环境上下文加载不到此类的时候则尝试从此加载
 
     @Column(name = "name", nullable = false, unique = true)
     public String getName() {

@@ -38,7 +38,7 @@ public class ProfileMedicationEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "demographic_id") String demographic_id,
             @ApiParam(name = "filter", value = "过滤条件org_code=xxxxx")
             @RequestParam(value = "filter", required = false) String filter,
-            @ApiParam(name = "hp_code", value = "健康问题代码（不传默认查找所有）")
+            @ApiParam(name = "hp_code", value = "健康问题代码，不传默认查找所有（接口改造后此参数可在filter中体现）")
             @RequestParam(value = "hp_code", required = false) String hp_code,
             @ApiParam(name = "date", value = "某个时间段内（不传默认查找所有）")
             @RequestParam(value = "date", required = false) String date) throws Exception {
@@ -54,7 +54,7 @@ public class ProfileMedicationEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "filter", required = false) String filter,
             @ApiParam(name = "date", value = "时间")
             @RequestParam(value = "date", required = false) String date,
-            @ApiParam(name = "key_word", value = "关键字")
+            @ApiParam(name = "key_word", value = "关键字（药品）")
             @RequestParam(value = "key_word", required = false) String key_word) throws Exception {
         return profileMedicationService.medicationRecords(demographic_id, filter, date, key_word);
     }
@@ -68,7 +68,7 @@ public class ProfileMedicationEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "filter", required = false) String filter,
             @ApiParam(name = "date", value = "时间")
             @RequestParam(value = "date", required = false) String date,
-            @ApiParam(name = "key_word", value = "关键字")
+            @ApiParam(name = "key_word", value = "关键字（药品）")
             @RequestParam(value = "key_word", required = false) String key_word,
             @ApiParam(name = "page", value = "页码", required = true)
             @RequestParam(value = "page") Integer page,

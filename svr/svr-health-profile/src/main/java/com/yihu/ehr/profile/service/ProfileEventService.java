@@ -2,13 +2,11 @@ package com.yihu.ehr.profile.service;
 
 
 import com.yihu.ehr.profile.family.ResourceCells;
-import com.yihu.ehr.profile.util.BasicConstant;
 import com.yihu.ehr.profile.util.SimpleSolrQueryUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import org.apache.commons.lang.time.DateUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -22,13 +20,19 @@ public class ProfileEventService extends ProfileBasicService {
     /**
      *
      * @param demographicId
-     * @param filter key=value的形式，多个条件用;分隔
+     * @param filter
+     *  1. key=value的形式，多个条件用;分隔
      * @param blurryType
+     *  1. 针对需要对特殊档案类型进行查询的参数(0-门诊 1-住院 2-体检 3-影像 4-检查 5-检验 6-妇幼 7-免疫)
+     *  2. 此处有值的话filter参数中不能再包含event_type
      * @param date
+     *  1. {"start":"2018-01-01T00:00:00Z","end":"2018-02-01T00:00:00Z","month":"2018-03"}
+     * @param searchParam
+     *  1. 此参数只针对机构和诊断
      * @return
      * @throws Exception
      */
-    public List<Map<String,Object>> getPatientEvents(String demographicId, String filter, String blurryType, String date, String searchParam) throws Exception {
+    public List<Map<String,Object>> visits (String demographicId, String filter, String blurryType, String date, String searchParam) throws Exception {
         List<Map<String, Object>> resultList = new ArrayList<Map<String,Object>>();
         String query = "{\"q\":\"demographic_id:" + demographicId + "\"}";
         Envelop envelop;
@@ -40,22 +44,15 @@ public class ProfileEventService extends ProfileBasicService {
             } else if ("2".equals(blurryType)) { //体检 medicalExam
                 query = "{\"q\":\"demographic_id:" + demographicId + " AND event_type:2\"}";
             } else if ("3".equals(blurryType)) { //影像 imagery
-                query = SimpleSolrQueryUtil.getQuery(filter, date, query);
-                envelop = resource.getMasterData(query, 1, 1000, null);
-                List<Map<String, Object>> masterList = envelop.getDetailModelList();
-                if (masterList != null && masterList.size() > 0) {
-                    for (Map<String ,Object> temp : masterList) {
-                        String masterRowKey = (String) temp.get("rowkey");
-                        String subQ = "{\"q\":\"rowkey:" + masterRowKey + "$HDSD00_19_02$*" + "\"}";
-                        Envelop subEnvelop = resource.getSubData(subQ, 1, 1, null);
-                        List<Map<String, Object>> subList = subEnvelop.getDetailModelList();
-                        if (subList != null && subList.size() > 0) {
-                            Map<String, Object> resultMap = simpleEvent(temp, searchParam);
-                            if (resultMap != null) {
-                                resultMap.put("eventType", blurryType);
-                                resultMap.put("mark", "mark"); //临时处理
-                                resultList.add(resultMap);
-                            }
+                Envelop envelop1 = resource.healthFile("profile_type=2;id_card_no=" + demographicId, "-event_date", 1, 1000);
+                List<Map<String, Object>> list1 = envelop1.getDetailModelList();
+                if (list1 != null && list1.size() > 0) {
+                    for (Map<String ,Object> temp : list1) {
+                        Map<String, Object> resultMap = simpleEvent(temp, searchParam);
+                        if (resultMap != null) {
+                            resultMap.put("eventType", blurryType);
+                            resultMap.put("mark", "mark"); //临时处理
+                            resultList.add(resultMap);
                         }
                     }
                 }
@@ -143,7 +140,7 @@ public class ProfileEventService extends ProfileBasicService {
      * @return
      * @throws Exception
      */
-    public Map<String, Object> recentMedicalEvents(String demographicId) throws Exception {
+    public Map<String, Object> recentVisit (String demographicId, Integer days) throws Exception {
         String q = "{\"q\":\"demographic_id:" + demographicId + "\"}";
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, 0);
@@ -151,7 +148,7 @@ public class ProfileEventService extends ProfileBasicService {
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
         Date now = calendar.getTime();
-        Date before = DateUtils.addDays(now, -30);
+        Date before = DateUtils.addDays(now, days);
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         String start = dateFormat.format(before);
         String end = dateFormat.format(now);
@@ -174,7 +171,7 @@ public class ProfileEventService extends ProfileBasicService {
      * @return
      * @throws Exception
      */
-    public List<Map<String, Object>> recentVisits (String demographicId) throws Exception {
+    public List<Map<String, Object>> recentVisits (String demographicId, Integer days) throws Exception {
         List<Map<String, Object>> resultList = new ArrayList<>();
         String q = "{\"q\":\"demographic_id:" + demographicId + "\"}";
         Calendar calendar = Calendar.getInstance();
@@ -183,7 +180,7 @@ public class ProfileEventService extends ProfileBasicService {
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
         Date now = calendar.getTime();
-        Date before = DateUtils.addDays(now, -180);
+        Date before = DateUtils.addDays(now, days);
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         String start = dateFormat.format(before);
         String end = dateFormat.format(DateUtils.addDays(now, 1));

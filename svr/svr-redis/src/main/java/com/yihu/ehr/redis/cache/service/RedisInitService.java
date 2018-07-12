@@ -82,7 +82,7 @@ public class RedisInitService extends BaseJpaService {
         List<Map<String, Object>> list = jdbc.queryForList(sql);
         //清空相关Redis
         orgKeySchema.deleteAll();
-        for (Map<String,Object> map:list){
+        for (Map<String,Object> map : list){
             orgKeySchema.set(String.valueOf(map.get("org_code")), String.valueOf(map.get("full_name")));
         }
         return list.size();
@@ -96,7 +96,7 @@ public class RedisInitService extends BaseJpaService {
         List<Map<String,Object>> list = jdbc.queryForList(sql);
         //清空相关Redis
         orgKeySchema.deleteOrgArea();
-        for (Map<String,Object> map:list){
+        for (Map<String,Object> map : list){
             orgKeySchema.setOrgArea(String.valueOf(map.get("org_code")), String.valueOf(map.get("administrative_division")));
         }
         return list.size();

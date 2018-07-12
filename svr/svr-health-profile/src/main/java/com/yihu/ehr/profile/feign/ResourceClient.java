@@ -73,6 +73,14 @@ public interface ResourceClient {
                        @RequestParam(value = "page", required = false) Integer page,
                        @RequestParam(value = "size", required = false) Integer size);
 
+    //获取非结构化数据
+    @RequestMapping(value = ServiceApi.Resources.ResourceHealthFile, method = RequestMethod.GET)
+    Envelop healthFile(
+            @RequestParam(value = "filters", required = false) String filters,
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @RequestParam(value = "page") Integer page,
+            @RequestParam(value = "size") Integer size);
+
     @RequestMapping(value = ServiceApi.Resources.ResourceRawFiles, method = GET)
     Envelop getRawFiles(@RequestParam(value = "profileId", required = false) String profileId,
                         @RequestParam(value = "cdaDocumentId", required = false) String cdaDocumentId,
