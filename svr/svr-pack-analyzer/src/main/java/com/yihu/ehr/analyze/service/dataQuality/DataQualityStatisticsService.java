@@ -199,29 +199,52 @@ public class DataQualityStatisticsService extends BaseJpaService {
             }
 
             //接收 数据集
-            String sql4 = "SELECT details FROM json_archives_qc/qc_dataset_info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' and qc_step=1 and org_code='"+orgCode+"' ";
-            if(eventType!=null){
-                sql4 += " and event_type = "+eventType ;
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("qc_step=1;");
+            stringBuilder.append("receive_date>=" + start + " 00:00:00;");
+            stringBuilder.append("receive_date<" + end + " 23:59:59;");
+            stringBuilder.append("org_code=" + orgCode);
+            if (eventType!=null){
+                stringBuilder.append("event_type=" + eventType);
             }
-            try {
-                ResultSet resultSet4 = elasticSearchUtil.findBySql(sql4);
-                Set set = new HashSet();
-
-                while (resultSet4.next()) {
-                    String details = resultSet4.getString("details");//接收 数据集
-                    JSONArray jsonArray = JSONArray.parseArray(details);
-                    for(int i=0;i<jsonArray.size();i++){
-                        JSONObject tmp = jsonArray.getJSONObject(i);
-                        set.addAll(tmp.keySet());
-                        totalSet.addAll(tmp.keySet());
-                    }
-                }
-                map.put("receiveDataset",set.size());//数据集个数
-            }catch (Exception e){
-                if(!"Error".equals(e.getMessage())){
-                    e.printStackTrace();
+            Set set = new HashSet();
+            List<Map<String, Object>> list = elasticSearchUtil.list("json_archives_qc", "qc_dataset_info", stringBuilder.toString());
+            for(Map<String, Object> mapTmp : list){
+                String details = mapTmp.get("details").toString();//接收 数据集
+                JSONArray jsonArray = JSONArray.parseArray(details);
+                for(int i=0;i<jsonArray.size();i++){
+                    JSONObject tmp = jsonArray.getJSONObject(i);
+                    set.addAll(tmp.keySet());
+                    totalSet.addAll(tmp.keySet());
                 }
             }
+            map.put("receiveDataset",set.size());//数据集个数
+//            String sql4 = "SELECT details FROM json_archives_qc/qc_dataset_info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' and qc_step=1 and org_code='"+orgCode+"' ";
+//            if(eventType!=null){
+//                sql4 += " and event_type = "+eventType ;
+//            }
+//            try {
+//                ResultSet resultSet4 = elasticSearchUtil.findBySql(sql4);
+//                Set set = new HashSet();
+//
+//                while (resultSet4.next()) {
+//                    String details = resultSet4.getString("details");//接收 数据集
+//                    if("492190575".equals(orgCode)){
+//                        System.out.println(details);
+//                    }
+//                    JSONArray jsonArray = JSONArray.parseArray(details);
+//                    for(int i=0;i<jsonArray.size();i++){
+//                        JSONObject tmp = jsonArray.getJSONObject(i);
+//                        set.addAll(tmp.keySet());
+//                        totalSet.addAll(tmp.keySet());
+//                    }
+//                }
+//                map.put("receiveDataset",set.size());//数据集个数
+//            }catch (Exception e){
+//                if(!"Error".equals(e.getMessage())){
+//                    e.printStackTrace();
+//                }
+//            }
 
             //资源化数据
             String sql52 = "SELECT count(*) c FROM json_archives/info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' AND pack_type=1 and archive_status=2 and org_code='"+orgCode+"' ";
