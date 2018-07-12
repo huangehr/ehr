@@ -140,16 +140,16 @@ zookeeper:
 spring:
   profiles: demo_guigang
   datasource:
-    url: jdbc:mysql://10.128.100.50:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    url: jdbc:mysql://192.168.50.51:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: healthcloud
     password: GP8Qz4qU
 service-gateway:
   username: user
   password: eureka
-  url: http://10.128.100.63:10000/api/v1.0/admin
+  url: http://192.168.50.64:10000/api/v1.0/admin
   data:
     mongodb:
-      host: 10.128.100.52
+      host: 192.168.50.53
       port: 20000
       username: jkzlehr
       password: GMLBq1LG
@@ -161,8 +161,8 @@ kafka:
 es:
   index: wlyy_quota
   type: wlyy_quota
-  host:  http://10.128.100.51:9200
-  tHost: 10.128.100.51:9300
+  host:  http://192.168.50.52:9200
+  tHost: 192.168.50.52:9300
   clusterName: jkzl
 zookeeper:
   broker:
