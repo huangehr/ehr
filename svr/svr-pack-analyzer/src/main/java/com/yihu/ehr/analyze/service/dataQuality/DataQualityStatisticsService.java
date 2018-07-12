@@ -1,7 +1,6 @@
 package com.yihu.ehr.analyze.service.dataQuality;
 
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.yihu.ehr.analyze.dao.DqPaltformReceiveWarningDao;
@@ -162,6 +161,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
             }
         }
 
+        Set totalSet = new HashSet();
         for (Map<String, Object> map:dataMap.values()){
             String orgCode = map.get("orgCode").toString();
             //统计接收数据
@@ -199,31 +199,24 @@ public class DataQualityStatisticsService extends BaseJpaService {
             }
 
             //接收 数据集
-            String sql4 = "SELECT distinct details FROM json_archives_qc/qc_dataset_info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' and qc_step=1 and org_code='"+orgCode+"' ";
+            String sql4 = "SELECT details FROM json_archives_qc/qc_dataset_info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' and qc_step=1 and org_code='"+orgCode+"' ";
             if(eventType!=null){
                 sql4 += " and event_type = "+eventType ;
             }
             try {
                 ResultSet resultSet4 = elasticSearchUtil.findBySql(sql4);
-                Map<String,String> totalMap = new HashedMap();
-                Map<String, Object> datasetMap1 = new HashedMap();;
+                Set set = new HashSet();
+
                 while (resultSet4.next()) {
                     String details = resultSet4.getString("details");//接收 数据集
-                    JSONArray jsonArray = JSON.parseArray(details);
+                    JSONArray jsonArray = JSONArray.parseArray(details);
                     for(int i=0;i<jsonArray.size();i++){
                         JSONObject tmp = jsonArray.getJSONObject(i);
-                        for(String dataset:tmp.keySet()){
-                            if(!datasetMap1.containsKey(dataset)){
-                                datasetMap1.put(dataset,dataset);
-                            }
-                            if(!totalMap.containsKey(dataset)){
-                                totalMap.put(dataset,dataset);
-                            }
-                        }
+                        set.addAll(tmp.keySet());
+                        totalSet.addAll(tmp.keySet());
                     }
                 }
-                map.put("receiveDataset",datasetMap1.size());//数据集个数
-                totalReceiveDataset = totalMap.size();
+                map.put("receiveDataset",set.size());//数据集个数
             }catch (Exception e){
                 if(!"Error".equals(e.getMessage())){
                     e.printStackTrace();
@@ -265,6 +258,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
             }
         }
 
+        totalReceiveDataset = totalSet.size();
         //新增医疗云平台数据
         Map<String, Object> totalMap = new HashedMap();
         totalMap.put("orgCode",cloud);
@@ -627,7 +621,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
             }
             // 及时率场合
 
-            StringBuilder sql = new StringBuilder("SELECT COUNT(*) packetCount FROM json_archives/info WHERE ");
+            StringBuilder sql = new StringBuilder("SELECT COUNT(DISTINCT event_no) packetCount FROM json_archives/info WHERE ");
             sql.append(filters);
             sql.append(" GROUP BY date_histogram(field='receive_date','interval'='1d',format='yyyy-MM-dd',alias=receiveDate)");
             List<String> fields = new ArrayList<>(2);
