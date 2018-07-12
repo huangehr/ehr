@@ -158,6 +158,10 @@ public class LinkPackageResolver extends PackageResolver {
                     if (ftpFiles == null || ftpFiles.length == 0){
                         throw new ResolveException("ftp上找不到该文件:" + path);
                     }
+                    JsonNode md5Node = fileNode.get("md5");
+                    if(md5Node == null){
+                        throw new IllegalJsonFileException("md5 value is null");
+                    }
                     JsonNode reportFormNoNode = fileNode.get("report_form_no");
                     if(reportFormNoNode == null){
                         throw new ResolveException("report_form_no is null");
@@ -176,6 +180,9 @@ public class LinkPackageResolver extends PackageResolver {
                     ObjectNode msg = fastDFSUtil.upload(groupName, inputStream, fileExtension, fileMetaData);
                     LinkFile linkFile = new LinkFile();
                     linkFile.setFileSize(fileSize);
+                    String md5 = md5Node.asText();
+                    //校验文件完整性
+                    linkFile.setMd5(md5);
                     linkFile.setFileExtension(fileExtension);
                     linkFile.setOriginName(fileName);
                     linkFile.setReportFormNo(reportFormNo);
