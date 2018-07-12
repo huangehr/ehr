@@ -72,11 +72,11 @@ public class PackQcReportService extends BaseJpaService {
         int oupatient=0;
         int physical=0;
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-        RangeQueryBuilder startRange = QueryBuilders.rangeQuery("create_date");
+        RangeQueryBuilder startRange = QueryBuilders.rangeQuery("event_date");
         startRange.gte(startDate);
         boolQueryBuilder.must(startRange);
 
-        RangeQueryBuilder endRange = QueryBuilders.rangeQuery("create_date");
+        RangeQueryBuilder endRange = QueryBuilders.rangeQuery("event_date");
         endRange.lt(DateUtil.toString(end));
         boolQueryBuilder.must(endRange);
 
