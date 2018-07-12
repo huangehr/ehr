@@ -158,6 +158,8 @@ public class LinkPackageResolver extends PackageResolver {
                     if (ftpFiles == null || ftpFiles.length == 0){
                         throw new ResolveException("ftp上找不到该文件:" + path);
                     }
+                    //ftp协议不提供校验功能,目前只将md5存起来...
+                    //如果可以在ftp获取md5,可以加个校验,文件md5值与 json上报的md5值不一致,则抛出异常
                     JsonNode md5Node = fileNode.get("md5");
                     if(md5Node == null){
                         throw new IllegalJsonFileException("md5 value is null");
