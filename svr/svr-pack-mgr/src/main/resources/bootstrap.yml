@@ -12,7 +12,7 @@ spring:
   cloud:
     config:
       uri: ${spring.config.uri:http://172.19.107.73:1221}
-      label: ${spring.config.lable:dev}
+      label: ${spring.config.label:dev}
 
 ---
 spring:
@@ -20,4 +20,4 @@ spring:
   cloud:
     config:
       uri: ${spring.config.uri}
-      label: ${spring.config.lable}
+      label: ${spring.config.label}
