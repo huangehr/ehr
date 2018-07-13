@@ -73,7 +73,7 @@ public class SchedulerEndPoint extends EnvelopRestEndPoint {
             }
             GroupMatcher groupMatcher = GroupMatcher.groupEquals("PackResolve");
             Set<JobKey> jobKeys = scheduler.getJobKeys(groupMatcher);
-            if(null == jobKeys) {
+            if (null == jobKeys) {
                 for (int i = 0; i < count; i++) {
                     String suffix = UUID.randomUUID().toString().substring(0, 8);
                     JobDetail jobDetail = newJob(PackageResourceJob.class)

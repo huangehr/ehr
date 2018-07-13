@@ -47,6 +47,12 @@ elasticsearch:
     init-size: 5
     max-size: 10
 
+event:
+  job:
+    init-size: 10 #事件处理初始任务数
+    max-size: 10 #事件处理最大任务数
+    cron-exp: 0/1 * * * * ? #事件处理任务触发间隔表达式
+
 ---
 spring:
   profiles: dev

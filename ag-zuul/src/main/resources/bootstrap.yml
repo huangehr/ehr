@@ -11,7 +11,7 @@ spring:
   profiles: dev
   cloud:
     config:
-      uri: ${spring.config.uri:http://172.19.107.73:1221}
+      uri: ${spring.config.uri:http://172.19.103.73:1221}
       label: ${spring.config.label:dev}
 
 ---
