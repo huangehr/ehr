@@ -59,7 +59,7 @@ fast-dfs:
 
 ---
 spring:
-  profiles: test
+  profiles: prod
   datasource:
     url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: weifuwu
@@ -70,59 +70,3 @@ elasticsearch:
 fast-dfs:
   tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52:80
-
----
-spring:
-  profiles: prod_fz
-  datasource:
-    url: jdbc:mysql://11.1.2.5:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: healthcloud
-    password: GP8Qz4qU
-elasticsearch:
-  cluster-name: elasticsearch
-  cluster-nodes: 11.1.2.7:9300
-fast-dfs:
-  tracker-server: 11.1.2.9:22122
-  public-server: http://11.1.2.9:80
-
----
-spring:
-  profiles: prod_fzzy
-  datasource:
-    url: jdbc:mysql:///100.100.1.159:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: healthcloud
-    password: GP8Qz4qU
-elasticsearch:
-  cluster-name: elasticsearch
-  cluster-nodes: 100.100.1.158:9300
-fast-dfs:
-  tracker-server: 100.100.1.157:22122
-  public-server: http://100.100.1.157:8888
-
----
-spring:
-  profiles: prod_srformal
-  datasource:
-    url: jdbc:mysql://192.168.210.3:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: healthcloud
-    password: GP8Qz4qU
-elasticsearch:
-  cluster-name: elasticsearch
-  cluster-nodes: 172.10.10.5:9300
-fast-dfs:
-  tracker-server: 192.168.50.116:22122,192.168.50.119:22122
-  public-server: http://192.168.220.62:23000
-
----
-spring:
-  profiles: demo_guigang
-  datasource:
-    url: jdbc:mysql://192.168.50.51:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: healthcloud
-    password: GP8Qz4qU
-elasticsearch:
-  cluster-name: elasticsearch
-  cluster-nodes: 192.168.50.52:9300
-fast-dfs:
-  tracker-server: 192.168.50.52:22122
-  public-server: http://192.168.50.52:8888

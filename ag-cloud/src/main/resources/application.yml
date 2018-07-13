@@ -6,27 +6,3 @@ server:
 
 eip:
   tenant: jkzl
-
----
-spring:
-  profiles: dev
-
----
-spring:
-  profiles: test
-
----
-spring:
-  profiles: prod_fz
-
----
-spring:
-  profiles: prod_fzzy
-
----
-spring:
-  profiles: prod_srformal
-
----
-spring:
-  profiles: demo_guigang

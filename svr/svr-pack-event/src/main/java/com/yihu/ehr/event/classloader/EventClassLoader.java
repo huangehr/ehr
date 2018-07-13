@@ -36,10 +36,10 @@ public class EventClassLoader extends ClassLoader {
             return clazz;
         }
         EventProcessor packEventProcessor = eventProcessorService.findByName(name);
-        if (null == packEventProcessor || StringUtils.isEmpty(packEventProcessor.getRemote_path())) {
+        if (null == packEventProcessor || StringUtils.isEmpty(packEventProcessor.getRemotePath())) {
             throw new ClassNotFoundException("java.lang.ClassNotFoundException: " + name);
         }
-        String remote_path = packEventProcessor.getRemote_path();
+        String remote_path = packEventProcessor.getRemotePath();
         String extension = remote_path.substring(remote_path.lastIndexOf(".") + 1);
         switch (extension) {
             case "class":
