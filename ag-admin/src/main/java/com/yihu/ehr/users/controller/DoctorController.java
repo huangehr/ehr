@@ -232,12 +232,13 @@ public class DoctorController extends BaseController {
                 return failed(errorMsg);
             }
             MDoctor mDoctor = convertToMDoctor(detailModel);
-            Envelop envelop = doctorClient.createDoctor(objectMapper.writeValueAsString(mDoctor), model);
-            if (envelop.isSuccessFlg()) {
-                mDoctor = objectMapper.readValue(envelop.getObj().toString(), MDoctor.class);
-                detailModel = convertToModel(mDoctor, DoctorDetailModel.class);
+            mDoctor = doctorClient.createDoctor(objectMapper.writeValueAsString(mDoctor), model);
+            if (mDoctor == null || mDoctor.getId() == null) {
+                return failed("保存失败!");
             }
-            return envelop;
+
+            detailModel = convertToModel(mDoctor, DoctorDetailModel.class);
+            return success(detailModel);
         } catch (Exception ex) {
             ex.printStackTrace();
             return failedSystem();
@@ -279,12 +280,13 @@ public class DoctorController extends BaseController {
                 return failed(errorMsg);
             }
             MDoctor mDoctor = convertToMDoctor(detailModel);
-            Envelop envelop = doctorClient.updateDoctor(objectMapper.writeValueAsString(mDoctor), model);
-            if (envelop.isSuccessFlg()) {
-                mDoctor = objectMapper.readValue(envelop.getObj().toString(), MDoctor.class);
-                detailModel = convertToModel(mDoctor, DoctorDetailModel.class);
+            mDoctor = doctorClient.updateDoctor(objectMapper.writeValueAsString(mDoctor), model);
+            if(mDoctor == null || mDoctor.getId() == null){
+                return failed("保存失败!");
             }
-            return envelop;
+
+            detailModel = convertToModel(mDoctor, DoctorDetailModel.class);
+            return success(detailModel);
         } catch (Exception ex){
             ex.printStackTrace();
             return failedSystem();

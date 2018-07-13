@@ -105,7 +105,7 @@ public class ChronicDiseaseScheduler {
         List<String> diabetesRowkeyList = new ArrayList();
         String q_diabetes = "rowkey:*$HDSB04_05$* OR (rowkey:*$HDSD00_73$* AND (EHR_000109:E1O* OR EHR_000109:E11* OR EHR_000109:E12* OR EHR_000109:E13* OR EHR_000109:E14*))" +
                 " OR (rowkey:*$HDSD00_69$* AND (EHR_000293:E1O* OR EHR_000293:E11* OR EHR_000293:E12* OR EHR_000293:E13* OR EHR_000293:E14*))";
-        SolrDocumentList diabetesDocList = solrUtil.queryDistinctOneField(ResourceCore.SubTable, q_diabetes, fq, null, 0, -1, showFields, idCardField, "event_date desc");
+        SolrDocumentList diabetesDocList = solrUtil.queryDistinctOneFieldForDocList(ResourceCore.SubTable, q_diabetes, fq, null, 0, -1, showFields, idCardField, "event_date desc");
         if (diabetesDocList != null && diabetesDocList.getNumFound() > 0) {
             for (SolrDocument doc : diabetesDocList) {
                 diabetesRowkeyList.add(doc.getFieldValue("rowkey").toString());
@@ -117,7 +117,7 @@ public class ChronicDiseaseScheduler {
         List<String> hypertensionRowkeyList = new ArrayList();
         String q_hypertension = "rowkey:*$HDSB04_02$* OR (rowkey:*$HDSD00_73$* AND (EHR_000109:I1O* OR EHR_000109:I11* OR EHR_000109:I12* OR EHR_000109:I13* OR EHR_000109:I14*))" +
                 " OR (rowkey:*$HDSD00_69$* AND (EHR_000293:I1O* OR EHR_000293:I11* OR EHR_000293:I12* OR EHR_000293:I13* OR EHR_000293:I14*))";
-        SolrDocumentList hypertensionDocList = solrUtil.queryDistinctOneField(ResourceCore.SubTable, q_hypertension, fq, null, 0, -1, showFields, idCardField, "event_date desc");
+        SolrDocumentList hypertensionDocList = solrUtil.queryDistinctOneFieldForDocList(ResourceCore.SubTable, q_hypertension, fq, null, 0, -1, showFields, idCardField, "event_date desc");
         if (hypertensionDocList != null && hypertensionDocList.getNumFound() > 0) {
             for (SolrDocument doc : hypertensionDocList) {
                 hypertensionRowkeyList.add(doc.getFieldValue("rowkey").toString());

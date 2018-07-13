@@ -132,7 +132,7 @@ public class ElasticSearchController extends BaseController {
                 HSSFRow row0 = sheet.createRow(0);
                 row0.createCell(0).setCellValue("数据超过五万条，数据量过大");
             }else {
-                list =  solrQuery.queryReturnFieldList(core, q, null, null, 0, rows,fields, null, null);
+                list =  solrQuery.queryReturnFieldList(core, q, null, null, 0, rows,fields);
                 HSSFRow row0 = sheet.createRow(0);
                 for(int j = 0;j < fields.length ;j++){
                     row0.createCell(j).setCellValue(fields[j]);

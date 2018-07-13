@@ -180,4 +180,8 @@ public interface PatientClient {
             @RequestParam(value = "userId", required = false) String userId,
             @ApiParam(name = "jsonData", value = "json数据", defaultValue = "")
             @RequestBody String jsonData);
+
+    @RequestMapping(value = ApiVersion.Version1_0+"/populations/{id_card_no}/register",method = RequestMethod.GET)
+    boolean isRegistered(@PathVariable(value = "id_card_no") String idCardNo);
+
 }

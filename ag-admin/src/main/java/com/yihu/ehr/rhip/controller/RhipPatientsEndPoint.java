@@ -1,4 +1,4 @@
-package com.yihu.ehr.api.rhip;
+package com.yihu.ehr.rhip.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -7,15 +7,14 @@ import com.yihu.ehr.agModel.patient.PatientDetailModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.exception.ApiException;
-import com.yihu.ehr.feign.AddressClient;
-import com.yihu.ehr.feign.ConventionalDictEntryClient;
-import com.yihu.ehr.feign.GeographyClient;
-import com.yihu.ehr.feign.PatientClient;
+import com.yihu.ehr.geography.service.AddressClient;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.geography.MGeography;
 import com.yihu.ehr.model.geography.MGeographyDict;
 import com.yihu.ehr.model.patient.MDemographicInfo;
+import com.yihu.ehr.patient.service.PatientClient;
 import com.yihu.ehr.profile.util.DataSetParserUtil;
+import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.rest.Envelop;
@@ -55,7 +54,7 @@ public class RhipPatientsEndPoint extends BaseController {
     private PatientClient patientClient;
 
     @Autowired
-    private GeographyClient geographyClient;
+    private AddressClient geographyClient;
 
     @Autowired
     private ConventionalDictEntryClient conventionalDictClient;

@@ -1,8 +1,0 @@
-server:
-  port: ${ag-cloud.server.port}
-#  ssl:
-#    key-store-password: 123456
-#    key-password: 123456
-
-eip:
-  tenant: jkzl

@@ -1,31 +1,17 @@
-package com.yihu.ehr.api.rhip;
+package com.yihu.ehr.rhip.controller;
 
-import com.yihu.ehr.agModel.geogrephy.GeographyModel;
-import com.yihu.ehr.agModel.org.OrgDetailModel;
-import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
-import com.yihu.ehr.feign.ConventionalDictEntryClient;
-import com.yihu.ehr.feign.GeographyClient;
-import com.yihu.ehr.feign.OrganizationClient;
-import com.yihu.ehr.feign.SecurityClient;
-import com.yihu.ehr.model.dict.MConventionalDict;
-import com.yihu.ehr.model.geography.MGeography;
-import com.yihu.ehr.model.geography.MGeographyDict;
-import com.yihu.ehr.model.org.MOrganization;
-import com.yihu.ehr.model.security.MKey;
-import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author HZY

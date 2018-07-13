@@ -20,9 +20,10 @@ public class EsConfig {
     private String superiorBaseQuotaCode;  // 上级基础指标code
     private String dateComparisonType;      //时间对比类型  lastYear 去年 lastMonth 上个月 lastWeek 上个星期 lastDay 昨天
 
-    // 去重查询
+    // solr去重查询
     private String distinctGroupField; // 分组去重字段
     private String distinctGroupSort; // 去重组内排序，如：“event_date asc”。
+    private Boolean distinctGroupNullIsolate; // 去重组内，空值记录是保存第一条，还是每条记录单独保存，true：拆分保存，false：保存第一条，默认合并保存。
 
     //除法运算
     private String molecular;  // 统计除法的分子  指标code
@@ -315,4 +316,11 @@ public class EsConfig {
         this.distinctGroupSort = distinctGroupSort;
     }
 
+    public Boolean getDistinctGroupNullIsolate() {
+        return distinctGroupNullIsolate;
+    }
+
+    public void setDistinctGroupNullIsolate(Boolean distinctGroupNullIsolate) {
+        this.distinctGroupNullIsolate = distinctGroupNullIsolate;
+    }
 }
