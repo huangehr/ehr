@@ -27,8 +27,7 @@ public class ProfileInfoBaseService extends BaseJpaService {
     @Autowired
     private ProfileDiseaseService profileDiseaseService;
     @Autowired
-    protected RedisService redisService;
-
+    private RedisService redisService;
 
     /**
      * @获取患者档案基本信息

@@ -21,12 +21,12 @@ spring:
 
 ---
 spring:
-  profiles: prod_sr
-
----
-spring:
   profiles: prod_fzzy
 
 ---
 spring:
   profiles: prod_srformal
+
+---
+spring:
+  profiles: demo_guigang

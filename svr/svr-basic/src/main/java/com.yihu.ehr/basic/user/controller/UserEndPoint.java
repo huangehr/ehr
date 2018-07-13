@@ -927,6 +927,7 @@ public class UserEndPoint extends EnvelopRestEndPoint {
             demographicInfo.setTelephoneNo("{\"联系电话\":\"" + user.getTelephone() + "\"}");
             demographicInfo.setName(user.getRealName());
             demographicInfo.setPassword(user.getPassword());
+            demographicInfo.setRegisterTime(new Date());
             demographicService.savePatient(demographicInfo);
         }
         envelop.setObj(convertToModel(user, MUser.class, null));

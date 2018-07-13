@@ -10,6 +10,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 /**
+ * 监听器
  * Created by progr1mmer on 2018/7/4.
  */
 @Component

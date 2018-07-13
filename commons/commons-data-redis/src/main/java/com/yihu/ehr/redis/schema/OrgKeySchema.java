@@ -17,21 +17,21 @@ public class OrgKeySchema extends KeySchema {
      * 获取机构区域Redis
      */
     public String getOrgArea(String key) {
-          return get("Code_Area:" + key);
+          return redisClient.get(makeKey(table, key, "area"));
     }
 
     /**
      *设置机构区域Redis
      */
     public void setOrgArea(String key, String value) {
-        set("Code_Area:" + key, value);
+        redisClient.set(makeKey(table, key, "area"), value);
     }
 
     /**
      * 删除机构区域Redis
      */
     public void deleteOrgArea() {
-        delete("Code_Area:*");
+        redisClient.delete(makeKey(table, "*", "area"));
     }
 
     /**
