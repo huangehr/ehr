@@ -1,13 +1,6 @@
 server:
   port: ${ag-admin.server.port}
 
-info:
-  app:
-    name: AgAdminService
-    description: EHR platform json app service.
-    version: 1.0.0
-  component: Zuul Server
-
 eip:
   tenant: jkzl
 
