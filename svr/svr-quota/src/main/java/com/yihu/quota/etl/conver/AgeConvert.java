@@ -16,8 +16,8 @@ import java.util.regex.Pattern;
  */
 public class AgeConvert implements Convert {
 
-    private static String EHR_003905 = "EHR_003905";  // 门诊年龄
-    private static String EHR_005013 = "EHR_005013";  // 住院年龄
+    private static String patient_age = "patient_age";  //solr年龄
+    private static String mysql_age = "cardIdCalculateAge(id_card_no)";  //mysql 年龄
 
 
     /**
@@ -35,16 +35,15 @@ public class AgeConvert implements Convert {
                 String ageStr = "";
                 String oldAgeStr = "";
                 tempMap = one;
-                if(one.get(EHR_003905) != null ||  one.get(EHR_005013) != null ){
-                    String key = "";
-                    if(one.get(EHR_003905) != null){
-                        ageStr = one.get(EHR_003905).toString();
-                        key = EHR_003905;
-                    }else  if(one.get(EHR_005013) != null){
-                        ageStr = one.get(EHR_005013).toString();
-                        key = EHR_005013;
+                if(one.get(patient_age) != null ||  one.get(mysql_age) != null ){
+                    String ageIndex = "";
+                    if(one.get(patient_age) != null){
+                        ageIndex = patient_age;
+                    }else  if(one.get(mysql_age) != null){
+                        ageIndex = mysql_age;
                     }
-                    oldAgeStr = ageStr;
+                    oldAgeStr = one.get(ageIndex).toString();
+                    ageStr = oldAgeStr;
                     boolean falg = false;
                     if(ageStr.contains("岁") ){
                         ageStr = ageStr.substring(0,ageStr.indexOf("岁"));
@@ -59,13 +58,14 @@ public class AgeConvert implements Convert {
                         if(ageStr.contains(".")){
                             ageStr = ageStr.substring(0,ageStr.indexOf("."));
                             falg = true;
+                        }else {
+                            falg = true;
                         }
                     }
-                    System.out.println("run in age Conver ageStr = " + ageStr);
                     if(falg){
                         age = Integer.parseInt(ageStr);
                         String ageLevel = getAgeCode(age);
-                        tempMap.put(key,ageLevel);
+                        tempMap.put(ageIndex,ageLevel);
                         if(one.get("$statisticsKey") != null){
                             String statisticsKey = one.get("$statisticsKey").toString();
                             tempMap.put("$statisticsKey",statisticsKey.replaceAll(oldAgeStr,ageLevel));
@@ -96,21 +96,5 @@ public class AgeConvert implements Convert {
             return Contant.convert.level_age_5;
         }
     }
-
-    public String converAge(String ageStr) {
-            int age = 0;
-            if(ageStr.contains("岁") ){
-                ageStr = ageStr.substring(0,ageStr.indexOf("岁"));
-            }else if(ageStr.contains("月")){
-                ageStr = "0";
-            }else{
-                if(ageStr.contains(".")){
-                    ageStr = ageStr.substring(0,ageStr.indexOf("."));
-                }
-            }
-            age = Integer.valueOf(ageStr);
-            return getAgeCode(age);
-    }
-
 
 }

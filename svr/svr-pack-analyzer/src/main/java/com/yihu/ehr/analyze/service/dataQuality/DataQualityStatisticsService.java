@@ -147,12 +147,12 @@ public class DataQualityStatisticsService extends BaseJpaService {
         }
 
         //统计有数据的医院code
-        String sqlOrg = "SELECT org_code FROM json_archives/info where event_date>= '"+start+" 00:00:00' AND event_date<='" +  end + " 23:59:59' AND pack_type=1 group by org_code ";
+        String sqlOrg = "SELECT org_code FROM json_archives/info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' group by org_code ";
         try {
             ResultSet resultSetOrg = elasticSearchUtil.findBySql(sqlOrg);
             while (resultSetOrg.next()) {
                 String orgCode = resultSetOrg.getString("org_code");
-                if(!datasetMap.containsKey(orgCode)){
+                if(!dataMap.containsKey(orgCode)){
                     dataMap.put(orgCode,initDataMap(datasetMap,orgMap.get(orgCode),orgCode));
                 }
             }
@@ -161,7 +161,6 @@ public class DataQualityStatisticsService extends BaseJpaService {
                 e.printStackTrace();
             }
         }
-
 
         for (Map<String, Object> map:dataMap.values()){
             String orgCode = map.get("orgCode").toString();
@@ -183,7 +182,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
             }
 
             //接收 质量异常
-            String sql3 = "SELECT count(*) c,org_code FROM json_archives_qc/qc_metadata_info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' and qc_step=1 and org_code='"+orgCode+"' ";
+            String sql3 = "SELECT count(*) c FROM json_archives_qc/qc_metadata_info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' and qc_step=1 and org_code='"+orgCode+"' ";
             if(eventType!=null){
                 sql3 += " and event_type = "+eventType ;
             }
@@ -252,7 +251,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
                 }
             }
 
-            String sql6 = "SELECT count(*) c,org_code FROM json_archives_qc/qc_metadata_info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' AND qc_step=2 and org_code='"+orgCode+"'";
+            String sql6 = "SELECT count(*) c FROM json_archives_qc/qc_metadata_info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' AND qc_step=2 and org_code='"+orgCode+"'";
             try {
                 ResultSet resultSet6 = elasticSearchUtil.findBySql(sql6);
                 resultSet6.next();
@@ -736,7 +735,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
         }
 
         //统计有数据的医院code
-        String sqlOrg = "SELECT org_code FROM json_archives/info where event_date>= '"+start+" 00:00:00' AND event_date<='" +  end + " 23:59:59' AND pack_type=1 group by org_code ";
+        String sqlOrg = "SELECT org_code FROM json_archives/info where event_date>= '"+start+" 00:00:00' AND event_date<='" +  end + " 23:59:59' group by org_code ";
         try {
             ResultSet resultSetOrg = elasticSearchUtil.findBySql(sqlOrg);
             while (resultSetOrg.next()) {

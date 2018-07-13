@@ -226,7 +226,7 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "page", value = "页数", required = true)
             @RequestParam(value = "page") Integer page,
             @ApiParam(name = "size", value = "分页大小", required = true)
-            @RequestParam(value = "size", required = false) Integer size) throws Exception {
+            @RequestParam(value = "size") Integer size) throws Exception {
         Envelop envelop = resourceBrowseService.getEhrFile(filters, sorts, page, size);
         return envelop;
     }

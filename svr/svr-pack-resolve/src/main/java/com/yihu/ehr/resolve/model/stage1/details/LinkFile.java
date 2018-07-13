@@ -15,6 +15,7 @@ public class LinkFile {
     private long fileSize;//文件大小
     private String reportFormNo;//所属报告单号
     private String serialNo;//子项序号
+    private String md5;//文件md5
 
     public String getUrl() {
         return url;
@@ -64,6 +65,14 @@ public class LinkFile {
         this.serialNo = serialNo;
     }
 
+    public String getMd5() {
+        return md5;
+    }
+
+    public void setMd5(String md5) {
+        this.md5 = md5;
+    }
+
     public String toJson() {
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode root = objectMapper.createObjectNode();
@@ -73,6 +82,7 @@ public class LinkFile {
         root.put("fileSize", this.fileSize);
         root.put("reportFormNo", this.reportFormNo);
         root.put("serialNo", this.serialNo);
+        root.put("md5",this.md5);
         return root.toString();
     }
 }

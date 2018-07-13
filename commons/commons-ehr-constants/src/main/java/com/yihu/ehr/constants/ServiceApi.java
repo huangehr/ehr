@@ -745,6 +745,7 @@ public class ServiceApi {
         public static final String Doctors = "/doctors";
         public static final String DoctorsExistence = "/doctors/{doctor_code}/existence";
         public static final String DoctorAdmin = "/doctors/admin/{doctor_id}";
+        public static final String DoctorByIdCardNo = "/doctor/{idCardNo}";
         public static final String DoctorPhoneExistence = "/doctor/phone/existence";
         public static final String DoctorBatch = "/doctor/batch";
         public static final String DoctorOnePhoneExistence = "/doctor/onePhone/existence";

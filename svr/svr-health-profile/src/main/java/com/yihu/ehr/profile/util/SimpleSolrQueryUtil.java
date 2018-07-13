@@ -18,9 +18,9 @@ public class SimpleSolrQueryUtil {
 
     /**
      *
-     * @param filter 处理基础字段 org_code=49229004X
+     * @param filter 要追加的参数 org_code=49229004X 多个条件用;分隔
      * @param date 时间类型 {"start":"2018-01-01T00:00:00Z","end":"2018-02-01T00:00:00Z","month":"2018-03"}
-     * @param q 基础参数
+     * @param q 基础参数 {"q":"*:*"}
      * @return
      * @throws Exception
      */

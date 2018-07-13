@@ -139,8 +139,8 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
             XWPFParagraph paragraph1 = document.createParagraph();
             XWPFRun run1 = paragraph1.createRun();
             String text1 = "                    统计时间:"+reportDate+"\n\r" +
-                           "                    报告时间:"+reportDate+"\n\r" +
-                           "                    报告人: "+reporter;
+                    "                    报告时间:"+reportDate+"\n\r" +
+                    "                    报告人: "+reporter;
             run1.setText(text1);
             run1.setFontSize(12);
             addEmptyRow(document);
@@ -469,12 +469,12 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.DataQuality.ExportQualityMonitoring, method = RequestMethod.GET)
     @ApiOperation(value = "导出平台接收列表")
     public void exportQualityMonitoring( @ApiParam(name = "start", value = "开始时间")
-                               @RequestParam(value = "start", required = false) String start,
-                               @ApiParam(name = "end", value = "结束时间", defaultValue = "")
-                               @RequestParam(value = "end", required = false) String end,
-                               @ApiParam(name = "eventType", value = "就诊类型 0门诊 1住院 2体检,null全部", defaultValue = "")
-                               @RequestParam(value = "eventType", required = false) String eventType,
-                              HttpServletResponse response){
+                                         @RequestParam(value = "start", required = false) String start,
+                                         @ApiParam(name = "end", value = "结束时间", defaultValue = "")
+                                         @RequestParam(value = "end", required = false) String end,
+                                         @ApiParam(name = "eventType", value = "就诊类型 0门诊 1住院 2体检,null全部", defaultValue = "")
+                                         @RequestParam(value = "eventType", required = false) String eventType,
+                                         HttpServletResponse response){
         try {
             String fileName = "平台接收列表";
             //设置下载
@@ -530,10 +530,10 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.DataQuality.ExportReceptionList, method = RequestMethod.GET)
     @ApiOperation(value = "导出接收情况列表")
     public void exportReceptionList( @ApiParam(name = "start", value = "开始时间")
-                                         @RequestParam(value = "start", required = false) String start,
-                                         @ApiParam(name = "end", value = "结束时间", defaultValue = "")
-                                         @RequestParam(value = "end", required = false) String end,
-                                         HttpServletResponse response){
+                                     @RequestParam(value = "start", required = false) String start,
+                                     @ApiParam(name = "end", value = "结束时间", defaultValue = "")
+                                     @RequestParam(value = "end", required = false) String end,
+                                     HttpServletResponse response){
         try {
             String fileName = "接收情况列表";
             //设置下载

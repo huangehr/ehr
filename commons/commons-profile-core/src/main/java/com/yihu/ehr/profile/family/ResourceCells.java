@@ -123,6 +123,7 @@ public class ResourceCells {
                         EVENT_DATE,
                         PATIENT_AGE,
                         PATIENT_SEX,
+                        PATIENT_ID,
                         DEPT_CODE
                 ));
             case File:

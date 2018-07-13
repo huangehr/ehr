@@ -14,14 +14,19 @@ import java.util.Set;
  */
 public class KeySchema {
 
-    @Autowired
-    protected RedisClient redisClient;
+    protected final String keySchema = "%1:%2:%3";
     protected String table = "table";
     protected String column = "column";
-    protected String keySchema = "%1:%2:%3";
+
+    @Autowired
+    protected RedisClient redisClient;
 
     /**
-     * 获取key
+     * 获取组合键值 table:key:column
+     * @param table 表名
+     * @param key 主键
+     * @param column 列名
+     * @return
      */
     public String makeKey(String table, String key, String column) {
         return new StringBuilderEx(keySchema)
@@ -33,6 +38,9 @@ public class KeySchema {
 
     /**
      * 获取单条缓存
+     * @param key
+     * @param <T>
+     * @return
      */
     public <T> T get(String key) {
         return redisClient.get(makeKey(table, key, column));
@@ -40,6 +48,8 @@ public class KeySchema {
 
     /**
      * 保存单条缓存
+     * @param key
+     * @param val
      */
     public void set(String key, Serializable val){
         redisClient.set(makeKey(table, key, column), val);
@@ -47,13 +57,14 @@ public class KeySchema {
 
     /**
      * 删除单条缓存
+     * @param key
      */
     public void delete(String key) {
         redisClient.delete(makeKey(table, key, column));
     }
 
     /**
-     * 删除所有缓存
+     * 删除默认缓存
      */
     public void deleteAll(){
         redisClient.delete(makeKey(table,"*", column));
@@ -63,15 +74,12 @@ public class KeySchema {
      * 获取所有缓存数据
      */
     public Map<String,Object> getAll(){
-        Map<String,Object> re = new HashMap<>();
-        Set<String> keys = redisClient.keys(makeKey(table,"*",column));
-
-        for(String key:keys)
-        {
+        Map<String, Object> re = new HashMap<>();
+        Set<String> keys = redisClient.keys(makeKey(table,"*", column));
+        for (String key : keys) {
             String val = redisClient.get(key);
             re.put(key,val);
         }
-
         return re;
     }
 

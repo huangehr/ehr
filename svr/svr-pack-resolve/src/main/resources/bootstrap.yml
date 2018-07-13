@@ -1,63 +1,23 @@
 spring:
   application:
     name: svr-pack-resolve
+  cloud:
+    config:
+      username: user
+      password: configuration
 
 ---
 spring:
   profiles: dev
   cloud:
     config:
-      username: user
-      password: configuration
-      uri: http://172.19.103.73:1221
-      label: dev
+      uri: ${spring.config.uri:http://172.19.107.73:1221}
+      label: ${spring.config.label:dev}
 
 ---
 spring:
-  profiles: test
+  profiles: prod
   cloud:
     config:
-      username: user
-      password: configuration
-      uri: http://172.19.103.73:1221
-      label: dev
-
----
-spring:
-  profiles: prod_fz
-  cloud:
-    config:
-      username: user
-      password: configuration
-      uri: http://11.1.2.1:1221
-      label: master
-
----
-spring:
-  profiles: prod_sr
-  cloud:
-    config:
-      username: user
-      password: configuration
-      uri: http://10.176.97.10:1221
-      label: master
-
----
-spring:
-  profiles: prod_fzzy
-  cloud:
-    config:
-      username: user
-      password: configuration
-      uri: http://100.100.1.162:1221
-      label: master
-
----
-spring:
-  profiles: prod_srformal
-  cloud:
-    config:
-      username: user
-      password: configuration
-      uri: http://192.168.200.61:1221
-      label: master
+      uri: ${spring.config.uri}
+      label: ${spring.config.label}

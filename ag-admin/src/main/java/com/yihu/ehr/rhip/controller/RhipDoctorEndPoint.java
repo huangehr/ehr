@@ -1,18 +1,18 @@
-package com.yihu.ehr.api.rhip;
+package com.yihu.ehr.rhip.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.user.DoctorDetailModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
-import com.yihu.ehr.feign.DoctorClient;
-import com.yihu.ehr.feign.FileResourceClient;
-import com.yihu.ehr.feign.OrganizationClient;
-import com.yihu.ehr.feign.UserClient;
+import com.yihu.ehr.fileresource.service.FileResourceClient;
 import com.yihu.ehr.model.org.MOrgDept;
 import com.yihu.ehr.model.org.MOrgDeptJson;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.user.MDoctor;
+import com.yihu.ehr.organization.service.OrgDeptClient;
+import com.yihu.ehr.organization.service.OrganizationClient;
+import com.yihu.ehr.users.service.DoctorClient;
+import com.yihu.ehr.users.service.UserClient;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
@@ -24,7 +24,6 @@ import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +48,8 @@ public class RhipDoctorEndPoint extends BaseController {
     @Autowired
     private OrganizationClient orgClient;
     @Autowired
+    private OrgDeptClient orgDeptClient;
+    @Autowired
     private UserClient userClient;
 
     private String regex = "^[A-Za-z0-9\\-]+$";
@@ -56,13 +57,13 @@ public class RhipDoctorEndPoint extends BaseController {
 
 
 
-    @RequestMapping(value = "doctor/{doctor_id}", method = RequestMethod.GET)
+    @RequestMapping(value = "doctor/{idCardNo}", method = RequestMethod.GET)
     @ApiOperation(value = "通过身份证获取医生信息", notes = "医生信息")
     public Envelop getUser(
-            @ApiParam(name = "doctor_id", value = "身份证号", defaultValue = "")
-            @PathVariable(value = "doctor_id") String doctorId) {
+            @ApiParam(name = "idCardNo", value = "身份证号", defaultValue = "")
+            @PathVariable(value = "idCardNo") String idCardNo) {
         try {
-            MDoctor mDoctor = doctorClient.getDoctor(doctorId);
+            MDoctor mDoctor = doctorClient.getDoctorByIdCardNo(idCardNo);
             if (mDoctor == null) {
                 return failed("医生信息获取失败!");
             }
@@ -180,7 +181,7 @@ public class RhipDoctorEndPoint extends BaseController {
                 return failed(errorMsg);
             }
             //根据机构id和部门名称获取部门id
-            MOrgDept mOrgDept = orgClient.getOrgDeptByDeptName(orgId, deptName);
+            MOrgDept mOrgDept = orgDeptClient.getOrgDeptByDeptName(orgId, deptName);
             MOrgDeptJson mOrgDeptJson =new MOrgDeptJson();
             mOrgDeptJson.setOrgId(orgId.toString());
             if(null == mOrgDept){
@@ -283,7 +284,7 @@ public class RhipDoctorEndPoint extends BaseController {
                 return failed(errorMsg);
             }
             //根据机构id和部门名称获取部门id
-            MOrgDept mOrgDept = orgClient.getOrgDeptByDeptName(orgId, deptName);
+            MOrgDept mOrgDept = orgDeptClient.getOrgDeptByDeptName(orgId, deptName);
             MOrgDeptJson mOrgDeptJson =new MOrgDeptJson();
             mOrgDeptJson.setOrgId(orgId.toString());
             if(null == mOrgDept){
@@ -317,19 +318,6 @@ public class RhipDoctorEndPoint extends BaseController {
         mDoctor.setInsertTime(DateTimeUtil.simpleDateTimeParse(detailModel.getInsertTime()));
 
         return mDoctor;
-    }
-
-    public static void main(String[] args) {
-        ObjectMapper objectMapper =new ObjectMapper();
-
-        String doctorJsonData="{\"idCardNo\":\"342221333122223423\",\"code\":\"CWS\",\"name\":\"陈新川\"}\",\"model\":\"{\"orgCode\":\"492240421\",\"deptName\":\"骨科\"}";
-        try {
-            DoctorDetailModel detailModel = objectMapper.readValue(doctorJsonData, DoctorDetailModel.class);
-            System.out.println(detailModel);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
     }
 
 }

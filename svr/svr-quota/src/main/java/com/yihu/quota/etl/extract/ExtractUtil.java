@@ -107,83 +107,86 @@ public class ExtractUtil {
             }
 
             for (TjQuotaDimensionMain main : qdm) {
-                String value = map.get(main.getKeyVal()).toString();
-                if(main.getMainCode().equals(main_town) && !StringUtils.isEmpty(townDictMap.get(value))){
-                    saveModel.setTown(value);
-                    saveModel.setTownName(townDictMap.get(value));
-                }else if(main.getMainCode().equals(main_org) && !StringUtils.isEmpty(orgDictMap.get(value))){
-                    saveModel.setOrg(value);
-                    saveModel.setOrgName(orgDictMap.get(value));
-                } else if(main.getMainCode().equals(main_year) && !StringUtils.isEmpty(yearDictMap.get(value))){
-                    saveModel.setYearName(yearDictMap.get(value));
-                    saveModel.setYear(value);
+                String keyVal = main.getKeyVal().contains(".")?main.getKeyVal().substring(main.getKeyVal().indexOf(".")+1):main.getKeyVal();//如mysql 多表拼接时 d.org_code
+                if(map.get(keyVal.trim()) != null ){
+                    String value = map.get(keyVal.trim()).toString();
+                    if(main.getMainCode().equals(main_town) && !StringUtils.isEmpty(townDictMap.get(value))){
+                        saveModel.setTown(value);
+                        saveModel.setTownName(townDictMap.get(value));
+                    }else if(main.getMainCode().equals(main_org) && !StringUtils.isEmpty(orgDictMap.get(value))){
+                        saveModel.setOrg(value);
+                        saveModel.setOrgName(orgDictMap.get(value));
+                    } else if(main.getMainCode().equals(main_year) && !StringUtils.isEmpty(yearDictMap.get(value))){
+                        saveModel.setYearName(yearDictMap.get(value));
+                        saveModel.setYear(value);
+                    }
                 }
             }
             if(saveModel.getTown() != null || saveModel.getOrg() !=null){
                 for (int i = 0; i < qds.size(); i++) {
                     int num = i+1 ;
                     if(num == 1) {
-                        if(map.get(qds.get(i).getKeyVal()) != null){
-                            String value = map.get(qds.get(i).getKeyVal()).toString();
+                        if(map.get(qds.get(i).getKeyVal().trim()) != null){
+                            String value = map.get(qds.get(i).getKeyVal().trim()).toString();
                             if( !StringUtils.isEmpty(slave1DictMap.get(value))){
                                 saveModel.setSlaveKey1(value);
                                 saveModel.setSlaveKey1Name(slave1DictMap.get(value));
                             }
                         }else {
-                            String key = getSexAndAgeUnKnownDict(qds.get(i), slave1DictMap);
-                            if(!StringUtils.isEmpty(key)){
-                                saveModel.setSlaveKey1(key);
-                                saveModel.setSlaveKey1Name("未知");
-                            }
+//                            String key = getSexAndAgeUnKnownDict(qds.get(i), slave1DictMap);
+//                            if(!StringUtils.isEmpty(key)){
+//                                saveModel.setSlaveKey1(key);
+//                                saveModel.setSlaveKey1Name("未知");
+//                            }
                         }
                     }else if(num == 2) {
-                        if(map.get(qds.get(i).getKeyVal()) != null){
-                            String value = map.get(qds.get(i).getKeyVal()).toString();
+                        if(map.get(qds.get(i).getKeyVal().trim()) != null){
+                            String value = map.get(qds.get(i).getKeyVal().trim()).toString();
                             if( !StringUtils.isEmpty(slave2DictMap.get(value))){
                                 saveModel.setSlaveKey2(value);
                                 saveModel.setSlaveKey2Name(slave2DictMap.get(value));
                             }
                         }else {
-                            String key = getSexAndAgeUnKnownDict(qds.get(i), slave2DictMap);
-                            if(!StringUtils.isEmpty(key)){
-                                saveModel.setSlaveKey2(key);
-                                saveModel.setSlaveKey2Name("未知");
-                            }
+//                            String key = getSexAndAgeUnKnownDict(qds.get(i), slave2DictMap);
+//                            if(!StringUtils.isEmpty(key)){
+//                                saveModel.setSlaveKey2(key);
+//                                saveModel.setSlaveKey2Name("未知");
+//                            }
                         }
                     }else if(num == 3) {
-                        if(map.get(qds.get(i).getKeyVal()) != null){
-                            String value = map.get(qds.get(i).getKeyVal()).toString();
+                        if(map.get(qds.get(i).getKeyVal().trim()) != null){
+                            String value = map.get(qds.get(i).getKeyVal().trim()).toString();
                             if( !StringUtils.isEmpty(slave3DictMap.get(value))){
                                 saveModel.setSlaveKey3(value);
                                 saveModel.setSlaveKey3Name(slave3DictMap.get(value));
                             }
                         }else {
-                            String key = getSexAndAgeUnKnownDict(qds.get(i), slave3DictMap);
-                            if(!StringUtils.isEmpty(key)){
-                                saveModel.setSlaveKey3(key);
-                                saveModel.setSlaveKey3Name("未知");
-                            }
+//                            String key = getSexAndAgeUnKnownDict(qds.get(i), slave3DictMap);
+//                            if(!StringUtils.isEmpty(key)){
+//                                saveModel.setSlaveKey3(key);
+//                                saveModel.setSlaveKey3Name("未知");
+//                            }
                         }
                     }else if(num == 4 ) {
-                        if(map.get(qds.get(i).getKeyVal()) != null){
-                            String value = map.get(qds.get(i).getKeyVal()).toString();
+                        if(map.get(qds.get(i).getKeyVal().trim()) != null){
+                            String value = map.get(qds.get(i).getKeyVal().trim()).toString();
                             if( !StringUtils.isEmpty(slave4DictMap.get(value))){
                                 saveModel.setSlaveKey4(value);
                                 saveModel.setSlaveKey4Name(slave4DictMap.get(value));
                             }
                         }else {
-                            String key = getSexAndAgeUnKnownDict(qds.get(i), slave4DictMap);
-                            if(!StringUtils.isEmpty(key)){
-                                saveModel.setSlaveKey4(key);
-                                saveModel.setSlaveKey4Name("未知");
-                            }
+//                            String key = getSexAndAgeUnKnownDict(qds.get(i), slave4DictMap);
+//                            if(!StringUtils.isEmpty(key)){
+//                                saveModel.setSlaveKey4(key);
+//                                saveModel.setSlaveKey4Name("未知");
+//                            }
                         }
                     }
                 }
                 if(!StringUtils.isEmpty(timeKey)){
-                    Date  quotaDate = (Date) map.get(timeKey);
-                    String quotaDateStr = DateUtil.formatDate(quotaDate, DateUtil.DEFAULT_DATE_YMD_FORMAT);
-                    saveModel.setQuotaDate(quotaDateStr);
+                    if(!StringUtils.isEmpty( map.get("quotaDate") )){
+                        saveModel.setQuotaDate(map.get("quotaDate").toString());
+                    }
                 }
                 if(!StringUtils.isEmpty(aggregationKey)){
                     if(map.get(aggregationKey) != null){

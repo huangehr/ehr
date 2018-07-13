@@ -14,6 +14,9 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
+ * 处理链
+ * 1. 添加处理器
+ * 2. 将事件依次交由处理器进行相关处理
  * Created by progr1mmer on 2018/7/4.
  */
 @Component
@@ -68,6 +71,10 @@ public class EventDealChain {
         return this.processors;
     }
 
+    /**
+     * 事件处理入口
+     * @param event
+     */
     public void deal(Event event) {
         Iterator<String> iterator = processors.keySet().iterator();
         while (iterator.hasNext()) {
