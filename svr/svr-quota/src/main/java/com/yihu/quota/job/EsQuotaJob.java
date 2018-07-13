@@ -225,18 +225,23 @@ public class EsQuotaJob implements Job {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         QueryStringQueryBuilder termQueryQuotaCode = QueryBuilders.queryStringQuery("quotaCode:" + quotaVo.getCode().replaceAll("_", ""));
         boolQueryBuilder.must(termQueryQuotaCode);
+        String start = "";
+        String end = "";
         if(sourceEsConfig.getFullQuery() !=null && sourceEsConfig.getFullQuery().equals("true")){
-            startTime = LocalDate.now().toString();
-            endTime = LocalDate.now().toString();
+            start = LocalDate.now().toString();
+            end = start;
+        }else {
+            if (!StringUtils.isEmpty(startTime)) {
+                start = startTime;
+            }
+            if (!StringUtils.isEmpty(endTime)) {
+                end = endTime;
+            }
         }
-        if (!StringUtils.isEmpty(startTime)) {
-            RangeQueryBuilder rangeQueryStartTime = QueryBuilders.rangeQuery("quotaDate").gte(startTime.substring(0, 10));
-            boolQueryBuilder.must(rangeQueryStartTime);
-        }
-        if (!StringUtils.isEmpty(endTime)) {
-            RangeQueryBuilder rangeQueryEndTime = QueryBuilders.rangeQuery("quotaDate").lte(endTime.substring(0, 10));
-            boolQueryBuilder.must(rangeQueryEndTime);
-        }
+        RangeQueryBuilder rangeQueryStartTime = QueryBuilders.rangeQuery("quotaDate").gte(start.substring(0, 10));
+        boolQueryBuilder.must(rangeQueryStartTime);
+        RangeQueryBuilder rangeQueryEndTime = QueryBuilders.rangeQuery("quotaDate").lte(end.substring(0, 10));
+        boolQueryBuilder.must(rangeQueryEndTime);
         boolean flag = true ;
         Client talClient = elasticSearchPool.getClient();
         Client client = elasticSearchPool.getClient();

@@ -175,6 +175,7 @@ public class LinkPackageResolver extends PackageResolver {
                     //影像文件存在group2
                     ObjectNode msg = fastDFSUtil.upload(groupName, inputStream, fileExtension, fileMetaData);
                     LinkFile linkFile = new LinkFile();
+                    linkFile.setFileSize(fileSize);
                     linkFile.setFileExtension(fileExtension);
                     linkFile.setOriginName(fileName);
                     linkFile.setReportFormNo(reportFormNo);
