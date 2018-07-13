@@ -21,7 +21,7 @@ import java.net.URLClassLoader;
 @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class EventClassLoader extends ClassLoader {
 
-    @Value("${fast-dfs.public-server:http://120.0.0.1:8080}")
+    @Value("${fast-dfs.public-server:http://127.0.0.1:8080}")
     private String publicServer;
 
     @Autowired
@@ -54,7 +54,7 @@ public class EventClassLoader extends ClassLoader {
                 return clazz;
             case "jar":
                 try {
-                    //URLClassLoader loader = new URLClassLoader(new URL[]{new URL("file:///D:/event.jar")}); //从方式需要该路径底下包含完整的包名文件夹
+                    //URLClassLoader loader = new URLClassLoader(new URL[]{new URL("file:///D:/event.jar")}); //此方式需要该路径底下包含完整的包名文件夹
                     URLClassLoader loader = new URLClassLoader(new URL[]{new URL(publicServer  + "/" + remote_path.replaceAll(":", "/"))}); //从方式需要该路径底下包含完整的包名文件夹
                     clazz = loader.loadClass(name);
                     return clazz;
