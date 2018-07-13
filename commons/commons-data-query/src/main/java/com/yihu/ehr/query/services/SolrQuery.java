@@ -13,10 +13,7 @@ import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.CellUtil;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.apache.solr.client.solrj.response.FacetField;
-import org.apache.solr.client.solrj.response.FieldStatsInfo;
-import org.apache.solr.client.solrj.response.PivotField;
-import org.apache.solr.client.solrj.response.RangeFacet;
+import org.apache.solr.client.solrj.response.*;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -210,9 +207,8 @@ public class SolrQuery {
         return solrUtil.count(table, queryString);
     }
 
-
     /**
-     * 获取指定字段的查询集合，可选择去重查询
+     * 获取指定返回字段的查询集合
      *
      * @param q      查询字符串
      * @param fq     过滤查询
@@ -220,8 +216,6 @@ public class SolrQuery {
      * @param start  查询起始行
      * @param rows   查询行数
      * @param fields 返回字段
-     * @param groupField 可选，分组去重字段
-     * @param groupSort 可选，组内排序字段
      * @return
      */
     public List<Map<String, Object>> queryReturnFieldList(String tableName,
@@ -230,57 +224,133 @@ public class SolrQuery {
                                                           Map<String, String> sort,
                                                           long start,
                                                           long rows,
-                                                          String[] fields,
-                                                          String groupField,
-                                                          String groupSort) throws Exception {
+                                                          String[] fields) throws Exception {
         List<Map<String, Object>> data = new ArrayList<>();
         List<String> falseStoreList = new ArrayList<>();
-        Map<String,Integer> falseStroreIndexMap = new HashMap<>();
-        Map<String,String> SolrIndexEnumMap = new HashMap<>();
-        for (SolrIndexEnum solrIndex: SolrIndexEnum.values()) {
-            SolrIndexEnumMap.put(solrIndex.toString(),solrIndex.toString());
+        Map<String, Integer> falseStoreIndexMap = new HashMap<>();
+        Map<String, String> SolrIndexEnumMap = new HashMap<>();
+        for (SolrIndexEnum solrIndex : SolrIndexEnum.values()) {
+            SolrIndexEnumMap.put(solrIndex.toString(), solrIndex.toString());
         }
-        SolrDocumentList solrDocList = new SolrDocumentList();
-        if (StringUtils.isEmpty(groupField)) {
-            solrDocList = solrUtil.query(tableName, q, fq, sort, start, rows, fields);
-        } else {
-            // 去重查询
-            solrDocList = solrUtil.queryDistinctOneField(tableName, q, fq, sort, start, rows, fields, groupField, groupSort);
-        }
+
+        SolrDocumentList solrDocList = solrUtil.query(tableName, q, fq, sort, start, rows, fields);
+
         if (solrDocList != null && solrDocList.getNumFound() > 0) {
             for (SolrDocument doc : solrDocList) {
                 Map<String, Object> map = new HashMap<>();
-                // 去重查询场合
-                if (!StringUtils.isEmpty(groupField)) {
-                    map.put("distinctField", groupField);
-                    map.put("distinctFieldValue", doc.getFieldValue(groupField));
+                // 从solr查询结果中，给返回字段赋值，并判断标记该字段是否在solr中配置为store为false的。
+                putFieldValueFromSolr(data, map, fields, doc, falseStoreIndexMap);
+            }
+        }
+
+        // 返回字段在solr结果中没有存储值，则从HBase中获取赋值
+        fillFieldValueFromHbase(data, falseStoreIndexMap, solrDocList.size(), tableName);
+
+        return data;
+    }
+
+    /**
+     * 去重查询指定返回字段的集合
+     *
+     * @param q                查询字符串
+     * @param fq               过滤查询
+     * @param sort             排序
+     * @param start            查询起始行
+     * @param rows             查询行数
+     * @param fields           返回字段
+     * @param groupField       分组去重字段
+     * @param groupSort        组内排序字段
+     * @param groupNullIsolate 组内空值记录是保存第一条，还是每条记录单独保存
+     * @return
+     */
+    public List<Map<String, Object>> distinctQueryReturnFieldList(String tableName,
+                                                                  String q,
+                                                                  String fq,
+                                                                  Map<String, String> sort,
+                                                                  long start,
+                                                                  long rows,
+                                                                  String[] fields,
+                                                                  String groupField,
+                                                                  String groupSort,
+                                                                  boolean groupNullIsolate) throws Exception {
+        List<Map<String, Object>> data = new ArrayList<>();
+        List<String> falseStoreList = new ArrayList<>();
+        Map<String, Integer> falseStoreIndexMap = new HashMap<>();
+        Map<String, String> SolrIndexEnumMap = new HashMap<>();
+        for (SolrIndexEnum solrIndex : SolrIndexEnum.values()) {
+            SolrIndexEnumMap.put(solrIndex.toString(), solrIndex.toString());
+        }
+
+        List<Group> groupList = solrUtil.queryDistinctOneField(tableName, q, fq, sort, start, rows, fields, groupField, groupSort);
+
+        int solrDocListSize = 0;
+        for (Group group : groupList) {
+            int groupChildCount = group.getResult().size();
+            SolrDocument firstDoc = group.getResult().get(0);
+            Object fieldValueObj = firstDoc.getFieldValue(groupField);
+
+            int i = 1;
+            // 该组为空值的话，判断每条空值记录是单独保存，还是合并为一条保存。
+            SolrDocumentList nullDocList = new SolrDocumentList();
+            if (fieldValueObj == null && groupNullIsolate) {
+                String null_fq = fq + " AND -" + groupField + ":*";
+                nullDocList = solrUtil.query(tableName, q, null_fq, sort, start, rows, fields);
+                i = (int) nullDocList.getNumFound();
+            }
+            while (i != 0) {
+                Map<String, Object> map = new HashMap<>();
+                SolrDocument doc;
+                if (nullDocList.getNumFound() == 0) {
+                    doc = group.getResult().get(0);
+                } else {
+                    doc = nullDocList.get(i);
                 }
-                if (fields != null && fields.length > 0) {
-                    for (String key : fields) {
-                        if (key.equals("event_date")) {
-                            //如果是时间结果，则被加了八个小时
-                            map.put(key, DateUtils.addHours((Date) doc.getFieldValue(key), -8));
+                map.put("distinctField", groupField);
+                map.put("distinctFieldValue", fieldValueObj);
+                // 从solr查询结果中，给返回字段赋值，并判断标记该字段是否在solr中配置为store为false的。
+                putFieldValueFromSolr(data, map, fields, doc, falseStoreIndexMap);
+                solrDocListSize++;
+                i--;
+            }
+        }
+
+        // 返回字段在solr结果中没有存储值，则从HBase中获取赋值
+        fillFieldValueFromHbase(data, falseStoreIndexMap, solrDocListSize, tableName);
+
+        return data;
+    }
+
+    // 从solr查询结果中，给返回字段赋值，并判断标记该字段是否在solr中配置为store为false的。
+    private void putFieldValueFromSolr(List<Map<String, Object>> data, Map<String, Object> itemMap, String[] fields, SolrDocument doc, Map<String, Integer> falseStoreIndexMap) {
+        if (fields != null && fields.length > 0) {
+            for (String key : fields) {
+                if (key.equals("event_date")) {
+                    //如果是时间结果，则被加了八个小时
+                    itemMap.put(key, DateUtils.addHours((Date) doc.getFieldValue(key), -8));
+                } else {
+                    if (doc.getFieldValue(key) != null) {
+                        itemMap.put(key, doc.getFieldValue(key));
+                    } else {
+                        if (falseStoreIndexMap.containsKey(key)) {//&& !SolrIndexEnumMap.containsKey(key) 后续改为配置
+                            int n = falseStoreIndexMap.get(key);
+                            n++;
+                            falseStoreIndexMap.put(key, n);
                         } else {
-                            if (doc.getFieldValue(key) != null) {
-                                map.put(key, doc.getFieldValue(key));
-                            }else {
-                                if( falseStroreIndexMap.containsKey(key) ){//&& !SolrIndexEnumMap.containsKey(key) 后续改为配置
-                                    int n = falseStroreIndexMap.get(key);
-                                    n++;
-                                    falseStroreIndexMap.put(key,n);
-                                }else{
-                                    falseStroreIndexMap.put(key,1);
-                                }
-                            }
+                            falseStoreIndexMap.put(key, 1);
                         }
                     }
                 }
-                data.add(map);
             }
         }
+        data.add(itemMap);
+    }
+
+    // 返回字段在solr结果中没有存储值，则从HBase中获取赋值
+    private void fillFieldValueFromHbase(List<Map<String, Object>> data, Map<String, Integer> falseStoreIndexMap, int solrDocListSize, String tableName) {
+        List<String> falseStoreList = new ArrayList<>();
         boolean isStored = true;
-        for (String key : falseStroreIndexMap.keySet()) {
-            if (key.contains("EHR_") && falseStroreIndexMap.get(key)==solrDocList.size()) {
+        for (String key : falseStoreIndexMap.keySet()) {
+            if (key.contains("EHR_") && falseStoreIndexMap.get(key) == solrDocListSize) {
                 isStored = false;
                 falseStoreList.add(key);
             }
@@ -314,7 +384,6 @@ public class SolrQuery {
                 }
             }
         }
-        return data;
     }
 
     /**

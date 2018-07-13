@@ -393,7 +393,7 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
             count = solrQuery.count(core,q);
             long page = count / PAGE_SIZE_SOLR +1;
             for (int i = 0; i < page; i++) {
-                list = solrQuery.queryReturnFieldList(core, q, null, null, i * PAGE_SIZE_SOLR, PAGE_SIZE_SOLR, fields, null, null);
+                list = solrQuery.queryReturnFieldList(core, q, null, null, i * PAGE_SIZE_SOLR, PAGE_SIZE_SOLR, fields);
                 for (Map<String, Object> item : list) {
                     EsSimplePackage esSimplePackage = new EsSimplePackage();
                     esSimplePackage.setRowkey(String.valueOf(item.get("rowkey")));

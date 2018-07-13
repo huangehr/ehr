@@ -100,7 +100,7 @@ public class SolrUtil {
      * @param groupSort  可选，组内排序字段，如："event_date asc"
      * @return
      */
-    public SolrDocumentList queryDistinctOneField(String core, String q, String fq, Map<String, String> sort, long start, long rows,
+    public List<Group> queryDistinctOneField(String core, String q, String fq, Map<String, String> sort, long start, long rows,
                                                   String[] fields, String groupField, String groupSort) throws Exception {
         SolrClient conn = pool.getConnection(core);
         SolrQuery query = new SolrQuery();
@@ -125,21 +125,56 @@ public class SolrUtil {
         query.setStart(Integer.parseInt(String.valueOf(start)));
         query.setRows(Integer.parseInt(String.valueOf(rows)));
         query.setParam(GroupParams.GROUP, true);
-        query.setParam(GroupParams.GROUP_FORMAT, "simple");
+        query.setParam(GroupParams.GROUP_FORMAT, "grouped");
         query.setParam(GroupParams.GROUP_FIELD, groupField);
         if (StringUtils.isNotEmpty(groupSort)) {
             query.setParam(GroupParams.GROUP_SORT, groupSort);
         }
 
-        SolrDocumentList solrDocumentList = new SolrDocumentList();
+        List<Group> groups = new ArrayList<>();
         QueryResponse response = conn.query(query);
         GroupResponse groupResponse = response.getGroupResponse();
         if (groupResponse != null) {
             List<GroupCommand> groupList = groupResponse.getValues();
             for (GroupCommand groupCommand : groupList) {
-                List<Group> groups = groupCommand.getValues();
+                groups = groupCommand.getValues();
+            }
+        }
+
+        return groups;
+    }
+
+    /**
+     * Solr单个字段去重查询
+     *
+     * @param q          可选，查询字符串
+     * @param fq         可选，过滤查询
+     * @param sort       可选，排序
+     * @param start      必填，查询起始行
+     * @param rows       必填，查询行数
+     * @param fields     必填，返回字段
+     * @param groupField 必填，分组去重字段。针对一个字段去重。
+     * @param groupSort  可选，组内排序字段，如："event_date asc"
+     * @return
+     */
+    public SolrDocumentList queryDistinctOneFieldForDocList(String core, String q, String fq, Map<String, String> sort, long start, long rows,
+                                             String[] fields, String groupField, String groupSort) throws Exception {
+        SolrDocumentList solrDocumentList = new SolrDocumentList();
+        SolrClient conn = pool.getConnection(core);
+        SolrQuery query = new SolrQuery();
+
+        List<Group> groups = queryDistinctOneField(core, q, fq, sort, start, rows, fields, groupField, groupSort);
+
+        QueryResponse response = conn.query(query);
+        GroupResponse groupResponse = response.getGroupResponse();
+        if (groupResponse != null) {
+            List<GroupCommand> groupList = groupResponse.getValues();
+            for (GroupCommand groupCommand : groupList) {
+                groups = groupCommand.getValues();
                 for (Group group : groups) {
-                    solrDocumentList = group.getResult();
+                    if (group.getResult().size() > 0) {
+                        solrDocumentList.add(group.getResult().get(0));
+                    }
                 }
             }
         }
