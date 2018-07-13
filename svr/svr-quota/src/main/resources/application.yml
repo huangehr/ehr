@@ -2,35 +2,10 @@
 server:
   port: ${svr-quota.server.port}
 
-spring:
-  # REDIS
-  redis:
-    database: 0 # Database index used by the connection factory.
-    timeout: 0 # Connection timeout in milliseconds.
-    pool:
-      max-active: 8 # Max number of connections that can be allocated by the pool at a given time. Use a negative value for no limit.
-      max-idle: 8 # Max number of "idle" connections in the pool. Use a negative value to indicate an unlimited number of idle connections.
-      max-wait: -1 # Maximum amount of time (in milliseconds) a connection allocation should block before throwing an exception when the pool is exhausted. Use a negative value to block indefinitely.
-      min-idle: 1 # Target for the minimum number of idle connections to maintain in the pool. This setting only has an effect if it is positive.
-  datasource:
-    driver-class-name: com.mysql.jdbc.Driver
-    max-active: 20
-    max-idle: 8
-    min-idle: 8
-    validation-query: SELECT 1
-    test-on-borrow: true
-
 elasticsearch:
   pool:
     init-size: 5
     max-size: 10
-
-hadoop:
-  hbase-properties:
-    hbase.zookeeper.property.clientPort: 2181
-    zookeeper.znode.parent: /hbase-unsecure
-  user:
-    name: root
 
 ---
 spring:
@@ -55,9 +30,10 @@ elasticsearch:
 hadoop:
   hbase-properties:
     hbase.zookeeper.quorum: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com
+
 ---
 spring:
-  profiles: test
+  profiles: prod
   datasource:
     url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: chenweishan
@@ -78,99 +54,3 @@ elasticsearch:
 hadoop:
   hbase-properties:
     hbase.zookeeper.quorum: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com
-
----
-spring:
-  profiles: prod_fz
-  datasource:
-    url: jdbc:mysql://11.1.2.5:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: healthcloud
-    password: GP8Qz4qU
-  redis:
-    host: 11.1.2.22
-    port: 6390
-    password: Kb6wKDQP1W4
-  data:
-    solr:
-      zk-host: node1.ehr.h3c.com,node2.ehr.h3c.com,node3.ehr.h3c.com:2181/solr
-  elasticsearch:
-    jest:
-      uris: http://11.1.2.3:9200
-elasticsearch:
-  cluster-name: elasticsearch
-  cluster-nodes: 11.1.2.3:9300
-hadoop:
-  hbase-properties:
-    hbase.zookeeper.quorum: node1.ehr.h3c.com,node2.ehr.h3c.com,node3.ehr.h3c.com
-
----
-spring:
-  profiles: prod_fzzy
-  datasource:
-    url: jdbc:mysql://100.100.1.159:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: healthcloud
-    password: GP8Qz4qU
-  redis:
-    host: 100.100.1.161
-    port: 6390
-    password: q4YaQemf
-  data:
-    solr:
-      zk-host: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com:2181/solr
-  elasticsearch:
-    jest:
-      uris: http://100.100.1.158:9200
-elasticsearch:
-  cluster-name: elasticsearch
-  cluster-nodes: 100.100.1.158:9300
-hadoop:
-  hbase-properties:
-    hbase.zookeeper.quorum: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com
-
----
-spring:
-  profiles: prod_srformal
-  datasource:
-    url:  jdbc:mysql://192.168.210.3:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: healthcloud
-    password: GP8Qz4qU
-  redis:
-    host: 192.168.50.82
-    port: 6379
-    password: q4YaQemf
-  data:
-    solr:
-      zk-host: node1.jkzl.com,node2.jkzl.com,node4.jkzl.com:2181/solr
-  elasticsearch:
-    jest:
-      uris: http://192.168.220.92:9200
-elasticsearch:
-  cluster-name: elasticsearch
-  cluster-nodes: 192.168.220.92:9300
-hadoop:
-  hbase-properties:
-    hbase.zookeeper.quorum: node1.jkzl.com,node2.jkzl.com,node4.jkzl.com
-
----
-spring:
-  profiles: demo_guigang
-  datasource:
-    url:  jdbc:mysql://192.168.50.51:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: healthcloud
-    password: GP8Qz4qU
-  redis:
-    host: 192.168.50.52
-    port: 6379
-    password: q4YaQemf
-  data:
-    solr:
-      zk-host: node1.jkzl.com,node2.jkzl.com,node3.jkzl.com:2181/solr
-  elasticsearch:
-    jest:
-      uris: http://192.168.50.52:9200
-elasticsearch:
-  cluster-name: elasticsearch
-  cluster-nodes: 192.168.50.52:9300
-hadoop:
-  hbase-properties:
-    hbase.zookeeper.quorum: node1.jkzl.com,node2.jkzl.com,node3.jkzl.com
