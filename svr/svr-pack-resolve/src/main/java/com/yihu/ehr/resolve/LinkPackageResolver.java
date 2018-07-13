@@ -16,6 +16,7 @@ import com.yihu.ehr.resolve.model.stage1.LinkPackage;
 import com.yihu.ehr.resolve.model.stage1.OriginalPackage;
 import com.yihu.ehr.resolve.model.stage1.details.LinkFile;
 import com.yihu.ehr.util.datetime.DateUtil;
+import com.yihu.ehr.util.encrypt.MD5;
 import com.yihu.ehr.util.ftp.FtpUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.ftp.FTPClient;
@@ -158,6 +159,10 @@ public class LinkPackageResolver extends PackageResolver {
                     if (ftpFiles == null || ftpFiles.length == 0){
                         throw new ResolveException("ftp上找不到该文件:" + path);
                     }
+                    JsonNode md5Node = fileNode.get("md5");
+                    if(md5Node == null){
+                        throw new IllegalJsonFileException("md5 value is null");
+                    }
                     JsonNode reportFormNoNode = fileNode.get("report_form_no");
                     if(reportFormNoNode == null){
                         throw new ResolveException("report_form_no is null");
@@ -169,6 +174,11 @@ public class LinkPackageResolver extends PackageResolver {
                     }
                     String serialNo = serialNoNode.asText();
                     InputStream inputStream = ftpUtils.getInputStream(path);
+                    //手动获取md5值与json中的md5做校验
+                    boolean b = MD5.md5CheckSum(inputStream,md5Node.asText());
+                    if(!b){
+                        throw new ResolveException("ftp file is not correct:the file name is "+path);
+                    }
                     long fileSize = ftpFiles[0].getSize();
                     NameValuePair[] fileMetaData = new NameValuePair[1];
                     fileMetaData[0] = new NameValuePair("description", "File from link profile package.");
@@ -176,6 +186,9 @@ public class LinkPackageResolver extends PackageResolver {
                     ObjectNode msg = fastDFSUtil.upload(groupName, inputStream, fileExtension, fileMetaData);
                     LinkFile linkFile = new LinkFile();
                     linkFile.setFileSize(fileSize);
+                    String md5 = md5Node.asText();
+                    //校验文件完整性
+                    linkFile.setMd5(md5);
                     linkFile.setFileExtension(fileExtension);
                     linkFile.setOriginName(fileName);
                     linkFile.setReportFormNo(reportFormNo);

@@ -71,6 +71,7 @@ public class ResourcesTransformService extends BaseJpaService {
                 }
             }
             //将rowkey等基础字段放入数据
+            returnMap.put("patient_id",resource.get("patient_id"));
             returnMap.put("rowkey", resource.get("rowkey"));
             returnMap.put("org_code", resource.get("org_code"));
             returnMap.put("event_no", resource.get("event_no"));
@@ -121,6 +122,7 @@ public class ResourcesTransformService extends BaseJpaService {
                         }
                     }
                     //将rowkey等基础字段放入数据
+                    data.put("patient_id",metadataResource.get("patient_id"));
                     data.put("rowkey", metadataResource.get("rowkey"));
                     data.put("org_code", metadataResource.get("org_code"));
                     data.put("event_no", metadataResource.get("event_no"));
@@ -159,9 +161,11 @@ public class ResourcesTransformService extends BaseJpaService {
                 }
             }
             //将rowkey放入数据
+            returnRs.put("patient_id",resource.get("patient_id"));
             returnRs.put("rowkey", resource.get("rowkey"));
             returnRs.put("org_code", resource.get("org_code"));
             returnRs.put("event_no", resource.get("event_no"));
+            returnRs.put("event_type", resource.get("event_type"));
             returnRs.put("event_date", resource.get("event_date"));
         }
         return returnRs;
