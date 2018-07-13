@@ -1,19 +1,19 @@
-package com.yihu.ehr.api.rhip;
+package com.yihu.ehr.rhip.controller;
 
 import com.yihu.ehr.agModel.geogrephy.GeographyModel;
 import com.yihu.ehr.agModel.org.OrgDetailModel;
 import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
-import com.yihu.ehr.feign.ConventionalDictEntryClient;
-import com.yihu.ehr.feign.GeographyClient;
-import com.yihu.ehr.feign.OrganizationClient;
-import com.yihu.ehr.feign.SecurityClient;
+import com.yihu.ehr.geography.service.AddressClient;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.geography.MGeography;
 import com.yihu.ehr.model.geography.MGeographyDict;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.security.MKey;
+import com.yihu.ehr.organization.service.OrganizationClient;
+import com.yihu.ehr.security.service.SecurityClient;
+import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
@@ -44,7 +44,7 @@ public class RhipOrgEndPoint extends BaseController {
     private SecurityClient securityClient;
 
     @Autowired
-    private GeographyClient geographyClient;
+    private AddressClient geographyClient;
 
     @Autowired
     private ConventionalDictEntryClient conDictEntryClient;
