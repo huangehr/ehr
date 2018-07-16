@@ -301,7 +301,7 @@ public class SolrQuery {
                 Map<String, Object> map = new HashMap<>();
                 SolrDocument doc;
                 if (nullDocList.getNumFound() == 0) {
-                    doc = group.getResult().get(0);
+                    doc = firstDoc;
                 } else {
                     doc = nullDocList.get(i);
                 }
