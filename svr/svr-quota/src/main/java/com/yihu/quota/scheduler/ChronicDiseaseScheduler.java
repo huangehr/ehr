@@ -206,6 +206,8 @@ public class ChronicDiseaseScheduler {
                 data.put("org_code", subInfo.get("org_code"));
                 // 就诊日期
                 data.put("event_date", subInfo.get("event_date"));
+                // 就诊类型
+                data.put("event_type", subInfo.get("event_type"));
                 // 慢性病类型
                 data.put("type", type);
                 // 慢性病类型名称
