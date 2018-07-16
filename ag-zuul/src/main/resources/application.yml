@@ -3,9 +3,10 @@ server:
 
 info:
   app:
-    name: Ag-Zuul
-    description:  EHR Platform Zuul Service.
+    name: AG-ZUUL
+    description: EHR Platform Gateway Service
     version: 1.0.0
+  component: Zuul Server
 
 spring:
   redis:

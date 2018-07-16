@@ -3,8 +3,8 @@ server:
 
 info:
   app:
-    name: svr-dfs
-    description: Ehr Platform Distributed File System Service.
+    name: SVR-DFS
+    description: EHR Platform Microservice.
     version: 1.0.0
 
 spring:

@@ -2,6 +2,12 @@
 server:
   port: ${svr-quota.server.port}
 
+info:
+  app:
+    name: SVR-QUOTA
+    description: EHR Platform Microservice.
+    version: 1.0.0
+
 spring:
   # REDIS
   redis:

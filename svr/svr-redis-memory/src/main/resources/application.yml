@@ -1,6 +1,12 @@
 server:
   port: ${svr-redis-memory.server.port}
 
+info:
+  app:
+    name: SVR-REDIS-MEMORY
+    description: EHR Platform Microservice.
+    version: 1.0.0
+
 spring:
   # REDIS
   redis:
