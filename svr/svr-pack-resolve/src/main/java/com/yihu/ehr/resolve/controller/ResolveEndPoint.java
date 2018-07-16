@@ -1,6 +1,7 @@
 package com.yihu.ehr.resolve.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.profile.ArchiveStatus;
 import com.yihu.ehr.profile.ProfileType;
 import com.yihu.ehr.constants.ServiceApi;
@@ -32,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -97,6 +99,11 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
             map.put("delay", delay % (1000 * 60 * 60 * 24) > 0 ? delay / (1000 * 60 * 60 * 24) + 1 : delay / (1000 * 60 * 60 * 24));
             map.put("re_upload_flg", String.valueOf(originalPackage.isReUploadFlg()));
             statusReportService.reportStatus(pack.get_id(), ArchiveStatus.Finished, 0, "resolve success", map);
+            //发送事件处理消息
+            if (originalPackage.getProfileType() == ProfileType.File || originalPackage.getProfileType() == ProfileType.Link) {
+                KafkaTemplate kafkaTemplate = SpringContext.getService(KafkaTemplate.class);
+                kafkaTemplate.send("svr-pack-event", "resolve", objectMapper.writeValueAsString(pack));
+            }
             //是否返回数据
             if (echo) {
                 return originalPackage.toJson();

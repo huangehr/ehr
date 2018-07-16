@@ -29,6 +29,10 @@ spring:
       max-idle: 8 # Max number of "idle" connections in the pool. Use a negative value to indicate an unlimited number of idle connections.
       max-wait: -1 # Maximum amount of time (in milliseconds) a connection allocation should block before throwing an exception when the pool is exhausted. Use a negative value to block indefinitely.
       min-idle: 1 # Target for the minimum number of idle connections to maintain in the pool. This setting only has an effect if it is positive.
+  kafka:
+    consumer:
+      group-id: svr-pack-event
+      auto-offset-reset: earliest
 
 fast-dfs:
   connect-timeout: 20
@@ -155,11 +159,12 @@ spring:
     host: 172.19.103.47 # Redis server host.
     port: 6379
     password: redis!@456
+  kafka:
+    bootstrap-servers: node4.hde.h3c.com:6667
 fast-dfs:
   tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52:80
   pacs-group-name: group1 # 影像文件落入到group1上
-
 hadoop:
   hbase-properties:
     hbase.zookeeper.quorum: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com
@@ -183,6 +188,8 @@ spring:
     host: 172.19.103.47
     port: 6379
     password: redis!@456
+  kafka:
+    bootstrap-servers: node4.hde.h3c.com:6667
 fast-dfs:
   tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52:80
