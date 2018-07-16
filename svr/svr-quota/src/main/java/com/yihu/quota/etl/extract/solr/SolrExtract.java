@@ -132,6 +132,7 @@ public class SolrExtract {
             slaveMap.put(timeKey, timeKey);
             TjQuotaDimensionSlave daySlave = new TjQuotaDimensionSlave();
             daySlave.setSlaveCode(timeKey);
+            daySlave.setKeyVal(timeKey);
             qds.add(daySlave);
             dimensionGroupList.add(new SolrGroupEntity(timeKey, SolrGroupEntity.GroupType.DATE_RANGE, "+1DAY"));
         }

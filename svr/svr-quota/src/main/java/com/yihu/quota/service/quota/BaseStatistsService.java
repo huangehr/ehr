@@ -424,7 +424,7 @@ public class BaseStatistsService {
     public List<Map<String, Object>>  getOrgHealthCategory(String code,String filters,String dateType,boolean isTrunTree, String top) throws Exception {
 
         List<Map<String, Object>> dimenListResult = new ArrayList<>();
-        if(dateType != null && (dateType.contains("year") || dateType.contains("month") || dateType.contains("day"))){
+        if(dateType != null && (dateType.contains("year") || dateType.contains("quarter")|| dateType.contains("month") || dateType.contains("day"))){
             dimenListResult = getTimeAggregationResult(code,orgHealthCategoryCode,filters,dateType);//dimension 维度为 year,month,day
         }else {
             dimenListResult = getAggregationResult(code, orgHealthCategoryCode, filters, top);
@@ -634,8 +634,17 @@ public class BaseStatistsService {
                     String value = "";
                     if (dateDime.equals("year")) {
                         value = map.get(key).toString().substring(0, 4);
+                    } else if (dateDime.contains("quarter")) {
+                        value = map.get(key).toString().substring(0, 7);
                     } else if (dateDime.contains("month")) {
                         value = map.get(key).toString().substring(0, 7);
+                        if(value.contains("-04")){
+                            value = value.replace("-04","02");
+                        }else if(value.contains("-07")){
+                            value = value.replace("-07","03");
+                        }else if(value.contains("-10")){
+                            value = value.replace("-10","04");
+                        }
                     } else if (dateDime.contains("week")) {
                         value = map.get(key).toString().substring(0, 7);
                     } else if (dateDime.contains("day")) {
@@ -902,7 +911,8 @@ public class BaseStatistsService {
      */
     private String getQuotaDimensionDictSql(String quotaCode, String dimension) {
         boolean mainFlag = dimension.contains("province") || dimension.contains("city") ||dimension.contains("town")
-                ||dimension.contains("org") ||dimension.contains("year") ||dimension.contains("month") ||dimension.contains("day") || dimension.contains(quotaDateField) ;
+                ||dimension.contains("org") ||dimension.contains("year") ||dimension.contains("quarter")
+                ||dimension.contains("month") ||dimension.contains("day") || dimension.contains(quotaDateField) ;
         String dictSql = "";
         //查询维度 sql
         if( mainFlag){
@@ -943,7 +953,10 @@ public class BaseStatistsService {
         Map<String,String> dimensionDicMap = new HashMap<>();
         if(StringUtils.isNotEmpty(dictSql)) {
             BasesicUtil baseUtil = new BasesicUtil();
-            boolean main = dimension.contains("province") || dimension.contains("city") ||dimension.contains("town") ||dimension.contains("org") ||dimension.contains("year") ||dimension.contains("month") ;
+            boolean main = dimension.contains("province") || dimension.contains("city") ||dimension.contains("town")
+                    ||dimension.contains("org") ||dimension.contains("year") ||dimension.contains("month")
+                    ||dimension.contains("quarter") ||dimension.contains("day");
+
             if( main){
                 //主纬度字典项
                 List<SaveModel> dictDatas = jdbcTemplate.query(dictSql, new BeanPropertyRowMapper(SaveModel.class));
@@ -982,6 +995,9 @@ public class BaseStatistsService {
         //指标的展示维度，由视图中决定
         if(dimension.trim().equals("year")){
             dateType = "year";
+            dimension = "";
+        }else if(dimension.trim().equals("quarter")){
+            dateType = "quarter";
             dimension = "";
         }else if(dimension.trim().equals("month")){
             dateType = "month";
@@ -1221,6 +1237,19 @@ public class BaseStatistsService {
                 if(xdataName.contains("date_histogram")){
                     if(xdataName.contains("year")){
                         xData.add(one.get(xdataName).toString().substring(0,4) + "");
+                    }else if(xdataName.contains("quarter")){
+                        String quarter = "";
+                        if(one.get(xdataName) != null){
+                            quarter = one.get(xdataName).toString().substring(0,7);
+                            if(quarter.contains("-04")){
+                                quarter = quarter.replace("-04","02");
+                            }else if(quarter.contains("-07")){
+                                quarter = quarter.replace("-07","03");
+                            }else if(quarter.contains("-10")){
+                                quarter = quarter.replace("-10","04");
+                            }
+                        }
+                        xData.add( quarter + "");
                     }else if(xdataName.contains("month")){
                         xData.add(one.get(xdataName).toString().substring(0,7) + "");
                     }
@@ -1330,10 +1359,6 @@ public class BaseStatistsService {
      */
     public List<Map<String, Object>> getGrowthByQuota(String dimension, String filters, EsConfig esConfig, String dateType) throws Exception {
         List<Map<String, Object>>  resultList = new ArrayList<>();
-//        if(dimension.contains(";")){//视图查询数据是，综合维度有多个，取第一个维度
-//            dimension = dimension.substring(0,dimension.indexOf(";"));
-//        }
-        filters = "quotaDate >= '2017-08-01' and quotaDate <= '2017-09-31'";
         String startQuotaDate = "";
         String endQuotaDate = "";
         String noDateFilter = "";
@@ -1472,7 +1497,7 @@ public class BaseStatistsService {
                             }
                         }
                         if(last == 0){
-                            map.put(resultField,"-");
+                            map.put(resultField,"--");
                         }else {
                             double precent = (current - last)/last;
                             map.put(resultField,df.format(precent));
@@ -1480,6 +1505,7 @@ public class BaseStatistsService {
                         resultList.add(map);
                     }
                 }
+                //quarter
                 if(dateType.toLowerCase().equals("month")){
 
                     double current = 0;
@@ -1505,7 +1531,7 @@ public class BaseStatistsService {
                             }
                         }
                         if(last == 0){
-                            map.put(resultField,"-");
+                            map.put(resultField,"--");
                         }else {
                             double precent = (current - last)/last*100;
                             if(precent == 0){
@@ -1543,7 +1569,7 @@ public class BaseStatistsService {
             int start = b ? filters.indexOf("'") : filters.indexOf("\"");
             String condition = filters.substring(start + 1, start + 5); // 获取年份
             int year = Integer.parseInt(condition);
-            String condition2 = filters.substring(filters.indexOf("-") + 1, filters.indexOf("-") + 3);  // 获取月份
+            String condition2 = filters.substring(filters.indexOf("--") + 1, filters.indexOf("-") + 3);  // 获取月份
             int month = Integer.parseInt(condition2);
             cal.set(Calendar.YEAR, year);
             cal.set(Calendar.MONTH, month - 1);
