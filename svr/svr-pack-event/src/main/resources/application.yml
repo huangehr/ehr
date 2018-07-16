@@ -65,7 +65,7 @@ spring:
     port: 6379
     password: redis!@456
   kafka:
-    bootstrap-servers: debian-1:9092
+    bootstrap-servers: node4.hde.h3c.com:6667
 fast-dfs:
   tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52
@@ -88,7 +88,7 @@ spring:
     port: 6379
     password: redis!@456
   kafka:
-    bootstrap-servers: debian-1:9092
+    bootstrap-servers: node4.hde.h3c.com:6667
 fast-dfs:
   tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52

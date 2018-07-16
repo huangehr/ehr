@@ -19,8 +19,8 @@ public class EventListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(EventListener.class);
     private static final BlockingQueue<Event> EVENT_BLOCKING_QUEUE = new ArrayBlockingQueue<>(50000);
 
-    @KafkaListener(topics = {"svr-event"})
-    public void listen (ConsumerRecord consumerRecord){
+    @KafkaListener(topics = {"svr-pack-event"})
+    public void listening (ConsumerRecord consumerRecord){
         while (EVENT_BLOCKING_QUEUE.size() >= 49990) {
             try {
                 Thread.sleep(10000);

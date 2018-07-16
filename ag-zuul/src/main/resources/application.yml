@@ -1,6 +1,23 @@
 server:
   port: ${ag-zuul.server.port}
 
+info:
+  app:
+    name: AG-ZUUL
+    description: EHR Platform Gateway Service
+    version: 1.0.0
+  component: Zuul Server
+
+spring:
+  redis:
+    database: 0
+    timeout: 0
+    pool:
+      max-active: 8
+      max-idle: 8
+      max-wait: -1
+      min-idle: 1
+
 zuul:
   ignored-services: '*'
   sensitive-headers:

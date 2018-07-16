@@ -1,6 +1,59 @@
 server:
   port: ${svr-pack-resolve.server.port}
 
+info:
+  app:
+    name: SVR-PACK-RESOLVE
+    description: EHR Platform Microservice.
+    version: 1.0.0
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    max-active: 20
+    max-idle: 8
+    min-idle: 8
+    validation-query: SELECT 1
+    test-on-borrow: true
+  # REDIS
+  redis:
+    database: 0 # Database index used by the connection factory.
+    port: 6379 # Redis server port.
+    password: # Login password of the redis server.
+    timeout: 0 # Connection timeout in milliseconds.
+    #sentinel:
+    #  master: # Name of Redis server.
+    #  nodes: # Comma-separated list of host:port pairs.
+    pool:
+      max-active: 8 # Max number of connections that can be allocated by the pool at a given time. Use a negative value for no limit.
+      max-idle: 8 # Max number of "idle" connections in the pool. Use a negative value to indicate an unlimited number of idle connections.
+      max-wait: -1 # Maximum amount of time (in milliseconds) a connection allocation should block before throwing an exception when the pool is exhausted. Use a negative value to block indefinitely.
+      min-idle: 1 # Target for the minimum number of idle connections to maintain in the pool. This setting only has an effect if it is positive.
+  kafka:
+    consumer:
+      group-id: svr-pack-event
+      auto-offset-reset: earliest
+
+fast-dfs:
+  connect-timeout: 20
+  network-timeout: 60
+  charset: ISO8859-1
+  pool:
+    init-size: 10
+    max-size: 20
+    wait-time: 500
+  http:
+    tracker-http-port: 80
+    anti-steal-token: no
+    secret-key: FastDFS1234567890
+
+hadoop:
+  hbase-properties:
+    hbase.zookeeper.property.clientPort: 2181
+    zookeeper.znode.parent: /hbase-unsecure
+  user:
+    name: root
+
 resolve:
   job:
     init-size: 10 #解析入库初始任务数
@@ -91,7 +144,7 @@ ehr:
       - HDSD00_13_057 #入院日期时间 v1.3
       - HDSD00_01_185 #出院日期 v1.0
       - HDSD00_16_005 #出院日期时间 v1.3
-#error code and message
+
 eip:
   schemaVersion: 5a6951bff0bb
 
@@ -106,34 +159,8 @@ spring:
     host: 172.19.103.47 # Redis server host.
     port: 6379
     password: redis!@456
-fast-dfs:
-  tracker-server: 172.19.103.13:22122
-  public-server: http://172.19.103.52:80
-  pacs-group-name: group1 # 影像文件落入到group1上
-
-hadoop:
-  hbase-properties:
-    hbase.zookeeper.quorum: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com
-elasticsearch:
-  cluster-name: elasticsearch
-  cluster-nodes: 172.19.103.9:9300
-ftp:
-  address: 172.19.103.58
-  username: pacs
-  password: pacssr2018
-  port: 21
-
----
-spring:
-  profiles: prod
-  datasource:
-    url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: chenweishan
-    password: chenweishan
-  redis:
-    host: 172.19.103.47
-    port: 6379
-    password: redis!@456
+  kafka:
+    bootstrap-servers: node4.hde.h3c.com:6667
 fast-dfs:
   tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52:80
@@ -149,4 +176,3 @@ ftp:
   username: pacs
   password: pacssr2018
   port: 21
-

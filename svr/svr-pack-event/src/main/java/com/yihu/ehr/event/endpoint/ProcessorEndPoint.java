@@ -24,7 +24,7 @@ import java.util.Map;
  * Created by progr1mmer on 2018/7/4.
  */
 @RestController
-@RequestMapping(value = ApiVersion.Version1_0, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+@RequestMapping(value = ApiVersion.Version1_0)
 @Api(value = "ProcessorEndPoint", description = "事件处理链", tags = {"事件服务-事件处理链"})
 public class ProcessorEndPoint extends EnvelopRestEndPoint{
 

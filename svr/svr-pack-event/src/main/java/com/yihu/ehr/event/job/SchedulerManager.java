@@ -17,7 +17,7 @@ import static org.quartz.TriggerBuilder.newTrigger;
  * Created by progr1mmer on 2018/7/13.
  */
 @Component
-public class JobManager {
+public class SchedulerManager {
 
     private int jobSetSize;
     @Autowired
@@ -46,6 +46,16 @@ public class JobManager {
         this.jobSetSize = schedulerConfig.getInitSize();
     }
 
+    public int getJobSetSize() {
+        return jobSetSize;
+    }
+
+    public int getJobSize() throws Exception {
+        GroupMatcher groupMatcher = GroupMatcher.groupEquals("EventProcess");
+        Set<JobKey> jobKeys = scheduler.getJobKeys(groupMatcher);
+        return jobKeys.size();
+    }
+
     public void addJob (int count, String cronExp) throws Exception {
         int addCount = 0;
         GroupMatcher groupMatcher = GroupMatcher.groupEquals("EventProcess");
@@ -60,7 +70,7 @@ public class JobManager {
                     .withIdentity("EventProcessJob-" + suffix, "EventProcess")
                     .build();
             CronTrigger trigger = newTrigger()
-                    .withIdentity("EventProcessJob-" + suffix, "EventProcess")
+                    .withIdentity("EventProcessTrigger-" + suffix, "EventProcess")
                     .withSchedule(CronScheduleBuilder.cronSchedule(cronExp))
                     .startNow()
                     .build();

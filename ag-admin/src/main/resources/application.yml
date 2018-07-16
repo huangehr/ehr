@@ -1,6 +1,13 @@
 server:
   port: ${ag-admin.server.port}
 
+info:
+  app:
+    name: AG-ADMIN
+    description: EHR Platform Gateway Service
+    version: 1.0.0
+  component: Zuul Server
+
 eip:
   tenant: jkzl
 

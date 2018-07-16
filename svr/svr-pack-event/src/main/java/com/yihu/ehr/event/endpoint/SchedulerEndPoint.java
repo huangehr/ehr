@@ -1,14 +1,15 @@
-package com.yihu.ehr.resolve.controller;
+package com.yihu.ehr.event.endpoint;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
-import com.yihu.ehr.resolve.config.SchedulerConfig;
-import com.yihu.ehr.resolve.job.SchedulerManager;
+import com.yihu.ehr.event.config.SchedulerConfig;
+import com.yihu.ehr.event.job.SchedulerManager;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.quartz.*;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -25,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-@Api(value = "SchedulerEndPoint", description = "资源化入库任务", tags = {"档案解析服务-资源化入库任务"})
+@Api(value = "SchedulerEndPoint", description = "事件处理任务", tags = {"事件服务-事件处理任务"})
 public class SchedulerEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
