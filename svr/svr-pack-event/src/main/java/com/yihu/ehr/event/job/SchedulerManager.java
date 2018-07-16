@@ -70,7 +70,7 @@ public class SchedulerManager {
                     .withIdentity("EventProcessJob-" + suffix, "EventProcess")
                     .build();
             CronTrigger trigger = newTrigger()
-                    .withIdentity("EventProcessJob-" + suffix, "EventProcess")
+                    .withIdentity("EventProcessTrigger-" + suffix, "EventProcess")
                     .withSchedule(CronScheduleBuilder.cronSchedule(cronExp))
                     .startNow()
                     .build();

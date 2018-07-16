@@ -34,7 +34,7 @@ public class SchedulerManager {
                         .withIdentity("PackResolveJob-" + suffix, "PackResolve")
                         .build();
                 CronTrigger trigger = newTrigger()
-                        .withIdentity("PackResolveJob-" + suffix, "PackResolve")
+                        .withIdentity("PackResolveTrigger-" + suffix, "PackResolve")
                         .withSchedule(CronScheduleBuilder.cronSchedule(schedulerConfig.getCronExp()))
                         .startNow()
                         .build();
