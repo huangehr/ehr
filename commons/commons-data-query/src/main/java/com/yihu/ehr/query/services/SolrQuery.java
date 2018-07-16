@@ -295,7 +295,7 @@ public class SolrQuery {
             if (fieldValueObj == null && groupNullIsolate) {
                 String null_fq = fq + " AND -" + groupField + ":*";
                 nullDocList = solrUtil.query(tableName, q, null_fq, sort, start, rows, fields);
-                i = (int) nullDocList.getNumFound();
+                i = groupChildCount;
             }
             while (i != 0) {
                 Map<String, Object> map = new HashMap<>();
