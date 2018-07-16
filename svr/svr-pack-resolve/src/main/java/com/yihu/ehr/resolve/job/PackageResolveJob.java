@@ -2,6 +2,7 @@ package com.yihu.ehr.resolve.job;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.profile.ArchiveStatus;
+import com.yihu.ehr.profile.ProfileType;
 import com.yihu.ehr.profile.exception.ResolveException;
 import com.yihu.ehr.profile.family.ResourceCells;
 import com.yihu.ehr.profile.queue.RedisCollection;
@@ -24,6 +25,7 @@ import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.*;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
@@ -67,8 +69,14 @@ public class PackageResolveJob implements InterruptableJob {
             if (pack != null) {
                 PackResolveLogger.info("开始入库:" + pack.get_id() + ", Timestamp:" + new Date());
                 statusReportService.reportStatus(pack.get_id(), ArchiveStatus.Acquired, 0, "正在入库中", null);
-                doResolve(pack, statusReportService);
+                OriginalPackage originalPackage = doResolve(pack, statusReportService);
+                //发送省平台上传消息
                 redisTemplate.opsForList().leftPush(RedisCollection.ProvincialPlatformQueue, objectMapper.writeValueAsString(pack));
+                //发送事件处理消息
+                if (originalPackage.getProfileType() == ProfileType.File || originalPackage.getProfileType() == ProfileType.Link) {
+                    KafkaTemplate kafkaTemplate = SpringContext.getService(KafkaTemplate.class);
+                    kafkaTemplate.send("svr-pack-event", "resolve", objectMapper.writeValueAsString(pack));
+                }
             }
         } catch (Exception e) {
             int errorType = -2;
@@ -95,7 +103,7 @@ public class PackageResolveJob implements InterruptableJob {
         }
     }
 
-    private void doResolve(EsSimplePackage pack, StatusReportService statusReportService) throws Exception {
+    private OriginalPackage doResolve(EsSimplePackage pack, StatusReportService statusReportService) throws Exception {
         ResolveService resolveEngine = SpringContext.getService(ResolveService.class);
         PackMillService packMill = SpringContext.getService(PackMillService.class);
         IdentifyService identifyService = SpringContext.getService(IdentifyService.class);
@@ -118,6 +126,8 @@ public class PackageResolveJob implements InterruptableJob {
         long delay = pack.getReceive_date().getTime() - originalPackage.getEventTime().getTime();
         map.put("delay", delay % DAY > 0 ? delay / DAY + 1 : delay / DAY);
         map.put("re_upload_flg", String.valueOf(originalPackage.isReUploadFlg()));
+        statusReportService.reportStatus(pack.get_id(), ArchiveStatus.Finished, 0, "resolve success",  map);
+        //回填解析数据
         pack.setRowkey(resourceBucket.getId());
         pack.setPatient_id(originalPackage.getPatientId());
         pack.setEvent_date(DateUtil.toStringLong(originalPackage.getEventTime()));
@@ -127,7 +137,7 @@ public class PackageResolveJob implements InterruptableJob {
         pack.setOrg_name(resourceBucket.getBasicRecord(ResourceCells.ORG_NAME));
         pack.setPatient_name(resourceBucket.getBasicRecord(ResourceCells.PATIENT_NAME));
         pack.setIdcard_no(resourceBucket.getBasicRecord(ResourceCells.DEMOGRAPHIC_ID));
-        statusReportService.reportStatus(pack.get_id(), ArchiveStatus.Finished, 0, "resolve success",  map);
+        return originalPackage;
     }
 
     private String downloadTo(String filePath) throws Exception {

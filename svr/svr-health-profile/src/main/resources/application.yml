@@ -1,6 +1,12 @@
 server:
   port: ${svr-health-profile.server.port}
 
+info:
+  app:
+    name: SVR-HEALTH-PROFILE
+    description: EHR Platform Microservice.
+    version: 1.0.0
+
 spring:
   # REDIS
   redis:

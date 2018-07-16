@@ -3,9 +3,9 @@ server:
 
 info:
   app:
-    name: JsonPackageService
-    description: EHR platform package service.
-    version: 1.2.0
+    name: SVR-PACK-MGR
+    description: EHR Platform Microservice.
+    version: 1.0.0
 
 spring:
   http:

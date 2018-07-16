@@ -1,6 +1,12 @@
 server:
   port: ${svr-pack-resolve.server.port}
 
+info:
+  app:
+    name: SVR-PACK-RESOLVE
+    description: EHR Platform Microservice.
+    version: 1.0.0
+
 spring:
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
@@ -23,6 +29,10 @@ spring:
       max-idle: 8 # Max number of "idle" connections in the pool. Use a negative value to indicate an unlimited number of idle connections.
       max-wait: -1 # Maximum amount of time (in milliseconds) a connection allocation should block before throwing an exception when the pool is exhausted. Use a negative value to block indefinitely.
       min-idle: 1 # Target for the minimum number of idle connections to maintain in the pool. This setting only has an effect if it is positive.
+  kafka:
+    consumer:
+      group-id: svr-pack-event
+      auto-offset-reset: earliest
 
 fast-dfs:
   connect-timeout: 20
@@ -149,34 +159,8 @@ spring:
     host: 172.19.103.47 # Redis server host.
     port: 6379
     password: redis!@456
-fast-dfs:
-  tracker-server: 172.19.103.13:22122
-  public-server: http://172.19.103.52:80
-  pacs-group-name: group1 # 影像文件落入到group1上
-
-hadoop:
-  hbase-properties:
-    hbase.zookeeper.quorum: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com
-elasticsearch:
-  cluster-name: elasticsearch
-  cluster-nodes: 172.19.103.9:9300
-ftp:
-  address: 172.19.103.58
-  username: pacs
-  password: pacssr2018
-  port: 21
-
----
-spring:
-  profiles: prod
-  datasource:
-    url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: chenweishan
-    password: chenweishan
-  redis:
-    host: 172.19.103.47
-    port: 6379
-    password: redis!@456
+  kafka:
+    bootstrap-servers: node4.hde.h3c.com:6667
 fast-dfs:
   tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52:80
@@ -192,4 +176,3 @@ ftp:
   username: pacs
   password: pacssr2018
   port: 21
-

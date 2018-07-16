@@ -3,8 +3,8 @@ server:
 
 info:
   app:
-    name: AgAdminService
-    description: EHR platform json app service.
+    name: AG-ADMIN
+    description: EHR Platform Gateway Service
     version: 1.0.0
   component: Zuul Server
 

@@ -3,8 +3,8 @@ server:
 
 info:
   app:
-    name: ResourceServiceApp
-    description: Resource service.
+    name: SVR-RESOURCE
+    description: EHR Platform Microservice.
     version: 1.0.0
 
 spring:
