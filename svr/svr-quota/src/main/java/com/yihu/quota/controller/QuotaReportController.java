@@ -173,7 +173,7 @@ public class QuotaReportController extends BaseController {
                 for (String viewQuotaCode : otherQuotaViewResult.keySet()) {
                     if(otherQuotaViewResult != null && otherQuotaViewResult.get(viewQuotaCode) != null && otherQuotaViewResult.get(viewQuotaCode).size()>0 ){
                         for (Map<String, Object> quotaResultMap : otherQuotaViewResult.get(viewQuotaCode)) {
-                            if (quotaResultMap.get(dimension) != null) {
+                            if (quotaResultMap.get(dimension) != null && vMap.get(dimension) != null ) {
                                 if (vMap.get(dimension).toString().trim().equals(quotaResultMap.get(dimension).toString().trim())) {
                                     vMap.put(viewQuotaCode, quotaResultMap.get("result")==null ? 0 : ("--".equals(quotaResultMap.get("result")) ? quotaResultMap.get("result") : nf.format(Double.valueOf(quotaResultMap.get("result").toString()))));
                                     break;
