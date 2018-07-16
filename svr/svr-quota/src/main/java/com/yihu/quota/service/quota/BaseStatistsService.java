@@ -636,8 +636,6 @@ public class BaseStatistsService {
                         value = map.get(key).toString().substring(0, 4);
                     } else if (dateDime.contains("quarter")) {
                         value = map.get(key).toString().substring(0, 7);
-                    } else if (dateDime.contains("month")) {
-                        value = map.get(key).toString().substring(0, 7);
                         if(value.contains("-04")){
                             value = value.replace("-04","02");
                         }else if(value.contains("-07")){
@@ -645,6 +643,8 @@ public class BaseStatistsService {
                         }else if(value.contains("-10")){
                             value = value.replace("-10","04");
                         }
+                    } else if (dateDime.contains("month")) {
+                        value = map.get(key).toString().substring(0, 7);
                     } else if (dateDime.contains("week")) {
                         value = map.get(key).toString().substring(0, 7);
                     } else if (dateDime.contains("day")) {
