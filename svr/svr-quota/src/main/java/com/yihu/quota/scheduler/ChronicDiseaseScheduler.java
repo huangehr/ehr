@@ -18,7 +18,6 @@ import org.apache.solr.common.SolrDocumentList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,14 +26,15 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.*;
 
 /**
- * 分别去重汇总高血压疾病、糖尿病疾病患者数据，转换年龄段。
+ * 记录高血压疾病、糖尿病疾病患者档案数据。
+ * 暂时没用 - 张进军 2018.7.16
  *
  * @author 张进军
  * @date 2018/6/27 17:05
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0)
-@Api(description = "分别去重汇总高血压疾病、糖尿病疾病患者数据，转换年龄段", tags = {"solr跨数据集数据抽取--分别去重汇总高血压疾病、糖尿病疾病患者数据，转换年龄段"})
+@Api(description = "记录高血压疾病、糖尿病疾病患者档案数据", tags = {"solr跨数据集数据抽取--记录高血压疾病、糖尿病疾病患者档案数据"})
 public class ChronicDiseaseScheduler {
 
     private static final Logger logger = LoggerFactory.getLogger(ChronicDiseaseScheduler.class);
@@ -50,13 +50,13 @@ public class ChronicDiseaseScheduler {
 
     // ES 中慢性病 index
     private String CD_INDEX = "chronic_disease";
-    // ES 中慢性病患者汇总 type
-    private String CD_TYPE_PATIENT = "chronic_disease_patient";
+    // ES 中慢性病患者记录汇总 type
+    private String CD_TYPE_PATIENT = "chronic_disease_patient_record";
 
     /**
      * 抽取昨天的高血压疾病、糖尿病疾病患者数据
      */
-    @Scheduled(cron = "0 40 02 * * ?")
+//    @Scheduled(cron = "0 0 8 * * ?")
     public void extractChronicDiseaseJob() {
         try {
             Date currDate = new Date();
@@ -101,11 +101,11 @@ public class ChronicDiseaseScheduler {
         String idCardField = "EHR_000017"; // 身份证号数据元
         String[] showFields = idCardField.split(","); // 查询结果的返回字段
 
-        // 去重查询糖尿病患者记录
+        // 查询糖尿病患者记录
         List<String> diabetesRowkeyList = new ArrayList();
         String q_diabetes = "rowkey:*$HDSB04_05$* OR (rowkey:*$HDSD00_73$* AND (EHR_000109:E1O* OR EHR_000109:E11* OR EHR_000109:E12* OR EHR_000109:E13* OR EHR_000109:E14*))" +
                 " OR (rowkey:*$HDSD00_69$* AND (EHR_000293:E1O* OR EHR_000293:E11* OR EHR_000293:E12* OR EHR_000293:E13* OR EHR_000293:E14*))";
-        SolrDocumentList diabetesDocList = solrUtil.queryDistinctOneFieldForDocList(ResourceCore.SubTable, q_diabetes, fq, null, 0, -1, showFields, idCardField, "event_date desc");
+        SolrDocumentList diabetesDocList = solrUtil.queryReturnFieldList(ResourceCore.SubTable, q_diabetes, fq, null, 0, -1, showFields);
         if (diabetesDocList != null && diabetesDocList.getNumFound() > 0) {
             for (SolrDocument doc : diabetesDocList) {
                 diabetesRowkeyList.add(doc.getFieldValue("rowkey").toString());
@@ -113,11 +113,11 @@ public class ChronicDiseaseScheduler {
         }
         this.translateAndSaveData(diabetesRowkeyList, "1");
 
-        // 去重查询高血压患者记录
+        // 查询高血压患者记录
         List<String> hypertensionRowkeyList = new ArrayList();
         String q_hypertension = "rowkey:*$HDSB04_02$* OR (rowkey:*$HDSD00_73$* AND (EHR_000109:I1O* OR EHR_000109:I11* OR EHR_000109:I12* OR EHR_000109:I13* OR EHR_000109:I14*))" +
                 " OR (rowkey:*$HDSD00_69$* AND (EHR_000293:I1O* OR EHR_000293:I11* OR EHR_000293:I12* OR EHR_000293:I13* OR EHR_000293:I14*))";
-        SolrDocumentList hypertensionDocList = solrUtil.queryDistinctOneFieldForDocList(ResourceCore.SubTable, q_hypertension, fq, null, 0, -1, showFields, idCardField, "event_date desc");
+        SolrDocumentList hypertensionDocList = solrUtil.queryReturnFieldList(ResourceCore.SubTable, q_hypertension, fq, null, 0, -1, showFields);
         if (hypertensionDocList != null && hypertensionDocList.getNumFound() > 0) {
             for (SolrDocument doc : hypertensionDocList) {
                 hypertensionRowkeyList.add(doc.getFieldValue("rowkey").toString());
@@ -179,27 +179,18 @@ public class ChronicDiseaseScheduler {
                 data.put("org_code", subInfo.get("org_code"));
                 // 就诊日期
                 data.put("event_date", subInfo.get("event_date"));
+                // 就诊编号
+                data.put("event_no", subInfo.get("event_no"));
                 // 慢性病类型
                 data.put("type", type);
                 // 慢性病类型名称
                 String typeName = null; // 患者疾病类型名称
                 if ("1".equals(type)) {
-                    typeName = "糖尿病患者";
+                    typeName = "糖尿病";
                 } else if ("2".equals(type)) {
-                    typeName = "高血压患者";
+                    typeName = "高血压";
                 }
                 data.put("type_value", typeName);
-                // 年龄段、年龄段名称
-                Object birthdayObj = masterInfo.get("EHR_000007"); // 出生日期
-                if (birthdayObj != null) {
-                    String birthday = birthdayObj.toString().substring(0, 10);
-                    int age = healthArchiveSchedulerService.getAgeByBirth(birthday);
-                    data.put("age_range", healthArchiveSchedulerService.exchangeCodeByAge(age));
-                    data.put("age_range_value", healthArchiveSchedulerService.exchangeNameByAge(age));
-                } else {
-                    data.put("age_range", "");
-                    data.put("age_range_value", "");
-                }
                 // 修改时间
                 String now = DateUtil.getNowDate(DateUtil.utcDateTimePattern);
                 data.put("modified_date", now);
