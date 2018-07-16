@@ -1,6 +1,6 @@
-package com.yihu.ehr.event.job;
+package com.yihu.ehr.resolve.job;
 
-import com.yihu.ehr.event.config.SchedulerConfig;
+import com.yihu.ehr.resolve.config.SchedulerConfig;
 import org.quartz.*;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,7 @@ import static org.quartz.TriggerBuilder.newTrigger;
  * Created by progr1mmer on 2018/7/13.
  */
 @Component
-public class JobManager {
+public class SchedulerManager {
 
     private int jobSetSize;
     @Autowired
@@ -30,11 +30,11 @@ public class JobManager {
         try {
             for (int i = 0; i < schedulerConfig.getInitSize(); i++) {
                 String suffix = UUID.randomUUID().toString().substring(0, 8);
-                JobDetail jobDetail = newJob(EventProcessJob.class)
-                        .withIdentity("EventProcessJob-" + suffix, "EventProcess")
+                JobDetail jobDetail = newJob(PackageResolveJob.class)
+                        .withIdentity("PackResolveJob-" + suffix, "PackResolve")
                         .build();
                 CronTrigger trigger = newTrigger()
-                        .withIdentity("EventProcessJob-" + suffix, "EventProcess")
+                        .withIdentity("PackResolveJob-" + suffix, "PackResolve")
                         .withSchedule(CronScheduleBuilder.cronSchedule(schedulerConfig.getCronExp()))
                         .startNow()
                         .build();
@@ -46,9 +46,19 @@ public class JobManager {
         this.jobSetSize = schedulerConfig.getInitSize();
     }
 
+    public int getJobSetSize() {
+        return jobSetSize;
+    }
+
+    public int getJobSize() throws Exception {
+        GroupMatcher groupMatcher = GroupMatcher.groupEquals("PackResolve");
+        Set<JobKey> jobKeys = scheduler.getJobKeys(groupMatcher);
+        return jobKeys.size();
+    }
+
     public void addJob (int count, String cronExp) throws Exception {
         int addCount = 0;
-        GroupMatcher groupMatcher = GroupMatcher.groupEquals("EventProcess");
+        GroupMatcher groupMatcher = GroupMatcher.groupEquals("PackResolve");
         Set<JobKey> jobKeys = scheduler.getJobKeys(groupMatcher);
         int activeJob = jobKeys.size();
         for (int i = 0; i < count; i++) {
@@ -56,11 +66,11 @@ public class JobManager {
                 break;
             }
             String suffix = UUID.randomUUID().toString().substring(0, 8);
-            JobDetail jobDetail = newJob(EventProcessJob.class)
-                    .withIdentity("EventProcessJob-" + suffix, "EventProcess")
+            JobDetail jobDetail = newJob(PackageResolveJob.class)
+                    .withIdentity("PackResolveJob-" + suffix, "PackResolve")
                     .build();
             CronTrigger trigger = newTrigger()
-                    .withIdentity("EventProcessJob-" + suffix, "EventProcess")
+                    .withIdentity("PackResolveJob-" + suffix, "PackResolve")
                     .withSchedule(CronScheduleBuilder.cronSchedule(cronExp))
                     .startNow()
                     .build();
@@ -75,7 +85,7 @@ public class JobManager {
 
     public void minusJob (int count) throws Exception {
         int minusCount = count;
-        GroupMatcher groupMatcher = GroupMatcher.groupEquals("EventProcess");
+        GroupMatcher groupMatcher = GroupMatcher.groupEquals("PackResolve");
         Set<JobKey> jobKeySet = scheduler.getJobKeys(groupMatcher);
         for (JobKey jobKey : jobKeySet) {
             scheduler.deleteJob(jobKey);

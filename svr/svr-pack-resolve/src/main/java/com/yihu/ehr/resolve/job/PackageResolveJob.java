@@ -40,7 +40,7 @@ import java.util.Map;
  */
 @Component
 @DisallowConcurrentExecution
-public class PackageResourceJob implements InterruptableJob {
+public class PackageResolveJob implements InterruptableJob {
 
     private static final long DAY = 1000 * 60 * 60 * 24;
 
