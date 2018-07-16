@@ -13,11 +13,13 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.time.DateUtils;
+import org.apache.solr.client.solrj.response.Group;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -26,15 +28,14 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.*;
 
 /**
- * 记录高血压疾病、糖尿病疾病患者档案数据。
- * 暂时没用 - 张进军 2018.7.16
+ * 去重记录高血压疾病、糖尿病疾病患者
  *
  * @author 张进军
  * @date 2018/6/27 17:05
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0)
-@Api(description = "记录高血压疾病、糖尿病疾病患者档案数据", tags = {"solr跨数据集数据抽取--记录高血压疾病、糖尿病疾病患者档案数据"})
+@Api(description = "去重记录高血压疾病、糖尿病疾病患者", tags = {"solr跨数据集数据抽取--去重记录高血压疾病、糖尿病疾病患者"})
 public class ChronicDiseaseScheduler {
 
     private static final Logger logger = LoggerFactory.getLogger(ChronicDiseaseScheduler.class);
@@ -51,12 +52,12 @@ public class ChronicDiseaseScheduler {
     // ES 中慢性病 index
     private String CD_INDEX = "chronic_disease";
     // ES 中慢性病患者记录汇总 type
-    private String CD_TYPE_PATIENT = "chronic_disease_patient_record";
+    private String CD_TYPE_PATIENT = "chronic_disease_patient";
 
     /**
-     * 抽取昨天的高血压疾病、糖尿病疾病患者数据
+     * 抽取昨天的去重记录高血压疾病、糖尿病疾病患者
      */
-//    @Scheduled(cron = "0 0 8 * * ?")
+    @Scheduled(cron = "0 0 8 * * ?")
     public void extractChronicDiseaseJob() {
         try {
             Date currDate = new Date();
@@ -72,7 +73,7 @@ public class ChronicDiseaseScheduler {
         }
     }
 
-    @ApiOperation("抽取指定时间段高血压疾病、糖尿病疾病患者数据")
+    @ApiOperation("抽取指定时间段去重记录高血压疾病、糖尿病疾病患者")
     @RequestMapping(value = ServiceApi.TJ.Scheduler.ExtractChronicDisease, method = RequestMethod.GET)
     public Envelop extractChronicDisease(
             @ApiParam(name = "startDate", value = "开始日期，格式 YYYY-MM-DD，接口里自动拼接 T00:00:00Z，", required = true)
@@ -99,31 +100,57 @@ public class ChronicDiseaseScheduler {
      */
     private void saveTotalData(String fq) throws Exception {
         String idCardField = "EHR_000017"; // 身份证号数据元
-        String[] showFields = idCardField.split(","); // 查询结果的返回字段
+        // 查询结果的返回字段
+        String[] showFields = {"EHR_000017"};
 
-        // 查询糖尿病患者记录
+        // 去重查询糖尿病患者记录
         List<String> diabetesRowkeyList = new ArrayList();
         String q_diabetes = "rowkey:*$HDSB04_05$* OR (rowkey:*$HDSD00_73$* AND (EHR_000109:E1O* OR EHR_000109:E11* OR EHR_000109:E12* OR EHR_000109:E13* OR EHR_000109:E14*))" +
                 " OR (rowkey:*$HDSD00_69$* AND (EHR_000293:E1O* OR EHR_000293:E11* OR EHR_000293:E12* OR EHR_000293:E13* OR EHR_000293:E14*))";
-        SolrDocumentList diabetesDocList = solrUtil.queryReturnFieldList(ResourceCore.SubTable, q_diabetes, fq, null, 0, -1, showFields);
-        if (diabetesDocList != null && diabetesDocList.getNumFound() > 0) {
-            for (SolrDocument doc : diabetesDocList) {
-                diabetesRowkeyList.add(doc.getFieldValue("rowkey").toString());
-            }
-        }
+        List<Group> diabetesGroupList = solrUtil.queryDistinctOneField(ResourceCore.SubTable, q_diabetes, fq, null, 0, -1, showFields, idCardField, "event_date asc");
+        this.collectRowkey(diabetesRowkeyList, diabetesGroupList, q_diabetes, fq, idCardField, showFields);
         this.translateAndSaveData(diabetesRowkeyList, "1");
 
-        // 查询高血压患者记录
+        // 去重查询高血压患者记录
         List<String> hypertensionRowkeyList = new ArrayList();
         String q_hypertension = "rowkey:*$HDSB04_02$* OR (rowkey:*$HDSD00_73$* AND (EHR_000109:I1O* OR EHR_000109:I11* OR EHR_000109:I12* OR EHR_000109:I13* OR EHR_000109:I14*))" +
                 " OR (rowkey:*$HDSD00_69$* AND (EHR_000293:I1O* OR EHR_000293:I11* OR EHR_000293:I12* OR EHR_000293:I13* OR EHR_000293:I14*))";
-        SolrDocumentList hypertensionDocList = solrUtil.queryReturnFieldList(ResourceCore.SubTable, q_hypertension, fq, null, 0, -1, showFields);
-        if (hypertensionDocList != null && hypertensionDocList.getNumFound() > 0) {
-            for (SolrDocument doc : hypertensionDocList) {
-                hypertensionRowkeyList.add(doc.getFieldValue("rowkey").toString());
+        SolrDocumentList hypertensionDocList = solrUtil.queryDistinctOneFieldForDocList(ResourceCore.SubTable, q_hypertension, fq, null, 0, -1, showFields, idCardField, "event_date asc");
+        this.collectRowkey(hypertensionRowkeyList, diabetesGroupList, q_hypertension, fq, idCardField, showFields);
+        this.translateAndSaveData(hypertensionRowkeyList, "2");
+    }
+
+    /**
+     * 收集细表的 rowkey
+     *
+     * @param rowkeyList        rowkey 容器
+     * @param groupList         去重分组结果
+     * @param q                 查询条件
+     * @param fq                筛选条件
+     * @param distinctFieldName 去重字段名
+     * @param showFields        查询返回字段名数组
+     * @throws Exception
+     */
+    private void collectRowkey(List<String> rowkeyList, List<Group> groupList, String q, String fq, String distinctFieldName, String[] showFields) throws Exception {
+        if (groupList != null && rowkeyList.size() > 0) {
+            // 查询空值时的筛选条件
+            fq += " AND -" + distinctFieldName + ":*";
+            for (Group group : groupList) {
+                int groupChildCount = group.getResult().size();
+                SolrDocument firstDoc = group.getResult().get(0);
+                Object fieldValueObj = firstDoc.getFieldValue(distinctFieldName);
+                if (fieldValueObj == null) {
+                    // 记录中去重字段是空值时，每条空值新单独记录到ES
+                    SolrDocumentList nullDocList = solrUtil.query(ResourceCore.SubTable, q, fq, null, 0, -1, showFields);
+                    for (int i = 0; i < groupChildCount; i++) {
+                        SolrDocument doc = nullDocList.get(i);
+                        rowkeyList.add(doc.getFieldValue("rowkey").toString());
+                    }
+                } else {
+                    rowkeyList.add(firstDoc.getFieldValue("rowkey").toString());
+                }
             }
         }
-        this.translateAndSaveData(hypertensionRowkeyList, "2");
     }
 
     /**
@@ -166,7 +193,7 @@ public class ChronicDiseaseScheduler {
                 String idCard = masterInfo.get("EHR_000017") != null ? masterInfo.get("EHR_000017").toString() : "";
                 data.put("id_card", idCard);
 
-                // 检测是否已有该患者
+                // 检测是否已有该患者，已有则不更新。
                 String sql = "SELECT id_card, type FROM chronic_disease/chronic_disease_patient WHERE id_card = '" + idCard + "' AND type = '" + type + "'";
                 List<Map<String, Object>> infoList = elasticSearchUtil.findBySql(fields, sql);
                 if (infoList != null || infoList.size() != 0) {
@@ -179,8 +206,6 @@ public class ChronicDiseaseScheduler {
                 data.put("org_code", subInfo.get("org_code"));
                 // 就诊日期
                 data.put("event_date", subInfo.get("event_date"));
-                // 就诊编号
-                data.put("event_no", subInfo.get("event_no"));
                 // 慢性病类型
                 data.put("type", type);
                 // 慢性病类型名称
