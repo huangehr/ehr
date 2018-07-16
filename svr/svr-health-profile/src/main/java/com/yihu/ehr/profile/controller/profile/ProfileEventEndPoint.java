@@ -35,39 +35,41 @@ public class ProfileEventEndPoint extends EnvelopRestEndPoint {
 
     @ApiOperation("门诊/住院事件(时间轴)")
     @RequestMapping(value = ServiceApi.Profiles.MedicalEvents, method = RequestMethod.GET)
-    public List<Map<String, Object>> medicalEvents(
+    public List<Map<String, Object>> visits (
             @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362301195002141528")
             @RequestParam(value = "demographic_id") String demographic_id,
-            @ApiParam(name = "filter", value = "过滤条件")
+            @ApiParam(name = "filter", value = "过滤条件(key1=val1;key2=val2)")
             @RequestParam(value = "filter", required = false) String filter,
-            @ApiParam(name = "blurry_type", value = "针对需要对特殊档案类型进行查询的参数(0-门诊 1-住院 2-体检 3-影像 4-检查 5-检验 6-妇幼 7-免疫), 此处有值的话filter中就不能再包含event_type")
+            @ApiParam(name = "blurry_type", value = "针对需要对特殊档案类型进行查询的参数" +
+                    "(0-门诊 1-住院 2-体检 3-影像 4-检查 5-检验 6-妇幼 7-免疫)；" +
+                    "此处有值的话filter参数中不能再包含event_type")
             @RequestParam(value = "blurry_type", required = false) String blurry_type,
-            @ApiParam(name = "date", value = "时间")
+            @ApiParam(name = "date", value = "时间，格式如：{\"start\":\"2018-01-01T00:00:00Z\",\"end\":\"2018-02-01T00:00:00Z\",\"month\":\"2018-03\"}")
             @RequestParam(value = "date", required = false) String date,
-            @ApiParam(name = "searchParam", value = "搜索条件")
+            @ApiParam(name = "searchParam", value = "搜索条件（此参数只针对机构和诊断）")
             @RequestParam(value = "searchParam", required = false) String searchParam) throws Exception {
-        return patientEvent.getPatientEvents(demographic_id, filter, blurry_type, date, searchParam);
+        return patientEvent.visits(demographic_id, filter, blurry_type, date, searchParam);
     }
 
     @ApiOperation("最近的一条就诊记录 - 上饶APP")
     @RequestMapping(value = ServiceApi.Profiles.RecentMedicalEvents, method = RequestMethod.GET)
-    public Map<String, Object> recentMedicalEvents(
+    public Map<String, Object> recentVisit (
             @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362301195002141528")
             @RequestParam(value = "demographic_id") String demographic_id) throws Exception {
-        return patientEvent.recentMedicalEvents(demographic_id);
+        return patientEvent.recentVisit(demographic_id, -30);
     }
 
-    @ApiOperation("近期就诊 - 档案浏览器")
+    @ApiOperation("近期就诊列表 - 档案浏览器")
     @RequestMapping(value = ServiceApi.Profiles.RecentVisits, method = RequestMethod.GET)
-    public List<Map<String, Object>> recentVisits(
+    public List<Map<String, Object>> recentVisits (
             @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362301195002141528")
             @RequestParam(value = "demographic_id") String demographic_id) throws Exception {
-        return patientEvent.recentVisits(demographic_id);
+        return patientEvent.recentVisits(demographic_id, -180);
     }
 
     @ApiOperation("近期就诊详情 - 档案浏览器")
     @RequestMapping(value = ServiceApi.Profiles.RecentVisitsSub, method = RequestMethod.GET)
-    public Map<String, Object> recentVisitsSub(
+    public Map<String, Object> recentVisitsSub (
             @ApiParam(name = "profile_id", value = "档案ID", required = true, defaultValue = "49229004X_000000481520_1513758586000")
             @RequestParam(value = "profile_id") String profile_id) throws Exception {
         return patientEvent.recentVisitsSub(profile_id);

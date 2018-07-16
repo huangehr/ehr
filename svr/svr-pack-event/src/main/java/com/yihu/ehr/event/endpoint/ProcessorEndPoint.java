@@ -59,7 +59,7 @@ public class ProcessorEndPoint extends EnvelopRestEndPoint{
             String groupName = objectNode.get(FastDFSUtil.GROUP_NAME).toString();
             String remoteFileName = objectNode.get(FastDFSUtil.REMOTE_FILE_NAME).toString();
             String path = groupName.substring(1, groupName.length() - 1) + ":" + remoteFileName.substring(1, remoteFileName.length() - 1);
-            eventProcessor.setRemote_path(path);
+            eventProcessor.setRemotePath(path);
         }
         eventProcessor = eventProcessorService.save(eventProcessor);
         try {
@@ -79,7 +79,7 @@ public class ProcessorEndPoint extends EnvelopRestEndPoint{
         dealChain.removeProcessor(processor);
         EventProcessor eventProcessor = eventProcessorService.findByName(processor);
         if (eventProcessor != null) {
-            String remote_path = eventProcessor.getRemote_path();
+            String remote_path = eventProcessor.getRemotePath();
             if (!StringUtils.isEmpty(remote_path)) {
                 fastDFSUtil.delete(remote_path.split(":")[0], remote_path.split(":")[1]);
             }

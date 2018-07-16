@@ -18,9 +18,6 @@ spring:
     validation-query: SELECT 1
     test-on-borrow: true
 
-#  ssl:
-#    key-store: D:/tomcat.keystore
-
 ---
 spring:
   profiles: dev
@@ -40,11 +37,11 @@ fz-gateway:
 
 ---
 spring:
-  profiles: test
+  profiles: prod
   datasource:
     url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: weifuwu
-    password: weifuwu
+    username: chenweishan
+    password: chenweishan
   redis:
     host: 172.19.103.47
     port: 6379
@@ -54,71 +51,3 @@ fz-gateway:
   clientId: 9000401
   clientVersion: 1.0
   handlerId: 50871
-
----
-spring:
-  profiles: prod_fz
-  datasource:
-    url: jdbc:mysql://11.1.2.5:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: healthcloud
-    password: GP8Qz4qU
-  redis:
-    host: 11.1.2.22
-    port: 6390
-    password: Kb6wKDQP1W4
-fz-gateway:
-  url: http://11.1.2.13:10001/fzGateway/WSGW/rest
-  clientId: 9000401
-  clientVersion: 1.0
-  handlerId: 50871
-
----
-spring:
-  profiles: prod_sr
-  datasource:
-    url: jdbc:mysql://10.176.97.9:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: healthcloud
-    password: GP8Qz4qU
-  redis:
-    host: 10.176.97.5
-    port: 6390
-    password: q4YaQemf
-fz-gateway:
-  url: http://10.176.97.10:10001/fzGateway/WSGW/rest
-  clientId: 9000401
-  clientVersion: 1.0
-  handlerId: 50641
-
----
-spring:
-  profiles: prod_fzzy
-  datasource:
-    url: jdbc:mysql://100.100.1.159:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: healthcloud
-    password: GP8Qz4qU
-  redis:
-    host: 100.100.1.161
-    port: 6390
-    password: q4YaQemf
-fz-gateway:
-  url: http://100.100.1.162:10001/fzGateway/WSGW/rest
-  clientId: 9000401
-  clientVersion: 1.0
-  handlerId: 50641
-
----
-spring:
-  profiles: prod_srformal
-  datasource:
-    url: jdbc:mysql://192.168.210.3:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: healthcloud
-    password: GP8Qz4qU
-  redis:
-    host: 192.168.50.82
-    port: 6379
-    password: q4YaQemf
-fz-gateway:
-  url: http://192.168.220.84:10001/fzGateway/WSGW/rest
-  clientId: 9000401
-  clientVersion: 1.0
-  handlerId: 50641

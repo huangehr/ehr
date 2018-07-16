@@ -102,7 +102,7 @@ public class IdentityExtractor extends KeyDataExtractor {
         return properties;
     }
 
-    private static String getPatientAge(Date _eventDate, String birthday, String demographicId) throws Exception {
+    public String getPatientAge(Date _eventDate, String birthday, String demographicId) throws Exception {
         if (!StringUtils.isEmpty(birthday)) {
             DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             Date _birthday = dateFormat.parse(birthday.substring(0, birthday.indexOf("T")));
@@ -145,10 +145,6 @@ public class IdentityExtractor extends KeyDataExtractor {
             }
         }
         return "";
-    }
-
-    public static void main(String [] args) throws Exception {
-        System.out.println(getPatientAge(new Date(), "", ""));
     }
 
     public List<String> getDataSets() {

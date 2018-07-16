@@ -81,23 +81,27 @@ public class MysqlExtract {
             }catch (Exception e){
                 throw new Exception("mysql查询数据出错" + e.getMessage());
             }
-            if(mapList != null && mapList.size() > 0){
-                for(Map<String, Object> map :mapList){
-                    String keyVal  = "";
-                    for(String key :map.keySet()){
-                        if(!key.equals("result")){
-                            keyVal = keyVal + map.get(key) +  "-";
+            if(org.apache.commons.lang.StringUtils.isNotEmpty(esConfig.getAggregation()) && esConfig.getAggregation().equals("list")){
+                returnList = extractUtil.computeList(qdm, qds, mapList, esConfig.getTimekey(), esConfig.getAggregationKey(), quotaVo);
+            }else {
+                if(mapList != null && mapList.size() > 0){
+                    for(Map<String, Object> map :mapList){
+                        String keyVal  = "";
+                        for(String key :map.keySet()){
+                            if(!key.equals("result")){
+                                keyVal = keyVal + map.get(key) +  "-";
+                            }
                         }
+                        String result = map.get("result").toString();
+                        String mapKey = keyVal.substring(0, keyVal.length() - 1);
+                        resultMap.put(mapKey, result);
+                        daySlaveDictMap.put(mapKey, map.get("quotaDate").toString());
                     }
-                    String result = map.get("result").toString();
-                    String mapKey = keyVal.substring(0, keyVal.length() - 1);
-                    resultMap.put(mapKey, result);
-                    daySlaveDictMap.put(mapKey, map.get("quotaDate").toString());
+                    TjQuotaDimensionSlave tjQuotaDimensionSlave = new TjQuotaDimensionSlave();
+                    tjQuotaDimensionSlave.setQuotaCode(quotaVo.getCode());
+                    qds.add(tjQuotaDimensionSlave);
+                    extractUtil.compute(qdm, qds, returnList, resultMap,daySlaveDictMap,quotaVo);
                 }
-                TjQuotaDimensionSlave tjQuotaDimensionSlave = new TjQuotaDimensionSlave();
-                tjQuotaDimensionSlave.setQuotaCode(quotaVo.getCode());
-                qds.add(tjQuotaDimensionSlave);
-                extractUtil.compute(qdm, qds, returnList, resultMap,daySlaveDictMap,quotaVo);
             }
         }
         return returnList;

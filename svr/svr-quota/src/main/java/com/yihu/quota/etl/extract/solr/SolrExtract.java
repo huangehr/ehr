@@ -2,10 +2,8 @@ package com.yihu.quota.etl.extract.solr;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
-import com.yihu.ehr.hbase.HBaseDao;
 import com.yihu.ehr.query.common.model.SolrGroupEntity;
 import com.yihu.ehr.query.services.SolrQuery;
-import com.yihu.ehr.solr.SolrUtil;
 import com.yihu.quota.dao.jpa.save.TjQuotaDataSaveDao;
 import com.yihu.quota.etl.Contant;
 import com.yihu.quota.etl.ExtractConverUtil;
@@ -78,7 +76,7 @@ public class SolrExtract {
         return statiscSlor(qdm, qds, quotaVo);
     }
 
-    public int getExtractTotal(String startTime, String endTime,  EsConfig esConfig) throws Exception {
+    public int getExtractTotal(String startTime, String endTime, EsConfig esConfig) throws Exception {
         this.startTime = startTime;
         this.endTime = endTime;
         this.esConfig = esConfig;
@@ -97,8 +95,6 @@ public class SolrExtract {
         long rows = solrQuery.count(core, q + " AND " + esConfig.getFilter());
         return Integer.valueOf(String.valueOf(rows));
     }
-
-
 
     public List<SaveModel> statiscSlor(List<TjQuotaDimensionMain> qdm,
                                        List<TjQuotaDimensionSlave> qds,
@@ -175,7 +171,7 @@ public class SolrExtract {
                 if (esConfig.getAggregation().equals(Contant.quota.aggregation_list) && !StringUtils.isEmpty(esConfig.getAggregationKey())) {
                     fl = fl + "," + esConfig.getAggregationKey();
                 }
-                list = solrQuery.queryReturnFieldList(core, q, fq, null, quotaVo.getStart(), quotaVo.getRows(), fl.split(","), null, null);
+                list = solrQuery.queryReturnFieldList(core, q, fq, null, quotaVo.getStart(), quotaVo.getRows(), fl.split(","));
             } catch (Exception e) {
                 throw new Exception("solr 查询异常 " + e.getMessage());
             }
@@ -183,7 +179,9 @@ public class SolrExtract {
             listFlag = true;
             // 去重查询
             fl += "," + esConfig.getDistinctGroupField();
-            list = solrQuery.queryReturnFieldList(core, q, fq, null, 0, -1, fl.split(","), esConfig.getDistinctGroupField(), esConfig.getDistinctGroupSort());
+            boolean groupNullIsolate = esConfig.getDistinctGroupNullIsolate() != null ? esConfig.getDistinctGroupNullIsolate() : false;
+            list = solrQuery.distinctQueryReturnFieldList(core, q, fq, null, 0, -1, fl.split(","),
+                    esConfig.getDistinctGroupField(), esConfig.getDistinctGroupSort(), groupNullIsolate);
             // 对比ES中如果已存在该条数据则更新，并从集合中移除该条数据。
             checkEsDistinctData(list);
         }

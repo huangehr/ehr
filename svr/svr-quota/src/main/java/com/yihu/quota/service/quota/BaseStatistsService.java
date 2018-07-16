@@ -21,6 +21,7 @@ import com.yihu.quota.service.source.TjDataSourceService;
 import com.yihu.quota.util.BasesicUtil;
 import com.yihu.quota.vo.DictModel;
 import com.yihu.quota.vo.SaveModel;
+import net.bytebuddy.implementation.bytecode.Throw;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -41,7 +42,7 @@ import java.util.*;
  */
 @Service
 public class BaseStatistsService {
-
+    Logger log = LoggerFactory.getLogger(BaseStatistsService.class);
     @Autowired
     private TjQuotaDao quotaDao;
     @Autowired
@@ -75,7 +76,20 @@ public class BaseStatistsService {
     public static String quotaDateField = "quotaDate";
     public static String firstColumnField = "firstColumn";
 
-    private static final Logger log = LoggerFactory.getLogger(BaseStatistsService.class);
+    /**
+     *  特殊机构类型   根据 上级基础指标code 获取基础数据集
+     * @param code
+     * @param filter
+     * @param dimension
+     * @return
+     * @throws Exception
+     */
+    public List<Map<String, Object>> getOrgHealthCategoryQuotaResultList(String code,String dimension,String filter, String top) throws Exception {
+        List<Map<String, Object>> dimenListResult = getOrgHealthCategoryAggregationResult(code, dimension, filter, top);
+        return dimenListResult;
+    }
+
+
     /**
      * 根据指标code 和维度及条件 分组获取指标查询结果集
      * @param code
@@ -87,15 +101,15 @@ public class BaseStatistsService {
     public List<Map<String, Object>> getQuotaResultList(String code,String dimension,String filter,String dateType, String top) throws Exception {
         TjQuota tjQuota = quotaService.findByCode(code);
         if( tjQuota != null && StringUtils.isNotEmpty(tjQuota.getResultGetType())){
-           if (tjQuota.getResultGetType().equals("2")){//二次统计
-               TjQuotaDataSource quotaDataSorce = dataSourceService.findSourceByQuotaCode(code);
-               if(quotaDataSorce != null){
-                   JSONObject obj = new JSONObject().fromObject(quotaDataSorce.getConfigJson());
-                   EsConfig esConfig= (EsConfig) JSONObject.toBean(obj,EsConfig.class);
-                   if(StringUtils.isNotEmpty(esConfig.getSuperiorBaseQuotaCode()) && StringUtils.isEmpty(esConfig.getEspecialType()) ){
-                       code =  esConfig.getSuperiorBaseQuotaCode();
-                   }
-               }
+            if (tjQuota.getResultGetType().equals("2")){//二次统计
+                TjQuotaDataSource quotaDataSorce = dataSourceService.findSourceByQuotaCode(code);
+                if(quotaDataSorce != null){
+                    JSONObject obj = new JSONObject().fromObject(quotaDataSorce.getConfigJson());
+                    EsConfig esConfig= (EsConfig) JSONObject.toBean(obj,EsConfig.class);
+                    if(StringUtils.isNotEmpty(esConfig.getSuperiorBaseQuotaCode()) && StringUtils.isEmpty(esConfig.getEspecialType()) ){
+                        code =  esConfig.getSuperiorBaseQuotaCode();
+                    }
+                }
             }
         }
         List<Map<String, Object>> dimenListResult = new ArrayList<>();
@@ -104,20 +118,6 @@ public class BaseStatistsService {
         }else {
             dimenListResult = getAggregationResult(code, dimension, filter, top);
         }
-        return dimenListResult;
-    }
-
-
-    /**
-     *  特殊机构类型   根据 上级基础指标code 获取基础数据集
-     * @param code
-     * @param filter
-     * @param dimension
-     * @return
-     * @throws Exception
-     */
-    public List<Map<String, Object>> getOrgHealthCategoryQuotaResultList(String code,String dimension,String filter, String top) throws Exception {
-        List<Map<String, Object>> dimenListResult = getOrgHealthCategoryAggregationResult(code, dimension, filter, top);
         return dimenListResult;
     }
 
@@ -251,8 +251,6 @@ public class BaseStatistsService {
      */
     public List<Map<String, Object>>  divisionQuota(String molecular, String denominator, String dimension,
         String molecularFilter,String denominatorFilters,String operation,String operationValue,String dateType, String top) throws Exception {
-//        List<Map<String, Object>> moleList = getQuotaResultList(molecular,dimension,molecularFilter,dateType, top);
-//        List<Map<String, Object>> denoList =  getQuotaResultList(denominator,dimension,denominatorFilters,dateType, top);
         if(StringUtils.isEmpty(dimension) && StringUtils.isNotEmpty(dateType)){
             dimension = dateType;
         }
@@ -974,7 +972,7 @@ public class BaseStatistsService {
     /**
      * 获取单个指标结果
      * @param code
-     * @param filters
+     * @param filters 外部传入条件
      * @param dimension
      * @return
      * @throws Exception
@@ -1258,6 +1256,15 @@ public class BaseStatistsService {
         return handleData;
     }
 
+    /**
+     * 百分比 增幅运算 维度不是时间维度
+     * @param dimension
+     * @param moleList
+     * @param denoList
+     * @param operation
+     * @param operationValue
+     * @return
+     */
     public List<Map<String, Object>> divisionPercent(String dimension, List<Map<String, Object>> moleList, List<Map<String, Object>> denoList,int operation,int operationValue){
         List<Map<String, Object>> divisionResultList = new ArrayList<>();
         for(Map<String, Object> denoMap : denoList) {
@@ -1312,78 +1319,209 @@ public class BaseStatistsService {
         return  divisionResultList;
     }
 
+    /**
+     * 计算增幅 环比和 同比
+     * @param dimension 不为空时，查询固定某个月或者某年的增幅
+     * @param filters  外部过滤条件 如 quotaDate >= '2018-03-01' and quotaDate <= '2018-03-31'
+     * @param esConfig 指标内部配置
+     * @param dateType 不为空时，查询某个时间区间的增幅
+     * @return
+     * @throws Exception
+     */
     public List<Map<String, Object>> getGrowthByQuota(String dimension, String filters, EsConfig esConfig, String dateType) throws Exception {
         List<Map<String, Object>>  resultList = new ArrayList<>();
+//        if(dimension.contains(";")){//视图查询数据是，综合维度有多个，取第一个维度
+//            dimension = dimension.substring(0,dimension.indexOf(";"));
+//        }
+        filters = "quotaDate >= '2017-08-01' and quotaDate <= '2017-09-31'";
+        String startQuotaDate = "";
+        String endQuotaDate = "";
+        String noDateFilter = "";
+        if (StringUtils.isNotEmpty(filters) && filters.contains(quotaDateField)) {// 外部指定时间
+            String params [] = filters.split("and ");
+            for(int i =0 ;i< params.length ;i++){
+                String quotaDateParam = params[i];
+                if(quotaDateParam.contains(quotaDateField)){
+                    boolean b = quotaDateParam.indexOf("'") > -1;
+                    int start = b ? quotaDateParam.indexOf("'") : quotaDateParam.indexOf("\"");//查询条件不是' ,就是"
+                    if(quotaDateParam.contains(">")){
+                        startQuotaDate = quotaDateParam.substring(start + 1, start + 11);
+                    }
+                    if(quotaDateParam.contains("<")){
+                        endQuotaDate = quotaDateParam.substring(start + 1, start + 11);
+                    }
+                }else{
+                    if(StringUtils.isNotEmpty(noDateFilter)){
+                        noDateFilter += " and " + quotaDateParam;
+                    }else {
+                        noDateFilter = quotaDateParam;
+                    }
+                }
+            }
+        }
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         Calendar lastDate = Calendar.getInstance();
         String molecularFilter = "";
         String denominatorFilter = "";
         String growthFlag = esConfig.getGrowthFlag();
-        if ("1".equals(growthFlag)) {
-            // 年增幅
-            int now;
-            int beforeNow;
-            now = lastDate.get(Calendar.YEAR);
-            lastDate.add(Calendar.YEAR, -1);
-            beforeNow = lastDate.get(Calendar.YEAR);
-            if (StringUtils.isNotEmpty(filters) && filters.contains(quotaDateField)) {
-                boolean b = filters.indexOf("'") > -1;
-                int start = b ? filters.indexOf("'") : filters.indexOf("\"");
-                String condition = filters.substring(start + 1, start + 5);
-                now = Integer.parseInt(condition);
+        if(StringUtils.isEmpty(dateType)){
+            if ("1".equals(growthFlag)) { // 年增幅  没有传时间条件默认当前年份
+                int now;
+                int beforeNow;
+                now = lastDate.get(Calendar.YEAR);
+                if (StringUtils.isNotEmpty(endQuotaDate)) {// 外部指定时间
+                    now = Integer.parseInt(endQuotaDate.substring(0,4));
+                }
                 beforeNow = now - 1;
-            }
-            molecularFilter = "quotaDate >= '" + now + "-01-01' and quotaDate <= '" + now + "-12-31'";
-            denominatorFilter = "quotaDate >= '" + beforeNow + "-01-01' and quotaDate <= '" + beforeNow + "-12-31'";
-        } else if ("2".equals(growthFlag)) {
-            // 月增幅
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            lastDate.set(Calendar.DAY_OF_MONTH, 1); // 设置为1号,当前日期既为本月第一天
-            String firstDay = sdf.format(lastDate.getTime());
-            lastDate.set(Calendar.DAY_OF_MONTH, lastDate.getActualMaximum(Calendar.DAY_OF_MONTH));
-            String lastDay = sdf.format(lastDate.getTime());
-            lastDate.add(Calendar.MONTH, -1);
-            lastDate.set(Calendar.DAY_OF_MONTH, 1);
-            String preMonthFirstDay = sdf.format(lastDate.getTime());
-            lastDate.set(Calendar.DAY_OF_MONTH, lastDate.getActualMaximum(Calendar.DAY_OF_MONTH));
-            String preMonthLastDay = sdf.format(lastDate.getTime());
-            // 如果有时间过滤条件，则按时间条件计算
-            if (StringUtils.isNotEmpty(filters) && filters.contains(quotaDateField)) {
-                Calendar cal = Calendar.getInstance();
-                boolean b = filters.indexOf("'") > -1;
-                int start = b ? filters.indexOf("'") : filters.indexOf("\"");
-                String condition = filters.substring(start + 1, start + 5);
-                int year = Integer.parseInt(condition);
-                String condition2 = filters.substring(filters.indexOf("-") + 1, filters.indexOf("-") + 3);
-                int month = Integer.parseInt(condition2);
-                cal.set(Calendar.YEAR, year);
-                cal.set(Calendar.MONTH, month - 1);
-                cal.set(Calendar.DAY_OF_MONTH, 1); // 设置为1号,当前日期既为本月第一天
-                firstDay = sdf.format(cal.getTime());
-                cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
-                lastDay = sdf.format(cal.getTime());
-                cal.add(Calendar.MONTH, -1);
-                cal.set(Calendar.DAY_OF_MONTH, 1);
-                preMonthFirstDay = sdf.format(cal.getTime());
-                cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
-                preMonthLastDay = sdf.format(cal.getTime());
+                molecularFilter = "quotaDate >= '" + now + "-01-01' and quotaDate <= '" + now + "-12-31'";
+                denominatorFilter = "quotaDate >= '" + beforeNow + "-01-01' and quotaDate <= '" + beforeNow + "-12-31'";
+            } else if ("2".equals(growthFlag)) { // 月增幅  没有传时间条件默认当前月份
+                // 如果有时间过滤条件，则按时间条件计算
+                if (StringUtils.isNotEmpty(endQuotaDate)) {
+                    lastDate.setTime(sdf.parse(endQuotaDate));
+                }
+                lastDate.set(Calendar.DAY_OF_MONTH, 1); // 设置为1号,当前日期既为本月第一天
+                String firstDay = sdf.format(lastDate.getTime());
+                lastDate.set(Calendar.DAY_OF_MONTH, lastDate.getActualMaximum(Calendar.DAY_OF_MONTH));
+                String lastDay = sdf.format(lastDate.getTime());
+                lastDate.add(Calendar.MONTH, -1);
+                lastDate.set(Calendar.DAY_OF_MONTH, 1);
+                String preMonthFirstDay = sdf.format(lastDate.getTime());
+                lastDate.set(Calendar.DAY_OF_MONTH, lastDate.getActualMaximum(Calendar.DAY_OF_MONTH));
+                String preMonthLastDay = sdf.format(lastDate.getTime());
                 log.info("firstDay = {}, lastDay = {}", firstDay, lastDay);
                 log.info("preMonthFirstDay = {}, preMonthLastDay = {}", preMonthFirstDay, preMonthLastDay);
+                molecularFilter = "quotaDate >= '" + firstDay + "' and quotaDate <= '" + lastDay + "'";
+                denominatorFilter = "quotaDate >= '" + preMonthFirstDay + "' and quotaDate <= '" + preMonthLastDay + "'";
             }
-            molecularFilter = "quotaDate >= '" + firstDay + "' and quotaDate <= '" + lastDay + "'";
-            denominatorFilter = "quotaDate >= '" + preMonthFirstDay + "' and quotaDate <= '" + preMonthLastDay + "'";
+            if (StringUtils.isNotEmpty(esConfig.getMolecularFilter())) {
+                molecularFilter += " and " + esConfig.getMolecularFilter();
+            }
+            if (StringUtils.isNotEmpty(esConfig.getDenominatorFilter())) {
+                denominatorFilter += " and " + esConfig.getDenominatorFilter();
+            }
+            if(StringUtils.isNotEmpty(noDateFilter)){
+                molecularFilter += " and " + noDateFilter;
+                denominatorFilter += " and " + noDateFilter;
+            }
+            List<Map<String, Object>> moleList = getSimpleQuotaReport(esConfig.getMolecular(), molecularFilter,dimension ,false , null);
+            List<Map<String, Object>> denoList =  getSimpleQuotaReport(esConfig.getDenominator(),denominatorFilter,dimension,false, null);
+            resultList = divisionPercent(dimension, moleList, denoList, 1, 100);
+            return resultList;
+
+        }else {
+            String dateFilter = "";
+            //按时间维度 增幅，即时间区间增幅
+            int nowYear;
+            int beforeYear;
+            Date firstMonth = new Date();
+            Date endMonth = new Date();
+            nowYear = lastDate.get(Calendar.YEAR);
+            beforeYear = nowYear - 4;
+            if ("1".equals(growthFlag)) { // 年增幅  没有传时间条件默认当前年份 向前推3年
+                if (StringUtils.isNotEmpty(startQuotaDate)) {// 外部指定时间
+                    beforeYear = Integer.parseInt(startQuotaDate.substring(0,4))-1;
+                }
+                if (StringUtils.isNotEmpty(endQuotaDate)) {// 外部指定时间
+                    nowYear = Integer.parseInt(endQuotaDate.substring(0,4));
+                }
+                dateFilter = "quotaDate >= '" + beforeYear + "-01-01' and quotaDate <= '" + nowYear + "-12-31'";
+            } else if ("2".equals(growthFlag)) { // 月增幅  没有传时间条件默认当前月份 向前推6个月
+                lastDate.set(Calendar.DAY_OF_MONTH, 1); // 设置为1号,当前日期既为本月第一天
+                endMonth =lastDate.getTime();
+                lastDate.add(Calendar.MONTH, - 7);
+                lastDate.set(Calendar.DAY_OF_MONTH, lastDate.getActualMaximum(Calendar.DAY_OF_MONTH));
+                firstMonth = lastDate.getTime();
+                // 如果有时间过滤条件，则按时间条件计算
+                if (StringUtils.isNotEmpty(startQuotaDate)) {
+                    if (StringUtils.isNotEmpty(startQuotaDate)) {// 外部指定时间
+                        firstMonth = sdf.parse(startQuotaDate);
+                        lastDate.setTime(firstMonth);
+                        lastDate.add(Calendar.MONTH, -1);//向前推一个月 用于计算最后一个月增幅
+                        firstMonth = lastDate.getTime();
+                    }
+                    if (StringUtils.isNotEmpty(endQuotaDate)) {// 外部指定时间
+                        endMonth = sdf.parse(endQuotaDate);
+                    }
+                }
+                log.info("firstDay = {}, preMonthLastDay = {}", sdf.format(firstMonth), sdf.format(endMonth) );
+                dateFilter = "quotaDate >= '" + sdf.format(firstMonth) + "' and quotaDate <= '" + sdf.format(endMonth) + "'";
+            }
+            if(StringUtils.isNotEmpty(noDateFilter)){
+                filters = dateFilter + " and " + noDateFilter;
+            }else{
+                filters = dateFilter;
+            }
+            dimension = dateType;
+            List<Map<String, Object>> dataList = getSimpleQuotaReport(esConfig.getMolecular(), filters,dimension ,false , null);
+            DecimalFormat df = new DecimalFormat(".0");
+            if(dataList != null && dataList.size() > 0){
+                if(dateType.toLowerCase().equals("year")){
+                    Map<String,Object> map = new HashMap<>();
+                    double current = 0;
+                    double last = 0;
+                    for(int i = nowYear ; i > beforeYear ;i--){
+                        for(Map<String,Object> dataMap : dataList){
+                            if(dataMap.get(String.valueOf(i)) != null ){
+                                map.put(firstColumnField, dataMap.get(firstColumnField));
+                                map.put(dimension, dataMap.get(dimension).toString());
+                                current = Double.valueOf(dataMap.get(resultField).toString());
+                            }
+                            if(dataMap.get(String.valueOf(i-1)) != null ){
+                                last = Double.valueOf(dataMap.get(resultField).toString());
+                            }
+                        }
+                        if(last == 0){
+                            map.put(resultField,"-");
+                        }else {
+                            double precent = (current - last)/last;
+                            map.put(resultField,df.format(precent));
+                        }
+                        resultList.add(map);
+                    }
+                }
+                if(dateType.toLowerCase().equals("month")){
+
+                    double current = 0;
+                    double last = 0;
+                    String starthMonthStr = sdf.format(firstMonth).substring(0,7);
+                    String endMonthStr = sdf.format(endMonth).substring(0,7);
+                    while ( !starthMonthStr.equals(endMonthStr)){
+                        Map<String,Object> map = new HashMap<>();
+                        String nowMonthStr = endMonthStr;
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTime(sdf.parse(endMonthStr + "-01"));
+                        calendar.add(Calendar.MONTH, -1);//当前时间前去一个月，即一个月前的时间
+                        String lastMontStr = sdf.format(calendar.getTime()).substring(0,7);
+                        for(Map<String,Object> dataMap : dataList){
+                            String val = dataMap.get(dimension).toString();
+                            if(val.equals(nowMonthStr) ){
+                                map.put(firstColumnField, val);
+                                map.put(dimension, val);
+                                current = Double.valueOf(dataMap.get(resultField).toString());
+                            }
+                            if(val.equals(lastMontStr) ){
+                                last = Double.valueOf(dataMap.get(resultField).toString());
+                            }
+                        }
+                        if(last == 0){
+                            map.put(resultField,"-");
+                        }else {
+                            double precent = (current - last)/last*100;
+                            if(precent == 0){
+                                map.put(resultField,0);
+                            }else {
+                                map.put(resultField,df.format(precent));
+                            }
+                        }
+                        resultList.add(map);
+
+                        endMonthStr = lastMontStr;
+                    }
+                }
+            }
+            return resultList;
         }
-        if (StringUtils.isNotEmpty(esConfig.getMolecularFilter())) {
-            molecularFilter += " and " + esConfig.getMolecularFilter();
-        }
-        if (StringUtils.isNotEmpty(esConfig.getDenominatorFilter())) {
-            denominatorFilter += " and " + esConfig.getDenominatorFilter();
-        }
-        List<Map<String, Object>> moleList = getSimpleQuotaReport(esConfig.getMolecular(), molecularFilter,dimension ,false , null);
-        List<Map<String, Object>> denoList =  getSimpleQuotaReport(esConfig.getDenominator(),denominatorFilter,dimension,false, null);
-//        List<Map<String, Object>> moleList = divisionQuota(esConfig.getMolecular(), esConfig.getDenominator(), dimension, molecularFilter, molecularFilter, esConfig.getPercentOperation(), esConfig.getPercentOperationValue(), dateType, "");
-//        List<Map<String, Object>> denoList = divisionQuota(esConfig.getMolecular(), esConfig.getDenominator(), dimension, denominatorFilter, denominatorFilter, esConfig.getPercentOperation(), esConfig.getPercentOperationValue(),dateType, "");
-        resultList = divisionPercent(dimension, moleList, denoList, 1, 100);
-        return resultList;
     }
 
     public String filtersExchangeHandle(String filters, EsConfig esConfig) {

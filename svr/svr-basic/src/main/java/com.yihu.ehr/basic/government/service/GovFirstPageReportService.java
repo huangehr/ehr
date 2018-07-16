@@ -149,7 +149,7 @@ public class GovFirstPageReportService {
             Long count = solrUtil.count(ResourceCore.MasterTable, q);
             // 总住院人数
             String[] fields = new String[]{"event_no"};
-            SolrDocumentList patientSolrDocList = solrUtil.queryDistinctOneField(ResourceCore.MasterTable, q, null, null, 0, -1, fields, "EHR_000017", "event_date desc");
+            SolrDocumentList patientSolrDocList = solrUtil.queryDistinctOneFieldForDocList(ResourceCore.MasterTable, q, null, null, 0, -1, fields, "EHR_000017", "event_date desc");
             Long patientCount = 0L;
             if (patientSolrDocList != null) {
                 patientCount = patientSolrDocList.getNumFound();

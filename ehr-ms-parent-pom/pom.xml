@@ -16,7 +16,6 @@
 
     <modules>
         <module>../ag-admin</module>
-        <module>../ag-cloud</module>
         <module>../ag-zuul</module>
         <module>../svr-configuration</module>
         <module>../svr-discovery</module>
