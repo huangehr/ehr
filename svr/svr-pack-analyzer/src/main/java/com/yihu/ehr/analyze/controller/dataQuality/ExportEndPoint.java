@@ -686,7 +686,7 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                 row.createCell(2).setCellValue(dataset_name);
                 row.createCell(3).setCellValue(resultSet.getString("metadata"));
                 row.createCell(4).setCellValue(metadata_name);
-                row.createCell(6).setCellValue(getExceptionType(resultSet.getString("qc_error_type")));
+                row.createCell(5).setCellValue(getExceptionType(resultSet.getString("qc_error_type")));
                 j++;
             }
             wwb.write(os);
