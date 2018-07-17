@@ -33,7 +33,7 @@ public class EventDealChain {
 
     public void addProcessor(Processor processor, boolean active) {
         processor.setActive(active);
-        this.processors.put(processor.getClass().getSimpleName(), processor);
+        this.processors.put(processor.getClass().getName(), processor);
     }
 
     public void addProcessor(String processor, String type) throws Exception {
