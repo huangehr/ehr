@@ -533,7 +533,7 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
             for (AddressDict addressDict : addList) {
                 List<Map<String, Object>> childListMap = new ArrayList<>();
                 Map<String, Object> allMap = new HashMap<>();
-                allMap.put("text", "全机构");
+                allMap.put("text", "全部机构");
                 childListMap.add(allMap);
                 Map<String, Object> map = new HashMap<>();
                 map.put("text", addressDict.getName());
