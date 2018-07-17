@@ -27,15 +27,15 @@ public interface RsReportCategoryDao extends CrudRepository<RsReportCategory, In
     @Query(" FROM RsReportCategory rc WHERE rc.pid = :id AND rc.name = :name ")
     RsReportCategory isUniqueName(@Param("id") Integer id, @Param("name") String name);
 
-    @Query("from RsReportCategory rc where rc.id in(:ids)")
+    @Query("from RsReportCategory rc where rc.id in(:ids)  ORDER BY rc.sortNo asc")
     List<RsReportCategory> findCategoryByIds(@Param("ids") List<Integer> ids);
 
-    @Query("select rc.id from RsReportCategory rc where rc.pid =(select r.id from RsReportCategory r where r.code = :code)")
+    @Query("select rc.id from RsReportCategory rc where rc.pid =(select r.id from RsReportCategory r where r.code = :code) ORDER BY rc.sortNo asc")
     List<Integer> findCategoryIds(@Param("code") String code);
 
     @Query("select rc.code from RsReportCategory rc where rc.id = :id")
     String findCategoryCodeById(@Param("id") Integer id);
 
-    @Query("select rc.id from RsReportCategory rc where rc.pid in (select r.id from RsReportCategory r where r.code in('businessMonitoringSystem','healthMonitorSystem'))")
+    @Query("select rc.id from RsReportCategory rc where rc.pid in (select r.id from RsReportCategory r where r.code in('businessMonitoringSystem','healthMonitorSystem')) ORDER BY rc.sortNo asc")
     List<Integer> findCategoryIdsByCodeList();
 }
