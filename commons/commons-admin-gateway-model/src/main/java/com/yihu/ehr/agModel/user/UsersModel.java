@@ -17,6 +17,7 @@ public class UsersModel {
     private String lastLoginTime;
     private String source;
     private String sourceName;
+    private String idCardNo;
 
 
     public String getId() {
@@ -121,5 +122,13 @@ public class UsersModel {
 
     public void setSourceName(String sourceName) {
         this.sourceName = sourceName;
+    }
+
+    public String getIdCardNo() {
+        return idCardNo;
+    }
+
+    public void setIdCardNo(String idCardNo) {
+        this.idCardNo = idCardNo;
     }
 }

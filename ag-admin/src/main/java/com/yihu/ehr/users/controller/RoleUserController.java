@@ -311,6 +311,7 @@ public class RoleUserController extends BaseController {
         //获取角色名
         MRoles roles = rolesClient.getRolesById(m.getRoleId());
         model.setRoleName(roles == null?"":roles.getName());
+        model.setIdCardNo(user == null?"":user.getIdCardNo());
         return model;
     }
 
