@@ -16,6 +16,7 @@ public class RsReportCategoryModel implements Serializable {
     private String code; // 编码
     private String name; // 名称
     private String remark; // 备注
+    private Integer sortNo; // 排序
     private List<RsReportCategoryModel> children;
     private boolean flag;
 
@@ -57,6 +58,14 @@ public class RsReportCategoryModel implements Serializable {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    public Integer getSortNo() {
+        return sortNo;
+    }
+
+    public void setSortNo(Integer sortNo) {
+        this.sortNo = sortNo;
     }
 
     public List<RsReportCategoryModel> getChildren() {
