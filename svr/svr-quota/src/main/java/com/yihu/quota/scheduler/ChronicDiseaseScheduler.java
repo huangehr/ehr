@@ -14,7 +14,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.solr.client.solrj.response.Group;
-import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,48 +106,15 @@ public class ChronicDiseaseScheduler {
         List<String> diabetesRowkeyList = new ArrayList();
         String q_diabetes = "(rowkey:*$HDSB04_87$* AND EHR_002858:[E10 TO E14.900]) OR (rowkey:*$HDSD00_73$* AND EHR_000109:[E10 TO E14.900])) OR (rowkey:*$HDSD00_69$* AND EHR_000293:[E10 TO E14.900]))";
         List<Group> diabetesGroupList = solrUtil.queryDistinctOneField(ResourceCore.SubTable, q_diabetes, fq, null, 0, -1, showFields, idCardField, "event_date asc");
-        this.collectRowkey(diabetesRowkeyList, diabetesGroupList, q_diabetes, fq, idCardField, showFields);
+        SchedulerUtil.collectRowkeyFromDistinctGroup(diabetesRowkeyList, solrUtil, diabetesGroupList, q_diabetes, fq, idCardField, showFields);
         this.translateAndSaveData(diabetesRowkeyList, "1");
 
         // 去重查询高血压患者记录
         List<String> hypertensionRowkeyList = new ArrayList();
         String q_hypertension = "(rowkey:*$HDSB04_87$* AND EHR_002858:[I10 TO I15.900]) OR (rowkey:*$HDSD00_73$* AND EHR_000109:[I10 TO I15.900])) OR (rowkey:*$HDSD00_69$* AND EHR_000293:[I10 TO I15.900]))";
         SolrDocumentList hypertensionDocList = solrUtil.queryDistinctOneFieldForDocList(ResourceCore.SubTable, q_hypertension, fq, null, 0, -1, showFields, idCardField, "event_date asc");
-        this.collectRowkey(hypertensionRowkeyList, diabetesGroupList, q_hypertension, fq, idCardField, showFields);
+        SchedulerUtil.collectRowkeyFromDistinctGroup(hypertensionRowkeyList, solrUtil, diabetesGroupList, q_hypertension, fq, idCardField, showFields);
         this.translateAndSaveData(hypertensionRowkeyList, "2");
-    }
-
-    /**
-     * 收集细表的 rowkey
-     *
-     * @param rowkeyList        rowkey 容器
-     * @param groupList         去重分组结果
-     * @param q                 查询条件
-     * @param fq                筛选条件
-     * @param distinctFieldName 去重字段名
-     * @param showFields        查询返回字段名数组
-     * @throws Exception
-     */
-    private void collectRowkey(List<String> rowkeyList, List<Group> groupList, String q, String fq, String distinctFieldName, String[] showFields) throws Exception {
-        if (groupList != null && rowkeyList.size() > 0) {
-            // 查询空值时的筛选条件
-            fq += " AND -" + distinctFieldName + ":*";
-            for (Group group : groupList) {
-                int groupChildCount = group.getResult().size();
-                SolrDocument firstDoc = group.getResult().get(0);
-                Object fieldValueObj = firstDoc.getFieldValue(distinctFieldName);
-                if (fieldValueObj == null) {
-                    // 记录中去重字段是空值时，每条空值新单独记录到ES
-                    SolrDocumentList nullDocList = solrUtil.query(ResourceCore.SubTable, q, fq, null, 0, -1, showFields);
-                    for (int i = 0; i < groupChildCount; i++) {
-                        SolrDocument doc = nullDocList.get(i);
-                        rowkeyList.add(doc.getFieldValue("rowkey").toString());
-                    }
-                } else {
-                    rowkeyList.add(firstDoc.getFieldValue("rowkey").toString());
-                }
-            }
-        }
     }
 
     /**
