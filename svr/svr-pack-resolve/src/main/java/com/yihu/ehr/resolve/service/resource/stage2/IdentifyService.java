@@ -52,14 +52,15 @@ public class IdentifyService {
                         DateTimeUtil.simpleDateParse(resourceBucket.getMasterRecord().getResourceValue("EHR_000007")) : new Date();
                 //手机号码
                 String telephoneNo = StringUtils.isNotEmpty(resourceBucket.getMasterRecord().getResourceValue("EHR_000003")) ?
-                        resourceBucket.getMasterRecord().getResourceValue("EHR_000003").toString() : random;
+                        resourceBucket.getMasterRecord().getResourceValue("EHR_000003") : random;
                 telephoneNo = "{\"联系电话\":\"" + telephoneNo + "\"}";
                 //性别
                 String gender = StringUtils.isNotEmpty(resourceBucket.getMasterRecord().getResourceValue("EHR_000019")) ?
-                        resourceBucket.getMasterRecord().getResourceValue("EHR_000019").toString() : random;
+                        resourceBucket.getMasterRecord().getResourceValue("EHR_000019") : random;
                 //家庭住址
                 String homeAddress = StringUtils.isNotEmpty(resourceBucket.getMasterRecord().getResourceValue("EHR_001227")) ?
-                        resourceBucket.getMasterRecord().getResourceValue("EHR_001227").toString() : random;
+                        resourceBucket.getMasterRecord().getResourceValue("EHR_001227") : random;
+
                 List<DemographicInfo> demographicInfoList = patientService.findByNameOrBirthdayOrTelephoneNo(name, birthday, telephoneNo);
                 if (!demographicInfoList.isEmpty()) {
                     for (DemographicInfo demographicInfo : demographicInfoList) {
