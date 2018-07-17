@@ -55,7 +55,6 @@ public class ArchiveRelationEndPoint extends EnvelopRestEndPoint {
             item = (Map) envelop.getDetailModelList().get(i);
             //卡类型编码
             String cardType = (null == item.get("card_type") ? "" : item.get("card_type").toString());
-            cardType = "9";
             //获取资源字典-卡类型代码 集合
             cardType = rsDictionaryEntryService.getRsDictionaryEntryByDictCode("STD_CARD_TYPE", cardType);
             //获取字典值
@@ -63,7 +62,6 @@ public class ArchiveRelationEndPoint extends EnvelopRestEndPoint {
             envelop.getDetailModelList().remove(i);
             envelop.getDetailModelList().set(i,item);
         }
-        Envelop  envelopNew=new Envelop();
         //updated by zdm on 2018/07/17---end
         return envelop;
     }
