@@ -127,7 +127,7 @@ public class SolrExtract {
         }
         fl += timeKey + ",rowkey";
 
-        if (StringUtils.isEmpty(esConfig.getAggregation()) || !esConfig.getAggregation().equals(Contant.quota.aggregation_list)) {
+        if (StringUtils.isEmpty(esConfig.getAggregation()) || (!esConfig.getAggregation().equals(Contant.quota.aggregation_list)  && !esConfig.getAggregation().equals(Contant.quota.aggregation_distinct))) {
             // 默认追加一个日期字段作为细维度，方便按天统计作为最小单位统计值。
             slaveMap.put(timeKey, timeKey);
             TjQuotaDimensionSlave daySlave = new TjQuotaDimensionSlave();

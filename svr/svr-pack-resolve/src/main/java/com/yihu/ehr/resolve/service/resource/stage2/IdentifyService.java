@@ -24,7 +24,6 @@ public class IdentifyService {
 
     private static final IdCardValidator idCardValidator = new IdCardValidator();
     private static final Pattern pattern = Pattern.compile("^[A-Za-z0-9\\-]+$");
-    private static final String DEFAULT_VALUE = "default";
 
     @Autowired
     private ArchiveRelationService archiveRelationService;
@@ -44,17 +43,24 @@ public class IdentifyService {
                 }
             }
             if (!recognition) {
+                String random = UUID.randomUUID().toString();
                 //姓名
-                String name = StringUtils.isNotEmpty(resourceBucket.getBasicRecord(ResourceCells.PATIENT_NAME)) ? resourceBucket.getBasicRecord(ResourceCells.PATIENT_NAME) : DEFAULT_VALUE;
+                String name = StringUtils.isNotEmpty(resourceBucket.getBasicRecord(ResourceCells.PATIENT_NAME)) ?
+                        resourceBucket.getBasicRecord(ResourceCells.PATIENT_NAME) : random;
                 //生日
-                Date birthday = resourceBucket.getMasterRecord().getResourceValue("EHR_000007") == null ? new Date() : DateTimeUtil.simpleDateParse(resourceBucket.getMasterRecord().getResourceValue("EHR_000007"));
+                Date birthday = StringUtils.isNotEmpty(resourceBucket.getMasterRecord().getResourceValue("EHR_000007")) ?
+                        DateTimeUtil.simpleDateParse(resourceBucket.getMasterRecord().getResourceValue("EHR_000007")) : new Date();
                 //手机号码
-                String telephoneNo = resourceBucket.getMasterRecord().getResourceValue("EHR_000003") == null ? DEFAULT_VALUE : resourceBucket.getMasterRecord().getResourceValue("EHR_000003").toString();
-                telephoneNo += "{\"联系电话\":\"" + telephoneNo + "\"}";
+                String telephoneNo = StringUtils.isNotEmpty(resourceBucket.getMasterRecord().getResourceValue("EHR_000003")) ?
+                        resourceBucket.getMasterRecord().getResourceValue("EHR_000003") : random;
+                telephoneNo = "{\"联系电话\":\"" + telephoneNo + "\"}";
                 //性别
-                String gender = resourceBucket.getMasterRecord().getResourceValue("EHR_000019") == null ? DEFAULT_VALUE : resourceBucket.getMasterRecord().getResourceValue("EHR_000019").toString();
+                String gender = StringUtils.isNotEmpty(resourceBucket.getMasterRecord().getResourceValue("EHR_000019")) ?
+                        resourceBucket.getMasterRecord().getResourceValue("EHR_000019") : random;
                 //家庭住址
-                String homeAddress = resourceBucket.getMasterRecord().getResourceValue("EHR_001227") == null ?  DEFAULT_VALUE :resourceBucket.getMasterRecord().getResourceValue("EHR_001227").toString();
+                String homeAddress = StringUtils.isNotEmpty(resourceBucket.getMasterRecord().getResourceValue("EHR_001227")) ?
+                        resourceBucket.getMasterRecord().getResourceValue("EHR_001227") : random;
+
                 List<DemographicInfo> demographicInfoList = patientService.findByNameOrBirthdayOrTelephoneNo(name, birthday, telephoneNo);
                 if (!demographicInfoList.isEmpty()) {
                     for (DemographicInfo demographicInfo : demographicInfoList) {
