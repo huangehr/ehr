@@ -364,7 +364,7 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "version", value = "版本号")
             @RequestParam(value = "version", required = false) String version) throws Exception {
         //获取档案包中包含的数据集
-        Envelop result = resourceBrowseService.getResultDataList(version,dataSets, roleId , orgCode, areaCode, rowKey );
+        Envelop result = resourceBrowseService.getResultByDataSets(version,dataSets, roleId , orgCode, areaCode, rowKey );
         if (version != null && version.length() > 0) {
             result.setObj(resourcesTransformService.displayCodeListConvert((Map<String, Object>) result.getObj(), version));
         }
