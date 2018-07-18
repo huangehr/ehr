@@ -635,13 +635,16 @@ public class BaseStatistsService {
                     if (dateDime.equals("year")) {
                         value = map.get(key).toString().substring(0, 4);
                     } else if (dateDime.contains("quarter")) {
-                        value = map.get(key).toString().substring(0, 7);
-                        if(value.contains("-04")){
-                            value = value.replace("-04","02");
-                        }else if(value.contains("-07")){
-                            value = value.replace("-07","03");
-                        }else if(value.contains("-10")){
-                            value = value.replace("-10","04");
+                        String y = map.get(key).toString().substring(0, 4);
+                        String q = map.get(key).toString().substring(5, 7);
+                        if(q.contains("01")){
+                            value = y + "年1季度";
+                        }else if(q.contains("04")){
+                            value = y + "年2季度";
+                        }else if(q.contains("07")){
+                            value = y + "年3季度";
+                        }else if(q.contains("10")){
+                            value = y + "年4季度";
                         }
                     } else if (dateDime.contains("month")) {
                         value = map.get(key).toString().substring(0, 7);
@@ -792,7 +795,7 @@ public class BaseStatistsService {
                 resultList = filteUnKnowDept(resultList,dimension);
             }
             if(slave.getSlaveCode().equals("sex") ){
-                resultList = filteUnKnowSex(resultList,dimension);
+                resultList = filteUnKnowSex(resultList, dimension);
             }
         }
         return resultList;
@@ -1280,16 +1283,20 @@ public class BaseStatistsService {
                     }else if(xdataName.contains("quarter")){
                         String quarter = "";
                         if(one.get(xdataName) != null){
-                            quarter = one.get(xdataName).toString().substring(0,7);
-                            if(quarter.contains("-04")){
-                                quarter = quarter.replace("-04","02");
-                            }else if(quarter.contains("-07")){
-                                quarter = quarter.replace("-07","03");
-                            }else if(quarter.contains("-10")){
-                                quarter = quarter.replace("-10","04");
+                           String value = one.get(xdataName).toString();
+                            String y = value.substring(0, 4);
+                            String q = value.substring(5, 7);
+                            if(q.contains("01")){
+                                quarter = y + "年1季度";
+                            }else if(q.contains("04")) {
+                                value = y + "年2季度";
+                            }else if(q.contains("07")){
+                                quarter = y + "年3季度";
+                            }else if(q.contains("10")){
+                                quarter = y + "年4季度";
                             }
+                            xData.add(quarter);
                         }
-                        xData.add( quarter + "");
                     }else if(xdataName.contains("month")){
                         xData.add(one.get(xdataName).toString().substring(0,7) + "");
                     }
@@ -1458,6 +1465,39 @@ public class BaseStatistsService {
                 log.info("preMonthFirstDay = {}, preMonthLastDay = {}", preMonthFirstDay, preMonthLastDay);
                 molecularFilter = "quotaDate >= '" + firstDay + "' and quotaDate <= '" + lastDay + "'";
                 denominatorFilter = "quotaDate >= '" + preMonthFirstDay + "' and quotaDate <= '" + preMonthLastDay + "'";
+            } else if ("3".equals(growthFlag)) { // 季度增幅  没有传时间条件默认当前季度
+                // 如果有时间过滤条件，则按时间条件计算
+                if (StringUtils.isNotEmpty(endQuotaDate)) {
+                    lastDate.setTime(sdf.parse(endQuotaDate));
+                }
+                String firstDay = "";
+                String lastDay = "";
+                int currentMonth = lastDate.get(Calendar.MONTH) + 1;
+                if (currentMonth >= 1 && currentMonth <= 3){
+                    lastDate.set(Calendar.MONTH, 0);
+                }else if (currentMonth >= 4 && currentMonth <= 6){
+                    lastDate.set(Calendar.MONTH, 3);
+                } else if (currentMonth >= 7 && currentMonth <= 9){
+                    lastDate.set(Calendar.MONTH, 6);
+                } else if (currentMonth >= 10 && currentMonth <= 12){
+                    lastDate.set(Calendar.MONTH, 9);
+                }
+                lastDate.set(Calendar.DAY_OF_MONTH, 1); // 设置为1号,当前日期既为本月第一天
+                firstDay = sdf.format(lastDate.getTime());//这个季度第一天
+                lastDate.add(Calendar.MONTH, 3);
+                lastDate.set(Calendar.DAY_OF_MONTH, lastDate.getActualMaximum(Calendar.DAY_OF_MONTH));
+                lastDay = sdf.format(lastDate.getTime());//这个季度最后一天
+
+                lastDate.add(Calendar.MONTH, -6);//前一个季度第一天
+                lastDate.set(Calendar.DAY_OF_MONTH, 1);
+                lastDate.add(Calendar.MONTH, 3);
+                String preMonthFirstDay = sdf.format(lastDate.getTime());
+                lastDate.set(Calendar.DAY_OF_MONTH, lastDate.getActualMaximum(Calendar.DAY_OF_MONTH));
+                String preMonthLastDay = sdf.format(lastDate.getTime());
+                log.info("firstDay = {}, lastDay = {}", firstDay, lastDay);
+                log.info("preMonthFirstDay = {}, preMonthLastDay = {}", preMonthFirstDay, preMonthLastDay);
+                molecularFilter = "quotaDate >= '" + firstDay + "' and quotaDate <= '" + lastDay + "'";
+                denominatorFilter = "quotaDate >= '" + preMonthFirstDay + "' and quotaDate <= '" + preMonthLastDay + "'";
             }
             if (StringUtils.isNotEmpty(esConfig.getMolecularFilter())) {
                 molecularFilter += " and " + esConfig.getMolecularFilter();
@@ -1491,7 +1531,7 @@ public class BaseStatistsService {
                     nowYear = Integer.parseInt(endQuotaDate.substring(0,4));
                 }
                 dateFilter = "quotaDate >= '" + beforeYear + "-01-01' and quotaDate <= '" + nowYear + "-12-31'";
-            } else if ("2".equals(growthFlag)) { // 月增幅  没有传时间条件默认当前月份 向前推6个月
+            } else if ("2".equals(growthFlag)) { // 月增幅  没有传时间条件默认当前月份 计算前6个月数据 计算向前推7个月
                 lastDate.set(Calendar.DAY_OF_MONTH, 1); // 设置为1号,当前日期既为本月第一天
                 endMonth =lastDate.getTime();
                 lastDate.add(Calendar.MONTH, - 7);
@@ -1509,7 +1549,36 @@ public class BaseStatistsService {
                         endMonth = sdf.parse(endQuotaDate);
                     }
                 }
-                log.info("firstDay = {}, preMonthLastDay = {}", sdf.format(firstMonth), sdf.format(endMonth) );
+                dateFilter = "quotaDate >= '" + sdf.format(firstMonth) + "' and quotaDate <= '" + sdf.format(endMonth) + "'";
+            }else if ("3".equals(growthFlag)) { // 季度增幅  没有传时间条件默认当前季度，计算查询向前推一个季度
+                int currentMonth = lastDate.get(Calendar.MONTH) + 1;
+                if (currentMonth >= 1 && currentMonth <= 3){
+                    lastDate.set(Calendar.MONTH, 0);
+                }else if (currentMonth >= 4 && currentMonth <= 6){
+                    lastDate.set(Calendar.MONTH, 3);
+                } else if (currentMonth >= 7 && currentMonth <= 9){
+                    lastDate.set(Calendar.MONTH, 6);
+                } else if (currentMonth >= 10 && currentMonth <= 12){
+                    lastDate.set(Calendar.MONTH, 9);
+                }
+                lastDate.set(Calendar.MONTH, 3);//此季度最后一天
+                lastDate.set(Calendar.DAY_OF_MONTH, lastDate.getActualMaximum(Calendar.DAY_OF_MONTH));
+                endMonth =lastDate.getTime();
+                lastDate.set(Calendar.MONTH, -6);//向前推一个季度 向前推3个月
+                lastDate.set(Calendar.DAY_OF_MONTH, 1); // 设置为1号,当前日期既为本月第一天
+                firstMonth = lastDate.getTime();
+                // 如果有时间过滤条件，则按时间条件计算
+                if (StringUtils.isNotEmpty(startQuotaDate)) {
+                    if (StringUtils.isNotEmpty(startQuotaDate)) {// 外部指定时间
+                        firstMonth = sdf.parse(startQuotaDate);
+                        lastDate.setTime(firstMonth);
+                        lastDate.add(Calendar.MONTH, -3);//向前推一季度 用于计算最后一个季度增幅
+                        firstMonth = lastDate.getTime();
+                    }
+                    if (StringUtils.isNotEmpty(endQuotaDate)) {// 外部指定时间
+                        endMonth = sdf.parse(endQuotaDate);
+                    }
+                }
                 dateFilter = "quotaDate >= '" + sdf.format(firstMonth) + "' and quotaDate <= '" + sdf.format(endMonth) + "'";
             }
             if(StringUtils.isNotEmpty(noDateFilter)){
@@ -1544,10 +1613,70 @@ public class BaseStatistsService {
                         }
                         resultList.add(map);
                     }
-                }
-                //quarter
-                if(dateType.toLowerCase().equals("month")){
+                }else if(dateType.toLowerCase().equals("quarter")){
+                    Map<String,Object> map = new HashMap<>();
+                    String startQuarter = "";
+                    String endQuarter = "";
+                    lastDate.setTime(firstMonth);
+                    int currentMonth = lastDate.get(Calendar.MONTH) + 1;
+                    if (currentMonth >= 1 && currentMonth <= 3){
+                        startQuarter = sdf.format(lastDate).substring(0,4)+"年1季度";
+                    }else if (currentMonth >= 4 && currentMonth <= 6){
+                        startQuarter = sdf.format(lastDate).substring(0,4)+"年2季度";
+                    } else if (currentMonth >= 7 && currentMonth <= 9){
+                        startQuarter = sdf.format(lastDate).substring(0,4)+"年3季度";
+                    } else if (currentMonth >= 10 && currentMonth <= 12){
+                        startQuarter = sdf.format(lastDate).substring(0,4)+"年4季度";
+                    }
 
+                    lastDate.setTime(endMonth);
+                    if (currentMonth >= 1 && currentMonth <= 3){
+                        endQuarter = sdf.format(lastDate).substring(0,4)+"年1季度";
+                    }else if (currentMonth >= 4 && currentMonth <= 6){
+                        endQuarter = sdf.format(lastDate).substring(0,4)+"年2季度";
+                    } else if (currentMonth >= 7 && currentMonth <= 9){
+                        endQuarter = sdf.format(lastDate).substring(0,4)+"年3季度";
+                    } else if (currentMonth >= 10 && currentMonth <= 12){
+                        endQuarter = sdf.format(lastDate).substring(0,4)+"年4季度";
+                    }
+                    while ( !startQuarter.equals(endQuarter)){
+                        int eYear = Integer.valueOf(endQuarter.substring(0, 4));
+                        int eQuarter = Integer.valueOf(endQuarter.substring(6, 7));
+                        if(eQuarter == 1){
+                            eYear--;
+                        }else {
+                            eQuarter--;
+                        }
+                        String lastQuarter = eYear + "年" + eQuarter + "季度";
+                        double current = 0;
+                        double last = 0;
+                        for(Map<String,Object> dataMap : dataList){
+                            String val = dataMap.get(dimension).toString();
+                            if(val.equals(endQuarter) ){
+                                map.put(firstColumnField, val);
+                                map.put(dimension, val);
+                                current = Double.valueOf(dataMap.get(resultField).toString());
+                            }
+                            if(val.equals(lastQuarter) ){
+                                last = Double.valueOf(dataMap.get(resultField).toString());
+                            }
+                        }
+                        if(last == 0){
+                            map.put(resultField,"--");
+                        }else {
+                            double precent = (current - last)/last*100;
+                            if(precent == 0){
+                                map.put(resultField,0);
+                            }else {
+                                map.put(resultField,df.format(precent));
+                            }
+                        }
+                        resultList.add(map);
+                        endQuarter = lastQuarter;
+                    }
+
+
+                }else if(dateType.toLowerCase().equals("month")){
                     double current = 0;
                     double last = 0;
                     String starthMonthStr = sdf.format(firstMonth).substring(0,7);

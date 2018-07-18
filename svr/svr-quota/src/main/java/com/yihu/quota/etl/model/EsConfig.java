@@ -41,7 +41,7 @@ public class EsConfig {
     private String addSecondQuotaCode;//加法第二个指标
     private String addSecondFilter;//加法第二个指标过滤条件
 
-    private String growthFlag;  // 增幅标志  1 year  2 month
+    private String growthFlag;  // 增幅标志  1 year  2 month 3 quarter
     private String incrementFlag;   // 环比  1 上月  2 本月
 
 
