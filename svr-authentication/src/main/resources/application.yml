@@ -39,15 +39,15 @@ fz-gateway:
 spring:
   profiles: prod
   datasource:
-    url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: chenweishan
-    password: chenweishan
+    url: jdbc:mysql://192.168.210.3:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: healthcloud
+    password: GP8Qz4qU
   redis:
-    host: 172.19.103.47
+    host: 192.168.50.82
     port: 6379
-    password: redis!@456
+    password: q4YaQemf
 fz-gateway:
-  url: http://172.19.103.73:10001/fzGateway/WSGW/rest
+  url: http://192.168.220.84:10001/fzGateway/WSGW/rest
   clientId: 9000401
   clientVersion: 1.0
-  handlerId: 50871
+  handlerId: 50641

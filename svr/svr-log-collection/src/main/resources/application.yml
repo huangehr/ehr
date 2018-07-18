@@ -1,5 +1,5 @@
 server:
-  port: 10320
+  port: ${svr-log-collection.server.port}
 
 logging:
   level:
