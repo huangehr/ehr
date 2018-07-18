@@ -308,4 +308,13 @@ public class PackQcReportEndPoint extends EnvelopRestEndPoint {
         int totalCount = getTotalCount(res);
         return getPageResult(list,totalCount,page,size);
     }
+
+    @RequestMapping(value = "/packQcReport/datasetDetail", method = RequestMethod.GET)
+    @ApiOperation(value = "上传记录详情")
+    public Envelop datasetDetail(
+            @ApiParam(name = "date", value = "日期", required = true)
+            @RequestParam(value = "date") String date) throws Exception {
+        Envelop envelop = packQcReportService.datasetDetail(date);
+        return envelop;
+    }
 }

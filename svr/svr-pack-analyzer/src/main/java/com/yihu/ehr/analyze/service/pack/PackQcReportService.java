@@ -222,21 +222,22 @@ public class PackQcReportService extends BaseJpaService {
     public Envelop dataSetList(String startDate, String endDate, String orgCode) throws Exception {
         Envelop envelop = new Envelop();
         List<Map<String, Object>> res = new ArrayList<>();
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("qc_step=1;");
-        stringBuilder.append("receive_date>=" + startDate + " 00:00:00;");
-        stringBuilder.append("receive_date<" + endDate + " 23:59:59;");
+        StringBuffer sql = new StringBuffer();
+        sql.append(" select sum(count) as count ,sum(row) as row, dataset_name, dataset ");
+        sql.append(" from json_archives_qc/qc_dataset_detail");
+        sql.append(" where receive_date>='" + startDate + " 00:00:00' and receive_date<='" + endDate + " 23:59:59'");
         if (StringUtils.isNotEmpty(orgCode) && !"null".equals(orgCode)&&!cloud.equals(orgCode)){
-            stringBuilder.append("org_code=" + orgCode);
+            sql.append(" and org_code='" + orgCode +"'");
         }
-        List<Map<String, Object>> list = elasticSearchUtil.list("json_archives_qc", "qc_dataset_info", stringBuilder.toString());
-        for(Map<String, Object> map : list){
-            List<Map<String,Object>> dataSets = objectMapper.readValue(map.get("details").toString(), List.class);
-            for(Map<String, Object> dataSet : dataSets){
-                for (Map.Entry<String, Object> entry : dataSet.entrySet()) {
-                    getDataSets(map.get("version")+"", entry.getKey(), (int)entry.getValue(), res);
-                }
-            }
+        sql.append("group by dataset_name,dataset");
+        List<String> field = new ArrayList<>();
+        field.add("count");
+        field.add("row");
+        field.add("dataset_name");
+        field.add("dataset");
+        List<Map<String,Object>> list = elasticSearchUtil.findBySql(field, sql.toString());
+        for(Map<String,Object> map :list){
+            map.put("name" ,map.get("dataset_name"));
         }
         envelop.setSuccessFlg(true);
         envelop.setDetailModelList(res);
@@ -259,6 +260,67 @@ public class PackQcReportService extends BaseJpaService {
             map.put("name", redisClient.get("std_data_set_" + version + ":" + dataSet + ":name"));
             map.put("row", row);
             map.put("count", 1);
+            res.add(map);
+        }
+    }
+
+    public Envelop datasetDetail(String date) throws Exception{
+        Envelop envelop = new Envelop();
+        List<String> field = new ArrayList<>();
+        field.add("org_code");
+        String sqlOrg = "SELECT org_code FROM json_archives/info where receive_date>= '"+date+" 00:00:00' AND receive_date<='" +  date + " 23:59:59' group by org_code";
+        List<Map<String, Object>> orgList = elasticSearchUtil.findBySql(field,sqlOrg);
+        for(Map<String,Object> orgMap : orgList) {
+            String orgCode = orgMap.get("org_code")+"";
+            List<Map<String, Object>> res = new ArrayList<>();
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("qc_step=1;");
+            stringBuilder.append("receive_date>=" + date + " 00:00:00;");
+            stringBuilder.append("receive_date<" + date + " 23:59:59;");
+            stringBuilder.append("org_code=" + orgCode);
+            long starttime = System.currentTimeMillis();
+            int count = (int) elasticSearchUtil.count("json_archives_qc", "qc_dataset_info", stringBuilder.toString());
+            double pageNum = count % 1000 > 0 ? count / 1000 + 1 : count / 1000;
+            for (int i = 0; i < pageNum; i++) {
+                List<Map<String, Object>> list = elasticSearchUtil.page("json_archives_qc", "qc_dataset_info", stringBuilder.toString(), i + 1, 1000);
+                logger.info("查询耗时：" + (System.currentTimeMillis() - starttime) + "ms");
+                for (Map<String, Object> map : list) {
+                    String eventType = map.get("event_type").toString();
+                    List<Map<String, Object>> dataSets = objectMapper.readValue(map.get("details").toString(), List.class);
+                    for (Map<String, Object> dataSet : dataSets) {
+                        for (Map.Entry<String, Object> entry : dataSet.entrySet()) {
+                            getDataSetsDetail(map.get("version") + "", entry.getKey(), (int) entry.getValue(), res, date, orgCode, eventType);
+                        }
+                    }
+                }
+            }
+            elasticSearchUtil.bulkIndex("json_archives_qc","qc_dataset_detail",res);
+            logger.info("统计耗时：" + (System.currentTimeMillis() - starttime) + "ms");
+        }
+        envelop.setSuccessFlg(true);
+        return envelop;
+    }
+
+    public void getDataSetsDetail(String version, String dataSet, int row, List<Map<String, Object>> res,String date,String orgCode,String eventType){
+        boolean flag = true;
+        for(Map<String, Object> map : res){
+            if(dataSet.equals(map.get("dataset"))&&eventType.equals(map.get("event_type"))){
+                flag = false;
+                map.put("row", (int)map.get("row") + row);
+                map.put("count", (int)map.get("count") + 1);
+                break;
+            }
+        }
+        if(flag){
+            Map<String, Object> map = new HashMap<>();
+            map.put("org_code", orgCode);
+            map.put("event_type", eventType);
+            map.put("receive_date", date+" 00:00:00");
+            map.put("dataset", dataSet);
+            map.put("dataset_name", redisClient.get("std_data_set_" + version + ":" + dataSet + ":name"));
+            map.put("row", row);
+            map.put("count", 1);
+
             res.add(map);
         }
     }
@@ -434,7 +496,9 @@ public class PackQcReportService extends BaseJpaService {
      * @throws Exception
      */
     public List<Map<String, Object>> archiveList(String filters, String sorts, int page, int size) throws Exception {
+        long starttime = System.currentTimeMillis();
         List<Map<String, Object>> list = elasticSearchUtil.page("json_archives","info", filters, sorts, page, size);
+        logger.info("查询耗时：" + (System.currentTimeMillis() - starttime) + "ms");
         return list;
     }
 
