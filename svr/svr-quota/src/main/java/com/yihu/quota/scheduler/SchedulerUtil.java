@@ -29,7 +29,7 @@ class SchedulerUtil {
      */
     static void collectRowkeyFromDistinctGroup(List<String> rowkeyList, SolrUtil solrUtil, List<Group> groupList,
                                                String q, String fq, String distinctFieldName, String[] showFields) throws Exception {
-        if (groupList != null && rowkeyList.size() > 0) {
+        if (groupList != null && groupList.size() > 0) {
             // 查询空值时的筛选条件
             fq += " AND -" + distinctFieldName + ":*";
             for (Group group : groupList) {
