@@ -783,11 +783,51 @@ public class BaseStatistsService {
             }
             resultList.add(dataMap);
         }
-        if (StringUtils.isEmpty(top)) {
-            return "town".equals(dimension) ? noDataDimenDictionary(resultList,dimension,filter) : resultList;
+        if (StringUtils.isEmpty(top) && "town".equals(dimension)) {
+            resultList = noDataDimenDictionary(resultList,dimension,filter);
+        }
+        List<TjQuotaDimensionSlave> slaves = tjDimensionSlaveService.findTjQuotaDimensionSlaveByQuotaCode(code);
+        for(TjQuotaDimensionSlave slave :slaves){
+            if(slave.getSlaveCode().equals("dept") ){
+                resultList = filteUnKnowDept(resultList,dimension);
+            }
+            if(slave.getSlaveCode().equals("sex") ){
+                resultList = filteUnKnowSex(resultList,dimension);
+            }
         }
         return resultList;
     }
+
+    /**
+     * 过滤其他机构
+     * @param dataList
+     * @return
+     */
+    public List<Map<String, Object>> filteUnKnowDept(List<Map<String, Object>> dataList,String dimension){
+        List<Map<String, Object>> resultList = new ArrayList<>();
+        for(Map<String,Object> map : dataList){
+            if( !map.get(dimension).toString().contains("其他")){
+                resultList.add(map);
+            }
+        }
+        return  resultList;
+    }
+
+    /**
+     * 过滤未说明的性别
+     * @param dataList
+     * @return
+     */
+    public List<Map<String, Object>> filteUnKnowSex(List<Map<String, Object>> dataList,String dimension){
+        List<Map<String, Object>> resultList = new ArrayList<>();
+        for(Map<String,Object> map : dataList){
+            if( !map.get(dimension).toString().contains("未说明")){
+                resultList.add(map);
+            }
+        }
+        return  resultList;
+    }
+
 
     /**
      * 查询结果 对无数据的字典项补0
