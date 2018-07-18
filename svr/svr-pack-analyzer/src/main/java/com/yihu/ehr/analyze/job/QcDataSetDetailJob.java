@@ -29,14 +29,14 @@ public class QcDataSetDetailJob {
     @Autowired
     protected ObjectMapper objectMapper;
 
-   // @Scheduled(fixedDelay = 600000)
+    @Scheduled(cron = "0 0 18 * * ?")
     public void dataSetTask() throws Exception {
         String date = redisClient.get("start_date");
         if (StringUtils.isEmpty(date)) {
-            date = "2018-04-14";
+            date = "2018-07-18";
             redisClient.set("start_date",date);
         }
-        if("2018-07-17".equals(date)){
+        if("2018-04-14".equals(date)){
             return;
         }
         List<String> field = new ArrayList<>();
@@ -71,7 +71,7 @@ public class QcDataSetDetailJob {
             System.out.println("统计耗时：" + (System.currentTimeMillis() - starttime) + "ms");
         }
         Date beginDate = DateUtil.strToDate(date);
-        Date addDate = DateUtil.addDate(1, beginDate);
+        Date addDate = DateUtil.addDate(-1, beginDate);
         String endDate = DateUtil.toString(addDate);
         redisClient.set("start_date",endDate);
     }
