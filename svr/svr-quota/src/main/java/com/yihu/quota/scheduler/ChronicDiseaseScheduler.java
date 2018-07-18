@@ -104,14 +104,14 @@ public class ChronicDiseaseScheduler {
 
         // 去重查询糖尿病患者记录
         List<String> diabetesRowkeyList = new ArrayList();
-        String q_diabetes = "(rowkey:*$HDSD00_73$* AND EHR_000109:[E10 TO E14.900])) OR (rowkey:*$HDSD00_69$* AND EHR_000293:[E10 TO E14.900]))";
+        String q_diabetes = "(rowkey:*$HDSD00_73$* AND EHR_000109:[E10 TO E14.900]) OR (rowkey:*$HDSD00_69$* AND EHR_000293:[E10 TO E14.900])";
         List<Group> diabetesGroupList = solrUtil.queryDistinctOneField(ResourceCore.SubTable, q_diabetes, fq, null, 0, -1, showFields, idCardField, "event_date asc");
         SchedulerUtil.collectRowkeyFromDistinctGroup(diabetesRowkeyList, solrUtil, diabetesGroupList, q_diabetes, fq, idCardField, showFields);
         this.translateAndSaveData(diabetesRowkeyList, "1");
 
         // 去重查询高血压患者记录
         List<String> hypertensionRowkeyList = new ArrayList();
-        String q_hypertension = "(rowkey:*$HDSD00_73$* AND EHR_000109:[I10 TO I15.900])) OR (rowkey:*$HDSD00_69$* AND EHR_000293:[I10 TO I15.900]))";
+        String q_hypertension = "(rowkey:*$HDSD00_73$* AND EHR_000109:[I10 TO I15.900]) OR (rowkey:*$HDSD00_69$* AND EHR_000293:[I10 TO I15.900])";
         SolrDocumentList hypertensionDocList = solrUtil.queryDistinctOneFieldForDocList(ResourceCore.SubTable, q_hypertension, fq, null, 0, -1, showFields, idCardField, "event_date asc");
         SchedulerUtil.collectRowkeyFromDistinctGroup(hypertensionRowkeyList, solrUtil, diabetesGroupList, q_hypertension, fq, idCardField, showFields);
         this.translateAndSaveData(hypertensionRowkeyList, "2");
