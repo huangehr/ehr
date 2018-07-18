@@ -12,6 +12,7 @@ import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.entity.quality.DqDatasetWarning;
 import com.yihu.ehr.model.adaption.MAdapterDataSet;
 import com.yihu.ehr.model.resource.MRsAdapterMetadata;
+import com.yihu.ehr.redis.client.RedisClient;
 import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.hos.model.standard.MStdMetaData;
 import io.swagger.annotations.Api;
@@ -48,6 +49,9 @@ public class PackQcReportEndPoint extends EnvelopRestEndPoint {
     private HosAdminServiceClient hosAdminServiceClient;
     @Value("${quality.cloud}")
     private String cloud;
+    @Autowired
+    private RedisClient redisClient;
+
 
     @RequestMapping(value = ServiceApi.PackQcReport.dailyReport, method = RequestMethod.GET)
     @ApiOperation(value = "获取医院数据")
@@ -310,11 +314,22 @@ public class PackQcReportEndPoint extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value = "/packQcReport/datasetDetail", method = RequestMethod.GET)
-    @ApiOperation(value = "上传记录详情")
+    @ApiOperation(value = "抽取数据集")
     public Envelop datasetDetail(
             @ApiParam(name = "date", value = "日期", required = true)
             @RequestParam(value = "date") String date) throws Exception {
         Envelop envelop = packQcReportService.datasetDetail(date);
+        return envelop;
+    }
+
+    @RequestMapping(value = "/packQcReport/setStartTime", method = RequestMethod.GET)
+    @ApiOperation(value = "设置抽取时间")
+    public Envelop setStartTime(
+            @ApiParam(name = "date", value = "日期", required = true)
+            @RequestParam(value = "date") String date) throws Exception {
+        Envelop envelop = new Envelop();
+        redisClient.set("start_date",date);
+        envelop.setSuccessFlg(true);
         return envelop;
     }
 }
