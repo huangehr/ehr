@@ -25,7 +25,7 @@ public interface RsReportDao extends PagingAndSortingRepository<RsReport, Intege
 
     List<RsReport> findByReportCategoryId(@Param("reportCategoryId") Integer reportCategoryId);
 
-    @Query("FROM RsReport rc WHERE rc.status = 1 and rc.reportCategoryId =:reportCategoryId")
+    @Query("FROM RsReport rc WHERE rc.status = 1 and rc.reportCategoryId =:reportCategoryId order by rc.showType asc")
     List<RsReport> findByReportCategoryIdAndStatus(@Param("reportCategoryId") Integer reportCategoryId);
 
     @Query("FROM RsReport rc WHERE rc.status = 1 and rc.id in (:ids)")
