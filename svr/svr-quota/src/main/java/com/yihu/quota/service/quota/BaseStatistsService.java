@@ -635,13 +635,16 @@ public class BaseStatistsService {
                     if (dateDime.equals("year")) {
                         value = map.get(key).toString().substring(0, 4);
                     } else if (dateDime.contains("quarter")) {
-                        value = map.get(key).toString().substring(0, 7);
-                        if(value.contains("-04")){
-                            value = value.replace("-04","02");
-                        }else if(value.contains("-07")){
-                            value = value.replace("-07","03");
-                        }else if(value.contains("-10")){
-                            value = value.replace("-10","04");
+                        String y = map.get(key).toString().substring(0, 4);
+                        String q = map.get(key).toString().substring(5, 7);
+                        if(q.contains("01")){
+                            value = y + "年1季度";
+                        }else if(q.contains("04")){
+                            value = y + "年2季度";
+                        }else if(q.contains("07")){
+                            value = y + "年3季度";
+                        }else if(q.contains("10")){
+                            value = y + "年4季度";
                         }
                     } else if (dateDime.contains("month")) {
                         value = map.get(key).toString().substring(0, 7);
@@ -792,7 +795,7 @@ public class BaseStatistsService {
                 resultList = filteUnKnowDept(resultList,dimension);
             }
             if(slave.getSlaveCode().equals("sex") ){
-                resultList = filteUnKnowSex(resultList,dimension);
+                resultList = filteUnKnowSex(resultList, dimension);
             }
         }
         return resultList;
@@ -1280,16 +1283,20 @@ public class BaseStatistsService {
                     }else if(xdataName.contains("quarter")){
                         String quarter = "";
                         if(one.get(xdataName) != null){
-                            quarter = one.get(xdataName).toString().substring(0,7);
-                            if(quarter.contains("-04")){
-                                quarter = quarter.replace("-04","02");
-                            }else if(quarter.contains("-07")){
-                                quarter = quarter.replace("-07","03");
-                            }else if(quarter.contains("-10")){
-                                quarter = quarter.replace("-10","04");
+                           String value = one.get(xdataName).toString();
+                            String y = value.substring(0, 4);
+                            String q = value.substring(5, 7);
+                            if(q.contains("01")){
+                                quarter = y + "年1季度";
+                            }else if(q.contains("04")) {
+                                value = y + "年2季度";
+                            }else if(q.contains("07")){
+                                quarter = y + "年3季度";
+                            }else if(q.contains("10")){
+                                quarter = y + "年4季度";
                             }
+                            xData.add(quarter);
                         }
-                        xData.add( quarter + "");
                     }else if(xdataName.contains("month")){
                         xData.add(one.get(xdataName).toString().substring(0,7) + "");
                     }
