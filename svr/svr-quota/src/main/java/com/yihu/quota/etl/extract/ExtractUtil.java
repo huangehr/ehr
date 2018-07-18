@@ -132,12 +132,6 @@ public class ExtractUtil {
                                 saveModel.setSlaveKey1(value);
                                 saveModel.setSlaveKey1Name(slave1DictMap.get(value));
                             }
-                        }else {
-//                            String key = getSexAndAgeUnKnownDict(qds.get(i), slave1DictMap);
-//                            if(!StringUtils.isEmpty(key)){
-//                                saveModel.setSlaveKey1(key);
-//                                saveModel.setSlaveKey1Name("未知");
-//                            }
                         }
                     }else if(num == 2) {
                         if(map.get(qds.get(i).getKeyVal().trim()) != null){
@@ -146,12 +140,6 @@ public class ExtractUtil {
                                 saveModel.setSlaveKey2(value);
                                 saveModel.setSlaveKey2Name(slave2DictMap.get(value));
                             }
-                        }else {
-//                            String key = getSexAndAgeUnKnownDict(qds.get(i), slave2DictMap);
-//                            if(!StringUtils.isEmpty(key)){
-//                                saveModel.setSlaveKey2(key);
-//                                saveModel.setSlaveKey2Name("未知");
-//                            }
                         }
                     }else if(num == 3) {
                         if(map.get(qds.get(i).getKeyVal().trim()) != null){
@@ -160,12 +148,6 @@ public class ExtractUtil {
                                 saveModel.setSlaveKey3(value);
                                 saveModel.setSlaveKey3Name(slave3DictMap.get(value));
                             }
-                        }else {
-//                            String key = getSexAndAgeUnKnownDict(qds.get(i), slave3DictMap);
-//                            if(!StringUtils.isEmpty(key)){
-//                                saveModel.setSlaveKey3(key);
-//                                saveModel.setSlaveKey3Name("未知");
-//                            }
                         }
                     }else if(num == 4 ) {
                         if(map.get(qds.get(i).getKeyVal().trim()) != null){
@@ -174,12 +156,6 @@ public class ExtractUtil {
                                 saveModel.setSlaveKey4(value);
                                 saveModel.setSlaveKey4Name(slave4DictMap.get(value));
                             }
-                        }else {
-//                            String key = getSexAndAgeUnKnownDict(qds.get(i), slave4DictMap);
-//                            if(!StringUtils.isEmpty(key)){
-//                                saveModel.setSlaveKey4(key);
-//                                saveModel.setSlaveKey4Name("未知");
-//                            }
                         }
                     }
                 }
@@ -213,20 +189,6 @@ public class ExtractUtil {
         }
         logger.info("指标：" + quotaVo.getName() + "统计时指标或者机构未关联上错误数据有：" + errorCount);
         return returnList;
-    }
-
-    public String getSexAndAgeUnKnownDict(TjQuotaDimensionSlave tjQuotaDimensionSlave , Map<String,String> dictMap){
-        String dictKey = "";
-        if(tjQuotaDimensionSlave.getSlaveCode().equals(slave_sex) || tjQuotaDimensionSlave.getSlaveCode().equals(slave_age) ){
-            dictKey = "0";
-            for(String key : dictMap.keySet()){
-                if(dictMap.get(key).equals(unknown)){
-                    dictKey = key;
-                    break;
-                }
-            }
-        }
-        return  dictKey;
     }
 
     /**

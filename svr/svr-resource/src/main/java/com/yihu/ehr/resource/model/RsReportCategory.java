@@ -19,6 +19,7 @@ public class RsReportCategory {
     private String code; // 编码
     private String name; // 名称
     private String remark; // 备注
+    private Integer sortNo; // 排序
 
     // 临时字段
     private String text; // 名称，树形下拉框使用
@@ -69,6 +70,15 @@ public class RsReportCategory {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    @Column(name = "sort_no")
+    public Integer getSortNo() {
+        return sortNo;
+    }
+
+    public void setSortNo(Integer sortNo) {
+        this.sortNo = sortNo;
     }
 
     @Transient

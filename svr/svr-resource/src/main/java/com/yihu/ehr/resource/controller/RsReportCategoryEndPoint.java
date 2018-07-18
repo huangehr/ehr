@@ -95,6 +95,9 @@ public class RsReportCategoryEndPoint extends EnvelopRestEndPoint {
         if (null == newRsReportCategory.getPid()) {
             newRsReportCategory.setPid(0);
         }
+        if (null == newRsReportCategory.getSortNo()) {
+            newRsReportCategory.setSortNo(99);
+        }
         newRsReportCategory = rsReportCategoryService.save(newRsReportCategory);
         return convertToModel(newRsReportCategory, MRsReportCategory.class);
     }
