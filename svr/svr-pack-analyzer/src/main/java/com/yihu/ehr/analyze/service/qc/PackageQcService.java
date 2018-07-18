@@ -15,24 +15,27 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Airhead
  * @created 2018-01-19
  */
 @Service
+@Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class PackageQcService {
     private static final Logger logger = LoggerFactory.getLogger(PackageQcService.class);
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static final Class clazz = QcRuleCheckService.class;
-
+    private static final Map<String, String> DATASET_RECORDS = new ConcurrentHashMap<>();
 
     @Autowired
     private QcRuleCheckService qcRuleCheckService;
@@ -40,8 +43,6 @@ public class PackageQcService {
     private RedisClient redisClient;
     @Autowired
     protected ObjectMapper objectMapper;
-    @Autowired
-    private ElasticSearchUtil elasticSearchUtil;
 
     /**
      * 处理质控消息，统一入口，减少异步消息的数量
@@ -75,8 +76,6 @@ public class PackageQcService {
         List<Map<String, Object>> details = new ArrayList<>();
         Map<String, PackageDataSet> dataSets = zipPackage.getDataSets();
         for (String dataSetCode : dataSets.keySet()) {
-            updateDatasetDetail(zipPackage.getOrgCode(), DATE_FORMAT.format(esSimplePackage.getReceive_date()),dataSetCode,zipPackage.getCdaVersion()
-                    ,zipPackage.getEventType().getType() ,dataSets.get(dataSetCode).getRecords().size());
             Map<String, Object> dataSet = new HashMap<>();
             dataSet.put(dataSetCode, dataSets.get(dataSetCode).getRecords().size());
             details.add(dataSet);
@@ -137,6 +136,10 @@ public class PackageQcService {
         }
         qcDataSetRecord.put("details", objectMapper.writeValueAsString(details));
         qcDataSetRecord.put("missing", "[]");
+        for (String dataSetCode : dataSets.keySet()) {
+            this.updateDatasetDetails(zipPackage.getOrgCode(), DATE_FORMAT.format(esSimplePackage.getReceive_date()), zipPackage.getCdaVersion(),
+                    dataSetCode, zipPackage.getEventType().getType(), dataSets.get(dataSetCode).getRecords().size());
+        }
     }
 
     private List<String> getDataElementList(String version, String dataSetCode) {
@@ -160,31 +163,68 @@ public class PackageQcService {
                 .toString();
     }
 
-    private void updateDatasetDetail(String orgCode, String receiveDate, String dataset,
-                                     String version, int eventType, int row) throws Exception{
-        String date = receiveDate.substring(0,10);
+   /* private void updateDatasetDetail(String orgCode, String receiveDate, String version,
+                                     String dataset, int eventType, int row) throws Exception{
+        String date = receiveDate.substring(0, 10);
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("dataset="+dataset+";");
+        stringBuilder.append("dataset=" + dataset+";");
         stringBuilder.append("receive_date>=" + date + " 00:00:00;");
         stringBuilder.append("receive_date<" + date + " 23:59:59;");
-        stringBuilder.append("org_code=" + orgCode+";");
-        stringBuilder.append("event_type=" + eventType+";");
-        List<Map<String, Object>> list = elasticSearchUtil.list("json_archives_qc","qc_dataset_detail",stringBuilder.toString());
-        if(list!=null&&list.size()>0){
+        stringBuilder.append("org_code=" + orgCode + ";");
+        stringBuilder.append("event_type=" + eventType + ";");
+        List<Map<String, Object>> list = elasticSearchUtil.list("json_archives_qc","qc_dataset_detail", stringBuilder.toString());
+        if (list != null && list.size() > 0){
             Map<String, Object> map = list.get(0);
-            map.put("row", Integer.parseInt(map.get("row").toString())+row);
-            map.put("count", Integer.parseInt(map.get("count").toString())+1);
-            elasticSearchUtil.update("json_archives_qc", "qc_dataset_detail", map.get("_id")+"", map);
-        }else{
+            map.put("row", Integer.parseInt(map.get("row").toString()) + row);
+            map.put("count", Integer.parseInt(map.get("count").toString()) + 1);
+            elasticSearchUtil.voidUpdate("json_archives_qc", "qc_dataset_detail", map.get("_id")+"", map);
+        } else {
             Map<String, Object> map = new HashMap<>();
             map.put("org_code", orgCode);
             map.put("event_type", eventType);
-            map.put("receive_date", date+" 00:00:00");
+            map.put("receive_date", date + " 00:00:00");
             map.put("dataset", dataset);
             map.put("dataset_name", redisClient.get("std_data_set_" + version + ":" + dataset + ":name"));
             map.put("row", row);
             map.put("count", 1);
             elasticSearchUtil.index("json_archives_qc", "qc_dataset_detail", map);
         }
+    }*/
+
+    private void updateDatasetDetails (String orgCode, String receiveDate, String version,
+                                       String dataset, int eventType, int row) throws Exception{
+        String date = receiveDate.substring(0, 10);
+        StringBuilder record = new StringBuilder();
+        record.append(orgCode)
+                .append(";")
+                .append(date)
+                .append(";")
+                .append(version)
+                .append(";")
+                .append(eventType)
+                .append(";")
+                .append(dataset);
+        String val = DATASET_RECORDS.get(record.toString());
+        if (val != null) {
+            String [] _val = val.split(";");
+            int count = Integer.parseInt(_val[0]) + 1;
+            int rows = Integer.parseInt(_val[1]) + row;
+            //双重检查，防止处理数据的时候保存数据的任务线程已经刷新了【DATASET_RECORDS】数据集合，降低前后数据不一致的概率
+            if (DATASET_RECORDS.get(record.toString()) != null) {
+                DATASET_RECORDS.put(record.toString(), count + ";" + rows);
+            } else {
+                DATASET_RECORDS.put(record.toString(), 1 + ";" + row);
+            }
+        } else {
+            DATASET_RECORDS.put(record.toString(), 1 + ";" + row);
+        }
+    }
+
+    //获取数据集合的时候加锁
+    public static synchronized Map<String, String> getDatasetDetails (){
+        Map<String, String> temp = new HashMap<>();
+        temp.putAll(DATASET_RECORDS);
+        DATASET_RECORDS.clear();
+        return temp;
     }
 }
