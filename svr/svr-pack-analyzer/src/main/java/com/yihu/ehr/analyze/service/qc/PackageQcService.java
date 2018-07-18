@@ -52,7 +52,7 @@ public class PackageQcService {
      */
     public void qcHandle(ZipPackage zipPackage) throws Throwable {
         if(zipPackage.getEventType() == null){
-            throw new IllegalJsonDataException("event type is empty");
+            throw new IllegalJsonDataException("提取不到事件类型");
         }
         EsSimplePackage esSimplePackage = zipPackage.getEsSimplePackage();
         Map<String, Object> qcDataSetRecord = zipPackage.getQcDataSetRecord();
