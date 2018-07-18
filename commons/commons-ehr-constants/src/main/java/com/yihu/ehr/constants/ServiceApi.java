@@ -1330,6 +1330,7 @@ public class ServiceApi {
         public static class Scheduler {
             public static final String ExtractMedicineExpense = "/tj/scheduler/extractMedicineExpense";
             public static final String ExtractChronicDisease = "/tj/scheduler/extractChronicDisease";
+            public static final String ExtractPregnantWoman = "/tj/scheduler/extractPregnantWoman";
         }
 
     }
