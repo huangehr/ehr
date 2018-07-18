@@ -2,8 +2,10 @@ package com.yihu.ehr.analyze.service.qc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.analyze.model.ZipPackage;
+import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.model.packs.EsSimplePackage;
 import com.yihu.ehr.profile.ErrorType;
+import com.yihu.ehr.profile.exception.IllegalJsonDataException;
 import com.yihu.ehr.profile.model.MetaDataRecord;
 import com.yihu.ehr.profile.model.PackageDataSet;
 import com.yihu.ehr.redis.client.RedisClient;
@@ -38,7 +40,8 @@ public class PackageQcService {
     private RedisClient redisClient;
     @Autowired
     protected ObjectMapper objectMapper;
-
+    @Autowired
+    private ElasticSearchUtil elasticSearchUtil;
 
     /**
      * 处理质控消息，统一入口，减少异步消息的数量
@@ -48,6 +51,9 @@ public class PackageQcService {
      * @param zipPackage 档案包
      */
     public void qcHandle(ZipPackage zipPackage) throws Throwable {
+        if(zipPackage.getEventType() == null){
+            throw new IllegalJsonDataException("event type is empty");
+        }
         EsSimplePackage esSimplePackage = zipPackage.getEsSimplePackage();
         Map<String, Object> qcDataSetRecord = zipPackage.getQcDataSetRecord();
         qcDataSetRecord.put("_id", esSimplePackage.get_id());
@@ -69,6 +75,8 @@ public class PackageQcService {
         List<Map<String, Object>> details = new ArrayList<>();
         Map<String, PackageDataSet> dataSets = zipPackage.getDataSets();
         for (String dataSetCode : dataSets.keySet()) {
+            updateDatasetDetail(zipPackage.getOrgCode(), DATE_FORMAT.format(esSimplePackage.getReceive_date()),dataSetCode,zipPackage.getCdaVersion()
+                    ,zipPackage.getEventType().getType() ,dataSets.get(dataSetCode).getRecords().size());
             Map<String, Object> dataSet = new HashMap<>();
             dataSet.put(dataSetCode, dataSets.get(dataSetCode).getRecords().size());
             details.add(dataSet);
@@ -150,5 +158,33 @@ public class PackageQcService {
                 .arg(key)
                 .arg(column)
                 .toString();
+    }
+
+    private void updateDatasetDetail(String orgCode, String receiveDate, String dataset,
+                                     String version, int eventType, int row) throws Exception{
+        String date = receiveDate.substring(0,10);
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("dataset="+dataset+";");
+        stringBuilder.append("receive_date>=" + date + " 00:00:00;");
+        stringBuilder.append("receive_date<" + date + " 23:59:59;");
+        stringBuilder.append("org_code=" + orgCode+";");
+        stringBuilder.append("event_type=" + eventType+";");
+        List<Map<String, Object>> list = elasticSearchUtil.list("json_archives_qc","qc_dataset_detail",stringBuilder.toString());
+        if(list!=null&&list.size()>0){
+            Map<String, Object> map = list.get(0);
+            map.put("row", Integer.parseInt(map.get("row").toString())+row);
+            map.put("count", Integer.parseInt(map.get("count").toString())+1);
+            elasticSearchUtil.update("json_archives_qc", "qc_dataset_detail", map.get("_id")+"", map);
+        }else{
+            Map<String, Object> map = new HashMap<>();
+            map.put("org_code", orgCode);
+            map.put("event_type", eventType);
+            map.put("receive_date", date+" 00:00:00");
+            map.put("dataset", dataset);
+            map.put("dataset_name", redisClient.get("std_data_set_" + version + ":" + dataset + ":name"));
+            map.put("row", row);
+            map.put("count", 1);
+            elasticSearchUtil.index("json_archives_qc", "qc_dataset_detail", map);
+        }
     }
 }
