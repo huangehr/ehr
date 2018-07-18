@@ -81,8 +81,8 @@ public class HtmlProcessor extends Processor {
     }
 
     public static void main(String [] args) {
-        Processor processor = new HtmlProcessor("Resolve");
-        processor.process(new Event("Resolve", "{}"));
+        Processor processor = new HtmlProcessor("resolve");
+        processor.process(new Event("resolve", "{}"));
     }
 
 }

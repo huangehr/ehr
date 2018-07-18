@@ -97,11 +97,9 @@ public class ElasticSearchPool {
                 //判断是否有用，能否取到服务器的信息
                 transportClient.listedNodes();
             } catch (Exception e){
-                if (e instanceof NoNodeAvailableException){
-                    //判断是否报以上错误，或是即为取不到服务
-                    //则重新返回一个新的链接。
-                    return getTransportClient();
-                }
+                //判断是否出错，或是即为取不到可用服务
+                //重新返回一个新的链接，减少因网络问题引发程序错误的概率
+                return getTransportClient();
             }
         }
         return transportClient;
