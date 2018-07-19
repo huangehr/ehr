@@ -17,6 +17,8 @@ public interface RsResourceDefaultParamDao extends PagingAndSortingRepository<Rs
 
     void deleteByResourcesId(String resourcesId);
 
+    void deleteByResourcesIdAndParamKey(String resourcesId, String paramKey);
+
     @Query("from RsResourceDefaultParam where resourcesId = ?1 or resourcesCode = ?2 ")
     List<RsResourceDefaultParam> findByResourcesIdOrResourcesCode(String resourcesId, String resourceCode);
 
@@ -25,4 +27,5 @@ public interface RsResourceDefaultParamDao extends PagingAndSortingRepository<Rs
 
     @Query("select rdf from RsResourceDefaultParam rdf where rdf.id = :id")
     RsResourceDefaultParam findById(@Param("id") String id);
+
 }

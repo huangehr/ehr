@@ -23,11 +23,18 @@ public class RsResourceDefaultParamService extends BaseJpaService<RsResourceDefa
     public RsResourceDefaultParam findById(String id) {
         return resourceDefaultParamDao.findById(id);
     }
+
     public List<RsResourceDefaultParam> findByResourcesIdOrResourcesCodeWithParamKey(String resourcesId, String resourcesCode, String paramKey){
         return resourceDefaultParamDao.findByResourcesIdOrResourcesCodeWithParamKey(resourcesId, resourcesCode, paramKey);
     }
+
     public List<RsResourceDefaultParam> findByResourcesIdOrResourcesCode(String resourcesId, String resourcesCode){
         return resourceDefaultParamDao.findByResourcesIdOrResourcesCode(resourcesId, resourcesCode);
+    }
+
+    public RsResourceDefaultParam saveWithDel (RsResourceDefaultParam resourceDefaultParam) {
+        resourceDefaultParamDao.deleteByResourcesIdAndParamKey(resourceDefaultParam.getResourcesId(), "q");
+        return resourceDefaultParamDao.save(resourceDefaultParam);
     }
 
 }

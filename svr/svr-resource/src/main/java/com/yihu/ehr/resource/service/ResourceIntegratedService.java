@@ -7,7 +7,6 @@ import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.resource.dao.*;
 import com.yihu.ehr.resource.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
@@ -15,8 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Created by Sxy on 2016/08/01.
@@ -26,13 +23,9 @@ import java.util.regex.Pattern;
 public class ResourceIntegratedService extends BaseJpaService {
 
     @Autowired
-    private ResourceBrowseService resourceBrowseService;
-    @Autowired
     private ResourceBrowseMetadataDao resourceBrowseMetadataDao;
     @Autowired
     private RsResourceDao rsResourceDao;
-    @Autowired
-    private RsResourceDefaultQueryDao resourceDefaultQueryDao;
     @Autowired
     private RsResourceMetadataDao rsResourceMetadataDao;
     @Autowired
@@ -45,6 +38,8 @@ public class ResourceIntegratedService extends BaseJpaService {
     private RsDictionaryDao rsDictionaryDao;
     @Autowired
     private RsResourceCategoryDao rsResourceCategoryDao;
+    @Autowired
+    private RsResourceDefaultParamDao resourceDefaultParamDao;
 
     /**
      * 获取档案数据资源列表
@@ -453,17 +448,21 @@ public class ResourceIntegratedService extends BaseJpaService {
         return resultList;
     }
 
-    public RsResource profileCompleteSave(RsResource rsResource, List<RsResourceMetadata> metadataList, RsResourceDefaultQuery resourceDefaultQuery) {
+    public RsResource profileCompleteSave(RsResource rsResource, List<RsResourceMetadata> metadataList, RsResourceDefaultParam resourceDefaultParam) {
         RsResource newRsResource =  rsResourceDao.save(rsResource);
         metadataList.forEach(item -> rsResourceMetadataDao.save(item));
-        resourceDefaultQueryDao.save(resourceDefaultQuery);
+        if (resourceDefaultParam != null) {
+            resourceDefaultParamDao.save(resourceDefaultParam);
+        }
         return newRsResource;
     }
 
-    public RsResource quotaCompleteSave(RsResource rsResource, List<RsResourceQuota> resourceQuotaList, RsResourceDefaultQuery resourceDefaultQuery) {
+    public RsResource quotaCompleteSave(RsResource rsResource, List<RsResourceQuota> resourceQuotaList, RsResourceDefaultParam rsResourceDefaultParam) {
         RsResource newRsResource =  rsResourceDao.save(rsResource);
         resourceQuotaList.forEach(item -> rsResourceQuotaDao.save(item));
-        resourceDefaultQueryDao.save(resourceDefaultQuery);
+        if (rsResourceDefaultParam != null) {
+            resourceDefaultParamDao.save(rsResourceDefaultParam);
+        }
         return newRsResource;
     }
 
