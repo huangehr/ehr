@@ -50,7 +50,7 @@ public class PackDatasetDetailsJob {
                 } else {
                     map.put("org_code", _key[0]);
                     map.put("receive_date", _key[1] + " 00:00:00");
-                    map.put("event_type", _key[3]);
+                    map.put("event_type", Integer.parseInt(_key[3]));
                     map.put("dataset", _key[4]);
                     map.put("dataset_name", redisClient.get("std_data_set_" + _key[2] + ":" + _key[4] + ":name"));
                     map.put("count", Integer.parseInt(_val[0]));
