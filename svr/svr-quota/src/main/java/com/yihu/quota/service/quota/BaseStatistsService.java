@@ -21,7 +21,6 @@ import com.yihu.quota.service.source.TjDataSourceService;
 import com.yihu.quota.util.BasesicUtil;
 import com.yihu.quota.vo.DictModel;
 import com.yihu.quota.vo.SaveModel;
-import net.bytebuddy.implementation.bytecode.Throw;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -817,7 +816,7 @@ public class BaseStatistsService {
     }
 
     /**
-     * 过滤未说明的性别
+     * 过滤未说明的性别,和其他为0的数据
      * @param dataList
      * @return
      */
@@ -825,7 +824,9 @@ public class BaseStatistsService {
         List<Map<String, Object>> resultList = new ArrayList<>();
         for(Map<String,Object> map : dataList){
             if( !map.get(dimension).toString().contains("未说明")){
-                resultList.add(map);
+                if(!map.get(dimension).toString().contains("未知") || ! map.get(resultField).equals("0") ){
+                    resultList.add(map);
+                }
             }
         }
         return  resultList;
