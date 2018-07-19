@@ -61,27 +61,3 @@ elasticsearch:
 hadoop:
   hbase-properties:
     hbase.zookeeper.quorum: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com
-
----
-spring:
-  profiles: prod
-  datasource:
-    url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: chenweishan
-    password: chenweishan
-  redis:
-    host: 172.19.103.47
-    port: 6379
-    password: redis!@456
-  data:
-    solr:
-      zk-host: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com:2181/solr
-  elasticsearch:
-    jest:
-      uris: http://172.19.103.9:9200
-elasticsearch:
-  cluster-name: elasticsearch
-  cluster-nodes: 172.19.103.9:9300
-hadoop:
-  hbase-properties:
-    hbase.zookeeper.quorum: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com
