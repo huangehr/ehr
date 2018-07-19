@@ -34,6 +34,7 @@ public class ExtractUtil {
     private Logger logger = LoggerFactory.getLogger(ExtractUtil.class);
     private static String main_town = "twon";
     private static String main_org = "org";
+    private static String main_dept = "dept";
     private static String main_year = "year";
     private static String slave_sex = "sex";
     private static String slave_age = "age";
@@ -66,6 +67,7 @@ public class ExtractUtil {
         List<SaveModel> totalSaveModelDictList = getTotalDictDataList(qdm,qds);
         Map<String,String> townDictMap = new HashMap<>();
         Map<String,String> orgDictMap = new HashMap<>();
+        Map<String,String> deptDictMap = new HashMap<>();
         Map<String,String> yearDictMap = new HashMap<>();
         Map<String,String> slave1DictMap = new HashMap<>();
         Map<String,String> slave2DictMap = new HashMap<>();
@@ -77,6 +79,9 @@ public class ExtractUtil {
             }
             if(saveModel.getOrg() != null){
                 orgDictMap.put(saveModel.getOrg(), saveModel.getOrgName());
+            }
+            if(saveModel.getDept() != null){
+                deptDictMap.put(saveModel.getDept(), saveModel.getDeptName());
             }
             if(saveModel.getYear() != null){
                 yearDictMap.put(saveModel.getYear(), saveModel.getYearName());
@@ -116,9 +121,12 @@ public class ExtractUtil {
                     }else if(main.getMainCode().equals(main_org) && !StringUtils.isEmpty(orgDictMap.get(value))){
                         saveModel.setOrg(value);
                         saveModel.setOrgName(orgDictMap.get(value));
-                    } else if(main.getMainCode().equals(main_year) && !StringUtils.isEmpty(yearDictMap.get(value))){
+                    }else if(main.getMainCode().equals(main_year) && !StringUtils.isEmpty(yearDictMap.get(value))){
                         saveModel.setYearName(yearDictMap.get(value));
                         saveModel.setYear(value);
+                    }else if(main.getMainCode().equals(main_dept) && !StringUtils.isEmpty(deptDictMap.get(value))){
+                        saveModel.setDeptName(deptDictMap.get(value));
+                        saveModel.setDept(value);
                     }
                 }
             }
@@ -514,10 +522,10 @@ public class ExtractUtil {
                 });
                 break;
             }
-            case Contant.main_dimension.area_team: {
-                //设置团队
+            case Contant.main_dimension.area_dept: {
+                //设置科室
                 dictData.stream().forEach(one -> {
-                    setOneData(allData, one.getTeam(), one, Contant.main_dimension_areaLevel.area_team);
+                    setOneData(allData, one.getDept(), one, Contant.main_dimension_areaLevel.area_dept);
                 });
                 break;
             }
@@ -556,9 +564,9 @@ public class ExtractUtil {
                 name = mainOne.getOrgName();
                 break;
             }
-            case Contant.main_dimension.area_team: {
-                code = mainOne.getTeam();
-                name = mainOne.getTeamName();
+            case Contant.main_dimension.area_dept: {
+                code = mainOne.getDept();
+                name = mainOne.getDeptName();
                 break;
             }
             case Contant.main_dimension.time_year: {
