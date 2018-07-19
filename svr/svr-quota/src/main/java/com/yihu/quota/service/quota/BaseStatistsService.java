@@ -1613,47 +1613,52 @@ public class BaseStatistsService {
                         resultList.add(map);
                     }
                 }else if(dateType.toLowerCase().equals("quarter")){
-                    Map<String,Object> map = new HashMap<>();
                     String startQuarter = "";
                     String endQuarter = "";
                     lastDate.setTime(firstMonth);
+                    Date firstDate = lastDate.getTime();
                     int currentMonth = lastDate.get(Calendar.MONTH) + 1;
                     if (currentMonth >= 1 && currentMonth <= 3){
-                        startQuarter = sdf.format(lastDate).substring(0,4)+"年1季度";
+                        startQuarter = sdf.format(firstDate).substring(0,4)+"年1季度";
                     }else if (currentMonth >= 4 && currentMonth <= 6){
-                        startQuarter = sdf.format(lastDate).substring(0,4)+"年2季度";
+                        startQuarter = sdf.format(firstDate).substring(0,4)+"年2季度";
                     } else if (currentMonth >= 7 && currentMonth <= 9){
-                        startQuarter = sdf.format(lastDate).substring(0,4)+"年3季度";
+                        startQuarter = sdf.format(firstDate).substring(0,4)+"年3季度";
                     } else if (currentMonth >= 10 && currentMonth <= 12){
-                        startQuarter = sdf.format(lastDate).substring(0,4)+"年4季度";
+                        startQuarter = sdf.format(firstDate).substring(0,4)+"年4季度";
                     }
 
                     lastDate.setTime(endMonth);
+                    Date downDate = lastDate.getTime();
                     if (currentMonth >= 1 && currentMonth <= 3){
-                        endQuarter = sdf.format(lastDate).substring(0,4)+"年1季度";
+                        endQuarter = sdf.format(downDate).substring(0,4)+"年1季度";
                     }else if (currentMonth >= 4 && currentMonth <= 6){
-                        endQuarter = sdf.format(lastDate).substring(0,4)+"年2季度";
+                        endQuarter = sdf.format(downDate).substring(0,4)+"年2季度";
                     } else if (currentMonth >= 7 && currentMonth <= 9){
-                        endQuarter = sdf.format(lastDate).substring(0,4)+"年3季度";
+                        endQuarter = sdf.format(downDate).substring(0,4)+"年3季度";
                     } else if (currentMonth >= 10 && currentMonth <= 12){
-                        endQuarter = sdf.format(lastDate).substring(0,4)+"年4季度";
+                        endQuarter = sdf.format(downDate).substring(0,4)+"年4季度";
                     }
-                    while ( !startQuarter.equals(endQuarter)){
+                    String lastQuarter = "";
+                    while ( !startQuarter.equals(lastQuarter)){
                         int eYear = Integer.valueOf(endQuarter.substring(0, 4));
-                        int eQuarter = Integer.valueOf(endQuarter.substring(6, 7));
+                        int eQuarter = Integer.valueOf(endQuarter.substring(5, 6));
+                        endQuarter = eYear+ "年" + eQuarter + "季度";
                         if(eQuarter == 1){
                             eYear--;
+                            eQuarter = 4;
                         }else {
                             eQuarter--;
                         }
-                        String lastQuarter = eYear + "年" + eQuarter + "季度";
+                        lastQuarter = eYear + "年" + eQuarter + "季度";
                         double current = 0;
                         double last = 0;
+                        Map<String,Object> map = new HashMap<>();
                         for(Map<String,Object> dataMap : dataList){
                             String val = dataMap.get(dimension).toString();
                             if(val.equals(endQuarter) ){
-                                map.put(firstColumnField, val);
-                                map.put(dimension, val);
+                                map.put(firstColumnField, endQuarter);
+                                map.put(dimension, endQuarter);
                                 current = Double.valueOf(dataMap.get(resultField).toString());
                             }
                             if(val.equals(lastQuarter) ){
