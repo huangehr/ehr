@@ -56,7 +56,7 @@ public class PregnantWomanScheduler {
      * 抽取昨天的去重记录孕妇数据
      */
     @Scheduled(cron = "0 0 8 * * ?")
-    public void extractChronicDiseaseJob() {
+    public void extractPregnantWomanJob() {
         try {
             Date currDate = new Date();
             // 抽取昨天数据
@@ -72,8 +72,8 @@ public class PregnantWomanScheduler {
     }
 
     @ApiOperation("抽取指定时间段去重记录孕妇数据")
-    @RequestMapping(value = ServiceApi.TJ.Scheduler.ExtractChronicDisease, method = RequestMethod.GET)
-    public Envelop extractChronicDisease(
+    @RequestMapping(value = ServiceApi.TJ.Scheduler.ExtractPregnantWoman, method = RequestMethod.GET)
+    public Envelop extractPregnantWoman(
             @ApiParam(name = "startDate", value = "开始日期，格式 YYYY-MM-DD，接口里自动拼接 T00:00:00Z，", required = true)
             @RequestParam(value = "startDate") String startDate,
             @ApiParam(name = "endDate", value = "截止日期，格式 YYYY-MM-DD，接口里自动拼接 T23:59:59Z", required = true)
@@ -103,7 +103,7 @@ public class PregnantWomanScheduler {
 
         // 去重查询孕妇记录
         List<String> rowkeyList = new ArrayList();
-        String q = "rowkey:*$HDSB02_05$* OR (rowkey:*$HDSD00_73$* AND EHR_000109:Z32.100))";
+        String q = "rowkey:*$HDSB02_05$* OR (rowkey:*$HDSD00_73$* AND EHR_000109:Z32.100)";
         List<Group> groupList = solrUtil.queryDistinctOneField(ResourceCore.SubTable, q, fq, null, 0, -1, showFields, idCardField, "event_date asc");
         SchedulerUtil.collectRowkeyFromDistinctGroup(rowkeyList, solrUtil, groupList, q, fq, idCardField, showFields);
         this.translateAndSaveData(rowkeyList);
