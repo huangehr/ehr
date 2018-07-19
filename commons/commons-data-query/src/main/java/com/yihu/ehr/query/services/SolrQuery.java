@@ -60,28 +60,28 @@ public class SolrQuery {
         Object[] keywords = condition.getKeywords();
         switch (operation) {
             case Operation.LIKE:
-                s = field + ":*\"" + keyword + "\"*";
+                s = field + ":*" + keyword + "*";
                 break;
             case Operation.LEFTLIKE:
-                s = field + ":*\"" + keyword + "\"";
+                s = field + ":*" + keyword + "";
                 break;
             case Operation.RIGHTLIKE:
-                s = field + ":\"" + keyword + "\"*";
+                s = field + ":" + keyword + "*";
                 break;
             case Operation.RANGE: {
                 if (keywords.length >= 2) {
-                    s = field + ":[\"" + keywords[0] + "\" TO \"" + keywords[1] + "\"]";
+                    s = field + ":[" + keywords[0] + " TO " + keywords[1] + "]";
                 }
                 break;
             }
             case Operation.NOTRANGE: {
                 if (keywords.length >= 2) {
-                    s = "NOT " + field + ":[\"" + keywords[0] + "\" TO \"" + keywords[1] + "\"]";
+                    s = "NOT " + field + ":[" + keywords[0] + " TO " + keywords[1] + "]";
                 }
                 break;
             }
             case Operation.NE: {
-                s = "NOT(" + field + ":\"" + keyword + "\")";
+                s = "NOT(" + field + ":" + keyword + ")";
                 break;
             }
             case Operation.IN: {
@@ -89,13 +89,13 @@ public class SolrQuery {
                 if (keywords != null && keywords.length > 0) {
                     for (Object key : keywords) {
                         if (in != null && in.length() > 0) {
-                            in += " OR " + field + ":\"" + key + "\"";
+                            in += " OR " + field + ":" + key;
                         } else {
-                            in = field + ":\"" + key + "\"";
+                            in = field + ":" + key;
                         }
                     }
                 } else if (keyword != null) {
-                    in = field + ":\"" + keyword + "\"";
+                    in = field + ":" + keyword;
                 }
                 s = "( " + in + " )";
                 break;
@@ -105,35 +105,35 @@ public class SolrQuery {
                 if (keywords != null && keywords.length > 0) {
                     for (Object key : keywords) {
                         if (in != null && in.length() > 0) {
-                            in += " OR " + field + ":\"" + key + "\"";
+                            in += " OR " + field + ":" + key;
                         } else {
-                            in = field + ":\"" + key + "\"";
+                            in = field + ":" + key;
                         }
                     }
                 } else if (keyword != null) {
-                    in = field + ":\"" + keyword + "\"";
+                    in = field + ":" + keyword;
                 }
                 s = "NOT (" + in + ")";
                 break;
             }
             case Operation.GT: {
-                s = field + ":{\"" + keyword + "\" TO *}";
+                s = field + ":{" + keyword + " TO *}";
                 break;
             }
             case Operation.GTE: {
-                s = field + ":[\"" + keyword + "\" TO * ]";
+                s = field + ":[" + keyword + " TO * ]";
                 break;
             }
             case Operation.LT: {
-                s = field + ":" + "{* TO \"" + keyword + "\" }";
+                s = field + ":" + "{* TO " + keyword + "}";
                 break;
             }
             case Operation.LTE: {
-                s = field + ":" + "[* TO \"" + keyword + "\" ]";
+                s = field + ":" + "[* TO " + keyword + "]";
                 break;
             }
             case Operation.EQ: {
-                s = field + ":\"" + keyword + "\"";
+                s = field + ":" + keyword;
                 break;
             }
             default:

@@ -435,7 +435,7 @@ public class ResourceBrowseService extends BaseJpaService {
      * @return
      * @throws Exception
      */
-    public List<QueryCondition> parseCondition(String queryCondition) throws Exception {
+    private List<QueryCondition> parseCondition(String queryCondition) throws Exception {
         List<QueryCondition> ql = new ArrayList<QueryCondition>();
         ObjectMapper mapper = new ObjectMapper();
         JavaType javaType = mapper.getTypeFactory().constructParametricType(List.class, Map.class);
