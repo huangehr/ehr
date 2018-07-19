@@ -92,15 +92,8 @@
 		</root>
 	</springProfile>
 
-    <!-- 上饶过渡环境配置 -->
-    <springProfile name="prod_sr">
-        <root level="WARN">
-            <appender-ref ref="console"/>
-        </root>
-    </springProfile>
-
     <!-- 上饶正式环境配置 -->
-    <springProfile name="prod_srformal">
+    <springProfile name="prod">
         <root level="WARN">
             <appender-ref ref="console"/>
         </root>
