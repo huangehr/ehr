@@ -392,7 +392,7 @@ public class QuotaReportController extends BaseController {
                     List<Map<String, Object>> datalist = new ArrayList<>();
                     for (Map<String, Object> resultMap : listMap) {
                         Map<String, Object> map = new HashMap<>();
-                        map.put("NAME", resultMap.get(dimensionName));
+                        map.put("NAME", null == resultMap.get(dimensionName) ? resultMap.get(dimension) : resultMap.get(dimensionName));
                         map.put("TOTAL", resultMap.get("result"));
                         if(resultMap.get(dimensionName) != null){
                             map.put("NAME",resultMap.get(dimensionName));
@@ -924,7 +924,7 @@ public class QuotaReportController extends BaseController {
                 List<Map<String, Object>> datalist = new ArrayList<>();
                 for (Map<String, Object> resultMap : listMap) {
                     Map<String, Object> map = new HashMap<>();
-                    map.put("NAME", resultMap.get(dimensionName));
+                    map.put("NAME", null == resultMap.get(dimensionName) ? resultMap.get(dimension) : resultMap.get(dimensionName));
                     map.put("TOTAL", resultMap.get("result"));
                     if(resultMap.get(dimensionName) != null){
                         map.put("NAME",resultMap.get(dimensionName));
