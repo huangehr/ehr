@@ -757,6 +757,17 @@ public class BaseStatistsService {
         Map<String,String>  dimensionDicMap = getDimensionDicMap(code,dimension);
         List<String> dimenList = getDimenList(dimension);
         String groupDimension = joinDimen(dimension);
+        List<TjQuotaDimensionSlave> slaves = tjDimensionSlaveService.findTjQuotaDimensionSlaveByQuotaCode(code);
+        for(TjQuotaDimensionSlave slave :slaves) {
+            if (slave.getSlaveCode().equals("dept")) {
+                String dimenName = dimension + "Name not in('其他') ";
+                if(StringUtils.isEmpty(filter)){
+                    filter = dimenName;
+                }else {
+                    filter += " and " + dimenName;
+                }
+            }
+        }
         List<Map<String, Object>>  dimenListResult = esResultExtract.searcherSumGroup(tjQuota, groupDimension, filter, resultField, groupDimension, "asc", top);
 
         List<Map<String, Object>> resultList = new ArrayList<>();
@@ -788,31 +799,12 @@ public class BaseStatistsService {
         if (StringUtils.isEmpty(top) && "town".equals(dimension)) {
             resultList = noDataDimenDictionary(resultList,dimension,filter);
         }
-        List<TjQuotaDimensionSlave> slaves = tjDimensionSlaveService.findTjQuotaDimensionSlaveByQuotaCode(code);
         for(TjQuotaDimensionSlave slave :slaves){
-            if(slave.getSlaveCode().equals("dept") ){
-                resultList = filteUnKnowDept(resultList,dimension);
-            }
             if(slave.getSlaveCode().equals("sex") ){
                 resultList = filteUnKnowSex(resultList, dimension);
             }
         }
         return resultList;
-    }
-
-    /**
-     * 过滤其他机构
-     * @param dataList
-     * @return
-     */
-    public List<Map<String, Object>> filteUnKnowDept(List<Map<String, Object>> dataList,String dimension){
-        List<Map<String, Object>> resultList = new ArrayList<>();
-        for(Map<String,Object> map : dataList){
-            if( !map.get(dimension).toString().contains("其他")){
-                resultList.add(map);
-            }
-        }
-        return  resultList;
     }
 
     /**
