@@ -14,7 +14,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.solr.client.solrj.response.Group;
-import org.apache.solr.common.SolrDocumentList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -112,8 +111,8 @@ public class ChronicDiseaseScheduler {
         // 去重查询高血压患者记录
         List<String> hypertensionRowkeyList = new ArrayList();
         String q_hypertension = "(rowkey:*$HDSD00_73$* AND EHR_000109:[I10 TO I15.900]) OR (rowkey:*$HDSD00_69$* AND EHR_000293:[I10 TO I15.900])";
-        SolrDocumentList hypertensionDocList = solrUtil.queryDistinctOneFieldForDocList(ResourceCore.SubTable, q_hypertension, fq, null, 0, -1, showFields, idCardField, "event_date asc");
-        SchedulerUtil.collectRowkeyFromDistinctGroup(hypertensionRowkeyList, solrUtil, diabetesGroupList, q_hypertension, fq, idCardField, showFields);
+        List<Group> hypertensionGroupList = solrUtil.queryDistinctOneField(ResourceCore.SubTable, q_hypertension, fq, null, 0, -1, showFields, idCardField, "event_date asc");
+        SchedulerUtil.collectRowkeyFromDistinctGroup(hypertensionRowkeyList, solrUtil, hypertensionGroupList, q_hypertension, fq, idCardField, showFields);
         this.translateAndSaveData(hypertensionRowkeyList, "2");
     }
 
