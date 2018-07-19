@@ -221,15 +221,14 @@ public class PackQcReportService extends BaseJpaService {
      */
     public Envelop dataSetList(String startDate, String endDate, String orgCode) throws Exception {
         Envelop envelop = new Envelop();
-        List<Map<String, Object>> res = new ArrayList<>();
         StringBuffer sql = new StringBuffer();
-        sql.append(" select sum(count) as count ,sum(row) as row, dataset_name, dataset ");
-        sql.append(" from json_archives_qc/qc_dataset_detail");
-        sql.append(" where receive_date>='" + startDate + " 00:00:00' and receive_date<='" + endDate + " 23:59:59'");
+        sql.append("SELECT SUM(count) as count ,SUM(row) as row, dataset_name, dataset ");
+        sql.append("FROM json_archives_qc/qc_dataset_detail");
+        sql.append(" WHERE receive_date>='" + startDate + " 00:00:00' and receive_date<='" + endDate + " 23:59:59'");
         if (StringUtils.isNotEmpty(orgCode) && !"null".equals(orgCode)&&!cloud.equals(orgCode)){
             sql.append(" and org_code='" + orgCode +"'");
         }
-        sql.append("group by dataset_name,dataset");
+        sql.append("GROUP BY dataset_name,dataset");
         List<String> field = new ArrayList<>();
         field.add("count");
         field.add("row");
@@ -240,7 +239,7 @@ public class PackQcReportService extends BaseJpaService {
             map.put("name" ,map.get("dataset_name"));
         }
         envelop.setSuccessFlg(true);
-        envelop.setDetailModelList(res);
+        envelop.setDetailModelList(list);
         return envelop;
     }
 

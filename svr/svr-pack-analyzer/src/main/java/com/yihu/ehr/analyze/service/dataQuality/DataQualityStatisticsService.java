@@ -200,14 +200,15 @@ public class DataQualityStatisticsService extends BaseJpaService {
 
             //接收 数据集
             StringBuffer sql = new StringBuffer();
-            sql.append(" select count(distinct dataset) from json_archives_qc/qc_dataset_detail ");
-            sql.append(" where receive_date>='" + start + " 00:00:00' and receive_date<='" + end + " 23:59:59'");
-            sql.append(" and org_code='" + orgCode +"'");
+            sql.append("SELECT COUNT(DISTINCT dataset) as count from json_archives_qc/qc_dataset_detail ");
+            sql.append("WHERE receive_date>='" + start + " 00:00:00' AND receive_date<='" + end + " 23:59:59'");
+            sql.append(" AND org_code='" + orgCode +"'");
             if(eventType!=null){
                 sql.append(" and event_type = "+eventType) ;
             }
             ResultSet resultset = elasticSearchUtil.findBySql(sql.toString());
-            int size = new Double(resultset.getObject("count(distinct dataset)").toString()).intValue();
+            resultset.next();
+            int size = new Double(resultset.getObject("count").toString()).intValue();
             totalSize+=size;
             map.put("receiveDataset",size);//数据集个数
 //            String sql4 = "SELECT details FROM json_archives_qc/qc_dataset_info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' and qc_step=1 and org_code='"+orgCode+"' ";
