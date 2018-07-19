@@ -38,7 +38,8 @@ class SchedulerUtil {
                 Object fieldValueObj = firstDoc.getFieldValue(distinctFieldName);
                 if (fieldValueObj == null) {
                     // 记录中去重字段是空值时，每条空值新单独记录到ES
-                    SolrDocumentList nullDocList = solrUtil.query(ResourceCore.SubTable, q, fq, null, 0, -1, showFields);
+                    long count = solrUtil.count(ResourceCore.SubTable, q, fq);
+                    SolrDocumentList nullDocList = solrUtil.query(ResourceCore.SubTable, q, fq, null, 0, count, showFields);
                     for (int i = 0; i < groupChildCount; i++) {
                         SolrDocument doc = nullDocList.get(i);
                         rowkeyList.add(doc.getFieldValue("rowkey").toString());
