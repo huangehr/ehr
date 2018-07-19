@@ -206,10 +206,10 @@ public class ResourceBrowseDao {
         }
         String fq = "";
         final Map<String, String> sort = new HashMap<>();
-        Map<String, Object> query = new HashMap<>();
+        Map<String, String> query = new HashMap<>();
         if (queryParams != null) {
             query = objectMapper.readValue(queryParams, Map.class);
-            if (query.containsKey("q")) {
+            if (query.containsKey("q") && !query.get("q").trim().equals("*:*")) {
                 if (q.length() > 0) {
                     q.append(" AND (");
                     q.append(query.get("q"));
@@ -219,7 +219,7 @@ public class ResourceBrowseDao {
                 }
             }
             if (query.containsKey("fq")) {
-                fq = (String) query.get("fq");
+                fq = query.get("fq");
             }
             if (query.containsKey("sort")) {
                 Map<String, String> temp = objectMapper.readValue((String) query.get("sort"), Map.class);
@@ -241,6 +241,8 @@ public class ResourceBrowseDao {
                 List<QueryCondition> ql = parseCondition(param.getParamValue());
                 if (q.length() > 0) {
                     q.append(" AND ");
+                    q.append(solrQuery.conditionToString(ql));
+                } else {
                     q.append(solrQuery.conditionToString(ql));
                 }
             }
@@ -273,10 +275,10 @@ public class ResourceBrowseDao {
             String basicFl = "";
             String dFl = "";
             if (query.containsKey("basicFl")) {
-                basicFl = (String) query.get("basicFl");
+                basicFl = query.get("basicFl");
             }
             if (query.containsKey("dFl")) {
-                dFl = (String) query.get("dFl");
+                dFl = query.get("dFl");
             }
             Page<Map<String, Object>> result = hbaseQuery.queryBySolr(ResourceCore.MasterTable, q.toString(), objectMapper.writeValueAsString(sort), fq, basicFl, dFl, page, size);
             Envelop envelop = new Envelop();
@@ -308,20 +310,20 @@ public class ResourceBrowseDao {
         }
         String fq = "";
         final Map<String, String> sort = new HashMap<>();
-        Map<String, Object> query = new HashMap<>();
+        Map<String, String> query = new HashMap<>();
         if (queryParams != null) {
             query = objectMapper.readValue(queryParams, Map.class);
-            if (query.containsKey("q")) {
+            if (query.containsKey("q") && !query.get("q").trim().equals("*:*")) {
                 if (q.length() > 0) {
                     q.append(" AND (");
                     q.append(query.get("q"));
                     q.append(")");
                 } else {
-                    q.append("(" + query.get("q") + ")");
+                    q.append(query.get("q"));
                 }
             }
             if (query.containsKey("fq")) {
-                fq = (String) query.get("fq");
+                fq = query.get("fq");
             }
             if (query.containsKey("sort")) {
                 Map<String, String> temp = objectMapper.readValue((String) query.get("sort"), Map.class);
@@ -350,6 +352,8 @@ public class ResourceBrowseDao {
                 List<QueryCondition> ql = parseCondition(param.getParamValue());
                 if (q.length() > 0) {
                     q.append(" AND ");
+                    q.append(solrQuery.conditionToString(ql));
+                } else {
                     q.append(solrQuery.conditionToString(ql));
                 }
             }
@@ -382,10 +386,10 @@ public class ResourceBrowseDao {
             String basicFl = "";
             String dFl = "";
             if (query.containsKey("basicFl")) {
-                basicFl = (String) query.get("basicFl");
+                basicFl = query.get("basicFl");
             }
             if (query.containsKey("dFl")) {
-                dFl = (String) query.get("dFl");
+                dFl = query.get("dFl");
             }
             Page<Map<String, Object>> result = hbaseQuery.queryBySolr(ResourceCore.SubTable, q.toString(), objectMapper.writeValueAsString(sort), fq, basicFl, dFl, page, size);
             Envelop envelop = new Envelop();
