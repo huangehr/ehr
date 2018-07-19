@@ -8,6 +8,7 @@ import com.yihu.ehr.hbase.HBaseDao;
 import com.yihu.ehr.profile.ProfileType;
 import com.yihu.ehr.profile.core.ResourceCore;
 import com.yihu.ehr.profile.family.ResourceCells;
+import com.yihu.ehr.query.common.model.QueryCondition;
 import com.yihu.ehr.query.common.model.SolrGroupEntity;
 import com.yihu.ehr.query.common.sqlparser.ParserFactory;
 import com.yihu.ehr.query.common.sqlparser.ParserSql;
@@ -76,6 +77,8 @@ public class ResourceBrowseDao {
     private HBaseDao hbaseDao;
     @Autowired
     private ElasticSearchUtil elasticSearchUtil;
+    @Autowired
+    private SolrQuery solrQuery;
 
     /**
      * 获取资源授权数据元列表
@@ -235,10 +238,10 @@ public class ResourceBrowseDao {
                 });
             }
             if (param.getParamKey().equals("q")) {
+                List<QueryCondition> ql = parseCondition(param.getParamValue());
                 if (q.length() > 0) {
-                    q.append(" AND (");
-                    q.append(param.getParamValue());
-                    q.append(")");
+                    q.append(" AND ");
+                    q.append(solrQuery.conditionToString(ql));
                 }
             }
         }
@@ -344,10 +347,10 @@ public class ResourceBrowseDao {
                 }
             }
             if (param.getParamKey().equals("q")) {
+                List<QueryCondition> ql = parseCondition(param.getParamValue());
                 if (q.length() > 0) {
-                    q.append(" AND (");
-                    q.append(param.getParamValue());
-                    q.append(")");
+                    q.append(" AND ");
+                    q.append(solrQuery.conditionToString(ql));
                 }
             }
         }
@@ -977,5 +980,30 @@ public class ResourceBrowseDao {
 
     }
 
+    /**
+     * 查询条件转换
+     *
+     * @param queryCondition
+     * @return
+     * @throws Exception
+     */
+    private List<QueryCondition> parseCondition(String queryCondition) throws Exception {
+        List<QueryCondition> ql = new ArrayList<QueryCondition>();
+        List<Map<String, Object>> list = objectMapper.readValue(queryCondition, List.class);
+        if (list != null && list.size() > 0) {
+            for (Map<String, Object> item : list) {
+                String andOr = String.valueOf(item.get("andOr")).trim();
+                String field = String.valueOf(item.get("field")).trim();
+                String cond = String.valueOf(item.get("condition")).trim();
+                String value = String.valueOf(item.get("value"));
+                if (value.indexOf(",") > 0) {
+                    ql.add(new QueryCondition(andOr, cond, field, value.split(",")));
+                } else {
+                    ql.add(new QueryCondition(andOr, cond, field, value));
+                }
+            }
+        }
+        return ql;
+    }
 
 }

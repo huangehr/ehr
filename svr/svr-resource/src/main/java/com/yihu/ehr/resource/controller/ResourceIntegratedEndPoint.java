@@ -5,7 +5,6 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.query.common.model.QueryCondition;
-import com.yihu.ehr.query.services.SolrQuery;
 import com.yihu.ehr.resource.model.RsResource;
 import com.yihu.ehr.resource.model.RsResourceDefaultParam;
 import com.yihu.ehr.resource.model.RsResourceQuota;
@@ -37,8 +36,6 @@ public class ResourceIntegratedEndPoint extends EnvelopRestEndPoint {
     private RsResourceService rsService;
     @Autowired
     private ResourceBrowseService resourceBrowseService;
-    @Autowired
-    private SolrQuery solrQuery;
     @Autowired
     private RsResourceDefaultParamService resourceDefaultParamService;
 
@@ -157,12 +154,11 @@ public class ResourceIntegratedEndPoint extends EnvelopRestEndPoint {
                 List<Map<String, String>> queryList = (List<Map<String, String>>) paraMap.get("queryCondition");
                 if (!queryList.isEmpty()) {
                     String queryCondition = objectMapper.writeValueAsString(queryList);
-                    List<QueryCondition> ql = resourceBrowseService.parseCondition(queryCondition);
                     rsResourceDefaultParam = new RsResourceDefaultParam();
                     rsResourceDefaultParam.setResourcesId(reId);
                     rsResourceDefaultParam.setResourcesCode(rsResources.getCode());
                     rsResourceDefaultParam.setParamKey("q");
-                    rsResourceDefaultParam.setParamValue(solrQuery.conditionToString(ql));
+                    rsResourceDefaultParam.setParamValue(queryCondition);
                 }
             }
             newResources = resourcesIntegratedService.profileCompleteSave(rsResources, Arrays.asList(rsMetadatas), rsResourceDefaultParam);
@@ -212,20 +208,17 @@ public class ResourceIntegratedEndPoint extends EnvelopRestEndPoint {
         String resourceId = (String)paraMap.get("resourceId");
         RsResource rsResources = rsService.getResourceById(resourceId);
         if (rsResources != null) {
-            String queryCondition;
             RsResourceDefaultParam rsResourceDefaultParam = null;
+            String queryCondition = (String)paraMap.get("queryCondition");
             if (rsResources.getDataSource() == 1) {
-                queryCondition = (String)paraMap.get("queryCondition");
-                List<QueryCondition> ql = resourceBrowseService.parseCondition(queryCondition);
-                if (!ql.isEmpty()) {
+                if (!queryCondition.equals("[]")) {
                     rsResourceDefaultParam = new RsResourceDefaultParam();
                     rsResourceDefaultParam.setResourcesId(rsResources.getId());
                     rsResourceDefaultParam.setResourcesCode(rsResources.getCode());
                     rsResourceDefaultParam.setParamKey("q");
-                    rsResourceDefaultParam.setParamValue(solrQuery.conditionToString(ql));
+                    rsResourceDefaultParam.setParamValue(queryCondition);
                 }
             } else {
-                queryCondition = (String)paraMap.get("queryCondition");
                 if (!queryCondition.equals("{}")) {
                     rsResourceDefaultParam = new RsResourceDefaultParam();
                     rsResourceDefaultParam.setResourcesId(rsResources.getId());
