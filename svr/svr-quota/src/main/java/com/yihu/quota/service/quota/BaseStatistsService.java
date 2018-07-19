@@ -815,14 +815,20 @@ public class BaseStatistsService {
     public List<Map<String, Object>> filteUnKnowSex(List<Map<String, Object>> dataList,String dimension){
         List<Map<String, Object>> resultList = new ArrayList<>();
         for(Map<String,Object> map : dataList){
-            if( !map.get(dimension).toString().contains("未说明")){
-                if(!map.get(dimension).toString().contains("未知") || ! map.get(resultField).equals("0") ){
-                    resultList.add(map);
+            if(map.get(dimension) !=null){
+                if( !map.get(dimension).toString().contains("未说明")){
+                    if(map.get(resultField) !=null){
+                        if(!map.get(dimension).toString().contains("未知") || ! map.get(resultField).toString().equals("0") ){
+                            resultList.add(map);
+                        }
+                    }
                 }
             }
         }
         return  resultList;
     }
+
+
 
 
     /**
