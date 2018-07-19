@@ -134,6 +134,8 @@ public class BaseStatistsService {
         NumberFormat nf = NumberFormat.getInstance();
         nf.setGroupingUsed(false);
         nf.setMaximumFractionDigits(2);
+        List<Map<String, Object>> otherList = new ArrayList<>();
+        otherList = secondList;
         String [] moleDimensions = dimension.split(";");
         for(Map<String, Object> firstMap :firstList) {
             if (null != firstMap && firstMap.size() > 0 ) {
@@ -173,6 +175,7 @@ public class BaseStatistsService {
                         map.put(resultField,nf.format(point));
                         addResultList.add(map);
                         pflag = false;
+                        otherList.remove(secondMap);
                         break;
                     }
                 }
@@ -182,9 +185,9 @@ public class BaseStatistsService {
                 }
             }
         }
-        // 第一加数列表个数小雨第二个加数列表
-        if (secondList.size() - firstList.size() > 0) {
-            for(Map<String, Object> secondMap :secondList) {
+
+        if (null != otherList && otherList.size() > 0) {
+            for(Map<String, Object> secondMap : otherList) {
                 Map<String, Object> map = new HashMap<>();
                 map.put(firstColumnField, secondMap.get(firstColumnField));
                 for(int i = 0 ;i < moleDimensions.length ; i++){
@@ -203,6 +206,8 @@ public class BaseStatistsService {
                 addResultList.add(map);
             }
         }
+
+
         //检查后面指标的维度是否全部有 累加进去
         /*Map<String, Object> addResuDimenMap = new HashMap<>();
         for(int k = 0;k < addResultList.size();k++) {
@@ -1742,7 +1747,7 @@ public class BaseStatistsService {
             int start = b ? filters.indexOf("'") : filters.indexOf("\"");
             String condition = filters.substring(start + 1, start + 5); // 获取年份
             int year = Integer.parseInt(condition);
-            String condition2 = filters.substring(filters.indexOf("--") + 1, filters.indexOf("-") + 3);  // 获取月份
+            String condition2 = filters.substring(filters.indexOf("-") + 1, filters.indexOf("-") + 3);  // 获取月份
             int month = Integer.parseInt(condition2);
             cal.set(Calendar.YEAR, year);
             cal.set(Calendar.MONTH, month - 1);

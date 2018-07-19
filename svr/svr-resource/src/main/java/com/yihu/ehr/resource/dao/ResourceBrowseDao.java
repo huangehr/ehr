@@ -8,6 +8,7 @@ import com.yihu.ehr.hbase.HBaseDao;
 import com.yihu.ehr.profile.ProfileType;
 import com.yihu.ehr.profile.core.ResourceCore;
 import com.yihu.ehr.profile.family.ResourceCells;
+import com.yihu.ehr.query.common.model.QueryCondition;
 import com.yihu.ehr.query.common.model.SolrGroupEntity;
 import com.yihu.ehr.query.common.sqlparser.ParserFactory;
 import com.yihu.ehr.query.common.sqlparser.ParserSql;
@@ -76,6 +77,8 @@ public class ResourceBrowseDao {
     private HBaseDao hbaseDao;
     @Autowired
     private ElasticSearchUtil elasticSearchUtil;
+    @Autowired
+    private SolrQuery solrQuery;
 
     /**
      * 获取资源授权数据元列表
@@ -203,10 +206,10 @@ public class ResourceBrowseDao {
         }
         String fq = "";
         final Map<String, String> sort = new HashMap<>();
-        Map<String, Object> query = new HashMap<>();
+        Map<String, String> query = new HashMap<>();
         if (queryParams != null) {
             query = objectMapper.readValue(queryParams, Map.class);
-            if (query.containsKey("q")) {
+            if (query.containsKey("q") && !query.get("q").trim().equals("*:*")) {
                 if (q.length() > 0) {
                     q.append(" AND (");
                     q.append(query.get("q"));
@@ -216,7 +219,7 @@ public class ResourceBrowseDao {
                 }
             }
             if (query.containsKey("fq")) {
-                fq = (String) query.get("fq");
+                fq = query.get("fq");
             }
             if (query.containsKey("sort")) {
                 Map<String, String> temp = objectMapper.readValue((String) query.get("sort"), Map.class);
@@ -235,10 +238,12 @@ public class ResourceBrowseDao {
                 });
             }
             if (param.getParamKey().equals("q")) {
+                List<QueryCondition> ql = parseCondition(param.getParamValue());
                 if (q.length() > 0) {
-                    q.append(" AND (");
-                    q.append(param.getParamValue());
-                    q.append(")");
+                    q.append(" AND ");
+                    q.append(solrQuery.conditionToString(ql));
+                } else {
+                    q.append(solrQuery.conditionToString(ql));
                 }
             }
         }
@@ -270,10 +275,10 @@ public class ResourceBrowseDao {
             String basicFl = "";
             String dFl = "";
             if (query.containsKey("basicFl")) {
-                basicFl = (String) query.get("basicFl");
+                basicFl = query.get("basicFl");
             }
             if (query.containsKey("dFl")) {
-                dFl = (String) query.get("dFl");
+                dFl = query.get("dFl");
             }
             Page<Map<String, Object>> result = hbaseQuery.queryBySolr(ResourceCore.MasterTable, q.toString(), objectMapper.writeValueAsString(sort), fq, basicFl, dFl, page, size);
             Envelop envelop = new Envelop();
@@ -305,20 +310,20 @@ public class ResourceBrowseDao {
         }
         String fq = "";
         final Map<String, String> sort = new HashMap<>();
-        Map<String, Object> query = new HashMap<>();
+        Map<String, String> query = new HashMap<>();
         if (queryParams != null) {
             query = objectMapper.readValue(queryParams, Map.class);
-            if (query.containsKey("q")) {
+            if (query.containsKey("q") && !query.get("q").trim().equals("*:*")) {
                 if (q.length() > 0) {
                     q.append(" AND (");
                     q.append(query.get("q"));
                     q.append(")");
                 } else {
-                    q.append("(" + query.get("q") + ")");
+                    q.append(query.get("q"));
                 }
             }
             if (query.containsKey("fq")) {
-                fq = (String) query.get("fq");
+                fq = query.get("fq");
             }
             if (query.containsKey("sort")) {
                 Map<String, String> temp = objectMapper.readValue((String) query.get("sort"), Map.class);
@@ -344,10 +349,12 @@ public class ResourceBrowseDao {
                 }
             }
             if (param.getParamKey().equals("q")) {
+                List<QueryCondition> ql = parseCondition(param.getParamValue());
                 if (q.length() > 0) {
-                    q.append(" AND (");
-                    q.append(param.getParamValue());
-                    q.append(")");
+                    q.append(" AND ");
+                    q.append(solrQuery.conditionToString(ql));
+                } else {
+                    q.append(solrQuery.conditionToString(ql));
                 }
             }
         }
@@ -379,10 +386,10 @@ public class ResourceBrowseDao {
             String basicFl = "";
             String dFl = "";
             if (query.containsKey("basicFl")) {
-                basicFl = (String) query.get("basicFl");
+                basicFl = query.get("basicFl");
             }
             if (query.containsKey("dFl")) {
-                dFl = (String) query.get("dFl");
+                dFl = query.get("dFl");
             }
             Page<Map<String, Object>> result = hbaseQuery.queryBySolr(ResourceCore.SubTable, q.toString(), objectMapper.writeValueAsString(sort), fq, basicFl, dFl, page, size);
             Envelop envelop = new Envelop();
@@ -977,5 +984,30 @@ public class ResourceBrowseDao {
 
     }
 
+    /**
+     * 查询条件转换
+     *
+     * @param queryCondition
+     * @return
+     * @throws Exception
+     */
+    private List<QueryCondition> parseCondition(String queryCondition) throws Exception {
+        List<QueryCondition> ql = new ArrayList<QueryCondition>();
+        List<Map<String, Object>> list = objectMapper.readValue(queryCondition, List.class);
+        if (list != null && list.size() > 0) {
+            for (Map<String, Object> item : list) {
+                String andOr = String.valueOf(item.get("andOr")).trim();
+                String field = String.valueOf(item.get("field")).trim();
+                String cond = String.valueOf(item.get("condition")).trim();
+                String value = String.valueOf(item.get("value"));
+                if (value.indexOf(",") > 0) {
+                    ql.add(new QueryCondition(andOr, cond, field, value.split(",")));
+                } else {
+                    ql.add(new QueryCondition(andOr, cond, field, value));
+                }
+            }
+        }
+        return ql;
+    }
 
 }
