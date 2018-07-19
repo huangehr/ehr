@@ -1,7 +1,6 @@
 package com.yihu.ehr.resource.service;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.resource.dao.*;
 import com.yihu.ehr.resource.model.RsResource;
@@ -39,8 +38,6 @@ public class RsResourceService extends BaseJpaService<RsResource, RsResourceDao>
     @Autowired
     private RsResourceCategoryDao rsResourceCategoryDao;
     @Autowired
-    private RsResourceDefaultQueryDao rsResourceDefaultQueryDao;
-    @Autowired
     private RsResourceDefaultParamDao rsResourceDefaultParamDao;
     @Autowired
     private RsRolesResourceDao rsRolesResourceDao;
@@ -65,7 +62,6 @@ public class RsResourceService extends BaseJpaService<RsResource, RsResourceDao>
     public void deleteResource(String id) {
         String[] ids = id.split(",");
         for (String id_ : ids) {
-            rsResourceDefaultQueryDao.deleteByResourcesId(id_);
             rsResourceDefaultParamDao.deleteByResourcesId(id_);
             rsResourceMetadataDao.deleteByResourcesId(id_);
             List<RsRolesResource> rsRolesResourceList = rsRolesResourceDao.findByResourceId(id_);

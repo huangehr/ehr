@@ -7,6 +7,8 @@ import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.resource.MRsColumnsModel;
+import com.yihu.ehr.profile.ProfileType;
+import com.yihu.ehr.profile.family.ResourceCells;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.query.common.model.QueryCondition;
 import com.yihu.ehr.query.services.SolrQuery;
@@ -14,10 +16,8 @@ import com.yihu.ehr.resource.client.StdTransformClient;
 import com.yihu.ehr.resource.dao.ResourceBrowseDao;
 import com.yihu.ehr.resource.dao.ResourceBrowseMetadataDao;
 import com.yihu.ehr.resource.dao.RsResourceDao;
-import com.yihu.ehr.resource.dao.RsResourceDefaultQueryDao;
 import com.yihu.ehr.resource.model.DtoResourceMetadata;
 import com.yihu.ehr.resource.model.RsResource;
-import com.yihu.ehr.resource.model.RsResourceDefaultQuery;
 import com.yihu.ehr.util.rest.Envelop;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -34,9 +34,6 @@ import java.util.*;
 @Service
 public class ResourceBrowseService extends BaseJpaService {
 
-    //忽略字段
-    private List<String> basicField = new ArrayList<>(Arrays.asList("rowkey", "event_type", "event_no", "event_date", "demographic_id", "patient_id", "org_code", "org_name", "profile_id", "cda_version", "client_id", "profile_type", "patient_name", "org_area", "diagnosis", "health_problem"));
-
     @Autowired
     private SolrQuery solrQuery;
     @Autowired
@@ -45,8 +42,6 @@ public class ResourceBrowseService extends BaseJpaService {
     private ResourceBrowseMetadataDao resourceBrowseMetadataDao;
     @Autowired
     private ResourceBrowseDao resourceBrowseDao;
-    @Autowired
-    private RsResourceDefaultQueryDao resourcesDefaultQueryDao;
     @Autowired
     private StdTransformClient stdTransformClient;
     @Autowired
@@ -127,21 +122,13 @@ public class ResourceBrowseService extends BaseJpaService {
     public Envelop getResourceData(String resourcesCode, String roleId, String orgCode, String areaCode, String queryCondition, Integer page, Integer size) throws Exception {
         String queryParams = "";
         //获取资源信息
-        RsResource rsResources = rsResourceDao.findByCode(resourcesCode);
-        if (rsResources != null) {
-            RsResourceDefaultQuery resourcesQuery = resourcesDefaultQueryDao.findByResourcesId(rsResources.getId());
-            List<QueryCondition> ql = new ArrayList<>();
-            //设置参数
-            if (!StringUtils.isEmpty(queryCondition) && !queryCondition.equals("{}")) {
-                ql = parseCondition(queryCondition);
-            } else if (resourcesQuery != null && resourcesQuery.getResourcesType() == 1) {
-                String defaultQuery = resourcesQuery.getQuery();
-                ql = parseCondition(defaultQuery);
-            }
-            queryParams = addParams(queryParams, "q", solrQuery.conditionToString(ql));
-            return getResultData(resourcesCode, roleId, orgCode, areaCode, queryParams, page, size);
+        List<QueryCondition> ql = new ArrayList<>();
+        //设置参数
+        if (!StringUtils.isEmpty(queryCondition)) {
+            ql = parseCondition(queryCondition);
         }
-        throw new ApiException(ErrorCode.OBJECT_NOT_FOUND, "无相关资源");
+        queryParams = addParams(queryParams, "q", solrQuery.conditionToString(ql));
+        return getResultData(resourcesCode, roleId, orgCode, areaCode, queryParams, page, size);
     }
 
     /**
@@ -207,7 +194,7 @@ public class ResourceBrowseService extends BaseJpaService {
      * @return
      * @throws Exception
      */
-    public List<Object> getSubDateByRowkey(String rowKey, String version) throws Exception {
+    public List<Object> getSubDateByRowkey (String rowKey, String version) throws Exception {
         //查询出所有细表的rowKey
         List<Object> resultList = new ArrayList<>();
         String q = "{\"q\":\"profile_id:" + rowKey + "\"}";
@@ -329,7 +316,7 @@ public class ResourceBrowseService extends BaseJpaService {
         }
         queryParams = addParams(queryParams, "sort", "{\"create_date\":\"desc\"}");
         //基础数据字段
-        queryParams = addParams(queryParams, "basicFl", org.apache.commons.lang3.StringUtils.join(basicField, ","));
+        queryParams = addParams(queryParams, "basicFl", org.apache.commons.lang3.StringUtils.join(ResourceCells.getMasterBasicCell(ProfileType.Standard), ","));
         //数据元信息字段
         List<String> customizeList = (List<String>) objectMapper.readValue(metaData, List.class);
         //参数集合
@@ -431,24 +418,6 @@ public class ResourceBrowseService extends BaseJpaService {
     }
 
     /**
-     * 非结构化数据
-     *
-     * @param profileId
-     * @param cdaDocumentId
-     * @param page
-     * @param size
-     * @return
-     * @throws Exception
-     */
-    public Page<Map<String, Object>> getRawFiles(String profileId, String cdaDocumentId, Integer page, Integer size) throws Exception {
-        String queryParams = "{\"q\":\"rowkey:" + profileId + "*\"}";
-        if (cdaDocumentId != null && cdaDocumentId.length() > 0) {
-            queryParams = "{\"q\":\"rowkey:" + profileId + "* AND cda_document_id:" + cdaDocumentId + "\"}";
-        }
-        return resourceBrowseDao.getRawFiles(queryParams, page, size);
-    }
-
-    /**
      * @param queryParams
      * @param page
      * @param size
@@ -466,7 +435,7 @@ public class ResourceBrowseService extends BaseJpaService {
      * @return
      * @throws Exception
      */
-    private List<QueryCondition> parseCondition(String queryCondition) throws Exception {
+    public List<QueryCondition> parseCondition(String queryCondition) throws Exception {
         List<QueryCondition> ql = new ArrayList<QueryCondition>();
         ObjectMapper mapper = new ObjectMapper();
         JavaType javaType = mapper.getTypeFactory().constructParametricType(List.class, Map.class);
