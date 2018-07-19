@@ -1742,7 +1742,7 @@ public class BaseStatistsService {
             int start = b ? filters.indexOf("'") : filters.indexOf("\"");
             String condition = filters.substring(start + 1, start + 5); // 获取年份
             int year = Integer.parseInt(condition);
-            String condition2 = filters.substring(filters.indexOf("--") + 1, filters.indexOf("-") + 3);  // 获取月份
+            String condition2 = filters.substring(filters.indexOf("-") + 1, filters.indexOf("-") + 3);  // 获取月份
             int month = Integer.parseInt(condition2);
             cal.set(Calendar.YEAR, year);
             cal.set(Calendar.MONTH, month - 1);
