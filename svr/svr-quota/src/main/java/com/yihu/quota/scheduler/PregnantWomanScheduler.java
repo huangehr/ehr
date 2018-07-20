@@ -99,7 +99,7 @@ public class PregnantWomanScheduler {
     private void saveTotalData(String fq) throws Exception {
         String idCardField = "EHR_000017"; // 身份证号数据元
         // 查询结果的返回字段
-        String[] showFields = {"EHR_000017"};
+        String[] showFields = {"rowkey"};
 
         // 去重查询孕妇记录
         List<String> rowkeyList = new ArrayList();
