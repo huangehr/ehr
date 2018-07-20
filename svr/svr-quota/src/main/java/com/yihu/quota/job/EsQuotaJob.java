@@ -197,6 +197,7 @@ public class EsQuotaJob implements Job {
                 jdbcTemplate.update(sql);
             }
         } catch (Exception e) {
+            haveThreadCount++;
             tjQuotaLog.setStatus(Contant.save_status.fail);
             tjQuotaLog.setContent(e.getMessage());
             tjQuotaLog = saveLog(tjQuotaLog);
