@@ -153,7 +153,7 @@ public class EsQuotaJob implements Job {
                     }
                     Thread th = new Thread(new Thread(){
                         public void run(){
-                            logger.info("启动第 "+ f + " 个线程。 ");//只能访问外部的final变量。
+                            logger.info("启动第 "+ (f+1) + " 个线程。 ");//只能访问外部的final变量。
                             quota(quotaLogf, quotaVof);
                         }
                     });

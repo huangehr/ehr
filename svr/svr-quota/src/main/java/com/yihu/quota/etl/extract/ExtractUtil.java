@@ -125,6 +125,9 @@ public class ExtractUtil {
                         saveModel.setYearName(yearDictMap.get(value));
                         saveModel.setYear(value);
                     }else if(main.getMainCode().equals(main_dept) && !StringUtils.isEmpty(deptDictMap.get(value))){
+                        if(value.length() > 2){
+                            value = value.substring(0,2);
+                        }
                         saveModel.setDeptName(deptDictMap.get(value));
                         saveModel.setDept(value);
                     }
