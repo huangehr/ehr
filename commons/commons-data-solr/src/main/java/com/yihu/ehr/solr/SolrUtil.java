@@ -8,6 +8,8 @@ import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.params.FacetParams;
 import org.apache.solr.common.params.GroupParams;
 import org.apache.solr.common.util.NamedList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -25,6 +27,8 @@ import java.util.*;
 @Service
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class SolrUtil {
+
+    private static final Logger logger = LoggerFactory.getLogger(SolrUtil.class);
 
     private final static String ASC = "asc";
 
@@ -94,13 +98,13 @@ public class SolrUtil {
      * @param fq         可选，过滤查询
      * @param sort       可选，排序
      * @param start      必填，查询起始行
-     * @param rows       必填，查询行数
+     * @param rows       必填，查询行数，可为-1表示获取全部
      * @param fields     必填，返回字段
      * @param groupField 必填，分组去重字段。针对一个字段去重。
      * @param groupSort  可选，组内排序字段，如："event_date asc"
      * @return
      */
-    public List<Group> queryDistinctOneField(String core, String q, String fq, Map<String, String> sort, long start, long rows,
+    public List<Group> queryDistinctOneField(String core, String q, String fq, Map<String, String> sort, int start, int rows,
                                                   String[] fields, String groupField, String groupSort) throws Exception {
         SolrClient conn = pool.getConnection(core);
         SolrQuery query = new SolrQuery();
@@ -122,8 +126,8 @@ public class SolrUtil {
             }
         }
         query.setFields(fields);
-        query.setStart(Integer.parseInt(String.valueOf(start)));
-        query.setRows(Integer.parseInt(String.valueOf(rows)));
+        query.setStart(start);
+        query.setRows(rows);
         query.setParam(GroupParams.GROUP, true);
         query.setParam(GroupParams.GROUP_FORMAT, "grouped");
         query.setParam(GroupParams.GROUP_FIELD, groupField);
@@ -151,13 +155,13 @@ public class SolrUtil {
      * @param fq         可选，过滤查询
      * @param sort       可选，排序
      * @param start      必填，查询起始行
-     * @param rows       必填，查询行数
+     * @param rows       必填，查询行数，可为-1表示获取全部
      * @param fields     必填，返回字段
      * @param groupField 必填，分组去重字段。针对一个字段去重。
      * @param groupSort  可选，组内排序字段，如："event_date asc"
      * @return
      */
-    public SolrDocumentList queryDistinctOneFieldForDocList(String core, String q, String fq, Map<String, String> sort, long start, long rows,
+    public SolrDocumentList queryDistinctOneFieldForDocList(String core, String q, String fq, Map<String, String> sort, int start, int rows,
                                              String[] fields, String groupField, String groupSort) throws Exception {
         SolrDocumentList solrDocumentList = new SolrDocumentList();
         SolrClient conn = pool.getConnection(core);
