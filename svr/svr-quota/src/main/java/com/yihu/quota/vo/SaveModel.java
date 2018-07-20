@@ -24,8 +24,8 @@ public class SaveModel {
     private String cityName;//
     private String town;//区代码 350206
     private String townName;//
-    private String team;//团队的code
-    private String teamName;//
+    private String dept;//科室的code
+    private String deptName;//
     private String slaveKey1;//从维度  1级维度
     private String slaveKey1Name;
     private String slaveKey2;//从维度  2级维度
@@ -103,12 +103,20 @@ public class SaveModel {
         this.town = town;
     }
 
-    public String getTeam() {
-        return team;
+    public String getDept() {
+        return dept;
     }
 
-    public void setTeam(String team) {
-        this.team = team;
+    public void setDept(String dept) {
+        this.dept = dept;
+    }
+
+    public String getDeptName() {
+        return deptName;
+    }
+
+    public void setDeptName(String deptName) {
+        this.deptName = deptName;
     }
 
     public String getSlaveKey1() {
@@ -205,14 +213,6 @@ public class SaveModel {
 
     public void setTownName(String townName) {
         this.townName = townName;
-    }
-
-    public String getTeamName() {
-        return teamName;
-    }
-
-    public void setTeamName(String teamName) {
-        this.teamName = teamName;
     }
 
     public String getQuotaCode() {

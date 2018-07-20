@@ -157,6 +157,7 @@ public class EsQuotaJob implements Job {
                             quota(quotaLogf, quotaVof);
                         }
                     });
+                    Thread.sleep(10000);//延迟10 秒 Es 保存2万条 有时超时，延迟执行减缓个线程同时执行的压力
                     th.start();
                 }
             }else {
@@ -196,6 +197,7 @@ public class EsQuotaJob implements Job {
                 jdbcTemplate.update(sql);
             }
         } catch (Exception e) {
+            haveThreadCount++;
             tjQuotaLog.setStatus(Contant.save_status.fail);
             tjQuotaLog.setContent(e.getMessage());
             tjQuotaLog = saveLog(tjQuotaLog);
