@@ -256,7 +256,7 @@ public class SolrQuery {
      * @param fq               过滤查询
      * @param sort             排序
      * @param start            查询起始行
-     * @param rows             查询行数
+     * @param rows             查询行数，可为-1表示获取全部
      * @param fields           返回字段
      * @param groupField       分组去重字段
      * @param groupSort        组内排序字段
@@ -267,8 +267,8 @@ public class SolrQuery {
                                                                   String q,
                                                                   String fq,
                                                                   Map<String, String> sort,
-                                                                  long start,
-                                                                  long rows,
+                                                                  int start,
+                                                                  int rows,
                                                                   String[] fields,
                                                                   String groupField,
                                                                   String groupSort,
@@ -294,7 +294,8 @@ public class SolrQuery {
             SolrDocumentList nullDocList = new SolrDocumentList();
             if (fieldValueObj == null && groupNullIsolate) {
                 String null_fq = fq + " AND -" + groupField + ":*";
-                nullDocList = solrUtil.query(tableName, q, null_fq, sort, start, rows, fields);
+                long count = solrUtil.count(tableName, q, null_fq);
+                nullDocList = solrUtil.query(tableName, q, null_fq, null, 0, count, fields);
                 i = groupChildCount;
             }
             while (i != 0) {
