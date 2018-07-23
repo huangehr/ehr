@@ -172,10 +172,30 @@ public class ExtractUtil {
                 }
                 if(!StringUtils.isEmpty(timeKey)){
                     if(!StringUtils.isEmpty( map.get("quotaDate") ) ){
-                        saveModel.setQuotaDate(map.get("quotaDate").toString());
+                        String date = "";
+                        if(map.get("quotaDate") instanceof String){
+                            date = map.get("quotaDate").toString();
+                        }else if(map.get("quotaDate") instanceof Date){
+                            date = DateUtil.formatDate((Date)map.get("quotaDate"),DateUtil.DEFAULT_DATE_YMD_FORMAT);
+                        }
+                        saveModel.setQuotaDate(date);
                     }
                     if(!StringUtils.isEmpty( map.get("event_date") )){
-                        String date = DateUtil.formatDate((Date)map.get("event_date"),DateUtil.DEFAULT_DATE_YMD_FORMAT);
+                        String date = "";
+                        if(map.get("event_date") instanceof String){
+                            date = map.get("event_date").toString().substring(0,10);
+                        }else if(map.get("event_date") instanceof Date){
+                            date = DateUtil.formatDate((Date)map.get("event_date"),DateUtil.DEFAULT_DATE_YMD_FORMAT);
+                        }
+                        saveModel.setQuotaDate(date);
+                    }
+                    if(!StringUtils.isEmpty( map.get("eventDate") )){
+                        String date = "";
+                        if(map.get("eventDate") instanceof String){
+                            date = map.get("eventDate").toString().substring(0,10);
+                        }else if(map.get("eventDate") instanceof Date){
+                            date = DateUtil.formatDate((Date)map.get("event_date"),DateUtil.DEFAULT_DATE_YMD_FORMAT);
+                        }
                         saveModel.setQuotaDate(date);
                     }
                 }
