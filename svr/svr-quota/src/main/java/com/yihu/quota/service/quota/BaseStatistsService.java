@@ -977,7 +977,7 @@ public class BaseStatistsService {
                 if (dimensionSlaves != null && dimensionSlaves.size() > 0) {
                     if(StringUtils.isNotEmpty(dimension)){
                         String n = dimension.substring(dimension.length() - 1, dimension.length());
-                        if(StringUtils.isNotEmpty(n) && (n.equals("1") || n.equals("2") || n.equals("3")) ){
+                        if(StringUtils.isNotEmpty(n) && (n.equals("1") || n.equals("2") || n.equals("3") || n.equals("4")) ){
                             int slave = Integer.valueOf(n);
                             if(dimensionSlaves.size() >= slave){
                                 dictSql = dimensionSlaves.get(slave-1).getDictSql();
