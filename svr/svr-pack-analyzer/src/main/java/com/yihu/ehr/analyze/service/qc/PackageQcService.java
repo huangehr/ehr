@@ -1,6 +1,6 @@
 package com.yihu.ehr.analyze.service.qc;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.analyze.config.RequireDatasetsConfig;
 import com.yihu.ehr.analyze.model.ZipPackage;
 import com.yihu.ehr.model.packs.EsSimplePackage;
 import com.yihu.ehr.profile.ErrorType;
@@ -9,13 +9,13 @@ import com.yihu.ehr.profile.model.PackageDataSet;
 import com.yihu.ehr.redis.client.RedisClient;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.string.StringBuilderEx;
+import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -37,7 +37,7 @@ public class PackageQcService {
     @Autowired
     private RedisClient redisClient;
     @Autowired
-    protected ObjectMapper objectMapper;
+    private RequireDatasetsConfig requireDatasetsConfig;
 
 
     /**
@@ -50,6 +50,15 @@ public class PackageQcService {
     public void qcHandle(ZipPackage zipPackage) throws Throwable {
         EsSimplePackage esSimplePackage = zipPackage.getEsSimplePackage();
         Map<String, Object> qcDataSetRecord = zipPackage.getQcDataSetRecord();
+        List<String> details = new ArrayList<>();
+        Map<String, PackageDataSet> dataSets = zipPackage.getDataSets();
+        dataSets.keySet().forEach(item -> details.add(item));
+        //必传数据集判断
+        List<String> required = requireDatasetsConfig.getRequireDataset(zipPackage.getEventType());
+        if (!details.containsAll(required)) {
+            throw new ZipException("Incomplete data set");
+        }
+        qcDataSetRecord.put("details", details);
         qcDataSetRecord.put("_id", esSimplePackage.get_id());
         qcDataSetRecord.put("patient_id", zipPackage.getPatientId());
         qcDataSetRecord.put("pack_id", esSimplePackage.get_id());
@@ -66,12 +75,7 @@ public class PackageQcService {
         qcDataSetRecord.put("count", zipPackage.getDataSets().size());
         qcDataSetRecord.put("qc_step", 1);
         qcDataSetRecord.put("create_date", DATE_FORMAT.format(new Date()));
-        List<Map<String, Object>> details = new ArrayList<>();
-        Map<String, PackageDataSet> dataSets = zipPackage.getDataSets();
         for (String dataSetCode : dataSets.keySet()) {
-            Map<String, Object> dataSet = new HashMap<>();
-            dataSet.put(dataSetCode, dataSets.get(dataSetCode).getRecords().size());
-            details.add(dataSet);
             Map<String, MetaDataRecord> records = dataSets.get(dataSetCode).getRecords();
             Set<String> existSet = new HashSet<>(); //存放已经生成了质控信息的数据元
             for (String recordKey : records.keySet()) {
@@ -127,8 +131,6 @@ public class PackageQcService {
                 }
             }
         }
-        qcDataSetRecord.put("details", objectMapper.writeValueAsString(details));
-        qcDataSetRecord.put("missing", "[]");
     }
 
     private List<String> getDataElementList(String version, String dataSetCode) {

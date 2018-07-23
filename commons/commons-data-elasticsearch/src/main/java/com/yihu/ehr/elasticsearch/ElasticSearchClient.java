@@ -162,7 +162,6 @@ public class ElasticSearchClient {
             resultList.add(source);
         }
         return resultList;
-
     }
 
     public List<Map<String, Object>> page(String index, String type, QueryBuilder queryBuilder, List<SortBuilder> sortBuilders, int page, int size){
