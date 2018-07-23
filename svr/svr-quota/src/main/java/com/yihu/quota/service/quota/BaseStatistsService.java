@@ -1001,7 +1001,7 @@ public class BaseStatistsService {
         if(StringUtils.isNotEmpty(dictSql)) {
             BasesicUtil baseUtil = new BasesicUtil();
             boolean main = dimension.contains("province") || dimension.contains("city") ||dimension.contains("town")
-                    ||dimension.contains("org") ||dimension.contains("year") ||dimension.contains("month")
+                    ||dimension.contains("org") ||dimension.contains("dept") ||dimension.contains("year") ||dimension.contains("month")
                     ||dimension.contains("quarter") ||dimension.contains("day");
 
             if( main){
