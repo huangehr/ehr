@@ -504,28 +504,24 @@ public class DataQualityStatisticsService extends BaseJpaService {
                 stringBuilder2.append("org_code=" + orgCode);
             }
             TransportClient transportClient = elasticSearchPool.getClient();
-            try {
-                List<Map<String, Object>> resultList = new ArrayList<>();
-                SearchRequestBuilder builder = transportClient.prepareSearch("json_archives");
-                builder.setTypes("info");
-                builder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
-                builder.setQuery(elasticSearchUtil.getQueryBuilder(stringBuilder2.toString()));
-                AggregationBuilder terms = AggregationBuilders.terms("error_type").field("error_type");
-                builder.addAggregation(terms);
-                builder.setSize(0);
-                builder.setExplain(true);
-                SearchResponse response = builder.get();
-                LongTerms longTerms = response.getAggregations().get("error_type");
-                for(Terms.Bucket item: longTerms.getBuckets()){
-                    Map<String, Object> temp = new HashMap<>();
-                    temp.put("error_type", item.getKeyAsString());
-                    temp.put("error_count", item.getDocCount());
-                    resultList.add(temp);
-                }
-                reportData.put("reportedNumList6", resultList);
-            } finally {
-                elasticSearchPool.releaseClient(transportClient);
+            List<Map<String, Object>> resultList = new ArrayList<>();
+            SearchRequestBuilder builder = transportClient.prepareSearch("json_archives");
+            builder.setTypes("info");
+            builder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
+            builder.setQuery(elasticSearchUtil.getQueryBuilder(stringBuilder2.toString()));
+            AggregationBuilder terms = AggregationBuilders.terms("error_type").field("error_type");
+            builder.addAggregation(terms);
+            builder.setSize(0);
+            builder.setExplain(true);
+            SearchResponse response = builder.get();
+            LongTerms longTerms = response.getAggregations().get("error_type");
+            for(Terms.Bucket item: longTerms.getBuckets()){
+                Map<String, Object> temp = new HashMap<>();
+                temp.put("error_type", item.getKeyAsString());
+                temp.put("error_count", item.getDocCount());
+                resultList.add(temp);
             }
+            reportData.put("reportedNumList6", resultList);
             reportDataList.add(reportData);
         }
         return reportDataList;

@@ -151,8 +151,6 @@ public class EsResultExtract {
             restltList =  elasticsearchUtil.queryPageList(client, esConfig.getIndex(), esConfig.getType(), boolQueryBuilder, pageNo, pageSize,"quotaDate");
         } catch (Exception e){
             e.getMessage();
-        } finally {
-            elasticSearchPool.releaseClient(client);
         }
         return restltList;
     }
@@ -167,8 +165,6 @@ public class EsResultExtract {
             count  = (int)elasticsearchUtil.getTotalCount(client,esConfig.getIndex(),esConfig.getType(),boolQueryBuilder);
         }catch (Exception e){
             e.getMessage();
-        }finally {
-            elasticSearchPool.releaseClient(client);
         }
         return count;
 
@@ -184,8 +180,6 @@ public class EsResultExtract {
            list = elasticsearchUtil.queryList(client,esConfig.getIndex(),esConfig.getType(),boolQueryBuilder, "quotaDate",size);
         }catch (Exception e){
             e.getMessage();
-        }finally {
-            elasticSearchPool.releaseClient(client);
         }
         return  list;
     }
@@ -324,8 +318,6 @@ public class EsResultExtract {
             list = elasticsearchUtil.searcherByGroup(client,esConfig.getIndex(),esConfig.getType(), boolQueryBuilder, aggsField, "result");
         } catch (Exception e){
             e.getMessage();
-        } finally {
-            elasticSearchPool.releaseClient(client);
         }
         return  list;
     }
@@ -344,8 +336,6 @@ public class EsResultExtract {
             map = elasticsearchUtil.searcherSumByGroupBySql(client, esConfig.getIndex(), aggsFields, filter, sumField,orderFild,order);;
         } catch (Exception e){
             e.getMessage();
-        } finally {
-            elasticSearchPool.releaseClient(client);
         }
         return map;
     }
@@ -372,7 +362,6 @@ public class EsResultExtract {
         if(StringUtils.isNotEmpty(aggsFields)){
             aggsFields += ",";
         }
-        TransportClient client = elasticSearchPool.getClient();
         try {
             //SELECT sum(result) FROM medical_service_index group by town,date_histogram(field='quotaDate','interval'='year')
             StringBuffer mysql = new StringBuffer("SELECT ")
@@ -392,8 +381,6 @@ public class EsResultExtract {
             return  new ArrayList<>();
         } catch (Exception e){
             e.getMessage();
-        } finally {
-            elasticSearchPool.releaseClient(client);
         }
         return null;
     }

@@ -54,9 +54,8 @@ public class ElasticSearchEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "type") String type,
             @ApiParam(name = "source", value = "值", required = true)
             @RequestParam(value = "source") String source) throws Exception {
-        Map<String, Object> result;
         Map<String, Object> sourceMap = objectMapper.readValue(source, Map.class);
-        result = elasticSearchUtil.index(index, type, sourceMap);
+        Map<String, Object> result = elasticSearchUtil.index(index, type, sourceMap);
         return success(result);
     }
 
