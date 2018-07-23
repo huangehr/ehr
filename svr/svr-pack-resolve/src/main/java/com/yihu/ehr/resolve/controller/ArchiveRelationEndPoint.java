@@ -11,6 +11,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -47,22 +48,19 @@ public class ArchiveRelationEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "size", value = "页码", required = true, defaultValue = "15")
             @RequestParam(value = "size") int size) throws Exception {
         List<Map<String, Object>> archiveRelationList = elasticSearchUtil.page(INDEX, TYPE, filters, sorts, page, size);
+        //updated by zdm on 2018/07/17 ,bug 6343---start
+        archiveRelationList.forEach(item -> {
+            //卡类型编码不为空
+            if (!StringUtils.isEmpty(item.get("card_type"))) {
+                //获取资源字典-卡类型代码 集合
+                String cardType = rsDictionaryEntryService.getRsDictionaryEntryByDictCode("STD_CARD_TYPE", item.get("card_type").toString());
+                //获取字典值
+                item.put("card_type", cardType);
+            }
+        });
+        //updated by zdm on 2018/07/17---end
         int count = (int) elasticSearchUtil.count(INDEX, TYPE, filters);
         Envelop envelop = getPageResult(archiveRelationList, count, page, size);
-        //updated by zdm on 2018/07/17 ,bug 6343---start
-        Map item;
-        for (int i=0;i< envelop.getDetailModelList().size();i++) {
-            item = (Map) envelop.getDetailModelList().get(i);
-            //卡类型编码
-            String cardType = (null == item.get("card_type") ? "" : item.get("card_type").toString());
-            //获取资源字典-卡类型代码 集合
-            cardType = rsDictionaryEntryService.getRsDictionaryEntryByDictCode("STD_CARD_TYPE", cardType);
-            //获取字典值
-            item.put("card_type", cardType);
-            envelop.getDetailModelList().remove(i);
-            envelop.getDetailModelList().set(i,item);
-        }
-        //updated by zdm on 2018/07/17---end
         return envelop;
     }
 
