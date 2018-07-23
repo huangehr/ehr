@@ -55,10 +55,15 @@ public class PackageQcService {
         dataSets.keySet().forEach(item -> details.add(item));
         //必传数据集判断
         List<String> required = requireDatasetsConfig.getRequireDataset(zipPackage.getEventType());
-        if (!details.containsAll(required)) {
-            throw new ZipException("Incomplete data set");
-        }
+        List<String> missing = new ArrayList<>();
+        required.forEach(item -> {
+            if (!details.contains(item)) {
+                missing.add(item);
+            }
+        });
         qcDataSetRecord.put("details", details);
+        qcDataSetRecord.put("missing", missing);
+        qcDataSetRecord.put("is_defect", missing.isEmpty() ? 0 : 1);
         qcDataSetRecord.put("_id", esSimplePackage.get_id());
         qcDataSetRecord.put("patient_id", zipPackage.getPatientId());
         qcDataSetRecord.put("pack_id", esSimplePackage.get_id());
@@ -78,9 +83,9 @@ public class PackageQcService {
         for (String dataSetCode : dataSets.keySet()) {
             Map<String, MetaDataRecord> records = dataSets.get(dataSetCode).getRecords();
             Set<String> existSet = new HashSet<>(); //存放已经生成了质控信息的数据元
+            List<String> listDataElement = getDataElementList(dataSets.get(dataSetCode).getCdaVersion(), dataSetCode);
             for (String recordKey : records.keySet()) {
                 Map<String, String> dataGroup = records.get(recordKey).getDataGroup();
-                List<String> listDataElement = getDataElementList(dataSets.get(dataSetCode).getCdaVersion(), dataSetCode);
                 for (String metadata : listDataElement) {
                     if (existSet.contains(dataSetCode + "$" + metadata)) { //如果该数据元已经有质控数据则跳过
                         continue;

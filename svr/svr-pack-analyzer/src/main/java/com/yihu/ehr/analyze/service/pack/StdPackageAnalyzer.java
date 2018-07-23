@@ -94,12 +94,12 @@ public class StdPackageAnalyzer extends PackageAnalyzer {
             zipPackage.setOrgCode(dataSet.getOrgCode());
             String orgName = redisService.getOrgName(dataSet.getOrgCode());
             if (StringUtils.isEmpty(orgName)) {
-                //throw new AnalyzerException("Can not get org name for " + dataSet.getOrgCode() + ", forget to cache?");
+                throw new AnalyzerException("Can not get org name for " + dataSet.getOrgCode() + ", forget to cache?");
             }
             zipPackage.setOrgName(orgName);
             String orgArea = redisService.getOrgArea(dataSet.getOrgCode());
             if (StringUtils.isEmpty(orgArea)) {
-                //throw new AnalyzerException("Can not get org area for " + dataSet.getOrgCode() + ", forget to cache?");
+                throw new AnalyzerException("Can not get org area for " + dataSet.getOrgCode() + ", forget to cache?");
             }
             zipPackage.setOrgArea(orgArea);
             zipPackage.setCdaVersion(dataSet.getCdaVersion());
