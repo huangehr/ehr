@@ -958,7 +958,7 @@ public class BaseStatistsService {
      */
     private String getQuotaDimensionDictSql(String quotaCode, String dimension) {
         boolean mainFlag = dimension.contains("province") || dimension.contains("city") ||dimension.contains("town")
-                ||dimension.contains("org") ||dimension.contains("year") ||dimension.contains("quarter")
+                ||dimension.contains("org") ||dimension.contains("dept") ||dimension.contains("year") ||dimension.contains("quarter")
                 ||dimension.contains("month") ||dimension.contains("day") || dimension.contains(quotaDateField) ;
         String dictSql = "";
         //查询维度 sql
