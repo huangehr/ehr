@@ -54,7 +54,7 @@ public class Contant {
         public static final String area_city = "6";//行政区划 市
         public static final String area_town = "7";//行政区划 区县
         public static final String area_org = "8";//行政区划 机构
-        public static final String area_team = "9";//行政区划  团队
+        public static final String area_dept = "9";//科室
     }
 
     public static class quota {
@@ -76,7 +76,7 @@ public class Contant {
         public static final String area_city = "2";//行政区划 市
         public static final String area_town = "3";//行政区划 区县
         public static final String area_org = "4";//行政区划 机构
-        public static final String area_team = "5";//行政区划  团队
+        public static final String area_dept = "5";//行政区划 科室
 
         public static String getAreaLevelByMainDimension(String key) {
             switch (key) {
@@ -92,8 +92,8 @@ public class Contant {
                 case main_dimension.area_org: {
                     return area_org;
                 }
-                case main_dimension.area_team: {
-                    return area_team;
+                case main_dimension.area_dept: {
+                    return area_dept;
                 }
             }
             return "";

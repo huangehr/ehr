@@ -62,7 +62,7 @@ public class ChronicDiseaseScheduler {
             // 抽取昨天数据
             Date yesterdayDate = DateUtils.addDays(currDate, -1);
             String yesterday = DateUtil.formatDate(yesterdayDate, DateUtil.DEFAULT_DATE_YMD_FORMAT);
-            String fq = "event_date:[" + yesterday + "T00:00:00Z TO  " + yesterday + "T23:59:59Z]";
+            String fq = "event_date:[" + yesterday + "T00:00:00Z TO " + yesterday + "T23:59:59Z]";
 
             // 整合并保存到ES
             saveTotalData(fq);
@@ -81,7 +81,7 @@ public class ChronicDiseaseScheduler {
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(true);
         try {
-            String fq = "event_date:[" + startDate + "T00:00:00Z TO  " + endDate + "T23:59:59Z]";
+            String fq = "event_date:[" + startDate + "T00:00:00Z TO " + endDate + "T23:59:59Z]";
 
             // 整合并保存到ES
             saveTotalData(fq);
@@ -99,7 +99,7 @@ public class ChronicDiseaseScheduler {
     private void saveTotalData(String fq) throws Exception {
         String idCardField = "EHR_000017"; // 身份证号数据元
         // 查询结果的返回字段
-        String[] showFields = {"EHR_000017"};
+        String[] showFields = {"rowkey"};
 
         // 去重查询糖尿病患者记录
         List<String> diabetesRowkeyList = new ArrayList();

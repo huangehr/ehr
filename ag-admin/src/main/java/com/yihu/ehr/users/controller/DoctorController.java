@@ -163,8 +163,10 @@ public class DoctorController extends BaseController {
 
             Envelop envelop = success(detailModel);
             String userId = userClient.getUserIdByIdCardNo(detailModel.getIdCardNo());
-            List<MOrgDeptJson> orgDeptJsonList = orgDeptMemberClient.getByUserId(userId);
-            envelop.setDetailModelList(orgDeptJsonList);
+            if (StringUtils.isNotEmpty(userId)) {
+                List<MOrgDeptJson> orgDeptJsonList = orgDeptMemberClient.getByUserId(userId);
+                envelop.setDetailModelList(orgDeptJsonList);
+            }
             return envelop;
         }
         catch (Exception ex){

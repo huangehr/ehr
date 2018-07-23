@@ -134,6 +134,8 @@ public class BaseStatistsService {
         NumberFormat nf = NumberFormat.getInstance();
         nf.setGroupingUsed(false);
         nf.setMaximumFractionDigits(2);
+        List<Map<String, Object>> otherList = new ArrayList<>();
+        otherList = secondList;
         String [] moleDimensions = dimension.split(";");
         for(Map<String, Object> firstMap :firstList) {
             if (null != firstMap && firstMap.size() > 0 ) {
@@ -173,6 +175,7 @@ public class BaseStatistsService {
                         map.put(resultField,nf.format(point));
                         addResultList.add(map);
                         pflag = false;
+                        otherList.remove(secondMap);
                         break;
                     }
                 }
@@ -182,9 +185,9 @@ public class BaseStatistsService {
                 }
             }
         }
-        // 第一加数列表个数小雨第二个加数列表
-        if (secondList.size() - firstList.size() > 0) {
-            for(Map<String, Object> secondMap :secondList) {
+
+        if (null != otherList && otherList.size() > 0) {
+            for(Map<String, Object> secondMap : otherList) {
                 Map<String, Object> map = new HashMap<>();
                 map.put(firstColumnField, secondMap.get(firstColumnField));
                 for(int i = 0 ;i < moleDimensions.length ; i++){
@@ -203,6 +206,8 @@ public class BaseStatistsService {
                 addResultList.add(map);
             }
         }
+
+
         //检查后面指标的维度是否全部有 累加进去
         /*Map<String, Object> addResuDimenMap = new HashMap<>();
         for(int k = 0;k < addResultList.size();k++) {
@@ -972,7 +977,7 @@ public class BaseStatistsService {
                 if (dimensionSlaves != null && dimensionSlaves.size() > 0) {
                     if(StringUtils.isNotEmpty(dimension)){
                         String n = dimension.substring(dimension.length() - 1, dimension.length());
-                        if(StringUtils.isNotEmpty(n) && (n.equals("1") || n.equals("2") || n.equals("3")) ){
+                        if(StringUtils.isNotEmpty(n) && (n.equals("1") || n.equals("2") || n.equals("3") || n.equals("4")) ){
                             int slave = Integer.valueOf(n);
                             if(dimensionSlaves.size() >= slave){
                                 dictSql = dimensionSlaves.get(slave-1).getDictSql();
@@ -996,7 +1001,7 @@ public class BaseStatistsService {
         if(StringUtils.isNotEmpty(dictSql)) {
             BasesicUtil baseUtil = new BasesicUtil();
             boolean main = dimension.contains("province") || dimension.contains("city") ||dimension.contains("town")
-                    ||dimension.contains("org") ||dimension.contains("year") ||dimension.contains("month")
+                    ||dimension.contains("org") ||dimension.contains("dept") ||dimension.contains("year") ||dimension.contains("month")
                     ||dimension.contains("quarter") ||dimension.contains("day");
 
             if( main){
@@ -1613,47 +1618,52 @@ public class BaseStatistsService {
                         resultList.add(map);
                     }
                 }else if(dateType.toLowerCase().equals("quarter")){
-                    Map<String,Object> map = new HashMap<>();
                     String startQuarter = "";
                     String endQuarter = "";
                     lastDate.setTime(firstMonth);
+                    Date firstDate = lastDate.getTime();
                     int currentMonth = lastDate.get(Calendar.MONTH) + 1;
                     if (currentMonth >= 1 && currentMonth <= 3){
-                        startQuarter = sdf.format(lastDate).substring(0,4)+"年1季度";
+                        startQuarter = sdf.format(firstDate).substring(0,4)+"年1季度";
                     }else if (currentMonth >= 4 && currentMonth <= 6){
-                        startQuarter = sdf.format(lastDate).substring(0,4)+"年2季度";
+                        startQuarter = sdf.format(firstDate).substring(0,4)+"年2季度";
                     } else if (currentMonth >= 7 && currentMonth <= 9){
-                        startQuarter = sdf.format(lastDate).substring(0,4)+"年3季度";
+                        startQuarter = sdf.format(firstDate).substring(0,4)+"年3季度";
                     } else if (currentMonth >= 10 && currentMonth <= 12){
-                        startQuarter = sdf.format(lastDate).substring(0,4)+"年4季度";
+                        startQuarter = sdf.format(firstDate).substring(0,4)+"年4季度";
                     }
 
                     lastDate.setTime(endMonth);
+                    Date downDate = lastDate.getTime();
                     if (currentMonth >= 1 && currentMonth <= 3){
-                        endQuarter = sdf.format(lastDate).substring(0,4)+"年1季度";
+                        endQuarter = sdf.format(downDate).substring(0,4)+"年1季度";
                     }else if (currentMonth >= 4 && currentMonth <= 6){
-                        endQuarter = sdf.format(lastDate).substring(0,4)+"年2季度";
+                        endQuarter = sdf.format(downDate).substring(0,4)+"年2季度";
                     } else if (currentMonth >= 7 && currentMonth <= 9){
-                        endQuarter = sdf.format(lastDate).substring(0,4)+"年3季度";
+                        endQuarter = sdf.format(downDate).substring(0,4)+"年3季度";
                     } else if (currentMonth >= 10 && currentMonth <= 12){
-                        endQuarter = sdf.format(lastDate).substring(0,4)+"年4季度";
+                        endQuarter = sdf.format(downDate).substring(0,4)+"年4季度";
                     }
-                    while ( !startQuarter.equals(endQuarter)){
+                    String lastQuarter = "";
+                    while ( !startQuarter.equals(lastQuarter)){
                         int eYear = Integer.valueOf(endQuarter.substring(0, 4));
-                        int eQuarter = Integer.valueOf(endQuarter.substring(6, 7));
+                        int eQuarter = Integer.valueOf(endQuarter.substring(5, 6));
+                        endQuarter = eYear+ "年" + eQuarter + "季度";
                         if(eQuarter == 1){
                             eYear--;
+                            eQuarter = 4;
                         }else {
                             eQuarter--;
                         }
-                        String lastQuarter = eYear + "年" + eQuarter + "季度";
+                        lastQuarter = eYear + "年" + eQuarter + "季度";
                         double current = 0;
                         double last = 0;
+                        Map<String,Object> map = new HashMap<>();
                         for(Map<String,Object> dataMap : dataList){
                             String val = dataMap.get(dimension).toString();
                             if(val.equals(endQuarter) ){
-                                map.put(firstColumnField, val);
-                                map.put(dimension, val);
+                                map.put(firstColumnField, endQuarter);
+                                map.put(dimension, endQuarter);
                                 current = Double.valueOf(dataMap.get(resultField).toString());
                             }
                             if(val.equals(lastQuarter) ){
@@ -1737,7 +1747,7 @@ public class BaseStatistsService {
             int start = b ? filters.indexOf("'") : filters.indexOf("\"");
             String condition = filters.substring(start + 1, start + 5); // 获取年份
             int year = Integer.parseInt(condition);
-            String condition2 = filters.substring(filters.indexOf("--") + 1, filters.indexOf("-") + 3);  // 获取月份
+            String condition2 = filters.substring(filters.indexOf("-") + 1, filters.indexOf("-") + 3);  // 获取月份
             int month = Integer.parseInt(condition2);
             cal.set(Calendar.YEAR, year);
             cal.set(Calendar.MONTH, month - 1);

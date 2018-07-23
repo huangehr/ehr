@@ -1009,8 +1009,12 @@ public class QuotaReportController extends BaseController {
             optionData.forEach(one -> {
                 List<Object> list = new ArrayList<>();
                 one.forEach(item -> {
-                    item = nf.format(Double.parseDouble(item.toString()) / v);
-                    list.add(item);
+                    if(item != null && !item.toString().equals("--")){
+                        item = nf.format(Double.parseDouble(item.toString()) / v);
+                        list.add(item);
+                    }else {
+                        list.add(0);
+                    }
                 });
                 handleList.add(list);
             });
