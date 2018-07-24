@@ -1,7 +1,5 @@
 package com.yihu.ehr.agModel.tj;
 
-import java.io.Serializable;
-
 /**
  *
  * @author janseny
@@ -19,6 +17,7 @@ public class TjQuotaDimensionSlaveModel{
     private String dictSql;
     private String keyVal;
     private Integer sort;       //纬度顺序
+    private String converClass;//转换类
 
     public Long getId() {
         return id;
@@ -74,5 +73,13 @@ public class TjQuotaDimensionSlaveModel{
 
     public void setSort(Integer sort) {
         this.sort = sort;
+    }
+
+    public String getConverClass() {
+        return converClass;
+    }
+
+    public void setConverClass(String converClass) {
+        this.converClass = converClass;
     }
 }
