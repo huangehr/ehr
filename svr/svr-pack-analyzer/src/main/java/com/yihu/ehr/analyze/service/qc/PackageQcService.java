@@ -9,7 +9,6 @@ import com.yihu.ehr.profile.model.PackageDataSet;
 import com.yihu.ehr.redis.client.RedisClient;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.string.StringBuilderEx;
-import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,8 +28,6 @@ import java.util.*;
 public class PackageQcService {
     private static final Logger logger = LoggerFactory.getLogger(PackageQcService.class);
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    private static final Class clazz = QcRuleCheckService.class;
-
 
     @Autowired
     private QcRuleCheckService qcRuleCheckService;
@@ -92,6 +89,7 @@ public class PackageQcService {
                     }
                     String method = redisClient.get("qc_" + zipPackage.getCdaVersion() + ":" + dataSetCode + ":" + metadata);
                     if (method != null) {
+                        Class clazz = QcRuleCheckService.class;
                         Method _method = clazz.getMethod(method, new Class[]{String.class, String.class, String.class, String.class});
                         _method.setAccessible(true);
                         ErrorType errorType;

@@ -49,14 +49,14 @@ public class ElasticSearchClient {
         TransportClient transportClient = elasticSearchPool.getClient();
         CreateIndexRequestBuilder createIndexRequestBuilder = transportClient.admin().indices().prepareCreate(index);
         createIndexRequestBuilder.addMapping(type, xContentBuilder);
-        //Map<String, Object> settingSource = new HashMap<>();
-        //settingSource.put("index.translog.flush_threshold_size", "1g"); //log文件大小
-        //settingSource.put("index.translog.flush_threshold_ops", "100000"); //flush触发次数
-        //settingSource.put("index.translog.durability", "async"); //异步更新
-        //settingSource.put("index.refresh_interval", "30s"); //刷新间隔
-        //settingSource.put("index.number_of_replicas", 1); //副本数
-        //settingSource.put("index.number_of_shards", 3); //分片数
-        //createIndexRequestBuilder.setSettings(settingSource);
+        /*Map<String, Object> settingSource = new HashMap<>();
+        settingSource.put("index.translog.flush_threshold_size", "1g"); //log文件大小
+        settingSource.put("index.translog.flush_threshold_ops", "100000"); //flush触发次数
+        settingSource.put("index.translog.durability", "async"); //异步更新
+        settingSource.put("index.refresh_interval", "30s"); //刷新间隔
+        settingSource.put("index.number_of_replicas", 1); //副本数
+        settingSource.put("index.number_of_shards", 3); //分片数
+        createIndexRequestBuilder.setSettings(settingSource);*/
         if (setting != null && !setting.isEmpty()) {
             createIndexRequestBuilder.setSettings(setting);
         }
