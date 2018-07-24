@@ -22,6 +22,7 @@ public class TjQuotaDimensionSlave implements Serializable{
     private String dictSql;//
     private String keyVal;//
     private Integer sort;//纬度顺序
+    private String converClass;//转换类
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -69,11 +70,21 @@ public class TjQuotaDimensionSlave implements Serializable{
         this.keyVal = keyVal;
     }
 
+    @Column(name = "sort",  nullable = true)
     public Integer getSort() {
         return sort;
     }
 
     public void setSort(Integer sort) {
         this.sort = sort;
+    }
+
+    @Column(name = "conver_class",  nullable = true)
+    public String getConverClass() {
+        return converClass;
+    }
+
+    public void setConverClass(String converClass) {
+        this.converClass = converClass;
     }
 }

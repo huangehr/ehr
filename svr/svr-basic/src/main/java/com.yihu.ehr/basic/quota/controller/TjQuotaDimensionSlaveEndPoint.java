@@ -107,7 +107,12 @@ public class TjQuotaDimensionSlaveEndPoint extends EnvelopRestEndPoint {
             tjQuotaDimensionSlaveService.deleteByQuotaCode(list.get(0).getQuotaCode());
         }
         for (int i=0; i<list.size(); i++) {
-            tjQuotaDimensionSlaveService.save(list.get(i));
+            TjQuotaDimensionSlave item = list.get(i);
+            // 年龄段转换类
+            if ("age".equals(item.getSlaveCode()) && "patient_age".equals(item.getKeyVal())) {
+                item.setConverClass("com.yihu.quota.etl.conver.AgeConvert");
+            }
+            tjQuotaDimensionSlaveService.save(item);
         }
         return Result.success("统计指标从维度关联信息更新成功！", list);
     }
