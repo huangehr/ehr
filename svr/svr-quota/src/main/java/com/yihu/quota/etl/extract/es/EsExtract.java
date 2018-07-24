@@ -412,7 +412,7 @@ public class EsExtract {
             }
             if ( !StringUtils.isEmpty(startTime) && !StringUtils.isEmpty(endTime)) {
                 whereSql.append( timeKey + " >= '" + startTime + "' and ");
-                whereSql.append( timeKey + " < '" + endTime + "'");
+                whereSql.append( timeKey + " <='" + endTime + "'");
             }
         }
 

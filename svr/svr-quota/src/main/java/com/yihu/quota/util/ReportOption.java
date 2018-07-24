@@ -177,10 +177,12 @@ public class ReportOption {
         List<Object> lineValList = getList(datalist,"TOTAL");
         List<Map<String,Object>> dataList = new ArrayList<Map<String,Object>>();
         for(int i =0 ;i < lineValList.size() ; i++){
-            Map<String,Object> map = new HashMap<>();
-            map.put("value",lineValList.get(i));
-            map.put("name",lineNameList.get(i));
-            dataList.add(map);
+            if (StringUtils.isNotEmpty(lineValList.get(i) + "") && Integer.parseInt(lineValList.get(i) + "") != 0) {
+                Map<String,Object> map = new HashMap<>();
+                map.put("value",lineValList.get(i));
+                map.put("name",lineNameList.get(i));
+                dataList.add(map);
+            }
         }
         List<Object> list = new ArrayList<>(dataList);
         pie.setData(list);
@@ -200,10 +202,12 @@ public class ReportOption {
             List<Object> lineValList2 = getList(data2list,"TOTAL");
             List<Map<String,Object>> dataList2 = new ArrayList<Map<String,Object>>();
             for(int i =0 ;i < lineValList2.size() ; i++){
-                Map<String,Object> map = new HashMap<>();
-                map.put("value",lineValList2.get(i));
-                map.put("name",lineNameList2.get(i));
-                dataList2.add(map);
+                if (StringUtils.isNotEmpty(lineValList2.get(i) + "") && Integer.parseInt(lineValList2.get(i) + "") != 0) {
+                    Map<String,Object> map = new HashMap<>();
+                    map.put("value",lineValList2.get(i));
+                    map.put("name",lineNameList2.get(i));
+                    dataList2.add(map);
+                }
             }
             List<Object> list2 = new ArrayList<>(dataList2);
             pie2.setData(list2);
