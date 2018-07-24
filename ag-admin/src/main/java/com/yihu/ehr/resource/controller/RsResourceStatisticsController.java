@@ -15,6 +15,7 @@ import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -78,6 +79,8 @@ public class RsResourceStatisticsController extends ExtendController {
             @RequestParam(value = "resourceId") String resourceId,
             @ApiParam(name = "filters", value = "检索条件 多个条件用 and 拼接 如：town=361002 and org=10000001 ", defaultValue = "")
             @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "dimension", value = "维度字段", defaultValue = "quotaDate")
+            @RequestParam(value = "dimension", required = false) String dimension,
             @ApiParam(name = "top", value = "获取前几条数据")
             @RequestParam(value = "top", required = false) String top){
         Envelop envelop = new Envelop();
@@ -96,7 +99,7 @@ public class RsResourceStatisticsController extends ExtendController {
             }
         }
         RsResourcesModel rsResourcesModel = objectMapper.convertValue(resourceResult.getObj(), RsResourcesModel.class);
-        List<Map<String, Object>> resultList = rsResourceStatisticsClient.getQuotaReportTwoDimensionalTable(quotaCodeStr, filters, rsResourcesModel.getDimension(), top);
+        List<Map<String, Object>> resultList = rsResourceStatisticsClient.getQuotaReportTwoDimensionalTable(quotaCodeStr, filters, StringUtils.isEmpty(dimension) ? rsResourcesModel.getDimension() : dimension, top);
         envelop.setObj(resultList);
         envelop.setSuccessFlg(true);
         return  envelop;
