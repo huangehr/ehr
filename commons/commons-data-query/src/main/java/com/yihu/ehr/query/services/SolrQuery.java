@@ -203,8 +203,8 @@ public class SolrQuery {
      * @param queryString
      * @return
      */
-    public long count(String table, String queryString) throws Exception {
-        return solrUtil.count(table, queryString);
+    public long count(String table, String q , String fq) throws Exception {
+        return solrUtil.count(table, q,fq);
     }
 
     /**

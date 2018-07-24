@@ -92,7 +92,7 @@ public class SolrExtract {
                 q = timeKey + ":[* TO *]";
             }
         }
-        long rows = solrQuery.count(core, q + " AND " + esConfig.getFilter());
+        long rows = solrQuery.count(core, q ,esConfig.getFilter());
         return Integer.valueOf(String.valueOf(rows));
     }
 
@@ -104,6 +104,9 @@ public class SolrExtract {
         String core = esConfig.getTable(); // solr的core名
         String q = null; // 查询条件
         String fq = null; // 过滤条件
+        if (esConfig.getFilter() != null) {
+            fq = esConfig.getFilter();
+        }
         String fl = ""; // 结果指定查询字段
         List<SolrGroupEntity> dimensionGroupList = new ArrayList<>(); // 维度分组统计条件
         if (StringUtils.isEmpty(esConfig.getTimekey())) {
@@ -140,18 +143,9 @@ public class SolrExtract {
         // 拼接增量或全量的筛选条件
         if (!StringUtils.isEmpty(timeKey)) {
             if (!StringUtils.isEmpty(startTime) && !StringUtils.isEmpty(endTime)) {
-                fq = String.format("%s:[%s TO %s]", timeKey, startTime, endTime);
+                q = String.format("%s:[%s TO %s]", timeKey, startTime, endTime);
             } else {
-                fq = timeKey + ":[* TO *]";
-            }
-        }
-
-        // 拼接过滤条件
-        if (esConfig.getFilter() != null) {
-            if (StringUtils.isEmpty(fq)) {
-                fq = esConfig.getFilter();
-            } else {
-                fq += " AND " + esConfig.getFilter();
+                q = timeKey + ":[* TO *]";
             }
         }
 
