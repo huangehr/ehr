@@ -127,7 +127,7 @@ public class SolrUtil {
         }
         query.setFields(fields);
         query.setStart(start);
-        query.setRows(rows);
+        query.setRows(10000000);
         query.setParam(GroupParams.GROUP, true);
         query.setParam(GroupParams.GROUP_FORMAT, "grouped");
         query.setParam(GroupParams.GROUP_FIELD, groupField);
