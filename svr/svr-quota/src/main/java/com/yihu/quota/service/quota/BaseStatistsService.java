@@ -1409,7 +1409,7 @@ public class BaseStatistsService {
      * @throws Exception
      */
     public List<Map<String, Object>> getGrowthByQuota(String dimension, String filters, EsConfig esConfig, String dateType) throws Exception {
-        List<Map<String, Object>>  resultList = new ArrayList<>();
+        List<Map<String, Object>>  resultList = new LinkedList<>();
         String startQuotaDate = "";
         String endQuotaDate = "";
         String noDateFilter = "";
@@ -1684,7 +1684,6 @@ public class BaseStatistsService {
                         endQuarter = lastQuarter;
                     }
 
-
                 }else if(dateType.toLowerCase().equals("month")){
                     double current = 0;
                     double last = 0;
@@ -1719,10 +1718,12 @@ public class BaseStatistsService {
                             }
                         }
                         resultList.add(map);
-
                         endMonthStr = lastMontStr;
                     }
                 }
+            }
+            if(resultList != null ){
+                Collections.reverse(resultList); // 倒序排列
             }
             return resultList;
         }
