@@ -178,7 +178,9 @@ public class QuotaReportController extends BaseController {
                                     vMap.put(viewQuotaCode, quotaResultMap.get("result")==null ? 0 : ("--".equals(quotaResultMap.get("result")) ? quotaResultMap.get("result") : nf.format(Double.valueOf(quotaResultMap.get("result").toString()))));
                                     break;
                                 } else {
-                                    vMap.put(viewQuotaCode, 0);
+                                    if( !vMap.get(dimension).toString().equals("合计")){
+                                        vMap.put(viewQuotaCode, 0);
+                                    }
                                 }
                             } else {
                                 vMap.put(viewQuotaCode, 0);
@@ -236,13 +238,36 @@ public class QuotaReportController extends BaseController {
             Map<String, Object> sumMap = new HashMap<>();
             sumMap.put("firstColumn","合计");
             for (String code : quotaCodes) {
-                double sum = 0;
-                sum = calculateSum(sum,code,dataList);
-                sumMap.put(code, nf.format(sum));
+                String total =  existsTotal(code,dataList);
+                if( total.equals("false")){
+                    double sum = 0;
+                    sum = calculateSum(sum,code,dataList);
+                    sumMap.put(code, nf.format(sum));
+                }else {
+                    sumMap.put(code, nf.format(Double.valueOf(total)));
+                }
             }
             dataList.add(0,sumMap);
+            if(dataList.get(dataList.size()-1).get("firstColumn").equals("合计")){
+                dataList.remove(dataList.size()-1);
+            }
         }
         return dataList;
+    }
+
+    /**
+     * 判断指标统计中 总计 是否已经计算过
+     * @param code
+     * @param dataList
+     * @return
+     */
+    private String existsTotal(String code,List<Map<String, Object>> dataList){
+        for(Map<String, Object> map : dataList){
+            if(map.get("firstColumn").equals("合计") && map.get(code) != null){
+                return map.get(code).toString();
+            }
+        }
+        return "false";
     }
 
     /**
