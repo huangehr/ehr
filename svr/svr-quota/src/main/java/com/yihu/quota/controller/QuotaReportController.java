@@ -248,8 +248,10 @@ public class QuotaReportController extends BaseController {
                 }
             }
             dataList.add(0,sumMap);
-            if(dataList.get(dataList.size()-1).get("firstColumn").equals("合计")){
-                dataList.remove(dataList.size()-1);
+            if(dataList.get(dataList.size()-1).get("firstColumn") != null){
+                if(dataList.get(dataList.size()-1).get("firstColumn").equals("合计")){
+                    dataList.remove(dataList.size()-1);
+                }
             }
         }
         return dataList;
@@ -263,7 +265,7 @@ public class QuotaReportController extends BaseController {
      */
     private String existsTotal(String code,List<Map<String, Object>> dataList){
         for(Map<String, Object> map : dataList){
-            if(map.get("firstColumn").equals("合计") && map.get(code) != null){
+            if(map.get("firstColumn") != null && map.get("firstColumn").toString().equals("合计") && map.get(code) != null){
                 return map.get(code).toString();
             }
         }
