@@ -155,10 +155,10 @@ public class GovFirstPageReportService {
 
             // 统计住院费用，说明：HDSD00_68 住院-费用汇总，EHR_000175 住院费用金额
             String q = String.format("rowkey:*$HDSD00_68$* AND event_date:[%s TO %s]", firstDate, lastDate);
-            FieldStatsInfo statsInfo = solrUtil.getStats(ResourceCore.SubTable, q, null, "EHR_000175");
             if (StringUtils.isNotEmpty(orgArea)) {
                 q += " AND org_area:" + orgArea;
             }
+            FieldStatsInfo statsInfo = solrUtil.getStats(ResourceCore.SubTable, q, null, "EHR_000175");
             Double expense = Double.parseDouble(statsInfo.getSum().toString());
 
             result = df.format(expense);
