@@ -71,6 +71,8 @@ public class ElasticSearchController extends BaseController {
         try {
             List<Map<String, Object>> listData = elasticsearchUtil.excuteDataModel(sql);
             envelop.setDetailModelList(listData);
+            envelop.setObj(listData.size());
+            envelop.setSuccessFlg(true);
         } catch (Exception e) {
             envelop.setErrorMsg("sql执行出错");
         }
@@ -98,6 +100,7 @@ public class ElasticSearchController extends BaseController {
             List<Map<String, Object>> listData = elasticsearchUtil.excuteDataModel(sb.toString());
             envelop.setDetailModelList(listData);
             envelop.setObj(listData.size());
+            envelop.setSuccessFlg(true);
         } catch (Exception e) {
             envelop.setErrorMsg("sql执行出错");
         }

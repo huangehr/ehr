@@ -44,7 +44,7 @@ public class EsClientUtil {
                 .Builder(hostAddress)
                 .multiThreaded(true)
                 //.discoveryEnabled(true)
-                .readTimeout(30000)//30秒
+                .readTimeout(60000)//30秒 -60s
                 .build());
         return factory.getObject();
     }
