@@ -240,6 +240,7 @@ public class DoctorController extends BaseController {
             }
 
             detailModel = convertToModel(mDoctor, DoctorDetailModel.class);
+            detailModel.setInsertTime(DateTimeUtil.simpleDateTimeFormat(mDoctor.getInsertTime()));
             return success(detailModel);
         } catch (Exception ex) {
             ex.printStackTrace();
