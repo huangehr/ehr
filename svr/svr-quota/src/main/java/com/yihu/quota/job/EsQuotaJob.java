@@ -207,7 +207,7 @@ public class EsQuotaJob implements Job {
             if(haveThreadCount  == threadCount){
                 tjQuotaLog.setStatus(Contant.save_status.success);
                 tjQuotaLog.setContent(time+"统计保存成功");
-                System.out.println("指标" + tjQuotaLog.getQuotaCode() + "统计成功 结束！");
+                logger.warn("指标" + tjQuotaLog.getQuotaCode() + "统计成功 结束！");
             }else {
                 tjQuotaLog.setStatus(Contant.save_status.fail);
                 tjQuotaLog.setContent( time+"统计保存失败");
