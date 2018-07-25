@@ -256,7 +256,7 @@ public class SolrQuery {
      * @param fq               过滤查询
      * @param sort             排序
      * @param start            查询起始行
-     * @param rows             查询行数，可为-1表示获取全部
+     * @param rows             查询行数
      * @param fields           返回字段
      * @param groupField       分组去重字段
      * @param groupSort        组内排序字段

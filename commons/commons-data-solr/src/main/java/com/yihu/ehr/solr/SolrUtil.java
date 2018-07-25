@@ -98,7 +98,7 @@ public class SolrUtil {
      * @param fq         可选，过滤查询
      * @param sort       可选，排序
      * @param start      必填，查询起始行
-     * @param rows       必填，查询行数，可为-1表示获取全部
+     * @param rows       必填，查询行数
      * @param fields     必填，返回字段
      * @param groupField 必填，分组去重字段。针对一个字段去重。
      * @param groupSort  可选，组内排序字段，如："event_date asc"
@@ -155,7 +155,7 @@ public class SolrUtil {
      * @param fq         可选，过滤查询
      * @param sort       可选，排序
      * @param start      必填，查询起始行
-     * @param rows       必填，查询行数，可为-1表示获取全部
+     * @param rows       必填，查询行数
      * @param fields     必填，返回字段
      * @param groupField 必填，分组去重字段。针对一个字段去重。
      * @param groupSort  可选，组内排序字段，如："event_date asc"

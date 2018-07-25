@@ -104,7 +104,8 @@ public class PregnantWomanScheduler {
         // 去重查询孕妇记录
         List<String> rowkeyList = new ArrayList();
         String q = "rowkey:*$HDSB02_05$* OR (rowkey:*$HDSD00_73$* AND EHR_000109:Z32.100)";
-        List<Group> groupList = solrUtil.queryDistinctOneField(ResourceCore.SubTable, q, fq, null, 0, -1, showFields, idCardField, "event_date asc");
+        int count = (int) solrUtil.count(ResourceCore.SubTable, q, fq);
+        List<Group> groupList = solrUtil.queryDistinctOneField(ResourceCore.SubTable, q, fq, null, 0, count, showFields, idCardField, "event_date asc");
         SchedulerUtil.collectRowkeyFromDistinctGroup(rowkeyList, solrUtil, groupList, q, fq, idCardField, showFields);
         this.translateAndSaveData(rowkeyList);
     }
