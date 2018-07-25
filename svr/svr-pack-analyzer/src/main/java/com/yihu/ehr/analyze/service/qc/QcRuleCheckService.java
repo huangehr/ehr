@@ -52,8 +52,7 @@ public class QcRuleCheckService {
     }
 
     /**
-     * 检查值类型是否正确，通过将值转为对应类型是否成功来判断
-     * 暂未实现
+     * 检查值类型是否正确
      *
      * @param version
      * @param dataSetCode
@@ -123,8 +122,7 @@ public class QcRuleCheckService {
     }
 
     /**
-     * 检查值类型是否正确，通过将值转为对应类型是否成功来判断
-     * 暂未实现
+     * 检查值类型是否正确
      *
      * @param version
      * @param dataSetCode
@@ -140,6 +138,8 @@ public class QcRuleCheckService {
     }
 
     /**
+     * 检查值格式是否正确
+     * 暂未实现
      *
      * @param version
      * @param dataSetCode
@@ -193,6 +193,8 @@ public class QcRuleCheckService {
     }
 
     /**
+     * 检查值格式是否正确
+     * 暂未实现
      *
      * @param version
      * @param dataSetCode
