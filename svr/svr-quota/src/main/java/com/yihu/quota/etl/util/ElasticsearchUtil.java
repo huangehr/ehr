@@ -257,12 +257,14 @@ public class ElasticsearchUtil {
             bulkRequestBuilder.add(deleteRequestBuilder.request());
         }
         //进行批量删除操作
-        boolean optFlag = false;
-        BulkResponse bulkResponse = bulkRequestBuilder.execute().actionGet();
-        if (bulkResponse.hasFailures()) {
-            optFlag = false;
-        }else {
-            optFlag = true;
+        boolean optFlag = true;
+        if(hits.getHits() != null && hits.getHits().length > 0){
+            BulkResponse bulkResponse = bulkRequestBuilder.execute().actionGet();
+            if (bulkResponse.hasFailures()) {
+                optFlag = false;
+            }else {
+                optFlag = true;
+            }
         }
         return  optFlag;
     }

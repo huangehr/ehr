@@ -207,6 +207,7 @@ public class EsQuotaJob implements Job {
             if(haveThreadCount  == threadCount){
                 tjQuotaLog.setStatus(Contant.save_status.success);
                 tjQuotaLog.setContent(time+"统计保存成功");
+                System.out.println("指标" + tjQuotaLog.getQuotaCode() + "统计成功 结束！");
             }else {
                 tjQuotaLog.setStatus(Contant.save_status.fail);
                 tjQuotaLog.setContent( time+"统计保存失败");
@@ -251,14 +252,17 @@ public class EsQuotaJob implements Job {
             while (flag){
                 long count = elasticsearchUtil.getTotalCount(talClient, esConfig.getIndex() ,esConfig.getType(), boolQueryBuilder);
                 if(count != 0){
-                    flag = elasticsearchUtil.queryDelete(client, esConfig.getIndex() ,esConfig.getType(),boolQueryBuilder);
+                    boolean successFlag = elasticsearchUtil.queryDelete(client, esConfig.getIndex() ,esConfig.getType(),boolQueryBuilder);
+                    if(!successFlag){
+                        throw  new Exception("Elasticsearch 指标统计时原始数据删除失败");
+                    }
                 }else {
                     flag = false ;
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
-            throw  new Exception("Elasticsearch 指标统计时删除数据异常");
+            throw  new Exception("Elasticsearch 指标统计时原始数据删除异常");
         } finally {
             talClient.close();
             client.close();
