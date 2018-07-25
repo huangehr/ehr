@@ -175,7 +175,8 @@ public class SolrExtract {
             // 去重查询
             fl += "," + esConfig.getDistinctGroupField();
             boolean groupNullIsolate = esConfig.getDistinctGroupNullIsolate() != null ? esConfig.getDistinctGroupNullIsolate() : false;
-            list = solrQuery.distinctQueryReturnFieldList(core, q, fq, null, 0, -1, fl.split(","),
+            int count = (int) solrQuery.count(core, q, fq);
+            list = solrQuery.distinctQueryReturnFieldList(core, q, fq, null, 0, count, fl.split(","),
                     esConfig.getDistinctGroupField(), esConfig.getDistinctGroupSort(), groupNullIsolate);
             // 对比ES中如果已存在该条数据则更新，并从集合中移除该条数据。
             checkEsDistinctData(list);
