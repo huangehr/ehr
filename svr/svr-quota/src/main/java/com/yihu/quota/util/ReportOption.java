@@ -177,7 +177,7 @@ public class ReportOption {
         List<Object> lineValList = getList(datalist,"TOTAL");
         List<Map<String,Object>> dataList = new ArrayList<Map<String,Object>>();
         for(int i =0 ;i < lineValList.size() ; i++){
-            if (StringUtils.isNotEmpty(lineValList.get(i) + "") && Integer.parseInt(lineValList.get(i) + "") != 0) {
+            if (StringUtils.isNotEmpty(lineValList.get(i) + "") && Double.parseDouble(lineValList.get(i) + "") != 0) {
                 Map<String,Object> map = new HashMap<>();
                 map.put("value",lineValList.get(i));
                 map.put("name",lineNameList.get(i));
@@ -202,7 +202,7 @@ public class ReportOption {
             List<Object> lineValList2 = getList(data2list,"TOTAL");
             List<Map<String,Object>> dataList2 = new ArrayList<Map<String,Object>>();
             for(int i =0 ;i < lineValList2.size() ; i++){
-                if (StringUtils.isNotEmpty(lineValList2.get(i) + "") && Integer.parseInt(lineValList2.get(i) + "") != 0) {
+                if (StringUtils.isNotEmpty(lineValList2.get(i) + "") && Double.parseDouble(lineValList2.get(i) + "") != 0) {
                     Map<String,Object> map = new HashMap<>();
                     map.put("value",lineValList2.get(i));
                     map.put("name",lineNameList2.get(i));
@@ -215,7 +215,6 @@ public class ReportOption {
         }
         return option;
     }
-
 
     /**
      * 柱状+饼状 图
