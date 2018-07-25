@@ -43,29 +43,30 @@ public class ResourceIntegratedService extends BaseJpaService {
 
     /**
      * 获取档案数据资源列表
+     *
      * @return
      */
     @Transactional(readOnly = true)
-    public List<RsResource> findFileMasterList(String ids, String filters) {
+    public List<RsResource> findFileMasterList(String ids, String filters, String categoryCode) {
         String sql = "";
         if (filters != null) {
             if (ids != null) {
-                sql = "SELECT rr.id, rr.code, rr.name, rr.category_id, rr.rs_interface, rr.grant_type FROM rs_resource rr WHERE ((rr.category_id IN (SELECT id FROM rs_resource_category WHERE code = 'standard') " +
+                sql = "SELECT rr.id, rr.code, rr.name, rr.category_id, rr.rs_interface, rr.grant_type FROM rs_resource rr WHERE ((rr.category_id IN (SELECT id FROM rs_resource_category WHERE code ='" + categoryCode + "') " +
                         "AND (rr.rs_interface = 'getEhrCenter' AND rr.id IN (" + ids + "))) " +
-                        "OR ((rr.category_id IN (SELECT id FROM rs_resource_category WHERE code = 'standard') AND rr.rs_interface = 'getEhrCenter' AND rr.grant_type = '0'))) " +
+                        "OR ((rr.category_id IN (SELECT id FROM rs_resource_category WHERE code = '" + categoryCode + "') AND rr.rs_interface = 'getEhrCenter' AND rr.grant_type = '0'))) " +
                         "AND rr.name like " + "'%" + filters + "%'";
             } else {
-                sql = "SELECT rr.id, rr.code, rr.name, rr.category_id, rr.rs_interface, rr.grant_type FROM rs_resource rr WHERE rr.category_id IN (SELECT id FROM rs_resource_category WHERE code = 'standard') " +
+                sql = "SELECT rr.id, rr.code, rr.name, rr.category_id, rr.rs_interface, rr.grant_type FROM rs_resource rr WHERE rr.category_id IN (SELECT id FROM rs_resource_category WHERE code ='" + categoryCode + "') " +
                         "AND rr.rs_interface = 'getEhrCenter' " +
                         "AND rr.name like " + "'%" + filters + "%'";
             }
         } else {
             if (ids != null) {
-                sql = "SELECT rr.id, rr.code, rr.name, rr.category_id, rr.rs_interface, rr.grant_type FROM rs_resource rr WHERE ((rr.category_id IN (SELECT id FROM rs_resource_category WHERE code = 'standard') " +
+                sql = "SELECT rr.id, rr.code, rr.name, rr.category_id, rr.rs_interface, rr.grant_type FROM rs_resource rr WHERE ((rr.category_id IN (SELECT id FROM rs_resource_category WHERE code ='" + categoryCode + "') " +
                         "AND (rr.rs_interface = 'getEhrCenter' AND rr.id IN (" + ids + "))) " +
                         "OR ((rr.category_id IN (SELECT id FROM rs_resource_category WHERE code = 'standard') AND rr.rs_interface = 'getEhrCenter' AND rr.grant_type = '0')))";
             } else {
-                sql = "SELECT rr.id, rr.code, rr.name, rr.category_id, rr.rs_interface, rr.grant_type FROM rs_resource rr WHERE rr.category_id IN (SELECT id FROM rs_resource_category WHERE code = 'standard') " +
+                sql = "SELECT rr.id, rr.code, rr.name, rr.category_id, rr.rs_interface, rr.grant_type FROM rs_resource rr WHERE rr.category_id IN (SELECT id FROM rs_resource_category WHERE code ='" + categoryCode + "') " +
                         "AND rr.rs_interface = 'getEhrCenter'";
             }
         }
@@ -75,29 +76,38 @@ public class ResourceIntegratedService extends BaseJpaService {
 
     /**
      * 获取档案数据资源列表
+     *
      * @return
      */
     @Transactional(readOnly = true)
-    public List<RsResource> findFileMasterList (String categoryId, String ids, String filters) {
+    public List<RsResource> findFileMasterList(String categoryId, String ids, String filters, String categoryCode) {
         String sql;
         if (filters != null) {
             if (ids != null) {
-                sql = "SELECT rr.id, rr.code, rr.name, rr.category_id, rr.rs_interface, rr.grant_type FROM rs_resource rr WHERE rr.category_id = '" + categoryId + "' " +
+                sql = "SELECT rr.id, rr.code, rr.name, rr.category_id, rr.rs_interface, rr.grant_type FROM rs_resource rr ,rs_resource_category rrc  WHERE" +
+                        " rr.category_id=rrc.ID AND rrc. CODE = '" + categoryCode + "' " +
+                        "AND rr.category_id = '" + categoryId + "' " +
                         "AND rr.rs_interface = 'getEhrCenter' " +
                         "AND (rr.id IN (" + ids + ")) " + "OR rr.grant_type = '0') " +
                         "AND rr.name like " + "'%" + filters + "%'";
             } else {
-                sql = "SELECT rr.id, rr.code, rr.name, rr.category_id, rr.rs_interface, rr.grant_type FROM rs_resource rr WHERE rr.category_id = '" + categoryId + "'" +
+                sql = "SELECT rr.id, rr.code, rr.name, rr.category_id, rr.rs_interface, rr.grant_type FROM rs_resource rr ,rs_resource_category rrc   WHERE" +
+                        " rr.category_id=rrc.ID AND rrc. CODE = '" + categoryCode + "' " +
+                        "AND rr.category_id = '" + categoryId + "'" +
                         "AND rr.rs_interface = 'getEhrCenter' " +
                         "AND rr.name like " + "'%" + filters + "%'";
             }
         } else {
             if (ids != null) {
-                sql = "SELECT rr.id, rr.code, rr.name, rr.category_id, rr.rs_interface, rr.grant_type FROM rs_resource rr WHERE rr.category_id = '" + categoryId + "'" +
+                sql = "SELECT rr.id, rr.code, rr.name, rr.category_id, rr.rs_interface, rr.grant_type FROM rs_resource rr ,rs_resource_category rrc   WHERE" +
+                        " rr.category_id=rrc.ID AND rrc. CODE = '" + categoryCode + "' " +
+                        "AND rr.category_id = '" + categoryId + "'" +
                         "AND rr.rs_interface = 'getEhrCenter' " +
                         "AND rr.id IN (" + ids + ")) " + "OR rr.grant_type = '0') ";
             } else {
-                sql = "SELECT rr.id, rr.code, rr.name, rr.category_id, rr.rs_interface, rr.grant_type FROM rs_resource rr WHERE rr.category_id = '" + categoryId + "'" +
+                sql = "SELECT rr.id, rr.code, rr.name, rr.category_id, rr.rs_interface, rr.grant_type FROM rs_resource rr ,rs_resource_category rrc   WHERE" +
+                        " rr.category_id=rrc.ID AND rrc. CODE = '" + categoryCode + "' " +
+                        "AND rr.category_id = '" + categoryId + "'" +
                         "AND rr.rs_interface = 'getEhrCenter'";
             }
         }
@@ -108,12 +118,13 @@ public class ResourceIntegratedService extends BaseJpaService {
 
     /**
      * 获取档案数据资源数据元列表
+     *
      * @param rsResource
      * @param roleId
      * @return
      */
     @Transactional(readOnly = true)
-    public List<RsMetadata> findFileMetadataList(RsResource rsResource, String roleId) throws Exception{
+    public List<RsMetadata> findFileMetadataList(RsResource rsResource, String roleId) throws Exception {
         List<DtoResourceMetadata> metadataList;
         Set<String> rsMetadataIdSet = new HashSet<String>();
         String grantType = rsResource.getGrantType();
@@ -148,7 +159,7 @@ public class ResourceIntegratedService extends BaseJpaService {
         }
         if (metadataList != null && metadataList.size() > 0) {
             String metadataIds = "";
-            for (DtoResourceMetadata dtoResourceMetadata : metadataList){
+            for (DtoResourceMetadata dtoResourceMetadata : metadataList) {
                 metadataIds += "'" + dtoResourceMetadata.getId() + "'" + ",";
             }
             String sql = "";
@@ -162,6 +173,7 @@ public class ResourceIntegratedService extends BaseJpaService {
 
     /**
      * 根据parentId获取指标分类主体列表
+     *
      * @return
      */
     @Transactional(readOnly = true)
@@ -172,12 +184,13 @@ public class ResourceIntegratedService extends BaseJpaService {
         } else {
             sql = "select * from tj_quota_category where parent_id = " + parentId;
         }
-        RowMapper rowMapper =  BeanPropertyRowMapper.newInstance(TjQuotaCategory.class);
+        RowMapper rowMapper = BeanPropertyRowMapper.newInstance(TjQuotaCategory.class);
         return jdbcTemplate.query(sql, rowMapper);
     }
 
     /**
      * 根据指标分类获取指标
+     *
      * @param quotaCategory
      * @return
      */
@@ -195,6 +208,7 @@ public class ResourceIntegratedService extends BaseJpaService {
 
     /**
      * 递归获取指标分类包含的子集分类和指标
+     *
      * @param quotaCategory
      * @return
      */
@@ -237,7 +251,7 @@ public class ResourceIntegratedService extends BaseJpaService {
             List<TjQuotaCategory> hList = findQuotaCategoryList(quotaCategory.getId(), filters);
             if (hList != null) {
                 List<Map<String, Object>> childList = new ArrayList<Map<String, Object>>();
-                for (TjQuotaCategory quotaCategory1: hList) {
+                for (TjQuotaCategory quotaCategory1 : hList) {
                     childList.add(getTreeMap(quotaCategory1, level + 1, filters));
                 }
                 masterMap.put("child", childList);
@@ -248,11 +262,12 @@ public class ResourceIntegratedService extends BaseJpaService {
 
     /**
      * 综合查询档案数据列表树
+     *
      * @param filters
      * @return
      */
     @Transactional(readOnly = true)
-    public List<Object> getMetadataList(String userResource, String roleId, String filters) throws Exception{
+    public List<Object> getMetadataList(String userResource, String roleId, String categoryCode, String filters) throws Exception {
         List<Object> resultList = new ArrayList<>();
         Map<String, Object> baseMap = new HashMap<String, Object>();
         baseMap.put("level", "0");
@@ -260,7 +275,7 @@ public class ResourceIntegratedService extends BaseJpaService {
         resultList.add(baseMap);
         List<RsResource> rrList;
         if (userResource.equals("*")) {
-            rrList = findFileMasterList(null, filters);
+            rrList = findFileMasterList(null, filters, categoryCode);
         } else {
             //授权资源
             List<String> userResourceList = objectMapper.readValue(userResource, List.class);
@@ -272,9 +287,9 @@ public class ResourceIntegratedService extends BaseJpaService {
             }
             String ids = builder.toString();
             if (StringUtils.isEmpty(ids)) {
-                rrList = findFileMasterList("''", filters);
+                rrList = findFileMasterList("''", filters, categoryCode);
             } else {
-                rrList = findFileMasterList(ids.substring(0, ids.length() -1), filters);
+                rrList = findFileMasterList(ids.substring(0, ids.length() - 1), filters, categoryCode);
             }
         }
         Map<String, Object> finalMap = new HashMap<>();
@@ -296,7 +311,7 @@ public class ResourceIntegratedService extends BaseJpaService {
                         metadataMap.put("name", rsMetadata.getName());
                         String dictCode = rsMetadata.getDictCode();
                         metadataMap.put("dictCode", rsMetadata.getDictCode());
-                        if (!StringUtils.isEmpty(dictCode)){
+                        if (!StringUtils.isEmpty(dictCode)) {
                             if (dictCode.equals("DATECONDITION")) {
                                 metadataMap.put("dictName", "时间");
                             } else {
@@ -310,7 +325,7 @@ public class ResourceIntegratedService extends BaseJpaService {
                     }
                     masterMap.put("children", metadataList);
                     if (categoryMap.containsKey(categoryId)) {
-                        List<Map> dataList = (List)((Map)finalMap.get(categoryId)).get("children");
+                        List<Map> dataList = (List) ((Map) finalMap.get(categoryId)).get("children");
                         if (dataList != null) {
                             dataList.add(masterMap);
                         }
@@ -341,12 +356,13 @@ public class ResourceIntegratedService extends BaseJpaService {
 
     /**
      * 综合查询档案数据分类列表
+     *@param categoryCode 追加视图分类：standard-标准分类、business-业务分类
      * @return
      * @throws Exception
      */
     @Transactional(readOnly = true)
-    public List<Map<String, Object>> intCategory() throws Exception{
-        List<RsResourceCategory> rsResourceCategoryList = rsResourceCategoryDao.findByCode("standard");
+    public List<Map<String, Object>> intCategory(String categoryCode) throws Exception {
+        List<RsResourceCategory> rsResourceCategoryList = rsResourceCategoryDao.findByCode(categoryCode);
         List<Map<String, Object>> cateMapList = new ArrayList<>(rsResourceCategoryList.size());
         rsResourceCategoryList.forEach(item -> {
             Map<String, Object> cateMap = new HashMap<>();
@@ -360,15 +376,16 @@ public class ResourceIntegratedService extends BaseJpaService {
 
     /**
      * 综合查询档案数据列表树
+     *
      * @param filters
      * @return
      */
     @Transactional(readOnly = true)
-    public List< Map<String, Object>> intMetadata(String categoryId, String userResource, String roleId, String filters) throws Exception{
-        List< Map<String, Object>> resultList = new ArrayList<>();
+    public List<Map<String, Object>> intMetadata(String categoryId, String userResource, String roleId, String categoryCode, String filters) throws Exception {
+        List<Map<String, Object>> resultList = new ArrayList<>();
         List<RsResource> rrList;
         if (userResource.equals("*")) {
-            rrList = findFileMasterList(categoryId, null, filters);
+            rrList = findFileMasterList(categoryId, null, filters, categoryCode);
         } else {
             //授权资源
             List<String> userResourceList = objectMapper.readValue(userResource, List.class);
@@ -380,9 +397,9 @@ public class ResourceIntegratedService extends BaseJpaService {
             }
             String ids = builder.toString();
             if (StringUtils.isEmpty(ids)) {
-                rrList = findFileMasterList(categoryId, "''", filters);
+                rrList = findFileMasterList(categoryId, "''", filters, categoryCode);
             } else {
-                rrList = findFileMasterList(categoryId, ids.substring(0, ids.length() -1), filters);
+                rrList = findFileMasterList(categoryId, ids.substring(0, ids.length() - 1), filters, categoryCode);
             }
         }
         if (rrList != null) {
@@ -403,7 +420,7 @@ public class ResourceIntegratedService extends BaseJpaService {
                         metadataMap.put("id", UUID.randomUUID().toString());
                         String dictCode = rsMetadata.getDictCode();
                         metadataMap.put("dictCode", rsMetadata.getDictCode());
-                        if (!StringUtils.isEmpty(dictCode)){
+                        if (!StringUtils.isEmpty(dictCode)) {
                             if (dictCode.equals("DATECONDITION")) {
                                 metadataMap.put("dictName", "时间");
                             } else {
@@ -425,6 +442,7 @@ public class ResourceIntegratedService extends BaseJpaService {
 
     /**
      * 综合查询指标统计列表树
+     *
      * @param filters
      * @return
      */
@@ -437,7 +455,7 @@ public class ResourceIntegratedService extends BaseJpaService {
             for (TjQuotaCategory quotaCategory : parentList) {
                 Map<String, Object> childMap = getTreeMap(quotaCategory, 0, filters);
                 if (filters != null && !filters.equals("")) {
-                    if(((List<String>) childMap.get("child")).size() > 0) {
+                    if (((List<String>) childMap.get("child")).size() > 0) {
                         resultList.add(childMap);
                     }
                 } else {
@@ -449,7 +467,7 @@ public class ResourceIntegratedService extends BaseJpaService {
     }
 
     public RsResource profileCompleteSave(RsResource rsResource, List<RsResourceMetadata> metadataList, RsResourceDefaultParam resourceDefaultParam) {
-        RsResource newRsResource =  rsResourceDao.save(rsResource);
+        RsResource newRsResource = rsResourceDao.save(rsResource);
         metadataList.forEach(item -> rsResourceMetadataDao.save(item));
         if (resourceDefaultParam != null) {
             resourceDefaultParamDao.save(resourceDefaultParam);
@@ -458,7 +476,7 @@ public class ResourceIntegratedService extends BaseJpaService {
     }
 
     public RsResource quotaCompleteSave(RsResource rsResource, List<RsResourceQuota> resourceQuotaList, RsResourceDefaultParam rsResourceDefaultParam) {
-        RsResource newRsResource =  rsResourceDao.save(rsResource);
+        RsResource newRsResource = rsResourceDao.save(rsResource);
         resourceQuotaList.forEach(item -> rsResourceQuotaDao.save(item));
         if (rsResourceDefaultParam != null) {
             resourceDefaultParamDao.save(rsResourceDefaultParam);

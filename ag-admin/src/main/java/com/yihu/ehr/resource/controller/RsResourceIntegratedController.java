@@ -51,9 +51,11 @@ public class RsResourceIntegratedController extends BaseController {
             @RequestParam(value = "userResource") String userResource,
             @ApiParam(name = "roleId", value = "角色id")
             @RequestParam(value = "roleId") String roleId,
+            @ApiParam(name = "categoryCode", value = "视图分类")
+            @RequestParam(value = "categoryCode") String categoryCode,
             @ApiParam(name="filters",value="过滤条件(name)")
             @RequestParam(value="filters",required = false) String filters) {
-        return resourcesIntegratedClient.getMetadataList(userResource, roleId, filters);
+        return resourcesIntegratedClient.getMetadataList(userResource, roleId,categoryCode, filters);
     }
 
     @ApiOperation("综合查询档案数据检索")
