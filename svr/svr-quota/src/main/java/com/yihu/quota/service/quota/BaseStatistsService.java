@@ -98,10 +98,27 @@ public class BaseStatistsService {
      * @throws Exception
      */
     public List<Map<String, Object>> getQuotaResultList(String code,String dimension,String filter,String dateType, String top) throws Exception {
-        TjQuota tjQuota = quotaService.findByCode(code);
+        code = getBasicQuota(code);
+        List<Map<String, Object>> dimenListResult = new ArrayList<>();
+        if(StringUtils.isNotEmpty(dateType)){
+            dimenListResult = getTimeAggregationResult(code, dimension, filter, dateType);
+        }else {
+            dimenListResult = getAggregationResult(code, dimension, filter, top);
+        }
+        return dimenListResult;
+    }
+
+    /**
+     * 查找指标的最底层指标code
+     * @param quotaCode
+     * @return
+     */
+    public String getBasicQuota(String quotaCode){
+        String code = quotaCode;
+        TjQuota tjQuota = quotaService.findByCode(quotaCode);
         if( tjQuota != null && StringUtils.isNotEmpty(tjQuota.getResultGetType())){
             if (tjQuota.getResultGetType().equals("2")){//二次统计
-                TjQuotaDataSource quotaDataSorce = dataSourceService.findSourceByQuotaCode(code);
+                TjQuotaDataSource quotaDataSorce = dataSourceService.findSourceByQuotaCode(quotaCode);
                 if(quotaDataSorce != null){
                     JSONObject obj = new JSONObject().fromObject(quotaDataSorce.getConfigJson());
                     EsConfig esConfig= (EsConfig) JSONObject.toBean(obj,EsConfig.class);
@@ -111,13 +128,7 @@ public class BaseStatistsService {
                 }
             }
         }
-        List<Map<String, Object>> dimenListResult = new ArrayList<>();
-        if(StringUtils.isNotEmpty(dateType)){
-            dimenListResult = getTimeAggregationResult(code, dimension, filter, dateType);
-        }else {
-            dimenListResult = getAggregationResult(code, dimension, filter, top);
-        }
-        return dimenListResult;
+        return code;
     }
 
 
@@ -1088,9 +1099,11 @@ public class BaseStatistsService {
         String denominatorFilter = filters;
 
         if (StringUtils.isNotEmpty(esConfig.getGrowthFlag())) {
+            //增幅运算（环比和同比）
             result = getGrowthByQuota(dimension, filters, esConfig, dateType);
         } else {
             if (StringUtils.isNotEmpty(esConfig.getDateComparisonType())) {
+                //时间条件处理
                 filters = getdateComparisonTypeFilter(esConfig,filters);
             }
             if( (StringUtils.isNotEmpty(esConfig.getEspecialType())) && esConfig.getEspecialType().equals(orgHealthCategory)){
@@ -1105,6 +1118,55 @@ public class BaseStatistsService {
                 } else {
                     result = divisionQuota(esConfig.getMolecular(), esConfig.getDenominator(), dimension, molecularFilter, denominatorFilter, esConfig.getPercentOperation(), esConfig.getPercentOperationValue(),dateType, top);
                 }
+                //计算除法 合计
+                String moleQuotaCode = getBasicQuota(esConfig.getMolecular());
+                moleQuotaCode = " quotaCode='" + moleQuotaCode.replaceAll("_", "") + "' ";
+                String denoQuotaCode = getBasicQuota(esConfig.getDenominator());
+                denoQuotaCode = " quotaCode='" + denoQuotaCode.replaceAll("_", "") + "' ";
+                if(StringUtils.isEmpty(molecularFilter)){
+                    molecularFilter =  moleQuotaCode;
+                }else {
+                    molecularFilter += " and " + moleQuotaCode;
+                }
+                if(StringUtils.isEmpty(denominatorFilter)){
+                    denominatorFilter =  denoQuotaCode;
+                }else {
+                    denominatorFilter += " and " + denoQuotaCode;
+                }
+                String moleTotalSql = "select sum(result) result from  medical_service_index where " + molecularFilter;
+                String denoTotalSql = "select sum(result) result from  medical_service_index where " + denominatorFilter;
+                double moleTotal = 0;
+                double denoTotal = 0;
+                List<Map<String, Object>> moleListMap = elasticsearchUtil.excuteDataModel(moleTotalSql.toString());
+                if(moleListMap != null &&  moleListMap.size() > 0){
+                    if(moleListMap.get(0).get("result") != null){
+                        moleTotal = Double.valueOf(moleListMap.get(0).get("result").toString());
+                    }
+                }
+                List<Map<String, Object>> denoListMap = elasticsearchUtil.excuteDataModel(denoTotalSql.toString());
+                if(denoListMap != null &&  denoListMap.size() > 0){
+                    if(denoListMap.get(0).get("result") != null){
+                        denoTotal = Double.valueOf(denoListMap.get(0).get("result").toString());
+                    }
+                }
+                double point = 0;
+                DecimalFormat df = new DecimalFormat("0.0");
+                int operation = Integer.valueOf(esConfig.getPercentOperation());
+                int operationValue = Integer.valueOf(esConfig.getPercentOperationValue());
+                if(denoTotal - 0 != 0){
+                    if(moleTotal != 0){
+                        if(operation == 1){
+                            point = (moleTotal/denoTotal) * operationValue;
+                        }else if(operation == 2){
+                            point = (moleTotal/denoTotal) / operationValue;
+                        }
+                    }
+                }
+                Map<String, Object> totalMap = new HashMap<>();
+                totalMap.put(resultField,df.format(point));
+                totalMap.put(dimension,"合计");
+                totalMap.put(firstColumnField,"合计");
+                result.add(totalMap);
             }else if(StringUtils.isNotEmpty(esConfig.getAddOperation())){
                 String firstFilter = handleFilter(esConfig.getAddFirstFilter(), filters);
                 String secondFilter = handleFilter(esConfig.getAddSecondFilter(), filters);
