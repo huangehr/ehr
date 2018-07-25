@@ -32,14 +32,14 @@ public class GovFirstPageReportEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "按月统计门急诊人次")
     @RequestMapping(value = ServiceApi.GovFirsPage.Report.CountEmergencyAttendance, method = RequestMethod.GET)
     public Envelop countEmergencyAttendance(
-            @ApiParam(name = "orgCode", value = "机构编码", required = true)
-            @RequestParam String orgCode,
-            @ApiParam(name = "date", value = "日期（年月），格式：yyyy-MM-dd", required = true)
+            @ApiParam(name = "orgArea", value = "区县编码，全市则不传")
+            @RequestParam(required = false) String orgArea,
+            @ApiParam(name = "date", value = "日期（年月），格式：yyyy-MM", required = true)
             @RequestParam String date) {
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
         try {
-            Long result = govFirstPageReportService.countEmergencyAttendance(orgCode, date);
+            Long result = govFirstPageReportService.countEmergencyAttendance(orgArea, date);
             envelop.setObj(result);
             envelop.setSuccessFlg(true);
         } catch (Exception e) {
@@ -52,14 +52,14 @@ public class GovFirstPageReportEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "按月统计住院人次")
     @RequestMapping(value = ServiceApi.GovFirsPage.Report.CountHospitalizationAttendance, method = RequestMethod.GET)
     public Envelop countHospitalizationAttendance(
-            @ApiParam(name = "orgCode", value = "机构编码", required = true)
-            @RequestParam String orgCode,
-            @ApiParam(name = "date", value = "日期（年月），格式：yyyy-MM-dd", required = true)
+            @ApiParam(name = "orgArea", value = "区县编码，全市则不传")
+            @RequestParam(required = false) String orgArea,
+            @ApiParam(name = "date", value = "日期（年月），格式：yyyy-MM", required = true)
             @RequestParam String date) {
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
         try {
-            Long result = govFirstPageReportService.countHospitalizationAttendance(orgCode, date);
+            Long result = govFirstPageReportService.countHospitalizationAttendance(orgArea, date);
             envelop.setObj(result);
             envelop.setSuccessFlg(true);
         } catch (Exception e) {
@@ -69,57 +69,21 @@ public class GovFirstPageReportEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
-    @ApiOperation(value = "按月统计平均住院日")
-    @RequestMapping(value = ServiceApi.GovFirsPage.Report.AverageHospitalStayDay, method = RequestMethod.GET)
-    public Envelop averageHospitalStayDay(
-            @ApiParam(name = "orgCode", value = "机构编码", required = true)
-            @RequestParam String orgCode,
-            @ApiParam(name = "date", value = "日期（年月），格式：yyyy-MM-dd", required = true)
-            @RequestParam String date) {
-        Envelop envelop = new Envelop();
-        envelop.setSuccessFlg(false);
-        try {
-            Double result = govFirstPageReportService.averageHospitalStayDay(orgCode, date);
-            envelop.setObj(result);
-            envelop.setSuccessFlg(true);
-        } catch (Exception e) {
-            e.printStackTrace();
-            envelop.setErrorMsg("发生异常：" + e.getMessage());
-        }
-        return envelop;
-    }
-
-    @ApiOperation(value = "按月统计住院人次人头比")
-    @RequestMapping(value = ServiceApi.GovFirsPage.Report.StatHospitalizationHeadToHeadRatio, method = RequestMethod.GET)
-    public Envelop statHospitalizationHeadToHeadRatio(
-            @ApiParam(name = "orgCode", value = "机构编码", required = true)
-            @RequestParam String orgCode,
-            @ApiParam(name = "date", value = "日期（年月），格式：yyyy-MM-dd", required = true)
-            @RequestParam String date) {
-        Envelop envelop = new Envelop();
-        envelop.setSuccessFlg(false);
-        try {
-            String result = govFirstPageReportService.statHospitalizationHeadToHeadRatio(orgCode, date);
-            envelop.setObj(result);
-            envelop.setSuccessFlg(true);
-        } catch (Exception e) {
-            e.printStackTrace();
-            envelop.setErrorMsg("发生异常：" + e.getMessage());
-        }
-        return envelop;
-    }
-
-    @ApiOperation(value = "按月统计门急诊费用")
+    @ApiOperation(value = "按月统计门急诊费用、环比增幅")
     @RequestMapping(value = ServiceApi.GovFirsPage.Report.StatEmergencyExpense, method = RequestMethod.GET)
     public Envelop statEmergencyExpense(
-            @ApiParam(name = "orgCode", value = "机构编码", required = true)
-            @RequestParam String orgCode,
-            @ApiParam(name = "date", value = "日期（年月），格式：yyyy-MM-dd", required = true)
+            @ApiParam(name = "orgArea", value = "区县编码，全市则不传")
+            @RequestParam(required = false) String orgArea,
+            @ApiParam(name = "date", value = "日期（年月），格式：yyyy-MM", required = true)
             @RequestParam String date) {
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
         try {
-            String result = govFirstPageReportService.statEmergencyExpense(orgCode, date);
+            Map<String, Object> result = new HashMap<>();
+            String emergencyExpense = govFirstPageReportService.statEmergencyExpense(orgArea, date);
+            String emergencyExpenseRatio = govFirstPageReportService.statEmergencyExpenseRatio(orgArea, date);
+            result.put("emergencyExpense", emergencyExpense);
+            result.put("emergencyExpenseRatio", emergencyExpenseRatio);
             envelop.setObj(result);
             envelop.setSuccessFlg(true);
         } catch (Exception e) {
@@ -129,57 +93,21 @@ public class GovFirstPageReportEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
-    @ApiOperation(value = "按月统计住院费用")
+    @ApiOperation(value = "按月统计住院费用、环比增幅")
     @RequestMapping(value = ServiceApi.GovFirsPage.Report.StatHospitalizationExpense, method = RequestMethod.GET)
     public Envelop statHospitalizationExpense(
-            @ApiParam(name = "orgCode", value = "机构编码", required = true)
-            @RequestParam String orgCode,
-            @ApiParam(name = "date", value = "日期（年月），格式：yyyy-MM-dd", required = true)
+            @ApiParam(name = "orgArea", value = "区县编码，全市则不传")
+            @RequestParam(required = false) String orgArea,
+            @ApiParam(name = "date", value = "日期（年月），格式：yyyy-MM", required = true)
             @RequestParam String date) {
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
         try {
-            String result = govFirstPageReportService.statHospitalizationExpense(orgCode, date);
-            envelop.setObj(result);
-            envelop.setSuccessFlg(true);
-        } catch (Exception e) {
-            e.printStackTrace();
-            envelop.setErrorMsg("发生异常：" + e.getMessage());
-        }
-        return envelop;
-    }
-
-    @ApiOperation(value = "按月统计门急诊人均费用")
-    @RequestMapping(value = ServiceApi.GovFirsPage.Report.AverageEmergencyExpense, method = RequestMethod.GET)
-    public Envelop averageEmergencyExpense(
-            @ApiParam(name = "orgCode", value = "机构编码", required = true)
-            @RequestParam String orgCode,
-            @ApiParam(name = "date", value = "日期（年月），格式：yyyy-MM-dd", required = true)
-            @RequestParam String date) {
-        Envelop envelop = new Envelop();
-        envelop.setSuccessFlg(false);
-        try {
-            String result = govFirstPageReportService.averageEmergencyExpense(orgCode, date);
-            envelop.setObj(result);
-            envelop.setSuccessFlg(true);
-        } catch (Exception e) {
-            e.printStackTrace();
-            envelop.setErrorMsg("发生异常：" + e.getMessage());
-        }
-        return envelop;
-    }
-
-    @ApiOperation(value = "按月统计住院人均费用")
-    @RequestMapping(value = ServiceApi.GovFirsPage.Report.AverageHospitalizationExpense, method = RequestMethod.GET)
-    public Envelop averageHospitalizationExpense(
-            @ApiParam(name = "orgCode", value = "机构编码", required = true)
-            @RequestParam String orgCode,
-            @ApiParam(name = "date", value = "日期（年月），格式：yyyy-MM-dd", required = true)
-            @RequestParam String date) {
-        Envelop envelop = new Envelop();
-        envelop.setSuccessFlg(false);
-        try {
-            String result = govFirstPageReportService.averageHospitalizationExpense(orgCode, date);
+            Map<String, Object> result = new HashMap<>();
+            String hospitalizationExpense = govFirstPageReportService.statHospitalizationExpense(orgArea, date);
+            String hospitalizationExpenseRatio = govFirstPageReportService.statHospitalizationExpenseRatio(orgArea, date);
+            result.put("hospitalizationExpense", hospitalizationExpense);
+            result.put("hospitalizationExpenseRatio", hospitalizationExpenseRatio);
             envelop.setObj(result);
             envelop.setSuccessFlg(true);
         } catch (Exception e) {
@@ -192,14 +120,14 @@ public class GovFirstPageReportEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "按月统计门急诊医药费用")
     @RequestMapping(value = ServiceApi.GovFirsPage.Report.StatEmergencyMedicineExpense, method = RequestMethod.GET)
     public Envelop statEmergencyMedicineExpense(
-            @ApiParam(name = "orgCode", value = "机构编码", required = true)
-            @RequestParam String orgCode,
-            @ApiParam(name = "date", value = "日期（年月），格式：yyyy-MM-dd", required = true)
+            @ApiParam(name = "orgArea", value = "区县编码，全市则不传")
+            @RequestParam(required = false) String orgArea,
+            @ApiParam(name = "date", value = "日期（年月），格式：yyyy-MM", required = true)
             @RequestParam String date) {
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
         try {
-            String result = govFirstPageReportService.statEmergencyMedicineExpense(orgCode, date);
+            String result = govFirstPageReportService.statEmergencyMedicineExpense(orgArea, date);
             envelop.setObj(result);
             envelop.setSuccessFlg(true);
         } catch (Exception e) {
@@ -212,14 +140,14 @@ public class GovFirstPageReportEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "按月统计住院医药费用")
     @RequestMapping(value = ServiceApi.GovFirsPage.Report.StatHospitalizationMedicineExpense, method = RequestMethod.GET)
     public Envelop statHospitalizationMedicineExpense(
-            @ApiParam(name = "orgCode", value = "机构编码", required = true)
-            @RequestParam String orgCode,
-            @ApiParam(name = "date", value = "日期（年月），格式：yyyy-MM-dd", required = true)
+            @ApiParam(name = "orgArea", value = "区县编码，全市则不传")
+            @RequestParam(required = false) String orgArea,
+            @ApiParam(name = "date", value = "日期（年月），格式：yyyy-MM", required = true)
             @RequestParam String date) {
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
         try {
-            String result = govFirstPageReportService.statHospitalizationMedicineExpense(orgCode, date);
+            String result = govFirstPageReportService.statHospitalizationMedicineExpense(orgArea, date);
             envelop.setObj(result);
             envelop.setSuccessFlg(true);
         } catch (Exception e) {
@@ -232,16 +160,16 @@ public class GovFirstPageReportEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "统计近6个月的门急诊、住院人次趋势")
     @RequestMapping(value = ServiceApi.GovFirsPage.Report.StatAttendanceTrend, method = RequestMethod.GET)
     public Envelop statAttendanceTrend(
-            @ApiParam(name = "orgCode", value = "机构编码", required = true)
-            @RequestParam String orgCode,
-            @ApiParam(name = "date", value = "日期（年月），格式：yyyy-MM-dd", required = true)
+            @ApiParam(name = "orgArea", value = "区县编码，全市则不传")
+            @RequestParam(required = false) String orgArea,
+            @ApiParam(name = "date", value = "日期（年月），格式：yyyy-MM", required = true)
             @RequestParam String date) {
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
         try {
             Map<String, Object> result = new HashMap<>();
-            Map<String, Object> emergencyAttendanceTrend = govFirstPageReportService.statAttendanceTrend(orgCode, date, 0);
-            Map<String, Object> hospitalizationAttendanceTrend = govFirstPageReportService.statAttendanceTrend(orgCode, date, 1);
+            Map<String, Object> emergencyAttendanceTrend = govFirstPageReportService.statAttendanceTrend(orgArea, date, 0);
+            Map<String, Object> hospitalizationAttendanceTrend = govFirstPageReportService.statAttendanceTrend(orgArea, date, 1);
             result.put("emergencyAttendanceTrend", emergencyAttendanceTrend);
             result.put("hospitalizationAttendanceTrend", hospitalizationAttendanceTrend);
             envelop.setObj(result);
@@ -256,16 +184,16 @@ public class GovFirstPageReportEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "统计近6个月的门急诊、住院费用趋势")
     @RequestMapping(value = ServiceApi.GovFirsPage.Report.StatExpenseTrend, method = RequestMethod.GET)
     public Envelop statExpenseTrend(
-            @ApiParam(name = "orgCode", value = "机构编码", required = true)
-            @RequestParam String orgCode,
-            @ApiParam(name = "date", value = "日期（年月），格式：yyyy-MM-dd", required = true)
+            @ApiParam(name = "orgArea", value = "区县编码，全市则不传")
+            @RequestParam(required = false) String orgArea,
+            @ApiParam(name = "date", value = "日期（年月），格式：yyyy-MM", required = true)
             @RequestParam String date) {
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
         try {
             Map<String, Object> result = new HashMap<>();
-            Map<String, Object> emergencyExpenseTrend = govFirstPageReportService.statExpenseTrend(orgCode, date, 0);
-            Map<String, Object> hospitalizationExpenseTrend = govFirstPageReportService.statExpenseTrend(orgCode, date, 1);
+            Map<String, Object> emergencyExpenseTrend = govFirstPageReportService.statExpenseTrend(orgArea, date, 0);
+            Map<String, Object> hospitalizationExpenseTrend = govFirstPageReportService.statExpenseTrend(orgArea, date, 1);
             result.put("emergencyExpenseTrend", emergencyExpenseTrend);
             result.put("hospitalizationExpenseTrend", hospitalizationExpenseTrend);
             envelop.setObj(result);
