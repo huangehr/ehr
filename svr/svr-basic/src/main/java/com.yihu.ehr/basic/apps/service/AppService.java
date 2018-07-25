@@ -92,7 +92,7 @@ public class AppService extends BaseJpaService<App, AppDao> {
         app.setStatus("WaitingForApprove");
         OauthClientDetails oauthClientDetails = new OauthClientDetails();
         oauthClientDetails.setClientId(app.getId());
-        oauthClientDetails.setResourceIds("user");
+        oauthClientDetails.setResourceIds("*");
         oauthClientDetails.setClientSecret(app.getSecret());
         oauthClientDetails.setScope("read");
         oauthClientDetails.setAuthorizedGrantTypes("authorization_code,refresh_token,password,implicit,verify_code");

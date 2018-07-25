@@ -143,32 +143,13 @@ public class ElasticSearchEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "type") String type,
             @ApiParam(name = "filter", value = "过滤条件")
             @RequestParam(value = "filter" , required = false) String filter,
-            @ApiParam(name = "page", value = "页码", required = true, defaultValue = "1")
-            @RequestParam(value = "page") int page,
-            @ApiParam(name = "size", value = "分页大小", required = true, defaultValue = "15")
-            @RequestParam(value = "size") int size) throws Exception {
-        List<Map<String, Object>> resultList = elasticSearchUtil.page(index, type, filter, page, size);
-        int count = (int)elasticSearchUtil.count(index, type, filter);
-        Envelop envelop = getPageResult(resultList, count, page, size);
-        return envelop;
-    }
-
-    @RequestMapping(value = ServiceApi.ElasticSearch.PageSort, method = RequestMethod.GET)
-    @ApiOperation(value = "获取结果集,带排序")
-    public Envelop pageSort(
-            @ApiParam(name = "index", value = "索引名称", required = true)
-            @RequestParam(value = "index") String index,
-            @ApiParam(name = "type", value = "索引类型", required = true)
-            @RequestParam(value = "type") String type,
-            @ApiParam(name = "filter", value = "过滤条件")
-            @RequestParam(value = "filter" , required = false) String filter,
             @ApiParam(name = "sorts", value = "排序条件")
             @RequestParam(value = "sorts" , required = false) String sorts,
             @ApiParam(name = "page", value = "页码", required = true, defaultValue = "1")
             @RequestParam(value = "page") int page,
             @ApiParam(name = "size", value = "分页大小", required = true, defaultValue = "15")
             @RequestParam(value = "size") int size) throws Exception {
-        List<Map<String, Object>> resultList = elasticSearchUtil.page(index, type, filter,sorts, page, size);
+        List<Map<String, Object>> resultList = elasticSearchUtil.page(index, type, filter, sorts, page, size);
         int count = (int)elasticSearchUtil.count(index, type, filter);
         Envelop envelop = getPageResult(resultList, count, page, size);
         return envelop;

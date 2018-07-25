@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
-import com.yihu.ehr.dfs.fastdfs.service.FastDFSService;
 import com.yihu.ehr.dfs.fastdfs.service.SystemDictEntryService;
 import com.yihu.ehr.dfs.fastdfs.service.SystemDictService;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
@@ -18,7 +17,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.csource.fastdfs.FileInfo;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -26,8 +24,10 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -54,8 +54,6 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
     private String fastDfsPublicServers;
 
     @Autowired
-    private FastDFSService fastDFSService;
-    @Autowired
     private FastDFSUtil fastDFSUtil;
     @Autowired
     private ElasticSearchUtil elasticSearchUtil;
@@ -65,7 +63,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
     private SystemDictEntryService systemDictEntryService;
 
     /**
-     * 文件上传 - 返回相关索引信息,以及HttpUrl下载连接
+     * 文件上传 - 返回相关索引信息
      * @param file
      * @param creator
      * @param objectId
@@ -73,20 +71,24 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
      */
     @RequestMapping(value = ServiceApi.FastDFS.Upload, method = RequestMethod.POST)
     @ApiOperation(value = "文件上传", notes = "返回相关索引信息,以及HttpUrl下载连接")
-    public Envelop upload(
+    public Envelop upload (
             @ApiParam(name = "file", value = "文件", required = true)
             @RequestPart(value = "file") MultipartFile file,
             @ApiParam(name = "creator", value = "创建者", required = true)
             @RequestParam(value = "creator") String creator,
             @ApiParam(name = "objectId", value = "创建者标识", required = true, defaultValue = "EHR")
             @RequestParam(value = "objectId") String objectId) throws Exception {
-        ObjectNode objectNode;
+        String fileName = file.getOriginalFilename();
+        String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+        if (fileExtension.equals(fileName)) {
+            fileExtension = "file";
+        }
         //上传
-        objectNode = fastDFSService.upload(file);
+        ObjectNode objectNode = fastDFSUtil.upload(file.getInputStream(), fileExtension, "svr-dfs");
         String groupName = objectNode.get(FastDFSUtil.GROUP_NAME).toString();
         String remoteFileName = objectNode.get(FastDFSUtil.REMOTE_FILE_NAME).toString();
         //保存索引到ES库中
-        Map<String, String> paramMap = new HashMap<String, String>();
+        Map<String, String> paramMap = new HashMap<>();
         paramMap.put("fileName", file.getOriginalFilename());
         paramMap.put("creator", creator);
         paramMap.put("objectId", objectId);
@@ -102,26 +104,11 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
             }
             throw e;
         }
-        String path = groupName.substring(1, groupName.length() - 1) + "/" + remoteFileName.substring(1, remoteFileName.length() - 1);
-        if (null == publicServer || publicServer.isEmpty()) {
-            try {
-                publicServer = getPublicUrl().getDetailModelList();
-                if (null != publicServer && !publicServer.isEmpty()) {
-                    String publicUrl = publicServer.get((int) (Math.random() * publicServer.size()));
-                    newSource.put("httpUrl", publicUrl + "/" + path);
-                }
-            } catch (Exception e) {
-                LoggerFactory.getLogger(FastDFSEndPoint.class).error(e.getMessage());
-            }
-        } else {
-            String publicUrl = publicServer.get((int)(Math.random() * publicServer.size()));
-            newSource.put("httpUrl", publicUrl + "/" + path);
-        }
         return success(newSource);
     }
 
     /**
-     * 文件上传 - 返回相关索引信息,以及HttpUrl下载连接 开放接口
+     * 文件上传 - 返回相关索引信息，开放接口
      * @param file
      * @param creator
      * @param objectId
@@ -136,13 +123,17 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "creator") String creator,
             @ApiParam(name = "objectId", value = "创建者标识", required = true, defaultValue = "EHR")
             @RequestParam(value = "objectId") String objectId) throws Exception {
-        ObjectNode objectNode;
+        String fileName = file.getOriginalFilename();
+        String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+        if (fileExtension.equals(fileName)) {
+            fileExtension = "file";
+        }
         //上传
-        objectNode = fastDFSService.upload(file);
+        ObjectNode objectNode = fastDFSUtil.upload(file.getInputStream(), fileExtension, "svr-dfs");
         String groupName = objectNode.get(FastDFSUtil.GROUP_NAME).toString();
         String remoteFileName = objectNode.get(FastDFSUtil.REMOTE_FILE_NAME).toString();
         //保存索引到ES库中
-        Map<String, String> paramMap = new HashMap<String, String>();
+        Map<String, String> paramMap = new HashMap<>();
         paramMap.put("fileName", file.getOriginalFilename());
         paramMap.put("creator", creator);
         paramMap.put("objectId", objectId);
@@ -158,26 +149,11 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
             }
             throw e;
         }
-        String path = groupName.substring(1, groupName.length() - 1) + "/" + remoteFileName.substring(1, remoteFileName.length() - 1);
-        if (null == publicServer || publicServer.isEmpty()) {
-            try {
-                publicServer = getPublicUrl().getDetailModelList();
-                if (null != publicServer && !publicServer.isEmpty()) {
-                    String publicUrl = publicServer.get((int) (Math.random() * publicServer.size()));
-                    newSource.put("httpUrl", publicUrl + "/" + path);
-                }
-            } catch (Exception e) {
-                LoggerFactory.getLogger(FastDFSEndPoint.class).error(e.getMessage());
-            }
-        } else {
-            String publicUrl = publicServer.get((int)(Math.random() * publicServer.size()));
-            newSource.put("httpUrl", publicUrl + "/" + path);
-        }
         return success(newSource);
     }
 
     /**
-     * 文件上传 - 返回相关索引信息,以及HttpUrl下载连接(兼容旧接口)
+     * 文件上传 - 返回相关索引信息，兼容旧接口
      * @param jsonData
      * @return
      * @throws Exception
@@ -188,8 +164,15 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "jsonData", value = "文件资源", required = true)
             @RequestBody String jsonData) throws Exception {
         Map<String, String> paramMap = toEntity(jsonData, Map.class);
-        ObjectNode objectNode;
-        objectNode = fastDFSService.upload(paramMap);
+        String fileStr = paramMap.get("fileStr");
+        byte[] bytes = Base64.getDecoder().decode(fileStr);
+        InputStream inputStream = new ByteArrayInputStream(bytes);
+        String fileName = paramMap.get("fileName");
+        String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+        if (fileExtension.equals(fileName)) {
+            fileExtension = "file";
+        }
+        ObjectNode objectNode = fastDFSUtil.upload(inputStream, fileExtension, "svr-dfs");
         String groupName = objectNode.get(FastDFSUtil.GROUP_NAME).toString();
         String remoteFileName = objectNode.get(FastDFSUtil.REMOTE_FILE_NAME).toString();
         //保存索引到ES库中
@@ -200,31 +183,16 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
         } catch (Exception e) {
             try {
                 fastDFSUtil.delete(groupName, remoteFileName);
-            }catch (Exception e1) {
+            } catch (Exception e1) {
                 throw e1;
             }
             throw e;
-        }
-        String path = groupName.substring(1, groupName.length() - 1) + "/" + remoteFileName.substring(1, remoteFileName.length() - 1);
-        if (null == publicServer || publicServer.isEmpty()) {
-            try {
-                publicServer = getPublicUrl().getDetailModelList();
-                if (null != publicServer && !publicServer.isEmpty()) {
-                    String publicUrl = publicServer.get((int) (Math.random() * publicServer.size()));
-                    newSource.put("httpUrl", publicUrl + "/" + path);
-                }
-            } catch (Exception e) {
-                LoggerFactory.getLogger(FastDFSEndPoint.class).error(e.getMessage());
-            }
-        } else {
-            String publicUrl = publicServer.get((int)(Math.random() * publicServer.size()));
-            newSource.put("httpUrl", publicUrl + "/" + path);
         }
         return success(newSource);
     }
 
     /**
-     * 文件上传 - 返回相关索引信息,以及HttpUrl下载连接(兼容旧接口) 开放接口
+     * 文件上传 - 返回相关索引信息，兼容旧接口，开放接口
      * @param jsonData
      * @return
      * @throws Exception
@@ -235,8 +203,15 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "jsonData", value = "文件资源", required = true)
             @RequestBody String jsonData) throws Exception {
         Map<String, String> paramMap = toEntity(jsonData, Map.class);
-        ObjectNode objectNode;
-        objectNode = fastDFSService.upload(paramMap);
+        String fileStr = paramMap.get("fileStr");
+        byte[] bytes = Base64.getDecoder().decode(fileStr);
+        InputStream inputStream = new ByteArrayInputStream(bytes);
+        String fileName = paramMap.get("fileName");
+        String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+        if (fileExtension.equals(fileName)) {
+            fileExtension = "file";
+        }
+        ObjectNode objectNode = fastDFSUtil.upload(inputStream, fileExtension, "svr-dfs");
         String groupName = objectNode.get(FastDFSUtil.GROUP_NAME).toString();
         String remoteFileName = objectNode.get(FastDFSUtil.REMOTE_FILE_NAME).toString();
         //保存索引到ES库中
@@ -247,25 +222,10 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
         } catch (Exception e) {
             try {
                 fastDFSUtil.delete(groupName, remoteFileName);
-            }catch (Exception e1) {
+            } catch (Exception e1) {
                 throw e1;
             }
             throw e;
-        }
-        String path = groupName.substring(1, groupName.length() - 1) + "/" + remoteFileName.substring(1, remoteFileName.length() - 1);
-        if (null == publicServer || publicServer.isEmpty()) {
-            try {
-                publicServer = getPublicUrl().getDetailModelList();
-                if (null != publicServer && !publicServer.isEmpty()) {
-                    String publicUrl = publicServer.get((int) (Math.random() * publicServer.size()));
-                    newSource.put("httpUrl", publicUrl + "/" + path);
-                }
-            } catch (Exception e) {
-                LoggerFactory.getLogger(FastDFSEndPoint.class).error(e.getMessage());
-            }
-        } else {
-            String publicUrl = publicServer.get((int)(Math.random() * publicServer.size()));
-            newSource.put("httpUrl", publicUrl + "/" + path);
         }
         return success(newSource);
     }
@@ -336,7 +296,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "objectId") String objectId) throws Exception {
         List<Map<String, Object>> resultList = elasticSearchUtil.findByField(indexName, indexType, "objectId", objectId);
         StringBuilder ids = new StringBuilder();
-        for(Map<String, Object> resultMap : resultList) {
+        for (Map<String, Object> resultMap : resultList) {
             String id = resultMap.get("_id").toString();
             ids.append(id + ",");
             String storagePath = resultMap.get("path").toString();
@@ -348,105 +308,6 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
         // 删除索引
         elasticSearchUtil.bulkDelete(indexName, indexType, ids.toString().split(","));
         return success(true);
-    }
-
-    /**
-     * 修改文件 - 返回相关索引信息,以及HttpUrl下载连接
-     * @param file
-     * @param path
-     * @param _id
-     * @param modifier
-     * @return
-     */
-    @RequestMapping(value = ServiceApi.FastDFS.Modify, method = RequestMethod.POST)
-    @ApiOperation(value = "修改文件", notes = "返回相关索引信息,以及HttpUrl下载连接")
-    public Envelop modify(
-            @ApiParam(name = "file", value = "文件", required = true)
-            @RequestPart(value = "file") MultipartFile file,
-            @ApiParam(name = "path", value = "旧文件路径", required = true)
-            @RequestParam(value = "path") String path,
-            @ApiParam(name = "_id", value = "旧文件唯一索引ID", required = true)
-            @RequestParam(value = "_id") String _id,
-            @ApiParam(name = "modifier", value = "修改者", required = true)
-            @RequestParam(value = "modifier") String modifier) throws Exception {
-        Map<String, Object> source = elasticSearchUtil.findById(indexName, indexType, _id);
-        if (null == source) {
-            return failed("无相关文件资源");
-        }
-        if (path.split(":").length < 2) {
-            return failed("参数有误");
-        }
-        // 删除旧文件
-        fastDFSUtil.delete(path.split(":")[0], path.split(":")[1]);
-        // 上传新文件
-        ObjectNode objectNode = fastDFSService.upload(file);
-        // 更新索引
-        String groupName = objectNode.get(FastDFSUtil.GROUP_NAME).toString();
-        String remoteFileName = objectNode.get(FastDFSUtil.REMOTE_FILE_NAME).toString();
-        String name = file.getOriginalFilename();
-        if (!StringUtils.isEmpty(name)) {
-            source.put("name", name);
-        }
-        source.put("modifier", modifier);
-        source.put("path", groupName.substring(1, groupName.length() - 1) + ":" + remoteFileName.substring(1, remoteFileName.length() - 1));
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date now = new Date();
-        String nowStr = dateFormat.format(now);
-        source.put("modifyDate", nowStr);
-        Map<String, Object> resultMap = elasticSearchUtil.update(indexName, indexType, _id, source);
-        String newPath = groupName.substring(1, groupName.length() - 1) + "/" + remoteFileName.substring(1, remoteFileName.length() - 1);
-        if (null == publicServer || publicServer.isEmpty()) {
-            publicServer = getPublicUrl().getDetailModelList();
-        }
-        String publicUrl = publicServer.get((int)(Math.random() * publicServer.size()));
-        resultMap.put("httpUrl", publicUrl + "/" + newPath);
-        return success(resultMap);
-    }
-
-    /**
-     * 修改文件 - 返回相关索引信息,以及HttpUrl下载连接(兼容旧接口)
-     * @param jsonData
-     * @return
-     * @throws Exception
-     */
-    @RequestMapping(value = ServiceApi.FastDFS.OldModify, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "修改文件", notes = "返回相关索引信息,以及HttpUrl下载连接(兼容旧接口)")
-    public Envelop modify(
-            @ApiParam(name = "jsonData", value = "文件资源", required = true)
-            @RequestBody String jsonData) throws Exception {
-        Map<String, String> paramMap = toEntity(jsonData, Map.class);
-        String _id = paramMap.get("_id");
-        Map<String, Object> source = elasticSearchUtil.findById(indexName, indexType, _id);
-        if (null == source) {
-            return failed("无相关文件资源");
-        }
-        // 删除旧文件
-        String oldPath = source.get("path").toString();
-        fastDFSUtil.delete(oldPath.split(":")[0], oldPath.split(":")[1]);
-        // 上传文件
-        ObjectNode objectNode = fastDFSService.upload(paramMap);
-        // 更新索引
-        String groupName = objectNode.get(FastDFSUtil.GROUP_NAME).toString();
-        String remoteFileName = objectNode.get(FastDFSUtil.REMOTE_FILE_NAME).toString();
-        String modifier = paramMap.get("modifier");
-        String name = paramMap.get("fileName");
-        if (!StringUtils.isEmpty(name)) {
-            source.put("name", name);
-        }
-        source.put("modifier", modifier);
-        source.put("path", groupName.substring(1, groupName.length() - 1) + ":" + remoteFileName.substring(1, remoteFileName.length() - 1));
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date now = new Date();
-        String nowStr = dateFormat.format(now);
-        source.put("modifyDate", nowStr);
-        Map<String, Object> resultMap = elasticSearchUtil.update(indexName, indexType, _id, source);
-        String newPath = groupName.substring(1, groupName.length() - 1) + "/" + remoteFileName.substring(1, remoteFileName.length() - 1);
-        if (null == publicServer || publicServer.isEmpty()) {
-            publicServer = getPublicUrl().getDetailModelList();
-        }
-        String publicUrl = publicServer.get((int)(Math.random() * publicServer.size()));
-        resultMap.put("httpUrl", publicUrl + "/" + newPath);
-        return success(resultMap);
     }
 
     /**
@@ -561,9 +422,15 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
         String localFileName = localPath + remoteFileName.replaceAll("/", "_");
         byte[] bytes;
         bytes = fastDFSUtil.download(groupName, remoteFileName);
-        FileOutputStream fileOutputStream = new FileOutputStream(localFileName);
-        fileOutputStream.write(bytes);
-        fileOutputStream.close();
+        FileOutputStream fileOutputStream = null;
+        try {
+            fileOutputStream = new FileOutputStream(localFileName);
+            fileOutputStream.write(bytes);
+        } finally {
+            if (fileOutputStream != null) {
+                fileOutputStream.close();
+            }
+        }
         return success("文件已下载至:" + localFileName);
     }
 
@@ -608,8 +475,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "size") int size) throws Exception {
         List<Map<String, Object>> resultList = elasticSearchUtil.page(indexName, indexType, filter, page, size);
         int count = (int)elasticSearchUtil.count(indexName, indexType, filter);
-        Envelop envelop = getPageResult(resultList, count, page, size);
-        return envelop;
+        return getPageResult(resultList, count, page, size);
     }
 
     /**
@@ -663,6 +529,42 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
         return success(entry);
     }
 
+    /**
+     * 根据系统字典项获取Logo
+     * @param dictId
+     * @param code
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = ServiceApi.FastDFS.GetFileByDictEntry, method = RequestMethod.GET)
+    @ApiOperation(value = "根据系统字典id及系统字典项值获取结果集（logo）")
+    public Envelop getFileByDictEntry(
+            @ApiParam(name = "dictId", value = "字典ID", required = true)
+            @RequestParam(value = "dictId") long dictId,
+            @ApiParam(name = "code", value = "字典项代码", required = true)
+            @RequestParam(value = "code") String code) throws Exception {
+        StringBuffer dictEntryFilter = new StringBuffer();
+        dictEntryFilter.append("dictId=" + dictId + ";");
+        if (!org.apache.commons.lang3.StringUtils.isEmpty(code)) {
+            dictEntryFilter.append("code=" + code + ";");
+        }
+        List<SystemDictEntry> page = systemDictEntryService.search(dictEntryFilter.toString());
+        if (page.size() > 0){
+            SystemDictEntry systemDictEntry=page.get(0);
+            String filter = "sn=" + systemDictEntry.getValue() + ";";
+            List<Map<String, Object>> resultList = elasticSearchUtil.page(indexName, indexType, filter, 1, 1);
+            if (null != resultList && resultList.size() > 0){
+                Map<String, Object> map = resultList.get(0);
+                String path = fastDfsPublicServers + "/" + map.get("path").toString().replace(":","/");
+                map.put("path", path);
+            }
+            int count = (int)elasticSearchUtil.count(indexName, indexType, filter);
+            return getPageResult(resultList, count, 1, 5);
+        } else {
+            return failed("未设置字典项值！");
+        }
+    }
+
     private Map<String, Object> getIndexSource(ObjectNode objectNode, Map<String, String> paramMap) {
         Map<String, Object> source = new HashMap<String, Object>();
         String fileName = paramMap.get("fileName");
@@ -692,50 +594,6 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
         source.put("modifyDate", nowStr);
         source.put("modifier", creator);
         return source;
-    }
-
-
-    /**
-     * 根据系统字典项获取Logo
-     * @param dictId
-     * @param code
-     * @return
-     * @throws Exception
-     */
-    @RequestMapping(value = ServiceApi.FastDFS.GetFileByDictEntry, method = RequestMethod.GET)
-    @ApiOperation(value = "根据系统字典id及系统字典项值获取结果集（logo）")
-    public Envelop getFileByDictEntry(
-            @ApiParam(name = "dictId", value = "字典ID", required = true)
-            @RequestParam(value = "dictId") long dictId,
-            @ApiParam(name = "code", value = "字典项代码", required = true)
-            @RequestParam(value = "code") String code) throws Exception {
-        Envelop envelop;
-        StringBuffer dictEntryFilter = new StringBuffer();
-        dictEntryFilter.append("dictId=" + dictId + ";");
-        if (!org.apache.commons.lang3.StringUtils.isEmpty(code)) {
-            dictEntryFilter.append("code=" + code + ";");
-        }
-        List<SystemDictEntry> page =  systemDictEntryService.search(dictEntryFilter.toString());
-        if(page.size()>0){
-            SystemDictEntry systemDictEntry=page.get(0);
-            String filter="sn="+systemDictEntry.getValue()+";";
-            List<Map<String, Object>> resultList = elasticSearchUtil.page(indexName, indexType, filter, 1, 1);
-            Map<String, Object> map = new HashMap<>();
-            if(null != resultList && resultList.size()>0){
-                map = resultList.get(0);
-                String path =fastDfsPublicServers+"/"+ map.get("path").toString().replace(":","/");
-                map.put("path",path);
-                resultList.remove(0);
-                resultList.add(map);
-            }
-            int count = (int)elasticSearchUtil.count(indexName, indexType, filter);
-            envelop = getPageResult(resultList, count, 1, 5);
-        }else{
-            envelop = new Envelop();
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("未设置字典项值！");
-        }
-        return envelop;
     }
 
 }

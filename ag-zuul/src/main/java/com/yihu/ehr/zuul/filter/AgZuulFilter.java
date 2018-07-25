@@ -12,12 +12,14 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.redis.RedisTokenStore;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.Set;
 
 /**
  * Created by progr1mmer on 2017/12/27
@@ -30,8 +32,6 @@ public class AgZuulFilter extends ZuulFilter {
 
     @Autowired
     private ObjectMapper objectMapper;
-    //@Autowired
-    //private DataSource dataSource;
     @Autowired
     private TokenStore tokenStore;
 
@@ -57,17 +57,21 @@ public class AgZuulFilter extends ZuulFilter {
         String url = request.getRequestURI();
         //内部微服务有不需要认证的地址请在URL上追加/open/来进行过滤，如/api/v1.0/open/**，不要在此继续追加！！！
         if (url.contains("/authentication/")
-                || url.contains("/jkzl/")
                 || url.contains("/file/")
                 || url.contains("/open/")
+                || url.contains("/jkzl/")
                 || url.contains("/fzGateway/")
                 || url.contains("/usersOfApp")
                 || url.contains("/users/h5/handshake")
                 || url.contains("/appVersion/getAppVersion")
                 || url.contains("/messageTemplate/messageOrderPush")
                 || url.contains("/account/")) {
-            return null;
+            return true;
         }
+        return this.authenticate(ctx, request, url);
+    }
+
+    private Object authenticate(RequestContext ctx, HttpServletRequest request, String path) {
         String accessToken = this.extractToken(request);
         if (null == accessToken) {
             return this.forbidden(ctx, HttpStatus.FORBIDDEN.value(), "token can not be null");
@@ -79,8 +83,24 @@ public class AgZuulFilter extends ZuulFilter {
         if (oAuth2AccessToken.isExpired()) {
             return this.forbidden(ctx, HttpStatus.PAYMENT_REQUIRED.value(), "expired token"); //返回402 登陆过期
         }
-        //OAuth2Authentication oAuth2Authentication = tokenStore.readAuthentication(accessToken);
-        return null;
+        //以下代码取消注释可开启Oauth2应用资源授权验证
+        /*OAuth2Authentication auth = tokenStore.readAuthentication(accessToken);
+        Set<String> resourceIds = auth.getOAuth2Request().getResourceIds();
+        for (String resourceId : resourceIds) {
+            if (resourceId.equals("*")) {
+                return true;
+            }
+            if (!resourceId.startsWith("/")) {
+                resourceId = "/" + resourceId;
+            }
+            path = path.toLowerCase();
+            if (path.startsWith(resourceId)
+                    && (path.length() == resourceId.length() || path.charAt(resourceId.length()) == '/')) {
+                return true;
+            }
+        }
+        return this.forbidden(ctx, HttpStatus.FORBIDDEN.value(), "invalid token does not contain request resource " + path);*/
+        return true;
     }
 
     private String extractToken(HttpServletRequest request) {
@@ -103,7 +123,7 @@ public class AgZuulFilter extends ZuulFilter {
             requestContext.setResponseStatusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
             logger.error(e.getMessage());
         }
-        return null;
+        return false;
     }
 
     @Bean
@@ -112,9 +132,4 @@ public class AgZuulFilter extends ZuulFilter {
         return new RedisTokenStore(jedisConnectionFactory);
     }
 
-    /*@Bean
-    @Primary
-    public JdbcTokenStore tokenStore() {
-        return new JdbcTokenStore(dataSource);
-    }*/
 }

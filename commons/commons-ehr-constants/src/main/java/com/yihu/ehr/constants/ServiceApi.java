@@ -1488,8 +1488,6 @@ public class ServiceApi {
         public static final String DeleteById = "/fastDfs/deleteById";
         public static final String DeleteByPath = "/fastDfs/deleteByPath";
         public static final String DeleteByObjectId = "/fastDfs/deleteByObjectId";
-        public static final String Modify = "/fastDfs/modify";
-        public static final String OldModify = "/fastDfs/oldModify";
         public static final String FileInfo = "/fastDfs/fileInfo";
         public static final String DownloadById = "/fastDfs/downloadById";
         public static final String DownloadByPath = "/fastDfs/downloadByPath";
@@ -1512,7 +1510,6 @@ public class ServiceApi {
         public static final String FindById = "/elasticSearch/{id}";
         public static final String FindByField = "/elasticSearch/findByField";
         public static final String Page = "/elasticSearch/page";
-        public static final String PageSort = "/elasticSearch/pageSort";
         public static final String FindBySql = "/elasticSearch/findBySql";
         public static final String DateHistogram = "/elasticSearch/dateHistogram";
 
