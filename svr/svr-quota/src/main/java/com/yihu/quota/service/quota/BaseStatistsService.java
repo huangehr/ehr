@@ -1475,6 +1475,9 @@ public class BaseStatistsService {
         String startQuotaDate = "";
         String endQuotaDate = "";
         String noDateFilter = "";
+        if(StringUtils.isNotEmpty(esConfig.getDenominatorFilter()) ){
+            noDateFilter = esConfig.getDenominatorFilter();
+        }
         if (StringUtils.isNotEmpty(filters) && filters.contains(quotaDateField)) {// 外部指定时间
             String params [] = filters.split("and ");
             for(int i =0 ;i< params.length ;i++){
