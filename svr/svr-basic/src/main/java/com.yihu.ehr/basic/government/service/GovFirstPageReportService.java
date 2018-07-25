@@ -66,7 +66,7 @@ public class GovFirstPageReportService {
         try {
             String firstDate = DateUtil.getFirstDate(date, dateSourceFormat, DateUtil.utcDateTimePattern);
             String lastDate = DateUtil.getLastDate(date, dateSourceFormat, lastDateFormat);
-            String q = String.format("event_type:0 AND event_date:[%s TO %s]", firstDate, lastDate);
+            String q = String.format("event_type:1 AND event_date:[%s TO %s]", firstDate, lastDate);
             if (StringUtils.isNotEmpty(orgArea)) {
                 q += " AND org_area:" + orgArea;
             }
@@ -106,6 +106,8 @@ public class GovFirstPageReportService {
                     valueList.add(count.getCount());
                 }
             }
+            resultMap.put("nameList", nameList);
+            resultMap.put("valueList", valueList);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -133,7 +135,7 @@ public class GovFirstPageReportService {
             FieldStatsInfo statsInfo = solrUtil.getStats(ResourceCore.SubTable, q, null, "EHR_000045");
             Double expense = Double.parseDouble(statsInfo.getSum().toString());
 
-            result = df.format(expense);
+            result = expense == 0 ? "0" : df.format(expense);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -155,13 +157,13 @@ public class GovFirstPageReportService {
 
             // 统计住院费用，说明：HDSD00_68 住院-费用汇总，EHR_000175 住院费用金额
             String q = String.format("rowkey:*$HDSD00_68$* AND event_date:[%s TO %s]", firstDate, lastDate);
-            FieldStatsInfo statsInfo = solrUtil.getStats(ResourceCore.SubTable, q, null, "EHR_000175");
             if (StringUtils.isNotEmpty(orgArea)) {
                 q += " AND org_area:" + orgArea;
             }
+            FieldStatsInfo statsInfo = solrUtil.getStats(ResourceCore.SubTable, q, null, "EHR_000175");
             Double expense = Double.parseDouble(statsInfo.getSum().toString());
 
-            result = df.format(expense);
+            result = expense == 0 ? "0" : df.format(expense);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -187,7 +189,11 @@ public class GovFirstPageReportService {
             Double preExpense = Double.parseDouble(statEmergencyExpense(orgArea, preFirstDate));
 
             // 环比
-            result = df.format((expense - preExpense) / preExpense * 100) + "%";
+            if (preExpense == 0) {
+                result = "--";
+            } else {
+                result = df.format((expense - preExpense) / preExpense * 100) + "%";
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -213,7 +219,11 @@ public class GovFirstPageReportService {
             Double preExpense = Double.parseDouble(statHospitalizationExpense(orgArea, preFirstDate));
 
             // 环比
-            result = df.format((expense - preExpense) / preExpense * 100) + "%";
+            if (preExpense == 0) {
+                result = "--";
+            } else {
+                result = df.format((expense - preExpense) / preExpense * 100) + "%";
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
