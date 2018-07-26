@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.text.DecimalFormat;
 import java.util.*;
 
 /**
@@ -34,6 +35,9 @@ import java.util.*;
 @RequestMapping(value = ApiVersion.Version1_0)
 @Api(description = "统计疾病费用", tags = {"solr跨表数据抽取--统计疾病费用"})
 public class OutPatientCostScheduler {
+
+    DecimalFormat df = new DecimalFormat("#.00");
+
     @Autowired
     private SolrUtil solrUtil;
     @Autowired
@@ -216,13 +220,14 @@ public class OutPatientCostScheduler {
                                     value += Double.parseDouble(map.get(keyCost) + "");
                                 }
                             }
+                            String valueStr = value == 0 ? value.toString() : df.format(value);
                             for (Map.Entry<String, String> m : diseaseName.entrySet()) {
                                 Map<String, Object> costInfo = new HashMap<>();
                                 costInfo.put("_id", rowKeyName.get(m.getKey()) + type.toString());
                                 costInfo.put("type", type);
                                 costInfo.put("code", m.getKey());
                                 costInfo.put("name", m.getValue());
-                                costInfo.put("result", value);
+                                costInfo.put("result", valueStr);
                                 costInfo.put("town", town);
                                 costInfo.put("org", org);
                                 costInfo.put("dept", dept);
