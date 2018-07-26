@@ -5,6 +5,7 @@ import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +27,7 @@ public interface RsResourceIntegratedClient {
     Envelop getMetadataList(
             @RequestParam(value = "userResource") String userResource,
             @RequestParam(value = "roleId") String roleId,
+            @RequestParam(value = "categoryCode") String categoryCode,
             @RequestParam(value = "filters", required = false) String filters);
 
     @ApiOperation("综合查询档案数据检索")

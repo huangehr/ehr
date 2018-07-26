@@ -344,7 +344,7 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
             }
 
             String [] fields = fl.split(",");
-            count = solrQuery.count(core,q);
+            count = solrQuery.count(core,q,null);
             long page = count / PAGE_SIZE_SOLR +1;
             for (int i = 0; i < page; i++) {
                 list = solrQuery.queryReturnFieldList(core, q, null, null, i * PAGE_SIZE_SOLR, PAGE_SIZE_SOLR, fields);
