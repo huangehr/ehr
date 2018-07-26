@@ -345,6 +345,7 @@ public class BaseStatistsService {
                     moleKeyVal = moleKeyVal + "-" + moleMap.get(moleDimensions[i]).toString() ;
                 }
                 map.put(moleDimensions[i], moleMap.get(moleDimensions[i]).toString());
+                map.put(moleDimensions[i]+"Name", moleMap.get(moleDimensions[i]).toString());
             }
             if (moleResultVal == 0) {
                 map.put(resultField,0);
@@ -391,6 +392,7 @@ public class BaseStatistsService {
                     }
                     map.put(firstColumnField, moleMap.get(firstColumnField));
                     map.put(moleDimensions[i], moleMap.get(moleDimensions[i]).toString());
+                    map.put(moleDimensions[i]+"Name", moleMap.get(moleDimensions[i]).toString());
                 }
                 if (moleResultVal == 0) {
                     map.put(resultField,0);
@@ -1475,6 +1477,9 @@ public class BaseStatistsService {
         String startQuotaDate = "";
         String endQuotaDate = "";
         String noDateFilter = "";
+        if(StringUtils.isNotEmpty(esConfig.getDenominatorFilter()) ){
+            noDateFilter = esConfig.getDenominatorFilter();
+        }
         if (StringUtils.isNotEmpty(filters) && filters.contains(quotaDateField)) {// 外部指定时间
             String params [] = filters.split("and ");
             for(int i =0 ;i< params.length ;i++){
@@ -1722,14 +1727,16 @@ public class BaseStatistsService {
                         double last = 0;
                         Map<String,Object> map = new HashMap<>();
                         for(Map<String,Object> dataMap : dataList){
-                            String val = dataMap.get(dimension).toString();
-                            if(val.equals(endQuarter) ){
-                                map.put(firstColumnField, endQuarter);
-                                map.put(dimension, endQuarter);
-                                current = Double.valueOf(dataMap.get(resultField).toString());
-                            }
-                            if(val.equals(lastQuarter) ){
-                                last = Double.valueOf(dataMap.get(resultField).toString());
+                            if(dataMap.get(dimension) != null){
+                                String val = dataMap.get(dimension).toString();
+                                if(val.equals(endQuarter) ){
+                                    map.put(firstColumnField, endQuarter);
+                                    map.put(dimension, endQuarter);
+                                    current = Double.valueOf(dataMap.get(resultField).toString());
+                                }
+                                if(val.equals(lastQuarter) ){
+                                    last = Double.valueOf(dataMap.get(resultField).toString());
+                                }
                             }
                         }
                         if(last == 0){
@@ -1759,14 +1766,16 @@ public class BaseStatistsService {
                         calendar.add(Calendar.MONTH, -1);//当前时间前去一个月，即一个月前的时间
                         String lastMontStr = sdf.format(calendar.getTime()).substring(0,7);
                         for(Map<String,Object> dataMap : dataList){
-                            String val = dataMap.get(dimension).toString();
-                            if(val.equals(nowMonthStr) ){
-                                map.put(firstColumnField, val);
-                                map.put(dimension, val);
-                                current = Double.valueOf(dataMap.get(resultField).toString());
-                            }
-                            if(val.equals(lastMontStr) ){
-                                last = Double.valueOf(dataMap.get(resultField).toString());
+                            if(dataMap.get(dimension) != null){
+                                String val = dataMap.get(dimension).toString();
+                                if(val.equals(nowMonthStr) ){
+                                    map.put(firstColumnField, val);
+                                    map.put(dimension, val);
+                                    current = Double.valueOf(dataMap.get(resultField).toString());
+                                }
+                                if(val.equals(lastMontStr) ){
+                                    last = Double.valueOf(dataMap.get(resultField).toString());
+                                }
                             }
                         }
                         if(last == 0){

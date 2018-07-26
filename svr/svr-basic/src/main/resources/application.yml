@@ -75,6 +75,8 @@ spring:
       password: admin
       authenticationDatabase: admin
       database: ehr
+    solr:
+      zk-host: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com:2181/solr
   elasticsearch:
     jest:
       uris: http://172.19.103.68:9200
@@ -98,3 +100,4 @@ fz-gateway:
   clientVersion: 1.0
   secret: KU5XTORDKZI3O86YAT3ABCNJW2XTL1DJYF3GKU3ICXL
   handlerId: 50871
+
