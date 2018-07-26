@@ -14,6 +14,7 @@ import com.yihu.ehr.basic.user.entity.User;
 import com.yihu.ehr.entity.patient.DemographicInfo;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.query.BaseJpaService;
+import com.yihu.ehr.util.datetime.DateUtil;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Query;
@@ -166,7 +167,7 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
         String header = "INSERT INTO doctors(org_id, org_code, org_full_name, name, SFZJZL, id_card_no, CSRQ, sex, MZDM, CJGZRQ, office_tel, phone, SZKSDM, dept_name, " +
                 "role_type, YSZYZSBM, job_type, job_scope, SFDDDZYYS, DEZYDWJGLB, DSZYDWJGLB, SFHDGJZS, ZYYSZSBM, xzzc, " +
                 "lczc, ZYJSZWDM, XLDM, XWDM, SZYDM, ZKTC1, ZKTC2, ZKTC3, NNRYLDQK, DRDCSJ, " +
-                "BZQK, SFZCQKYX, QDHGZS, XZSQPZGZ, SFCSTJGZ, TJXXHGZ,insert_time) VALUES \n";
+                "BZQK, SFZCQKYX, QDHGZS, XZSQPZGZ, SFCSTJGZ, TJXXHGZ,insert_time,code) VALUES \n";
         StringBuilder sql = new StringBuilder(header) ;
         Map<String, Object> map;
         SQLQuery query;
@@ -214,7 +215,8 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
             sql.append(",'"+ map.get("xzsqpzgz") +"'");
             sql.append(",'"+ map.get("sfcstjgz") +"'");
             sql.append(",'"+ map.get("tjxxhgz") +"'");
-            sql.append(",'"+ new  Date()+"'");
+            sql.append(",'"+ DateUtil.getNowDateTime()+"'");
+            sql.append(",'"+ map.get("idCardNo") +"'");//卫统未提供医生code，以身份证号初始化
             sql.append(")\n");
 
             if(i%100==0 || i == doctorLs.size()){
@@ -242,14 +244,14 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
             demographicInfoRepository.save(demographicInfo);
         }
 
-        Map<String, Object> phoneMap;
-        StringBuffer phonesStr = new StringBuffer();
+        Map<String, Object> idCardNosStrMap;
+        StringBuffer idCardNosStr = new StringBuffer();
         for(int i=1; i<=doctorLs.size(); i++) {
-            phoneMap = doctorLs.get(i - 1);
-            phonesStr.append("\""+phoneMap.get("phone")+"\",");
+            idCardNosStrMap = doctorLs.get(i - 1);
+            idCardNosStr.append("\""+idCardNosStrMap.get("idCardNo")+"\",");
         }
 
-        return phonesStr.toString();
+        return idCardNosStr.toString();
     }
 
     private Object null2Space(Object o){
@@ -422,6 +424,18 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
         }
 
         return syncResultMap;
+    }
+
+
+    /**
+     * 查询根据身份证号码查询医生
+     */
+    public List getIdByIdCardNos(String[] idCardNos)
+    {
+        String sql = "SELECT d.* FROM doctors d WHERE id_card_no in(:idCardNos)";
+        SQLQuery sqlQuery = currentSession().createSQLQuery(sql);
+        sqlQuery.setParameterList("idCardNos", idCardNos);
+        return sqlQuery.list();
     }
 
 }

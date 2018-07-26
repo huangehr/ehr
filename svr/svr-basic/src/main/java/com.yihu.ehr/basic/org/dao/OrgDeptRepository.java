@@ -31,4 +31,7 @@ public interface OrgDeptRepository extends PagingAndSortingRepository<OrgDept, I
 
     @Query("select dept.id from OrgDept dept where dept.code = :code and dept.delFlag = 0")
     List<Integer> findIdByCode(@Param("code") String code);
+
+    @Query("select dept from OrgDept dept where dept.orgId = :orgId and dept.code=:code and dept.delFlag=0 order by dept.sortNo desc ")
+    List<OrgDept> searchByOrgIdAnddeptCode(@Param("orgId") String orgId,@Param("code") String code);
 }
