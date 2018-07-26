@@ -652,8 +652,6 @@ public class ExtractUtil {
             if (organizations != null && organizations.size() > 0) {
                 MOrganization organization = organizations.get(0);
                 if (!StringUtils.isEmpty(organization.getAdministrativeDivision())) {
-                    model.setCity("shangrao");
-                    model.setCityName("上饶市");
                     String orgCode = organization.getAdministrativeDivision().toString();
                     if(townMap.get(orgCode) != null ){
                         model.setTown(orgCode);
@@ -680,9 +678,6 @@ public class ExtractUtil {
                         model.setEconomic("1022");
                         model.setEconomicName("非公立");
                     }
-                } else {
-                    model.setEconomic("0");
-                    model.setEconomicName("未知");
                 }
                 if (!StringUtils.isEmpty(organization.getLevelId())) {
                     String levelId = organization.getLevelId();
@@ -699,9 +694,6 @@ public class ExtractUtil {
                         model.setLevel(levelId);
                         model.setLevelName("未定级");
                     }
-                } else {
-                    model.setLevel("9");
-                    model.setLevelName("未定级");
                 }
             }
         }
