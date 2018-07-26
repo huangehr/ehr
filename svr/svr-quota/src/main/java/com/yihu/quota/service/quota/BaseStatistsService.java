@@ -822,6 +822,9 @@ public class BaseStatistsService {
                 resultList = filteUnKnowSex(resultList, dimension);
             }
         }
+        if(dimension.equals("level")){
+            resultList = filteUnKnowLeve(resultList, dimension);
+        }
         return resultList;
     }
 
@@ -846,7 +849,22 @@ public class BaseStatistsService {
         return  resultList;
     }
 
-
+    /**
+     * 过滤未知的等级
+     * @param dataList
+     * @return
+     */
+    public List<Map<String, Object>> filteUnKnowLeve(List<Map<String, Object>> dataList,String dimension){
+        List<Map<String, Object>> resultList = new ArrayList<>();
+        for(Map<String,Object> map : dataList){
+            if(map.get(dimension) !=null){
+                if( !(map.get(dimension).toString().contains("未知") || map.get(dimension).toString().contains("9")) ){
+                    resultList.add(map);
+                }
+            }
+        }
+        return  resultList;
+    }
 
 
     /**
