@@ -166,7 +166,7 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
         String header = "INSERT INTO doctors(org_id, org_code, org_full_name, name, SFZJZL, id_card_no, CSRQ, sex, MZDM, CJGZRQ, office_tel, phone, SZKSDM, dept_name, " +
                 "role_type, YSZYZSBM, job_type, job_scope, SFDDDZYYS, DEZYDWJGLB, DSZYDWJGLB, SFHDGJZS, ZYYSZSBM, xzzc, " +
                 "lczc, ZYJSZWDM, XLDM, XWDM, SZYDM, ZKTC1, ZKTC2, ZKTC3, NNRYLDQK, DRDCSJ, " +
-                "BZQK, SFZCQKYX, QDHGZS, XZSQPZGZ, SFCSTJGZ, TJXXHGZ) VALUES \n";
+                "BZQK, SFZCQKYX, QDHGZS, XZSQPZGZ, SFCSTJGZ, TJXXHGZ,insert_time) VALUES \n";
         StringBuilder sql = new StringBuilder(header) ;
         Map<String, Object> map;
         SQLQuery query;
@@ -214,6 +214,7 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
             sql.append(",'"+ map.get("xzsqpzgz") +"'");
             sql.append(",'"+ map.get("sfcstjgz") +"'");
             sql.append(",'"+ map.get("tjxxhgz") +"'");
+            sql.append(",'"+ new  Date()+"'");
             sql.append(")\n");
 
             if(i%100==0 || i == doctorLs.size()){
