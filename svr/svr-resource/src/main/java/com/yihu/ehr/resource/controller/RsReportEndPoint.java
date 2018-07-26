@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -188,28 +189,31 @@ public class RsReportEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "filters", value = "筛选条件")
             @RequestParam(value = "filters", required = false) String filters) throws Exception {
         Envelop envelop = new Envelop();
-        List<Integer> categoryIds = rsReportCategoryService.findCategoryIdsByCodeList();
-        if (null != categoryIds && categoryIds.size() > 0) {
-            String pid = "";
-            for (Integer id : categoryIds) {
-                pid += id + ",";
-            }
-            if (!StringUtils.isEmpty(pid)) {
+        String filter = "";
+        List<Map<String, Object>> listMap = new ArrayList<>();
+        List governmentCategoryId = rsReportCategoryService.getGovernmentCategoryId();
+        if (null != governmentCategoryId && governmentCategoryId.size() > 0) {
+            for (int i = 0; i < governmentCategoryId.size(); i++) {
                 if (StringUtils.isNotEmpty(filters)) {
-                    filters += ";reportCategoryId=" + pid.substring(0, pid.length() - 1);
+                    filter = filters + ";status=1;reportCategoryId=" + governmentCategoryId.get(i);
                 } else {
-                    filters += "reportCategoryId=" + pid.substring(0, pid.length() - 1);
+                    filter = "status=1;reportCategoryId=" + governmentCategoryId.get(i);
+                }
+                List<RsReport> rsReports = rsReportService.search(filter);
+                if (null != rsReports && rsReports.size() > 0) {
+                    Map<String, Object> map = new HashMap<>();
+                    for (RsReport report : rsReports) {
+                        String categoryCode = rsReportCategoryService.getCategoryCodeById(report.getReportCategoryId());
+                        report.setReportCategoryTopCode(categoryCode);
+                    }
+                    map.put("name", rsReports.get(0).getReportCategory());
+                    map.put("arr", rsReports);
+                    listMap.add(map);
                 }
             }
         }
-        List<RsReport> rsReports = rsReportService.search(filters);
-        if (null != rsReports && rsReports.size() > 0) {
-            for (RsReport report : rsReports) {
-                String categoryCode = rsReportCategoryService.getCategoryCodeById(report.getReportCategoryId());
-                report.setReportCategoryTopCode(categoryCode);
-            }
-        }
-        envelop.setDetailModelList(rsReports);
+
+        envelop.setDetailModelList(listMap);
         envelop.setSuccessFlg(true);
         return envelop;
     }
