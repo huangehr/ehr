@@ -69,54 +69,9 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
      * @param objectId
      * @return
      */
-    @RequestMapping(value = ServiceApi.FastDFS.Upload, method = RequestMethod.POST)
+    @RequestMapping(value = {ServiceApi.FastDFS.Upload, ServiceApi.FastDFS.OpenUpload}, method = RequestMethod.POST)
     @ApiOperation(value = "文件上传", notes = "返回相关索引信息,以及HttpUrl下载连接")
     public Envelop upload (
-            @ApiParam(name = "file", value = "文件", required = true)
-            @RequestPart(value = "file") MultipartFile file,
-            @ApiParam(name = "creator", value = "创建者", required = true)
-            @RequestParam(value = "creator") String creator,
-            @ApiParam(name = "objectId", value = "创建者标识", required = true, defaultValue = "EHR")
-            @RequestParam(value = "objectId") String objectId) throws Exception {
-        String fileName = file.getOriginalFilename();
-        String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
-        if (fileExtension.equals(fileName)) {
-            fileExtension = "file";
-        }
-        //上传
-        ObjectNode objectNode = fastDFSUtil.upload(file.getInputStream(), fileExtension, "svr-dfs");
-        String groupName = objectNode.get(FastDFSUtil.GROUP_NAME).toString();
-        String remoteFileName = objectNode.get(FastDFSUtil.REMOTE_FILE_NAME).toString();
-        //保存索引到ES库中
-        Map<String, String> paramMap = new HashMap<>();
-        paramMap.put("fileName", file.getOriginalFilename());
-        paramMap.put("creator", creator);
-        paramMap.put("objectId", objectId);
-        Map<String, Object> source = getIndexSource(objectNode, paramMap);
-        Map<String, Object> newSource;
-        try {
-            newSource = elasticSearchUtil.index(indexName, indexType, source);
-        } catch (Exception e) {
-            try {
-                fastDFSUtil.delete(groupName, remoteFileName);
-            } catch (Exception e1) {
-                throw e1;
-            }
-            throw e;
-        }
-        return success(newSource);
-    }
-
-    /**
-     * 文件上传 - 返回相关索引信息，开放接口
-     * @param file
-     * @param creator
-     * @param objectId
-     * @return
-     */
-    @RequestMapping(value = ServiceApi.FastDFS.OpenUpload, method = RequestMethod.POST)
-    @ApiOperation(value = "文件上传", notes = "返回相关索引信息,以及HttpUrl下载连接")
-    public Envelop openUpload(
             @ApiParam(name = "file", value = "文件", required = true)
             @RequestPart(value = "file") MultipartFile file,
             @ApiParam(name = "creator", value = "创建者", required = true)
@@ -158,48 +113,9 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = ServiceApi.FastDFS.OldUpload, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = {ServiceApi.FastDFS.OldUpload, ServiceApi.FastDFS.OpenOldUpload}, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "文件上传", notes = "返回相关索引信息,以及HttpUrl下载连接(兼容旧接口)")
     public Envelop upload(
-            @ApiParam(name = "jsonData", value = "文件资源", required = true)
-            @RequestBody String jsonData) throws Exception {
-        Map<String, String> paramMap = toEntity(jsonData, Map.class);
-        String fileStr = paramMap.get("fileStr");
-        byte[] bytes = Base64.getDecoder().decode(fileStr);
-        InputStream inputStream = new ByteArrayInputStream(bytes);
-        String fileName = paramMap.get("fileName");
-        String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
-        if (fileExtension.equals(fileName)) {
-            fileExtension = "file";
-        }
-        ObjectNode objectNode = fastDFSUtil.upload(inputStream, fileExtension, "svr-dfs");
-        String groupName = objectNode.get(FastDFSUtil.GROUP_NAME).toString();
-        String remoteFileName = objectNode.get(FastDFSUtil.REMOTE_FILE_NAME).toString();
-        //保存索引到ES库中
-        Map<String, Object> source = getIndexSource(objectNode, paramMap);
-        Map<String, Object> newSource;
-        try {
-            newSource = elasticSearchUtil.index(indexName, indexType, source);
-        } catch (Exception e) {
-            try {
-                fastDFSUtil.delete(groupName, remoteFileName);
-            } catch (Exception e1) {
-                throw e1;
-            }
-            throw e;
-        }
-        return success(newSource);
-    }
-
-    /**
-     * 文件上传 - 返回相关索引信息，兼容旧接口，开放接口
-     * @param jsonData
-     * @return
-     * @throws Exception
-     */
-    @RequestMapping(value = ServiceApi.FastDFS.OpenOldUpload, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "文件上传", notes = "返回相关索引信息,以及HttpUrl下载连接(兼容旧接口)")
-    public Envelop openUpload(
             @ApiParam(name = "jsonData", value = "文件资源", required = true)
             @RequestBody String jsonData) throws Exception {
         Map<String, String> paramMap = toEntity(jsonData, Map.class);
@@ -469,11 +385,13 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
     public Envelop page(
             @ApiParam(name = "filter", value = "过滤条件")
             @RequestParam(value = "filter", required = false) String filter,
+            @ApiParam(name = "sorts", value = "排序")
+            @RequestParam(value = "sorts", required = false) String sorts,
             @ApiParam(name = "page", value = "页码", required = true, defaultValue = "1")
             @RequestParam(value = "page") int page,
             @ApiParam(name = "size", value = "分页大小", required = true, defaultValue = "15")
             @RequestParam(value = "size") int size) throws Exception {
-        List<Map<String, Object>> resultList = elasticSearchUtil.page(indexName, indexType, filter, page, size);
+        List<Map<String, Object>> resultList = elasticSearchUtil.page(indexName, indexType, filter, sorts, page, size);
         int count = (int)elasticSearchUtil.count(indexName, indexType, filter);
         return getPageResult(resultList, count, page, size);
     }
