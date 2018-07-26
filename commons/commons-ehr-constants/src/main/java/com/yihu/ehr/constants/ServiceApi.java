@@ -1428,6 +1428,7 @@ public class ServiceApi {
         public static final String CheckName = "/dictionaries/existence";
         public static final String CheckCode = "/dictionaries/checkCode";
         public static final String GetDictEntryByDictIdAndEntryCode = "/open/dictionaries/getDictEntryByDictIdAndEntryCode";
+        public static final String getDictEntryCodeAndValueByDictId = "/dictionaries/getDictEntryCodeAndValueByDictId";
 
     }
 

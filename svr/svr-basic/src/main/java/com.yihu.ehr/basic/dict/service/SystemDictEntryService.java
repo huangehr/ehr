@@ -4,6 +4,7 @@ import com.yihu.ehr.basic.dict.dao.SystemDictEntryRepository;
 import com.yihu.ehr.entity.dict.DictEntryKey;
 import com.yihu.ehr.entity.dict.SystemDictEntry;
 import com.yihu.ehr.query.BaseJpaService;
+import org.hibernate.SQLQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -142,5 +143,16 @@ public class SystemDictEntryService extends BaseJpaService<SystemDictEntry, Syst
     public void deleteDictEntry(long dictId, String code) {
         SystemDictEntryRepository repo = (SystemDictEntryRepository) getJpaRepository();
         repo.delete(new DictEntryKey(code, dictId));
+    }
+
+
+    /**
+     * 根据字典id获取字典项编码和值
+     */
+    public List getDictEntryCodeAndValueByDictId(String dict_id) {
+        String sql = "SELECT code,value FROM system_dict_entries where dict_id=:dict_id";
+        SQLQuery sqlQuery = currentSession().createSQLQuery(sql);
+        sqlQuery.setParameter("dict_id", dict_id);
+        return sqlQuery.list();
     }
 }

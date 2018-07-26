@@ -25,7 +25,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Sand
@@ -173,6 +175,29 @@ public class SystemDictEntryEndPoint extends EnvelopRestEndPoint {
         MDictionaryEntry mDictionaryEntry=convertToModel(systemDictEntry, MDictionaryEntry.class);
         envelop.setObj(mDictionaryEntry);
         envelop.setSuccessFlg(true);
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.SystemDict.getDictEntryCodeAndValueByDictId, method = RequestMethod.GET)
+    @ApiOperation("根据字典id获取所有字典项的code和值")
+    public Envelop getDictEntryCodeAndValueByDictId(
+            @ApiParam(name = "dictId", value = "字典id")
+            @RequestParam(value = "dictId", required = false) String dictId) throws Exception {
+        Envelop envelop = new Envelop();
+        Map<String, String> map = new HashMap<>();
+        List list = systemDictEntryService.getDictEntryCodeAndValueByDictId(dictId);
+        String code = "";
+        String value = "";
+        for (int i = 0; i < list.size(); i++) {
+            Object[] obj = (Object[]) list.get(i);
+            if (null != obj[0] && null != obj[1]) {
+                code = obj[0].toString();
+                value = obj[1].toString();
+                map.put(code, value);
+            }
+        }
+        envelop.setSuccessFlg(true);
+        envelop.setObj(map);
         return envelop;
     }
 

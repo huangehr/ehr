@@ -417,16 +417,27 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
                     deptCode = objectList[37].toString();
                 }
                 int deptId = orgDeptService.getOrgDeptByOrgIdAndDeptCode(orgId, deptCode);
-
+                String deptName="";
+                if (!StringUtils.isEmpty(objectList[27])) {
+                    deptName =objectList[27].toString();
+                }
                 OrgMemberRelation memberRelation = new OrgMemberRelation();
+                // 同步科室医生信息到福州总部，随后返回总部的科室医生信息
+                // 对 主任医师、副主任医师、主治医师、医师 才做同步
+                Map<String, Object> deptDoc = doctorService.syncDoctor(d, String.valueOf(orgId), deptName);
+                if ("10000".equals(deptDoc.get("Code").toString())) {
+                    memberRelation.setJkzlUserId(deptDoc.get("userId").toString());
+                    memberRelation.setJkzlDoctorUid(deptDoc.get("doctorUid").toString());
+                    memberRelation.setJkzlDoctorSn(deptDoc.get("doctorSn").toString());
+                    memberRelation.setJkzlHosDeptId(deptDoc.get("hosDeptId").toString());
+                }
+
                 memberRelation.setOrgId(orgId);
                 if (!StringUtils.isEmpty(objectList[25])) {
                     memberRelation.setOrgName(objectList[25].toString());
                 }
-                memberRelation.setDeptId(deptId);
-                if (!StringUtils.isEmpty(objectList[27])) {
-                    memberRelation.setDeptName(objectList[27].toString());
-                }
+                memberRelation.setDeptId(deptId);//卫统数据-机构没有关联科室，卫生人员提供的科室代码在系统字典中管理--考虑是否改为字典编码值
+                memberRelation.setDeptName(deptName);
                 memberRelation.setUserId(String.valueOf(userId));
                 memberRelation.setUserName(d.getName());
                 memberRelation.setStatus(0);

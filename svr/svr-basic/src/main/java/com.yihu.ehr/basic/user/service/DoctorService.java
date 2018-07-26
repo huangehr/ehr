@@ -382,6 +382,11 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
         int apiVersion = 1;
         Map<String, Object> apiParams = new HashMap<>();
         Organization org = orgService.getOrgById(orgId);
+        if (null==org) {
+            String message = String.format("获取机构失败！orgId="+orgId);
+            logger.error(message);
+            throw new ApiException(message);
+        }
         apiParams.put("orgID", org.getJkzlOrgId());
         apiParams.put("deptName", deptName);
         apiParams.put("doctorName", doctor.getName());
@@ -396,7 +401,7 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
             lczc = "1";
         } else if ("3".equals(doctor.getLczc())) { // 主治医师
             lczc = "2";
-        } else if ("4".equals(doctor.getLczc())) { // 医师
+        } else { // 医师
             lczc = "4";
         }
         apiParams.put("lczc", lczc);
