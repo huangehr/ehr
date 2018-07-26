@@ -195,7 +195,11 @@ public class RsReportEndPoint extends EnvelopRestEndPoint {
                 pid += id + ",";
             }
             if (!StringUtils.isEmpty(pid)) {
-                filters += ";reportCategoryId=" + pid.substring(0, pid.length() - 1);
+                if (StringUtils.isNotEmpty(filters)) {
+                    filters += ";reportCategoryId=" + pid.substring(0, pid.length() - 1);
+                } else {
+                    filters += "reportCategoryId=" + pid.substring(0, pid.length() - 1);
+                }
             }
         }
         List<RsReport> rsReports = rsReportService.search(filters);
