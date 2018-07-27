@@ -2,9 +2,12 @@ package com.yihu.quota.scheduler;
 
 import com.yihu.ehr.profile.core.ResourceCore;
 import com.yihu.ehr.solr.SolrUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.response.Group;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -15,6 +18,8 @@ import java.util.List;
  * @date 2018/7/17 15:31
  */
 class SchedulerUtil {
+
+    private static final Logger logger = LoggerFactory.getLogger(SchedulerUtil.class);
 
     /**
      * 从去重分组结果，收集细表的 rowkey
@@ -35,8 +40,7 @@ class SchedulerUtil {
             for (Group group : groupList) {
                 int groupChildCount = group.getResult().size();
                 SolrDocument firstDoc = group.getResult().get(0);
-                Object fieldValueObj = firstDoc.getFieldValue(distinctFieldName);
-                if (fieldValueObj == null) {
+                if (StringUtils.isEmpty(group.getGroupValue())) {
                     // 记录中去重字段是空值时，每条空值新单独记录到ES
                     long count = solrUtil.count(ResourceCore.SubTable, q, fq);
                     SolrDocumentList nullDocList = solrUtil.query(ResourceCore.SubTable, q, fq, null, 0, count, showFields);
