@@ -273,5 +273,15 @@ public class OrgDeptService extends BaseJpaService<OrgDept, OrgDeptRepository> {
             return null;
         }
     }
+
+    public int getOrgDeptByOrgIdAndDeptCode(String orgId,String code) {
+        List<OrgDept> orgDepts = orgDeptRepository.searchByOrgIdAnddeptCode(orgId, code);
+        if (orgDepts!=null && !orgDepts.isEmpty()){
+            OrgDept orgDept=orgDepts.get(0);
+            return orgDept.getId();
+        }else {
+            return 0;
+        }
+    }
 }
 

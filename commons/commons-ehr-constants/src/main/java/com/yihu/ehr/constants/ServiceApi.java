@@ -1369,6 +1369,8 @@ public class ServiceApi {
         public static final String GetOrgDeptInfoList = "/org/userId/getOrgDeptInfoList";
         public static final String getseaOrgsByOrgCode = "/organizations/seaOrgsByOrgCode";
         public static final String ChildOrgSaasByAreaCode = "/org/childOrgSaasByAreaCode";
+        public static final String getOrgCodeAndFullName = "/org/getOrgCodeAndFullName";
+
 
         // 卫生机构类别
         public static class HealthCategory {
@@ -1426,6 +1428,7 @@ public class ServiceApi {
         public static final String CheckName = "/dictionaries/existence";
         public static final String CheckCode = "/dictionaries/checkCode";
         public static final String GetDictEntryByDictIdAndEntryCode = "/open/dictionaries/getDictEntryByDictIdAndEntryCode";
+        public static final String getDictEntryCodeAndValueByDictId = "/dictionaries/getDictEntryCodeAndValueByDictId";
 
     }
 

@@ -347,4 +347,19 @@ public class OrgService extends BaseJpaService<Organization, OrganizationReposit
         }
         return null;
     }
+
+
+    /**
+     * 查询所有机构的组织机构代码和全称
+     */
+    public List getOrgCodeAndFullName(String field ){
+        String sql ="";
+        if(field.equals("id")){
+            sql= "SELECT org_code,id FROM organizations";
+        }else {
+            sql= "SELECT org_code,full_name FROM organizations";
+        }
+        SQLQuery sqlQuery = currentSession().createSQLQuery(sql);
+        return sqlQuery.list();
+    }
 }

@@ -327,14 +327,13 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
             @RequestBody String doctors) throws Exception {
         List<Map<String, Object>> doctorMapList = objectMapper.readValue(doctors, new TypeReference<List>() {
         });
-        String phones = doctorService.addDoctorBatch(doctorMapList);
+        String idCardNosStr = doctorService.addDoctorBatch(doctorMapList);
 
         List list = new ArrayList<>();
-        if (!"".equals(phones)) {
-            phones = "[" + phones.substring(0, phones.length() - 1) + "]";
-            list = doctorService.getIdByPhone(toEntity(phones, String[].class));
+        if (!"".equals(idCardNosStr)) {
+            idCardNosStr = "[" + idCardNosStr.substring(0, idCardNosStr.length() - 1) + "]";
+            list = doctorService.getIdByIdCardNos(toEntity(idCardNosStr, String[].class));
         }
-        List<Doctors> existPhonesList = new ArrayList<Doctors>();
         Doctors d;
         for (int i = 0; i < list.size(); i++) {
             Object[] objectList = (Object[]) list.get(i);
@@ -343,17 +342,27 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
                 //INSERT INTO users(login_code, real_name, gender, tech_title, email, telephone, password,doctor_id
                 d.setId(Long.parseLong(objectList[0].toString()));
                 d.setName(objectList[3].toString());
-                d.setCode(objectList[2].toString());
+                d.setCode(objectList[22].toString());//卫统没有医生code
                 d.setSex(objectList[5].toString());
-                d.setSkill(objectList[7].toString());
-                d.setEmail(objectList[9].toString());
-                d.setPhone(objectList[10].toString());
+                if (null != objectList[7]) {
+                    d.setSkill(objectList[7].toString());
+                }
+                if (null != objectList[9]) {
+                    d.setEmail(objectList[9].toString());
+                }
+                if (null != objectList[10]) {
+                    d.setPhone(objectList[10].toString());
+                }
                 d.setIdCardNo(objectList[22].toString());
 
                 //根据身份证和电话号码，判断账户表中是否存在该用户。若存在 将用户表与医生表关联；若不存在，为该医生初始化账户。
                 StringBuffer stringBuffer = new StringBuffer();
-                stringBuffer.append("idCardNo=" + d.getIdCardNo() + ";");
-                stringBuffer.append("telephone=" + d.getPhone() + ";");
+                if (!StringUtils.isEmpty(d.getIdCardNo())) {
+                    stringBuffer.append("idCardNo=" + d.getIdCardNo() + ";");
+                }
+                if (!StringUtils.isEmpty(d.getPhone())) {
+                    stringBuffer.append("telephone=" + d.getPhone() + ";");
+                }
                 String filters = stringBuffer.toString();
                 List<User> userList = userManager.search("", filters, "", 1, 1);
                 String userId = "";
@@ -366,7 +375,6 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
                     }
                 } else {
                     //若不存在，为该医生初始化账户。
-//                  existPhonesList.add(d);
                     User user = new User();
                     user.setId(getObjectId(BizObject.User));
                     user.setLoginCode(d.getIdCardNo());
@@ -404,18 +412,31 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
                 if (!StringUtils.isEmpty(objectList[23])) {
                     orgId = objectList[23].toString();
                 }
-                String deptName = "";
-                if (!StringUtils.isEmpty(objectList[27])) {
-                    deptName = objectList[27].toString();
+                String deptCode = "";
+                if (!StringUtils.isEmpty(objectList[37])) {
+                    deptCode = objectList[37].toString();
                 }
-                int deptId = orgDeptService.getOrgDeptByOrgIdAndName(orgId, deptName);
-
+                int deptId = orgDeptService.getOrgDeptByOrgIdAndDeptCode(orgId, deptCode);
+                String deptName="";
+                if (!StringUtils.isEmpty(objectList[27])) {
+                    deptName =objectList[27].toString();
+                }
                 OrgMemberRelation memberRelation = new OrgMemberRelation();
+                // 同步科室医生信息到福州总部，随后返回总部的科室医生信息
+                // 对 主任医师、副主任医师、主治医师、医师 才做同步
+                Map<String, Object> deptDoc = doctorService.syncDoctor(d, String.valueOf(orgId), deptName);
+                if ("10000".equals(deptDoc.get("Code").toString())) {
+                    memberRelation.setJkzlUserId(deptDoc.get("userId").toString());
+                    memberRelation.setJkzlDoctorUid(deptDoc.get("doctorUid").toString());
+                    memberRelation.setJkzlDoctorSn(deptDoc.get("doctorSn").toString());
+                    memberRelation.setJkzlHosDeptId(deptDoc.get("hosDeptId").toString());
+                }
+
                 memberRelation.setOrgId(orgId);
                 if (!StringUtils.isEmpty(objectList[25])) {
                     memberRelation.setOrgName(objectList[25].toString());
                 }
-                memberRelation.setDeptId(deptId);
+                memberRelation.setDeptId(deptId);//卫统数据-机构没有关联科室，卫生人员提供的科室代码在系统字典中管理--考虑是否改为字典编码值
                 memberRelation.setDeptName(deptName);
                 memberRelation.setUserId(String.valueOf(userId));
                 memberRelation.setUserName(d.getName());
@@ -423,9 +444,6 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
                 relationService.save(memberRelation);
             }
         }
-//        if(null!=existPhonesList&&existPhonesList.size()>0){
-//            userManager.addUserBatch(existPhonesList);
-//        }
         return true;
     }
 

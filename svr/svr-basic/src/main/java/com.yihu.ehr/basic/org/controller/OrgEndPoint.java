@@ -125,15 +125,16 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page) throws Exception {
-        filters = filters==null? "": filters;
-        if (StringUtils.isNotEmpty(searchParm)){
-            filters += "orgCode?"+searchParm+" g1;fullName?"+searchParm+" g1;";
+        filters = filters == null ? "" : filters;
+        if (StringUtils.isNotEmpty(searchParm)) {
+            filters += "orgCode?" + searchParm + " g1;fullName?" + searchParm + " g1;";
         }
         List<Organization> list = orgService.search(fields, filters, sorts, page, size);
-        int count = (int)orgService.getCount(filters);
+        int count = (int) orgService.getCount(filters);
         Envelop envelop = getPageResult(list, count, page, size);
         return envelop;
     }
+
     /**
      * 删除机构
      *
@@ -164,12 +165,12 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
         org.setCreateDate(new Date());
         org.setActivityFlag(1);
         org.setPyCode(PinyinUtil.getPinYinHeadChar(org.getFullName(), false));
-        Organization organization=orgService.save(org);
-        String orgId= orgService.getOrgIdByOrgCode(organization.getOrgCode());
+        Organization organization = orgService.save(org);
+        String orgId = orgService.getOrgIdByOrgCode(organization.getOrgCode());
         //添加默认部门
-        OrgDept dept=new OrgDept();
+        OrgDept dept = new OrgDept();
         dept.setOrgId(String.valueOf(orgId));
-        dept.setCode(String.valueOf(orgId)+"1");
+        dept.setCode(String.valueOf(orgId) + "1");
         dept.setName("未分配");
         orgDeptService.saveOrgDept(dept);
         return convertToModel(org, MOrganization.class);
@@ -248,7 +249,7 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
             @PathVariable(value = "org_code") String orgCode,
             @ApiParam(name = "admin_login_code", value = "机构代码", defaultValue = "")
             @PathVariable(value = "admin_login_code") String adminLoginCode) throws Exception {
-        Organization org = orgService.getOrgByAdminLoginCode(orgCode,adminLoginCode);
+        Organization org = orgService.getOrgByAdminLoginCode(orgCode, adminLoginCode);
         MOrganization orgModel = convertToModel(org, MOrganization.class);
         return orgModel;
     }
@@ -272,8 +273,7 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = "/organizations/areas/{area}", method = RequestMethod.GET)
     public List<MOrganization> getOrganizationByAreaCode(
             @ApiParam(name = "area", value = "地区代码", defaultValue = "")
-            @PathVariable(value = "area") String area)
-    {
+            @PathVariable(value = "area") String area) {
         List<Organization> organizationList = orgService.findByOrgArea(area);
         return (List<MOrganization>) convertToModels(organizationList, new ArrayList<MOrganization>(organizationList.size()), MOrganization.class, "");
     }
@@ -319,9 +319,9 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "district", value = "县")
             @RequestParam(value = "district", required = false) String district) {
         List<Organization> orgList = orgService.searchByAddress(province, city, district);
-        if(orgList != null && orgList.size() > 0 ){
+        if (orgList != null && orgList.size() > 0) {
             return (List<MOrganization>) convertToModels(orgList, new ArrayList<MOrganization>(orgList.size()), MOrganization.class, null);
-        }else {
+        } else {
             return null;
         }
     }
@@ -334,7 +334,7 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
         UserSecurity key = userSecurityService.getKeyByOrgCode(orgCode);
         Map<String, String> keyMap = new HashMap<>();
         if (key != null) {
-            List<UserKey> keyMaps =  userSecurityService.getKeyMapByOrgCode(orgCode);
+            List<UserKey> keyMaps = userSecurityService.getKeyMapByOrgCode(orgCode);
             userSecurityService.deleteKey(keyMaps);
         }
 
@@ -356,37 +356,38 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
         return orgService.isExistOrg(orgCode);
     }
 
-    @RequestMapping(value = "/organizations/checkSunOrg" , method = RequestMethod.PUT)
+    @RequestMapping(value = "/organizations/checkSunOrg", method = RequestMethod.PUT)
     @ApiOperation(value = "判断机构是否已经是子机构")
     boolean checkSunOrg(
             @ApiParam(name = "org_pId", value = "org_pId", defaultValue = "")
             @RequestParam(value = "org_pId") String orgPid,
             @ApiParam(name = "org_id", value = "org_id", defaultValue = "")
             @RequestParam(value = "org_id") String orgId) {
-        return orgService.checkSunOrg(orgPid,orgId);
+        return orgService.checkSunOrg(orgPid, orgId);
     }
 
 
     /**
      * 机构资质上传
+     *
      * @return
      * @throws IOException
      */
-    @RequestMapping(value = "/organizations/images",method = RequestMethod.POST)
+    @RequestMapping(value = "/organizations/images", method = RequestMethod.POST)
     @ApiOperation(value = "上传头像,把图片转成流的方式发送")
     public String uploadImages(
             @ApiParam(name = "jsonData", value = "头像转化后的输入流")
-            @RequestBody String jsonData ) throws Exception {
-        if(jsonData == null){
+            @RequestBody String jsonData) throws Exception {
+        if (jsonData == null) {
             return null;
         }
-        String date = URLDecoder.decode(jsonData,"UTF-8");
+        String date = URLDecoder.decode(jsonData, "UTF-8");
 
         String[] fileStreams = date.split(",");
-        String is = URLDecoder.decode(fileStreams[0],"UTF-8").replace(" ","+");
+        String is = URLDecoder.decode(fileStreams[0], "UTF-8").replace(" ", "+");
         byte[] in = Base64.getDecoder().decode(is);
 
-        String pictureName = fileStreams[1].substring(0,fileStreams[1].length()-1);
+        String pictureName = fileStreams[1].substring(0, fileStreams[1].length() - 1);
         String fileExtension = pictureName.substring(pictureName.lastIndexOf(".") + 1).toLowerCase();
         String description = null;
         if ((pictureName != null) && (pictureName.length() > 0)) {
@@ -400,7 +401,7 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
         String groupName = objectNode.get("groupName").toString();
         String remoteFileName = objectNode.get("remoteFileName").toString();
 //        String path = "{\"groupName\":" + groupName + ",\"remoteFileName\":" + remoteFileName + "}";
-        String path = groupName.substring(1,groupName.length()-1) + ":" + remoteFileName.substring(1,remoteFileName.length()-1);
+        String path = groupName.substring(1, groupName.length() - 1) + ":" + remoteFileName.substring(1, remoteFileName.length() - 1);
         //返回文件路径
         return path;
     }
@@ -408,9 +409,10 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
 
     /**
      * 机构资质下载
+     *
      * @return
      */
-    @RequestMapping(value = "/organizations/images",method = RequestMethod.GET)
+    @RequestMapping(value = "/organizations/images", method = RequestMethod.GET)
     @ApiOperation(value = "下载头像")
     public String downloadPicture(
             @ApiParam(name = "group_name", value = "分组", defaultValue = "")
@@ -429,9 +431,10 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
     public List<Organization> getAllSaasOrgs(
             @ApiParam(name = "saasName", value = "名称", defaultValue = "")
             @RequestParam(value = "saasName", required = false) String saasName) throws Exception {
-                List<Organization> orgs = orgService.getAllSaasOrgs(saasName);
-                return orgs;
-            }
+        List<Organization> orgs = orgService.getAllSaasOrgs(saasName);
+        return orgs;
+    }
+
     /**
      * 根据机构ID获取机构
      *
@@ -458,27 +461,30 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
     @ApiOperation("批量导入机构")
     public boolean createOrgBatch(
             @ApiParam(name = "orgs", value = "JSON", defaultValue = "")
-            @RequestBody String orgs) throws Exception{
-        List models = objectMapper.readValue(orgs, new TypeReference<List>() {});
+            @RequestBody String orgs) throws Exception {
+        List models = objectMapper.readValue(orgs, new TypeReference<List>() {
+        });
         orgService.addOrgBatch(models);
         return true;
     }
 
     @RequestMapping(value = ServiceApi.Org.getseaOrgsByOrgCode, method = RequestMethod.POST)
     @ApiOperation("根据机构code获取机构code和name")
-    public Map<String,String> seaOrgsByOrgCode(
+    public Map<String, String> seaOrgsByOrgCode(
             @ApiParam(name = "org_codes", value = "机构org_codes", defaultValue = "")
-            @RequestBody String org_codes)throws Exception{
+            @RequestBody String org_codes) throws Exception {
         Map<String, String> map = new HashMap<>();
-        List<Object> list = (List<Object>)orgService.orgExist(toEntity(org_codes, String[].class));
-            for(int i = 0 ;i < list.size() ; i++){
-                Object[] objectList=(Object[])list.get(i);
-                if(null!=objectList[0]&&null!=objectList[1]){
-                    map.put(objectList[0].toString(), objectList[1].toString());
-                }
+        List<Object> list = (List<Object>) orgService.orgExist(toEntity(org_codes, String[].class));
+        for (int i = 0; i < list.size(); i++) {
+            Object[] objectList = (Object[]) list.get(i);
+            if (null != objectList[0] && null != objectList[1]) {
+                map.put(objectList[0].toString(), objectList[1].toString());
             }
-        return  map;
-    };
+        }
+        return map;
+    }
+
+    ;
 
     @RequestMapping(value = "/organizations/getHospital", method = RequestMethod.GET)
     @ApiOperation(value = "查询所有经纬度医院列表")
@@ -488,7 +494,7 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
             List<Organization> orgs = orgService.getHospital();
             envelop.setSuccessFlg(true);
             envelop.setDetailModelList(orgs);
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg(e.getMessage());
@@ -513,7 +519,7 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
             }
             envelop.setSuccessFlg(true);
             envelop.setDetailModelList(orgList);
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg(e.getMessage());
@@ -550,9 +556,32 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
                 map.put("children", childListMap);
                 listMap.add(map);
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return listMap;
+    }
+
+    @RequestMapping(value = ServiceApi.Org.getOrgCodeAndFullName, method = RequestMethod.GET)
+    @ApiOperation("获取所有机构的机构组织机构代码和名称")
+    public Envelop getOrgCodeAndFullName(
+            @ApiParam(name = "field", value = "作为key值得字段")
+            @RequestParam(value = "field", required = false) String field) throws Exception {
+        Envelop envelop = new Envelop();
+        Map<String, String> map = new HashMap<>();
+        List list = orgService.getOrgCodeAndFullName(field);
+        String orgCode = "";
+        String fullName = "";
+        for (int i = 0; i < list.size(); i++) {
+            Object[] obj = (Object[]) list.get(i);
+            if (null != obj[0] && null != obj[1]) {
+                orgCode = obj[0].toString();
+                fullName = obj[1].toString();
+                map.put(orgCode, fullName);
+            }
+        }
+        envelop.setSuccessFlg(true);
+        envelop.setObj(map);
+        return envelop;
     }
 }

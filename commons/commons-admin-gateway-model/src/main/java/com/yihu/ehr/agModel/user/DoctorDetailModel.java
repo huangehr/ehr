@@ -37,32 +37,32 @@ public class DoctorDetailModel {
     private String jobScope; // 参考系统字典 执业范围
     private String jobState; // 参考系统字典 执业状态
     private String registerFlag; // 是否考试库连带注册-数据手动导入。默认0为是，1为否
-    private String SFZJZL;    //身份证件种类 ,代码：身份证件类别
-    private String CSRQ;    //出生日期 ,格式为：YYYYMMDD，例如：20131125
-    private String MZDM;    //民族代码 ,代码：民族代码
-    private String CJGZRQ;    //参加工作日期 ,格式为：YYYYMMDD，例如：20131125
-    private String SZKSDM;    //所在科室代码 ,代码：所在科室代码
-    private String YSZYZSBM;    //医师/卫生监督员执业证书编码 ,
-    private String SFDDDZYYS;    //是否多地点执业医师 ,代码：是否不确定代码
-    private String DEZYDWJGLB;    //第2执业单位的机构类别 ,代码：多点执业单位的机构类别
-    private String DSZYDWJGLB;    //第3执业单位的机构类别 ,代码：多点执业单位的机构类别
-    private String SFHDGJZS;    //是否获得国家住院医师规范化培训合格证书 ,代码：是否不确定代码
-    private String ZYYSZSBM;    //住院医师规范化培训合格证书编码 ,填写证书编码
-    private String ZYJSZWDM;    //专业技术职务(聘)代码 ,代码：聘任专业技术职务代码
-    private String XLDM;    //学历代码 ,代码：学历代码
-    private String XWDM;    //学位代码 ,代码：学位代码
-    private String SZYDM;    //所学专业代码 ,代码：所学专业代码
-    private String ZKTC1;    //专科特长1
-    private String ZKTC2;    //专科特长2
-    private String ZKTC3;    //专科特长3
-    private String NNRYLDQK;    //年内人员流动情况 ,代码：调动情况代码
-    private String DRDCSJ;    //调入/调出时间 ,格式为：YYYYMMDD，例如：20131125
-    private String BZQK;    //编制情况 ,代码：编制情况
-    private String SFZCQKYX;    //是否注册为全科医学专业 ,代码：是否不确定代码
-    private String QDHGZS;    //全科医生取得培训合格证书情况 ,代码：全科医生培训合格证书
-    private String XZSQPZGZ;    //是否由乡镇卫生院或社区卫生服务机构派驻村卫生室工作 ,代码：是否不确定代码
-    private String SFCSTJGZ;    //是否从事统计信息化业务工作 ,代码：是否不确定代码
-    private String TJXXHGZ;    //统计信息化业务工作 ,代码: 统计信息化业务工作
+    private String sfzjzl;    //身份证件种类 ,代码：身份证件类别
+    private String csrq;    //出生日期 ,格式为：YYYYMMDD，例如：20131125
+    private String mzdm;    //民族代码 ,代码：民族代码
+    private String cjgzrq;    //参加工作日期 ,格式为：YYYYMMDD，例如：20131125
+    private String szksdm;    //所在科室代码 ,代码：所在科室代码
+    private String yszyzsbm;    //医师/卫生监督员执业证书编码 ,
+    private String sfdddzyys;    //是否多地点执业医师 ,代码：是否不确定代码
+    private String dezydwjglb;    //第2执业单位的机构类别 ,代码：多点执业单位的机构类别
+    private String dszydwjglb;    //第3执业单位的机构类别 ,代码：多点执业单位的机构类别
+    private String sfhdgjzs;    //是否获得国家住院医师规范化培训合格证书 ,代码：是否不确定代码
+    private String zyyszsbm;    //住院医师规范化培训合格证书编码 ,填写证书编码
+    private String zyjszwdm;    //专业技术职务(聘)代码 ,代码：聘任专业技术职务代码
+    private String xldm;    //学历代码 ,代码：学历代码
+    private String xwdm;    //学位代码 ,代码：学位代码
+    private String szydm;    //所学专业代码 ,代码：所学专业代码
+    private String zktc1;    //专科特长1
+    private String zktc2;    //专科特长2
+    private String zktc3;    //专科特长3
+    private String nnryldqk;    //年内人员流动情况 ,代码：调动情况代码
+    private String drdcsj;    //调入/调出时间 ,格式为：YYYYMMDD，例如：20131125
+    private String bzqk;    //编制情况 ,代码：编制情况
+    private String sfzcqkyx;    //是否注册为全科医学专业 ,代码：是否不确定代码
+    private String qdhgzs;    //全科医生取得培训合格证书情况 ,代码：全科医生培训合格证书
+    private String xzsqpzgz;    //是否由乡镇卫生院或社区卫生服务机构派驻村卫生室工作 ,代码：是否不确定代码
+    private String sfcstjgz;    //是否从事统计信息化业务工作 ,代码：是否不确定代码
+    private String tjxxhgz;    //统计信息化业务工作 ,代码: 统计信息化业务工作
 
     private String lczcName;
 
@@ -338,211 +338,211 @@ public class DoctorDetailModel {
         this.lczcName = lczcName;
     }
 
-    public String getSFZJZL() {
-        return SFZJZL;
+    public String getSfzjzl() {
+        return sfzjzl;
     }
 
-    public void setSFZJZL(String SFZJZL) {
-        this.SFZJZL = SFZJZL;
+    public void setSfzjzl(String sfzjzl) {
+        this.sfzjzl = sfzjzl;
     }
 
-    public String getCSRQ() {
-        return CSRQ;
+    public String getCsrq() {
+        return csrq;
     }
 
-    public void setCSRQ(String CSRQ) {
-        this.CSRQ = CSRQ;
+    public void setCsrq(String csrq) {
+        this.csrq = csrq;
     }
 
-    public String getMZDM() {
-        return MZDM;
+    public String getMzdm() {
+        return mzdm;
     }
 
-    public void setMZDM(String MZDM) {
-        this.MZDM = MZDM;
+    public void setMzdm(String mzdm) {
+        this.mzdm = mzdm;
     }
 
-    public String getCJGZRQ() {
-        return CJGZRQ;
+    public String getCjgzrq() {
+        return cjgzrq;
     }
 
-    public void setCJGZRQ(String CJGZRQ) {
-        this.CJGZRQ = CJGZRQ;
+    public void setCjgzrq(String cjgzrq) {
+        this.cjgzrq = cjgzrq;
     }
 
-    public String getSZKSDM() {
-        return SZKSDM;
+    public String getSzksdm() {
+        return szksdm;
     }
 
-    public void setSZKSDM(String SZKSDM) {
-        this.SZKSDM = SZKSDM;
+    public void setSzksdm(String szksdm) {
+        this.szksdm = szksdm;
     }
 
-    public String getYSZYZSBM() {
-        return YSZYZSBM;
+    public String getYszyzsbm() {
+        return yszyzsbm;
     }
 
-    public void setYSZYZSBM(String YSZYZSBM) {
-        this.YSZYZSBM = YSZYZSBM;
+    public void setYszyzsbm(String yszyzsbm) {
+        this.yszyzsbm = yszyzsbm;
     }
 
-    public String getSFDDDZYYS() {
-        return SFDDDZYYS;
+    public String getSfdddzyys() {
+        return sfdddzyys;
     }
 
-    public void setSFDDDZYYS(String SFDDDZYYS) {
-        this.SFDDDZYYS = SFDDDZYYS;
+    public void setSfdddzyys(String sfdddzyys) {
+        this.sfdddzyys = sfdddzyys;
     }
 
-    public String getDEZYDWJGLB() {
-        return DEZYDWJGLB;
+    public String getDezydwjglb() {
+        return dezydwjglb;
     }
 
-    public void setDEZYDWJGLB(String DEZYDWJGLB) {
-        this.DEZYDWJGLB = DEZYDWJGLB;
+    public void setDezydwjglb(String dezydwjglb) {
+        this.dezydwjglb = dezydwjglb;
     }
 
-    public String getDSZYDWJGLB() {
-        return DSZYDWJGLB;
+    public String getDszydwjglb() {
+        return dszydwjglb;
     }
 
-    public void setDSZYDWJGLB(String DSZYDWJGLB) {
-        this.DSZYDWJGLB = DSZYDWJGLB;
+    public void setDszydwjglb(String dszydwjglb) {
+        this.dszydwjglb = dszydwjglb;
     }
 
-    public String getSFHDGJZS() {
-        return SFHDGJZS;
+    public String getSfhdgjzs() {
+        return sfhdgjzs;
     }
 
-    public void setSFHDGJZS(String SFHDGJZS) {
-        this.SFHDGJZS = SFHDGJZS;
+    public void setSfhdgjzs(String sfhdgjzs) {
+        this.sfhdgjzs = sfhdgjzs;
     }
 
-    public String getZYYSZSBM() {
-        return ZYYSZSBM;
+    public String getZyyszsbm() {
+        return zyyszsbm;
     }
 
-    public void setZYYSZSBM(String ZYYSZSBM) {
-        this.ZYYSZSBM = ZYYSZSBM;
+    public void setZyyszsbm(String zyyszsbm) {
+        this.zyyszsbm = zyyszsbm;
     }
 
-    public String getZYJSZWDM() {
-        return ZYJSZWDM;
+    public String getZyjszwdm() {
+        return zyjszwdm;
     }
 
-    public void setZYJSZWDM(String ZYJSZWDM) {
-        this.ZYJSZWDM = ZYJSZWDM;
+    public void setZyjszwdm(String zyjszwdm) {
+        this.zyjszwdm = zyjszwdm;
     }
 
-    public String getXLDM() {
-        return XLDM;
+    public String getXldm() {
+        return xldm;
     }
 
-    public void setXLDM(String XLDM) {
-        this.XLDM = XLDM;
+    public void setXldm(String xldm) {
+        this.xldm = xldm;
     }
 
-    public String getXWDM() {
-        return XWDM;
+    public String getXwdm() {
+        return xwdm;
     }
 
-    public void setXWDM(String XWDM) {
-        this.XWDM = XWDM;
+    public void setXwdm(String xwdm) {
+        this.xwdm = xwdm;
     }
 
-    public String getSZYDM() {
-        return SZYDM;
+    public String getSzydm() {
+        return szydm;
     }
 
-    public void setSZYDM(String SZYDM) {
-        this.SZYDM = SZYDM;
+    public void setSzydm(String szydm) {
+        this.szydm = szydm;
     }
 
-    public String getZKTC1() {
-        return ZKTC1;
+    public String getZktc1() {
+        return zktc1;
     }
 
-    public void setZKTC1(String ZKTC1) {
-        this.ZKTC1 = ZKTC1;
+    public void setZktc1(String zktc1) {
+        this.zktc1 = zktc1;
     }
 
-    public String getZKTC2() {
-        return ZKTC2;
+    public String getZktc2() {
+        return zktc2;
     }
 
-    public void setZKTC2(String ZKTC2) {
-        this.ZKTC2 = ZKTC2;
+    public void setZktc2(String zktc2) {
+        this.zktc2 = zktc2;
     }
 
-    public String getZKTC3() {
-        return ZKTC3;
+    public String getZktc3() {
+        return zktc3;
     }
 
-    public void setZKTC3(String ZKTC3) {
-        this.ZKTC3 = ZKTC3;
+    public void setZktc3(String zktc3) {
+        this.zktc3 = zktc3;
     }
 
-    public String getNNRYLDQK() {
-        return NNRYLDQK;
+    public String getNnryldqk() {
+        return nnryldqk;
     }
 
-    public void setNNRYLDQK(String NNRYLDQK) {
-        this.NNRYLDQK = NNRYLDQK;
+    public void setNnryldqk(String nnryldqk) {
+        this.nnryldqk = nnryldqk;
     }
 
-    public String getDRDCSJ() {
-        return DRDCSJ;
+    public String getDrdcsj() {
+        return drdcsj;
     }
 
-    public void setDRDCSJ(String DRDCSJ) {
-        this.DRDCSJ = DRDCSJ;
+    public void setDrdcsj(String drdcsj) {
+        this.drdcsj = drdcsj;
     }
 
-    public String getBZQK() {
-        return BZQK;
+    public String getBzqk() {
+        return bzqk;
     }
 
-    public void setBZQK(String BZQK) {
-        this.BZQK = BZQK;
+    public void setBzqk(String bzqk) {
+        this.bzqk = bzqk;
     }
 
-    public String getSFZCQKYX() {
-        return SFZCQKYX;
+    public String getSfzcqkyx() {
+        return sfzcqkyx;
     }
 
-    public void setSFZCQKYX(String SFZCQKYX) {
-        this.SFZCQKYX = SFZCQKYX;
+    public void setSfzcqkyx(String sfzcqkyx) {
+        this.sfzcqkyx = sfzcqkyx;
     }
 
-    public String getQDHGZS() {
-        return QDHGZS;
+    public String getQdhgzs() {
+        return qdhgzs;
     }
 
-    public void setQDHGZS(String QDHGZS) {
-        this.QDHGZS = QDHGZS;
+    public void setQdhgzs(String qdhgzs) {
+        this.qdhgzs = qdhgzs;
     }
 
-    public String getXZSQPZGZ() {
-        return XZSQPZGZ;
+    public String getXzsqpzgz() {
+        return xzsqpzgz;
     }
 
-    public void setXZSQPZGZ(String XZSQPZGZ) {
-        this.XZSQPZGZ = XZSQPZGZ;
+    public void setXzsqpzgz(String xzsqpzgz) {
+        this.xzsqpzgz = xzsqpzgz;
     }
 
-    public String getSFCSTJGZ() {
-        return SFCSTJGZ;
+    public String getSfcstjgz() {
+        return sfcstjgz;
     }
 
-    public void setSFCSTJGZ(String SFCSTJGZ) {
-        this.SFCSTJGZ = SFCSTJGZ;
+    public void setSfcstjgz(String sfcstjgz) {
+        this.sfcstjgz = sfcstjgz;
     }
 
-    public String getTJXXHGZ() {
-        return TJXXHGZ;
+    public String getTjxxhgz() {
+        return tjxxhgz;
     }
 
-    public void setTJXXHGZ(String TJXXHGZ) {
-        this.TJXXHGZ = TJXXHGZ;
+    public void setTjxxhgz(String tjxxhgz) {
+        this.tjxxhgz = tjxxhgz;
     }
 }

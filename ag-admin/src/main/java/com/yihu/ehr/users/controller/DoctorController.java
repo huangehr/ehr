@@ -81,8 +81,8 @@ public class DoctorController extends BaseController {
         List<DoctorDetailModel> doctorsModels = new ArrayList<>();
         for (MDoctor mDoctor : mDoctors) {
             DoctorDetailModel doctorsModel = convertToModel(mDoctor, DoctorDetailModel.class);
-            doctorsModel.setInsertTime(mDoctor.getInsertTime() == null?"": DateTimeUtil.simpleDateTimeFormat(mDoctor.getInsertTime()));
-            doctorsModel.setUpdateTime(mDoctor.getUpdateTime() == null?"": DateTimeUtil.simpleDateTimeFormat(mDoctor.getUpdateTime()));
+            doctorsModel.setInsertTime(mDoctor.getInsertTime() == null ? "" : DateTimeUtil.simpleDateTimeFormat(mDoctor.getInsertTime()));
+            doctorsModel.setUpdateTime(mDoctor.getUpdateTime() == null ? "" : DateTimeUtil.simpleDateTimeFormat(mDoctor.getUpdateTime()));
             //性别
             if (StringUtils.isNotEmpty(mDoctor.getSex())) {
                 MConventionalDict dict = conventionalDictClient.getGender(mDoctor.getSex());
@@ -105,9 +105,9 @@ public class DoctorController extends BaseController {
     @RequestMapping(value = "/doctor/existence", method = RequestMethod.GET)
     @ApiOperation(value = "医生属性唯一性验证", notes = "医生属性唯一性验证（用户名）")
     public Envelop existence(
-            @ApiParam(name = "existenceType",value = "", defaultValue = "")
+            @ApiParam(name = "existenceType", value = "", defaultValue = "")
             @RequestParam(value = "existenceType") String existenceType,
-            @ApiParam(name = "existenceNm",value = "", defaultValue = "")
+            @ApiParam(name = "existenceNm", value = "", defaultValue = "")
             @RequestParam(value = "existenceNm") String existenceNm) {
         try {
             Envelop envelop = new Envelop();
@@ -120,27 +120,26 @@ public class DoctorController extends BaseController {
                     bo = doctorClient.isCardNoExists(existenceNm);
                     break;
                 case "phone":
-                   String ph="phone="+existenceNm;
+                    String ph = "phone=" + existenceNm;
                     bo = doctorClient.isExistence(ph);
-                    boolean uf=userClient.isTelephoneExists(existenceNm);
-                    if(bo==true || uf==true){
-                        bo=true;
+                    boolean uf = userClient.isTelephoneExists(existenceNm);
+                    if (bo == true || uf == true) {
+                        bo = true;
                     }
                     break;
                 case "email":
-                    String email="email="+existenceNm;
+                    String email = "email=" + existenceNm;
                     bo = doctorClient.isExistence(email);
-                    boolean emailFlag=userClient.isEmailExists(existenceNm);
-                    if(bo==true || emailFlag==true){
-                        bo=true;
+                    boolean emailFlag = userClient.isEmailExists(existenceNm);
+                    if (bo == true || emailFlag == true) {
+                        bo = true;
                     }
                     break;
             }
             envelop.setSuccessFlg(bo);
 
             return envelop;
-        }
-        catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
             return failedSystem();
         }
@@ -158,16 +157,15 @@ public class DoctorController extends BaseController {
             }
 
             DoctorDetailModel detailModel = convertToModel(mDoctor, DoctorDetailModel.class);
-            detailModel.setInsertTime(mDoctor.getInsertTime() == null?"": DateTimeUtil.simpleDateTimeFormat(mDoctor.getInsertTime()));
-            detailModel.setUpdateTime(mDoctor.getUpdateTime() == null?"": DateTimeUtil.simpleDateTimeFormat(mDoctor.getUpdateTime()));
+            detailModel.setInsertTime(mDoctor.getInsertTime() == null ? "" : DateTimeUtil.simpleDateTimeFormat(mDoctor.getInsertTime()));
+            detailModel.setUpdateTime(mDoctor.getUpdateTime() == null ? "" : DateTimeUtil.simpleDateTimeFormat(mDoctor.getUpdateTime()));
 
             Envelop envelop = success(detailModel);
             String userId = userClient.getUserIdByIdCardNo(detailModel.getIdCardNo());
             List<MOrgDeptJson> orgDeptJsonList = orgDeptMemberClient.getByUserId(userId);
             envelop.setDetailModelList(orgDeptJsonList);
             return envelop;
-        }
-        catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
             return failedSystem();
         }
@@ -183,9 +181,9 @@ public class DoctorController extends BaseController {
             if (!result) {
                 return failed("删除失败!");
             }
-            try{
+            try {
                 fileResourceClient.filesDelete(doctorId);
-            }catch (Exception e){
+            } catch (Exception e) {
                 return success("数据删除成功！头像图片删除失败！");
             }
             return success(null);
@@ -214,9 +212,9 @@ public class DoctorController extends BaseController {
             if (StringUtils.isEmpty(detailModel.getName())) {
                 errorMsg += "姓名不能为空!";
             }
-            if (StringUtils.isEmpty(detailModel.getIdCardNo()) ) {
+            if (StringUtils.isEmpty(detailModel.getIdCardNo())) {
                 errorMsg += "身份证号不能为空!";
-            }else if(!pattern.matcher(detailModel.getIdCardNo()).find()){
+            } else if (!pattern.matcher(detailModel.getIdCardNo()).find()) {
                 errorMsg += "身份证号格式有误!";
             }
             if (StringUtils.isEmpty(detailModel.getSkill())) {
@@ -262,9 +260,9 @@ public class DoctorController extends BaseController {
             if (StringUtils.isEmpty(detailModel.getName())) {
                 errorMsg += "姓名不能为空!";
             }
-            if (StringUtils.isEmpty(detailModel.getIdCardNo()) ) {
+            if (StringUtils.isEmpty(detailModel.getIdCardNo())) {
                 errorMsg += "身份证号不能为空!";
-            }else if(!pattern.matcher(detailModel.getIdCardNo()).find()){
+            } else if (!pattern.matcher(detailModel.getIdCardNo()).find()) {
                 errorMsg += "身份证号格式有误!";
             }
             if (StringUtils.isEmpty(detailModel.getSkill())) {
@@ -301,27 +299,25 @@ public class DoctorController extends BaseController {
             @ApiParam(name = "status", value = "状态", defaultValue = "")
             @RequestParam(value = "status") String status) {
         try {
-            return doctorClient.updDoctorStatus(doctorId,status);
-        }
-        catch (Exception ex)
-        {
+            return doctorClient.updDoctorStatus(doctorId, status);
+        } catch (Exception ex) {
             ex.printStackTrace();
             return false;
         }
     }
 
     public MDoctor convertToMDoctor(DoctorDetailModel detailModel) throws ParseException {
-        if(detailModel==null)
-        {
+        if (detailModel == null) {
             return null;
         }
-        MDoctor mDoctor = convertToModel(detailModel,MDoctor.class);
+        MDoctor mDoctor = convertToModel(detailModel, MDoctor.class);
         mDoctor.setUpdateTime(DateTimeUtil.simpleDateTimeParse(detailModel.getUpdateTime()));
         mDoctor.setInsertTime(DateTimeUtil.simpleDateTimeParse(detailModel.getInsertTime()));
 
         return mDoctor;
     }
-    @RequestMapping(value = ServiceApi.Doctors.DoctorPhoneExistence,method = RequestMethod.POST)
+
+    @RequestMapping(value = ServiceApi.Doctors.DoctorPhoneExistence, method = RequestMethod.POST)
     @ApiOperation("获取已存在电话号码")
     public List idExistence(
             @ApiParam(name = "phones", value = "", defaultValue = "")
@@ -330,16 +326,15 @@ public class DoctorController extends BaseController {
         List existPhones = doctorClient.idExistence(phones);
         return existPhones;
     }
-    @RequestMapping(value = ServiceApi.Doctors.DoctoridCardNoExistence,method = RequestMethod.POST)
+
+    @RequestMapping(value = ServiceApi.Doctors.DoctoridCardNoExistence, method = RequestMethod.POST)
     @ApiOperation("获取已存在身份证号码")
     public List idCardNoExistence(
             @ApiParam(name = "idCardNos", value = "", defaultValue = "")
             @RequestParam("idCardNos") String idCardNos) throws Exception {
-
         List existPhones = doctorClient.idCardNoExistence(idCardNos);
         return existPhones;
     }
-
 
 
     @RequestMapping(value = ServiceApi.Doctors.DoctorBatch, method = RequestMethod.POST)
@@ -347,13 +342,11 @@ public class DoctorController extends BaseController {
     public Envelop createMetadataPatch(
             @ApiParam(name = "doctors", value = "医生JSON", defaultValue = "")
             @RequestParam(value = "doctors") String doctors) throws Exception {
-
-
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(true);
-        try{
+        try {
             doctorClient.createDoctorsPatch(doctors);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("系统出错！");
@@ -361,35 +354,33 @@ public class DoctorController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = ServiceApi.Doctors.DoctorOnePhoneExistence,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Doctors.DoctorOnePhoneExistence, method = RequestMethod.GET)
     @ApiOperation("根据过滤条件判断是否存在")
     public Envelop isExistence(
-            @ApiParam(name="filters",value="filters",defaultValue = "")
-            @RequestParam(value="filters") String filters) {
-
+            @ApiParam(name = "filters", value = "filters", defaultValue = "")
+            @RequestParam(value = "filters") String filters) {
         try {
             return success(doctorClient.isExistence(filters));
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return failed("查询出错！");
         }
     }
 
-    @RequestMapping(value = ServiceApi.Doctors.DoctorEmailExistence,method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Doctors.DoctorEmailExistence, method = RequestMethod.POST)
     @ApiOperation("获取已存在邮箱")
     public List emailsExistence(
             @ApiParam(name = "emails", value = "", defaultValue = "")
             @RequestParam("emails") String emails) throws Exception {
-
         List existPhones = doctorClient.emailsExistence(emails);
         return existPhones;
     }
 
-    @RequestMapping(value = ServiceApi.Org.GetOrgDeptInfoList,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Org.GetOrgDeptInfoList, method = RequestMethod.GET)
     @ApiOperation("根据身份证号查询该医生所在机构及部门信息")
     public Envelop getOrgDeptInfoList(
-            @ApiParam(name="idCardNo")
-            @RequestParam(value="idCardNo") String idCardNo) {
+            @ApiParam(name = "idCardNo")
+            @RequestParam(value = "idCardNo") String idCardNo) {
         try {
             String userId = userClient.getUserIdByIdCardNo(idCardNo);
             List<MOrgDeptData> orgDeptDataList = new ArrayList<>();
@@ -401,7 +392,7 @@ public class DoctorController extends BaseController {
                 orgIds.clear();
                 orgIds.addAll(hashSet);
                 if (null != orgIds && orgIds.size() > 0) {
-                    for (int i=0; i < list.size(); i++) {
+                    for (int i = 0; i < list.size(); i++) {
                         if (orgIds.contains(list.get(i).getId().toString())) {
                             list.get(i).setChecked(true);
                         }
@@ -412,24 +403,24 @@ public class DoctorController extends BaseController {
                     MOrgDeptData orgDeptsDate = orgDeptClient.getOrgDeptsDate(orgId);
                     orgDeptDataList.add(orgDeptsDate);
                 }
-                for (int i=0; i<orgDeptDataList.size(); i++) {
+                for (int i = 0; i < orgDeptDataList.size(); i++) {
                     if (null != orgDeptDataList.get(i).getChildren()) {
                         List<MOrgDeptData> children = orgDeptDataList.get(i).getChildren();
-                        for (int j=0; j<children.size(); j++) {
+                        for (int j = 0; j < children.size(); j++) {
                             if (deptIds.contains(children.get(j).getId())) {
                                 children.get(j).setChecked(true);
                             }
                         }
                     }
                 }
-                Envelop result = getResult(list, list.size(),1, 100);
+                Envelop result = getResult(list, list.size(), 1, 100);
                 result.setObj(orgDeptDataList);
                 return result;
-            } else{
+            } else {
                 Envelop envelop = new Envelop();
                 return envelop;
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return failed("查询出错！");
         }
