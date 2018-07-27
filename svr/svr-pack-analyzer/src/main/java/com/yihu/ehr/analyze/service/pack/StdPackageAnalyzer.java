@@ -57,6 +57,11 @@ public class StdPackageAnalyzer extends PackageAnalyzer {
         for (File file : files) {
             PackageDataSet dataSet = analyzeDataSet(file, origin);
 
+            //补传标识
+            if (dataSet.isReUploadFlg()) {
+                zipPackage.setReUploadFlg(dataSet.isReUploadFlg());
+            }
+
             //就诊事件信息
             if (zipPackage.getEventDate() == null || zipPackage.getEventType() == null) {
                 Map<String, Object> properties = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.EventInfo);

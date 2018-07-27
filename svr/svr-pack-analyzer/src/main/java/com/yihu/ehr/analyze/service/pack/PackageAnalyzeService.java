@@ -83,7 +83,7 @@ public class PackageAnalyzeService {
                 zipPackage.download();
                 zipPackage.unZip();
                 ProfileType profileType = zipPackage.resolve();
-                if (ProfileType.Standard == profileType ) {
+                if (ProfileType.Standard == profileType && !zipPackage.isReUploadFlg()) {
                     packageQcService.qcHandle(zipPackage);
                     //保存数据集质控数据
                     elasticSearchUtil.index(INDEX, QC_DATASET_INFO, zipPackage.getQcDataSetRecord());
@@ -93,7 +93,7 @@ public class PackageAnalyzeService {
                     statusReportService.reportStatus(esSimplePackage.get_id(), AnalyzeStatus.Finished, 0, "Qc success");
                 } else {
                     //报告非结构化档案包质控状态
-                    statusReportService.reportStatus(esSimplePackage.get_id(), AnalyzeStatus.Finished, 0, "Ignore non-standard package file");
+                    statusReportService.reportStatus(esSimplePackage.get_id(), AnalyzeStatus.Finished, 0, "Ignore non-standard package file or re-upload package file");
                 }
                 //发送解析消息
                 if (main) {
@@ -148,8 +148,8 @@ public class PackageAnalyzeService {
                 zipPackage.download();
                 zipPackage.unZip();
                 ProfileType profileType = zipPackage.resolve();
-                if (ProfileType.Standard != profileType) {
-                    throw new ZipException("Not a standard package file");
+                if (ProfileType.Standard != profileType && !zipPackage.isReUploadFlg()) {
+                    throw new ZipException("Ignore non-standard package file or re-upload package file");
                 }
                 packageQcService.qcHandle(zipPackage);
             }

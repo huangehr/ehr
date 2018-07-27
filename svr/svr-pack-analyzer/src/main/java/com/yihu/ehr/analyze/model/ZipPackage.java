@@ -65,6 +65,8 @@ public class ZipPackage {
     private String patientId;
     //科室代码
     private String deptCode;
+    //补传标识
+    protected boolean reUploadFlg = false;
     //ICD10诊断列表
     private Set<String> diagnosisCode = new HashSet<>() ;
     //ICD10诊断名称列表
@@ -151,6 +153,14 @@ public class ZipPackage {
     }
     public void setDeptCode(String deptCode) {
         this.deptCode = deptCode;
+    }
+
+    public boolean isReUploadFlg() {
+        return reUploadFlg;
+    }
+
+    public void setReUploadFlg(boolean reUploadFlg) {
+        this.reUploadFlg = reUploadFlg;
     }
 
     public Set<String> getDiagnosisCode() {

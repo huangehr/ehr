@@ -50,11 +50,9 @@ public class PackageQcService {
      * @param zipPackage 档案包
      */
     public void qcHandle(ZipPackage zipPackage) throws Throwable {
-        if(zipPackage.getEventType() == null){
-            throw new IllegalJsonDataException("提取不到事件类型");
+        if (zipPackage.getEventType() == null){
+            throw new IllegalJsonDataException("Cannot extract event type");
         }
-        EsSimplePackage esSimplePackage = zipPackage.getEsSimplePackage();
-        Map<String, Object> qcDataSetRecord = zipPackage.getQcDataSetRecord();
         List<String> details = new ArrayList<>();
         Map<String, PackageDataSet> dataSets = zipPackage.getDataSets();
         dataSets.keySet().forEach(item -> details.add(item));
@@ -66,6 +64,8 @@ public class PackageQcService {
                 missing.add(item);
             }
         });
+        EsSimplePackage esSimplePackage = zipPackage.getEsSimplePackage();
+        Map<String, Object> qcDataSetRecord = zipPackage.getQcDataSetRecord();
         qcDataSetRecord.put("details", details);
         qcDataSetRecord.put("missing", missing);
         qcDataSetRecord.put("is_defect", missing.isEmpty() ? 0 : 1);
@@ -87,12 +87,14 @@ public class PackageQcService {
         qcDataSetRecord.put("create_date", DATE_FORMAT.format(new Date()));
         for (String dataSetCode : dataSets.keySet()) {
             Map<String, MetaDataRecord> records = dataSets.get(dataSetCode).getRecords();
-            Set<String> existSet = new HashSet<>(); //存放已经生成了质控信息的数据元
+            //存放已经生成了质控信息的数据元
+            Set<String> existSet = new HashSet<>();
             List<String> listDataElement = getDataElementList(dataSets.get(dataSetCode).getCdaVersion(), dataSetCode);
             for (String recordKey : records.keySet()) {
                 Map<String, String> dataGroup = records.get(recordKey).getDataGroup();
                 for (String metadata : listDataElement) {
-                    if (existSet.contains(dataSetCode + "$" + metadata)) { //如果该数据元已经有质控数据则跳过
+                    //如果该数据元已经有质控数据则跳过
+                    if (existSet.contains(dataSetCode + "$" + metadata)) {
                         continue;
                     }
                     String method = redisClient.get("qc_" + zipPackage.getCdaVersion() + ":" + dataSetCode + ":" + metadata);

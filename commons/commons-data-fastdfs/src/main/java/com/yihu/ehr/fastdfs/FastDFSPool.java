@@ -5,12 +5,10 @@ import org.csource.fastdfs.StorageClient;
 import org.csource.fastdfs.TrackerClient;
 import org.csource.fastdfs.TrackerServer;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PreDestroy;
 import java.io.IOException;
 import java.util.*;
 

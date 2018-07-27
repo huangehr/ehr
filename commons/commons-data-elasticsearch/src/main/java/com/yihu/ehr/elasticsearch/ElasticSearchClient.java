@@ -112,7 +112,7 @@ public class ElasticSearchClient {
 
     public Map<String, Object> update (String index, String type, String id, Map<String, Object> source) throws DocumentMissingException {
         TransportClient transportClient = elasticSearchPool.getClient();
-        transportClient.prepareUpdate(index, type, id).setDoc(source).get();
+        transportClient.prepareUpdate(index, type, id).setDoc(source).setRetryOnConflict(5).get();
         return findById(index, type, id);
     }
 
@@ -127,7 +127,7 @@ public class ElasticSearchClient {
         source.forEach(item -> {
             String _id = (String)item.remove("_id");
             if (!StringUtils.isEmpty(_id)) {
-                bulkRequestBuilder.add(transportClient.prepareUpdate(index, type, _id).setDoc(item));
+                bulkRequestBuilder.add(transportClient.prepareUpdate(index, type, _id).setDoc(item).setRetryOnConflict(5));
             }
         });
         bulkRequestBuilder.get();
