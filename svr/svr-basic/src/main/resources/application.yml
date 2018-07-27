@@ -48,6 +48,13 @@ jksr-app:
   orgcode: PDY026797
   registerRoleClientId: WYo0l73F8e,HPnz4GXfYA #用于创建这些应用的默认角色(健康上饶app，公众健康服务)
 
+hadoop:
+  hbase-properties:
+    hbase.zookeeper.property.clientPort: 2181
+    zookeeper.znode.parent: /hbase-unsecure
+  user:
+    name: root
+
 ---
 spring:
   profiles: dev
@@ -100,4 +107,6 @@ fz-gateway:
   clientVersion: 1.0
   secret: KU5XTORDKZI3O86YAT3ABCNJW2XTL1DJYF3GKU3ICXL
   handlerId: 50871
-
+hadoop:
+  hbase-properties:
+    hbase.zookeeper.quorum: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com
