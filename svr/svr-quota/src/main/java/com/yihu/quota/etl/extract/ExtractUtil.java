@@ -184,8 +184,12 @@ public class ExtractUtil {
                     }
                 }
                 if(!StringUtils.isEmpty(timeKey)){
-                    if(!StringUtils.isEmpty( map.get("quotaDate") )){
+                    if(!StringUtils.isEmpty( map.get("quotaDate") ) ){
                         saveModel.setQuotaDate(map.get("quotaDate").toString());
+                    }
+                    if(!StringUtils.isEmpty( map.get("event_date") )){
+                        String date = DateUtil.formatDate((Date)map.get("event_date"),DateUtil.DEFAULT_DATE_YMD_FORMAT);
+                        saveModel.setQuotaDate(date);
                     }
                 }
                 if(!StringUtils.isEmpty(aggregationKey)){

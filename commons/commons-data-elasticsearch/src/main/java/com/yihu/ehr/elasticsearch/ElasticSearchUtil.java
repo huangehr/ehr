@@ -345,7 +345,7 @@ public class ElasticSearchUtil {
         }
         String [] filterArr = filters.split(";");
         for (String filter : filterArr) {
-            if(filter.contains("||")){
+            if (filter.contains("||")){
                 String [] fields = filter.split("\\|\\|");
                 BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
                 for (String filed : fields) {
@@ -370,33 +370,21 @@ public class ElasticSearchUtil {
             } else if (filter.contains(">=")) {
                 String [] condition = filter.split(">=");
                 RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery(condition[0]);
-                /*if (condition[0].toLowerCase().endsWith("date")) {
-                    rangeQueryBuilder.format("yyyy-MM-dd HH:mm:ss");
-                }*/
                 rangeQueryBuilder.gte(condition[1]);
                 boolQueryBuilder.must(rangeQueryBuilder);
             } else if (filter.contains(">")) {
                 String [] condition = filter.split(">");
                 RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery(condition[0]);
-                /*if (condition[0].toLowerCase().endsWith("date")) {
-                    rangeQueryBuilder.format("yyyy-MM-dd HH:mm:ss");
-                }*/
                 rangeQueryBuilder.gt(condition[1]);
                 boolQueryBuilder.must(rangeQueryBuilder);
             } else if (filter.contains("<=")) {
                 String [] condition = filter.split("<=");
                 RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery(condition[0]);
-                /*if (condition[0].toLowerCase().endsWith("date")) {
-                    rangeQueryBuilder.format("yyyy-MM-dd HH:mm:ss");
-                }*/
                 rangeQueryBuilder.lte(condition[1]);
                 boolQueryBuilder.must(rangeQueryBuilder);
             } else if (filter.contains("<")) {
                 String [] condition = filter.split("<");
                 RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery(condition[0]);
-                /*if (condition[0].toLowerCase().endsWith("date")) {
-                    rangeQueryBuilder.format("yyyy-MM-dd HH:mm:ss");
-                }*/
                 rangeQueryBuilder.lt(condition[1]);
                 boolQueryBuilder.must(rangeQueryBuilder);
             } else if (filter.contains("=")) {

@@ -363,8 +363,6 @@ public class ElasticsearchUtil {
             });
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            elasticSearchPool.releaseClient(client);
         }
         return returnModels;
     }
@@ -399,8 +397,6 @@ public class ElasticsearchUtil {
             return 0;
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            elasticSearchPool.releaseClient(client);
         }
         return 0;
     }

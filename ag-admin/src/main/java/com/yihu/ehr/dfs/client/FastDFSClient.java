@@ -50,19 +50,6 @@ public interface FastDFSClient {
     Envelop deleteByObjectId(
             @RequestParam(value = "objectId") String objectId);
 
-    @RequestMapping(value = ServiceApi.FastDFS.Modify, method = RequestMethod.POST)
-    @ApiOperation(value = "修改文件", notes = "返回相关索引信息,以及HttpUrl下载连接")
-    Envelop modify(
-            @RequestPart(value = "file") MultipartFile file,
-            @RequestParam(value = "path") String path,
-            @RequestParam(value = "_id") String _id,
-            @RequestParam(value = "modifier") String modifier);
-
-    @RequestMapping(value = ServiceApi.FastDFS.OldModify, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "修改文件", notes = "返回相关索引信息,以及HttpUrl下载连接(兼容旧接口)")
-    Envelop modify(
-            @RequestBody String jsonData);
-
     @RequestMapping(value = ServiceApi.FastDFS.FileInfo, method = RequestMethod.GET)
     @ApiOperation(value = "获取文件信息")
     Envelop getFileInfo(

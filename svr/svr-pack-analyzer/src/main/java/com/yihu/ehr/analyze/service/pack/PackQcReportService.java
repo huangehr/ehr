@@ -72,11 +72,11 @@ public class PackQcReportService extends BaseJpaService {
         int oupatient=0;
         int physical=0;
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-        RangeQueryBuilder startRange = QueryBuilders.rangeQuery("create_date");
+        RangeQueryBuilder startRange = QueryBuilders.rangeQuery("event_date");
         startRange.gte(startDate);
         boolQueryBuilder.must(startRange);
 
-        RangeQueryBuilder endRange = QueryBuilders.rangeQuery("create_date");
+        RangeQueryBuilder endRange = QueryBuilders.rangeQuery("event_date");
         endRange.lt(DateUtil.toString(end));
         boolQueryBuilder.must(endRange);
 
@@ -121,66 +121,62 @@ public class PackQcReportService extends BaseJpaService {
             stringBuilder.append("org_code=" + orgCode);
         }
         TransportClient transportClient = elasticSearchPool.getClient();
-        try {
-            List<Map<String, Object>> resultList = new ArrayList<>();
-            SearchRequestBuilder builder = transportClient.prepareSearch("json_archives");
-            builder.setTypes("info");
-            builder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
-            builder.setQuery(elasticSearchUtil.getQueryBuilder(stringBuilder.toString()));
-            DateHistogramBuilder dateHistogramBuilder = new DateHistogramBuilder("date");
-            dateHistogramBuilder.field("event_date");
-            dateHistogramBuilder.interval(DateHistogramInterval.DAY);
-            dateHistogramBuilder.format("yyyy-MM-dd");
-            dateHistogramBuilder.minDocCount(0);
-            AggregationBuilder terms = AggregationBuilders.terms("event_type").field("event_type");
-            dateHistogramBuilder.subAggregation(terms);
-            builder.addAggregation(dateHistogramBuilder);
-            builder.setSize(0);
-            builder.setExplain(true);
-            SearchResponse response = builder.get();
-            Histogram histogram = response.getAggregations().get("date");
-            double inpatient_total = 0.0;
-            double oupatient_total = 0.0;
-            double physical_total = 0.0;
-            for(Histogram.Bucket item: histogram.getBuckets()){
-                Map<String, Object> temp = new HashMap<>();
-                if(item.getDocCount()>0&&!"".equals(item.getKeyAsString())) {
-                    temp.put("date", item.getKeyAsString());
-                    LongTerms longTerms = item.getAggregations().get("event_type");
-                    double inpatient = 0.0;
-                    double oupatient = 0.0;
-                    double physical = 0.0;
-                    for(Terms.Bucket item1 : longTerms.getBuckets()){
-                        if("0".equals(item1.getKeyAsString())) {
-                            oupatient=item1.getDocCount();
-                            oupatient_total+=item1.getDocCount();
-                        }else if("1".equals(item1.getKeyAsString())) {
-                            inpatient=item1.getDocCount();
-                            inpatient_total+=item1.getDocCount();
-                        }else if("2".equals(item1.getKeyAsString())) {
-                            physical=item1.getDocCount();
-                            physical_total+=item1.getDocCount();
-                        }
+        List<Map<String, Object>> resultList = new ArrayList<>();
+        SearchRequestBuilder builder = transportClient.prepareSearch("json_archives");
+        builder.setTypes("info");
+        builder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
+        builder.setQuery(elasticSearchUtil.getQueryBuilder(stringBuilder.toString()));
+        DateHistogramBuilder dateHistogramBuilder = new DateHistogramBuilder("date");
+        dateHistogramBuilder.field("event_date");
+        dateHistogramBuilder.interval(DateHistogramInterval.DAY);
+        dateHistogramBuilder.format("yyyy-MM-dd");
+        dateHistogramBuilder.minDocCount(0);
+        AggregationBuilder terms = AggregationBuilders.terms("event_type").field("event_type");
+        dateHistogramBuilder.subAggregation(terms);
+        builder.addAggregation(dateHistogramBuilder);
+        builder.setSize(0);
+        builder.setExplain(true);
+        SearchResponse response = builder.get();
+        Histogram histogram = response.getAggregations().get("date");
+        double inpatient_total = 0.0;
+        double oupatient_total = 0.0;
+        double physical_total = 0.0;
+        for(Histogram.Bucket item: histogram.getBuckets()){
+            Map<String, Object> temp = new HashMap<>();
+            if(item.getDocCount()>0&&!"".equals(item.getKeyAsString())) {
+                temp.put("date", item.getKeyAsString());
+                LongTerms longTerms = item.getAggregations().get("event_type");
+                double inpatient = 0.0;
+                double oupatient = 0.0;
+                double physical = 0.0;
+                for(Terms.Bucket item1 : longTerms.getBuckets()){
+                    if("0".equals(item1.getKeyAsString())) {
+                        oupatient=item1.getDocCount();
+                        oupatient_total+=item1.getDocCount();
+                    }else if("1".equals(item1.getKeyAsString())) {
+                        inpatient=item1.getDocCount();
+                        inpatient_total+=item1.getDocCount();
+                    }else if("2".equals(item1.getKeyAsString())) {
+                        physical=item1.getDocCount();
+                        physical_total+=item1.getDocCount();
                     }
-                    temp.put("inpatient", inpatient);
-                    temp.put("oupatient", oupatient);
-                    temp.put("physical", physical);
-                    temp.put("total", inpatient+oupatient+physical);
-                    resultList.add(temp);
                 }
+                temp.put("inpatient", inpatient);
+                temp.put("oupatient", oupatient);
+                temp.put("physical", physical);
+                temp.put("total", inpatient+oupatient+physical);
+                resultList.add(temp);
             }
-            Map<String, Object> total = new HashMap<>();
-            total.put("date", "合计");
-            total.put("inpatient", inpatient_total);
-            total.put("oupatient", oupatient_total);
-            total.put("physical", physical_total);
-            total.put("total", inpatient_total + oupatient_total + physical_total);
-            resultList.add(0,total);
-            envelop.setSuccessFlg(true);
-            envelop.setDetailModelList(resultList);
-        } finally {
-            elasticSearchPool.releaseClient(transportClient);
         }
+        Map<String, Object> total = new HashMap<>();
+        total.put("date", "合计");
+        total.put("inpatient", inpatient_total);
+        total.put("oupatient", oupatient_total);
+        total.put("physical", physical_total);
+        total.put("total", inpatient_total + oupatient_total + physical_total);
+        resultList.add(0,total);
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(resultList);
         return envelop;
     }
 
@@ -280,29 +276,25 @@ public class PackQcReportService extends BaseJpaService {
             stringBuilder.append("org_code=" + orgCode);
         }
         TransportClient transportClient = elasticSearchPool.getClient();
-        try {
-            List<Map<String, Object>> resultList = new ArrayList<>();
-            SearchRequestBuilder builder = transportClient.prepareSearch("json_archives");
-            builder.setTypes("info");
-            builder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
-            builder.setQuery(elasticSearchUtil.getQueryBuilder(stringBuilder.toString()));
-            AggregationBuilder terms = AggregationBuilders.terms("error_type").field("error_type");
-            builder.addAggregation(terms);
-            builder.setSize(0);
-            builder.setExplain(true);
-            SearchResponse response = builder.get();
-            LongTerms longTerms = response.getAggregations().get("error_type");
-            for(Terms.Bucket item: longTerms.getBuckets()){
-                Map<String, Object> temp = new HashMap<>();
-                temp.put("error_type", item.getKeyAsString());
-                temp.put("error_count", item.getDocCount());
-                resultList.add(temp);
-            }
-            envelop.setSuccessFlg(true);
-            envelop.setDetailModelList(resultList);
-        } finally {
-            elasticSearchPool.releaseClient(transportClient);
+        List<Map<String, Object>> resultList = new ArrayList<>();
+        SearchRequestBuilder builder = transportClient.prepareSearch("json_archives");
+        builder.setTypes("info");
+        builder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
+        builder.setQuery(elasticSearchUtil.getQueryBuilder(stringBuilder.toString()));
+        AggregationBuilder terms = AggregationBuilders.terms("error_type").field("error_type");
+        builder.addAggregation(terms);
+        builder.setSize(0);
+        builder.setExplain(true);
+        SearchResponse response = builder.get();
+        LongTerms longTerms = response.getAggregations().get("error_type");
+        for(Terms.Bucket item: longTerms.getBuckets()){
+            Map<String, Object> temp = new HashMap<>();
+            temp.put("error_type", item.getKeyAsString());
+            temp.put("error_count", item.getDocCount());
+            resultList.add(temp);
         }
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(resultList);
         return envelop;
     }
 
@@ -324,29 +316,25 @@ public class PackQcReportService extends BaseJpaService {
             stringBuilder.append("org_code=" + orgCode);
         }
         TransportClient transportClient = elasticSearchPool.getClient();
-        try {
-            List<Map<String, Object>> resultList = new ArrayList<>();
-            SearchRequestBuilder builder = transportClient.prepareSearch("json_archives_qc");
-            builder.setTypes("qc_metadata_info");
-            builder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
-            builder.setQuery(elasticSearchUtil.getQueryBuilder(stringBuilder.toString()));
-            AggregationBuilder terms = AggregationBuilders.terms("qc_error_type").field("qc_error_type");
-            builder.addAggregation(terms);
-            builder.setSize(0);
-            builder.setExplain(true);
-            SearchResponse response = builder.get();
-            LongTerms longTerms = response.getAggregations().get("qc_error_type");
-            for(Terms.Bucket item: longTerms.getBuckets()){
-                Map<String, Object> temp = new HashMap<>();
-                temp.put("error_type", item.getKeyAsString());
-                temp.put("error_count", item.getDocCount());
-                resultList.add(temp);
-            }
-            envelop.setSuccessFlg(true);
-            envelop.setDetailModelList(resultList);
-        } finally {
-            elasticSearchPool.releaseClient(transportClient);
+        List<Map<String, Object>> resultList = new ArrayList<>();
+        SearchRequestBuilder builder = transportClient.prepareSearch("json_archives_qc");
+        builder.setTypes("qc_metadata_info");
+        builder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
+        builder.setQuery(elasticSearchUtil.getQueryBuilder(stringBuilder.toString()));
+        AggregationBuilder terms = AggregationBuilders.terms("qc_error_type").field("qc_error_type");
+        builder.addAggregation(terms);
+        builder.setSize(0);
+        builder.setExplain(true);
+        SearchResponse response = builder.get();
+        LongTerms longTerms = response.getAggregations().get("qc_error_type");
+        for(Terms.Bucket item: longTerms.getBuckets()){
+            Map<String, Object> temp = new HashMap<>();
+            temp.put("error_type", item.getKeyAsString());
+            temp.put("error_count", item.getDocCount());
+            resultList.add(temp);
         }
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(resultList);
         return envelop;
     }
 

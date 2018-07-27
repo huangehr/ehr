@@ -41,10 +41,6 @@ public class DataQualityStatisticsEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private DataQualityStatisticsService dataQualityStatisticsService;
     @Autowired
-    private DqPaltformReceiveWarningService dqPaltformReceiveWarningService;
-    @Autowired
-    private ElasticSearchUtil esUtil;
-    @Autowired
     private WarningProblemService warningProblemService;
 
 

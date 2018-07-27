@@ -213,35 +213,31 @@ public class PackStatisticsService extends BaseJpaService {
             stringBuilder.append("org_code=" + orgCode);
         }
         TransportClient transportClient = elasticSearchPool.getClient();
-        try {
-            List<Map<String, Object>> resultList = new ArrayList<>();
-            SearchRequestBuilder builder = transportClient.prepareSearch("json_archives");
-            builder.setTypes("info");
-            builder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
-            builder.setQuery(elasticSearchUtil.getQueryBuilder(stringBuilder.toString()));
-            DateHistogramBuilder dateHistogramBuilder = new DateHistogramBuilder("date");
-            dateHistogramBuilder.field("event_date");
-            dateHistogramBuilder.interval(DateHistogramInterval.DAY);
-            dateHistogramBuilder.format("yyyy-MM-dd");
-            dateHistogramBuilder.minDocCount(0);
-            builder.addAggregation(dateHistogramBuilder);
-            builder.setSize(0);
-            builder.setExplain(true);
-            SearchResponse response = builder.get();
-            Histogram histogram = response.getAggregations().get("date");
-            histogram.getBuckets().forEach(item -> {
-                Map<String, Object> temp = new HashMap<>();
-                if(item.getDocCount()>0&&!"".equals(item.getKeyAsString())) {
-                    temp.put("ed", item.getKeyAsString());
-                }
-                resultList.add(temp);
-            });
-            long endtime = System.currentTimeMillis();
-            System.out.println("业务分析获取数据查询耗时：" + (endtime - starttime) + "ms");
-            return resultList;
-        } finally {
-            elasticSearchPool.releaseClient(transportClient);
-        }
+        List<Map<String, Object>> resultList = new ArrayList<>();
+        SearchRequestBuilder builder = transportClient.prepareSearch("json_archives");
+        builder.setTypes("info");
+        builder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
+        builder.setQuery(elasticSearchUtil.getQueryBuilder(stringBuilder.toString()));
+        DateHistogramBuilder dateHistogramBuilder = new DateHistogramBuilder("date");
+        dateHistogramBuilder.field("event_date");
+        dateHistogramBuilder.interval(DateHistogramInterval.DAY);
+        dateHistogramBuilder.format("yyyy-MM-dd");
+        dateHistogramBuilder.minDocCount(0);
+        builder.addAggregation(dateHistogramBuilder);
+        builder.setSize(0);
+        builder.setExplain(true);
+        SearchResponse response = builder.get();
+        Histogram histogram = response.getAggregations().get("date");
+        histogram.getBuckets().forEach(item -> {
+            Map<String, Object> temp = new HashMap<>();
+            if(item.getDocCount()>0&&!"".equals(item.getKeyAsString())) {
+                temp.put("ed", item.getKeyAsString());
+            }
+            resultList.add(temp);
+        });
+        long endtime = System.currentTimeMillis();
+        System.out.println("业务分析获取数据查询耗时：" + (endtime - starttime) + "ms");
+        return resultList;
     }
     /**
      * 完整性分析

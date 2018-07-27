@@ -32,12 +32,12 @@ public class ArchiveTemplate extends BaseIdentityEntity {
     private String cdaVersion;
     private String cdaDocumentId;
     private String cdaDocumentName;
+    private String cdaCode;
     private String pcUrl;
     private String mobileUrl;
-    private String cdaCode;
     private Type type;
 
-    @Column(name = "title")
+    @Column(name = "title", nullable = false)
     public String getTitle() {
         return title;
     }
@@ -45,7 +45,7 @@ public class ArchiveTemplate extends BaseIdentityEntity {
         this.title = name;
     }
 
-    @Column(name = "cda_version")
+    @Column(name = "cda_version", nullable = false)
     public String getCdaVersion() {
         return cdaVersion;
     }
@@ -70,6 +70,14 @@ public class ArchiveTemplate extends BaseIdentityEntity {
         this.cdaDocumentName = cdaDocumentName;
     }
 
+    @Column(name = "cda_code")
+    public String getCdaCode() {
+        return cdaCode;
+    }
+    public void setCdaCode(String cdaCode) {
+        this.cdaCode = cdaCode;
+    }
+
     @Column(name = "pc_url")
     public String getPcUrl() {
         return pcUrl;
@@ -86,14 +94,6 @@ public class ArchiveTemplate extends BaseIdentityEntity {
 
     public void setMobileUrl(String mobileUrl) {
         this.mobileUrl = mobileUrl;
-    }
-
-    @Column(name = "cda_code")
-    public String getCdaCode() {
-        return cdaCode;
-    }
-    public void setCdaCode(String cdaCode) {
-        this.cdaCode = cdaCode;
     }
 
     @Column(name = "type")

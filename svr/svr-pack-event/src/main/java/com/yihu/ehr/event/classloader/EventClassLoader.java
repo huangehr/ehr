@@ -37,7 +37,7 @@ public class EventClassLoader extends ClassLoader {
         }
         EventProcessor packEventProcessor = eventProcessorService.findByName(name);
         if (null == packEventProcessor || StringUtils.isEmpty(packEventProcessor.getRemotePath())) {
-            throw new ClassNotFoundException("java.lang.ClassNotFoundException: " + name);
+            throw new ClassNotFoundException(name);
         }
         String remote_path = packEventProcessor.getRemotePath();
         String extension = remote_path.substring(remote_path.lastIndexOf(".") + 1);

@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.yihu.ehr.analyze.model.ZipPackage;
 import com.yihu.ehr.analyze.service.RedisService;
 import com.yihu.ehr.profile.EventType;
+import com.yihu.ehr.profile.exception.AnalyzerException;
 import com.yihu.ehr.profile.exception.IllegalJsonFileException;
+import com.yihu.ehr.profile.exception.ResolveException;
 import com.yihu.ehr.profile.extractor.KeyDataExtractor;
 import com.yihu.ehr.profile.family.ResourceCells;
 import com.yihu.ehr.profile.model.PackageDataSet;
@@ -90,8 +92,16 @@ public class StdPackageAnalyzer extends PackageAnalyzer {
             zipPackage.setPatientId(dataSet.getPatientId());
             zipPackage.setEventNo(dataSet.getEventNo());
             zipPackage.setOrgCode(dataSet.getOrgCode());
-            zipPackage.setOrgName(redisService.getOrgName(dataSet.getOrgCode()));
-            zipPackage.setOrgArea(redisService.getOrgArea(dataSet.getOrgCode()));
+            String orgName = redisService.getOrgName(dataSet.getOrgCode());
+            if (StringUtils.isEmpty(orgName)) {
+                throw new AnalyzerException("Can not get org name for " + dataSet.getOrgCode() + ", forget to cache?");
+            }
+            zipPackage.setOrgName(orgName);
+            String orgArea = redisService.getOrgArea(dataSet.getOrgCode());
+            if (StringUtils.isEmpty(orgArea)) {
+                throw new AnalyzerException("Can not get org area for " + dataSet.getOrgCode() + ", forget to cache?");
+            }
+            zipPackage.setOrgArea(orgArea);
             zipPackage.setCdaVersion(dataSet.getCdaVersion());
             zipPackage.setEventDate(dataSet.getEventTime());
         }

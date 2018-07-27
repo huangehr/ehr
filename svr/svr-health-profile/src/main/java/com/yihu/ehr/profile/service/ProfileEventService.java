@@ -47,7 +47,7 @@ public class ProfileEventService extends ProfileBasicService {
                 Envelop envelop1 = resource.healthFile("profile_type=2;id_card_no=" + demographicId, "-event_date", 1, 1000);
                 List<Map<String, Object>> list1 = envelop1.getDetailModelList();
                 if (list1 != null && list1.size() > 0) {
-                    for (Map<String ,Object> temp : list1) {
+                    for (Map<String, Object> temp : list1) {
                         Map<String, Object> resultMap = simpleEvent(temp, searchParam);
                         if (resultMap != null) {
                             resultMap.put("eventType", blurryType);

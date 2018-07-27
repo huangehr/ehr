@@ -11,14 +11,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class QcRecordService {
 
-    private static final String INDEX = "json_archives_qc";
-    private static final String QC_METADATA_INFO = "qc_metadata_info";
-
     @Autowired
     private ElasticSearchUtil elasticSearchUtil;
 
     public void record(ResourceBucket resourceBucket) throws Exception {
-        elasticSearchUtil.bulkIndex(INDEX, QC_METADATA_INFO, resourceBucket.getQcMetadataRecords().getRecords());
+        elasticSearchUtil.bulkIndex("json_archives_qc", "qc_metadata_info", resourceBucket.getQcMetadataRecords().getRecords());
     }
 
 }

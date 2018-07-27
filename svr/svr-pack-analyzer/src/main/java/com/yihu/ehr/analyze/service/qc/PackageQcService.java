@@ -1,6 +1,6 @@
 package com.yihu.ehr.analyze.service.qc;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.analyze.config.RequireDatasetsConfig;
 import com.yihu.ehr.analyze.model.ZipPackage;
 import com.yihu.ehr.model.packs.EsSimplePackage;
 import com.yihu.ehr.profile.ErrorType;
@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -29,15 +28,13 @@ import java.util.*;
 public class PackageQcService {
     private static final Logger logger = LoggerFactory.getLogger(PackageQcService.class);
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    private static final Class clazz = QcRuleCheckService.class;
-
 
     @Autowired
     private QcRuleCheckService qcRuleCheckService;
     @Autowired
     private RedisClient redisClient;
     @Autowired
-    protected ObjectMapper objectMapper;
+    private RequireDatasetsConfig requireDatasetsConfig;
 
 
     /**
@@ -50,6 +47,20 @@ public class PackageQcService {
     public void qcHandle(ZipPackage zipPackage) throws Throwable {
         EsSimplePackage esSimplePackage = zipPackage.getEsSimplePackage();
         Map<String, Object> qcDataSetRecord = zipPackage.getQcDataSetRecord();
+        List<String> details = new ArrayList<>();
+        Map<String, PackageDataSet> dataSets = zipPackage.getDataSets();
+        dataSets.keySet().forEach(item -> details.add(item));
+        //必传数据集判断
+        List<String> required = requireDatasetsConfig.getRequireDataset(zipPackage.getEventType());
+        List<String> missing = new ArrayList<>();
+        required.forEach(item -> {
+            if (!details.contains(item)) {
+                missing.add(item);
+            }
+        });
+        qcDataSetRecord.put("details", details);
+        qcDataSetRecord.put("missing", missing);
+        qcDataSetRecord.put("is_defect", missing.isEmpty() ? 0 : 1);
         qcDataSetRecord.put("_id", esSimplePackage.get_id());
         qcDataSetRecord.put("patient_id", zipPackage.getPatientId());
         qcDataSetRecord.put("pack_id", esSimplePackage.get_id());
@@ -66,23 +77,19 @@ public class PackageQcService {
         qcDataSetRecord.put("count", zipPackage.getDataSets().size());
         qcDataSetRecord.put("qc_step", 1);
         qcDataSetRecord.put("create_date", DATE_FORMAT.format(new Date()));
-        List<Map<String, Object>> details = new ArrayList<>();
-        Map<String, PackageDataSet> dataSets = zipPackage.getDataSets();
         for (String dataSetCode : dataSets.keySet()) {
-            Map<String, Object> dataSet = new HashMap<>();
-            dataSet.put(dataSetCode, dataSets.get(dataSetCode).getRecords().size());
-            details.add(dataSet);
             Map<String, MetaDataRecord> records = dataSets.get(dataSetCode).getRecords();
             Set<String> existSet = new HashSet<>(); //存放已经生成了质控信息的数据元
+            List<String> listDataElement = getDataElementList(dataSets.get(dataSetCode).getCdaVersion(), dataSetCode);
             for (String recordKey : records.keySet()) {
                 Map<String, String> dataGroup = records.get(recordKey).getDataGroup();
-                List<String> listDataElement = getDataElementList(dataSets.get(dataSetCode).getCdaVersion(), dataSetCode);
                 for (String metadata : listDataElement) {
                     if (existSet.contains(dataSetCode + "$" + metadata)) { //如果该数据元已经有质控数据则跳过
                         continue;
                     }
                     String method = redisClient.get("qc_" + zipPackage.getCdaVersion() + ":" + dataSetCode + ":" + metadata);
                     if (method != null) {
+                        Class clazz = QcRuleCheckService.class;
                         Method _method = clazz.getMethod(method, new Class[]{String.class, String.class, String.class, String.class});
                         _method.setAccessible(true);
                         ErrorType errorType;
@@ -127,8 +134,6 @@ public class PackageQcService {
                 }
             }
         }
-        qcDataSetRecord.put("details", objectMapper.writeValueAsString(details));
-        qcDataSetRecord.put("missing", "[]");
     }
 
     private List<String> getDataElementList(String version, String dataSetCode) {

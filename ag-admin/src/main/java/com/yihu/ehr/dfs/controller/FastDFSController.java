@@ -101,42 +101,6 @@ public class FastDFSController extends EnvelopRestEndPoint {
     }
 
     /**
-     * 修改文件 - 返回相关索引信息,以及HttpUrl下载连接
-     * @param file
-     * @param path
-     * @param _id
-     * @param modifier
-     * @return
-     */
-    @RequestMapping(value = ServiceApi.FastDFS.Modify, method = RequestMethod.POST)
-    @ApiOperation(value = "修改文件", notes = "返回相关索引信息,以及HttpUrl下载连接")
-    public Envelop modify(
-            @ApiParam(name = "file", value = "文件", required = true)
-            @RequestPart(value = "file") MultipartFile file,
-            @ApiParam(name = "path", value = "旧文件路径", required = true)
-            @RequestParam(value = "path") String path,
-            @ApiParam(name = "_id", value = "旧文件唯一索引ID", required = true)
-            @RequestParam(value = "_id") String _id,
-            @ApiParam(name = "modifier", value = "修改者", required = true)
-            @RequestParam(value = "modifier") String modifier) {
-        return fastDFSClient.modify(file, path, _id, modifier);
-    }
-
-    /**
-     * 修改文件 - 返回相关索引信息,以及HttpUrl下载连接(兼容旧接口)
-     * @param jsonData
-     * @return
-     * @throws Exception
-     */
-    @RequestMapping(value = ServiceApi.FastDFS.OldModify, method = RequestMethod.POST)
-    @ApiOperation(value = "修改文件", notes = "返回相关索引信息,以及HttpUrl下载连接(兼容旧接口)")
-    public Envelop modify(
-            @ApiParam(name = "jsonData", value = "文件资源", required = true)
-            @RequestParam(value = "jsonData") String jsonData) {
-        return fastDFSClient.modify(jsonData);
-    }
-
-    /**
      * 获取文件信息
      * @param path
      * @return
