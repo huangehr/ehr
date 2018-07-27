@@ -22,7 +22,7 @@ public class SolrPool {
     @Autowired
     private SolrConfig solrConfig;
 
-    private volatile MulticoreSolrClientFactory factory;
+    private static volatile MulticoreSolrClientFactory factory;
 
     protected MulticoreSolrClientFactory getFactory(){
         if (factory != null) {
