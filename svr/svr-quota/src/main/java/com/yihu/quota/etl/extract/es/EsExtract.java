@@ -79,7 +79,7 @@ public class EsExtract {
         //普通通用 拼接sql 方式
         //拼凑查询的sql
         String sql = getSql(qdm, qds);
-        logger.debug("查询sql:" + sql);
+        logger.info("查询sql:" + sql);
         //根据sql查询ES
         try {
             saveModels = queryEsBySql(sql,esConfig.getTimekey(),qdm, qds);
@@ -331,42 +331,46 @@ public class EsExtract {
             Map<String,String> resultMap = new HashMap<>();
             Map<String, String> daySlaveDictMap = new HashMap<>();
             List<Map<String, Object>> listMap = elasticsearchUtil.excuteDataModel(sql.toString());
-            for(Map<String, Object> map : listMap){
-                String keyVal = "";
-                for(String dimen :dimenList){
-                    if(map.get(dimen) != null){
-                        if(keyVal.length()==0){
-                            keyVal = map.get(dimen).toString();
-                        }else {
-                            keyVal += "-" + map.get(dimen) ;
+            if(org.apache.commons.lang.StringUtils.isNotEmpty(esConfig.getAggregation()) && esConfig.getAggregation().equals("list")){
+                returnList = extractUtil.computeList(qdm, qds, listMap, esConfig.getTimekey(), esConfig.getAggregationKey(), quotaVo);
+            }else {
+                for(Map<String, Object> map : listMap){
+                    String keyVal = "";
+                    for(String dimen :dimenList){
+                        if(map.get(dimen) != null){
+                            if(keyVal.length()==0){
+                                keyVal = map.get(dimen).toString();
+                            }else {
+                                keyVal += "-" + map.get(dimen) ;
+                            }
                         }
                     }
+                    String dateKey = "date_histogram(field=" + timekey + ",interval=day)";
+                    if(map.containsKey(dateKey)){
+                        keyVal += "-" + map.get(dateKey).toString().substring(0, 10);
+                        daySlaveDictMap.put(keyVal,map.get(dateKey).toString().substring(0,10));
+                    }
+                    if(map.containsKey("result")){
+                        NumberFormat nf = NumberFormat.getInstance();
+                        nf.setGroupingUsed(false);
+                        resultMap.put(keyVal, nf.format(map.get("result")));
+                    }
+                    if(map.containsKey("count(1)")){
+                        NumberFormat nf = NumberFormat.getInstance();
+                        nf.setGroupingUsed(false);
+                        resultMap.put(keyVal, nf.format(map.get("count(1)")));
+                    }
+                    if(map.containsKey("SUM(result)")){
+                        NumberFormat nf = NumberFormat.getInstance();
+                        nf.setGroupingUsed(false);
+                        resultMap.put(keyVal, nf.format(map.get("SUM(result)")));
+                    }
                 }
-                String dateKey = "date_histogram(field=" + timekey + ",interval=day)";
-                if(map.containsKey(dateKey)){
-                    keyVal += "-" + map.get(dateKey).toString().substring(0, 10);
-                    daySlaveDictMap.put(keyVal,map.get(dateKey).toString().substring(0,10));
-                }
-                if(map.containsKey("result")){
-                    NumberFormat nf = NumberFormat.getInstance();
-                    nf.setGroupingUsed(false);
-                    resultMap.put(keyVal, nf.format(map.get("result")));
-                }
-                if(map.containsKey("count(1)")){
-                    NumberFormat nf = NumberFormat.getInstance();
-                    nf.setGroupingUsed(false);
-                    resultMap.put(keyVal, nf.format(map.get("count(1)")));
-                }
-                if(map.containsKey("SUM(result)")){
-                    NumberFormat nf = NumberFormat.getInstance();
-                    nf.setGroupingUsed(false);
-                    resultMap.put(keyVal, nf.format(map.get("SUM(result)")));
-                }
+                TjQuotaDimensionSlave tjQuotaDimensionSlave = new TjQuotaDimensionSlave();
+                tjQuotaDimensionSlave.setQuotaCode(quotaVo.getCode());
+                qds.add(tjQuotaDimensionSlave);
+                extractUtil.compute(qdm, qds, returnList, resultMap, daySlaveDictMap, quotaVo);
             }
-            TjQuotaDimensionSlave tjQuotaDimensionSlave = new TjQuotaDimensionSlave();
-            tjQuotaDimensionSlave.setQuotaCode(quotaVo.getCode());
-            qds.add(tjQuotaDimensionSlave);
-            extractUtil.compute(qdm, qds, returnList, resultMap, daySlaveDictMap, quotaVo);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -380,7 +384,7 @@ public class EsExtract {
      * @param tjQuotaDimensionSlaves
      * @return
      */
-    private String getSql(List<TjQuotaDimensionMain> tjQuotaDimensionMains, List<TjQuotaDimensionSlave> tjQuotaDimensionSlaves) {
+    private String getSql(List<TjQuotaDimensionMain> tjQuotaDimensionMains, List<TjQuotaDimensionSlave> tjQuotaDimensionSlaves) throws Exception{
 
         StringBuffer allField = new StringBuffer("");
         String tableName = esConfig.getIndex();
@@ -408,7 +412,7 @@ public class EsExtract {
             }
             if ( !StringUtils.isEmpty(startTime) && !StringUtils.isEmpty(endTime)) {
                 whereSql.append( timeKey + " >= '" + startTime + "' and ");
-                whereSql.append( timeKey + " < '" + endTime + "'");
+                whereSql.append( timeKey + " <='" + endTime + "'");
             }
         }
 
@@ -431,10 +435,14 @@ public class EsExtract {
                 sql.append("select ").append(selectGroupField ).append(" sum(").append(esConfig.getAggregationKey()).append(" ) result from " + tableName + whereSql + " group by "  + whereGroupField + timeGroup );
             }
         }else if(esConfig.getAggregation().equals(Contant.quota.aggregation_list)){
-            if( StringUtils.isEmpty( esConfig.getAggregationKey()) ){
-                sql.append("select " + selectGroupField + " 1 result from " + tableName + whereSql);
+            if(esConfig.getTimekey() != null){
+                if( StringUtils.isEmpty( esConfig.getAggregationKey()) ){
+                    sql.append("select " + selectGroupField.substring(0,selectGroupField.length()-1) + "," + esConfig.getTimekey() +  " from " + tableName + whereSql + " limit 20000 ");//最多一次2万条
+                }else {
+                    sql.append("select " + selectGroupField + esConfig.getAggregationKey() + "," + esConfig.getTimekey() +   " from " + tableName + whereSql  + " limit 20000 ");
+                }
             }else {
-                sql.append("select " + selectGroupField + esConfig.getAggregationKey() + " result from " + tableName + whereSql);
+                throw  new Exception("配置参数 timekey 不能为空");
             }
         }
         return sql.toString();

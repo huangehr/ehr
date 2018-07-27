@@ -4,10 +4,11 @@ import com.yihu.ehr.constants.ApiVersion;
 
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.query.common.model.QueryCondition;
 import com.yihu.ehr.resource.model.RsResource;
+import com.yihu.ehr.resource.model.RsResourceDefaultParam;
 import com.yihu.ehr.resource.model.RsResourceQuota;
 import com.yihu.ehr.resource.model.RsResourceMetadata;
-import com.yihu.ehr.resource.model.RsResourceDefaultQuery;
 import com.yihu.ehr.resource.service.*;
 import com.yihu.ehr.util.id.BizObject;
 import com.yihu.ehr.util.rest.Envelop;
@@ -15,10 +16,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.*;
 
 
@@ -36,9 +35,9 @@ public class ResourceIntegratedEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private RsResourceService rsService;
     @Autowired
-    private RsResourceDefaultQueryService resourcesDefaultQueryService;
-    @Autowired
     private ResourceBrowseService resourceBrowseService;
+    @Autowired
+    private RsResourceDefaultParamService resourceDefaultParamService;
 
     @Deprecated
     @ApiOperation("综合查询档案数据列表树")
@@ -48,18 +47,23 @@ public class ResourceIntegratedEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "userResource") String userResource,
             @ApiParam(name = "roleId", value = "角色id", required = true)
             @RequestParam(value = "roleId") String roleId,
+            @ApiParam(name = "categoryCode", value = "视图分类", required = true)
+            @RequestParam(value = "categoryCode") String categoryCode,
             @ApiParam(name = "filters", value = "过滤条件(name)")
             @RequestParam(value = "filters", required = false) String filters) throws Exception {
-        List list = resourcesIntegratedService.getMetadataList(userResource, roleId, filters);
+        List list = resourcesIntegratedService.getMetadataList(userResource, roleId, categoryCode, filters);
         return success(list);
     }
 
     @ApiOperation("综合查询档案数据分类列表")
     @RequestMapping(value = ServiceApi.Resources.IntCategory, method = RequestMethod.GET)
-    public Envelop intCategory() throws Exception {
+    public Envelop intCategory(
+            @ApiParam(name = "categoryCode", value = "视图分类", required = true)
+            @RequestParam(value = "categoryCode") String categoryCode
+    ) throws Exception {
         Map<String, Object> baseMap = new HashMap<>();
         baseMap.put("baseInfo", new ArrayList<>());
-        List<Map<String, Object>> list = resourcesIntegratedService.intCategory();
+        List<Map<String, Object>> list = resourcesIntegratedService.intCategory(categoryCode);
         return success(baseMap, list);
     }
 
@@ -72,9 +76,11 @@ public class ResourceIntegratedEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "userResource") String userResource,
             @ApiParam(name = "roleId", value = "角色id", required = true)
             @RequestParam(value = "roleId") String roleId,
+            @ApiParam(name = "categoryCode", value = "视图分类")
+            @RequestParam(value = "categoryCode") String categoryCode,
             @ApiParam(name = "filters", value = "过滤条件(name)")
             @RequestParam(value = "filters", required = false) String filters) throws Exception {
-        List<Map<String, Object>> list = resourcesIntegratedService.intMetadata(categoryId, userResource, roleId, filters);
+        List<Map<String, Object>> list = resourcesIntegratedService.intMetadata(categoryId, userResource, roleId, categoryCode, filters);
         return success(list);
     }
 
@@ -94,8 +100,8 @@ public class ResourceIntegratedEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "page", value = "第几页(>0)")
             @RequestParam(value = "page", required = false) Integer page,
             @ApiParam(name = "size", value = "每页几行(>0)")
-            @RequestParam(value = "size", required = false) Integer size) throws Exception{
-       return resourceBrowseService.getCustomizeData(resourcesCode, metaData, orgCode, areaCode, queryCondition, page, size);
+            @RequestParam(value = "size", required = false) Integer size) throws Exception {
+        return resourceBrowseService.getCustomizeData(resourcesCode, metaData, orgCode, areaCode, queryCondition, page, size);
     }
 
     @ApiOperation("综合查询指标统计列表树")
@@ -109,10 +115,10 @@ public class ResourceIntegratedEndPoint extends EnvelopRestEndPoint {
 
     @ApiOperation("综合查询视图保存")
     @RequestMapping(value = ServiceApi.Resources.IntResourceUpdate, method = RequestMethod.POST)
-    public Envelop updateResource (
-            @ApiParam(name="dataJson",value = "JSON对象参数({\"resource\":\"objStr\",\"(metadatas)(quotas)\":\"[objStr]\",\"queryCondition\":\"([])({})\"})", required = true)
-            @RequestParam(value = "dataJson") String dataJson) throws IOException {
-        RsResource newResources = null;
+    public Envelop updateResource(
+            @ApiParam(name = "dataJson", value = "JSON对象参数({\"resource\":\"objStr\",\"(metadatas)(quotas)\":\"[objStr]\",\"queryCondition\":\"([])({})\"})", required = true)
+            @RequestParam(value = "dataJson") String dataJson) throws Exception {
+        RsResource newResources;
         Map<String, Object> paraMap = objectMapper.readValue(dataJson, Map.class);
         if (!paraMap.containsKey("resource")) {
             return failed("resource不能为空");
@@ -150,14 +156,19 @@ public class ResourceIntegratedEndPoint extends EnvelopRestEndPoint {
                 rsMetadata.setId(getObjectId(BizObject.ResourceMetadata));
             }
             //处理默认搜索条件
-            List<Map<String, String>> queryList = (List<Map<String, String>>) paraMap.get("queryCondition");
-            String queryCondition = objectMapper.writeValueAsString(queryList);
-            RsResourceDefaultQuery resourcesQuery = new RsResourceDefaultQuery();
-            resourcesQuery.setId(getObjectId(BizObject.ResourcesDefaultQuery));
-            resourcesQuery.setQuery(queryCondition);
-            resourcesQuery.setResourcesId(reId);
-            resourcesQuery.setResourcesType(1);
-            newResources = resourcesIntegratedService.profileCompleteSave(rsResources, Arrays.asList(rsMetadatas), resourcesQuery);
+            RsResourceDefaultParam rsResourceDefaultParam = null;
+            if (paraMap.get("queryCondition") != null) {
+                List<Map<String, String>> queryList = (List<Map<String, String>>) paraMap.get("queryCondition");
+                if (!queryList.isEmpty()) {
+                    String queryCondition = objectMapper.writeValueAsString(queryList);
+                    rsResourceDefaultParam = new RsResourceDefaultParam();
+                    rsResourceDefaultParam.setResourcesId(reId);
+                    rsResourceDefaultParam.setResourcesCode(rsResources.getCode());
+                    rsResourceDefaultParam.setParamKey("q");
+                    rsResourceDefaultParam.setParamValue(queryCondition);
+                }
+            }
+            newResources = resourcesIntegratedService.profileCompleteSave(rsResources, Arrays.asList(rsMetadatas), rsResourceDefaultParam);
             return success(newResources.getId());
         } else if (rsResources.getDataSource() == 2) { //统计指标
             //处理关联指标数据元
@@ -166,21 +177,26 @@ public class ResourceIntegratedEndPoint extends EnvelopRestEndPoint {
             }
             String rsQuotasStr = objectMapper.writeValueAsString(paraMap.get("quotas"));
             RsResourceQuota[] rsQuotas = toEntity(rsQuotasStr, RsResourceQuota[].class);
-            if (rsQuotas == null || rsQuotas.length <= 0 ) {
+            if (rsQuotas == null || rsQuotas.length <= 0) {
                 return failed("指标数据元不能为空");
             }
             for (RsResourceQuota resourceQuota : rsQuotas) {
                 resourceQuota.setResourceId(reId);
             }
             //处理默认搜索条件
-            Map<String, Object> queryMap = (Map<String, Object>)paraMap.get("queryCondition");
-            String queryCondition = objectMapper.writeValueAsString(queryMap);
-            RsResourceDefaultQuery resourcesQuery = new RsResourceDefaultQuery();
-            resourcesQuery.setId(getObjectId(BizObject.ResourcesDefaultQuery));
-            resourcesQuery.setQuery(queryCondition);
-            resourcesQuery.setResourcesId(reId);
-            resourcesQuery.setResourcesType(2);
-            newResources = resourcesIntegratedService.quotaCompleteSave(rsResources, Arrays.asList(rsQuotas), resourcesQuery);
+            RsResourceDefaultParam rsResourceDefaultParam = null;
+            if (paraMap.get("queryCondition") != null) {
+                Map<String, Object> queryMap = (Map<String, Object>) paraMap.get("queryCondition");
+                if (!queryMap.isEmpty()) {
+                    String queryCondition = objectMapper.writeValueAsString(queryMap);
+                    rsResourceDefaultParam = new RsResourceDefaultParam();
+                    rsResourceDefaultParam.setResourcesId(reId);
+                    rsResourceDefaultParam.setResourcesCode(rsResources.getCode());
+                    rsResourceDefaultParam.setParamKey("q");
+                    rsResourceDefaultParam.setParamValue(queryCondition);
+                }
+            }
+            newResources = resourcesIntegratedService.quotaCompleteSave(rsResources, Arrays.asList(rsQuotas), rsResourceDefaultParam);
             return success(newResources.getId());
         } else {
             return failed("资源类型有误");
@@ -190,35 +206,39 @@ public class ResourceIntegratedEndPoint extends EnvelopRestEndPoint {
     @ApiOperation("综合查询搜索条件更新")
     @RequestMapping(value = ServiceApi.Resources.IntResourceQueryUpdate, method = RequestMethod.PUT)
     public Envelop customizeUpdate(
-            @ApiParam(name="dataJson",value="JSON对象参数({\"resourceId\":\"resourceId\",\"queryCondition\":\"([])({})\"})", required = true)
-            @RequestParam(value = "dataJson") String dataJson) throws  Exception {
+            @ApiParam(name = "dataJson", value = "JSON对象参数({\"resourceId\":\"resourceId\",\"queryCondition\":\"([])({})\"})", required = true)
+            @RequestParam(value = "dataJson") String dataJson) throws Exception {
         Map<String, Object> paraMap = objectMapper.readValue(dataJson, Map.class);
         if (!paraMap.containsKey("resourceId") || !paraMap.containsKey("queryCondition")) {
             return failed("参数不完整，缺少resourceId或者queryCondition");
         }
-        String resourceId = (String)paraMap.get("resourceId");
+        String resourceId = (String) paraMap.get("resourceId");
         RsResource rsResources = rsService.getResourceById(resourceId);
         if (rsResources != null) {
-            RsResourceDefaultQuery rsResourcesQuery = resourcesDefaultQueryService.findByResourcesId(resourceId);
-            String queryCondition;
+            RsResourceDefaultParam rsResourceDefaultParam = null;
+            String queryCondition = (String) paraMap.get("queryCondition");
             if (rsResources.getDataSource() == 1) {
-                //List<Map<String, String>> queryList = (List<Map<String, String>>)paraMap.get("queryCondition");
-                //queryCondition = mapper.writeValueAsString(queryList);
-                queryCondition = (String)paraMap.get("queryCondition");
+                if (!queryCondition.equals("[]")) {
+                    rsResourceDefaultParam = new RsResourceDefaultParam();
+                    rsResourceDefaultParam.setResourcesId(rsResources.getId());
+                    rsResourceDefaultParam.setResourcesCode(rsResources.getCode());
+                    rsResourceDefaultParam.setParamKey("q");
+                    rsResourceDefaultParam.setParamValue(queryCondition);
+                }
             } else {
-                //Map<String, Object> queryMap = (Map<String, Object>)paraMap.get("queryCondition");
-                //queryCondition = mapper.writeValueAsString(queryMap);
-                queryCondition = (String)paraMap.get("queryCondition");
+                if (!queryCondition.equals("{}")) {
+                    rsResourceDefaultParam = new RsResourceDefaultParam();
+                    rsResourceDefaultParam.setResourcesId(rsResources.getId());
+                    rsResourceDefaultParam.setResourcesCode(rsResources.getCode());
+                    rsResourceDefaultParam.setParamKey("q");
+                    rsResourceDefaultParam.setParamValue(queryCondition);
+                }
             }
-            if (rsResourcesQuery == null) {
-                rsResourcesQuery = new RsResourceDefaultQuery();
-                rsResourcesQuery.setId(getObjectId(BizObject.ResourcesDefaultQuery));
-                rsResourcesQuery.setResourcesId(resourceId);
-                rsResourcesQuery.setResourcesType(rsResources.getDataSource());
+            if (rsResourceDefaultParam != null) {
+                RsResourceDefaultParam resourceDefaultParam = resourceDefaultParamService.saveWithDel(rsResourceDefaultParam);
+                return success(resourceDefaultParam);
             }
-            rsResourcesQuery.setQuery(queryCondition);
-            RsResourceDefaultQuery newRsResourceDefaultQuery = resourcesDefaultQueryService.saveResourceQuery(rsResourcesQuery);
-            return success(newRsResourceDefaultQuery);
+            return failed("条件不能为空");
         } else {
             return failed("资源不存在");
         }

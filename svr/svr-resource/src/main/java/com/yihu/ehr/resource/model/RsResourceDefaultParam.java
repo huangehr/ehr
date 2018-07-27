@@ -21,7 +21,7 @@ public class RsResourceDefaultParam {
 
     @Id
    // @GeneratedValue(strategy = GenerationType.AUTO)
-    @GenericGenerator(name="systemUUID",strategy="uuid")
+    @GenericGenerator(name="systemUUID", strategy="uuid")
     @GeneratedValue(generator="systemUUID")
     @Column(name = "id", unique = true, nullable = false, length = 32)
     public String getId() {
@@ -31,7 +31,6 @@ public class RsResourceDefaultParam {
         this.id = id;
     }
 
-
     @Column(name = "resources_id",nullable = false)
     public String getResourcesId() {
         return resourcesId;
@@ -40,7 +39,7 @@ public class RsResourceDefaultParam {
         this.resourcesId = resourcesId;
     }
 
-    @Column(name = "resources_code",nullable = true)
+    @Column(name = "resources_code", nullable = false)
     public String getResourcesCode() {
         return resourcesCode;
     }
@@ -48,7 +47,7 @@ public class RsResourceDefaultParam {
         this.resourcesCode = resourcesCode;
     }
 
-    @Column(name = "param_key",nullable = true)
+    @Column(name = "param_key", nullable = false)
     public String getParamKey() {
         return paramKey;
     }
@@ -57,7 +56,7 @@ public class RsResourceDefaultParam {
         this.paramKey = paramKey;
     }
 
-    @Column(name = "param_value",nullable = true)
+    @Column(name = "param_value",nullable = false)
     public String getParamValue() {
         return paramValue;
     }

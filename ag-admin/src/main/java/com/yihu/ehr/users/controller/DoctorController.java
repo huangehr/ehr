@@ -162,8 +162,10 @@ public class DoctorController extends BaseController {
 
             Envelop envelop = success(detailModel);
             String userId = userClient.getUserIdByIdCardNo(detailModel.getIdCardNo());
-            List<MOrgDeptJson> orgDeptJsonList = orgDeptMemberClient.getByUserId(userId);
-            envelop.setDetailModelList(orgDeptJsonList);
+            if (StringUtils.isNotEmpty(userId)) {
+                List<MOrgDeptJson> orgDeptJsonList = orgDeptMemberClient.getByUserId(userId);
+                envelop.setDetailModelList(orgDeptJsonList);
+            }
             return envelop;
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -236,6 +238,7 @@ public class DoctorController extends BaseController {
             }
 
             detailModel = convertToModel(mDoctor, DoctorDetailModel.class);
+            detailModel.setInsertTime(DateTimeUtil.simpleDateTimeFormat(mDoctor.getInsertTime()));
             return success(detailModel);
         } catch (Exception ex) {
             ex.printStackTrace();

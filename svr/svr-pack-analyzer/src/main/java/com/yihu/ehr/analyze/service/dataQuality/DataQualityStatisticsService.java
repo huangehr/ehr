@@ -161,7 +161,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
             }
         }
 
-        Set totalSet = new HashSet();
+        int totalSize=0;
         for (Map<String, Object> map:dataMap.values()){
             String orgCode = map.get("orgCode").toString();
             //统计接收数据
@@ -199,26 +199,18 @@ public class DataQualityStatisticsService extends BaseJpaService {
             }
 
             //接收 数据集
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("qc_step=1;");
-            stringBuilder.append("receive_date>=" + start + " 00:00:00;");
-            stringBuilder.append("receive_date<" + end + " 23:59:59;");
-            stringBuilder.append("org_code=" + orgCode);
-            if (eventType!=null){
-                stringBuilder.append("event_type=" + eventType);
+            StringBuffer sql = new StringBuffer();
+            sql.append("SELECT COUNT(DISTINCT dataset) as count from json_archives_qc/qc_dataset_detail ");
+            sql.append("WHERE receive_date>='" + start + " 00:00:00' AND receive_date<='" + end + " 23:59:59'");
+            sql.append(" AND org_code='" + orgCode +"'");
+            if(eventType!=null){
+                sql.append(" and event_type = "+eventType) ;
             }
-            Set set = new HashSet();
-            List<Map<String, Object>> list = elasticSearchUtil.list("json_archives_qc", "qc_dataset_info", stringBuilder.toString());
-            for(Map<String, Object> mapTmp : list){
-                String details = mapTmp.get("details").toString();//接收 数据集
-                JSONArray jsonArray = JSONArray.parseArray(details);
-                for(int i=0;i<jsonArray.size();i++){
-                    JSONObject tmp = jsonArray.getJSONObject(i);
-                    set.addAll(tmp.keySet());
-                    totalSet.addAll(tmp.keySet());
-                }
-            }
-            map.put("receiveDataset",set.size());//数据集个数
+            ResultSet resultset = elasticSearchUtil.findBySql(sql.toString());
+            resultset.next();
+            int size = new Double(resultset.getObject("count").toString()).intValue();
+            totalSize+=size;
+            map.put("receiveDataset",size);//数据集个数
 //            String sql4 = "SELECT details FROM json_archives_qc/qc_dataset_info where receive_date>= '"+start+" 00:00:00' AND receive_date<='" +  end + " 23:59:59' and qc_step=1 and org_code='"+orgCode+"' ";
 //            if(eventType!=null){
 //                sql4 += " and event_type = "+eventType ;
@@ -281,7 +273,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
             }
         }
 
-        totalReceiveDataset = totalSet.size();
+        //totalReceiveDataset = totalSet.size();
         //新增医疗云平台数据
         Map<String, Object> totalMap = new HashedMap();
         totalMap.put("orgCode",cloud);
@@ -289,7 +281,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
         totalMap.put("hospitalArchives",totalHospitalAcrhives);//医院档案数
         totalMap.put("hospitalDataset",totalHospitalDataset);//医院数据集
         totalMap.put("receiveArchives",totalReceiveArchives);//接收档案数
-        totalMap.put("receiveDataset",totalReceiveDataset); //接收数据集
+        totalMap.put("receiveDataset",totalSize); //接收数据集
         totalMap.put("receiveException",totalReceiveException);//接收异常
         totalMap.put("resourceSuccess",totalResourceSuccess);//资源化-成功
         totalMap.put("resourceFailure",totalResourceFailure);//资源化-失败

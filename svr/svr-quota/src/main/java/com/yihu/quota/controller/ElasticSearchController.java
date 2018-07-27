@@ -71,6 +71,8 @@ public class ElasticSearchController extends BaseController {
         try {
             List<Map<String, Object>> listData = elasticsearchUtil.excuteDataModel(sql);
             envelop.setDetailModelList(listData);
+            envelop.setObj(listData.size());
+            envelop.setSuccessFlg(true);
         } catch (Exception e) {
             envelop.setErrorMsg("sql执行出错");
         }
@@ -98,6 +100,7 @@ public class ElasticSearchController extends BaseController {
             List<Map<String, Object>> listData = elasticsearchUtil.excuteDataModel(sb.toString());
             envelop.setDetailModelList(listData);
             envelop.setObj(listData.size());
+            envelop.setSuccessFlg(true);
         } catch (Exception e) {
             envelop.setErrorMsg("sql执行出错");
         }
@@ -127,7 +130,7 @@ public class ElasticSearchController extends BaseController {
                 fl += ",rowkey";
             }
             String [] fields = fl.split(",");
-            rows = solrQuery.count(core,q);
+            rows = solrQuery.count(core,q,null);
             if(rows > 50000){
                 HSSFRow row0 = sheet.createRow(0);
                 row0.createCell(0).setCellValue("数据超过五万条，数据量过大");

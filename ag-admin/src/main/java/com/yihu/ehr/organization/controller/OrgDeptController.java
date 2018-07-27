@@ -560,15 +560,15 @@ public class OrgDeptController extends BaseController {
             OrgDeptMemberModel detailModel = convertToModel(mOrgMemberRelation, OrgDeptMemberModel.class);
             if (StringUtils.isNotEmpty(detailModel.getUserId())) {
                 MUser mUser = userClient.getUser(detailModel.getUserId());
-                detailModel.setUserName(mUser == null ? "" : mUser.getRealName());
+                detailModel.setUserName(mUser == null ? detailModel.getUserName() : mUser.getRealName());
             }
             if (StringUtils.isNotEmpty(detailModel.getParentUserId())) {
                 MUser mUser = userClient.getUser(detailModel.getParentUserId());
-                detailModel.setParentUserName(mUser == null ? "" : mUser.getRealName());
+                detailModel.setParentUserName(mUser == null ? detailModel.getParentUserName() : mUser.getRealName());
             }
             if (detailModel.getDeptId() != null && detailModel.getDeptId() != 0) {
                 MOrgDept mOrgDept = orgDeptClient.searchDeptDetail(detailModel.getDeptId());
-                detailModel.setDeptName(mOrgDept == null ? "" : mOrgDept.getName());
+                detailModel.setDeptName(mOrgDept == null ? detailModel.getDeptName() : mOrgDept.getName());
             }
             return success(detailModel);
         } catch (Exception ex) {

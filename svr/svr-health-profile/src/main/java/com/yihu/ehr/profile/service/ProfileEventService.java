@@ -101,7 +101,25 @@ public class ProfileEventService extends ProfileBasicService {
                 //query = "{\"q\":\"demographic_id:" + demographicId + " AND EHR_002443:*\"}";
                 return resultList;
             } else if ("7".equals(blurryType)){  //免疫 immunity
-                query = "{\"q\":\"demographic_id:" + demographicId + " AND EHR_002443:*\"}";
+                query = SimpleSolrQueryUtil.getQuery(filter, date, query);
+                envelop = resource.getMasterData(query, 1, 1000, null);
+                List<Map<String, Object>> eventList = envelop.getDetailModelList();
+                if (eventList != null && eventList.size() > 0) {
+                    for (Map<String, Object> temp : eventList) {
+                        String subQ = "{\"q\":\"rowkey:" + temp.get("rowkey") + "$HDSB03_12$*\"}";
+                        Envelop subEnvelop = resource.getSubData(subQ, 1, 1, null);
+                        List<Map<String, Object>> subList = subEnvelop.getDetailModelList();
+                        if (subList != null && subList.size() > 0) {
+                            Map<String, Object> resultMap = simpleEvent(temp, searchParam);
+                            if (resultMap != null) {
+                                resultMap.put("eventType", blurryType);
+                                resultMap.put("mark", subList.get(0).get("EHR_002438")); //预防接种卡编号
+                                resultList.add(resultMap);
+                            }
+                        }
+                    }
+                }
+                return resultList;
             } else {
                 return resultList;
             }

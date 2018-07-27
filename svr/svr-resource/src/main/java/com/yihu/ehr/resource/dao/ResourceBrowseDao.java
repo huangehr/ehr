@@ -5,7 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.hbase.HBaseDao;
+import com.yihu.ehr.profile.ProfileType;
 import com.yihu.ehr.profile.core.ResourceCore;
+import com.yihu.ehr.profile.family.ResourceCells;
+import com.yihu.ehr.query.common.model.QueryCondition;
 import com.yihu.ehr.query.common.model.SolrGroupEntity;
 import com.yihu.ehr.query.common.sqlparser.ParserFactory;
 import com.yihu.ehr.query.common.sqlparser.ParserSql;
@@ -36,8 +39,6 @@ import java.util.stream.Collectors;
  */
 @Repository
 public class ResourceBrowseDao {
-
-    private List<String> basicField = new ArrayList<>(Arrays.asList("rowkey", "event_type", "event_no", "event_date", "demographic_id", "patient_id", "org_code", "org_name", "profile_id", "cda_version", "client_id", "profile_type", "patient_name", "org_area", "diagnosis", "health_problem"));
 
     private Integer defaultPage = 1;
     private Integer defaultSize = 1000;
@@ -76,12 +77,14 @@ public class ResourceBrowseDao {
     private HBaseDao hbaseDao;
     @Autowired
     private ElasticSearchUtil elasticSearchUtil;
+    @Autowired
+    private SolrQuery solrQuery;
 
     /**
      * 获取资源授权数据元列表
      *
-     * @param rsResource
-     * @param roleId
+     * @param rsResource 资源
+     * @param roleId 角色ID列表
      * @return
      * @throws Exception
      */
@@ -189,13 +192,13 @@ public class ResourceBrowseDao {
      * @param resourcesCode 资源编码
      * @param roleId        角色ID列表
      * @param saas          权限
-     * @param queryParams   查询条件
+     * @param queryParams   查询条件 {"q":"*:*","fq":"*:*","basicFl":"","dFl":"","sort":"{\"field1\":\"asc\",\"field2\":\"desc\"}"}
      * @param page          页码
      * @param size          页数
      * @return
      * @throws Exception
      */
-    public Envelop getEhrCenter(String resourcesCode, String roleId, String saas, String queryParams, Integer page, Integer size) throws Exception {
+    public Envelop getEhrCenter (String resourcesCode, String roleId, String saas, String queryParams, Integer page, Integer size) throws Exception {
         //获取Saas权限
         StringBuilder q = new StringBuilder();
         if (saas != null && !"*".equals(saas)) {
@@ -203,10 +206,10 @@ public class ResourceBrowseDao {
         }
         String fq = "";
         final Map<String, String> sort = new HashMap<>();
-        Map<String, Object> query = new HashMap<>();
+        Map<String, String> query = new HashMap<>();
         if (queryParams != null) {
             query = objectMapper.readValue(queryParams, Map.class);
-            if (query.containsKey("q")) {
+            if (query.containsKey("q") && !query.get("q").trim().equals("*:*")) {
                 if (q.length() > 0) {
                     q.append(" AND (");
                     q.append(query.get("q"));
@@ -216,7 +219,7 @@ public class ResourceBrowseDao {
                 }
             }
             if (query.containsKey("fq")) {
-                fq = (String) query.get("fq");
+                fq = query.get("fq");
             }
             if (query.containsKey("sort")) {
                 Map<String, String> temp = objectMapper.readValue((String) query.get("sort"), Map.class);
@@ -234,6 +237,15 @@ public class ResourceBrowseDao {
                     sort.put(key, value);
                 });
             }
+            if (param.getParamKey().equals("q")) {
+                List<QueryCondition> ql = parseCondition(param.getParamValue());
+                if (q.length() > 0) {
+                    q.append(" AND ");
+                    q.append(solrQuery.conditionToString(ql));
+                } else {
+                    q.append(solrQuery.conditionToString(ql));
+                }
+            }
         }
         if (resourcesCode != null) {
             RsResource rsResources = rsResourceDao.findByCode(resourcesCode);
@@ -250,7 +262,7 @@ public class ResourceBrowseDao {
                         metadataIdList.add(id + "_VALUE");
                     }
                 }
-                Page<Map<String, Object>> result = hbaseQuery.queryBySolr(ResourceCore.MasterTable, q.toString(), objectMapper.writeValueAsString(sort), fq, StringUtils.join(basicField, ","), StringUtils.join(metadataIdList, ","), page, size);
+                Page<Map<String, Object>> result = hbaseQuery.queryBySolr(ResourceCore.MasterTable, q.toString(), objectMapper.writeValueAsString(sort), fq, StringUtils.join(ResourceCells.getMasterBasicCell(ProfileType.Standard), ","), StringUtils.join(metadataIdList, ","), page, size);
                 Envelop envelop = new Envelop();
                 envelop.setSuccessFlg(true);
                 envelop.setCurrPage(result.getNumber());
@@ -263,10 +275,10 @@ public class ResourceBrowseDao {
             String basicFl = "";
             String dFl = "";
             if (query.containsKey("basicFl")) {
-                basicFl = (String) query.get("basicFl");
+                basicFl = query.get("basicFl");
             }
             if (query.containsKey("dFl")) {
-                dFl = (String) query.get("dFl");
+                dFl = query.get("dFl");
             }
             Page<Map<String, Object>> result = hbaseQuery.queryBySolr(ResourceCore.MasterTable, q.toString(), objectMapper.writeValueAsString(sort), fq, basicFl, dFl, page, size);
             Envelop envelop = new Envelop();
@@ -284,13 +296,13 @@ public class ResourceBrowseDao {
      * @param resourcesCode 资源编码
      * @param roleId        角色ID列表
      * @param saas          权限
-     * @param queryParams   查询条件
+     * @param queryParams   查询条件 {"q":"*:*","fq":"*:*","basicFl":"","dFl":"","sort":"{\"field1\":\"asc\",\"field2\":\"desc\"}"}
      * @param page          页码
      * @param size          页数
      * @return
      * @throws Exception
      */
-    public Envelop getEhrCenterSub(String resourcesCode, String roleId, String saas, String queryParams, Integer page, Integer size) throws Exception {
+    public Envelop getEhrCenterSub (String resourcesCode, String roleId, String saas, String queryParams, Integer page, Integer size) throws Exception {
         //获取Saas权限
         StringBuilder q = new StringBuilder();
         if (saas != null && !"*".equals(saas)) {
@@ -298,20 +310,20 @@ public class ResourceBrowseDao {
         }
         String fq = "";
         final Map<String, String> sort = new HashMap<>();
-        Map<String, Object> query = new HashMap<>();
+        Map<String, String> query = new HashMap<>();
         if (queryParams != null) {
             query = objectMapper.readValue(queryParams, Map.class);
-            if (query.containsKey("q")) {
+            if (query.containsKey("q") && !query.get("q").trim().equals("*:*")) {
                 if (q.length() > 0) {
                     q.append(" AND (");
                     q.append(query.get("q"));
                     q.append(")");
                 } else {
-                    q.append("(" + query.get("q") + ")");
+                    q.append(query.get("q"));
                 }
             }
             if (query.containsKey("fq")) {
-                fq = (String) query.get("fq");
+                fq = query.get("fq");
             }
             if (query.containsKey("sort")) {
                 Map<String, String> temp = objectMapper.readValue((String) query.get("sort"), Map.class);
@@ -336,6 +348,15 @@ public class ResourceBrowseDao {
                     q.append("rowkey:*$" + param.getParamValue() + "$*");
                 }
             }
+            if (param.getParamKey().equals("q")) {
+                List<QueryCondition> ql = parseCondition(param.getParamValue());
+                if (q.length() > 0) {
+                    q.append(" AND ");
+                    q.append(solrQuery.conditionToString(ql));
+                } else {
+                    q.append(solrQuery.conditionToString(ql));
+                }
+            }
         }
         if (resourcesCode != null) {
             RsResource rsResources = rsResourceDao.findByCode(resourcesCode);
@@ -352,7 +373,7 @@ public class ResourceBrowseDao {
                         metadataIdList.add(id + "_VALUE");
                     }
                 }
-                Page<Map<String, Object>> result = hbaseQuery.queryBySolr(ResourceCore.SubTable, q.toString(), objectMapper.writeValueAsString(sort), fq, StringUtils.join(basicField, ","), StringUtils.join(metadataIdList, ","), page, size);
+                Page<Map<String, Object>> result = hbaseQuery.queryBySolr(ResourceCore.SubTable, q.toString(), objectMapper.writeValueAsString(sort), fq, StringUtils.join(ResourceCells.getSubBasicCell(ProfileType.Standard), ","), StringUtils.join(metadataIdList, ","), page, size);
                 Envelop envelop = new Envelop();
                 envelop.setSuccessFlg(true);
                 envelop.setCurrPage(result.getNumber());
@@ -365,10 +386,10 @@ public class ResourceBrowseDao {
             String basicFl = "";
             String dFl = "";
             if (query.containsKey("basicFl")) {
-                basicFl = (String) query.get("basicFl");
+                basicFl = query.get("basicFl");
             }
             if (query.containsKey("dFl")) {
-                dFl = (String) query.get("dFl");
+                dFl = query.get("dFl");
             }
             Page<Map<String, Object>> result = hbaseQuery.queryBySolr(ResourceCore.SubTable, q.toString(), objectMapper.writeValueAsString(sort), fq, basicFl, dFl, page, size);
             Envelop envelop = new Envelop();
@@ -476,7 +497,7 @@ public class ResourceBrowseDao {
      * @return
      * @throws Exception
      */
-    public Page<Map<String, Object>> countEhrCenterSub(String queryParams, Integer page, Integer size) throws Exception {
+    public Page<Map<String, Object>> countEhrCenterSub (String queryParams, Integer page, Integer size) throws Exception {
         String core = ResourceCore.SubTable;
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, String> params = objectMapper.readValue(queryParams, Map.class);
@@ -539,6 +560,16 @@ public class ResourceBrowseDao {
 
     }
 
+    /**
+     * 获取指标数据
+     * @param resourcesCode
+     * @param roleId
+     * @param saas
+     * @param queryParams
+     * @param page
+     * @param size
+     * @return
+     */
     public Envelop getQuotaData(String resourcesCode, String roleId, String saas, String queryParams, Integer page, Integer size) {
         RsResource rsResource = rsResourceDao.findByCode(resourcesCode);
         if (rsResource.getDimension() != null && "orgHealthCategoryCode".equals(rsResource.getDimension())) {
@@ -559,7 +590,7 @@ public class ResourceBrowseDao {
     /**
      * 获取非结构化资源
      *
-     * @param filters
+     * @param filters key1=val1;key2>val2;key3<>val3
      * @param sorts
      * @param page
      * @param size
@@ -642,47 +673,6 @@ public class ResourceBrowseDao {
     }
 
     /**
-     * 获取非结构化档案
-     *
-     * @return
-     */
-    public Page<Map<String, Object>> getRawFiles(String queryParams, Integer page, Integer size) throws Exception {
-        String core = ResourceCore.RawFiles;
-        String q = "";
-        String fq = "";
-        String sort = "";
-        if (queryParams != null && queryParams.length() > 0) {
-            if (queryParams.startsWith("{") && queryParams.endsWith("}")) {
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, String> obj = objectMapper.readValue(queryParams, Map.class);
-                if (obj.containsKey("q")) {
-                    q = obj.get("q");
-                }
-                if (obj.containsKey("sort")) {
-                    sort = obj.get("sort");
-                }
-                //join操作
-                if (obj.containsKey("join")) {
-                    String join = obj.get("join");
-                    fq = q;
-                    q = "{!join fromIndex=" + mainJoinCore + " from=rowkey to=profile_id}" + join;
-                }
-            } else {
-                q = queryParams;
-            }
-        }
-        //默认第一页
-        if (page == null) {
-            page = defaultPage;
-        }
-        //默认行数
-        if (size == null) {
-            size = defaultSize;
-        }
-        return hbaseQuery.queryBySolr(core, q, sort, fq, page, size);
-    }
-
-    /**
      * 获取solr索引列表
      * queryParams可为solr表达式，也可为json例：{"q":"*:*","saas":"*","join":"*:*","fl":"","sort":"{\"field1\":\"asc\",\"field2\":\"desc\"}""}
      * 有join参数做join操作
@@ -747,43 +737,8 @@ public class ResourceBrowseDao {
      * @return
      * @throws Exception
      */
-    public List<Map<String, Object>> getEhrCenterByScan(String resourcesCode, String roleId, String saas, String rowKey) throws Exception {
-        //获取Saas权限
-        StringBuilder q = new StringBuilder();
-        if (saas != null && !"*".equals(saas)) {
-            q.append(saas);
-        }
-        String fq = "";
-        final Map<String, String> sort = new HashMap<>();
+    public List<Map<String, Object>> getEhrCenterByScan (String resourcesCode, String roleId, String saas, String rowKey) throws Exception {
         Map<String, Object> query = new HashMap<>();
-        if (rowKey != null) {
-            if (q.length() > 0) {
-                q.append(" AND (");
-                q.append("rowkey:" + rowKey);
-                q.append(")");
-            } else {
-                q.append(query.get("q"));
-            }
-            if (query.containsKey("fq")) {
-                fq = (String) query.get("fq");
-            }
-            if (query.containsKey("sort")) {
-                Map<String, String> temp = objectMapper.readValue((String) query.get("sort"), Map.class);
-                temp.forEach((key, value) -> {
-                    sort.put(key, value);
-                });
-            }
-        }
-        //通过资源代码获取默认参数
-        List<RsResourceDefaultParam> paramsList = resourceDefaultParamDao.findByResourcesCode(resourcesCode);
-        for (RsResourceDefaultParam param : paramsList) {
-            if (param.getParamKey().equals("sort")) {
-                Map<String, String> temp = objectMapper.readValue(param.getParamValue(), Map.class);
-                temp.forEach((key, value) -> {
-                    sort.put(key, value);
-                });
-            }
-        }
         if (resourcesCode != null) {
             RsResource rsResources = rsResourceDao.findByCode(resourcesCode);
             //获取资源结构权限，该部分新增其他标准数据集的判断
@@ -799,12 +754,11 @@ public class ResourceBrowseDao {
                         metadataIdList.add(id + "_VALUE");
                     }
                 }
-
                 List<Map<String, Object>> data = new ArrayList<>();
                 //Scan查询
                 String legacyRowKeys[] = hbaseDao.findRowKeys(ResourceCore.MasterTable, rowKey, rowKey.substring(0, rowKey.length() - 1) + "1", "^" + rowKey);
                 List list = Arrays.asList(legacyRowKeys);
-                Result[] resultList = hbaseDao.getResultList(ResourceCore.MasterTable, list, StringUtils.join(basicField, ","), StringUtils.join(metadataIdList, ",")); //hbase结果集
+                Result[] resultList = hbaseDao.getResultList(ResourceCore.MasterTable, list, "", ""); //hbase结果集
                 if (resultList != null && resultList.length > 0) {
                     for (Result result : resultList) {
                         Map<String, Object> obj = hbaseQuery.resultToMap(result);
@@ -850,40 +804,8 @@ public class ResourceBrowseDao {
      * @return
      * @throws Exception
      */
-    public List<Map<String, Object>> getEhrCenterSubByScan(String dataSetCode, String roleId, String saas, String rowKey) throws Exception {
-        //获取Saas权限
-        StringBuilder q = new StringBuilder();
-        if (saas != null && !"*".equals(saas)) {
-            q.append(saas);
-        }
-        String fq = "";
-        final Map<String, String> sort = new HashMap<>();
+    public List<Map<String, Object>> getEhrCenterSubByScan (String dataSetCode, String roleId, String saas, String rowKey) throws Exception {
         Map<String, Object> query = new HashMap<>();
-        if (query.containsKey("q")) {
-            if (q.length() > 0) {
-                q.append(" AND (");
-                q.append("rowKey:" + rowKey);
-                q.append(")");
-            } else {
-                q.append("(" + query.get("q") + ")");
-            }
-        }
-        if (query.containsKey("fq")) {
-            fq = (String) query.get("fq");
-        }
-        if (query.containsKey("sort")) {
-            Map<String, String> temp = objectMapper.readValue((String) query.get("sort"), Map.class);
-            temp.forEach((key, value) -> {
-                sort.put(key, value);
-            });
-        }
-        //细表rowkey，生成
-        if (q.length() > 0) {
-            q.append(" AND (rowkey:*$" + dataSetCode + "$*)");
-        } else {
-            q.append("rowkey:*$" + dataSetCode + "$*");
-        }
-
         if (dataSetCode != null) {
             RsResource rsResources = rsResourceDao.findByCode(dataSetCode);
             //获取资源结构权限，该部分新增其他标准数据集的判断
@@ -909,7 +831,7 @@ public class ResourceBrowseDao {
                 List list = Arrays.asList(legacyRowKeys);
                 //获取各个数据集相关的rowkey
 
-                Result[] resultList = hbaseDao.getResultList(ResourceCore.SubTable, list, StringUtils.join(basicField, ","), StringUtils.join(metadataIdList, ",")); //hbase结果集
+                Result[] resultList = hbaseDao.getResultList(ResourceCore.SubTable, list, StringUtils.join(ResourceCells.getSubBasicCell(ProfileType.Standard), ","), StringUtils.join(metadataIdList, ",")); //hbase结果集
                 if (resultList != null && resultList.length > 0) {
                     for (Result result : resultList) {
                         Map<String, Object> obj = hbaseQuery.resultToMap(result);
@@ -958,7 +880,7 @@ public class ResourceBrowseDao {
      * @return
      * @throws Exception
      */
-    public Map<String, Object> getEhrCenterSubMapByScan(List<String> dataSetCodes, String roleId, String saas, String rowKey) throws Exception {
+    public Map<String, Object> getEhrCenterSubMapByScan (List<String> dataSetCodes, String roleId, String saas, String rowKey) throws Exception {
         Map<String, Object> resultMap = new HashMap<>();
         Map<String, List<String>> rowKeyMap = new HashMap<>();
         //获取Saas权限
@@ -1023,7 +945,7 @@ public class ResourceBrowseDao {
                     }
                     List<Map<String, Object>> data = new ArrayList<>();
 
-                    Result[] resultList = hbaseDao.getResultList(ResourceCore.SubTable, list, StringUtils.join(basicField, ","), StringUtils.join(metadataIdList, ",")); //hbase结果集
+                    Result[] resultList = hbaseDao.getResultList(ResourceCore.SubTable, list, StringUtils.join(ResourceCells.getSubBasicCell(ProfileType.Standard), ","), StringUtils.join(metadataIdList, ",")); //hbase结果集
                     if (resultList != null && resultList.length > 0) {
                         for (Result result : resultList) {
                             Map<String, Object> obj = hbaseQuery.resultToMap(result);
@@ -1062,5 +984,30 @@ public class ResourceBrowseDao {
 
     }
 
+    /**
+     * 查询条件转换
+     *
+     * @param queryCondition
+     * @return
+     * @throws Exception
+     */
+    private List<QueryCondition> parseCondition(String queryCondition) throws Exception {
+        List<QueryCondition> ql = new ArrayList<QueryCondition>();
+        List<Map<String, Object>> list = objectMapper.readValue(queryCondition, List.class);
+        if (list != null && list.size() > 0) {
+            for (Map<String, Object> item : list) {
+                String andOr = String.valueOf(item.get("andOr")).trim();
+                String field = String.valueOf(item.get("field")).trim();
+                String cond = String.valueOf(item.get("condition")).trim();
+                String value = String.valueOf(item.get("value"));
+                if (value.indexOf(",") > 0) {
+                    ql.add(new QueryCondition(andOr, cond, field, value.split(",")));
+                } else {
+                    ql.add(new QueryCondition(andOr, cond, field, value));
+                }
+            }
+        }
+        return ql;
+    }
 
 }

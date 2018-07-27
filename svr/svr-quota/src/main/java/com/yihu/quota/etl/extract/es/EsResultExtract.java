@@ -371,7 +371,7 @@ public class EsResultExtract {
                     .append(" group by ").append(aggsFields)
                     .append(" date_histogram(field='quotaDate','interval'='")
                     .append(dateDime).append("')").append(" limit 10000 ");
-            System.out.println("查询分组 mysql= " + mysql.toString());
+            logger.warn("查询分组 mysql= " + mysql.toString());
             List<Map<String, Object>> listMap = elasticsearchUtil.excuteDataModel(mysql.toString());
             if(listMap != null &&  listMap.size() > 0){
                 if(listMap.get(0).get("SUM(result)") != null){
@@ -423,7 +423,7 @@ public class EsResultExtract {
             } else {
                 mysql.append(" limit 10000 ");
             }
-            System.out.println("查询分组 mysql= " + mysql.toString());
+            logger.warn("查询分组 mysql= " + mysql.toString());
             List<Map<String, Object>> listMap = elasticsearchUtil.excuteDataModel(mysql.toString());
             if(listMap != null &&  listMap.size() > 0){
                 if(listMap.get(0).get("SUM(result)") != null){

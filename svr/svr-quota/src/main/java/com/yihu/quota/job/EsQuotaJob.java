@@ -153,10 +153,11 @@ public class EsQuotaJob implements Job {
                     }
                     Thread th = new Thread(new Thread(){
                         public void run(){
-                            logger.info("启动第 "+ f + " 个线程。 ");//只能访问外部的final变量。
+                            logger.info("启动第 "+ (f+1) + " 个线程。 ");//只能访问外部的final变量。
                             quota(quotaLogf, quotaVof);
                         }
                     });
+                    Thread.sleep(10000);//延迟10 秒 Es 保存2万条 有时超时，延迟执行减缓个线程同时执行的压力
                     th.start();
                 }
             }else {
@@ -196,6 +197,7 @@ public class EsQuotaJob implements Job {
                 jdbcTemplate.update(sql);
             }
         } catch (Exception e) {
+            haveThreadCount++;
             tjQuotaLog.setStatus(Contant.save_status.fail);
             tjQuotaLog.setContent(e.getMessage());
             tjQuotaLog = saveLog(tjQuotaLog);
@@ -205,6 +207,7 @@ public class EsQuotaJob implements Job {
             if(haveThreadCount  == threadCount){
                 tjQuotaLog.setStatus(Contant.save_status.success);
                 tjQuotaLog.setContent(time+"统计保存成功");
+                logger.warn("指标" + tjQuotaLog.getQuotaCode() + "统计成功 结束！");
             }else {
                 tjQuotaLog.setStatus(Contant.save_status.fail);
                 tjQuotaLog.setContent( time+"统计保存失败");
@@ -249,14 +252,17 @@ public class EsQuotaJob implements Job {
             while (flag){
                 long count = elasticsearchUtil.getTotalCount(talClient, esConfig.getIndex() ,esConfig.getType(), boolQueryBuilder);
                 if(count != 0){
-                    flag = elasticsearchUtil.queryDelete(client, esConfig.getIndex() ,esConfig.getType(),boolQueryBuilder);
+                    boolean successFlag = elasticsearchUtil.queryDelete(client, esConfig.getIndex() ,esConfig.getType(),boolQueryBuilder);
+                    if(!successFlag){
+                        throw  new Exception("Elasticsearch 指标统计时原始数据删除失败");
+                    }
                 }else {
                     flag = false ;
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
-            throw  new Exception("Elasticsearch 指标统计时删除数据异常");
+            throw  new Exception("Elasticsearch 指标统计时原始数据删除异常");
         } finally {
             talClient.close();
             client.close();

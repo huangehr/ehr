@@ -34,6 +34,7 @@ public class ExtractUtil {
     private Logger logger = LoggerFactory.getLogger(ExtractUtil.class);
     private static String main_town = "twon";
     private static String main_org = "org";
+    private static String main_dept = "dept";
     private static String main_year = "year";
     private static String slave_sex = "sex";
     private static String slave_age = "age";
@@ -66,6 +67,7 @@ public class ExtractUtil {
         List<SaveModel> totalSaveModelDictList = getTotalDictDataList(qdm,qds);
         Map<String,String> townDictMap = new HashMap<>();
         Map<String,String> orgDictMap = new HashMap<>();
+        Map<String,String> deptDictMap = new HashMap<>();
         Map<String,String> yearDictMap = new HashMap<>();
         Map<String,String> slave1DictMap = new HashMap<>();
         Map<String,String> slave2DictMap = new HashMap<>();
@@ -77,6 +79,9 @@ public class ExtractUtil {
             }
             if(saveModel.getOrg() != null){
                 orgDictMap.put(saveModel.getOrg(), saveModel.getOrgName());
+            }
+            if(saveModel.getDept() != null){
+                deptDictMap.put(saveModel.getDept(), saveModel.getDeptName());
             }
             if(saveModel.getYear() != null){
                 yearDictMap.put(saveModel.getYear(), saveModel.getYearName());
@@ -116,9 +121,15 @@ public class ExtractUtil {
                     }else if(main.getMainCode().equals(main_org) && !StringUtils.isEmpty(orgDictMap.get(value))){
                         saveModel.setOrg(value);
                         saveModel.setOrgName(orgDictMap.get(value));
-                    } else if(main.getMainCode().equals(main_year) && !StringUtils.isEmpty(yearDictMap.get(value))){
+                    }else if(main.getMainCode().equals(main_year) && !StringUtils.isEmpty(yearDictMap.get(value))){
                         saveModel.setYearName(yearDictMap.get(value));
                         saveModel.setYear(value);
+                    }else if(main.getMainCode().equals(main_dept) && !StringUtils.isEmpty(deptDictMap.get(value))){
+                        if(value.length() > 2){
+                            value = value.substring(0,2);
+                        }
+                        saveModel.setDeptName(deptDictMap.get(value));
+                        saveModel.setDept(value);
                     }
                 }
             }
@@ -132,12 +143,6 @@ public class ExtractUtil {
                                 saveModel.setSlaveKey1(value);
                                 saveModel.setSlaveKey1Name(slave1DictMap.get(value));
                             }
-                        }else {
-//                            String key = getSexAndAgeUnKnownDict(qds.get(i), slave1DictMap);
-//                            if(!StringUtils.isEmpty(key)){
-//                                saveModel.setSlaveKey1(key);
-//                                saveModel.setSlaveKey1Name("未知");
-//                            }
                         }
                     }else if(num == 2) {
                         if(map.get(qds.get(i).getKeyVal().trim()) != null){
@@ -146,12 +151,6 @@ public class ExtractUtil {
                                 saveModel.setSlaveKey2(value);
                                 saveModel.setSlaveKey2Name(slave2DictMap.get(value));
                             }
-                        }else {
-//                            String key = getSexAndAgeUnKnownDict(qds.get(i), slave2DictMap);
-//                            if(!StringUtils.isEmpty(key)){
-//                                saveModel.setSlaveKey2(key);
-//                                saveModel.setSlaveKey2Name("未知");
-//                            }
                         }
                     }else if(num == 3) {
                         if(map.get(qds.get(i).getKeyVal().trim()) != null){
@@ -160,12 +159,6 @@ public class ExtractUtil {
                                 saveModel.setSlaveKey3(value);
                                 saveModel.setSlaveKey3Name(slave3DictMap.get(value));
                             }
-                        }else {
-//                            String key = getSexAndAgeUnKnownDict(qds.get(i), slave3DictMap);
-//                            if(!StringUtils.isEmpty(key)){
-//                                saveModel.setSlaveKey3(key);
-//                                saveModel.setSlaveKey3Name("未知");
-//                            }
                         }
                     }else if(num == 4 ) {
                         if(map.get(qds.get(i).getKeyVal().trim()) != null){
@@ -174,21 +167,35 @@ public class ExtractUtil {
                                 saveModel.setSlaveKey4(value);
                                 saveModel.setSlaveKey4Name(slave4DictMap.get(value));
                             }
-                        }else {
-//                            String key = getSexAndAgeUnKnownDict(qds.get(i), slave4DictMap);
-//                            if(!StringUtils.isEmpty(key)){
-//                                saveModel.setSlaveKey4(key);
-//                                saveModel.setSlaveKey4Name("未知");
-//                            }
                         }
                     }
                 }
                 if(!StringUtils.isEmpty(timeKey)){
                     if(!StringUtils.isEmpty( map.get("quotaDate") ) ){
-                        saveModel.setQuotaDate(map.get("quotaDate").toString());
+                        String date = "";
+                        if(map.get("quotaDate") instanceof String){
+                            date = map.get("quotaDate").toString();
+                        }else if(map.get("quotaDate") instanceof Date){
+                            date = DateUtil.formatDate((Date)map.get("quotaDate"),DateUtil.DEFAULT_DATE_YMD_FORMAT);
+                        }
+                        saveModel.setQuotaDate(date);
                     }
                     if(!StringUtils.isEmpty( map.get("event_date") )){
-                        String date = DateUtil.formatDate((Date)map.get("event_date"),DateUtil.DEFAULT_DATE_YMD_FORMAT);
+                        String date = "";
+                        if(map.get("event_date") instanceof String){
+                            date = map.get("event_date").toString().substring(0,10);
+                        }else if(map.get("event_date") instanceof Date){
+                            date = DateUtil.formatDate((Date)map.get("event_date"),DateUtil.DEFAULT_DATE_YMD_FORMAT);
+                        }
+                        saveModel.setQuotaDate(date);
+                    }
+                    if(!StringUtils.isEmpty( map.get("eventDate") )){
+                        String date = "";
+                        if(map.get("eventDate") instanceof String){
+                            date = map.get("eventDate").toString().substring(0,10);
+                        }else if(map.get("eventDate") instanceof Date){
+                            date = DateUtil.formatDate((Date)map.get("event_date"),DateUtil.DEFAULT_DATE_YMD_FORMAT);
+                        }
                         saveModel.setQuotaDate(date);
                     }
                 }
@@ -213,20 +220,6 @@ public class ExtractUtil {
         }
         logger.info("指标：" + quotaVo.getName() + "统计时指标或者机构未关联上错误数据有：" + errorCount);
         return returnList;
-    }
-
-    public String getSexAndAgeUnKnownDict(TjQuotaDimensionSlave tjQuotaDimensionSlave , Map<String,String> dictMap){
-        String dictKey = "";
-        if(tjQuotaDimensionSlave.getSlaveCode().equals(slave_sex) || tjQuotaDimensionSlave.getSlaveCode().equals(slave_age) ){
-            dictKey = "0";
-            for(String key : dictMap.keySet()){
-                if(dictMap.get(key).equals(unknown)){
-                    dictKey = key;
-                    break;
-                }
-            }
-        }
-        return  dictKey;
     }
 
     /**
@@ -552,10 +545,10 @@ public class ExtractUtil {
                 });
                 break;
             }
-            case Contant.main_dimension.area_team: {
-                //设置团队
+            case Contant.main_dimension.area_dept: {
+                //设置科室
                 dictData.stream().forEach(one -> {
-                    setOneData(allData, one.getTeam(), one, Contant.main_dimension_areaLevel.area_team);
+                    setOneData(allData, one.getDept(), one, Contant.main_dimension_areaLevel.area_dept);
                 });
                 break;
             }
@@ -594,9 +587,9 @@ public class ExtractUtil {
                 name = mainOne.getOrgName();
                 break;
             }
-            case Contant.main_dimension.area_team: {
-                code = mainOne.getTeam();
-                name = mainOne.getTeamName();
+            case Contant.main_dimension.area_dept: {
+                code = mainOne.getDept();
+                name = mainOne.getDeptName();
                 break;
             }
             case Contant.main_dimension.time_year: {
@@ -659,8 +652,6 @@ public class ExtractUtil {
             if (organizations != null && organizations.size() > 0) {
                 MOrganization organization = organizations.get(0);
                 if (!StringUtils.isEmpty(organization.getAdministrativeDivision())) {
-                    model.setCity("shangrao");
-                    model.setCityName("上饶市");
                     String orgCode = organization.getAdministrativeDivision().toString();
                     if(townMap.get(orgCode) != null ){
                         model.setTown(orgCode);
@@ -687,9 +678,6 @@ public class ExtractUtil {
                         model.setEconomic("1022");
                         model.setEconomicName("非公立");
                     }
-                } else {
-                    model.setEconomic("0");
-                    model.setEconomicName("未知");
                 }
                 if (!StringUtils.isEmpty(organization.getLevelId())) {
                     String levelId = organization.getLevelId();
@@ -706,9 +694,6 @@ public class ExtractUtil {
                         model.setLevel(levelId);
                         model.setLevelName("未定级");
                     }
-                } else {
-                    model.setLevel("9");
-                    model.setLevelName("未定级");
                 }
             }
         }

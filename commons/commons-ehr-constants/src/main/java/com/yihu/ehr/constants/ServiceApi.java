@@ -1330,6 +1330,7 @@ public class ServiceApi {
         public static class Scheduler {
             public static final String ExtractMedicineExpense = "/tj/scheduler/extractMedicineExpense";
             public static final String ExtractChronicDisease = "/tj/scheduler/extractChronicDisease";
+            public static final String ExtractPregnantWoman = "/tj/scheduler/extractPregnantWoman";
         }
 
     }
@@ -1728,12 +1729,8 @@ public class ServiceApi {
         public static class Report {
             public static final String CountEmergencyAttendance = "/govFirstPage/report/countEmergencyAttendance";
             public static final String CountHospitalizationAttendance = "/govFirstPage/report/countHospitalizationAttendance";
-            public static final String AverageHospitalStayDay = "/govFirstPage/report/averageHospitalStayDay";
-            public static final String StatHospitalizationHeadToHeadRatio = "/govFirstPage/report/statHospitalizationHeadToHeadRatio";
             public static final String StatEmergencyExpense = "/govFirstPage/report/statEmergencyExpense";
             public static final String StatHospitalizationExpense = "/govFirstPage/report/statHospitalizationExpense";
-            public static final String AverageEmergencyExpense = "/govFirstPage/report/averageEmergencyExpense";
-            public static final String AverageHospitalizationExpense = "/govFirstPage/report/averageHospitalizationExpense";
             public static final String StatEmergencyMedicineExpense = "/govFirstPage/report/statEmergencyMedicineExpense";
             public static final String StatHospitalizationMedicineExpense = "/govFirstPage/report/statHospitalizationMedicineExpense";
             public static final String StatAttendanceTrend = "/govFirstPage/report/statAttendanceTrend";

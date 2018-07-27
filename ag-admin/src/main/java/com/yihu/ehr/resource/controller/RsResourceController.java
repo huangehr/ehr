@@ -421,9 +421,9 @@ public class RsResourceController extends BaseController {
                         }else{
                             chart = charstr;
                         }
-                        if(StringUtils.isNotEmpty(rsResourcesModel.getDimension())){
+                        if(StringUtils.isEmpty(dimension) && StringUtils.isNotEmpty(rsResourcesModel.getDimension())){
                             dimension = rsResourcesModel.getDimension();
-                        }else {
+                        }else if (StringUtils.isEmpty(dimension)) {
                             dimension =  firstDimension;
                         }
                         chartInfoModel = tjQuotaJobClient.getMoreQuotaGraphicReportPreviews(quotaIdstr, chart, filter, dimension , mRsResources.getName(), top, objectMapper.writeValueAsString(mRsResources));

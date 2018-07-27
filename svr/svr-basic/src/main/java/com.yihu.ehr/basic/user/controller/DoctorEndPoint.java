@@ -132,14 +132,13 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
         Organization organization = orgService.getOrgById(mOrgDeptJson.getOrgId());
         OrgDept orgDept = orgDeptService.searchBydeptId(Integer.parseInt(mOrgDeptJson.getDeptIds().split(",")[0]));
         Doctors doctor = toEntity(doctoJsonData, Doctors.class);
-        doctor.setInsertTime(new Date());
-        doctor.setUpdateTime(new Date());
         doctor.setStatus("1");
         doctor.setPyCode(PinyinUtil.getPinYinHeadChar(doctor.getName(), false));
         doctor.setOrgId(organization.getId().toString());
         doctor.setOrgCode(organization.getOrgCode());
         doctor.setOrgFullName(organization.getFullName());
         doctor.setDeptName(orgDept.getName());
+        doctor.setInsertTime(new Date());
         Doctors d = doctorService.save(doctor);
 
         String idCardNo = d.getIdCardNo();
@@ -184,6 +183,7 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
         }
 
         d.setUserId(user.getId());
+        d.setInsertTime(new Date());
         d = doctorService.save(d);
 
         //创建居民

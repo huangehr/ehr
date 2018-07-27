@@ -4,13 +4,14 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
-import com.yihu.ehr.model.common.Result;
 import com.yihu.ehr.resolve.service.profile.ArchiveRelationService;
+import com.yihu.ehr.resolve.service.resource.stage2.RsDictionaryEntryService;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,6 +33,8 @@ public class ArchiveRelationEndPoint extends EnvelopRestEndPoint {
     private ElasticSearchUtil elasticSearchUtil;
     @Autowired
     private ArchiveRelationService archiveRelationService;
+    @Autowired
+    private RsDictionaryEntryService rsDictionaryEntryService;
 
     @RequestMapping(value = ServiceApi.PackageResolve.ArchiveRelation, method = RequestMethod.GET)
     @ApiOperation(value = "获取档案关联列表")
@@ -44,8 +47,19 @@ public class ArchiveRelationEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page") int page,
             @ApiParam(name = "size", value = "页码", required = true, defaultValue = "15")
             @RequestParam(value = "size") int size) throws Exception {
-        List<Map<String, Object>> archiveRelationList  = elasticSearchUtil.page(INDEX, TYPE, filters, sorts, page, size);
-        int count = (int)elasticSearchUtil.count(INDEX, TYPE, filters);
+        List<Map<String, Object>> archiveRelationList = elasticSearchUtil.page(INDEX, TYPE, filters, sorts, page, size);
+        //updated by zdm on 2018/07/17 ,bug 6343---start
+        archiveRelationList.forEach(item -> {
+            //卡类型编码不为空
+            if (!StringUtils.isEmpty(item.get("card_type"))) {
+                //获取资源字典-卡类型代码 集合
+                String cardType = rsDictionaryEntryService.getRsDictionaryEntryByDictCode("STD_CARD_TYPE", item.get("card_type").toString());
+                //获取字典值
+                item.put("card_type", cardType);
+            }
+        });
+        //updated by zdm on 2018/07/17---end
+        int count = (int) elasticSearchUtil.count(INDEX, TYPE, filters);
         Envelop envelop = getPageResult(archiveRelationList, count, page, size);
         return envelop;
     }

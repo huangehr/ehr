@@ -178,7 +178,9 @@ public class QuotaReportController extends BaseController {
                                     vMap.put(viewQuotaCode, quotaResultMap.get("result")==null ? 0 : ("--".equals(quotaResultMap.get("result")) ? quotaResultMap.get("result") : nf.format(Double.valueOf(quotaResultMap.get("result").toString()))));
                                     break;
                                 } else {
-                                    vMap.put(viewQuotaCode, 0);
+                                    if( !vMap.get(dimension).toString().equals("合计")){
+                                        vMap.put(viewQuotaCode, 0);
+                                    }
                                 }
                             } else {
                                 vMap.put(viewQuotaCode, 0);
@@ -236,13 +238,38 @@ public class QuotaReportController extends BaseController {
             Map<String, Object> sumMap = new HashMap<>();
             sumMap.put("firstColumn","合计");
             for (String code : quotaCodes) {
-                double sum = 0;
-                sum = calculateSum(sum,code,dataList);
-                sumMap.put(code, nf.format(sum));
+                String total =  existsTotal(code,dataList);
+                if( total.equals("false")){
+                    double sum = 0;
+                    sum = calculateSum(sum,code,dataList);
+                    sumMap.put(code, nf.format(sum));
+                }else {
+                    sumMap.put(code, nf.format(Double.valueOf(total)));
+                }
             }
             dataList.add(0,sumMap);
+            if(dataList.get(dataList.size()-1).get("firstColumn") != null){
+                if(dataList.get(dataList.size()-1).get("firstColumn").equals("合计")){
+                    dataList.remove(dataList.size()-1);
+                }
+            }
         }
         return dataList;
+    }
+
+    /**
+     * 判断指标统计中 总计 是否已经计算过
+     * @param code
+     * @param dataList
+     * @return
+     */
+    private String existsTotal(String code,List<Map<String, Object>> dataList){
+        for(Map<String, Object> map : dataList){
+            if(map.get("firstColumn") != null && map.get("firstColumn").toString().equals("合计") && map.get(code) != null){
+                return map.get(code).toString();
+            }
+        }
+        return "false";
     }
 
     /**
@@ -392,7 +419,7 @@ public class QuotaReportController extends BaseController {
                     List<Map<String, Object>> datalist = new ArrayList<>();
                     for (Map<String, Object> resultMap : listMap) {
                         Map<String, Object> map = new HashMap<>();
-                        map.put("NAME", resultMap.get(dimensionName));
+                        map.put("NAME", null == resultMap.get(dimensionName) ? resultMap.get(dimension) : resultMap.get(dimensionName));
                         map.put("TOTAL", resultMap.get("result"));
                         if(resultMap.get(dimensionName) != null){
                             map.put("NAME",resultMap.get(dimensionName));
@@ -924,7 +951,7 @@ public class QuotaReportController extends BaseController {
                 List<Map<String, Object>> datalist = new ArrayList<>();
                 for (Map<String, Object> resultMap : listMap) {
                     Map<String, Object> map = new HashMap<>();
-                    map.put("NAME", resultMap.get(dimensionName));
+                    map.put("NAME", null == resultMap.get(dimensionName) ? resultMap.get(dimension) : resultMap.get(dimensionName));
                     map.put("TOTAL", resultMap.get("result"));
                     if(resultMap.get(dimensionName) != null){
                         map.put("NAME",resultMap.get(dimensionName));
@@ -1009,8 +1036,12 @@ public class QuotaReportController extends BaseController {
             optionData.forEach(one -> {
                 List<Object> list = new ArrayList<>();
                 one.forEach(item -> {
-                    item = nf.format(Double.parseDouble(item.toString()) / v);
-                    list.add(item);
+                    if(item != null && !item.toString().equals("--")){
+                        item = nf.format(Double.parseDouble(item.toString()) / v);
+                        list.add(item);
+                    }else {
+                        list.add(0);
+                    }
                 });
                 handleList.add(list);
             });

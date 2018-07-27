@@ -11,6 +11,7 @@ public class RoleUserModel {
     private String userName;
     private String loginCode;
     private String userType;
+    private String idCardNo;
 
     public RoleUserModel() {
     }
@@ -69,5 +70,13 @@ public class RoleUserModel {
 
     public void setUserType(String userType) {
         this.userType = userType;
+    }
+
+    public String getIdCardNo() {
+        return idCardNo;
+    }
+
+    public void setIdCardNo(String idCardNo) {
+        this.idCardNo = idCardNo;
     }
 }

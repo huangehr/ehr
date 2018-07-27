@@ -47,7 +47,7 @@ public class QcReportScheduler {
      *
      * @throws Exception
      */
-    @Scheduled(cron = "0 0 1 * * ?")
+    //@Scheduled(cron = "0 0 1 * * ?")
 //	@Scheduled(cron = "0 0/1 * * * ?")
     public void resolveFileScheduler() throws Exception {
         resolveFile();
@@ -60,7 +60,7 @@ public class QcReportScheduler {
      *
      * @throws Exception
      */
-    @Scheduled(cron = "0 0 3 * * ?")
+    //@Scheduled(cron = "0 0 3 * * ?")
 //	@Scheduled(cron = "0 0/2 * * * ?")//每2分钟
     public void statisticalScheduler() throws Exception {
         List<Object> objectList;

@@ -60,28 +60,28 @@ public class SolrQuery {
         Object[] keywords = condition.getKeywords();
         switch (operation) {
             case Operation.LIKE:
-                s = field + ":*\"" + keyword + "\"*";
+                s = field + ":*" + keyword + "*";
                 break;
             case Operation.LEFTLIKE:
-                s = field + ":*\"" + keyword + "\"";
+                s = field + ":*" + keyword + "";
                 break;
             case Operation.RIGHTLIKE:
-                s = field + ":\"" + keyword + "\"*";
+                s = field + ":" + keyword + "*";
                 break;
             case Operation.RANGE: {
                 if (keywords.length >= 2) {
-                    s = field + ":[\"" + keywords[0] + "\" TO \"" + keywords[1] + "\"]";
+                    s = field + ":[" + keywords[0] + " TO " + keywords[1] + "]";
                 }
                 break;
             }
             case Operation.NOTRANGE: {
                 if (keywords.length >= 2) {
-                    s = "NOT " + field + ":[\"" + keywords[0] + "\" TO \"" + keywords[1] + "\"]";
+                    s = "NOT " + field + ":[" + keywords[0] + " TO " + keywords[1] + "]";
                 }
                 break;
             }
             case Operation.NE: {
-                s = "NOT(" + field + ":\"" + keyword + "\")";
+                s = "NOT(" + field + ":" + keyword + ")";
                 break;
             }
             case Operation.IN: {
@@ -89,13 +89,13 @@ public class SolrQuery {
                 if (keywords != null && keywords.length > 0) {
                     for (Object key : keywords) {
                         if (in != null && in.length() > 0) {
-                            in += " OR " + field + ":\"" + key + "\"";
+                            in += " OR " + field + ":" + key;
                         } else {
-                            in = field + ":\"" + key + "\"";
+                            in = field + ":" + key;
                         }
                     }
                 } else if (keyword != null) {
-                    in = field + ":\"" + keyword + "\"";
+                    in = field + ":" + keyword;
                 }
                 s = "( " + in + " )";
                 break;
@@ -105,35 +105,35 @@ public class SolrQuery {
                 if (keywords != null && keywords.length > 0) {
                     for (Object key : keywords) {
                         if (in != null && in.length() > 0) {
-                            in += " OR " + field + ":\"" + key + "\"";
+                            in += " OR " + field + ":" + key;
                         } else {
-                            in = field + ":\"" + key + "\"";
+                            in = field + ":" + key;
                         }
                     }
                 } else if (keyword != null) {
-                    in = field + ":\"" + keyword + "\"";
+                    in = field + ":" + keyword;
                 }
                 s = "NOT (" + in + ")";
                 break;
             }
             case Operation.GT: {
-                s = field + ":{\"" + keyword + "\" TO *}";
+                s = field + ":{" + keyword + " TO *}";
                 break;
             }
             case Operation.GTE: {
-                s = field + ":[\"" + keyword + "\" TO * ]";
+                s = field + ":[" + keyword + " TO * ]";
                 break;
             }
             case Operation.LT: {
-                s = field + ":" + "{* TO \"" + keyword + "\" }";
+                s = field + ":" + "{* TO " + keyword + "}";
                 break;
             }
             case Operation.LTE: {
-                s = field + ":" + "[* TO \"" + keyword + "\" ]";
+                s = field + ":" + "[* TO " + keyword + "]";
                 break;
             }
             case Operation.EQ: {
-                s = field + ":\"" + keyword + "\"";
+                s = field + ":" + keyword;
                 break;
             }
             default:
@@ -200,11 +200,13 @@ public class SolrQuery {
     /**
      * 获取总条数
      *
-     * @param queryString
+     * @param table
+     * @param q
+     * @param fq
      * @return
      */
-    public long count(String table, String queryString) throws Exception {
-        return solrUtil.count(table, queryString);
+    public long count(String table, String q , String fq) throws Exception {
+        return solrUtil.count(table, q,fq);
     }
 
     /**
@@ -267,8 +269,8 @@ public class SolrQuery {
                                                                   String q,
                                                                   String fq,
                                                                   Map<String, String> sort,
-                                                                  long start,
-                                                                  long rows,
+                                                                  int start,
+                                                                  int rows,
                                                                   String[] fields,
                                                                   String groupField,
                                                                   String groupSort,
@@ -292,9 +294,10 @@ public class SolrQuery {
             int i = 1;
             // 该组为空值的话，判断每条空值记录是单独保存，还是合并为一条保存。
             SolrDocumentList nullDocList = new SolrDocumentList();
-            if (fieldValueObj == null && groupNullIsolate) {
+            if (StringUtils.isEmpty(group.getGroupValue()) && groupNullIsolate) {
                 String null_fq = fq + " AND -" + groupField + ":*";
-                nullDocList = solrUtil.query(tableName, q, null_fq, sort, start, rows, fields);
+                long count = solrUtil.count(tableName, q, null_fq);
+                nullDocList = solrUtil.query(tableName, q, null_fq, null, 0, count, fields);
                 i = groupChildCount;
             }
             while (i != 0) {
