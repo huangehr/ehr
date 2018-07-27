@@ -27,7 +27,7 @@ public class SolrConfig {
         StringBuilder info = new StringBuilder("{");
         info.append("\n  spring.data.solr.zk-host = " + zkHost);
         info.append("\n}");
-        System.out.println("Solr.configInfo" + info.toString());
+        System.out.println("Solr.configInfo : " + info.toString());
     }
 
 }

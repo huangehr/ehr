@@ -57,7 +57,7 @@ public class HbaseConfig{
         hbaseProperties.forEach((key, val) -> info.append("\n  hadoop." + key + " = " + val));
         info.append("\n  hadoop.user.name = " + user.getName());
         info.append("\n}");
-        System.out.println("Hbase.configInfo" + info.toString());
+        System.out.println("Hbase.configInfo : " + info.toString());
     }
 
     @Bean

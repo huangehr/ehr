@@ -187,6 +187,6 @@ public class FastDFSConfig {
                 ClientGlobal.g_secret_key = http.secretKey;
             }
         }
-        System.out.println("FastDFS.configInfo(): " + ClientGlobal.configInfo());
+        System.out.println("FastDFS.configInfo() : " + ClientGlobal.configInfo());
     }
 }

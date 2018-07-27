@@ -40,6 +40,6 @@ public class ElasticSearchConfig {
         info.append("\n  elasticsearch.cluster-name = " + clusterName);
         info.append("\n  elasticsearch.cluster-nodes = " + clusterNodes);
         info.append("\n}");
-        System.out.println("Elasticsearch.configInfo" + info.toString());
+        System.out.println("Elasticsearch.configInfo : " + info.toString());
     }
 }

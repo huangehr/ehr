@@ -57,7 +57,6 @@ public class ElasticSearchPool {
                     if (transportClient.connectedNodes().isEmpty()) {
                         transportClient = getTransportClient();
                     }
-                    return transportClient;
                 }
             }
             return transportClient;
@@ -66,8 +65,8 @@ public class ElasticSearchPool {
             if (null == transportClient) {
                 transportClient = getTransportClient();
             }
-            return transportClient;
         }
+        return transportClient;
     }
 
     public DruidDataSource getDruidDataSource() throws Exception {

@@ -33,8 +33,8 @@ public class SolrPool {
                 CloudSolrClient client = new CloudSolrClient(solrConfig.getZkHost());
                 factory = new MulticoreSolrClientFactory(client);
             }
-            return factory;
         }
+        return factory;
     }
 
     public SolrClient getConnection(String core) throws Exception{
