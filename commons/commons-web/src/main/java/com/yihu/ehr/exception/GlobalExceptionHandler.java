@@ -1,11 +1,9 @@
 package com.yihu.ehr.exception;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.util.rest.Envelop;
 import feign.FeignException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
