@@ -200,7 +200,9 @@ public class SolrQuery {
     /**
      * 获取总条数
      *
-     * @param queryString
+     * @param table
+     * @param q
+     * @param fq
      * @return
      */
     public long count(String table, String q , String fq) throws Exception {
@@ -292,7 +294,7 @@ public class SolrQuery {
             int i = 1;
             // 该组为空值的话，判断每条空值记录是单独保存，还是合并为一条保存。
             SolrDocumentList nullDocList = new SolrDocumentList();
-            if (fieldValueObj == null && groupNullIsolate) {
+            if (StringUtils.isEmpty(group.getGroupValue()) && groupNullIsolate) {
                 String null_fq = fq + " AND -" + groupField + ":*";
                 long count = solrUtil.count(tableName, q, null_fq);
                 nullDocList = solrUtil.query(tableName, q, null_fq, null, 0, count, fields);
