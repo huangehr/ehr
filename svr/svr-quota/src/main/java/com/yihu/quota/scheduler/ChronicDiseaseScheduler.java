@@ -12,6 +12,7 @@ import com.yihu.quota.service.scheduler.HealthArchiveSchedulerService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.solr.client.solrj.response.Group;
 import org.slf4j.Logger;
@@ -152,16 +153,15 @@ public class ChronicDiseaseScheduler {
             fields.add("type");
             for (Map<String, Object> subInfo : hBaseDataList) {
                 Map<String, Object> data = new HashMap<>();
-                Map<String, Object> masterInfo = hBaseDao.getResultMap(ResourceCore.MasterTable, subInfo.get("profile_id").toString());
 
                 // 身份证号
-                String idCard = masterInfo.get("EHR_000017") != null ? masterInfo.get("EHR_000017").toString() : "";
+                String idCard = subInfo.get("EHR_000017") != null ? subInfo.get("EHR_000017").toString() : "";
                 data.put("id_card", idCard);
 
                 // 检测是否已有该患者，已有则不更新。
-                String sql = "SELECT id_card, type FROM chronic_disease/chronic_disease_patient WHERE id_card = '" + idCard + "' AND type = '" + type + "'";
+                String sql = "SELECT id_card, type FROM " + CD_INDEX + "/" + CD_TYPE_PATIENT + " WHERE id_card = '" + idCard + "' AND type = '" + type + "'";
                 List<Map<String, Object>> infoList = elasticSearchUtil.findBySql(fields, sql);
-                if (infoList != null || infoList.size() != 0) {
+                if ((infoList != null && infoList.size() != 0) || StringUtils.isNotEmpty(idCard)) {
                     continue;
                 }
 
