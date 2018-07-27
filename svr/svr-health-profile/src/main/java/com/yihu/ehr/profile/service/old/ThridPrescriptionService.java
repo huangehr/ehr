@@ -2,7 +2,7 @@ package com.yihu.ehr.profile.service.old;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.yihu.ehr.config.FastDFSConfig;
+import com.yihu.ehr.fastdfs.config.FastDFSConfig;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.profile.dao.ArchiveTemplateDao;
 import com.yihu.ehr.profile.model.ArchiveTemplate;
@@ -29,7 +29,7 @@ import java.util.List;
 public class ThridPrescriptionService extends BaseJpaService<ArchiveTemplate, ArchiveTemplateDao> {
 
     @Autowired
-    private FastDFSConfig FastDFSConfig;
+    private FastDFSUtil fastDFSUtil;
     @Autowired
     private ArchiveTemplateService tempService;
     @Autowired
@@ -230,8 +230,7 @@ public class ThridPrescriptionService extends BaseJpaService<ArchiveTemplate, Ar
             render.renderURL("file:///" + url, out, ImageRenderer.Type.PNG);
             //保存到fastdfs
             InputStream in = new FileInputStream(file);
-            FastDFSUtil fdfs = FastDFSConfig.fastDFSUtil();
-            ObjectNode jsonResult = fdfs.upload(in, "png", "");
+            ObjectNode jsonResult = fastDFSUtil.upload(in, "png", "");
             String filePath = jsonResult.get("fid").textValue();
 
             out.close();

@@ -1,15 +1,13 @@
 package com.yihu.ehr.solr;
 
+import com.yihu.ehr.solr.config.SolrConfig;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.impl.CloudSolrClient;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.solr.server.support.MulticoreSolrClientFactory;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.PreDestroy;
-
 
 /**
  * Solr连接池
@@ -21,17 +19,22 @@ import javax.annotation.PreDestroy;
 @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class SolrPool {
 
-    @Value("${spring.data.solr.zk-host:localhost:2181}")
-    private String zkHost;
+    @Autowired
+    private SolrConfig solrConfig;
 
-    private MulticoreSolrClientFactory factory;
+    private volatile MulticoreSolrClientFactory factory;
 
-    protected synchronized MulticoreSolrClientFactory getFactory(){
-        if (null == factory) {
-            CloudSolrClient client = new CloudSolrClient(zkHost);
-            factory = new MulticoreSolrClientFactory(client);
+    protected MulticoreSolrClientFactory getFactory(){
+        if (factory != null) {
+            return factory;
         }
-        return factory;
+        synchronized (MulticoreSolrClientFactory.class) {
+            if (null == factory) {
+                CloudSolrClient client = new CloudSolrClient(solrConfig.getZkHost());
+                factory = new MulticoreSolrClientFactory(client);
+            }
+            return factory;
+        }
     }
 
     public SolrClient getConnection(String core) throws Exception{
@@ -40,20 +43,5 @@ public class SolrPool {
         }
         return getFactory().getSolrClient(core);
     }
-
-    @PreDestroy
-    private void destroy() {
-        if (factory != null) {
-            factory.destroy();
-        }
-    }
-
-    /**
-     * 关闭连接
-    public void close(SolrClient solrClient) throws Exception{
-        solrClient.close();
-    }
-     */
-
 
 }

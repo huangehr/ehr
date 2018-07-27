@@ -11,6 +11,7 @@ import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.entity.dict.SystemDict;
 import com.yihu.ehr.entity.dict.SystemDictEntry;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
+import com.yihu.ehr.fastdfs.config.FastDFSConfig;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -50,11 +51,11 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
     private String indexType;
     @Value("${fast-dfs.server.dict-code}")
     private String dictCode;
-    @Value("${fast-dfs.public-server}")
-    private String fastDfsPublicServers;
 
     @Autowired
     private FastDFSUtil fastDFSUtil;
+    @Autowired
+    private FastDFSConfig fastDFSConfig;
     @Autowired
     private ElasticSearchUtil elasticSearchUtil;
     @Autowired
@@ -473,7 +474,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
             List<Map<String, Object>> resultList = elasticSearchUtil.page(indexName, indexType, filter, 1, 1);
             if (null != resultList && resultList.size() > 0){
                 Map<String, Object> map = resultList.get(0);
-                String path = fastDfsPublicServers + "/" + map.get("path").toString().replace(":","/");
+                String path = fastDFSConfig.getPublicServer() + "/" + map.get("path").toString().replace(":","/");
                 map.put("path", path);
             }
             int count = (int)elasticSearchUtil.count(indexName, indexType, filter);

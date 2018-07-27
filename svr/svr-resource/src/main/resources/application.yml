@@ -45,11 +45,6 @@ hadoop:
   user:
     name: root
 
-elasticsearch:
-  pool:
-    init-size: 1
-    max-size: 5
-
 eip:
   tenant: jkzl
 

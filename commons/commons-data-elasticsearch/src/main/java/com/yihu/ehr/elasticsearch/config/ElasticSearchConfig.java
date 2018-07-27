@@ -1,7 +1,9 @@
-package com.yihu.ehr.elasticsearch;
+package com.yihu.ehr.elasticsearch.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+
+import javax.annotation.PostConstruct;
 
 /**
  * Created by progr1mmer on 2017/12/1.
@@ -30,5 +32,14 @@ public class ElasticSearchConfig {
 
     public void setClusterNodes(String clusterNodes) {
         this.clusterNodes = clusterNodes;
+    }
+
+    @PostConstruct
+    private void configInfo() {
+        StringBuilder info = new StringBuilder("{");
+        info.append("\n  elasticsearch.cluster-name = " + clusterName);
+        info.append("\n  elasticsearch.cluster-nodes = " + clusterNodes);
+        info.append("\n}");
+        System.out.println("Elasticsearch.configInfo" + info.toString());
     }
 }

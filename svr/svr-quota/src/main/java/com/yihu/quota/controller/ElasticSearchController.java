@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.elasticsearch.ElasticSearchClient;
-import com.yihu.ehr.elasticsearch.ElasticSearchConfig;
+import com.yihu.ehr.elasticsearch.config.ElasticSearchConfig;
 import com.yihu.ehr.query.services.SolrQuery;
 import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.quota.etl.util.ElasticsearchUtil;

@@ -1,8 +1,8 @@
 package com.yihu.ehr.analyze.model;
 
-import com.yihu.ehr.analyze.config.FastDfsConfig;
 import com.yihu.ehr.analyze.service.pack.PackageAnalyzeService;
 import com.yihu.ehr.analyze.service.pack.StdPackageAnalyzer;
+import com.yihu.ehr.fastdfs.config.FastDFSConfig;
 import com.yihu.ehr.profile.EventType;
 import com.yihu.ehr.profile.ProfileType;
 import com.yihu.ehr.lang.SpringContext;
@@ -200,7 +200,7 @@ public class ZipPackage {
     }
 
     public void download() throws IOException {
-        FastDfsConfig config = SpringContext.getService(FastDfsConfig.class);
+        FastDFSConfig config = SpringContext.getService(FastDFSConfig.class);
         String remotePath = esSimplePackage.getRemote_path();
         String url = config.getPublicServer() + "/" + remotePath.replace(":", "/");
         HttpEntity<String> entity = new HttpEntity<>(HTTP_HEADERS);

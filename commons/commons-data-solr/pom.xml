@@ -27,6 +27,10 @@
             <scope>${dependency.scope}</scope>
         </dependency>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-util</artifactId>
         </dependency>

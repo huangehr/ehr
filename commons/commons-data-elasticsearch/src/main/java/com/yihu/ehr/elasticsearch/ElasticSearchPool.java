@@ -2,6 +2,7 @@ package com.yihu.ehr.elasticsearch;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.pool.ElasticSearchDruidDataSourceFactory;
+import com.yihu.ehr.elasticsearch.config.ElasticSearchConfig;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;

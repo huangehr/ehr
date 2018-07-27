@@ -42,11 +42,6 @@ hadoop:
   user:
     name: root
 
-elasticsearch:
-  pool:
-    init-size: 5
-    max-size: 10
-
 event:
   job:
     init-size: 10 #事件处理初始任务数

@@ -39,8 +39,6 @@ public class FastDFSTask {
     protected ObjectMapper objectMapper;
     @Autowired
     private RedisService redisService;
-    private static final String INDEX = "json_archives";
-    private static final String TYPE = "info";
     private static final Logger logger = LoggerFactory.getLogger(FastDFSTask.class);
 
     /**
@@ -75,7 +73,7 @@ public class FastDFSTask {
         sourceMap.put("pack_type", packType);
         //保存索引出错的时候，删除文件
         try {
-            sourceMap = elasticSearchUtil.index(INDEX, TYPE, sourceMap);
+            sourceMap = elasticSearchUtil.index("json_archives", "info", sourceMap);
         } catch (Exception e) {
             fastDFSUtil.delete(group, remoteFile);
             throw e;

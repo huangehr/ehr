@@ -56,11 +56,6 @@ resolve:
     max-size: 10 #解析入库最大任务数
     cron-exp: 0/1 * * * * ? #解析任务触发间隔表达式
 
-elasticsearch:
-  pool:
-    init-size: 10
-    max-size: 20
-
 ehr:
   # 档案包数据提取器参数，从数据集中提取摘要、事件时间与身份标识
   pack-extractor:

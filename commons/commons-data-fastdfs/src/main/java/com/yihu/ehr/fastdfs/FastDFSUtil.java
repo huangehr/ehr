@@ -2,11 +2,12 @@ package com.yihu.ehr.fastdfs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.yihu.ehr.fastdfs.config.FastDFSConfig;
 import org.csource.common.MyException;
 import org.csource.common.NameValuePair;
 import org.csource.fastdfs.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.io.BufferedInputStream;
@@ -26,6 +27,7 @@ import java.util.Map;
  * @author szx
  * @author Sand
  */
+@Component
 public class FastDFSUtil {
 
     public final static String GROUP_NAME = "groupName";
@@ -36,8 +38,8 @@ public class FastDFSUtil {
 
     @Autowired
     private FastDFSPool pool;
-    @Value(value = "${fast-dfs.public-server:http://120.0.0.1:8080}")
-    private String publicServer;
+    @Autowired
+    private FastDFSConfig fastDFSConfig;
 
     public ObjectNode upload(InputStream in, String fileExtension, String description) throws IOException, MyException, NoSuchAlgorithmException{
         NameValuePair[] fileMetaData = new NameValuePair[1];
@@ -97,7 +99,7 @@ public class FastDFSUtil {
                 message.put(REMOTE_FILE_NAME, remoteFile);
                 String fileId = groupName + StorageClient1.SPLIT_GROUP_NAME_AND_FILENAME_SEPERATOR + remoteFile;
                 message.put(FILE_ID, fileId);
-                String fileURl = publicServer += "/" + fileId;
+                String fileURl = fastDFSConfig.getPublicServer() + "/" + fileId;
                 if (ClientGlobal.g_anti_steal_token) {
                     int ts = (int) (System.currentTimeMillis() / 1000);
                     String token = ProtoCommon.getToken(fileId, ts, ClientGlobal.g_secret_key);
@@ -158,7 +160,7 @@ public class FastDFSUtil {
                 message.put(REMOTE_FILE_NAME, remoteFileName);
                 String fileId = groupName + StorageClient1.SPLIT_GROUP_NAME_AND_FILENAME_SEPERATOR + remoteFileName;
                 message.put(FILE_ID, fileId);
-                String fileURl = publicServer += "/" + fileId;
+                String fileURl = fastDFSConfig.getPublicServer() + "/" + fileId;
                 if (ClientGlobal.g_anti_steal_token) {
                     int ts = (int) (System.currentTimeMillis() / 1000);
                     String token = ProtoCommon.getToken(fileId, ts, ClientGlobal.g_secret_key);
@@ -198,7 +200,7 @@ public class FastDFSUtil {
                 message.put(REMOTE_FILE_NAME, remoteFile);
                 String fileId = groupName + StorageClient1.SPLIT_GROUP_NAME_AND_FILENAME_SEPERATOR + remoteFile;
                 message.put(FILE_ID, fileId);
-                String fileURl = publicServer += "/" + fileId;
+                String fileURl = fastDFSConfig.getPublicServer() + "/" + fileId;
                 if (ClientGlobal.g_anti_steal_token) {
                     int ts = (int) (System.currentTimeMillis() / 1000);
                     String token = ProtoCommon.getToken(fileId, ts, ClientGlobal.g_secret_key);
