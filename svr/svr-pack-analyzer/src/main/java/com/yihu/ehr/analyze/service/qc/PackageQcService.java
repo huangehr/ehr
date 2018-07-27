@@ -2,7 +2,6 @@ package com.yihu.ehr.analyze.service.qc;
 
 import com.yihu.ehr.analyze.config.RequireDatasetsConfig;
 import com.yihu.ehr.analyze.model.ZipPackage;
-import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.model.packs.EsSimplePackage;
 import com.yihu.ehr.profile.ErrorType;
 import com.yihu.ehr.profile.exception.IllegalJsonDataException;
@@ -34,7 +33,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PackageQcService {
     private static final Logger logger = LoggerFactory.getLogger(PackageQcService.class);
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    private static final Class clazz = QcRuleCheckService.class;
     private static final Map<String, String> DATASET_RECORDS = new ConcurrentHashMap<>();
 
     @Autowired
@@ -144,12 +142,10 @@ public class PackageQcService {
                 }
             }
         }
-        qcDataSetRecord.put("details", objectMapper.writeValueAsString(details));
-        qcDataSetRecord.put("missing", "[]");
-        for (String dataSetCode : dataSets.keySet()) {
+        details.forEach(item -> {
             this.updateDatasetDetails(zipPackage.getOrgCode(), DATE_FORMAT.format(esSimplePackage.getReceive_date()), zipPackage.getCdaVersion(),
-                    dataSetCode, zipPackage.getEventType().getType(), dataSets.get(dataSetCode).getRecords().size());
-        }
+                    item, zipPackage.getEventType().getType(), dataSets.get(item).getRecords().size());
+        });
     }
 
     private List<String> getDataElementList(String version, String dataSetCode) {
@@ -202,7 +198,7 @@ public class PackageQcService {
     }*/
 
     private void updateDatasetDetails (String orgCode, String receiveDate, String version,
-                                       String dataset, int eventType, int row) throws Exception{
+                                       String dataset, int eventType, int row) {
         String date = receiveDate.substring(0, 10);
         StringBuilder record = new StringBuilder();
         record.append(orgCode)
