@@ -3,6 +3,7 @@ package com.yihu.ehr.resource.service;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.resource.dao.RsReportCategoryDao;
 import com.yihu.ehr.resource.model.RsReportCategory;
+import org.hibernate.FlushMode;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -224,5 +225,13 @@ public class RsReportCategoryService extends BaseJpaService<RsReportCategory, Rs
 
     public List<Integer> findCategoryIdsByCodeList() {
         return rsReportCategoryDao.findCategoryIdsByCodeList();
+    }
+
+    public List getGovernmentCategoryId() {
+        String sql = "SELECT id from rs_report_category where PID in(SELECT id from rs_report_category where CODE in('businessMonitoringSystem','healthMonitorSystem')) order by SORT_NO";
+        Session session = currentSession();
+        Query query = session.createSQLQuery(sql);
+        query.setFlushMode(FlushMode.COMMIT);
+        return query.list();
     }
 }
