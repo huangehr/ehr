@@ -36,7 +36,7 @@ public class OpenEndPoint extends EnvelopRestEndPoint {
     @ApiOperation("转发福州总部开放平台接口")
     @RequestMapping(value = ServiceApi.Fz.OpenApi, method = RequestMethod.POST)
     public Envelop fzOpenApi(
-            @ApiParam(name = "apiUrl", value = "相对接口路径，不用\"/\"开头", required = true)
+            @ApiParam(name = "apiUrl", value = "", required = true)
             @RequestParam(value = "apiUrl") String apiUrl,
             @ApiParam(name = "paramsJson", value = "参数JSON字符串，timestamp 不用传，后台添加", required = true)
             @RequestParam(value = "paramsJson") String paramsJson) {

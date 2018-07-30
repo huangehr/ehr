@@ -6,7 +6,6 @@ import com.yihu.ehr.resolve.dao.SubResourceDao;
 import com.yihu.ehr.resolve.model.stage1.OriginalPackage;
 import com.yihu.ehr.resolve.model.stage2.ResourceBucket;
 import com.yihu.ehr.resolve.service.profile.ArchiveRelationService;
-import com.yihu.ehr.resolve.service.profile.UploadService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,8 +27,6 @@ public class ResourceService {
     @Autowired
     private ArchiveRelationService archiveRelationService;
     @Autowired
-    private UploadService uploadService;
-    @Autowired
     private PatientService patientService;
     @Autowired
     private QcRecordService qcRecordService;
@@ -46,9 +43,6 @@ public class ResourceService {
 
         //保存ES质控数据
         qcRecordService.record(resourceBucket);
-
-        //保存ES 待上传省平台upload记录
-        uploadService.addWaitUpload(resourceBucket, originalPackage);
 
         //保存居民信息记录
         if (originalPackage.isIdentifyFlag()) {

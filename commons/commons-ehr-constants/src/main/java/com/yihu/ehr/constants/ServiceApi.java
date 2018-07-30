@@ -471,6 +471,7 @@ public class ServiceApi {
 
     public static class Packages {
         public static final String Packages = "/packages";
+        public static final String PackagesByFilter = "/packagesByFilter";
         public static final String Package = "/packages/{id}";
         public static final String Analyze = "/packages/analyze/{id}";
         public static final String Resolve = "/packages/resolve/{id}";
@@ -851,6 +852,9 @@ public class ServiceApi {
         public static final String SearchRoleReportRelationNoPage = "/roles/role_report/searchNoPage";
         public static final String SearchRoleReportRelationIsReportAccredited = "/roles/role_report/isReportAccredited";
         public static final String ClientRole = "/roles/clientRole";
+
+        public static final String RoleUserTypeInit = "/roles/usertype/init";
+        public static final String RoleUserTypeUpdate = "/roles/usertype/update";
 
     }
 

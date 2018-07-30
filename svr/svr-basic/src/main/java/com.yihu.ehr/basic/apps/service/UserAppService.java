@@ -26,6 +26,12 @@ public class UserAppService extends BaseJpaService<UserApp, UserAppDao> {
         return  userAppRepository.findByAppIdAndUserId(appId,userId);
     }
 
+    // 根据用户ID，删除所有的该用户关联的应用授权
+    public void delUserAppByUserId(String userId){
+        userAppRepository.deleteByUserId(userId);
+    }
+
+
     /**
      * 根据userIds查询
      * @param userIds
