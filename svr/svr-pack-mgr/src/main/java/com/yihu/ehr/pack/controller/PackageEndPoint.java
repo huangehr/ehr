@@ -21,6 +21,7 @@ import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -135,6 +136,30 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         }
         return true;
     }
+
+    @RequestMapping(value = ServiceApi.Packages.Packages, method = RequestMethod.DELETE)
+    @ApiOperation(value = "批量删除档案包")
+    public boolean deletePackages(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件,慎用!最好先条件查询,确定是否是需要删除的数据")
+            @RequestParam(value = "filters", required = false) String filters) throws Exception {
+        List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, filters, 1, 10000);
+        while(CollectionUtils.isNotEmpty(resultList)){
+            List<String> idList = new ArrayList<>();
+            for (Map<String, Object> temp : resultList) {
+                String [] tokens =  String.valueOf(temp.get("remote_path")).split(":");
+                fastDFSUtil.delete(tokens[0], tokens[1]);
+                idList.add(String.valueOf(temp.get("_id")));
+            }
+            if (idList.size() > 0) {
+                String [] _id = new String[idList.size()];
+                elasticSearchUtil.bulkDelete(INDEX, TYPE, idList.toArray(_id));
+            }
+            resultList = elasticSearchUtil.page(INDEX, TYPE, filters, 1, 10000);
+        }
+        return true;
+    }
+
+
 
     @RequestMapping(value = ServiceApi.Packages.Package, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除单个档案包", notes = "删除一个数据包")
