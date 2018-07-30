@@ -137,7 +137,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         return true;
     }
 
-    @RequestMapping(value = ServiceApi.Packages.Packages, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Packages.PackagesByFilter, method = RequestMethod.DELETE)
     @ApiOperation(value = "批量删除档案包")
     public boolean deletePackages(
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件,慎用!最好先条件查询,确定是否是需要删除的数据")
