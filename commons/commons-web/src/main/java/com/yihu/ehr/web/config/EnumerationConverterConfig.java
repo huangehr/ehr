@@ -1,7 +1,7 @@
-package com.yihu.ehr.web;
+package com.yihu.ehr.web.config;
 
-import com.yihu.ehr.constants.JobType;
 import com.yihu.ehr.profile.ArchiveStatus;
+import com.yihu.ehr.web.converter.ArchiveStatusConverter;
 import org.springframework.beans.factory.config.CustomEditorConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,15 +19,14 @@ import java.util.Map;
  */
 @Configuration
 public class EnumerationConverterConfig {
+
     @Bean
     org.springframework.beans.factory.config.CustomEditorConfigurer customEditorConfigurer(){
         Map<Class<?>, Class<? extends PropertyEditor>> propertyEditorMap = new HashMap<>();
-        propertyEditorMap.put(JobType.class, JobTypeConverter.class);
         propertyEditorMap.put(ArchiveStatus.class, ArchiveStatusConverter.class);
 
         CustomEditorConfigurer customEditorConfigurer = new CustomEditorConfigurer();
         customEditorConfigurer.setCustomEditors(propertyEditorMap);
-
         return customEditorConfigurer;
     }
 }

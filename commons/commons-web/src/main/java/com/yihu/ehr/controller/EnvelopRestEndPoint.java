@@ -4,9 +4,11 @@ import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.util.id.BizObject;
 import com.yihu.ehr.util.id.ObjectId;
 import com.yihu.ehr.util.rest.Envelop;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.util.List;
+import java.util.Random;
 
 /**
  * REST风格控控制器基类。此控制器用于对API进行校验，并处理平台根层级的业务，如API参数校验，错误及返回码设定等。
@@ -93,5 +95,21 @@ public class EnvelopRestEndPoint extends BaseRestEndPoint {
 
     protected String getObjectId(BizObject bizObject){
         return new ObjectId(deployRegion, bizObject).toString();
+    }
+
+    /**
+     * 获取指定长度的随机字符串
+     * @param length
+     * @return
+     */
+    protected String getRandomString(int length) {
+        String str = "abcdefghigklmnopkrstuvwxyzABCDEFGHIGKLMNOPQRSTUVWXYZ0123456789";
+        StringBuffer buffer = new StringBuffer();
+        Random random = new Random();
+        for (int i = 0; i < length; i++) {
+            int number = random.nextInt(str.length() - 1);//0~61
+            buffer.append(str.charAt(number));
+        }
+        return buffer.toString();
     }
 }

@@ -1,4 +1,4 @@
-package com.yihu.ehr.web;
+package com.yihu.ehr.web.converter;
 
 
 import com.yihu.ehr.profile.ArchiveStatus;
