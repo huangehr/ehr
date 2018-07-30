@@ -28,12 +28,12 @@
         <module>../svr/svr-standard</module>
         <module>../svr/svr-basic</module>
         <module>../svr-authentication</module>
-        <!--<module>../ag-portal-cloud</module>-->
         <module>../svr/svr-redis</module>
         <module>../svr/svr-redis-memory</module>
         <module>../svr/svr-quota</module>
         <module>../svr/svr-log-collection</module>
         <module>../svr/svr-pack-event</module>
+        <module>../svr-manager</module>
     </modules>
 
     <build>

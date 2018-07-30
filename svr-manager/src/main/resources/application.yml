@@ -1,0 +1,8 @@
+server:
+  port: ${svr-manager.server.port}
+
+info:
+  app:
+    name: SVR-MANAGER
+    description: EHR Platform Microservice.
+    version: 1.0.0

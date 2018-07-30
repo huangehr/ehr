@@ -287,7 +287,6 @@ public class SolrQuery {
 
         int solrDocListSize = 0;
         for (Group group : groupList) {
-            int groupChildCount = group.getResult().size();
             SolrDocument firstDoc = group.getResult().get(0);
             Object fieldValueObj = firstDoc.getFieldValue(groupField);
 
@@ -298,7 +297,7 @@ public class SolrQuery {
                 String null_fq = fq + " AND -" + groupField + ":*";
                 long count = solrUtil.count(tableName, q, null_fq);
                 nullDocList = solrUtil.query(tableName, q, null_fq, null, 0, count, fields);
-                i = groupChildCount;
+                i = nullDocList.size();
             }
             while (i != 0) {
                 Map<String, Object> map = new HashMap<>();

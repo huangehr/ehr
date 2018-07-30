@@ -98,6 +98,7 @@
         <version.hbase-client>1.1.1</version.hbase-client>
         <version.solr>5.5.4</version.solr>
         <version.hibernate>4.3.11.Final</version.hibernate>
+        <version.hibernate-validator>6.0.10.Final</version.hibernate-validator>
         <version.hibernate-jpa-api>1.0.0.Final</version.hibernate-jpa-api>
         <version.http-core>4.4.3</version.http-core>
         <version.http-client>4.5.1</version.http-client>
@@ -143,6 +144,7 @@
         <version.commons-net>3.3</version.commons-net>
         <version.jxl>2.6</version.jxl>
         <version.fastdfs>1.27</version.fastdfs>
+        <version.spring.boot.admin>1.5.7</version.spring.boot.admin>
     </properties>
 
     <dependencyManagement>
@@ -684,6 +686,11 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-validator</artifactId>
+                <version>${version.hibernate-validator}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-entitymanager</artifactId>
                 <version>${version.hibernate}</version>
                 <scope>${dependency.scope}</scope>
@@ -1031,6 +1038,18 @@
                 <groupId>com.alibaba</groupId>
                 <artifactId>fastjson</artifactId>
                 <version>${version.fastjson}</version>
+            </dependency>
+
+            <!-- Spring Boot Admin -->
+            <dependency>
+                <groupId>de.codecentric</groupId>
+                <artifactId>spring-boot-admin-starter-server</artifactId>
+                <version>${version.spring.boot.admin}</version>
+            </dependency>
+            <dependency>
+                <groupId>de.codecentric</groupId>
+                <artifactId>spring-boot-admin-server-ui</artifactId>
+                <version>${version.spring.boot.admin}</version>
             </dependency>
 
             <!-- Extend library-->

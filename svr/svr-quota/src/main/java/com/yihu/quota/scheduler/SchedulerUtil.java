@@ -38,13 +38,12 @@ class SchedulerUtil {
             // 查询空值时的筛选条件
             fq += " AND -" + distinctFieldName + ":*";
             for (Group group : groupList) {
-                int groupChildCount = group.getResult().size();
                 SolrDocument firstDoc = group.getResult().get(0);
                 if (StringUtils.isEmpty(group.getGroupValue())) {
                     // 记录中去重字段是空值时，每条空值新单独记录到ES
                     long count = solrUtil.count(ResourceCore.SubTable, q, fq);
                     SolrDocumentList nullDocList = solrUtil.query(ResourceCore.SubTable, q, fq, null, 0, count, showFields);
-                    for (int i = 0; i < groupChildCount; i++) {
+                    for (int i = 0, size = nullDocList.size(); i < size; i++) {
                         SolrDocument doc = nullDocList.get(i);
                         rowkeyList.add(doc.getFieldValue("rowkey").toString());
                     }

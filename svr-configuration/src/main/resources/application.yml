@@ -1,9 +1,6 @@
 server:
   port: 1221
 
-management:
-  port: ${server.port}
-
 security:
   user:
     password: configuration
@@ -16,7 +13,9 @@ info:
 
 eureka:
   instance:
-    prefer-ip-address: true
+    prefer-ip-address: false
   client:
     serviceUrl:
-      defaultZone: http://127.0.0.1:8761/eureka/
+      defaultZone: http://172.19.103.73:8761/eureka/
+    healthcheck:
+      enabled: false
