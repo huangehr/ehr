@@ -471,6 +471,7 @@ public class ServiceApi {
 
     public static class Packages {
         public static final String Packages = "/packages";
+        public static final String PackagesByFilter = "/packagesByFilter";
         public static final String Package = "/packages/{id}";
         public static final String Analyze = "/packages/analyze/{id}";
         public static final String Resolve = "/packages/resolve/{id}";

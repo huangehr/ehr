@@ -83,9 +83,11 @@ public class AgZuulFilter extends ZuulFilter {
         if (oAuth2AccessToken.isExpired()) {
             return this.forbidden(ctx, HttpStatus.PAYMENT_REQUIRED.value(), "expired token"); //返回402 登陆过期
         }
-        //以下代码取消注释可开启Oauth2应用资源授权验证
+        //将token的认证信息附加到请求中，转发给下游微服务
         /*OAuth2Authentication auth = tokenStore.readAuthentication(accessToken);
-        Set<String> resourceIds = auth.getOAuth2Request().getResourceIds();
+        ctx.addZuulRequestHeader("x-auth-name", auth.getName());*/
+        //以下代码取消注释可开启Oauth2应用资源授权验证
+        /*Set<String> resourceIds = auth.getOAuth2Request().getResourceIds();
         for (String resourceId : resourceIds) {
             if (resourceId.equals("*")) {
                 return true;

@@ -77,7 +77,7 @@ public class HbaseConfig{
 
     @Bean
     public HbaseTemplate hbaseTemplate(org.apache.hadoop.conf.Configuration configuration){
-        System.setProperty("HADOOP_USER_NAME", user.getName());
+        System.setProperty("HADOOP_USER_NAME", user.getName() != null ? user.getName() : "root");
         HbaseTemplate hbaseTemplate = new HbaseTemplate();
         hbaseTemplate.setConfiguration(configuration);
         return hbaseTemplate;
