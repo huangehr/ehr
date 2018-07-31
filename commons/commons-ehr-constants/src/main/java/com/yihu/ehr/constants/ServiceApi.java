@@ -858,6 +858,7 @@ public class ServiceApi {
         public static final String UserOrgRela = "/user/org/relation";
         public static final String CreateUserType = "/user/usertype";
         public static final String SearchUserType = "/user/SearchUserType";
+        public static final String UpdateUserType = "/user/UpdateUserType";
 
 
     }
