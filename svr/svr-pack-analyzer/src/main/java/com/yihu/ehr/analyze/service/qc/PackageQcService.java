@@ -137,6 +137,7 @@ public class PackageQcService {
                             qcMetadataRecord.put("qc_error_name", errorType.getName()); //标准质控错误名称
                             qcMetadataRecord.put("qc_error_message", String.format("%s failure for meta data %s of %s in %s", method, metadata, dataSetCode, zipPackage.getCdaVersion()));
                             qcMetadataRecord.put("create_date", DATE_FORMAT.format(new Date()));
+                            qcMetadataRecord.put("pack_pwd", esSimplePackage.getPwd());
                             zipPackage.getQcMetadataRecords().add(qcMetadataRecord);
                             existSet.add(dataSetCode + "$" + metadata);
                         }

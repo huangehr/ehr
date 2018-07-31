@@ -3,7 +3,10 @@ package com.yihu.ehr.basic.user.service;
 import com.yihu.ehr.basic.patient.dao.XDemographicInfoRepository;
 import com.yihu.ehr.basic.user.dao.XDoctorRepository;
 import com.yihu.ehr.basic.user.dao.XUserRepository;
+import com.yihu.ehr.basic.user.dao.XUserTypeRepository;
+import com.yihu.ehr.basic.user.dao.XUserTypeRolesRepository;
 import com.yihu.ehr.basic.user.entity.User;
+import com.yihu.ehr.basic.user.entity.UserTypeRoles;
 import com.yihu.ehr.entity.patient.DemographicInfo;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.basic.user.entity.Doctors;
@@ -21,10 +24,7 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * 用户管理接口实现类.
@@ -50,6 +50,10 @@ public class UserService extends BaseJpaService<User, XUserRepository> {
     @Autowired
     private XDoctorRepository xDoctorRepository;
 
+    @Autowired
+    private XUserTypeRepository xUserTypeRepository;
+    @Autowired
+    private XUserTypeRolesRepository xUserTypeRolesRepository;
 
     @PostConstruct
     void init() {
@@ -366,4 +370,16 @@ public class UserService extends BaseJpaService<User, XUserRepository> {
         }
         return user1;
     }
+
+    public List<UserTypeRoles> getUserTypeRoles(int typeId) {
+        List<UserTypeRoles> userTypeRoles = new ArrayList<>();
+
+        userTypeRoles = xUserTypeRolesRepository.findByTypeId(typeId);
+        if(userTypeRoles != null && userTypeRoles.size() > 0){
+            return userTypeRoles;
+        }else{
+            return null;
+        }
+    }
+
 }

@@ -200,4 +200,9 @@ public class OrgMemberRelationService extends BaseJpaService<OrgMemberRelation, 
         }
         return jkzlOrgId;
     }
+
+    public void deleteOrgMemberRelationByUserId(String userId) {
+        relationRepository.deleteOrgMemberRelationByUserId(userId);
+    }
+
 }

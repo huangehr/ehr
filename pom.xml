@@ -268,12 +268,6 @@
                 <version>${version.spring-framework}</version>
                 <scope>${dependency.scope}</scope>
             </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-orm</artifactId>
-                <version>${version.spring-framework}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
             <!-- https://mvnrepository.com/artifact/org.springframework.kafka/spring-kafka -->
             <dependency>
                 <groupId>org.springframework.kafka</groupId>
@@ -1094,7 +1088,7 @@
     <pluginRepositories>
         <pluginRepository>
             <id>public</id>
-            <name>Public Repositories</name>
+            <name>public</name>
             <url>http://172.19.103.43:8081/nexus/content/groups/public/</url>
             <releases>
                 <enabled>true</enabled>

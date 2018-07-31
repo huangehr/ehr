@@ -853,6 +853,9 @@ public class ServiceApi {
         public static final String SearchRoleReportRelationIsReportAccredited = "/roles/role_report/isReportAccredited";
         public static final String ClientRole = "/roles/clientRole";
 
+        public static final String RoleUserTypeInit = "/roles/usertype/init";
+        public static final String RoleUserTypeUpdate = "/roles/usertype/update";
+
     }
 
     public static class HealthProfile {
