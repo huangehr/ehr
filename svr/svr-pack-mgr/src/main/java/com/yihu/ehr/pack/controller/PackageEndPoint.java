@@ -1,6 +1,8 @@
 package com.yihu.ehr.pack.controller;
 
-import com.yihu.ehr.constants.*;
+import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.ErrorCode;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.exception.ApiException;
@@ -13,9 +15,7 @@ import com.yihu.ehr.pack.service.RedisService;
 import com.yihu.ehr.pack.task.FastDFSTask;
 import com.yihu.ehr.profile.AnalyzeStatus;
 import com.yihu.ehr.profile.ArchiveStatus;
-import com.yihu.ehr.profile.exception.ResolveException;
 import com.yihu.ehr.profile.queue.RedisCollection;
-import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.encrypt.RSA;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
@@ -391,6 +391,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
             response.setHeader("Content-Disposition", "attachment; filename=" + id + ".zip");
             IOUtils.copy(new ByteArrayInputStream(data), response.getOutputStream());
+
             response.flushBuffer();
             return new ResponseEntity(HttpStatus.OK);
         }
