@@ -7,10 +7,8 @@ import com.yihu.ehr.basic.org.model.OrgDept;
 import com.yihu.ehr.basic.org.model.OrgMemberRelation;
 import com.yihu.ehr.basic.org.model.Organization;
 import com.yihu.ehr.basic.org.service.OrgMemberRelationService;
-import com.yihu.ehr.basic.user.entity.RoleOrg;
-import com.yihu.ehr.basic.user.entity.RoleUser;
-import com.yihu.ehr.basic.user.entity.Roles;
-import com.yihu.ehr.basic.user.entity.UserTypeRoles;
+import com.yihu.ehr.basic.user.dao.XUserTypeRepository;
+import com.yihu.ehr.basic.user.entity.*;
 import com.yihu.ehr.basic.user.service.RoleOrgService;
 import com.yihu.ehr.basic.user.service.RoleUserService;
 import com.yihu.ehr.basic.user.service.RolesService;
@@ -55,6 +53,10 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
     private UserService userService;
     @Autowired
     private OrgMemberRelationService orgMemberRelationService;
+
+    @Autowired
+    private XUserTypeRepository xUserTypeRepository;
+
 
     @RequestMapping(value = ServiceApi.Roles.RoleUser,method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "为角色组配置人员，单个")
@@ -430,12 +432,24 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Roles.CreateUserType, method = RequestMethod.POST)
     @ApiOperation(value = "新增用户类别")
     public Envelop createUserType(
-            @ApiParam(name = "userId", value = "用户ID", required = true)
-            @RequestParam(value = "userId") String userId,
-            @ApiParam(name = "orgModel", value = "所属机构JSON串", required = false)
-            @RequestParam(value = "orgModel") String orgModel ) throws  Exception{
+            @ApiParam(name = "code", value = "用户类别编码", required = true)
+            @RequestParam(value = "code") String code,
+            @ApiParam(name = "name", value = "用户类别名称", required = false)
+            @RequestParam(value = "name") String name ) throws  Exception{
         Envelop envelop = new Envelop();
-        envelop = setOrgDeptRelation(orgModel,userId);
+        UserType userType = new UserType();
+
+        userType.setCode(code);
+        userType.setName(name);
+        userType.setActiveFlag("1");
+        userType = xUserTypeRepository.save(userType);
+        if(userType != null){
+            envelop.setSuccessFlg(true);
+            envelop.setObj(userType);
+        }else{
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("新增用户类别失败，请重试！");
+        }
         return envelop;
     }
 }
