@@ -22,6 +22,7 @@ import org.elasticsearch.search.aggregations.metrics.valuecount.InternalValueCou
 import org.elasticsearch.search.aggregations.metrics.valuecount.ValueCountBuilder;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.sql.ResultSet;
@@ -40,7 +41,8 @@ public class PackStatisticsService extends BaseJpaService {
     private ElasticSearchUtil elasticSearchUtil;
     @Autowired
     private ElasticSearchPool elasticSearchPool;
-
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
     /**
      * getRecieveOrgCount 根据接收日期统计各个医院的数据解析情况
      *
@@ -917,5 +919,70 @@ public class PackStatisticsService extends BaseJpaService {
         map.put("oupatient_total",new Double(resultSet2.getObject("COUNT(DISTINCT event_no)").toString()).intValue());
         map.put("archive_total",new Double(resultSet3.getObject("COUNT(DISTINCT event_no)").toString()).intValue());
         return map;
+    }
+
+    /**
+     * 获取采集数据
+     * @param startDate
+     * @param endDate
+     * @return
+     * @throws Exception
+     */
+    public Envelop getReceiveNum(String startDate, String endDate) throws Exception {
+        Envelop envelop = new Envelop();
+        List<Map<String, Object>> res = new ArrayList<>();
+        String city = getCurrentCity();
+        res = getAreaList(city);
+        for(Map<String, Object> map : res){
+            map.put("receiveNum",getReceive(startDate, endDate, map.get("ID")+""));
+            map.put("analyzeNum",getAnalyzer(startDate, endDate, map.get("ID")+""));
+            map.put("uploadNum",getUpload(startDate, endDate, map.get("ID")+""));
+        }
+        envelop.setObj(res);
+        envelop.setSuccessFlg(true);
+        return envelop;
+    }
+
+    private String getCurrentCity(){
+        String sql = "SELECT entry.value FROM system_dict_entries entry " +
+                "INNER JOIN system_dicts dict ON dict.id = entry.dict_id " +
+                "WHERE entry.code = 'CITY'";
+        List<Map<String, Object>> list = jdbcTemplate.queryForList(sql);
+        if(list!=null&&list.size()>0){
+            return list.get(0).get("VALUE")+"";
+        }else{
+            return "361100";
+        }
+    }
+
+    private List<Map<String,Object>> getAreaList(String city){
+        return jdbcTemplate.queryForList("select id,name from address_dict where pid = "+city);
+    }
+
+    private long getReceive(String startDate, String endDate ,String area){
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("pack_type=1;");
+        stringBuilder.append("receive_date>=" + startDate + " 00:00:00;");
+        stringBuilder.append("receive_date<" + endDate + " 23:59:59;");
+        stringBuilder.append("org_area="+area+";");
+        return elasticSearchUtil.count("json_archives","info",stringBuilder.toString());
+    }
+
+    private long getAnalyzer(String startDate, String endDate ,String area){
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("archive_status=3;pack_type=1;");
+        stringBuilder.append("parse_date>=" + startDate + " 00:00:00;");
+        stringBuilder.append("parse_date<" + endDate + " 23:59:59;");
+        stringBuilder.append("org_area="+area+";");
+        return elasticSearchUtil.count("json_archives","info",stringBuilder.toString());
+    }
+
+    private long getUpload(String startDate, String endDate ,String area){
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("archive_status=3;pack_type=1;");
+        stringBuilder.append("create_date>=" + startDate + " 00:00:00;");
+        stringBuilder.append("create_date<" + endDate + " 23:59:59;");
+        stringBuilder.append("org_area="+area+";");
+        return elasticSearchUtil.count("upload","info",stringBuilder.toString());
     }
 }

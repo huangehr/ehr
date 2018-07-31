@@ -123,19 +123,6 @@ public class AppService extends BaseJpaService<App, AppDao> {
         return app != null;
     }
 
-    private static String getRandomString(int length) {
-        String str = "abcdefghigklmnopkrstuvwxyzABCDEFGHIGKLMNOPQRSTUVWXYZ0123456789";
-        StringBuffer buffer = new StringBuffer();
-
-        Random random = new Random();
-        for (int i = 0; i < length; i++) {
-            int number = random.nextInt(str.length() - 1);//0~61
-            buffer.append(str.charAt(number));
-        }
-
-        return buffer.toString();
-    }
-
     public void checkStatus(String appId, String status) {
         App app = appDao.getOne(appId);
         //开启：Approved；禁用：Forbidden;

@@ -225,4 +225,20 @@ public class BaseJpaService<T, R> {
         return UUID.randomUUID().toString().replaceAll("-", "");
     }
 
+    /**
+     * 获取指定长度的随机字符串
+     * @param length
+     * @return
+     */
+    protected String getRandomString(int length) {
+        String str = "abcdefghigklmnopkrstuvwxyzABCDEFGHIGKLMNOPQRSTUVWXYZ0123456789";
+        StringBuffer buffer = new StringBuffer();
+        Random random = new Random();
+        for (int i = 0; i < length; i++) {
+            int number = random.nextInt(str.length() - 1);//0~61
+            buffer.append(str.charAt(number));
+        }
+        return buffer.toString();
+    }
+
 }
