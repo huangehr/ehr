@@ -271,6 +271,10 @@ public class ServiceApi {
         public static final String GetPositionMapByCode = "/resources/report/getPositionMapByCode";
         public static final String GetRsReportByParam = "/resources/report/getRsReportByParam";
 
+        public static final String QueryByUserId = "/open/resources/report/queryByUserId";
+        public static final String QueryOtherReportByUserId = "/open/resources/report/queryOtherReportByUserId";
+        public static final String SaveByUserId = "/open/resources/report/saveByUserId";
+
         /**
          * 资源报表视图配置
          */
