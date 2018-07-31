@@ -2,6 +2,7 @@ package com.yihu.ehr.resolve.service.resource.stage1;
 
 import com.yihu.ehr.model.packs.EsSimplePackage;
 import com.yihu.ehr.profile.ProfileType;
+import com.yihu.ehr.profile.exception.ResolveException;
 import com.yihu.ehr.resolve.*;
 import com.yihu.ehr.resolve.model.stage1.OriginalPackage;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
@@ -77,8 +78,7 @@ public class ResolveService {
                     packageResolver = packageResolvers.get(ProfileType.Simple);
                     break;
                 default:
-                    packageResolver = null;
-                    break;
+                    throw new ResolveException("Failed to identify file type");
             }
             packageResolver.resolve(originalPackage, root);
             originalPackage.regularRowKey();

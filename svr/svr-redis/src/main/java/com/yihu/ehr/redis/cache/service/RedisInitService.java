@@ -173,13 +173,17 @@ public class RedisInitService extends BaseJpaService {
      * @param id
      * @return
      */
-    public int cacheAdapterMetadata(String id){
+    public int cacheAdapterMetadata (String id, boolean deleteAll){
         String schemaSql = "SELECT adapter_version FROM rs_adapter_scheme WHERE id = " + id;
         String metaSql = "SELECT src_dataset_code, src_metadata_code, metadata_id FROM rs_adapter_metadata WHERE scheme_id = " + id;
         Map<String, Object> schemaMap = jdbc.queryForMap(schemaSql);
         List<Map<String, Object>> metaList = jdbc.queryForList(metaSql);
         //清空相关Redis
-        rsAdapterMetaKeySchema.deleteAll();
+        if (deleteAll) {
+            rsAdapterMetaKeySchema.deleteAll();
+        } else {
+            rsAdapterMetaKeySchema.deleteVersion(schemaMap.get("adapter_version").toString());
+        }
         for (Map<String, Object> metaMap : metaList) {
             if (StringUtils.isEmpty(metaMap.get("src_dataset_code")) || StringUtils.isEmpty(metaMap.get("metadata_id"))) {
                 continue;
