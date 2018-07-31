@@ -310,10 +310,22 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
     }
 
     /**
+     * 基于用户ID及用户类型进行授权清理及授权更新
+     */
+    @RequestMapping(value = ServiceApi.Roles.UserOrgRela, method = RequestMethod.POST)
+    @ApiOperation(value = "基于用户ID&用户所属机构进行机构及部门间的对应关系")
+    public Envelop setUserRolesForUpdate(
+            @ApiParam(name = "userId", value = "用户ID", required = true)
+            @RequestParam(value = "userId") String userId,
+            @ApiParam(name = "orgModel", value = "所属机构JSON串", required = false)
+            @RequestParam(value = "orgModel") String orgModel ) throws  Exception{
+        Envelop envelop = new Envelop();
+        envelop = setOrgDeptRelation(orgModel,userId);
+        return envelop;
+    }
+
+    /**
      * 用户新增初始化用户角色授权
-     * @param userTypeRoles
-     * @param userId
-     * @return
      */
     public Envelop setUserRoles( List<UserTypeRoles> userTypeRoles, String userId) {
         long roleId = 0;
@@ -409,6 +421,21 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
                 }
             }
         }
+        return envelop;
+    }
+
+    /**
+     * 新增用户类型
+     */
+    @RequestMapping(value = ServiceApi.Roles.CreateUserType, method = RequestMethod.POST)
+    @ApiOperation(value = "新增用户类别")
+    public Envelop createUserType(
+            @ApiParam(name = "userId", value = "用户ID", required = true)
+            @RequestParam(value = "userId") String userId,
+            @ApiParam(name = "orgModel", value = "所属机构JSON串", required = false)
+            @RequestParam(value = "orgModel") String orgModel ) throws  Exception{
+        Envelop envelop = new Envelop();
+        envelop = setOrgDeptRelation(orgModel,userId);
         return envelop;
     }
 }
