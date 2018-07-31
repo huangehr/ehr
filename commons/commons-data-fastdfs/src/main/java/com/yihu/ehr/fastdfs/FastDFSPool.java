@@ -26,6 +26,7 @@ public class FastDFSPool {
     private FastDFSConfig fastDFSConfig;
 
     public synchronized StorageClient getStorageClient() throws IOException {
+        //ProtoCommon.activeTest(socket);
         if (storageClientPool.isEmpty()) {
             TrackerClient tracker = new TrackerClient();
             TrackerServer trackerServer = tracker.getConnection();
