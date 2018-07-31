@@ -537,4 +537,23 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
+    @RequestMapping(value = ServiceApi.Roles.GetUserTypeById, method = RequestMethod.GET)
+    @ApiOperation(value = "根据id获取用户类型")
+    public Envelop GetUserTypeById(
+            @ApiParam(name = "userTypeId", value = "用户类型ID")
+            @RequestParam(value = "userTypeId")  int userTypeId) {
+        Envelop envelop = new Envelop();
+        UserType userType = null;
+        try {
+            userType = xUserTypeRepository.findById(userTypeId);
+            envelop.setSuccessFlg(true);
+            envelop.setObj(userType);
+        } catch (Exception e) {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+            e.printStackTrace();
+        }
+        return envelop;
+    }
+
 }
