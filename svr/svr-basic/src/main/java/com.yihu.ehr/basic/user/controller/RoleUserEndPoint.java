@@ -8,6 +8,7 @@ import com.yihu.ehr.basic.org.model.OrgMemberRelation;
 import com.yihu.ehr.basic.org.model.Organization;
 import com.yihu.ehr.basic.org.service.OrgMemberRelationService;
 import com.yihu.ehr.basic.user.dao.XUserTypeRepository;
+import com.yihu.ehr.basic.user.dao.XUserTypeRolesRepository;
 import com.yihu.ehr.basic.user.entity.*;
 import com.yihu.ehr.basic.user.service.*;
 import com.yihu.ehr.constants.ApiVersion;
@@ -56,6 +57,9 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
     private XUserTypeRepository xUserTypeRepository;
     @Autowired
     private UserTypeService userTypeService;
+    @Autowired
+    private XUserTypeRolesRepository xUserTypeRolesRepository;
+
 
 
     @RequestMapping(value = ServiceApi.Roles.RoleUser, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -508,6 +512,28 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
             e.printStackTrace();
         }
 
+        return envelop;
+    }
+
+
+    /**
+     * 根据用户类型，获取初始化的角色组列表
+     */
+    @RequestMapping(value = ServiceApi.Roles.GetUserTypeRoles, method = RequestMethod.POST)
+    @ApiOperation(value = "基于用户类型的内码，进行用户初始化角色列表的查询")
+    public Envelop getUserTypeRolesByUserType(
+            @ApiParam(name = "userTypeId", value = "用户类别内码", required = true)
+            @RequestParam(value = "userTypeId") String userTypeId ) throws  Exception{
+        Envelop envelop = new Envelop();
+        List<UserTypeRoles> userTypeRoles = new ArrayList<>();
+        userTypeRoles = xUserTypeRolesRepository.findByTypeId(Integer.parseInt(userTypeId));
+        if(userTypeRoles != null && userTypeRoles.size()>0){
+            envelop.setSuccessFlg(true);
+            envelop.setDetailModelList(userTypeRoles);
+        }else{
+            // 当查询无数据时，不返回报错信息，界面直接展示为空即可
+            envelop.setSuccessFlg(true);
+        }
         return envelop;
     }
 
