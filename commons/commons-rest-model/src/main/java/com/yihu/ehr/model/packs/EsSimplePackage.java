@@ -21,6 +21,7 @@ public class EsSimplePackage implements Serializable {
     private String event_no;//事件号
     private String org_code;//机构代码
     private String org_name;//机构名称
+    private String org_area;//机构所属行政区域编码
     private String event_date;//事件时间
     private Integer event_type;//事件类型
     private String patient_name;//病人姓名
@@ -138,5 +139,13 @@ public class EsSimplePackage implements Serializable {
 
     public void setOrg_name(String org_name) {
         this.org_name = org_name;
+    }
+
+    public String getOrg_area() {
+        return org_area;
+    }
+
+    public void setOrg_area(String org_area) {
+        this.org_area = org_area;
     }
 }

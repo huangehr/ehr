@@ -14,5 +14,5 @@ public interface XUserTypeRepository extends PagingAndSortingRepository<UserType
 
     @Modifying
     @Query("update UserType userType set userType.activeFlag = :activeFlag where userType.id = :id")
-    void changePassWord(@Param("id") int id, @Param("activeFlag") String activeFlag);
+    void changeFlag(@Param("id") int id, @Param("activeFlag") String activeFlag);
 }

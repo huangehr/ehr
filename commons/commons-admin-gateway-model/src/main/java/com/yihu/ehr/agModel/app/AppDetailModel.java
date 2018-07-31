@@ -37,6 +37,11 @@ public class AppDetailModel {
     private String role;
     private String roleJson;
 
+    /**
+     * 医生工作站的应用分类,与catalog并无父子关系，1、在线学习，2在线服务
+     */
+    private String doctorManageType;
+
     public String getIcon() {
         return icon;
     }
@@ -244,5 +249,13 @@ public class AppDetailModel {
 
     public void setManageType(String manageType) {
         this.manageType = manageType;
+    }
+
+    public String getDoctorManageType() {
+        return doctorManageType;
+    }
+
+    public void setDoctorManageType(String doctorManageType) {
+        this.doctorManageType = doctorManageType;
     }
 }

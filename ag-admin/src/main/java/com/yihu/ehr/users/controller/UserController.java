@@ -2,7 +2,6 @@ package com.yihu.ehr.users.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.app.AppFeatureModel;
-import com.yihu.ehr.agModel.geogrephy.GeographyModel;
 import com.yihu.ehr.agModel.patient.PatientDetailModel;
 import com.yihu.ehr.agModel.user.UserDetailModel;
 import com.yihu.ehr.agModel.user.UsersModel;
@@ -39,7 +38,6 @@ import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
@@ -270,9 +268,9 @@ public class UserController extends BaseController {
             if (StringUtils.isEmpty(idCard)) {
                 errorMsg += "身份证号不能为空!";
             }
-            if (StringUtils.isEmpty(detailModel.getEmail())) {
+           /* if (StringUtils.isEmpty(detailModel.getEmail())) {
                 errorMsg += "邮箱不能为空!";
-            }
+            }*/
             if (StringUtils.isEmpty(detailModel.getTelephone())) {
                 errorMsg += "电话号码不能为空!";
             }
@@ -289,9 +287,9 @@ public class UserController extends BaseController {
             if (userClient.isIdCardExists(idCard)) {
                 return failed("身份证号已存在!");
             }
-            if (userClient.isEmailExists(detailModel.getEmail())) {
+            /*if (userClient.isEmailExists(detailModel.getEmail())) {
                 return failed("邮箱已存在!");
-            }
+            }*/
             if (userClient.isTelephoneExists(detailModel.getTelephone())) {
                 return failed("电话号码已存在!");
             }
@@ -317,7 +315,7 @@ public class UserController extends BaseController {
                     info.setHomeAddress(detailModel.getProvinceName() + detailModel.getCityName() + detailModel.getAreaName());
 */
                 //新增家庭地址信息
-                GeographyModel geographyModel = new GeographyModel();
+               /* GeographyModel geographyModel = new GeographyModel();
                 geographyModel.setProvinceId(detailModel.getProvinceId());
                 geographyModel.setProvince(detailModel.getProvinceName());
                 geographyModel.setCityId(detailModel.getCityId());
@@ -328,7 +326,7 @@ public class UserController extends BaseController {
                 if (!geographyModel.nullAddress()) {
                     String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
                     patientModel.setHomeAddress(addressId);
-                }
+                }*/
 
                 MDemographicInfo info = patientClient.createPatient(objectMapper.writeValueAsString(patientModel));
                 if (info == null) {
@@ -375,9 +373,9 @@ public class UserController extends BaseController {
             if (StringUtils.isEmpty(detailModel.getIdCardNo())) {
                 errorMsg += "身份证号不能为空!";
             }
-            if (StringUtils.isEmpty(detailModel.getEmail())) {
+           /* if (StringUtils.isEmpty(detailModel.getEmail())) {
                 errorMsg += "邮箱不能为空!";
-            }
+            }*/
             if (StringUtils.isEmpty(detailModel.getTelephone())) {
                 errorMsg += "电话号码不能为空!";
             }
@@ -401,12 +399,12 @@ public class UserController extends BaseController {
                     return failed("身份证号已存在!");
                 }
             }
-            if(mUser.getEmail() != null){
+            /*if(mUser.getEmail() != null){
                 if (!mUser.getEmail().equals(detailModel.getEmail())
                         && userClient.isEmailExists(detailModel.getEmail())) {
                     return failed("邮箱已存在!");
                 }
-            }
+            }*/
             if(mUser.getTelephone() != null){
                 if (!mUser.getTelephone().equals(detailModel.getTelephone())
                         && userClient.isTelephoneExists(detailModel.getTelephone())) {
@@ -430,6 +428,7 @@ public class UserController extends BaseController {
                 mRoleUsers = roleUserClient.searchRoleUserNoPaging("userId=" + mUser.getDemographicId());
                 bo = roleUserClient.batchUpdateRoleUsersRelation(mUser.getDemographicId(), detailModel.getRole());
             } else {*/
+
             Collection<MRoleUser> mRoleUsers = roleUserClient.searchRoleUserNoPaging("userId=" + mUser.getId());
             boolean bo = roleUserClient.batchUpdateRoleUsersRelation(mUser.getId(), detailModel.getRole());
 //            }

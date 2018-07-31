@@ -7,10 +7,8 @@ import com.yihu.ehr.basic.org.model.OrgDept;
 import com.yihu.ehr.basic.org.model.OrgMemberRelation;
 import com.yihu.ehr.basic.org.model.Organization;
 import com.yihu.ehr.basic.org.service.OrgMemberRelationService;
-import com.yihu.ehr.basic.user.entity.RoleOrg;
-import com.yihu.ehr.basic.user.entity.RoleUser;
-import com.yihu.ehr.basic.user.entity.Roles;
-import com.yihu.ehr.basic.user.entity.UserTypeRoles;
+import com.yihu.ehr.basic.user.dao.XUserTypeRepository;
+import com.yihu.ehr.basic.user.entity.*;
 import com.yihu.ehr.basic.user.service.RoleOrgService;
 import com.yihu.ehr.basic.user.service.RoleUserService;
 import com.yihu.ehr.basic.user.service.RolesService;
@@ -55,6 +53,10 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
     private UserService userService;
     @Autowired
     private OrgMemberRelationService orgMemberRelationService;
+
+    @Autowired
+    private XUserTypeRepository xUserTypeRepository;
+
 
     @RequestMapping(value = ServiceApi.Roles.RoleUser,method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "为角色组配置人员，单个")
@@ -310,10 +312,22 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
     }
 
     /**
+     * 基于用户ID及用户类型进行授权清理及授权更新
+     */
+    @RequestMapping(value = ServiceApi.Roles.UserOrgRela, method = RequestMethod.POST)
+    @ApiOperation(value = "基于用户ID&用户所属机构进行机构及部门间的对应关系")
+    public Envelop setUserRolesForUpdate(
+            @ApiParam(name = "userId", value = "用户ID", required = true)
+            @RequestParam(value = "userId") String userId,
+            @ApiParam(name = "orgModel", value = "所属机构JSON串", required = false)
+            @RequestParam(value = "orgModel") String orgModel ) throws  Exception{
+        Envelop envelop = new Envelop();
+        envelop = setOrgDeptRelation(orgModel,userId);
+        return envelop;
+    }
+
+    /**
      * 用户新增初始化用户角色授权
-     * @param userTypeRoles
-     * @param userId
-     * @return
      */
     public Envelop setUserRoles( List<UserTypeRoles> userTypeRoles, String userId) {
         long roleId = 0;
@@ -408,6 +422,33 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
                     }
                 }
             }
+        }
+        return envelop;
+    }
+
+    /**
+     * 新增用户类型
+     */
+    @RequestMapping(value = ServiceApi.Roles.CreateUserType, method = RequestMethod.POST)
+    @ApiOperation(value = "新增用户类别")
+    public Envelop createUserType(
+            @ApiParam(name = "code", value = "用户类别编码", required = true)
+            @RequestParam(value = "code") String code,
+            @ApiParam(name = "name", value = "用户类别名称", required = false)
+            @RequestParam(value = "name") String name ) throws  Exception{
+        Envelop envelop = new Envelop();
+        UserType userType = new UserType();
+
+        userType.setCode(code);
+        userType.setName(name);
+        userType.setActiveFlag("1");
+        userType = xUserTypeRepository.save(userType);
+        if(userType != null){
+            envelop.setSuccessFlg(true);
+            envelop.setObj(userType);
+        }else{
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("新增用户类别失败，请重试！");
         }
         return envelop;
     }

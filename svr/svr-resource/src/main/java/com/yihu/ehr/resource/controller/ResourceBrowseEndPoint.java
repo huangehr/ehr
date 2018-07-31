@@ -359,6 +359,7 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
                     esSimplePackage.setIdcard_no(String.valueOf(item.get("demographic_id")));
                     esSimplePackage.setPatient_name(String.valueOf(item.get("patient_name")));
                     esSimplePackage.setOrg_name(String.valueOf(item.get("org_name")));
+                    esSimplePackage.setOrg_area(String.valueOf(item.get("org_area")));
                     //存入省平台上传队列
                     redisTemplate.opsForList().leftPush(RedisCollection.PROVINCIAL_PLATFORM_QUEUE_SUPPLEMENT, objectMapper.writeValueAsString(esSimplePackage));
                 }
