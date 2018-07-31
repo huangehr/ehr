@@ -544,9 +544,12 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "userTypeId")  int userTypeId) {
         Envelop envelop = new Envelop();
         UserType userType = null;
+        List<UserTypeRoles> userTypeRoles =null;
         try {
             userType = xUserTypeRepository.findById(userTypeId);
+            userTypeRoles = xUserTypeRolesRepository.findByTypeId(userTypeId);
             envelop.setSuccessFlg(true);
+            envelop.setDetailModelList(userTypeRoles);
             envelop.setObj(userType);
         } catch (Exception e) {
             envelop.setSuccessFlg(false);
