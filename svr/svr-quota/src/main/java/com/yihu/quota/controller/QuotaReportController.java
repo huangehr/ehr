@@ -239,7 +239,7 @@ public class QuotaReportController extends BaseController {
             sumMap.put("firstColumn","合计");
             for (String code : quotaCodes) {
                 String total =  existsTotal(code,dataList);
-                if( total.equals("false")){
+                if( total.equals("false") || total.equals("--")){
                     double sum = 0;
                     sum = calculateSum(sum,code,dataList);
                     sumMap.put(code, nf.format(sum));
@@ -266,7 +266,11 @@ public class QuotaReportController extends BaseController {
     private String existsTotal(String code,List<Map<String, Object>> dataList){
         for(Map<String, Object> map : dataList){
             if(map.get("firstColumn") != null && map.get("firstColumn").toString().equals("合计") && map.get(code) != null){
-                return map.get(code).toString();
+                if(map.get(code).toString().equals("--")){
+                    return "false";
+                }else {
+                    return map.get(code).toString();
+                }
             }
         }
         return "false";

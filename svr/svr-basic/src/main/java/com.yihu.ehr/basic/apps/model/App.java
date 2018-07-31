@@ -44,7 +44,10 @@ public class App {
     private String icon;
     private int releaseFlag;
     private String manageType; // 管理类型，dictId=94
-    private String doctorManageType; // 医生工作站的应用分类,与catalog并无父子关系，1、在线学习，2在线服务
+    /**
+     * 医生工作站的应用分类,与catalog并无父子关系，1、在线学习，2在线服务
+     */
+    private String doctorManageType;
 
     public App() {
     }
