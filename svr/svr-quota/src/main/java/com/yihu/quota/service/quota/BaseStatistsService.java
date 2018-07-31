@@ -796,6 +796,7 @@ public class BaseStatistsService {
                     if(dimensionDicMap.get(map.get(key).toString().toLowerCase())  != null){
                         dataMap.put(key,dimensionDicMap.get(map.get(key).toString().toLowerCase()));
                         dataMap.put(key+"Name",dimensionDicMap.get(map.get(key).toString().toLowerCase()));
+                        dataMap.put(key+"Code",map.get(key).toString().toLowerCase());
                         dataMap.put(firstColumnField,dimensionDicMap.get(map.get(key).toString().toLowerCase()));
                     }else {
                         dataMap.put(key,map.get(key));
@@ -875,31 +876,19 @@ public class BaseStatistsService {
      */
     public List<Map<String, Object>> noDataDimenDictionary(List<Map<String, Object>> dataList,String dimen,String filter){
         Map<String, Object> dictMap = new HashMap<>();
-        if(dimen.equals("town") || dimen.equals("org") ){
+        if(dimen.equals("town")){
             String sql = "";
             if(dimen.equals("town") ){
                 sql = "SELECT id as code,name as name  from address_dict where pid = '361100'";
-            }
-            if(dimen.equals("org") ){
-                String areasql = "SELECT id from address_dict where pid = '361100'";
-                String [] filters = filter.split("and");
-                List<String> filterList = Arrays.asList(filter.split("and"));
-                for(String fil : filterList){
-                   if(fil.contains("town")){
-                       areasql = fil.split("=")[1];
-                   }
-                }
-                sql = "SELECT org_code as code,full_name as name from organizations WHERE administrative_division in(" + areasql + ")";
-            }
-            List<Map<String, Object>> dictDataList = jdbcTemplate.queryForList(sql);
-            if(null != dictDataList) {
-                for(int i = 0 ; i < dictDataList.size();i++){
-                    if(null != dictDataList.get(i).get("code") && null != dictDataList.get(i).get("name")){
-                        dictMap.put(dictDataList.get(i).get("code").toString(),dictDataList.get(i).get("name").toString());
+                List<Map<String, Object>> dictDataList = jdbcTemplate.queryForList(sql);
+                if(null != dictDataList) {
+                    for(int i = 0 ; i < dictDataList.size();i++){
+                        if(null != dictDataList.get(i).get("code") && null != dictDataList.get(i).get("name")){
+                            dictMap.put(dictDataList.get(i).get("code").toString(),dictDataList.get(i).get("name").toString());
+                        }
                     }
                 }
             }
-
             List<Map<String, Object>> resultList = new ArrayList<>();
             for(String code : dictMap.keySet()){
                 Map<String,Object> oneMap = new HashMap<>();
@@ -911,8 +900,9 @@ public class BaseStatistsService {
                     }
                 }
                 oneMap.put(firstColumnField,dictMap.get(code));
-                oneMap.put(dimen+"Name",dictMap.get(code));
                 oneMap.put(dimen,dictMap.get(code));
+                oneMap.put(dimen+"Name",dictMap.get(code));
+                oneMap.put(dimen+"Code",code);
                 oneMap.put(resultField,result);
                 resultList.add(oneMap);
             }
