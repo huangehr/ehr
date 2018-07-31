@@ -9,10 +9,7 @@ import com.yihu.ehr.basic.org.model.Organization;
 import com.yihu.ehr.basic.org.service.OrgMemberRelationService;
 import com.yihu.ehr.basic.user.dao.XUserTypeRepository;
 import com.yihu.ehr.basic.user.entity.*;
-import com.yihu.ehr.basic.user.service.RoleOrgService;
-import com.yihu.ehr.basic.user.service.RoleUserService;
-import com.yihu.ehr.basic.user.service.RolesService;
-import com.yihu.ehr.basic.user.service.UserService;
+import com.yihu.ehr.basic.user.service.*;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
@@ -31,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.*;
 
 /**
@@ -56,6 +54,8 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     private XUserTypeRepository xUserTypeRepository;
+    @Autowired
+    private UserTypeService userTypeService;
 
 
     @RequestMapping(value = ServiceApi.Roles.RoleUser,method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -450,6 +450,37 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("新增用户类别失败，请重试！");
         }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.Roles.SearchUserType,method = RequestMethod.GET)
+    @ApiOperation(value = "查询用户类别列表---分页")
+    public Envelop searchUserType(
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有信息")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "-createDate")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page,
+            HttpServletRequest request,HttpServletResponse response){
+        Envelop envelop =new Envelop();
+        try {
+            List<UserType> roleUserList = userTypeService.search(fields, filters, sorts, page, size);
+            envelop.setSuccessFlg(true);
+            envelop.setDetailModelList(roleUserList);
+            envelop.setTotalCount((int)userTypeService.getCount(filters));
+            envelop.setCurrPage(page);
+            envelop.setPageSize(size);
+        } catch (ParseException e) {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+            e.printStackTrace();
+        }
+
         return envelop;
     }
 }
