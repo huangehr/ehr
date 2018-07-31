@@ -135,6 +135,7 @@ public class PackageResolveJob implements InterruptableJob {
         pack.setEvent_type(originalPackage.getEventType() == null ? -1 : originalPackage.getEventType().getType());
         pack.setOrg_code(originalPackage.getOrgCode());
         pack.setOrg_name(resourceBucket.getBasicRecord(ResourceCells.ORG_NAME));
+        pack.setOrg_area(resourceBucket.getBasicRecord(ResourceCells.ORG_AREA));
         pack.setPatient_name(resourceBucket.getBasicRecord(ResourceCells.PATIENT_NAME));
         pack.setIdcard_no(resourceBucket.getBasicRecord(ResourceCells.DEMOGRAPHIC_ID));
         return originalPackage;
