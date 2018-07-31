@@ -13,7 +13,7 @@ import java.util.List;
  */
 public interface RsReportUsersDao extends PagingAndSortingRepository<RsReportUsers, Integer> {
 
-    @Query("from RsReportUsers ru where ru.userId = :userId order by ru.sortNo desc")
+    @Query("from RsReportUsers ru where ru.userId = :userId order by ru.sortNo asc")
     List<RsReportUsers> findByUserId(@Param("userId") String userId);
 
     @Modifying
