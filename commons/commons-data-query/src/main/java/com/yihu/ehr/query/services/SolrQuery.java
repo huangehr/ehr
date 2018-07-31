@@ -288,7 +288,7 @@ public class SolrQuery {
         int solrDocListSize = 0;
         for (Group group : groupList) {
             SolrDocument firstDoc = group.getResult().get(0);
-            Object fieldValueObj = firstDoc.getFieldValue(groupField);
+            String fieldValue = firstDoc.getFieldValue(groupField) == null ? "null" : firstDoc.getFieldValue(groupField).toString();
 
             int i = 1;
             // 该组为空值的话，判断每条空值记录是单独保存，还是合并为一条保存。
@@ -305,10 +305,10 @@ public class SolrQuery {
                 if (nullDocList.getNumFound() == 0) {
                     doc = firstDoc;
                 } else {
-                    doc = nullDocList.get(i);
+                    doc = nullDocList.get(i-1);
                 }
                 map.put("distinctField", groupField);
-                map.put("distinctFieldValue", fieldValueObj);
+                map.put("distinctFieldValue", fieldValue);
                 // 从solr查询结果中，给返回字段赋值，并判断标记该字段是否在solr中配置为store为false的。
                 putFieldValueFromSolr(data, map, fields, doc, falseStoreIndexMap);
                 solrDocListSize++;
