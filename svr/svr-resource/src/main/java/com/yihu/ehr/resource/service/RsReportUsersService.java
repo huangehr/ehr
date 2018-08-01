@@ -58,7 +58,7 @@ public class RsReportUsersService extends BaseJpaService<RsReportUsers, RsReport
      */
     @Transactional
     public void saveRsReportUser(String userId, List<RsReportUsers> list) {
-        rsReportUsersDao.findByUserId(userId);
+        rsReportUsersDao.deleteByUserId(userId);
         rsReportUsersDao.save(list);
     }
 }
