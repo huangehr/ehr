@@ -19,7 +19,7 @@ import java.util.List;
  * Created by wxw on 2018/7/31.
  */
 @Service
-@Transactional(readOnly = true)
+@Transactional
 public class RsReportUsersService extends BaseJpaService<RsReportUsers, RsReportUsersDao> {
 
     @Autowired
@@ -56,9 +56,9 @@ public class RsReportUsersService extends BaseJpaService<RsReportUsers, RsReport
      * @param userId
      * @param list
      */
-    @Transactional(readOnly = false)
+    @Transactional
     public void saveRsReportUser(String userId, List<RsReportUsers> list) {
-        rsReportUsersDao.findByUserId(userId);
+        rsReportUsersDao.deleteByUserId(userId);
         rsReportUsersDao.save(list);
     }
 }
