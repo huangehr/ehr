@@ -1667,7 +1667,7 @@ public class BaseStatistsService {
             }
             dimension = dateType;
             List<Map<String, Object>> dataList = getSimpleQuotaReport(esConfig.getMolecular(), filters,dimension ,false , null);
-            DecimalFormat df = new DecimalFormat(".0");
+            DecimalFormat df = new DecimalFormat("0.0");
             if(dataList != null && dataList.size() > 0){
                 if(dateType.toLowerCase().equals("year")){
                     for(int i = nowYear ; i > beforeYear ;i--){
@@ -1688,7 +1688,7 @@ public class BaseStatistsService {
                         if(last == 0){
                             map.put(resultField,"--");
                         }else {
-                            double precent = (current - last)/last;
+                            double precent = (current - last)/last*100;
                             map.put(resultField,precent-0 ==0 ? 0 : df.format(precent));
                         }
                         resultList.add(map);
