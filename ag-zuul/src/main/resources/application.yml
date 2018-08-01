@@ -82,7 +82,7 @@ zuul:
     # 卫计委官网
     gov-server:
       path: /open/govServer/**
-      url: http://www.srswjw.gov.cn:8080/
+      url: http://www.srswjw.gov.cn/
     # 应急指挥
     emergency-server:
       path: /open/baidu/**
