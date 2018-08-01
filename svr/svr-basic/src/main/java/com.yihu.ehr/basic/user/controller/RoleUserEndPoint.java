@@ -571,7 +571,8 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
         Envelop envelop = new Envelop();
         UserType userType = null;
         try {
-            List<UserTypeRoles> models = objectMapper.readValue(typeRolesJson, new TypeReference<List<UserTypeRoles>>() {});
+            List<UserTypeRoles> models = objectMapper.readValue(typeRolesJson, new TypeReference<List<UserTypeRoles>>() {
+            });
             userType = toEntity(userTypeJson, UserType.class);
             Integer userTypeId = userType.getId();
             if (null != userType && null != userTypeId && userTypeId > 0) {
@@ -582,10 +583,23 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
                     userTypeRoles.setId(null);
                     xUserTypeRolesRepository.save(userTypeRoles);
                 });
-                xUserTypeRolesRepository.save(models);
             } else {
                 if (null != userType && !userType.getActiveFlag().equals("0")) {
                     userType.setActiveFlag("1");
+                }
+                List<UserType> userTList = new ArrayList<>();
+                userTList = xUserTypeRepository.findByCode(userType.getCode());
+                if (null != userTList && userTList.size() > 0) {
+                    envelop.setSuccessFlg(false);
+                    envelop.setErrorMsg("用户类型编码已存在!");
+                    return envelop;
+                } else {
+                    userTList = xUserTypeRepository.findByName(userType.getName());
+                    if (null != userTList && userTList.size() > 0) {
+                        envelop.setSuccessFlg(false);
+                        envelop.setErrorMsg("用户类型名称已存在!");
+                        return envelop;
+                    }
                 }
                 UserType userTypeBak = userTypeService.save(userType);
                 models.forEach(userTypeRoles -> {
