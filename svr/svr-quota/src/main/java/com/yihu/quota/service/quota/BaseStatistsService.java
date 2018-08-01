@@ -136,7 +136,11 @@ public class BaseStatistsService {
         List<Map<String, Object>> firstList = getQuotaResultList(addFirstQuotaCode,dimension,firstFilter,dateType, top);
         List<Map<String, Object>> secondList =  getQuotaResultList(addSecondQuotaCode,dimension,secondFilter,dateType, top);
         dimension = StringUtils.isNotEmpty(dateType)? (StringUtils.isNotEmpty(dimension)? dimension +";"+dateType : dateType):dimension;
-        return addition(dimension, firstList, secondList, Integer.valueOf(operation));
+        List<Map<String, Object>> addition = addition(dimension, firstList, secondList, Integer.valueOf(operation));
+        if (StringUtils.isNotEmpty(top)) {
+            addition = sortResultList(addition, top);
+        }
+        return addition;
     }
 
 
@@ -191,7 +195,7 @@ public class BaseStatistsService {
                     }
                 }
                 if(pflag){
-                    map.put(resultField,firstResultVal);
+                    map.put(resultField, nf.format(firstResultVal));
                     addResultList.add(map);
                 }
             }
@@ -250,6 +254,24 @@ public class BaseStatistsService {
             }
         }*/
         return  addResultList;
+    }
+
+    public List<Map<String, Object>> sortResultList(List<Map<String, Object>> listMap, String top) {
+        Collections.sort(listMap, new Comparator<Map<String, Object>>() {
+
+            @Override
+            public int compare(Map<String, Object> o1, Map<String, Object> o2) {
+                // 根据result进行降序
+                double result = Double.parseDouble(o1.get("result") + "");
+                double result2 = Double.parseDouble(o2.get("result") + "");
+                double v = result2 - result;
+                return v > 0 ? 1 : v == 0 ? 0 : -1;
+            }
+        });
+        if (StringUtils.isNotEmpty(top)) {
+            listMap = listMap.subList(0, Integer.parseInt(top));
+        }
+        return listMap;
     }
 
     /**

@@ -14,6 +14,7 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URLDecoder;
 import java.util.List;
 
 /**
@@ -57,10 +58,9 @@ public class RsReportUsersEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "userId", value = "用户编码", required = true)
             @RequestParam(value = "userId") String userId,
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
-            @RequestBody String model) throws Exception {
+            @RequestParam String model) throws Exception {
         Envelop envelop = new Envelop();
-        List<RsReportUsers> rsReportUsersList = objectMapper.readValue(model, new TypeReference<List<RsReportUsers>>() {});
-        rsReportUsersService.deleteByUserId(userId);
+        List<RsReportUsers> rsReportUsersList = objectMapper.readValue(URLDecoder.decode(model, "UTF-8"), new TypeReference<List<RsReportUsers>>() {});
         rsReportUsersService.saveRsReportUser(userId, rsReportUsersList);
         envelop.setSuccessFlg(true);
         return envelop;
