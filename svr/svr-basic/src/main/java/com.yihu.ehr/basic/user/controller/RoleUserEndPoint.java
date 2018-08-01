@@ -491,7 +491,7 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
-    @RequestMapping(value = ServiceApi.Roles.UpdateUserType, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Roles.UpdateUserType, method = RequestMethod.POST)
     @ApiOperation(value = "用户类型变更")
     public Envelop updateUserType(
             @ApiParam(name = "userTypeJson", value = "用户类型json串")
