@@ -10,6 +10,7 @@ import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 
 import java.io.*;
 import java.net.SocketException;
@@ -257,6 +258,31 @@ public class FtpUtils {
         try {
             ftpClient.changeWorkingDirectory(path);//转移到指定FTP服务器目录
             ftpClient.deleteFile(fileName);
+            ftpClient.logout();
+            success = true;
+        } catch (Exception e) {
+            logger.error("Ftp文件删除失败！", e);
+        }
+        return success;
+    }
+
+
+    /**
+     * 删除文件-FTP方式
+     *
+     * @param path     FTP服务器上传地址
+     * @param fileNames FTP服务器上要删除的文件名集合
+     * @return
+     */
+    public boolean deleteFile(String path, List<String> fileNames) {
+        boolean success = false;
+        try {
+            ftpClient.changeWorkingDirectory(path);//转移到指定FTP服务器目录
+            if(!CollectionUtils.isEmpty(fileNames)){
+                for(String fileName: fileNames){
+                    ftpClient.deleteFile(fileName);
+                }
+            }
             ftpClient.logout();
             success = true;
         } catch (Exception e) {

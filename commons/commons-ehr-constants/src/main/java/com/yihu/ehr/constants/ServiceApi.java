@@ -1689,6 +1689,7 @@ public class ServiceApi {
         public static final String dailyReport = "/packQcReport/dailyReport";
         public static final String datasetWarningList = "/packQcReport/datasetWarningList";
         public static final String resourceSuccess = "/packQcReport/resourceSuccess";
+        public static final String resourceSuccessPage = "/packQcReport/resourceSuccessPage";
         public static final String archiveReport= "/packQcReport/archiveReport";
         public static final String dataSetList= "/packQcReport/dataSetList";
         public static final String archiveFailed= "/packQcReport/archiveFailed";

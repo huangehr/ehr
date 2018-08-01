@@ -143,7 +143,7 @@ public class PackQcReportService extends BaseJpaService {
         double physical_total = 0.0;
         for(Histogram.Bucket item: histogram.getBuckets()){
             Map<String, Object> temp = new HashMap<>();
-            if(item.getDocCount()>0&&!"".equals(item.getKeyAsString())) {
+            if(item.getDocCount()>0 && !"".equals(item.getKeyAsString())) {
                 temp.put("date", item.getKeyAsString());
                 LongTerms longTerms = item.getAggregations().get("event_type");
                 double inpatient = 0.0;
@@ -179,6 +179,82 @@ public class PackQcReportService extends BaseJpaService {
         envelop.setDetailModelList(resultList);
         return envelop;
     }
+
+    /**
+     * 获取资源化数据
+     * @param startDate
+     * @param endDate
+     * @param orgCode
+     * @return
+     * @throws Exception
+     */
+    public Envelop resourceSuccess(String startDate, String endDate, String orgCode,int size,int page) throws Exception {
+        Envelop envelop = new Envelop();
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("pack_type=1;archive_status=3;");
+        stringBuilder.append("receive_date>=" + startDate + " 00:00:00;");
+        stringBuilder.append("receive_date<" + endDate + " 23:59:59;");
+        if (StringUtils.isNotEmpty(orgCode) && !"null".equals(orgCode) && !cloud.equals(orgCode)){
+            stringBuilder.append("org_code=" + orgCode);
+        }
+        TransportClient transportClient = elasticSearchPool.getClient();
+        List<Map<String, Object>> resultList = new ArrayList<>();
+        SearchRequestBuilder builder = transportClient.prepareSearch("json_archives");//1        5   2 6
+        builder.setTypes("info");
+        builder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
+        builder.setQuery(elasticSearchUtil.getQueryBuilder(stringBuilder.toString()));
+        DateHistogramBuilder dateHistogramBuilder = new DateHistogramBuilder("date");
+        dateHistogramBuilder.field("event_date");
+        dateHistogramBuilder.interval(DateHistogramInterval.DAY);
+        dateHistogramBuilder.format("yyyy-MM-dd");
+        dateHistogramBuilder.minDocCount(0);
+
+        builder.addAggregation(dateHistogramBuilder);
+        builder.setExplain(true);
+        SearchResponse response = builder.get();
+        Histogram histogram = response.getAggregations().get("date");
+        double total  = 0.0;
+        for(Histogram.Bucket item: histogram.getBuckets()){
+            Map<String, Object> temp = new HashMap<>();
+            if(item.getDocCount()>0 && !"".equals(item.getKeyAsString())) {
+                temp.put("date", item.getKeyAsString());
+                long docCount = item.getDocCount();
+                temp.put("total", docCount);
+                total += docCount;
+                resultList.add(temp);
+            }
+        }
+        Map<String, Object> totalMap = new HashMap<>();
+        totalMap.put("date", "合计");
+        totalMap.put("total", total);
+        resultList.add(0,totalMap);
+
+        //设置假分页
+        int totalCount = resultList.size();
+        envelop.setTotalCount(totalCount);//1  5
+        int totalPage = totalCount%size==0 ? totalCount%size:totalCount%size+1;
+        envelop.setTotalPage(totalPage);
+        envelop.setCurrPage(page);
+        envelop.setPageSize(size);
+        List<Map<String, Object>> pagedList = getPagedList(page, size, resultList);
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(pagedList);
+        return envelop;
+    }
+
+    private List<Map<String, Object>> getPagedList(int pageNum,int pageSize,List<Map<String,Object>> data) {
+        int fromIndex = (pageNum - 1) * pageSize;
+        if (fromIndex >= data.size()) {
+            return Collections.emptyList();
+        }
+
+        int toIndex = pageNum * pageSize;
+        if (toIndex >= data.size()) {
+            toIndex = data.size();
+        }
+        return data.subList(fromIndex, toIndex);
+    }
+
 
     /**
      * 获取档案数据
