@@ -212,7 +212,7 @@ public class SolrExtract {
     }
 
     /**
-     * 去重查询后，对比 ES 中如果已存在该条数据，且去重集合中有更前的则更新，并从去重集合中移除该条数据。
+     * 去重查询后，对比 ES 中如果已存在该条数据，且去重集合中有更前的则更新quotaDate，并从去重集合中移除该条数据。
      *
      * @param distinctQueryList 去重查询结果集
      */
@@ -241,6 +241,7 @@ public class SolrExtract {
                 Map<String, Object> quotaData = existedList.get(0);
                 String quotaDate = quotaData.get("quotaDate").toString();
                 if (DateUtil.compareDate(DateUtil.DEFAULT_DATE_YMD_FORMAT, timeKeyValue, quotaDate) < 0) {
+                    quotaData.put("quotaDate", timeKeyValue);
                     updateList.add(quotaData);
                     iterator.remove();
                 }
