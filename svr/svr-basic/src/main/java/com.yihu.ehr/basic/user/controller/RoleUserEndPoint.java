@@ -1,11 +1,10 @@
 package com.yihu.ehr.basic.user.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JavaType;
 import com.yihu.ehr.basic.apps.model.UserApp;
 import com.yihu.ehr.basic.apps.service.UserAppService;
-import com.yihu.ehr.basic.org.model.OrgDept;
 import com.yihu.ehr.basic.org.model.OrgMemberRelation;
-import com.yihu.ehr.basic.org.model.Organization;
 import com.yihu.ehr.basic.org.service.OrgMemberRelationService;
 import com.yihu.ehr.basic.user.dao.XUserTypeRepository;
 import com.yihu.ehr.basic.user.dao.XUserTypeRolesRepository;
@@ -14,7 +13,6 @@ import com.yihu.ehr.basic.user.service.*;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
-import com.yihu.ehr.entity.dict.SystemDictEntry;
 import com.yihu.ehr.model.org.MOrgDeptJson;
 import com.yihu.ehr.model.user.MRoleOrg;
 import com.yihu.ehr.model.user.MRoleUser;
@@ -24,6 +22,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -59,7 +59,8 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
     private UserTypeService userTypeService;
     @Autowired
     private XUserTypeRolesRepository xUserTypeRolesRepository;
-
+    @Autowired
+    private UserTypeRolesService userTypeRolesService;
 
 
     @RequestMapping(value = ServiceApi.Roles.RoleUser, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -523,14 +524,14 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "基于用户类型的内码，进行用户初始化角色列表的查询")
     public Envelop getUserTypeRolesByUserType(
             @ApiParam(name = "userTypeId", value = "用户类别内码", required = true)
-            @RequestParam(value = "userTypeId") String userTypeId ) throws  Exception{
+            @RequestParam(value = "userTypeId") String userTypeId) throws Exception {
         Envelop envelop = new Envelop();
         List<UserTypeRoles> userTypeRoles = new ArrayList<>();
         userTypeRoles = xUserTypeRolesRepository.findByTypeId(Integer.parseInt(userTypeId));
-        if(userTypeRoles != null && userTypeRoles.size()>0){
+        if (userTypeRoles != null && userTypeRoles.size() > 0) {
             envelop.setSuccessFlg(true);
             envelop.setDetailModelList(userTypeRoles);
-        }else{
+        } else {
             // 当查询无数据时，不返回报错信息，界面直接展示为空即可
             envelop.setSuccessFlg(true);
         }
@@ -541,10 +542,10 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "根据id获取用户类型")
     public Envelop GetUserTypeById(
             @ApiParam(name = "userTypeId", value = "用户类型ID")
-            @RequestParam(value = "userTypeId")  int userTypeId) {
+            @RequestParam(value = "userTypeId") int userTypeId) {
         Envelop envelop = new Envelop();
         UserType userType = null;
-        List<UserTypeRoles> userTypeRoles =null;
+        List<UserTypeRoles> userTypeRoles = null;
         try {
             userType = xUserTypeRepository.findById(userTypeId);
             userTypeRoles = xUserTypeRolesRepository.findByTypeId(userTypeId);
@@ -552,6 +553,54 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
             envelop.setDetailModelList(userTypeRoles);
             envelop.setObj(userType);
         } catch (Exception e) {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+            e.printStackTrace();
+        }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.Roles.SaveUserTypeRoles, method = RequestMethod.POST)
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    @ApiOperation(value = "保存用户类型-角色组关联关系")
+    public Envelop saveUserTypeRoles(
+            @ApiParam(name = "userTypeJson", value = "用户类型json串")
+            @RequestParam(value = "userTypeJson") String userTypeJson,
+            @ApiParam(name = "typeRolesJson", value = "用户类型-角色组json串")
+            @RequestParam(value = "typeRolesJson") String typeRolesJson) {
+        //判断用户类型的id是否存在，如果存在，则视为变更与角色组关联关系。如果不存在则视为新的用户类型
+        Envelop envelop = new Envelop();
+        UserType userType = null;
+        try {
+            JavaType javaType = objectMapper.getTypeFactory().constructParametricType(List.class, UserTypeRoles.class);
+            List<UserTypeRoles> models = objectMapper.readValue(typeRolesJson, javaType);
+
+            userType = toEntity(userTypeJson, UserType.class);
+            Integer userTypeId = userType.getId();
+            if (null != userType && null != userTypeId && userTypeId > 0) {
+                //变更与角色组的关联关系
+                xUserTypeRolesRepository.deleteUserTypeRolesByTypeId(userTypeId);
+                models.forEach(userTypeRoles -> {
+                    userTypeRoles.setTypeId(userTypeId);
+                    userTypeRoles.setId(null);
+                    xUserTypeRolesRepository.save(userTypeRoles);
+                });
+                xUserTypeRolesRepository.save(models);
+            } else {
+                if (null != userType && !userType.getActiveFlag().equals("0")) {
+                    userType.setActiveFlag("1");
+                }
+                UserType userTypeBak = userTypeService.save(userType);
+                models.forEach(userTypeRoles -> {
+                    userTypeRoles.setTypeId(userTypeBak.getId());
+                    userTypeRoles.setId(null);
+                    xUserTypeRolesRepository.save(userTypeRoles);
+                });
+            }
+            envelop.setDetailModelList(models);
+            envelop.setSuccessFlg(true);
+            envelop.setObj(userType);
+        } catch (IOException e) {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg(e.getMessage());
             e.printStackTrace();
