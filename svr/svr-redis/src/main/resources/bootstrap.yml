@@ -1,6 +1,6 @@
 spring:
   application:
-    name: svr-redis-sxy
+    name: svr-redis
   cloud:
     config:
       username: user
