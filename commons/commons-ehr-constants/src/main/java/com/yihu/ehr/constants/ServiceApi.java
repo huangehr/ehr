@@ -1664,6 +1664,8 @@ public class ServiceApi {
         public static final String QualityMonitoringList = "/dataQuality/quality/qualityMonitoringList";
         public static final String ReceptionList = "/dataQuality/quality/receptionList";
         public static final String ReceiveDataset = "/dataQuality/quality/receiveDataset";
+        public static final String QualityMonitorProvincePlatform = "/dataQuality/quality/platform";
+
 
         public static final String WarningRecordList = "/dataQuality/warningRecord/warningRecordList";
         public static final String WarningRecord =    "/dataQuality/warningRecord/warningRecord/{id}";
