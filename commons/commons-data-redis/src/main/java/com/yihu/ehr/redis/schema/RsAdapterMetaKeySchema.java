@@ -18,6 +18,10 @@ public class RsAdapterMetaKeySchema extends KeySchema {
     }
 
     public void setMetaData(String cdaVersion, String dataSet, String ehrMetaData, String val){
-        set(String.format("%s.%s.%s", cdaVersion, dataSet, ehrMetaData),val);
+        set(String.format("%s.%s.%s", cdaVersion, dataSet, ehrMetaData), val);
+    }
+
+    public void deleteVersion (String cdaVersion) {
+        delete(String.format("%s.%s.%s", cdaVersion, "*", "*"));
     }
 }
