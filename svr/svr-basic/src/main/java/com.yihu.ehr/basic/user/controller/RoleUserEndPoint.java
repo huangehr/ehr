@@ -503,6 +503,22 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
             if (null != userType && !userType.getActiveFlag().equals("0")) {
                 userType.setActiveFlag("1");
             }
+            if (!(null != userType && null != Integer.valueOf(userType.getId()) && userType.getId() > 0)) {
+                List<UserType> userTList = new ArrayList<>();
+                userTList = xUserTypeRepository.findByCode(userType.getCode());
+                if (null != userTList && userTList.size() > 0) {
+                    envelop.setSuccessFlg(false);
+                    envelop.setErrorMsg("用户类型编码已存在!");
+                    return envelop;
+                } else {
+                    userTList = xUserTypeRepository.findByName(userType.getName());
+                    if (null != userTList && userTList.size() > 0) {
+                        envelop.setSuccessFlg(false);
+                        envelop.setErrorMsg("用户类型名称已存在!");
+                        return envelop;
+                    }
+                }
+            }
             userType = userTypeService.save(userType);
             envelop.setSuccessFlg(true);
             envelop.setObj(userType);
@@ -574,8 +590,8 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
             List<UserTypeRoles> models = objectMapper.readValue(typeRolesJson, new TypeReference<List<UserTypeRoles>>() {
             });
             userType = toEntity(userTypeJson, UserType.class);
-            Integer userTypeId = userType.getId();
-            if (null != userType && null != userTypeId && userTypeId > 0) {
+            if (null != userType && null != Integer.valueOf(userType.getId()) && userType.getId() > 0) {
+                Integer userTypeId = userType.getId();
                 //变更与角色组的关联关系
                 xUserTypeRolesRepository.deleteUserTypeRolesByTypeId(userTypeId);
                 models.forEach(userTypeRoles -> {
