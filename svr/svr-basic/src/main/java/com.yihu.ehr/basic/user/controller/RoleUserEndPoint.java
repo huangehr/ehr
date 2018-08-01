@@ -1,7 +1,6 @@
 package com.yihu.ehr.basic.user.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JavaType;
 import com.yihu.ehr.basic.apps.model.UserApp;
 import com.yihu.ehr.basic.apps.service.UserAppService;
 import com.yihu.ehr.basic.org.model.OrgMemberRelation;
@@ -572,9 +571,7 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
         Envelop envelop = new Envelop();
         UserType userType = null;
         try {
-            JavaType javaType = objectMapper.getTypeFactory().constructParametricType(List.class, UserTypeRoles.class);
-            List<UserTypeRoles> models = objectMapper.readValue(typeRolesJson, javaType);
-
+            List<UserTypeRoles> models = objectMapper.readValue(typeRolesJson, new TypeReference<List<UserTypeRoles>>() {});
             userType = toEntity(userTypeJson, UserType.class);
             Integer userTypeId = userType.getId();
             if (null != userType && null != userTypeId && userTypeId > 0) {
