@@ -102,7 +102,6 @@
             <scope>compile</scope>
         </dependency>
 
-
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
@@ -149,27 +148,22 @@
         <dependency>
             <groupId>com.gexin.platform</groupId>
             <artifactId>gexin-rp-sdk-http</artifactId>
-            <version>4.0.1.17</version>
         </dependency>
         <dependency>
             <groupId>com.gexin.platform</groupId>
             <artifactId>gexin-rp-fastjson</artifactId>
-            <version>1.0.0.1</version>
         </dependency>
         <dependency>
             <groupId>com.gexin.platform</groupId>
             <artifactId>gexin-rp-sdk-base</artifactId>
-            <version>4.0.0.22</version>
         </dependency>
         <dependency>
             <groupId>com.gexin.platform</groupId>
             <artifactId>gexin-rp-sdk-template</artifactId>
-            <version>4.0.0.16</version>
         </dependency>
         <dependency>
             <groupId>com.gexin.platform</groupId>
             <artifactId>protobuf-java</artifactId>
-            <version>2.5.0</version>
         </dependency>
     </dependencies>
 

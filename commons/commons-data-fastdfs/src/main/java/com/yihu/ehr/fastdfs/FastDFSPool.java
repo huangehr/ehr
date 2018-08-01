@@ -34,8 +34,8 @@ public class FastDFSPool {
             trackerServerMap.put(storageClient.hashCode(), trackerServer);
             return storageClient;
         }
-        int last_index = storageClientPool.size() - 1;
-        return storageClientPool.remove(last_index);
+        int lastIndex = storageClientPool.size() - 1;
+        return storageClientPool.remove(lastIndex);
     }
 
     public synchronized void releaseStorageClient(StorageClient storageClient) throws IOException {
