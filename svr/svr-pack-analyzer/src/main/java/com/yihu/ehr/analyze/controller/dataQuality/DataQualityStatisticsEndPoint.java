@@ -4,12 +4,10 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.yihu.ehr.analyze.service.dataQuality.DataQualityStatisticsService;
-import com.yihu.ehr.analyze.service.dataQuality.DqPaltformReceiveWarningService;
 import com.yihu.ehr.analyze.service.dataQuality.WarningProblemService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
-import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
@@ -44,8 +42,24 @@ public class DataQualityStatisticsEndPoint extends EnvelopRestEndPoint {
     private WarningProblemService warningProblemService;
 
 
+    @RequestMapping(value = ServiceApi.DataQuality.QualityMonitorProvincePlatform, method = RequestMethod.GET)
+    @ApiOperation(value = "质量监控查询--省平台上传")
+    public Envelop provincePaltformUpload(
+            @ApiParam(name = "filters", value = "查询条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters) throws Exception {
+        Envelop envelop = new Envelop();
+        try {
+            return success(dataQualityStatisticsService.findUploadStatistics(filters));
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return envelop;
+    }
+
     @RequestMapping(value = ServiceApi.DataQuality.QualityMonitoringList, method = RequestMethod.GET)
-    @ApiOperation(value = "质量监控查询")
+    @ApiOperation(value = "质量监控查询--平台接收")
     public Envelop qualityMonitoringList(
             @ApiParam(name = "start", value = "开始时间")
             @RequestParam(value = "start", required = false) String start,
@@ -65,7 +79,7 @@ public class DataQualityStatisticsEndPoint extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value = ServiceApi.DataQuality.ReceptionList, method = RequestMethod.GET)
-    @ApiOperation(value = "接收情况")
+    @ApiOperation(value = "质量监控查询--接收情况")
     public Envelop receptionList(
             @ApiParam(name = "start", value = "开始时间")
             @RequestParam(value = "start", required = false) String start,

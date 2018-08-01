@@ -1,8 +1,6 @@
 package com.yihu.ehr.analyze.service.dataQuality;
 
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.yihu.ehr.analyze.dao.DqPaltformReceiveWarningDao;
 import com.yihu.ehr.analyze.service.pack.PackQcReportService;
 import com.yihu.ehr.elasticsearch.ElasticSearchPool;
@@ -55,6 +53,22 @@ public class DataQualityStatisticsService extends BaseJpaService {
     private String cloud;
     @Value("${quality.cloudName}")
     private String cloudName;
+
+
+    /**
+     *  省平台上传-统计数据  获取
+     * @param filters   查询条件
+     * @return
+     * @throws Exception
+     */
+    public List<Map<String,Object>> findUploadStatistics (String filters) throws Exception{
+        List<Map<String,Object>> result = new ArrayList<>();
+
+        Map<String, Long> count = elasticSearchUtil.countByGroup("upload", "record", filters,"rowkey");
+
+
+        return result;
+    }
 
     /**
      * 统计查询

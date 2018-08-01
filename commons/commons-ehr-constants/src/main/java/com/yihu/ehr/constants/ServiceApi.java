@@ -857,6 +857,12 @@ public class ServiceApi {
         public static final String RoleUserTypeUpdate = "/roles/usertype/update";
         public static final String UserOrgRela = "/user/org/relation";
         public static final String CreateUserType = "/user/usertype";
+        public static final String SearchUserType = "/user/searchUserType";
+        public static final String UpdateUserType = "/user/updateUserType";
+        public static final String GetUserTypeRoles = "/user/usertype/roles";
+        public static final String GetUserTypeById = "/user/getUserTypeById";
+        public static final String SaveUserTypeRoles = "/user/saveUserTypeRoles";
+
 
     }
 
@@ -1666,6 +1672,8 @@ public class ServiceApi {
         public static final String QualityMonitoringList = "/dataQuality/quality/qualityMonitoringList";
         public static final String ReceptionList = "/dataQuality/quality/receptionList";
         public static final String ReceiveDataset = "/dataQuality/quality/receiveDataset";
+        public static final String QualityMonitorProvincePlatform = "/dataQuality/quality/platform";
+
 
         public static final String WarningRecordList = "/dataQuality/warningRecord/warningRecordList";
         public static final String WarningRecord =    "/dataQuality/warningRecord/warningRecord/{id}";
