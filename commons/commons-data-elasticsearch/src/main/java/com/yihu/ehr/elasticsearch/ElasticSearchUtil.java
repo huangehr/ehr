@@ -17,7 +17,10 @@ import org.springframework.util.StringUtils;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.text.ParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Util - Es搜索服务
@@ -254,6 +257,11 @@ public class ElasticSearchUtil {
     public long count(String index, String type, String filters) {
         QueryBuilder boolQueryBuilder = getQueryBuilder(filters);
         return elasticSearchClient.count(index, type, boolQueryBuilder);
+    }
+
+    public Map<String,Long> countByGroup(String index, String type, String filters,String groupField) {
+        QueryBuilder boolQueryBuilder = getQueryBuilder(filters);
+        return elasticSearchClient.countByGroup(index, type, boolQueryBuilder,groupField);
     }
 
     /**

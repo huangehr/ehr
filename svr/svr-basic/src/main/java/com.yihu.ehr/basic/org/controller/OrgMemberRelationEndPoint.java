@@ -42,6 +42,8 @@ public class OrgMemberRelationEndPoint extends EnvelopRestEndPoint {
     private OrgMemberRelationService relationService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private OrgMemberRelationService orgMemberRelationService;
 
     @RequestMapping(value = "/orgDeptMember/getAllOrgDeptMember", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "查询所有成员列表")
@@ -299,6 +301,25 @@ public class OrgMemberRelationEndPoint extends EnvelopRestEndPoint {
         mJkzlOrgMemberRelation.setJkzlHosId(jkzlOrgId);
         envelop.setObj(mJkzlOrgMemberRelation);
         envelop.setSuccessFlg(true);
+        return envelop;
+    }
+
+
+    @RequestMapping(value = "/orgDeptMember/getOrgDepts", method = RequestMethod.GET)
+    @ApiOperation(value = "根据userId获取总部orgId列表")
+    public Envelop getOrgDepts(
+            @ApiParam(name = "userId", value = "用户id")
+            @RequestParam(value = "userId", required = false) String userId) throws Exception{
+        Envelop envelop = new Envelop();
+
+        List<OrgMemberRelation> orgMemberRelations = new ArrayList<>();
+        orgMemberRelations = orgMemberRelationService.getByUserId(userId);
+        if(orgMemberRelations != null && orgMemberRelations.size()>0){
+            envelop.setSuccessFlg(true);
+            envelop.setDetailModelList(orgMemberRelations);
+        }else {
+            envelop.setSuccessFlg(true);
+        }
         return envelop;
     }
 

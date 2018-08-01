@@ -1,6 +1,6 @@
 package com.yihu.ehr.elasticsearch;
 
-import com.alibaba.druid.pool.*;
+import com.alibaba.druid.pool.DruidDataSource;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequestBuilder;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
@@ -16,6 +16,7 @@ import org.elasticsearch.index.engine.DocumentMissingException;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.aggregations.AbstractAggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramBuilder;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
@@ -209,6 +210,20 @@ public class ElasticSearchClient {
         builder.setQuery(queryBuilder);
         builder.setExplain(true);
         return builder.get().getHits().totalHits();
+    }
+
+    public Map<String,Long> countByGroup (String index, String type, QueryBuilder queryBuilder,String groupField){
+        Map<String,Long> groupMap = new HashMap<>();
+        TransportClient transportClient = elasticSearchPool.getClient();
+        AbstractAggregationBuilder aggregation = AggregationBuilders.terms("count").field(groupField);
+        SearchRequestBuilder builder = transportClient.prepareSearch(index);
+        builder.setTypes(type);
+        builder.addAggregation(aggregation);
+        builder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
+        builder.setQuery(queryBuilder);
+        builder.setExplain(true);
+        builder.get().getHits().totalHits();
+        return groupMap;
     }
 
     public List<Map<String, Object>> findBySql (List<String> fields, String sql) throws Exception {

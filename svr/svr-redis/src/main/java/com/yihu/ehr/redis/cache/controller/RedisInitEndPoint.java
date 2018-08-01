@@ -76,8 +76,10 @@ public class RedisInitEndPoint extends EnvelopRestEndPoint {
     @ApiOperation("Redis缓存适配数据元数据")
     public int cacheAdapterMetadata(
             @ApiParam(name = "id", value = "rs_adapter_scheme.id")
-            @PathVariable(value = "id") String id) throws Exception {
-       return redisInitService.cacheAdapterMetadata(id);
+            @PathVariable(value = "id") String id,
+            @ApiParam(name = "deleteAll", defaultValue = "false", required = true)
+            @RequestParam(value = "deleteAll") boolean deleteAll) throws Exception {
+       return redisInitService.cacheAdapterMetadata(id, deleteAll);
     }
 
     @RequestMapping(value= ServiceApi.Redis.InitRsMetadataDict, method = RequestMethod.POST)
