@@ -13,9 +13,7 @@ import com.yihu.ehr.resolve.model.stage1.details.LinkFile;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * 轻量级健康档案。其数据集保存的是机构健康档案中的链接。
@@ -31,7 +29,8 @@ public class LinkPackage extends OriginalPackage {
     private String demographicId; //身份证号码
     private String visitType;
     private Date expireDate;
-    private List<LinkFile> linkFiles = new ArrayList<>();
+    private List<LinkFile> linkFiles = new ArrayList<>(); //影像存入到fast dfs的基本信息等
+    private Map<String,List<String>> files = new HashMap<String,List<String>>(); //解析成功后,需要删除的 ftp 文件,map key值为路径 ,value值为文件名
 
     public LinkPackage(String packId, Date receiveDate){
         this.packId = packId;
@@ -127,5 +126,13 @@ public class LinkPackage extends OriginalPackage {
 
     public void setLinkFiles(List<LinkFile> linkFiles) {
         this.linkFiles = linkFiles;
+    }
+
+    public Map<String, List<String>> getFiles() {
+        return files;
+    }
+
+    public void setFiles(Map<String, List<String>> files) {
+        this.files = files;
     }
 }

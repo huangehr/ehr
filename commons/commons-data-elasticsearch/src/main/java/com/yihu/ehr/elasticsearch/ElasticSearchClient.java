@@ -21,6 +21,7 @@ import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramBuilder;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.metrics.cardinality.CardinalityBuilder;
 import org.elasticsearch.search.aggregations.metrics.cardinality.InternalCardinality;
 import org.elasticsearch.search.sort.SortBuilder;
@@ -222,7 +223,15 @@ public class ElasticSearchClient {
         builder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
         builder.setQuery(queryBuilder);
         builder.setExplain(true);
-        builder.get().getHits().totalHits();
+        SearchResponse response = builder.get();
+        SearchHits hits = builder.get().getHits();
+        Terms terms = response.getAggregations().get("count");
+        List<Terms.Bucket> buckets = terms.getBuckets();
+        for(Terms.Bucket bucket:buckets){
+            System.out.println(bucket.getKey()+"----"+bucket.getDocCount());
+            groupMap.put(bucket.getKey().toString(),bucket.getDocCount());
+        }
+        transportClient.close();
         return groupMap;
     }
 
