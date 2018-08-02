@@ -58,8 +58,6 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
     private UserTypeService userTypeService;
     @Autowired
     private XUserTypeRolesRepository xUserTypeRolesRepository;
-    @Autowired
-    private UserTypeRolesService userTypeRolesService;
 
 
     @RequestMapping(value = ServiceApi.Roles.RoleUser, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
