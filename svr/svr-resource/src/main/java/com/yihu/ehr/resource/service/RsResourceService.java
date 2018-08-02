@@ -113,7 +113,8 @@ public class RsResourceService extends BaseJpaService<RsResource, RsResourceDao>
      * @return
      */
     public RsResource getResourceByCode(String code) {
-        return rsResourceDao.findByCode(code);
+
+        return getResourceByCategory(code,"standard");
     }
 
     /**
@@ -270,6 +271,17 @@ public class RsResourceService extends BaseJpaService<RsResource, RsResourceDao>
     public List<String> findIdByCategoryIdAndDataSource(String rsResourceCategoryId, Integer dataSource) {
         List<String> rsList = rsResourceDao.findIdByCategoryIdAndDataSourceAndName(rsResourceCategoryId, dataSource);
         return rsList;
+    }
+
+    public RsResource getResourceByCategory(String resourceCode, String categoryCode)  {
+        Session session = currentSession();
+
+        String hql = "SELECT rsResource FROM RsResource rsResource,RsResourceCategory rsResourceCategory WHERE rsResource.categoryId =rsResourceCategory.id and rsResource.code = :resourceCode and rsResourceCategory.code= :categoryCode";
+        Query query = session.createQuery(hql);
+        query.setFlushMode(FlushMode.COMMIT);
+        query.setParameter("resourceCode", resourceCode);
+        query.setParameter("categoryCode", categoryCode);
+        return (RsResource) query.uniqueResult();
     }
 
 
