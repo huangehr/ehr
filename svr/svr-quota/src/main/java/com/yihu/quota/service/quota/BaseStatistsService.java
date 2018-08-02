@@ -268,8 +268,9 @@ public class BaseStatistsService {
                 return v > 0 ? 1 : v == 0 ? 0 : -1;
             }
         });
-        if (StringUtils.isNotEmpty(top)) {
-            listMap = listMap.subList(0, Integer.parseInt(top));
+        if (StringUtils.isNotEmpty(top) && listMap != null) {
+            int t = Integer.parseInt(top);
+            listMap = listMap.subList(0, listMap.size()>t ? t :listMap.size()-1);
         }
         return listMap;
     }
