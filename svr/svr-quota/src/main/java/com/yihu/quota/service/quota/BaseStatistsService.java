@@ -136,7 +136,11 @@ public class BaseStatistsService {
         List<Map<String, Object>> firstList = getQuotaResultList(addFirstQuotaCode,dimension,firstFilter,dateType, top);
         List<Map<String, Object>> secondList =  getQuotaResultList(addSecondQuotaCode,dimension,secondFilter,dateType, top);
         dimension = StringUtils.isNotEmpty(dateType)? (StringUtils.isNotEmpty(dimension)? dimension +";"+dateType : dateType):dimension;
-        return addition(dimension, firstList, secondList, Integer.valueOf(operation));
+        List<Map<String, Object>> addition = addition(dimension, firstList, secondList, Integer.valueOf(operation));
+        if (StringUtils.isNotEmpty(top)) {
+            addition = sortResultList(addition, top);
+        }
+        return addition;
     }
 
 
@@ -191,7 +195,7 @@ public class BaseStatistsService {
                     }
                 }
                 if(pflag){
-                    map.put(resultField,firstResultVal);
+                    map.put(resultField, nf.format(firstResultVal));
                     addResultList.add(map);
                 }
             }
@@ -250,6 +254,25 @@ public class BaseStatistsService {
             }
         }*/
         return  addResultList;
+    }
+
+    public List<Map<String, Object>> sortResultList(List<Map<String, Object>> listMap, String top) {
+        Collections.sort(listMap, new Comparator<Map<String, Object>>() {
+
+            @Override
+            public int compare(Map<String, Object> o1, Map<String, Object> o2) {
+                // 根据result进行降序
+                double result = Double.parseDouble(o1.get("result") + "");
+                double result2 = Double.parseDouble(o2.get("result") + "");
+                double v = result2 - result;
+                return v > 0 ? 1 : v == 0 ? 0 : -1;
+            }
+        });
+        if (StringUtils.isNotEmpty(top) && listMap != null) {
+            int t = Integer.parseInt(top);
+            listMap = listMap.subList(0, listMap.size()>t ? t :listMap.size()-1);
+        }
+        return listMap;
     }
 
     /**
@@ -796,6 +819,7 @@ public class BaseStatistsService {
                     if(dimensionDicMap.get(map.get(key).toString().toLowerCase())  != null){
                         dataMap.put(key,dimensionDicMap.get(map.get(key).toString().toLowerCase()));
                         dataMap.put(key+"Name",dimensionDicMap.get(map.get(key).toString().toLowerCase()));
+                        dataMap.put(key+"Code",map.get(key).toString().toLowerCase());
                         dataMap.put(firstColumnField,dimensionDicMap.get(map.get(key).toString().toLowerCase()));
                     }else {
                         dataMap.put(key,map.get(key));
@@ -875,31 +899,19 @@ public class BaseStatistsService {
      */
     public List<Map<String, Object>> noDataDimenDictionary(List<Map<String, Object>> dataList,String dimen,String filter){
         Map<String, Object> dictMap = new HashMap<>();
-        if(dimen.equals("town") || dimen.equals("org") ){
+        if(dimen.equals("town")){
             String sql = "";
             if(dimen.equals("town") ){
                 sql = "SELECT id as code,name as name  from address_dict where pid = '361100'";
-            }
-            if(dimen.equals("org") ){
-                String areasql = "SELECT id from address_dict where pid = '361100'";
-                String [] filters = filter.split("and");
-                List<String> filterList = Arrays.asList(filter.split("and"));
-                for(String fil : filterList){
-                   if(fil.contains("town")){
-                       areasql = fil.split("=")[1];
-                   }
-                }
-                sql = "SELECT org_code as code,full_name as name from organizations WHERE administrative_division in(" + areasql + ")";
-            }
-            List<Map<String, Object>> dictDataList = jdbcTemplate.queryForList(sql);
-            if(null != dictDataList) {
-                for(int i = 0 ; i < dictDataList.size();i++){
-                    if(null != dictDataList.get(i).get("code") && null != dictDataList.get(i).get("name")){
-                        dictMap.put(dictDataList.get(i).get("code").toString(),dictDataList.get(i).get("name").toString());
+                List<Map<String, Object>> dictDataList = jdbcTemplate.queryForList(sql);
+                if(null != dictDataList) {
+                    for(int i = 0 ; i < dictDataList.size();i++){
+                        if(null != dictDataList.get(i).get("code") && null != dictDataList.get(i).get("name")){
+                            dictMap.put(dictDataList.get(i).get("code").toString(),dictDataList.get(i).get("name").toString());
+                        }
                     }
                 }
             }
-
             List<Map<String, Object>> resultList = new ArrayList<>();
             for(String code : dictMap.keySet()){
                 Map<String,Object> oneMap = new HashMap<>();
@@ -911,8 +923,9 @@ public class BaseStatistsService {
                     }
                 }
                 oneMap.put(firstColumnField,dictMap.get(code));
-                oneMap.put(dimen+"Name",dictMap.get(code));
                 oneMap.put(dimen,dictMap.get(code));
+                oneMap.put(dimen+"Name",dictMap.get(code));
+                oneMap.put(dimen+"Code",code);
                 oneMap.put(resultField,result);
                 resultList.add(oneMap);
             }
@@ -1618,8 +1631,8 @@ public class BaseStatistsService {
                 }
                 if (StringUtils.isNotEmpty(endQuotaDate)) {// 外部指定时间
                     nowYear = Integer.parseInt(endQuotaDate.substring(0,4));
+                    dateFilter = "quotaDate >= '" + beforeYear + "-01-01' and quotaDate <= '" + nowYear + "-12-31'";
                 }
-                dateFilter = "quotaDate >= '" + beforeYear + "-01-01' and quotaDate <= '" + nowYear + "-12-31'";
             } else if ("2".equals(growthFlag)) { // 月增幅  没有传时间条件默认当前月份 计算前6个月数据 计算向前推7个月
                 lastDate.set(Calendar.DAY_OF_MONTH, 1); // 设置为1号,当前日期既为本月第一天
                 endMonth =lastDate.getTime();
@@ -1677,28 +1690,29 @@ public class BaseStatistsService {
             }
             dimension = dateType;
             List<Map<String, Object>> dataList = getSimpleQuotaReport(esConfig.getMolecular(), filters,dimension ,false , null);
-            DecimalFormat df = new DecimalFormat(".0");
+            DecimalFormat df = new DecimalFormat("0.0");
             if(dataList != null && dataList.size() > 0){
                 if(dateType.toLowerCase().equals("year")){
-                    Map<String,Object> map = new HashMap<>();
-                    double current = 0;
-                    double last = 0;
                     for(int i = nowYear ; i > beforeYear ;i--){
+                        double current = 0;
+                        double last = 0;
+                        Map<String,Object> map = new HashMap<>();
+                        map.put(dimension, i);
                         for(Map<String,Object> dataMap : dataList){
-                            if(dataMap.get(String.valueOf(i)) != null ){
+                            int y = Integer.valueOf(dataMap.get(dimension).toString());
+                            if( y == i ){
                                 map.put(firstColumnField, dataMap.get(firstColumnField));
-                                map.put(dimension, dataMap.get(dimension).toString());
                                 current = Double.valueOf(dataMap.get(resultField).toString());
                             }
-                            if(dataMap.get(String.valueOf(i-1)) != null ){
+                            if( y == i-1 ){
                                 last = Double.valueOf(dataMap.get(resultField).toString());
                             }
                         }
                         if(last == 0){
                             map.put(resultField,"--");
                         }else {
-                            double precent = (current - last)/last;
-                            map.put(resultField,df.format(precent));
+                            double precent = (current - last)/last*100;
+                            map.put(resultField,precent-0 ==0 ? 0 : df.format(precent));
                         }
                         resultList.add(map);
                     }
@@ -1764,7 +1778,7 @@ public class BaseStatistsService {
                             if(precent == 0){
                                 map.put(resultField,0);
                             }else {
-                                map.put(resultField,df.format(precent));
+                                map.put(resultField,precent-0 ==0 ? 0 : df.format(precent));
                             }
                         }
                         resultList.add(map);
@@ -1772,11 +1786,11 @@ public class BaseStatistsService {
                     }
 
                 }else if(dateType.toLowerCase().equals("month")){
-                    double current = 0;
-                    double last = 0;
                     String starthMonthStr = sdf.format(firstMonth).substring(0,7);
                     String endMonthStr = sdf.format(endMonth).substring(0,7);
                     while ( !starthMonthStr.equals(endMonthStr)){
+                        double current = 0;
+                        double last = 0;
                         Map<String,Object> map = new HashMap<>();
                         String nowMonthStr = endMonthStr;
                         Calendar calendar = Calendar.getInstance();
@@ -1803,7 +1817,7 @@ public class BaseStatistsService {
                             if(precent == 0){
                                 map.put(resultField,0);
                             }else {
-                                map.put(resultField,df.format(precent));
+                                map.put(resultField,precent-0 ==0 ? 0 : df.format(precent));
                             }
                         }
                         resultList.add(map);

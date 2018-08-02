@@ -271,6 +271,10 @@ public class ServiceApi {
         public static final String GetPositionMapByCode = "/resources/report/getPositionMapByCode";
         public static final String GetRsReportByParam = "/resources/report/getRsReportByParam";
 
+        public static final String QueryByUserId = "/open/resources/report/queryByUserId";
+        public static final String QueryOtherReportByUserId = "/open/resources/report/queryOtherReportByUserId";
+        public static final String SaveByUserId = "/open/resources/report/saveByUserId";
+
         /**
          * 资源报表视图配置
          */
@@ -861,6 +865,7 @@ public class ServiceApi {
         public static final String UpdateUserType = "/user/updateUserType";
         public static final String GetUserTypeRoles = "/user/usertype/roles";
         public static final String GetUserTypeById = "/user/getUserTypeById";
+        public static final String SaveUserTypeRoles = "/user/saveUserTypeRoles";
 
 
     }
