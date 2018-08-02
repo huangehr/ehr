@@ -1701,8 +1701,11 @@ public class ServiceApi {
         public static final String resourceSuccessPage = "/packQcReport/resourceSuccessPage";
         public static final String archiveReport= "/packQcReport/archiveReport";
         public static final String dataSetList= "/packQcReport/dataSetList";
+        public static final String dataSetListPage= "/packQcReport/dataSetListPage";
         public static final String archiveFailed= "/packQcReport/archiveFailed";
+        public static final String archiveFailedPage= "/packQcReport/archiveFailedPage";
         public static final String metadataError= "/packQcReport/metadataError";
+        public static final String metadataErrorPage= "/packQcReport/metadataErrorPage";
         public static final String analyzeErrorList= "/packQcReport/analyzeErrorList";
         public static final String metadataErrorList= "/packQcReport/metadataErrorList";
         public static final String metadataErrorDetail= "/packQcReport/metadataErrorDetail";

@@ -145,6 +145,24 @@ public class PackQcReportEndPoint extends EnvelopRestEndPoint {
         return packQcReportService.dataSetList(startDate, endDate, orgCode);
     }
 
+    @RequestMapping(value = ServiceApi.PackQcReport.dataSetListPage, method = RequestMethod.GET)
+    @ApiOperation(value = "获取接收数据集列表")
+    public Envelop dataSetListPage(
+            @ApiParam(name = "startDate", value = "开始日期")
+            @RequestParam(name = "startDate") String startDate,
+            @ApiParam(name = "endDate", value = "结束日期")
+            @RequestParam(name = "endDate") String endDate,
+            @ApiParam(name = "orgCode", value = "医院代码")
+            @RequestParam(name = "orgCode", required = false) String orgCode,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page) throws Exception {
+
+        return packQcReportService.getDataSetListPage(startDate, endDate, orgCode,size,page);
+    }
+
+
     @RequestMapping(value = ServiceApi.PackQcReport.archiveFailed, method = RequestMethod.GET)
     @ApiOperation(value = "获取资源化解析失败")
     public Envelop archiveFailed(
@@ -155,6 +173,22 @@ public class PackQcReportEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "orgCode", value = "医院代码")
             @RequestParam(name = "orgCode", required = false) String orgCode) throws Exception {
         return packQcReportService.archiveFailed(startDate, endDate, orgCode);
+    }
+
+    @RequestMapping(value = ServiceApi.PackQcReport.archiveFailedPage, method = RequestMethod.GET)
+    @ApiOperation(value = "获取资源化解析失败")
+    public Envelop archiveFailedPage(
+            @ApiParam(name = "startDate", value = "开始日期")
+            @RequestParam(name = "startDate") String startDate,
+            @ApiParam(name = "endDate", value = "结束日期")
+            @RequestParam(name = "endDate") String endDate,
+            @ApiParam(name = "orgCode", value = "医院代码")
+            @RequestParam(name = "orgCode", required = false) String orgCode,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page) throws Exception {
+        return packQcReportService.archiveFailed(startDate, endDate, orgCode,size,page);
     }
 
     @RequestMapping(value = ServiceApi.PackQcReport.metadataError, method = RequestMethod.GET)
@@ -169,6 +203,24 @@ public class PackQcReportEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "orgCode", value = "医院代码")
             @RequestParam(name = "orgCode", required = false) String orgCode) throws Exception {
         return packQcReportService.metadataError(step, startDate, endDate, orgCode);
+    }
+
+    @RequestMapping(value = ServiceApi.PackQcReport.metadataErrorPage, method = RequestMethod.GET)
+    @ApiOperation(value = "获取解析异常")
+    public Envelop metadataErrorPage(
+            @ApiParam(name = "step", value = "异常环节")
+            @RequestParam(name = "step") String step,
+            @ApiParam(name = "startDate", value = "开始日期")
+            @RequestParam(name = "startDate") String startDate,
+            @ApiParam(name = "endDate", value = "结束日期")
+            @RequestParam(name = "endDate") String endDate,
+            @ApiParam(name = "orgCode", value = "医院代码")
+            @RequestParam(name = "orgCode", required = false) String orgCode,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page) throws Exception {
+        return packQcReportService.metadataError(step, startDate, endDate, orgCode,size,page);
     }
 
     @RequestMapping(value = ServiceApi.PackQcReport.analyzeErrorList, method = RequestMethod.GET)
