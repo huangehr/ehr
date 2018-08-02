@@ -1,13 +1,13 @@
 package com.yihu.ehr.basic.user.entity;
 
-import com.yihu.ehr.entity.BaseAssignedEntity;
+import com.yihu.ehr.entity.BaseIdentityEntity;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "user_type_roles")
 @Access(value = AccessType.PROPERTY)
-public class UserTypeRoles extends BaseAssignedEntity {
+public class UserTypeRoles extends BaseIdentityEntity {
 
     private int typeId;
     private String typeName;

@@ -6,6 +6,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.model.portal.MPortalNotice;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -101,4 +102,23 @@ public class PortalNoticesEndPoint extends EnvelopRestEndPoint {
         return true;
     }
 
+
+    @RequestMapping(value = "/portalNoticesSearch", method = RequestMethod.GET)
+    @ApiOperation(value = "获取通知公告列表", notes = "直接返回Envelop")
+    public Envelop search(
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page) throws ParseException {
+        List<PortalNotices> portalNoticesList = portalNoticesService.search(fields, filters, sorts, page, size);
+        int count = (int)portalNoticesService.getCount(filters);
+        Envelop envelop = getPageResult(portalNoticesList, count, page, size);
+        return envelop;
+    }
 }
