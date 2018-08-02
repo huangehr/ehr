@@ -428,6 +428,7 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
                 }
             }
         }
+        envelop.setSuccessFlg(true);
         return envelop;
     }
 
