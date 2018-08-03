@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -494,7 +495,7 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "用户类型变更")
     public Envelop updateUserType(
             @ApiParam(name = "userTypeJson", value = "用户类型json串")
-            @RequestBody String userTypeJson) {
+            @RequestParam(value = "userTypeJson") String userTypeJson) {
         Envelop envelop = new Envelop();
         UserType userType = null;
         try {
@@ -627,6 +628,36 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
         } catch (IOException e) {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg(e.getMessage());
+            e.printStackTrace();
+        }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.Roles.ValidateUserType, method = RequestMethod.POST)
+    @ApiOperation(value = "验证用户类别是否关联用户")
+    public Envelop alidateUserType(
+            @ApiParam(name = "userTypeId", value = "用户类型id")
+            @RequestParam(value = "userTypeId",required = true) String userTypeId) {
+        Envelop envelop = new Envelop();
+        try {
+            //失效-需要验证用户类别是否有用户使用
+            StringBuffer stringBuffer = new StringBuffer();
+            stringBuffer.append("activated=true;");
+            if (!StringUtils.isEmpty(userTypeId)) {
+                stringBuffer.append("userType=" + userTypeId + ";");
+            }
+            String filters=stringBuffer.toString();
+            List<User> list = userService.search(filters);
+            if (null != list && list.size() > 0) {
+                envelop.setSuccessFlg(true);
+                envelop.setDetailModelList(list);
+            }else{
+                //未关联用户返回失败
+                envelop.setSuccessFlg(false);
+            }
+        } catch (ParseException e) {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("查询异常"+e.getMessage());
             e.printStackTrace();
         }
         return envelop;

@@ -22,8 +22,11 @@ import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramBuild
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.elasticsearch.search.aggregations.bucket.terms.TermsBuilder;
 import org.elasticsearch.search.aggregations.metrics.cardinality.CardinalityBuilder;
 import org.elasticsearch.search.aggregations.metrics.cardinality.InternalCardinality;
+import org.elasticsearch.search.aggregations.metrics.sum.Sum;
+import org.elasticsearch.search.aggregations.metrics.sum.SumBuilder;
 import org.elasticsearch.search.sort.SortBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -213,6 +216,7 @@ public class ElasticSearchClient {
         return builder.get().getHits().totalHits();
     }
 
+    //分组统计
     public Map<String,Long> countByGroup (String index, String type, QueryBuilder queryBuilder,String groupField){
         Map<String,Long> groupMap = new HashMap<>();
         TransportClient transportClient = elasticSearchPool.getClient();
@@ -228,8 +232,34 @@ public class ElasticSearchClient {
         Terms terms = response.getAggregations().get("count");
         List<Terms.Bucket> buckets = terms.getBuckets();
         for(Terms.Bucket bucket:buckets){
-            System.out.println(bucket.getKey()+"----"+bucket.getDocCount());
+//            System.out.println(bucket.getKey()+"----"+bucket.getDocCount());
             groupMap.put(bucket.getKey().toString(),bucket.getDocCount());
+        }
+        transportClient.close();
+        return groupMap;
+    }
+
+    //分组获取，求和数据
+    public Map<String,Double> sumByGroup (String index, String type, QueryBuilder queryBuilder,String sumField,String groupField){
+        Map<String,Double> groupMap = new HashMap<>();
+        TransportClient transportClient = elasticSearchPool.getClient();
+        TermsBuilder aggregation = AggregationBuilders.terms("sum_query").field(groupField);
+        SearchRequestBuilder builder = transportClient.prepareSearch(index);
+        builder.setTypes(type);
+        builder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
+        builder.setQuery(queryBuilder);
+        builder.setExplain(true);
+        SumBuilder sumBuilder= AggregationBuilders.sum("sum_row").field(sumField);
+        aggregation.subAggregation(sumBuilder);
+        builder.addAggregation(aggregation);
+
+        SearchResponse response = builder.get();
+        Terms terms = response.getAggregations().get("sum_query");
+
+        List<Terms.Bucket> buckets = terms.getBuckets();
+        for(Terms.Bucket bucket:buckets){
+            Sum sum2=bucket.getAggregations().get("sum_row");
+            groupMap.put(bucket.getKey().toString(),sum2.getValue());
         }
         transportClient.close();
         return groupMap;

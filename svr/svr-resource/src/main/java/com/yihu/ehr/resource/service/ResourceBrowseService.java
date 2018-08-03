@@ -48,7 +48,8 @@ public class ResourceBrowseService extends BaseJpaService {
     private RedisService redisService;
     @Autowired
     private ElasticSearchUtil elasticSearchUtil;
-
+    @Autowired
+    private RsResourceService rsResourceService;
 
     /**
      * 资源浏览 -- 资源数据元结构
@@ -59,7 +60,7 @@ public class ResourceBrowseService extends BaseJpaService {
      * @throws Exception
      */
     public List<MRsColumnsModel> getResourceMetadata(String resourcesCode, String roleId) throws Exception {
-        RsResource rsResource = rsResourceDao.findByCode(resourcesCode);
+        RsResource rsResource = rsResourceService.getResourceByCategory(resourcesCode,"standard");
         if (rsResource == null) {
             return null;
         }
@@ -145,7 +146,7 @@ public class ResourceBrowseService extends BaseJpaService {
      * @throws Exception
      */
     public Envelop getResultData(String resourcesCode, String roleId, String orgCode, String areaCode, String queryParams, Integer page, Integer size) throws Exception {
-        RsResource rsResources = rsResourceDao.findByCode(resourcesCode);
+        RsResource rsResources = rsResourceService.getResourceByCategory(resourcesCode,"standard");
         if (rsResources != null) {
             StringBuilder saas = new StringBuilder();
             if ("*".equals(orgCode) && "*".equals(areaCode)) {
@@ -265,7 +266,8 @@ public class ResourceBrowseService extends BaseJpaService {
         List<String> codeList = (List<String>) objectMapper.readValue(resourcesCodes, List.class);
         //资源判空检查
         for (String code : codeList) {
-            RsResource rsResources = rsResourceDao.findByCode(code);
+            RsResource rsResources = rsResourceService.getResourceByCategory(code,"standard");
+
             if (rsResources == null) {
                 throw new ApiException(ErrorCode.BAD_REQUEST, "无效的资源编码" + code);
             }
@@ -526,7 +528,7 @@ public class ResourceBrowseService extends BaseJpaService {
         List<Map<String, Object>> resultData = null;
         for (String resourcesCode : dataSets) {
             Boolean isMultiRecord = redisService.getDataSetMultiRecord(version, resourcesCode);
-            RsResource rsResources = rsResourceDao.findByCode(resourcesCode);
+            RsResource rsResources = rsResourceService.getResourceByCategory(resourcesCode,"standard");
             if (rsResources != null) {
                 StringBuilder saas = new StringBuilder();
                 if ("*".equals(orgCode) && "*".equals(areaCode)) {
@@ -632,7 +634,7 @@ public class ResourceBrowseService extends BaseJpaService {
         //分离查询，主细表分开查询
         for (String resourcesCode : dataSets) {
             Boolean isMultiRecord = redisService.getDataSetMultiRecord(version, resourcesCode);
-            RsResource rsResources = rsResourceDao.findByCode(resourcesCode);
+            RsResource rsResources = rsResourceService.getResourceByCategory(resourcesCode,"standard");
             if (rsResources != null) {
                 if (isMultiRecord) {
                     subDatas.add(resourcesCode);

@@ -41,7 +41,7 @@ public class AddressDictService extends BaseJpaService<AddressDict,AddressDictRe
     public AddressDict findByName(String name) {
         List<AddressDict> DictList =geographyDictRepository.findByName(name);
         AddressDict geographyDict=new AddressDict();
-        if(null!=DictList){
+        if (null != DictList & DictList.size() > 0) {
              geographyDict=DictList.get(0);
         }
         return geographyDict;
