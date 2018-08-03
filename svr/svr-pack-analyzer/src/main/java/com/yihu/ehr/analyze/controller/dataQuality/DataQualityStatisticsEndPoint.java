@@ -45,11 +45,15 @@ public class DataQualityStatisticsEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.DataQuality.QualityMonitorProvincePlatform, method = RequestMethod.GET)
     @ApiOperation(value = "质量监控查询--省平台上传")
     public Envelop provincePaltformUpload(
-            @ApiParam(name = "filters", value = "查询条件", defaultValue = "")
-            @RequestParam(value = "filters", required = false) String filters) throws Exception {
+            @ApiParam(name = "start", value = "开始时间")
+            @RequestParam(value = "start", required = false) String start,
+            @ApiParam(name = "end", value = "结束时间", defaultValue = "")
+            @RequestParam(value = "end", required = false) String end,
+            @ApiParam(name = "toPlatForm", value = "上传目标平台", defaultValue = "")
+            @RequestParam(value = "toPlatForm", required = false) String toPlatForm) throws Exception {
         Envelop envelop = new Envelop();
         try {
-            return success(dataQualityStatisticsService.findUploadStatistics(filters));
+            return success(dataQualityStatisticsService.findUploadStatistics(start,end,toPlatForm));
         }catch (Exception e){
             e.printStackTrace();
             envelop.setSuccessFlg(false);

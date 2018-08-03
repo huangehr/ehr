@@ -259,9 +259,16 @@ public class ElasticSearchUtil {
         return elasticSearchClient.count(index, type, boolQueryBuilder);
     }
 
+    //分组统计
     public Map<String,Long> countByGroup(String index, String type, String filters,String groupField) {
         QueryBuilder boolQueryBuilder = getQueryBuilder(filters);
         return elasticSearchClient.countByGroup(index, type, boolQueryBuilder,groupField);
+    }
+
+    //分组求和
+    public Map<String,Double> sumtByGroup(String index, String type, String filters,String sumField,String groupField) {
+        QueryBuilder boolQueryBuilder = getQueryBuilder(filters);
+        return elasticSearchClient.sumByGroup(index, type, boolQueryBuilder,sumField,groupField);
     }
 
     /**
