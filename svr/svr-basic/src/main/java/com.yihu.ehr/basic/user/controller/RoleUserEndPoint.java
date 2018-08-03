@@ -58,8 +58,6 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
     private UserTypeService userTypeService;
     @Autowired
     private XUserTypeRolesRepository xUserTypeRolesRepository;
-    @Autowired
-    private UserTypeRolesService userTypeRolesService;
 
 
     @RequestMapping(value = ServiceApi.Roles.RoleUser, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -495,7 +493,7 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "用户类型变更")
     public Envelop updateUserType(
             @ApiParam(name = "userTypeJson", value = "用户类型json串")
-            @RequestBody String userTypeJson) {
+            @RequestParam(value = "userTypeJson") String userTypeJson) {
         Envelop envelop = new Envelop();
         UserType userType = null;
         try {
