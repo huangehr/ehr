@@ -52,7 +52,7 @@ public class MedicineExpenseScheduler {
     // ES 中药品费用汇总 type
     private String ME_TYPE_COLLECTION = "medicine_expense_collection";
     // 门诊药品费用汇总、住院药品费用汇总过滤条件
-    private String Q_MZ_ZY_ME_COLLECTION = "(EHR_000045:* AND (EHR_000044:01 OR EHR_000044:02 OR EHR_000044:03)) OR (EHR_000175:* AND (EHR_000174:01 OR EHR_000174:02))";
+    private String Q_MZ_ZY_ME_COLLECTION = "(EHR_000045:* AND (EHR_000044:01 OR EHR_000044:02 OR EHR_000044:03)) OR (EHR_000175:* AND (EHR_000174:03 OR EHR_000174:04 OR EHR_000174:05))";
 
     /**
      * 抽取昨天的药品费用，整合来自其他数据集的部分数据到药品费用中。
@@ -144,6 +144,8 @@ public class MedicineExpenseScheduler {
                 medicineExpenseInfo.put("town", subInfo.get("org_area"));
                 // 机构编码
                 medicineExpenseInfo.put("org_code", subInfo.get("org_code"));
+                // 科室信息
+                medicineExpenseInfo.put("dept", null == subInfo.get("dept_code") ? "" : subInfo.get("dept_code"));
                 // 就诊日期
                 medicineExpenseInfo.put("event_date", subInfo.get("event_date"));
 
