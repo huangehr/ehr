@@ -47,6 +47,8 @@ spring:
     host: 172.19.103.47
     port: 6379
     password: redis!@456
+  kafka:
+    bootstrap-servers: node4.hde.h3c.com:6667
 ehr-redis:
   mq:
     pubsub:
