@@ -494,7 +494,7 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "用户类型变更")
     public Envelop updateUserType(
             @ApiParam(name = "userTypeJson", value = "用户类型json串")
-            @RequestBody String userTypeJson) {
+            @RequestParam(value = "userTypeJson") String userTypeJson) {
         Envelop envelop = new Envelop();
         UserType userType = null;
         try {
