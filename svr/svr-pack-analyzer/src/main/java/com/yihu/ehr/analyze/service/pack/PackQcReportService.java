@@ -111,8 +111,7 @@ public class PackQcReportService extends BaseJpaService {
      * @return
      * @throws Exception
      */
-    public Envelop resourceSuccess(String startDate, String endDate, String orgCode) throws Exception {
-        Envelop envelop = new Envelop();
+    public List<Map<String, Object>> getResourceSuccessList(String startDate, String endDate, String orgCode) throws Exception {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("pack_type=1;archive_status=3;");
         stringBuilder.append("receive_date>=" + startDate + " 00:00:00;");
@@ -143,7 +142,7 @@ public class PackQcReportService extends BaseJpaService {
         double physical_total = 0.0;
         for(Histogram.Bucket item: histogram.getBuckets()){
             Map<String, Object> temp = new HashMap<>();
-            if(item.getDocCount()>0&&!"".equals(item.getKeyAsString())) {
+            if(item.getDocCount()>0 && !"".equals(item.getKeyAsString())) {
                 temp.put("date", item.getKeyAsString());
                 LongTerms longTerms = item.getAggregations().get("event_type");
                 double inpatient = 0.0;
@@ -169,16 +168,73 @@ public class PackQcReportService extends BaseJpaService {
             }
         }
         Map<String, Object> total = new HashMap<>();
-        total.put("date", "合计");
+        total.put("date", "总计");
         total.put("inpatient", inpatient_total);
         total.put("oupatient", oupatient_total);
         total.put("physical", physical_total);
         total.put("total", inpatient_total + oupatient_total + physical_total);
         resultList.add(0,total);
+        return resultList;
+    }
+
+    /**
+     * 获取资源化数据
+     * @param startDate
+     * @param endDate
+     * @param orgCode
+     * @return
+     * @throws Exception
+     */
+    public Envelop resourceSuccess(String startDate, String endDate, String orgCode) throws Exception {
+        Envelop envelop = new Envelop();
+        List<Map<String, Object>> resultList = getResourceSuccessList(startDate, endDate, orgCode);
         envelop.setSuccessFlg(true);
         envelop.setDetailModelList(resultList);
         return envelop;
     }
+
+    /**
+     * 获取资源化数据
+     * @param startDate
+     * @param endDate
+     * @param orgCode
+     * @return
+     * @throws Exception
+     */
+    public Envelop resourceSuccess(String startDate, String endDate, String orgCode,int size,int page) throws Exception {
+        List<Map<String, Object>> resultList = getResourceSuccessList(startDate, endDate, orgCode);
+        //设置假分页
+        return getPageEnvelop(page,size,resultList);
+    }
+
+    private Envelop getPageEnvelop(int page,int size,List totalList){
+        Envelop envelop = new Envelop();
+        //设置假分页
+        int totalCount = totalList.size();
+        envelop.setTotalCount(totalCount);
+        int totalPage = totalCount%size==0 ? totalCount%size:totalCount%size+1;
+        envelop.setTotalPage(totalPage);
+        envelop.setCurrPage(page);
+        envelop.setPageSize(size);
+        List<Map<String, Object>> pagedList = getPageList(page, size, totalList);
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(pagedList);
+        return envelop;
+    }
+
+    private <T>List getPageList(int pageNum,int pageSize,List<T> data) {
+        int fromIndex = (pageNum - 1) * pageSize;
+        if (fromIndex >= data.size()) {
+            return Collections.emptyList();
+        }
+
+        int toIndex = pageNum * pageSize;
+        if (toIndex >= data.size()) {
+            toIndex = data.size();
+        }
+        return data.subList(fromIndex, toIndex);
+    }
+
 
     /**
      * 获取档案数据
@@ -215,8 +271,7 @@ public class PackQcReportService extends BaseJpaService {
      * @return
      * @throws Exception
      */
-    public Envelop dataSetList(String startDate, String endDate, String orgCode) throws Exception {
-        Envelop envelop = new Envelop();
+    public List<Map<String,Object>> getDataList(String startDate, String endDate, String orgCode) throws Exception {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT SUM(count) as count ,SUM(row) as row, dataset_name, dataset ");
         sql.append("FROM json_archives_qc/qc_dataset_detail");
@@ -231,12 +286,49 @@ public class PackQcReportService extends BaseJpaService {
         field.add("dataset_name");
         field.add("dataset");
         List<Map<String,Object>> list = elasticSearchUtil.findBySql(field, sql.toString());
+        Map<String, Object> totalMap = new HashMap<>();
+        totalMap.put("dataset","总计");
+        totalMap.put("dataset_name","-");
+        double rowTotal = 0;
+        double countTotal = 0;
         for(Map<String,Object> map :list){
             map.put("name" ,map.get("dataset_name"));
+            rowTotal += Double.valueOf(map.get("row").toString());
+            countTotal += Double.valueOf(map.get("count").toString());
         }
+        totalMap.put("row",rowTotal);
+        totalMap.put("count",countTotal);
+        list.add(0,totalMap);
+        return list;
+    }
+
+    /**
+     * 获取数据集列表数据
+     * @param startDate
+     * @param endDate
+     * @param orgCode
+     * @return
+     * @throws Exception
+     */
+    public Envelop dataSetList(String startDate, String endDate, String orgCode) throws Exception {
+        Envelop envelop = new Envelop();
+        List<Map<String, Object>> list = getDataList(startDate, endDate, orgCode);
         envelop.setSuccessFlg(true);
         envelop.setDetailModelList(list);
         return envelop;
+    }
+
+    /**
+     * 获取数据集列表数据
+     * @param startDate
+     * @param endDate
+     * @param orgCode
+     * @return
+     * @throws Exception
+     */
+    public Envelop getDataSetListPage(String startDate, String endDate, String orgCode,int size,int page) throws Exception {
+        List<Map<String, Object>> list = getDataList(startDate, endDate, orgCode);
+        return getPageEnvelop(page,size,list);
     }
 
     public void getDataSets(String version, String dataSet, int row, List<Map<String, Object>> res){
@@ -319,6 +411,7 @@ public class PackQcReportService extends BaseJpaService {
             res.add(map);
         }
     }
+
     /**
      * 获取资源化解析失败
      * @param startDate
@@ -327,8 +420,7 @@ public class PackQcReportService extends BaseJpaService {
      * @return
      * @throws Exception
      */
-    public Envelop archiveFailed(String startDate, String endDate, String orgCode) throws Exception {
-        Envelop envelop = new Envelop();
+    public List<Map<String, Object>> getArchiveFailedList(String startDate, String endDate, String orgCode) throws Exception {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("archive_status=2;pack_type=1;");
         stringBuilder.append("receive_date>=" + startDate + " 00:00:00;");
@@ -348,15 +440,49 @@ public class PackQcReportService extends BaseJpaService {
         builder.setExplain(true);
         SearchResponse response = builder.get();
         LongTerms longTerms = response.getAggregations().get("error_type");
+        Map<String, Object> totalMap = new HashMap<>();
+        double totalCount = 0.0;
         for(Terms.Bucket item: longTerms.getBuckets()){
             Map<String, Object> temp = new HashMap<>();
             temp.put("error_type", item.getKeyAsString());
             temp.put("error_count", item.getDocCount());
+            totalCount += item.getDocCount();
             resultList.add(temp);
         }
+        totalMap.put("error_type","total");
+        totalMap.put("error_count",totalCount);
+        resultList.add(0,totalMap);
+        return resultList;
+    }
+
+    /**
+     * 获取资源化解析失败
+     * @param startDate
+     * @param endDate
+     * @param orgCode
+     * @return
+     * @throws Exception
+     */
+    public Envelop archiveFailed(String startDate, String endDate, String orgCode) throws Exception {
+        Envelop envelop = new Envelop();
+        List<Map<String, Object>> resultList = getArchiveFailedList(startDate,endDate,orgCode);
         envelop.setSuccessFlg(true);
         envelop.setDetailModelList(resultList);
         return envelop;
+    }
+
+    /**
+     * 获取资源化解析失败
+     * @param startDate
+     * @param endDate
+     * @param orgCode
+     * @return
+     * @throws Exception
+     */
+    public Envelop archiveFailed(String startDate, String endDate, String orgCode,int size,int page) throws Exception {
+        List<Map<String, Object>> resultList = getArchiveFailedList(startDate,endDate,orgCode);
+        Envelop pageEnvelop = getPageEnvelop(page, size, resultList);
+        return pageEnvelop;
     }
 
     /**
@@ -367,8 +493,7 @@ public class PackQcReportService extends BaseJpaService {
      * @return
      * @throws Exception
      */
-    public Envelop metadataError(String step, String startDate, String endDate, String orgCode) throws Exception {
-        Envelop envelop = new Envelop();
+    public List<Map<String, Object>> getMetadaErrorList(String step, String startDate, String endDate, String orgCode) throws Exception {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("qc_step="+step+";");
         stringBuilder.append("receive_date>=" + startDate + " 00:00:00;");
@@ -388,15 +513,49 @@ public class PackQcReportService extends BaseJpaService {
         builder.setExplain(true);
         SearchResponse response = builder.get();
         LongTerms longTerms = response.getAggregations().get("qc_error_type");
+        Map<String, Object> total = new HashMap<>();
+        double totalNum = 0.0;
         for(Terms.Bucket item: longTerms.getBuckets()){
             Map<String, Object> temp = new HashMap<>();
             temp.put("error_type", item.getKeyAsString());
-            temp.put("error_count", item.getDocCount());
+            long docCount = item.getDocCount();
+            temp.put("error_count",docCount );
+            totalNum += docCount;
             resultList.add(temp);
         }
+        total.put("error_type","total");
+        total.put("error_count",totalNum);
+        resultList.add(0,total);
+        return resultList;
+    }
+
+    /**
+     * 获取数据元异常
+     * @param startDate
+     * @param endDate
+     * @param orgCode
+     * @return
+     * @throws Exception
+     */
+    public Envelop metadataError(String step, String startDate, String endDate, String orgCode) throws Exception {
+        Envelop envelop = new Envelop();
+        List<Map<String, Object>> resultList = getMetadaErrorList(step, startDate, endDate, orgCode);
         envelop.setSuccessFlg(true);
         envelop.setDetailModelList(resultList);
         return envelop;
+    }
+
+    /**
+     * 获取数据元异常
+     * @param startDate
+     * @param endDate
+     * @param orgCode
+     * @return
+     * @throws Exception
+     */
+    public Envelop metadataError(String step, String startDate, String endDate, String orgCode,int size,int page) throws Exception {
+        List<Map<String, Object>> resultList = getMetadaErrorList(step, startDate, endDate, orgCode);
+        return getPageEnvelop(page, size, resultList);
     }
 
     /**

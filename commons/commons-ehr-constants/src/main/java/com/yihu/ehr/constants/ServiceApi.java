@@ -271,6 +271,10 @@ public class ServiceApi {
         public static final String GetPositionMapByCode = "/resources/report/getPositionMapByCode";
         public static final String GetRsReportByParam = "/resources/report/getRsReportByParam";
 
+        public static final String QueryByUserId = "/open/resources/report/queryByUserId";
+        public static final String QueryOtherReportByUserId = "/open/resources/report/queryOtherReportByUserId";
+        public static final String SaveByUserId = "/open/resources/report/saveByUserId";
+
         /**
          * 资源报表视图配置
          */
@@ -1699,10 +1703,14 @@ public class ServiceApi {
         public static final String dailyReport = "/packQcReport/dailyReport";
         public static final String datasetWarningList = "/packQcReport/datasetWarningList";
         public static final String resourceSuccess = "/packQcReport/resourceSuccess";
+        public static final String resourceSuccessPage = "/packQcReport/resourceSuccessPage";
         public static final String archiveReport= "/packQcReport/archiveReport";
         public static final String dataSetList= "/packQcReport/dataSetList";
+        public static final String dataSetListPage= "/packQcReport/dataSetListPage";
         public static final String archiveFailed= "/packQcReport/archiveFailed";
+        public static final String archiveFailedPage= "/packQcReport/archiveFailedPage";
         public static final String metadataError= "/packQcReport/metadataError";
+        public static final String metadataErrorPage= "/packQcReport/metadataErrorPage";
         public static final String analyzeErrorList= "/packQcReport/analyzeErrorList";
         public static final String metadataErrorList= "/packQcReport/metadataErrorList";
         public static final String metadataErrorDetail= "/packQcReport/metadataErrorDetail";

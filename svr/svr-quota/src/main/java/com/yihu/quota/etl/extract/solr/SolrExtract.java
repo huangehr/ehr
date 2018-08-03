@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.query.common.model.SolrGroupEntity;
 import com.yihu.ehr.query.services.SolrQuery;
+import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.quota.dao.jpa.save.TjQuotaDataSaveDao;
 import com.yihu.quota.etl.Contant;
 import com.yihu.quota.etl.ExtractConverUtil;
@@ -211,7 +212,7 @@ public class SolrExtract {
     }
 
     /**
-     * 去重查询后，对比ES中如果已存在该条数据则更新，并从集合中移除该条数据。
+     * 去重查询后，对比 ES 中如果已存在该条数据，且去重集合中有更前的则更新quotaDate，并从去重集合中移除该条数据。
      *
      * @param distinctQueryList 去重查询结果集
      */
@@ -230,15 +231,20 @@ public class SolrExtract {
         Iterator<Map<String, Object>> iterator = distinctQueryList.iterator();
         while (iterator.hasNext()) {
             Map<String, Object> item = iterator.next();
+            String timeKeyValue = DateUtil.formatDate((Date) item.get(esConfig.getTimekey()), DateUtil.DEFAULT_DATE_YMD_FORMAT);
             String distinctField = item.get("distinctField").toString();
             String distinctFieldValue = item.get("distinctFieldValue").toString();
 
-            String filters = "quotaCode=" + quotaVo.getCode() + ";distinctField=" + distinctField + ";distinctFieldValue=" + distinctFieldValue;
+            String filters = "quotaCode=" + quotaVo.getCode().replace("_", "") + ";distinctField=" + distinctField + ";distinctFieldValue=" + distinctFieldValue;
             List<Map<String, Object>> existedList = esUtil.list(esIndex, esType, filters);
             if (existedList.size() > 0) {
                 Map<String, Object> quotaData = existedList.get(0);
-                updateList.add(quotaData);
-                iterator.remove();
+                String quotaDate = quotaData.get("quotaDate").toString();
+                if (DateUtil.compareDate(DateUtil.DEFAULT_DATE_YMD_FORMAT, timeKeyValue, quotaDate) < 0) {
+                    quotaData.put("quotaDate", timeKeyValue);
+                    updateList.add(quotaData);
+                    iterator.remove();
+                }
             }
         }
 

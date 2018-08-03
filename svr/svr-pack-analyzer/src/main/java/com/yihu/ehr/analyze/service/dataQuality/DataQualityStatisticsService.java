@@ -62,10 +62,22 @@ public class DataQualityStatisticsService extends BaseJpaService {
      * @throws Exception
      */
     public List<Map<String,Object>> findUploadStatistics (String filters) throws Exception{
+        String newFilters = "";
         List<Map<String,Object>> result = new ArrayList<>();
+        //上传总档案量
+        Map<String, Long> totalCount = elasticSearchUtil.countByGroup("upload", "record", filters,"org_code");
+        // 门诊量
+        newFilters = new String(filters+"event_type:0;");
+        Map<String, Long> outPatientCount = elasticSearchUtil.countByGroup("upload", "record", newFilters,"org_code");
+        // 住院量
+        newFilters = new String(filters+"event_type:1;");
+        Map<String, Long> inPatientCount = elasticSearchUtil.countByGroup("upload", "record", newFilters,"org_code");
+        // 体检量
+        newFilters = new String(filters+"event_type:2;");
+        Map<String, Long> examCount = elasticSearchUtil.countByGroup("upload", "record", newFilters,"org_code");
+        // 数据集量
 
-        Map<String, Long> count = elasticSearchUtil.countByGroup("upload", "record", filters,"rowkey");
-
+        // 上传异常的数据量
 
         return result;
     }

@@ -28,6 +28,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -126,7 +127,7 @@ public class LinkPackageResolver extends PackageResolver {
         JsonNode filesNode = jsonNode.get("files");
         if (filesNode != null){
             List<LinkFile> linkFiles = linkPackage.getLinkFiles();
-
+            Map<String,List<String>> needDeleteFiles = linkPackage.getFiles();
             ArrayNode arrayNode = (ArrayNode) filesNode;
             FtpUtils ftpUtils = null;
             try {
@@ -197,6 +198,13 @@ public class LinkPackageResolver extends PackageResolver {
                     linkFile.setUrl(fastdfsUrl);
                     linkFiles.add(linkFile);
                     path = path.substring(0, path.length() - fileName.length());//文件路径,不包含文件名
+                    List<String> _fileNames = needDeleteFiles.get(path);
+                    if(_fileNames == null){
+                        _fileNames = new ArrayList<>();
+                    }
+                    _fileNames.add(fileName);
+                    //ftp文件,待数据入库后,在删除
+                    needDeleteFiles.put(path,_fileNames);
                     ftpUtils.deleteFile(path, fileName);
                 }
             } finally {

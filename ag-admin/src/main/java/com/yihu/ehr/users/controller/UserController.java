@@ -714,12 +714,12 @@ public class UserController extends BaseController {
         detailModel.setLastLoginTime(DateToString(mUser.getLastLoginTime(), AgAdminConstants.DateTimeFormat));
 
         //获取婚姻状态代码
-        String marryCode = mUser.getMartialStatus();
+        /*String marryCode = mUser.getMartialStatus();*/
         MConventionalDict dict = null;
-        if (StringUtils.isNotEmpty(marryCode)) {
+       /* if (StringUtils.isNotEmpty(marryCode)) {
             dict = conventionalDictClient.getMartialStatus(marryCode);
             detailModel.setMartialStatusName(dict == null ? "" : dict.getValue());
-        }
+        }*/
         //获取用户类型
         String userType = mUser.getUserType();
         if (StringUtils.isNotEmpty(userType)) {
@@ -727,11 +727,11 @@ public class UserController extends BaseController {
             detailModel.setUserTypeName(dict == null ? "" : dict.getValue());
         }
         //获取用户标准来源
-        String userSource = mUser.getSource();
+        /*String userSource = mUser.getSource();
         if (StringUtils.isNotEmpty(userSource)) {
             dict = conventionalDictClient.getUserSource(userSource);
             detailModel.setSourceName(dict == null ? "" : dict.getValue());
-        }
+        }*/
         //从用户-角色组关系表获取用户所属角色组ids
         detailModel.setRole("");
         Collection<MRoleUser> mRoleUsers = roleUserClient.searchRoleUserNoPaging("userId=" + mUser.getId());

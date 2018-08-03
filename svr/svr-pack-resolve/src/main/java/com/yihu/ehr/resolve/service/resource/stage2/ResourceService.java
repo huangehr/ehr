@@ -3,11 +3,15 @@ package com.yihu.ehr.resolve.service.resource.stage2;
 
 import com.yihu.ehr.resolve.dao.MasterResourceDao;
 import com.yihu.ehr.resolve.dao.SubResourceDao;
+import com.yihu.ehr.resolve.model.stage1.LinkPackage;
 import com.yihu.ehr.resolve.model.stage1.OriginalPackage;
 import com.yihu.ehr.resolve.model.stage2.ResourceBucket;
 import com.yihu.ehr.resolve.service.profile.ArchiveRelationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -30,6 +34,8 @@ public class ResourceService {
     private PatientService patientService;
     @Autowired
     private QcRecordService qcRecordService;
+    @Autowired
+    private FtpFileService ftpFileService;
 
     public void save(ResourceBucket resourceBucket, OriginalPackage originalPackage) throws Exception {
         //资源主表
@@ -48,6 +54,13 @@ public class ResourceService {
         if (originalPackage.isIdentifyFlag()) {
             patientService.checkPatient(resourceBucket);
         }
+
+        //数据入库后,然后删除ftp上的文件
+        if(originalPackage instanceof LinkPackage){
+            LinkPackage pack = (LinkPackage) originalPackage;
+            ftpFileService.deleteFile(pack);
+        }
+
     }
 
 }
