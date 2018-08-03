@@ -18,12 +18,14 @@ import com.yihu.ehr.model.app.MAppFeature;
 import com.yihu.ehr.model.app.MUserApp;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.geography.MGeography;
+import com.yihu.ehr.model.org.MOrgDeptData;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.patient.MDemographicInfo;
 import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.model.user.MRoleFeatureRelation;
 import com.yihu.ehr.model.user.MRoleUser;
 import com.yihu.ehr.model.user.MUser;
+import com.yihu.ehr.organization.service.OrgDeptMemberClient;
 import com.yihu.ehr.organization.service.OrganizationClient;
 import com.yihu.ehr.patient.controller.PatientController;
 import com.yihu.ehr.patient.service.PatientClient;
@@ -39,15 +41,13 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.xmlbeans.UserType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by AndyCai on 2016/1/21.
@@ -89,6 +89,8 @@ public class UserController extends BaseController {
     private PatientController patientController;
     @Autowired
     private  AppClient appClient;
+    @Autowired
+    private OrgDeptMemberClient orgDeptMemberClient;
 
 
     private String resetFilter(String filters) {
@@ -153,7 +155,7 @@ public class UserController extends BaseController {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page,
             @ApiParam(name = "orgCode", value = "机构编码", defaultValue = "")
-            @RequestParam(value = "orgCode", required = false) String orgCode) {
+            @RequestParam(value = "orgCode", required = false) String orgCode)throws Exception{
         if (null == sorts) {
             sorts = "-createDate,-lastLoginTime";
         }
@@ -165,16 +167,17 @@ public class UserController extends BaseController {
             UsersModel usersModel = convertToModel(mUser, UsersModel.class);
             //usersModel.setLastLoginTime(DateToString( mUser.getLastLoginTime(),AgAdminConstants.DateTimeFormat));
             usersModel.setLastLoginTime(mUser.getLastLoginTime() == null ? "" : DateTimeUtil.simpleDateTimeFormat(mUser.getLastLoginTime()));
-            //获取用户类别字典
+
             if (StringUtils.isNotEmpty(mUser.getUserType())) {
-                MConventionalDict dict = conventionalDictClient.getUserType(mUser.getUserType());
-                usersModel.setUserTypeName(dict == null ? "" : dict.getValue());
+                int userTypeInt = Integer.parseInt(mUser.getUserType().toString());
+                Envelop envStr = roleUserClient.GetUserTypeById(userTypeInt);
+                if(envStr != null){
+                    HashMap userTypeM = objectMapper.readValue(toJson(envStr.getObj()),HashMap.class);
+                    String userTypeName = userTypeM.get("name").toString();
+                    usersModel.setUserTypeName(userTypeName);
+                }
             }
-            //获取机构信息
-            if (StringUtils.isNotEmpty(mUser.getOrganization())) {
-                MOrganization organization = orgClient.getOrg(mUser.getOrganization());
-                usersModel.setOrganizationName(organization == null ? "" : organization.getFullName());
-            }
+
             //获取用户来源信息
             if (StringUtils.isNotEmpty(mUser.getSource())) {
                 MConventionalDict dict = conventionalDictClient.getUserSource(mUser.getSource());
@@ -379,10 +382,10 @@ public class UserController extends BaseController {
             if (StringUtils.isEmpty(detailModel.getTelephone())) {
                 errorMsg += "电话号码不能为空!";
             }
-            String roles = detailModel.getRole();
+            /*String roles = detailModel.getRole();
             if (StringUtils.isEmpty(roles)) {
                 errorMsg += "用户角色不能为空!";
-            }
+            }*/
             if (StringUtils.isNotEmpty(errorMsg)) {
                 return failed(errorMsg);
             }
@@ -477,29 +480,7 @@ public class UserController extends BaseController {
             if (mUser == null) {
                 return failed("用户信息获取失败!");
             }
-//            if (!StringUtils.isEmpty(mUser.getImgRemotePath())) {
-////                Map<String, String> map = toEntity(mUser.getImgRemotePath(), Map.class);
-//                String imagePath[] = mUser.getImgRemotePath().split(":");
-//                String localPath = userClient.downloadPicture(imagePath[0], imagePath[1]);
-//                mUser.setImgLocalPath(localPath);
-//            }
-            if (StringUtils.isNotEmpty(mUser.getBirthday())) {
-                mUser.setBirthday(mUser.getBirthday().substring(0, 10));
-            }
             UserDetailModel detailModel = convertToUserDetailModel(mUser);
-            /*if (StringUtils.isNotEmpty(mUser.getUserType()) && StringUtils.isNotEmpty(mUser.getDemographicId()) && "Patient".equals(mUser.getUserType())) {
-                Collection<MRoleUser> mRoleUsers = roleUserClient.searchRoleUserNoPaging("userId=" + mUser.getDemographicId());
-                if (mRoleUsers != null) {
-                    StringBuffer buffer = new StringBuffer();
-                    for (MRoleUser m : mRoleUsers) {
-                        buffer.append(m.getRoleId());
-                        buffer.append(",");
-                    }
-                    String roleIds = buffer.substring(0, buffer.length() - 1);
-                    detailModel.setRole(roleIds);
-                }
-
-            }*/
 
             return success(detailModel);
         } catch (Exception ex) {
@@ -704,7 +685,7 @@ public class UserController extends BaseController {
      * @param mUser
      * @return UserDetailModel
      */
-    public UserDetailModel convertToUserDetailModel(MUser mUser) {
+    public UserDetailModel convertToUserDetailModel(MUser mUser) throws Exception{
         if (mUser == null) {
             return null;
         }
@@ -713,25 +694,19 @@ public class UserController extends BaseController {
         detailModel.setCreateDate(DateToString(mUser.getCreateDate(), AgAdminConstants.DateTimeFormat));
         detailModel.setLastLoginTime(DateToString(mUser.getLastLoginTime(), AgAdminConstants.DateTimeFormat));
 
-        //获取婚姻状态代码
-        /*String marryCode = mUser.getMartialStatus();*/
         MConventionalDict dict = null;
-       /* if (StringUtils.isNotEmpty(marryCode)) {
-            dict = conventionalDictClient.getMartialStatus(marryCode);
-            detailModel.setMartialStatusName(dict == null ? "" : dict.getValue());
-        }*/
         //获取用户类型
-        String userType = mUser.getUserType();
+        String userType = mUser.getUserType().toString();
         if (StringUtils.isNotEmpty(userType)) {
-            dict = conventionalDictClient.getUserType(userType);
-            detailModel.setUserTypeName(dict == null ? "" : dict.getValue());
+            int userTypeInt = Integer.parseInt(mUser.getUserType().toString());
+            Envelop envStr = roleUserClient.GetUserTypeById(userTypeInt);
+            if(envStr != null){
+                HashMap userTypeM = objectMapper.readValue(toJson(envStr.getObj()),HashMap.class);
+                String userTypeName = userTypeM.get("name").toString();
+                detailModel.setUserTypeName(userTypeName);
+            }
         }
-        //获取用户标准来源
-        /*String userSource = mUser.getSource();
-        if (StringUtils.isNotEmpty(userSource)) {
-            dict = conventionalDictClient.getUserSource(userSource);
-            detailModel.setSourceName(dict == null ? "" : dict.getValue());
-        }*/
+
         //从用户-角色组关系表获取用户所属角色组ids
         detailModel.setRole("");
         Collection<MRoleUser> mRoleUsers = roleUserClient.searchRoleUserNoPaging("userId=" + mUser.getId());
@@ -743,17 +718,14 @@ public class UserController extends BaseController {
             }
             detailModel.setRole(buffer.substring(0, buffer.length() - 1));
         }
-        //获取归属机构
-        String orgCode = mUser.getOrganization();
-        if (StringUtils.isNotEmpty(orgCode)) {
-            MOrganization orgModel = orgClient.getOrg(orgCode);
-            detailModel.setOrganizationName(orgModel == null ? "" : orgModel.getFullName());
-            if (orgModel != null && StringUtils.isNotEmpty(orgModel.getLocation())) {
-                MGeography mGeography = addressClient.getAddressById(orgModel.getLocation());
-                detailModel.setProvinceName(mGeography == null ? "" : mGeography.getProvince());
-                detailModel.setCityName(mGeography == null ? "" : mGeography.getCity());
-            }
+
+        //获取机构信息
+        List<MOrgDeptData> orgDeptDatas = orgDeptMemberClient.getOrgAndDeptRelation(detailModel.getId().toString());
+        if(orgDeptDatas != null && orgDeptDatas.size() >0){
+            String orgInfo = orgDeptDatas.toString();
+            detailModel.setOrganization(orgInfo);
         }
+
         //获取秘钥信息
         MKey userSecurity = securityClient.getUserKey(mUser.getId(), true);
         if (userSecurity != null) {

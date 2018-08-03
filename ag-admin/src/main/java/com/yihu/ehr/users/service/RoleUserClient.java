@@ -4,6 +4,7 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.user.MRoleUser;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -84,4 +85,13 @@ public interface RoleUserClient {
     Collection<MRoleUser> searchRoleUserNoPaging(
             @ApiParam(name = "filters",value = "过滤条件，为空检索全部",defaultValue = "")
             @RequestParam(value = "filters",required = false) String filters);
+
+    @RequestMapping(value = ServiceApi.Roles.GetUserTypeById, method = RequestMethod.GET)
+    @ApiOperation(value = "根据id获取用户类型")
+    Envelop GetUserTypeById(
+            @ApiParam(name = "userTypeId", value = "用户类型ID")
+            @RequestParam(value = "userTypeId") int userTypeId);
+
+
+
 }
