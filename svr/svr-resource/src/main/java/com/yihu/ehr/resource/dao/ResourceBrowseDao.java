@@ -18,6 +18,7 @@ import com.yihu.ehr.resource.client.QuotaStatisticsClient;
 import com.yihu.ehr.resource.client.StdTransformClient;
 import com.yihu.ehr.resource.model.*;
 import com.yihu.ehr.resource.service.RedisService;
+import com.yihu.ehr.resource.service.RsResourceService;
 import com.yihu.ehr.util.rest.Envelop;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -29,6 +30,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -79,6 +81,8 @@ public class ResourceBrowseDao {
     private ElasticSearchUtil elasticSearchUtil;
     @Autowired
     private SolrQuery solrQuery;
+    @Autowired
+    private RsResourceService rsResourceService;
 
     /**
      * 获取资源授权数据元列表
@@ -248,7 +252,7 @@ public class ResourceBrowseDao {
             }
         }
         if (resourcesCode != null) {
-            RsResource rsResources = rsResourceDao.findByCode(resourcesCode);
+            RsResource rsResources = rsResourceService.getResourceByCategory(resourcesCode,"standard");
             //获取资源结构权限，该部分新增其他标准数据集的判断
             List<DtoResourceMetadata> metadataList = getAccessMetadata(rsResources, roleId, new HashMap<>());
             if (metadataList != null && metadataList.size() > 0) {
@@ -359,7 +363,7 @@ public class ResourceBrowseDao {
             }
         }
         if (resourcesCode != null) {
-            RsResource rsResources = rsResourceDao.findByCode(resourcesCode);
+            RsResource rsResources = rsResourceService.getResourceByCategory(resourcesCode,"standard");
             //获取资源结构权限，该部分新增其他标准数据集的判断
             List<DtoResourceMetadata> metadataList = getAccessMetadata(rsResources, roleId, new HashMap<>());
             if (metadataList != null && metadataList.size() > 0) {
@@ -570,8 +574,8 @@ public class ResourceBrowseDao {
      * @param size
      * @return
      */
-    public Envelop getQuotaData(String resourcesCode, String roleId, String saas, String queryParams, Integer page, Integer size) {
-        RsResource rsResource = rsResourceDao.findByCode(resourcesCode);
+    public Envelop getQuotaData(String resourcesCode, String roleId, String saas, String queryParams, Integer page, Integer size) throws IOException {
+        RsResource rsResource = rsResourceService.getResourceByCategory(resourcesCode,"standard");
         if (rsResource.getDimension() != null && "orgHealthCategoryCode".equals(rsResource.getDimension())) {
             List<RsResourceQuota> list = rsResourceQuotaDao.findByResourceId(rsResource.getId());
             final StringBuilder quotaCodeStr = new StringBuilder();
@@ -740,7 +744,7 @@ public class ResourceBrowseDao {
     public List<Map<String, Object>> getEhrCenterByScan (String resourcesCode, String roleId, String saas, String rowKey) throws Exception {
         Map<String, Object> query = new HashMap<>();
         if (resourcesCode != null) {
-            RsResource rsResources = rsResourceDao.findByCode(resourcesCode);
+            RsResource rsResources = rsResourceService.getResourceByCategory(resourcesCode,"standard");
             //获取资源结构权限，该部分新增其他标准数据集的判断
             List<DtoResourceMetadata> metadataList = getAccessMetadata(rsResources, roleId, new HashMap<>());
             if (metadataList != null && metadataList.size() > 0) {
@@ -807,7 +811,7 @@ public class ResourceBrowseDao {
     public List<Map<String, Object>> getEhrCenterSubByScan (String dataSetCode, String roleId, String saas, String rowKey) throws Exception {
         Map<String, Object> query = new HashMap<>();
         if (dataSetCode != null) {
-            RsResource rsResources = rsResourceDao.findByCode(dataSetCode);
+            RsResource rsResources = rsResourceService.getResourceByCategory(dataSetCode,"standard");
             //获取资源结构权限，该部分新增其他标准数据集的判断
             List<DtoResourceMetadata> metadataList = getAccessMetadata(rsResources, roleId, new HashMap<>());
             if (metadataList != null && metadataList.size() > 0) {
@@ -929,7 +933,7 @@ public class ResourceBrowseDao {
             List<String> list = rowKeyMap.get(dataSetCode);
 
             if (dataSetCode != null) {
-                RsResource rsResources = rsResourceDao.findByCode(dataSetCode);
+                RsResource rsResources = rsResourceService.getResourceByCategory(dataSetCode,"standard");
                 //获取资源结构权限，该部分新增其他标准数据集的判断
                 List<DtoResourceMetadata> metadataList = getAccessMetadata(rsResources, roleId, new HashMap<>());
                 if (metadataList != null && metadataList.size() > 0) {
