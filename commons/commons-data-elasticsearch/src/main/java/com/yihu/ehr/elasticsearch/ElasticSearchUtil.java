@@ -643,10 +643,8 @@ public class ElasticSearchUtil {
         if (size != null) {
             if (from != null) {
                 builder.setFrom(from);
-                builder.setSize(size);
-            } else {
-                builder.setSize(size);
             }
+            builder.setSize(size);
         }
         return builder;
     }
