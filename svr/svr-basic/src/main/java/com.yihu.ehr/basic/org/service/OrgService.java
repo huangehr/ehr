@@ -203,8 +203,8 @@ public class OrgService extends BaseJpaService<Organization, OrganizationReposit
 //                organization.setId(Long.parseLong(map.get("id").toString()));
                 organization.setFullName(null2Space(map.get("fullName")));
                 organization.setBasicUnitFlag(null2Space(map.get("basicUnitFlag")));
-                organization.setParentHosId(Integer.valueOf(null2Space(map.get("parentHosId"))));
-                organization.setActivityFlag(Integer.valueOf(null2Space(map.get("activityFlag"))));
+                organization.setParentHosId(nullSpaceOfInteger(map.get("parentHosId")));
+                organization.setActivityFlag(nullSpaceOfInteger(map.get("activityFlag")));
 
                 organization.setOrgChanges(null2Space(map.get("orgChanges")));
                 organization.setOrgCode(null2Space(map.get("orgCode")));
@@ -213,13 +213,13 @@ public class OrgService extends BaseJpaService<Organization, OrganizationReposit
                 organization.setHosTypeId(null2Space(map.get("hosTypeId")));
 
                 organization.setHosTypeName(null2Space(map.get("hosTypeName")));
-                organization.setAdministrativeDivision(Integer.valueOf(null2Space(map.get("administrativeDivision"))));
+                organization.setAdministrativeDivision(nullSpaceOfInteger(map.get("administrativeDivision")));
                 organization.setStreetId(null2Space(map.get("streetId")));
                 organization.setLevelId(null2Space(map.get("levelId")));
                 organization.setHosHierarchy(null2Space(map.get("hosHierarchy")));
 
                 organization.setHostUnit(null2Space(map.get("hostUnit")));
-                organization.setAscriptionType(Integer.valueOf(null2Space(map.get("ascriptionType"))));
+                organization.setAscriptionType(nullSpaceOfInteger(map.get("ascriptionType")));
                 organization.setDischargePatientFlag(null2Space(map.get("dischargePatientFlag")));
                 organization.setReportingClinicFlag(null2Space(map.get("reportingClinicFlag")));
                 organization.setReportingVillageClinicFlag(null2Space(map.get("reportingVillageClinicFlag")));
@@ -415,5 +415,13 @@ public class OrgService extends BaseJpaService<Organization, OrganizationReposit
 
     private String null2Space(Object o) {
         return o == null ? "" : o.toString();
+    }
+
+    private Integer nullSpaceOfInteger(Object o) {
+        if(o != null&&StringUtils.isNotEmpty(o.toString())){
+            return  Integer.valueOf(o.toString());
+        }else{
+            return 0 ;
+        }
     }
 }
