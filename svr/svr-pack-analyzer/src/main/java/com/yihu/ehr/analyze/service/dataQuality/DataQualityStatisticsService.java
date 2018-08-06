@@ -753,10 +753,10 @@ public class DataQualityStatisticsService extends BaseJpaService {
                 dataMap1.put("totalOutpatient",HSI07_01_002);
                 dataMap1.put("totalPe",HSI07_01_004);
                 dataMap1.put("totalHospital",HSI07_01_012);
-                totalVisitNum+=HSI07_01_001;
-                totalOutpatientNum+=HSI07_01_002;
-                totalPeNum+=HSI07_01_004;
-                totalHospitalNum+=HSI07_01_012;
+                totalVisitNum += HSI07_01_001;
+                totalOutpatientNum += HSI07_01_002;
+                totalPeNum += HSI07_01_004;
+                totalHospitalNum += HSI07_01_012;
                 dataMap.put(orgCode,dataMap1);
             }
         }catch (Exception e){
@@ -771,7 +771,10 @@ public class DataQualityStatisticsService extends BaseJpaService {
             ResultSet resultSetOrg = elasticSearchUtil.findBySql(sqlOrg);
             while (resultSetOrg.next()) {
                 String orgCode = resultSetOrg.getString("org_code");
-                dataMap.put(orgCode,initRateMap(warningMap,orgMap.get(orgCode),orgCode));
+                Map<String, Object> map = dataMap.get(orgCode);
+                if(map == null){
+                    dataMap.put(orgCode,initRateMap(warningMap,orgMap.get(orgCode),orgCode));
+                }
             }
         }catch (Exception e){
             if(!"Error".equals(e.getMessage())){
@@ -876,7 +879,6 @@ public class DataQualityStatisticsService extends BaseJpaService {
             double totalOutpatient = Double.parseDouble(map.get("totalOutpatient").toString());//总门诊数
             double totalPe = Double.parseDouble(map.get("totalPe").toString());//总体检数
             double totalHospital = Double.parseDouble(map.get("totalHospital").toString());//总住院数
-
             double visitIntime = outpatientInTime + hospitalInTime + peInTime;
             double visitIntegrity = outpatientIntegrity + hospitalIntegrity + peIntegrity;
             map.put("visitIntime", visitIntime);

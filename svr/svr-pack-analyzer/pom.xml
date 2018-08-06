@@ -127,6 +127,10 @@
             <artifactId>commons-util</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.yihu.ehr</groupId>
+            <artifactId>commons-data-solr</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
         </dependency>
