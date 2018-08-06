@@ -588,7 +588,7 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
             List<UserTypeRoles> models = objectMapper.readValue(typeRolesJson, new TypeReference<List<UserTypeRoles>>() {
             });
             userType = toEntity(userTypeJson, UserType.class);
-            if (null != userType && null != Integer.valueOf(userType.getId()) && userType.getId() > 0) {
+            if (null != userType && null != userType.getId() && userType.getId() > 0) {
                 Integer userTypeId = userType.getId();
                 //变更与角色组的关联关系
                 xUserTypeRolesRepository.deleteUserTypeRolesByTypeId(userTypeId);
