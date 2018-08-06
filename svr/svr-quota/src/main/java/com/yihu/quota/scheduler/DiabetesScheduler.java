@@ -3,7 +3,6 @@ package com.yihu.quota.scheduler;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.elasticsearch.ElasticSearchClient;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.hbase.HBaseDao;
 import com.yihu.ehr.profile.core.ResourceCore;
@@ -59,8 +58,6 @@ public class DiabetesScheduler {
 	private ExtractUtil extractUtil;
 	@Autowired
 	private ElasticSearchUtil elasticSearchUtil;
-	@Autowired
-	private ElasticSearchClient elasticSearchClient;
 	@Autowired
 	private HBaseDao hbaseDao;
 	@Autowired
@@ -304,15 +301,15 @@ public class DiabetesScheduler {
 			if(personalInfo.getDemographicId() != null){
 				List<Map<String, Object>> relist = elasticSearchUtil.findByField(index, type, "demographicId", personalInfo.getDemographicId());
 				if( !(relist != null && relist.size() >0)){
-					elasticSearchClient.index(index,type, source);
+					elasticSearchUtil.index(index,type, source);
 				}
 			}else if(personalInfo.getCardId() != null){
 				List<Map<String, Object>> relist = elasticSearchUtil.findByField(index,type, "cardId",personalInfo.getCardId());
 				if( !(relist != null && relist.size() >0)){
-					elasticSearchClient.index(index,type, source);
+					elasticSearchUtil.index(index,type, source);
 				}
 			}else {
-				elasticSearchClient.index(index,type, source);
+				elasticSearchUtil.index(index,type, source);
 			}
 		}catch (Exception e){
 			new Exception("ElasticSearch 数据保存异常");

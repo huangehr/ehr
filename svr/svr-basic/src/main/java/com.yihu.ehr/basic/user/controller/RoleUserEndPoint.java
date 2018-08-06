@@ -394,7 +394,7 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
         orgMemberRelationService.deleteOrgMemberRelationByUserId(userId);
         String orgId = "";
         List<String> deptIds = new ArrayList<>();
-        OrgMemberRelation orgMemberRelation = new OrgMemberRelation();
+        OrgMemberRelation orgMemberRelation = null ;
 
         List<MOrgDeptJson> orgDeptJsonList = objectMapper.readValue(orgModel, new TypeReference<List<MOrgDeptJson>>() {
         });
@@ -408,9 +408,11 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
                         //验证用户机构关联是否已存在
                         int res = orgMemberRelationService.getCountByOrgIdAndUserId(orgId, userId, deptIdInt);
                         if (res == 0) {
+                            orgMemberRelation = new OrgMemberRelation();
                             orgMemberRelation.setUserId(userId);
                             orgMemberRelation.setOrgId(orgId);
                             orgMemberRelation.setDeptId(deptIdInt);
+                            orgMemberRelation.setStatus(0);
                             orgMemberRelation = orgMemberRelationService.save(orgMemberRelation);
 
                             if (orgMemberRelation != null) {
@@ -528,7 +530,6 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
 
         return envelop;
     }
-
 
     /**
      * 根据用户类型，获取初始化的角色组列表

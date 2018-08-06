@@ -7,7 +7,6 @@ import com.alibaba.druid.sql.parser.SQLExprParser;
 import com.alibaba.druid.sql.parser.Token;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.elasticsearch.ElasticSearchClient;
 import com.yihu.ehr.elasticsearch.ElasticSearchPool;
 import org.apache.commons.lang.StringUtils;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
@@ -50,8 +49,6 @@ public class ElasticsearchUtil {
 
     @Autowired
     ObjectMapper objectMapper;
-    @Autowired
-    private ElasticSearchClient elasticSearchClient;
     @Autowired
     private ElasticSearchPool elasticSearchPool;
 
