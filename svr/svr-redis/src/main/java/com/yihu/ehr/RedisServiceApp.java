@@ -1,6 +1,5 @@
 package com.yihu.ehr;
 
-import com.yihu.ehr.redis.listener.ApplicationReadyEventListener;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration;
@@ -26,7 +25,6 @@ public class RedisServiceApp extends SpringBootServletInitializer {
 
     public static void main(String[] args) {
         SpringApplication app = new SpringApplication();
-        app.addListeners(new ApplicationReadyEventListener());
         app.run(RedisServiceApp.class, args);
     }
 

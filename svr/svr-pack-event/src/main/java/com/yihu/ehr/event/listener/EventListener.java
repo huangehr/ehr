@@ -28,7 +28,7 @@ public class EventListener {
                 e.printStackTrace();
             }
         }
-        LOGGER.info("{} - {} : {}", consumerRecord.topic(), consumerRecord.key(), consumerRecord.value());
+        LOGGER.info("{} : {} : {}", consumerRecord.topic(), consumerRecord.key(), consumerRecord.value());
         EVENT_BLOCKING_QUEUE.add(new Event((String)consumerRecord.key(), (String)consumerRecord.value()));
     }
 

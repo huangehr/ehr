@@ -1,4 +1,4 @@
-package com.yihu.ehr.redis.listener;
+package com.yihu.ehr.listener;
 
 import com.yihu.ehr.redis.pubsub.CustomMessageListenerAdapter;
 import com.yihu.ehr.redis.pubsub.MessageCommonBiz;
@@ -21,12 +21,12 @@ import java.util.List;
  * @date 2017/11/14 17:48
  */
 @Component
-public class ApplicationReadyEventListener implements ApplicationListener<ApplicationReadyEvent> {
+public class ApplicationReadyListener implements ApplicationListener<ApplicationReadyEvent> {
 
     @Autowired
-    RedisMessageListenerContainer redisMessageListenerContainer;
+    private RedisMessageListenerContainer redisMessageListenerContainer;
     @Autowired
-    RedisMqChannelService redisMqChannelService;
+    private RedisMqChannelService redisMqChannelService;
 
     @Override
     public void onApplicationEvent(ApplicationReadyEvent applicationReadyEvent) {

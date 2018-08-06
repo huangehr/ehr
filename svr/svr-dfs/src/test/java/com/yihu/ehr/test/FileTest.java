@@ -1,4 +1,4 @@
-package com.yihu.ehr;
+package com.yihu.ehr.test;
 
 import org.junit.Test;
 

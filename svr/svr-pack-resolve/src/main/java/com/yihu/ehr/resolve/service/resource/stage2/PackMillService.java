@@ -211,10 +211,10 @@ public class PackMillService {
                         }
                     }
                 });
-                resourceBucket.insertBasicRecord(ResourceCells.DIAGNOSIS, StringUtils.join(standardPackage.getDiagnosisCode(),";"));
-                resourceBucket.insertBasicRecord(ResourceCells.DIAGNOSIS_NAME, StringUtils.join(standardPackage.getDiagnosisName(),";"));
-                resourceBucket.insertBasicRecord(ResourceCells.HEALTH_PROBLEM, StringUtils.join(healthProblem,";"));//健康问题
-                resourceBucket.insertBasicRecord(ResourceCells.HEALTH_PROBLEM_NAME, StringUtils.join(healthProblemName,";"));//健康问题名称
+                resourceBucket.insertBasicRecord(ResourceCells.DIAGNOSIS, StringUtils.join(standardPackage.getDiagnosisCode(), ";"));
+                resourceBucket.insertBasicRecord(ResourceCells.DIAGNOSIS_NAME, StringUtils.join(standardPackage.getDiagnosisName(), ";"));
+                resourceBucket.insertBasicRecord(ResourceCells.HEALTH_PROBLEM, StringUtils.join(healthProblem, ";"));//健康问题
+                resourceBucket.insertBasicRecord(ResourceCells.HEALTH_PROBLEM_NAME, StringUtils.join(healthProblemName, ";"));//健康问题名称
             }
             return resourceBucket;
         } else if (originalPackage.getProfileType() == ProfileType.File) {
