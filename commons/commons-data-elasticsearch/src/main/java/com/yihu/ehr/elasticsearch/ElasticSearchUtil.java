@@ -640,10 +640,10 @@ public class ElasticSearchUtil {
         if (sortBuilders != null) {
             sortBuilders.forEach(item -> builder.addSort(item));
         }
+        if (from != null) {
+            builder.setFrom(from);
+        }
         if (size != null) {
-            if (from != null) {
-                builder.setFrom(from);
-            }
             builder.setSize(size);
         }
         return builder;
