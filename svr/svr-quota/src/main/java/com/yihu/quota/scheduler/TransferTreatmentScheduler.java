@@ -3,7 +3,6 @@ package com.yihu.quota.scheduler;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.elasticsearch.ElasticSearchClient;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.hbase.HBaseDao;
 import com.yihu.ehr.model.org.MOrganization;
@@ -53,8 +52,6 @@ public class TransferTreatmentScheduler {
 	private static final Logger log = LoggerFactory.getLogger(TransferTreatmentScheduler.class);
 	@Autowired
 	private ElasticSearchUtil elasticSearchUtil;
-	@Autowired
-	private ElasticSearchClient elasticSearchClient;
 	@Autowired
 	private ObjectMapper objectMapper;
 	@Autowired
@@ -239,7 +236,7 @@ public class TransferTreatmentScheduler {
 			String jsonPer = objectMapper.writeValueAsString(transferTreatmentModel);
 			source = objectMapper.readValue(jsonPer, Map.class);
 			log.error("开始保存数据" + jsonPer);
-			elasticSearchClient.index(index,type, source);
+			elasticSearchUtil.index(index, type, source);
 
 		}catch (Exception e){
 			e.getMessage();

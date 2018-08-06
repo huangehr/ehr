@@ -47,7 +47,7 @@ public class ElasticSearchPool {
      * 1.TransportClient本身支持多线程的数据请求
      * 2.移除多个TransportClient的线程池支持，减少Socket链接
      * 3.基于多重检查的单例模式，兼顾安全和效率
-     * 4.使用完毕后无需进行关闭操作
+     * 4.为提高效率，使用完毕后请勿进行 transportClient.close() 的关闭操作
      * @return
      */
     public TransportClient getClient() {

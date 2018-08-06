@@ -2,12 +2,9 @@ package com.yihu.ehr.analyze.job;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.analyze.feign.RedisServiceClient;
-import com.yihu.ehr.elasticsearch.ElasticSearchClient;
-import com.yihu.ehr.elasticsearch.ElasticSearchPool;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.redis.client.RedisClient;
 import com.yihu.ehr.util.datetime.DateUtil;
-import com.yihu.ehr.util.rest.Envelop;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
