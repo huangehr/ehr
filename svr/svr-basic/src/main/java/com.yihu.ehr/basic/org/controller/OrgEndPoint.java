@@ -86,7 +86,7 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
             @RequestParam(value = "filters", required = false) String filters,
-            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "")
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "-createDate")
             @RequestParam(value = "sorts", required = false) String sorts,
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
@@ -583,5 +583,61 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
         envelop.setSuccessFlg(true);
         envelop.setObj(map);
         return envelop;
+    }
+
+    @RequestMapping(value = "/getAdressByLocation", method = RequestMethod.GET)
+    @ApiOperation("地址处理111111")
+    public Map<String, String> getAdressByLocation(String location) {
+        Map<String, String> map = new HashMap<>();
+        String[] temp = null;
+        temp = location.split("省");
+        String str ="";
+        for(int i=0;i<temp.length;i++){
+            if(temp[0].indexOf("省")>0){
+                //不包括直辖市、自治区
+                map.put("provinceName", temp[0]+"省");
+            }
+            str=temp[temp.length-1];
+        }
+        if (StringUtils.isNotEmpty(str)) {
+            temp = str.split("市");
+            str=temp[temp.length-1];
+            if(temp.length>2){
+                map.put("cityName", temp[0]+"市");
+                map.put("district", temp[1]+"市");
+                map.put("street", temp[2]);
+            }else if(temp.length>1){
+                map.put("cityName", temp[0]+"市");
+                map.put("district", temp[1]);
+                temp = str.split("县");
+                if (temp.length>1) {
+                    map.put("district", temp[0]+"县");
+                    map.put("street", temp[1]);
+                }else{
+                    temp = str.split("区");
+                    if (temp.length>1) {
+                        map.put("district", temp[0]+"区");
+                        map.put("street", temp[1]);
+                    }else {
+                        map.put("street", temp[0]);
+                    }
+                }
+            }else{
+                temp = str.split("县");
+                if (temp.length>1) {
+                    map.put("district", temp[0]+"县");
+                    map.put("street", temp[1]);
+                }else{
+                    temp = str.split("区");
+                    if (temp.length>1) {
+                        map.put("district", temp[0]+"区");
+                        map.put("street", temp[1]);
+                    }else {
+                        map.put("street", temp[0]);
+                    }
+                }
+            }
+        }
+        return map;
     }
 }

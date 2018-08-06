@@ -1720,6 +1720,9 @@ public class BaseStatistsService {
                             map.put(resultField,precent-0 ==0 ? 0 : df.format(precent));
                         }
                         resultList.add(map);
+                        if(i-beforeYear <= 0){
+                            break;
+                        }
                     }
                 }else if(dateType.toLowerCase().equals("quarter")){
                     String startQuarter = "";
@@ -1753,11 +1756,13 @@ public class BaseStatistsService {
                         int eYear = Integer.valueOf(endQuarter.substring(0, 4));
                         int eQuarter = Integer.valueOf(endQuarter.substring(5, 6));
                         endQuarter = eYear+ "年" + eQuarter + "季度";
-                        if(eQuarter == 1){
-                            eYear--;
-                            eQuarter = 4;
-                        }else {
-                            eQuarter--;
+                        if( !endQuarter.equals(startQuarter)){
+                            if(eQuarter == 1){
+                                eYear--;
+                                eQuarter = 4;
+                            }else {
+                                eQuarter--;
+                            }
                         }
                         lastQuarter = eYear + "年" + eQuarter + "季度";
                         double current = 0;
@@ -1798,10 +1803,15 @@ public class BaseStatistsService {
                         double last = 0;
                         Map<String,Object> map = new HashMap<>();
                         String nowMonthStr = endMonthStr;
-                        Calendar calendar = Calendar.getInstance();
-                        calendar.setTime(sdf.parse(endMonthStr + "-01"));
-                        calendar.add(Calendar.MONTH, -1);//当前时间前去一个月，即一个月前的时间
-                        String lastMontStr = sdf.format(calendar.getTime()).substring(0,7);
+                        String lastMontStr = "";
+                        if( !starthMonthStr.equals(endMonthStr)){
+                            Calendar calendar = Calendar.getInstance();
+                            calendar.setTime(sdf.parse(endMonthStr + "-01"));
+                            calendar.add(Calendar.MONTH, -1);//当前时间前去一个月，即一个月前的时间
+                            lastMontStr = sdf.format(calendar.getTime()).substring(0,7);
+                        }else {
+                            lastMontStr = starthMonthStr;
+                        }
                         for(Map<String,Object> dataMap : dataList){
                             if(dataMap.get(dimension) != null){
                                 String val = dataMap.get(dimension).toString();

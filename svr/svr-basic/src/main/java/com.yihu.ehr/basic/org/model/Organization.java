@@ -151,21 +151,106 @@ public class Organization  {
     @Column(name = "berth",nullable = true)
     private Integer berth;  //核定床位
 
+    @Column(name = "hos_hierarchy", nullable = true)
     private String hosHierarchy;//医院等次 ：1：特等、2：甲等、3：乙等、4：丙等、9：未评
 
+    @Column(name = "hos_economic", nullable = true)
     private String hosEconomic;//经济类型代码 与 资源字典对应
 
+    @Column(name = "classification", nullable = true)
     private String classification;//卫生机构分类，值参考系统字典卫生机构分类
 
+    @Column(name = "big_classification", nullable = true)
     private String bigClassification;//卫生机构大分类，值参考系统字典卫生机构大分类
 
+    @Column(name = "nature", nullable = true)
     private String nature;//机构性质1，1公立、2民营
 
+    @Column(name = "branch_type", nullable = true)
     private String branchType;//机构性质Ⅱ，1总院、2分院
 
+    @Column(name = "display_status", nullable = true)
     private String displayStatus;//与总部同步数据补充字段是否开放显示：0：不显示 1:显示
 
+    @Column(name = "jkzl_org_id", nullable = true)
     private String jkzlOrgId;//总部机构id-同步数据使用
+    @Column(name = "host_unit", nullable = true)
+    private String hostUnit;     //	主办单位
+
+    @Column(name = "hos_manage_type", nullable = true)
+    private String hosManageType;     //	机构分类管理代码
+
+    @Column(name = "basic_unit_flag", nullable = true)
+    private String basicUnitFlag;     //	是否基层单位
+
+    @Column(name = "org_changes", nullable = true)
+    private String orgChanges;         //	机构变动情况
+
+    @Column(name = "hos_type_name", nullable = true)
+    private String hosTypeName;     // 机构类别代码名称
+
+    @Column(name = "street_id", nullable = true)
+    private String streetId;     // 街道/乡镇代码
+
+    @Column(name = "discharge_patient_flag", nullable = true)
+    private String dischargePatientFlag;    //	是否填报出院病人表
+
+    @Column(name = "reporting_clinic_flag", nullable = true)
+    private String reportingClinicFlag;    //	是否代报诊所
+
+    @Column(name = "reporting_village_clinic_flag", nullable = true)
+    private String reportingVillageClinicFlag;    //	是否代报村卫生室
+
+    @Column(name = "reporting_org", nullable = true)
+    private String reportingOrg;        // 诊所、村卫生室所属代报机构
+
+    @Column(name = "founding_time", nullable = true)
+    private String foundingTime;    //	单位开业/成立时间
+
+    @Column(name = "registered_capital", nullable = true)
+    private String registeredCapital;    //	注册资金(万元)
+
+    @Column(name = "branch_org_flag", nullable = true)
+    private String branchOrgFlag;        // 是否分支机构
+
+    @Column(name = "postalcode", nullable = true)
+    private String postalcode;    //	邮政编码
+
+    @Column(name = "email", nullable = true)
+    private String email;        // 电子邮箱
+
+    @Column(name = "domain_name", nullable = true)
+    private String domainName;        // 单位网站域名
+
+    @Column(name = "registration_number", nullable = true)
+    private String registrationNumber;    //	批准文号/注册号
+
+    @Column(name = "registration_ratification_agency", nullable = true)
+    private String registrationRatificationAgency;    //	登记批准机构
+
+    @Column(name = "certificate_date", nullable = true)
+    private String certificateDate;    //	办证日期
+
+    @Column(name = "operator", nullable = true)
+    private String operator;    //	经办人
+
+    @Column(name = "entry_staff", nullable = true)
+    private String entryStaff;     //	录入人
+
+    @Column(name = "create_time", nullable = true)
+    private String createTime;     //	新增机构创建时间
+
+    @Column(name = "cancel_time", nullable = true)
+    private String cancelTime;    //	作废日期
+
+    @Column(name = "term_validity_start", nullable = true)
+    private String termValidityStart;    //	有效期起
+
+    @Column(name = "term_validity_end", nullable = true)
+    private String termValidityEnd;    //	有效期止
+
+
+
 
     public Organization() {
         //tags = new HashSet<>();
@@ -583,5 +668,205 @@ public class Organization  {
 
     public void setJkzlOrgId(String jkzlOrgId) {
         this.jkzlOrgId = jkzlOrgId;
+    }
+
+    public String getHostUnit() {
+        return hostUnit;
+    }
+
+    public void setHostUnit(String hostUnit) {
+        this.hostUnit = hostUnit;
+    }
+
+    public String getHosManageType() {
+        return hosManageType;
+    }
+
+    public void setHosManageType(String hosManageType) {
+        this.hosManageType = hosManageType;
+    }
+
+    public String getBasicUnitFlag() {
+        return basicUnitFlag;
+    }
+
+    public void setBasicUnitFlag(String basicUnitFlag) {
+        this.basicUnitFlag = basicUnitFlag;
+    }
+
+    public String getOrgChanges() {
+        return orgChanges;
+    }
+
+    public void setOrgChanges(String orgChanges) {
+        this.orgChanges = orgChanges;
+    }
+
+    public String getHosTypeName() {
+        return hosTypeName;
+    }
+
+    public void setHosTypeName(String hosTypeName) {
+        this.hosTypeName = hosTypeName;
+    }
+
+    public String getStreetId() {
+        return streetId;
+    }
+
+    public void setStreetId(String streetId) {
+        this.streetId = streetId;
+    }
+
+    public String getDischargePatientFlag() {
+        return dischargePatientFlag;
+    }
+
+    public void setDischargePatientFlag(String dischargePatientFlag) {
+        this.dischargePatientFlag = dischargePatientFlag;
+    }
+
+    public String getReportingClinicFlag() {
+        return reportingClinicFlag;
+    }
+
+    public void setReportingClinicFlag(String reportingClinicFlag) {
+        this.reportingClinicFlag = reportingClinicFlag;
+    }
+
+    public String getReportingVillageClinicFlag() {
+        return reportingVillageClinicFlag;
+    }
+
+    public void setReportingVillageClinicFlag(String reportingVillageClinicFlag) {
+        this.reportingVillageClinicFlag = reportingVillageClinicFlag;
+    }
+
+    public String getReportingOrg() {
+        return reportingOrg;
+    }
+
+    public void setReportingOrg(String reportingOrg) {
+        this.reportingOrg = reportingOrg;
+    }
+
+    public String getFoundingTime() {
+        return foundingTime;
+    }
+
+    public void setFoundingTime(String foundingTime) {
+        this.foundingTime = foundingTime;
+    }
+
+    public String getRegisteredCapital() {
+        return registeredCapital;
+    }
+
+    public void setRegisteredCapital(String registeredCapital) {
+        this.registeredCapital = registeredCapital;
+    }
+
+    public String getBranchOrgFlag() {
+        return branchOrgFlag;
+    }
+
+    public void setBranchOrgFlag(String branchOrgFlag) {
+        this.branchOrgFlag = branchOrgFlag;
+    }
+
+    public String getPostalcode() {
+        return postalcode;
+    }
+
+    public void setPostalcode(String postalcode) {
+        this.postalcode = postalcode;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getDomainName() {
+        return domainName;
+    }
+
+    public void setDomainName(String domainName) {
+        this.domainName = domainName;
+    }
+
+    public String getRegistrationNumber() {
+        return registrationNumber;
+    }
+
+    public void setRegistrationNumber(String registrationNumber) {
+        this.registrationNumber = registrationNumber;
+    }
+
+    public String getRegistrationRatificationAgency() {
+        return registrationRatificationAgency;
+    }
+
+    public void setRegistrationRatificationAgency(String registrationRatificationAgency) {
+        this.registrationRatificationAgency = registrationRatificationAgency;
+    }
+
+    public String getCertificateDate() {
+        return certificateDate;
+    }
+
+    public void setCertificateDate(String certificateDate) {
+        this.certificateDate = certificateDate;
+    }
+
+    public String getOperator() {
+        return operator;
+    }
+
+    public void setOperator(String operator) {
+        this.operator = operator;
+    }
+
+    public String getEntryStaff() {
+        return entryStaff;
+    }
+
+    public void setEntryStaff(String entryStaff) {
+        this.entryStaff = entryStaff;
+    }
+
+    public String getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(String createTime) {
+        this.createTime = createTime;
+    }
+
+    public String getCancelTime() {
+        return cancelTime;
+    }
+
+    public void setCancelTime(String cancelTime) {
+        this.cancelTime = cancelTime;
+    }
+
+    public String getTermValidityStart() {
+        return termValidityStart;
+    }
+
+    public void setTermValidityStart(String termValidityStart) {
+        this.termValidityStart = termValidityStart;
+    }
+
+    public String getTermValidityEnd() {
+        return termValidityEnd;
+    }
+
+    public void setTermValidityEnd(String termValidityEnd) {
+        this.termValidityEnd = termValidityEnd;
     }
 }

@@ -673,8 +673,8 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
                 envelop.setSuccessFlg(true);
                 envelop.setDetailModelList(list);
             }else{
-                //未关联用户返回失败
-                envelop.setSuccessFlg(false);
+                //未关联用户返回空list
+                envelop.setSuccessFlg(true);
             }
         } catch (ParseException e) {
             envelop.setSuccessFlg(false);
