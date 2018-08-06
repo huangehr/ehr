@@ -55,29 +55,83 @@ public class DataQualityStatisticsService extends BaseJpaService {
     private String cloudName;
 
 
+    public Map<String,Object> getOrgMap(){
+        //初始化 数据集数据
+        Session session = currentSession();
+        //获取医院数据
+        Query query1 = session.createSQLQuery("SELECT org_code,full_name from organizations where org_type = 'Hospital' ");
+        List<Object[]> orgList = query1.list();
+        Map<String, Object> orgMap = new HashedMap();
+        orgList.forEach(one->{
+            String orgCode = one[0].toString();
+            String name = one[1].toString();
+            orgMap.put(orgCode,name);
+        });
+        return orgMap;
+    }
+
     /**
      *  省平台上传-统计数据  获取
-     * @param filters   查询条件
+     * @param toPlatForm   上传到的平台
      * @return
      * @throws Exception
      */
-    public List<Map<String,Object>> findUploadStatistics (String filters) throws Exception{
-        String newFilters = "";
+    public List<Map<String,Object>> findUploadStatistics (String start, String end,String toPlatForm) throws Exception{
         List<Map<String,Object>> result = new ArrayList<>();
+        String dateStr = DateUtil.toString(new Date());
+        if(StringUtils.isBlank(start)){
+            start = dateStr;
+        }
+        if(StringUtils.isBlank(end)){
+            end = dateStr;
+        }
+        StringBuilder filter = new StringBuilder();
+        filter.append("analyze_date>=").append(start).append(";");
+        filter.append("analyze_date<=").append(end).append(";");
+
+        String newFilters = "";
         //上传总档案量
-        Map<String, Long> totalCount = elasticSearchUtil.countByGroup("upload", "record", filters,"org_code");
+        Map<String, Long> totalCount = elasticSearchUtil.countByGroup("upload", "record", filter.toString(),"org_code");
         // 门诊量
-        newFilters = new String(filters+"event_type:0;");
+        newFilters = new String(filter.toString()+"event_type:0;");
         Map<String, Long> outPatientCount = elasticSearchUtil.countByGroup("upload", "record", newFilters,"org_code");
         // 住院量
-        newFilters = new String(filters+"event_type:1;");
+        newFilters = new String(filter.toString()+"event_type:1;");
         Map<String, Long> inPatientCount = elasticSearchUtil.countByGroup("upload", "record", newFilters,"org_code");
         // 体检量
-        newFilters = new String(filters+"event_type:2;");
+        newFilters = new String(filter.toString()+"event_type:2;");
         Map<String, Long> examCount = elasticSearchUtil.countByGroup("upload", "record", newFilters,"org_code");
         // 数据集量
-
+        if (!StringUtils.isEmpty(toPlatForm)) {
+            newFilters = new String(filter.toString()+"to_platform:"+ toPlatForm +";");
+        }else {
+            newFilters = filter.toString();
+        }
+        Map<String, Double> dataSetCount = elasticSearchUtil.sumtByGroup("upload", "qc_dataset_detail", newFilters,"row","org_code");
         // 上传异常的数据量
+        filter = new StringBuilder();
+        filter.append("create_date>=").append(start).append(";");
+        filter.append("create_date<=").append(end).append(";");
+        Map<String, Long> errorDataCount = elasticSearchUtil.countByGroup("upload", "info", filter.toString(),"org_code");
+
+        //获取医院信息
+        Map<String,Object> orgMap = getOrgMap();
+        //整理统计数据
+        Iterator<String> iterator = totalCount.keySet().iterator();
+        Map<String,Object> map = null;
+        while (iterator.hasNext()) {
+            map = new HashMap<>();
+            String orgCode = iterator.next();
+            map.put("orgCode",orgCode);
+            map.put("orgName",orgMap.get(orgCode));
+            map.put("total",totalCount.get(orgCode));
+            map.put("outPatient",outPatientCount.get(orgCode));
+            map.put("inPatient",inPatientCount.get(orgCode));
+            map.put("exam",examCount.get(orgCode));
+            map.put("dataset",dataSetCount.get(orgCode));
+            map.put("error",errorDataCount.get(orgCode));
+            result.add(map);
+        }
 
         return result;
     }
@@ -753,10 +807,10 @@ public class DataQualityStatisticsService extends BaseJpaService {
                 dataMap1.put("totalOutpatient",HSI07_01_002);
                 dataMap1.put("totalPe",HSI07_01_004);
                 dataMap1.put("totalHospital",HSI07_01_012);
-                totalVisitNum+=HSI07_01_001;
-                totalOutpatientNum+=HSI07_01_002;
-                totalPeNum+=HSI07_01_004;
-                totalHospitalNum+=HSI07_01_012;
+                totalVisitNum += HSI07_01_001;
+                totalOutpatientNum += HSI07_01_002;
+                totalPeNum += HSI07_01_004;
+                totalHospitalNum += HSI07_01_012;
                 dataMap.put(orgCode,dataMap1);
             }
         }catch (Exception e){
@@ -771,7 +825,10 @@ public class DataQualityStatisticsService extends BaseJpaService {
             ResultSet resultSetOrg = elasticSearchUtil.findBySql(sqlOrg);
             while (resultSetOrg.next()) {
                 String orgCode = resultSetOrg.getString("org_code");
-                dataMap.put(orgCode,initRateMap(warningMap,orgMap.get(orgCode),orgCode));
+                Map<String, Object> map = dataMap.get(orgCode);
+                if(map == null){
+                    dataMap.put(orgCode,initRateMap(warningMap,orgMap.get(orgCode),orgCode));
+                }
             }
         }catch (Exception e){
             if(!"Error".equals(e.getMessage())){
@@ -876,7 +933,6 @@ public class DataQualityStatisticsService extends BaseJpaService {
             double totalOutpatient = Double.parseDouble(map.get("totalOutpatient").toString());//总门诊数
             double totalPe = Double.parseDouble(map.get("totalPe").toString());//总体检数
             double totalHospital = Double.parseDouble(map.get("totalHospital").toString());//总住院数
-
             double visitIntime = outpatientInTime + hospitalInTime + peInTime;
             double visitIntegrity = outpatientIntegrity + hospitalIntegrity + peIntegrity;
             map.put("visitIntime", visitIntime);
