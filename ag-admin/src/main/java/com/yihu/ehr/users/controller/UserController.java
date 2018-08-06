@@ -203,13 +203,6 @@ public class UserController extends BaseController {
     public Envelop deleteUser(
             @ApiParam(name = "user_id", value = "用户编号", defaultValue = "")
             @PathVariable(value = "user_id") String userId) {
-
-//        MKey userSecurity = securityClient.getUserSecurityByUserId(userId);
-//        if (userSecurity != null) {
-//            String userKeyId = securityClient.getUserKeyByUserId(userId);
-//            securityClient.deleteSecurity(userSecurity.getId());
-//            securityClient.deleteUserKey(userKeyId);
-//        }
         try {
             // 删除用户秘钥信息
             boolean _res = securityClient.deleteKeyByUserId(userId);
@@ -325,12 +318,11 @@ public class UserController extends BaseController {
                 }
             }else{
                 Envelop envelop = roleUserClient.setUserRolesForUpdate(mUser.getId(), Integer.parseInt(mUser.getUserType().toString()));
-                if(envelop.isSuccessFlg()){
-                    detailModel = convertToUserDetailModel(mUser);
-                }else {
+                if(!envelop.isSuccessFlg()){
                     return failed("用户新增成功，但授权失败，请重新手动进行授权配置！");
                 }
             }
+            detailModel = convertToUserDetailModel(mUser);
             return success(detailModel);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -663,10 +655,9 @@ public class UserController extends BaseController {
         }
 
         //获取机构信息
-        List<MOrgDeptJson> orgDeptDatas = orgDeptMemberClient.getByUserId(detailModel.getId().toString());
-        if(orgDeptDatas != null && orgDeptDatas.size() >0){
-            String orgInfo = orgDeptDatas.toString();
-            detailModel.setOrganization(orgInfo);
+        if (StringUtils.isNotEmpty(mUser.getId())) {
+            List<MOrgDeptJson> orgDeptJsonList = orgDeptMemberClient.getByUserId(mUser.getId());
+            detailModel.setDetailModelList(orgDeptJsonList);
         }
 
         //获取秘钥信息
