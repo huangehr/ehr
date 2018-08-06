@@ -20,10 +20,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.springframework.util.StringUtils;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -43,8 +40,6 @@ public class HttpUtils {
     }
 
     public static HttpResponse doGet(String url, Map<String, Object> params, Map<String, String> headers, String username, String password) throws Exception {
-        String response;
-        int status;
         CloseableHttpClient httpClient = null;
         CloseableHttpResponse closeableHttpResponse = null;
         List<NameValuePair> nameValuePairList = new ArrayList<NameValuePair>();
@@ -74,8 +69,11 @@ public class HttpUtils {
             }
             closeableHttpResponse = httpClient.execute(httpGet);
             HttpEntity resEntity = closeableHttpResponse.getEntity();
-            status = closeableHttpResponse.getStatusLine().getStatusCode();
-            response = getRespString(resEntity);
+            int status = closeableHttpResponse.getStatusLine().getStatusCode();
+            if (status != HttpStatus.SC_OK) {
+                LogService.getLogger().error(" GET: " + url + " " + status);
+            }
+            return getResp(status, resEntity);
         } finally {
             try {
                 if (closeableHttpResponse != null) {
@@ -84,16 +82,10 @@ public class HttpUtils {
                 if (httpClient != null) {
                     httpClient.close();
                 }
-            }catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        if (status != HttpStatus.SC_OK) {
-            LogService.getLogger().error(" GET: " + url + " " + status);
-        }
-        HttpResponse httpResponse = new HttpResponse(status, response);
-        return httpResponse;
-
     }
 
     public static HttpResponse doPost(String url, Map<String, Object> params) throws Exception {
@@ -105,8 +97,6 @@ public class HttpUtils {
     }
 
     public static HttpResponse doPost(String url, Map<String, Object> params, Map<String, String> headers, String username, String password) throws Exception{
-        String response;
-        int status;
         CloseableHttpClient httpClient = null;
         CloseableHttpResponse closeableHttpResponse = null;
         HttpPost httpPost = new HttpPost(url);
@@ -136,8 +126,11 @@ public class HttpUtils {
             }
             closeableHttpResponse = httpClient.execute(httpPost);
             HttpEntity resEntity = closeableHttpResponse.getEntity();
-            status = closeableHttpResponse.getStatusLine().getStatusCode();
-            response = getRespString(resEntity);
+            int status = closeableHttpResponse.getStatusLine().getStatusCode();
+            if (status != HttpStatus.SC_OK) {
+                LogService.getLogger().error(" POST: " + url + " " + status);
+            }
+            return getResp(status, resEntity);
         } finally {
             try {
                 if (closeableHttpResponse != null) {
@@ -146,20 +139,13 @@ public class HttpUtils {
                 if (httpClient != null) {
                     httpClient.close();
                 }
-            }catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        if(status != HttpStatus.SC_OK) {
-            LogService.getLogger().error(" POST: " + url + " " + status);
-        }
-        HttpResponse httpResponse = new HttpResponse(status, response);
-        return httpResponse;
     }
 
     public static HttpResponse doJsonPost(String url, String jsonData, Map<String, String> headers, String username, String password) throws Exception{
-        String response;
-        int status;
         CloseableHttpClient httpClient = null;
         CloseableHttpResponse closeableHttpResponse = null;
         HttpPost httpPost = new HttpPost(url);
@@ -181,8 +167,11 @@ public class HttpUtils {
             }
             closeableHttpResponse = httpClient.execute(httpPost);
             HttpEntity resEntity = closeableHttpResponse.getEntity();
-            status = closeableHttpResponse.getStatusLine().getStatusCode();
-            response = getRespString(resEntity);
+            int status = closeableHttpResponse.getStatusLine().getStatusCode();
+            if (status != HttpStatus.SC_OK) {
+                LogService.getLogger().error(" POST: " + url + " " + status);
+            }
+            return getResp(status, resEntity);
         } finally {
             try {
                 if (closeableHttpResponse != null) {
@@ -195,11 +184,6 @@ public class HttpUtils {
                 e.printStackTrace();
             }
         }
-        if(status != HttpStatus.SC_OK) {
-            LogService.getLogger().error(" POST: " + url + " " + status);
-        }
-        HttpResponse httpResponse = new HttpResponse(status, response);
-        return httpResponse;
     }
 
     public static HttpResponse doPut(String url, Map<String, Object> params) throws Exception {
@@ -211,8 +195,6 @@ public class HttpUtils {
     }
 
     public static HttpResponse doPut(String url, Map<String, Object> params, Map<String, String> headers, String username, String password) throws Exception {
-        String response;
-        int status;
         CloseableHttpClient httpClient = null;
         CloseableHttpResponse closeableHttpResponse = null;
         HttpPut httpPut = new HttpPut(url);
@@ -242,8 +224,11 @@ public class HttpUtils {
             }
             closeableHttpResponse = httpClient.execute(httpPut);
             HttpEntity resEntity = closeableHttpResponse.getEntity();
-            status = closeableHttpResponse.getStatusLine().getStatusCode();
-            response = getRespString(resEntity);
+            int status = closeableHttpResponse.getStatusLine().getStatusCode();
+            if (status != HttpStatus.SC_OK) {
+                LogService.getLogger().error(" PUT: " + url + " " + status);
+            }
+            return getResp(status, resEntity);
         } finally {
             try {
                 if (closeableHttpResponse != null) {
@@ -256,16 +241,9 @@ public class HttpUtils {
                 e.printStackTrace();
             }
         }
-        if (status != HttpStatus.SC_OK) {
-            LogService.getLogger().error(" PUT: " + url + " " + status);
-        }
-        HttpResponse httpResponse = new HttpResponse(status, response);
-        return httpResponse;
     }
 
     public static HttpResponse doJsonPut(String url, String jsonData, Map<String, String> headers, String username, String password) throws Exception {
-        String response;
-        int status;
         CloseableHttpClient httpClient = null;
         CloseableHttpResponse closeableHttpResponse = null;
         HttpPut httpPut = new HttpPut(url);
@@ -287,8 +265,11 @@ public class HttpUtils {
             }
             closeableHttpResponse = httpClient.execute(httpPut);
             HttpEntity resEntity = closeableHttpResponse.getEntity();
-            status = closeableHttpResponse.getStatusLine().getStatusCode();
-            response = getRespString(resEntity);
+            int status = closeableHttpResponse.getStatusLine().getStatusCode();
+            if (status != HttpStatus.SC_OK) {
+                LogService.getLogger().error(" PUT: " + url + " " + status);
+            }
+            return getResp(status, resEntity);
         } finally {
             try {
                 if (closeableHttpResponse != null) {
@@ -301,11 +282,6 @@ public class HttpUtils {
                 e.printStackTrace();
             }
         }
-        if (status != HttpStatus.SC_OK) {
-            LogService.getLogger().error(" PUT: " + url + " " + status);
-        }
-        HttpResponse httpResponse = new HttpResponse(status, response);
-        return httpResponse;
     }
 
     public static HttpResponse doDelete(String url, Map<String, Object> params) throws Exception {
@@ -317,8 +293,6 @@ public class HttpUtils {
     }
 
     public static HttpResponse doDelete(String url, Map<String, Object> params, Map<String, String> headers, String username, String password) throws Exception {
-        String response;
-        int status;
         CloseableHttpClient httpClient = null;
         CloseableHttpResponse closeableHttpResponse = null;
         List<NameValuePair> nameValuePairList = new ArrayList<NameValuePair>();
@@ -348,8 +322,11 @@ public class HttpUtils {
             }
             closeableHttpResponse = httpClient.execute(httpDelete);
             HttpEntity resEntity = closeableHttpResponse.getEntity();
-            status = closeableHttpResponse.getStatusLine().getStatusCode();
-            response = getRespString(resEntity);
+            int status = closeableHttpResponse.getStatusLine().getStatusCode();
+            if (status != HttpStatus.SC_OK) {
+                LogService.getLogger().error(" DELETE: " + url + " " + status);
+            }
+            return getResp(status, resEntity);
         } finally {
             try {
                 if (closeableHttpResponse != null) {
@@ -362,30 +339,27 @@ public class HttpUtils {
                 e.printStackTrace();
             }
         }
-        if (status != HttpStatus.SC_OK) {
-            LogService.getLogger().error(" DELETE: " + url + " " + status);
-        }
-        HttpResponse httpResponse = new HttpResponse(status, response);
-        return httpResponse;
     }
 
     public static HttpResponse doUpload(String url, Map<String, Object> params, File file) throws Exception {
-        return doUpload(url, params, null, file, null, null);
+        return doUpload(url, params, null, file);
     }
 
     public static HttpResponse doUpload(String url, Map<String, Object> params, Map<String, String> headers, File file) throws Exception {
-        return doUpload(url, params, headers, file, null, null);
+        return doUpload(url, params, headers, "file", file);
     }
 
-    public static HttpResponse doUpload(String url, Map<String, Object> params, Map<String, String> headers, File file, String username, String password) throws Exception {
-        String response;
-        int status;
+    public static HttpResponse doUpload(String url, Map<String, Object> params, Map<String, String> headers, String fileKey, File file) throws Exception {
+        return doUpload(url, params, headers, fileKey, file, null, null);
+    }
+
+    public static HttpResponse doUpload(String url, Map<String, Object> params, Map<String, String> headers, String fileKey, File file, String username, String password) throws Exception {
         CloseableHttpClient httpClient = null;
         CloseableHttpResponse closeableHttpResponse = null;
         HttpPost httpPost = new HttpPost(url);
         MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create();
         FileBody fileBody = new FileBody(file);
-        multipartEntityBuilder.addPart("file", fileBody);
+        multipartEntityBuilder.addPart(fileKey, fileBody);
         if (params != null) {
             for (String key : params.keySet()) {
                 Object value = params.get(key);
@@ -412,8 +386,11 @@ public class HttpUtils {
             }
             closeableHttpResponse = httpClient.execute(httpPost);
             HttpEntity resEntity = closeableHttpResponse.getEntity();
-            status = closeableHttpResponse.getStatusLine().getStatusCode();
-            response = getRespString(resEntity);
+            int status = closeableHttpResponse.getStatusLine().getStatusCode();
+            if (status != HttpStatus.SC_OK) {
+                LogService.getLogger().error(" POST UPLOAD: " + url + " " + status);
+            }
+            return getResp(status, resEntity);
         } finally {
             try {
                 if (closeableHttpResponse != null) {
@@ -422,20 +399,68 @@ public class HttpUtils {
                 if (httpClient != null) {
                     httpClient.close();
                 }
-            }catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        if (status != HttpStatus.SC_OK) {
-            LogService.getLogger().error(" POST UPLOAD: " + url + " " + status);
-        }
-        HttpResponse httpResponse = new HttpResponse(status, response);
-        return httpResponse;
     }
 
-    private static String getRespString(HttpEntity entity) throws Exception {
-        if (entity == null) {
-            return null;
+    public static File download(String url, String filePath, Map<String, Object> params, Map<String, String> headers) throws Exception {
+        return download(url, filePath, params, headers, null, null);
+    }
+
+    public static File download(String url, String filePath, Map<String, Object> params, Map<String, String> headers, String username, String password) throws Exception {
+        CloseableHttpClient httpClient = null;
+        CloseableHttpResponse closeableHttpResponse = null;
+        List<NameValuePair> nameValuePairList = new ArrayList<NameValuePair>();
+        if (params != null) {
+            for (String key : params.keySet()) {
+                Object value = params.get(key);
+                if (value != null) {
+                    nameValuePairList.add(new BasicNameValuePair(key, String.valueOf(params.get(key))));
+                }
+            }
+        }
+        String paramStr = EntityUtils.toString(new UrlEncodedFormEntity(nameValuePairList, "UTF-8"));
+        HttpGet httpGet = new HttpGet(url + "?" + paramStr);
+        if (headers != null) {
+            for (String key : headers.keySet()) {
+                httpGet.addHeader(key, headers.get(key));
+            }
+        }
+        try {
+            if (!StringUtils.isEmpty(username) && !StringUtils.isEmpty(password)) {
+                UsernamePasswordCredentials usernamePasswordCredentials = new UsernamePasswordCredentials(username, password);
+                CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+                credentialsProvider.setCredentials(AuthScope.ANY, usernamePasswordCredentials);
+                httpClient = HttpClients.custom().setDefaultCredentialsProvider(credentialsProvider).build();
+            } else {
+                httpClient = HttpClients.createDefault();
+            }
+            closeableHttpResponse = httpClient.execute(httpGet);
+            HttpEntity resEntity = closeableHttpResponse.getEntity();
+            int status = closeableHttpResponse.getStatusLine().getStatusCode();
+            if (status != HttpStatus.SC_OK) {
+                LogService.getLogger().error(" DOWNLOAD: " + url + " " + status);
+            }
+            return getRespFile(filePath, resEntity);
+        } finally {
+            try {
+                if (closeableHttpResponse != null) {
+                    closeableHttpResponse.close();
+                }
+                if (httpClient != null) {
+                    httpClient.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private static HttpResponse getResp(int status, HttpEntity entity) throws Exception {
+        if (null == entity) {
+            return new HttpResponse(status, null);
         }
         InputStream is = entity.getContent();
         BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
@@ -444,7 +469,29 @@ public class HttpUtils {
         while ((line = reader.readLine()) != null) {
             stringBuilder.append(line);
         }
-        return stringBuilder.toString();
+        return new HttpResponse(status, stringBuilder.toString());
     }
 
+    private static File getRespFile(String filePath, HttpEntity entity) throws Exception {
+        if (entity == null) {
+            return null;
+        }
+        FileOutputStream outputStream = null;
+        try {
+            InputStream inputStream = entity.getContent();
+            File file = new File(filePath);
+            outputStream = new FileOutputStream(file);
+            byte [] buff = new byte[1024];
+            int j;
+            while ((j = inputStream.read(buff)) != -1) {
+                outputStream.write(buff, 0, j);
+            }
+            outputStream.flush();
+            return file;
+        } finally {
+            if (outputStream != null) {
+                outputStream.close();
+            }
+        }
+    }
 }

@@ -1,6 +1,5 @@
 package com.yihu.ehr.analyze.service.pack;
 
-import com.yihu.ehr.elasticsearch.ElasticSearchClient;
 import com.yihu.ehr.elasticsearch.ElasticSearchPool;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.model.quality.MProfileInfo;
@@ -49,8 +48,6 @@ public class PackQcReportService extends BaseJpaService {
     @Autowired
     private ElasticSearchPool elasticSearchPool;
     @Autowired
-    private ElasticSearchClient elasticSearchClient;
-    @Autowired
     private JdbcTemplate jdbcTemplate;
     @Autowired
     private RedisClient redisClient;
@@ -89,7 +86,7 @@ public class PackQcReportService extends BaseJpaService {
             MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery("org_code", orgCode);
             boolQueryBuilder.must(matchQueryBuilder);
         }
-        List<Map<String, Object>> res = elasticSearchClient.findByField("qc","daily_report", boolQueryBuilder);
+        List<Map<String, Object>> res = elasticSearchUtil.list("qc","daily_report", boolQueryBuilder);
         if(res!=null && res.size()>0){
             for(Map<String,Object> report : res){
                 total+=Integer.parseInt(report.get("HSI07_01_001").toString());

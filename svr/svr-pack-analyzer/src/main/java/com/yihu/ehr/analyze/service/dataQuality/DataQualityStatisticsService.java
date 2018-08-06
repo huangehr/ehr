@@ -107,7 +107,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
         }else {
             newFilters = filter.toString();
         }
-        Map<String, Double> dataSetCount = elasticSearchUtil.sumtByGroup("upload", "qc_dataset_detail", newFilters,"row","org_code");
+        Map<String, Double> dataSetCount = elasticSearchUtil.sumByGroup("upload", "qc_dataset_detail", newFilters,"row","org_code");
         // 上传异常的数据量
         filter = new StringBuilder();
         filter.append("create_date>=").append(start).append(";");
