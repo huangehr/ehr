@@ -49,6 +49,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * Created by AndyCai on 2016/1/21.
@@ -169,7 +170,7 @@ public class UserController extends BaseController {
             //usersModel.setLastLoginTime(DateToString( mUser.getLastLoginTime(),AgAdminConstants.DateTimeFormat));
             usersModel.setLastLoginTime(mUser.getLastLoginTime() == null ? "" : DateTimeUtil.simpleDateTimeFormat(mUser.getLastLoginTime()));
 
-            if (StringUtils.isNotEmpty(mUser.getUserType())) {
+            if (StringUtils.isNotEmpty(mUser.getUserType())&& isInteger(mUser.getUserType())) {
                 int userTypeInt = Integer.parseInt(mUser.getUserType().toString());
                 Envelop envStr = roleUserClient.GetUserTypeById(userTypeInt);
                 if(envStr != null){
@@ -253,7 +254,7 @@ public class UserController extends BaseController {
     @ApiOperation(value = "创建用户", notes = "重新绑定用户信息")
     public Envelop createUser(
             @ApiParam(name = "user_json_data", value = "", defaultValue = "")
-            @RequestParam(value = "user_json_data") String userJsonData) {
+            @RequestParam(value = "user_json_data",required = true) String userJsonData) {
         try {
             UserDetailModel detailModel = objectMapper.readValue(userJsonData, UserDetailModel.class);
             PatientDetailModel patientModel = objectMapper.readValue(userJsonData, PatientDetailModel.class);
@@ -315,7 +316,7 @@ public class UserController extends BaseController {
                 return failed("保存失败!");
             }
             //新增时先新增用户再保存所属角色组-人员关系表，用户新增失败（新增失败）、角色组关系表新增失败（删除新增用户-提示新增失败）
-            if(!(detailModel.getRole() == null)){
+            if(!(detailModel.getRole() == null)&&StringUtils.isNotEmpty(detailModel.getRole())){
                 String roles = detailModel.getRole();
                 boolean bo = roleUserClient.batchCreateRolUsersRelation(mUser.getId(), roles);
                 if (!bo) {
@@ -1021,6 +1022,11 @@ public class UserController extends BaseController {
             ex.printStackTrace();
             return failed(ex.getMessage());
         }
+    }
+
+    public static boolean isInteger(String str) {
+        Pattern pattern = Pattern.compile("^[-\\+]?[\\d]*$");
+        return pattern.matcher(str).matches();
     }
 
 }

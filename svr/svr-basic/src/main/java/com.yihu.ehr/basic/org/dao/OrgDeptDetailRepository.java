@@ -17,4 +17,7 @@ public interface OrgDeptDetailRepository extends PagingAndSortingRepository<OrgD
     @Query("select deptDetail from OrgDeptDetail deptDetail where deptDetail.deptId = :deptId order by deptDetail.insertTime desc ")
     List<OrgDeptDetail> searchByDeptId(@Param("deptId") Integer deptId);
 
+    @Query("select deptDetail from OrgDeptDetail deptDetail where deptDetail.id = :id ")
+    OrgDeptDetail findOrgDeptDetailsById(@Param("id") Integer id);
+
 }
