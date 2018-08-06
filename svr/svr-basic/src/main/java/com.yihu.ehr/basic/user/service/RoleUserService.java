@@ -197,9 +197,9 @@ public class RoleUserService extends BaseJpaService<RoleUser,RoleUserDao> {
             List<Map<String,Object>> listTemp = null;
             List<Map<String,Object>> list = jdbcTemplate.queryForList(sql);
             for(Map<String,Object> map:list){
-                String app_id = map.get("app_id").toString();
-                String app_name = map.get("app_name").toString();
-                String user_name = map.get("user_name").toString();
+                String app_id = map.get("app_id")==null?"":map.get("app_id").toString();
+                String app_name = map.get("app_name")==null?"":map.get("app_name").toString();
+                String user_name = map.get("user_name")==null?"":map.get("user_name").toString();
                 String org_id = map.get("org_id")==null?"":map.get("org_id").toString();
                 String org_name = map.get("org_name")==null?"":map.get("org_name").toString();
 

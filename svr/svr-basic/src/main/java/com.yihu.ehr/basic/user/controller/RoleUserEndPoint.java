@@ -422,7 +422,7 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
                             orgMemberRelation.setOrgId(orgId);
                             Organization org = orgService.getOrgById(orgId);
                             if(org != null){
-                                orgMemberRelation.setOrgName(org.getShortName());
+                                orgMemberRelation.setOrgName(org.getFullName());
                             }
 
                             // 获取部门关联信息 - 名称
