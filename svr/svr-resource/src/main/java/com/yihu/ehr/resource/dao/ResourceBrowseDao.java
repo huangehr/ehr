@@ -602,10 +602,10 @@ public class ResourceBrowseDao {
      * @throws Exception
      */
     public Envelop getEhrFile(String filters, String sorts, Integer page, Integer size) throws Exception {
-        List<Map<String, Object>> esList = elasticSearchUtil.page(INDEX, TYPE, filters, sorts, page, size);
-        List<String> rowkeys = new ArrayList<>(esList.size());
+        Page<Map<String, Object>> esList = elasticSearchUtil.page(INDEX, TYPE, filters, sorts, page, size);
+        List<String> rowkeys = new ArrayList<>();
         esList.forEach(item -> rowkeys.add((String) item.get("_id")));
-        List<Map<String, Object>> hbaseList = new ArrayList<>(esList.size());
+        List<Map<String, Object>> hbaseList = new ArrayList<>();
         Result[] results = hbaseDao.getResultList("HealthFile", rowkeys, "", ""); //hbase结果集
         if (results != null && results.length > 0) {
             for (Result result : results) {
@@ -627,12 +627,11 @@ public class ResourceBrowseDao {
                 }
             }
         }
-        int count = (int) elasticSearchUtil.count(INDEX, TYPE, filters);
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(true);
         envelop.setCurrPage(page);
         envelop.setPageSize(size);
-        envelop.setTotalCount(count);
+        envelop.setTotalCount((int)esList.getTotalElements());
         envelop.setDetailModelList(hbaseList);
         return envelop;
     }

@@ -7,6 +7,7 @@ import com.yihu.ehr.redis.client.RedisClient;
 import com.yihu.ehr.util.datetime.DateUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -52,9 +53,9 @@ public class QcDataSetDetailJob {
             int count = (int) elasticSearchUtil.count("json_archives_qc", "qc_dataset_info", stringBuilder.toString());
             double pageNum = count % 1000 > 0 ? count / 1000 + 1 : count / 1000;
             for (int i = 0; i < pageNum; i++) {
-                List<Map<String, Object>> list = elasticSearchUtil.page("json_archives_qc", "qc_dataset_info", stringBuilder.toString(), i + 1, 1000);
+                Page<Map<String, Object>> result = elasticSearchUtil.page("json_archives_qc", "qc_dataset_info", stringBuilder.toString(), i + 1, 1000);
                 System.out.println("查询耗时：" + (System.currentTimeMillis() - starttime) + "ms");
-                for (Map<String, Object> map : list) {
+                for (Map<String, Object> map : result) {
                     List<Map<String, Object>> dataSets = objectMapper.readValue(map.get("details").toString(), List.class);
                     String eventType = map.get("event_type").toString();
                     for (Map<String, Object> dataSet : dataSets) {
