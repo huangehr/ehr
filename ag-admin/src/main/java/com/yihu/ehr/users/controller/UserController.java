@@ -254,9 +254,7 @@ public class UserController extends BaseController {
     public Envelop createUser(
             @ApiParam(name = "user_json_data", value = "", defaultValue = "")
             @RequestParam(value = "user_json_data") String userJsonData) {
-
         try {
-
             UserDetailModel detailModel = objectMapper.readValue(userJsonData, UserDetailModel.class);
             PatientDetailModel patientModel = objectMapper.readValue(userJsonData, PatientDetailModel.class);
             String idCard = detailModel.getIdCardNo();
@@ -274,10 +272,6 @@ public class UserController extends BaseController {
             }
             if (StringUtils.isEmpty(detailModel.getTelephone())) {
                 errorMsg += "电话号码不能为空!";
-            }
-            String roles = detailModel.getRole();
-            if (StringUtils.isEmpty(roles)) {
-                errorMsg += "用户角色不能为空!";
             }
             if (StringUtils.isNotEmpty(errorMsg)) {
                 return failed(errorMsg);
@@ -299,7 +293,7 @@ public class UserController extends BaseController {
             }else{
                 detailModel.setPassword(AgAdminConstants.DefaultPassword);
             }
-            detailModel.setRole(null);
+            //detailModel.setRole(null);
             MUser mUser = convertToMUser(detailModel);
 //            增加居民注册账号时身份证号的校验，demographics表中已存在，users表增加demographic_id身份证号关联
             mUser.setDemographicId(idCard);
@@ -321,13 +315,21 @@ public class UserController extends BaseController {
                 return failed("保存失败!");
             }
             //新增时先新增用户再保存所属角色组-人员关系表，用户新增失败（新增失败）、角色组关系表新增失败（删除新增用户-提示新增失败）
-            boolean bo = roleUserClient.batchCreateRolUsersRelation(mUser.getId(), roles);
-            if (!bo) {
-                userClient.deleteUser(mUser.getId());
-                return failed("保存失败!");
+            if(!(detailModel.getRole() == null)){
+                String roles = detailModel.getRole();
+                boolean bo = roleUserClient.batchCreateRolUsersRelation(mUser.getId(), roles);
+                if (!bo) {
+                    userClient.deleteUser(mUser.getId());
+                    return failed("保存失败!");
+                }
+            }else{
+                Envelop envelop = roleUserClient.setUserRolesForUpdate(mUser.getId(), Integer.parseInt(mUser.getUserType().toString()));
+                if(envelop.isSuccessFlg()){
+                    detailModel = convertToUserDetailModel(mUser);
+                }else {
+                    return failed("用户新增成功，但授权失败，请重新手动进行授权配置！");
+                }
             }
-
-            detailModel = convertToUserDetailModel(mUser);
             return success(detailModel);
         } catch (Exception ex) {
             ex.printStackTrace();
