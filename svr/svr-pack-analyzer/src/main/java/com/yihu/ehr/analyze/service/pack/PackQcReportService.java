@@ -3,14 +3,17 @@ package com.yihu.ehr.analyze.service.pack;
 import com.yihu.ehr.elasticsearch.ElasticSearchClient;
 import com.yihu.ehr.elasticsearch.ElasticSearchPool;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
+import com.yihu.ehr.model.quality.MProfileInfo;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.redis.client.RedisClient;
+import com.yihu.ehr.solr.SolrUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.solr.client.solrj.response.RangeFacet;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
@@ -51,6 +54,8 @@ public class PackQcReportService extends BaseJpaService {
     private JdbcTemplate jdbcTemplate;
     @Autowired
     private RedisClient redisClient;
+    @Autowired
+    private SolrUtil solrUtil;
     @Value("${quality.cloud}")
     private String cloud;
     protected final Log logger = LogFactory.getLog(this.getClass());
@@ -717,5 +722,74 @@ public class PackQcReportService extends BaseJpaService {
         envelop.setSuccessFlg(true);
         envelop.setObj(res);
         return envelop;
+    }
+
+    /**
+     * 通过solr查询某一段日期,各类型就诊数据
+     * 返回list<Map<String,>>
+     * @param startDate
+     * @param endDate
+     * @param orgCode
+     */
+    public List<MProfileInfo> getProfileInfo(String startDate, String endDate, String orgCode) throws Exception {
+        String q = "event_date:["+startDate+"T00:00:00Z TO "+ endDate +"T23:59:59Z]";
+        if(StringUtils.isNotBlank(orgCode)){
+            q += " AND org_code="+orgCode;
+        }
+
+        //查找门诊
+        List<RangeFacet> outRangeFacet = solrUtil.getFacetDateRange("HealthProfile", "event_date", startDate+"T23:59:59Z", endDate+"T23:59:59Z", "+1DAY", "event_type:0",q);
+        RangeFacet outPatientRangeFacet = outRangeFacet.get(0);
+        List<RangeFacet.Count> outCounts = outPatientRangeFacet.getCounts();
+        //查找住院
+        List<RangeFacet> inRangeFacet = solrUtil.getFacetDateRange("HealthProfile", "event_date", startDate+"T23:59:59Z", endDate+"T23:59:59Z", "+1DAY", "event_type:1",q);
+        RangeFacet inpatientRangeFacet = inRangeFacet.get(0);
+        List<RangeFacet.Count> inCounts = inpatientRangeFacet.getCounts();
+        //查找体检
+        List<RangeFacet> examRangeFacet = solrUtil.getFacetDateRange("HealthProfile", "event_date", startDate+"T23:59:59Z", endDate+"T23:59:59Z", "+1DAY", "event_type:2",q);
+        RangeFacet healRangeFacet = examRangeFacet.get(0);
+        List<RangeFacet.Count> healCounts = healRangeFacet.getCounts();
+
+        //前端需要list
+//        Map<String, Map<String,Integer>> dataMap = new LinkedHashMap<>(outRangeFacet.size());
+//        for (int i=0;i<inCounts.size();i++) {
+//            Map<String, Integer> map = new LinkedHashMap<>();
+//            map.put("out",outCounts.get(i).getCount());
+//            map.put("inp",inCounts.get(i).getCount());
+//            map.put("heal",healCounts.get(i).getCount());
+//            String date = outCounts.get(i).getValue().substring(0, 10);//日期
+//            dataMap.put(date, map);
+//        }
+//        return dataMap;
+        int healExamTotal = 0;
+        int outTotal = 0;
+        int inTotal = 0;
+        int hosTotal = 0;
+        List<MProfileInfo> list = new ArrayList();
+        for (int i=0;i<inCounts.size();i++) {
+            MProfileInfo profileInfo = new MProfileInfo();
+            profileInfo.setData(outCounts.get(i).getValue().substring(0, 10));
+            int healCount = healCounts.get(i).getCount();
+            healExamTotal += healCount;
+            profileInfo.setHealExam(healCount);
+            int inCount = inCounts.get(i).getCount();
+            inTotal += inCount;
+            profileInfo.setInpatient(inCount);
+            int outCount = outCounts.get(i).getCount();
+            outTotal += outCount;
+            profileInfo.setOutpatient(outCount);
+            int total = healCount + inCount + outCount;
+            profileInfo.setTotal(total);
+            hosTotal += total;
+            list.add(profileInfo);
+        }
+        MProfileInfo profileInfo = new MProfileInfo();
+        profileInfo.setData("总计");
+        profileInfo.setHealExam(healExamTotal);
+        profileInfo.setInpatient(inTotal);
+        profileInfo.setOutpatient(outTotal);
+        profileInfo.setTotal(hosTotal);
+        list.add(0,profileInfo);
+        return list;
     }
 }
