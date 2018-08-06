@@ -76,6 +76,33 @@ public class MOrganization implements Serializable{
 
     private String jkzlOrgId;//总部机构id-同步数据使用
 
+    // 卫统数据导入-追加字段
+    private String basicUnitFlag;     //	是否基层单位
+    private String orgChanges;         //	机构变动情况
+    private String hosTypeName;     // 机构类别代码名称
+    private String streetId;     // 街道/乡镇代码
+    private String dischargePatientFlag;    //	是否填报出院病人表
+    private String reportingClinicFlag;    //	是否代报诊所
+    private String reportingVillageClinicFlag;    //	是否代报村卫生室
+    private String reportingOrg;        // 诊所、村卫生室所属代报机构
+    private String foundingTime;    //	单位开业/成立时间
+    private String registeredCapital;    //	注册资金(万元)
+    private String branchOrgFlag;        // 是否分支机构
+    private String postalcode;    //	邮政编码
+    private String email;        // 电子邮箱
+    private String domainName;        // 单位网站域名
+    private String registrationNumber;    //	批准文号/注册号
+    private String registrationRatificationAgency;    //	登记批准机构
+    private String certificateDate;    //	办证日期
+    private String operator;    //	经办人
+    private String entryStaff;     //	录入人
+    private String createTime;     //	新增机构创建时间
+    private String cancelTime;    //	作废日期
+    private String termValidityStart;    //	有效期起
+    private String termValidityEnd;    //	有效期止
+    private String hostUnit;     //	主办单位
+    private String hosManageType;     //	机构分类管理代码
+
     public MOrganization() {
     }
 
@@ -450,5 +477,205 @@ public class MOrganization implements Serializable{
 
     public void setJkzlOrgId(String jkzlOrgId) {
         this.jkzlOrgId = jkzlOrgId;
+    }
+
+    public String getBasicUnitFlag() {
+        return basicUnitFlag;
+    }
+
+    public void setBasicUnitFlag(String basicUnitFlag) {
+        this.basicUnitFlag = basicUnitFlag;
+    }
+
+    public String getOrgChanges() {
+        return orgChanges;
+    }
+
+    public void setOrgChanges(String orgChanges) {
+        this.orgChanges = orgChanges;
+    }
+
+    public String getHosTypeName() {
+        return hosTypeName;
+    }
+
+    public void setHosTypeName(String hosTypeName) {
+        this.hosTypeName = hosTypeName;
+    }
+
+    public String getStreetId() {
+        return streetId;
+    }
+
+    public void setStreetId(String streetId) {
+        this.streetId = streetId;
+    }
+
+    public String getDischargePatientFlag() {
+        return dischargePatientFlag;
+    }
+
+    public void setDischargePatientFlag(String dischargePatientFlag) {
+        this.dischargePatientFlag = dischargePatientFlag;
+    }
+
+    public String getReportingClinicFlag() {
+        return reportingClinicFlag;
+    }
+
+    public void setReportingClinicFlag(String reportingClinicFlag) {
+        this.reportingClinicFlag = reportingClinicFlag;
+    }
+
+    public String getReportingVillageClinicFlag() {
+        return reportingVillageClinicFlag;
+    }
+
+    public void setReportingVillageClinicFlag(String reportingVillageClinicFlag) {
+        this.reportingVillageClinicFlag = reportingVillageClinicFlag;
+    }
+
+    public String getReportingOrg() {
+        return reportingOrg;
+    }
+
+    public void setReportingOrg(String reportingOrg) {
+        this.reportingOrg = reportingOrg;
+    }
+
+    public String getFoundingTime() {
+        return foundingTime;
+    }
+
+    public void setFoundingTime(String foundingTime) {
+        this.foundingTime = foundingTime;
+    }
+
+    public String getRegisteredCapital() {
+        return registeredCapital;
+    }
+
+    public void setRegisteredCapital(String registeredCapital) {
+        this.registeredCapital = registeredCapital;
+    }
+
+    public String getBranchOrgFlag() {
+        return branchOrgFlag;
+    }
+
+    public void setBranchOrgFlag(String branchOrgFlag) {
+        this.branchOrgFlag = branchOrgFlag;
+    }
+
+    public String getPostalcode() {
+        return postalcode;
+    }
+
+    public void setPostalcode(String postalcode) {
+        this.postalcode = postalcode;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getDomainName() {
+        return domainName;
+    }
+
+    public void setDomainName(String domainName) {
+        this.domainName = domainName;
+    }
+
+    public String getRegistrationNumber() {
+        return registrationNumber;
+    }
+
+    public void setRegistrationNumber(String registrationNumber) {
+        this.registrationNumber = registrationNumber;
+    }
+
+    public String getRegistrationRatificationAgency() {
+        return registrationRatificationAgency;
+    }
+
+    public void setRegistrationRatificationAgency(String registrationRatificationAgency) {
+        this.registrationRatificationAgency = registrationRatificationAgency;
+    }
+
+    public String getCertificateDate() {
+        return certificateDate;
+    }
+
+    public void setCertificateDate(String certificateDate) {
+        this.certificateDate = certificateDate;
+    }
+
+    public String getOperator() {
+        return operator;
+    }
+
+    public void setOperator(String operator) {
+        this.operator = operator;
+    }
+
+    public String getEntryStaff() {
+        return entryStaff;
+    }
+
+    public void setEntryStaff(String entryStaff) {
+        this.entryStaff = entryStaff;
+    }
+
+    public String getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(String createTime) {
+        this.createTime = createTime;
+    }
+
+    public String getCancelTime() {
+        return cancelTime;
+    }
+
+    public void setCancelTime(String cancelTime) {
+        this.cancelTime = cancelTime;
+    }
+
+    public String getTermValidityStart() {
+        return termValidityStart;
+    }
+
+    public void setTermValidityStart(String termValidityStart) {
+        this.termValidityStart = termValidityStart;
+    }
+
+    public String getTermValidityEnd() {
+        return termValidityEnd;
+    }
+
+    public void setTermValidityEnd(String termValidityEnd) {
+        this.termValidityEnd = termValidityEnd;
+    }
+
+    public String getHostUnit() {
+        return hostUnit;
+    }
+
+    public void setHostUnit(String hostUnit) {
+        this.hostUnit = hostUnit;
+    }
+
+    public String getHosManageType() {
+        return hosManageType;
+    }
+
+    public void setHosManageType(String hosManageType) {
+        this.hosManageType = hosManageType;
     }
 }
