@@ -1,6 +1,7 @@
 package com.yihu.ehr.elasticsearch;
 
 import com.alibaba.druid.pool.DruidDataSource;
+import org.elasticsearch.action.ActionRequestBuilder;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequestBuilder;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
@@ -322,13 +323,7 @@ public class ElasticSearchUtil {
      */
     public List<Map<String, Object>> list(String index, String type, QueryBuilder queryBuilder) {
         int size = (int)count(index, type, queryBuilder);
-        TransportClient transportClient = elasticSearchPool.getClient();
-        SearchRequestBuilder builder = transportClient.prepareSearch(index);
-        builder.setTypes(type);
-        builder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
-        builder.setQuery(queryBuilder);
-        builder.setFrom(0).setSize(size);
-        builder.setExplain(true);
+        SearchRequestBuilder builder = searchRequestBuilder(index, type, queryBuilder, null, 0, size);
         SearchResponse response = builder.get();
         SearchHits hits = response.getHits();
         List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
@@ -380,14 +375,7 @@ public class ElasticSearchUtil {
      * @return
      */
     public Page<Map<String, Object>> page(String index, String type, QueryBuilder queryBuilder, List<SortBuilder> sortBuilders, int page, int size) {
-        TransportClient transportClient = elasticSearchPool.getClient();
-        SearchRequestBuilder builder = transportClient.prepareSearch(index);
-        sortBuilders.forEach(item -> builder.addSort(item));
-        builder.setTypes(type);
-        builder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
-        builder.setQuery(queryBuilder);
-        builder.setFrom((page - 1) * size).setSize(size);
-        builder.setExplain(true);
+        SearchRequestBuilder builder = searchRequestBuilder(index, type, queryBuilder, sortBuilders, (page - 1) * size, size);
         SearchResponse response = builder.get();
         SearchHits hits = response.getHits();
         List<Map<String, Object>> resultList = new ArrayList<>();
@@ -397,6 +385,37 @@ public class ElasticSearchUtil {
             resultList.add(source);
         }
         return new PageImpl<>(resultList, new PageRequest(page - 1, size), hits.totalHits());
+    }
+
+    /**
+     * 获取ID列表
+     * @param index
+     * @param type
+     * @param filters
+     * @return
+     */
+    public List<String> getIds (String index, String type, String filters){
+        QueryBuilder queryBuilder = getQueryBuilder(filters);
+        return getIds(index, type, queryBuilder);
+    }
+
+    /**
+     * 获取ID列表
+     * @param index
+     * @param type
+     * @param queryBuilder
+     * @return
+     */
+    public List<String> getIds (String index, String type, QueryBuilder queryBuilder) {
+        int size = (int)count(index, type, queryBuilder);
+        SearchRequestBuilder builder = searchRequestBuilder(index, type, queryBuilder, null, 0, size);
+        SearchResponse response = builder.get();
+        SearchHits hits = response.getHits();
+        List<String> resultList = new ArrayList<>();
+        for (SearchHit hit : hits.getHits()) {
+            resultList.add(hit.getId());
+        }
+        return resultList;
     }
 
     /**
@@ -419,49 +438,8 @@ public class ElasticSearchUtil {
      * @return
      */
     public long count(String index, String type, QueryBuilder queryBuilder) {
-        TransportClient transportClient = elasticSearchPool.getClient();
-        SearchRequestBuilder builder = transportClient.prepareSearch(index);
-        builder.setTypes(type);
-        builder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
-        builder.setQuery(queryBuilder);
-        builder.setExplain(true);
+        SearchRequestBuilder builder = searchRequestBuilder(index, type, queryBuilder, null, null, null);
         return builder.get().getHits().totalHits();
-    }
-
-    /**
-     * 获取ID列表
-     * @param index
-     * @param type
-     * @param filters
-     * @return
-     */
-    public List<String> getIds (String index, String type, String filters){
-        QueryBuilder queryBuilder = getQueryBuilder(filters);
-        return getIds(index, type, queryBuilder);
-    }
-
-    /**
-     * 获取ID列表
-     * @param index
-     * @param type
-     * @param queryBuilder
-     * @return
-     */
-    public List<String> getIds (String index, String type, QueryBuilder queryBuilder){
-        TransportClient transportClient = elasticSearchPool.getClient();
-        SearchRequestBuilder builder = transportClient.prepareSearch(index);
-        builder.setTypes(type);
-        builder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
-        builder.setQuery(queryBuilder);
-        builder.setFrom(0).setSize(10000);
-        builder.setExplain(true);
-        SearchResponse response = builder.get();
-        SearchHits hits = response.getHits();
-        List<String> resultList = new ArrayList<>();
-        for (SearchHit hit : hits.getHits()) {
-            resultList.add(hit.getId());
-        }
-        return resultList;
     }
 
     /**
@@ -557,12 +535,8 @@ public class ElasticSearchUtil {
      * @return
      */
     public Map<String, Long> dateHistogram(String index, String type, String filters, Date start, Date end, String field, DateHistogramInterval interval, String format) {
-        TransportClient transportClient = elasticSearchPool.getClient();
         QueryBuilder queryBuilder = getQueryBuilder(filters);
-        SearchRequestBuilder builder = transportClient.prepareSearch(index);
-        builder.setTypes(type);
-        builder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
-        builder.setQuery(queryBuilder);
+        SearchRequestBuilder builder = searchRequestBuilder(index, type, queryBuilder, null, 0, 0);
         DateHistogramBuilder dateHistogramBuilder = new DateHistogramBuilder(index + "-" + field);
         dateHistogramBuilder.field(field);
         dateHistogramBuilder.interval(interval);
@@ -572,8 +546,6 @@ public class ElasticSearchUtil {
         dateHistogramBuilder.minDocCount(0);
         dateHistogramBuilder.extendedBounds(start.getTime(), end.getTime());
         builder.addAggregation(dateHistogramBuilder);
-        builder.setSize(0);
-        builder.setExplain(true);
         SearchResponse response = builder.get();
         Histogram histogram = response.getAggregations().get(index + "-" + field);
         Map<String, Long> temp = new HashMap<>();
@@ -591,15 +563,9 @@ public class ElasticSearchUtil {
      */
     public int cardinality(String index, String type, String filters, String filed){
         QueryBuilder queryBuilder = getQueryBuilder(filters);
-        TransportClient transportClient = elasticSearchPool.getClient();
-        SearchRequestBuilder builder = transportClient.prepareSearch(index);
-        builder.setTypes(type);
-        builder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
-        builder.setQuery(queryBuilder);
+        SearchRequestBuilder builder = searchRequestBuilder(index, type, queryBuilder, null, 0, 0);
         CardinalityBuilder cardinality = AggregationBuilders.cardinality("cardinality").field(filed);
         builder.addAggregation(cardinality);
-        builder.setSize(0);
-        builder.setExplain(true);
         SearchResponse response = builder.get();
         InternalCardinality internalCard = response.getAggregations().get("cardinality");
         return new Double(internalCard.getProperty("value").toString()).intValue();
@@ -613,23 +579,18 @@ public class ElasticSearchUtil {
      * @param groupField
      * @return
      */
-    public Map<String,Long> countByGroup(String index, String type, String filters,String groupField) {
+    public Map<String, Long> countByGroup(String index, String type, String filters, String groupField) {
         QueryBuilder queryBuilder = getQueryBuilder(filters);
-        Map<String,Long> groupMap = new HashMap<>();
-        TransportClient transportClient = elasticSearchPool.getClient();
+        SearchRequestBuilder builder = searchRequestBuilder(index, type, queryBuilder, null, null, null);
         AbstractAggregationBuilder aggregation = AggregationBuilders.terms("count").field(groupField);
-        SearchRequestBuilder builder = transportClient.prepareSearch(index);
-        builder.setTypes(type);
         builder.addAggregation(aggregation);
-        builder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
-        builder.setQuery(queryBuilder);
-        builder.setExplain(true);
         SearchResponse response = builder.get();
         Terms terms = response.getAggregations().get("count");
         List<Terms.Bucket> buckets = terms.getBuckets();
+        Map<String, Long> groupMap = new HashMap<>();
         for (Terms.Bucket bucket : buckets) {
             //System.out.println(bucket.getKey()+"----"+bucket.getDocCount());
-            groupMap.put(bucket.getKey().toString(),bucket.getDocCount());
+            groupMap.put(bucket.getKey().toString(), bucket.getDocCount());
         }
         return groupMap;
     }
@@ -643,27 +604,51 @@ public class ElasticSearchUtil {
      * @param groupField
      * @return
      */
-    public Map<String,Double> sumByGroup(String index, String type, String filters, String sumField, String groupField) {
-        TransportClient transportClient = elasticSearchPool.getClient();
+    public Map<String, Double> sumByGroup(String index, String type, String filters, String sumField, String groupField) {
         QueryBuilder queryBuilder = getQueryBuilder(filters);
-        Map<String,Double> groupMap = new HashMap<>();
+        SearchRequestBuilder builder = searchRequestBuilder(index, type, queryBuilder, null, null, null);
         TermsBuilder aggregation = AggregationBuilders.terms("sum_query").field(groupField);
-        SearchRequestBuilder builder = transportClient.prepareSearch(index);
-        builder.setTypes(type);
-        builder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
-        builder.setQuery(queryBuilder);
-        builder.setExplain(true);
         SumBuilder sumBuilder= AggregationBuilders.sum("sum_row").field(sumField);
         aggregation.subAggregation(sumBuilder);
         builder.addAggregation(aggregation);
         SearchResponse response = builder.get();
         Terms terms = response.getAggregations().get("sum_query");
         List<Terms.Bucket> buckets = terms.getBuckets();
+        Map<String, Double> groupMap = new HashMap<>();
         for (Terms.Bucket bucket : buckets){
             Sum sum2 = bucket.getAggregations().get("sum_row");
-            groupMap.put(bucket.getKey().toString(),sum2.getValue());
+            groupMap.put(bucket.getKey().toString(), sum2.getValue());
         }
         return groupMap;
+    }
+
+    /**
+     * 获取基础请求生成器
+     * @param index
+     * @param type
+     * @param queryBuilder
+     * @param sortBuilders
+     * @return
+     */
+    public SearchRequestBuilder searchRequestBuilder(String index, String type, QueryBuilder queryBuilder, List<SortBuilder> sortBuilders, Integer from, Integer size) {
+        TransportClient transportClient = elasticSearchPool.getClient();
+        SearchRequestBuilder builder = transportClient.prepareSearch(index);
+        builder.setTypes(type);
+        builder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
+        builder.setQuery(queryBuilder);
+        builder.setExplain(true);
+        if (sortBuilders != null) {
+            sortBuilders.forEach(item -> builder.addSort(item));
+        }
+        if (size != null) {
+            if (from != null) {
+                builder.setFrom(from);
+                builder.setSize(size);
+            } else {
+                builder.setSize(size);
+            }
+        }
+        return builder;
     }
 
     /**
