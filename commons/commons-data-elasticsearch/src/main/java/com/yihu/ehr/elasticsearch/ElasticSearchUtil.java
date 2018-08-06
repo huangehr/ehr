@@ -640,7 +640,7 @@ public class ElasticSearchUtil {
      * @param groupField
      * @return
      */
-    public Map<String,Double> sumtByGroup(String index, String type, String filters, String sumField, String groupField) {
+    public Map<String,Double> sumByGroup(String index, String type, String filters, String sumField, String groupField) {
         TransportClient transportClient = elasticSearchPool.getClient();
         QueryBuilder queryBuilder = getQueryBuilder(filters);
         Map<String,Double> groupMap = new HashMap<>();
@@ -668,7 +668,7 @@ public class ElasticSearchUtil {
      * @param sorts
      * @return
      */
-    private List<SortBuilder> getSortBuilder(String sorts) {
+    public List<SortBuilder> getSortBuilder(String sorts) {
         List<SortBuilder> sortBuilderList = new ArrayList<>();
         if (StringUtils.isEmpty(sorts)) {
             return sortBuilderList;
