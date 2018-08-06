@@ -228,14 +228,12 @@ public class ElasticSearchClient {
         builder.setQuery(queryBuilder);
         builder.setExplain(true);
         SearchResponse response = builder.get();
-        SearchHits hits = builder.get().getHits();
         Terms terms = response.getAggregations().get("count");
         List<Terms.Bucket> buckets = terms.getBuckets();
-        for(Terms.Bucket bucket:buckets){
+        for (Terms.Bucket bucket : buckets) {
 //            System.out.println(bucket.getKey()+"----"+bucket.getDocCount());
             groupMap.put(bucket.getKey().toString(),bucket.getDocCount());
         }
-        transportClient.close();
         return groupMap;
     }
 
@@ -257,11 +255,10 @@ public class ElasticSearchClient {
         Terms terms = response.getAggregations().get("sum_query");
 
         List<Terms.Bucket> buckets = terms.getBuckets();
-        for(Terms.Bucket bucket:buckets){
+        for (Terms.Bucket bucket : buckets){
             Sum sum2=bucket.getAggregations().get("sum_row");
             groupMap.put(bucket.getKey().toString(),sum2.getValue());
         }
-        transportClient.close();
         return groupMap;
     }
 
