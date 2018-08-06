@@ -611,10 +611,12 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
             userType = toEntity(userTypeJson, UserType.class);
             if (null != userType && null != userType.getId() && userType.getId() > 0) {
                 Integer userTypeId = userType.getId();
+                String userTypeName = userType.getName();
                 //变更与角色组的关联关系
                 xUserTypeRolesRepository.deleteUserTypeRolesByTypeId(userTypeId);
                 models.forEach(userTypeRoles -> {
                     userTypeRoles.setTypeId(userTypeId);
+                    userTypeRoles.setTypeName(userTypeName);
                     userTypeRoles.setId(null);
                     xUserTypeRolesRepository.save(userTypeRoles);
                 });
@@ -639,6 +641,7 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
                 UserType userTypeBak = userTypeService.save(userType);
                 models.forEach(userTypeRoles -> {
                     userTypeRoles.setTypeId(userTypeBak.getId());
+                    userTypeRoles.setTypeName(userTypeBak.getName());
                     userTypeRoles.setId(null);
                     xUserTypeRolesRepository.save(userTypeRoles);
                 });
