@@ -63,7 +63,7 @@ public class MysqlExtract {
         List<SaveModel> returnList = new ArrayList<>();
         //获取mysql
         String mysql = getSql(qdm,qds);
-        logger.debug(mysql);
+        logger.warn(mysql);
         if( !StringUtils.isEmpty(mysql)){
             Map<String,String> resultMap = new HashMap<>();
             Map<String, String> daySlaveDictMap = new HashMap<>();

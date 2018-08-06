@@ -165,6 +165,11 @@ public class BaseStatistsService {
                         firstKeyVal = firstKeyVal + "-" + firstMap.get(moleDimensions[i]).toString() ;
                     }
                     map.put(moleDimensions[i], firstMap.get(moleDimensions[i]).toString());
+                    if(moleDimensions[i].equals("town") || moleDimensions[i].equals("org") ){
+                        if(firstMap.get(moleDimensions[i] + "Code")  != null){
+                            map.put(moleDimensions[i]+ "Code", firstMap.get(moleDimensions[i] + "Code").toString());
+                        }
+                    }
                 }
                 boolean pflag = true;
                 for(Map<String, Object> secondMap :secondList) {
