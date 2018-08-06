@@ -12,6 +12,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -59,16 +60,16 @@ public class PackAnalyzeEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page") Integer page,
             @ApiParam(name = "size", value = "size", required = true)
             @RequestParam(value = "size") Integer size) throws Exception {
-        List<Map<String, Object>> sourceList = elasticSearchUtil.page("json_archives", "info", filters, page, size);
-        List<Map<String, Object>> updateSourceList = new ArrayList<>(sourceList.size());
-        sourceList.forEach(item -> {
+        Page<Map<String, Object>> result = elasticSearchUtil.page("json_archives", "info", filters, page, size);
+        List<Map<String, Object>> updateSourceList = new ArrayList<>();
+        result.forEach(item -> {
             Map<String, Object> updateSource = new HashMap<>();
             updateSource.put("_id", item.get("_id"));
             updateSource.put("analyze_status", status);
             updateSourceList.add(updateSource);
         });
         elasticSearchUtil.bulkUpdate("json_archives", "info", updateSourceList);
-        return sourceList.size();
+        return result.getNumberOfElements();
     }
 
     @RequestMapping(value = ServiceApi.PackageAnalyzer.Analyzer, method = RequestMethod.PUT)

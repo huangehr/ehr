@@ -34,6 +34,9 @@ import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -346,7 +349,7 @@ public class ElasticSearchUtil {
      * @param size
      * @return
      */
-    public List<Map<String, Object>> page(String index, String type, String filters, int page, int size) {
+    public Page<Map<String, Object>> page(String index, String type, String filters, int page, int size) {
         return page(index, type, filters, null, page, size);
     }
 
@@ -360,7 +363,7 @@ public class ElasticSearchUtil {
      * @param size
      * @return
      */
-    public List<Map<String, Object>> page(String index, String type, String filters, String sorts, int page, int size) {
+    public Page<Map<String, Object>> page(String index, String type, String filters, String sorts, int page, int size) {
         QueryBuilder queryBuilder = getQueryBuilder(filters);
         List<SortBuilder> sortBuilders = getSortBuilder(sorts);
         return page(index, type, queryBuilder, sortBuilders, page, size);
@@ -376,7 +379,7 @@ public class ElasticSearchUtil {
      * @param size
      * @return
      */
-    public List<Map<String, Object>> page(String index, String type, QueryBuilder queryBuilder, List<SortBuilder> sortBuilders, int page, int size) {
+    public Page<Map<String, Object>> page(String index, String type, QueryBuilder queryBuilder, List<SortBuilder> sortBuilders, int page, int size) {
         TransportClient transportClient = elasticSearchPool.getClient();
         SearchRequestBuilder builder = transportClient.prepareSearch(index);
         sortBuilders.forEach(item -> builder.addSort(item));
@@ -387,13 +390,13 @@ public class ElasticSearchUtil {
         builder.setExplain(true);
         SearchResponse response = builder.get();
         SearchHits hits = response.getHits();
-        List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
+        List<Map<String, Object>> resultList = new ArrayList<>();
         for (SearchHit hit : hits.getHits()) {
             Map<String, Object> source = hit.getSource();
             source.put("_id", hit.getId());
             resultList.add(source);
         }
-        return resultList;
+        return new PageImpl<>(resultList, new PageRequest(page - 1, size), hits.totalHits());
     }
 
     /**

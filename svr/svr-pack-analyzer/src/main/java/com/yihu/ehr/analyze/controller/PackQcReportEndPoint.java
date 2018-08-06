@@ -19,6 +19,7 @@ import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -232,14 +233,13 @@ public class PackQcReportEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page") int page,
             @ApiParam(name = "size", value = "页码", required = true, defaultValue = "15")
             @RequestParam(value = "size") int size) throws Exception {
-        if(StringUtils.isNotEmpty(filters)){
-            filters="analyze_status=2||archive_status=2;"+filters;
-        }else{
-            filters="analyze_status=2||archive_status=2";
+        if (StringUtils.isNotEmpty(filters)) {
+            filters = "analyze_status=2||archive_status=2;" + filters;
+        } else {
+            filters = "analyze_status=2||archive_status=2";
         }
-        List<Map<String, Object>> list = packQcReportService.analyzeErrorList(filters, sorts, page, size);
-        int count = (int) elasticSearchUtil.count("json_archives", "info", filters);
-        Envelop envelop = getPageResult(list, count, page, size);
+        Page<Map<String, Object>> result = packQcReportService.analyzeErrorList(filters, sorts, page, size);
+        Envelop envelop = getPageResult(result.getContent(), (int)result.getTotalElements(), page, size);
         return envelop;
     }
 
@@ -255,9 +255,8 @@ public class PackQcReportEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "size", value = "页码", required = true, defaultValue = "15")
             @RequestParam(value = "size") int size) throws Exception {
 
-        List<Map<String, Object>> list = packQcReportService.metadataErrorList(filters, sorts, page, size);
-        int count = (int) elasticSearchUtil.count("json_archives_qc", "qc_metadata_info", filters);
-        Envelop envelop = getPageResult(list, count, page, size);
+        Page<Map<String, Object>> result = packQcReportService.metadataErrorList(filters, sorts, page, size);
+        Envelop envelop = getPageResult(result.getContent(), (int)result.getTotalElements(), page, size);
         return envelop;
     }
 
@@ -282,15 +281,13 @@ public class PackQcReportEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page") int page,
             @ApiParam(name = "size", value = "页码", required = true, defaultValue = "15")
             @RequestParam(value = "size") int size) throws Exception {
-
 //        if(StringUtils.isNotEmpty(filters)){
 //            filters="archive_status=3;"+filters;
 //        }else{
 //            filters="archive_status=3";
 //        }
-        List<Map<String, Object>> list = packQcReportService.archiveList(filters, sorts, page, size);
-        int count = (int) elasticSearchUtil.count("json_archives", "info", filters);
-        Envelop envelop = getPageResult(list, count, page, size);
+        Page<Map<String, Object>> result = packQcReportService.archiveList(filters, sorts, page, size);
+        Envelop envelop = getPageResult(result.getContent(), (int)result.getTotalElements(), page, size);
         return envelop;
     }
 
@@ -315,9 +312,8 @@ public class PackQcReportEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page") int page,
             @ApiParam(name = "size", value = "页码", required = true, defaultValue = "15")
             @RequestParam(value = "size") int size) throws Exception {
-        List<Map<String, Object>> list = packQcReportService.uploadRecordList(filters, sorts, page, size);
-        int count = (int) elasticSearchUtil.count("upload", "record", filters);
-        Envelop envelop = getPageResult(list, count, page, size);
+        Page<Map<String, Object>> result = packQcReportService.uploadRecordList(filters, sorts, page, size);
+        Envelop envelop = getPageResult(result.getContent(), (int)result.getTotalElements(), page, size);
         return envelop;
     }
 

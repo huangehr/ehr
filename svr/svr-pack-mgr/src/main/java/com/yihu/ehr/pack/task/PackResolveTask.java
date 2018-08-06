@@ -6,6 +6,7 @@ import com.yihu.ehr.model.packs.EsSimplePackage;
 import com.yihu.ehr.profile.queue.RedisCollection;
 import org.apache.commons.lang.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -41,17 +42,17 @@ public class PackResolveTask {
         List<String> esSimplePackageList = new ArrayList<>(200);
         //当解析队列为空，将数据库中状态为缓存状态的档案包加入解析队列
         if (redisTemplate.opsForSet().size(RedisCollection.ResolveQueueVice) <= 0) {
-            List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, "analyze_status=3;archive_status=0", "+receive_date", 1, 1000);
-            for (Map<String, Object> pack : resultList) {
+            Page<Map<String, Object>> result = elasticSearchUtil.page(INDEX, TYPE, "analyze_status=3;archive_status=0", "+receive_date", 1, 1000);
+            for (Map<String, Object> pack : result) {
                 String packStr = objectMapper.writeValueAsString(pack);
                 EsSimplePackage esSimplePackage = objectMapper.readValue(packStr, EsSimplePackage.class);
                 redisTemplate.opsForSet().add(RedisCollection.ResolveQueueVice, objectMapper.writeValueAsString(esSimplePackage));
             }
         }
         //将解析状态为失败且错误次数小于三次的档案包重新加入解析队列
-        List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, "analyze_status=3;archive_status=2;fail_count<3", "+receive_date", 1, 100);
-        List<Map<String, Object>> updateSourceList = new ArrayList<>(resultList.size());
-        for (Map<String, Object> pack : resultList) {
+        Page<Map<String, Object>> result = elasticSearchUtil.page(INDEX, TYPE, "analyze_status=3;archive_status=2;fail_count<3", "+receive_date", 1, 100);
+        List<Map<String, Object>> updateSourceList = new ArrayList<>();
+        for (Map<String, Object> pack : result) {
             Map<String, Object> updateSource = new HashMap<>();
             updateSource.put("_id", pack.get("_id"));
             updateSource.put("archive_status", 0);
@@ -63,8 +64,8 @@ public class PackResolveTask {
         //将解析状态为正在解析但解析开始时间超过当前时间一定范围内的档案包重新加入解析队列
         Date past = DateUtils.addDays(new Date(), -1);
         String pastStr = dateFormat.format(past) + " 00:00:00";
-        resultList = elasticSearchUtil.page(INDEX, TYPE, "analyze_status=3;archive_status=1;parse_date<" + pastStr, "+receive_date", 1, 100);
-        for (Map<String, Object> pack : resultList) {
+        result = elasticSearchUtil.page(INDEX, TYPE, "analyze_status=3;archive_status=1;parse_date<" + pastStr, "+receive_date", 1, 100);
+        for (Map<String, Object> pack : result) {
             Map<String, Object> updateSource = new HashMap<>();
             updateSource.put("_id", pack.get("_id"));
             updateSource.put("archive_status", 0);
