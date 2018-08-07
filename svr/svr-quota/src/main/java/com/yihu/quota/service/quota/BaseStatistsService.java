@@ -421,6 +421,11 @@ public class BaseStatistsService {
                     map.put(firstColumnField, moleMap.get(firstColumnField));
                     map.put(moleDimensions[i], moleMap.get(moleDimensions[i]).toString());
                     map.put(moleDimensions[i]+"Name", moleMap.get(moleDimensions[i]).toString());
+                    if("town".equals(moleDimensions[i]) || "org".equals(moleDimensions[i])) {
+                        if(moleMap.get(moleDimensions[i] + "Code")  != null) {
+                            map.put(moleDimensions[i]+ "Code", moleMap.get(moleDimensions[i] + "Code").toString());
+                        }
+                    }
                 }
                 if (moleResultVal == 0) {
                     map.put(resultField,0);
