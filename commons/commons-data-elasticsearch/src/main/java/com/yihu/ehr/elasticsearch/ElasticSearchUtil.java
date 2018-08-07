@@ -1,7 +1,6 @@
 package com.yihu.ehr.elasticsearch;
 
 import com.alibaba.druid.pool.DruidDataSource;
-import org.elasticsearch.action.ActionRequestBuilder;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequestBuilder;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
