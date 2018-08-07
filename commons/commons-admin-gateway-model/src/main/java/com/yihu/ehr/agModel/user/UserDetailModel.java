@@ -1,6 +1,7 @@
 package com.yihu.ehr.agModel.user;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Created by AndyCai on 2016/2/22.
@@ -26,6 +27,7 @@ public class UserDetailModel implements Serializable {
     private String idCardNo;
     private String organization;
     private String organizationName;
+    private List detailModelList;
 
     private int provinceId;
     private String provinceName;
@@ -75,6 +77,14 @@ public class UserDetailModel implements Serializable {
     private  String profession;
     private  String department;//部门
     private  String position;//职务
+
+    public List getDetailModelList() {
+        return detailModelList;
+    }
+
+    public void setDetailModelList(List detailModelList) {
+        this.detailModelList = detailModelList;
+    }
 
     public String getDemographicId() {
         return demographicId;

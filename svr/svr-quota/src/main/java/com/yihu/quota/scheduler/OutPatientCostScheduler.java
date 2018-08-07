@@ -3,7 +3,7 @@ package com.yihu.quota.scheduler;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.elasticsearch.ElasticSearchClient;
+import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.profile.core.ResourceCore;
 import com.yihu.ehr.solr.SolrUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
@@ -45,9 +45,9 @@ public class OutPatientCostScheduler {
     @Autowired
     private HealthArchiveSchedulerService healthArchiveSchedulerService;
     @Autowired
-    private ElasticSearchClient elasticSearchClient;
+    private ElasticSearchUtil elasticSearchUtil;
 
-    private static final Logger log = LoggerFactory.getLogger(HealthArchiveScheduler.class);
+    private static final Logger log = LoggerFactory.getLogger(OutPatientCostScheduler.class);
 
     /**
      * 门急诊疾病费用统计
@@ -254,7 +254,7 @@ public class OutPatientCostScheduler {
         String type = "cost_info";
         long start = System.currentTimeMillis();
         log.info("开始保存时间 = {}", costInfo, start);
-        elasticSearchClient.index(index, type, costInfo);
+        elasticSearchUtil.index(index, type, costInfo);
         long end = System.currentTimeMillis();
         log.info("用时 = {}毫秒", end - start);
     }

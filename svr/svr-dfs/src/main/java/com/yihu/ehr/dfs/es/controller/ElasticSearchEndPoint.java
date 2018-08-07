@@ -9,6 +9,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -149,9 +150,8 @@ public class ElasticSearchEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page") int page,
             @ApiParam(name = "size", value = "分页大小", required = true, defaultValue = "15")
             @RequestParam(value = "size") int size) throws Exception {
-        List<Map<String, Object>> resultList = elasticSearchUtil.page(index, type, filter, sorts, page, size);
-        int count = (int)elasticSearchUtil.count(index, type, filter);
-        Envelop envelop = getPageResult(resultList, count, page, size);
+        Page<Map<String, Object>> result = elasticSearchUtil.page(index, type, filter, sorts, page, size);
+        Envelop envelop = getPageResult(result.getContent(), (int)result.getTotalElements(), page, size);
         return envelop;
     }
 

@@ -1,7 +1,6 @@
 package com.yihu.quota.service.scheduler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.elasticsearch.ElasticSearchClient;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.hbase.HBaseDao;
 import com.yihu.ehr.profile.core.ResourceCore;
@@ -31,8 +30,6 @@ public class HealthArchiveSchedulerService {
 
     @Autowired
     private SolrUtil solrUtil;
-    @Autowired
-    private ElasticSearchClient elasticSearchClient;
     @Autowired
     private HBaseDao hbaseDao;
     @Autowired
@@ -67,7 +64,7 @@ public class HealthArchiveSchedulerService {
                 }
                 if (null == healthArchiveSchema.get(archiveInfo.getDemographicId())) {
                     healthArchiveSchema.set(archiveInfo.getDemographicId(), archiveInfo.getDemographicId(), 54000);
-                    elasticSearchClient.index(index, type, source);
+                    elasticSearchUtil.index(index, type, source);
                 }
             }
         } else if(null != archiveInfo.getCardId()) {
@@ -75,11 +72,11 @@ public class HealthArchiveSchedulerService {
             if(list == null || list.size() == 0) {
                 if (null == healthArchiveSchema.get(archiveInfo.getCardId())) {
                     healthArchiveSchema.set(archiveInfo.getCardId(), archiveInfo.getCardId(), 54000);
-                    elasticSearchClient.index(index, type, source);
+                    elasticSearchUtil.index(index, type, source);
                 }
             }
         } else {
-            elasticSearchClient.index(index, type, source);
+            elasticSearchUtil.index(index, type, source);
         }
     }
 

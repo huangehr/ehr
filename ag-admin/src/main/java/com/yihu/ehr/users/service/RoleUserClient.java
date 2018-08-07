@@ -92,6 +92,13 @@ public interface RoleUserClient {
             @ApiParam(name = "userTypeId", value = "用户类型ID")
             @RequestParam(value = "userTypeId") int userTypeId);
 
+    @RequestMapping(value = ServiceApi.Roles.RoleUserTypeUpdate, method = RequestMethod.POST)
+    @ApiOperation(value = "基于用户ID&用户类型进行授权更新")
+    Envelop setUserRolesForUpdate(
+            @ApiParam(name = "userId", value = "用户ID", required = true)
+            @RequestParam(value = "userId") String userId,
+            @ApiParam(name = "userType", value = "变更后用户类型", required = true)
+            @RequestParam(value = "userType") int userType) throws Exception;
 
 
 }

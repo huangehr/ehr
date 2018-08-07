@@ -31,6 +31,7 @@ import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTblWidth;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.STTblWidth;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -608,7 +609,7 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
             int count = (int) elasticSearchUtil.count("json_archives", "info", filters);
             double pageNum = count % maxRowSize > 0 ? count / maxRowSize + 1 : count / maxRowSize;
             for (int i = 0; i < pageNum; i++) {
-                List<Map<String, Object>> list = packQcReportService.analyzeErrorList(filters,sorts,i+1,maxRowSize);
+                Page<Map<String, Object>> result = packQcReportService.analyzeErrorList(filters,sorts,i+1,maxRowSize);
                 //创建Excel工作表 指定名称和位置
                 Sheet sheet = wwb.createSheet("Sheet" + (i+1));
                 //添加固定信息，题头等
@@ -617,9 +618,9 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                     Cell xcell = titleRow.createCell(t);
                     xcell.setCellValue(title[t] + "");
                 }
-                for (int j = 0; j < list.size(); j++) {
+                for (int j = 0; j < result.getNumberOfElements(); j++) {
                     Row row = sheet.createRow(j+ 1);
-                    Map<String, Object> record = list.get(j);
+                    Map<String, Object> record = result.getContent().get(j);
                     //添加列表明细
 
                     row.createCell(0).setCellValue(ObjectUtils.toString(record.get("receive_date")));
@@ -627,9 +628,9 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                     row.createCell(2).setCellValue(ObjectUtils.toString(record.get("org_name")));
                     row.createCell(3).setCellValue(ObjectUtils.toString(record.get("_id")));
                     row.createCell(4).setCellValue(getErrorType(ObjectUtils.toString(record.get("error_type"))));
-                    if("2".equals(record.get("analyze_status"))){
+                    if ("2".equals(record.get("analyze_status"))){
                         row.createCell(5).setCellValue("质控");
-                    }else{
+                    } else {
                         row.createCell(5).setCellValue("解析");
                     }
                     row.createCell(6).setCellValue(ObjectUtils.toString(record.get("message")));
@@ -727,7 +728,7 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
             int count = (int) elasticSearchUtil.count("json_archives", "info", filters);
             double pageNum = count % maxRowSize > 0 ? count / maxRowSize + 1 : count / maxRowSize;
             for (int i = 0; i < pageNum; i++) {
-                List<Map<String, Object>> list = packQcReportService.archiveList(filters,sorts,i+1,maxRowSize);
+                Page<Map<String, Object>> result = packQcReportService.archiveList(filters,sorts,i+1,maxRowSize);
                 logger.info("查询耗时：" + (System.currentTimeMillis() - starttime) + "ms");
                 //创建Excel工作表 指定名称和位置
                 Sheet sheet = wwb.createSheet("Sheet" + (i+1));
@@ -737,9 +738,9 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                     Cell xcell = titleRow.createCell(t);
                     xcell.setCellValue(title[t] + "");
                 }
-                for (int j = 0; j < list.size(); j++) {
+                for (int j = 0; j < result.getNumberOfElements(); j++) {
                     Row row = sheet.createRow(j+ 1);
-                    Map<String, Object> record = list.get(j);
+                    Map<String, Object> record = result.getContent().get(j);
                     //添加列表明细
                     row.createCell(0).setCellValue(ObjectUtils.toString(record.get("receive_date")));
                     row.createCell(1).setCellValue(getAnalyzerStatus(record.get("analyze_status")+"",record.get("archive_status")+""));
@@ -785,7 +786,7 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
             int count = (int) elasticSearchUtil.count("upload", "record", filters);
             double pageNum = count % maxRowSize > 0 ? count / maxRowSize + 1 : count / maxRowSize;
             for (int i = 0; i < pageNum; i++) {
-                List<Map<String, Object>> list = packQcReportService.uploadRecordList(filters,sorts,i+1,maxRowSize);
+                Page<Map<String, Object>> result = packQcReportService.uploadRecordList(filters,sorts,i+1,maxRowSize);
                 //创建Excel工作表 指定名称和位置
                 Sheet sheet = wwb.createSheet("Sheet" + (i+1));
                 //添加固定信息，题头等
@@ -794,9 +795,9 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                     Cell xcell = titleRow.createCell(t);
                     xcell.setCellValue(title[t] + "");
                 }
-                for (int j = 0; j < list.size(); j++) {
-                    Row row = sheet.createRow(j+ 1);
-                    Map<String, Object> record = list.get(j);
+                for (int j = 0; j < result.getNumberOfElements(); j++) {
+                    Row row = sheet.createRow(j + 1);
+                    Map<String, Object> record = result.getContent().get(j);
                     //添加列表明细
                     row.createCell(0).setCellValue(ObjectUtils.toString(record.get("analyze_date")));
                     row.createCell(1).setCellValue(getPlatform(ObjectUtils.toString(record.get("to_platform"))));
@@ -817,6 +818,67 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
             e.printStackTrace();
         }
     }
+
+
+    @RequestMapping(value = ServiceApi.DataQuality.ExportQualityUpload, method = RequestMethod.GET)
+    @ApiOperation(value = "导出平台上传统计列表")
+    public void exportQualityUpload( @ApiParam(name = "start", value = "开始时间")
+                                         @RequestParam(value = "start", required = false) String start,
+                                         @ApiParam(name = "end", value = "结束时间", defaultValue = "")
+                                         @RequestParam(value = "end", required = false) String end,
+                                         @ApiParam(name = "toPlatform", value = "上传平台代码", defaultValue = "jiangxi_001")
+                                         @RequestParam(value = "toPlatform", required = false) String toPlatform,
+                                         HttpServletResponse response){
+        try {
+            String fileName = "平台上传列表";
+            //设置下载
+            response.setContentType("octets/stream");
+            response.setHeader("Content-Disposition", "attachment; filename="
+                    + new String( fileName.getBytes("gb2312"), "ISO8859-1" )+".xls");
+            OutputStream os = response.getOutputStream();
+
+            List<Map<String, Object>> list = dataQualityStatisticsService.findUploadStatistics(start,end,toPlatform);
+            //写excel
+            WritableWorkbook wwb = Workbook.createWorkbook(os);
+            //创建Excel工作表 指定名称和位置
+            WritableSheet ws = wwb.createSheet(fileName,0);
+            //添加固定信息，题头等
+            addCell(ws,0,0,"机构");
+            addCell(ws,1,0,"总档案数");
+            addCell(ws,2,0,"门诊档案数");
+            addCell(ws,3,0,"住院档案数");
+            addCell(ws,4,0,"体检档案数");
+            addCell(ws,5,0,"上传数据集数");
+            addCell(ws,6,0,"上传异常数");
+            WritableCellFormat wc = new WritableCellFormat();
+            wc.setBorder(jxl.format.Border.ALL, jxl.format.BorderLineStyle.THIN, Colour.SKY_BLUE);//边框
+            for(int i=0;i<list.size();i++) {
+                int j=i+1;
+                Map<String,Object> record = list.get(i);
+                //添加列表明细
+                addCell(ws,0,j,ObjectUtils.toString(record.get("orgName")),wc);
+                addCell(ws,1,j,ObjectUtils.toString(record.get("total")),wc);
+                addCell(ws,2,j,ObjectUtils.toString(record.get("outPatient")),wc);
+                addCell(ws,3,j,ObjectUtils.toString(record.get("inPatient")),wc);
+                addCell(ws,4,j,ObjectUtils.toString(record.get("exam")),wc);
+                addCell(ws,5,j,ObjectUtils.toString(record.get("dataset")),wc);
+                addCell(ws,6,j,ObjectUtils.toString(record.get("error")),wc);
+            }
+            //写入工作表
+            wwb.write();
+            wwb.close();
+            os.flush();
+            os.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+
+
+
     /**
      * 添加单元格内容
      * @param ws
@@ -1021,4 +1083,8 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
             return "";
         }
     }
+
+
+
+
 }

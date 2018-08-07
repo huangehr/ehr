@@ -283,6 +283,7 @@ public class ExtractUtil {
                         Map<String, String> daySlaveDictMap,
                         QuotaVo quotaVo) throws Exception {
         if (statisticsResultMap == null || statisticsResultMap.size() == 0) {
+            logger.warn("没有查询到数据");
             return;
         }
         this.quotaVo = quotaVo;
@@ -385,6 +386,9 @@ public class ExtractUtil {
                 if (dictData == null) {
                     throw new Exception("主纬度配置有误");
                 } else {
+                    if (dimensionMains.get(0).getMainCode().equals("org")) {//机构关联出区县
+                        setSaveModelProperties(dictData);
+                    }
                     //设置到map里面
                     setAllData(allData, dictData, dimensionMains.get(0).getType());
                 }

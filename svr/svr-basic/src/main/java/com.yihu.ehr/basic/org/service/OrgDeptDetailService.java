@@ -48,5 +48,9 @@ public class OrgDeptDetailService extends BaseJpaService<OrgDeptDetail, OrgDeptD
         return  orgDeptDetailPlace;
     }
 
+    public  OrgDeptDetail findOrgDeptDetailsById(int id){
+        return  deptDetailRepository.findOrgDeptDetailsById(id);
+    }
+
 }
 
