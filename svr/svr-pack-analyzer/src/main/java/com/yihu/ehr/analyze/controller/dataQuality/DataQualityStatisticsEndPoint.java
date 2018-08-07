@@ -207,4 +207,56 @@ public class DataQualityStatisticsEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
+
+    @RequestMapping(value = ServiceApi.DataQuality.uploadRecordDetail, method = RequestMethod.GET)
+    @ApiOperation(value = "【上传统计】-- 获取上传档案统计数据")
+    public Envelop uploadRecordList(
+            @ApiParam(name = "startDate", value = "开始日期")
+            @RequestParam(name = "startDate") String startDate,
+            @ApiParam(name = "endDate", value = "结束日期")
+            @RequestParam(name = "endDate") String endDate,
+            @ApiParam(name = "orgCode", value = "医院代码")
+            @RequestParam(name = "orgCode", required = false) String orgCode) throws Exception {
+        Envelop envelop = new Envelop();
+        List<Map<String, Object>> list = dataQualityStatisticsService.getUploadSuccessList(startDate, endDate, orgCode);
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(list);
+        return envelop;
+    }
+
+
+    @RequestMapping(value = ServiceApi.DataQuality.UploadDataSetList, method = RequestMethod.GET)
+    @ApiOperation(value = "【上传统计】-- 获取上传数据集统计数据")
+    public Envelop uploadDataSetList(
+            @ApiParam(name = "startDate", value = "开始日期")
+            @RequestParam(name = "startDate") String startDate,
+            @ApiParam(name = "endDate", value = "结束日期")
+            @RequestParam(name = "endDate") String endDate,
+            @ApiParam(name = "orgCode", value = "医院代码")
+            @RequestParam(name = "orgCode", required = false) String orgCode) throws Exception {
+        Envelop envelop = new Envelop();
+        List<Map<String, Object>> list = dataQualityStatisticsService.getUploadDataSetList(startDate, endDate, orgCode);
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(list);
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.DataQuality.UploadErrorList, method = RequestMethod.GET)
+    @ApiOperation(value = "【上传统计】-- 获取上传失败档案统计数据")
+    public Envelop uploadErrorList(
+            @ApiParam(name = "startDate", value = "开始日期")
+            @RequestParam(name = "startDate") String startDate,
+            @ApiParam(name = "endDate", value = "结束日期")
+            @RequestParam(name = "endDate") String endDate,
+            @ApiParam(name = "orgCode", value = "医院代码")
+            @RequestParam(name = "orgCode", required = false) String orgCode) throws Exception {
+        Envelop envelop = new Envelop();
+        List<Map<String, Object>> list = dataQualityStatisticsService.getUploadErrorList(startDate, endDate, orgCode);
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(list);
+        return envelop;
+    }
+
+
+
 }
