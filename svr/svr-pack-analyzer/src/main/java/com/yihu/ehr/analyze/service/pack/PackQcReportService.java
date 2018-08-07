@@ -33,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 
@@ -620,18 +621,59 @@ public class PackQcReportService extends BaseJpaService {
         Envelop envelop = new Envelop();
         Map<String, Object> res = new HashMap<>();
         Map<String, Object> metedata = elasticSearchUtil.findById("json_archives_qc","qc_metadata_info",id);
-        if("2".equals(metedata.get("qc_step")+"")){
-            String sql = "SELECT * FROM rs_adapter_scheme WHERE adapter_version='"+metedata.get("version")+"'";
-            List<Map<String, Object>> schemeList = jdbcTemplate.queryForList(sql);
-            if(schemeList!=null&&schemeList.size()>0){
-                metedata.put("scheme", schemeList.get(0).get("NAME"));
-            }
+
+        //查找包密码
+        Map<String, Object> jsonArchives = elasticSearchUtil.findById("json_archives","info",id);
+        if(jsonArchives != null){
+            metedata.put("pwd",jsonArchives.get("pwd"));
+        }
+        String sql = "SELECT * FROM rs_adapter_scheme WHERE adapter_version='"+metedata.get("version")+"'";
+        List<Map<String, Object>> schemeList = jdbcTemplate.queryForList(sql);
+        if(schemeList!=null&&schemeList.size()>0){
+            metedata.put("scheme", schemeList.get(0).get("NAME"));
         }
         metedata.put("dataset_name", redisClient.get("std_data_set_" + metedata.get("version") + ":" + metedata.get("dataset") + ":name"));
         metedata.put("metadata_name", redisClient.get("std_meta_data_" + metedata.get("version") + ":" + metedata.get("dataset")+"."+ metedata.get("metadata")+ ":name"));
         String relationId = metedata.get("org_code")+"_"+metedata.get("event_no")+"_"+ DateUtil.strToDate(metedata.get("event_date")+"").getTime();
+        //增加资源化信息
+        Map<String,Object> resourceInfo = new HashMap<>();
+        String version = metedata.get("version")+"";
+        String datasetCode = metedata.get("dataset")+"";
+        String metadaCode = metedata.get("metadata")+"";
+        resourceInfo.put("originDatasetCode",datasetCode);
+        resourceInfo.put("originDatasetName",metedata.get("dataset_name"));
+        resourceInfo.put("originMetadataCode",metadaCode);
+        resourceInfo.put("originMetadataName",metedata.get("metadata_name"));
+        //获取资源化的名称编码
+        String targetMetadataCode = redisClient.get(String.format("%s.%s.%s", version, datasetCode, metadaCode));
+        if(StringUtils.isNotBlank(targetMetadataCode)){
+            resourceInfo.put("targetMetadataCode",targetMetadataCode);
+            String querySql = "SELECT * FROM rs_metadata WHERE id='"+metedata.get("version")+"'";
+            List<Map<String, Object>> resourMetadata = jdbcTemplate.queryForList(querySql);
+            if(!CollectionUtils.isEmpty(resourMetadata)){
+                resourceInfo.put("targetMetadataName",resourMetadata.get(0).get("name"));
+                Object dict_id = resourMetadata.get(0).get("dict_id");
+                if(dict_id != null && !dict_id.toString().equals("0")){
+                    resourceInfo.put("targetDataType","编码");
+                } else {
+                    resourceInfo.put("targetDataType","值");
+                }
+            }
+        }
+        String dictId = redisClient.get(String.format("%s:%s:%s", "std_meta_data_"+version, datasetCode+"."+metadaCode, "dict_id"));
+        if(StringUtils.isNotBlank(dictId)){
+            resourceInfo.put("originDataType","编码");
+        } else {
+            resourceInfo.put("originDataType","值");
+        }
+        resourceInfo.put("originValue",metedata.get("value"));
+        res.put("resourceInfo",resourceInfo);
         res.put("metedata",metedata);
-        res.put("relation",elasticSearchUtil.findById("archive_relation","info",relationId));
+        Map<String, Object> relation = elasticSearchUtil.findById("archive_relation", "info", relationId);
+        if(relation == null){
+            relation = new HashMap<>();
+        }
+        res.put("relation",relation);
         envelop.setObj(res);
         envelop.setSuccessFlg(true);
         return envelop;
