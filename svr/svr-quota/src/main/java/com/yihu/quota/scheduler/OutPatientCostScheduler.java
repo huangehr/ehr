@@ -47,7 +47,7 @@ public class OutPatientCostScheduler {
     @Autowired
     private ElasticSearchUtil elasticSearchUtil;
 
-    private static final Logger log = LoggerFactory.getLogger(HealthArchiveScheduler.class);
+    private static final Logger log = LoggerFactory.getLogger(OutPatientCostScheduler.class);
 
     /**
      * 门急诊疾病费用统计
