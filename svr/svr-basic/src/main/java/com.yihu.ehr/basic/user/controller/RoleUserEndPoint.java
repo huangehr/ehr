@@ -3,10 +3,11 @@ package com.yihu.ehr.basic.user.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.yihu.ehr.basic.apps.model.UserApp;
 import com.yihu.ehr.basic.apps.service.UserAppService;
+import com.yihu.ehr.basic.org.model.OrgDept;
 import com.yihu.ehr.basic.org.model.OrgDeptDetail;
 import com.yihu.ehr.basic.org.model.OrgMemberRelation;
 import com.yihu.ehr.basic.org.model.Organization;
-import com.yihu.ehr.basic.org.service.OrgDeptDetailService;
+import com.yihu.ehr.basic.org.service.OrgDeptService;
 import com.yihu.ehr.basic.org.service.OrgMemberRelationService;
 import com.yihu.ehr.basic.org.service.OrgService;
 import com.yihu.ehr.basic.user.dao.XUserTypeRepository;
@@ -65,7 +66,7 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
     private XUserTypeRolesRepository xUserTypeRolesRepository;
 
     @Autowired
-    private OrgDeptDetailService deptDetailService;
+    private OrgDeptService orgDeptService;
     @Autowired
     private OrgService orgService;
 
@@ -427,9 +428,9 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
 
                             // 获取部门关联信息 - 名称
                             orgMemberRelation.setDeptId(deptIdInt);
-                            OrgDeptDetail orgDeptDetail = deptDetailService.searchByDeptId(deptIdInt);
-                            if(orgDeptDetail!= null){
-                                orgMemberRelation.setDeptName(orgDeptDetail.getName());
+                            OrgDept orgDept = orgDeptService.searchBydeptId(deptIdInt);
+                            if(orgDept!= null){
+                                orgMemberRelation.setDeptName(orgDept.getName());
                             }
 
                             orgMemberRelation.setStatus(0);
