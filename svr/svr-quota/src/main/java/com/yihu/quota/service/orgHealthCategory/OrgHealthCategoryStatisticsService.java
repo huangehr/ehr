@@ -1,7 +1,6 @@
 package com.yihu.quota.service.orgHealthCategory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.elasticsearch.ElasticSearchClient;
 import com.yihu.quota.vo.SaveModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -20,8 +19,6 @@ public class OrgHealthCategoryStatisticsService {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
-    @Autowired
-    private ElasticSearchClient esClient;
     @Autowired
     private ObjectMapper objectMapper;
 

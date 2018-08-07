@@ -392,9 +392,8 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page") int page,
             @ApiParam(name = "size", value = "分页大小", required = true, defaultValue = "15")
             @RequestParam(value = "size") int size) throws Exception {
-        List<Map<String, Object>> resultList = elasticSearchUtil.page(indexName, indexType, filter, sorts, page, size);
-        int count = (int)elasticSearchUtil.count(indexName, indexType, filter);
-        return getPageResult(resultList, count, page, size);
+        Page<Map<String, Object>> result = elasticSearchUtil.page(indexName, indexType, filter, sorts, page, size);
+        return getPageResult(result.getContent(), (int)result.getTotalElements(), page, size);
     }
 
     /**
@@ -469,16 +468,14 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
         }
         List<SystemDictEntry> page = systemDictEntryService.search(dictEntryFilter.toString());
         if (page.size() > 0){
-            SystemDictEntry systemDictEntry=page.get(0);
+            SystemDictEntry systemDictEntry = page.get(0);
             String filter = "sn=" + systemDictEntry.getValue() + ";";
-            List<Map<String, Object>> resultList = elasticSearchUtil.page(indexName, indexType, filter, 1, 1);
-            if (null != resultList && resultList.size() > 0){
-                Map<String, Object> map = resultList.get(0);
-                String path = fastDFSConfig.getPublicServer() + "/" + map.get("path").toString().replace(":","/");
-                map.put("path", path);
-            }
-            int count = (int)elasticSearchUtil.count(indexName, indexType, filter);
-            return getPageResult(resultList, count, 1, 5);
+            Page<Map<String, Object>> result = elasticSearchUtil.page(indexName, indexType, filter, 1, 1);
+            result.forEach(item -> {
+                String path = fastDFSConfig.getPublicServer() + "/" + item.get("path").toString().replace(":","/");
+                item.put("path", path);
+            });
+            return getPageResult(result.getContent(), (int)result.getTotalElements(), 1, 5);
         } else {
             return failed("未设置字典项值！");
         }

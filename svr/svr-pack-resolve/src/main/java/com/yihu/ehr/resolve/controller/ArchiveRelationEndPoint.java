@@ -11,6 +11,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,9 +48,9 @@ public class ArchiveRelationEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page") int page,
             @ApiParam(name = "size", value = "页码", required = true, defaultValue = "15")
             @RequestParam(value = "size") int size) throws Exception {
-        List<Map<String, Object>> archiveRelationList = elasticSearchUtil.page(INDEX, TYPE, filters, sorts, page, size);
+        Page<Map<String, Object>> result = elasticSearchUtil.page(INDEX, TYPE, filters, sorts, page, size);
         //updated by zdm on 2018/07/17 ,bug 6343---start
-        archiveRelationList.forEach(item -> {
+        result.forEach(item -> {
             //卡类型编码不为空
             if (!StringUtils.isEmpty(item.get("card_type"))) {
                 //获取资源字典-卡类型代码 集合
@@ -59,8 +60,7 @@ public class ArchiveRelationEndPoint extends EnvelopRestEndPoint {
             }
         });
         //updated by zdm on 2018/07/17---end
-        int count = (int) elasticSearchUtil.count(INDEX, TYPE, filters);
-        Envelop envelop = getPageResult(archiveRelationList, count, page, size);
+        Envelop envelop = getPageResult(result.getContent(), (int)result.getTotalElements(), page, size);
         return envelop;
     }
 

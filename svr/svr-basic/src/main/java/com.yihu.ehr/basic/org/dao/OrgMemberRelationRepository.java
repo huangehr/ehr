@@ -50,7 +50,7 @@ public interface OrgMemberRelationRepository extends PagingAndSortingRepository<
     void deleteOrgMemberRelationByUserId(@Param("userId") String userId);
 
 
-    @Query("select r from OrgMemberRelation r where r.status=0 and r.userId=:userId")
+    @Query("select r from OrgMemberRelation r where r.status = 0 and r.userId = :userId")
     List<OrgMemberRelation> findByUserId(@Param("userId") String userId);
 
     Page<OrgMemberRelation> findByOrgIdAndUserNameLike( String orgId,String userName,Pageable pageable);

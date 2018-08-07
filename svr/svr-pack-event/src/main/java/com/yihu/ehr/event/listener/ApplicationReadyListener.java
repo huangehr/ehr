@@ -16,7 +16,7 @@ import java.util.List;
  * Created by progr1mmer on 2018/7/5.
  */
 @Component
-public class ApplicationReadyEventListener implements ApplicationListener<ApplicationReadyEvent> {
+public class ApplicationReadyListener implements ApplicationListener<ApplicationReadyEvent> {
 
     @Autowired
     private EventDealChain dealChain;

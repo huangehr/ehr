@@ -3,8 +3,13 @@ package com.yihu.ehr.basic.user.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.yihu.ehr.basic.apps.model.UserApp;
 import com.yihu.ehr.basic.apps.service.UserAppService;
+import com.yihu.ehr.basic.org.model.OrgDept;
+import com.yihu.ehr.basic.org.model.OrgDeptDetail;
 import com.yihu.ehr.basic.org.model.OrgMemberRelation;
+import com.yihu.ehr.basic.org.model.Organization;
+import com.yihu.ehr.basic.org.service.OrgDeptService;
 import com.yihu.ehr.basic.org.service.OrgMemberRelationService;
+import com.yihu.ehr.basic.org.service.OrgService;
 import com.yihu.ehr.basic.user.dao.XUserTypeRepository;
 import com.yihu.ehr.basic.user.dao.XUserTypeRolesRepository;
 import com.yihu.ehr.basic.user.entity.*;
@@ -23,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -58,6 +64,11 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
     private UserTypeService userTypeService;
     @Autowired
     private XUserTypeRolesRepository xUserTypeRolesRepository;
+
+    @Autowired
+    private OrgDeptService orgDeptService;
+    @Autowired
+    private OrgService orgService;
 
 
     @RequestMapping(value = ServiceApi.Roles.RoleUser, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -283,25 +294,23 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "userId", value = "用户ID", required = true)
             @RequestParam(value = "userId") String userId,
             @ApiParam(name = "userType", value = "变更后用户类型", required = true)
-            @RequestParam(value = "userType") int userType,
-            @ApiParam(name = "flag", value = "更新类型，当0-删除所有的旧有授权，1-不删除旧有授权", required = true)
-            @RequestParam(value = "flag") int flag,
-            @ApiParam(name = "orgModel", value = "所属机构JSON串", required = false)
-            @RequestParam(value = "orgModel") String orgModel) throws Exception {
+            @RequestParam(value = "userType") int userType
+            /*@ApiParam(name = "flag", value = "更新类型，当0-删除所有的旧有授权，1-不删除旧有授权", required = true)
+            @RequestParam(value = "flag") int flag*/
+            /*@ApiParam(name = "orgModel", value = "所属机构JSON串", required = false)
+            @RequestParam(value = "orgModel") String orgModel*/) throws Exception {
         Envelop envelop = new Envelop();
 
-        if (flag == 0) {
-            //当flag为0时，删除当前用户，所有的角色授权，并重新按新的用户类型进行授权
-            Collection<RoleUser> roleUsers = roleUserService.search("userId=" + userId);
-            List<Long> ids = new ArrayList<>();
-            for (RoleUser roleUser : roleUsers) {
-                ids.add(roleUser.getId());
-            }
-            //删除该用户所有的角色授权
-            roleUserService.delete(ids);
-            //删除该用户所有的应用授权
-            userAppService.delUserAppByUserId(userId);
+        //删除当前用户，所有的角色授权，并重新按新的用户类型进行授权
+        Collection<RoleUser> roleUsers = roleUserService.search("userId=" + userId);
+        List<Long> ids = new ArrayList<>();
+        for (RoleUser roleUser : roleUsers) {
+            ids.add(roleUser.getId());
         }
+        //删除该用户所有的角色授权
+        roleUserService.delete(ids);
+        //删除该用户所有的应用授权
+        userAppService.delUserAppByUserId(userId);
 
         //基于变更后的用户类型进行角色的初始化授权
         List<UserTypeRoles> userTypeRoles = new ArrayList<>();
@@ -310,8 +319,6 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
             envelop = setUserRoles(userTypeRoles, userId);
         }
 
-        // 以上角色授权完毕，以下更新用户所属机构及部门的信息
-        envelop = setOrgDeptRelation(orgModel, userId);
         return envelop;
     }
 
@@ -337,12 +344,13 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
         long roleId = 0;
         String appId = "";
         Map<String, String> result = new HashMap<>();
-        RoleUser roleUser = new RoleUser();
+        RoleUser roleUser =null;
 
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
 
         for (UserTypeRoles userTypeRoles1 : userTypeRoles) {
+            roleUser = new RoleUser();
             roleId = userTypeRoles1.getRoleId();
             appId = userTypeRoles1.getClientId().toString();
             roleUser.setRoleId(roleId);
@@ -393,7 +401,7 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
         orgMemberRelationService.deleteOrgMemberRelationByUserId(userId);
         String orgId = "";
         List<String> deptIds = new ArrayList<>();
-        OrgMemberRelation orgMemberRelation = new OrgMemberRelation();
+        OrgMemberRelation orgMemberRelation = null ;
 
         List<MOrgDeptJson> orgDeptJsonList = objectMapper.readValue(orgModel, new TypeReference<List<MOrgDeptJson>>() {
         });
@@ -407,9 +415,25 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
                         //验证用户机构关联是否已存在
                         int res = orgMemberRelationService.getCountByOrgIdAndUserId(orgId, userId, deptIdInt);
                         if (res == 0) {
+                            orgMemberRelation = new OrgMemberRelation();
                             orgMemberRelation.setUserId(userId);
+
+                            //TODO 验证数据存储
+                            // 获取机构关联信息 - 名称
                             orgMemberRelation.setOrgId(orgId);
+                            Organization org = orgService.getOrgById(orgId);
+                            if(org != null){
+                                orgMemberRelation.setOrgName(org.getFullName());
+                            }
+
+                            // 获取部门关联信息 - 名称
                             orgMemberRelation.setDeptId(deptIdInt);
+                            OrgDept orgDept = orgDeptService.searchBydeptId(deptIdInt);
+                            if(orgDept!= null){
+                                orgMemberRelation.setDeptName(orgDept.getName());
+                            }
+
+                            orgMemberRelation.setStatus(0);
                             orgMemberRelation = orgMemberRelationService.save(orgMemberRelation);
 
                             if (orgMemberRelation != null) {
@@ -528,7 +552,6 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
-
     /**
      * 根据用户类型，获取初始化的角色组列表
      */
@@ -587,12 +610,14 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
             List<UserTypeRoles> models = objectMapper.readValue(typeRolesJson, new TypeReference<List<UserTypeRoles>>() {
             });
             userType = toEntity(userTypeJson, UserType.class);
-            if (null != userType && null != Integer.valueOf(userType.getId()) && userType.getId() > 0) {
+            if (null != userType && null != userType.getId() && userType.getId() > 0) {
                 Integer userTypeId = userType.getId();
+                String userTypeName = userType.getName();
                 //变更与角色组的关联关系
                 xUserTypeRolesRepository.deleteUserTypeRolesByTypeId(userTypeId);
                 models.forEach(userTypeRoles -> {
                     userTypeRoles.setTypeId(userTypeId);
+                    userTypeRoles.setTypeName(userTypeName);
                     userTypeRoles.setId(null);
                     xUserTypeRolesRepository.save(userTypeRoles);
                 });
@@ -617,6 +642,7 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
                 UserType userTypeBak = userTypeService.save(userType);
                 models.forEach(userTypeRoles -> {
                     userTypeRoles.setTypeId(userTypeBak.getId());
+                    userTypeRoles.setTypeName(userTypeBak.getName());
                     userTypeRoles.setId(null);
                     xUserTypeRolesRepository.save(userTypeRoles);
                 });
@@ -627,6 +653,36 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
         } catch (IOException e) {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg(e.getMessage());
+            e.printStackTrace();
+        }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.Roles.ValidateUserType, method = RequestMethod.POST)
+    @ApiOperation(value = "验证用户类别是否关联用户")
+    public Envelop alidateUserType(
+            @ApiParam(name = "userTypeId", value = "用户类型id")
+            @RequestParam(value = "userTypeId",required = true) String userTypeId) {
+        Envelop envelop = new Envelop();
+        try {
+            //失效-需要验证用户类别是否有用户使用
+            StringBuffer stringBuffer = new StringBuffer();
+            stringBuffer.append("activated=true;");
+            if (!StringUtils.isEmpty(userTypeId)) {
+                stringBuffer.append("userType=" + userTypeId + ";");
+            }
+            String filters=stringBuffer.toString();
+            List<User> list = userService.search(filters);
+            if (null != list && list.size() > 0) {
+                envelop.setSuccessFlg(true);
+                envelop.setDetailModelList(list);
+            }else{
+                //未关联用户返回空list
+                envelop.setSuccessFlg(true);
+            }
+        } catch (ParseException e) {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("查询异常"+e.getMessage());
             e.printStackTrace();
         }
         return envelop;

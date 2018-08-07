@@ -1,16 +1,18 @@
 package com.yihu.ehr.analyze.service.pack;
 
-import com.yihu.ehr.elasticsearch.ElasticSearchClient;
 import com.yihu.ehr.elasticsearch.ElasticSearchPool;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
+import com.yihu.ehr.model.quality.MProfileInfo;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.redis.client.RedisClient;
+import com.yihu.ehr.solr.SolrUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.solr.client.solrj.response.RangeFacet;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
@@ -28,6 +30,7 @@ import org.elasticsearch.search.aggregations.bucket.terms.LongTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -46,11 +49,11 @@ public class PackQcReportService extends BaseJpaService {
     @Autowired
     private ElasticSearchPool elasticSearchPool;
     @Autowired
-    private ElasticSearchClient elasticSearchClient;
-    @Autowired
     private JdbcTemplate jdbcTemplate;
     @Autowired
     private RedisClient redisClient;
+    @Autowired
+    private SolrUtil solrUtil;
     @Value("${quality.cloud}")
     private String cloud;
     protected final Log logger = LogFactory.getLog(this.getClass());
@@ -84,7 +87,7 @@ public class PackQcReportService extends BaseJpaService {
             MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery("org_code", orgCode);
             boolQueryBuilder.must(matchQueryBuilder);
         }
-        List<Map<String, Object>> res = elasticSearchClient.findByField("qc","daily_report", boolQueryBuilder);
+        List<Map<String, Object>> res = elasticSearchUtil.list("qc","daily_report", boolQueryBuilder);
         if(res!=null && res.size()>0){
             for(Map<String,Object> report : res){
                 total+=Integer.parseInt(report.get("HSI07_01_001").toString());
@@ -369,9 +372,9 @@ public class PackQcReportService extends BaseJpaService {
             int count = (int) elasticSearchUtil.count("json_archives_qc", "qc_dataset_info", stringBuilder.toString());
             double pageNum = count % 1000 > 0 ? count / 1000 + 1 : count / 1000;
             for (int i = 0; i < pageNum; i++) {
-                List<Map<String, Object>> list = elasticSearchUtil.page("json_archives_qc", "qc_dataset_info", stringBuilder.toString(), i + 1, 1000);
+                Page<Map<String, Object>> result = elasticSearchUtil.page("json_archives_qc", "qc_dataset_info", stringBuilder.toString(), i + 1, 1000);
                 logger.info("查询耗时：" + (System.currentTimeMillis() - starttime) + "ms");
-                for (Map<String, Object> map : list) {
+                for (Map<String, Object> map : result) {
                     String eventType = map.get("event_type").toString();
                     List<Map<String, Object>> dataSets = objectMapper.readValue(map.get("details").toString(), List.class);
                     for (Map<String, Object> dataSet : dataSets) {
@@ -567,9 +570,8 @@ public class PackQcReportService extends BaseJpaService {
      * @return
      * @throws Exception
      */
-    public List<Map<String, Object>> analyzeErrorList(String filters, String sorts, int page, int size) throws Exception {
-        List<Map<String, Object>> list = elasticSearchUtil.page("json_archives","info", filters, sorts, page, size);
-        return list;
+    public Page<Map<String, Object>> analyzeErrorList(String filters, String sorts, int page, int size) throws Exception {
+        return elasticSearchUtil.page("json_archives","info", filters, sorts, page, size);
     }
 
     /**
@@ -581,13 +583,13 @@ public class PackQcReportService extends BaseJpaService {
      * @return
      * @throws Exception
      */
-    public List<Map<String, Object>> metadataErrorList(String filters, String sorts, int page, int size) throws Exception {
-        List<Map<String, Object>> list = elasticSearchUtil.page("json_archives_qc","qc_metadata_info", filters, sorts, page, size);
-        for(Map<String, Object> map:list){
+    public Page<Map<String, Object>> metadataErrorList(String filters, String sorts, int page, int size) throws Exception {
+        Page<Map<String, Object>> result = elasticSearchUtil.page("json_archives_qc","qc_metadata_info", filters, sorts, page, size);
+        for (Map<String, Object> map : result){
             map.put("dataset_name", redisClient.get("std_data_set_" + map.get("version") + ":" + map.get("dataset") + ":name"));
             map.put("metadata_name", redisClient.get("std_meta_data_" + map.get("version") + ":" + map.get("dataset")+"."+ map.get("metadata")+ ":name"));
         }
-        return list;
+        return result;
     }
 
     public List<Map<String, Object>> getOrgs(){
@@ -641,11 +643,11 @@ public class PackQcReportService extends BaseJpaService {
      * @return
      * @throws Exception
      */
-    public List<Map<String, Object>> archiveList(String filters, String sorts, int page, int size) throws Exception {
+    public Page<Map<String, Object>> archiveList(String filters, String sorts, int page, int size) throws Exception {
         long starttime = System.currentTimeMillis();
-        List<Map<String, Object>> list = elasticSearchUtil.page("json_archives","info", filters, sorts, page, size);
+        Page<Map<String, Object>> result = elasticSearchUtil.page("json_archives","info", filters, sorts, page, size);
         logger.info("查询耗时：" + (System.currentTimeMillis() - starttime) + "ms");
-        return list;
+        return result;
     }
 
     /**
@@ -674,9 +676,8 @@ public class PackQcReportService extends BaseJpaService {
      * @return
      * @throws Exception
      */
-    public List<Map<String, Object>> uploadRecordList(String filters, String sorts, int page, int size) throws Exception {
-        List<Map<String, Object>> list = elasticSearchUtil.page("upload","record", filters, sorts, page, size);
-        return list;
+    public Page<Map<String, Object>> uploadRecordList(String filters, String sorts, int page, int size) throws Exception {
+        return elasticSearchUtil.page("upload", "record", filters, sorts, page, size);
     }
 
     /**
@@ -717,5 +718,74 @@ public class PackQcReportService extends BaseJpaService {
         envelop.setSuccessFlg(true);
         envelop.setObj(res);
         return envelop;
+    }
+
+    /**
+     * 通过solr查询某一段日期,各类型就诊数据
+     * 返回list<Map<String,>>
+     * @param startDate
+     * @param endDate
+     * @param orgCode
+     */
+    public List<MProfileInfo> getProfileInfo(String startDate, String endDate, String orgCode) throws Exception {
+        String q = "event_date:["+startDate+"T00:00:00Z TO "+ endDate +"T23:59:59Z]";
+        if(StringUtils.isNotBlank(orgCode)){
+            q += " AND org_code="+orgCode;
+        }
+
+        //查找门诊
+        List<RangeFacet> outRangeFacet = solrUtil.getFacetDateRange("HealthProfile", "event_date", startDate+"T23:59:59Z", endDate+"T23:59:59Z", "+1DAY", "event_type:0",q);
+        RangeFacet outPatientRangeFacet = outRangeFacet.get(0);
+        List<RangeFacet.Count> outCounts = outPatientRangeFacet.getCounts();
+        //查找住院
+        List<RangeFacet> inRangeFacet = solrUtil.getFacetDateRange("HealthProfile", "event_date", startDate+"T23:59:59Z", endDate+"T23:59:59Z", "+1DAY", "event_type:1",q);
+        RangeFacet inpatientRangeFacet = inRangeFacet.get(0);
+        List<RangeFacet.Count> inCounts = inpatientRangeFacet.getCounts();
+        //查找体检
+        List<RangeFacet> examRangeFacet = solrUtil.getFacetDateRange("HealthProfile", "event_date", startDate+"T23:59:59Z", endDate+"T23:59:59Z", "+1DAY", "event_type:2",q);
+        RangeFacet healRangeFacet = examRangeFacet.get(0);
+        List<RangeFacet.Count> healCounts = healRangeFacet.getCounts();
+
+        //前端需要list
+//        Map<String, Map<String,Integer>> dataMap = new LinkedHashMap<>(outRangeFacet.size());
+//        for (int i=0;i<inCounts.size();i++) {
+//            Map<String, Integer> map = new LinkedHashMap<>();
+//            map.put("out",outCounts.get(i).getCount());
+//            map.put("inp",inCounts.get(i).getCount());
+//            map.put("heal",healCounts.get(i).getCount());
+//            String date = outCounts.get(i).getValue().substring(0, 10);//日期
+//            dataMap.put(date, map);
+//        }
+//        return dataMap;
+        int healExamTotal = 0;
+        int outTotal = 0;
+        int inTotal = 0;
+        int hosTotal = 0;
+        List<MProfileInfo> list = new ArrayList();
+        for (int i=0;i<inCounts.size();i++) {
+            MProfileInfo profileInfo = new MProfileInfo();
+            profileInfo.setData(outCounts.get(i).getValue().substring(0, 10));
+            int healCount = healCounts.get(i).getCount();
+            healExamTotal += healCount;
+            profileInfo.setHealExam(healCount);
+            int inCount = inCounts.get(i).getCount();
+            inTotal += inCount;
+            profileInfo.setInpatient(inCount);
+            int outCount = outCounts.get(i).getCount();
+            outTotal += outCount;
+            profileInfo.setOutpatient(outCount);
+            int total = healCount + inCount + outCount;
+            profileInfo.setTotal(total);
+            hosTotal += total;
+            list.add(profileInfo);
+        }
+        MProfileInfo profileInfo = new MProfileInfo();
+        profileInfo.setData("总计");
+        profileInfo.setHealExam(healExamTotal);
+        profileInfo.setInpatient(inTotal);
+        profileInfo.setOutpatient(outTotal);
+        profileInfo.setTotal(hosTotal);
+        list.add(0,profileInfo);
+        return list;
     }
 }

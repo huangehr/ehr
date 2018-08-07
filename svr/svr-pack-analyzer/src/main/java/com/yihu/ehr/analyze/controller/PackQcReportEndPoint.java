@@ -10,17 +10,16 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.entity.quality.DqDatasetWarning;
-import com.yihu.ehr.model.adaption.MAdapterDataSet;
-import com.yihu.ehr.model.resource.MRsAdapterMetadata;
+import com.yihu.ehr.model.quality.MProfileInfo;
 import com.yihu.ehr.redis.client.RedisClient;
 import com.yihu.ehr.util.rest.Envelop;
-import com.yihu.hos.model.standard.MStdMetaData;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -234,14 +233,13 @@ public class PackQcReportEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page") int page,
             @ApiParam(name = "size", value = "页码", required = true, defaultValue = "15")
             @RequestParam(value = "size") int size) throws Exception {
-        if(StringUtils.isNotEmpty(filters)){
-            filters="analyze_status=2||archive_status=2;"+filters;
-        }else{
-            filters="analyze_status=2||archive_status=2";
+        if (StringUtils.isNotEmpty(filters)) {
+            filters = "analyze_status=2||archive_status=2;" + filters;
+        } else {
+            filters = "analyze_status=2||archive_status=2";
         }
-        List<Map<String, Object>> list = packQcReportService.analyzeErrorList(filters, sorts, page, size);
-        int count = (int) elasticSearchUtil.count("json_archives", "info", filters);
-        Envelop envelop = getPageResult(list, count, page, size);
+        Page<Map<String, Object>> result = packQcReportService.analyzeErrorList(filters, sorts, page, size);
+        Envelop envelop = getPageResult(result.getContent(), (int)result.getTotalElements(), page, size);
         return envelop;
     }
 
@@ -257,9 +255,8 @@ public class PackQcReportEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "size", value = "页码", required = true, defaultValue = "15")
             @RequestParam(value = "size") int size) throws Exception {
 
-        List<Map<String, Object>> list = packQcReportService.metadataErrorList(filters, sorts, page, size);
-        int count = (int) elasticSearchUtil.count("json_archives_qc", "qc_metadata_info", filters);
-        Envelop envelop = getPageResult(list, count, page, size);
+        Page<Map<String, Object>> result = packQcReportService.metadataErrorList(filters, sorts, page, size);
+        Envelop envelop = getPageResult(result.getContent(), (int)result.getTotalElements(), page, size);
         return envelop;
     }
 
@@ -284,15 +281,13 @@ public class PackQcReportEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page") int page,
             @ApiParam(name = "size", value = "页码", required = true, defaultValue = "15")
             @RequestParam(value = "size") int size) throws Exception {
-
 //        if(StringUtils.isNotEmpty(filters)){
 //            filters="archive_status=3;"+filters;
 //        }else{
 //            filters="archive_status=3";
 //        }
-        List<Map<String, Object>> list = packQcReportService.archiveList(filters, sorts, page, size);
-        int count = (int) elasticSearchUtil.count("json_archives", "info", filters);
-        Envelop envelop = getPageResult(list, count, page, size);
+        Page<Map<String, Object>> result = packQcReportService.archiveList(filters, sorts, page, size);
+        Envelop envelop = getPageResult(result.getContent(), (int)result.getTotalElements(), page, size);
         return envelop;
     }
 
@@ -317,9 +312,8 @@ public class PackQcReportEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page") int page,
             @ApiParam(name = "size", value = "页码", required = true, defaultValue = "15")
             @RequestParam(value = "size") int size) throws Exception {
-        List<Map<String, Object>> list = packQcReportService.uploadRecordList(filters, sorts, page, size);
-        int count = (int) elasticSearchUtil.count("upload", "record", filters);
-        Envelop envelop = getPageResult(list, count, page, size);
+        Page<Map<String, Object>> result = packQcReportService.uploadRecordList(filters, sorts, page, size);
+        Envelop envelop = getPageResult(result.getContent(), (int)result.getTotalElements(), page, size);
         return envelop;
     }
 
@@ -398,6 +392,21 @@ public class PackQcReportEndPoint extends EnvelopRestEndPoint {
         Envelop envelop = new Envelop();
         redisClient.set("start_date",date);
         envelop.setSuccessFlg(true);
+        return envelop;
+    }
+
+    @RequestMapping(value = "/packQcReport/getProfileInfo", method = RequestMethod.GET)
+    @ApiOperation(value = "设置抽取时间")
+    public Envelop getProfileInfo(@ApiParam(name = "startDate", value = "就诊开始日期")
+                                  @RequestParam(name = "startDate") String startDate,
+                                  @ApiParam(name = "endDate", value = "就诊结束日期")
+                                  @RequestParam(name = "endDate") String endDate,
+                                  @ApiParam(name = "orgCode", value = "医院代码")
+                                  @RequestParam(name = "orgCode", required = false) String orgCode) throws Exception {
+        List<MProfileInfo> profileInfo = packQcReportService.getProfileInfo(startDate, endDate, orgCode);
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(profileInfo);
         return envelop;
     }
 }

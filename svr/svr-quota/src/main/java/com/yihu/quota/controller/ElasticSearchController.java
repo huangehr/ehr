@@ -3,7 +3,7 @@ package com.yihu.quota.controller;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.elasticsearch.ElasticSearchClient;
+import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.elasticsearch.config.ElasticSearchConfig;
 import com.yihu.ehr.query.services.SolrQuery;
 import com.yihu.ehr.util.rest.Envelop;
@@ -46,15 +46,13 @@ public class ElasticSearchController extends BaseController {
     @Autowired
     private  ObjectMapper objectMapper;
     @Autowired
-    private ElasticsearchUtil elasticsearchUtil;
-    @Autowired
     private EsClientUtil esClientUtil;
     @Autowired
-    private ElasticsearchUtil searchUtil;
-    @Autowired
-    private ElasticSearchClient elasticSearchClient;
+    private ElasticsearchUtil elasticsearchUtil;
     @Autowired
     private ElasticSearchConfig elasticSearchConfig;
+    @Autowired
+    private ElasticSearchUtil elasticSearchUtil;
     @Autowired
     private SolrQuery solrQuery;
 
@@ -420,7 +418,7 @@ public class ElasticSearchController extends BaseController {
             personalInfo.setDemographicId(data);
             try {
                 String sql = "SELECT count(demographicId) FROM singleDiseasePersonal where demographicId ="+data+" group by demographicId ";
-                long count2 = searchUtil.getCountBySql(sql);
+                long count2 = elasticsearchUtil.getCountBySql(sql);
                 System.out.println("结果条数 count2="+count2);
 
 //                List<Map<String, Object>> relist = elasticSearchUtil.findByField(index, type, "demographicId", data);
@@ -436,7 +434,7 @@ public class ElasticSearchController extends BaseController {
                     Map<String, Object> source = new HashMap<>();
                     String jsonPer = objectMapper.writeValueAsString(personalInfo);
                     source = objectMapper.readValue(jsonPer, Map.class);
-                    elasticSearchClient.index(index,type, source);
+                    elasticSearchUtil.index(index,type, source);
                 }
                 i++;
             }catch (Exception e){

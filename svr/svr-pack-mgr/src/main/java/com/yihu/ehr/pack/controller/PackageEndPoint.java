@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -123,9 +124,9 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         if (count > 10000) {
             count = 10000;
         }
-        List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, filters, 1, count);
+        Page<Map<String, Object>> result = elasticSearchUtil.page(INDEX, TYPE, filters, 1, count);
         List<String> idList = new ArrayList<>();
-        for (Map<String, Object> temp : resultList) {
+        for (Map<String, Object> temp : result) {
             String [] tokens =  String.valueOf(temp.get("remote_path")).split(":");
             fastDFSUtil.delete(tokens[0], tokens[1]);
             idList.add(String.valueOf(temp.get("_id")));
@@ -142,10 +143,10 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
     public boolean deletePackages(
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件,慎用!最好先条件查询,确定是否是需要删除的数据")
             @RequestParam(value = "filters", required = false) String filters) throws Exception {
-        List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, filters, 1, 10000);
-        while(CollectionUtils.isNotEmpty(resultList)){
+        Page<Map<String, Object>> result = elasticSearchUtil.page(INDEX, TYPE, filters, 1, 10000);
+        while (CollectionUtils.isNotEmpty(result.getContent())){
             List<String> idList = new ArrayList<>();
-            for (Map<String, Object> temp : resultList) {
+            for (Map<String, Object> temp : result.getContent()) {
                 String [] tokens =  String.valueOf(temp.get("remote_path")).split(":");
                 fastDFSUtil.delete(tokens[0], tokens[1]);
                 idList.add(String.valueOf(temp.get("_id")));
@@ -154,7 +155,6 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
                 String [] _id = new String[idList.size()];
                 elasticSearchUtil.bulkDelete(INDEX, TYPE, idList.toArray(_id));
             }
-            resultList = elasticSearchUtil.page(INDEX, TYPE, filters, 1, 10000);
         }
         return true;
     }
@@ -279,10 +279,10 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page") Integer page,
             @ApiParam(name = "size", value = "状态", required = true)
             @RequestParam(value = "size") Integer size) throws Exception {
-        List<Map<String, Object>> sourceList = elasticSearchUtil.page(INDEX, TYPE, filters, page, size);
-        List<Map<String, Object>> updateSourceList = new ArrayList<>(sourceList.size());
+        Page<Map<String, Object>> result = elasticSearchUtil.page(INDEX, TYPE, filters, page, size);
+        List<Map<String, Object>> updateSourceList = new ArrayList<>();
         final int _status = status.ordinal();
-        sourceList.forEach(item -> {
+        result.forEach(item -> {
             Map<String, Object> updateSource = new HashMap<>();
             updateSource.put("_id", item.get("_id"));
             updateSource.put("analyze_status", status.ordinal());
@@ -294,7 +294,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             updateSourceList.add(updateSource);
         });
         elasticSearchUtil.bulkUpdate(INDEX, TYPE, updateSourceList);
-        return sourceList.size();
+        return result.getNumberOfElements();
     }
 
     @RequestMapping(value = ServiceApi.Packages.Resolves, method = RequestMethod.PUT)
@@ -308,10 +308,10 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page") Integer page,
             @ApiParam(name = "size", value = "状态", required = true)
             @RequestParam(value = "size") Integer size) throws Exception {
-        List<Map<String, Object>> sourceList = elasticSearchUtil.page(INDEX, TYPE, filters, page, size);
-        List<Map<String, Object>> updateSourceList = new ArrayList<>(sourceList.size());
+        Page<Map<String, Object>> result = elasticSearchUtil.page(INDEX, TYPE, filters, page, size);
+        List<Map<String, Object>> updateSourceList = new ArrayList<>();
         final int _status = status.ordinal();
-        sourceList.forEach(item -> {
+        result.forEach(item -> {
             Map<String, Object> updateSource = new HashMap<>();
             updateSource.put("_id", item.get("_id"));
             updateSource.put("archive_status", status.ordinal());
@@ -323,7 +323,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             updateSourceList.add(updateSource);
         });
         elasticSearchUtil.bulkUpdate(INDEX, TYPE, updateSourceList);
-        return sourceList.size();
+        return result.getNumberOfElements();
     }
 
     @RequestMapping(value = ServiceApi.Packages.Packages, method = RequestMethod.GET)
@@ -335,9 +335,8 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page") int page,
             @ApiParam(name = "size", value = "分页大小", required = true, defaultValue = "15")
             @RequestParam(value = "size") int size) throws Exception {
-        List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, filters, page, size);
-        int count = (int)elasticSearchUtil.count(INDEX, TYPE, filters);
-        Envelop envelop = getPageResult(resultList, count, page, size);
+        Page<Map<String, Object>> result = elasticSearchUtil.page(INDEX, TYPE, filters, page, size);
+        Envelop envelop = getPageResult(result.getContent(), (int)result.getTotalElements(), page, size);
         return envelop;
     }
 
@@ -352,9 +351,9 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page") int page,
             @ApiParam(name = "size", value = "分页大小", required = true, defaultValue = "15")
             @RequestParam(value = "size") int size) throws Exception {
-        List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, filters, sorts, page, size);
+        Page<Map<String, Object>> result = elasticSearchUtil.page(INDEX, TYPE, filters, sorts, page, size);
         List<EsDetailsPackage> esDetailsPackages = new ArrayList<>();
-        for (Map<String, Object> temp : resultList) {
+        for (Map<String, Object> temp : result) {
             esDetailsPackages.add(objectMapper.readValue(objectMapper.writeValueAsString(temp), EsDetailsPackage.class));
         }
         return esDetailsPackages;
@@ -450,8 +449,8 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         if (count > 0) {
             int page = count / PAGE_SIZE + 1;
             for (int i = 1; i <= page; i++) {
-                List<Map<String, Object>> resultList = elasticSearchUtil.page(INDEX, TYPE, stringBuilder.toString(), sorts, i, PAGE_SIZE);
-                for (Map<String, Object> item : resultList) {
+                Page<Map<String, Object>> result = elasticSearchUtil.page(INDEX, TYPE, stringBuilder.toString(), sorts, i, PAGE_SIZE);
+                for (Map<String, Object> item : result) {
                     EsSimplePackage esSimplePackage = new EsSimplePackage();
                     esSimplePackage.set_id(String.valueOf(item.get("_id")));
                     esSimplePackage.setPwd(String.valueOf(item.get("pwd")));
@@ -471,7 +470,6 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
                             esSimplePackage.setOrg_name(orgName);
                         }
                     }
-
                     //存入省平台上传队列
                     redisTemplate.opsForList().leftPush(RedisCollection.ProvincialPlatformQueue, objectMapper.writeValueAsString(esSimplePackage));
                 }
