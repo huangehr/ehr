@@ -1388,6 +1388,7 @@ public class ServiceApi {
         public static final String getseaOrgsByOrgCode = "/organizations/seaOrgsByOrgCode";
         public static final String ChildOrgSaasByAreaCode = "/org/childOrgSaasByAreaCode";
         public static final String getOrgCodeAndFullName = "/org/getOrgCodeAndFullName";
+        public static final String getUserOrgCodelistByUserId = "/org/getUserOrgCodelistByUserId";
 
 
         // 卫生机构类别

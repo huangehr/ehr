@@ -255,4 +255,18 @@ public class OrgDeptEndPoint extends EnvelopRestEndPoint {
         return convertToModel(dept, MOrgDept.class);
 
     }
+
+    @RequestMapping(value =ServiceApi.Org.getUserOrgCodelistByUserId, method = RequestMethod.GET)
+    @ApiOperation(value = "根据用户ＩＤ获取机构code")
+    public List<String> getUserOrgCodelistByUserId(
+            @ApiParam(name = "userId", value = "用户ID")
+            @RequestParam(value = "userId", required = true) String userId) throws Exception {
+        List<String> orgDepts = orgDeptService.searchByUserId(userId);
+        List<Long> longList=new ArrayList<>();
+        orgDepts.forEach(s -> {
+            longList.add(Long.parseLong(s));
+        });
+        List<String> organizationList = orgService.getOrgListById(longList);
+        return organizationList;
+    }
 }
