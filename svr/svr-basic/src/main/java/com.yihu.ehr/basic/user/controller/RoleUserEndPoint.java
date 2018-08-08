@@ -611,6 +611,22 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
             });
             userType = toEntity(userTypeJson, UserType.class);
             if (null != userType && null != userType.getId() && userType.getId() > 0) {
+                //变更 用户类型
+                List<UserType> userTList = new ArrayList<>();
+                userTList = xUserTypeRepository.findByCode(userType.getCode());
+                if (null != userTList && userTList.size() > 0 && !userTList.get(0).getId().equals(userType.getId())) {
+                    envelop.setSuccessFlg(false);
+                    envelop.setErrorMsg("用户类型编码已存在!");
+                    return envelop;
+                } else {
+                    userTList = xUserTypeRepository.findByName(userType.getName());
+                    if (null != userTList && userTList.size() > 0&& !userTList.get(0).getId().equals(userType.getId())) {
+                        envelop.setSuccessFlg(false);
+                        envelop.setErrorMsg("用户类型名称已存在!");
+                        return envelop;
+                    }
+                }
+                userType = userTypeService.save(userType);
                 Integer userTypeId = userType.getId();
                 String userTypeName = userType.getName();
                 //变更与角色组的关联关系
