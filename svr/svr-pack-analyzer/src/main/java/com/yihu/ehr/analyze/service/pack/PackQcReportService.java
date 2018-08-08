@@ -636,9 +636,11 @@ public class PackQcReportService extends BaseJpaService {
             String datasetCode = metedata.get("dataset")+"";
             String metadaCode = metedata.get("metadata")+"";
             resourceInfo.put("originDatasetCode",datasetCode);
-            resourceInfo.put("originDatasetName",metedata.get("dataset_name"));
+            String originDatasetName = redisClient.get("std_data_set_" + metedata.get("version") + ":" + metedata.get("dataset") + ":name");
+            resourceInfo.put("originDatasetName",originDatasetName);
             resourceInfo.put("originMetadataCode",metadaCode);
-            resourceInfo.put("originMetadataName",metedata.get("metadata_name"));
+            String originMetadataName = redisClient.get("std_meta_data_" + metedata.get("version") + ":" + metedata.get("dataset")+"."+ metedata.get("metadata")+ ":name");
+            resourceInfo.put("originMetadataName",originMetadataName);
             //获取资源化的名称编码
             String targetMetadataCode = redisClient.get(String.format("%s.%s.%s", version, datasetCode, metadaCode));
             if(StringUtils.isNotBlank(targetMetadataCode)){
