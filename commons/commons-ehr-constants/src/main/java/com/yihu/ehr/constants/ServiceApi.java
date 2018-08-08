@@ -1679,12 +1679,15 @@ public class ServiceApi {
         public static final String ReceptionList = "/dataQuality/quality/receptionList";
         public static final String ReceiveDataset = "/dataQuality/quality/receiveDataset";
         public static final String QualityMonitorProvincePlatform = "/dataQuality/quality/platform";
-        public static final String uploadRecordDetail= "/dataQuality/quality/uploadRecord";
-        public static final String UploadDataSetList= "/dataQuality/quality/uploadDataSets";
-        public static final String UploadErrorList= "/dataQuality/quality/uploadError";
+        public static final String uploadRecordDetail = "/dataQuality/quality/uploadRecord";
+        public static final String uploadRecordDetailPage = "/dataQuality/quality/uploadRecordPage";
+        public static final String UploadDataSetList = "/dataQuality/quality/uploadDataSets";
+        public static final String UploadDataSetListPage = "/dataQuality/quality/uploadDataSetsPage";
+        public static final String UploadErrorList = "/dataQuality/quality/uploadError";
+        public static final String UploadErrorListPage = "/dataQuality/quality/uploadErrorPage";
 
         public static final String WarningRecordList = "/dataQuality/warningRecord/warningRecordList";
-        public static final String WarningRecord =    "/dataQuality/warningRecord/warningRecord/{id}";
+        public static final String WarningRecord =  "/dataQuality/warningRecord/warningRecord/{id}";
         public static final String WarningRecordUpd = "/dataQuality/warningRecord/warningRecordUpd";
         public static final String WarningQuestionAnalyze = "/dataQuality/warningRecord/warningQuestionAnalyze";
         public static final String WarningQuestionJob = "/dataQuality/warningRecord/WarningQuestionJob";

@@ -8,6 +8,7 @@ import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.entity.quality.DqPaltformReceiveWarning;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.util.datetime.DateUtil;
+import com.yihu.ehr.util.rest.Envelop;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
 import org.elasticsearch.action.search.SearchRequestBuilder;
@@ -1158,6 +1159,48 @@ public class DataQualityStatisticsService extends BaseJpaService {
         return resultList;
     }
 
+    /**
+     * 获取省平台上传 -- 档案统计数据
+     *
+     * @param startDate
+     * @param endDate
+     * @param orgCode
+     * @return
+     * @throws Exception
+     */
+    public Envelop getUploadSuccessListPage(String startDate, String endDate, String orgCode,int size,int page) throws Exception {
+        List<Map<String, Object>> list = getUploadSuccessList(startDate, endDate, orgCode);
+        Envelop pageEnvelop = getPageEnvelop(page, size, list);
+        return pageEnvelop;
+    }
+
+    private Envelop getPageEnvelop(int page, int size, List totalList){
+        Envelop envelop = new Envelop();
+        //设置假分页
+        int totalCount = totalList.size();
+        envelop.setTotalCount(totalCount);
+        int totalPage = totalCount%size==0 ? totalCount%size:totalCount%size+1;
+        envelop.setTotalPage(totalPage);
+        envelop.setCurrPage(page);
+        envelop.setPageSize(size);
+        List<Map<String, Object>> pagedList = getPageList(page, size, totalList);
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(pagedList);
+        return envelop;
+    }
+
+    private List getPageList(int pageNum,int pageSize,List data) {
+        int fromIndex = (pageNum - 1) * pageSize;
+        if (fromIndex >= data.size()) {
+            return Collections.emptyList();
+        }
+
+        int toIndex = pageNum * pageSize;
+        if (toIndex >= data.size()) {
+            toIndex = data.size();
+        }
+        return data.subList(fromIndex, toIndex);
+    }
 
     /**
      * 获取省平台上传 -- 数据集统计数据
@@ -1204,6 +1247,20 @@ public class DataQualityStatisticsService extends BaseJpaService {
         totalMap.put("count", countTotal);
         list.add(0, totalMap);
         return list;
+    }
+
+    /**
+     * 获取省平台上传 -- 数据集统计数据
+     *
+     * @param startDate
+     * @param endDate
+     * @param orgCode
+     * @return
+     * @throws Exception
+     */
+    public Envelop getUploadDataSetListPage(String startDate, String endDate, String orgCode,int size,int page) throws Exception {
+        List<Map<String, Object>> uploadDataSetList = getUploadDataSetList(startDate, endDate, orgCode);
+        return getPageEnvelop(page, size, uploadDataSetList);
     }
 
 
@@ -1274,6 +1331,11 @@ public class DataQualityStatisticsService extends BaseJpaService {
         return resultList;
     }
 
+    public Envelop getUploadErrorListPage(String startDate, String endDate, String orgCode, int size, int page) throws Exception {
+        List<Map<String, Object>> uploadErrorList = getUploadErrorList(startDate, endDate, orgCode);
+        return getPageEnvelop(page,size,uploadErrorList);
+    }
+
     public double getDoubleValue(Double object) {
         if (object == null) {
             return 0;
@@ -1289,6 +1351,5 @@ public class DataQualityStatisticsService extends BaseJpaService {
             return object;
         }
     }
-
 
 }
