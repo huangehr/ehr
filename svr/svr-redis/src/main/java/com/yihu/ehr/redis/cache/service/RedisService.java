@@ -113,8 +113,8 @@ public class RedisService {
      *
      * @return
      */
-    public String getRsAdapterMetaData(String cdaVersion, String dictCode, String srcDictEntryCode) {
-        return rsAdapterMetaKeySchema.getMetaData(cdaVersion, dictCode, srcDictEntryCode);
+    public String getRsAdapterMetaData(String cdaVersion, String srcDataSetCode, String srcMetadataCode) {
+        return rsAdapterMetaKeySchema.getMetaData(cdaVersion, srcDataSetCode, srcMetadataCode);
     }
 
     /**
