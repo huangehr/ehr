@@ -269,9 +269,9 @@ public class ExportEndPoint extends EnvelopRestEndPoint {
                 if(collectionMap.size()>0){
                     XWPFTableRow tableRow = table3.createRow();
                     int archive_status3 = Double.valueOf(archiveMap.get("archive_status3").toString()).intValue();
-                    int archive_status2 = Double.valueOf(archiveMap.get("archive_status3").toString()).intValue();
-                    int archive_status1 = Double.valueOf(archiveMap.get("archive_status3").toString()).intValue();
-                    int archive_status0 = Double.valueOf(archiveMap.get("archive_status3").toString()).intValue();
+                    int archive_status2 = Double.valueOf(archiveMap.get("archive_status2").toString()).intValue();
+                    int archive_status1 = Double.valueOf(archiveMap.get("archive_status1").toString()).intValue();
+                    int archive_status0 = Double.valueOf(archiveMap.get("archive_status0").toString()).intValue();
                     tableRow.getCell(0).setText((archive_status3+archive_status2+archive_status1+archive_status0)+"");//0未解析 1正在解析 2解析失败 3解析完成
                     tableRow.getCell(1).setText(archive_status3+"");
                     tableRow.getCell(2).setText(archive_status2+"");
