@@ -274,14 +274,26 @@ public class RsResourceService extends BaseJpaService<RsResource, RsResourceDao>
     }
 
     public RsResource getResourceByCategory(String resourceCode, String categoryCode)  {
+        RsResource rsResource =null;
         Session session = currentSession();
-
-        String hql = "SELECT rsResource FROM RsResource rsResource,RsResourceCategory rsResourceCategory WHERE rsResource.categoryId =rsResourceCategory.id and rsResource.code = :resourceCode and rsResourceCategory.code= :categoryCode";
+        String hql="SELECT rsResource FROM RsResource rsResource WHERE rsResource.code = :resourceCode ";
         Query query = session.createQuery(hql);
         query.setFlushMode(FlushMode.COMMIT);
         query.setParameter("resourceCode", resourceCode);
-        query.setParameter("categoryCode", categoryCode);
-        return (RsResource) query.uniqueResult();
+        List list = query.list();
+        //因为标准视图和业务视图的编码（使用数据集编码）重复，导致根据视图编码查视图会出现不唯一的情况。但是指标（指标视图为派生分类）也使用该接口，直接传“standard”会导致指标查不出数据。
+        //所以临时的方案是先根据视图code查询（指标视图id唯一），若结果大于1条，则加resourceCode=standard 查询。--zdm
+        if (null != list && list.size() > 1) {
+            hql = "SELECT rsResource FROM RsResource rsResource,RsResourceCategory rsResourceCategory WHERE rsResource.categoryId =rsResourceCategory.id and rsResource.code = :resourceCode and rsResourceCategory.code= :categoryCode";
+            Query queryNew = session.createQuery(hql);
+            queryNew.setFlushMode(FlushMode.COMMIT);
+            queryNew.setParameter("resourceCode", resourceCode);
+            queryNew.setParameter("categoryCode", categoryCode);
+            rsResource = (RsResource) queryNew.uniqueResult();
+        } else if (null != list && list.size() == 1) {
+            rsResource = (RsResource) list.get(0);
+        }
+        return rsResource;
     }
 
 
