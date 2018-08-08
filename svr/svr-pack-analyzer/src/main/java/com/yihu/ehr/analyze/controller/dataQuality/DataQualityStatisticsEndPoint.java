@@ -224,6 +224,22 @@ public class DataQualityStatisticsEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
+    @RequestMapping(value = ServiceApi.DataQuality.uploadRecordDetailPage, method = RequestMethod.GET)
+    @ApiOperation(value = "【上传统计】-- 获取上传档案统计数据")
+    public Envelop uploadRecordListPage(
+            @ApiParam(name = "startDate", value = "开始日期")
+            @RequestParam(name = "startDate") String startDate,
+            @ApiParam(name = "endDate", value = "结束日期")
+            @RequestParam(name = "endDate") String endDate,
+            @ApiParam(name = "orgCode", value = "医院代码")
+            @RequestParam(name = "orgCode", required = false) String orgCode,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page) throws Exception {
+        return dataQualityStatisticsService.getUploadSuccessListPage(startDate, endDate, orgCode,size,page);
+    }
+
 
     @RequestMapping(value = ServiceApi.DataQuality.UploadDataSetList, method = RequestMethod.GET)
     @ApiOperation(value = "【上传统计】-- 获取上传数据集统计数据")
@@ -241,6 +257,22 @@ public class DataQualityStatisticsEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
+    @RequestMapping(value = ServiceApi.DataQuality.UploadDataSetListPage, method = RequestMethod.GET)
+    @ApiOperation(value = "【上传统计】-- 获取上传数据集统计数据")
+    public Envelop uploadDataSetListPage(
+            @ApiParam(name = "startDate", value = "开始日期")
+            @RequestParam(name = "startDate") String startDate,
+            @ApiParam(name = "endDate", value = "结束日期")
+            @RequestParam(name = "endDate") String endDate,
+            @ApiParam(name = "orgCode", value = "医院代码")
+            @RequestParam(name = "orgCode", required = false) String orgCode,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page) throws Exception {
+        return dataQualityStatisticsService.getUploadDataSetListPage(startDate,endDate,orgCode,size,page);
+    }
+
     @RequestMapping(value = ServiceApi.DataQuality.UploadErrorList, method = RequestMethod.GET)
     @ApiOperation(value = "【上传统计】-- 获取上传失败档案统计数据")
     public Envelop uploadErrorList(
@@ -255,6 +287,22 @@ public class DataQualityStatisticsEndPoint extends EnvelopRestEndPoint {
         envelop.setSuccessFlg(true);
         envelop.setDetailModelList(list);
         return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.DataQuality.UploadErrorListPage, method = RequestMethod.GET)
+    @ApiOperation(value = "【上传统计】-- 获取上传失败档案统计数据")
+    public Envelop uploadErrorListPage(
+            @ApiParam(name = "startDate", value = "开始日期")
+            @RequestParam(name = "startDate") String startDate,
+            @ApiParam(name = "endDate", value = "结束日期")
+            @RequestParam(name = "endDate") String endDate,
+            @ApiParam(name = "orgCode", value = "医院代码")
+            @RequestParam(name = "orgCode", required = false) String orgCode,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page) throws Exception {
+        return dataQualityStatisticsService.getUploadErrorListPage(startDate, endDate, orgCode,size,page);
     }
 
 
