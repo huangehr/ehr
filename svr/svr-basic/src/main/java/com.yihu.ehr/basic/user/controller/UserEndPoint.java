@@ -1104,4 +1104,22 @@ public class UserEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
+    @RequestMapping(value = ServiceApi.Users.initializationAuthorization, method = RequestMethod.GET)
+    @ApiOperation(value = "根据用户类型id，用户id进行初始化授权")
+    public Envelop initializationAuthorization(
+            @ApiParam(name = "userTypeId", value = "用户类型id", defaultValue = "")
+            @RequestParam(value = "userTypeId",required =true) int userTypeId,
+            @ApiParam(name = "userId", value = "用户id", defaultValue = "")
+            @RequestParam(value = "userId",required =true) String userId) {
+        Envelop envelop = new Envelop();
+        boolean authorrizationFlag= userService.initializationAuthorization(userTypeId,userId);
+        if (authorrizationFlag) {
+            envelop.setSuccessFlg(true);
+        } else {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("初始化授权失败！");
+        }
+        return envelop;
+    }
+
 }

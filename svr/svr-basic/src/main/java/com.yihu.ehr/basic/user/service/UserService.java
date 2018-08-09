@@ -1,10 +1,8 @@
 package com.yihu.ehr.basic.user.service;
 
+import com.yihu.ehr.basic.apps.dao.UserAppDao;
 import com.yihu.ehr.basic.patient.dao.XDemographicInfoRepository;
-import com.yihu.ehr.basic.user.dao.XDoctorRepository;
-import com.yihu.ehr.basic.user.dao.XUserRepository;
-import com.yihu.ehr.basic.user.dao.XUserTypeRepository;
-import com.yihu.ehr.basic.user.dao.XUserTypeRolesRepository;
+import com.yihu.ehr.basic.user.dao.*;
 import com.yihu.ehr.basic.user.entity.User;
 import com.yihu.ehr.basic.user.entity.UserTypeRoles;
 import com.yihu.ehr.entity.patient.DemographicInfo;
@@ -54,6 +52,10 @@ public class UserService extends BaseJpaService<User, XUserRepository> {
     private XUserTypeRepository xUserTypeRepository;
     @Autowired
     private XUserTypeRolesRepository xUserTypeRolesRepository;
+    @Autowired
+    private RoleUserDao roleUserDao;
+    @Autowired
+    private UserAppDao userAppRepository;
 
     @PostConstruct
     void init() {
@@ -380,6 +382,34 @@ public class UserService extends BaseJpaService<User, XUserRepository> {
         }else{
             return null;
         }
+    }
+
+
+    /**
+     * 初始化授权
+     * @param userTypeId
+     * @param userId
+     * @return
+     */
+    @Transactional(propagation = Propagation.REQUIRED ,rollbackFor = Exception.class)
+    public  boolean initializationAuthorization(int userTypeId,String userId){
+        try {
+            roleUserDao.deleteByUserId(userId);
+            userAppRepository.deleteByUserId(userId);
+            //根据用户类型获取授权信息
+            List<UserTypeRoles> userTypeRoles = xUserTypeRolesRepository.findByTypeId(userTypeId);
+            //授权users_apps
+            List roles = new ArrayList();
+            userTypeRoles.forEach(userTypeRoles1 -> {
+                roles.add(userTypeRoles1.getRoleId());
+            });
+            String roleStr = org.apache.commons.lang.StringUtils.join(roles.toArray(), ",");
+            roleUserService.batchCreateRoleUsersRelation(userId, roleStr);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return  false;
+        }
+        return  true;
     }
 
 }
