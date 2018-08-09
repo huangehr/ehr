@@ -211,7 +211,7 @@ public class OutPatientCostScheduler {
                                     if (StringUtils.isEmpty(org)) {
                                         org = map.get("org_code").toString();
                                     }
-                                    if (StringUtils.isEmpty(dept)) {
+                                    if (StringUtils.isEmpty(dept) && null != map.get("dept_code")) {
                                         dept = map.get("dept_code").toString();
                                     }
                                     if (StringUtils.isEmpty(eventDate)) {
