@@ -114,7 +114,7 @@ public class ElasticSearchEndPoint extends EnvelopRestEndPoint {
             RangeQueryBuilder rangeQueryEndTime = QueryBuilders.rangeQuery(dateField).lte(endDate);
             boolQueryBuilder.must(rangeQueryEndTime);
         }
-        elasticSearchUtil.deleteByFilter(index, type, boolQueryBuilder,10000);
+        elasticSearchUtil.deleteByFilter(index, type, boolQueryBuilder);
         return success(true);
     }
 
