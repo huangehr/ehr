@@ -128,7 +128,7 @@ public class ExtractUtil {
                         if(value.length() > 2){
                             value = value.substring(0,2);
                         }
-                        if( StringUtils.isEmpty(deptDictMap.get(value))){
+                        if( !StringUtils.isEmpty(deptDictMap.get(value))){
                             saveModel.setDeptName(deptDictMap.get(value));
                             saveModel.setDept(value);
                         }
