@@ -194,10 +194,11 @@ public class ElasticSearchUtil {
      * @param index
      * @param type
      * @param filters
+     * 每次最多一万条
      */
     public void deleteByFilter(String index, String type, String filters) {
         QueryBuilder queryBuilder = getQueryBuilder(filters);
-        deleteByFilter(index, type, queryBuilder);
+        deleteByFilter(index, type, queryBuilder,10000);
     }
 
     /**
@@ -205,12 +206,14 @@ public class ElasticSearchUtil {
      * @param index
      * @param type
      * @param queryBuilder
+     * @param size
      */
-    public void deleteByFilter(String index, String type, QueryBuilder queryBuilder) {
+    public void deleteByFilter(String index, String type, QueryBuilder queryBuilder,int size) {
         List<String> idList = getIds(index, type, queryBuilder);
         if (idList.size() > 0) {
             TransportClient transportClient = elasticSearchPool.getClient();
-            String [] idArr = new String[idList.size()];
+            size = idList.size()>size ? size : idList.size();
+            String [] idArr = new String[size];
             idArr = idList.toArray(idArr);
             BulkRequestBuilder bulkRequestBuilder = transportClient.prepareBulk();
             for (String id : idArr) {
