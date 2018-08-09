@@ -124,12 +124,14 @@ public class ExtractUtil {
                     }else if(main.getMainCode().equals(main_year) && !StringUtils.isEmpty(yearDictMap.get(value))){
                         saveModel.setYearName(yearDictMap.get(value));
                         saveModel.setYear(value);
-                    }else if(main.getMainCode().equals(main_dept) && !StringUtils.isEmpty(deptDictMap.get(value))){
+                    }else if(main.getMainCode().equals(main_dept)){
                         if(value.length() > 2){
                             value = value.substring(0,2);
                         }
-                        saveModel.setDeptName(deptDictMap.get(value));
-                        saveModel.setDept(value);
+                        if( StringUtils.isEmpty(deptDictMap.get(value))){
+                            saveModel.setDeptName(deptDictMap.get(value));
+                            saveModel.setDept(value);
+                        }
                     }
                 }
             }
