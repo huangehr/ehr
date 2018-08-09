@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.model.packs.EsSimplePackage;
 import com.yihu.ehr.profile.queue.RedisCollection;
+import com.yihu.ehr.util.datetime.DateUtil;
 import org.apache.commons.lang.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -44,7 +45,10 @@ public class PackResolveTask {
         if (redisTemplate.opsForSet().size(RedisCollection.ResolveQueueVice) <= 0) {
             Page<Map<String, Object>> result = elasticSearchUtil.page(INDEX, TYPE, "analyze_status=3;archive_status=0", "+receive_date", 1, 1000);
             for (Map<String, Object> pack : result) {
-                String packStr = objectMapper.writeValueAsString(pack);
+                pack.put("archive_status",1);
+                pack.put("message","加入消息队列,等待入库");
+                Map<String, Object> update = elasticSearchUtil.update(INDEX, TYPE, pack.get("_id") + "", pack);
+                String packStr = objectMapper.writeValueAsString(update);
                 EsSimplePackage esSimplePackage = objectMapper.readValue(packStr, EsSimplePackage.class);
                 redisTemplate.opsForSet().add(RedisCollection.ResolveQueueVice, objectMapper.writeValueAsString(esSimplePackage));
             }
@@ -55,7 +59,8 @@ public class PackResolveTask {
         for (Map<String, Object> pack : result) {
             Map<String, Object> updateSource = new HashMap<>();
             updateSource.put("_id", pack.get("_id"));
-            updateSource.put("archive_status", 0);
+            updateSource.put("archive_status", 1);
+            updateSource.put("message","重新加入消息队列,等待入库");
             updateSourceList.add(updateSource);
             String packStr = objectMapper.writeValueAsString(pack);
             EsSimplePackage esSimplePackage = objectMapper.readValue(packStr, EsSimplePackage.class);
@@ -68,7 +73,9 @@ public class PackResolveTask {
         for (Map<String, Object> pack : result) {
             Map<String, Object> updateSource = new HashMap<>();
             updateSource.put("_id", pack.get("_id"));
-            updateSource.put("archive_status", 0);
+            updateSource.put("archive_status", 1);
+            updateSource.put("message","重新加入消息队列,等待入库");
+            updateSource.put("parse_date",DateUtil.toStringLong(new Date()));
             updateSourceList.add(updateSource);
             String packStr = objectMapper.writeValueAsString(pack);
             EsSimplePackage esSimplePackage = objectMapper.readValue(packStr, EsSimplePackage.class);

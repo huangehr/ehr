@@ -173,15 +173,24 @@ public class ExtractUtil {
                     }
                 }
                 if(!StringUtils.isEmpty(timeKey)){
-                    if(!StringUtils.isEmpty( map.get("quotaDate") ) ){
+                    if(!StringUtils.isEmpty( map.get(timeKey) ) ){
                         String date = "";
-                        if(map.get("quotaDate") instanceof String){
-                            date = map.get("quotaDate").toString();
-                        }else if(map.get("quotaDate") instanceof Date){
-                            date = DateUtil.formatDate((Date)map.get("quotaDate"),DateUtil.DEFAULT_DATE_YMD_FORMAT);
+                        if(map.get(timeKey) instanceof String){
+                            date = map.get(timeKey).toString().substring(0,10);
+                        }else if(map.get(timeKey) instanceof Date){
+                            date = DateUtil.formatDate((Date)map.get(timeKey),DateUtil.DEFAULT_DATE_YMD_FORMAT);
                         }
                         saveModel.setQuotaDate(date);
                     }
+//                    if(!StringUtils.isEmpty( map.get("quotaDate") ) ){
+//                        String date = "";
+//                        if(map.get("quotaDate") instanceof String){
+//                            date = map.get("quotaDate").toString();
+//                        }else if(map.get("quotaDate") instanceof Date){
+//                            date = DateUtil.formatDate((Date)map.get("quotaDate"),DateUtil.DEFAULT_DATE_YMD_FORMAT);
+//                        }
+//                        saveModel.setQuotaDate(date);
+//                    }
                     if(!StringUtils.isEmpty( map.get("event_date") )){
                         String date = "";
                         if(map.get("event_date") instanceof String){
