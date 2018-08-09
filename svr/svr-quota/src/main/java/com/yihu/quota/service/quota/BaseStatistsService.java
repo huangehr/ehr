@@ -31,7 +31,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -380,7 +379,9 @@ public class BaseStatistsService {
                 divisionResultList.add(map);
             } else {
                 double point = 0;
-                DecimalFormat df = new DecimalFormat("0.00");
+                NumberFormat df = NumberFormat.getInstance();
+                df.setGroupingUsed(false);
+                df.setMaximumFractionDigits(2);
                 if (operation == 1) {
                     point = (moleResultVal / denominatorVal) * operationValue;
                 } else if (operation == 2) {
@@ -443,7 +444,9 @@ public class BaseStatistsService {
                         }
                         if(moleKeyVal.equals(dimenKeyVal)){
                             double point = 0;
-                            DecimalFormat df = new DecimalFormat("0.0");
+                            NumberFormat df = NumberFormat.getInstance();
+                            df.setGroupingUsed(false);
+                            df.setMaximumFractionDigits(2);
                             float dimeResultVal = Float.valueOf(denoMap.get(resultField).toString());
                             if(dimeResultVal != 0){
                                 if(operation == 1){
@@ -1193,7 +1196,9 @@ public class BaseStatistsService {
                     }
                 }
                 double point = 0;
-                DecimalFormat df = new DecimalFormat("0.0");
+                NumberFormat df = NumberFormat.getInstance();
+                df.setGroupingUsed(false);
+                df.setMaximumFractionDigits(2);
                 int operation = Integer.valueOf(esConfig.getPercentOperation());
                 int operationValue = Integer.valueOf(esConfig.getPercentOperationValue());
                 if(denoTotal - 0 != 0){
@@ -1700,7 +1705,9 @@ public class BaseStatistsService {
             }
             dimension = dateType;
             List<Map<String, Object>> dataList = getSimpleQuotaReport(esConfig.getMolecular(), filters,dimension ,false , null);
-            DecimalFormat df = new DecimalFormat("0.0");
+            NumberFormat df = NumberFormat.getInstance();
+            df.setGroupingUsed(false);
+            df.setMaximumFractionDigits(2);
             if(dataList != null && dataList.size() > 0){
                 if(dateType.toLowerCase().equals("year")){
                     for(int i = nowYear ; i > beforeYear ;i--){
