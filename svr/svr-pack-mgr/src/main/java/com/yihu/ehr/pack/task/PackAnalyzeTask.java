@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.model.packs.EsSimplePackage;
 import com.yihu.ehr.profile.queue.RedisCollection;
+import com.yihu.ehr.util.datetime.DateUtil;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -15,6 +16,8 @@ import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
+import static com.yihu.ehr.util.datetime.DateUtil.DEFAULT_YMDHMSDATE_FORMAT;
 
 /**
  * 档案包质控容错处理任务
@@ -41,10 +44,13 @@ public class PackAnalyzeTask {
     public void delayPushTask() throws Exception {
         List<String> esSimplePackageList = new ArrayList<>(200);
         //当质控队列为空，将状态为待质控的档案包加入质控队列
-        if (redisTemplate.opsForSet().size(RedisCollection.AnalyzeQueueVice) <= 0) {
+        if (redisTemplate.opsForSet().size(RedisCollection.AnalyzeQueueVice) <= 0 ) {
             Page<Map<String, Object>> result = elasticSearchUtil.page(INDEX, TYPE, "analyze_status=0", "+receive_date", 1, 1000);
             for (Map<String, Object> pack : result) {
-                String packStr = objectMapper.writeValueAsString(pack);
+                pack.put("analyze_status",1);
+                pack.put("message","加入消息队列,等待质控");
+                Map<String, Object> update = elasticSearchUtil.update(INDEX, TYPE, pack.get("_id") + "", pack);
+                String packStr = objectMapper.writeValueAsString(update);
                 EsSimplePackage esSimplePackage = objectMapper.readValue(packStr, EsSimplePackage.class);
                 redisTemplate.opsForSet().add(RedisCollection.AnalyzeQueueVice, objectMapper.writeValueAsString(esSimplePackage));
             }
@@ -55,7 +61,8 @@ public class PackAnalyzeTask {
         for (Map<String, Object> pack : result) {
             Map<String, Object> updateSource = new HashMap<>();
             updateSource.put("_id", pack.get("_id"));
-            updateSource.put("analyze_status", 0);
+            updateSource.put("analyze_status", 1);
+            updateSource.put("message","重新加入消息队列,等待质控");
             updateSourceList.add(updateSource);
             String packStr = objectMapper.writeValueAsString(pack);
             EsSimplePackage esSimplePackage = objectMapper.readValue(packStr, EsSimplePackage.class);
@@ -68,7 +75,9 @@ public class PackAnalyzeTask {
         for (Map<String, Object> pack : result) {
             Map<String, Object> updateSource = new HashMap<>();
             updateSource.put("_id", pack.get("_id"));
-            updateSource.put("analyze_status", 0);
+            updateSource.put("analyze_date",DateUtil.toStringLong(new Date()));
+            updateSource.put("analyze_status", 1);
+            updateSource.put("message","重新加入消息队列,等待质控");
             updateSourceList.add(updateSource);
             String packStr = objectMapper.writeValueAsString(pack);
             EsSimplePackage esSimplePackage = objectMapper.readValue(packStr, EsSimplePackage.class);
