@@ -801,6 +801,7 @@ public class ServiceApi {
         public static final String changePasswordByOldPassword = "/users/changePasswordByOldPassword";
         public static final String updateUserTelePhone = "/users/updateTelephone";
 
+        public static final String initializationAuthorization = "/users/initializationAuthorization";
     }
 
     public static class TelVerification {
