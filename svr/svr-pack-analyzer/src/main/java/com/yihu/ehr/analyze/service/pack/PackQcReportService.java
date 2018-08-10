@@ -725,7 +725,11 @@ public class PackQcReportService extends BaseJpaService {
         Map<String, Object> res = new HashMap<>();
         Map<String, Object> archive = elasticSearchUtil.findById("json_archives","info",id);
         res.put("archive",archive);
-        res.put("relation",elasticSearchUtil.findById("archive_relation","info",archive.get("profile_id")+""));
+        Map<String, Object> relation = elasticSearchUtil.findById("archive_relation", "info", archive.get("profile_id") + "");
+        if(relation == null){
+            relation = new HashMap<>();
+        }
+        res.put("relation",relation);
         envelop.setObj(res);
         envelop.setSuccessFlg(true);
         return envelop;
