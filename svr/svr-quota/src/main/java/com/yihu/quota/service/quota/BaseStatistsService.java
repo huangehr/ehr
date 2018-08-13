@@ -766,7 +766,12 @@ public class BaseStatistsService {
         }else {
             groupDimension = dimension;
         }
-        List<Map<String, Object>>  dimenListResult = esResultExtract.searcherSumGroup(tjQuota, groupDimension, filter, resultField, "", "", top);
+        List<Map<String, Object>>  dimenListResult = null;
+        if (StringUtils.isNotEmpty(top)) {
+            dimenListResult = esResultExtract.searcherSumGroup(tjQuota, groupDimension, filter, resultField, groupDimension, "asc", "1000");
+            dimenListResult.subList(0, dimenListResult.size() > Integer.parseInt(top) ? Integer.parseInt(top) : dimenListResult.size());
+        }
+        dimenListResult = esResultExtract.searcherSumGroup(tjQuota, groupDimension, filter, resultField, "", "", top);
         List<Map<String, Object>> resultList = new ArrayList<>();
         for(Map<String, Object> map : dimenListResult){
             Map<String,Object> dataMap = new HashMap<>();
@@ -822,7 +827,12 @@ public class BaseStatistsService {
                 }
             }
         }
-        List<Map<String, Object>>  dimenListResult = esResultExtract.searcherSumGroup(tjQuota, groupDimension, filter, resultField, groupDimension, "asc", top);
+        List<Map<String, Object>>  dimenListResult = null;
+        if (StringUtils.isNotEmpty(top)) {
+            dimenListResult = esResultExtract.searcherSumGroup(tjQuota, groupDimension, filter, resultField, groupDimension, "asc", "1000");
+            dimenListResult.subList(0, dimenListResult.size() > Integer.parseInt(top) ? Integer.parseInt(top) : dimenListResult.size());
+        }
+        dimenListResult = esResultExtract.searcherSumGroup(tjQuota, groupDimension, filter, resultField, groupDimension, "asc", top);
 
         List<Map<String, Object>> resultList = new ArrayList<>();
         for(Map<String, Object> map : dimenListResult){
