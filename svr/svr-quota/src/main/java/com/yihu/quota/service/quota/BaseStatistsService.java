@@ -832,7 +832,7 @@ public class BaseStatistsService {
                     if(dimensionDicMap.get(map.get(key).toString().toLowerCase())  != null){
                         dataMap.put(key,dimensionDicMap.get(map.get(key).toString().toLowerCase()));
                         dataMap.put(key+"Name",dimensionDicMap.get(map.get(key).toString().toLowerCase()));
-                        dataMap.put(key+"Code",map.get(key).toString().toLowerCase());
+                        dataMap.put(key+"Code",map.get(key).toString());
                         dataMap.put(firstColumnField,dimensionDicMap.get(map.get(key).toString().toLowerCase()));
                     }else {
                         dataMap.put(key,map.get(key));
