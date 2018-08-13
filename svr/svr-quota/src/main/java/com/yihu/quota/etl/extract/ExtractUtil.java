@@ -501,21 +501,20 @@ public class ExtractUtil {
 
     private Map<String, SaveModel> setAllSlaveData(Map<String, SaveModel> allData, List<DictModel> dictData, Integer key) {
         Map<String, SaveModel> returnAllData = new HashMap<>();
+        String keyMethod = "setSlaveKey" + (key + 1);
+        String nameMethod = keyMethod + "Name";
         try {
             for (Map.Entry<String, SaveModel> one : allData.entrySet()) {
+                DictModel dictOne = null;
                 for (int i = 0; i < dictData.size(); i++) {
-                    DictModel dictOne = dictData.get(i);
+                    dictOne = dictData.get(i);
                     //设置新key
-                    StringBuffer newKey = new StringBuffer(one.getKey() + "-" + dictOne.getCode());
+                    String newKey = one.getKey() + "-" + dictOne.getCode();
                     //设置新的value
                     SaveModel saveModelTemp = new SaveModel();
                     BeanUtils.copyProperties(one.getValue(), saveModelTemp);
-
-                    StringBuffer keyMethodName = new StringBuffer("setSlaveKey" + (key + 1));
-                    StringBuffer nameMethodName = new StringBuffer("setSlaveKey" + (key + 1) + "Name");
-
-                    SaveModel.class.getMethod(keyMethodName.toString(), String.class).invoke(saveModelTemp, dictOne.getCode());
-                    SaveModel.class.getMethod(nameMethodName.toString(), String.class).invoke(saveModelTemp, dictOne.getName());
+                    SaveModel.class.getMethod(keyMethod, String.class).invoke(saveModelTemp, dictOne.getCode());
+                    SaveModel.class.getMethod(nameMethod, String.class).invoke(saveModelTemp, dictOne.getName());
                     returnAllData.put(newKey.toString(), saveModelTemp);
                 }
             }
