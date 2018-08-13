@@ -209,24 +209,23 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
         orgMemberRelationInfo(orgDeptJsonList, user, d);
 
         //TODO 角色有可能没有关联机构，此部分需要待确认 根据机构获取医生角色id,保存到role_users表中,appId是健康上饶APP对应的id:WYo0l73F8e
-        List<String> orgList = orgService.getOrgList(orgDeptJsonList);
-        if (null != orgList && orgList.size() > 0) {
-            List<Roles> rolesList = rolesService.findByCodeAndAppIdAndOrgCode(orgList, "WYo0l73F8e", "Doctor");
-            if (null != rolesList && rolesList.size() > 0) {
-                roleUserService.batchCreateRoleUsersRelation(user.getId(), String.valueOf(rolesList.get(0).getId()));
-            } else {
-                // 不存在 则往角色表中插入该应用的医生角色
-                Roles roles = new Roles();
-                roles.setCode("Doctor");
-                roles.setName("医生");
-                roles.setAppId("WYo0l73F8e");
-                roles.setType("1");
-                roles.setOrgCode(orgList.get(0));
-                roles = rolesService.save(roles);
-                roleUserService.batchCreateRoleUsersRelation(user.getId(), String.valueOf(roles.getId()));
-            }
-        }
-
+//        List<String> orgList = orgService.getOrgList(orgDeptJsonList);
+//        if (null != orgList && orgList.size() > 0) {
+//            List<Roles> rolesList = rolesService.findByCodeAndAppIdAndOrgCode(orgList, "WYo0l73F8e", "Doctor");
+//            if (null != rolesList && rolesList.size() > 0) {
+//                roleUserService.batchCreateRoleUsersRelation(user.getId(), String.valueOf(rolesList.get(0).getId()));
+//            } else {
+//                // 不存在 则往角色表中插入该应用的医生角色
+//                Roles roles = new Roles();
+//                roles.setCode("Doctor");
+//                roles.setName("医生");
+//                roles.setAppId("WYo0l73F8e");
+//                roles.setType("1");
+//                roles.setOrgCode(orgList.get(0));
+//                roles = rolesService.save(roles);
+//                roleUserService.batchCreateRoleUsersRelation(user.getId(), String.valueOf(roles.getId()));
+//            }
+//        }
         return convertToModel(doctor, MDoctor.class);
 
     }
