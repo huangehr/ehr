@@ -6,7 +6,10 @@ import com.yihu.ehr.basic.apps.service.AppService;
 import com.yihu.ehr.basic.apps.service.AppsRelationService;
 import com.yihu.ehr.basic.apps.service.OauthClientDetailsService;
 import com.yihu.ehr.basic.dict.service.SystemDictEntryService;
+import com.yihu.ehr.basic.getui.ConstantUtil;
+import com.yihu.ehr.basic.user.entity.RoleAppRelation;
 import com.yihu.ehr.basic.user.entity.Roles;
+import com.yihu.ehr.basic.user.service.RoleAppRelationService;
 import com.yihu.ehr.basic.user.service.RolesService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ErrorCode;
@@ -55,6 +58,8 @@ public class AppEndPoint extends EnvelopRestEndPoint {
     private AppsRelationService appsRelationService;
     @Autowired
     private OauthClientDetailsService oauthClientDetailsService;
+    @Autowired
+    private RoleAppRelationService roleAppRelationService;
 
     @RequestMapping(value = ServiceApi.Apps.Apps, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建App")
@@ -64,6 +69,25 @@ public class AppEndPoint extends EnvelopRestEndPoint {
         App app = toEntity(appJson, App.class);
         app.setId(getObjectId(BizObject.App));
         app = appService.createApp(app);
+        //为应用追加默认角色组
+        Roles roles=null;
+        RoleAppRelation relation =null;
+        String[][] rolestr= ConstantUtil.roles;
+        for (String[] role : rolestr) {
+            roles=new Roles();
+            roles.setAppId(app.getId());
+            roles.setType("1");
+            roles.setCode(role[0]);
+            roles.setName(role[1]);
+            roles= roleAppRelation.save(roles);
+            relation = new RoleAppRelation();
+            relation.setAppId(app.getId());
+            relation.setRoleId(roles.getId());
+            roleAppRelationService.save(relation);
+        }
+
+
+
         return convertToModel(app, MApp.class);
     }
 

@@ -17,5 +17,9 @@ public class ConstantUtil {
     //卫生人员初始化 用户类型id(编码是可变的)
     public static String DOCTORUSERTYPEID="2";
     public static String PATIENTUSERTYPEID="5";
+    /**
+     * 默认角色组，在新建应用时需要生成的角色组
+     */
+    public static String[][] roles={{"AdminManager","行政管理"},{"SuperAdmin","超级管理员"},{"MedicalStaff","医护人员"},{"Operation","运维人员"}};
 
 }
