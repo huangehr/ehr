@@ -78,6 +78,22 @@ public class PackageAnalyzeService {
                 esSimplePackage = objectMapper.readValue(packStr, EsSimplePackage.class);
             }
             if (esSimplePackage != null) {
+                //判断是否已经 解析完成|| 正在解析 || 质控完成 || 正在质控  (由于部署多个服务,运行的时间差可能导致多次加入队列,造成多次质控,解析)
+                Map<String, Object> map = statusReportService.getJsonArchiveById(esSimplePackage.get_id());
+                if(map != null){
+                    if("3".equals(map.get("analyze_status")+"") || "1".equals(map.get("analyze_status")+"")){//已经质控完成的,或者正在质控的  直接返回
+                        logger.error("sssssssss====>>analyze_status:"+map.get("analyze_status"));
+                        logger.error("id:"+map.get("_id"));
+                        return;
+                    }
+                    //如果已经到了解析流程,必定已经完成质控流程
+                    if("3".equals(map.get("archive_status")+"") || "1".equals(map.get("archive_status")+"")){ //如果已经解析完成了,或者正在解析, 将其标记为 已完成质控
+                        logger.error("rrrrrrr====>>archive_status:"+map.get("archive_status"));
+                        logger.error("id:"+map.get("_id"));
+                        statusReportService.reportStatus(esSimplePackage.get_id(), AnalyzeStatus.Finished, 0, null);
+                        return;
+                    }
+                }
                 statusReportService.reportStatus(esSimplePackage.get_id(), AnalyzeStatus.Acquired, 0, "正在质控中");
                 zipPackage = new ZipPackage(esSimplePackage);
                 zipPackage.download();
