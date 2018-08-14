@@ -105,6 +105,8 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
             }
             throw e;
         }
+        String path = groupName.substring(1, groupName.length() - 1) + "/" + remoteFileName.substring(1, remoteFileName.length() - 1);
+        newSource.put("httpUrl", fastDFSConfig.getPublicServer() + "/" + path);
         return success(newSource);
     }
 
@@ -144,6 +146,8 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
             }
             throw e;
         }
+        String path = groupName.substring(1, groupName.length() - 1) + "/" + remoteFileName.substring(1, remoteFileName.length() - 1);
+        newSource.put("httpUrl", fastDFSConfig.getPublicServer() + "/" + path);
         return success(newSource);
     }
 
