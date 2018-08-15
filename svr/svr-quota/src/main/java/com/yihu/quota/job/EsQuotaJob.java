@@ -81,6 +81,7 @@ public class EsQuotaJob implements Job {
             //初始化参数
             initParams(context);
             quotaVo.setExecuteFlag(executeFlag);
+            logger.warn("开始执行指标" + quotaVo.getCode());
             tjQuotaLog.setQuotaCode(quotaVo.getCode());
             tjQuotaLog.setSaasId(saasid);
             tjQuotaLog.setStartTime(new Date());

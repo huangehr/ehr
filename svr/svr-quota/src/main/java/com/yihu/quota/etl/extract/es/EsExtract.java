@@ -79,7 +79,7 @@ public class EsExtract {
         //普通通用 拼接sql 方式
         //拼凑查询的sql
         String sql = getSql(qdm, qds);
-        logger.info("查询sql:" + sql);
+        logger.warn("查询sql:" + sql);
         //根据sql查询ES
         try {
             saveModels = queryEsBySql(sql,esConfig.getTimekey(),qdm, qds);
