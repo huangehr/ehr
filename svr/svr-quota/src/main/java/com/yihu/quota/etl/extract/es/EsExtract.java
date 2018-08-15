@@ -440,9 +440,9 @@ public class EsExtract {
         }else if(esConfig.getAggregation().equals(Contant.quota.aggregation_list)){
             if(esConfig.getTimekey() != null){
                 if( StringUtils.isEmpty( esConfig.getAggregationKey()) ){
-                    sql.append("select " + selectGroupField.substring(0,selectGroupField.length()-1) + "," + esConfig.getTimekey() +  " from " + tableName + whereSql + " limit 20000 ");//最多一次2万条
+                    sql.append("select " + selectGroupField.substring(0,selectGroupField.length()-1) + "," + esConfig.getTimekey() +  " from " + tableName + whereSql + " limit 10000 ");//最多一次1万条
                 }else {
-                    sql.append("select " + selectGroupField + esConfig.getAggregationKey() + "," + esConfig.getTimekey() +   " from " + tableName + whereSql  + " limit 20000 ");
+                    sql.append("select " + selectGroupField + esConfig.getAggregationKey() + "," + esConfig.getTimekey() +   " from " + tableName + whereSql  + " limit 10000 ");
                 }
             }else {
                 throw  new Exception("配置参数 timekey 不能为空");
