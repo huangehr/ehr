@@ -155,6 +155,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
                 String [] _id = new String[idList.size()];
                 elasticSearchUtil.bulkDelete(INDEX, TYPE, idList.toArray(_id));
             }
+            result = elasticSearchUtil.page(INDEX, TYPE, filters, 1, 10000);
         }
         return true;
     }
