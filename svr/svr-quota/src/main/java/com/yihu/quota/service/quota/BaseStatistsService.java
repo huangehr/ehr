@@ -261,21 +261,24 @@ public class BaseStatistsService {
     }
 
     public List<Map<String, Object>> sortResultList(List<Map<String, Object>> listMap, String top) {
-        Collections.sort(listMap, new Comparator<Map<String, Object>>() {
+        if (null != listMap && listMap.size() > 0) {
+            Collections.sort(listMap, new Comparator<Map<String, Object>>() {
 
-            @Override
-            public int compare(Map<String, Object> o1, Map<String, Object> o2) {
-                // 根据result进行降序
-                double result = Double.parseDouble(o1.get("result") + "");
-                double result2 = Double.parseDouble(o2.get("result") + "");
-                double v = result2 - result;
-                return v > 0 ? 1 : v == 0 ? 0 : -1;
+                @Override
+                public int compare(Map<String, Object> o1, Map<String, Object> o2) {
+                    // 根据result进行降序
+                    double result = Double.parseDouble(o1.get("result") + "");
+                    double result2 = Double.parseDouble(o2.get("result") + "");
+                    double v = result2 - result;
+                    return v > 0 ? 1 : v == 0 ? 0 : -1;
+                }
+            });
+            if (StringUtils.isNotEmpty(top)) {
+                int t = Integer.parseInt(top);
+                listMap = listMap.subList(0, listMap.size() > t ? t :listMap.size());
             }
-        });
-        if (StringUtils.isNotEmpty(top) && listMap != null && listMap.size() > 0) {
-            int t = Integer.parseInt(top);
-            listMap = listMap.subList(0, listMap.size()>t ? t :listMap.size()-1);
         }
+
         return listMap;
     }
 
