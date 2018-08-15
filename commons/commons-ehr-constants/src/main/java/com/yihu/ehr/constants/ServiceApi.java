@@ -415,6 +415,8 @@ public class ServiceApi {
         //--------------- 总支撑平台 ---------------
         public static final String SaveAppsRelation = "/app/saveAppsRelation";
 
+        public static final String GetUserApp = "/app/role/get";
+
     }
 
     public static class AppApi {
