@@ -742,6 +742,7 @@ public class BaseStatistsService {
                 if(key.equals("SUM(result)")){
                     NumberFormat nf = NumberFormat.getInstance();
                     nf.setGroupingUsed(false);
+                    nf.setMaximumFractionDigits(2);
                     dataMap.put(resultField,  nf.format(map.get(key)));
                 }
             }
@@ -790,6 +791,7 @@ public class BaseStatistsService {
                 if(key.equals("SUM(result)")){
                     NumberFormat nf = NumberFormat.getInstance();
                     nf.setGroupingUsed(false);
+                    nf.setMaximumFractionDigits(2);
                     dataMap.put(resultField,  nf.format(map.get(key)));
                 }
                 if(key.equals(quotaDateField)){
@@ -865,6 +867,7 @@ public class BaseStatistsService {
                 if(key.equals("SUM(result)")){
                     NumberFormat nf = NumberFormat.getInstance();
                     nf.setGroupingUsed(false);
+                    nf.setMaximumFractionDigits(2);
                     dataMap.put(resultField,  nf.format(map.get(key)));
                 }
             }
@@ -1322,6 +1325,7 @@ public class BaseStatistsService {
         List<Map<String, Object>> listData = elasticsearchUtil.excuteDataModel(sql);
         NumberFormat nf = NumberFormat.getInstance();
         nf.setGroupingUsed(false);
+        nf.setMaximumFractionDigits(2);
         if (null != listData && listData.size() > 0 && listData.get(0).size() > 0) {
             for (Map<String, Object> map : listData) {
                 sum = nf.format(map.get("SUM(result)"));
@@ -1340,6 +1344,7 @@ public class BaseStatistsService {
         List<Map<String, Object>> listData = singleDiseaseService.parseIntegerValue(sql);
         NumberFormat nf = NumberFormat.getInstance();
         nf.setGroupingUsed(false);
+        nf.setMaximumFractionDigits(2);
         if (null != listData && listData.size() > 0 && listData.get(0).size() > 0) {
             for (Map<String, Object> map : listData) {
                 String value = nf.format(map.get("SUM(result)"));
@@ -1359,6 +1364,7 @@ public class BaseStatistsService {
         List<Map<String, Object>> listData = elasticsearchUtil.excuteDataModel(sql);
         NumberFormat nf = NumberFormat.getInstance();
         nf.setGroupingUsed(false);
+        nf.setMaximumFractionDigits(2);
         if (null != listData && listData.size() > 0 && listData.get(0).size() > 0) {
             for (Map<String, Object> map : listData) {
                 sum = nf.format(map.get("SUM(result)"));
@@ -1377,6 +1383,7 @@ public class BaseStatistsService {
         List<Map<String, Object>> listData = singleDiseaseService.parseIntegerValue(sql);
         NumberFormat nf = NumberFormat.getInstance();
         nf.setGroupingUsed(false);
+        nf.setMaximumFractionDigits(2);
         if (null != listData && listData.size() > 0 && listData.get(0).size() > 0) {
             for (Map<String, Object> map : listData) {
                 String value = nf.format(map.get("SUM(result)"));
@@ -1389,6 +1396,7 @@ public class BaseStatistsService {
     public String getCostOfMedicalMonitor() {
         NumberFormat nf = NumberFormat.getInstance();
         nf.setGroupingUsed(false);
+        nf.setMaximumFractionDigits(2);
         // 获取门急诊费用
         Double costOfOutPatient = Double.parseDouble(getCostOfOutPatient());
         // 获取入院费用
@@ -1510,7 +1518,7 @@ public class BaseStatistsService {
                                 double point = 0;
                                 NumberFormat nf = NumberFormat.getInstance();
                                 nf.setGroupingUsed(false);
-                                nf.setMaximumFractionDigits(1);
+                                nf.setMaximumFractionDigits(2);
                                 float moleResultVal = Float.valueOf(moleMap.get(resultField).toString());
                                 point = ((moleResultVal - denoResultVal)/denoResultVal) * operationValue;
                                 map.put(resultField, nf.format(point));
