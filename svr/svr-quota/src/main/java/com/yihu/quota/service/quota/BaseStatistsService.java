@@ -774,7 +774,7 @@ public class BaseStatistsService {
         if (StringUtils.isNotEmpty(top)) {
             dimenListResult = esResultExtract.searcherSumGroup(tjQuota, groupDimension, filter, resultField, groupDimension, "asc", "1000");
             if (dimenListResult != null && dimenListResult.size() > 0) {
-                dimenListResult.subList(0, dimenListResult.size() > Integer.parseInt(top) ? Integer.parseInt(top) : dimenListResult.size());
+                dimenListResult = dimenListResult.subList(0, dimenListResult.size() > Integer.parseInt(top) ? Integer.parseInt(top) : dimenListResult.size());
             }
         }else {
             dimenListResult = esResultExtract.searcherSumGroup(tjQuota, groupDimension, filter, resultField, groupDimension, "asc", top);
@@ -839,7 +839,7 @@ public class BaseStatistsService {
         if (StringUtils.isNotEmpty(top)) {
             dimenListResult = esResultExtract.searcherSumGroup(tjQuota, groupDimension, filter, resultField, groupDimension, "asc", "1000");
             if (dimenListResult != null && dimenListResult.size() > 0) {
-                dimenListResult.subList(0, dimenListResult.size() > Integer.parseInt(top) ? Integer.parseInt(top) : dimenListResult.size());
+                dimenListResult = dimenListResult.subList(0, dimenListResult.size() > Integer.parseInt(top) ? Integer.parseInt(top) : dimenListResult.size());
             }
         }else {
             dimenListResult = esResultExtract.searcherSumGroup(tjQuota, groupDimension, filter, resultField, groupDimension, "asc", top);
