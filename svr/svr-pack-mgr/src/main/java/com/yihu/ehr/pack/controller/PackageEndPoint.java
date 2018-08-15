@@ -155,9 +155,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
                 String [] _id = new String[idList.size()];
                 elasticSearchUtil.bulkDelete(INDEX, TYPE, idList.toArray(_id));
             }
-            //https://www.cnblogs.com/duanxingxing/p/5686159.html    虽已设置,不抛异常,但是循环几次后,数据开始莫名其妙不删除
-            //睡一觉, 防止出现连接数不足,等各种异常 ,如果还有问题,可适当增加沉睡时间,目前只用于清理脏数据, 效率问题 不是特别重要
-            Thread.sleep(10000);
+            result = elasticSearchUtil.page(INDEX, TYPE, filters, 1, 10000);
         }
         return true;
     }
