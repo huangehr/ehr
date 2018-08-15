@@ -353,16 +353,19 @@ public class EsExtract {
                     if(map.containsKey("result")){
                         NumberFormat nf = NumberFormat.getInstance();
                         nf.setGroupingUsed(false);
+                        nf.setMaximumFractionDigits(2);
                         resultMap.put(keyVal, nf.format(map.get("result")));
                     }
                     if(map.containsKey("count(1)")){
                         NumberFormat nf = NumberFormat.getInstance();
                         nf.setGroupingUsed(false);
+                        nf.setMaximumFractionDigits(2);
                         resultMap.put(keyVal, nf.format(map.get("count(1)")));
                     }
                     if(map.containsKey("SUM(result)")){
                         NumberFormat nf = NumberFormat.getInstance();
                         nf.setGroupingUsed(false);
+                        nf.setMaximumFractionDigits(2);
                         resultMap.put(keyVal, nf.format(map.get("SUM(result)")));
                     }
                 }
