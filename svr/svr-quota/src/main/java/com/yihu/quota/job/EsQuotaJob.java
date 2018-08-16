@@ -220,6 +220,7 @@ public class EsQuotaJob implements Job {
             tjQuotaLog.setContent(content);
             tjQuotaLog.setEndTime(new Date());
             saveLog(tjQuotaLog);
+            logger.warn("结束！" + content);
         }
     }
 
