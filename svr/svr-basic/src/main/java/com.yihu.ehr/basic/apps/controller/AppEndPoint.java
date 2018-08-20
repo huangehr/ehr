@@ -88,9 +88,6 @@ public class AppEndPoint extends EnvelopRestEndPoint {
             relation.setRoleId(roles.getId());
             roleAppRelationService.save(relation);
         }
-
-
-
         return convertToModel(app, MApp.class);
     }
 
@@ -468,6 +465,58 @@ public class AppEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
+    @RequestMapping(value = ServiceApi.Apps.createAppRolesByAppId, method = RequestMethod.POST)
+    @ApiOperation(value = "创建默认的App角色组")
+    public Envelop createAppRolesByAppId(
+            @ApiParam(name = "appId", value = "appId")
+            @RequestParam(value = "appId",required = false) String appId,
+            @ApiParam(name = "allAppFlag", value = "allAppFlag",defaultValue = "false")
+            @RequestParam(value = "allAppFlag") boolean allAppFlag){
+        Envelop envelop =new Envelop();
+        //为应用追加默认角色组
+        String[][] rolestr= ConstantUtil.roles;
+        try {
+            if(allAppFlag){
+                List<App> appList = appService.search("");
+                appList.forEach(app -> {
+                    Roles roles=null;
+                    RoleAppRelation relation =null;
+                    for (String[] role : rolestr) {
+                        roles=new Roles();
+                        roles.setAppId(app.getId());
+                        roles.setType("1");
+                        roles.setCode(role[0]);
+                        roles.setName(role[1]);
+                        roles= roleAppRelation.save(roles);
+                        relation = new RoleAppRelation();
+                        relation.setAppId(app.getId());
+                        relation.setRoleId(roles.getId());
+                        roleAppRelationService.save(relation);
+                    }
+                });
+            }else {
+                Roles roles=null;
+                RoleAppRelation relation =null;
+                for (String[] role : rolestr) {
+                    roles=new Roles();
+                    roles.setAppId(appId);
+                    roles.setType("1");
+                    roles.setCode(role[0]);
+                    roles.setName(role[1]);
+                    roles= roleAppRelation.save(roles);
+                    relation = new RoleAppRelation();
+                    relation.setAppId(appId);
+                    relation.setRoleId(roles.getId());
+                    roleAppRelationService.save(relation);
+                }
 
-
+            }
+            envelop.setSuccessFlg(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return  envelop;
+    }
 }
