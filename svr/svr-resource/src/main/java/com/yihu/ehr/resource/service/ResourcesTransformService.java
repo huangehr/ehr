@@ -77,6 +77,7 @@ public class ResourcesTransformService extends BaseJpaService {
             returnMap.put("event_no", resource.get("event_no"));
             returnMap.put("event_date", resource.get("event_date"));
             returnMap.put("event_type",resource.get("event_type"));
+            returnMap.put("org_name",resource.get("org_name"));
         }
         return returnMap;
     }
