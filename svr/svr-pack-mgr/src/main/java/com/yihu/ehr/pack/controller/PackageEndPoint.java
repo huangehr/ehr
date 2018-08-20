@@ -292,6 +292,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             } else if(_status == 0){
                 updateSource.put("analyze_fail_count", 0);
                 updateSource.put("analyze_status",0);
+                updateSource.put("archive_status",0);
             } else {
                 updateSource.put("analyze_fail_count", 0);
             }
