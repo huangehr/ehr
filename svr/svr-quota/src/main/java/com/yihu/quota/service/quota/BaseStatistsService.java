@@ -261,21 +261,24 @@ public class BaseStatistsService {
     }
 
     public List<Map<String, Object>> sortResultList(List<Map<String, Object>> listMap, String top) {
-        Collections.sort(listMap, new Comparator<Map<String, Object>>() {
+        if (null != listMap && listMap.size() > 0) {
+            Collections.sort(listMap, new Comparator<Map<String, Object>>() {
 
-            @Override
-            public int compare(Map<String, Object> o1, Map<String, Object> o2) {
-                // 根据result进行降序
-                double result = Double.parseDouble(o1.get("result") + "");
-                double result2 = Double.parseDouble(o2.get("result") + "");
-                double v = result2 - result;
-                return v > 0 ? 1 : v == 0 ? 0 : -1;
+                @Override
+                public int compare(Map<String, Object> o1, Map<String, Object> o2) {
+                    // 根据result进行降序
+                    double result = Double.parseDouble(o1.get("result") + "");
+                    double result2 = Double.parseDouble(o2.get("result") + "");
+                    double v = result2 - result;
+                    return v > 0 ? 1 : v == 0 ? 0 : -1;
+                }
+            });
+            if (StringUtils.isNotEmpty(top)) {
+                int t = Integer.parseInt(top);
+                listMap = listMap.subList(0, listMap.size() > t ? t :listMap.size());
             }
-        });
-        if (StringUtils.isNotEmpty(top) && listMap != null) {
-            int t = Integer.parseInt(top);
-            listMap = listMap.subList(0, listMap.size()>t ? t :listMap.size()-1);
         }
+
         return listMap;
     }
 
@@ -739,6 +742,7 @@ public class BaseStatistsService {
                 if(key.equals("SUM(result)")){
                     NumberFormat nf = NumberFormat.getInstance();
                     nf.setGroupingUsed(false);
+                    nf.setMaximumFractionDigits(2);
                     dataMap.put(resultField,  nf.format(map.get(key)));
                 }
             }
@@ -769,7 +773,9 @@ public class BaseStatistsService {
         List<Map<String, Object>>  dimenListResult = null;
         if (StringUtils.isNotEmpty(top)) {
             dimenListResult = esResultExtract.searcherSumGroup(tjQuota, groupDimension, filter, resultField, groupDimension, "asc", "1000");
-            dimenListResult.subList(0, dimenListResult.size() > Integer.parseInt(top) ? Integer.parseInt(top) : dimenListResult.size());
+            if (dimenListResult != null && dimenListResult.size() > 0) {
+                dimenListResult = dimenListResult.subList(0, dimenListResult.size() > Integer.parseInt(top) ? Integer.parseInt(top) : dimenListResult.size());
+            }
         }else {
             dimenListResult = esResultExtract.searcherSumGroup(tjQuota, groupDimension, filter, resultField, groupDimension, "asc", top);
         }
@@ -785,6 +791,7 @@ public class BaseStatistsService {
                 if(key.equals("SUM(result)")){
                     NumberFormat nf = NumberFormat.getInstance();
                     nf.setGroupingUsed(false);
+                    nf.setMaximumFractionDigits(2);
                     dataMap.put(resultField,  nf.format(map.get(key)));
                 }
                 if(key.equals(quotaDateField)){
@@ -831,7 +838,9 @@ public class BaseStatistsService {
         List<Map<String, Object>>  dimenListResult = null;
         if (StringUtils.isNotEmpty(top)) {
             dimenListResult = esResultExtract.searcherSumGroup(tjQuota, groupDimension, filter, resultField, groupDimension, "asc", "1000");
-            dimenListResult.subList(0, dimenListResult.size() > Integer.parseInt(top) ? Integer.parseInt(top) : dimenListResult.size());
+            if (dimenListResult != null && dimenListResult.size() > 0) {
+                dimenListResult = dimenListResult.subList(0, dimenListResult.size() > Integer.parseInt(top) ? Integer.parseInt(top) : dimenListResult.size());
+            }
         }else {
             dimenListResult = esResultExtract.searcherSumGroup(tjQuota, groupDimension, filter, resultField, groupDimension, "asc", top);
         }
@@ -858,6 +867,7 @@ public class BaseStatistsService {
                 if(key.equals("SUM(result)")){
                     NumberFormat nf = NumberFormat.getInstance();
                     nf.setGroupingUsed(false);
+                    nf.setMaximumFractionDigits(2);
                     dataMap.put(resultField,  nf.format(map.get(key)));
                 }
             }
@@ -1315,6 +1325,7 @@ public class BaseStatistsService {
         List<Map<String, Object>> listData = elasticsearchUtil.excuteDataModel(sql);
         NumberFormat nf = NumberFormat.getInstance();
         nf.setGroupingUsed(false);
+        nf.setMaximumFractionDigits(2);
         if (null != listData && listData.size() > 0 && listData.get(0).size() > 0) {
             for (Map<String, Object> map : listData) {
                 sum = nf.format(map.get("SUM(result)"));
@@ -1333,6 +1344,7 @@ public class BaseStatistsService {
         List<Map<String, Object>> listData = singleDiseaseService.parseIntegerValue(sql);
         NumberFormat nf = NumberFormat.getInstance();
         nf.setGroupingUsed(false);
+        nf.setMaximumFractionDigits(2);
         if (null != listData && listData.size() > 0 && listData.get(0).size() > 0) {
             for (Map<String, Object> map : listData) {
                 String value = nf.format(map.get("SUM(result)"));
@@ -1352,6 +1364,7 @@ public class BaseStatistsService {
         List<Map<String, Object>> listData = elasticsearchUtil.excuteDataModel(sql);
         NumberFormat nf = NumberFormat.getInstance();
         nf.setGroupingUsed(false);
+        nf.setMaximumFractionDigits(2);
         if (null != listData && listData.size() > 0 && listData.get(0).size() > 0) {
             for (Map<String, Object> map : listData) {
                 sum = nf.format(map.get("SUM(result)"));
@@ -1370,6 +1383,7 @@ public class BaseStatistsService {
         List<Map<String, Object>> listData = singleDiseaseService.parseIntegerValue(sql);
         NumberFormat nf = NumberFormat.getInstance();
         nf.setGroupingUsed(false);
+        nf.setMaximumFractionDigits(2);
         if (null != listData && listData.size() > 0 && listData.get(0).size() > 0) {
             for (Map<String, Object> map : listData) {
                 String value = nf.format(map.get("SUM(result)"));
@@ -1382,6 +1396,7 @@ public class BaseStatistsService {
     public String getCostOfMedicalMonitor() {
         NumberFormat nf = NumberFormat.getInstance();
         nf.setGroupingUsed(false);
+        nf.setMaximumFractionDigits(2);
         // 获取门急诊费用
         Double costOfOutPatient = Double.parseDouble(getCostOfOutPatient());
         // 获取入院费用
@@ -1503,7 +1518,7 @@ public class BaseStatistsService {
                                 double point = 0;
                                 NumberFormat nf = NumberFormat.getInstance();
                                 nf.setGroupingUsed(false);
-                                nf.setMaximumFractionDigits(1);
+                                nf.setMaximumFractionDigits(2);
                                 float moleResultVal = Float.valueOf(moleMap.get(resultField).toString());
                                 point = ((moleResultVal - denoResultVal)/denoResultVal) * operationValue;
                                 map.put(resultField, nf.format(point));

@@ -167,6 +167,7 @@ public class SolrExtract {
                 if (esConfig.getAggregation().equals(Contant.quota.aggregation_list) && !StringUtils.isEmpty(esConfig.getAggregationKey())) {
                     fl = fl + "," + esConfig.getAggregationKey();
                 }
+                logger.warn("solr 从"+ quotaVo.getStart() + " 开始获取数据，这次准备获取" + quotaVo.getRows() + "条");
                 list = solrQuery.queryReturnFieldList(core, q, fq, null, quotaVo.getStart(), quotaVo.getRows(), fl.split(","));
             } catch (Exception e) {
                 throw new Exception("solr 查询异常 " + e.getMessage());
