@@ -122,6 +122,22 @@ public class SolrExtract {
             mainMap.put(key, key);
             dimensionGroupList.add(new SolrGroupEntity(key, SolrGroupEntity.GroupType.FIELD_VALUE));
             fl += key + ",";
+            if(qdm.get(i).getMainCode().equals("org")){
+                String orgFilter = " AND org_code:*" ;
+                if ( !StringUtils.isEmpty(fq)) {
+                    fq += orgFilter ;
+                }else {
+                    fq = orgFilter;
+                }
+            }
+            if(qdm.get(i).getMainCode().equals("town")){
+                String townFilter = " AND org_area:*" ;
+                if ( !StringUtils.isEmpty(fq)) {
+                    fq += townFilter ;
+                }else {
+                    fq = townFilter;
+                }
+            }
         }
         for (int i = 0; i < qds.size(); i++) {
             String key = qds.get(i).getKeyVal();
