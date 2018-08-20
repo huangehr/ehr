@@ -401,6 +401,7 @@ public class ServiceApi {
         public static final String getAppTypeAndApps = "/getAppTypeAndApps";
         public static final String getApps = "/getApps";
         public static final String getDoctorAppsByType = "/getDoctorAppsByType";
+        public static final String createAppRolesByAppId = "/createAppRolesByAppId";
 
         // ---------------- 开放平台 ----------------
         public static final String CheckField = "/app/checkField";
