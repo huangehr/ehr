@@ -18,4 +18,7 @@ public interface XUserTypeRolesRepository extends PagingAndSortingRepository<Use
     @Query("delete from UserTypeRoles r where r.typeId = :typeId")
     void deleteUserTypeRolesByTypeId(@Param("typeId") int typeId);
 
+    @Query("select r from UserTypeRoles r where r.typeId = :typeId and r.clientId=:clientId")
+    List<UserTypeRoles> ListUserTypeRolesByTypeIdAndClientId(@Param("typeId") int typeId,@Param("clientId")String clientId);
+
 }

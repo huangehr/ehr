@@ -79,7 +79,7 @@ public class EsExtract {
         //普通通用 拼接sql 方式
         //拼凑查询的sql
         String sql = getSql(qdm, qds);
-        logger.info("查询sql:" + sql);
+        logger.warn("查询sql:" + sql);
         //根据sql查询ES
         try {
             saveModels = queryEsBySql(sql,esConfig.getTimekey(),qdm, qds);
@@ -353,16 +353,19 @@ public class EsExtract {
                     if(map.containsKey("result")){
                         NumberFormat nf = NumberFormat.getInstance();
                         nf.setGroupingUsed(false);
+                        nf.setMaximumFractionDigits(2);
                         resultMap.put(keyVal, nf.format(map.get("result")));
                     }
                     if(map.containsKey("count(1)")){
                         NumberFormat nf = NumberFormat.getInstance();
                         nf.setGroupingUsed(false);
+                        nf.setMaximumFractionDigits(2);
                         resultMap.put(keyVal, nf.format(map.get("count(1)")));
                     }
                     if(map.containsKey("SUM(result)")){
                         NumberFormat nf = NumberFormat.getInstance();
                         nf.setGroupingUsed(false);
+                        nf.setMaximumFractionDigits(2);
                         resultMap.put(keyVal, nf.format(map.get("SUM(result)")));
                     }
                 }
@@ -437,9 +440,9 @@ public class EsExtract {
         }else if(esConfig.getAggregation().equals(Contant.quota.aggregation_list)){
             if(esConfig.getTimekey() != null){
                 if( StringUtils.isEmpty( esConfig.getAggregationKey()) ){
-                    sql.append("select " + selectGroupField.substring(0,selectGroupField.length()-1) + "," + esConfig.getTimekey() +  " from " + tableName + whereSql + " limit 20000 ");//最多一次2万条
+                    sql.append("select " + selectGroupField.substring(0,selectGroupField.length()-1) + "," + esConfig.getTimekey() +  " from " + tableName + whereSql + " limit 10000 ");//最多一次1万条
                 }else {
-                    sql.append("select " + selectGroupField + esConfig.getAggregationKey() + "," + esConfig.getTimekey() +   " from " + tableName + whereSql  + " limit 20000 ");
+                    sql.append("select " + selectGroupField + esConfig.getAggregationKey() + "," + esConfig.getTimekey() +   " from " + tableName + whereSql  + " limit 10000 ");
                 }
             }else {
                 throw  new Exception("配置参数 timekey 不能为空");

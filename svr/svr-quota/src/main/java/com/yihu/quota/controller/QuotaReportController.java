@@ -147,6 +147,7 @@ public class QuotaReportController extends BaseController {
     ) {
         NumberFormat nf = NumberFormat.getInstance();
         nf.setGroupingUsed(false);
+        nf.setMaximumFractionDigits(2);
         List<Map<String, Object>> dataList = new ArrayList<>();
         Map<String, List<Map<String, Object>>> quotaViewResult = new HashMap<>();
         List<String> quotaCodes = Arrays.asList(quotaCodeStr.split(","));
@@ -911,6 +912,7 @@ public class QuotaReportController extends BaseController {
             }
             NumberFormat nf = NumberFormat.getInstance();
             nf.setGroupingUsed(false);
+            nf.setMaximumFractionDigits(2);
             Set<String> hashSet = new HashSet<>(lineNames);
             Map<String, Object> newMap = new HashMap<>();
             for (Map<String, Object> data : lineData.values()) {

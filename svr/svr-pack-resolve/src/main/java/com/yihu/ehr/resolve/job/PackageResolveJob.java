@@ -23,6 +23,8 @@ import com.yihu.ehr.resolve.util.LocalTempPathUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
 import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.quartz.*;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -45,6 +47,7 @@ import java.util.Map;
 public class PackageResolveJob implements InterruptableJob {
 
     private static final long DAY = 1000 * 60 * 60 * 24;
+    private final Log logger = LogFactory.getLog(this.getClass());
 
     @Override
     public void interrupt() throws UnableToInterruptJobException {
@@ -67,6 +70,13 @@ public class PackageResolveJob implements InterruptableJob {
                 pack = objectMapper.readValue(packStr, EsSimplePackage.class);
             }
             if (pack != null) {
+                //判断是否已经解析成功,或者正在解析(由于部署多个服务,运行的时间差可能导致多次加入队列,造成多次解析)
+                Map<String, Object> map = statusReportService.getJsonArchiveById(pack.get_id());
+                if(map != null && ("3".equals(map.get("archive_status")+"") || "1".equals(map.get("archive_status")+""))){
+                    logger.error(map.get("archive_status")+"");
+                    logger.error("==================stop archive:"+map.get("_id"));
+                    return;
+                }
                 PackResolveLogger.info("开始入库:" + pack.get_id() + ", Timestamp:" + new Date());
                 statusReportService.reportStatus(pack.get_id(), ArchiveStatus.Acquired, 0, "正在入库中", null);
                 OriginalPackage originalPackage = doResolve(pack, statusReportService);
