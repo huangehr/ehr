@@ -320,7 +320,7 @@ public class ProfileEventService extends ProfileBasicService {
                 }
                 resultMap.put("inResult", inResult); //入院诊断
                 resultMap.put("outResult", outResult); //出院诊断
-                resultMap.put("treatmentResults", temp.get("EHR_000166") == null ? "" : temp.get("EHR_000166")); //治疗结果
+                resultMap.put("treatmentResults", temp.get("EHR_000299") == null ? "" : temp.get("EHR_000299")); //治疗结果
                 resultMap.put("dischargeInstructions", temp.get("EHR_000157") == null ? "" :  temp.get("EHR_000157")); //出院医嘱
             }
             return resultMap;

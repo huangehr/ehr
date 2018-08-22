@@ -1,6 +1,7 @@
 package com.yihu.ehr.profile.service;
 
 import com.yihu.ehr.profile.family.ResourceCells;
+import com.yihu.ehr.profile.model.DrugInfo;
 import com.yihu.ehr.profile.util.SimpleSolrQueryUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import org.springframework.stereotype.Service;
@@ -61,6 +62,74 @@ public class ProfileMedicationService extends ProfileBasicService {
             }
         }
         return sortByValue(dataMap);
+    }
+
+    public List<DrugInfo> medicationRankingWithTable(String demographicId, String filter, String hpCode, String date, String table) throws Exception {
+        String masterQ;
+        if (!StringUtils.isEmpty(hpCode)) {
+            masterQ = "{\"q\":\"demographic_id:" + demographicId + " AND health_problem:*" +  hpCode + "*\"}";
+        } else {
+            masterQ = "{\"q\":\"demographic_id:" + demographicId + "\"}";
+        }
+        masterQ = SimpleSolrQueryUtil.getQuery(filter, date, masterQ);
+        Map<String, Integer> dataMap = new HashMap<>();
+        Envelop masterEnvelop = resource.getMasterData(masterQ, 1, 500, null);
+        if (masterEnvelop.isSuccessFlg()) {
+            List<Map<String, Object>> masterList = masterEnvelop.getDetailModelList();
+            //循环获取结果集
+            for (Map<String, Object> masterMap : masterList) {
+                String rowKey = (String) masterMap.get(ResourceCells.ROWKEY);
+                String subQ;
+                if (StringUtils.isEmpty(table)) {
+                    subQ = "{\"q\":\"rowkey:" + rowKey + "$HDSD00_83$* OR rowkey:" + rowKey + "$HDSD00_84$*\"}";
+                } else {
+                    subQ = "{\"q\":\"rowkey:" + rowKey + "$" + table + "$*\"}";
+                }
+                Envelop subEnvelop = resource.getSubData(subQ, 1, 1000, null);
+                if (subEnvelop.isSuccessFlg()) {
+                    List<Map<String, Object>> subList = subEnvelop.getDetailModelList();
+                    if (subList.size() > 0) {
+                        for (Map<String, Object> subMap : subList) {
+                            if (!StringUtils.isEmpty(subMap.get("EHR_000131"))) {
+                                String drugName = subMap.get("EHR_000131") + "_01";  //中药名称
+                                if (dataMap.containsKey(drugName)) {
+                                    Integer count = dataMap.get(drugName);
+                                    dataMap.put(drugName, count + 1);
+                                } else {
+                                    dataMap.put(drugName, 1);
+                                }
+                                continue;
+                            }
+                            if (!StringUtils.isEmpty(subMap.get("EHR_000100"))) {
+                                String drugName = subMap.get("EHR_000100") + "_02"; //西药名称
+                                if (dataMap.containsKey(drugName)) {
+                                    Integer count = dataMap.get(drugName);
+                                    dataMap.put(drugName, count + 1);
+                                } else {
+                                    dataMap.put(drugName, 1);
+                                }
+                                continue;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        List<DrugInfo> drugInfos = new ArrayList<>();
+        dataMap = sortByValue(dataMap);
+        dataMap.forEach((key, val) -> {
+            DrugInfo drugInfo = new DrugInfo();
+            String [] info = key.split("_");
+            drugInfo.setName(info[0]);
+            drugInfo.setCount(val);
+            if (info[1].endsWith("01")) {
+                drugInfo.setLabel("中药");
+            } else {
+                drugInfo.setLabel("西药");
+            }
+            drugInfos.add(drugInfo);
+        });
+        return drugInfos;
     }
 
     public List<Map<String, Object>> medicationRecords(String demographicId, String filter, String date, String keyWord) throws Exception {

@@ -109,6 +109,29 @@ public class ProfileCDAService extends ProfileBasicService {
                         temp.put("multi", true);
                         temp.put("data", new HashMap<>());
                         temp.put("records", data);
+                    } else if (item.getTitle().contains("手术记录")) {
+                        String subQ = "{\"q\":\"rowkey:" + profileId + "$HDSD00_06$*\"}";
+                        Envelop subEnvelop = resource.getSubData(subQ, 1, 1000, null);
+                        List<Map<String, Object>> subList = subEnvelop.getDetailModelList();
+                        List<Map<String, Object>> data = new ArrayList<>();
+                        subList.forEach(item2 -> {
+                            Map<String, Object> dataMap = new HashMap<>();
+                            String item2Name = (String) item2.get("EHR_000418"); //手术名称
+                            dataMap.put(ResourceCells.PROFILE_ID, item2.get(ResourceCells.ROWKEY));
+                            dataMap.put(ResourceCells.PROFILE_TYPE, event.get(ResourceCells.PROFILE_TYPE));
+                            dataMap.put("cda_document_id", item.getCdaDocumentId());
+                            dataMap.put("cda_code", item.getCdaCode());
+                            dataMap.put("pc_template", item.getPcUrl());
+                            dataMap.put("mobile_template", item.getMobileUrl());
+                            dataMap.put("template_id", item.getId());
+                            dataMap.put("name", item2Name);
+                            dataMap.put("mark", item2.get("EHR_000423")); //手术申请单号
+                            data.add(dataMap);
+                        });
+                        temp.put("template_name", item.getTitle());
+                        temp.put("multi", true);
+                        temp.put("data", new HashMap<>());
+                        temp.put("records", data);
                     } else if (item.getTitle().contains("处方")) {
                         //中西药特殊处理
                         if (item.getTitle().contains("中药")) {
@@ -248,130 +271,7 @@ public class ProfileCDAService extends ProfileBasicService {
                 String cdaVersion = String.valueOf(event.get(ResourceCells.CDA_VERSION));
                 Map<String, Object> dataMap = new HashMap<>();
                 Map<String, List<MCdaDataSet>> cdaDataSetMap = cdaService.getCDADataSetByCDAIdList(cdaVersion, cdaDocumentIdList);
-                if (!transform) {
-                    cdaDataSetMap.keySet().forEach(cdaDocId -> {
-                        List<MCdaDataSet> cdaDataSets = cdaDataSetMap.get(cdaDocId);
-                        Map<String, Object> tempMap = new HashMap<>();
-                        List<String> multipleDataset = new ArrayList<>();
-                        if (cdaDataSets != null) {
-                            cdaDataSets.forEach(cdaDataSet -> {
-                                String dataSetCode = cdaDataSet.getDataSetCode();
-                                if (cdaDataSet.getMultiRecord().equals("0")) {
-                                    //主表数据
-                                    if (!tempMap.containsKey(dataSetCode)) {
-                                        List<Map<String, Object>> tempList = new ArrayList<>();
-                                        tempList.add(resourcesTransformService.stdMerge(event, dataSetCode, cdaVersion));
-                                        tempMap.put(dataSetCode, tempList);
-                                    }
-                                } else {
-                                    multipleDataset.add(dataSetCode);
-                                }
-                            });
-                        }
-                        //细表数据
-                        if (is_multi) {
-                            String[] combination = profileId.split("\\$");
-                            String subQ = "{\"q\":\"profile_id:" + combination[0] + "\"}";
-                            Envelop subData = resource.getSubData(subQ, 1, 2000, null);
-                            List<Map<String, Object>> subList = subData.getDetailModelList();
-                            subList.forEach(item -> {
-                                item.put(ResourceCells.ORG_AREA, event.get(ResourceCells.ORG_AREA));
-                                item.put(ResourceCells.ORG_NAME, event.get(ResourceCells.ORG_NAME));
-                                item.put(ResourceCells.EVENT_DATE, event.get(ResourceCells.EVENT_DATE));
-                                String dataSetCode = String.valueOf(item.get(ResourceCells.ROWKEY)).split("\\$")[1];
-                                if (combination[1].equals(dataSetCode)) {
-                                    if (profileId.equals(item.get(ResourceCells.ROWKEY))) {
-                                        if (tempMap.containsKey(dataSetCode)) {
-                                            List<Map<String, Object>> tempList = (List<Map<String, Object>>) tempMap.get(dataSetCode);
-                                            tempList.add(item);
-                                        } else {
-                                            List<Map<String, Object>> tempList = new ArrayList<>();
-                                            tempList.add(item);
-                                            tempMap.put(dataSetCode, tempList);
-                                        }
-                                    }
-                                    return;
-                                }
-                                if (combination[1].equals("HDSD00_79") && dataSetCode.equals("HDSD00_78") && !StringUtils.isEmpty(mark)) {
-                                    if (mark.equals(item.get("EHR_006291"))) { //报告单号
-                                        if (tempMap.containsKey(dataSetCode)) {
-                                            List<Map<String, Object>> tempList = (List<Map<String, Object>>) tempMap.get(dataSetCode);
-                                            tempList.add(item);
-                                        } else {
-                                            List<Map<String, Object>> tempList = new ArrayList<>();
-                                            tempList.add(item);
-                                            tempMap.put(dataSetCode, tempList);
-                                        }
-                                    }
-                                    return;
-                                }
-                                if (combination[1].equals("HDSD00_77") && dataSetCode.equals("HDSD00_76") && !StringUtils.isEmpty(mark)) {
-                                    if (mark.equals(item.get("EHR_006294"))) { //报告单号
-                                        if (tempMap.containsKey(dataSetCode)) {
-                                            List<Map<String, Object>> tempList = (List<Map<String, Object>>) tempMap.get(dataSetCode);
-                                            tempList.add(item);
-                                        } else {
-                                            List<Map<String, Object>> tempList = new ArrayList<>();
-                                            tempList.add(item);
-                                            tempMap.put(dataSetCode, tempList);
-                                        }
-                                    }
-                                }
-                                if (combination[1].equals("HDSD00_77") && dataSetCode.equals("HDSD00_75") && !StringUtils.isEmpty(mark)) {
-                                    if (mark.equals(item.get("EHR_006339"))) { //报告单号
-                                        if (tempMap.containsKey(dataSetCode)) {
-                                            List<Map<String, Object>> tempList = (List<Map<String, Object>>) tempMap.get(dataSetCode);
-                                            tempList.add(item);
-                                        } else {
-                                            List<Map<String, Object>> tempList = new ArrayList<>();
-                                            tempList.add(item);
-                                            tempMap.put(dataSetCode, tempList);
-                                        }
-                                    }
-                                    return;
-                                }
-                                if (tempMap.containsKey(dataSetCode)) {
-                                    List<Map<String, Object>> tempList = (List<Map<String, Object>>) tempMap.get(dataSetCode);
-                                    tempList.add(item);
-                                } else {
-                                    List<Map<String, Object>> tempList = new ArrayList<>();
-                                    tempList.add(item);
-                                    tempMap.put(dataSetCode, tempList);
-                                }
-                            });
-                            multipleDataset.forEach(item -> {
-                                if (!tempMap.containsKey(item)) {
-                                    tempMap.put(item, new ArrayList<>());
-                                }
-                            });
-                            dataMap.put(cdaDocId, tempMap);
-                        } else {
-                            String subQ = "{\"q\":\"profile_id:" + profileId + "\"}";
-                            Envelop subData = resource.getSubData(subQ, 1, 2000, null);
-                            List<Map<String, Object>> subList = subData.getDetailModelList();
-                            subList.forEach(item -> {
-                                item.put(ResourceCells.ORG_AREA, event.get(ResourceCells.ORG_AREA));
-                                item.put(ResourceCells.ORG_NAME, event.get(ResourceCells.ORG_NAME));
-                                item.put(ResourceCells.EVENT_DATE, event.get(ResourceCells.EVENT_DATE));
-                                String dataSetCode = String.valueOf(item.get(ResourceCells.ROWKEY)).split("\\$")[1];
-                                if (tempMap.containsKey(dataSetCode)) {
-                                    List<Map<String, Object>> tempList = (List<Map<String, Object>>) tempMap.get(dataSetCode);
-                                    tempList.add(item);
-                                } else {
-                                    List<Map<String, Object>> tempList = new ArrayList<>();
-                                    tempList.add(item);
-                                    tempMap.put(dataSetCode, tempList);
-                                }
-                            });
-                            multipleDataset.forEach(item -> {
-                                if (!tempMap.containsKey(item)) {
-                                    tempMap.put(item, new ArrayList<>());
-                                }
-                            });
-                            dataMap.put(cdaDocId, tempMap);
-                        }
-                    });
-                } else {
+                if (transform) {
                     cdaDataSetMap.keySet().forEach(cdaDocId -> {
                         List<MCdaDataSet> cdaDataSets = cdaDataSetMap.get(cdaDocId);
                         Map<String, Object> tempMap = new HashMap<>();
@@ -484,6 +384,130 @@ public class ProfileCDAService extends ProfileBasicService {
                                 } else {
                                     List<Map<String, Object>> tempList = new ArrayList<>();
                                     tempList.add(resourcesTransformService.stdTransform(item, dataSetCode, cdaVersion));
+                                    tempMap.put(dataSetCode, tempList);
+                                }
+                            });
+                            multipleDataset.forEach(item -> {
+                                if (!tempMap.containsKey(item)) {
+                                    tempMap.put(item, new ArrayList<>());
+                                }
+                            });
+                            dataMap.put(cdaDocId, tempMap);
+                        }
+                    });
+                } else {
+                    cdaDataSetMap.keySet().forEach(cdaDocId -> {
+                        List<MCdaDataSet> cdaDataSets = cdaDataSetMap.get(cdaDocId);
+                        Map<String, Object> tempMap = new HashMap<>();
+                        List<String> multipleDataset = new ArrayList<>();
+                        if (cdaDataSets != null) {
+                            cdaDataSets.forEach(cdaDataSet -> {
+                                String dataSetCode = cdaDataSet.getDataSetCode();
+                                if (cdaDataSet.getMultiRecord().equals("0")) {
+                                    //主表数据
+                                    if (!tempMap.containsKey(dataSetCode)) {
+                                        List<Map<String, Object>> tempList = new ArrayList<>();
+                                        tempList.add(resourcesTransformService.stdMerge(event, dataSetCode, cdaVersion));
+                                        tempMap.put(dataSetCode, tempList);
+                                    }
+                                } else {
+                                    multipleDataset.add(dataSetCode);
+                                }
+                            });
+                        }
+                        //细表数据
+                        if (is_multi) {
+                            String[] combination = profileId.split("\\$");
+                            String subQ = "{\"q\":\"profile_id:" + combination[0] + "\"}";
+                            Envelop subData = resource.getSubData(subQ, 1, 2000, null);
+                            List<Map<String, Object>> subList = subData.getDetailModelList();
+                            subList.forEach(item -> {
+                                item.put(ResourceCells.ORG_AREA, event.get(ResourceCells.ORG_AREA));
+                                item.put(ResourceCells.ORG_NAME, event.get(ResourceCells.ORG_NAME));
+                                item.put(ResourceCells.EVENT_DATE, event.get(ResourceCells.EVENT_DATE));
+                                String dataSetCode = String.valueOf(item.get(ResourceCells.ROWKEY)).split("\\$")[1];
+                                if (combination[1].equals(dataSetCode)) {
+                                    if (profileId.equals(item.get(ResourceCells.ROWKEY))) {
+                                        if (tempMap.containsKey(dataSetCode)) {
+                                            List<Map<String, Object>> tempList = (List<Map<String, Object>>) tempMap.get(dataSetCode);
+                                            tempList.add(item);
+                                        } else {
+                                            List<Map<String, Object>> tempList = new ArrayList<>();
+                                            tempList.add(item);
+                                            tempMap.put(dataSetCode, tempList);
+                                        }
+                                    }
+                                    return;
+                                }
+                                if (combination[1].equals("HDSD00_79") && dataSetCode.equals("HDSD00_78") && !StringUtils.isEmpty(mark)) {
+                                    if (mark.equals(item.get("EHR_006291"))) { //报告单号
+                                        if (tempMap.containsKey(dataSetCode)) {
+                                            List<Map<String, Object>> tempList = (List<Map<String, Object>>) tempMap.get(dataSetCode);
+                                            tempList.add(item);
+                                        } else {
+                                            List<Map<String, Object>> tempList = new ArrayList<>();
+                                            tempList.add(item);
+                                            tempMap.put(dataSetCode, tempList);
+                                        }
+                                    }
+                                    return;
+                                }
+                                if (combination[1].equals("HDSD00_77") && dataSetCode.equals("HDSD00_76") && !StringUtils.isEmpty(mark)) {
+                                    if (mark.equals(item.get("EHR_006294"))) { //报告单号
+                                        if (tempMap.containsKey(dataSetCode)) {
+                                            List<Map<String, Object>> tempList = (List<Map<String, Object>>) tempMap.get(dataSetCode);
+                                            tempList.add(item);
+                                        } else {
+                                            List<Map<String, Object>> tempList = new ArrayList<>();
+                                            tempList.add(item);
+                                            tempMap.put(dataSetCode, tempList);
+                                        }
+                                    }
+                                    return;
+                                }
+                                if (combination[1].equals("HDSD00_77") && dataSetCode.equals("HDSD00_75") && !StringUtils.isEmpty(mark)) {
+                                    if (mark.equals(item.get("EHR_006339"))) { //报告单号
+                                        if (tempMap.containsKey(dataSetCode)) {
+                                            List<Map<String, Object>> tempList = (List<Map<String, Object>>) tempMap.get(dataSetCode);
+                                            tempList.add(item);
+                                        } else {
+                                            List<Map<String, Object>> tempList = new ArrayList<>();
+                                            tempList.add(item);
+                                            tempMap.put(dataSetCode, tempList);
+                                        }
+                                    }
+                                    return;
+                                }
+                                if (tempMap.containsKey(dataSetCode)) {
+                                    List<Map<String, Object>> tempList = (List<Map<String, Object>>) tempMap.get(dataSetCode);
+                                    tempList.add(item);
+                                } else {
+                                    List<Map<String, Object>> tempList = new ArrayList<>();
+                                    tempList.add(item);
+                                    tempMap.put(dataSetCode, tempList);
+                                }
+                            });
+                            multipleDataset.forEach(item -> {
+                                if (!tempMap.containsKey(item)) {
+                                    tempMap.put(item, new ArrayList<>());
+                                }
+                            });
+                            dataMap.put(cdaDocId, tempMap);
+                        } else {
+                            String subQ = "{\"q\":\"profile_id:" + profileId + "\"}";
+                            Envelop subData = resource.getSubData(subQ, 1, 2000, null);
+                            List<Map<String, Object>> subList = subData.getDetailModelList();
+                            subList.forEach(item -> {
+                                item.put(ResourceCells.ORG_AREA, event.get(ResourceCells.ORG_AREA));
+                                item.put(ResourceCells.ORG_NAME, event.get(ResourceCells.ORG_NAME));
+                                item.put(ResourceCells.EVENT_DATE, event.get(ResourceCells.EVENT_DATE));
+                                String dataSetCode = String.valueOf(item.get(ResourceCells.ROWKEY)).split("\\$")[1];
+                                if (tempMap.containsKey(dataSetCode)) {
+                                    List<Map<String, Object>> tempList = (List<Map<String, Object>>) tempMap.get(dataSetCode);
+                                    tempList.add(item);
+                                } else {
+                                    List<Map<String, Object>> tempList = new ArrayList<>();
+                                    tempList.add(item);
                                     tempMap.put(dataSetCode, tempList);
                                 }
                             });
