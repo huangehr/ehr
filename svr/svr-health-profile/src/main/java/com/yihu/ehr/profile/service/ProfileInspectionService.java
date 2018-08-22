@@ -378,8 +378,4 @@ public class ProfileInspectionService extends ProfileBasicService {
         }
     }
 
-    public static void main(String [] args) {
-        System.out.println(NumberValidationUtils.isRealNumber("121.2"));
-    }
-
 }
