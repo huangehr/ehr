@@ -1,5 +1,6 @@
 package com.yihu.ehr.analyze.controller;
 
+import com.yihu.ehr.analyze.service.RedisService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
@@ -32,6 +33,8 @@ public class DailyReportEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     private ElasticSearchUtil elasticSearchUtil;
+    @Autowired
+    private RedisService redisService;
 
     @ApiOperation(value = "档案日报上传")
     @RequestMapping(value = ServiceApi.PackageAnalyzer.DailyReport, method = RequestMethod.POST)
@@ -76,6 +79,8 @@ public class DailyReportEndPoint extends EnvelopRestEndPoint {
                         elasticSearchUtil.delete(INDEX, TYPE ,m.get("_id").toString());
                     }
                 }
+                String orgArea = redisService.getOrgArea(map.get("org_code").toString());
+                map.put("org_area",orgArea);
                 elasticSearchUtil.index(INDEX, TYPE, map);
             }
             return success(true);

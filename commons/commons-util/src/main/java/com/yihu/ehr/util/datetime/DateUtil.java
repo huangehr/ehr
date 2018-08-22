@@ -597,6 +597,15 @@ public class DateUtil {
         return formatDate(addDate(add, formatCharDateYMD(sDate, DEFAULT_CHAR_DATE_YMD_FORMAT)), DEFAULT_CHAR_DATE_YMD_FORMAT);
     }
 
+    public static String addDate(int add, String sDate,String pattern) {
+
+        if (sDate.length() < 8) {
+            return null;
+        }
+
+        return formatDate(addDate(add, formatCharDateYMD(sDate, pattern)), pattern);
+    }
+
 
     public static Date addMonth(int add, Date d) {
 

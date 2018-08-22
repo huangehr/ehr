@@ -70,7 +70,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
         orgList.forEach(one -> {
             String orgCode = one[0].toString();
             String name = one[1].toString();
-            orgMap.put(orgCode,name);
+            orgMap.put(orgCode, name);
         });
         return orgMap;
     }
@@ -843,15 +843,15 @@ public class DataQualityStatisticsService extends BaseJpaService {
                 } else {
                     dataMap1 = initRateMap(warningMap, orgMap.get(orgCode), orgCode);
                 }
-                dataMap1.put("totalVisit",HSI07_01_001);
-                dataMap1.put("totalOutpatient",HSI07_01_002);
-                dataMap1.put("totalPe",HSI07_01_004);
-                dataMap1.put("totalHospital",HSI07_01_012);
+                dataMap1.put("totalVisit", HSI07_01_001);
+                dataMap1.put("totalOutpatient", HSI07_01_002);
+                dataMap1.put("totalPe", HSI07_01_004);
+                dataMap1.put("totalHospital", HSI07_01_012);
                 totalVisitNum += HSI07_01_001;
                 totalOutpatientNum += HSI07_01_002;
                 totalPeNum += HSI07_01_004;
                 totalHospitalNum += HSI07_01_012;
-                dataMap.put(orgCode,dataMap1);
+                dataMap.put(orgCode, dataMap1);
             }
         } catch (Exception e) {
             if (!"Error".equals(e.getMessage())) {
@@ -866,8 +866,8 @@ public class DataQualityStatisticsService extends BaseJpaService {
             while (resultSetOrg.next()) {
                 String orgCode = resultSetOrg.getString("org_code");
                 Map<String, Object> map = dataMap.get(orgCode);
-                if(map == null){
-                    dataMap.put(orgCode,initRateMap(warningMap,orgMap.get(orgCode),orgCode));
+                if (map == null) {
+                    dataMap.put(orgCode, initRateMap(warningMap, orgMap.get(orgCode), orgCode));
                 }
             }
         } catch (Exception e) {
@@ -880,7 +880,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
         for (Map<String, Object> map : dataMap.values()) {
             String orgCode = map.get("orgCode").toString();
             //完整数
-            getPatientCount(start, end, orgCode, map);
+            getPatientCount("event_date",start, end, orgCode, map);
             //及时率
             DqPaltformReceiveWarning warning = null;
             if (warningMap.containsKey(orgCode)) {
@@ -932,7 +932,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
         totalMap.put("outpatientInTime", totalOutpatientInTime);//门诊及时数
         totalMap.put("hospitalInTime", totalHospitalInTime);//住院及时数
         totalMap.put("peInTime", totalPeInTime);//体检及时数
-        getPatientCount(start, end, null, totalMap);
+        getPatientCount("event_date" ,start, end, null, totalMap);
         totalOutpatientIntegrity = Double.valueOf(totalMap.get("outpatientIntegrity").toString());//门诊完整数
         totalHospitalIntegrity = Double.valueOf(totalMap.get("hospitalIntegrity").toString());//住院完整数
         totalPeIntegrity = Double.valueOf(totalMap.get("peIntegrity").toString());//体检完整数
@@ -962,7 +962,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
         re.add(totalMap);
 
         //计算及时率及完整率
-        for (Map<String, Object> map:dataMap.values()){
+        for (Map<String, Object> map : dataMap.values()) {
             double outpatientInTime = Double.parseDouble(map.get("outpatientInTime").toString());//门诊及时数
             double hospitalInTime = Double.parseDouble(map.get("hospitalInTime").toString());//住院及时数
             double peInTime = Double.parseDouble(map.get("peInTime").toString());//体检及时数
@@ -1000,14 +1000,14 @@ public class DataQualityStatisticsService extends BaseJpaService {
     }
 
     /**
-     * 平台就诊人数 去重复(完整人数)
-     *
+     * 平台就诊人数 去重复(完整人数)  档案完整性
+     * @param dateField 时间区间查询字段
      * @param start
      * @param end
      * @param orgCode
      * @return
      */
-    public void getPatientCount(String start, String end, String orgCode, Map<String, Object> map) throws Exception {
+    public void getPatientCount(String dateField,String start, String end, String orgCode, Map<String, Object> map) throws Exception {
         try {
             long starttime = System.currentTimeMillis();
             String sql0 = "";
@@ -1015,29 +1015,29 @@ public class DataQualityStatisticsService extends BaseJpaService {
             String sql2 = "";
             String sql3 = "";
             if (StringUtils.isNotEmpty(orgCode)) {
-                sql0 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=2 AND pack_type=1 AND org_code='" + orgCode + "' AND event_date BETWEEN" +
+                sql0 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=2 AND pack_type=1 AND org_code='" + orgCode + "' AND " + dateField + " BETWEEN" +
                         " '" + start + " 00:00:00' AND '" + end + " 23:59:59'";
 
-                sql1 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=1 AND pack_type=1 AND org_code='" + orgCode + "' AND event_date BETWEEN" +
+                sql1 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=1 AND pack_type=1 AND org_code='" + orgCode + "' AND " + dateField + " BETWEEN" +
                         " '" + start + " 00:00:00' AND '" + end + " 23:59:59'";
 
-                sql2 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=0 AND pack_type=1 AND org_code='" + orgCode + "' AND event_date BETWEEN " +
+                sql2 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=0 AND pack_type=1 AND org_code='" + orgCode + "' AND " + dateField + " BETWEEN " +
                         "'" + start + " 00:00:00' AND '" + end + " 23:59:59'";
 
-                sql3 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE pack_type=1 AND org_code='" + orgCode + "' AND event_date BETWEEN " +
+                sql3 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE pack_type=1 AND org_code='" + orgCode + "' AND " + dateField + " BETWEEN " +
                         "'" + start + " 00:00:00' AND '" + end + " 23:59:59'";
             } else {
-                sql0 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=2 AND pack_type=1 AND event_date " +
-                        "BETWEEN '" + start + " 00:00:00' AND '" + end + " 23:59:59'";
+                sql0 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=2 AND pack_type=1 AND " + dateField +
+                        " BETWEEN '" + start + " 00:00:00' AND '" + end + " 23:59:59'";
 
-                sql1 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=1 AND pack_type=1 AND event_date " +
-                        "BETWEEN '" + start + " 00:00:00' AND '" + end + " 23:59:59'";
+                sql1 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=1 AND pack_type=1 AND " + dateField +
+                        " BETWEEN '" + start + " 00:00:00' AND '" + end + " 23:59:59'";
 
-                sql2 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=0 AND pack_type=1 AND event_date " +
-                        "BETWEEN '" + start + " 00:00:00' AND '" + end + " 23:59:59'";
+                sql2 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=0 AND pack_type=1 AND " + dateField +
+                        " BETWEEN '" + start + " 00:00:00' AND '" + end + " 23:59:59'";
 
-                sql3 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE pack_type=1 AND event_date " +
-                        "BETWEEN '" + start + " 00:00:00' AND '" + end + " 23:59:59'";
+                sql3 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE pack_type=1 AND " + dateField +
+                        " BETWEEN '" + start + " 00:00:00' AND '" + end + " 23:59:59'";
             }
             ResultSet resultSet0 = elasticSearchUtil.findBySql(sql0);
             ResultSet resultSet1 = elasticSearchUtil.findBySql(sql1);
@@ -1168,18 +1168,18 @@ public class DataQualityStatisticsService extends BaseJpaService {
      * @return
      * @throws Exception
      */
-    public Envelop getUploadSuccessListPage(String startDate, String endDate, String orgCode,int size,int page) throws Exception {
+    public Envelop getUploadSuccessListPage(String startDate, String endDate, String orgCode, int size, int page) throws Exception {
         List<Map<String, Object>> list = getUploadSuccessList(startDate, endDate, orgCode);
         Envelop pageEnvelop = getPageEnvelop(page, size, list);
         return pageEnvelop;
     }
 
-    private Envelop getPageEnvelop(int page, int size, List totalList){
+    private Envelop getPageEnvelop(int page, int size, List totalList) {
         Envelop envelop = new Envelop();
         //设置假分页
         int totalCount = totalList.size();
         envelop.setTotalCount(totalCount);
-        int totalPage = totalCount%size==0 ? totalCount%size:totalCount%size+1;
+        int totalPage = totalCount % size == 0 ? totalCount % size : totalCount % size + 1;
         envelop.setTotalPage(totalPage);
         envelop.setCurrPage(page);
         envelop.setPageSize(size);
@@ -1189,7 +1189,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
         return envelop;
     }
 
-    private List getPageList(int pageNum,int pageSize,List data) {
+    private List getPageList(int pageNum, int pageSize, List data) {
         int fromIndex = (pageNum - 1) * pageSize;
         if (fromIndex >= data.size()) {
             return Collections.emptyList();
@@ -1258,7 +1258,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
      * @return
      * @throws Exception
      */
-    public Envelop getUploadDataSetListPage(String startDate, String endDate, String orgCode,int size,int page) throws Exception {
+    public Envelop getUploadDataSetListPage(String startDate, String endDate, String orgCode, int size, int page) throws Exception {
         List<Map<String, Object>> uploadDataSetList = getUploadDataSetList(startDate, endDate, orgCode);
         return getPageEnvelop(page, size, uploadDataSetList);
     }
@@ -1333,7 +1333,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
 
     public Envelop getUploadErrorListPage(String startDate, String endDate, String orgCode, int size, int page) throws Exception {
         List<Map<String, Object>> uploadErrorList = getUploadErrorList(startDate, endDate, orgCode);
-        return getPageEnvelop(page,size,uploadErrorList);
+        return getPageEnvelop(page, size, uploadErrorList);
     }
 
     public double getDoubleValue(Double object) {

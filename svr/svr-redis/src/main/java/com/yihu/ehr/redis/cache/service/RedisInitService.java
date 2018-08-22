@@ -30,6 +30,8 @@ public class RedisInitService extends BaseJpaService {
     private RsAdapterMetaKeySchema rsAdapterMetaKeySchema;
     @Autowired
     private RsMetadataKeySchema rsMetadataKeySchema;
+    @Autowired
+    private AddressDictSchema addressDictSchema;
 
     /**
      * 缓存健康问题名称Redis
@@ -211,6 +213,20 @@ public class RedisInitService extends BaseJpaService {
             rsMetadataKeySchema.set((String) tempMap.get("id"), (String) tempMap.get("dict_code"));
         }
         return metaList.size();
+    }
+
+    /**
+     * 缓存行政区域Redis
+     */
+    public int cacheAreaName() {
+        String sql = "select id, name from address_dict";
+        List<Map<String,Object>> list = jdbc.queryForList(sql);
+        //清空相关Redis
+        addressDictSchema.delete();
+        for (Map<String,Object> map : list){
+            addressDictSchema.setAreaName(String.valueOf(map.get("id")), String.valueOf(map.get("name")));
+        }
+        return list.size();
     }
 
     //TODO ------------------- 未知用途 --------------------------
