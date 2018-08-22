@@ -3,23 +3,23 @@ package com.yihu.ehr.analyze.service.dataQuality;
 
 import com.yihu.ehr.analyze.dao.DqPaltformReceiveWarningDao;
 import com.yihu.ehr.analyze.service.pack.PackQcReportService;
-import com.yihu.ehr.elasticsearch.ElasticSearchPool;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.entity.quality.DqPaltformReceiveWarning;
+import com.yihu.ehr.profile.ProfileType;
+import com.yihu.ehr.profile.qualilty.DqDataType;
 import com.yihu.ehr.query.BaseJpaService;
-import com.yihu.ehr.redis.schema.AddressDictSchema;
+import com.yihu.ehr.redis.client.RedisClient;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.rest.Envelop;
-import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.Query;
-import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.text.DecimalFormat;
@@ -37,10 +37,6 @@ public class DataQualityHomeService extends BaseJpaService {
     @Autowired
     private ElasticSearchUtil elasticSearchUtil;
     @Autowired
-    private ElasticSearchPool elasticSearchPool;
-    @Autowired
-    private WarningSettingService warningSettingService;
-    @Autowired
     private DqPaltformReceiveWarningDao dqPaltformReceiveWarningDao;
     @Autowired
     private PackQcReportService packQcReportService;
@@ -51,74 +47,38 @@ public class DataQualityHomeService extends BaseJpaService {
     @Value("${quality.cloudName}")
     private String cloudName;
     @Autowired
-    private AddressDictSchema addressDictSchema;
+    private RedisClient redisClient;
+    @Autowired
+    private DataCompleteService dataCompleteService;
+    @Autowired
+    private ApplicationContext context;
 
+    private Map<DqDataType, DataQualityBaseService> dqBaseServiceMap;
 
-    public Map<String, Object> getOrgMap() {
-        //初始化 数据集数据
-        Session session = currentSession();
-        //获取医院数据
-        Query query1 = session.createSQLQuery("SELECT org_code,full_name from organizations where org_type = 'Hospital' ");
-        List<Object[]> orgList = query1.list();
-        Map<String, Object> orgMap = new HashedMap();
-        orgList.forEach(one -> {
-            String orgCode = one[0].toString();
-            String name = one[1].toString();
-            orgMap.put(orgCode, name);
-        });
-        return orgMap;
+    @PostConstruct
+    private void init() {
+        dqBaseServiceMap = new HashMap<>();
+        dqBaseServiceMap.put(DqDataType.complete, context.getBean(DataCompleteService.class));
+        dqBaseServiceMap.put(DqDataType.imTime, context.getBean(DataInTimeService.class));
+        dqBaseServiceMap.put(DqDataType.correct, context.getBean(DataCorrectService.class));
     }
 
-
-    /**
-     * 初始化datamap 数据
-     *
-     * @param datasetMap
-     * @param orgCode
-     * @return
-     */
-    private Map initDataMap(Map<String, Object> datasetMap, Object orgName, String orgCode) {
-        Map dataMap = new HashedMap();
-        dataMap.put("orgCode", orgCode);//机构code
-        dataMap.put("orgName", orgName);//机构名称
-        dataMap.put("hospitalArchives", 0);//医院档案数
-        dataMap.put("hospitalDataset", 0);//医院数据集
-        dataMap.put("receiveArchives", 0);//接收档案数
-        dataMap.put("receiveDataset", 0); //接收数据集
-        dataMap.put("receiveException", 0);//接收异常
-        dataMap.put("resourceSuccess", 0);//资源化-成功
-        dataMap.put("resourceFailure", 0);//资源化-失败
-        dataMap.put("resourceException", 0);//资源化-异常
-        if (datasetMap.containsKey(orgCode)) {
-            dataMap.put("hospitalDataset", datasetMap.get(orgCode));
-        } else {
-            dataMap.put("hospitalDataset", datasetMap.get(defaultOrgCode));
+    public DataQualityBaseService getInstance(DqDataType type){
+        DataQualityBaseService dataQualityBaseService;
+        switch (type) {
+            case complete:
+                dataQualityBaseService = dqBaseServiceMap.get(ProfileType.Standard);
+                break;
+            case imTime:
+                dataQualityBaseService = dqBaseServiceMap.get(ProfileType.File);
+                break;
+            case correct:
+                dataQualityBaseService = dqBaseServiceMap.get(ProfileType.Link);
+                break;
+            default:
+                throw new RuntimeException("Failed to identify dataQualityBaseService type");
         }
-        return dataMap;
-    }
-
-    /**
-     * 初始化ratemap 数据
-     *
-     * @param warningMap
-     * @param orgCode
-     * @return
-     */
-    private Map initRateMap(Map<String, DqPaltformReceiveWarning> warningMap, Object orgName, String orgCode) {
-        Map dataMap = new HashedMap();
-        dataMap.put("orgCode", orgCode);//机构code
-        dataMap.put("orgName", orgName);//机构名称
-        dataMap.put("outpatientInTime", 0);//门诊及时数
-        dataMap.put("hospitalInTime", 0);//住院及时数
-        dataMap.put("peInTime", 0);//体检及时数
-        dataMap.put("outpatientIntegrity", 0);//门诊完整数
-        dataMap.put("hospitalIntegrity", 0);//住院完整数
-        dataMap.put("peIntegrity", 0);//体检完整数
-        dataMap.put("totalVisit", 0);//总就诊数
-        dataMap.put("totalOutpatient", 0);//总门诊数
-        dataMap.put("totalPe", 0);//总体检数
-        dataMap.put("totalHospital", 0);//总住院数
-        return dataMap;
+        return dataQualityBaseService;
     }
 
     /**
@@ -196,36 +156,6 @@ public class DataQualityHomeService extends BaseJpaService {
         }
         DecimalFormat decimalFormat = new DecimalFormat("0.00%");
         return decimalFormat.format(molecular / denominator);
-    }
-
-    /**
-     *  百分比计算
-     * @param molecular    分子
-     * @param denominator 分母
-     * @return
-     */
-    public String calRate(Integer molecular, Integer denominator) {
-        if (molecular == 0) {
-            return "0.00%";
-        } else if (denominator == 0) {
-            return "100.00%";
-        }
-        DecimalFormat decimalFormat = new DecimalFormat("0.00%");
-        return decimalFormat.format(molecular / denominator);
-    }
-
-
-    private List getPageList(int pageNum, int pageSize, List data) {
-        int fromIndex = (pageNum - 1) * pageSize;
-        if (fromIndex >= data.size()) {
-            return Collections.emptyList();
-        }
-
-        int toIndex = pageNum * pageSize;
-        if (toIndex >= data.size()) {
-            toIndex = data.size();
-        }
-        return data.subList(fromIndex, toIndex);
     }
 
 
@@ -428,9 +358,32 @@ public class DataQualityHomeService extends BaseJpaService {
         return map;
     }
 
+
+    /**
+     *  批量更新es中的区域编码org_area
+     *  (通过机构编码org_code 更新org_area）
+     */
+    public void bulkUpdateOrgArea(String index,String type){
+        List<Map<String, Object>> result = elasticSearchUtil.list(index, type, "");
+        List<Map<String, Object>> updateSourceList = new ArrayList<>();
+
+        result.forEach(item -> {
+            Map<String, Object> updateSource = new HashMap<>();
+            updateSource.put("_id", item.get("_id"));
+            String orgCode = (String) item.get("org_code");
+            String orgArea = redisClient.get("organizations:" + orgCode + ":area");
+            updateSource.put("org_area", orgArea);
+            updateSourceList.add(updateSource);
+        });
+        elasticSearchUtil.bulkUpdate(index, type, updateSourceList);
+    }
+
+
+             /* ******************************** 区域层级模块相关 ***********************************/
+
     /**
      *  获取市区域的下级区域质控情况
-     * @param dataType 数据维度  （及时性，完整性，准确性）
+     * @param dataType 数据维度  （complete: 完整性，inTime:及时性，correct:准确性）
      * @param areaCode 上区域编码
      * @param start
      * @param end
@@ -448,7 +401,7 @@ public class DataQualityHomeService extends BaseJpaService {
 
         switch (dataType) {
             case "complete" :
-                //完整性
+                list = dataCompleteService.areaDataComplete(start,end);//完整性
                 break;
             case "inTime" :
                 //及时性
@@ -456,7 +409,7 @@ public class DataQualityHomeService extends BaseJpaService {
             case "correct" :
                 //准确性
                 break;
-                default:break;
+            default:break;
         }
 
         return list;
@@ -492,85 +445,6 @@ public class DataQualityHomeService extends BaseJpaService {
         totalMap.put("count",countTotal);
         list.add(0,totalMap);
         return list;
-    }
-
-    /**
-     * 【完整性】 获取区域数据 - 行政区号分组
-     * @param startDate
-     * @param endDate
-     * @return
-     * @throws Exception
-     */
-    public Envelop areaDataComplete(String startDate, String endDate) throws Exception{
-        Envelop envelop = new Envelop();
-        String end = DateUtil.addDate(1, endDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
-        Map<String,Object> resMap = null;
-        List<Map<String,Object>> list = new ArrayList<>();
-        //机构数据
-        List<Map<String,Object>> groupList = getOrgDataGroup(startDate,end);
-        //平台接收数据量
-        Map<String, Object> platformDataGroup = getPlatformDataGroup(startDate, end);
-        // 计算
-        for (Map<String,Object> map:groupList){
-            resMap = new HashMap<String,Object>();
-            Integer platPormNum = Integer.parseInt(platformDataGroup.get("org_area").toString());
-            Integer orgNum = Integer.parseInt(map.get("count").toString());
-            String rate = calRate(platPormNum,orgNum);
-            resMap.put("org_area",map.get("org_area"));
-            resMap.put("count",platPormNum);
-            resMap.put("total",orgNum);
-            resMap.put("rate",rate);
-            list.add(resMap);
-        }
-        envelop.setDetailModelList(list);
-        envelop.setSuccessFlg(true);
-        return envelop;
-    }
-
-    /**
-     * 获取平台区域分组档案数据量 - （区域编码分组）
-     * @param startDate
-     * @param endDate
-     * @return
-     * @throws Exception
-     */
-    public Map<String,Object> getPlatformDataGroup(String startDate,String endDate) throws Exception {
-        Map<String,Object> resMap = new HashMap<>();
-        //平台数据
-        StringBuffer sql = new StringBuffer();
-        sql.append("SELECT SUM(row) as count ,org_area ");
-        sql.append("FROM json_archives_qc/qc_dataset_detail");
-        sql.append(" WHERE receive_date>='" + startDate + " 00:00:00' and receive_date<='" + endDate + " 23:59:59'");
-        sql.append("GROUP BY org_area");
-        List<String> field2 = new ArrayList<>();
-        field2.add("count");
-        field2.add("org_area");
-        List<Map<String,Object>> platformList = elasticSearchUtil.findBySql(field2, sql.toString());
-        for (Map<String,Object> map : platformList){
-            resMap.put(map.get("org_area").toString(),map.get("count"));
-        }
-        return resMap;
-    }
-
-    /**
-     *  获取机构采集- 区域分组数据量 - （区域编码分组）
-     * @param startDate
-     * @param endDate
-     * @return
-     * @throws Exception
-     */
-    public  List<Map<String,Object>> getOrgDataGroup(String startDate,String endDate) throws Exception {
-        //机构数据
-        StringBuffer sql = new StringBuffer();
-        sql.append("SELECT SUM(HSI07_01_001) as count ,org_area ");
-        sql.append("FROM qc/daily_report");
-        sql.append(" WHERE create_date>='" + startDate + "T00:00:00Z' and create_date<='" + endDate + "T23:59:59Z'");
-        sql.append("GROUP BY org_area");
-        List<String> field = new ArrayList<>();
-        field.add("count");
-        field.add("org_area");
-        List<Map<String,Object>> groupList = elasticSearchUtil.findBySql(field, sql.toString());
-        return groupList;
     }
 
 

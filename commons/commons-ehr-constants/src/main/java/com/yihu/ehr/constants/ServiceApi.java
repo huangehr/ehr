@@ -1708,6 +1708,7 @@ public class ServiceApi {
 
         //首页相关
         public static final String  HomeSummary= "/dataQuality/home/recordList";
+        public static final String  HomeAreaDataList= "/dataQuality/home/areaDataList";
 
 
 

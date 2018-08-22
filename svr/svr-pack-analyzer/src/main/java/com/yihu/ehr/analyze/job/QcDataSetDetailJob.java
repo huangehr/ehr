@@ -1,7 +1,6 @@
 package com.yihu.ehr.analyze.job;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.analyze.feign.RedisServiceClient;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.redis.client.RedisClient;
 import com.yihu.ehr.util.datetime.DateUtil;
@@ -93,7 +92,8 @@ public class QcDataSetDetailJob {
             map.put("dataset_name", redisClient.get("std_data_set_" + version + ":" + dataSet + ":name"));
             map.put("row", row);
             map.put("count", 1);
-
+            String orgArea = redisClient.get("organizations:" + orgCode + ":area");
+            map.put("org_area",orgArea);
             res.add(map);
         }
     }
