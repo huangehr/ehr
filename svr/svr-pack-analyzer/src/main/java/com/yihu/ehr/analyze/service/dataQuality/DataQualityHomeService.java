@@ -446,5 +446,71 @@ public class DataQualityHomeService extends BaseJpaService {
         return list;
     }
 
+    /**
+     * 首页错误数据集
+     * @param orgCode
+     * @param dataType
+     * @param start
+     * @param end
+     * @return
+     * @throws Exception
+     */
+    public List<Map<String,Object>> homeDatasetError(String orgCode, String dataType, String start, String end) throws Exception {
+        List<String> fileds = new ArrayList<>();
+        fileds.add("dataset");
+        fileds.add("count");
+        fileds.add("version");
+        StringBuffer sql = new StringBuffer();
+        sql.append("SELECT dataset,COUNT(dataset) count ,version FROM json_archives_qc/qc_metadata_info ");
+        sql.append(" WHERE receive_date>='" + start + " 00:00:00' and receive_date<='" + end + " 23:59:59'");
+        if(StringUtils.isNotEmpty(orgCode)){
+            sql.append(" AND org_code = '"+orgCode+"'");
+        }
+        if(dataType.equals(DqDataType.complete.toString())){
+            sql.append(" AND qc_error_type=1");
+        }else{
+            sql.append(" AND qc_error_type<>1");
+        }
+        sql.append(" group by dataset,version");
+        List<Map<String,Object>> list = elasticSearchUtil.findBySql(fileds,sql.toString());
+        for(Map<String,Object> map:list){
+            map.put("dataset_name", redisClient.get("std_data_set_" + map.get("version") + ":" + map.get("dataset") + ":name"));
+        }
+        return list;
+    }
 
+
+    /**
+     * 首页错误数据元
+     * @param dataset
+     * @param dataType
+     * @param start
+     * @param end
+     * @return
+     * @throws Exception
+     */
+    public List<Map<String,Object>> homeMetadataError(String dataset ,String dataType,String start,String end) throws Exception {
+        List<String> fileds = new ArrayList<>();
+        fileds.add("dataset");
+        fileds.add("metadata");
+        fileds.add("count");
+        fileds.add("version");
+        StringBuffer sql = new StringBuffer();
+        sql.append("SELECT dataset, metadata,COUNT(metadata) count ,version FROM json_archives_qc/qc_metadata_info ");
+        sql.append(" WHERE receive_date>='" + start + " 00:00:00' and receive_date<='" + end + " 23:59:59'");
+        if(StringUtils.isNotEmpty(dataset)){
+            sql.append(" AND dataset = '"+dataset+"'");
+        }
+        if(dataType.equals(DqDataType.complete.toString())){
+            sql.append(" AND qc_error_type=1");
+        }else{
+            sql.append(" AND qc_error_type<>1");
+        }
+        sql.append(" group by dataset,metadata,version");
+        List<Map<String,Object>> list = elasticSearchUtil.findBySql(fileds,sql.toString());
+        for(Map<String,Object> map:list){
+            map.put("metadata_name", redisClient.get("std_meta_data_" + map.get("version") + ":" + map.get("dataset")+"."+ map.get("metadata")+ ":name"));
+        }
+        return list;
+    }
 }

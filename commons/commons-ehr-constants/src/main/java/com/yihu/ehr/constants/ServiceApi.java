@@ -1713,7 +1713,8 @@ public class ServiceApi {
         //首页相关
         public static final String  HomeSummary= "/dataQuality/home/recordList";
         public static final String  HomeAreaDataList= "/dataQuality/home/areaDataList";
-
+        public static final String  HomeDatasetError= "/dataQuality/home/datasetError";
+        public static final String  HomeMetadataError= "/dataQuality/home/metadataError";
 
 
     }

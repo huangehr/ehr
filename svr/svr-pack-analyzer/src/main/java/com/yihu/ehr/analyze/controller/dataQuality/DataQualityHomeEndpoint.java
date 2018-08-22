@@ -88,7 +88,48 @@ public class DataQualityHomeEndpoint extends EnvelopRestEndPoint {
         dataQualityHomeService.bulkUpdateOrgArea(index,type);
     }
 
+    @RequestMapping(value = ServiceApi.DataQuality.HomeDatasetError, method = RequestMethod.GET)
+    @ApiOperation(value = "质量监控首页--错误数据集")
+    public Envelop homeDatasetError(
+            @ApiParam(name = "orgCode", value = "机构代码")
+            @RequestParam(value = "orgCode", required = false) String orgCode,
+            @ApiParam(name = "dataType", value = "数据维度  （complete: 完整性，correct:准确性）")
+            @RequestParam(value = "dataType", required = false) String dataType,
+            @ApiParam(name = "start", value = "开始时间，（接收时间）")
+            @RequestParam(value = "start", required = false) String start,
+            @ApiParam(name = "end", value = "结束时间，（接收时间）")
+            @RequestParam(value = "end", required = false) String end ) throws Exception {
+        Envelop envelop = new Envelop();
+        try {
+            return success(dataQualityHomeService.homeDatasetError(orgCode, dataType, start, end));
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return envelop;
+    }
 
-
+    @RequestMapping(value = ServiceApi.DataQuality.HomeMetadataError, method = RequestMethod.GET)
+    @ApiOperation(value = "质量监控首页--错误数据集")
+    public Envelop homeMetadataError(
+            @ApiParam(name = "dataset", value = "数据集")
+            @RequestParam(value = "dataset", required = false) String dataset,
+            @ApiParam(name = "dataType", value = "数据维度  （complete: 完整性，correct:准确性）")
+            @RequestParam(value = "dataType", required = false) String dataType,
+            @ApiParam(name = "start", value = "开始时间，（接收时间）")
+            @RequestParam(value = "start", required = false) String start,
+            @ApiParam(name = "end", value = "结束时间，（接收时间）")
+            @RequestParam(value = "end", required = false) String end ) throws Exception {
+        Envelop envelop = new Envelop();
+        try {
+            return success(dataQualityHomeService.homeMetadataError(dataset, dataType, start, end));
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return envelop;
+    }
 
 }
