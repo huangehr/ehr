@@ -5,7 +5,6 @@ import com.yihu.ehr.analyze.dao.DqPaltformReceiveWarningDao;
 import com.yihu.ehr.analyze.service.pack.PackQcReportService;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.entity.quality.DqPaltformReceiveWarning;
-import com.yihu.ehr.profile.ProfileType;
 import com.yihu.ehr.profile.qualilty.DqDataType;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.redis.client.RedisClient;
@@ -67,13 +66,13 @@ public class DataQualityHomeService extends BaseJpaService {
         DataQualityBaseService dataQualityBaseService;
         switch (type) {
             case complete:
-                dataQualityBaseService = dqBaseServiceMap.get(ProfileType.Standard);
+                dataQualityBaseService = dqBaseServiceMap.get(DqDataType.complete);
                 break;
             case imTime:
-                dataQualityBaseService = dqBaseServiceMap.get(ProfileType.File);
+                dataQualityBaseService = dqBaseServiceMap.get(DqDataType.imTime);
                 break;
             case correct:
-                dataQualityBaseService = dqBaseServiceMap.get(ProfileType.Link);
+                dataQualityBaseService = dqBaseServiceMap.get(DqDataType.correct);
                 break;
             default:
                 throw new RuntimeException("Failed to identify dataQualityBaseService type");
