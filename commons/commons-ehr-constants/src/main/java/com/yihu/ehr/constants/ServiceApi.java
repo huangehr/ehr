@@ -335,8 +335,12 @@ public class ServiceApi {
         public static final String MedicationRecords = "/profile/medicationRecords"; //患者用药清单
         public static final String MedicationRecordsPage = "/profile/medicationRecordsPage"; //患者用药清单
         public static final String MedicationRanking = "/profile/medicationRanking"; //患者用药排行
+        public static final String MedicationRankingWithTable = "/profile/medicationRankingWithTable"; //患者用药排行
         public static final String RecentMedicationSub = "/profile/recentMedicationSub"; //患者用药详情
         public static final String InspectionRecords = "/profile/inspectionRecords"; //检查检验记录
+        public static final String InspectionStatistics = "/profile/inspectionStatistics"; //检查检验记录统计
+        public static final String InspectionStatisticsOneSub = "/profile/inspectionStatisticsOneSub"; //检查检验记录子项详情（某次检验记录）
+        public static final String InspectionStatisticsAllSub = "/profile/inspectionStatisticsAllSub"; //检查检验记录子项详情（相关检验全部记录）
         public static final String MotherhoodOverview = "/profile/motherhoodOverview"; //孕产概况
 
         // ------------------------------ 以上为已对接接口 ------------------------------
