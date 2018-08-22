@@ -88,6 +88,12 @@ public class RedisInitEndPoint extends EnvelopRestEndPoint {
         return redisInitService.cacheMetadataDict();
     }
 
+    @ApiOperation("Redis缓存行政区域")
+    @RequestMapping(value = ServiceApi.Redis.InitAreaName, method = RequestMethod.POST)
+    public int cacheAreaName() throws Exception {
+        return redisInitService.cacheAreaName();
+    }
+
     //TODO ------------------- 未知用途 --------------------------
 
     /*@ApiOperation("Redis缓存指标(-1)")

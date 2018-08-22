@@ -1025,7 +1025,7 @@ public class ServiceApi {
         public static final String InitOrgSaasOrg = "/redis/init/orgSaasOrg";
         public static final String InitRsAdapterMeta = "/redis/init/rsAdapterMeta/{id}";
         public static final String InitRsMetadataDict = "/redis/init/rsMetadataDict";
-
+        public static final String InitAreaName = "/redis/init/areaName";
         //清除缓存
         public static final String Delete = "/redis/delete";
 
@@ -1703,6 +1703,11 @@ public class ServiceApi {
         public static final String ExportUploadRecordList = "/dataQuality/export/exportUploadRecordList";
         public static final String ExportQualityMonitoringListToExcel = "/dataQuality/export/exportQualityMonitoringListToExcel";
         public static final String ExportQualityUpload = "/dataQuality/export/exportQualityUpload";
+
+        //首页相关
+        public static final String  HomeSummary= "/dataQuality/home/recordList";
+
+
 
     }
 

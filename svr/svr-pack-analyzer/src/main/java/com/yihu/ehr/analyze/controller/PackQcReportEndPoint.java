@@ -61,7 +61,7 @@ public class PackQcReportEndPoint extends EnvelopRestEndPoint {
             @RequestParam(name = "endDate") String endDate,
             @ApiParam(name = "orgCode", value = "医院代码", required = false)
             @RequestParam(name = "orgCode") String orgCode) throws Exception {
-        return packQcReportService.dailyReport(startDate, endDate, orgCode);
+        return packQcReportService.dailyReport("event_date",startDate, endDate, orgCode);
     }
 
     @RequestMapping(value = ServiceApi.PackQcReport.datasetWarningList, method = RequestMethod.GET)

@@ -60,13 +60,14 @@ public class PackQcReportService extends BaseJpaService {
     protected final Log logger = LogFactory.getLog(this.getClass());
     /**
      * 获取医院数据
+     * @param dateField  时间区间查询字段
      * @param startDate
      * @param endDate
      * @param orgCode
      * @return
      * @throws Exception
      */
-    public Envelop dailyReport(String startDate, String endDate, String orgCode) throws Exception{
+    public Envelop dailyReport(String dateField,String startDate, String endDate, String orgCode) throws Exception{
         Envelop envelop = new Envelop();
         Date end = DateUtil.addDate(1, DateUtil.formatCharDateYMD(endDate));
         Map<String,Object> resMap = new HashMap<String,Object>();
@@ -76,7 +77,7 @@ public class PackQcReportService extends BaseJpaService {
         int oupatient=0;
         int physical=0;
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-        RangeQueryBuilder startRange = QueryBuilders.rangeQuery("event_date");
+        RangeQueryBuilder startRange = QueryBuilders.rangeQuery(dateField);
         startRange.gte(startDate);
         boolQueryBuilder.must(startRange);
 
