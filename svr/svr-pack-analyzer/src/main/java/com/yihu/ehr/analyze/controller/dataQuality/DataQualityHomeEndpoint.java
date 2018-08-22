@@ -54,15 +54,15 @@ public class DataQualityHomeEndpoint extends EnvelopRestEndPoint {
     public Envelop orgAndAreDatas(
             @ApiParam(name = "orgArea", value = "市区域编码")
             @RequestParam(value = "orgArea", required = false) String orgArea,
-            @ApiParam(name = "dataType", value = "数据维度  （complete: 完整性，inTime:及时性，correct:准确性）")
-            @RequestParam(value = "dataType", required = false) String dataType,
+            @ApiParam(name = "dataType", value = "数据维度  （0: 完整性，1:及时性，2:准确性）")
+            @RequestParam(value = "dataType", required = false) Integer dataType,
             @ApiParam(name = "start", value = "开始时间，（接收时间）")
             @RequestParam(value = "start", required = false) String start,
             @ApiParam(name = "end", value = "结束时间，（接收时间）", defaultValue = "")
             @RequestParam(value = "end", required = false) String end ) throws Exception {
         Envelop envelop = new Envelop();
         try {
-            return success(dataQualityHomeService.getAreaData(dataType,orgArea,start,end));
+            return success(dataQualityHomeService.findAreaData(dataType,orgArea,start,end));
         }catch (Exception e){
             e.printStackTrace();
             envelop.setSuccessFlg(false);

@@ -253,4 +253,18 @@ public class DataCorrectService extends DataQualityBaseService {
     }
 
 
+    @Override
+    public List<Map<String, Object>> getAreaDataQuality(String startDate, String endDate) throws Exception {
+        return null;
+    }
+
+    @Override
+    public List<Map<String, Object>> getOrgDataQuality(String areaCode, String startDate, String endDate) throws Exception {
+        return null;
+    }
+
+    @Override
+    public List<Map<String, Object>> getDataSetDataQuality(String areaCode, String startDate, String endDate) throws Exception {
+        return null;
+    }
 }

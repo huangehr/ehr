@@ -382,13 +382,13 @@ public class DataQualityHomeService extends BaseJpaService {
 
     /**
      *  获取市区域的下级区域质控情况
-     * @param dataType 数据维度  （complete: 完整性，inTime:及时性，correct:准确性）
+     * @param dataType 数据维度  （0: 完整性，1:及时性，2:准确性）
      * @param areaCode 上区域编码
      * @param start
      * @param end
      * @return
      */
-    public List<Map<String,Object>> getAreaData(String dataType ,String areaCode,String start,String end) throws Exception {
+    public List<Map<String,Object>> findAreaData(Integer dataType , String areaCode, String start, String end) throws Exception {
         List<Map<String,Object>> list = new ArrayList<>();
         String dateStr = DateUtil.toString(new Date());
         if (StringUtils.isBlank(start)) {
@@ -397,22 +397,13 @@ public class DataQualityHomeService extends BaseJpaService {
         if (StringUtils.isBlank(end)) {
             end = dateStr;
         }
-
-        switch (dataType) {
-            case "complete" :
-                list = dataCompleteService.areaDataComplete(start,end);//完整性
-                break;
-            case "inTime" :
-                //及时性
-                break;
-            case "correct" :
-                //准确性
-                break;
-            default:break;
-        }
-
+        DataQualityBaseService dataQualityBaseService = getInstance(DqDataType.create(dataType));
+        list = dataQualityBaseService.getAreaDataQuality(start,end);
         return list;
     }
+
+    /* ******************************** 机构 层级模块相关 ***********************************/
+
 
 
     public List<Map<String,Object>> getHospitalDataByGroup(String startDate, String endDate, String orgCode,String groupField) throws Exception {

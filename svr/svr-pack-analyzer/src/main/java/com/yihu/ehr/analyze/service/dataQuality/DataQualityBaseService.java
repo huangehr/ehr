@@ -31,8 +31,34 @@ public abstract class DataQualityBaseService extends BaseJpaService {
     private String cloudName;
 
 
+    /**
+     * 获取市级下的区县质控信息 - 【区域级别】
+     * @param startDate
+     * @param endDate
+     * @return
+     * @throws Exception
+     */
+    public abstract List<Map<String,Object>> getAreaDataQuality(String startDate, String endDate) throws Exception;
 
+    /**
+     * 获取区县下的机构质控信息 - 【机构级别】
+     * @param areaCode 区域编码
+     * @param startDate
+     * @param endDate
+     * @return
+     * @throws Exception
+     */
+    public abstract List<Map<String,Object>> getOrgDataQuality(String areaCode ,String startDate, String endDate) throws Exception;
 
+    /**
+     * 获取机构下的数据集质控信息 - 【级别】
+     * @param areaCode 区域编码
+     * @param startDate
+     * @param endDate
+     * @return
+     * @throws Exception
+     */
+    public abstract List<Map<String,Object>> getDataSetDataQuality(String areaCode ,String startDate, String endDate) throws Exception;
 
     /**
      * 获取医院列表

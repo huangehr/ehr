@@ -40,7 +40,8 @@ public class DataCompleteService extends DataQualityBaseService {
      * @return
      * @throws Exception
      */
-    public  List<Map<String,Object>> areaDataComplete(String startDate, String endDate) throws Exception{
+    @Override
+    public  List<Map<String,Object>> getAreaDataQuality(String startDate, String endDate) throws Exception{
         String end = DateUtil.addDate(1, endDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
         Map<String,Object> resMap = null;
         List<Map<String,Object>> list = new ArrayList<>();
@@ -63,6 +64,18 @@ public class DataCompleteService extends DataQualityBaseService {
 
         return list;
     }
+
+    @Override
+    public List<Map<String, Object>> getOrgDataQuality(String areaCode, String startDate, String endDate) throws Exception {
+        return null;
+    }
+
+    @Override
+    public List<Map<String, Object>> getDataSetDataQuality(String areaCode, String startDate, String endDate) throws Exception {
+        return null;
+    }
+
+
 
     /**
      * 获取平台区域分组档案数据量 - （区域编码分组）
