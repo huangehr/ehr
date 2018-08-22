@@ -77,6 +77,7 @@ public class ResourcesTransformService extends BaseJpaService {
             returnMap.put("event_no", resource.get("event_no"));
             returnMap.put("event_date", resource.get("event_date"));
             returnMap.put("event_type",resource.get("event_type"));
+            returnMap.put("org_name",resource.get("org_name"));
         }
         return returnMap;
     }
@@ -128,6 +129,7 @@ public class ResourcesTransformService extends BaseJpaService {
                     data.put("event_no", metadataResource.get("event_no"));
                     data.put("event_date", metadataResource.get("event_date"));
                     data.put("event_type",metadataResource.get("event_type"));
+                    data.put("org_name",resource.get("org_name"));
                     datas.add(data);
                 }
                 result.put(dataset,datas);
@@ -167,6 +169,7 @@ public class ResourcesTransformService extends BaseJpaService {
             returnRs.put("event_no", resource.get("event_no"));
             returnRs.put("event_type", resource.get("event_type"));
             returnRs.put("event_date", resource.get("event_date"));
+            returnRs.put("org_name",resource.get("org_name"));
         }
         return returnRs;
     }

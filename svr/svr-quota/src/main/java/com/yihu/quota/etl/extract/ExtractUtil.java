@@ -124,12 +124,14 @@ public class ExtractUtil {
                     }else if(main.getMainCode().equals(main_year) && !StringUtils.isEmpty(yearDictMap.get(value))){
                         saveModel.setYearName(yearDictMap.get(value));
                         saveModel.setYear(value);
-                    }else if(main.getMainCode().equals(main_dept) && !StringUtils.isEmpty(deptDictMap.get(value))){
+                    }else if(main.getMainCode().equals(main_dept)){
                         if(value.length() > 2){
                             value = value.substring(0,2);
                         }
-                        saveModel.setDeptName(deptDictMap.get(value));
-                        saveModel.setDept(value);
+                        if( !StringUtils.isEmpty(deptDictMap.get(value))){
+                            saveModel.setDeptName(deptDictMap.get(value));
+                            saveModel.setDept(value);
+                        }
                     }
                 }
             }
@@ -171,15 +173,24 @@ public class ExtractUtil {
                     }
                 }
                 if(!StringUtils.isEmpty(timeKey)){
-                    if(!StringUtils.isEmpty( map.get("quotaDate") ) ){
+                    if(!StringUtils.isEmpty( map.get(timeKey) ) ){
                         String date = "";
-                        if(map.get("quotaDate") instanceof String){
-                            date = map.get("quotaDate").toString();
-                        }else if(map.get("quotaDate") instanceof Date){
-                            date = DateUtil.formatDate((Date)map.get("quotaDate"),DateUtil.DEFAULT_DATE_YMD_FORMAT);
+                        if(map.get(timeKey) instanceof String){
+                            date = map.get(timeKey).toString().substring(0,10);
+                        }else if(map.get(timeKey) instanceof Date){
+                            date = DateUtil.formatDate((Date)map.get(timeKey),DateUtil.DEFAULT_DATE_YMD_FORMAT);
                         }
                         saveModel.setQuotaDate(date);
                     }
+//                    if(!StringUtils.isEmpty( map.get("quotaDate") ) ){
+//                        String date = "";
+//                        if(map.get("quotaDate") instanceof String){
+//                            date = map.get("quotaDate").toString();
+//                        }else if(map.get("quotaDate") instanceof Date){
+//                            date = DateUtil.formatDate((Date)map.get("quotaDate"),DateUtil.DEFAULT_DATE_YMD_FORMAT);
+//                        }
+//                        saveModel.setQuotaDate(date);
+//                    }
                     if(!StringUtils.isEmpty( map.get("event_date") )){
                         String date = "";
                         if(map.get("event_date") instanceof String){
@@ -490,21 +501,20 @@ public class ExtractUtil {
 
     private Map<String, SaveModel> setAllSlaveData(Map<String, SaveModel> allData, List<DictModel> dictData, Integer key) {
         Map<String, SaveModel> returnAllData = new HashMap<>();
+        String keyMethod = "setSlaveKey" + (key + 1);
+        String nameMethod = keyMethod + "Name";
         try {
             for (Map.Entry<String, SaveModel> one : allData.entrySet()) {
+                DictModel dictOne = null;
                 for (int i = 0; i < dictData.size(); i++) {
-                    DictModel dictOne = dictData.get(i);
+                    dictOne = dictData.get(i);
                     //设置新key
-                    StringBuffer newKey = new StringBuffer(one.getKey() + "-" + dictOne.getCode());
+                    String newKey = one.getKey() + "-" + dictOne.getCode();
                     //设置新的value
                     SaveModel saveModelTemp = new SaveModel();
                     BeanUtils.copyProperties(one.getValue(), saveModelTemp);
-
-                    StringBuffer keyMethodName = new StringBuffer("setSlaveKey" + (key + 1));
-                    StringBuffer nameMethodName = new StringBuffer("setSlaveKey" + (key + 1) + "Name");
-
-                    SaveModel.class.getMethod(keyMethodName.toString(), String.class).invoke(saveModelTemp, dictOne.getCode());
-                    SaveModel.class.getMethod(nameMethodName.toString(), String.class).invoke(saveModelTemp, dictOne.getName());
+                    SaveModel.class.getMethod(keyMethod, String.class).invoke(saveModelTemp, dictOne.getCode());
+                    SaveModel.class.getMethod(nameMethod, String.class).invoke(saveModelTemp, dictOne.getName());
                     returnAllData.put(newKey.toString(), saveModelTemp);
                 }
             }

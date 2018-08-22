@@ -401,6 +401,7 @@ public class ServiceApi {
         public static final String getAppTypeAndApps = "/getAppTypeAndApps";
         public static final String getApps = "/getApps";
         public static final String getDoctorAppsByType = "/getDoctorAppsByType";
+        public static final String createAppRolesByAppId = "/createAppRolesByAppId";
 
         // ---------------- 开放平台 ----------------
         public static final String CheckField = "/app/checkField";
@@ -414,6 +415,8 @@ public class ServiceApi {
 
         //--------------- 总支撑平台 ---------------
         public static final String SaveAppsRelation = "/app/saveAppsRelation";
+
+        public static final String GetUserApp = "/app/role/get";
 
     }
 
@@ -801,6 +804,7 @@ public class ServiceApi {
         public static final String changePasswordByOldPassword = "/users/changePasswordByOldPassword";
         public static final String updateUserTelePhone = "/users/updateTelephone";
 
+        public static final String initializationAuthorization = "/users/initializationAuthorization";
     }
 
     public static class TelVerification {

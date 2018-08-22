@@ -7,7 +7,7 @@ package com.yihu.ehr.profile;
  */
 public enum ArchiveStatus {
     Received,                   // 0待入库
-    Acquired,                   // 1正在入库库
+    Acquired,                   // 1正在入库
     Failed,                     // 2入库失败
     Finished                   // 3已入库
     //LegacyIgnored;              // 未能入库的档案

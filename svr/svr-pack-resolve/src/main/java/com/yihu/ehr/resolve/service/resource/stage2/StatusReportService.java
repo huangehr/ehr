@@ -67,4 +67,8 @@ public class StatusReportService {
         elasticSearchUtil.voidUpdate(MAIN_INDEX, MAIN_INFO, _id, updateSource);
     }
 
+    public Map<String, Object> getJsonArchiveById(String id){
+        return  elasticSearchUtil.findById(MAIN_INDEX, MAIN_INFO, id);
+    }
+
 }

@@ -81,6 +81,7 @@ public class EsQuotaJob implements Job {
             //初始化参数
             initParams(context);
             quotaVo.setExecuteFlag(executeFlag);
+            logger.warn("开始执行指标" + quotaVo.getCode());
             tjQuotaLog.setQuotaCode(quotaVo.getCode());
             tjQuotaLog.setSaasId(saasid);
             tjQuotaLog.setStartTime(new Date());
@@ -152,8 +153,8 @@ public class EsQuotaJob implements Job {
                         quotaVof.setRows(perCount);
                     }
                     Thread th = new Thread(new Thread(){
-                        public void run(){
-                            logger.info("启动第 "+ (f+1) + " 个线程。 ");//只能访问外部的final变量。
+                        public synchronized void run(){
+                            logger.warn("启动第 "+ (f+1) + " 个线程。 ");//只能访问外部的final变量。
                             quota(quotaLogf, quotaVof);
                         }
                     });
@@ -219,6 +220,7 @@ public class EsQuotaJob implements Job {
             tjQuotaLog.setContent(content);
             tjQuotaLog.setEndTime(new Date());
             saveLog(tjQuotaLog);
+            logger.warn("结束！" + content);
         }
     }
 

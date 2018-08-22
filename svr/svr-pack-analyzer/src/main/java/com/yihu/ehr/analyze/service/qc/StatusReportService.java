@@ -2,6 +2,7 @@ package com.yihu.ehr.analyze.service.qc;
 
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.profile.AnalyzeStatus;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -42,9 +43,15 @@ public class StatusReportService {
         } else if (analyzeStatus == AnalyzeStatus.Acquired) {
             updateSource.put("analyze_date", DATE_FORMAT.format(new Date()));
         }
-        updateSource.put("message", message);
+        if(StringUtils.isNoneBlank(message)){
+            updateSource.put("message", message);
+        }
         updateSource.put("error_type", errorType);
         updateSource.put("analyze_status", analyzeStatus.ordinal());
         elasticSearchUtil.voidUpdate(MAIN_INDEX, MAIN_INFO, _id, updateSource);
+    }
+
+    public Map<String, Object> getJsonArchiveById(String id){
+        return  elasticSearchUtil.findById(MAIN_INDEX, MAIN_INFO, id);
     }
 }

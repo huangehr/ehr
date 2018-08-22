@@ -42,7 +42,8 @@ public class PackAnalyzeTask {
         List<String> esSimplePackageList = new ArrayList<>(200);
         //当质控队列为空，将状态为待质控的档案包加入质控队列
         if (redisTemplate.opsForSet().size(RedisCollection.AnalyzeQueueVice) <= 0) {
-            Page<Map<String, Object>> result = elasticSearchUtil.page(INDEX, TYPE, "analyze_status=0", "+receive_date", 1, 1000);
+            //影像档案,如果是待质控,不添加入次质控队列, 防止主消息队列刚消费完,还未进行更改状态,就添加到 次质控队列,进而添加到次解析队列,进行二次解析(此时,很可能主解析队列已经将该影像档案入库,将ftp文件干掉了!)
+            Page<Map<String, Object>> result = elasticSearchUtil.page(INDEX, TYPE, "analyze_status=0;pack_type<>3", "+receive_date", 1, 1000);
             for (Map<String, Object> pack : result) {
                 String packStr = objectMapper.writeValueAsString(pack);
                 EsSimplePackage esSimplePackage = objectMapper.readValue(packStr, EsSimplePackage.class);
