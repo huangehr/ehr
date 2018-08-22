@@ -1691,6 +1691,7 @@ public class ServiceApi {
         public static final String UploadErrorListPage = "/dataQuality/quality/uploadErrorPage";
 
         public static final String WarningRecordList = "/dataQuality/warningRecord/warningRecordList";
+        public static final String RealTimeMonitorList = "/dataQuality/warningRecord/realTimeMonitorList";
         public static final String WarningRecord =  "/dataQuality/warningRecord/warningRecord/{id}";
         public static final String WarningRecordUpd = "/dataQuality/warningRecord/warningRecordUpd";
         public static final String WarningQuestionAnalyze = "/dataQuality/warningRecord/warningQuestionAnalyze";
