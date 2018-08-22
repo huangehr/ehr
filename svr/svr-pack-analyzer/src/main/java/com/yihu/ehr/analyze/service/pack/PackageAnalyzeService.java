@@ -160,7 +160,7 @@ public class PackageAnalyzeService {
                 zipPackage.download();
                 zipPackage.unZip();
                 ProfileType profileType = zipPackage.resolve();
-                if (ProfileType.Standard != profileType && !zipPackage.isReUploadFlg()) {
+                if (ProfileType.Standard != profileType) {
                     throw new ZipException("Ignore non-standard package file or re-upload package file");
                 }
                 packageQcService.qcHandle(zipPackage);

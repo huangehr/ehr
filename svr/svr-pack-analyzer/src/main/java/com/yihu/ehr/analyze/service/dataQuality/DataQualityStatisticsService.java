@@ -354,7 +354,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
 //            }
 
             //资源化数据
-            String sql52 = "SELECT count(*) c FROM json_archives/info where receive_date>= '" + start + " 00:00:00' AND receive_date<='" + end + " 23:59:59' AND pack_type=1 and archive_status=2 and org_code='" + orgCode + "' ";
+            String sql52 = "SELECT count(*) c FROM json_archives/info where receive_date>= '" + start + " 00:00:00' AND receive_date<='" + end + " 23:59:59' AND pack_type=1 and archive_status<>3 and org_code='" + orgCode + "' ";
             String sql53 = "SELECT count(*) c FROM json_archives/info where receive_date>= '" + start + " 00:00:00' AND receive_date<='" + end + " 23:59:59' AND pack_type=1 and archive_status=3 and org_code='" + orgCode + "' ";
 
             try {

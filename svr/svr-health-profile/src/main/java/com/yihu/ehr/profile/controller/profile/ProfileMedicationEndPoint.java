@@ -3,6 +3,7 @@ package com.yihu.ehr.profile.controller.profile;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.profile.model.DrugInfo;
 import com.yihu.ehr.profile.service.ProfileMedicationService;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
@@ -43,6 +44,22 @@ public class ProfileMedicationEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "date", value = "某个时间段内（不传默认查找所有）")
             @RequestParam(value = "date", required = false) String date) throws Exception {
         return profileMedicationService.medicationRanking(demographic_id, filter, hp_code, date);
+    }
+
+    @ApiOperation("用药排行(带药物类型)")
+    @RequestMapping(value = ServiceApi.Profiles.MedicationRankingWithTable, method = RequestMethod.GET)
+    public List<DrugInfo> medicationRankingWithTable (
+            @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362301195002141528")
+            @RequestParam(value = "demographic_id") String demographic_id,
+            @ApiParam(name = "filter", value = "过滤条件org_code=xxxxx")
+            @RequestParam(value = "filter", required = false) String filter,
+            @ApiParam(name = "hp_code", value = "健康问题代码，不传默认查找所有（接口改造后此参数可在filter中体现）")
+            @RequestParam(value = "hp_code", required = false) String hp_code,
+            @ApiParam(name = "date", value = "某个时间段内（不传默认查找所有）")
+            @RequestParam(value = "date", required = false) String date,
+            @ApiParam(name = "table", value = "HDSD00_83 - 中药， HDSD00_84 - 西药")
+            @RequestParam(value = "table", required = false) String table) throws Exception {
+        return profileMedicationService.medicationRankingWithTable(demographic_id, filter, hp_code, date, table);
     }
 
     @ApiOperation("用药记录 - 上饶PP")
@@ -95,7 +112,7 @@ public class ProfileMedicationEndPoint extends EnvelopRestEndPoint {
     @ApiOperation("最近的处方清单 - 档案浏览器")
     @RequestMapping(value = ServiceApi.Profiles.RecentMedicationSub, method = RequestMethod.GET)
     public Envelop recentMedicationSub(
-            @ApiParam(name = "demographic_id", value = "主表事件索引", required = true, defaultValue = "362301195002141528")
+            @ApiParam(name = "demographic_id", value = "身份证号码", required = true, defaultValue = "362301195002141528")
             @RequestParam(value = "demographic_id") String demographic_id,
             @ApiParam(name = "page", value = "页码", required = true)
             @RequestParam(value = "page") Integer page,
