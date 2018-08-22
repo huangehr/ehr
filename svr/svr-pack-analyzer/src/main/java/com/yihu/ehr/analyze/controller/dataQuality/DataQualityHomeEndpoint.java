@@ -111,7 +111,7 @@ public class DataQualityHomeEndpoint extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value = ServiceApi.DataQuality.HomeMetadataError, method = RequestMethod.GET)
-    @ApiOperation(value = "质量监控首页--错误数据集")
+    @ApiOperation(value = "质量监控首页--错误数据元")
     public Envelop homeMetadataError(
             @ApiParam(name = "dataset", value = "数据集")
             @RequestParam(value = "dataset", required = false) String dataset,
