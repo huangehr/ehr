@@ -122,6 +122,22 @@ public class SolrExtract {
             mainMap.put(key, key);
             dimensionGroupList.add(new SolrGroupEntity(key, SolrGroupEntity.GroupType.FIELD_VALUE));
             fl += key + ",";
+            if(qdm.get(i).getMainCode().equals("org")){
+                String orgFilter = " AND org_code:*" ;
+                if ( !StringUtils.isEmpty(fq)) {
+                    fq += orgFilter ;
+                }else {
+                    fq = orgFilter;
+                }
+            }
+            if(qdm.get(i).getMainCode().equals("town")){
+                String townFilter = " AND org_area:*" ;
+                if ( !StringUtils.isEmpty(fq)) {
+                    fq += townFilter ;
+                }else {
+                    fq = townFilter;
+                }
+            }
         }
         for (int i = 0; i < qds.size(); i++) {
             String key = qds.get(i).getKeyVal();
@@ -167,6 +183,7 @@ public class SolrExtract {
                 if (esConfig.getAggregation().equals(Contant.quota.aggregation_list) && !StringUtils.isEmpty(esConfig.getAggregationKey())) {
                     fl = fl + "," + esConfig.getAggregationKey();
                 }
+                logger.warn("solr 从"+ quotaVo.getStart() + " 开始获取数据，这次准备获取" + quotaVo.getRows() + "条");
                 list = solrQuery.queryReturnFieldList(core, q, fq, null, quotaVo.getStart(), quotaVo.getRows(), fl.split(","));
             } catch (Exception e) {
                 throw new Exception("solr 查询异常 " + e.getMessage());

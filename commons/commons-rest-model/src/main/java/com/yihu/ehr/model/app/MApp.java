@@ -35,6 +35,10 @@ public class MApp implements Serializable {
     private String icon;
     private int releaseFlag;
     private String manageType; // 管理类型，dictId=94
+
+    private String roleType; // 是否授权，用于医疗云平台首页，授权状态控制 0 - 默认未授权， 1 - 已授权
+
+
     /**
      * 医生工作站的应用分类,与catalog并无父子关系，1、在线学习，2在线服务
      */
@@ -42,6 +46,14 @@ public class MApp implements Serializable {
 
 
     public MApp(){
+    }
+
+    public String getRoleType() {
+        return roleType;
+    }
+
+    public void setRoleType(String roleType) {
+        this.roleType = roleType;
     }
 
     public String getId() {

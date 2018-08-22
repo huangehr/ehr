@@ -6,11 +6,13 @@ import com.yihu.ehr.analyze.service.RedisService;
 import com.yihu.ehr.profile.EventType;
 import com.yihu.ehr.profile.exception.AnalyzerException;
 import com.yihu.ehr.profile.exception.IllegalJsonFileException;
-import com.yihu.ehr.profile.exception.ResolveException;
 import com.yihu.ehr.profile.extractor.KeyDataExtractor;
 import com.yihu.ehr.profile.family.ResourceCells;
 import com.yihu.ehr.profile.model.PackageDataSet;
+import com.yihu.ehr.solr.SolrUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -33,6 +35,8 @@ public class StdPackageAnalyzer extends PackageAnalyzer {
 
     @Autowired
     private RedisService redisService;
+    @Autowired
+    private SolrUtil solrUtil;
 
     @Override
     public void analyze(ZipPackage zipPackage) throws Exception {
@@ -60,6 +64,22 @@ public class StdPackageAnalyzer extends PackageAnalyzer {
             //补传标识
             if (dataSet.isReUploadFlg()) {
                 zipPackage.setReUploadFlg(dataSet.isReUploadFlg());
+                if(zipPackage.getEventType()==null && StringUtils.isNotBlank(dataSet.getOrgCode()) && StringUtils.isNotBlank(dataSet.getEventNo()) && dataSet.getEventTime()!=null){
+                    //拼接出rowkey
+                    String rowkey = dataSet.getOrgCode()+"_"+dataSet.getEventNo()+"_"+dataSet.getEventTime().getTime();
+                    String q= "rowkey:"+rowkey;
+                    //目前只有结构化档案有做质控,后期如果对非结构化等做质控,查询表名需要做判断
+                    SolrDocumentList healthProfile = solrUtil.query("HealthProfile", q, null, 0, 1);
+                    if (healthProfile != null && healthProfile.getNumFound() > 0) {
+                        for (SolrDocument doc : healthProfile) {
+                            String eventType = (String) doc.getFieldValue("event_type");
+                            zipPackage.setEventType(EventType.create(eventType));
+                        }
+                    }else{
+                        throw new IllegalJsonFileException("Please upload the complete package(" + rowkey + ") first !");
+                    }
+
+                }
             }
 
             //就诊事件信息
@@ -70,7 +90,6 @@ public class StdPackageAnalyzer extends PackageAnalyzer {
                     zipPackage.setEventType(eventType);
                 }
             }
-
             //门诊或住院诊断
             if (zipPackage.getDiagnosisCode().size() <= 0 || zipPackage.getDiagnosisName().size() <= 0) {
                 Map<String, Object> properties = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.Diagnosis);

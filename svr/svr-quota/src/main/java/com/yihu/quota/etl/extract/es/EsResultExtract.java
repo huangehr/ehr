@@ -354,10 +354,11 @@ public class EsResultExtract {
      */
     public List<Map<String, Object>> searcherSumByGroupByTime(TjQuota tjQuota , String aggsFields ,String filter,String dateDime) throws Exception {
         initialize(tjQuota,null);
+        String quotaCode = " quotaCode='" + tjQuota.getCode().replaceAll("_", "") + "' ";
         if(StringUtils.isEmpty(filter)){
-            filter =  " quotaCode='" + tjQuota.getCode().replaceAll("_", "") + "' ";
+            filter =  quotaCode;
         }else {
-            filter = filter + " and quotaCode='" + tjQuota.getCode().replaceAll("_","") + "' ";
+            filter += " and " + quotaCode;
         }
         if(StringUtils.isNotEmpty(aggsFields)){
             aggsFields += ",";
@@ -399,10 +400,11 @@ public class EsResultExtract {
      */
     public  List<Map<String, Object>>  searcherSumGroup(TjQuota tjQuota , String aggsFields ,String filter, String sumField,String orderFild,String order, String top) throws Exception {
         initialize(tjQuota,null);
+        String quotaCode = " quotaCode='" + tjQuota.getCode().replaceAll("_", "") + "' ";
         if(StringUtils.isEmpty(filter)){
-            filter =  " quotaCode='" + tjQuota.getCode().replaceAll("_", "") + "' ";
+            filter =  quotaCode;
         }else {
-            filter = filter + " and quotaCode='" + tjQuota.getCode().replaceAll("_","") + "' ";
+            filter += " and " + quotaCode;
         }
         try {
             StringBuffer mysql = new StringBuffer("select ");

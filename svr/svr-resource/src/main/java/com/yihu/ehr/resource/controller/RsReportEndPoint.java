@@ -199,7 +199,7 @@ public class RsReportEndPoint extends EnvelopRestEndPoint {
                 } else {
                     filter = "status=1;reportCategoryId=" + governmentCategoryId.get(i);
                 }
-                List<RsReport> rsReports = rsReportService.search(filter);
+                List<RsReport> rsReports = rsReportService.search(filter, "+showType");
                 if (null != rsReports && rsReports.size() > 0) {
                     Map<String, Object> map = new HashMap<>();
                     for (RsReport report : rsReports) {

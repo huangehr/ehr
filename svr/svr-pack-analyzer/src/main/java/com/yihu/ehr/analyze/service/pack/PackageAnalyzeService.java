@@ -82,14 +82,10 @@ public class PackageAnalyzeService {
                 Map<String, Object> map = statusReportService.getJsonArchiveById(esSimplePackage.get_id());
                 if(map != null){
                     if("3".equals(map.get("analyze_status")+"") || "1".equals(map.get("analyze_status")+"")){//已经质控完成的,或者正在质控的  直接返回
-                        logger.error("sssssssss====>>analyze_status:"+map.get("analyze_status"));
-                        logger.error("id:"+map.get("_id"));
                         return;
                     }
                     //如果已经到了解析流程,必定已经完成质控流程
                     if("3".equals(map.get("archive_status")+"") || "1".equals(map.get("archive_status")+"")){ //如果已经解析完成了,或者正在解析, 将其标记为 已完成质控
-                        logger.error("rrrrrrr====>>archive_status:"+map.get("archive_status"));
-                        logger.error("id:"+map.get("_id"));
                         statusReportService.reportStatus(esSimplePackage.get_id(), AnalyzeStatus.Finished, 0, null);
                         return;
                     }
@@ -99,7 +95,7 @@ public class PackageAnalyzeService {
                 zipPackage.download();
                 zipPackage.unZip();
                 ProfileType profileType = zipPackage.resolve();
-                if (ProfileType.Standard == profileType && !zipPackage.isReUploadFlg()) {
+                if (ProfileType.Standard == profileType) {
                     packageQcService.qcHandle(zipPackage);
                     //保存数据集质控数据
                     elasticSearchUtil.index(INDEX, QC_DATASET_INFO, zipPackage.getQcDataSetRecord());
@@ -164,7 +160,7 @@ public class PackageAnalyzeService {
                 zipPackage.download();
                 zipPackage.unZip();
                 ProfileType profileType = zipPackage.resolve();
-                if (ProfileType.Standard != profileType && !zipPackage.isReUploadFlg()) {
+                if (ProfileType.Standard != profileType) {
                     throw new ZipException("Ignore non-standard package file or re-upload package file");
                 }
                 packageQcService.qcHandle(zipPackage);

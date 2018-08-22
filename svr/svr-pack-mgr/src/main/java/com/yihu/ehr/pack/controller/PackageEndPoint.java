@@ -155,6 +155,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
                 String [] _id = new String[idList.size()];
                 elasticSearchUtil.bulkDelete(INDEX, TYPE, idList.toArray(_id));
             }
+            result = elasticSearchUtil.page(INDEX, TYPE, filters, 1, 10000);
         }
         return true;
     }
@@ -288,6 +289,10 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             updateSource.put("analyze_status", status.ordinal());
             if (_status == 2) {
                 updateSource.put("analyze_fail_count", 3);
+            } else if(_status == 0){
+                updateSource.put("analyze_fail_count", 0);
+                updateSource.put("analyze_status",0);
+                updateSource.put("archive_status",0);
             } else {
                 updateSource.put("analyze_fail_count", 0);
             }

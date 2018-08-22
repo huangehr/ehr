@@ -91,8 +91,12 @@ public class TelVerificationEndPoint extends EnvelopRestEndPoint {
             if (resultStr != null) {
                 Map<String, Object> resultMap = objectMapper.readValue(resultStr, Map.class);
                 Integer resultCode = 0;
+                String msg="";
                 if (null != resultMap.get("Code") && !"".equals(resultMap.get("Code"))) {
                     resultCode = Integer.valueOf(resultMap.get("Code").toString());
+                }
+                if (null != resultMap.get("Message") && !"".equals(resultMap.get("Message"))) {
+                    msg = resultMap.get("Message").toString();
                 }
                 if (resultCode == 10000) {
                     envelop.setSuccessFlg(true);
@@ -108,7 +112,7 @@ public class TelVerificationEndPoint extends EnvelopRestEndPoint {
                 }else{
                     envelop.setSuccessFlg(false);
                     envelop.setErrorCode(resultCode);
-                    envelop.setErrorMsg("短信发送失败！");
+                    envelop.setErrorMsg("短信发送失败！" + msg);
                 }
             }else{
                 envelop.setSuccessFlg(false);

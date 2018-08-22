@@ -2,9 +2,11 @@ package com.yihu.ehr.basic.apps.controller;
 
 import com.yihu.ehr.basic.apps.model.App;
 import com.yihu.ehr.basic.apps.model.AppsRelation;
+import com.yihu.ehr.basic.apps.model.UserApp;
 import com.yihu.ehr.basic.apps.service.AppService;
 import com.yihu.ehr.basic.apps.service.AppsRelationService;
 import com.yihu.ehr.basic.apps.service.OauthClientDetailsService;
+import com.yihu.ehr.basic.apps.service.UserAppService;
 import com.yihu.ehr.basic.dict.service.SystemDictEntryService;
 import com.yihu.ehr.basic.getui.ConstantUtil;
 import com.yihu.ehr.basic.user.entity.RoleAppRelation;
@@ -47,9 +49,10 @@ public class AppEndPoint extends EnvelopRestEndPoint {
 
     @Value("${fast-dfs.public-server}")
     private String fastDfsPublicServers;
-
     @Autowired
     private AppService appService;
+    @Autowired
+    private UserAppService userAppService;
     @Autowired
     private RolesService roleAppRelation;
     @Autowired
@@ -85,9 +88,6 @@ public class AppEndPoint extends EnvelopRestEndPoint {
             relation.setRoleId(roles.getId());
             roleAppRelationService.save(relation);
         }
-
-
-
         return convertToModel(app, MApp.class);
     }
 
@@ -263,6 +263,52 @@ public class AppEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
+    @RequestMapping(value = ServiceApi.Apps.GetUserApp, method = RequestMethod.GET)
+    @ApiOperation(value = "基于新的菜单需求，根据用户获取授权内的应用列表信息")
+    public Envelop getUserApp(
+            @ApiParam(name = "userId", value = "用户APP对象json")
+            @RequestParam(value = "userId", required = true) String userId) throws Exception {
+
+        Envelop res  = new Envelop();
+
+        //查询所有生效的应用列表
+        String filters = "";
+        List<App> appList = appService.search(filters);
+        Collection<MApp> mAppList =  convertToModels(appList,new ArrayList<MApp>(appList.size()),MApp.class,"");
+        if(mAppList != null && mAppList.size() > 0){
+            res.setSuccessFlg(true);
+        }else {
+            res.setSuccessFlg(false);
+            res.setErrorMsg("应用信息列表获取失败，请重试！");
+            return res;
+        }
+
+        //查询所有的授权应用列表
+        filters = "userId="+userId;
+        List<UserApp> userAppList =  userAppService.search(filters);
+        if(userAppList == null && userAppList.size() == 0){
+            res.setDetailModelList(new ArrayList<MApp>(mAppList));
+            return res;
+        }
+
+        //基于授权的应用列表，更新roleType状态
+        //循环更新 roleType状态，初始化为0 ，存在授权的情况，赋值为 1
+        for(MApp mApp :mAppList){
+            mApp.setRoleType("0");
+            String appId = mApp.getId();
+            for(UserApp userApp: userAppList){
+                if((appId).equals(userApp.getAppId())){
+                    mApp.setRoleType("1");
+                    break;
+                }else{
+                    continue;
+                }
+            }
+        }
+        res.setSuccessFlg(true);
+        res.setDetailModelList(new ArrayList<MApp>(mAppList));
+        return res;
+    }
 
     // -------------------------- 开放平台 ---------------------------------
 
@@ -419,6 +465,58 @@ public class AppEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
+    @RequestMapping(value = ServiceApi.Apps.createAppRolesByAppId, method = RequestMethod.POST)
+    @ApiOperation(value = "创建默认的App角色组")
+    public Envelop createAppRolesByAppId(
+            @ApiParam(name = "appId", value = "appId")
+            @RequestParam(value = "appId",required = false) String appId,
+            @ApiParam(name = "allAppFlag", value = "allAppFlag",defaultValue = "false")
+            @RequestParam(value = "allAppFlag") boolean allAppFlag){
+        Envelop envelop =new Envelop();
+        //为应用追加默认角色组
+        String[][] rolestr= ConstantUtil.roles;
+        try {
+            if(allAppFlag){
+                List<App> appList = appService.search("");
+                appList.forEach(app -> {
+                    Roles roles=null;
+                    RoleAppRelation relation =null;
+                    for (String[] role : rolestr) {
+                        roles=new Roles();
+                        roles.setAppId(app.getId());
+                        roles.setType("1");
+                        roles.setCode(role[0]);
+                        roles.setName(role[1]);
+                        roles= roleAppRelation.save(roles);
+                        relation = new RoleAppRelation();
+                        relation.setAppId(app.getId());
+                        relation.setRoleId(roles.getId());
+                        roleAppRelationService.save(relation);
+                    }
+                });
+            }else {
+                Roles roles=null;
+                RoleAppRelation relation =null;
+                for (String[] role : rolestr) {
+                    roles=new Roles();
+                    roles.setAppId(appId);
+                    roles.setType("1");
+                    roles.setCode(role[0]);
+                    roles.setName(role[1]);
+                    roles= roleAppRelation.save(roles);
+                    relation = new RoleAppRelation();
+                    relation.setAppId(appId);
+                    relation.setRoleId(roles.getId());
+                    roleAppRelationService.save(relation);
+                }
 
-
+            }
+            envelop.setSuccessFlg(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return  envelop;
+    }
 }
