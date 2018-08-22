@@ -403,10 +403,12 @@ public class ElasticSearchUtil {
      * @param index
      * @param type
      * @param queryBuilder
+     * 最多只能一万条
      * @return
      */
     public List<String> getIds (String index, String type, QueryBuilder queryBuilder) {
         int size = (int)count(index, type, queryBuilder);
+        size = size > 10000 ? 10000:size;
         SearchRequestBuilder builder = searchRequestBuilder(index, type, queryBuilder, null, 0, size);
         SearchResponse response = builder.get();
         SearchHits hits = response.getHits();

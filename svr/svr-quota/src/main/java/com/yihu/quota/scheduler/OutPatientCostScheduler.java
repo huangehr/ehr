@@ -205,19 +205,19 @@ public class OutPatientCostScheduler {
                             List<Map<String,Object>> hbaseDataList = healthArchiveSchedulerService.selectHbaseData(ResourceCore.SubTable, rowKeyList);
                             if( hbaseDataList != null && hbaseDataList.size() > 0 ) {
                                 for(Map<String,Object> map : hbaseDataList) {
-                                    if (StringUtils.isEmpty(town)) {
+                                    if (StringUtils.isEmpty(town) && null != map.get(keyArea)) {
                                         town = map.get(keyArea).toString();
                                     }
-                                    if (StringUtils.isEmpty(org)) {
+                                    if (StringUtils.isEmpty(org) && null != map.get("org_code")) {
                                         org = map.get("org_code").toString();
                                     }
-                                    if (StringUtils.isEmpty(dept)) {
+                                    if (StringUtils.isEmpty(dept) && null != map.get("dept_code")) {
                                         dept = map.get("dept_code").toString();
                                     }
-                                    if (StringUtils.isEmpty(eventDate)) {
+                                    if (StringUtils.isEmpty(eventDate) && null != map.get(keyEventDate)) {
                                         eventDate = map.get(keyEventDate) + "";
                                     }
-                                    value += Double.parseDouble(map.get(keyCost) + "");
+                                    value += Double.parseDouble(null != map.get(keyCost) ? map.get(keyCost) + "" : "0");
                                 }
                             }
                             String valueStr = value == 0 ? value.toString() : df.format(value);

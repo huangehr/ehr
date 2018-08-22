@@ -31,7 +31,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -262,21 +261,24 @@ public class BaseStatistsService {
     }
 
     public List<Map<String, Object>> sortResultList(List<Map<String, Object>> listMap, String top) {
-        Collections.sort(listMap, new Comparator<Map<String, Object>>() {
+        if (null != listMap && listMap.size() > 0) {
+            Collections.sort(listMap, new Comparator<Map<String, Object>>() {
 
-            @Override
-            public int compare(Map<String, Object> o1, Map<String, Object> o2) {
-                // 根据result进行降序
-                double result = Double.parseDouble(o1.get("result") + "");
-                double result2 = Double.parseDouble(o2.get("result") + "");
-                double v = result2 - result;
-                return v > 0 ? 1 : v == 0 ? 0 : -1;
+                @Override
+                public int compare(Map<String, Object> o1, Map<String, Object> o2) {
+                    // 根据result进行降序
+                    double result = Double.parseDouble(o1.get("result") + "");
+                    double result2 = Double.parseDouble(o2.get("result") + "");
+                    double v = result2 - result;
+                    return v > 0 ? 1 : v == 0 ? 0 : -1;
+                }
+            });
+            if (StringUtils.isNotEmpty(top)) {
+                int t = Integer.parseInt(top);
+                listMap = listMap.subList(0, listMap.size() > t ? t :listMap.size());
             }
-        });
-        if (StringUtils.isNotEmpty(top) && listMap != null) {
-            int t = Integer.parseInt(top);
-            listMap = listMap.subList(0, listMap.size()>t ? t :listMap.size()-1);
         }
+
         return listMap;
     }
 
@@ -380,7 +382,9 @@ public class BaseStatistsService {
                 divisionResultList.add(map);
             } else {
                 double point = 0;
-                DecimalFormat df = new DecimalFormat("0.00");
+                NumberFormat df = NumberFormat.getInstance();
+                df.setGroupingUsed(false);
+                df.setMaximumFractionDigits(2);
                 if (operation == 1) {
                     point = (moleResultVal / denominatorVal) * operationValue;
                 } else if (operation == 2) {
@@ -443,7 +447,9 @@ public class BaseStatistsService {
                         }
                         if(moleKeyVal.equals(dimenKeyVal)){
                             double point = 0;
-                            DecimalFormat df = new DecimalFormat("0.0");
+                            NumberFormat df = NumberFormat.getInstance();
+                            df.setGroupingUsed(false);
+                            df.setMaximumFractionDigits(2);
                             float dimeResultVal = Float.valueOf(denoMap.get(resultField).toString());
                             if(dimeResultVal != 0){
                                 if(operation == 1){
@@ -736,6 +742,7 @@ public class BaseStatistsService {
                 if(key.equals("SUM(result)")){
                     NumberFormat nf = NumberFormat.getInstance();
                     nf.setGroupingUsed(false);
+                    nf.setMaximumFractionDigits(2);
                     dataMap.put(resultField,  nf.format(map.get(key)));
                 }
             }
@@ -763,7 +770,15 @@ public class BaseStatistsService {
         }else {
             groupDimension = dimension;
         }
-        List<Map<String, Object>>  dimenListResult = esResultExtract.searcherSumGroup(tjQuota, groupDimension, filter, resultField, "", "", top);
+        List<Map<String, Object>>  dimenListResult = null;
+        if (StringUtils.isNotEmpty(top)) {
+            dimenListResult = esResultExtract.searcherSumGroup(tjQuota, groupDimension, filter, resultField, groupDimension, "asc", "1000");
+            if (dimenListResult != null && dimenListResult.size() > 0) {
+                dimenListResult = dimenListResult.subList(0, dimenListResult.size() > Integer.parseInt(top) ? Integer.parseInt(top) : dimenListResult.size());
+            }
+        }else {
+            dimenListResult = esResultExtract.searcherSumGroup(tjQuota, groupDimension, filter, resultField, groupDimension, "asc", top);
+        }
         List<Map<String, Object>> resultList = new ArrayList<>();
         for(Map<String, Object> map : dimenListResult){
             Map<String,Object> dataMap = new HashMap<>();
@@ -776,6 +791,7 @@ public class BaseStatistsService {
                 if(key.equals("SUM(result)")){
                     NumberFormat nf = NumberFormat.getInstance();
                     nf.setGroupingUsed(false);
+                    nf.setMaximumFractionDigits(2);
                     dataMap.put(resultField,  nf.format(map.get(key)));
                 }
                 if(key.equals(quotaDateField)){
@@ -819,7 +835,15 @@ public class BaseStatistsService {
                 }
             }
         }
-        List<Map<String, Object>>  dimenListResult = esResultExtract.searcherSumGroup(tjQuota, groupDimension, filter, resultField, groupDimension, "asc", top);
+        List<Map<String, Object>>  dimenListResult = null;
+        if (StringUtils.isNotEmpty(top)) {
+            dimenListResult = esResultExtract.searcherSumGroup(tjQuota, groupDimension, filter, resultField, groupDimension, "asc", "1000");
+            if (dimenListResult != null && dimenListResult.size() > 0) {
+                dimenListResult = dimenListResult.subList(0, dimenListResult.size() > Integer.parseInt(top) ? Integer.parseInt(top) : dimenListResult.size());
+            }
+        }else {
+            dimenListResult = esResultExtract.searcherSumGroup(tjQuota, groupDimension, filter, resultField, groupDimension, "asc", top);
+        }
 
         List<Map<String, Object>> resultList = new ArrayList<>();
         for(Map<String, Object> map : dimenListResult){
@@ -829,7 +853,7 @@ public class BaseStatistsService {
                     if(dimensionDicMap.get(map.get(key).toString().toLowerCase())  != null){
                         dataMap.put(key,dimensionDicMap.get(map.get(key).toString().toLowerCase()));
                         dataMap.put(key+"Name",dimensionDicMap.get(map.get(key).toString().toLowerCase()));
-                        dataMap.put(key+"Code",map.get(key).toString().toLowerCase());
+                        dataMap.put(key+"Code",map.get(key).toString());
                         dataMap.put(firstColumnField,dimensionDicMap.get(map.get(key).toString().toLowerCase()));
                     }else {
                         dataMap.put(key,map.get(key));
@@ -843,6 +867,7 @@ public class BaseStatistsService {
                 if(key.equals("SUM(result)")){
                     NumberFormat nf = NumberFormat.getInstance();
                     nf.setGroupingUsed(false);
+                    nf.setMaximumFractionDigits(2);
                     dataMap.put(resultField,  nf.format(map.get(key)));
                 }
             }
@@ -1193,7 +1218,9 @@ public class BaseStatistsService {
                     }
                 }
                 double point = 0;
-                DecimalFormat df = new DecimalFormat("0.0");
+                NumberFormat df = NumberFormat.getInstance();
+                df.setGroupingUsed(false);
+                df.setMaximumFractionDigits(2);
                 int operation = Integer.valueOf(esConfig.getPercentOperation());
                 int operationValue = Integer.valueOf(esConfig.getPercentOperationValue());
                 if(denoTotal - 0 != 0){
@@ -1298,6 +1325,7 @@ public class BaseStatistsService {
         List<Map<String, Object>> listData = elasticsearchUtil.excuteDataModel(sql);
         NumberFormat nf = NumberFormat.getInstance();
         nf.setGroupingUsed(false);
+        nf.setMaximumFractionDigits(2);
         if (null != listData && listData.size() > 0 && listData.get(0).size() > 0) {
             for (Map<String, Object> map : listData) {
                 sum = nf.format(map.get("SUM(result)"));
@@ -1316,6 +1344,7 @@ public class BaseStatistsService {
         List<Map<String, Object>> listData = singleDiseaseService.parseIntegerValue(sql);
         NumberFormat nf = NumberFormat.getInstance();
         nf.setGroupingUsed(false);
+        nf.setMaximumFractionDigits(2);
         if (null != listData && listData.size() > 0 && listData.get(0).size() > 0) {
             for (Map<String, Object> map : listData) {
                 String value = nf.format(map.get("SUM(result)"));
@@ -1335,6 +1364,7 @@ public class BaseStatistsService {
         List<Map<String, Object>> listData = elasticsearchUtil.excuteDataModel(sql);
         NumberFormat nf = NumberFormat.getInstance();
         nf.setGroupingUsed(false);
+        nf.setMaximumFractionDigits(2);
         if (null != listData && listData.size() > 0 && listData.get(0).size() > 0) {
             for (Map<String, Object> map : listData) {
                 sum = nf.format(map.get("SUM(result)"));
@@ -1353,6 +1383,7 @@ public class BaseStatistsService {
         List<Map<String, Object>> listData = singleDiseaseService.parseIntegerValue(sql);
         NumberFormat nf = NumberFormat.getInstance();
         nf.setGroupingUsed(false);
+        nf.setMaximumFractionDigits(2);
         if (null != listData && listData.size() > 0 && listData.get(0).size() > 0) {
             for (Map<String, Object> map : listData) {
                 String value = nf.format(map.get("SUM(result)"));
@@ -1365,6 +1396,7 @@ public class BaseStatistsService {
     public String getCostOfMedicalMonitor() {
         NumberFormat nf = NumberFormat.getInstance();
         nf.setGroupingUsed(false);
+        nf.setMaximumFractionDigits(2);
         // 获取门急诊费用
         Double costOfOutPatient = Double.parseDouble(getCostOfOutPatient());
         // 获取入院费用
@@ -1486,7 +1518,7 @@ public class BaseStatistsService {
                                 double point = 0;
                                 NumberFormat nf = NumberFormat.getInstance();
                                 nf.setGroupingUsed(false);
-                                nf.setMaximumFractionDigits(1);
+                                nf.setMaximumFractionDigits(2);
                                 float moleResultVal = Float.valueOf(moleMap.get(resultField).toString());
                                 point = ((moleResultVal - denoResultVal)/denoResultVal) * operationValue;
                                 map.put(resultField, nf.format(point));
@@ -1700,7 +1732,9 @@ public class BaseStatistsService {
             }
             dimension = dateType;
             List<Map<String, Object>> dataList = getSimpleQuotaReport(esConfig.getMolecular(), filters,dimension ,false , null);
-            DecimalFormat df = new DecimalFormat("0.0");
+            NumberFormat df = NumberFormat.getInstance();
+            df.setGroupingUsed(false);
+            df.setMaximumFractionDigits(2);
             if(dataList != null && dataList.size() > 0){
                 if(dateType.toLowerCase().equals("year")){
                     for(int i = nowYear ; i > beforeYear ;i--){

@@ -1,6 +1,7 @@
 package com.yihu.ehr.basic.user.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.yihu.ehr.basic.getui.ConstantUtil;
 import com.yihu.ehr.basic.org.model.OrgDept;
 import com.yihu.ehr.basic.org.model.OrgMemberRelation;
 import com.yihu.ehr.basic.org.model.Organization;
@@ -175,7 +176,10 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
             user.setAreaId(0);
             user.setActivated(true);
             user.setImgRemotePath(d.getPhoto());
+            user.setUserType(ConstantUtil.DOCTORUSERTYPEID);
             user = userManager.saveUser(user);
+            //卫生人员初始化授权
+            userManager.initializationAuthorization(Integer.valueOf(ConstantUtil.DOCTORUSERTYPEID),user.getId());
         } else {
             //todo 是否修改user信息
             //......
@@ -204,25 +208,24 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
         //创建用户与机构关系
         orgMemberRelationInfo(orgDeptJsonList, user, d);
 
-        // 根据机构获取医生角色id,保存到role_users表中,appId是健康上饶APP对应的id:WYo0l73F8e
-        List<String> orgList = orgService.getOrgList(orgDeptJsonList);
-        if (null != orgList && orgList.size() > 0) {
-            List<Roles> rolesList = rolesService.findByCodeAndAppIdAndOrgCode(orgList, "WYo0l73F8e", "Doctor");
-            if (null != rolesList && rolesList.size() > 0) {
-                roleUserService.batchCreateRoleUsersRelation(user.getId(), String.valueOf(rolesList.get(0).getId()));
-            } else {
-                // 不存在 则往角色表中插入该应用的医生角色
-                Roles roles = new Roles();
-                roles.setCode("Doctor");
-                roles.setName("医生");
-                roles.setAppId("WYo0l73F8e");
-                roles.setType("1");
-                roles.setOrgCode(orgList.get(0));
-                roles = rolesService.save(roles);
-                roleUserService.batchCreateRoleUsersRelation(user.getId(), String.valueOf(roles.getId()));
-            }
-        }
-
+        //TODO 角色有可能没有关联机构，此部分需要待确认 根据机构获取医生角色id,保存到role_users表中,appId是健康上饶APP对应的id:WYo0l73F8e
+//        List<String> orgList = orgService.getOrgList(orgDeptJsonList);
+//        if (null != orgList && orgList.size() > 0) {
+//            List<Roles> rolesList = rolesService.findByCodeAndAppIdAndOrgCode(orgList, "WYo0l73F8e", "Doctor");
+//            if (null != rolesList && rolesList.size() > 0) {
+//                roleUserService.batchCreateRoleUsersRelation(user.getId(), String.valueOf(rolesList.get(0).getId()));
+//            } else {
+//                // 不存在 则往角色表中插入该应用的医生角色
+//                Roles roles = new Roles();
+//                roles.setCode("Doctor");
+//                roles.setName("医生");
+//                roles.setAppId("WYo0l73F8e");
+//                roles.setType("1");
+//                roles.setOrgCode(orgList.get(0));
+//                roles = rolesService.save(roles);
+//                roleUserService.batchCreateRoleUsersRelation(user.getId(), String.valueOf(roles.getId()));
+//            }
+//        }
         return convertToModel(doctor, MDoctor.class);
 
     }
@@ -370,6 +373,7 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
                 if (null != userList && userList.size() > 0) {
                     for (User user : userList) {
                         user.setDoctorId(String.valueOf(d.getId()));
+                        user.setUserType(ConstantUtil.DOCTORUSERTYPEID);
                         user = userManager.saveUser(user);
                         userId = user.getId();
                     }
@@ -393,13 +397,7 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
                     }
                     user.setCreateDate(DateUtil.strToDate(DateUtil.getNowDateTime()));
                     user.setActivated(true);
-                    if (StringUtils.isEmpty(d.getRoleType())) {
-                        user.setUserType("5");
-                        user.setDType("5");
-                    } else {
-                        user.setUserType(d.getRoleType());
-                        user.setDType(d.getRoleType());
-                    }
+                    user.setUserType(ConstantUtil.DOCTORUSERTYPEID);
                     user.setDoctorId(d.getId() + "");
                     user.setProvinceId(0);
                     user.setCityId(0);
@@ -407,6 +405,8 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
                     user = userManager.saveUser(user);
                     userId = user.getId();
                 }
+                //卫生人员初始化授权
+                userManager.initializationAuthorization(Integer.valueOf(ConstantUtil.DOCTORUSERTYPEID),userId);
 
                 String orgId = "";
                 if (!StringUtils.isEmpty(objectList[23])) {

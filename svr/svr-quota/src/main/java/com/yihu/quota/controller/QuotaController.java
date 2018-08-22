@@ -207,7 +207,9 @@ public class QuotaController extends BaseController {
                         ResultModel resultModel = new ResultModel();
                         resultModel.setValue(map.get("result"));
                         for(int i = 0;i < dimens.length;i++){
-                            cloumns.add(map.get(dimens[i]).toString());
+                            if(map.get(dimens[i]) != null){
+                                cloumns.add(map.get(dimens[i]).toString());
+                            }
                         }
                         resultModel.setCloumns(cloumns);
                         resultModelList.add(resultModel);

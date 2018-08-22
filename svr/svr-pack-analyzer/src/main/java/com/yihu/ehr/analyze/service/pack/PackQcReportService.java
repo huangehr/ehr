@@ -5,6 +5,8 @@ import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.model.quality.MProfileInfo;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.redis.client.RedisClient;
+import com.yihu.ehr.redis.schema.OrgKeySchema;
+import com.yihu.ehr.redis.schema.RsAdapterMetaKeySchema;
 import com.yihu.ehr.solr.SolrUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.rest.Envelop;
@@ -57,6 +59,10 @@ public class PackQcReportService extends BaseJpaService {
     private SolrUtil solrUtil;
     @Value("${quality.cloud}")
     private String cloud;
+    @Autowired
+    private OrgKeySchema orgKeySchema;
+    @Autowired
+    private RsAdapterMetaKeySchema rsAdapterMetaKeySchema;
     protected final Log logger = LogFactory.getLog(this.getClass());
     /**
      * 获取医院数据
@@ -588,6 +594,9 @@ public class PackQcReportService extends BaseJpaService {
     public Page<Map<String, Object>> metadataErrorList(String filters, String sorts, int page, int size) throws Exception {
         Page<Map<String, Object>> result = elasticSearchUtil.page("json_archives_qc","qc_metadata_info", filters, sorts, page, size);
         for (Map<String, Object> map : result){
+            if(map.get("org_name") == null && map.get("org_code") != null){
+                map.put("org_name",orgKeySchema.get(map.get("org_code")+""));
+            }
             map.put("dataset_name", redisClient.get("std_data_set_" + map.get("version") + ":" + map.get("dataset") + ":name"));
             map.put("metadata_name", redisClient.get("std_meta_data_" + map.get("version") + ":" + map.get("dataset")+"."+ map.get("metadata")+ ":name"));
         }
@@ -619,9 +628,11 @@ public class PackQcReportService extends BaseJpaService {
         Envelop envelop = new Envelop();
         Map<String, Object> res = new HashMap<>();
         Map<String, Object> metedata = elasticSearchUtil.findById("json_archives_qc","qc_metadata_info",id);
-
+        if(metedata.get("org_name") == null && metedata.get("org_code") != null){
+            metedata.put("org_name",orgKeySchema.get(metedata.get("org_code")+""));
+        }
         //查找包密码
-        Map<String, Object> jsonArchives = elasticSearchUtil.findById("json_archives","info",id);
+        Map<String, Object> jsonArchives = elasticSearchUtil.findById("json_archives","info",metedata.get("pack_id")+"");
         if(jsonArchives != null){
             metedata.put("pwd",jsonArchives.get("pwd"));
         }
@@ -637,14 +648,16 @@ public class PackQcReportService extends BaseJpaService {
             String datasetCode = metedata.get("dataset")+"";
             String metadaCode = metedata.get("metadata")+"";
             resourceInfo.put("originDatasetCode",datasetCode);
-            resourceInfo.put("originDatasetName",metedata.get("dataset_name"));
+            String originDatasetName = redisClient.get("std_data_set_" + metedata.get("version") + ":" + metedata.get("dataset") + ":name");
+            resourceInfo.put("originDatasetName",originDatasetName);
             resourceInfo.put("originMetadataCode",metadaCode);
-            resourceInfo.put("originMetadataName",metedata.get("metadata_name"));
+            String originMetadataName = redisClient.get("std_meta_data_" + metedata.get("version") + ":" + metedata.get("dataset")+"."+ metedata.get("metadata")+ ":name");
+            resourceInfo.put("originMetadataName",originMetadataName);
             //获取资源化的名称编码
-            String targetMetadataCode = redisClient.get(String.format("%s.%s.%s", version, datasetCode, metadaCode));
+            String targetMetadataCode = rsAdapterMetaKeySchema.getMetaData(version, datasetCode, metadaCode);
             if(StringUtils.isNotBlank(targetMetadataCode)){
                 resourceInfo.put("targetMetadataCode",targetMetadataCode);
-                String querySql = "SELECT * FROM rs_metadata WHERE id='"+metedata.get("version")+"'";
+                String querySql = "SELECT * FROM rs_metadata WHERE id='"+targetMetadataCode+"'";
                 List<Map<String, Object>> resourMetadata = jdbcTemplate.queryForList(querySql);
                 if(!CollectionUtils.isEmpty(resourMetadata)){
                     resourceInfo.put("targetMetadataName",resourMetadata.get(0).get("name"));
@@ -666,8 +679,8 @@ public class PackQcReportService extends BaseJpaService {
             res.put("resourceInfo",resourceInfo);
         }else if("3".equals(metedata.get("qc_step")+"")){//上传省平台
             //获取适配版本名称
-            String versionName = redisClient.get(metedata.get("version") + "");
-            metedata.put("adapterName", versionName);
+            String adapterName = redisClient.get(metedata.get("adapter_version") + "");
+            metedata.put("adapterName", adapterName);
             //增加上传信息
             Map<String,Object> uploadInfo = new HashMap<>();
 
@@ -713,7 +726,11 @@ public class PackQcReportService extends BaseJpaService {
         Map<String, Object> res = new HashMap<>();
         Map<String, Object> archive = elasticSearchUtil.findById("json_archives","info",id);
         res.put("archive",archive);
-        res.put("relation",elasticSearchUtil.findById("archive_relation","info",archive.get("profile_id")+""));
+        Map<String, Object> relation = elasticSearchUtil.findById("archive_relation", "info", archive.get("profile_id") + "");
+        if(relation == null){
+            relation = new HashMap<>();
+        }
+        res.put("relation",relation);
         envelop.setObj(res);
         envelop.setSuccessFlg(true);
         return envelop;

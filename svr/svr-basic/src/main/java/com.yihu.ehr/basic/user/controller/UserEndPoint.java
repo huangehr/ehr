@@ -3,11 +3,14 @@ package com.yihu.ehr.basic.user.controller;
 import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.basic.dict.service.SystemDictEntryService;
+import com.yihu.ehr.basic.getui.ConstantUtil;
 import com.yihu.ehr.basic.org.model.OrgMemberRelation;
 import com.yihu.ehr.basic.org.service.OrgMemberRelationService;
 import com.yihu.ehr.basic.patient.service.DemographicService;
 import com.yihu.ehr.basic.security.service.UserSecurityService;
+import com.yihu.ehr.basic.user.dao.XUserTypeRolesRepository;
 import com.yihu.ehr.basic.user.entity.Roles;
+import com.yihu.ehr.basic.user.entity.UserTypeRoles;
 import com.yihu.ehr.basic.user.service.RoleUserService;
 import com.yihu.ehr.basic.user.service.RolesService;
 import com.yihu.ehr.constants.ServiceApi;
@@ -92,6 +95,8 @@ public class UserEndPoint extends EnvelopRestEndPoint {
     private OrgMemberRelationService orgMemberRelationService;
     @Autowired
     private OrgMemberRelationService relationService;
+    @Autowired
+    private XUserTypeRolesRepository xUserTypeRolesRepository;
 
     @RequestMapping(value = ServiceApi.Users.Users, method = RequestMethod.GET)
     @ApiOperation(value = "获取用户列表", notes = "根据查询条件获取用户列表在前端表格展示")
@@ -882,6 +887,7 @@ public class UserEndPoint extends EnvelopRestEndPoint {
         }
         user.setLoginCode(user.getDemographicId());
         user.setDType("Patient");
+        user.setUserType(ConstantUtil.PATIENTUSERTYPEID);
         user.setActivated(true);
         if (userService.findByField("loginCode", user.getDemographicId()).size() > 0) {
             envelop.setErrorMsg("账户已存在");
@@ -891,7 +897,6 @@ public class UserEndPoint extends EnvelopRestEndPoint {
             envelop.setErrorMsg("身份证号已存在");
             return envelop;
         }
-
         if (userService.findByField("telephone", user.getTelephone()).size() > 0) {
             envelop.setErrorMsg("电话号码已存在");
             return envelop;
@@ -899,24 +904,31 @@ public class UserEndPoint extends EnvelopRestEndPoint {
         user = userService.saveUser(user);
         String[] appIds = registerRoleClientId.split(",");
         for (String rgAppId : appIds) {
-            // orgcode卫计委机构编码-PDY026797 添加居民的时候 默认 加到卫计委-居民角色中
-            List<Roles> rolesList = rolesService.findByCodeAndAppIdAndOrgCode(Arrays.asList(new String[]{orgcode}), rgAppId, "Patient");
-            Roles roles = new Roles();
-            if (null != rolesList && rolesList.size() > 0) {
-                roles = rolesList.get(0);
-            } else {
-                //如果角色不存在，为该应用创建居民角色
-                roles.setAppId(appId);
-                roles.setName("居民");
-                roles.setCode("Patient");
-                //上饶市卫计委机构
-                roles.setOrgCode(orgcode);
-                roles.setType("1");
-                roles.setDescription("系统创建默认角色");
-                roles = rolesService.save(roles);
+            //根据用户类型、应用id判断是否关联角色,
+            List<UserTypeRoles> list = xUserTypeRolesRepository.ListUserTypeRolesByTypeIdAndClientId(Integer.valueOf(ConstantUtil.PATIENTUSERTYPEID), rgAppId);
+            if(null!=list && list.size()>0){
+                //卫生人员初始化授权
+                userService.initializationAuthorization(Integer.valueOf(ConstantUtil.PATIENTUSERTYPEID),userId);
+            }else{
+                // orgcode卫计委机构编码-PDY026797 添加居民的时候 默认 加到卫计委-居民角色中
+                List<Roles> rolesList = rolesService.findByCodeAndAppIdAndOrgCode(Arrays.asList(new String[]{orgcode}), rgAppId, "Patient");
+                Roles roles = new Roles();
+                if (null != rolesList && rolesList.size() > 0) {
+                    roles = rolesList.get(0);
+                } else {
+                    //如果角色不存在，为该应用创建居民角色
+                    roles.setAppId(appId);
+                    roles.setName("居民");
+                    roles.setCode("Patient");
+                    //上饶市卫计委机构
+                    roles.setOrgCode(orgcode);
+                    roles.setType("1");
+                    roles.setDescription("系统创建默认角色");
+                    roles = rolesService.save(roles);
+                }
+                //在org_member_relation 表里追加关联关系
+                roleUserService.batchCreateRoleUsersRelation(userId, String.valueOf(roles.getId()));
             }
-            //在org_member_relation 表里追加关联关系
-            roleUserService.batchCreateRoleUsersRelation(userId, String.valueOf(roles.getId()));
         }
 
         // 根据身份证号码查找居民，若不存在则创建居民。
@@ -1101,6 +1113,24 @@ public class UserEndPoint extends EnvelopRestEndPoint {
         envelop.setObj(mUser);
         envelop.setDetailModelList(roles);
         envelop.setSuccessFlg(true);
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.Users.initializationAuthorization, method = RequestMethod.GET)
+    @ApiOperation(value = "根据用户类型id，用户id进行初始化授权")
+    public Envelop initializationAuthorization(
+            @ApiParam(name = "userTypeId", value = "用户类型id", defaultValue = "")
+            @RequestParam(value = "userTypeId",required =true) int userTypeId,
+            @ApiParam(name = "userId", value = "用户id", defaultValue = "")
+            @RequestParam(value = "userId",required =true) String userId) {
+        Envelop envelop = new Envelop();
+        boolean authorrizationFlag= userService.initializationAuthorization(userTypeId,userId);
+        if (authorrizationFlag) {
+            envelop.setSuccessFlg(true);
+        } else {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("初始化授权失败！");
+        }
         return envelop;
     }
 
