@@ -192,6 +192,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
         double totalHospitalDataset = 0;//医疗云总数据集数
         double totalReceiveArchives = 0;//医疗云总接收档案数
         double totalReceiveException = 0;//医疗云总接收质量异常数
+        double totalReceiveError = 0;//医疗云总接收质量错误数
         double totalReceiveDataset = 0;//医疗云总接收据集数
         double totalResourceFailure = 0;//医疗云总资源化失败数
         double totalResourceSuccess = 0;//医疗云总资源化成功数
@@ -313,6 +314,23 @@ public class DataQualityStatisticsService extends BaseJpaService {
                 }
             }
 
+
+            //接收 质量异常
+            String sql4 = "SELECT count(*) c FROM json_archives/info where receive_date>= '" + start + " 00:00:00' AND receive_date<='" + end + " 23:59:59' and analyze_status=2 and pack_type=1 and org_code='" + orgCode + "' ";
+            if (eventType != null) {
+                sql4 += " and event_type = " + eventType;
+            }
+            try {
+                ResultSet resultSet4 = elasticSearchUtil.findBySql(sql4);
+                resultSet4.next();
+                double total = resultSet4.getDouble("c");//接收 解析错误
+                map.put("receiveError", total);
+                totalReceiveError += total;
+            } catch (Exception e) {
+                if (!"Error".equals(e.getMessage())) {
+                    e.printStackTrace();
+                }
+            }
             //接收 数据集
             StringBuffer sql = new StringBuffer();
             sql.append("SELECT COUNT(DISTINCT dataset) as count from json_archives_qc/qc_dataset_detail ");
@@ -354,7 +372,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
 //            }
 
             //资源化数据
-            String sql52 = "SELECT count(*) c FROM json_archives/info where receive_date>= '" + start + " 00:00:00' AND receive_date<='" + end + " 23:59:59' AND pack_type=1 and archive_status<>3 and org_code='" + orgCode + "' ";
+            String sql52 = "SELECT count(*) c FROM json_archives/info where receive_date>= '" + start + " 00:00:00' AND receive_date<='" + end + " 23:59:59' AND pack_type=1 and archive_status=2 and org_code='" + orgCode + "' ";
             String sql53 = "SELECT count(*) c FROM json_archives/info where receive_date>= '" + start + " 00:00:00' AND receive_date<='" + end + " 23:59:59' AND pack_type=1 and archive_status=3 and org_code='" + orgCode + "' ";
 
             try {
@@ -398,6 +416,7 @@ public class DataQualityStatisticsService extends BaseJpaService {
         totalMap.put("receiveArchives", totalReceiveArchives);//接收档案数
         totalMap.put("receiveDataset", totalSize); //接收数据集
         totalMap.put("receiveException", totalReceiveException);//接收异常
+        totalMap.put("receiveError", totalReceiveError);//接收错误
         totalMap.put("resourceSuccess", totalResourceSuccess);//资源化-成功
         totalMap.put("resourceFailure", totalResourceFailure);//资源化-失败
         totalMap.put("resourceException", totalResourceException);//资源化-异常
