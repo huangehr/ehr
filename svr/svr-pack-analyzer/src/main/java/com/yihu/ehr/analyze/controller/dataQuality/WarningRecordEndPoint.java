@@ -218,6 +218,7 @@ public class WarningRecordEndPoint extends EnvelopRestEndPoint {
             map.put("thisMonthAdd",thisMonthAdd);//本月新增
             map.put("thisMonthDealed",thisMonthDealed);//本月已解决
             map.put("unDeal",unDeal);
+            envelop.setSuccessFlg(true);
             envelop.setObj(map);
         }catch (Exception e){
             e.printStackTrace();
