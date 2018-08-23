@@ -8,6 +8,7 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.entity.quality.DqWarningRecord;
 import com.yihu.ehr.model.quality.MDqWarningRecord;
+import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -17,8 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author yeshijie on 2018/6/12.
@@ -76,7 +76,7 @@ public class WarningRecordEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "status", value = "状态（1未解决，2已解决）", defaultValue = "1")
             @RequestParam(value = "status", required = false) String status,
             @ApiParam(name = "type", value = "类型（1接收，2资源化，3上传）", defaultValue = "1")
-            @RequestParam(value = "type", required = true) String type,
+            @RequestParam(value = "type", required = false) String type,
             @ApiParam(name = "startTime", value = "开始时间", defaultValue = "2018-06-11")
             @RequestParam(value = "startTime", required = false) String startTime,
             @ApiParam(name = "endTime", value = "结束时间", defaultValue = "2018-06-11")
@@ -87,21 +87,24 @@ public class WarningRecordEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page", required = false) int page) {
         Envelop envelop = new Envelop();
         try {
-            String filters = "type="+type;
+            String filters = "";
+            if(StringUtils.isNotBlank(type)){
+                filters += "type="+type+";";
+            }
             if(StringUtils.isNotBlank(orgCode)){
-                filters += ";orgCode="+orgCode;
+                filters += "orgCode="+orgCode+";";
             }
             if(StringUtils.isNotBlank(quota)){
-                filters += ";warningType="+quota;
+                filters += "warningType="+quota+";";
             }
             if(StringUtils.isNotBlank(status)){
-                filters += ";status="+status;
+                filters += "status="+status+";";
             }
             if(StringUtils.isNotBlank(startTime)){
-                filters += ";recordTime>="+startTime;
+                filters += "recordTime>="+startTime+";";
             }
             if(StringUtils.isNotBlank(endTime)){
-                filters += ";recordTime<="+endTime;
+                filters += "recordTime<="+endTime+";";
             }
             String sorts = "-warningTime";
             List<DqWarningRecord> list = warningRecordService.search(null, filters, sorts, page, size);
@@ -154,6 +157,68 @@ public class WarningRecordEndPoint extends EnvelopRestEndPoint {
             }else {
                 return success(null);
             }
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return envelop;
+    }
+
+
+    @RequestMapping(value = ServiceApi.DataQuality.RealTimeMonitorList, method = RequestMethod.GET)
+    @ApiOperation(value = "实时问题监控列表")
+    public Envelop realTimeMonitor() {
+        Envelop envelop = new Envelop();
+        try {
+            //获取上个月第一天
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.MONTH, -1);
+            calendar.set(Calendar.DAY_OF_MONTH, 1);
+            Date lastMonStart = calendar.getTime();
+            String lastMonStartStr = DateUtil.toString(lastMonStart);
+
+            //获取上个月最后一天
+            Calendar calendar2 = Calendar.getInstance();
+            calendar2.set(Calendar.DAY_OF_MONTH, 1);
+            calendar2.add(Calendar.DATE, -1);
+            Date lastMonEnd = calendar2.getTime();
+            String lastMonEndStr = DateUtil.toString(lastMonEnd);
+
+            //拼接上个月未解决的过滤条件
+            String filters = "recordTime>="+lastMonStartStr+";recordTime<="+lastMonEndStr+";status=1;";
+            //上个月未解决问题数量
+            long lastMonth = warningRecordService.getCount(filters);
+
+            //获取当月第一天
+            Calendar c = Calendar.getInstance();
+            c.add(Calendar.MONTH, 0);
+            c.set(Calendar.DAY_OF_MONTH,1);
+            String presentMonthStr = DateUtil.toString(c.getTime());
+
+            //获取当月最后一天
+            Calendar ca = Calendar.getInstance();
+            ca.set(Calendar.DAY_OF_MONTH, ca.getActualMaximum(Calendar.DAY_OF_MONTH));
+            String presentMonthEnd = DateUtil.toString(ca.getTime());
+
+            //拼接本月新增问题过滤条件
+            String filters2 = "recordTime>="+presentMonthStr+";recordTime<="+presentMonthEnd+";";
+            //本月新增问题数量
+            long thisMonthAdd = warningRecordService.getCount(filters2);
+
+            String filters3 = filters2+"status=2;";
+            //获取本月已解决问题数量
+            long thisMonthDealed = warningRecordService.getCount(filters3);
+
+            //待处理数量 = 本月新增+上月待处理-本月已解决
+            long unDeal = lastMonth + thisMonthAdd - thisMonthDealed;
+
+            Map<String, Long> map = new HashMap<String, Long>();
+            map.put("lastMonth",lastMonth);//上个月待处理
+            map.put("thisMonthAdd",thisMonthAdd);//本月新增
+            map.put("thisMonthDealed",thisMonthDealed);//本月已解决
+            map.put("unDeal",unDeal);
+            envelop.setObj(map);
         }catch (Exception e){
             e.printStackTrace();
             envelop.setSuccessFlg(false);
