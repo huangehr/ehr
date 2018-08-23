@@ -85,7 +85,6 @@ ehr:
       data-sets:
         - HDSC01_02: Clinic #门诊-挂号 v1.0
         - HDSD00_85: Clinic #门诊-挂号 v1.3
-        - HDSB03_10: Clinic #门诊-传染病报告卡信息 v1.3
         - HDSC02_09: Resident #住院-入院记录 v1.0
         - HDSD00_13: Resident #住院-入院记录 v1.3
         - HDSD00_16: Resident #住院-出院小结 v1.3
