@@ -5,8 +5,6 @@ import com.yihu.ehr.query.BaseJpaService;
 import org.apache.commons.collections.map.HashedMap;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +20,6 @@ import java.util.Map;
 @Service
 public abstract class DataQualityBaseService extends BaseJpaService {
 
-    private final static Logger logger = LoggerFactory.getLogger(DataQualityBaseService.class);
     @Value("${quality.orgCode}")
     private String defaultOrgCode;
     @Value("${quality.cloud}")
@@ -50,15 +47,6 @@ public abstract class DataQualityBaseService extends BaseJpaService {
      */
     public abstract List<Map<String,Object>> getOrgDataQuality(String areaCode ,String startDate, String endDate) throws Exception;
 
-    /**
-     * 获取机构下的数据集质控信息 - 【级别】
-     * @param areaCode 区域编码
-     * @param startDate
-     * @param endDate
-     * @return
-     * @throws Exception
-     */
-    public abstract List<Map<String,Object>> getDataSetDataQuality(String areaCode ,String startDate, String endDate) throws Exception;
 
     /**
      * 获取医院列表

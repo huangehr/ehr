@@ -404,7 +404,27 @@ public class DataQualityHomeService extends BaseJpaService {
 
     /* ******************************** 机构 层级模块相关 ***********************************/
 
-
+    /**
+     *  获取区县下的机构质控情况
+     * @param dataType 数据维度  （0: 完整性，1:及时性，2:准确性）
+     * @param areaCode 上区域编码
+     * @param start
+     * @param end
+     * @return
+     */
+    public List<Map<String,Object>> findOrgData(Integer dataType , String areaCode, String start, String end) throws Exception {
+        List<Map<String,Object>> list = new ArrayList<>();
+        String dateStr = DateUtil.toString(new Date());
+        if (StringUtils.isBlank(start)) {
+            start = dateStr;
+        }
+        if (StringUtils.isBlank(end)) {
+            end = dateStr;
+        }
+        DataQualityBaseService dataQualityBaseService = getInstance(DqDataType.create(dataType));
+        list = dataQualityBaseService.getOrgDataQuality(areaCode,start,end);
+        return list;
+    }
 
     public List<Map<String,Object>> getHospitalDataByGroup(String startDate, String endDate, String orgCode,String groupField) throws Exception {
         StringBuffer sql = new StringBuffer();

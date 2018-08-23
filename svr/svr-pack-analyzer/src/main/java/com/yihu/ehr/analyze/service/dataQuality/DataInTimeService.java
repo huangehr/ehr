@@ -263,10 +263,6 @@ public class DataInTimeService extends DataQualityBaseService {
         return null;
     }
 
-    @Override
-    public List<Map<String, Object>> getDataSetDataQuality(String areaCode, String startDate, String endDate) throws Exception {
-        return null;
-    }
 
 
 }
