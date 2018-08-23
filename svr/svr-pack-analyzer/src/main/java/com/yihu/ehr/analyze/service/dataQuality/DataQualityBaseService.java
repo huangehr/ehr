@@ -13,7 +13,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *  质控管理首页- 基础逻辑类
+ * 质控管理首页- 基础逻辑类
+ *
  * @author HZY
  * @created 2018/8/17 11:24
  */
@@ -30,26 +31,29 @@ public abstract class DataQualityBaseService extends BaseJpaService {
 
     /**
      * 获取市级下的区县质控信息 - 【区域级别】
+     *
      * @param startDate
      * @param endDate
      * @return
      * @throws Exception
      */
-    public abstract List<Map<String,Object>> getAreaDataQuality(String startDate, String endDate) throws Exception;
+    public abstract List<Map<String, Object>> getAreaDataQuality(String startDate, String endDate) throws Exception;
 
     /**
      * 获取区县下的机构质控信息 - 【机构级别】
-     * @param areaCode 区域编码
+     *
+     * @param areaCode  区域编码
      * @param startDate
      * @param endDate
      * @return
      * @throws Exception
      */
-    public abstract List<Map<String,Object>> getOrgDataQuality(String areaCode ,String startDate, String endDate) throws Exception;
+    public abstract List<Map<String, Object>> getOrgDataQuality(String areaCode, String startDate, String endDate) throws Exception;
 
 
     /**
      * 获取医院列表
+     *
      * @return
      */
     public Map<String, Object> getOrgMap() {
@@ -84,8 +88,9 @@ public abstract class DataQualityBaseService extends BaseJpaService {
     }
 
     /**
-     *  百分比计算
-     * @param molecular    分子
+     * 百分比计算
+     *
+     * @param molecular   分子
      * @param denominator 分母
      * @return
      */
@@ -97,6 +102,23 @@ public abstract class DataQualityBaseService extends BaseJpaService {
         }
         DecimalFormat decimalFormat = new DecimalFormat("0.00%");
         return decimalFormat.format(molecular / denominator);
+    }
+
+    /**
+     * 获取douuble值
+     *
+     * @param objValue
+     * @return
+     */
+    public double getDoubleValue(Object objValue) {
+        double value = 0;
+        try {
+            if (objValue != null)
+                value = Double.parseDouble(objValue.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return value;
     }
 
 }

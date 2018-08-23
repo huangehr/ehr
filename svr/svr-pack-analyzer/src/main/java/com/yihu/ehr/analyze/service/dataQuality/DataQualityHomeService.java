@@ -383,12 +383,11 @@ public class DataQualityHomeService extends BaseJpaService {
     /**
      *  获取市区域的下级区域质控情况
      * @param dataType 数据维度  （0: 完整性，1:及时性，2:准确性）
-     * @param areaCode 上区域编码
      * @param start
      * @param end
      * @return
      */
-    public List<Map<String,Object>> findAreaData(Integer dataType , String areaCode, String start, String end) throws Exception {
+    public List<Map<String,Object>> findAreaData(Integer dataType, String start, String end) throws Exception {
         List<Map<String,Object>> list = new ArrayList<>();
         String dateStr = DateUtil.toString(new Date());
         if (StringUtils.isBlank(start)) {
@@ -466,7 +465,7 @@ public class DataQualityHomeService extends BaseJpaService {
      * @return
      * @throws Exception
      */
-    public List<Map<String,Object>> homeDatasetError(String orgCode, String dataType, String start, String end) throws Exception {
+    public List<Map<String,Object>> homeDatasetError(String orgCode, Integer dataType, String start, String end) throws Exception {
         List<String> fileds = new ArrayList<>();
         fileds.add("dataset");
         fileds.add("count");
@@ -477,7 +476,7 @@ public class DataQualityHomeService extends BaseJpaService {
         if(StringUtils.isNotEmpty(orgCode)){
             sql.append(" AND org_code = '"+orgCode+"'");
         }
-        if(dataType.equals(DqDataType.complete.toString())){
+        if(dataType == 0){
             sql.append(" AND qc_error_type=1");
         }else{
             sql.append(" AND qc_error_type<>1");
@@ -500,7 +499,7 @@ public class DataQualityHomeService extends BaseJpaService {
      * @return
      * @throws Exception
      */
-    public List<Map<String,Object>> homeMetadataError(String dataset ,String dataType,String start,String end) throws Exception {
+    public List<Map<String,Object>> homeMetadataError(String dataset ,Integer dataType,String start,String end) throws Exception {
         List<String> fileds = new ArrayList<>();
         fileds.add("dataset");
         fileds.add("metadata");
@@ -512,7 +511,7 @@ public class DataQualityHomeService extends BaseJpaService {
         if(StringUtils.isNotEmpty(dataset)){
             sql.append(" AND dataset = '"+dataset+"'");
         }
-        if(dataType.equals(DqDataType.complete.toString())){
+        if(dataType == 0){
             sql.append(" AND qc_error_type=1");
         }else{
             sql.append(" AND qc_error_type<>1");
