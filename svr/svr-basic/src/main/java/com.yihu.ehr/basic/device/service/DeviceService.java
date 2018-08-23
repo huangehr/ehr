@@ -46,17 +46,19 @@ public class DeviceService extends BaseJpaService<Device, DeviceDao> {
                 }
                 if("进口".equals(map.get("originPlace").toString())){
                     device.setOriginPlace("1");
-                }else{
+                }else if("国产/合资".equals(map.get("originPlace").toString())){
                     device.setOriginPlace("2");
                 }
+
                 device.setManufacturerName(map.get("manufacturerName").toString());
                 device.setDeviceModel(map.get("deviceModel").toString());
                 device.setPurchaseTime(DateUtil.strToDate(map.get("purchaseTime").toString(),"yyyy-MM-dd"));
                 if("新设备".equals(map.get("isNew").toString())){
                     device.setIsNew("1");
-                }else{
+                }else if("二手设备".equals(map.get("isNew").toString())){
                     device.setIsNew("2");
                 }
+
                 if(null!=map.get("devicePrice")){
                     device.setDevicePrice(Double.valueOf(map .get("devicePrice").toString()));
                 }
@@ -68,14 +70,16 @@ public class DeviceService extends BaseJpaService<Device, DeviceDao> {
                     device.setStatus("1");
                 }else if("未启用".equals(map.get("status").toString())){
                     device.setStatus("2");
-                }else{
+                }else if("报废".equals(map.get("status").toString())){
                     device.setStatus("3");
                 }
+
                 if("是".equals(map.get("isGps").toString())){
                     device.setIsGps("1");
-                }else{
+                }else if("否".equals(map.get("isGps").toString())){
                     device.setIsGps("0");
                 }
+
                 device.setCreator(map.get("creator").toString());
                 deviceDao.save(device);
             }
