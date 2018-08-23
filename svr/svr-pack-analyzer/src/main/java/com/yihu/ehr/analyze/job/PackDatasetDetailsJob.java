@@ -55,6 +55,8 @@ public class PackDatasetDetailsJob {
                     map.put("dataset_name", redisClient.get("std_data_set_" + _key[2] + ":" + _key[4] + ":name"));
                     map.put("count", Integer.parseInt(_val[0]));
                     map.put("row", Integer.parseInt(_val[1]));
+                    String orgArea = redisClient.get("organizations:" + _key[0] + ":area");
+                    map.put("org_area",orgArea);
                     indexs.add(map);
                 }
             });
