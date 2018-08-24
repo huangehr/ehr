@@ -9,6 +9,13 @@ info:
   component: Zuul Server
 
 spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    max-active: 5
+    max-idle: 2
+    min-idle: 2
+    validation-query: SELECT 1
+    test-on-borrow: true
   redis:
     database: 0
     timeout: 0
@@ -19,12 +26,13 @@ spring:
       min-idle: 1
 
 zuul:
+  config-priority: false
   ignored-services: '*'
   sensitive-headers:
   routes:
     svr-dfs:
       path: /dfs/**
-      serviceId: svr-dfs
+      serviceId: svr-dfs-sxy
     svr-basic:
       path: /basic/**
       serviceId: svr-basic
@@ -62,6 +70,10 @@ zuul:
 ---
 spring:
   profiles: dev
+  datasource:
+    url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: chenweishan
+    password: chenweishan
   redis:
     host: 172.19.103.47
     port: 6379
