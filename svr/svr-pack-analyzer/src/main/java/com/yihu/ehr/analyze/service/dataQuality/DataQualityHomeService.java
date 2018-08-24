@@ -444,7 +444,7 @@ public class DataQualityHomeService extends BaseJpaService {
         sql.append(" WHERE receive_date>='" + start + " 00:00:00' and (qc_step=1 or qc_step=2) and  receive_date<='" + end + " 23:59:59'");
 
         if(StringUtils.isNotEmpty(orgArea)){
-            sql.append(" AND orgArea = '"+orgArea+"'");
+            sql.append(" AND org_area = '"+orgArea+"'");
         }
 
         if(StringUtils.isNotEmpty(orgCode)){
@@ -483,7 +483,7 @@ public class DataQualityHomeService extends BaseJpaService {
         sql.append("SELECT dataset, metadata,COUNT(metadata) count ,version FROM json_archives_qc/qc_metadata_info ");
         sql.append(" WHERE receive_date>='" + start + " 00:00:00' and (qc_step=1 or qc_step=2) and receive_date<='" + end + " 23:59:59'");
         if(StringUtils.isNotEmpty(orgArea)){
-            sql.append(" AND orgArea = '"+orgArea+"'");
+            sql.append(" AND org_area = '"+orgArea+"'");
         }
 
         if(StringUtils.isNotEmpty(orgCode)){
