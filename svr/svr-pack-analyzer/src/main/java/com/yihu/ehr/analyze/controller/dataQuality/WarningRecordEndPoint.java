@@ -16,6 +16,7 @@ import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -81,6 +82,8 @@ public class WarningRecordEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "startTime", required = false) String startTime,
             @ApiParam(name = "endTime", value = "结束时间", defaultValue = "2018-06-11")
             @RequestParam(value = "endTime", required = false) String endTime,
+            @ApiParam(name = "id", value = "将某条数据置顶")
+            @RequestParam(value = "id", required = false) String id,
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
@@ -106,8 +109,21 @@ public class WarningRecordEndPoint extends EnvelopRestEndPoint {
             if(StringUtils.isNotBlank(endTime)){
                 filters += "recordTime<="+endTime+";";
             }
+            if(StringUtils.isNotBlank(id)){
+                filters +=";id<>"+id;
+            }
             String sorts = "-warningTime";
             List<DqWarningRecord> list = warningRecordService.search(null, filters, sorts, page, size);
+
+            if(StringUtils.isNotBlank(id)){
+                DqWarningRecord upDqWarningRecord = warningRecordService.findById(id);
+                if(!CollectionUtils.isEmpty(list)){
+                    //移出最后一条,
+                    list.remove(list.size()-1);
+                }
+                list.add(0,upDqWarningRecord);
+            }
+
             List<MDqWarningRecord> records = (List<MDqWarningRecord>) convertToModels(list, new ArrayList<>(list.size()), MDqWarningRecord.class, null);
             return getPageResult(records,(int)warningRecordService.getCount(filters), page, size);
         }catch (Exception e){
@@ -217,7 +233,7 @@ public class WarningRecordEndPoint extends EnvelopRestEndPoint {
             map.put("lastMonth",lastMonth);//上个月待处理
             map.put("thisMonthAdd",thisMonthAdd);//本月新增
             map.put("thisMonthDealed",thisMonthDealed);//本月已解决
-            map.put("unDeal",unDeal);
+            map.put("unDeal",unDeal);//待解决
             envelop.setSuccessFlg(true);
             envelop.setObj(map);
         }catch (Exception e){
