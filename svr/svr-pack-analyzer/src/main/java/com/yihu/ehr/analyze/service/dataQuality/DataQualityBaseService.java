@@ -37,7 +37,7 @@ public abstract class DataQualityBaseService extends BaseJpaService {
      * @return
      * @throws Exception
      */
-    public abstract List<Map<String, Object>> getAreaDataQuality(String startDate, String endDate) throws Exception;
+    public abstract List<Map<String, Object>> getAreaDataQuality(Integer dataLevel,String startDate, String endDate) throws Exception;
 
     /**
      * 获取区县下的机构质控信息 - 【机构级别】
@@ -48,7 +48,7 @@ public abstract class DataQualityBaseService extends BaseJpaService {
      * @return
      * @throws Exception
      */
-    public abstract List<Map<String, Object>> getOrgDataQuality(String areaCode, String startDate, String endDate) throws Exception;
+    public abstract List<Map<String, Object>> getOrgDataQuality(Integer dataLevel,String areaCode, String startDate, String endDate) throws Exception;
 
 
     /**

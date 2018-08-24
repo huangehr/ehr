@@ -99,7 +99,7 @@ public class DataCorrectService extends DataQualityBaseService {
      * @param orgArea
      * @return
      */
-    public Map<String,Object> getErrorPlatformData(String dateField,String start, String end, String orgArea) {
+    public Map<String,Object> getErrorPlatformData(Integer dataLevel,String dateField,String start, String end, String orgArea) {
         Map<String,Object> resMap = new HashMap<>();
         double totalAreaCout = 0;
         try {
@@ -114,35 +114,42 @@ public class DataCorrectService extends DataQualityBaseService {
 
             fields.add("count");
             String sql1 = "";
-            if (StringUtils.isNotEmpty(orgArea)) {
+            if (StringUtils.isNotEmpty(orgArea) ) {
                 resMap.put("type","org_code");
                 fields.add("org_code");
                 sql1 = "SELECT org_code,count(DISTINCT event_no) as count from json_archives_qc/qc_metadata_info where org_area='" + orgArea + "' and " +
                         dateField + ">='" + start + " 00:00:00' and "+ dateField + "<='" + end + " 23:59:59' and (qc_step=1 or qc_step=2) group by org_code";
-            } else {
+            } else  if ( StringUtils.isEmpty(orgArea) && ( dataLevel ==0 && StringUtils.isEmpty(orgArea))){
                 resMap.put("type","org_area");
                 fields.add("org_area");
                 sql1 = "SELECT org_area,count(DISTINCT event_no) as count from json_archives_qc/qc_metadata_info where " +
                         dateField +">='" + start + " 00:00:00' and "+dateField+"<='" + end + " 23:59:59' and (qc_step=1 or qc_step=2) group by org_area";
+            }else if ( StringUtils.isEmpty(orgArea) && ( dataLevel ==1 && StringUtils.isEmpty(orgArea))){
+                resMap.put("type","org_code");
+                fields.add("org_code");
+                sql1 = "SELECT org_code,count(DISTINCT event_no) as count from json_archives_qc/qc_metadata_info where " +
+                        dateField +">='" + start + " 00:00:00' and "+dateField+"<='" + end + " 23:59:59' and (qc_step=1 or qc_step=2) group by org_code";
             }
 
             List<Map<String, Object>> resultList = elasticSearchUtil.findBySql(fields, sql1);
             if (resultList != null && resultList.size() > 0) {
                 for (Map<String,Object> map : resultList){
                     totalAreaCout += getDoubleValue(map.get("count")) ;
-                    if (StringUtils.isNotEmpty(orgArea)) {
+                    if (StringUtils.isNotEmpty(orgArea) || ( dataLevel ==1 && StringUtils.isEmpty(orgArea))) {
                         resMap.put(map.get("org_code").toString(),map.get("count"));
                     }else {
                         resMap.put(map.get("org_area").toString(),map.get("count"));
                     }
                 }
             }
-            //总计
-            if (StringUtils.isEmpty(orgArea)) {
-                //TODO 默认写上饶市，后面需要修改
-                resMap.put("361100",totalAreaCout);
-            }else {
-                resMap.put("-",totalAreaCout);
+            if (!resMap.isEmpty()) {
+                //总计
+                if (dataLevel ==0) {
+                    //TODO 默认写上饶市，后面需要修改
+                    resMap.put("361100", totalAreaCout);
+                } else {
+                    resMap.put("-", totalAreaCout);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -155,12 +162,13 @@ public class DataCorrectService extends DataQualityBaseService {
      * 获取医院总数据量
      *  (1. orgArea为空时，根据区域分组查询
      *   2. orgArea不为空时，根据机构分组查询）
+     *   @param dataLevel 数据级别：  0：区县，1：机构
      * @param start
      * @param end
      * @param orgArea
      * @return
      */
-    public List<Map<String, Object>> getOrgDataMap(String dateField,String start, String end, String orgArea) throws IOException {
+    public List<Map<String, Object>> getOrgDataMap(Integer dataLevel,String dateField,String start, String end, String orgArea) throws IOException {
         List<Map<String, Object>> resultList = new ArrayList<>();
         double totalAreaCout = 0;
         try {
@@ -187,17 +195,25 @@ public class DataCorrectService extends DataQualityBaseService {
                 sql1 = "SELECT org_code,sum(HSI07_01_001) as count from qc/daily_report where org_area='" + orgArea + "' and " +
                         dateField + ">='" + start + "' and "+ dateField + "<='" + end + "' group by org_code";
             } else {
-                fields.add("org_area");
-                sql1 = "SELECT org_area,sum(HSI07_01_001) as count from qc/daily_report where " +
-                        dateField +">='" + start + "' and "+dateField+"<='" + end + "' group by org_area";
+                if (dataLevel == 0) {
+                    fields.add("org_area");
+                    sql1 = "SELECT org_area,sum(HSI07_01_001) as count from qc/daily_report where " +
+                            dateField +">='" + start + "' and "+dateField+"<='" + end + "' group by org_area";
+                }else {
+                    fields.add("org_code");
+                    sql1 = "SELECT org_code,sum(HSI07_01_001) as count from qc/daily_report where " +
+                            dateField +">='" + start + "' and "+dateField+"<='" + end + "' group by org_code";
+                }
+
             }
             fields.add("count");
             resultList = elasticSearchUtil.findBySql(fields, sql1);
 
+            //设置机构，区域名称
             if (resultList != null && resultList.size() > 0) {
                 for (Map<String, Object> map1 : resultList) {
                     String name = "";
-                    if (StringUtils.isNotEmpty(orgArea)) {
+                    if (StringUtils.isNotEmpty(orgArea) || ( dataLevel ==1 && StringUtils.isEmpty(orgArea))) {
                         String code = (String) map1.get("org_code");
                         name = redisClient.get("organizations:" + code + ":name");
                     }else {
@@ -209,20 +225,21 @@ public class DataCorrectService extends DataQualityBaseService {
                 }
             }
 
-            Map<String, Object> total = new HashMap<>();
-            if (StringUtils.isEmpty(orgArea)) {
-                //TODO 临时写死上饶市
-                total.put("name","上饶市");
-                total.put("org_area","361100");
-                total.put("361100",totalAreaCout);
-                total.put("count",totalAreaCout);
-            }else {
-                total.put("name","全部机构");
-                total.put("org_code","");
-                total.put("-",totalAreaCout);
-                total.put("count",totalAreaCout);
+            if (!resultList.isEmpty()) {
+                Map<String, Object> total = new HashMap<>();
+                if (dataLevel ==0) {
+                    //TODO 临时写死上饶市
+                    total.put("name", "上饶市");
+                    total.put("org_area", "361100");
+                    total.put("361100", totalAreaCout);
+                    total.put("count", totalAreaCout);
+                } else {
+                    total.put("name", "全部机构");
+                    total.put("org_code", "-");
+                    total.put("count", totalAreaCout);
+                }
+                resultList.add(0, total);
             }
-            resultList.add(0,total);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -231,28 +248,28 @@ public class DataCorrectService extends DataQualityBaseService {
 
 
     @Override
-    public List<Map<String, Object>> getAreaDataQuality(String startDate, String endDate) throws Exception {
+    public List<Map<String, Object>> getAreaDataQuality(Integer dataLevel,String startDate, String endDate) throws Exception {
         String end = DateUtil.addDate(1, endDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
         Map<String,Object> resMap = null;
         List<Map<String,Object>> list = new ArrayList<>();
         //机构数据
-        List<Map<String,Object>> groupList = getOrgDataMap("create_date",startDate,end,null);
+        List<Map<String,Object>> groupList = getOrgDataMap(dataLevel,"create_date",startDate,end,null);
         //平台接收错误数据量
-        Map<String, Object> platformErrorGroup = getErrorPlatformData("receive_date",startDate, end,null);
+        Map<String, Object> platformErrorGroup = getErrorPlatformData(dataLevel,"receive_date",startDate, end,null);
         // 计算
         for (Map<String,Object> map:groupList){
             resMap = new HashMap<String,Object>();
             String type = platformErrorGroup.get("type").toString();
             double platPormErrorNum = 0;
             if ("org_area".equals(type)) {
-                platPormErrorNum = Double.parseDouble(platformErrorGroup.get(map.get("org_area")).toString());
+                platPormErrorNum = getDoubleValue(platformErrorGroup.get(map.get("org_area")));
                 resMap.put("code",map.get("org_area"));
             }else {
-                platPormErrorNum = Double.parseDouble(platformErrorGroup.get(map.get("org_code")).toString());
+                platPormErrorNum = getDoubleValue(platformErrorGroup.get(map.get("org_code")));
                 resMap.put("code",map.get("org_code"));
             }
 
-            double orgNum = Double.parseDouble(map.get("count").toString());
+            double orgNum = getDoubleValue(map.get("count"));
             double platPormNum = orgNum - platPormErrorNum;
             String rate = calRate(platPormNum,orgNum);
             resMap.put("name",map.get("name"));
@@ -266,28 +283,28 @@ public class DataCorrectService extends DataQualityBaseService {
     }
 
     @Override
-    public List<Map<String, Object>> getOrgDataQuality(String areaCode, String startDate, String endDate) throws Exception {
+    public List<Map<String, Object>> getOrgDataQuality(Integer dataLevel,String areaCode, String startDate, String endDate) throws Exception {
         String end = DateUtil.addDate(1, endDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
         Map<String,Object> resMap = null;
         List<Map<String,Object>> list = new ArrayList<>();
         //机构数据
-        List<Map<String,Object>> groupList = getOrgDataMap("create_date",startDate,end,areaCode);
+        List<Map<String,Object>> groupList = getOrgDataMap(dataLevel,"create_date",startDate,end,areaCode);
         //平台接收数据量
-        Map<String, Object> platformDataGroup = getErrorPlatformData("receive_date",startDate, end,areaCode);
+        Map<String, Object> platformDataGroup = getErrorPlatformData(dataLevel,"receive_date",startDate, end,areaCode);
         // 计算
         for (Map<String,Object> map:groupList){
             resMap = new HashMap<String,Object>();
             String type = platformDataGroup.get("type").toString();
             double platPormErrorNum = 0;
             if ("org_area".equals(type)) {
-                platPormErrorNum = Double.parseDouble(platformDataGroup.get(map.get("org_area")).toString());
+                platPormErrorNum = getDoubleValue(platformDataGroup.get(map.get("org_area")));
                 resMap.put("code",map.get("org_area"));
             }else {
-                platPormErrorNum = Double.parseDouble(platformDataGroup.get(map.get("org_code")).toString());
+                platPormErrorNum = getDoubleValue(platformDataGroup.get(map.get("org_code")));
                 resMap.put("code",map.get("org_code"));
             }
 
-            double orgNum = Double.parseDouble(map.get("count").toString());
+            double orgNum = getDoubleValue(map.get("count"));
             double platPormNum = orgNum - platPormErrorNum;
             String rate = calRate(platPormNum,orgNum);
             resMap.put("name",map.get("name"));

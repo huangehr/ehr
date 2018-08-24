@@ -397,7 +397,7 @@ public class DataQualityHomeService extends BaseJpaService {
             end = dateStr;
         }
         DataQualityBaseService dataQualityBaseService = getInstance(DqDataType.create(dataType));
-        list = dataQualityBaseService.getAreaDataQuality(start,end);
+        list = dataQualityBaseService.getAreaDataQuality(0,start,end);
         return list;
     }
 
@@ -421,38 +421,7 @@ public class DataQualityHomeService extends BaseJpaService {
             end = dateStr;
         }
         DataQualityBaseService dataQualityBaseService = getInstance(DqDataType.create(dataType));
-        list = dataQualityBaseService.getOrgDataQuality(areaCode,start,end);
-        return list;
-    }
-
-    public List<Map<String,Object>> getHospitalDataByGroup(String startDate, String endDate, String orgCode,String groupField) throws Exception {
-        StringBuffer sql = new StringBuffer();
-        sql.append("SELECT SUM(count) as count ,SUM(row) as row, dataset_name, dataset ");
-        sql.append("FROM json_archives_qc/qc_dataset_detail");
-        sql.append(" WHERE receive_date>='" + startDate + " 00:00:00' and receive_date<='" + endDate + " 23:59:59'");
-        if (StringUtils.isNotEmpty(orgCode) && !"null".equals(orgCode)&&!cloud.equals(orgCode)){
-            sql.append(" and org_code='" + orgCode +"'");
-        }
-        sql.append("GROUP BY dataset_name,dataset");
-        List<String> field = new ArrayList<>();
-        field.add("count");
-        field.add("row");
-        field.add("dataset_name");
-        field.add("dataset");
-        List<Map<String,Object>> list = elasticSearchUtil.findBySql(field, sql.toString());
-        Map<String, Object> totalMap = new HashMap<>();
-        totalMap.put("dataset","总计");
-        totalMap.put("dataset_name","-");
-        double rowTotal = 0;
-        double countTotal = 0;
-        for(Map<String,Object> map :list){
-            map.put("name" ,map.get("dataset_name"));
-            rowTotal += Double.valueOf(map.get("row").toString());
-            countTotal += Double.valueOf(map.get("count").toString());
-        }
-        totalMap.put("row",rowTotal);
-        totalMap.put("count",countTotal);
-        list.add(0,totalMap);
+        list = dataQualityBaseService.getOrgDataQuality(1,areaCode,start,end);
         return list;
     }
 
@@ -465,14 +434,19 @@ public class DataQualityHomeService extends BaseJpaService {
      * @return
      * @throws Exception
      */
-    public List<Map<String,Object>> homeDatasetError(String orgCode, Integer dataType, String start, String end) throws Exception {
+    public List<Map<String,Object>> homeDatasetError(String orgArea, String orgCode, Integer dataType, String start, String end) throws Exception {
         List<String> fileds = new ArrayList<>();
         fileds.add("dataset");
         fileds.add("count");
         fileds.add("version");
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT dataset,COUNT(dataset) count ,version FROM json_archives_qc/qc_metadata_info ");
-        sql.append(" WHERE receive_date>='" + start + " 00:00:00' and receive_date<='" + end + " 23:59:59'");
+        sql.append(" WHERE receive_date>='" + start + " 00:00:00' and (qc_step=1 or qc_step=2) and  receive_date<='" + end + " 23:59:59'");
+
+        if(StringUtils.isNotEmpty(orgArea)){
+            sql.append(" AND orgArea = '"+orgArea+"'");
+        }
+
         if(StringUtils.isNotEmpty(orgCode)){
             sql.append(" AND org_code = '"+orgCode+"'");
         }
@@ -499,7 +473,7 @@ public class DataQualityHomeService extends BaseJpaService {
      * @return
      * @throws Exception
      */
-    public List<Map<String,Object>> homeMetadataError(String dataset ,Integer dataType,String start,String end) throws Exception {
+    public List<Map<String,Object>> homeMetadataError(String orgArea, String orgCode, String dataset ,Integer dataType,String start,String end) throws Exception {
         List<String> fileds = new ArrayList<>();
         fileds.add("dataset");
         fileds.add("metadata");
@@ -507,7 +481,14 @@ public class DataQualityHomeService extends BaseJpaService {
         fileds.add("version");
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT dataset, metadata,COUNT(metadata) count ,version FROM json_archives_qc/qc_metadata_info ");
-        sql.append(" WHERE receive_date>='" + start + " 00:00:00' and receive_date<='" + end + " 23:59:59'");
+        sql.append(" WHERE receive_date>='" + start + " 00:00:00' and (qc_step=1 or qc_step=2) and receive_date<='" + end + " 23:59:59'");
+        if(StringUtils.isNotEmpty(orgArea)){
+            sql.append(" AND orgArea = '"+orgArea+"'");
+        }
+
+        if(StringUtils.isNotEmpty(orgCode)){
+            sql.append(" AND org_code = '"+orgCode+"'");
+        }
         if(StringUtils.isNotEmpty(dataset)){
             sql.append(" AND dataset = '"+dataset+"'");
         }
