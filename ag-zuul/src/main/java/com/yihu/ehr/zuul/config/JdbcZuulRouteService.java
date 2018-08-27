@@ -9,7 +9,6 @@ import java.util.List;
 /**
  * Created by progr1mmer on 2018/8/24.
  */
-
 public class JdbcZuulRouteService {
 
     private final JdbcTemplate jdbcTemplate;
@@ -28,7 +27,7 @@ public class JdbcZuulRouteService {
     }
 
     public int updateZuulRouteEnable(String id, int enabled) {
-        return jdbcTemplate.update("update zuul_route set enabled = ? where id = ?", new Object[]{id, enabled});
+        return jdbcTemplate.update("update zuul_route set enabled = ? where id = ?", new Object[]{enabled, id});
     }
 
     public List<ZuulProperties.ZuulRoute> loadZuulRoutes() {

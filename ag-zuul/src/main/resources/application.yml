@@ -32,7 +32,7 @@ zuul:
   routes:
     svr-dfs:
       path: /dfs/**
-      serviceId: svr-dfs-sxy
+      serviceId: svr-dfs
     svr-basic:
       path: /basic/**
       serviceId: svr-basic
