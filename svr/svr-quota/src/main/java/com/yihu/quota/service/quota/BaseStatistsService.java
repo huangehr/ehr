@@ -622,6 +622,9 @@ public class BaseStatistsService {
     //获取该节点下所有末节点的结果和
     public   Map<String,Object> getParentAllChildren(List<String> quotaCodes, Map<String,Object> mapCategory,Map<String,Object> returnMap, List<Map<String, Object>> dimenListResult, double parentResult ){
         try {
+                NumberFormat df = NumberFormat.getInstance();
+                df.setGroupingUsed(false);
+                df.setMaximumFractionDigits(2);
                 boolean childrenFlag = false;
                 if(mapCategory.get("children") != null){
                     List<Map<String,Object>> childrenOrgHealthCategoryList = (List<Map<String, Object>>) mapCategory.get("children");
@@ -644,14 +647,14 @@ public class BaseStatistsService {
                                 if(returnMap.get(resultField) != null){
                                     oldResult = Double.parseDouble(returnMap.get(resultField).toString());
                                 }
-                                returnMap.put(resultField,result + oldResult);
+                                returnMap.put(resultField,df.format(result + oldResult));
                                 for(String quotaCode : quotaCodes){
                                     double quotaResult = Double.parseDouble(dimenMap.get(quotaCode).toString());
                                     double oldQuotaResult = 0;
                                     if( returnMap.get(quotaCode) != null ){
                                         oldQuotaResult = Double.parseDouble(returnMap.get(quotaCode).toString());
                                     }
-                                    returnMap.put(quotaCode,quotaResult + oldQuotaResult);
+                                    returnMap.put(quotaCode,df.format(quotaResult + oldQuotaResult));
                                 }
                                 break;
                             }
@@ -1175,8 +1178,8 @@ public class BaseStatistsService {
                 filters = getdateComparisonTypeFilter(esConfig,filters);
             }
             if( (StringUtils.isNotEmpty(esConfig.getEspecialType())) && esConfig.getEspecialType().equals(orgHealthCategory)){
-                //特殊机构类型查询输出结果  只有查询条件没有维度 默认是 机构类型维度
-                result = getOrgHealthCategory(code,filters,dateType,isTrunTree, top);
+//                //特殊机构类型查询输出结果  只有查询条件没有维度 默认是 机构类型维度
+//                result = getOrgHealthCategory(code,filters,dateType,isTrunTree, top);
             }else if( (StringUtils.isNotEmpty(esConfig.getMolecular())) && StringUtils.isNotEmpty(esConfig.getDenominator())){//除法
                 //除法指标查询输出结果
                 molecularFilter = handleFilter(esConfig.getMolecularFilter(), molecularFilter);

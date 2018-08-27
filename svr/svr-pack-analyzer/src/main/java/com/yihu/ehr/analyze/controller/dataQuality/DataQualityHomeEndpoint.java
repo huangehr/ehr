@@ -28,6 +28,9 @@ public class DataQualityHomeEndpoint extends EnvelopRestEndPoint {
     @Autowired
     private DataQualityHomeService dataQualityHomeService;
 
+
+
+
     @RequestMapping(value = ServiceApi.DataQuality.HomeSummary, method = RequestMethod.GET)
     @ApiOperation(value = "质量监控首页--质控情况")
     public Envelop homneSummary(
@@ -46,24 +49,114 @@ public class DataQualityHomeEndpoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
-    @RequestMapping(value = ServiceApi.DataQuality.HomeSummary, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.DataQuality.HomeAreaDataList, method = RequestMethod.GET)
     @ApiOperation(value = "质量监控首页--各区县质控情况")
-    public Envelop orgAndAreDatas(
-            @ApiParam(name = "orgArea", value = "市区域编码")
-            @RequestParam(value = "orgArea", required = false) String orgArea,
+    public Envelop findAreaData(
+            @ApiParam(name = "dataType", value = "数据维度  （0: 完整性，1:及时性，2:准确性）")
+            @RequestParam(value = "dataType", required = false) Integer dataType,
             @ApiParam(name = "start", value = "开始时间，（接收时间）")
             @RequestParam(value = "start", required = false) String start,
             @ApiParam(name = "end", value = "结束时间，（接收时间）", defaultValue = "")
             @RequestParam(value = "end", required = false) String end ) throws Exception {
         Envelop envelop = new Envelop();
         try {
-            return success(dataQualityHomeService.getQuailyDetail(start,end));
+            return success(dataQualityHomeService.findAreaData(dataType,start,end));
         }catch (Exception e){
             e.printStackTrace();
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg(e.getMessage());
         }
         return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.DataQuality.HomeOrgDataList, method = RequestMethod.GET)
+    @ApiOperation(value = "质量监控首页--区县下各机构质控情况")
+    public Envelop findOrgDataByArea(
+            @ApiParam(name = "orgArea", value = "市区域编码")
+            @RequestParam(value = "orgArea", required = false) String orgArea,
+            @ApiParam(name = "dataType", value = "数据维度  （0: 完整性，1:及时性，2:准确性）")
+            @RequestParam(value = "dataType", required = false) Integer dataType,
+            @ApiParam(name = "start", value = "开始时间，（接收时间）")
+            @RequestParam(value = "start", required = false) String start,
+            @ApiParam(name = "end", value = "结束时间，（接收时间）", defaultValue = "")
+            @RequestParam(value = "end", required = false) String end ) throws Exception {
+        Envelop envelop = new Envelop();
+        try {
+            return success(dataQualityHomeService.findOrgData(dataType,orgArea,start,end));
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return envelop;
+    }
+
+
+    @RequestMapping(value = ServiceApi.DataQuality.HomeDatasetError, method = RequestMethod.GET)
+    @ApiOperation(value = "质量监控首页--错误数据集")
+    public Envelop homeDatasetError(
+            @ApiParam(name = "orgArea", value = "市区域编码")
+            @RequestParam(value = "orgArea", required = false) String orgArea,
+            @ApiParam(name = "orgCode", value = "机构代码")
+            @RequestParam(value = "orgCode", required = false) String orgCode,
+            @ApiParam(name = "dataType", value = "数据维度  （0: 完整性，1:准确性）")
+            @RequestParam(value = "dataType", required = false) Integer dataType,
+            @ApiParam(name = "start", value = "开始时间，（接收时间）")
+            @RequestParam(value = "start", required = false) String start,
+            @ApiParam(name = "end", value = "结束时间，（接收时间）")
+            @RequestParam(value = "end", required = false) String end ) throws Exception {
+        Envelop envelop = new Envelop();
+        try {
+            return success(dataQualityHomeService.homeDatasetError(orgArea,orgCode, dataType, start, end));
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.DataQuality.HomeMetadataError, method = RequestMethod.GET)
+    @ApiOperation(value = "质量监控首页--错误数据元")
+    public Envelop homeMetadataError(
+            @ApiParam(name = "orgArea", value = "市区域编码")
+            @RequestParam(value = "orgArea", required = false) String orgArea,
+            @ApiParam(name = "orgCode", value = "机构代码")
+            @RequestParam(value = "orgCode", required = false) String orgCode,
+            @ApiParam(name = "dataset", value = "数据集")
+            @RequestParam(value = "dataset", required = false) String dataset,
+            @ApiParam(name = "dataType", value = "数据维度  （0: 完整性，1:准确性）")
+            @RequestParam(value = "dataType", required = false) Integer dataType,
+            @ApiParam(name = "start", value = "开始时间，（接收时间）")
+            @RequestParam(value = "start", required = false) String start,
+            @ApiParam(name = "end", value = "结束时间，（接收时间）")
+            @RequestParam(value = "end", required = false) String end ) throws Exception {
+        Envelop envelop = new Envelop();
+        try {
+            return success(dataQualityHomeService.homeMetadataError(orgArea,orgCode,dataset, dataType, start, end));
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return envelop;
+    }
+
+
+
+
+
+
+
+    @RequestMapping(value = "bulkUpDateOrgArea", method = RequestMethod.GET)
+    @ApiOperation(value = "批量更新机构关联的区域编码")
+    public void bulkUploadOrgArea(
+            @ApiParam(name = "index", value = "索引")
+            @RequestParam(value = "index", required = false) String index,
+            @ApiParam(name = "type", value = "type")
+            @RequestParam(value = "type", required = false) String type
+    ) throws Exception {
+        dataQualityHomeService.bulkUpdateOrgArea(index,type);
     }
 
 }

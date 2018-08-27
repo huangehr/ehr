@@ -32,14 +32,31 @@ public class GovernmentBrowseLogService extends BaseJpaService<GovernmentBrowseL
     public List<GovernmentBrowseLog> getBrowseName(String userId) {
         String sql = "select show_type from rs_report where code = ?";
         List<GovernmentBrowseLog> list = governmentBrowseLogRepository.findByUserId(userId);
-        for (GovernmentBrowseLog governmentBrowseLog : list) {
-            List<MRsReport> query = jdbcTmeplate.query(sql, new BeanPropertyRowMapper(MRsReport.class), governmentBrowseLog.getResourceId());
-            if (null != query && query.size() > 0) {
-                governmentBrowseLog.setShowType(query.get(0).getShowType());
-            }
-
+        List<String> arrayList = new ArrayList();
+        if (null != list && list.size() > 0) {
+            list.forEach(item -> {
+                if (arrayList.size() < 5) {
+                    if (!arrayList.contains(item.getResourceId())) {
+                        arrayList.add(item.getResourceId());
+                    }
+                }
+            });
         }
-        return list;
+        List<GovernmentBrowseLog> govList = new ArrayList<>();
+        if (arrayList.size() > 0) {
+            for (String code : arrayList) {
+                List<GovernmentBrowseLog> governmentBrowseLogs = governmentBrowseLogRepository.findByResourceId(code);
+                if (null != governmentBrowseLogs && governmentBrowseLogs.size() > 0) {
+                    GovernmentBrowseLog governmentBrowseLog = governmentBrowseLogs.get(0);
+                    List<MRsReport> query = jdbcTmeplate.query(sql, new BeanPropertyRowMapper(MRsReport.class), governmentBrowseLog.getResourceId());
+                    if (null != query && query.size() > 0) {
+                        governmentBrowseLog.setShowType(query.get(0).getShowType());
+                    }
+                    govList.add(governmentBrowseLog);
+                }
+            }
+        }
+        return govList;
     }
 
     public List getHotBrowseLog() {

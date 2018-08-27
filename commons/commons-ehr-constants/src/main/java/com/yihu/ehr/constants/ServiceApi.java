@@ -1695,6 +1695,7 @@ public class ServiceApi {
         public static final String UploadErrorListPage = "/dataQuality/quality/uploadErrorPage";
 
         public static final String WarningRecordList = "/dataQuality/warningRecord/warningRecordList";
+        public static final String RealTimeMonitorList = "/dataQuality/warningRecord/realTimeMonitorList";
         public static final String WarningRecord =  "/dataQuality/warningRecord/warningRecord/{id}";
         public static final String WarningRecordUpd = "/dataQuality/warningRecord/warningRecordUpd";
         public static final String WarningQuestionAnalyze = "/dataQuality/warningRecord/warningQuestionAnalyze";
@@ -1712,7 +1713,10 @@ public class ServiceApi {
 
         //首页相关
         public static final String  HomeSummary= "/dataQuality/home/recordList";
-
+        public static final String  HomeAreaDataList= "/dataQuality/home/areaDataList";
+        public static final String  HomeOrgDataList= "/dataQuality/home/orgDataList";
+        public static final String  HomeDatasetError= "/dataQuality/home/datasetError";
+        public static final String  HomeMetadataError= "/dataQuality/home/metadataError";
 
 
     }
