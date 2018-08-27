@@ -8,7 +8,10 @@ import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -70,22 +73,41 @@ public abstract class DataQualityBaseService extends BaseJpaService {
         return orgMap;
     }
 
+
     /**
-     * 百分比计算
-     *
-     * @param molecular   分子
-     * @param denominator 分母
+     * 通过map中的rate字段降序排雷
+     * @param list
+     */
+    public void comparator(List<Map<String, Object>> list ){
+        Collections.sort(list, new Comparator<Map<String, Object>>() {
+            public int compare(Map<String, Object> o1, Map<String, Object> o2) {
+                return getDoubleValue(o2.get("rate")).compareTo(getDoubleValue(o1.get("rate")));
+            }
+        });
+        list.forEach(map->{
+            map.put("rate",map.get("rate") + "%");
+        });
+    }
+
+
+    /**
+     * 百分比计算（不带单位）
+     * @param molecular
+     * @param denominator
      * @return
      */
-    public String calRate(double molecular, double denominator) {
+    public Double calDoubleRate(double molecular, double denominator) {
         if (molecular == 0) {
-            return "0.00%";
+            return 0.00;
         } else if (denominator == 0) {
-            return "100.00%";
+            return 100.00;
         }
-        DecimalFormat decimalFormat = new DecimalFormat("0.00%");
-        return decimalFormat.format(molecular / denominator);
+
+        BigDecimal b = new BigDecimal((molecular/denominator) *100) ;
+        return b.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
     }
+
+
 
     /**
      * 百分比计算
@@ -110,7 +132,7 @@ public abstract class DataQualityBaseService extends BaseJpaService {
      * @param objValue
      * @return
      */
-    public double getDoubleValue(Object objValue) {
+    public Double getDoubleValue(Object objValue) {
         double value = 0;
         try {
             if (objValue != null)
