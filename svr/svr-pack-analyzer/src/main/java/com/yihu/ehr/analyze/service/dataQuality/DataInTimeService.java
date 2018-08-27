@@ -130,11 +130,10 @@ public class DataInTimeService extends DataQualityBaseService {
         if (resMap.isEmpty()) {
             if (dataLevel ==0) {
                 resMap.put("type", "org_area");
-                //TODO 默认写上饶市，后面需要修改
-                resMap.put("361100", totalAreaCout);
+                resMap.put("", totalAreaCout);
             } else {
                 resMap.put("type", "org_code");
-                resMap.put("-", totalAreaCout);
+                resMap.put("", totalAreaCout);
             }
         }
         logger.info("平台就诊及时人数 去重复：" + (System.currentTimeMillis() - starttime) + "ms");

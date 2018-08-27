@@ -146,9 +146,9 @@ public class DataCorrectService extends DataQualityBaseService {
                 //总计
                 if (dataLevel ==0) {
                     //TODO 默认写上饶市，后面需要修改
-                    resMap.put("361100", totalAreaCout);
+                    resMap.put("", totalAreaCout);
                 } else {
-                    resMap.put("-", totalAreaCout);
+                    resMap.put("", totalAreaCout);
                 }
             }
         } catch (Exception e) {
@@ -230,8 +230,8 @@ public class DataCorrectService extends DataQualityBaseService {
                 if (dataLevel ==0) {
                     //TODO 临时写死上饶市
                     total.put("name", "上饶市");
-                    total.put("org_area", "361100");
-                    total.put("361100", totalAreaCout);
+                    total.put("org_area", "");
+                    total.put("", totalAreaCout);
                     total.put("count", totalAreaCout);
                 } else {
                     total.put("name", "全部机构");

@@ -163,9 +163,9 @@ public class DataCompleteService extends DataQualityBaseService {
             //总计
             if (dataLevel ==0) {
                 //TODO 默认写上饶市，后面需要修改
-                resMap.put("361100", totalAreaCout);
+                resMap.put("", totalAreaCout);
             } else {
-                resMap.put("-", totalAreaCout);
+                resMap.put("", totalAreaCout);
             }
         }
         return resMap;
