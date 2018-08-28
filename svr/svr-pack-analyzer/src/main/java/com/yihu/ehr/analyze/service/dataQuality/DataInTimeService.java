@@ -67,11 +67,11 @@ public class DataInTimeService extends DataQualityBaseService {
                 fields.add("org_code");
                 sql0 = "SELECT  COUNT(DISTINCT event_no) as count,org_code FROM json_archives WHERE event_type=" + eventType + " AND pack_type=1 AND org_area='" + orgArea + "' AND " + dateField +
                         " BETWEEN '" + start + " 00:00:00' AND '" + end + " 23:59:59' and delay <=" + warning.getPeInTime() + " GROUP BY org_code";
-            } else if ( StringUtils.isEmpty(orgArea) && ( dataLevel ==1 && StringUtils.isEmpty(orgArea))){
+            } else if (  dataLevel ==0 && StringUtils.isEmpty(orgArea)){
                 fields.add("org_area");
                 sql0 = "SELECT  COUNT(DISTINCT event_no) as count,org_area FROM json_archives WHERE event_type=" + eventType + " AND pack_type=1 AND " + dateField +
                         " BETWEEN '" + start + " 00:00:00' AND '" + end + " 23:59:59' and delay <=" + warning.getPeInTime() + " GROUP BY org_area";
-            }else  if ( StringUtils.isEmpty(orgArea) && ( dataLevel ==1 && StringUtils.isEmpty(orgArea))){
+            }else  if (  dataLevel ==1 && StringUtils.isEmpty(orgArea)){
                 fields.add("org_code");
                 sql0 = "SELECT  COUNT(DISTINCT event_no) as count,org_area FROM json_archives WHERE event_type=" + eventType + " AND pack_type=1 AND " + dateField +
                         " BETWEEN '" + start + " 00:00:00' AND '" + end + " 23:59:59' and delay <=" + warning.getPeInTime() + " GROUP BY org_code";
@@ -126,15 +126,16 @@ public class DataInTimeService extends DataQualityBaseService {
             resMap.put(key, totalInTime);
             totalAreaCout += totalInTime;
         }
+        //指定数据类型
+        if (dataLevel ==0) {
+            resMap.put("type", "org_area");
+        } else {
+            resMap.put("type", "org_code");
+        }
+
         //总计
-        if (resMap.isEmpty()) {
-            if (dataLevel ==0) {
-                resMap.put("type", "org_area");
-                resMap.put("", totalAreaCout);
-            } else {
-                resMap.put("type", "org_code");
-                resMap.put("", totalAreaCout);
-            }
+        if (!resMap.isEmpty()) {
+            resMap.put("", totalAreaCout);
         }
         logger.info("平台就诊及时人数 去重复：" + (System.currentTimeMillis() - starttime) + "ms");
 
@@ -148,6 +149,7 @@ public class DataInTimeService extends DataQualityBaseService {
     public List<Map<String, Object>> getAreaDataQuality(Integer dataLevel,String startDate, String endDate) throws Exception {
         String end = DateUtil.addDate(1, endDate, DateUtil.DEFAULT_DATE_YMD_FORMAT);
         Map<String, Object> resMap = null;
+        Map<String, Object> totalMap = new HashMap<>();
         List<Map<String, Object>> list = new ArrayList<>();
         //机构数据
         List<Map<String, Object>> groupList = dataCorrectService.getOrgDataMap(dataLevel,"create_date", startDate, end, null);
@@ -157,23 +159,36 @@ public class DataInTimeService extends DataQualityBaseService {
         for (Map<String, Object> map : groupList) {
             resMap = new HashMap<String, Object>();
             String type = platformDataGroup.get("type").toString();
+            String code = "";
             double platPormNum = 0;
             if ("org_area".equals(type)) {
                 platPormNum = getDoubleValue(platformDataGroup.get(map.get("org_area")));
-                resMap.put("code", map.get("org_area"));
+                code = map.get("org_area").toString();
             } else {
                 platPormNum = getDoubleValue(platformDataGroup.get(map.get("org_code")));
-                resMap.put("code", map.get("org_code"));
+                code = map.get("org_code").toString();
             }
             double orgNum = getDoubleValue(map.get("count"));
-            String rate = calRate(platPormNum, orgNum);
-            resMap.put("name", map.get("name"));
-            resMap.put("count", platPormNum);
-            resMap.put("total", orgNum);
-            resMap.put("rate", rate);
+            double rate = calDoubleRate(platPormNum, orgNum);
+            if ("".equals(code)) {
+                totalMap.put("code",code);
+                totalMap.put("name", map.get("name"));
+                totalMap.put("count", platPormNum + "%");
+                totalMap.put("total", orgNum);
+                totalMap.put("rate", rate);
+            } else {
+                resMap.put("code",code);
+                resMap.put("name", map.get("name"));
+                resMap.put("count", platPormNum);
+                resMap.put("total", orgNum);
+                resMap.put("rate", rate);
+            }
             list.add(resMap);
         }
-
+        //排序
+        comparator(list);
+        //添加总计
+        list.add(0,totalMap);
         return list;
     }
 
@@ -181,6 +196,7 @@ public class DataInTimeService extends DataQualityBaseService {
     public List<Map<String, Object>> getOrgDataQuality(Integer dataLevel,String areaCode, String startDate, String endDate) throws Exception {
         String end = DateUtil.addDate(1, endDate, DateUtil.DEFAULT_DATE_YMD_FORMAT);
         Map<String, Object> resMap = null;
+        Map<String, Object> totalMap = new HashMap<>();
         List<Map<String, Object>> list = new ArrayList<>();
         //机构数据
         List<Map<String, Object>> groupList = dataCorrectService.getOrgDataMap(dataLevel,"create_date", startDate, end, areaCode);
@@ -190,23 +206,37 @@ public class DataInTimeService extends DataQualityBaseService {
         for (Map<String, Object> map : groupList) {
             resMap = new HashMap<String, Object>();
             String type = platformDataGroup.get("type").toString();
+            String code = "";
             double platPormNum = 0;
             if ("org_area".equals(type)) {
                 platPormNum = getDoubleValue(platformDataGroup.get(map.get("org_area")));
-                resMap.put("code", map.get("org_area"));
+                code = map.get("org_area").toString();
             } else {
                 platPormNum = getDoubleValue(platformDataGroup.get(map.get("org_code")));
-                resMap.put("code", map.get("org_code"));
+                code = map.get("org_code").toString();
             }
             double orgNum = getDoubleValue(map.get("count"));
-            String rate = calRate(platPormNum, orgNum);
-            resMap.put("name", map.get("name"));
-            resMap.put("count", platPormNum);
-            resMap.put("total", orgNum);
-            resMap.put("rate", rate);
+            double rate = calDoubleRate(platPormNum, orgNum);
+
+            if ("".equals(code)) {
+                totalMap.put("code",code);
+                totalMap.put("name", map.get("name"));
+                totalMap.put("count", platPormNum + "%");
+                totalMap.put("total", orgNum);
+                totalMap.put("rate", rate);
+            } else {
+                resMap.put("code",code);
+                resMap.put("name", map.get("name"));
+                resMap.put("count", platPormNum);
+                resMap.put("total", orgNum);
+                resMap.put("rate", rate);
+            }
             list.add(resMap);
         }
-
+        //排序
+        comparator(list);
+        //添加总计
+        list.add(0,totalMap);
         return list;
     }
 
