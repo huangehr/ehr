@@ -63,7 +63,7 @@ public class ProfileCDAService extends ProfileBasicService {
                 List<Map<String, Object>> prescription = new ArrayList<>();
                 for (ArchiveTemplate item : list) {
                     Map<String, Object> temp = new HashMap<>();
-                    if (item.getTitle().contains("检查报告")) {
+                    if (item.getTitle().contains("检查")) {
                         String subQ = "{\"q\":\"rowkey:" + profileId + "$HDSD00_79$*\"}";
                         Envelop subEnvelop = resource.getSubData(subQ, 1, 1000, null);
                         List<Map<String, Object>> subList = subEnvelop.getDetailModelList();
@@ -86,7 +86,7 @@ public class ProfileCDAService extends ProfileBasicService {
                         temp.put("multi", true);
                         temp.put("data", new HashMap<>());
                         temp.put("records", data);
-                    } else if (item.getTitle().contains("检验报告")) {
+                    } else if (item.getTitle().contains("检验")) {
                         String subQ = "{\"q\":\"rowkey:" + profileId + "$HDSD00_77$*\"}";
                         Envelop subEnvelop = resource.getSubData(subQ, 1, 1000, null);
                         List<Map<String, Object>> subList = subEnvelop.getDetailModelList();
@@ -109,7 +109,7 @@ public class ProfileCDAService extends ProfileBasicService {
                         temp.put("multi", true);
                         temp.put("data", new HashMap<>());
                         temp.put("records", data);
-                    } else if (item.getTitle().contains("手术记录")) {
+                    } else if (item.getTitle().contains("手术")) {
                         String subQ = "{\"q\":\"rowkey:" + profileId + "$HDSD00_06$*\"}";
                         Envelop subEnvelop = resource.getSubData(subQ, 1, 1000, null);
                         List<Map<String, Object>> subList = subEnvelop.getDetailModelList();
