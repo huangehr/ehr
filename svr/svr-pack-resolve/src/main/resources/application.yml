@@ -69,6 +69,7 @@ ehr:
         - HDSC02_09: Resident #住院-入院记录 v1.0
         - HDSD00_13: Resident #住院-入院记录 v1.3
         - HDSD00_16: Resident #住院-出院小结 v1.3
+        - HDSD00_11: Resident #住院-病案首页 v1.5
         - HDSB05_03: MedicalExam #体检-登记信息 v1.3
     #诊断信息
     diagnosis:

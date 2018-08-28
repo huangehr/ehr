@@ -110,7 +110,7 @@ public class WarningRecordEndPoint extends EnvelopRestEndPoint {
                 filters += "recordTime<="+endTime+";";
             }
             if(StringUtils.isNotBlank(id)){
-                filters +=";id<>"+id;
+                filters +="id<>"+id+";";
             }
             String sorts = "-warningTime";
             List<DqWarningRecord> list = warningRecordService.search(null, filters, sorts, page, size);
