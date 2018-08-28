@@ -290,8 +290,10 @@ public class DataCorrectService extends DataQualityBaseService {
         //排序
         comparator(list);
         //添加总计
-        Map<String, Object> totalMap = genTotalData("上饶市",totalNum,totalHospitalNum);
-        list.add(0,totalMap);
+        if (totalHospitalNum !=0) {
+            Map<String, Object> totalMap = genTotalData("上饶市", totalNum, totalHospitalNum);
+            list.add(0, totalMap);
+        }
         return list;
     }
 
@@ -338,8 +340,10 @@ public class DataCorrectService extends DataQualityBaseService {
         //排序
         comparator(list);
         //添加总计
-        Map<String, Object> totalMap = genTotalData("全部机构",totalNum,totalHospitalNum);
-        list.add(0,totalMap);
+        if (totalHospitalNum !=0) {
+            Map<String, Object> totalMap = genTotalData("全部机构", totalNum, totalHospitalNum);
+            list.add(0, totalMap);
+        }
         return list;
     }
 
