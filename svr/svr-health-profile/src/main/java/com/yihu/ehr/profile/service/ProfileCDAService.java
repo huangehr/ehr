@@ -86,7 +86,7 @@ public class ProfileCDAService extends ProfileBasicService {
                         temp.put("multi", true);
                         temp.put("data", new HashMap<>());
                         temp.put("records", data);
-                    } else if (item.getTitle().contains("检验")) {
+                    } else if (item.getTitle().contains("化验")) {
                         String subQ = "{\"q\":\"rowkey:" + profileId + "$HDSD00_77$*\"}";
                         Envelop subEnvelop = resource.getSubData(subQ, 1, 1000, null);
                         List<Map<String, Object>> subList = subEnvelop.getDetailModelList();
@@ -132,40 +132,38 @@ public class ProfileCDAService extends ProfileBasicService {
                         temp.put("multi", true);
                         temp.put("data", new HashMap<>());
                         temp.put("records", data);
-                    } else if (item.getTitle().contains("处方")) {
-                        //中西药特殊处理
-                        if (item.getTitle().contains("中药")) {
-                            String subQ = "{\"q\":\"rowkey:" + profileId + "$HDSD00_83$*\"}";
-                            Envelop subEnvelop = resource.getSubData(subQ, 1, 1, null);
-                            if (subEnvelop.getDetailModelList() != null && subEnvelop.getDetailModelList().size() > 0) {
-                                Map<String, Object> dataMap = new HashMap<>();
-                                dataMap.put(ResourceCells.PROFILE_ID, profileId);
-                                dataMap.put(ResourceCells.PROFILE_TYPE, event.get(ResourceCells.PROFILE_TYPE));
-                                dataMap.put("cda_document_id", item.getCdaDocumentId());
-                                dataMap.put("cda_code", item.getCdaCode());
-                                dataMap.put("pc_template", item.getPcUrl());
-                                dataMap.put("mobile_template", item.getMobileUrl());
-                                dataMap.put("template_id", item.getId());
-                                dataMap.put("name", item.getTitle());
-                                dataMap.put("mark", "01");
-                                prescription.add(dataMap);
-                            }
-                        } else if (item.getTitle().contains("西药")) {
-                            String subQ = "{\"q\":\"rowkey:" + profileId + "$HDSD00_84$*\"}";
-                            Envelop subEnvelop = resource.getSubData(subQ, 1, 1, null);
-                            if (subEnvelop.getDetailModelList() != null && subEnvelop.getDetailModelList().size() > 0) {
-                                Map<String, Object> dataMap = new HashMap<>();
-                                dataMap.put(ResourceCells.PROFILE_ID, profileId);
-                                dataMap.put(ResourceCells.PROFILE_TYPE, event.get(ResourceCells.PROFILE_TYPE));
-                                dataMap.put("cda_document_id", item.getCdaDocumentId());
-                                dataMap.put("cda_code", item.getCdaCode());
-                                dataMap.put("pc_template", item.getPcUrl());
-                                dataMap.put("mobile_template", item.getMobileUrl());
-                                dataMap.put("template_id", item.getId());
-                                dataMap.put("name", item.getTitle());
-                                dataMap.put("mark", "02");
-                                prescription.add(dataMap);
-                            }
+                    } else if  (item.getTitle().contains("中药")) { //中西药特殊处理
+                        String subQ = "{\"q\":\"rowkey:" + profileId + "$HDSD00_83$*\"}";
+                        Envelop subEnvelop = resource.getSubData(subQ, 1, 1, null);
+                        if (subEnvelop.getDetailModelList() != null && subEnvelop.getDetailModelList().size() > 0) {
+                            Map<String, Object> dataMap = new HashMap<>();
+                            dataMap.put(ResourceCells.PROFILE_ID, profileId);
+                            dataMap.put(ResourceCells.PROFILE_TYPE, event.get(ResourceCells.PROFILE_TYPE));
+                            dataMap.put("cda_document_id", item.getCdaDocumentId());
+                            dataMap.put("cda_code", item.getCdaCode());
+                            dataMap.put("pc_template", item.getPcUrl());
+                            dataMap.put("mobile_template", item.getMobileUrl());
+                            dataMap.put("template_id", item.getId());
+                            dataMap.put("name", item.getTitle());
+                            dataMap.put("mark", "01");
+                            prescription.add(dataMap);
+                        }
+                        continue;
+                    } else if (item.getTitle().contains("西药")) { //中西药特殊处理
+                        String subQ = "{\"q\":\"rowkey:" + profileId + "$HDSD00_84$*\"}";
+                        Envelop subEnvelop = resource.getSubData(subQ, 1, 1, null);
+                        if (subEnvelop.getDetailModelList() != null && subEnvelop.getDetailModelList().size() > 0) {
+                            Map<String, Object> dataMap = new HashMap<>();
+                            dataMap.put(ResourceCells.PROFILE_ID, profileId);
+                            dataMap.put(ResourceCells.PROFILE_TYPE, event.get(ResourceCells.PROFILE_TYPE));
+                            dataMap.put("cda_document_id", item.getCdaDocumentId());
+                            dataMap.put("cda_code", item.getCdaCode());
+                            dataMap.put("pc_template", item.getPcUrl());
+                            dataMap.put("mobile_template", item.getMobileUrl());
+                            dataMap.put("template_id", item.getId());
+                            dataMap.put("name", item.getTitle());
+                            dataMap.put("mark", "02");
+                            prescription.add(dataMap);
                         }
                         continue;
                     } else {

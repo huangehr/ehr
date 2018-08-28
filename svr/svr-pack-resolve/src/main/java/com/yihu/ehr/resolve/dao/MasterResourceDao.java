@@ -1,10 +1,17 @@
 package com.yihu.ehr.resolve.dao;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.yihu.ehr.profile.EventType;
 import com.yihu.ehr.hbase.HBaseDao;
 import com.yihu.ehr.hbase.TableBundle;
+import com.yihu.ehr.profile.core.ResourceCore;
 import com.yihu.ehr.profile.exception.IllegalJsonFileException;
 import com.yihu.ehr.profile.family.ResourceCells;
+import com.yihu.ehr.resolve.model.stage1.FilePackage;
+import com.yihu.ehr.resolve.model.stage1.LinkPackage;
 import com.yihu.ehr.resolve.model.stage1.OriginalPackage;
 import com.yihu.ehr.resolve.model.stage2.MasterRecord;
 import com.yihu.ehr.resolve.model.stage2.ResourceBucket;
@@ -28,6 +35,15 @@ public class MasterResourceDao {
     private HBaseDao hbaseDao;
 
     public void saveOrUpdate(ResourceBucket resourceBucket, OriginalPackage originalPackage) throws Exception {
+        //如果是非结构化档案, 或者是 影像档案, 通过rowkey 判断结构化档案 是否有数据
+        if(originalPackage instanceof FilePackage || originalPackage instanceof LinkPackage){
+            String profileId = originalPackage.getProfileId().toString();
+            String rowkey = profileId.substring(2,profileId.length());
+            Map<String, String> originResult = hbaseDao.get(ResourceCore.MasterTable, rowkey, resourceBucket.getdFamily());
+            /*if (!originResult.isEmpty()) {
+                throw new IllegalJsonFileException("Please upload the struct package(" + rowkey + ") first !");
+            }*/
+        }
         String rowKey = resourceBucket.getId();
         TableBundle bundle = new TableBundle();
         if (originalPackage.isReUploadFlg()) { //补传处理
@@ -39,6 +55,7 @@ public class MasterResourceDao {
                 bundle.addValues(rowKey, resourceBucket.getdFamily(), originResult);
                 hbaseDao.save(resourceBucket.getMaster(), bundle);
                 Map<String, String> basicResult = hbaseDao.get(resourceBucket.getMaster(), rowKey, resourceBucket.getBasicFamily());
+                updateFile(resourceBucket,originalPackage,basicResult);
                 if (StringUtils.isNotEmpty(basicResult.get(ResourceCells.EVENT_TYPE))) {
                     EventType eventType = EventType.create(basicResult.get(ResourceCells.EVENT_TYPE));
                     originalPackage.setEventType(eventType);
@@ -68,5 +85,39 @@ public class MasterResourceDao {
             );
             hbaseDao.save(resourceBucket.getMaster(), bundle);
         }
+    }
+
+    /**
+     * 此处方法主要是非结构化档案补传,文件的更新
+     * @param resourceBucket
+     * @param originalPackage
+     * @param basicResult
+     */
+    private void updateFile(ResourceBucket resourceBucket, OriginalPackage originalPackage,Map<String, String> basicResult){
+        if(originalPackage instanceof FilePackage){
+            String file_list = basicResult.get("file_list");
+            JsonArray oldFileArray = new JsonParser().parse(file_list).getAsJsonArray();
+            JsonArray newFileArray = new JsonArray();
+            newFileArray.addAll(oldFileArray);
+            //新上报的数据
+            String file_list1 = resourceBucket.getBasicRecord("file_list");
+            JsonArray waitAddFileArray = new JsonParser().parse(file_list1).getAsJsonArray();
+
+            for(JsonElement waitAdd :waitAddFileArray){
+                String cdaId = ((JsonObject) waitAdd).get("cda_document_id").getAsString();
+                for(JsonElement oldFile :oldFileArray){
+                    String oldCdaId = ((JsonObject) oldFile).get("cda_document_id").getAsString();
+                    if(cdaId.equalsIgnoreCase(oldCdaId)){
+                        newFileArray.remove(oldFile);
+                    }
+                }
+            }
+            newFileArray.addAll(waitAddFileArray);
+            basicResult.put("file_list",newFileArray.toString());
+            TableBundle bundle = new TableBundle();
+            bundle.addValues(resourceBucket.getId(), resourceBucket.getBasicFamily(), basicResult);
+            hbaseDao.save(resourceBucket.getMaster(), bundle);
+        }
+
     }
 }
