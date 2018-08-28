@@ -59,6 +59,7 @@ public class FilePackageResolver extends PackageResolver {
         String eventDate = root.get("event_time") == null ? "" : root.get("event_time").asText();
         String createDate = root.get("create_date") == null ? "" : root.get("create_date").asText();
         String cdaVersion = root.get("inner_version") == null ? "" : root.get("inner_version").asText();
+        Boolean reUploadFlg = root.get("reUploadFlg") == null ? false : root.get("reUploadFlg").asBoolean();
 
         //验证档案基础数据的完整性，当其中某字段为空的情况下直接提示档案包信息缺失。
         StringBuilder errorMsg = new StringBuilder();
@@ -80,6 +81,7 @@ public class FilePackageResolver extends PackageResolver {
         if (!StringUtils.isEmpty(errorMsg.toString())){
             throw new IllegalJsonDataException(errorMsg.toString());
         }
+        filePackage.setReUploadFlg(reUploadFlg);
         filePackage.setPatientId(patientId);
         filePackage.setEventNo(eventNo);
         if (eventType != -1) {
@@ -90,8 +92,9 @@ public class FilePackageResolver extends PackageResolver {
         filePackage.setCreateDate(DateUtil.strToDate(createDate));
         filePackage.setEventTime(DateUtil.strToDate(eventDate));
         filePackage.setDemographicId(demographicId);
-
-        parseDataSets(filePackage, (ObjectNode) root.get("data_sets"));
+        if(root.get("data_sets") != null){
+            parseDataSets(filePackage, (ObjectNode) root.get("data_sets"));
+        }
         parseFiles(filePackage, (ArrayNode) root.get("files"), documents.getParent() + File.separator + "documents");
     }
 
@@ -118,7 +121,6 @@ public class FilePackageResolver extends PackageResolver {
                 Iterator<Map.Entry<String, JsonNode>> filedIterator = jsonRecord.fields();
                 while (filedIterator.hasNext()) {
                     Map.Entry<String, JsonNode> field = filedIterator.next();
-                    //String metaData = translateMetaDataCode(profile.getCdaVersion(), dataSetCode, field.getKey());
                     String value = field.getValue().asText().equals("null") ? "" : field.getValue().asText();
                     if (field.getKey() != null) {
                         record.putMetaData(field.getKey(), value);

@@ -34,6 +34,7 @@
         <module>../svr/svr-log-collection</module>
         <module>../svr/svr-pack-event</module>
         <module>../svr-manager</module>
+        <module>../svr/svr-report</module>
     </modules>
 
     <build>
