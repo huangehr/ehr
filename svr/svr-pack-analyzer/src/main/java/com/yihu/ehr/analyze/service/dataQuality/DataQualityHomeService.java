@@ -180,6 +180,10 @@ public class DataQualityHomeService extends BaseJpaService {
         DqPaltformReceiveWarning warning = dqPaltformReceiveWarningDao.findByOrgCode(defaultOrgCode);
 
         int totalHospitalNum = 0;//医院总就诊数
+        double hospitalOutpatientNum = 0;//总门诊数
+        double hospitalExamNum = 0;//总体检数
+        double hospitalInpatientNum = 0;//总住院数
+
         double totalOutpatientNum = 0;//总门诊数
         double totalExamNum = 0;//总体检数
         double totalInpatientNum = 0;//总住院数
@@ -192,6 +196,9 @@ public class DataQualityHomeService extends BaseJpaService {
         Map<String, Object> hospitalDataMap = (Map<String, Object>) envelop.getDetailModelList().get(0);
         //医院总数据量
         totalHospitalNum = (int) hospitalDataMap.get("total");
+        hospitalOutpatientNum = (int) hospitalDataMap.get("oupatient");
+        hospitalInpatientNum = (int) hospitalDataMap.get("inpatient");
+        hospitalExamNum = (int) hospitalDataMap.get("physical");
         Map<String, Object> dataMap = new HashMap<>();
         //2. 平台就诊完整数
         getPatientCount("receive_date",start, end, null, dataMap);
@@ -218,9 +225,9 @@ public class DataQualityHomeService extends BaseJpaService {
         totalMap.put("completeRate", calRate(totalVisitNum, totalHospitalNum));//完整率
         totalMap.put("correctRate", calRate(totalCorrect, dataSetsMun));//数据集准确率
 
-        Map<String, Object> outPatientMap = genVisitMap("outPatient", totalOutpatientNum, totalVisitNum);
-        Map<String, Object> inPatientMap = genVisitMap("inPatient", totalInpatientNum, totalVisitNum);
-        Map<String, Object> examPatientMap = genVisitMap("exam", totalExamNum, totalVisitNum);
+        Map<String, Object> outPatientMap = genVisitMap("outPatient", hospitalOutpatientNum, totalHospitalNum);
+        Map<String, Object> inPatientMap = genVisitMap("inPatient", hospitalInpatientNum, totalHospitalNum);
+        Map<String, Object> examPatientMap = genVisitMap("exam", hospitalExamNum, totalHospitalNum);
         archiveMapList.add(outPatientMap);
         archiveMapList.add(inPatientMap);
         archiveMapList.add(examPatientMap);

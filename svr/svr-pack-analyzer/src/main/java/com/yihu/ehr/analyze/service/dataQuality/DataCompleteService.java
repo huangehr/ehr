@@ -1,7 +1,6 @@
 package com.yihu.ehr.analyze.service.dataQuality;
 
 
-import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -22,8 +21,6 @@ import java.util.*;
 public class DataCompleteService extends DataQualityBaseService {
 
     private final static Logger logger = LoggerFactory.getLogger(DataCompleteService.class);
-    @Autowired
-    private ElasticSearchUtil elasticSearchUtil;
     @Value("${quality.orgCode}")
     private String defaultOrgCode;
     @Value("${quality.cloud}")
@@ -75,10 +72,10 @@ public class DataCompleteService extends DataQualityBaseService {
                 resMap.put("total", orgNum);
                 resMap.put("rate", rate);
                 totalNum += platPormNum;
+                list.add(resMap);
             } else {
                 totalHospitalNum = platPormNum;
             }
-            list.add(resMap);
         }
         //排序
         comparator(list);
@@ -124,10 +121,10 @@ public class DataCompleteService extends DataQualityBaseService {
                 resMap.put("total", orgNum);
                 resMap.put("rate", rate);
                 totalNum += platPormNum;
+                list.add(resMap);
             } else {
                 totalHospitalNum = platPormNum;
             }
-            list.add(resMap);
         }
 
         //排序
