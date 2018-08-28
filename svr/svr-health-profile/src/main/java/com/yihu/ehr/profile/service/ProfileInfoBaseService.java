@@ -8,6 +8,7 @@ import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.http.HttpResponse;
 import com.yihu.ehr.util.http.HttpUtils;
 import com.yihu.ehr.util.rest.Envelop;
+import com.yihu.ehr.util.validate.IdCardValidator;
 import org.hibernate.FlushMode;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -21,6 +22,8 @@ import java.util.*;
  */
 @Service
 public class ProfileInfoBaseService extends BaseJpaService {
+
+    private final IdCardValidator idCardValidator = new IdCardValidator();
 
     @Autowired
     private ResourceClient resource;
@@ -111,14 +114,20 @@ public class ProfileInfoBaseService extends BaseJpaService {
             }
             patientMap.put("weight", weight);
             List<String> labels = new ArrayList<>();
-            if (result.get(ResourceCells.DIAGNOSIS) != null && result.get(ResourceCells.DIAGNOSIS).toString().contains("Z37")) { //1 新生儿
-                labels.add("新生儿");
-                //出生身高
-                patientMap.put("height", result.get("EHR_001256") == null ? "" : result.get("EHR_001256"));
-                //出生体重
-                patientMap.put("weight", result.get("EHR_001257") == null ? "" : result.get("EHR_001257")); //单位(g)
-            } else if (result.get(ResourceCells.DIAGNOSIS) != null && result.get(ResourceCells.DIAGNOSIS).toString().contains("O80")) { //2 孕妇
-                labels.add("孕妇");
+            if (result.get(ResourceCells.DIAGNOSIS) != null) {
+                if (result.get(ResourceCells.DIAGNOSIS).toString().contains("Z37") || result.get(ResourceCells.DIAGNOSIS).toString().contains("O80")) {
+                    if (demographicId.length() == 18 && idCardValidator.is18Idcard(demographicId)) {
+                        labels.add("孕妇");
+                    } else if (demographicId.length() == 15 && idCardValidator.is15Idcard(demographicId)) {
+                        labels.add("孕妇");
+                    } else {
+                        labels.add("新生儿");
+                        //出生身高
+                        patientMap.put("height", result.get("EHR_001256") == null ? "" : result.get("EHR_001256"));
+                        //出生体重
+                        patientMap.put("weight", result.get("EHR_001257") == null ? "" : result.get("EHR_001257")); //单位(g)
+                    }
+                }
             } else if (profileDiseaseService.getHealthProblem(demographicId).size() > 0){
                 labels.add("慢病");
             }

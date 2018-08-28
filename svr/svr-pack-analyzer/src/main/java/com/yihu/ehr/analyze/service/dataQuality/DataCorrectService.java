@@ -83,7 +83,7 @@ public class DataCorrectService extends DataQualityBaseService {
         Map<String, Object> map = new HashMap<>();
         map.put("name", typeField);
         map.put("value", value);
-        map.put("rate", calRate(value,total));
+        map.put("rate", calDoubleRate(value,total));
         return map;
     }
 
@@ -145,7 +145,7 @@ public class DataCorrectService extends DataQualityBaseService {
             if (!resMap.isEmpty()) {
                 //总计
                 if (dataLevel ==0) {
-                    //TODO 默认写上饶市，后面需要修改
+                    // 默认上饶市，
                     resMap.put("", totalAreaCout);
                 } else {
                     resMap.put("", totalAreaCout);
@@ -228,14 +228,14 @@ public class DataCorrectService extends DataQualityBaseService {
             if (!resultList.isEmpty()) {
                 Map<String, Object> total = new HashMap<>();
                 if (dataLevel ==0) {
-                    //TODO 临时写死上饶市
+                    // 临时写死上饶市
                     total.put("name", "上饶市");
                     total.put("org_area", "");
                     total.put("", totalAreaCout);
                     total.put("count", totalAreaCout);
                 } else {
                     total.put("name", "全部机构");
-                    total.put("org_code", "-");
+                    total.put("org_code", "");
                     total.put("count", totalAreaCout);
                 }
                 resultList.add(0, total);
@@ -252,6 +252,8 @@ public class DataCorrectService extends DataQualityBaseService {
         String end = DateUtil.addDate(1, endDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
         Map<String,Object> resMap = null;
         List<Map<String,Object>> list = new ArrayList<>();
+        double totalNum = 0;//平台总数
+        double totalHospitalNum = 0;//医院总数
         //机构数据
         List<Map<String,Object>> groupList = getOrgDataMap(dataLevel,"create_date",startDate,end,null);
         //平台接收错误数据量
@@ -261,24 +263,37 @@ public class DataCorrectService extends DataQualityBaseService {
             resMap = new HashMap<String,Object>();
             String type = platformErrorGroup.get("type").toString();
             double platPormErrorNum = 0;
+            String code = "";
             if ("org_area".equals(type)) {
                 platPormErrorNum = getDoubleValue(platformErrorGroup.get(map.get("org_area")));
-                resMap.put("code",map.get("org_area"));
+                code = map.get("org_area").toString();
             }else {
                 platPormErrorNum = getDoubleValue(platformErrorGroup.get(map.get("org_code")));
-                resMap.put("code",map.get("org_code"));
+                code = map.get("org_code").toString();
             }
 
             double orgNum = getDoubleValue(map.get("count"));
             double platPormNum = orgNum - platPormErrorNum;
-            String rate = calRate(platPormNum,orgNum);
-            resMap.put("name",map.get("name"));
-            resMap.put("count",platPormErrorNum);
-            resMap.put("total",orgNum);
-            resMap.put("rate",rate);
+            double rate = calDoubleRate(platPormNum,orgNum);
+            if (!"".equals(code)) {
+                resMap.put("code", code);
+                resMap.put("name", map.get("name"));
+                resMap.put("count", platPormNum);
+                resMap.put("total", orgNum);
+                resMap.put("rate", rate);
+                totalNum += platPormNum;
+            } else {
+                totalHospitalNum = platPormNum;
+            }
             list.add(resMap);
         }
-
+        //排序
+        comparator(list);
+        //添加总计
+        if (totalHospitalNum !=0) {
+            Map<String, Object> totalMap = genTotalData("上饶市", totalNum, totalHospitalNum);
+            list.add(0, totalMap);
+        }
         return list;
     }
 
@@ -287,6 +302,8 @@ public class DataCorrectService extends DataQualityBaseService {
         String end = DateUtil.addDate(1, endDate,DateUtil.DEFAULT_DATE_YMD_FORMAT);
         Map<String,Object> resMap = null;
         List<Map<String,Object>> list = new ArrayList<>();
+        double totalNum = 0;//平台总数
+        double totalHospitalNum = 0;//医院总数
         //机构数据
         List<Map<String,Object>> groupList = getOrgDataMap(dataLevel,"create_date",startDate,end,areaCode);
         //平台接收数据量
@@ -296,22 +313,36 @@ public class DataCorrectService extends DataQualityBaseService {
             resMap = new HashMap<String,Object>();
             String type = platformDataGroup.get("type").toString();
             double platPormErrorNum = 0;
+            String code = "";
             if ("org_area".equals(type)) {
                 platPormErrorNum = getDoubleValue(platformDataGroup.get(map.get("org_area")));
-                resMap.put("code",map.get("org_area"));
+                code = map.get("org_area").toString();
             }else {
                 platPormErrorNum = getDoubleValue(platformDataGroup.get(map.get("org_code")));
-                resMap.put("code",map.get("org_code"));
+                code = map.get("org_code").toString();
             }
 
             double orgNum = getDoubleValue(map.get("count"));
             double platPormNum = orgNum - platPormErrorNum;
-            String rate = calRate(platPormNum,orgNum);
-            resMap.put("name",map.get("name"));
-            resMap.put("count",platPormNum);
-            resMap.put("total",orgNum);
-            resMap.put("rate",rate);
+            double rate = calDoubleRate(platPormNum,orgNum);
+            if (!"".equals(code)) {
+                resMap.put("code", code);
+                resMap.put("name", map.get("name"));
+                resMap.put("count", platPormNum);
+                resMap.put("total", orgNum);
+                resMap.put("rate", rate);
+                totalNum += platPormNum;
+            } else {
+                totalHospitalNum = platPormNum;
+            }
             list.add(resMap);
+        }
+        //排序
+        comparator(list);
+        //添加总计
+        if (totalHospitalNum !=0) {
+            Map<String, Object> totalMap = genTotalData("全部机构", totalNum, totalHospitalNum);
+            list.add(0, totalMap);
         }
         return list;
     }
