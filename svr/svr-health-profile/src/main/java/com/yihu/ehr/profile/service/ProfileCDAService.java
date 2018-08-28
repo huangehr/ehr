@@ -146,7 +146,7 @@ public class ProfileCDAService extends ProfileBasicService {
                                 dataMap.put("pc_template", item.getPcUrl());
                                 dataMap.put("mobile_template", item.getMobileUrl());
                                 dataMap.put("template_id", item.getId());
-                                dataMap.put("name", "中药处方");
+                                dataMap.put("name", item.getTitle());
                                 dataMap.put("mark", "01");
                                 prescription.add(dataMap);
                             }
@@ -162,7 +162,7 @@ public class ProfileCDAService extends ProfileBasicService {
                                 dataMap.put("pc_template", item.getPcUrl());
                                 dataMap.put("mobile_template", item.getMobileUrl());
                                 dataMap.put("template_id", item.getId());
-                                dataMap.put("name", "西药处方");
+                                dataMap.put("name", item.getTitle());
                                 dataMap.put("mark", "02");
                                 prescription.add(dataMap);
                             }
