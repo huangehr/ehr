@@ -149,8 +149,9 @@ public class DataInTimeService extends DataQualityBaseService {
     public List<Map<String, Object>> getAreaDataQuality(Integer dataLevel,String startDate, String endDate) throws Exception {
         String end = DateUtil.addDate(1, endDate, DateUtil.DEFAULT_DATE_YMD_FORMAT);
         Map<String, Object> resMap = null;
-        Map<String, Object> totalMap = new HashMap<>();
         List<Map<String, Object>> list = new ArrayList<>();
+        double totalNum = 0;//平台总数
+        double totalHospitalNum = 0;//医院总数
         //机构数据
         List<Map<String, Object>> groupList = dataCorrectService.getOrgDataMap(dataLevel,"create_date", startDate, end, null);
         //平台接收数据量
@@ -170,24 +171,22 @@ public class DataInTimeService extends DataQualityBaseService {
             }
             double orgNum = getDoubleValue(map.get("count"));
             double rate = calDoubleRate(platPormNum, orgNum);
-            if ("".equals(code)) {
-                totalMap.put("code",code);
-                totalMap.put("name", map.get("name"));
-                totalMap.put("count", platPormNum + "%");
-                totalMap.put("total", orgNum);
-                totalMap.put("rate", rate);
-            } else {
-                resMap.put("code",code);
+            if (!"".equals(code)) {
+                resMap.put("code", code);
                 resMap.put("name", map.get("name"));
                 resMap.put("count", platPormNum);
                 resMap.put("total", orgNum);
                 resMap.put("rate", rate);
+                totalNum += platPormNum;
+            } else {
+                totalHospitalNum = platPormNum;
             }
             list.add(resMap);
         }
         //排序
         comparator(list);
         //添加总计
+        Map<String, Object> totalMap = genTotalData("上饶市",totalNum,totalHospitalNum);
         list.add(0,totalMap);
         return list;
     }
@@ -196,8 +195,9 @@ public class DataInTimeService extends DataQualityBaseService {
     public List<Map<String, Object>> getOrgDataQuality(Integer dataLevel,String areaCode, String startDate, String endDate) throws Exception {
         String end = DateUtil.addDate(1, endDate, DateUtil.DEFAULT_DATE_YMD_FORMAT);
         Map<String, Object> resMap = null;
-        Map<String, Object> totalMap = new HashMap<>();
         List<Map<String, Object>> list = new ArrayList<>();
+        double totalNum = 0;//平台总数
+        double totalHospitalNum = 0;//医院总数
         //机构数据
         List<Map<String, Object>> groupList = dataCorrectService.getOrgDataMap(dataLevel,"create_date", startDate, end, areaCode);
         //平台接收数据量
@@ -217,25 +217,22 @@ public class DataInTimeService extends DataQualityBaseService {
             }
             double orgNum = getDoubleValue(map.get("count"));
             double rate = calDoubleRate(platPormNum, orgNum);
-
-            if ("".equals(code)) {
-                totalMap.put("code",code);
-                totalMap.put("name", map.get("name"));
-                totalMap.put("count", platPormNum + "%");
-                totalMap.put("total", orgNum);
-                totalMap.put("rate", rate);
-            } else {
-                resMap.put("code",code);
+            if (!"".equals(code)) {
+                resMap.put("code", code);
                 resMap.put("name", map.get("name"));
                 resMap.put("count", platPormNum);
                 resMap.put("total", orgNum);
                 resMap.put("rate", rate);
+                totalNum += platPormNum;
+            } else {
+                totalHospitalNum = platPormNum;
             }
             list.add(resMap);
         }
         //排序
         comparator(list);
         //添加总计
+        Map<String, Object> totalMap = genTotalData("全部机构",totalNum,totalHospitalNum);
         list.add(0,totalMap);
         return list;
     }
