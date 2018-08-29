@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -369,19 +370,29 @@ public class DataQualityHomeService extends BaseJpaService {
      *  批量更新es中的区域编码org_area
      *  (通过机构编码org_code 更新org_area）
      */
-    public void bulkUpdateOrgArea(String index,String type){
-        List<Map<String, Object>> result = elasticSearchUtil.list(index, type, "");
-        List<Map<String, Object>> updateSourceList = new ArrayList<>();
+    public void bulkUpdateOrgArea(String index,String type,String filters){
+        long page = 0;
+        long count = elasticSearchUtil.count(index, type, filters);
+        if (count >10000) {
+            page = count/10000 + 1;
+        }else {
+            page = 1;
+        }
 
-        result.forEach(item -> {
-            Map<String, Object> updateSource = new HashMap<>();
-            updateSource.put("_id", item.get("_id"));
-            String orgCode = (String) item.get("org_code");
-            String orgArea = redisClient.get("organizations:" + orgCode + ":area");
-            updateSource.put("org_area", orgArea);
-            updateSourceList.add(updateSource);
-        });
-        elasticSearchUtil.bulkUpdate(index, type, updateSourceList);
+        for (int i = 1;i<=page;i++) {
+            Page<Map<String, Object>> result = elasticSearchUtil.page(index, type, "",i,10000);
+            List<Map<String, Object>> updateSourceList = new ArrayList<>();
+            result.forEach(item -> {
+                Map<String, Object> updateSource = new HashMap<>();
+                updateSource.put("_id", item.get("_id"));
+                String orgCode = (String) item.get("org_code");
+                String orgArea = redisClient.get("organizations:" + orgCode + ":area");
+                updateSource.put("org_area", orgArea);
+                updateSourceList.add(updateSource);
+            });
+            elasticSearchUtil.bulkUpdate(index, type, updateSourceList);
+        }
+
     }
 
 
