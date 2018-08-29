@@ -150,7 +150,7 @@ public class DataQualityHomeEndpoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = "bulkUpDateOrgArea", method = RequestMethod.GET)
     @ApiOperation(value = "批量更新机构关联的区域编码(通过org_code字段更新org_area字段")
-    public void bulkUploadOrgArea(
+    public String bulkUploadOrgArea(
             @ApiParam(name = "index", value = "索引")
             @RequestParam(value = "index", required = true) String index,
             @ApiParam(name = "type", value = "type")
@@ -158,7 +158,8 @@ public class DataQualityHomeEndpoint extends EnvelopRestEndPoint {
             @ApiParam(name = "filters", value = "es查询条件以“；”分割（示例：a=1;b=test）")
             @RequestParam(value = "filters", required = false) String filters
     ) throws Exception {
-        dataQualityHomeService.bulkUpdateOrgArea(index,type,filters);
+        long result = dataQualityHomeService.bulkUpdateOrgArea(index, type, filters);
+        return "本次更新总数："+result;
     }
 
 }

@@ -153,7 +153,7 @@ public class DataInTimeService extends DataQualityBaseService {
         //机构数据
         List<Map<String, Object>> groupList = dataCorrectService.getOrgDataMap(dataLevel,"create_date", startDate, end, null);
         //平台接收数据量
-        Map<String, Object> platformDataGroup = getInTimeMap(dataLevel,"receive_date", startDate, end, null);
+        Map<String, Object> platformDataGroup = getInTimeMap(dataLevel,"receive_date", startDate, endDate, null);
         // 计算
         for (Map<String, Object> map : groupList) {
             resMap = new HashMap<String, Object>();
@@ -201,7 +201,7 @@ public class DataInTimeService extends DataQualityBaseService {
         //机构数据
         List<Map<String, Object>> groupList = dataCorrectService.getOrgDataMap(dataLevel,"create_date", startDate, end, areaCode);
         //平台接收数据量
-        Map<String, Object> platformDataGroup = getInTimeMap(dataLevel,"receive_date", startDate, end, areaCode);
+        Map<String, Object> platformDataGroup = getInTimeMap(dataLevel,"receive_date", startDate, endDate, areaCode);
         // 计算
         for (Map<String, Object> map : groupList) {
             resMap = new HashMap<String, Object>();

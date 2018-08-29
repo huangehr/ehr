@@ -49,7 +49,7 @@ public class DataCompleteService extends DataQualityBaseService {
         //机构数据
         List<Map<String, Object>> groupList = dataCorrectService.getOrgDataMap(dataLevel, "create_date", startDate, end, null);
         //平台接收数据量
-        Map<String, Object> platformDataGroup = getPlatformDataGroup(dataLevel, "receive_date", startDate, end, null);
+        Map<String, Object> platformDataGroup = getPlatformDataGroup(dataLevel, "receive_date", startDate, endDate, null);
         // 计算
         for (Map<String, Object> map : groupList) {
             resMap = new HashMap<String, Object>();
@@ -97,7 +97,7 @@ public class DataCompleteService extends DataQualityBaseService {
         //机构数据
         List<Map<String, Object>> groupList = dataCorrectService.getOrgDataMap(dataLevel, "create_date", startDate, end, areaCode);
         //平台接收数据量
-        Map<String, Object> platformDataGroup = getPlatformDataGroup(dataLevel, "receive_date", startDate, end, areaCode);
+        Map<String, Object> platformDataGroup = getPlatformDataGroup(dataLevel, "receive_date", startDate, endDate, areaCode);
         // 计算
         for (Map<String, Object> map : groupList) {
             resMap = new HashMap<String, Object>();
@@ -165,17 +165,17 @@ public class DataCompleteService extends DataQualityBaseService {
             //添加标识，标识是机构数据
             resMap.put("type", "org_code");
             fields.add("org_code");
-            sql1 = "SELECT count(DISTINCT event_no) as count ,org_code FROM json_archives/info where pack_type=1 and analyze_status=3 and org_area='" + orgArea + "' and " +
+            sql1 = "SELECT count(DISTINCT event_no) as count ,org_code FROM json_archives/info where pack_type=1  and org_area='" + orgArea + "' and " +
                     dateField + ">='" + start + " 00:00:00' and " + dateField + "<='" + end + " 23:59:59' group by org_code";
         } else if (StringUtils.isEmpty(orgArea) && (dataLevel == 0 && StringUtils.isEmpty(orgArea))) {
             resMap.put("type", "org_area");
             fields.add("org_area");
-            sql1 = "SELECT count(DISTINCT event_no) as count ,org_area FROM json_archives/info  where pack_type=1 and analyze_status=3 and " +
+            sql1 = "SELECT count(DISTINCT event_no) as count ,org_area FROM json_archives/info  where pack_type=1  and " +
                     dateField + ">='" + start + " 00:00:00' and " + dateField + "<='" + end + " 23:59:59' group by org_area";
         } else if (StringUtils.isEmpty(orgArea) && (dataLevel == 1 && StringUtils.isEmpty(orgArea))) {
             resMap.put("type", "org_code");
             fields.add("org_code");
-            sql1 = "SELECT count(DISTINCT event_no) as count ,org_code FROM json_archives/info  where pack_type=1 and analyze_status=3 and " +
+            sql1 = "SELECT count(DISTINCT event_no) as count ,org_code FROM json_archives/info  where pack_type=1  and " +
                     dateField + ">='" + start + " 00:00:00' and " + dateField + "<='" + end + " 23:59:59' group by org_code";
         }
 

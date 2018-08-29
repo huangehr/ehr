@@ -370,7 +370,7 @@ public class DataQualityHomeService extends BaseJpaService {
      *  批量更新es中的区域编码org_area
      *  (通过机构编码org_code 更新org_area）
      */
-    public void bulkUpdateOrgArea(String index,String type,String filters){
+    public long bulkUpdateOrgArea(String index,String type,String filters){
         long page = 0;
         long count = elasticSearchUtil.count(index, type, filters);
         if (count >10000) {
@@ -380,7 +380,7 @@ public class DataQualityHomeService extends BaseJpaService {
         }
 
         for (int i = 1;i<=page;i++) {
-            Page<Map<String, Object>> result = elasticSearchUtil.page(index, type, "",i,10000);
+            Page<Map<String, Object>> result = elasticSearchUtil.page(index, type, filters, i, 10000);
             List<Map<String, Object>> updateSourceList = new ArrayList<>();
             result.forEach(item -> {
                 Map<String, Object> updateSource = new HashMap<>();
@@ -390,8 +390,11 @@ public class DataQualityHomeService extends BaseJpaService {
                 updateSource.put("org_area", orgArea);
                 updateSourceList.add(updateSource);
             });
-            elasticSearchUtil.bulkUpdate(index, type, updateSourceList);
+            if (!updateSourceList.isEmpty()) {
+                elasticSearchUtil.bulkUpdate(index, type, updateSourceList);
+            }
         }
+        return count;
 
     }
 
