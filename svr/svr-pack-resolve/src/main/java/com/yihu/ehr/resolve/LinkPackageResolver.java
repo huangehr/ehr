@@ -207,7 +207,6 @@ public class LinkPackageResolver extends PackageResolver {
                     _fileNames.add(fileName);
                     //ftp文件,待数据入库后,在删除
                     needDeleteFiles.put(path,_fileNames);
-                    ftpUtils.deleteFile(path, fileName);
                 }
             } finally {
                 if (ftpUtils != null){
