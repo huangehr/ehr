@@ -117,6 +117,17 @@ public class MasterResourceDao {
             TableBundle bundle = new TableBundle();
             bundle.addValues(resourceBucket.getId(), resourceBucket.getBasicFamily(), basicResult);
             hbaseDao.save(resourceBucket.getMaster(), bundle);
+        }else if (originalPackage instanceof LinkPackage){
+            String file_list = basicResult.get("file_list");
+            JsonArray oldFileArray = new JsonParser().parse(file_list).getAsJsonArray();
+            //新上报的数据
+            String file_list1 = resourceBucket.getBasicRecord("file_list");
+            JsonArray waitAddFileArray = new JsonParser().parse(file_list1).getAsJsonArray();
+            oldFileArray.addAll(waitAddFileArray);
+            basicResult.put("file_list",oldFileArray.toString());
+            TableBundle bundle = new TableBundle();
+            bundle.addValues(resourceBucket.getId(), resourceBucket.getBasicFamily(), basicResult);
+            hbaseDao.save(resourceBucket.getMaster(), bundle);
         }
 
     }
