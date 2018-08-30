@@ -58,4 +58,12 @@ public interface RsResourceStatisticsClient {
     @RequestMapping(value = ServiceApi.TJ.GetArchiveManCount, method = RequestMethod.GET)
     @ApiOperation(value = "健康档案的建档人数数量")
     Envelop getArchiveManCount();
+
+    @ApiOperation("根据条件到solr中获取记录数")
+    @RequestMapping(value = "/report/searchSolrByParam", method = RequestMethod.POST)
+    Envelop searchSolrByParam(
+            @RequestParam(value = "core") String core,
+            @RequestParam(value = "eventType") String eventType,
+            @RequestParam(value = "time", required = false) String time,
+            @RequestParam(value = "month", defaultValue = "0", required = false) Integer month);
 }

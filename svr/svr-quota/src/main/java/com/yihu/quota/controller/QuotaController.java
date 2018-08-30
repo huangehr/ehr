@@ -3,6 +3,8 @@ package com.yihu.quota.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
+import com.yihu.ehr.solr.SolrUtil;
+import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.quota.etl.model.EsConfig;
 import com.yihu.quota.model.jpa.TjQuota;
@@ -27,12 +29,10 @@ import org.apache.hadoop.hdfs.server.namenode.Quota;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URLDecoder;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 
@@ -55,6 +55,8 @@ public class QuotaController extends BaseController {
     private BaseStatistsService baseStatistsService;
     @Autowired
     private TjDataSaveService dataSaveService;
+    @Autowired
+    private SolrUtil solrUtil;
 
     private static final Logger log = LoggerFactory.getLogger(QuotaController.class);
     /**
@@ -260,6 +262,61 @@ public class QuotaController extends BaseController {
             invalidUserException(e, -1, "查询失败:" + e.getMessage());
         }
         envelop.setSuccessFlg(false);
+        return envelop;
+    }
+
+    @ApiOperation("根据条件到solr中获取记录数")
+    @RequestMapping(value = "/report/searchSolrByParam", method = RequestMethod.POST)
+    public Envelop searchSolrByParam(
+            @ApiParam(name = "core", value = "solr core名称")
+            @RequestParam(value = "core") String core,
+            @ApiParam(name = "eventType", value = "就诊类型")
+            @RequestParam(value = "eventType") String eventType,
+            @ApiParam(name = "time", value = "过滤时间")
+            @RequestParam(value = "time", required = false) String time,
+            @ApiParam(name = "month", value = "获取几个月数据", defaultValue = "0")
+            @RequestParam(value = "month", defaultValue = "0", required = false) Integer month) throws Exception {
+        Envelop envelop = new Envelop();
+        List<String> xDate = new ArrayList<>(); // x轴坐标
+        List<String> yDate = new ArrayList<>(); // x轴坐标对应的值
+        Map<String, String> map = new HashMap();
+        String q = "";
+        SimpleDateFormat dfs = new SimpleDateFormat("yyyy-MM-dd'T'23:59:59'Z'");
+        if (StringUtils.isEmpty(eventType)) {
+            q = "*:*";
+        } else {
+            q = "event_type:" + eventType;
+        }
+        if (StringUtils.isNotEmpty(time)) {
+            Date dateTime = DateUtil.strToDate(time);
+            Calendar calendar = new GregorianCalendar();
+            calendar.setTime(dateTime);
+            for (int i = 0; i < month; i++) {
+                calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMinimum(Calendar.DAY_OF_MONTH));
+                String startDate = DateUtil.utcToDate(calendar.getTime());
+                calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
+                String endDate = dfs.format(calendar.getTime());
+                StringBuffer sb = new StringBuffer();
+                if ("1".equals(eventType)) { // 就诊类型为住院
+                    sb.append("EHR_005130:[").append(startDate).append(" TO ").append(endDate).append("] AND event_date:[")
+                            .append(startDate).append(" TO ").append(endDate).append("]");
+                } else if ("0".equals(eventType) || "2".equals(eventType)) {  // 就诊类型为门急诊、体检
+                    sb.append("event_date:[").append(startDate).append(" TO ").append(endDate).append("]");
+                }
+                log.info(q);
+                log.info(sb.toString());
+                long count = solrUtil.count(core, q, sb.toString());
+                xDate.add(startDate.substring(0,7));
+                yDate.add(count == 0 ? "0" : count + "");
+                calendar.add(Calendar.MONTH, -1);
+            }
+            Collections.reverse(xDate);
+            Collections.reverse(yDate);
+            envelop.setSuccessFlg(true);
+            envelop.setObj(xDate);
+            envelop.setDetailModelList(yDate);
+        }
+
         return envelop;
     }
 
