@@ -118,4 +118,18 @@ public class RsResourceStatisticsController extends ExtendController {
         Envelop envelop = rsResourceStatisticsClient.getArchiveManCount();
         return envelop;
     }
+
+    @ApiOperation("根据条件到solr中获取记录数")
+    @RequestMapping(value = "/report/searchSolrByParam", method = RequestMethod.POST)
+    public Envelop searchSolrByParam(
+            @ApiParam(name = "core", value = "solr core名称")
+            @RequestParam(value = "core") String core,
+            @ApiParam(name = "eventType", value = "solr的查询条件")
+            @RequestParam(value = "eventType") String eventType,
+            @ApiParam(name = "time", value = "过滤时间")
+            @RequestParam(value = "time", required = false) String time,
+            @ApiParam(name = "month", value = "获取几个月数据", defaultValue = "0")
+            @RequestParam(value = "month", defaultValue = "0", required = false) Integer month) {
+        return rsResourceStatisticsClient.searchSolrByParam(core, eventType, time, month);
+    }
 }
