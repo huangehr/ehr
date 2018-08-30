@@ -74,6 +74,7 @@ public class LinkPackageResolver extends PackageResolver {
         String visitType = jsonNode.get("visit_type") == null? "" : jsonNode.get("visit_type").asText();
         String eventDate = jsonNode.get("event_time") == null ? "" : jsonNode.get("event_time").asText();
         String expireDate = jsonNode.get("expire_date") == null? "" : jsonNode.get("expire_date").asText();
+        Boolean reUploadFlg = jsonNode.get("reUploadFlg") == null ? false : jsonNode.get("reUploadFlg").asBoolean();
 
         //验证档案基础数据的完整性，当其中某字段为空的情况下直接提示档案包信息缺失。
         StringBuilder errorMsg = new StringBuilder();
@@ -106,6 +107,7 @@ public class LinkPackageResolver extends PackageResolver {
         linkPackage.setEventTime(DateUtil.strToDate(eventDate));
         linkPackage.setVisitType(visitType);
         linkPackage.setExpireDate(DateUtil.strToDate(expireDate));
+        linkPackage.setReUploadFlg(reUploadFlg);
         // dataset节点，存储数据集URL
         JsonNode dataSetNode = jsonNode.get("dataset");
         Iterator<String> fieldNames = dataSetNode.fieldNames();
@@ -205,7 +207,6 @@ public class LinkPackageResolver extends PackageResolver {
                     _fileNames.add(fileName);
                     //ftp文件,待数据入库后,在删除
                     needDeleteFiles.put(path,_fileNames);
-                    ftpUtils.deleteFile(path, fileName);
                 }
             } finally {
                 if (ftpUtils != null){

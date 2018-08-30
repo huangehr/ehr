@@ -98,12 +98,15 @@ public class PackQcReportService extends BaseJpaService {
         List<Map<String, Object>> res = elasticSearchUtil.list("qc","daily_report", boolQueryBuilder);
         if(res!=null && res.size()>0){
             for(Map<String,Object> report : res){
-                total+=Integer.parseInt(report.get("HSI07_01_001").toString());
+//                total+=Integer.parseInt(report.get("HSI07_01_001").toString());
                 inpatient+=Integer.parseInt(report.get("HSI07_01_012").toString());
                 oupatient+=Integer.parseInt(report.get("HSI07_01_002").toString());
                 physical+=Integer.parseInt(report.get("HSI07_01_004").toString());
             }
         }
+        total +=inpatient;
+        total +=oupatient;
+        total +=physical;
         resMap.put("total",total);
         resMap.put("inpatient",inpatient);
         resMap.put("oupatient",oupatient);
