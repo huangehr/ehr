@@ -487,7 +487,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value = ServiceApi.Packages.Status, method = RequestMethod.PUT)
-    @ApiOperation(value = "根据条件批量修改档案包解析状态", notes = "根据条件批量修改档案包解析状态")
+    @ApiOperation(value = "根据条件批量修改档案包为待入库状态", notes = "根据条件批量修改档案包为待入库状态")
     public long bulkUpdate(String filters){
         long count = elasticSearchUtil.count(INDEX, TYPE, filters);
         Page<Map<String, Object>> result = elasticSearchUtil.page(INDEX, TYPE, filters, 1, 10000);

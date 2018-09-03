@@ -488,7 +488,7 @@ public class ServiceApi {
         public static final String Resolve = "/packages/resolve/{id}";
         public static final String Analyzes = "/packages/analyze";
         public static final String Resolves = "/packages/resolve";
-        public static final String Status = "/packages/Status";
+        public static final String Status = "/packages/status";
         public static final String Search = "/packages/search";
         public static final String Download = "/packages/download/{id}";
         public static final String PackageCrypto = "/packages/crypto";
