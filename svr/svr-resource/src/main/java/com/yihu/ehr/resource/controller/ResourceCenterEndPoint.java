@@ -916,14 +916,14 @@ public class ResourceCenterEndPoint extends EnvelopRestEndPoint {
     public Envelop visualization() throws Exception {
         List<Map<String, Object>> resultList = new ArrayList<>();
         //已配置视图
-        List<Object[]> list1 = resourceCenterService.findAppFeatureIdAndNameByAppIdAndCode("Resource_ResourceManage_Initial", "zkGuSIm2Fg");
+        List<Object[]> list1 = resourceCenterService.findAppFeatureIdAndNameByAppIdAndCode("Resource_ResourceManage_Initial", "R1yHNdX5Ud");
         if (list1.size() > 0) {
             Map<String, Object> dataMap1 = new LinkedHashMap<>();
             Object [] data = list1.get(0);
             Integer id = (Integer) data[0];
             String name = (String) data[1];
             dataMap1.put("label", "已配置视图");
-            dataMap1.put("appId", "zkGuSIm2Fg");
+            dataMap1.put("appId", "R1yHNdX5Ud");
             dataMap1.put("name", name);
             dataMap1.put("menuId", id);
             BigInteger total = resourceCenterService.getTotalViewCount(null);
@@ -968,14 +968,14 @@ public class ResourceCenterEndPoint extends EnvelopRestEndPoint {
             resultList.add(dataMap1);
         }
         //已配置资源报表
-        List<Object[]> list2 = resourceCenterService.findAppFeatureIdAndNameByAppIdAndCode("Ehr_Resource_Report_Index", "zkGuSIm2Fg");
+        List<Object[]> list2 = resourceCenterService.findAppFeatureIdAndNameByAppIdAndCode("Ehr_Resource_Report_Index", "R1yHNdX5Ud");
         if (list2.size() > 0) {
             Map<String, Object> dataMap1 = new LinkedHashMap<>();
             Object [] data = list2.get(0);
             Integer id = (Integer) data[0];
             String name = (String) data[1];
             dataMap1.put("label", "已配置资源报表");
-            dataMap1.put("appId", "zkGuSIm2Fg");
+            dataMap1.put("appId", "R1yHNdX5Ud");
             dataMap1.put("name", name);
             dataMap1.put("menuId", id);
             BigInteger total = resourceCenterService.getTotalReportCount();
@@ -1005,14 +1005,14 @@ public class ResourceCenterEndPoint extends EnvelopRestEndPoint {
     public Envelop dataAnalysis() throws Exception {
         List<Map<String, Object>> resultList = new ArrayList<>();
         //已注册指标
-        List<Object[]> list1 = resourceCenterService.findAppFeatureIdAndNameByAppIdAndCode("Ehr_Zhibiao_Initial", "zkGuSIm2Fg");
+        List<Object[]> list1 = resourceCenterService.findAppFeatureIdAndNameByAppIdAndCode("Ehr_Zhibiao_Initial", "R1yHNdX5Ud");
         if (list1.size() > 0) {
             Map<String, Object> dataMap1 = new LinkedHashMap<>();
             Object [] data = list1.get(0);
             Integer id = (Integer) data[0];
             String name = (String) data[1];
             dataMap1.put("label", "已注册指标");
-            dataMap1.put("appId", "zkGuSIm2Fg");
+            dataMap1.put("appId", "R1yHNdX5Ud");
             dataMap1.put("name", name);
             dataMap1.put("menuId", id);
             BigInteger total = resourceCenterService.getTotalQuotaCount();
