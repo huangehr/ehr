@@ -128,7 +128,8 @@ public class ProfileInfoBaseService extends BaseJpaService {
                         patientMap.put("weight", result.get("EHR_001257") == null ? "" : result.get("EHR_001257")); //单位(g)
                     }
                 }
-            } else if (profileDiseaseService.getHealthProblem(demographicId).size() > 0){
+            }
+            if (profileDiseaseService.getHealthProblem(demographicId).size() > 0){
                 labels.add("慢病");
             }
             Map<String, Object> params = new HashMap<>();

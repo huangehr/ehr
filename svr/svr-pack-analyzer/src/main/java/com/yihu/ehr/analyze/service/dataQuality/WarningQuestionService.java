@@ -73,7 +73,7 @@ public class WarningQuestionService extends BaseJpaService {
     public void receive(String dateStr){
         Session session = currentSession();
         //0.获取医院数据
-        Query query1 = session.createSQLQuery("SELECT org_code,full_name from organizations where org_type = 'Hospital'");
+        Query query1 = session.createSQLQuery("SELECT org_code,full_name from organizations");
         List<Object[]> orgList = query1.list();
         Map<String, String> orgMap = new HashedMap(orgList.size());
         orgList.forEach(one->{
