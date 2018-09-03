@@ -298,7 +298,7 @@ public class QuotaController extends BaseController {
                 String endDate = dfs.format(calendar.getTime());
                 StringBuffer sb = new StringBuffer();
                 if ("1".equals(eventType)) { // 就诊类型为住院
-                    sb.append("EHR_005130:[").append(startDate).append(" TO ").append(endDate).append("] AND event_date:[")
+                    sb.append("EHR_005130:[").append(startDate).append(" TO ").append(endDate).append("] OR event_date:[")
                             .append(startDate).append(" TO ").append(endDate).append("]");
                 } else if ("0".equals(eventType) || "2".equals(eventType)) {  // 就诊类型为门急诊、体检
                     sb.append("event_date:[").append(startDate).append(" TO ").append(endDate).append("]");
