@@ -487,8 +487,23 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value = ServiceApi.Packages.Status, method = RequestMethod.PUT)
-    @ApiOperation(value = "根据条件批量修改档案包为待入库状态", notes = "根据条件批量修改档案包为待入库状态")
-    public long bulkUpdate(String filters){
+    @ApiOperation(value = "将接收时间为某段时间的结构化档案,状态更改为待解析", notes = "将接收时间为某段时间的结构化档案")
+    public long bulkUpdate(@ApiParam(name = "startDate", value = "开始时间（eg：2017-01-01 00:00:00）", required = false )
+                           @RequestParam(value = "startDate") String startDate,
+                           @ApiParam(name = "endDate", value = "结束时间（eg：2017-01-01 00:00:00）", required = false )
+                           @RequestParam(value = "endDate") String endDate,
+                           @ApiParam(name = "orgCode", value = "机构编码", required = false )
+                           @RequestParam(value = "orgCode") String orgCode){
+        String filters = "archive_status<>0;";
+        if(StringUtils.isNotBlank(startDate)){
+            filters+="receive_date>="+startDate+";";
+        }
+        if(StringUtils.isNotBlank(endDate)){
+            filters+="receive_date<="+endDate+";";
+        }
+        if(StringUtils.isNotBlank(orgCode)){
+            filters += "org_code="+orgCode+";";
+        }
         long count = elasticSearchUtil.count(INDEX, TYPE, filters);
         Page<Map<String, Object>> result = elasticSearchUtil.page(INDEX, TYPE, filters, 1, 10000);
         while (CollectionUtils.isNotEmpty(result.getContent())) {
@@ -505,6 +520,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             if (!updateSourceList.isEmpty()) {
                 elasticSearchUtil.bulkUpdate(INDEX, TYPE, updateSourceList);
             }
+            result = elasticSearchUtil.page(INDEX, TYPE, filters, 1, 10000);
         }
         return count;
     }
