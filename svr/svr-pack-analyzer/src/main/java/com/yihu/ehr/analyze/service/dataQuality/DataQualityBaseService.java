@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.sql.ResultSet;
 import java.util.*;
 
 /**
@@ -70,20 +71,36 @@ public abstract class DataQualityBaseService extends BaseJpaService {
     }
 
     /**
-     * 通过map中的rate字段降序排列
+     * 通过map中的rate字段降序排列，并添加% 号
      * @param list
      */
-    public void comparator(List<Map<String, Object>> list ){
-        Collections.sort(list, new Comparator<Map<String, Object>>() {
-            public int compare(Map<String, Object> o1, Map<String, Object> o2) {
-                return getDoubleValue(o2.get("rate")).compareTo(getDoubleValue(o1.get("rate")));
-            }
-        });
+    public void rateComparator(List<Map<String, Object>> list ){
+        comparator(list,"rate",1);
         list.forEach(map->{
             map.put("rate",map.get("rate") + "%");
         });
     }
 
+    /**
+     * 根据map中的字段排序
+     * @param list           map集合
+     * @param orderField    排序字段
+     * @param order          排序顺序  0：正序，1：降序
+     */
+    public void comparator(List<Map<String, Object>> list ,String orderField,int order){
+        Collections.sort(list, new Comparator<Map<String, Object>>() {
+            public int compare(Map<String, Object> o1, Map<String, Object> o2) {
+                if (order==0) {
+                    return getDoubleValue(o1.get(orderField)).compareTo(getDoubleValue(o2.get(orderField)));
+                }else if (order==1) {
+                    return getDoubleValue(o2.get(orderField)).compareTo(getDoubleValue(o1.get(orderField)));
+                }else {
+                    return 0;
+                }
+            }
+        });
+
+    }
 
     /**
      * 百分比计算（不带单位）
@@ -171,6 +188,62 @@ public abstract class DataQualityBaseService extends BaseJpaService {
             resMap.put("oupatient_total",0);
             return resMap;
         }
+    }
+
+    /**
+     * 获取有数据的医院
+     * @param dateField  过滤时间字段
+     * @param start       起始时间
+     * @param end          截止时间
+     * @return
+     */
+    public List<String> hasDataHospital(String dateField,String start,String end){
+        //统计有数据的医院code
+        String sqlOrg = "";
+        List<String> list = new ArrayList<>();
+         sqlOrg = "SELECT org_code FROM json_archives/info where "+ dateField +">= '" + start + " 00:00:00' AND "+dateField+"<='" + end + " 23:59:59' group by org_code ";
+        try {
+            ResultSet resultSetOrg = elasticSearchUtil.findBySql(sqlOrg);
+            while (resultSetOrg.next()) {
+                String orgCode = resultSetOrg.getString("org_code");
+                if (StringUtils.isNotEmpty(orgCode)) {
+                    list.add(orgCode);
+                }
+            }
+        } catch (Exception e) {
+            if (!"Error".equals(e.getMessage())) {
+                e.printStackTrace();
+            }
+        }
+        return list;
+    }
+
+    /**
+     * 获取有数据的区县
+     * @param dateField
+     * @param start
+     * @param end
+     * @return
+     */
+    public List<String> hasDataArea(String dateField,String start,String end){
+        //统计有数据的区域code
+        String sqlOrg = "";
+        List<String> list = new ArrayList<>();
+        sqlOrg = "SELECT org_area FROM json_archives/info where "+ dateField +">= '" + start + " 00:00:00' AND "+dateField+"<='" + end + " 23:59:59' group by org_area ";
+        try {
+            ResultSet resultSetOrg = elasticSearchUtil.findBySql(sqlOrg);
+            while (resultSetOrg.next()) {
+                String orgCode = resultSetOrg.getString("org_code");
+                if (StringUtils.isNotEmpty(orgCode)) {
+                    list.add(orgCode);
+                }
+            }
+        } catch (Exception e) {
+            if (!"Error".equals(e.getMessage())) {
+                e.printStackTrace();
+            }
+        }
+        return list;
     }
 
 }

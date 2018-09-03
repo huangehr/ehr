@@ -49,12 +49,9 @@ public class DataQualityHomeService extends BaseJpaService {
     @Autowired
     private RedisClient redisClient;
     @Autowired
-    private DataCompleteService dataCompleteService;
-    @Autowired
     private ApplicationContext context;
 
     private Map<DqDataType, DataQualityBaseService> dqBaseServiceMap;
-
     @PostConstruct
     private void init() {
         dqBaseServiceMap = new HashMap<>();
@@ -177,9 +174,6 @@ public class DataQualityHomeService extends BaseJpaService {
             end = dateStr;
         }
 
-        //初始化 及时率预警信息
-        DqPaltformReceiveWarning warning = dqPaltformReceiveWarningDao.findByOrgCode(defaultOrgCode);
-
         int totalHospitalNum = 0;//医院总就诊数
         double hospitalOutpatientNum = 0;//总门诊数
         double hospitalExamNum = 0;//总体检数
@@ -208,10 +202,10 @@ public class DataQualityHomeService extends BaseJpaService {
         totalExamNum = Double.valueOf(dataMap.get("peIntegrity").toString());//体检完整数
         totalVisitNum = Double.valueOf(dataMap.get("visitIntegrity").toString());//就诊完整数
         //3. 及时数
-        totalInTime = getInTimeNum("receive_date" ,start, end, warning);
-        // 3. 准确数
+        totalInTime = getInTimeNum("receive_date" ,start, end);
+        // 3. 去重准确数
         totalCorrect = getErrorDataSetData("receive_date",start, end, null);
-        //4. 数据集总条数
+        //4. 数据集总量
         int dataSetsMun = getDataSetsMap(start, end, null);
 
         totalMap.put("orgCode", cloud);//机构code
@@ -292,7 +286,7 @@ public class DataQualityHomeService extends BaseJpaService {
      * @return
      */
     public int getDataSetsMap(String start, String end, String orgCode) throws IOException {
-        // TODO 数据集总量
+        //  数据集总量
         int totalNum = 0;
         String dateStr = DateUtil.toString(new Date());
         if (StringUtils.isBlank(start)) {
@@ -310,48 +304,50 @@ public class DataQualityHomeService extends BaseJpaService {
         List<Map<String, Object>> dataSets = elasticSearchUtil.list("json_archives_qc", "qc_dataset_detail", stringBuilder1.toString());
         for (Map<String, Object> dataSet : dataSets) {
             for (Map.Entry<String, Object> entry : dataSet.entrySet()) {
-                totalNum += (Integer) dataSet.get("row");
+                totalNum += (Integer) dataSet.get("count");
             }
         }
         return totalNum;
     }
 
     /**
-     *  获取及时上传数
+     *  获取所有及时上传数
      * @param dateField  时间区间查询字段
      * @param start
      * @param end
-     * @param warning  预警信息
      * @return
      */
-    public double getInTimeNum(String dateField,String start, String end, DqPaltformReceiveWarning warning) {
+    public double getInTimeNum(String dateField,String start, String end) {
         double totalInTime = 0;
-        //及时率
-        try {
+        Map<String, Object> resMap = new HashMap<>();
+        DataQualityBaseService dataQualityBaseService = getInstance(DqDataType.create(1));
+        //获取有数据的医院code列表
+        List<String> orgList = dataQualityBaseService.hasDataHospital(dateField, start, end);
+        for (String orgCode : orgList) {
+            //初始化 及时率预警信息
+            DqPaltformReceiveWarning warning = dqPaltformReceiveWarningDao.findByOrgCode(orgCode);
+            if (warning == null) {
+                warning = dqPaltformReceiveWarningDao.findByOrgCode(defaultOrgCode);
+            }
             long starttime = System.currentTimeMillis();
-            String sql0 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=2 AND pack_type=1 AND " + dateField +
-                    " BETWEEN '" + start + " 00:00:00' AND '" + end + " 23:59:59' and delay <=" + warning.getPeInTime();
+            String sql0 = "";
+            List<String> fields = new ArrayList<String>();
+            fields.add("count");
+            try {
+                sql0 = "SELECT  COUNT(DISTINCT event_no) as count FROM json_archives WHERE  pack_type=1 AND org_code='" + orgCode + "' AND " + dateField +
+                        " BETWEEN '" + start + " 00:00:00' AND '" + end + " 23:59:59' and delay <=" + warning.getPeInTime() ;
 
-            String sql1 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=1 AND pack_type=1 AND " + dateField +
-                    " BETWEEN '" + start + " 00:00:00' AND '" + end + " 23:59:59' and delay <=" + warning.getHospitalInTime();
+                List<Map<String, Object>> resultSet0 = elasticSearchUtil.findBySql(fields, sql0);
+                for (Map<String, Object> orgData : resultSet0) {
+                    double newValue = (double) orgData.get("count");
+                    totalInTime +=newValue;
+                }
 
-            String sql2 = "SELECT COUNT(DISTINCT event_no) FROM json_archives WHERE event_type=0 AND pack_type=1 AND " + dateField +
-                    " BETWEEN '" + start + " 00:00:00' AND '" + end + " 23:59:59' and delay <=" + warning.getOutpatientInTime();
-
-            ResultSet resultSet0 = elasticSearchUtil.findBySql(sql0);
-            ResultSet resultSet1 = elasticSearchUtil.findBySql(sql1);
-            ResultSet resultSet2 = elasticSearchUtil.findBySql(sql2);
-            resultSet0.next();
-            resultSet1.next();
-            resultSet2.next();
-            double outpatientInTime = new Double(resultSet2.getObject("COUNT(DISTINCT event_no)").toString());//门诊及时数
-            double inpatientInTime = new Double(resultSet1.getObject("COUNT(DISTINCT event_no)").toString());//住院及时数
-            double examInTime = new Double(resultSet0.getObject("COUNT(DISTINCT event_no)").toString());//体检及时数
-            totalInTime = outpatientInTime + inpatientInTime + examInTime; // //就诊及时性
-            logger.info("平台就诊及时人数 去重复：" + (System.currentTimeMillis() - starttime) + "ms");
-        } catch (Exception e) {
-            if (!"Error".equals(e.getMessage())) {
-                e.printStackTrace();
+                logger.info("平台就诊及时人数 去重复：" + (System.currentTimeMillis() - starttime) + "ms");
+            } catch (Exception e) {
+                if (!"Error".equals(e.getMessage())) {
+                    e.printStackTrace();
+                }
             }
         }
         return totalInTime;
@@ -481,6 +477,8 @@ public class DataQualityHomeService extends BaseJpaService {
         for(Map<String,Object> map:list){
             map.put("dataset_name", redisClient.get("std_data_set_" + map.get("version") + ":" + map.get("dataset") + ":name"));
         }
+        DataQualityBaseService dataQualityBaseService = getInstance(DqDataType.create(1));
+        dataQualityBaseService.comparator(list,"count",1);//降序排序
         return list;
     }
 
@@ -523,6 +521,9 @@ public class DataQualityHomeService extends BaseJpaService {
         for(Map<String,Object> map:list){
             map.put("metadata_name", redisClient.get("std_meta_data_" + map.get("version") + ":" + map.get("dataset")+"."+ map.get("metadata")+ ":name"));
         }
+        DataQualityBaseService dataQualityBaseService = getInstance(DqDataType.create(1));
+        dataQualityBaseService.comparator(list,"count",1);//降序排序
         return list;
     }
+
 }

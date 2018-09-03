@@ -284,7 +284,7 @@ public class DataCorrectService extends DataQualityBaseService {
             }
         }
         //排序
-        comparator(list);
+        rateComparator(list);
         //添加总计
         if (totalHospitalNum !=0) {
             Map<String, Object> totalMap = genTotalData("上饶市", totalNum, totalHospitalNum);
@@ -334,7 +334,7 @@ public class DataCorrectService extends DataQualityBaseService {
             }
         }
         //排序
-        comparator(list);
+        rateComparator(list);
         //添加总计
         if (totalHospitalNum !=0) {
             Map<String, Object> totalMap = genTotalData("全部机构", totalNum, totalHospitalNum);

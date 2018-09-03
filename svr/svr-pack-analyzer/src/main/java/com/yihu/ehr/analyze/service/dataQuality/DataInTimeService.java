@@ -51,46 +51,51 @@ public class DataInTimeService extends DataQualityBaseService {
      * @param end
      * @return
      */
-    public Map<String, Object> getInTimeMap(Integer dataLevel,Integer eventType, String dateField, String start, String end, String orgArea) {
+    public Map<String, Object> getInTimeMap(Integer dataLevel, String dateField, String start, String end, String orgArea) {
         Map<String, Object> resMap = new HashMap<>();
-        double totalInTime = 0;
-        //初始化 及时率预警信息
-        DqPaltformReceiveWarning warning = dqPaltformReceiveWarningDao.findByOrgCode(defaultOrgCode);
-        long starttime = System.currentTimeMillis();
-        String sql0 = "";
-        List<String> fields = new ArrayList<String>();
-        fields.add("count");
-        try {
-            if (StringUtils.isNotEmpty(orgArea) ) {
-                fields.add("org_code");
-                sql0 = "SELECT  COUNT(DISTINCT event_no) as count,org_code FROM json_archives WHERE event_type=" + eventType + " AND pack_type=1 AND org_area='" + orgArea + "' AND " + dateField +
-                        " BETWEEN '" + start + " 00:00:00' AND '" + end + " 23:59:59' and delay <=" + warning.getPeInTime() + " GROUP BY org_code";
-            } else if (  dataLevel ==0 && StringUtils.isEmpty(orgArea)){
-                fields.add("org_area");
-                sql0 = "SELECT  COUNT(DISTINCT event_no) as count,org_area FROM json_archives WHERE event_type=" + eventType + " AND pack_type=1 AND " + dateField +
-                        " BETWEEN '" + start + " 00:00:00' AND '" + end + " 23:59:59' and delay <=" + warning.getPeInTime() + " GROUP BY org_area";
-            }else  if (  dataLevel ==1 && StringUtils.isEmpty(orgArea)){
-                fields.add("org_code");
-                sql0 = "SELECT  COUNT(DISTINCT event_no) as count,org_area FROM json_archives WHERE event_type=" + eventType + " AND pack_type=1 AND " + dateField +
-                        " BETWEEN '" + start + " 00:00:00' AND '" + end + " 23:59:59' and delay <=" + warning.getPeInTime() + " GROUP BY org_code";
-
+        //获取有数据的医院code列表
+        List<String> orgList = hasDataHospital(dateField, start, end);
+        for (String orgCode : orgList) {
+            //初始化 及时率预警信息
+            DqPaltformReceiveWarning warning = dqPaltformReceiveWarningDao.findByOrgCode(orgCode);
+            if (warning == null) {
+                warning = dqPaltformReceiveWarningDao.findByOrgCode(defaultOrgCode);
             }
+            long starttime = System.currentTimeMillis();
+            String sql0 = "";
+            List<String> fields = new ArrayList<String>();
+            fields.add("count");
+            fields.add("org_code");
+            try {
 
-            List<Map<String, Object>> resultSet0 = elasticSearchUtil.findBySql(fields, sql0);
+                if (StringUtils.isNotEmpty(orgArea)) {
+                    sql0 = "SELECT  COUNT(DISTINCT event_no) as count,org_code FROM json_archives WHERE  pack_type=1 AND org_area='" + orgArea + "' AND " + dateField +
+                            " BETWEEN '" + start + " 00:00:00' AND '" + end + " 23:59:59' and delay <=" + warning.getPeInTime() + " GROUP BY org_code";
+                } else {
+                    sql0 = "SELECT  COUNT(DISTINCT event_no) as count,org_code FROM json_archives WHERE  pack_type=1 AND " + dateField +
+                            " BETWEEN '" + start + " 00:00:00' AND '" + end + " 23:59:59' and delay <=" + warning.getPeInTime() + " GROUP BY org_code";
+                }
 
-            if (resultSet0 != null && resultSet0.size() > 0) {
-                for (Map<String, Object> map : resultSet0) {
-                    if (StringUtils.isNotEmpty(orgArea) || ( dataLevel ==1 && StringUtils.isEmpty(orgArea))) {
-                        resMap.put(map.get("org_code").toString(), map.get("count"));
-                    } else {
-                        resMap.put(map.get("org_area").toString(), map.get("count"));
+                List<Map<String, Object>> resultSet0 = elasticSearchUtil.excute( sql0);
+                for (Map<String, Object> orgData : resultSet0) {
+                    if (dataLevel == 0) {
+                        //区域级别分组
+                        String org = orgData.get("org_code").toString();
+                        double newValue = (double) orgData.get("count");
+                        String area = redisClient.get("organizations:" + org + ":area");
+                        double oldValue = resMap.get(area) == null ? 0 : (double) resMap.get(area);
+                        resMap.put(area, oldValue + newValue);
+                    } else if (dataLevel == 1) {
+                        //机构级别分组
+                        resMap.put(orgData.get("org_code").toString(), orgData.get("count"));
                     }
                 }
-            }
-            logger.info("平台就诊及时人数 去重复：" + (System.currentTimeMillis() - starttime) + "ms");
-        } catch (Exception e) {
-            if (!"Error".equals(e.getMessage())) {
-                e.printStackTrace();
+
+                logger.info("平台就诊及时人数 去重复：" + (System.currentTimeMillis() - starttime) + "ms");
+            } catch (Exception e) {
+                if (!"Error".equals(e.getMessage())) {
+                    e.printStackTrace();
+                }
             }
         }
         return resMap;
@@ -104,28 +109,19 @@ public class DataInTimeService extends DataQualityBaseService {
      * @param end
      * @return
      */
-    public Map<String, Object> getInTimeMap(Integer dataLevel,String dateField, String start, String end, String orgArea) {
+    public Map<String, Object> getInTimeDataMap(Integer dataLevel, String dateField, String start, String end, String orgArea) {
         Map<String, Object> resMap = new HashMap<>();
-        double totalAreaCout = 0;//总计
-        double totalInTime = 0;//就诊及时数
-        //初始化 及时率预警信息
-        DqPaltformReceiveWarning warning = dqPaltformReceiveWarningDao.findByOrgCode(defaultOrgCode);
+        double totalInTime = 0;//总计就诊及时数
         long starttime = System.currentTimeMillis();
         //获取及时数组
-        Map<String, Object> outPatientInTimeMap = getInTimeMap(dataLevel,0, dateField, start, end, orgArea); //门诊及时数
-        Map<String, Object> inPatientInTimeMap = getInTimeMap(dataLevel,1, dateField, start, end, orgArea); //住院及时数
-        Map<String, Object> examInTimeMap = getInTimeMap(dataLevel,2, dateField, start, end, orgArea); //体检及时数
+        resMap = getInTimeMap(dataLevel, dateField, start, end, orgArea); //就诊及时数
 
-        for (String key : outPatientInTimeMap.keySet()) {
-            double outpatientInTime = getDoubleValue(outPatientInTimeMap.get(key));
-            double inpatientInTime = getDoubleValue(inPatientInTimeMap.get(key));
-            double examInTime = getDoubleValue(examInTimeMap.get(key));
-            totalInTime = outpatientInTime + inpatientInTime + examInTime; // //就诊及时性
-            resMap.put(key, totalInTime);
-            totalAreaCout += totalInTime;
+        for (String key : resMap.keySet()) {
+            double outpatientInTime = getDoubleValue(resMap.get(key));
+            totalInTime += outpatientInTime; // //就诊及时性
         }
         //指定数据类型
-        if (dataLevel ==0) {
+        if (dataLevel == 0) {
             resMap.put("type", "org_area");
         } else {
             resMap.put("type", "org_code");
@@ -133,7 +129,7 @@ public class DataInTimeService extends DataQualityBaseService {
 
         //总计
         if (!resMap.isEmpty()) {
-            resMap.put("", totalAreaCout);
+            resMap.put("", totalInTime);
         }
         logger.info("平台就诊及时人数 去重复：" + (System.currentTimeMillis() - starttime) + "ms");
 
@@ -144,16 +140,16 @@ public class DataInTimeService extends DataQualityBaseService {
 
     /* ******************************** 区域层级模块相关 ***********************************/
     @Override
-    public List<Map<String, Object>> getAreaDataQuality(Integer dataLevel,String startDate, String endDate) throws Exception {
+    public List<Map<String, Object>> getAreaDataQuality(Integer dataLevel, String startDate, String endDate) throws Exception {
         String end = DateUtil.addDate(1, endDate, DateUtil.DEFAULT_DATE_YMD_FORMAT);
         Map<String, Object> resMap = null;
         List<Map<String, Object>> list = new ArrayList<>();
         double totalNum = 0;//平台总数
         double totalHospitalNum = 0;//医院总数
         //机构数据
-        List<Map<String, Object>> groupList = dataCorrectService.getOrgDataMap(dataLevel,"create_date", startDate, end, null);
+        List<Map<String, Object>> groupList = dataCorrectService.getOrgDataMap(dataLevel, "create_date", startDate, end, null);
         //平台接收数据量
-        Map<String, Object> platformDataGroup = getInTimeMap(dataLevel,"receive_date", startDate, endDate, null);
+        Map<String, Object> platformDataGroup = getInTimeDataMap(dataLevel, "receive_date", startDate, endDate, null);
         // 计算
         for (Map<String, Object> map : groupList) {
             resMap = new HashMap<String, Object>();
@@ -182,9 +178,9 @@ public class DataInTimeService extends DataQualityBaseService {
             }
         }
         //排序
-        comparator(list);
+        rateComparator(list);
         //添加总计
-        if (totalHospitalNum !=0) {
+        if (totalHospitalNum != 0) {
             Map<String, Object> totalMap = genTotalData("上饶市", totalNum, totalHospitalNum);
             list.add(0, totalMap);
         }
@@ -192,16 +188,16 @@ public class DataInTimeService extends DataQualityBaseService {
     }
 
     @Override
-    public List<Map<String, Object>> getOrgDataQuality(Integer dataLevel,String areaCode, String startDate, String endDate) throws Exception {
+    public List<Map<String, Object>> getOrgDataQuality(Integer dataLevel, String areaCode, String startDate, String endDate) throws Exception {
         String end = DateUtil.addDate(1, endDate, DateUtil.DEFAULT_DATE_YMD_FORMAT);
         Map<String, Object> resMap = null;
         List<Map<String, Object>> list = new ArrayList<>();
         double totalNum = 0;//平台总数
         double totalHospitalNum = 0;//医院总数
         //机构数据
-        List<Map<String, Object>> groupList = dataCorrectService.getOrgDataMap(dataLevel,"create_date", startDate, end, areaCode);
+        List<Map<String, Object>> groupList = dataCorrectService.getOrgDataMap(dataLevel, "create_date", startDate, end, areaCode);
         //平台接收数据量
-        Map<String, Object> platformDataGroup = getInTimeMap(dataLevel,"receive_date", startDate, endDate, areaCode);
+        Map<String, Object> platformDataGroup = getInTimeDataMap(dataLevel, "receive_date", startDate, endDate, areaCode);
         // 计算
         for (Map<String, Object> map : groupList) {
             resMap = new HashMap<String, Object>();
@@ -230,9 +226,9 @@ public class DataInTimeService extends DataQualityBaseService {
             }
         }
         //排序
-        comparator(list);
+        rateComparator(list);
         //添加总计
-        if (totalHospitalNum !=0) {
+        if (totalHospitalNum != 0) {
             Map<String, Object> totalMap = genTotalData("全部机构", totalNum, totalHospitalNum);
             list.add(0, totalMap);
         }

@@ -99,7 +99,7 @@ public class DataQualityHomeEndpoint extends EnvelopRestEndPoint {
             @RequestParam(value = "orgArea", required = false) String orgArea,
             @ApiParam(name = "orgCode", value = "机构代码")
             @RequestParam(value = "orgCode", required = false) String orgCode,
-            @ApiParam(name = "dataType", value = "数据维度  （0: 完整性，1:准确性）")
+            @ApiParam(name = "dataType", value = "数据维度  （0: 完整性，2:准确性）")
             @RequestParam(value = "dataType", required = false) Integer dataType,
             @ApiParam(name = "start", value = "开始时间，（接收时间）")
             @RequestParam(value = "start", required = false) String start,
@@ -125,7 +125,7 @@ public class DataQualityHomeEndpoint extends EnvelopRestEndPoint {
             @RequestParam(value = "orgCode", required = false) String orgCode,
             @ApiParam(name = "dataset", value = "数据集")
             @RequestParam(value = "dataset", required = false) String dataset,
-            @ApiParam(name = "dataType", value = "数据维度  （0: 完整性，1:准确性）")
+            @ApiParam(name = "dataType", value = "数据维度  （0: 完整性，2:准确性）")
             @RequestParam(value = "dataType", required = false) Integer dataType,
             @ApiParam(name = "start", value = "开始时间，（接收时间）")
             @RequestParam(value = "start", required = false) String start,
@@ -150,7 +150,7 @@ public class DataQualityHomeEndpoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = "bulkUpDateOrgArea", method = RequestMethod.GET)
     @ApiOperation(value = "批量更新机构关联的区域编码(通过org_code字段更新org_area字段")
-    public String bulkUploadOrgArea(
+    public long bulkUploadOrgArea(
             @ApiParam(name = "index", value = "索引")
             @RequestParam(value = "index", required = true) String index,
             @ApiParam(name = "type", value = "type")
@@ -159,7 +159,7 @@ public class DataQualityHomeEndpoint extends EnvelopRestEndPoint {
             @RequestParam(value = "filters", required = false) String filters
     ) throws Exception {
         long result = dataQualityHomeService.bulkUpdateOrgArea(index, type, filters);
-        return "本次更新总数："+result;
+        return result;
     }
 
 }
