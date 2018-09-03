@@ -76,7 +76,7 @@ public class DataInTimeService extends DataQualityBaseService {
                             " BETWEEN '" + start + " 00:00:00' AND '" + end + " 23:59:59' and delay <=" + warning.getPeInTime() + " GROUP BY org_code";
                 }
 
-                List<Map<String, Object>> resultSet0 = elasticSearchUtil.excute( sql0);
+                List<Map<String, Object>> resultSet0 = elasticSearchUtil.findBySql(fields, sql0);
                 for (Map<String, Object> orgData : resultSet0) {
                     if (dataLevel == 0) {
                         //区域级别分组

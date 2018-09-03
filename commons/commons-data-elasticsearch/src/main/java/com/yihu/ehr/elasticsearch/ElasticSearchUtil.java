@@ -1,9 +1,6 @@
 package com.yihu.ehr.elasticsearch;
 
 import com.alibaba.druid.pool.DruidDataSource;
-import com.alibaba.druid.sql.ast.SQLExpr;
-import com.alibaba.druid.sql.ast.expr.SQLQueryExpr;
-import com.alibaba.druid.sql.parser.SQLExprParser;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequestBuilder;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
@@ -34,14 +31,6 @@ import org.elasticsearch.search.aggregations.metrics.sum.SumBuilder;
 import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortBuilder;
 import org.elasticsearch.search.sort.SortOrder;
-import org.nlpcn.es4sql.domain.Select;
-import org.nlpcn.es4sql.jdbc.ObjectResult;
-import org.nlpcn.es4sql.jdbc.ObjectResultsExtractor;
-import org.nlpcn.es4sql.parse.ElasticSqlExprParser;
-import org.nlpcn.es4sql.parse.SqlParser;
-import org.nlpcn.es4sql.query.AggregationQueryAction;
-import org.nlpcn.es4sql.query.DefaultQueryAction;
-import org.nlpcn.es4sql.query.SqlElasticSearchRequestBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -505,62 +494,6 @@ public class ElasticSearchUtil {
         }
     }
 
-    public List<Map<String, Object>> excute(String sql) {
-        List<Map<String, Object>> saveModels = new ArrayList<>();
-        TransportClient client = elasticSearchPool.getClient();
-        try {
-            SQLExprParser parser = new ElasticSqlExprParser(sql);
-            SQLExpr expr = parser.expr();
-            SQLQueryExpr queryExpr = (SQLQueryExpr) expr;
-//            if (parser.getLexer().token() != Token.EOF) {
-//                throw new ParserException("illegal sql expr : " + sql);
-//            }
-            Select select = null;
-            select = new SqlParser().parseSelect(queryExpr);
-
-            //通过抽象语法树，封装成自定义的Select，包含了select、from、where group、limit等
-            AggregationQueryAction action = null;
-            DefaultQueryAction queryAction = null;
-            SqlElasticSearchRequestBuilder requestBuilder = null;
-            if (select.isAgg) {
-                //包含计算的的排序分组的
-                action = new AggregationQueryAction(client, select);
-                requestBuilder = action.explain();
-            } else {
-                //封装成自己的Select对象
-                queryAction = new DefaultQueryAction(client, select);
-                requestBuilder = queryAction.explain();
-            }
-            SearchResponse response = (SearchResponse) requestBuilder.get();
-            Object queryResult = null;
-            if(sql.toUpperCase().indexOf("GROUP")!=-1||sql.toUpperCase().indexOf("SUM")!=-1){
-                queryResult = response.getAggregations();
-            }else{
-                queryResult = response.getHits();
-            }
-            ObjectResult temp = new ObjectResultsExtractor(true, true, true).extractResults(queryResult, true);
-            List<String> heads = temp.getHeaders();
-            temp.getLines().stream().forEach(one -> {
-                try {
-                    Map<String, Object> saveModel = new HashMap<>();
-                    for (int i = 0; i < one.size(); i++) {
-                        String key = null;
-                        Object value = one.get(i);
-                        if(heads.get(i).startsWith("_")){
-                            continue;
-                        }
-                        saveModel.put(key,value);
-                    }
-                    saveModels.add(saveModel);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return saveModels;
-    }
 
     /**
      * 根据SQL查找数据
