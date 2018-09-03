@@ -486,6 +486,30 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
 
     }
 
+    @RequestMapping(value = ServiceApi.Packages.Status, method = RequestMethod.PUT)
+    @ApiOperation(value = "根据条件批量修改档案包解析状态", notes = "根据条件批量修改档案包解析状态")
+    public long bulkUpdate(String filters){
+        long count = elasticSearchUtil.count(INDEX, TYPE, filters);
+        Page<Map<String, Object>> result = elasticSearchUtil.page(INDEX, TYPE, filters, 1, 10000);
+        while (CollectionUtils.isNotEmpty(result.getContent())) {
+            List<Map<String, Object>> updateSourceList = new ArrayList<>();
+            result.forEach(item -> {
+                Map<String, Object> updateSource = new HashMap<>();
+                updateSource.put("_id", item.get("_id"));
+                updateSource.put("analyze_status",0);
+                updateSource.put("fail_count",0);
+                updateSource.put("archive_status",0);
+                updateSource.put("analyze_fail_count",0);
+                updateSourceList.add(updateSource);
+            });
+            if (!updateSourceList.isEmpty()) {
+                elasticSearchUtil.bulkUpdate(INDEX, TYPE, updateSourceList);
+            }
+        }
+        return count;
+    }
+
+
     //-------------------------------------------------
 
     /*@RequestMapping(value = ServiceApi.Packages.Migrate, method = RequestMethod.POST)
