@@ -489,13 +489,13 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Packages.Status, method = RequestMethod.PUT)
     @ApiOperation(value = "将接收时间为某段时间的结构化档案,状态更改为待解析", notes = "将接收时间为某段时间的结构化档案")
     public long bulkUpdate(@ApiParam(name = "startDate", value = "开始时间（eg：2017-01-01 00:00:00）", required = false )
-                           @RequestParam(value = "startDate") String startDate,
+                           @RequestParam(value = "startDate",required = false) String startDate,
                            @ApiParam(name = "endDate", value = "结束时间（eg：2017-01-01 00:00:00）", required = false )
-                           @RequestParam(value = "endDate") String endDate,
+                           @RequestParam(value = "endDate",required = false) String endDate,
                            @ApiParam(name = "orgCode", value = "机构编码", required = false )
-                           @RequestParam(value = "orgCode") String orgCode,
+                           @RequestParam(value = "orgCode",required = false) String orgCode,
                            @ApiParam(name = "packType", value = "包类型", required = false )
-                           @RequestParam(value = "packType") String packType){
+                           @RequestParam(value = "packType",required = false) String packType){
         String filters = "archive_status<>0;";
         if(StringUtils.isNotBlank(startDate)){
             filters+="receive_date>="+startDate+";";
