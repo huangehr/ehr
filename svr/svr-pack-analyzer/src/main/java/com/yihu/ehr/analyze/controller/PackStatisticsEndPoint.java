@@ -147,7 +147,9 @@ public class PackStatisticsEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "startDate", value = "开始日期")
             @RequestParam(name = "startDate") String startDate,
             @ApiParam(name = "endDate", value = "结束日期")
-            @RequestParam(name = "endDate") String endDate) throws Exception {
-        return statisticService.getReceiveNum(startDate, endDate);
+            @RequestParam(name = "endDate") String endDate,
+            @ApiParam(name = "orgArea", value = "区域代码")
+            @RequestParam(name = "orgArea", required = false) String orgArea) throws Exception {
+        return statisticService.getReceiveNum(startDate, endDate, orgArea);
     }
 }

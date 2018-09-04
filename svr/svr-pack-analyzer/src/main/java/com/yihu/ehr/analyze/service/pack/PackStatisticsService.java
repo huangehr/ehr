@@ -3,6 +3,7 @@ package com.yihu.ehr.analyze.service.pack;
 import com.yihu.ehr.elasticsearch.ElasticSearchPool;
 import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import com.yihu.ehr.query.BaseJpaService;
+import com.yihu.ehr.redis.client.RedisClient;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import org.apache.commons.lang.ObjectUtils;
@@ -11,15 +12,9 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.search.aggregations.AggregationBuilder;
-import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramBuilder;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
-import org.elasticsearch.search.aggregations.bucket.terms.LongTerms;
-import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
-import org.elasticsearch.search.aggregations.metrics.valuecount.InternalValueCount;
-import org.elasticsearch.search.aggregations.metrics.valuecount.ValueCountBuilder;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -43,6 +38,8 @@ public class PackStatisticsService extends BaseJpaService {
     private ElasticSearchPool elasticSearchPool;
     @Autowired
     private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private RedisClient redisClient;
     /**
      * getRecieveOrgCount 根据接收日期统计各个医院的数据解析情况
      *
@@ -928,16 +925,26 @@ public class PackStatisticsService extends BaseJpaService {
      * @return
      * @throws Exception
      */
-    public Envelop getReceiveNum(String startDate, String endDate) throws Exception {
+    public Envelop getReceiveNum(String startDate, String endDate, String orgArea) throws Exception {
         Envelop envelop = new Envelop();
-        List<Map<String, Object>> res = new ArrayList<>();
-        String city = getCurrentCity();
-        res = getAreaList(city);
+        List<Map<String, Object>> res  = getReceive(startDate, endDate ,orgArea);
         for(Map<String, Object> map : res){
-            map.put("receiveNum",getReceive(startDate, endDate, map.get("ID")+""));
-            map.put("analyzeNum",getAnalyzer(startDate, endDate, map.get("ID")+""));
-            map.put("uploadNum",getUpload(startDate, endDate, map.get("ID")+""));
+            if(StringUtils.isNotEmpty(orgArea)){
+                map.put("analyzeNum",getAnalyzer(startDate, endDate,"", map.get("org_code")+""));
+                map.put("uploadNum",getUpload(startDate, endDate, "", map.get("org_code")+""));
+            }else{
+                map.put("analyzeNum",getAnalyzer(startDate, endDate, map.get("org_area")+"",""));
+                map.put("uploadNum",getUpload(startDate, endDate, map.get("org_area")+"",""));
+            }
         }
+
+        Collections.sort(res, new Comparator<Map<String, Object>>() {
+            public int compare(Map<String, Object> o1, Map<String, Object> o2) {
+                Integer num1 = Double.valueOf(o1.get("receiveNum")+"").intValue();
+                Integer num2 = Double.valueOf(o2.get("receiveNum")+"").intValue();
+                return num2.compareTo(num1);
+            }
+        });
         envelop.setObj(res);
         envelop.setSuccessFlg(true);
         return envelop;
@@ -959,30 +966,61 @@ public class PackStatisticsService extends BaseJpaService {
         return jdbcTemplate.queryForList("select id,name from address_dict where pid = "+city);
     }
 
-    private long getReceive(String startDate, String endDate ,String area){
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("pack_type=1;");
-        stringBuilder.append("receive_date>=" + startDate + " 00:00:00;");
-        stringBuilder.append("receive_date<" + endDate + " 23:59:59;");
-        stringBuilder.append("org_area="+area+";");
-        return elasticSearchUtil.count("json_archives","info",stringBuilder.toString());
+    private List<Map<String,Object>> getReceive(String startDate, String endDate ,String area) throws Exception{
+        List<String> fields = new ArrayList<>();
+        fields.add("receiveNum");
+        String sql = "";
+        if(StringUtils.isNotEmpty(area)){
+            fields.add("org_code");
+            sql = "SELECT org_code ,COUNT(org_code) as receiveNum from json_archives/info where pack_type=1 and org_area='" + area + "' and " +
+                    "receive_date >='" + startDate + " 00:00:00' and receive_date <='" + endDate + " 23:59:59' group by org_code";
+        }else{
+            fields.add("org_area");
+            sql = "SELECT org_area ,COUNT(org_area) as receiveNum from json_archives/info where pack_type=1  and " +
+                    "receive_date >='" + startDate + " 00:00:00' and receive_date <='" + endDate + " 23:59:59' group by org_area";
+        }
+        List<Map<String, Object>>  resultList = elasticSearchUtil.findBySql(fields, sql);
+        //设置机构，区域名称
+        if (resultList != null && resultList.size() > 0) {
+            for (Map<String, Object> map : resultList) {
+                String name = "";
+                if (StringUtils.isNotEmpty(area)) {
+                    String code = (String) map.get("org_code");
+                    name = redisClient.get("organizations:" + code + ":name");
+                }else {
+                    String code = (String) map.get("org_area");
+                    name = redisClient.get("area:" + code + ":name");
+                }
+                map.put("name",name);
+            }
+        }
+        return resultList;
     }
 
-    private long getAnalyzer(String startDate, String endDate ,String area){
+    private long getAnalyzer(String startDate, String endDate ,String area, String orgCode){
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("archive_status=3;pack_type=1;");
         stringBuilder.append("parse_date>=" + startDate + " 00:00:00;");
         stringBuilder.append("parse_date<" + endDate + " 23:59:59;");
-        stringBuilder.append("org_area="+area+";");
+        if(StringUtils.isNotEmpty(area)){
+            stringBuilder.append("org_area="+area+";");
+        }
+        if(StringUtils.isNotEmpty(orgCode)){
+            stringBuilder.append("org_code="+orgCode+";");
+        }
         return elasticSearchUtil.count("json_archives","info",stringBuilder.toString());
     }
 
-    private long getUpload(String startDate, String endDate ,String area){
+    private long getUpload(String startDate, String endDate ,String area, String orgCode){
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("archive_status=3;pack_type=1;");
         stringBuilder.append("create_date>=" + startDate + " 00:00:00;");
         stringBuilder.append("create_date<" + endDate + " 23:59:59;");
-        stringBuilder.append("org_area="+area+";");
-        return elasticSearchUtil.count("upload","info",stringBuilder.toString());
+        if(StringUtils.isNotEmpty(area)){
+            stringBuilder.append("org_area="+area+";");
+        }
+        if(StringUtils.isNotEmpty(orgCode)){
+            stringBuilder.append("org_code="+orgCode+";");
+        }
+        return elasticSearchUtil.count("upload","record",stringBuilder.toString());
     }
 }
