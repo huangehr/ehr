@@ -493,7 +493,9 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
                            @ApiParam(name = "endDate", value = "结束时间（eg：2017-01-01 00:00:00）", required = false )
                            @RequestParam(value = "endDate") String endDate,
                            @ApiParam(name = "orgCode", value = "机构编码", required = false )
-                           @RequestParam(value = "orgCode") String orgCode){
+                           @RequestParam(value = "orgCode") String orgCode,
+                           @ApiParam(name = "packType", value = "包类型", required = false )
+                           @RequestParam(value = "packType") String packType){
         String filters = "archive_status<>0;";
         if(StringUtils.isNotBlank(startDate)){
             filters+="receive_date>="+startDate+";";
@@ -503,6 +505,9 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         }
         if(StringUtils.isNotBlank(orgCode)){
             filters += "org_code="+orgCode+";";
+        }
+        if(StringUtils.isNotBlank(packType)){
+            filters += "pack_type="+packType+";";
         }
         long count = elasticSearchUtil.count(INDEX, TYPE, filters);
         Page<Map<String, Object>> result = elasticSearchUtil.page(INDEX, TYPE, filters, 1, 10000);
