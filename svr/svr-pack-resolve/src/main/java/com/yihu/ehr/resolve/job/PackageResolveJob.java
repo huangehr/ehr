@@ -73,8 +73,6 @@ public class PackageResolveJob implements InterruptableJob {
                 //判断是否已经解析成功,或者正在解析(由于部署多个服务,运行的时间差可能导致多次加入队列,造成多次解析)
                 Map<String, Object> map = statusReportService.getJsonArchiveById(pack.get_id());
                 if(map != null && ("3".equals(map.get("archive_status")+"") || "1".equals(map.get("archive_status")+""))){
-                    logger.error(map.get("archive_status")+"");
-                    logger.error("==================stop archive:"+map.get("_id"));
                     return;
                 }
                 PackResolveLogger.info("开始入库:" + pack.get_id() + ", Timestamp:" + new Date());
@@ -148,6 +146,7 @@ public class PackageResolveJob implements InterruptableJob {
         pack.setOrg_area(resourceBucket.getBasicRecord(ResourceCells.ORG_AREA));
         pack.setPatient_name(resourceBucket.getBasicRecord(ResourceCells.PATIENT_NAME));
         pack.setIdcard_no(resourceBucket.getBasicRecord(ResourceCells.DEMOGRAPHIC_ID));
+        pack.setVersion(originalPackage.getCdaVersion());
         return originalPackage;
     }
 

@@ -26,6 +26,7 @@ public class EsSimplePackage implements Serializable {
     private Integer event_type;//事件类型
     private String patient_name;//病人姓名
     private String idcard_no;//身份证号
+    private String version;//版本号
 
 
     public String get_id() {
@@ -147,5 +148,13 @@ public class EsSimplePackage implements Serializable {
 
     public void setOrg_area(String org_area) {
         this.org_area = org_area;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 }
