@@ -40,9 +40,9 @@ public class MasterResourceDao {
             String profileId = originalPackage.getProfileId().toString();
             String rowkey = profileId.substring(2,profileId.length());
             Map<String, String> originResult = hbaseDao.get(ResourceCore.MasterTable, rowkey, resourceBucket.getdFamily());
-            /*if (!originResult.isEmpty()) {
+            if (!originResult.isEmpty()) {
                 throw new IllegalJsonFileException("Please upload the struct package(" + rowkey + ") first !");
-            }*/
+            }
         }
         String rowKey = resourceBucket.getId();
         TableBundle bundle = new TableBundle();
